@@ -1,4 +1,5 @@
-package com.sd_editions.collatex;
+//Make this part of the same package so we can test the protected methods
+package com.sd_editions.collatex.block;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -111,7 +112,6 @@ public class WordTest extends TestCase
 	  word1.removeEndParent();
 	  assertNull(word1.getEndParent());
 	}
-<<<<<<< HEAD:src/test/java/com/sd_editions/collatex/WordTest.java
 
 	public void testFirstChild() {
 	  String wordContent = new String("test content");
@@ -236,6 +236,7 @@ public class WordTest extends TestCase
 	 */
 	public void testPreviousSibling() {
 	  String wordContent = new String("test content");
+	  Word word0 = new Word(wordContent);
 	  Word word1 = new Word(wordContent);
 	  Word word2 = new Word(wordContent);
 	  Word word3 = new Word(wordContent);
@@ -257,6 +258,4 @@ public class WordTest extends TestCase
 	  assertEquals(word2.getNextSibling(), word1);
 
 	}
-=======
->>>>>>> 458ee4e... More changes to Block.java and it's test suite.:src/test/java/com/sd_editions/collatex/WordTest.java
 }
