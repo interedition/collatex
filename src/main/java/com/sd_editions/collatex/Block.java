@@ -5,6 +5,7 @@ import java.util.HashMap;
 /**
  * Our basic block class.
  * This shouldn't be used itself, use one of it's subclasses or create your own
+ * Quick check for svn usage
  *
  */
 public abstract class Block {
