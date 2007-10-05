@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.block;
+package com.sd_editions.collatex.Block;
 /**
  *
  *

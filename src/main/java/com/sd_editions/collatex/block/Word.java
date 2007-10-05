@@ -1,7 +1,6 @@
-package com.sd_editions.collatex.block;
+package com.sd_editions.collatex.Block;
 
 import java.lang.String;
-import java.util.HashMap;
 /**
  *
  *
@@ -24,6 +23,10 @@ public class Word extends Block {
 
   public String getContent() {
 	return this.content;
+  }
+
+  public String toString() {
+	return "<w>" + this.content + "</w>";
   }
 
 }

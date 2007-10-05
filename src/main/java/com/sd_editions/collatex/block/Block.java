@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.block;
+package com.sd_editions.collatex.Block;
 
 import java.lang.String;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ public abstract class Block {
   /* The Block's name */
   private String name;
   /* Any attributes associated with this block */
-  private HashMap attributes;
+  private HashMap<String, String> attributes;
   /* Basic XML like association with other Blocks */
   private Block firstChild;
   private Block lastChild;
@@ -151,6 +151,22 @@ public abstract class Block {
 
   protected void removeEndParent() {
 	this.endParent = null;
+  }
+
+  public void setAttribute(String key, String value) {
+	this.attributes.put(key, value);
+  }
+
+  public String getAttribute(String key) {
+	return this.attributes.get(key);
+  }
+
+  public String removeAttribute(String key) {
+	return this.attributes.remove(key);
+  }
+
+  public int numberOfAttributes() {
+	return this.attributes.size();
   }
 
 }
