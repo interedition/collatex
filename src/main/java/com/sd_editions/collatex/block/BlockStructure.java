@@ -15,6 +15,19 @@ public class BlockStructure {
   }
 
   /**
+   * @param root The root block for this structure
+   *
+   * @throws BlockStructureCascadeException thrown if the structure already contains a root element
+   */
+  public void setRootBlock(Block root) throws BlockStructureCascadeException {
+	if (rootBlock!=null) {
+	  throw new BlockStructureCascadeException();
+	  return;
+	}
+	setRootBlock(root, false);
+  }
+
+  /**
    * Set the root Block for this structure
    *
    * @param root The root block for this structure
@@ -24,7 +37,7 @@ public class BlockStructure {
    *		 cascade is set to false
    *
    */
-  public void setRootBlock(Block root, boolean cascade = false) throws BlockStructureCascadeException {
+  public void setRootBlock(Block root, boolean cascade) throws BlockStructureCascadeException {
 	if (rootBlock==null) {
 	  this.rootBlock = root;
 	} else if (cascade) {
@@ -36,7 +49,19 @@ public class BlockStructure {
   }
 
   /**
-   * Set's the child block or a block
+   * Set's the child block
+   *
+   * @param parent The parent Block to set a child of
+   * @param child The child Block
+   *
+   * @throws BlockStructureCascadeException thrown if the parent Block already contains a child element and
+   */
+  public void setChildBlock(Block parent, Block child) {
+	setChildBlock(parent, child, false);
+  }
+
+  /**
+   * Set's the child block 
    *
    * @param parent The parent block to set a child of
    * @param child The child block
@@ -45,8 +70,9 @@ public class BlockStructure {
    * @throws BlockStructureCascadeException thrown if the parent Block already contains a child element and
    *		 cascade is set to false
    */
-  public void setChildBlock(Block parent, Block child, boolean cascade = false) {
+  public void setChildBlock(Block parent, Block child, boolean cascade) {
 	child.setStartParent(parent);
+	child.setEndParent(parent);
   }
 
 }
