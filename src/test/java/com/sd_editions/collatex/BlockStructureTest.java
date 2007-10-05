@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Unit test for Word Word.
+ * Unit test for BlockStructure and it's containing Blocks.
  */
 public class BlockStructureTest extends TestCase
 {
@@ -45,14 +45,14 @@ public class BlockStructureTest extends TestCase
 
 	  //Create our BlockStructure to hold the words
 	  BlockStructure document = new BlockStructure();
-	  assertEquals(document.numberOfBlocks(), 0);
+	  assertEquals(document.getNumberOfBlocks(), 0);
 	  try {
 		document.setRootBlock(word1);
 	  } catch (BlockStructureCascadeException e) {
 		fail("Could not set root block to word1." + e);
 	  }
 	  //Make sure we have only 1 block in the BlockStructureCascadeException
-	  assertEquals(document.numberOfBlocks(), 1);
+	  assertEquals(document.getNumberOfBlocks(), 1);
 	  //Word 1 shouldn't have any 
 	  this.checkBlockHasNoRelations(word1);
 	  //Word 2 shouldn't have any 
@@ -61,7 +61,7 @@ public class BlockStructureTest extends TestCase
 	  this.checkBlockHasNoRelations(word3);
 	  //Set word1 to the root element
 	  document.setChildBlock(word1, word2);
-	  assertEquals(document.numberOfBlocks(), 2);
+	  assertEquals(document.getNumberOfBlocks(), 2);
 	  //Make sure that word1 actually has word2 as it first and last child
 	  assertTrue(word1.hasFirstChild());
 	  assertTrue(word1.hasLastChild());
@@ -82,7 +82,7 @@ public class BlockStructureTest extends TestCase
 
 	  //Now add word3 as a child of word1, it should be added as a next sibling of word2
 	  document.setChildBlock(word1, word3);
-	  assertEquals(document.numberOfBlocks(), 3);
+	  assertEquals(document.getNumberOfBlocks(), 3);
 	  //Let's check word1 again, shouldn't have previous/next siblings or ancestors
 	  assertTrue(word1.hasFirstChild());
 	  assertTrue(word1.hasLastChild());
@@ -121,7 +121,7 @@ public class BlockStructureTest extends TestCase
 	  } catch (BlockStructureCascadeException e) {
 		fail("Could not remove word2 from word1: " + e);
 	  }
-	  assertEquals(document.numberOfBlocks(), 2);
+	  assertEquals(document.getNumberOfBlocks(), 2);
 	  assertTrue(word1.hasFirstChild());
 	  assertTrue(word1.hasLastChild());
 	  assertFalse(word1.hasStartParent());
@@ -160,7 +160,7 @@ public class BlockStructureTest extends TestCase
 	  } catch (BlockStructureCascadeException e) {
 	  }
 
-	  assertEquals(document.numberOfBlocks(), 0);
+	  assertEquals(document.getNumberOfBlocks(), 0);
 	  
 	  //Let's check the words have been left in a good state.
 	  //no of the words should have any relations to each other
@@ -182,10 +182,10 @@ public class BlockStructureTest extends TestCase
 	  } catch (BlockStructureCascadeException e) {
 	  }
 
-	  assertEquals(1, document.numberOfBlocks());
+	  assertEquals(1, document.getNumberOfBlocks());
 
 	  document.setChildBlock(word1, word2);
-	  assertEquals(2, document.numberOfBlocks());
+	  assertEquals(2, document.getNumberOfBlocks());
 	  assertTrue(word1.hasFirstChild());
 	  assertTrue(word1.hasLastChild());
 	  assertEquals(word1.getFirstChild(), word2);
@@ -198,7 +198,7 @@ public class BlockStructureTest extends TestCase
 
 	  //Set word3 as the child of word2
 	  document.setChildBlock(word2, word3);
-	  assertEquals(3, document.numberOfBlocks());
+	  assertEquals(3, document.getNumberOfBlocks());
 	  assertTrue(word2.hasFirstChild());
 	  assertTrue(word2.hasLastChild());
 	  assertEquals(word3, word2.getFirstChild());

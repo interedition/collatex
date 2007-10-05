@@ -4,12 +4,12 @@ import java.util.ListIterator;
 import java.lang.UnsupportedOperationException;
 import java.util.NoSuchElementException;
 
-public class BlockListIterator<E> implements ListIterator<E> {
+public class BlockStructureListIterator<E> implements ListIterator<E> {
 
   private BlockStructure bs;
   private Block currentBlock;
 
-  public BlockListIterator(BlockStructure bs) {
+  public BlockStructureListIterator(BlockStructure bs) {
 	this.bs = bs;
 	currentBlock = null;
   }
@@ -22,7 +22,7 @@ public class BlockListIterator<E> implements ListIterator<E> {
   }
 
   public boolean hasNext() {
-	if (currentBlock==null && bs.numberOfBlocks()>0) {
+	if (currentBlock==null && bs.getNumberOfBlocks()>0) {
 	  return true;
 	} else if (currentBlock.hasNextSibling() || currentBlock.hasFirstChild()) {
 	  return true;
@@ -38,7 +38,7 @@ public class BlockListIterator<E> implements ListIterator<E> {
   public boolean hasPrevious() {
 	//If the currentBlock is null, check we actually have some
 	//blocks in the structure is so then there is a previous!
-	if (currentBlock==null && bs.numberOfBlocks()>0) {
+	if (currentBlock==null && bs.getNumberOfBlocks()>0) {
 	  return true;
 	} else if (currentBlock.hasPreviousSibling() || currentBlock.hasStartParent()) {
 	  return true;
@@ -49,7 +49,6 @@ public class BlockListIterator<E> implements ListIterator<E> {
 
   /*
    * Returns the next Block in this BlockStructure.
-   * If we are at the end of the BlockStructure it returns the first Block in the BlockStructure
    *
    * @return The next Block in the BlockStructure
    */
@@ -76,8 +75,6 @@ public class BlockListIterator<E> implements ListIterator<E> {
 
   /*
    * Returns the previous Block in the BlockStructure.
-   * If we are at the start of the BlockStructure it will return the last Block
-   * in the BlockStructure
    *
    * @return The previous block
    */

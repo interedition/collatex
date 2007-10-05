@@ -43,6 +43,11 @@ public class SimpleInputPlugin implements IntInputPlugin {
 	while (token != StreamTokenizer.TT_EOF) {
 	  switch (token) {
 		case StreamTokenizer.TT_EOL:
+		  //Check we aren't actually at the end of the file
+		  if (st.nextToken() == StreamTokenizer.TT_EOF) {
+			st.pushBack();
+			break;
+		  }
 		  //Found an end of line
 		  lineCount++;
 		  Line nLine = new Line(lineCount);
@@ -61,25 +66,5 @@ public class SimpleInputPlugin implements IntInputPlugin {
 	//Close the file
 	is.close();
 	return document;
-  }
-
-
-  public static void main(String[] args) {
-	String filename = "examples/inputfiles/example1.txt";
-	BlockStructure document;
-	if (args.length==1) {
-	  filename = args[0];
-	}
-	SimpleInputPlugin ip = new SimpleInputPlugin(filename);
-	try {
-	  document = ip.readFile();
-	  System.out.println(document);
-	} catch (FileNotFoundException e) {
-	  System.out.println("Could not find example file");
-	} catch (IOException e) {
-	  System.out.println("Could not read example file");
-	} catch (BlockStructureCascadeException e) {
-	  System.out.println("Error creating block structure.");
-	}
   }
 }
