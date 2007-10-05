@@ -20,18 +20,14 @@ public class BlockStructure {
    * @throws BlockStructureCascadeException thrown if the structure already contains a root element
    */
   public void setRootBlock(Block root) throws BlockStructureCascadeException {
-	if (rootBlock!=null) {
-	  throw new BlockStructureCascadeException();
-	  return;
-	}
 	setRootBlock(root, false);
   }
 
   /**
    * Set the root Block for this structure
    *
-   * @param root The root block for this structure
-   * @param cascade If true then this will remove all blocks already in the structure if any exist, default's to false
+   * @param root The root Block for this structure
+   * @param cascade If true then this will remove all Blocks already in the structure if any exist, default's to false
    *
    * @throws BlockStructureCascadeException thrown if the structure already contains a root element and 
    *		 cascade is set to false
@@ -41,7 +37,7 @@ public class BlockStructure {
 	if (rootBlock==null) {
 	  this.rootBlock = root;
 	} else if (cascade) {
-	  //We're o.k. to remove all the containing blocks
+	  //We're o.k. to remove all the containing Blocks
 	  blocks.clear();
 	} else {
 	  throw new BlockStructureCascadeException();
@@ -50,29 +46,25 @@ public class BlockStructure {
 
   /**
    * Set's the child block
+   * If the parent Block already has a child block, simple add this to the next sibling of last child
    *
    * @param parent The parent Block to set a child of
    * @param child The child Block
    *
-   * @throws BlockStructureCascadeException thrown if the parent Block already contains a child element and
    */
   public void setChildBlock(Block parent, Block child) {
-	setChildBlock(parent, child, false);
-  }
-
-  /**
-   * Set's the child block 
-   *
-   * @param parent The parent block to set a child of
-   * @param child The child block
-   * @param cascade If true then this will remove all blocks already in the structure if any exist, default's to false
-   *
-   * @throws BlockStructureCascadeException thrown if the parent Block already contains a child element and
-   *		 cascade is set to false
-   */
-  public void setChildBlock(Block parent, Block child, boolean cascade) {
 	child.setStartParent(parent);
 	child.setEndParent(parent);
+	if (!parent.hasFirstChild()) {
+	  parent.setFirstChild(child);
+	  parent.setLastChild(child);
+	} else  {
+	  //Need to set the next sibling of the last child to this,
+	  //set the left sibling to that of the previous last child,
+	  //the right sibling of the previous last child
+	  child.setPreviousSibling(parent.getLastChild());
+	  child.getPreviousSibling().setNextSibling(child);
+	}
   }
 
 }

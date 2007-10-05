@@ -41,6 +41,14 @@ public abstract class Block {
 	return firstChild;
   }
 
+  public boolean hasFirstChild() {
+	if (this.firstChild==null) {
+	  return false;
+	} else {
+	  return true;
+	}
+  }
+
   protected void removeFirstChild() {
 	this.firstChild = null;
   }
@@ -51,6 +59,14 @@ public abstract class Block {
 
   public Block getLastChild() {
 	return this.lastChild;
+  }
+
+  public boolean hasLastChild() {
+	if (this.lastChild==null) {
+	  return false;
+	} else {
+	  return true;
+	}
   }
 
   protected void removeLastChild() {
@@ -65,6 +81,14 @@ public abstract class Block {
 	return this.nextSibling;
   }
 
+  public boolean hasNextSibling() {
+	if (this.nextSibling==null) {
+	  return false;
+	} else {
+	  return true;
+	}
+  }
+
   protected void removeNextSibling() {
 	this.nextSibling = null;
   }
@@ -75,6 +99,14 @@ public abstract class Block {
 
   public Block getPreviousSibling() {
 	return this.previousSibling;
+  }
+
+  public boolean hasPreviousSibling() {
+	if (this.previousSibling==null) {
+	  return false;
+	} else {
+	  return true;
+	}
   }
 
   protected void removePreviousSibling() {
@@ -89,6 +121,14 @@ public abstract class Block {
 	return this.startParent;
   }
 
+  public boolean hasStartParent() {
+	if (this.startParent==null) {
+	  return false;
+	} else {
+	  return true;
+	}
+  }
+
   protected void removeStartParent() {
 	this.startParent = null;
   }
@@ -99,6 +139,14 @@ public abstract class Block {
 
   public Block getEndParent() {
 	return this.endParent;
+  }
+
+  public boolean hasEndParent() {
+	if (this.endParent==null) {
+	  return false;
+	} else {
+	  return true;
+	}
   }
 
   protected void removeEndParent() {
