@@ -207,10 +207,10 @@ public class BlockStructure {
   /**
    * Returns a ListIterator that will iterate over this BlockStructure in an ordered manner.
    *
-   * @return BlockListIterator
+   * @return BlockStructureListIterator
    */
-  public BlockListIterator<? extends Block> listIterator() {
-	return new BlockListIterator(this);
+  public BlockStructureListIterator<? extends Block> listIterator() {
+	return new BlockStructureListIterator(this);
   }
 
   public String toString() {

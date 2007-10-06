@@ -67,4 +67,5 @@ public class SimpleInputPlugin implements IntInputPlugin {
 	is.close();
 	return document;
   }
+
 }
