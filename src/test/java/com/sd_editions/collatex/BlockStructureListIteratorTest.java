@@ -5,6 +5,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import java.util.NoSuchElementException;
+
 /**
  * Unit test for BlockStructureListIterator
  */
@@ -61,11 +63,61 @@ public class BlockStructureListIteratorTest extends TestCase
 	  //First get line
 	  assertEquals(line, it.next());
 	  assertTrue(it.hasNext());
+	  assertFalse(line + " should not have a previous element", it.hasPrevious());
+	  //Next should be word1
+	  assertEquals(word1, it.next());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Next should be word2
+	  assertEquals(word2, it.next());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Next should be word3
+	  assertEquals(word3, it.next());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Go back one, should get word2
+	  assertEquals(word2, it.previous());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Go back one, should get word1
+	  assertEquals(word1, it.previous());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Go back one, should get line 
+	  assertEquals(line, it.previous());
+	  assertTrue(it.hasNext());
 	  assertFalse(it.hasPrevious());
 	  //Next should be word1
 	  assertEquals(word1, it.next());
 	  assertTrue(it.hasNext());
 	  assertTrue(it.hasPrevious());
+	  //Next should be word2
+	  assertEquals(word2, it.next());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Next should be word3
+	  assertEquals(word3, it.next());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Next should be word4
+	  assertEquals(word4, it.next());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Next should be word5
+	  assertEquals(word5, it.next());
+	  assertTrue(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //Next should be word6
+	  assertEquals(word6, it.next());
+	  assertFalse(it.hasNext());
+	  assertTrue(it.hasPrevious());
+	  //We're at the end so it should throw an exception
+	  try {
+		it.next();
+		fail();
+	  } catch (NoSuchElementException e) {
+	  }
 	}
 }
 

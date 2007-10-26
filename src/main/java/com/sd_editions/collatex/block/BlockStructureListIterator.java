@@ -7,11 +7,13 @@ import java.util.NoSuchElementException;
 public class BlockStructureListIterator<E> implements ListIterator<E> {
 
   private BlockStructure bs;
-  private Block currentBlock;
+  private Block previousBlock;
+  private Block nextBlock;
 
   public BlockStructureListIterator(BlockStructure bs) {
 	this.bs = bs;
-	currentBlock = null;
+	this.previousBlock = null;
+	this.nextBlock = this.bs.getRootBlock();
   }
 
   /**
@@ -22,12 +24,10 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
   }
 
   public boolean hasNext() {
-	if (currentBlock==null && bs.getNumberOfBlocks()>0) {
-	  return true;
-	} else if (currentBlock.hasNextSibling() || currentBlock.hasFirstChild()) {
-	  return true;
-	} else {
+	if (nextBlock==null || bs.getNumberOfBlocks()==0) {
 	  return false;
+	} else {
+	  return true;
 	}
   }
 
@@ -36,11 +36,8 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
    * @return true if the BlockStructure has a previous Block
    */
   public boolean hasPrevious() {
-	//If the currentBlock is null, check we actually have some
-	//blocks in the structure is so then there is a previous!
-	if (currentBlock==null && bs.getNumberOfBlocks()>0) {
-	  return true;
-	} else if (currentBlock.hasPreviousSibling() || currentBlock.hasStartParent()) {
+	//Current block actually represents the next block in the iteration, so we need to set back
+	if (this.previousBlock!=null) {
 	  return true;
 	} else {
 	  return false;
@@ -53,17 +50,19 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
    * @return The next Block in the BlockStructure
    */
   public E next() {
-	if (this.currentBlock==null) {
-	  this.currentBlock = this.bs.getRootBlock();
-	  if (this.currentBlock==null) { throw new NoSuchElementException(); }
-	  return (E) this.currentBlock;
-	}
-	//If the current element doesn't have a first child or next sibling
-	if (!this.currentBlock.hasFirstChild() && !this.currentBlock.hasNextSibling()) {
+	if (this.nextBlock==null) {
 	  throw new NoSuchElementException();
 	}
-	this.currentBlock = this.currentBlock.getNextSibling();
-	return (E) this.currentBlock;
+	Block result = this.nextBlock;
+	this.previousBlock = this.getPreviousBlock(this.nextBlock);
+	if (this.nextBlock.hasFirstChild()) {
+	  this.nextBlock = this.nextBlock.getFirstChild();
+	} else if (this.nextBlock.hasNextSibling()) {
+	  this.nextBlock = this.nextBlock.getNextSibling();
+	} else {
+	  this.nextBlock = null;
+	}
+	return (E) result;
   }
 
   /**
@@ -79,7 +78,13 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
    * @return The previous block
    */
   public E previous() {
-	return null;
+	//Right the previous block is the previous previous of the next block
+	Block pBlock = this.getPreviousBlock(this.nextBlock);
+	Block ppBlock = this.getPreviousBlock(pBlock);
+	this.nextBlock = pBlock;
+	this.previousBlock = this.getPreviousBlock(ppBlock);
+	this.nextBlock = pBlock;
+	return (E) ppBlock;
   }
 
   /**
@@ -102,4 +107,49 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
   public void set(E block) {
 	throw new UnsupportedOperationException();
   }
+  /**
+   * Get previous block
+   */
+  private Block getPreviousBlock(Block thisBlock) {
+	if (thisBlock==null) {
+	  return null;
+	} else if (thisBlock.hasPreviousSibling()) {
+	  return thisBlock.getPreviousSibling();
+	} else if (thisBlock.hasStartParent()) {
+	  return thisBlock.getStartParent();
+	} else {
+	  return null;
+	}
+  }
+
+  /** 
+   * Get a next block
+   */
+  private Block getNextBlock(Block thisBlock) {
+	if (thisBlock==null) {
+	  return null;
+	} else if (thisBlock.hasNextSibling()) {
+	  return thisBlock.getNextSibling();
+	} else if (thisBlock.hasEndParent()) {
+	  Block eParent = thisBlock.getEndParent();
+	  if (eParent.hasNextSibling()) {
+		return eParent.getNextSibling();
+	  } else {
+		return null;
+	  }
+	} else {
+	  return null;
+	}
+  }
+
+  /**
+   * toString method, for debugging only.
+   */
+  public String toString() {
+	StringBuffer sb = new StringBuffer();
+	sb.append("nextBlock = " + this.nextBlock + "\n");
+	sb.append("previousBlock = " + this.previousBlock);
+	return sb.toString();
+  }
+
 }
