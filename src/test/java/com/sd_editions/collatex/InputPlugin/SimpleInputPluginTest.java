@@ -1,17 +1,15 @@
 //Make this part of the same package so we can test the protected methods
 package com.sd_editions.collatex.InputPlugin;
 
-import com.sd_editions.collatex.Block.BlockStructure;
-import com.sd_editions.collatex.Block.BlockStructureCascadeException;
-import com.sd_editions.collatex.Block.Line;
-import com.sd_editions.collatex.Block.Word;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import com.sd_editions.collatex.Block.BlockStructure;
+import com.sd_editions.collatex.Block.BlockStructureCascadeException;
 
 /**
  * Unit test for SimpleInputPlugin.
