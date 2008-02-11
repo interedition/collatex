@@ -28,5 +28,9 @@ public class Line extends Block {
   public String toString() {
 	return "<l number=\"" + this.getLineNumber()+ "\">";
   }
+  
+  public void accept(IntBlockVisitor visitor) {
+	  visitor.visitLine(this);
+  }
 
 }

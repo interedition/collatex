@@ -234,4 +234,8 @@ public class BlockStructure {
 	}
 	return sb.toString();
   }
+  
+  public void accept(IntBlockVisitor visitor) {
+	visitor.visitBlockStructure(this);
+  }
 }
