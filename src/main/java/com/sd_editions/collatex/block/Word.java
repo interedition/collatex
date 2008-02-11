@@ -12,6 +12,7 @@ import java.lang.String;
  */
 public class Word extends Block {
   private String content;
+  private Word alignedWord;
 
   public Word(String content) {
 	this.content = content;
@@ -32,5 +33,18 @@ public class Word extends Block {
   public void accept(IntBlockVisitor visitor) {
 	visitor.visitWord(this);
   }
+  
+	public Word getAlignedWord() {
+		return alignedWord;
+	}
+
+	public void setAlignedWord(Word the_other) {
+		this.alignedWord = the_other;
+	}
+	
+	public boolean aligns(Word the_other) {
+		return getContent().equalsIgnoreCase(the_other.getContent()); 
+	}
+
 
 }
