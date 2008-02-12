@@ -79,6 +79,21 @@ public class TextAlignmentVisitorTest extends TestCase {
 		assertEquals(word3base, word3variant.getAlignedWord());
 	}
 
+	public void testOmission() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+		BlockStructure base = new StringInputPlugin("a white cat").readFile();
+		BlockStructure variant = new StringInputPlugin("a cat").readFile();
+		base.accept(new TextAlignmentVisitor(variant));
+		Line baseLine1 = (Line) base.getRootBlock();
+		Line variantLine1 = (Line) variant.getRootBlock();
+		Word word1base = (Word) baseLine1.getFirstChild();
+		Word word1variant = (Word) variantLine1.getFirstChild();
+		assertEquals(word1base, word1variant.getAlignedWord());
+		Word word2variant = (Word) word1variant.getNextSibling();
+		Word word2base = (Word) word1base.getNextSibling();
+		Word word3base = (Word) baseLine1.getLastChild();
+		assertEquals(word3base, word2variant.getAlignedWord());
+	}
+
 //	public void testAddition() throws FileNotFoundException, IOException, BlockStructureCascadeException {
 //		BlockStructure base = new StringInputPlugin("a cat").readFile();
 //		BlockStructure variant = new StringInputPlugin("a black cat").readFile();
