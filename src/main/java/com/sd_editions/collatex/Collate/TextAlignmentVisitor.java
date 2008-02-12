@@ -38,14 +38,22 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 			if (word.aligns(the_other)) {
 				the_other.setAlignedWord(word);
 				this.other = other.getNextSibling();
-			} else if (other.getNextSibling() != null && the_other.getNextSibling() != null){
+			} else if (word.hasNextSibling() && the_other.hasNextSibling()){
 				Word nextWord = (Word) word.getNextSibling();
 				Word nextOtherWord = (Word) the_other.getNextSibling();
 				if (nextWord.aligns(nextOtherWord)) {
 					the_other.setAlignedWord(word);
 					this.other=other.getNextSibling();
 				}
+			} else if ( !word.hasNextSibling() && the_other.hasNextSibling() ){
+				Word nextOtherWord = (Word) the_other.getNextSibling();
+				if (word.aligns(nextOtherWord)) {
+					nextOtherWord.setAlignedWord(word);
+					this.other=nextOtherWord.getNextSibling();
+				}
+				
 			}
+			
 		}
 
 
