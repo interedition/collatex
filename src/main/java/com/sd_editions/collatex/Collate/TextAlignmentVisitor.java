@@ -7,54 +7,55 @@ import com.sd_editions.collatex.Block.Line;
 import com.sd_editions.collatex.Block.Word;
 
 public class TextAlignmentVisitor implements IntBlockVisitor {
-		private Block other;
-		
-		public TextAlignmentVisitor(BlockStructure variant) {
-			this.other = variant.getRootBlock();
-		}
+  private Block witnessBlock;
 
-		public TextAlignmentVisitor(Word variant) {
-			this.other = variant;
-		}
+  public TextAlignmentVisitor(BlockStructure variant) {
+    this.witnessBlock = variant.getRootBlock();
+  }
 
-		public void visitBlockStructure(BlockStructure blockStructure) {
-			Block rootBlock = blockStructure.getRootBlock();
-			rootBlock.accept(this);
-		}
+  public TextAlignmentVisitor(Word variant) {
+    this.witnessBlock = variant;
+  }
 
-		public void visitLine(Line line) {
-			this.other = other.getFirstChild();
-			Word w = (Word) line.getFirstChild();
-			w.accept(this);
-			while (w.hasNextSibling()) {
-				w = (Word) w.getNextSibling();
-				w.accept(this);
-			}
-			// TODO: move to next line etc...
-		}
+  public void visitBlockStructure(BlockStructure blockStructure) {
+    Block rootBlock = blockStructure.getRootBlock();
+    rootBlock.accept(this);
+  }
 
-		public void visitWord(Word word) {
-			Word the_other = (Word) other;
-			if (word.aligns(the_other)) {
-				the_other.setAlignedWord(word);
-				this.other = other.getNextSibling();
-			} else if (word.hasNextSibling() && the_other.hasNextSibling()){
-				Word nextWord = (Word) word.getNextSibling();
-				Word nextOtherWord = (Word) the_other.getNextSibling();
-				if (nextWord.aligns(nextOtherWord)) {
-					the_other.setAlignedWord(word);
-					this.other=other.getNextSibling();
-				}
-			} else if ( !word.hasNextSibling() && the_other.hasNextSibling() ){
-				Word nextOtherWord = (Word) the_other.getNextSibling();
-				if (word.aligns(nextOtherWord)) {
-					nextOtherWord.setAlignedWord(word);
-					this.other=nextOtherWord.getNextSibling();
-				}
-				
-			}
-			
-		}
+  public void visitLine(Line line) {
+    this.witnessBlock = witnessBlock.getFirstChild();
+    Word w = (Word) line.getFirstChild();
+    w.accept(this);
+    while (w.hasNextSibling()) {
+      w = (Word) w.getNextSibling();
+      w.accept(this);
+    }
+    // TODO: move to next line etc...
+  }
 
+  public void visitWord(Word baseWord) {
+    Word witnessWord = (Word) witnessBlock;
+    if (baseWord.alignsWith(witnessWord)) {
+      witnessWord.setAlignedWord(baseWord);
+      this.witnessBlock = witnessBlock.getNextSibling();
+
+    } else if (baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
+      Word nextWord = (Word) baseWord.getNextSibling();
+      Word nextWitnessWord = (Word) witnessWord.getNextSibling();
+      if (nextWord.alignsWith(nextWitnessWord)) {
+        witnessWord.setAlignedWord(baseWord);
+        this.witnessBlock = witnessBlock.getNextSibling();
+      }
+
+    } else if (!baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
+      Word nextWitnessWord = (Word) witnessWord.getNextSibling();
+      if (baseWord.alignsWith(nextWitnessWord)) {
+        nextWitnessWord.setAlignedWord(baseWord);
+        this.witnessBlock = nextWitnessWord.getNextSibling();
+      }
+
+    }
+
+  }
 
 }

@@ -1,6 +1,5 @@
 package com.sd_editions.collatex.Block;
 
-import java.lang.String;
 /**
  *
  *
@@ -15,36 +14,35 @@ public class Word extends Block {
   private Word alignedWord;
 
   public Word(String content) {
-	this.content = content;
+    this.content = content;
   }
 
   public void setContent(String content) {
-	this.content = content;
+    this.content = content;
   }
 
   public String getContent() {
-	return this.content;
+    return this.content;
   }
 
   public String toString() {
-	return "<w>" + this.content + "</w>";
+    return "<w>" + this.content + "</w>";
   }
 
   public void accept(IntBlockVisitor visitor) {
-	visitor.visitWord(this);
+    visitor.visitWord(this);
   }
-  
-	public Word getAlignedWord() {
-		return alignedWord;
-	}
 
-	public void setAlignedWord(Word the_other) {
-		this.alignedWord = the_other;
-	}
-	
-	public boolean aligns(Word the_other) {
-		return getContent().equalsIgnoreCase(the_other.getContent()); 
-	}
+  public Word getAlignedWord() {
+    return alignedWord;
+  }
 
+  public void setAlignedWord(Word the_other) {
+    this.alignedWord = the_other;
+  }
+
+  public boolean alignsWith(Word the_other) {
+    return getContent().equalsIgnoreCase(the_other.getContent());
+  }
 
 }
