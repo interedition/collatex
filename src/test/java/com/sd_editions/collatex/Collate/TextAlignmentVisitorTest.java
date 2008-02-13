@@ -108,19 +108,19 @@ public class TextAlignmentVisitorTest extends TestCase {
     assertEquals(baseWord3, variantWord2.getAlignedWord());
   }
 
-  //  public void testOmission_AtTheEnd() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-  //    BlockStructure base = new StringInputPlugin("a calico cat").readFile();
-  //    BlockStructure variant = new StringInputPlugin("a calico").readFile();
-  //    base.accept(new TextAlignmentVisitor(variant));
-  //    Line baseLine1 = (Line) base.getRootBlock();
-  //    Line variantLine1 = (Line) variant.getRootBlock();
-  //    Word baseWord1 = (Word) baseLine1.getFirstChild();
-  //    Word baseWord2 = (Word) baseWord1.getNextSibling();
-  //    Word variantWord1 = (Word) variantLine1.getFirstChild();
-  //    Word variantWord2 = (Word) variantWord1.getNextSibling();
-  //    assertEquals(baseWord1, variantWord1.getAlignedWord());
-  //    assertEquals(baseWord2, variantWord2.getAlignedWord());
-  //  }
+    public void testOmission_AtTheEnd() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    BlockStructure base = new StringInputPlugin("a calico cat").readFile();
+    BlockStructure variant = new StringInputPlugin("a calico").readFile();
+    base.accept(new TextAlignmentVisitor(variant));
+    Line baseLine1 = (Line) base.getRootBlock();
+    Line variantLine1 = (Line) variant.getRootBlock();
+    Word baseWord1 = (Word) baseLine1.getFirstChild();
+    Word baseWord2 = (Word) baseWord1.getNextSibling();
+    Word variantWord1 = (Word) variantLine1.getFirstChild();
+    Word variantWord2 = (Word) variantWord1.getNextSibling();
+    assertEquals(baseWord1, variantWord1.getAlignedWord());
+    assertEquals(baseWord2, variantWord2.getAlignedWord());
+  }
 
   public void testAddition_InTheMiddle() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin("a cat").readFile();

@@ -35,27 +35,27 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 
   public void visitWord(Word baseWord) {
     Word witnessWord = (Word) witnessBlock;
-    if (baseWord.alignsWith(witnessWord)) {
-      witnessWord.setAlignedWord(baseWord);
-      this.witnessBlock = witnessBlock.getNextSibling();
-
-    } else if (baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
-      Word nextWord = (Word) baseWord.getNextSibling();
-      Word nextWitnessWord = (Word) witnessWord.getNextSibling();
-      if (nextWord.alignsWith(nextWitnessWord)) {
+    if (witnessWord != null) {
+      if (baseWord.alignsWith(witnessWord)) {
         witnessWord.setAlignedWord(baseWord);
         this.witnessBlock = witnessBlock.getNextSibling();
-      }
 
-    } else if (!baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
-      Word nextWitnessWord = (Word) witnessWord.getNextSibling();
-      if (baseWord.alignsWith(nextWitnessWord)) {
-        nextWitnessWord.setAlignedWord(baseWord);
-        this.witnessBlock = nextWitnessWord.getNextSibling();
-      }
+      } else if (baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
+        Word nextWord = (Word) baseWord.getNextSibling();
+        Word nextWitnessWord = (Word) witnessWord.getNextSibling();
+        if (nextWord.alignsWith(nextWitnessWord)) {
+          witnessWord.setAlignedWord(baseWord);
+          this.witnessBlock = witnessBlock.getNextSibling();
+        }
 
+      } else if (!baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
+        Word nextWitnessWord = (Word) witnessWord.getNextSibling();
+        if (baseWord.alignsWith(nextWitnessWord)) {
+          nextWitnessWord.setAlignedWord(baseWord);
+          this.witnessBlock = nextWitnessWord.getNextSibling();
+        }
+      }
     }
-
   }
 
 }
