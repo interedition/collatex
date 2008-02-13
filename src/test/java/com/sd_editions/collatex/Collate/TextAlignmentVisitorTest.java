@@ -154,21 +154,21 @@ public class TextAlignmentVisitorTest extends TestCase {
     assertNull(variantWord3.getAlignedWord());
   }
 
-//  public void testAddition_AtTheStart() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-//    BlockStructure base = new StringInputPlugin("to be").readFile();
-//    BlockStructure variant = new StringInputPlugin("not to be").readFile();
-//    base.accept(new TextAlignmentVisitor(variant));
-//    Line baseLine1 = (Line) base.getRootBlock();
-//    Line variantLine1 = (Line) variant.getRootBlock();
-//    Word baseWord1 = (Word) baseLine1.getFirstChild();
-//    Word baseWord2 = (Word) baseWord1.getNextSibling();
-//    Word variantWord1 = (Word) variantLine1.getFirstChild();
-//    Word variantWord2 = (Word) variantWord1.getNextSibling();
-//    Word variantWord3 = (Word) variantLine1.getLastChild();
-//    assertNull(variantWord1.getAlignedWord());
-//    assertEquals(baseWord1, variantWord2.getAlignedWord());
-//    assertEquals(baseWord2, variantWord3.getAlignedWord());
-//  }
+  public void testAddition_AtTheStart() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    BlockStructure base = new StringInputPlugin("to be").readFile();
+    BlockStructure variant = new StringInputPlugin("not to be").readFile();
+    base.accept(new TextAlignmentVisitor(variant));
+    Line baseLine1 = (Line) base.getRootBlock();
+    Line variantLine1 = (Line) variant.getRootBlock();
+    Word baseWord1 = (Word) baseLine1.getFirstChild();
+    Word baseWord2 = (Word) baseWord1.getNextSibling();
+    Word variantWord1 = (Word) variantLine1.getFirstChild();
+    Word variantWord2 = (Word) variantWord1.getNextSibling();
+    Word variantWord3 = (Word) variantLine1.getLastChild();
+    assertNull(variantWord1.getAlignedWord());
+    assertEquals(baseWord1, variantWord2.getAlignedWord());
+    assertEquals(baseWord2, variantWord3.getAlignedWord());
+  }
 
   // public void testAddition() throws FileNotFoundException, IOException,
   // BlockStructureCascadeException {

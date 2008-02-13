@@ -41,11 +41,14 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
         this.witnessBlock = witnessBlock.getNextSibling();
 
       } else if (baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
-        Word nextWord = (Word) baseWord.getNextSibling();
+        Word nextBaseWord = (Word) baseWord.getNextSibling();
         Word nextWitnessWord = (Word) witnessWord.getNextSibling();
-        if (nextWord.alignsWith(nextWitnessWord)) {
+        if (nextBaseWord.alignsWith(nextWitnessWord)) {
           witnessWord.setAlignedWord(baseWord);
           this.witnessBlock = witnessBlock.getNextSibling();
+        } else if (baseWord.alignsWith(nextWitnessWord)) {
+          nextWitnessWord.setAlignedWord(baseWord);
+          this.witnessBlock = nextWitnessWord.getNextSibling();
         }
 
       } else if (!baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
