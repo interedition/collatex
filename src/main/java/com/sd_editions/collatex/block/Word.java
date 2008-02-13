@@ -11,7 +11,6 @@ package com.sd_editions.collatex.Block;
  */
 public class Word extends Block {
   private String content;
-  private Word alignedWord;
 
   public Word(String content) {
     this.content = content;
@@ -31,14 +30,6 @@ public class Word extends Block {
 
   public void accept(IntBlockVisitor visitor) {
     visitor.visitWord(this);
-  }
-
-  public Word getAlignedWord() {
-    return alignedWord;
-  }
-
-  public void setAlignedWord(Word the_other) {
-    this.alignedWord = the_other;
   }
 
   public boolean alignsWith(Word the_other) {
