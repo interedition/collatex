@@ -10,8 +10,9 @@ import com.sd_editions.collatex.Block.Word;
 public class TextAlignmentVisitor implements IntBlockVisitor {
   private Block witnessBlock;
   private BlockStructure result;
-	private int lineCount;
-	private Block pLine;
+	private Table pTable;
+	private int column;
+	private int variant = 1;
   
   public TextAlignmentVisitor(BlockStructure variant) {
     this.witnessBlock = variant.getRootBlock();
@@ -21,21 +22,23 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
   public TextAlignmentVisitor(Word variant) {
     this.witnessBlock = variant;
     this.result = new BlockStructure();
-    createNewLineInResult();
+    createNewTableInResult();
   }
 
-  public void visitBlockStructure(BlockStructure blockStructure) {
+	public void visitBlockStructure(BlockStructure blockStructure) {
     Block rootBlock = blockStructure.getRootBlock();
     rootBlock.accept(this);
   }
 
   public void visitLine(Line line) {
-		createNewLineInResult();
+  	createNewTableInResult();
     this.witnessBlock = witnessBlock.getFirstChild();
     Word w = (Word) line.getFirstChild();
+    column = 0;
     w.accept(this);
     while (w.hasNextSibling()) {
       w = (Word) w.getNextSibling();
+      column += 2;
       w.accept(this);
     }
     // TODO: move to next line etc...
@@ -48,8 +51,8 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
     if (check3(baseWord, witnessWord)) return;
     if (check4Omission(baseWord, witnessWord)) return;
     if (check5Addition(baseWord, witnessWord)) return; 
-   	Block nonAlignment = new NonAlignment(baseWord, witnessWord);
-   	addAlignmentInformationToResult(nonAlignment);
+   	Cell nonAlignment = new NonAlignment(baseWord, witnessWord);
+   	addAlignmentInformationToResult(2, nonAlignment);
   }
 
 	public BlockStructure getResult() {
@@ -58,8 +61,8 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 
 	private boolean checkOmission(Word baseWord) {
 		if (witnessBlock == null) {
-			Block alignment = new Omission(baseWord);
-			addAlignmentInformationToResult(alignment);
+			Cell alignment = new Omission(baseWord);
+			addAlignmentInformationToResult(2, alignment);
 			return true;
     }
 		return false;
@@ -67,11 +70,12 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 
 	private boolean check1(Word baseWord, Word witnessWord) {
 		if (witnessWord!=null&&baseWord.alignsWith(witnessWord)) {
-			Block alignment = new AlignmentIdentical(baseWord, witnessWord);
-			addAlignmentInformationToResult(alignment);
+			Cell alignment = new AlignmentIdentical(baseWord, witnessWord);
+			addAlignmentInformationToResult(2, alignment);
       if (!baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
   			alignment = new Addition((Word)witnessWord.getNextSibling());
-  			addAlignmentInformationToResult(alignment);
+  			addAlignmentInformationToResult(3, alignment);
+      	// TODO: we should loop here: there could be more additional words in the witness
   			return true;
       }
       this.witnessBlock = witnessBlock.getNextSibling();
@@ -85,8 +89,8 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
       Word nextWord = (Word) baseWord.getNextSibling();
       Word nextWitnessWord = (Word) witnessWord.getNextSibling();
       if (nextWord.alignsWith(nextWitnessWord)) {
-  			Block alignment = new AlignmentVariant(baseWord, witnessWord);
-  			addAlignmentInformationToResult(alignment);
+  			Cell alignment = new AlignmentVariant(baseWord, witnessWord);
+  			addAlignmentInformationToResult(2, alignment);
         this.witnessBlock = witnessBlock.getNextSibling();
         return true;
       }
@@ -97,8 +101,8 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 
 	private boolean check4Omission(Word baseWord, Word witnessWord) {
 		if (baseWord.hasNextSibling() && witnessWord.alignsWith((Word)baseWord.getNextSibling())) {
-			Block alignment = new Omission(baseWord);
-			addAlignmentInformationToResult(alignment);
+			Cell alignment = new Omission(baseWord);
+			addAlignmentInformationToResult(2, alignment);
 			return true;
 		}
 		return false;
@@ -108,10 +112,10 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 		if (witnessWord!=null && witnessWord.hasNextSibling()) {
       Word nextWitnessWord = (Word) witnessWord.getNextSibling();
       if (baseWord.alignsWith(nextWitnessWord)) {
-  			Block alignment = new Addition(witnessWord);
-  			addAlignmentInformationToResult(alignment);
+  			Cell alignment = new Addition(witnessWord);
+  			addAlignmentInformationToResult(1, alignment);
   			alignment = new AlignmentIdentical(baseWord, nextWitnessWord);
-  			addAlignmentInformationToResult(alignment);
+  			addAlignmentInformationToResult(2, alignment);
         this.witnessBlock = nextWitnessWord.getNextSibling();
         return true;
       }
@@ -120,23 +124,22 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 		return false;
 	}
 
-	private void createNewLineInResult() {
-		lineCount++;
-		Line nLine = new Line(lineCount);
-		if (pLine == null) {
+  private void createNewTableInResult() {
+		Table nTable = new Table();
+		if (pTable == null) {
 			try {
-				result.setRootBlock(nLine, true);
+				result.setRootBlock(nTable, true);
 			} catch (BlockStructureCascadeException e) {
 				throw new RuntimeException(e);
 			}
 		} else {
-			result.setNextSibling(pLine, nLine);
+			result.setNextSibling(pTable, nTable);
 		}
-		pLine = nLine;
+		pTable = nTable;
 	}
 
-	private void addAlignmentInformationToResult(Block alignment) {
-		result.setChildBlock(pLine, alignment);
+	private void addAlignmentInformationToResult(int offset, Cell alignment) {
+		pTable.setCell(variant, column+offset, alignment);
 	}
 
 }

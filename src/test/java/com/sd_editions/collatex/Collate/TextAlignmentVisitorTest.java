@@ -8,7 +8,6 @@ import junit.framework.TestCase;
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
-import com.sd_editions.collatex.Block.Line;
 import com.sd_editions.collatex.Block.Word;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
@@ -19,8 +18,8 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     visitor.visitWord(base);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    assertEquals("identical: cat", alignmentInfo1.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: cat", table.get(1, 2).toString());
   }
 
   public void testNonAlignment() {
@@ -29,8 +28,8 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     visitor.visitWord(base);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    assertEquals("non-alignment: cat, boat", alignmentInfo1.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("non-alignment: cat, boat", table.get(1, 2).toString());
   }
 
   public void testCapital() {
@@ -39,8 +38,8 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     visitor.visitWord(base);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    assertEquals("identical: the", alignmentInfo1.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: the", table.get(1, 2).toString());
   }
 
   public void testSentence() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -49,12 +48,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("identical: a", alignmentInfo1.toString());
-    assertEquals("identical: black", alignmentInfo2.toString());
-    assertEquals("identical: cat", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("identical: black", table.get(1, 4).toString());
+    assertEquals("identical: cat", table.get(1, 6).toString());
   }
 
   public void testPunctuation() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -63,12 +60,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("identical: the", alignmentInfo1.toString());
-    assertEquals("identical: black", alignmentInfo2.toString());
-    assertEquals("identical: cat", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: the", table.get(1, 2).toString());
+    assertEquals("identical: black", table.get(1, 4).toString());
+    assertEquals("identical: cat", table.get(1, 6).toString());
   }
 
   public void testVariant() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -77,12 +72,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("identical: a", alignmentInfo1.toString());
-    assertEquals("variant-align: white / black", alignmentInfo2.toString());
-    assertEquals("identical: cat", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("variant-align: white / black", table.get(1, 4).toString());
+    assertEquals("identical: cat", table.get(1, 6).toString());
   }
 
   public void testOmission_InTheMiddle() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -91,12 +84,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("identical: a", alignmentInfo1.toString());
-    assertEquals("omission: white", alignmentInfo2.toString());
-    assertEquals("identical: horse", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("omission: white", table.get(1, 4).toString());
+    assertEquals("identical: horse", table.get(1, 6).toString());
   }
 
   public void testOmission_AtTheStart() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -105,12 +96,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("omission: a", alignmentInfo1.toString());
-    assertEquals("identical: certain", alignmentInfo2.toString());
-    assertEquals("identical: death", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("omission: a", table.get(1, 2).toString());
+    assertEquals("identical: certain", table.get(1, 4).toString());
+    assertEquals("identical: death", table.get(1, 6).toString());
   }
 
     public void testOmission_AtTheEnd() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -119,12 +108,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("identical: a", alignmentInfo1.toString());
-    assertEquals("identical: calico", alignmentInfo2.toString());
-    assertEquals("omission: cat", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("identical: calico", table.get(1, 4).toString());
+    assertEquals("omission: cat", table.get(1, 6).toString());
   }
 
   public void testAddition_InTheMiddle() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -133,12 +120,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("identical: a", alignmentInfo1.toString());
-    assertEquals("addition: calico", alignmentInfo2.toString());
-    assertEquals("identical: cat", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("addition: calico", table.get(1, 3).toString());
+    assertEquals("identical: cat", table.get(1, 4).toString());
   }
 
   public void testAddition_AtTheEnd() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -147,12 +132,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("identical: to", alignmentInfo1.toString());
-    assertEquals("identical: be", alignmentInfo2.toString());
-    assertEquals("addition: lost", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("identical: to", table.get(1, 2).toString());
+    assertEquals("identical: be", table.get(1, 4).toString());
+    assertEquals("addition: lost", table.get(1, 5).toString());
   }
 
   public void testAddition_AtTheStart() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -161,12 +144,10 @@ public class TextAlignmentVisitorTest extends TestCase {
     TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     base.accept(visitor);
     BlockStructure alignmentInformation = visitor.getResult();
-    Block alignmentInfo1 = alignmentInformation.getRootBlock().getFirstChild();
-    Block alignmentInfo2 = alignmentInfo1.getNextSibling();
-    Block alignmentInfo3 = alignmentInfo2.getNextSibling();
-    assertEquals("addition: not", alignmentInfo1.toString());
-    assertEquals("identical: to", alignmentInfo2.toString());
-    assertEquals("identical: be", alignmentInfo3.toString());
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("addition: not", table.get(1, 1).toString());
+    assertEquals("identical: to", table.get(1, 2).toString());
+    assertEquals("identical: be", table.get(1, 4).toString());
   }
 
 }

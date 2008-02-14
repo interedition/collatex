@@ -1,9 +1,8 @@
 package com.sd_editions.collatex.Collate;
 
-import com.sd_editions.collatex.Block.IntBlockVisitor;
 import com.sd_editions.collatex.Block.Word;
 
-public class NonAlignment extends com.sd_editions.collatex.Block.Block {
+public class NonAlignment extends Cell {
 	private final Word base;
 	private final Word witness;
 
@@ -17,10 +16,5 @@ public class NonAlignment extends com.sd_editions.collatex.Block.Block {
 		return "non-alignment: "+base.getContent()+", "+witness.getContent();
 	}
 	
-	@Override
-	public void accept(IntBlockVisitor visitor) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

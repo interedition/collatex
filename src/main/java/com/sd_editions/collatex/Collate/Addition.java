@@ -1,10 +1,8 @@
 package com.sd_editions.collatex.Collate;
 
-import com.sd_editions.collatex.Block.Block;
-import com.sd_editions.collatex.Block.IntBlockVisitor;
 import com.sd_editions.collatex.Block.Word;
 
-public class Addition extends Block {
+public class Addition extends Cell {
 
 	private final Word witnessWord;
 
@@ -17,10 +15,4 @@ public class Addition extends Block {
 		return "addition: "+witnessWord.getContent();
 	}
 	
-	@Override
-	public void accept(IntBlockVisitor visitor) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

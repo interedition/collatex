@@ -1,10 +1,8 @@
 package com.sd_editions.collatex.Collate;
 
-import com.sd_editions.collatex.Block.Block;
-import com.sd_editions.collatex.Block.IntBlockVisitor;
 import com.sd_editions.collatex.Block.Word;
 
-public class AlignmentVariant extends Block {
+public class AlignmentVariant extends Cell {
 	private final Word base;
 	private final Word witness;
 
@@ -18,10 +16,4 @@ public class AlignmentVariant extends Block {
 		return "variant-align: "+base.getContent()+ " / "+witness.getContent();
 	}
 	
-	@Override
-	public void accept(IntBlockVisitor visitor) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
