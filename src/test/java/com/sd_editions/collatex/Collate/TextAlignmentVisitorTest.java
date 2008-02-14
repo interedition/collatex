@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
 import com.sd_editions.collatex.Block.Word;
@@ -20,6 +19,16 @@ public class TextAlignmentVisitorTest extends TestCase {
     BlockStructure alignmentInformation = visitor.getResult();
     Table table = (Table) alignmentInformation.getRootBlock();
     assertEquals("identical: cat", table.get(1, 2).toString());
+  }
+  
+  public void testAlignmentVariant() {
+    Word base = new Word("cat");
+    Word variant = new Word("mat");
+    TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
+    visitor.visitWord(base);
+    BlockStructure alignmentInformation = visitor.getResult();
+    Table table = (Table) alignmentInformation.getRootBlock();
+    assertEquals("variant-align: cat / mat", table.get(1, 2).toString());
   }
 
   public void testNonAlignment() {

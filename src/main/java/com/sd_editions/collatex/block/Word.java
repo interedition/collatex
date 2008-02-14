@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.Block;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  *
  *
@@ -33,7 +35,13 @@ public class Word extends Block {
   }
 
   public boolean alignsWith(Word the_other) {
-    return getContent().equalsIgnoreCase(the_other.getContent());
+  	return alignmentFactor(the_other) < 2;
+  }
+  
+  public int alignmentFactor(Word the_other) {
+  	String left = getContent().toLowerCase();
+  	String right = the_other.getContent().toLowerCase();
+    return StringUtils.getLevenshteinDistance(left, right);  	
   }
 
 }

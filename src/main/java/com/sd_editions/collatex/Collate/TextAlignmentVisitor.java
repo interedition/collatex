@@ -70,10 +70,9 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 
 	private boolean check1(Word baseWord, Word witnessWord) {
 		if (witnessWord!=null&&baseWord.alignsWith(witnessWord)) {
-			Cell alignment = new AlignmentIdentical(baseWord, witnessWord);
-			addAlignmentInformationToResult(2, alignment);
+			addDoAlign(baseWord, witnessWord);
       if (!baseWord.hasNextSibling() && witnessWord.hasNextSibling()) {
-  			alignment = new Addition((Word)witnessWord.getNextSibling());
+  			Cell alignment = new Addition((Word)witnessWord.getNextSibling());
   			addAlignmentInformationToResult(3, alignment);
       	// TODO: we should loop here: there could be more additional words in the witness
   			return true;
@@ -114,14 +113,22 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
       if (baseWord.alignsWith(nextWitnessWord)) {
   			Cell alignment = new Addition(witnessWord);
   			addAlignmentInformationToResult(1, alignment);
-  			alignment = new AlignmentIdentical(baseWord, nextWitnessWord);
-  			addAlignmentInformationToResult(2, alignment);
+  			addDoAlign(baseWord, nextWitnessWord);
         this.witnessBlock = nextWitnessWord.getNextSibling();
         return true;
       }
-
     }
 		return false;
+	}
+
+	private void addDoAlign(Word baseWord, Word witnessWord) {
+		Cell alignment;
+		if (baseWord.alignmentFactor(witnessWord)==0) {
+			alignment = new AlignmentIdentical(baseWord, witnessWord);			
+		} else {
+			alignment = new AlignmentVariant(baseWord, witnessWord);
+		}
+		addAlignmentInformationToResult(2, alignment);
 	}
 
   private void createNewTableInResult() {
