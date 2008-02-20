@@ -30,21 +30,21 @@ public class Table extends Block {
 
 	public String toHTML() {
 		String alignmentTableHTML = "<table border=\"1\">";
-		alignmentTableHTML += "<tr>";
+		alignmentTableHTML += "<tr><td>Numbers</td>";
 		for (int i = 1; i < 10; i++) {
 			alignmentTableHTML += "<td>";
 			alignmentTableHTML += "" + i;
 			alignmentTableHTML += "</td>";
 		}
 		alignmentTableHTML += "</tr>";
-		alignmentTableHTML += showRow(0);
-		alignmentTableHTML += showRow(1);
+		alignmentTableHTML += showRow(0, "Base");
+		alignmentTableHTML += showRow(1, "Witness");
 		alignmentTableHTML += "</table>";
 		return alignmentTableHTML;
 	}
 
-	private String showRow(int row) {
-		String alignmentTableHTML = "<tr>";
+	private String showRow(int row, String label) {
+		String alignmentTableHTML = "<tr><td>"+label+"</td>";
 		for (int i = 1; i < 10; i++) {
 			Cell cell = get(row, i);
 			alignmentTableHTML += "<td>";
