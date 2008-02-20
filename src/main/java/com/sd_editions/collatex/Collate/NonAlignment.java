@@ -15,6 +15,11 @@ public class NonAlignment extends Cell {
 	public String toString() {
 		return "non-alignment: "+base.getContent()+", "+witness.getContent();
 	}
+
+	@Override
+	public String toHTML() {
+		return witness.getContent();
+	}
 	
 
 }

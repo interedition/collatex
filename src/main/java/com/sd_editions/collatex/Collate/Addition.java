@@ -14,5 +14,9 @@ public class Addition extends Cell {
 	public String toString() {
 		return "addition: "+witnessWord.getContent();
 	}
+	@Override
+	public String toHTML() {
+		return witnessWord.getContent();
+	}
 	
 }

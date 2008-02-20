@@ -15,5 +15,10 @@ public class AlignmentVariant extends Cell {
 	public String toString() {
 		return "variant-align: "+base.getContent()+ " / "+witness.getContent();
 	}
+
+	@Override
+	public String toHTML() {
+		return witness.getContent();
+	}
 	
 }

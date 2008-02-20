@@ -13,5 +13,10 @@ public class Empty extends Cell {
 		}
 		return instance;
 	}
+
+	@Override
+	public String toHTML() {
+		return "&nbsp;";
+	}
 	
 }

@@ -15,6 +15,9 @@ public class AlignmentIdentical extends Cell {
 	public String toString() {
 		return "identical: "+base.getContent();
 	}
-	
+	@Override
+	public String toHTML() {
+		return witness.getContent();
+	}
 
 }

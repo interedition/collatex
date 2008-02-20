@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.Collate;
 
-public class Cell {
+public abstract class Cell {
+
+	public abstract String toHTML();
 
 }
