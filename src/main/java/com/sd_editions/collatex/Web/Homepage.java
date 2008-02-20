@@ -12,7 +12,6 @@ import org.apache.wicket.model.PropertyModel;
 
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
-import com.sd_editions.collatex.Collate.Cell;
 import com.sd_editions.collatex.Collate.Table;
 import com.sd_editions.collatex.Collate.TextAlignmentVisitor;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
@@ -32,7 +31,7 @@ public class Homepage extends WebPage {
 		add(new AlignmentForm("alignmentform", model));
 	}
 	
-	class ModelForView  implements Serializable {
+	class ModelForView implements Serializable {
 		private String base;
 		private String witness;
 		private String html;
@@ -61,7 +60,7 @@ public class Homepage extends WebPage {
 			baseStructure.accept(visitor);
 			BlockStructure result = visitor.getResult();
 			Table alignment = (Table) result.getRootBlock();
-			this.html = showAlignmentTable(alignment);
+			this.html = alignment.toHTML();
 		}
 
 		public void setBase(String base) {
@@ -102,42 +101,12 @@ public class Homepage extends WebPage {
 		
 		@Override
 		protected void onSubmit() {
-			System.out.println(modelForView.base);
-			System.out.println(modelForView.witness);
-			// TODO: this can be moved to model!
+			// NOTE: this can be moved to model!
 			modelForView.fillAlignmentTable(); 
 		}
 		
 	}
 	
 	
-	// TODO: move to Table class!
-	private String showAlignmentTable(Table table) {
-		String alignmentTableHTML = "<table border=\"1\">";
-		alignmentTableHTML += "<tr>";
-		for (int i = 1; i < 10; i++) {
-			alignmentTableHTML += "<td>";
-			alignmentTableHTML += ""+i;
-			alignmentTableHTML += "</td>";
-		}
-		alignmentTableHTML += "</tr>";
-		alignmentTableHTML = showRow(table, alignmentTableHTML, 0);
-		alignmentTableHTML = showRow(table, alignmentTableHTML, 1);
-		alignmentTableHTML += "</table>";
-		return alignmentTableHTML;
-	}
-
-	// TODO: move to Table class! TODO: remove alignmentTableHTML parameter!
-	private String showRow(Table table, String alignmentTableHTML, int row) {
-		alignmentTableHTML += "<tr>";
-		for (int i = 1; i < 10; i++) {
-			Cell cell = table.get(row, i);
-			alignmentTableHTML += "<td>";
-			alignmentTableHTML += cell.toHTML();
-			alignmentTableHTML += "</td>";
-		}
-		alignmentTableHTML += "</tr>";
-		return alignmentTableHTML;
-	}
 
 }
