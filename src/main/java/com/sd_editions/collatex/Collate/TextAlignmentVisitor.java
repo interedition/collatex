@@ -45,6 +45,7 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
   }
 
   public void visitWord(Word baseWord) {
+  	pTable.setCell(0, column+2, new BaseWord(baseWord));
     Word witnessWord = (Word) witnessBlock;
     if (checkOmission(baseWord)) return;
     if (check1(baseWord, witnessWord)) return; 
