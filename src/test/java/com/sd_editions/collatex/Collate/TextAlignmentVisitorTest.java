@@ -158,5 +158,20 @@ public class TextAlignmentVisitorTest extends TestCase {
     assertEquals("identical: to", table.get(1, 2).toString());
     assertEquals("identical: be", table.get(1, 4).toString());
   }
+  
+//  public void testMultipleAdditions() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+////  	black 	  	  	cat
+////  	the 	black 	and 	white 	cat
+//    BlockStructure base = new StringInputPlugin("black cat").readFile();
+//    BlockStructure variant = new StringInputPlugin("the black and white cat").readFile();
+//    TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
+//    base.accept(visitor);
+//    BlockStructure alignmentInformation = visitor.getResult();
+//    Table table = (Table) alignmentInformation.getRootBlock();
+//    assertEquals("addition: the", table.get(1, 1).toString());
+//    assertEquals("identical: black", table.get(1, 2).toString());
+//    assertEquals("addition: and white", table.get(1, 3).toString());
+//    assertEquals("identical: cat", table.get(1, 4).toString());
+//  }
 
 }
