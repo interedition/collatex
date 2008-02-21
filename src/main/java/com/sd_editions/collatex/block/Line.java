@@ -33,4 +33,12 @@ public class Line extends Block {
 	  visitor.visitLine(this);
   }
 
+	public Block get(int i) {
+		Block child = this.getFirstChild();
+		for (int j = 1; j<i; j++) {
+			child = child.getNextSibling();
+		}
+		return child;
+	}
+
 }
