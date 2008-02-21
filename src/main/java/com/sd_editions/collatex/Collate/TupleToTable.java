@@ -44,9 +44,22 @@ public class TupleToTable {
 				witnessIndex = tuple.witnessIndex;
 				column = baseIndex * 2 - 2;
 				addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
+			} else if (difBaseIndex > 1 && difWitnessIndex == 1) {
+				baseIndex = baseIndex+1;
+				column = baseIndex * 2 - 2;
+				addOmissionToTable(base.get(baseIndex));
+				baseIndex = tuple.baseIndex;
+				witnessIndex = tuple.witnessIndex;
+				column = baseIndex * 2 - 2;
+				addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
 			}
 		}
 
+	}
+
+	private void addOmissionToTable(Word baseWord) {
+		Cell omission = new Omission(baseWord);
+		addAlignmentInformationToResult(2, omission);
 	}
 
 	private void addReplacementToTable(Word baseWord, Word replacementWord) {
