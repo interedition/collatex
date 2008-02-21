@@ -11,8 +11,8 @@ import com.sd_editions.collatex.Block.Word;
 public class WordAlignmentVisitor implements IntBlockVisitor {
   private Block witnessBlock;
   private ArrayList<Tuple> result;
-  private int baseIndex=1;
-  private int witnessIndex=1;
+  private int baseIndex = 1;
+  private int witnessIndex = 1;
 
   public WordAlignmentVisitor(BlockStructure variant) {
     this.witnessBlock = variant.getRootBlock();
@@ -47,16 +47,54 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
   }
 
   public void visitWord(Word baseWord) {
-    System.out.println("visitWord("+baseWord+")");
     Word witnessWord = (Word) witnessBlock;
-    if (baseWord.alignmentFactor(witnessWord) == 0) {
+    System.out.println("visitWord: comparing " + baseWord + " + " + witnessWord);
+    if (baseWord.alignsWith(witnessWord)) {
       result.add(new Tuple(baseIndex, witnessIndex));
+      baseIndex++;
+      witnessIndex++;
+      witnessBlock = witnessBlock.getNextSibling();
+    } else {
+      // now, first try to find a match in the witnessBlock for the baseWord
+      Block savedWitnessPosition = witnessBlock;
+      int savedWitnessIndex = witnessIndex;
+      boolean foundMatchInWitness = false;
+      while (!foundMatchInWitness && witnessWord.hasNextSibling()) {
+        witnessWord = (Word) witnessWord.getNextSibling();
+        witnessIndex++;
+        if (baseWord.alignsWith(witnessWord)) {
+          result.add(new Tuple(baseIndex, witnessIndex));
+          baseIndex++;
+          witnessIndex = savedWitnessIndex;
+          witnessBlock = witnessWord.getNextSibling();
+          foundMatchInWitness = true;
+        }
+      }
+      if (!foundMatchInWitness) {
+        // reset
+        witnessBlock = savedWitnessPosition;
+        witnessWord = (Word) savedWitnessPosition;
+        witnessIndex = savedWitnessIndex;
+        // now try to find a baseWord that matches the current witnessWord;
+        boolean foundMatchInBase = false;
+        while (!foundMatchInBase && baseWord.hasNextSibling()) {
+          baseWord = (Word) baseWord.getNextSibling();
+          baseIndex++;
+          if (baseWord.alignsWith(witnessWord)) {
+            result.add(new Tuple(baseIndex, witnessIndex));
+            witnessIndex++;
+            witnessIndex = savedWitnessIndex;
+            baseWord = (Word) baseWord.getNextSibling();
+            foundMatchInBase = true;
+          }
+        }
+      }
     }
-    baseIndex++;
-    witnessIndex++;
+
   }
 
   public Tuple[] getResult() {
+    System.out.println("getResult: " + result);
     return result.toArray(new Tuple[] {});
   }
 

@@ -14,22 +14,19 @@ public class WordAlignmentVisitorTest extends TestCase {
   public void testAlignmentPhase_a() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     final String base = "cat";
     final String witness = "cat";
-    Tuple[] expected = { new Tuple(1, 1) };
-    assertResultIsExpected(base, witness, expected);
+    assertResultIsExpected(base, witness, "[[1,1]]");
   }
 
-//  public void testAlignmentPhase_b() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-//    final String base = "a black cat";
-//    final String witness = "a white cat";
-//    Tuple[] expected = { new Tuple(1, 1), new Tuple(3, 3) };
-//    assertResultIsExpected(base, witness, expected);
-//  }
-//
+  public void testAlignmentPhase_b() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    final String base = "a black cat";
+    final String witness = "a white cat";
+    assertResultIsExpected(base, witness, "[[1,1],[3,3]]");
+  }
+
 //  public void testAlignmentPhase_c() throws FileNotFoundException, IOException, BlockStructureCascadeException {
 //    final String base = "a black cat";
 //    final String witness = "on a white mat";
-//    Tuple[] expected = { new Tuple(1, 2), new Tuple(3, 4) };
-//    assertResultIsExpected(base, witness, expected);
+//    assertResultIsExpected(base, witness, "[[1,2],[3,4]]");
 //  }
 
   private Tuple[] phase1Table(String baseString, String witnessString) throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -40,14 +37,16 @@ public class WordAlignmentVisitorTest extends TestCase {
     return visitor.getResult();
   }
 
-  private void assertResultIsExpected(final String base, final String witness, Tuple[] expected) throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    assertEquals(resultAsString(expected), resultAsString(phase1Table(base, witness)));
+  private void assertResultIsExpected(final String base, final String witness, String expected) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    assertEquals(expected, resultAsString(phase1Table(base, witness)));
   }
 
   private String resultAsString(Tuple[] array) {
     StringBuffer result = new StringBuffer("[");
+    String join = "";
     for (int i = 0; i < array.length; i++) {
-      result.append(array[i].toString());
+      result.append(join + array[i].toString());
+      join = ",";
     }
     result.append("]");
     return result.toString();
