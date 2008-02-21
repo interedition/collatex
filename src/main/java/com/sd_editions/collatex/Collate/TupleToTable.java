@@ -10,7 +10,7 @@ public class TupleToTable {
 	private final Line base;
 	private final Line witness;
 	private final Tuple[] tuples;
-	private int variant=1;
+	private int variant = 1;
 	private int column;
 
 	public TupleToTable(BlockStructure base, BlockStructure variant,
@@ -26,34 +26,47 @@ public class TupleToTable {
 		int baseIndex = 0;
 		int witnessIndex = 0;
 		for (int i = 0; i < tuples.length; i++) {
+			System.out.println("i: " + i + "; baseIndex: " + baseIndex + "; witnessIndex: " + witnessIndex);
 			Tuple tuple = tuples[i];
 			int difBaseIndex = tuple.baseIndex - baseIndex;
-			baseIndex =  tuple.baseIndex;
 			int difWitnessIndex = tuple.witnessIndex - witnessIndex;
-			witnessIndex = tuple.witnessIndex;
-			if (difBaseIndex ==1 && difWitnessIndex == 1) {
-				column = baseIndex*2-2;
+			if (difBaseIndex == 1 && difWitnessIndex == 1) {
+				baseIndex = tuple.baseIndex;
+				witnessIndex = tuple.witnessIndex;
+				column = baseIndex * 2 - 2;
 				addIdenticalToTable(base.get(baseIndex), witness.get(witnessIndex));
+			} else if (difBaseIndex > 1 && difWitnessIndex > 1) {
+				baseIndex = baseIndex+1;
+				witnessIndex = witnessIndex+1;
+				column = baseIndex * 2 - 2;
+				addReplacementToTable(base.get(baseIndex), witness.get(witnessIndex));
+				baseIndex = tuple.baseIndex;
+				witnessIndex = tuple.witnessIndex;
+				column = baseIndex * 2 - 2;
+				addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
 			}
 		}
-		
+
+	}
+
+	private void addReplacementToTable(Word baseWord, Word replacementWord) {
+		Cell replacement = new Replacement(baseWord, replacementWord);
+		addAlignmentInformationToResult(2, replacement);
 	}
 
 	private void addIdenticalToTable(Word baseWord, Word witnessWord) {
 		Cell alignment;
-		if (baseWord.alignmentFactor(witnessWord)==0) {
-			alignment = new AlignmentIdentical(baseWord, witnessWord);			
+		if (baseWord.alignmentFactor(witnessWord) == 0) {
+			alignment = new AlignmentIdentical(baseWord, witnessWord);
 		} else {
 			alignment = new AlignmentVariant(baseWord, witnessWord);
 		}
 		addAlignmentInformationToResult(2, alignment);
 	}
 
-
 	private void addAlignmentInformationToResult(int offset, Cell alignment) {
-		table.setCell(variant, column+offset, alignment);
+		table.setCell(variant, column + offset, alignment);
 	}
-	
 
 	public Table getTable() {
 		return table;

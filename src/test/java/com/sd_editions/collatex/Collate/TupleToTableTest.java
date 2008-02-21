@@ -18,7 +18,14 @@ public class TupleToTableTest extends TestCase {
     assertEquals("identical: cat", table.get(1, 6).toString());
   }
 
-	
+  public void testReplacement() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  	Tuple[] tuples = new Tuple[] { new Tuple(1,1), new Tuple(3,3) };
+    Table table = wordAlignmentTable("a white cat", "a black cat", tuples);
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("replacement: white / black", table.get(1, 4).toString());
+    assertEquals("identical: cat", table.get(1, 6).toString());
+  }
+
 	
 	private Table wordAlignmentTable(final String baseString, final String witnessString, Tuple[] tuples) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
