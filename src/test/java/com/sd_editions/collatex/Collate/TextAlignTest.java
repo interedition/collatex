@@ -152,7 +152,7 @@ public class TextAlignTest extends TestCase {
 		arrL = ta.collateBase2Wit();
 		ta.addAlignInfoRow(arrL);
 		
-	  assertEquals(arrL.toString(), "[1, , the, angry big, black, , cat, , sat, , on, , the, , red, , mat, ]");
+	  assertEquals(arrL.toString(), "[1, , the, angry big, black, , cat, sat on the red mat]");
   }
   
   public void testAlignment_variant() {
@@ -195,6 +195,32 @@ public class TextAlignTest extends TestCase {
 		ta.addAlignInfoRow(arrL);
 		assertEquals(arrL.toString(), "[1, , the, black and, white, , , , , , cat, ]");
 		assertEquals(12, arrL.size());
+  }
+  
+  public void testAlignment_new2() {
+	  TextAlign ta = new TextAlign();
+	  ArrayList arrL = new ArrayList<String>();
+		// Basis
+	  	ta.addNewBase(ta.createBlockStruct("str", "the white and black cat sat on mat"));
+		// Witnesses
+	  	ta.addNewWit(ta.createBlockStruct("str", "the black and white cat sat on the mat"));
+		arrL = testAlign(ta);
+		arrL = ta.collateBase2Wit();
+		ta.addAlignInfoRow(arrL);
+		assertEquals(arrL.toString(), "[1, , the, black and, white, , , , , , cat, , sat, , on, the, mat, ]");
+  }
+  
+  public void testAlignment_new3() {
+	  TextAlign ta = new TextAlign();
+	  ArrayList arrL = new ArrayList<String>();
+		// Basis
+	  	ta.addNewBase(ta.createBlockStruct("str", "the white and black cat sat on the green mat"));
+		// Witnesses
+	  	ta.addNewWit(ta.createBlockStruct("str", "the black and white cat sat on the red mat"));
+		arrL = testAlign(ta);
+		arrL = ta.collateBase2Wit();
+		ta.addAlignInfoRow(arrL);
+		assertEquals(arrL.toString(), "[1, , the, black and, white, , , , , , cat, , sat, , on, , the, red, , , mat, ]");
   }
   
 }

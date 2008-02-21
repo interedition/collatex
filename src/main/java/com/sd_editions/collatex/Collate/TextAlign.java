@@ -315,18 +315,31 @@ public class TextAlign {
 
 					break;
 				}
-			}
+			}// Ende while
 
 		} // Ende while
-		for (int k = j; k < this.wit.size(); k += 2) {
-			if (k >= this.wit.size() - 1) {
-				break;
+		if (this.base.size() > this.wit.size()) {
+			for (int k = j; k < this.wit.size(); k += 2) {
+				if (k >= this.wit.size() - 1) {
+					break;
+				}
+				arrLnew.add(this.slot);
+				arrLnew.add(this.wit.get(k));
 			}
 			arrLnew.add(this.slot);
-			arrLnew.add(this.wit.get(k));
+		} else {
+			for (int k = j; k < this.wit.size(); k += 2) {
+				if (k >= this.wit.size() - 1) {
+					break;
+				}
+				sb.append(this.wit.get(k) + " ");
+			}
+			arrLnew.add(sb.toString().trim());
+			sb.delete(0, sb.length());
 		}
 
-		arrLnew.add(this.slot);
+
+		//arrLnew.add(this.slot);
 		return arrLnew;
 	}
 
