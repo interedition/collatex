@@ -44,6 +44,18 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
     // TODO: move to next line etc...
   }
 
+//ArrayList<Word> skipped = new ArrayList<Word>();
+//boolean match=false;
+//while(match==false&&witnessWord!=null) {
+//	if(baseWord.alignsWith(witnessWord)) {
+//		match=true;
+//	} else {
+//		skipped.add(witnessWord);
+//		witnessWord = (Word) witnessWord.getNextSibling();
+//	}
+//}
+
+
   public void visitWord(Word baseWord) {
   	pTable.setCell(0, column+2, new BaseWord(baseWord));
     Word witnessWord = (Word) witnessBlock;
