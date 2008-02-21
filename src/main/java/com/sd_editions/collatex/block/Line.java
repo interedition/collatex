@@ -40,5 +40,18 @@ public class Line extends Block {
 		}
 		return child;
 	}
+	
+	public int size() {
+		if (!this.hasFirstChild()) {
+			return 0;
+		}
+		int i =1;
+		Block child = this.getFirstChild();
+		while(child.hasNextSibling()) {
+			i++;
+			child = child.getNextSibling();
+		}
+		return i;
+	}
 
 }
