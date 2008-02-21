@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.Collate;
 
+import TextAlign;
+
 import java.util.ArrayList;
 import junit.framework.TestCase;
 
@@ -179,6 +181,20 @@ public class TextAlignTest extends TestCase {
 		ta.addAlignInfoRow(arrL);
 
 	  assertEquals(arrL.toString(), "[1, , A, , red /yellow, , cat, ]");
+  }
+  
+  public void testAlignment_new() {
+	  TextAlign ta = new TextAlign();
+	  ArrayList arrL = new ArrayList<String>();
+		// Basis
+	  	ta.addNewBase(ta.createBlockStruct("str", "the white and black cat"));
+		// Witnesses
+	  	ta.addNewWit(ta.createBlockStruct("str", "the black and white cat"));
+		arrL = testAlign(ta);
+		arrL = ta.collateBase2Wit();
+		ta.addAlignInfoRow(arrL);
+		assertEquals(arrL.toString(), "[1, , the, black and, white, , , , , , cat, ]");
+		assertEquals(12, arrL.size());
   }
   
 }
