@@ -26,7 +26,8 @@ public class TupleToTable {
 		int baseIndex = 0;
 		int witnessIndex = 0;
 		for (int i = 0; i < tuples.length; i++) {
-			System.out.println("i: " + i + "; baseIndex: " + baseIndex + "; witnessIndex: " + witnessIndex);
+			System.out.println("i: " + i + "; baseIndex: " + baseIndex
+					+ "; witnessIndex: " + witnessIndex);
 			Tuple tuple = tuples[i];
 			int difBaseIndex = tuple.baseIndex - baseIndex;
 			int difWitnessIndex = tuple.witnessIndex - witnessIndex;
@@ -36,32 +37,51 @@ public class TupleToTable {
 				column = baseIndex * 2 - 2;
 				addIdenticalToTable(base.get(baseIndex), witness.get(witnessIndex));
 			} else if (difBaseIndex > 1 && difWitnessIndex > 1) {
-				baseIndex = baseIndex+1;
-				witnessIndex = witnessIndex+1;
+				baseIndex = baseIndex + 1;
+				witnessIndex = witnessIndex + 1;
 				column = baseIndex * 2 - 2;
 				addReplacementToTable(base.get(baseIndex), witness.get(witnessIndex));
 				baseIndex = tuple.baseIndex;
 				witnessIndex = tuple.witnessIndex;
 				column = baseIndex * 2 - 2;
-				addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
+				addIdenticalToTable(base.get(tuple.baseIndex), witness
+						.get(tuple.witnessIndex));
 			} else if (difBaseIndex > 1 && difWitnessIndex == 1) {
-				baseIndex = baseIndex+1;
+				baseIndex = baseIndex + 1;
 				column = baseIndex * 2 - 2;
 				addOmissionToTable(base.get(baseIndex));
 				baseIndex = tuple.baseIndex;
 				witnessIndex = tuple.witnessIndex;
 				column = baseIndex * 2 - 2;
-				addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
+				addIdenticalToTable(base.get(tuple.baseIndex), witness
+						.get(tuple.witnessIndex));
 			} else if (difBaseIndex == 1 && difWitnessIndex > 1) {
-				baseIndex = baseIndex+1;
+				baseIndex = baseIndex + 1;
 				witnessIndex++;
 				column = baseIndex * 2 - 2;
 				addAdditionToTable(witness.get(witnessIndex));
 				baseIndex = tuple.baseIndex;
 				witnessIndex = tuple.witnessIndex;
 				column = baseIndex * 2 - 2;
-				addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
+				addIdenticalToTable(base.get(tuple.baseIndex), witness
+						.get(tuple.witnessIndex));
 			}
+		}
+		int difBaseIndex = base.size() - baseIndex;
+		int difWitnessIndex = witness.size() - witnessIndex;
+		if (difBaseIndex > 0 && difWitnessIndex > 0) {
+			baseIndex = baseIndex + 1;
+			witnessIndex = witnessIndex + 1;
+			column = baseIndex * 2 - 2;
+			addReplacementToTable(base.get(baseIndex), witness.get(witnessIndex));
+		} else if (difBaseIndex > 0 && difWitnessIndex == 0) {
+			baseIndex++;
+			column = baseIndex * 2 - 2;
+			addOmissionToTable(base.get(baseIndex));
+		} else if (difBaseIndex == 0 && difWitnessIndex > 0) {
+			witnessIndex++;
+			column = baseIndex * 2;
+			addAdditionToTable(witness.get(witnessIndex));
 		}
 
 	}

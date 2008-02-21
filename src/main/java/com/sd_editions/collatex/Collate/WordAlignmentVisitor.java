@@ -51,6 +51,7 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     Word witnessWord = (Word) witnessBlock;
     System.out.println("visitWord: comparing " + baseWord + " + " + witnessWord);
     System.out.println("index: [" + baseIndex + "," + witnessIndex + "]");
+    if (witnessWord == null) return;
     if (baseWord.alignsWith(witnessWord)) {
       result.add(new Tuple(baseIndex, witnessIndex));
       witnessIndex++;
