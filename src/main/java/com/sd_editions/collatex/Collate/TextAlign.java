@@ -199,7 +199,8 @@ public class TextAlign {
 		StringBuffer sb = new StringBuffer();
 		boolean collate = true;
 		boolean muneq = false;
-		boolean merkh = false;;
+		boolean merkh = false;
+		;
 		boolean first = true;
 		int pos1eq = 0;
 		int pos2eq = 0;
@@ -209,17 +210,17 @@ public class TextAlign {
 		int j = 2;
 		int z = 1;
 		arrLnew.add(this.wit.get(0));
-		//arrLnew.add(this.slot);
-		
+		// arrLnew.add(this.slot);
+
 		// Collate
 		while (collate) {
-			if (this.base.size()==i) {
-				for (int k = 0; k < ((i-posfirstuneq)/2); k++) {
-					if (!(this.wit.size()==j)) {
+			if (this.base.size() == i) {
+				for (int k = 0; k < ((i - posfirstuneq) / 2); k++) {
+					if (!(this.wit.size() == j)) {
 						arrLnew.add(this.wit.get(j));
 						arrLnew.add(this.slot);
 						arrLnew.add(this.slot);
-						j+=2;
+						j += 2;
 					} else {
 						arrLnew.add(this.slot);
 						arrLnew.add(this.slot);
@@ -229,35 +230,35 @@ public class TextAlign {
 			}
 			while ((this.base.get(i).equalsIgnoreCase(this.wit.get(j)))) {
 				first = true;
-				//For Variant indent
+				// For Variant indent
 				if (pos1eq == 0) {
-					pos1eq=i;
+					pos1eq = i;
 				} else {
-					pos2eq=i;
+					pos2eq = i;
 				}
 				if (muneq) {
-					muneq=false;
-					for (int k = i; k <= j; k+=2) {
+					muneq = false;
+					for (int k = i; k <= j; k += 2) {
 						if (j != posfirstuneq) {
 							if (!proofCollate(i, posfirstuneq)) {
 								break;
 							}
-							sb.append(this.wit.get(posfirstuneq)+" ");
+							sb.append(this.wit.get(posfirstuneq) + " ");
 						}
-						posfirstuneq+=2;
-						merkh=true;
+						posfirstuneq += 2;
+						merkh = true;
 						z++;
 					}
 					if (merkh) {
-						//Is Variant?
-						if ((pos2eq-pos1eq)/2 == 2) {
+						// Is Variant?
+						if ((pos2eq - pos1eq) / 2 == 2) {
 							arrLnew.add(this.slot);
-							sb.append("/" + this.base.get((pos2eq-pos1eq)));
+							sb.append("/" + this.base.get((pos2eq - pos1eq)));
 							arrLnew.add(sb.toString().trim());
 							sb.delete(0, sb.length());
-							pos1eq=0;
-							pos2eq=0;
-							z=0;
+							pos1eq = 0;
+							pos2eq = 0;
+							z = 0;
 						} else {
 							arrLnew.add(sb.toString().trim());
 							sb.delete(0, sb.length());
@@ -266,23 +267,28 @@ public class TextAlign {
 					}
 
 					for (int k = 0; k <= z; k++) {
-						if (posfirstuneq>i) {
+						if (posfirstuneq > i) {
 							break;
 						}
 						arrLnew.add(this.slot);
 					}
-					z=0;
+					z = 0;
 				} else {
 					if (merkh) {
-						merkh=false;
+						merkh = false;
 					} else {
 						arrLnew.add(this.slot);
 					}
+					if (z == 0 && i != arrLnew.size() && i==j) {
+						for (int k = 0; k < 4; k++) {
+							arrLnew.add(this.slot);
+						}
+					}
 					arrLnew.add(this.wit.get(j));
-					j+=2;
-					i+=2;
+					j += 2;
+					i += 2;
 				}
-				
+
 				if (!proofCollate(i, j)) {
 					break;
 				}
@@ -294,31 +300,31 @@ public class TextAlign {
 				if (first) {
 					muneq = true;
 					first = false;
-					posfirstuneq=j;
+					posfirstuneq = j;
 				}
-				j+=2;
-				
+				j += 2;
+
 				if (!proofCollate(i, j)) {
-					i+=2;
-					if (this.wit.size()-2 > i) {
-						j=i;
+					i += 2;
+					if (this.wit.size() - 2 > i) {
+						j = i;
 					} else {
 						z++;
-						j=posfirstuneq;
+						j = posfirstuneq;
 					}
-					
+
 					break;
 				}
 			}
-			
+
 		} // Ende while
-			for (int k = j; k < this.wit.size(); k += 2) {
-				if (k >= this.wit.size() - 1) {
-					break;
-				}
-				arrLnew.add(this.slot);
-				arrLnew.add(this.wit.get(k));
+		for (int k = j; k < this.wit.size(); k += 2) {
+			if (k >= this.wit.size() - 1) {
+				break;
 			}
+			arrLnew.add(this.slot);
+			arrLnew.add(this.wit.get(k));
+		}
 
 		arrLnew.add(this.slot);
 		return arrLnew;
