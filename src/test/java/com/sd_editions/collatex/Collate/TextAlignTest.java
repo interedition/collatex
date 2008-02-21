@@ -1,6 +1,6 @@
 package com.sd_editions.collatex.Collate;
 
-import TextAlign;
+import com.sd_editions.collatex.Collate.TextAlign;
 
 import java.util.ArrayList;
 import junit.framework.TestCase;
