@@ -22,7 +22,7 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
   public TextAlignmentVisitor(Word variant) {
     this.witnessBlock = variant;
     this.result = new BlockStructure();
-    createNewTableInResult();
+    createNewTableInResult(1);
   }
 
 	public void visitBlockStructure(BlockStructure blockStructure) {
@@ -31,7 +31,7 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
   }
 
   public void visitLine(Line line) {
-  	createNewTableInResult();
+  	createNewTableInResult(line.size());
     this.witnessBlock = witnessBlock.getFirstChild();
     Word w = (Word) line.getFirstChild();
     column = 0;
@@ -144,8 +144,8 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 		addAlignmentInformationToResult(2, alignment);
 	}
 
-  private void createNewTableInResult() {
-		Table nTable = new Table();
+  private void createNewTableInResult(int size) {
+		Table nTable = new Table(size);
 		if (pTable == null) {
 			try {
 				result.setRootBlock(nTable, true);

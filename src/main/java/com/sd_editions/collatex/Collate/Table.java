@@ -6,9 +6,15 @@ import com.sd_editions.collatex.Block.IntBlockVisitor;
 public class Table extends Block {
 
 	private Cell[][] cells;
+	private final int baselinesize;
 
-	public Table() {
-		this.cells = new Cell[10][10]; // TODO: make dimensions flexible
+	public Table(int baselinesize) {
+		this.baselinesize = baselinesize;
+		this.cells = new Cell[10][size()+1];
+	}
+
+	private int size() {
+		return baselinesize*2+1;
 	}
 
 	@Override
@@ -31,7 +37,7 @@ public class Table extends Block {
 	public String toHTML() {
 		String alignmentTableHTML = "<table border=\"1\">";
 		alignmentTableHTML += "<tr><td>Numbers</td>";
-		for (int i = 1; i < 10; i++) {
+		for (int i = 1; i <= size(); i++) {
 			alignmentTableHTML += "<td>";
 			alignmentTableHTML += "" + i;
 			alignmentTableHTML += "</td>";
@@ -45,7 +51,7 @@ public class Table extends Block {
 
 	private String showRow(int row, String label) {
 		String alignmentTableHTML = "<tr><td>"+label+"</td>";
-		for (int i = 1; i < 10; i++) {
+		for (int i = 1; i <= size(); i++) {
 			Cell cell = get(row, i);
 			alignmentTableHTML += "<td>";
 			alignmentTableHTML += cell.toHTML();
