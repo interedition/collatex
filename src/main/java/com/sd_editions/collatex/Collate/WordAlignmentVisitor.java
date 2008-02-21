@@ -41,6 +41,7 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     w.accept(this);
     while (w.hasNextSibling()) {
       w = (Word) w.getNextSibling();
+      baseIndex++;
       w.accept(this);
     }
     // TODO: move to next line etc...
@@ -49,9 +50,9 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
   public void visitWord(Word baseWord) {
     Word witnessWord = (Word) witnessBlock;
     System.out.println("visitWord: comparing " + baseWord + " + " + witnessWord);
+    System.out.println("index: [" + baseIndex + "," + witnessIndex + "]");
     if (baseWord.alignsWith(witnessWord)) {
       result.add(new Tuple(baseIndex, witnessIndex));
-      baseIndex++;
       witnessIndex++;
       witnessBlock = witnessBlock.getNextSibling();
     } else {
@@ -62,10 +63,10 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
       while (!foundMatchInWitness && witnessWord.hasNextSibling()) {
         witnessWord = (Word) witnessWord.getNextSibling();
         witnessIndex++;
+        witnessBlock = witnessBlock.getNextSibling();
         if (baseWord.alignsWith(witnessWord)) {
           result.add(new Tuple(baseIndex, witnessIndex));
-          baseIndex++;
-          witnessIndex = savedWitnessIndex;
+          witnessIndex++;
           witnessBlock = witnessWord.getNextSibling();
           foundMatchInWitness = true;
         }
@@ -75,22 +76,8 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
         witnessBlock = savedWitnessPosition;
         witnessWord = (Word) savedWitnessPosition;
         witnessIndex = savedWitnessIndex;
-        // now try to find a baseWord that matches the current witnessWord;
-        boolean foundMatchInBase = false;
-        while (!foundMatchInBase && baseWord.hasNextSibling()) {
-          baseWord = (Word) baseWord.getNextSibling();
-          baseIndex++;
-          if (baseWord.alignsWith(witnessWord)) {
-            result.add(new Tuple(baseIndex, witnessIndex));
-            witnessIndex++;
-            witnessIndex = savedWitnessIndex;
-            baseWord = (Word) baseWord.getNextSibling();
-            foundMatchInBase = true;
-          }
-        }
       }
     }
-
   }
 
   public Tuple[] getResult() {

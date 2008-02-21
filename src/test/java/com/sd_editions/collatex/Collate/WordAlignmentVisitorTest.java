@@ -23,11 +23,11 @@ public class WordAlignmentVisitorTest extends TestCase {
     assertResultIsExpected(base, witness, "[[1,1],[3,3]]");
   }
 
-//  public void testAlignmentPhase_c() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-//    final String base = "a black cat";
-//    final String witness = "on a white mat";
-//    assertResultIsExpected(base, witness, "[[1,2],[3,4]]");
-//  }
+  public void testAlignmentPhase_c() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    final String base = "a black cat";
+    final String witness = "on a white mat";
+    assertResultIsExpected(base, witness, "[[1,2],[3,4]]");
+  }
 
   private Tuple[] phase1Table(String baseString, String witnessString) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
