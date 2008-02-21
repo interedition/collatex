@@ -33,6 +33,16 @@ public class TupleToTableTest extends TestCase {
     assertEquals("omission: white", table.get(1, 4).toString());
     assertEquals("identical: horse", table.get(1, 6).toString());
   }
+  
+  public void testAddition_InTheMiddle() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  	Tuple[] tuples = new Tuple[] { new Tuple(1,1), new Tuple(2,3) };
+    Table table = wordAlignmentTable("a cat", "a calico cat", tuples);
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("addition: calico", table.get(1, 3).toString());
+    assertEquals("identical: cat", table.get(1, 4).toString());
+  }
+
+
 
 	
 	private Table wordAlignmentTable(final String baseString, final String witnessString, Tuple[] tuples) throws FileNotFoundException, IOException, BlockStructureCascadeException {
