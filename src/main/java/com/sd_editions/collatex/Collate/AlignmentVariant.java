@@ -20,5 +20,9 @@ public class AlignmentVariant extends Cell {
 	public String toHTML() {
 		return witness.getContent();
 	}
-	
+  @Override
+  public String getType() {
+    return "variant";
+  }
+
 }

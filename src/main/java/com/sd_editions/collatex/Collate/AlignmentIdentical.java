@@ -20,4 +20,9 @@ public class AlignmentIdentical extends Cell {
 		return witness.getContent();
 	}
 
+	@Override
+  public String getType() {
+    return "identical";
+  }
+
 }

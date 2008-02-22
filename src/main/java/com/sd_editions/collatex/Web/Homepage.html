@@ -2,14 +2,33 @@
 <title>
 CollateX
 </title>
+<head>
+  <style type="text/css">
+    .baseword    { color: black; font-style: italic; }
+	.identical   { color: black; }
+    .addition    { color: #3366FF; }
+	.variant     { color: #FF3366; }
+	.nonalign    { color: #B88A00; }
+	.omission    { color: #009933; }
+	.replacement { color: #FFCC33; }
+  </style>
+</head>
 <body>
 Base: <span wicket:id="base">base comes here</span><br/>
 Witness: <span wicket:id="witness">witness comes here</span><br/><br/>
 Alignment: <span wicket:id="alignment">alignment table comes here</span>
-</body><br/><br/>
+Legend: [<span class="baseword">baseword</span>]
+        [<span class="identical">identical</span>]
+        [<span class="addition">addition</span>]   
+        [<span class="variant">variant</span>]   
+        [<span class="nonalign">nonalign</span>]   
+        [<span class="omission">omission</span>]   
+        [<span class="replacement">replacement</span>]   
+<br/><br/>
 <form wicket:id="alignmentform">
-Enter base: <input type="text" wicket:id="base"/><br/>
-Enter witness: <input type="text" wicket:id="witness"/><br/>
+Enter base: <input type="text" size="100" wicket:id="base"/><br/>
+Enter witness: <input type="text" size="100" wicket:id="witness"/><br/>
 <input type="submit"/>
 </form>
+</body>
 </html>

@@ -38,5 +38,10 @@ public class Addition extends Cell {
 	public String toHTML() {
 		return additionsToString();
 	}
+
+  @Override
+  public String getType() {
+    return "addition";
+  }
 	
 }

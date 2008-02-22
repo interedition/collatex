@@ -31,6 +31,7 @@ public class Homepage extends WebPage {
     add(new AlignmentForm("alignmentform", model));
   }
 
+  @SuppressWarnings("serial")
   class ModelForView implements Serializable {
     private String base;
     private String witness;
@@ -48,8 +49,7 @@ public class Homepage extends WebPage {
       try {
         baseStructure = new StringInputPlugin(base).readFile();
         witnessStructure = new StringInputPlugin(witness).readFile();
-      } catch (FileNotFoundException e) { // TODO: work away those exceptions..
-                                          // they are not relevant for Strings
+      } catch (FileNotFoundException e) { // TODO: work away those exceptions.. they are not relevant for Strings
         throw new RuntimeException(e);
       } catch (IOException e) {
         throw new RuntimeException(e);
@@ -88,6 +88,7 @@ public class Homepage extends WebPage {
     }
   }
 
+  @SuppressWarnings("serial")
   class AlignmentForm extends Form {
 
     private final ModelForView modelForView;
