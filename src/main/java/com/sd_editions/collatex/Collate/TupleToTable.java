@@ -1,6 +1,5 @@
 package com.sd_editions.collatex.Collate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.sd_editions.collatex.Block.BlockStructure;
@@ -34,13 +33,8 @@ public class TupleToTable {
       int difWitnessIndex = tuple.witnessIndex - witnessIndex;
       if (difBaseIndex > 1 && difWitnessIndex > 1) {
         baseIndex++;
-        witnessIndex++;
         column = baseIndex * 2 - 2;
-        List<Word> replacementWords = new ArrayList<Word>() {
-        };
-        for (int j = witnessIndex; j < tuple.witnessIndex; j++) {
-          replacementWords.add(witness.get(j));
-        }
+        List<Word> replacementWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1); 
         addReplacementToTable(base.get(baseIndex), replacementWords);
       } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
         baseIndex++;
@@ -48,13 +42,8 @@ public class TupleToTable {
         addOmissionToTable(base.get(baseIndex));
       } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
         baseIndex++;
-        witnessIndex++;
         column = baseIndex * 2 - 2;
-        List<Word> additionalWords = new ArrayList<Word>() {
-        };
-        for (int j = witnessIndex; j < tuple.witnessIndex; j++) {
-          additionalWords.add(witness.get(j));
-        }
+        List<Word> additionalWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1);
         addAdditionToTable(additionalWords);
       }
       baseIndex = tuple.baseIndex;
