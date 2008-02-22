@@ -42,11 +42,7 @@ public abstract class Block {
   }
 
   public boolean hasFirstChild() {
-    if (this.firstChild == null) {
-      return false;
-    } else {
-      return true;
-    }
+    return (this.firstChild != null);
   }
 
   protected void removeFirstChild() {
@@ -62,11 +58,7 @@ public abstract class Block {
   }
 
   public boolean hasLastChild() {
-    if (this.lastChild == null) {
-      return false;
-    } else {
-      return true;
-    }
+    return (this.lastChild != null);
   }
 
   protected void removeLastChild() {
@@ -82,11 +74,7 @@ public abstract class Block {
   }
 
   public boolean hasNextSibling() {
-    if (this.nextSibling == null) {
-      return false;
-    } else {
-      return true;
-    }
+    return (this.nextSibling != null);
   }
 
   protected void removeNextSibling() {
@@ -102,11 +90,7 @@ public abstract class Block {
   }
 
   public boolean hasPreviousSibling() {
-    if (this.previousSibling == null) {
-      return false;
-    } else {
-      return true;
-    }
+    return (this.previousSibling != null);
   }
 
   protected void removePreviousSibling() {
@@ -122,11 +106,7 @@ public abstract class Block {
   }
 
   public boolean hasStartParent() {
-    if (this.startParent == null) {
-      return false;
-    } else {
-      return true;
-    }
+    return (this.startParent != null);
   }
 
   protected void removeStartParent() {
@@ -142,11 +122,7 @@ public abstract class Block {
   }
 
   public boolean hasEndParent() {
-    if (this.endParent == null) {
-      return false;
-    } else {
-      return true;
-    }
+    return (this.endParent != null);
   }
 
   protected void removeEndParent() {
