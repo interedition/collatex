@@ -7,6 +7,8 @@ import com.sd_editions.collatex.Block.IntBlockVisitor;
 import com.sd_editions.collatex.Block.Line;
 import com.sd_editions.collatex.Block.Word;
 
+//NOTE: Obsolete code!!! See WordAlignmentVisitor and TupleToTable
+//TODO: move tests to integration test class
 public class TextAlignmentVisitor implements IntBlockVisitor {
   private Block witnessBlock;
   private BlockStructure result;
