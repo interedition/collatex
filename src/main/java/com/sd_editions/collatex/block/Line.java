@@ -1,5 +1,9 @@
 package com.sd_editions.collatex.Block;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  *
  *
@@ -52,6 +56,17 @@ public class Line extends Block {
 			child = child.getNextSibling();
 		}
 		return i;
+	}
+	
+	public List<Word> getPhrase(int i, int j) {
+	  List<Word> result = new ArrayList<Word>();
+	  Word word = get(i);
+	  result.add(word);
+	  for (int k = i; k < j; k++) {
+      word = (Word) word.getNextSibling();
+      result.add(word);
+    }
+	  return result;
 	}
 
 }
