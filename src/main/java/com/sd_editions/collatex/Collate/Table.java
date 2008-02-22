@@ -51,6 +51,11 @@ public class Table extends Block {
     addAlignmentInformationToResult(variant, baseIndex, 3, addition);
   }
 
+  public void setReplacement(int variant, int baseIndex, List<Word> replacementWords) {
+    Cell replacement = new Replacement(base.get(baseIndex), replacementWords);
+    addAlignmentInformationToResult(variant, baseIndex, 2, replacement);
+  }
+
 
   
   private void addAlignmentInformationToResult(int variant, int baseIndex, int offset, Cell alignment) {

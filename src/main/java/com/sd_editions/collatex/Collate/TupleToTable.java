@@ -33,7 +33,7 @@ public class TupleToTable {
       int difWitnessIndex = tuple.witnessIndex - witnessIndex;
       if (difBaseIndex > 1 && difWitnessIndex > 1) {
         List<Word> replacementWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1); 
-        addReplacementToTable(baseIndex+1, replacementWords);
+        table.setReplacement(variant, baseIndex+1, replacementWords);
       } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
         table.setOmission(variant, baseIndex+1);
       } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
@@ -48,7 +48,7 @@ public class TupleToTable {
     int difBaseIndex = base.size() - baseIndex;
     int difWitnessIndex = witness.size() - witnessIndex;
     if (difBaseIndex > 0 && difWitnessIndex > 0) {
-      addReplacementToTable(baseIndex+1, witness.getPhrase(witnessIndex+1, witness.size()));
+      table.setReplacement(variant, baseIndex+1, witness.getPhrase(witnessIndex+1, witness.size()));
     } else if (difBaseIndex > 0 && difWitnessIndex == 0) {
       table.setOmission(variant, baseIndex+1);
     } else if (difBaseIndex == 0 && difWitnessIndex > 0) {
@@ -58,13 +58,6 @@ public class TupleToTable {
   }
 
   // TODO: move to table!
-  //  table.setReplacement(1, baseIndex, List<Word> replacements)
-  private void addReplacementToTable(int baseIndex, List<Word> replacementWords) {
-    column = baseIndex * 2 - 2;
-    Cell replacement = new Replacement(base.get(baseIndex), replacementWords);
-    addAlignmentInformationToResult(2, replacement);
-  }
-
   private void addIdenticalToTable(Word baseWord, Word witnessWord) {
     Cell alignment;
     if (baseWord.alignmentFactor(witnessWord) == 0) {
