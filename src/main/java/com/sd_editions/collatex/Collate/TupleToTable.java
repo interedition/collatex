@@ -37,10 +37,8 @@ public class TupleToTable {
       } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
         addOmissionToTable(baseIndex+1);
       } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
-        baseIndex++;
-        column = baseIndex * 2 - 2;
         List<Word> additionalWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1);
-        addAdditionToTable(additionalWords);
+        addFrontAdditionToTable(baseIndex+1, additionalWords);
       }
       baseIndex = tuple.baseIndex;
       witnessIndex = tuple.witnessIndex;
@@ -54,17 +52,9 @@ public class TupleToTable {
     } else if (difBaseIndex > 0 && difWitnessIndex == 0) {
       addOmissionToTable(baseIndex+1);
     } else if (difBaseIndex == 0 && difWitnessIndex > 0) {
-      witnessIndex++;
-      column = baseIndex * 2;
-      String additionWord = "";
-      String divider = "";
-      for (int j = witnessIndex; j <= witness.size(); j++) {
-        additionWord += divider + witness.get(j).getContent();
-        divider = " ";
-      }
-      addAdditionToTable(new Word(additionWord));
+      List<Word> additionalWords = witness.getPhrase(witnessIndex+1, witness.size());
+      addBackAdditionToTable(baseIndex, additionalWords);
     }
-
   }
 
   private void addOmissionToTable(int baseIndex) {
@@ -73,16 +63,18 @@ public class TupleToTable {
     addAlignmentInformationToResult(2, omission);
   }
 
-  private void addAdditionToTable(Word witnessWord) {
-    Cell addition = new Addition(witnessWord);
-    addAlignmentInformationToResult(1, addition);
-  }
-
-  private void addAdditionToTable(List<Word> witnessWords) {
+  private void addFrontAdditionToTable(int baseIndex, List<Word> witnessWords) {
+    column = baseIndex * 2 - 2;
     Cell addition = new Addition(witnessWords);
     addAlignmentInformationToResult(1, addition);
   }
   
+  private void addBackAdditionToTable(int baseIndex, List<Word> witnessWords) {
+    column = baseIndex * 2 - 2;
+    Cell addition = new Addition(witnessWords);
+    addAlignmentInformationToResult(3, addition);
+  }
+
   //  table.setReplacement(1, baseIndex, List<Word> replacements)
   private void addReplacementToTable(int baseIndex, List<Word> replacementWords) {
     column = baseIndex * 2 - 2;
