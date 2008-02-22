@@ -33,16 +33,18 @@ public class Table extends Block {
     return cell;
   }
 
-  public void setOmission(int witness, int baseIndex) {
-    Cell omission = new Omission(base.get(baseIndex));
-    addAlignmentInformationToResult(witness, baseIndex, 2, omission);
+  public void setOmission(int witness, int baseIndexStart, int baseIndexEnd) {
+    for (int i = baseIndexStart; i < baseIndexEnd; i++) {
+      Cell omission = new Omission(base.get(i));
+      addAlignmentInformationToResult(witness, i, 2, omission);
+    }
   }
-  
+
   public void setFrontAddition(int witness, int baseIndex, List<Word> witnessWords) {
     Cell addition = new Addition(witnessWords);
     addAlignmentInformationToResult(witness, baseIndex, 1, addition);
   }
-  
+
   public void setBackAddition(int witness, int baseIndex, List<Word> witnessWords) {
     Cell addition = new Addition(witnessWords);
     addAlignmentInformationToResult(witness, baseIndex, 3, addition);
@@ -64,14 +66,10 @@ public class Table extends Block {
     addAlignmentInformationToResult(witness, baseIndex, 2, alignment);
   }
 
-
-
-  
   private void addAlignmentInformationToResult(int witness, int baseIndex, int offset, Cell alignment) {
     int column = baseIndex * 2 - 2;
     setCell(witness, column + offset, alignment);
   }
-
 
   public void setCell(int witness, int column, Cell alignment) {
     cells[witness][column] = alignment;

@@ -31,13 +31,13 @@ public class TupleToTable {
       int difBaseIndex = tuple.baseIndex - baseIndex;
       int difWitnessIndex = tuple.witnessIndex - witnessIndex;
       if (difBaseIndex > 1 && difWitnessIndex > 1) {
-        List<Word> replacementWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1); 
-        table.setReplacement(witnessNr, baseIndex+1, replacementWords);
+        List<Word> replacementWords = witness.getPhrase(witnessIndex + 1, tuple.witnessIndex - 1);
+        table.setReplacement(witnessNr, baseIndex + 1, replacementWords);
       } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
-        table.setOmission(witnessNr, baseIndex+1);
+        table.setOmission(witnessNr, baseIndex + 1, tuple.baseIndex);
       } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
-        List<Word> additionalWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1);
-        table.setFrontAddition(witnessNr, baseIndex+1, additionalWords);
+        List<Word> additionalWords = witness.getPhrase(witnessIndex + 1, tuple.witnessIndex - 1);
+        table.setFrontAddition(witnessNr, baseIndex + 1, additionalWords);
       }
       baseIndex = tuple.baseIndex;
       witnessIndex = tuple.witnessIndex;
@@ -46,11 +46,11 @@ public class TupleToTable {
     int difBaseIndex = base.size() - baseIndex;
     int difWitnessIndex = witness.size() - witnessIndex;
     if (difBaseIndex > 0 && difWitnessIndex > 0) {
-      table.setReplacement(witnessNr, baseIndex+1, witness.getPhrase(witnessIndex+1, witness.size()));
+      table.setReplacement(witnessNr, baseIndex + 1, witness.getPhrase(witnessIndex + 1, witness.size()));
     } else if (difBaseIndex > 0 && difWitnessIndex == 0) {
-      table.setOmission(witnessNr, baseIndex+1);
+      table.setOmission(witnessNr, baseIndex + 1, base.size()+1);
     } else if (difBaseIndex == 0 && difWitnessIndex > 0) {
-      List<Word> additionalWords = witness.getPhrase(witnessIndex+1, witness.size());
+      List<Word> additionalWords = witness.getPhrase(witnessIndex + 1, witness.size());
       table.setBackAddition(witnessNr, baseIndex, additionalWords);
     }
   }

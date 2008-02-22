@@ -52,24 +52,28 @@ public class TextAlignmentTest extends TestCase {
   }
 
   public void testOmission_InTheMiddle() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    Table table = alignmentTable("a white horse", "a horse");
+    Table table = alignmentTable("a white working horse", "a horse");
     assertEquals("identical: a", table.get(1, 2).toString());
     assertEquals("omission: white", table.get(1, 4).toString());
-    assertEquals("identical: horse", table.get(1, 6).toString());
+    assertEquals("omission: working", table.get(1, 6).toString());
+    assertEquals("identical: horse", table.get(1, 8).toString());
   }
 
   public void testOmission_AtTheStart() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    Table table = alignmentTable("a certain death", "certain death");
-    assertEquals("omission: a", table.get(1, 2).toString());
-    assertEquals("identical: certain", table.get(1, 4).toString());
-    assertEquals("identical: death", table.get(1, 6).toString());
+    Table table = alignmentTable("an almost certain death", "certain death");
+    assertEquals("omission: an", table.get(1, 2).toString());
+    assertEquals("omission: almost", table.get(1, 4).toString());
+    assertEquals("identical: certain", table.get(1, 6).toString());
+    assertEquals("identical: death", table.get(1, 8).toString());
   }
 
   public void testOmission_AtTheEnd() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    Table table = alignmentTable("a calico cat", "a calico");
+    Table table = alignmentTable("a calico, or tortoiseshell cat", "a calico");
     assertEquals("identical: a", table.get(1, 2).toString());
     assertEquals("identical: calico", table.get(1, 4).toString());
-    assertEquals("omission: cat", table.get(1, 6).toString());
+    assertEquals("omission: or", table.get(1, 6).toString());
+    assertEquals("omission: tortoiseshell", table.get(1, 8).toString());
+    assertEquals("omission: cat", table.get(1, 10).toString());
   }
 
   public void testAddition_InTheMiddle() throws FileNotFoundException, IOException, BlockStructureCascadeException {
