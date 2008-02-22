@@ -32,10 +32,8 @@ public class TupleToTable {
       int difBaseIndex = tuple.baseIndex - baseIndex;
       int difWitnessIndex = tuple.witnessIndex - witnessIndex;
       if (difBaseIndex > 1 && difWitnessIndex > 1) {
-        baseIndex++;
-        column = baseIndex * 2 - 2;
         List<Word> replacementWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1); 
-        addReplacementToTable(base.get(baseIndex), replacementWords);
+        addReplacementToTable(baseIndex+1, replacementWords);
       } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
         baseIndex++;
         column = baseIndex * 2 - 2;
@@ -54,10 +52,7 @@ public class TupleToTable {
     int difBaseIndex = base.size() - baseIndex;
     int difWitnessIndex = witness.size() - witnessIndex;
     if (difBaseIndex > 0 && difWitnessIndex > 0) {
-      baseIndex = baseIndex + 1;
-      witnessIndex = witnessIndex + 1;
-      column = baseIndex * 2 - 2;
-      addReplacementToTable(base.get(baseIndex), witness.get(witnessIndex));
+      addReplacementToTable(baseIndex+1, witness.getPhrase(witnessIndex+1, witness.size()));
     } else if (difBaseIndex > 0 && difWitnessIndex == 0) {
       baseIndex++;
       column = baseIndex * 2 - 2;
@@ -90,14 +85,11 @@ public class TupleToTable {
     Cell addition = new Addition(witnessWords);
     addAlignmentInformationToResult(1, addition);
   }
-//  table.setReplacement(1, baseIndex, List<Word> replacements)
-  private void addReplacementToTable(Word baseWord, Word replacementWord) {
-    Cell replacement = new Replacement(baseWord, replacementWord);
-    addAlignmentInformationToResult(2, replacement);
-  }
-
-  private void addReplacementToTable(Word baseWord, List<Word> replacementWords) {
-    Cell replacement = new Replacement(baseWord, replacementWords);
+  
+  //  table.setReplacement(1, baseIndex, List<Word> replacements)
+  private void addReplacementToTable(int baseIndex, List<Word> replacementWords) {
+    column = baseIndex * 2 - 2;
+    Cell replacement = new Replacement(base.get(baseIndex), replacementWords);
     addAlignmentInformationToResult(2, replacement);
   }
 
