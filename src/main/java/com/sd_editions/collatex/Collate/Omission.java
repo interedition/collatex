@@ -16,7 +16,7 @@ public class Omission extends Cell {
 
   @Override
   public String toHTML() {
-    return "&nbsp;";
+    return "{" + base.getContent() + "}";
   }
 
   @Override
