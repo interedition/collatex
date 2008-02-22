@@ -1,10 +1,10 @@
 package com.sd_editions.collatex.Block;
 
-import java.lang.String;
 import java.util.HashMap;
+
 /**
  * Our basic block class.
- * This shouldn't be used itself, use one of it's subclasses or create your own
+ * This shouldn't be used itself, use one of its subclasses or create your own
  *
  */
 public abstract class Block {
@@ -22,151 +22,151 @@ public abstract class Block {
   private Block endParent;
 
   public Block() {
-	this.attributes = new HashMap();
+    this.attributes = new HashMap<String, String>();
   }
 
   public String getName() {
-	return this.name;
+    return this.name;
   }
 
   protected void setName(String name) {
-	this.name = name;
+    this.name = name;
   }
 
   protected void setFirstChild(Block firstChild) {
-	this.firstChild = firstChild;
+    this.firstChild = firstChild;
   }
 
   public Block getFirstChild() {
-	return firstChild;
+    return firstChild;
   }
 
   public boolean hasFirstChild() {
-	if (this.firstChild==null) {
-	  return false;
-	} else {
-	  return true;
-	}
+    if (this.firstChild == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   protected void removeFirstChild() {
-	this.firstChild = null;
+    this.firstChild = null;
   }
 
   protected void setLastChild(Block lastChild) {
-	this.lastChild = lastChild;
+    this.lastChild = lastChild;
   }
 
   public Block getLastChild() {
-	return this.lastChild;
+    return this.lastChild;
   }
 
   public boolean hasLastChild() {
-	if (this.lastChild==null) {
-	  return false;
-	} else {
-	  return true;
-	}
+    if (this.lastChild == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   protected void removeLastChild() {
-	this.lastChild = null;
+    this.lastChild = null;
   }
 
   protected void setNextSibling(Block nextSibling) {
-	this.nextSibling = nextSibling;
+    this.nextSibling = nextSibling;
   }
 
   public Block getNextSibling() {
-	return this.nextSibling;
+    return this.nextSibling;
   }
 
   public boolean hasNextSibling() {
-	if (this.nextSibling==null) {
-	  return false;
-	} else {
-	  return true;
-	}
+    if (this.nextSibling == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   protected void removeNextSibling() {
-	this.nextSibling = null;
+    this.nextSibling = null;
   }
 
   protected void setPreviousSibling(Block previousSibling) {
-	this.previousSibling = previousSibling;
+    this.previousSibling = previousSibling;
   }
 
   public Block getPreviousSibling() {
-	return this.previousSibling;
+    return this.previousSibling;
   }
 
   public boolean hasPreviousSibling() {
-	if (this.previousSibling==null) {
-	  return false;
-	} else {
-	  return true;
-	}
+    if (this.previousSibling == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   protected void removePreviousSibling() {
-	this.previousSibling = null;
+    this.previousSibling = null;
   }
 
   protected void setStartParent(Block startParent) {
-	this.startParent = startParent;
+    this.startParent = startParent;
   }
 
   public Block getStartParent() {
-	return this.startParent;
+    return this.startParent;
   }
 
   public boolean hasStartParent() {
-	if (this.startParent==null) {
-	  return false;
-	} else {
-	  return true;
-	}
+    if (this.startParent == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   protected void removeStartParent() {
-	this.startParent = null;
+    this.startParent = null;
   }
 
   protected void setEndParent(Block endParent) {
-	this.endParent = endParent;
+    this.endParent = endParent;
   }
 
   public Block getEndParent() {
-	return this.endParent;
+    return this.endParent;
   }
 
   public boolean hasEndParent() {
-	if (this.endParent==null) {
-	  return false;
-	} else {
-	  return true;
-	}
+    if (this.endParent == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   protected void removeEndParent() {
-	this.endParent = null;
+    this.endParent = null;
   }
 
   public void setAttribute(String key, String value) {
-	this.attributes.put(key, value);
+    this.attributes.put(key, value);
   }
 
   public String getAttribute(String key) {
-	return this.attributes.get(key);
+    return this.attributes.get(key);
   }
 
   public String removeAttribute(String key) {
-	return this.attributes.remove(key);
+    return this.attributes.remove(key);
   }
 
   public int numberOfAttributes() {
-	return this.attributes.size();
+    return this.attributes.size();
   }
 
   public abstract void accept(IntBlockVisitor visitor);
