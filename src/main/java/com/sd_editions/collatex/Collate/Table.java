@@ -7,9 +7,11 @@ import com.sd_editions.collatex.Block.Line;
 public class Table extends Block {
 
   private final Cell[][] cells;
-  private final int baselinesize;
+  private final int baselinesize; //TODO: remove!
+  private final Line base;
 
   public Table(Line base) {
+    this.base = base;
     this.baselinesize = base.size();
     this.cells = new Cell[10][size() + 1];
     for (int i = 1; i <= baselinesize; i++) {
@@ -30,6 +32,17 @@ public class Table extends Block {
       return Empty.getInstance();
     return cell;
   }
+
+  public void setOmission(int variant, int baseIndex) {
+    Cell omission = new Omission(base.get(baseIndex));
+    addAlignmentInformationToResult(variant, baseIndex, 2, omission);
+  }
+  
+  private void addAlignmentInformationToResult(int variant, int baseIndex, int offset, Cell alignment) {
+    int column = baseIndex * 2 - 2;
+    setCell(variant, column + offset, alignment);
+  }
+
 
   public void setCell(int variant, int column, Cell alignment) {
     cells[variant][column] = alignment;
