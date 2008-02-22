@@ -19,10 +19,19 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
     this.result = new BlockStructure();
   }
 
+  //NOTE: only for test
   public TextAlignmentVisitor(Word variant) {
     this.witnessBlock = variant;
     this.result = new BlockStructure();
-    createNewTableInResult(1);
+    Line line = new Line(1);
+    BlockStructure structure = new BlockStructure();
+    try {
+      structure.setRootBlock(line);
+    } catch (BlockStructureCascadeException e) {
+      throw new RuntimeException(e);
+    }
+    structure.setChildBlock(line, variant);
+    createNewTableInResult(line);
   }
 
 	public void visitBlockStructure(BlockStructure blockStructure) {
@@ -31,7 +40,7 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
   }
 
   public void visitLine(Line line) {
-  	createNewTableInResult(line.size());
+  	createNewTableInResult(line);
     this.witnessBlock = witnessBlock.getFirstChild();
     Word w = (Word) line.getFirstChild();
     column = 0;
@@ -144,8 +153,8 @@ public class TextAlignmentVisitor implements IntBlockVisitor {
 		addAlignmentInformationToResult(2, alignment);
 	}
 
-  private void createNewTableInResult(int size) {
-		Table nTable = new Table(size);
+  private void createNewTableInResult(Line base) {
+		Table nTable = new Table(base);
 		if (pTable == null) {
 			try {
 				result.setRootBlock(nTable, true);

@@ -20,7 +20,7 @@ public class TupleToTable {
     this.tuples = tuples;
     this.base = (Line) base.getRootBlock();
     this.witness = (Line) variant.getRootBlock();
-    this.table = new Table(this.base.size());
+    this.table = new Table(this.base);
     fillTable();
   }
 

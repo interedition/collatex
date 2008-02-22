@@ -2,15 +2,19 @@ package com.sd_editions.collatex.Collate;
 
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.IntBlockVisitor;
+import com.sd_editions.collatex.Block.Line;
 
 public class Table extends Block {
 
-	private Cell[][] cells;
+	private final Cell[][] cells;
 	private final int baselinesize;
 
-	public Table(int baselinesize) {
-		this.baselinesize = baselinesize;
-		this.cells = new Cell[10][size()+1];
+	public Table(Line base) {
+	  this.baselinesize = base.size();
+	  this.cells = new Cell[10][size()+1];
+	  for (int i = 1; i <= baselinesize; i++) {
+      cells[0][i*2] = new BaseWord(base.get(i));
+    }
 	}
 
 	private int size() {
