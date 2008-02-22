@@ -7,27 +7,26 @@ import junit.framework.TestCase;
 
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
-import com.sd_editions.collatex.Block.Word;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
-public class TextAlignmentVisitorTest extends TestCase {
-  public void testAlignment() {
-    Table table = wordAlignmentTable("cat", "cat");
+public class TextAlignmentTest extends TestCase {
+  public void testAlignment() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Table table = alignmentTable("cat", "cat");
     assertEquals("identical: cat", table.get(1, 2).toString());
   }
 
-  public void testAlignmentVariant() {
-    Table table = wordAlignmentTable("cat", "mat");
+  public void testAlignmentVariant() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Table table = alignmentTable("cat", "mat");
     assertEquals("variant-align: cat / mat", table.get(1, 2).toString());
   }
 
-  public void testNonAlignment() {
-    Table table = wordAlignmentTable("cat", "boat");
-    assertEquals("non-alignment: cat, boat", table.get(1, 2).toString());
+  public void testReplacement() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Table table = alignmentTable("cat", "boat");
+    assertEquals("replacement: cat / boat", table.get(1, 2).toString());
   }
 
-  public void testCapital() {
-    Table table = wordAlignmentTable("the", "The");
+  public void testCapital() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Table table = alignmentTable("the", "The");
     assertEquals("identical: the", table.get(1, 2).toString());
   }
 
@@ -105,21 +104,9 @@ public class TextAlignmentVisitorTest extends TestCase {
   private Table alignmentTable(String baseString, String witnessString) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
     BlockStructure variant = new StringInputPlugin(witnessString).readFile();
-    // TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
     WordAlignmentVisitor visitor = new WordAlignmentVisitor(variant);
     base.accept(visitor);
-    // BlockStructure alignmentInformation = visitor.getResult();
     Table table = new TupleToTable(base, variant, visitor.getResult()).getTable();
-    return table;
-  }
-
-  private Table wordAlignmentTable(final String string, final String string2) {
-    Word base = new Word(string);
-    Word variant = new Word(string2);
-    TextAlignmentVisitor visitor = new TextAlignmentVisitor(variant);
-    visitor.visitWord(base);
-    BlockStructure alignmentInformation = visitor.getResult();
-    Table table = (Table) alignmentInformation.getRootBlock();
     return table;
   }
 
