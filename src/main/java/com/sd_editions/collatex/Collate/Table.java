@@ -8,64 +8,73 @@ import com.sd_editions.collatex.Block.Line;
 import com.sd_editions.collatex.Block.Word;
 
 public class Table extends Block {
-
-  private final Cell[][] cells;
-  private final int baselinesize; //TODO: remove!
   private final Line base;
+  private final Cell[][] cells;
 
   public Table(Line base) {
     this.base = base;
-    this.baselinesize = base.size();
     this.cells = new Cell[10][size() + 1];
-    for (int i = 1; i <= baselinesize; i++) {
+    for (int i = 1; i <= base.size(); i++) {
       cells[0][i * 2] = new BaseWord(base.get(i));
     }
   }
 
   private int size() {
-    return baselinesize * 2 + 1;
+    return base.size() * 2 + 1;
   }
 
   @Override
   public void accept(IntBlockVisitor visitor) {}
 
-  public Cell get(int variant, int word) {
-    Cell cell = cells[variant][word];
+  public Cell get(int witness, int column) {
+    Cell cell = cells[witness][column];
     if (cell == null)
       return Empty.getInstance();
     return cell;
   }
 
-  public void setOmission(int variant, int baseIndex) {
+  public void setOmission(int witness, int baseIndex) {
     Cell omission = new Omission(base.get(baseIndex));
-    addAlignmentInformationToResult(variant, baseIndex, 2, omission);
+    addAlignmentInformationToResult(witness, baseIndex, 2, omission);
   }
   
-  public void setFrontAddition(int variant, int baseIndex, List<Word> witnessWords) {
+  public void setFrontAddition(int witness, int baseIndex, List<Word> witnessWords) {
     Cell addition = new Addition(witnessWords);
-    addAlignmentInformationToResult(variant, baseIndex, 1, addition);
+    addAlignmentInformationToResult(witness, baseIndex, 1, addition);
   }
   
-  public void setBackAddition(int variant, int baseIndex, List<Word> witnessWords) {
+  public void setBackAddition(int witness, int baseIndex, List<Word> witnessWords) {
     Cell addition = new Addition(witnessWords);
-    addAlignmentInformationToResult(variant, baseIndex, 3, addition);
+    addAlignmentInformationToResult(witness, baseIndex, 3, addition);
   }
 
-  public void setReplacement(int variant, int baseIndex, List<Word> replacementWords) {
+  public void setReplacement(int witness, int baseIndex, List<Word> replacementWords) {
     Cell replacement = new Replacement(base.get(baseIndex), replacementWords);
-    addAlignmentInformationToResult(variant, baseIndex, 2, replacement);
+    addAlignmentInformationToResult(witness, baseIndex, 2, replacement);
   }
+
+  public void setIdenticalOrVariant(int witness, int baseIndex, Word witnessWord) {
+    Word baseWord = base.get(baseIndex);
+    Cell alignment;
+    if (baseWord.alignmentFactor(witnessWord) == 0) {
+      alignment = new AlignmentIdentical(baseWord, witnessWord);
+    } else {
+      alignment = new AlignmentVariant(baseWord, witnessWord);
+    }
+    addAlignmentInformationToResult(witness, baseIndex, 2, alignment);
+  }
+
 
 
   
-  private void addAlignmentInformationToResult(int variant, int baseIndex, int offset, Cell alignment) {
+  private void addAlignmentInformationToResult(int witness, int baseIndex, int offset, Cell alignment) {
     int column = baseIndex * 2 - 2;
-    setCell(variant, column + offset, alignment);
+    setCell(witness, column + offset, alignment);
   }
 
 
-  public void setCell(int variant, int column, Cell alignment) {
-    cells[variant][column] = alignment;
+  public void setCell(int witness, int column, Cell alignment) {
+    cells[witness][column] = alignment;
   }
 
   public String toHTML() {

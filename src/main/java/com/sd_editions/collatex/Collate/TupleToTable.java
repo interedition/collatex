@@ -12,8 +12,7 @@ public class TupleToTable {
   private final Line base;
   private final Line witness;
   private final Tuple[] tuples;
-  private int variant = 1;
-  private int column;
+  private int witnessNr = 1;
 
   public TupleToTable(BlockStructure base, BlockStructure variant, Tuple[] tuples) {
     this.tuples = tuples;
@@ -33,43 +32,27 @@ public class TupleToTable {
       int difWitnessIndex = tuple.witnessIndex - witnessIndex;
       if (difBaseIndex > 1 && difWitnessIndex > 1) {
         List<Word> replacementWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1); 
-        table.setReplacement(variant, baseIndex+1, replacementWords);
+        table.setReplacement(witnessNr, baseIndex+1, replacementWords);
       } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
-        table.setOmission(variant, baseIndex+1);
+        table.setOmission(witnessNr, baseIndex+1);
       } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
         List<Word> additionalWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1);
-        table.setFrontAddition(variant, baseIndex+1, additionalWords);
+        table.setFrontAddition(witnessNr, baseIndex+1, additionalWords);
       }
       baseIndex = tuple.baseIndex;
       witnessIndex = tuple.witnessIndex;
-      column = baseIndex * 2 - 2;
-      addIdenticalToTable(base.get(baseIndex), witness.get(witnessIndex));
+      table.setIdenticalOrVariant(witnessNr, baseIndex, witness.get(witnessIndex));
     }
     int difBaseIndex = base.size() - baseIndex;
     int difWitnessIndex = witness.size() - witnessIndex;
     if (difBaseIndex > 0 && difWitnessIndex > 0) {
-      table.setReplacement(variant, baseIndex+1, witness.getPhrase(witnessIndex+1, witness.size()));
+      table.setReplacement(witnessNr, baseIndex+1, witness.getPhrase(witnessIndex+1, witness.size()));
     } else if (difBaseIndex > 0 && difWitnessIndex == 0) {
-      table.setOmission(variant, baseIndex+1);
+      table.setOmission(witnessNr, baseIndex+1);
     } else if (difBaseIndex == 0 && difWitnessIndex > 0) {
       List<Word> additionalWords = witness.getPhrase(witnessIndex+1, witness.size());
-      table.setBackAddition(variant, baseIndex, additionalWords);
+      table.setBackAddition(witnessNr, baseIndex, additionalWords);
     }
-  }
-
-  // TODO: move to table!
-  private void addIdenticalToTable(Word baseWord, Word witnessWord) {
-    Cell alignment;
-    if (baseWord.alignmentFactor(witnessWord) == 0) {
-      alignment = new AlignmentIdentical(baseWord, witnessWord);
-    } else {
-      alignment = new AlignmentVariant(baseWord, witnessWord);
-    }
-    addAlignmentInformationToResult(2, alignment);
-  }
-
-  private void addAlignmentInformationToResult(int offset, Cell alignment) {
-    table.setCell(variant, column + offset, alignment);
   }
 
   public Table getTable() {
