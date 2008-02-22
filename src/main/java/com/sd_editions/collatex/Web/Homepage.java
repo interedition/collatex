@@ -20,7 +20,7 @@ import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 public class Homepage extends WebPage {
 
   public Homepage() {
-    ModelForView model = new ModelForView("a black cat", "a white cat");
+    ModelForView model = new ModelForView("a big black cat came in", "on a tiny black mat");
 
     add(new Label("base", new PropertyModel(model, "base")));
     add(new Label("witness", new PropertyModel(model, "witness")));
