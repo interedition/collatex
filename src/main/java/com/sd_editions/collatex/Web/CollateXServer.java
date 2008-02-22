@@ -9,7 +9,7 @@ public class CollateXServer {
 	public static void main(String[] args) throws Exception {
 		
     	System.setProperty("org.mortbay.xml.XmlParser.NotValidating", "true");
-    	Server server = new Server(8080);
+    	Server server = new Server(3333);
     	Context root = new Context(server,"/",Context.SESSIONS);
     	ServletHolder holder = new ServletHolder(new WicketServlet());
     	holder.setInitParameter("applicationClassName", "com.sd_editions.collatex.Web.CollateXApplication");
