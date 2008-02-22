@@ -53,17 +53,11 @@ public class TupleToTable {
       table.setOmission(variant, baseIndex+1);
     } else if (difBaseIndex == 0 && difWitnessIndex > 0) {
       List<Word> additionalWords = witness.getPhrase(witnessIndex+1, witness.size());
-      addBackAdditionToTable(baseIndex, additionalWords);
+      table.setBackAddition(variant, baseIndex, additionalWords);
     }
   }
 
   // TODO: move to table!
-  private void addBackAdditionToTable(int baseIndex, List<Word> witnessWords) {
-    column = baseIndex * 2 - 2;
-    Cell addition = new Addition(witnessWords);
-    addAlignmentInformationToResult(3, addition);
-  }
-
   //  table.setReplacement(1, baseIndex, List<Word> replacements)
   private void addReplacementToTable(int baseIndex, List<Word> replacementWords) {
     column = baseIndex * 2 - 2;

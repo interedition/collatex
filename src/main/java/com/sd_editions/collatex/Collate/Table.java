@@ -46,6 +46,11 @@ public class Table extends Block {
     addAlignmentInformationToResult(variant, baseIndex, 1, addition);
   }
   
+  public void setBackAddition(int variant, int baseIndex, List<Word> witnessWords) {
+    Cell addition = new Addition(witnessWords);
+    addAlignmentInformationToResult(variant, baseIndex, 3, addition);
+  }
+
 
   
   private void addAlignmentInformationToResult(int variant, int baseIndex, int offset, Cell alignment) {
