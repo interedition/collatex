@@ -35,9 +35,7 @@ public class TupleToTable {
         List<Word> replacementWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1); 
         addReplacementToTable(baseIndex+1, replacementWords);
       } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
-        baseIndex++;
-        column = baseIndex * 2 - 2;
-        addOmissionToTable(base.get(baseIndex));
+        addOmissionToTable(baseIndex+1);
       } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
         baseIndex++;
         column = baseIndex * 2 - 2;
@@ -54,9 +52,7 @@ public class TupleToTable {
     if (difBaseIndex > 0 && difWitnessIndex > 0) {
       addReplacementToTable(baseIndex+1, witness.getPhrase(witnessIndex+1, witness.size()));
     } else if (difBaseIndex > 0 && difWitnessIndex == 0) {
-      baseIndex++;
-      column = baseIndex * 2 - 2;
-      addOmissionToTable(base.get(baseIndex));
+      addOmissionToTable(baseIndex+1);
     } else if (difBaseIndex == 0 && difWitnessIndex > 0) {
       witnessIndex++;
       column = baseIndex * 2;
@@ -71,8 +67,9 @@ public class TupleToTable {
 
   }
 
-  private void addOmissionToTable(Word baseWord) {
-    Cell omission = new Omission(baseWord);
+  private void addOmissionToTable(int baseIndex) {
+    column = baseIndex * 2 - 2;
+    Cell omission = new Omission(base.get(baseIndex));
     addAlignmentInformationToResult(2, omission);
   }
 
