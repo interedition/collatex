@@ -1,7 +1,6 @@
 package com.sd_editions.collatex.Collate;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.sd_editions.collatex.Block.Word;
@@ -21,8 +20,7 @@ public class Replacement extends Cell {
 
 	@Override
 	public String toHTML() {
-		// TODO Auto-generated method stub
-		return null;
+		return replacementsAsString();
 	}
 	
 	@Override
