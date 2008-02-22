@@ -1,8 +1,11 @@
 package com.sd_editions.collatex.Collate;
 
+import java.util.List;
+
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.IntBlockVisitor;
 import com.sd_editions.collatex.Block.Line;
+import com.sd_editions.collatex.Block.Word;
 
 public class Table extends Block {
 
@@ -37,6 +40,13 @@ public class Table extends Block {
     Cell omission = new Omission(base.get(baseIndex));
     addAlignmentInformationToResult(variant, baseIndex, 2, omission);
   }
+  
+  public void setFrontAddition(int variant, int baseIndex, List<Word> witnessWords) {
+    Cell addition = new Addition(witnessWords);
+    addAlignmentInformationToResult(variant, baseIndex, 1, addition);
+  }
+  
+
   
   private void addAlignmentInformationToResult(int variant, int baseIndex, int offset, Cell alignment) {
     int column = baseIndex * 2 - 2;

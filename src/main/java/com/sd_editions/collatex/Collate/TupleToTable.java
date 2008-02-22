@@ -38,7 +38,7 @@ public class TupleToTable {
         table.setOmission(variant, baseIndex+1);
       } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
         List<Word> additionalWords = witness.getPhrase(witnessIndex+1, tuple.witnessIndex-1);
-        addFrontAdditionToTable(baseIndex+1, additionalWords);
+        table.setFrontAddition(variant, baseIndex+1, additionalWords);
       }
       baseIndex = tuple.baseIndex;
       witnessIndex = tuple.witnessIndex;
@@ -58,12 +58,6 @@ public class TupleToTable {
   }
 
   // TODO: move to table!
-  private void addFrontAdditionToTable(int baseIndex, List<Word> witnessWords) {
-    column = baseIndex * 2 - 2;
-    Cell addition = new Addition(witnessWords);
-    addAlignmentInformationToResult(1, addition);
-  }
-  
   private void addBackAdditionToTable(int baseIndex, List<Word> witnessWords) {
     column = baseIndex * 2 - 2;
     Cell addition = new Addition(witnessWords);
