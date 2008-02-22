@@ -32,12 +32,7 @@ public class TupleToTable {
       Tuple tuple = tuples[i];
       int difBaseIndex = tuple.baseIndex - baseIndex;
       int difWitnessIndex = tuple.witnessIndex - witnessIndex;
-      if (difBaseIndex == 1 && difWitnessIndex == 1) {
-        baseIndex = tuple.baseIndex;
-        witnessIndex = tuple.witnessIndex;
-        column = baseIndex * 2 - 2;
-        addIdenticalToTable(base.get(baseIndex), witness.get(witnessIndex));
-      } else if (difBaseIndex > 1 && difWitnessIndex > 1) {
+      if (difBaseIndex > 1 && difWitnessIndex > 1) {
         baseIndex++;
         witnessIndex++;
         column = baseIndex * 2 - 2;
@@ -47,18 +42,10 @@ public class TupleToTable {
           replacementWords.add(witness.get(j));
         }
         addReplacementToTable(base.get(baseIndex), replacementWords);
-        baseIndex = tuple.baseIndex;
-        witnessIndex = tuple.witnessIndex;
-        column = baseIndex * 2 - 2;
-        addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
       } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
         baseIndex++;
         column = baseIndex * 2 - 2;
         addOmissionToTable(base.get(baseIndex));
-        baseIndex = tuple.baseIndex;
-        witnessIndex = tuple.witnessIndex;
-        column = baseIndex * 2 - 2;
-        addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
       } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
         baseIndex++;
         witnessIndex++;
@@ -69,11 +56,11 @@ public class TupleToTable {
           additionalWords.add(witness.get(j));
         }
         addAdditionToTable(additionalWords);
-        baseIndex = tuple.baseIndex;
-        witnessIndex = tuple.witnessIndex;
-        column = baseIndex * 2 - 2;
-        addIdenticalToTable(base.get(tuple.baseIndex), witness.get(tuple.witnessIndex));
       }
+      baseIndex = tuple.baseIndex;
+      witnessIndex = tuple.witnessIndex;
+      column = baseIndex * 2 - 2;
+      addIdenticalToTable(base.get(baseIndex), witness.get(witnessIndex));
     }
     int difBaseIndex = base.size() - baseIndex;
     int difWitnessIndex = witness.size() - witnessIndex;
@@ -114,7 +101,7 @@ public class TupleToTable {
     Cell addition = new Addition(witnessWords);
     addAlignmentInformationToResult(1, addition);
   }
-
+//  table.setReplacement(1, baseIndex, List<Word> replacements)
   private void addReplacementToTable(Word baseWord, Word replacementWord) {
     Cell replacement = new Replacement(baseWord, replacementWord);
     addAlignmentInformationToResult(2, replacement);
