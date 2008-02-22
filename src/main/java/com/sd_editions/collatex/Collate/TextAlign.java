@@ -200,7 +200,6 @@ public class TextAlign {
 		boolean collate = true;
 		boolean muneq = false;
 		boolean merkh = false;
-		;
 		boolean first = true;
 		int pos1eq = 0;
 		int pos2eq = 0;
@@ -231,7 +230,7 @@ public class TextAlign {
 			while ((this.base.get(i).equalsIgnoreCase(this.wit.get(j)))) {
 				first = true;
 				// For Variant indent
-				if (pos1eq == 0) {
+				if (pos1eq == 0 || !muneq) {
 					pos1eq = i;
 				} else {
 					pos2eq = i;
@@ -253,7 +252,7 @@ public class TextAlign {
 						// Is Variant?
 						if ((pos2eq - pos1eq) / 2 == 2) {
 							arrLnew.add(this.slot);
-							sb.append("/" + this.base.get((pos2eq - pos1eq)));
+							sb.append("/" + this.base.get(pos2eq -2));
 							arrLnew.add(sb.toString().trim());
 							sb.delete(0, sb.length());
 							pos1eq = 0;

@@ -220,7 +220,7 @@ public class TextAlignTest extends TestCase {
 		arrL = testAlign(ta);
 		arrL = ta.collateBase2Wit();
 		ta.addAlignInfoRow(arrL);
-		assertEquals(arrL.toString(), "[1, , the, black and, white, , , , , , cat, , sat, , on, , the, red, , , mat, ]");
+		assertEquals(arrL.toString(), "[1, , the, black and, white, , , , , , cat, , sat, , on, , the, , red /green, , mat, ]");
   }
   
 }
