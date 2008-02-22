@@ -13,100 +13,98 @@ import org.apache.wicket.model.PropertyModel;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
 import com.sd_editions.collatex.Collate.Table;
-import com.sd_editions.collatex.Collate.TextAlignmentVisitor;
+import com.sd_editions.collatex.Collate.TupleToTable;
+import com.sd_editions.collatex.Collate.WordAlignmentVisitor;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
-
 public class Homepage extends WebPage {
-	
-	public Homepage() {
-		ModelForView model = new ModelForView("a black cat", "a white cat");
 
-		add(new Label("base", new PropertyModel(model, "base")));
-		add(new Label("witness", new PropertyModel(model, "witness")));
-		
-		Label label = new Label("alignment", new PropertyModel(model, "html"));
-		label.setEscapeModelStrings(false);
-		add(label);
-		add(new AlignmentForm("alignmentform", model));
-	}
-	
-	class ModelForView implements Serializable {
-		private String base;
-		private String witness;
-		private String html;
-		
-		public ModelForView(String base, String witness){
-			this.base = base;
-			this.witness = witness;
-			fillAlignmentTable();
-		}
+  public Homepage() {
+    ModelForView model = new ModelForView("a black cat", "a white cat");
 
-		private void fillAlignmentTable() {
-			BlockStructure baseStructure;
-			BlockStructure witnessStructure;
-			try {
-				baseStructure = new StringInputPlugin(base).readFile();
-				witnessStructure = new StringInputPlugin(witness).readFile();
-			} catch (FileNotFoundException e) { // TODO: work away those exceptions.. they are not relevant for Strings
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			} catch (BlockStructureCascadeException e) {
-				throw new RuntimeException(e);
-			}
-			
-			TextAlignmentVisitor visitor = new TextAlignmentVisitor(witnessStructure);
-			baseStructure.accept(visitor);
-			BlockStructure result = visitor.getResult();
-			Table alignment = (Table) result.getRootBlock();
-			this.html = alignment.toHTML();
-		}
+    add(new Label("base", new PropertyModel(model, "base")));
+    add(new Label("witness", new PropertyModel(model, "witness")));
 
-		public void setBase(String base) {
-			this.base = base;
-		}
+    Label label = new Label("alignment", new PropertyModel(model, "html"));
+    label.setEscapeModelStrings(false);
+    add(label);
+    add(new AlignmentForm("alignmentform", model));
+  }
 
-		public String getBase() {
-			return base;
-		}
+  class ModelForView implements Serializable {
+    private String base;
+    private String witness;
+    private String html;
 
-		public void setWitness(String witness) {
-			this.witness = witness;
-		}
+    public ModelForView(String base, String witness) {
+      this.base = base;
+      this.witness = witness;
+      fillAlignmentTable();
+    }
 
-		public String getWitness() {
-			return witness;
-		}
+    private void fillAlignmentTable() {
+      BlockStructure baseStructure;
+      BlockStructure witnessStructure;
+      try {
+        baseStructure = new StringInputPlugin(base).readFile();
+        witnessStructure = new StringInputPlugin(witness).readFile();
+      } catch (FileNotFoundException e) { // TODO: work away those exceptions..
+                                          // they are not relevant for Strings
+        throw new RuntimeException(e);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      } catch (BlockStructureCascadeException e) {
+        throw new RuntimeException(e);
+      }
 
-		public void setHtml(String html) {
-			this.html = html;
-		}
+      WordAlignmentVisitor visitor = new WordAlignmentVisitor(witnessStructure);
+      baseStructure.accept(visitor);
+      Table alignment = new TupleToTable(baseStructure, witnessStructure, visitor.getResult()).getTable();
+      this.html = alignment.toHTML();
+    }
 
-		public String getHtml() {
-			return html;
-		}
-	}
-	
-	class AlignmentForm extends Form {
+    public void setBase(String base) {
+      this.base = base;
+    }
 
-		private final ModelForView modelForView;
+    public String getBase() {
+      return base;
+    }
 
-		public AlignmentForm(String id, ModelForView modelForView) {
-			super(id);
-			this.modelForView = modelForView;
-			add(new TextField("base", new PropertyModel(modelForView, "base")));
-			add(new TextField("witness", new PropertyModel(modelForView, "witness")));
-		}
-		
-		@Override
-		protected void onSubmit() {
-			// NOTE: this can be moved to model!
-			modelForView.fillAlignmentTable(); 
-		}
-		
-	}
-	
-	
+    public void setWitness(String witness) {
+      this.witness = witness;
+    }
+
+    public String getWitness() {
+      return witness;
+    }
+
+    public void setHtml(String html) {
+      this.html = html;
+    }
+
+    public String getHtml() {
+      return html;
+    }
+  }
+
+  class AlignmentForm extends Form {
+
+    private final ModelForView modelForView;
+
+    public AlignmentForm(String id, ModelForView modelForView) {
+      super(id);
+      this.modelForView = modelForView;
+      add(new TextField("base", new PropertyModel(modelForView, "base")));
+      add(new TextField("witness", new PropertyModel(modelForView, "witness")));
+    }
+
+    @Override
+    protected void onSubmit() {
+      // NOTE: this can be moved to model!
+      modelForView.fillAlignmentTable();
+    }
+
+  }
 
 }
