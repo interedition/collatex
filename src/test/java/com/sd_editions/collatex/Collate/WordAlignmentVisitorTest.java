@@ -29,6 +29,18 @@ public class WordAlignmentVisitorTest extends TestCase {
     assertResultIsExpected(base, witness, "[[1,2],[3,4]]");
   }
 
+//  public void testAlignmentPhase_join() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+//    final String base = "a full blood cat";
+//    final String witness = "a fullblood cat";
+//    assertResultIsExpected(base, witness, "[[1,1],[2,2],[3,2][4,3]]");
+//  }
+//
+//  public void testAlignmentPhase_division() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+//    final String base = "a fullblood cat";
+//    final String witness = "a full blood cat";
+//    assertResultIsExpected(base, witness, "[[1,1],[2,2],[2,3][3,4]]");
+//  }
+
   private Tuple[] phase1Table(String baseString, String witnessString) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
     BlockStructure witness = new StringInputPlugin(witnessString).readFile();

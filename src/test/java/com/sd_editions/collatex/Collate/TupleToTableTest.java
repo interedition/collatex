@@ -42,6 +42,30 @@ public class TupleToTableTest extends TestCase {
     assertEquals("identical: cat", table.get(1, 4).toString());
   }
 
+//  public void testJoin() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+//    Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(3, 4) };
+//    Table table = wordAlignmentTable("a full blood cat", "a fullblood cat", tuples);
+//    assertEquals("identical: a", table.get(1, 2).toString());
+//    assertEquals("join: full blood -> fullblood", table.get(1, 4).toString());
+//    assertEquals("identical: cat", table.get(1, 6).toString());
+//  }
+
+  public void testDivision() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(3, 4) };
+    Table table = wordAlignmentTable("a fullblood cat", "a full blood cat", tuples);
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("division: fullblood -> full blood", table.get(1, 4).toString());
+    assertEquals("identical: cat", table.get(1, 6).toString());
+  }
+
+  public void testDivision2() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(3, 5) };
+    Table table = wordAlignmentTable("a hotblooded teacher", "a hot blood ed teacher", tuples);
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("division: hotblooded -> hot blood ed", table.get(1, 4).toString());
+    assertEquals("identical: teacher", table.get(1, 6).toString());
+  }
+
   private Table wordAlignmentTable(final String baseString, final String witnessString, Tuple[] tuples) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
     BlockStructure variant = new StringInputPlugin(witnessString).readFile();

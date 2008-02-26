@@ -97,6 +97,16 @@ public class TextAlignmentTest extends TestCase {
     assertEquals("identical: be", table.get(1, 4).toString());
   }
 
+  public void testDivision() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Table table = alignmentTable("that guy is superfly", "that guy is one super fly catcher");
+    assertEquals("identical: that", table.get(1, 2).toString());
+    assertEquals("identical: guy", table.get(1, 4).toString());
+    assertEquals("identical: is", table.get(1, 6).toString());
+//    assertEquals("addition: one", table.get(1, 7).toString());
+    assertEquals("division: superfly -> super fly", table.get(1, 8).toString());
+    assertEquals("addition: catcher", table.get(1, 9).toString());
+  }
+
   public void testPhraseAlignment_InTheMiddle() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     Table table = alignmentTable("i saw cloverfield yesterday", "i saw the moon get eclipsed yesterday");
     assertEquals("identical: i", table.get(1, 2).toString());

@@ -14,9 +14,9 @@ public class TupleToTable {
   private final Tuple[] tuples;
   private int witnessNr = 1;
 
-  public TupleToTable(BlockStructure base, BlockStructure variant, Tuple[] tuples) {
-    this.tuples = tuples;
-    this.base = (Line) base.getRootBlock();
+  public TupleToTable(BlockStructure base1, BlockStructure variant, Tuple[] tuples1) {
+    this.tuples = tuples1;
+    this.base = (Line) base1.getRootBlock();
     this.witness = (Line) variant.getRootBlock();
     this.table = new Table(this.base);
     fillTable();

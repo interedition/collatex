@@ -51,8 +51,45 @@ public class Table extends Block {
   }
 
   public void setReplacement(int witness, int baseIndex, List<Word> replacementWords) {
-    Cell replacement = new Replacement(base.get(baseIndex), replacementWords);
-    addAlignmentInformationToResult(witness, baseIndex, 2, replacement);
+    Cell replacement;
+    // check if joining words in the witness produces a match
+    Word baseWord = base.get(baseIndex);
+    int joinStartIndex = 0;
+    int joinEndIndex = 0;
+    Word joinedWord = null;
+    boolean joinFound = false;
+    System.out.println(replacementWords.size());
+    System.out.println(replacementWords);
+    for (int start = 0; start < replacementWords.size()-1; start++) {
+      for (int end = 1; end < replacementWords.size(); end++) {
+        String joined = "";
+        for (int i = start; i <= end; i++) {
+          joined += replacementWords.get(i).getContent();
+        }
+        System.out.println(joined);
+        joinedWord = new Word(joined);
+        if (baseWord.alignsWith(joinedWord)) {
+          joinFound = true;
+          joinStartIndex = start;
+          joinEndIndex = end;
+          start = replacementWords.size();
+          end = start;
+        }
+      }
+    }
+    if (joinFound) {
+      System.out.println(joinStartIndex+","+joinEndIndex);
+      if (joinStartIndex > 0) {
+        addAlignmentInformationToResult(witness, baseIndex, 1, new Addition(replacementWords.subList(0, joinStartIndex - 1)));
+      }
+      addAlignmentInformationToResult(witness, baseIndex, 2, new Division(base.get(baseIndex), replacementWords.subList(joinStartIndex, joinEndIndex + 1)));
+      if (joinEndIndex < replacementWords.size()) {
+        addAlignmentInformationToResult(witness, baseIndex, 3, new Addition(replacementWords.subList(joinEndIndex + 1, replacementWords.size())));
+      }
+    } else {
+      replacement = new Replacement(base.get(baseIndex), replacementWords);
+      addAlignmentInformationToResult(witness, baseIndex, 2, replacement);
+    }
   }
 
   public void setIdenticalOrVariant(int witness, int baseIndex, Word witnessWord) {

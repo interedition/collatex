@@ -49,9 +49,10 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
 
   public void visitWord(Word baseWord) {
     Word witnessWord = (Word) witnessBlock;
-//    System.out.println("visitWord: comparing " + baseWord + " + " + witnessWord);
-//    System.out.println("index: [" + baseIndex + "," + witnessIndex + "]");
-    if (witnessWord == null) return;
+    //    System.out.println("visitWord: comparing " + baseWord + " + " + witnessWord);
+    //    System.out.println("index: [" + baseIndex + "," + witnessIndex + "]");
+    if (witnessWord == null)
+      return;
     if (baseWord.alignsWith(witnessWord)) {
       result.add(new Tuple(baseIndex, witnessIndex));
       witnessIndex++;
@@ -82,7 +83,7 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
   }
 
   public Tuple[] getResult() {
-//    System.out.println("getResult: " + result);
+    //    System.out.println("getResult: " + result);
     return result.toArray(new Tuple[] {});
   }
 
