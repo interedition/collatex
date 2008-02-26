@@ -28,10 +28,12 @@ public class Line extends Block {
     return this.lineNumber;
   }
 
+  @Override
   public String toString() {
     return "<l number=\"" + this.getLineNumber() + "\">";
   }
 
+  @Override
   public void accept(IntBlockVisitor visitor) {
     visitor.visitLine(this);
   }
