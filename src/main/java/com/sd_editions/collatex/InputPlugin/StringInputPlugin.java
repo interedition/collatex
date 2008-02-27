@@ -5,15 +5,15 @@ import java.io.StringReader;
 
 public class StringInputPlugin extends AbstractPlainTextInputPlugin {
 
-	private String text;
+  private String text;
 
-	public StringInputPlugin(String text) {
-		this.text = text;
-	}
+  public StringInputPlugin(String text) {
+    this.text = text;
+  }
 
-	@Override
-	protected Reader getReader() {
-		return new StringReader(text);
-	}
+  @Override
+  protected Reader getReader() {
+    return new StringReader(text);
+  }
 
 }

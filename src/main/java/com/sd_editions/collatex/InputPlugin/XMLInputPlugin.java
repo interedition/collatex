@@ -19,92 +19,87 @@ import com.sd_editions.collatex.Block.Line;
 import com.sd_editions.collatex.Block.Word;
 
 public class XMLInputPlugin implements IntInputPlugin {
-	private final File xmlFile;
-	
-	public XMLInputPlugin(File xmlFile) {
-		this.xmlFile = xmlFile;
-	}
-	public BlockStructure readFile() throws FileNotFoundException, IOException,
-			BlockStructureCascadeException {
-		SAXHandler saxHandler = new SAXHandler();
-		XMLReader parser = new SAXParser();
-		parser.setContentHandler(saxHandler);
-		parser.setEntityResolver(saxHandler);
-		try {
-			parser.parse(new InputSource(new FileReader(xmlFile)));
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-		BlockStructure document = saxHandler.getDocument();
-		return document;
-	}
+  private final File xmlFile;
 
-	public void registerInputPlugin() {
-		//Do nothing for the moment
-	}
-	
-	public class SAXHandler extends DefaultHandler2 {
+  public XMLInputPlugin(File xmlFile) {
+    this.xmlFile = xmlFile;
+  }
 
-		private BlockStructure document;
-		private int lineCount;
-		private Line pLine;
-		private StringBuffer text;
+  public BlockStructure readFile() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    SAXHandler saxHandler = new SAXHandler();
+    XMLReader parser = new SAXParser();
+    parser.setContentHandler(saxHandler);
+    parser.setEntityResolver(saxHandler);
+    try {
+      parser.parse(new InputSource(new FileReader(xmlFile)));
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    }
+    BlockStructure document = saxHandler.getDocument();
+    return document;
+  }
 
-		public SAXHandler() {
-			document = new BlockStructure();
-			text = new StringBuffer();
-		}
+  public void registerInputPlugin() {
+  //Do nothing for the moment
+  }
 
-		public BlockStructure getDocument() {
-			return document;
-		}
+  public class SAXHandler extends DefaultHandler2 {
 
-		@Override
-		public void startElement(String uri, String localName, String name,
-				Attributes attributes) throws SAXException {
-			if (name.equals("l")) {
-				lineCount++;
-				Line nLine = new Line(lineCount);
-				if (pLine == null) {
-					try {
-						document.setRootBlock(nLine, true);
-					} catch (BlockStructureCascadeException e) {
-						throw new RuntimeException(e);
-					}
-				} else {
-					document.setNextSibling(pLine, nLine);
-				}
-				pLine = nLine;
-			} else if (name.equals("w")) {
-				text = new StringBuffer();
-			}
-		}
+    private BlockStructure document;
+    private int lineCount;
+    private Line pLine;
+    private StringBuffer text;
 
-		@Override
-		public void characters(char[] ch, int start, int length)
-				throws SAXException {
-			text.append(ch, start, length);
-		}
+    public SAXHandler() {
+      document = new BlockStructure();
+      text = new StringBuffer();
+    }
 
-		@Override
-		public void endElement(String uri, String localName, String name)
-				throws SAXException {
-			if (name.equals("w")) {
-				Word word = new Word(text.toString());
-				document.setChildBlock(pLine, word);
-			}
-		}
+    public BlockStructure getDocument() {
+      return document;
+    }
 
-		@Override
-		public InputSource getExternalSubset(String name, String baseURI)
-				throws SAXException, IOException {
-			String entities = "<!ENTITY Base ' '>"; // TODO: replace base with?
-			entities += "<!ENTITY paraph ' '>"; // TODO: replace paraph with?
-			entities += "<!ENTITY virgule '/'>";
-			return new InputSource(new StringReader(entities));
-		}
+    @Override
+    public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
+      if (name.equals("l")) {
+        lineCount++;
+        Line nLine = new Line(lineCount);
+        if (pLine == null) {
+          try {
+            document.setRootBlock(nLine, true);
+          } catch (BlockStructureCascadeException e) {
+            throw new RuntimeException(e);
+          }
+        } else {
+          document.setNextSibling(pLine, nLine);
+        }
+        pLine = nLine;
+      } else if (name.equals("w")) {
+        text = new StringBuffer();
+      }
+    }
 
-	}
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+      text.append(ch, start, length);
+    }
 
+    @Override
+    public void endElement(String uri, String localName, String name) throws SAXException {
+      if (name.equals("w")) {
+        Word word = new Word(text.toString());
+        document.setChildBlock(pLine, word);
+      }
+    }
+
+    @Override
+    public InputSource getExternalSubset(String name, String baseURI) throws SAXException, IOException {
+      String entities = "<!ENTITY Base ' '>"; // TODO: replace base with?
+      entities += "<!ENTITY paraph ' '>"; // TODO: replace paraph with?
+      entities += "<!ENTITY virgule '/'>";
+      return new InputSource(new StringReader(entities));
+    }
+
+  }
 
 }
