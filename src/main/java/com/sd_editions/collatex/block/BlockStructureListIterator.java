@@ -114,24 +114,24 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
     }
   }
 
-  /** 
-   * Get a next block
-   */
-  private Block getNextBlock(Block thisBlock) {
-    if (thisBlock == null) {
-      return null;
-    } else if (thisBlock.hasNextSibling()) {
-      return thisBlock.getNextSibling();
-    } else if (thisBlock.hasEndParent()) {
-      Block eParent = thisBlock.getEndParent();
-      if (eParent.hasNextSibling()) {
-        return eParent.getNextSibling();
-      }
-      return null;
-    } else {
-      return null;
-    }
-  }
+  //  /** 
+  //   * Get a next block
+  //   */
+  //  private Block getNextBlock(Block thisBlock) {
+  //    if (thisBlock == null) {
+  //      return null;
+  //    } else if (thisBlock.hasNextSibling()) {
+  //      return thisBlock.getNextSibling();
+  //    } else if (thisBlock.hasEndParent()) {
+  //      Block eParent = thisBlock.getEndParent();
+  //      if (eParent.hasNextSibling()) {
+  //        return eParent.getNextSibling();
+  //      }
+  //      return null;
+  //    } else {
+  //      return null;
+  //    }
+  //  }
 
   /**
    * toString method, for debugging only.
