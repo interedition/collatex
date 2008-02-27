@@ -9,6 +9,7 @@ public class Tuple {
     this.witnessIndex = witnessIndex;
   }
 
+  @Override
   public String toString() {
     return "[" + baseIndex + "," + witnessIndex + "]";
   }

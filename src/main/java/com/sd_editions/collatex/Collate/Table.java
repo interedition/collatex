@@ -28,8 +28,9 @@ public class Table extends Block {
 
   public Cell get(int witness, int column) {
     Cell cell = cells[witness][column];
-    if (cell == null)
+    if (cell == null) {
       return Empty.getInstance();
+    }
     return cell;
   }
 
@@ -60,7 +61,7 @@ public class Table extends Block {
     boolean joinFound = false;
     System.out.println(replacementWords.size());
     System.out.println(replacementWords);
-    for (int start = 0; start < replacementWords.size()-1; start++) {
+    for (int start = 0; start < replacementWords.size() - 1; start++) {
       for (int end = 1; end < replacementWords.size(); end++) {
         String joined = "";
         for (int i = start; i <= end; i++) {
@@ -78,7 +79,7 @@ public class Table extends Block {
       }
     }
     if (joinFound) {
-      System.out.println(joinStartIndex+","+joinEndIndex);
+      System.out.println(joinStartIndex + "," + joinEndIndex);
       if (joinStartIndex > 0) {
         addAlignmentInformationToResult(witness, baseIndex, 1, new Addition(replacementWords.subList(0, joinStartIndex - 1)));
       }
