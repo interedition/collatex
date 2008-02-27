@@ -2,11 +2,14 @@ package com.sd_editions.collatex.Collate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
+import com.sd_editions.collatex.Block.Word;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
 public class TupleToTableTest extends TestCase {
@@ -42,13 +45,25 @@ public class TupleToTableTest extends TestCase {
     assertEquals("identical: cat", table.get(1, 4).toString());
   }
 
-//  public void testJoin() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-//    Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(3, 4) };
-//    Table table = wordAlignmentTable("a full blood cat", "a fullblood cat", tuples);
-//    assertEquals("identical: a", table.get(1, 2).toString());
-//    assertEquals("join: full blood -> fullblood", table.get(1, 4).toString());
-//    assertEquals("identical: cat", table.get(1, 6).toString());
-//  }
+  public void testMultipleWitnesses() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Tuple[][] tuplesArray = new Tuple[][] { { new Tuple(1, 1), new Tuple(2, 3) }, { new Tuple(1, 1), new Tuple(2, 3) } };
+    Table table = wordAlignmentTable("a cat", new String[] { "a calico cat", "a black cat" }, tuplesArray);
+    assertEquals("identical: a", table.get(1, 2).toString());
+    assertEquals("addition: calico", table.get(1, 3).toString());
+    assertEquals("identical: cat", table.get(1, 4).toString());
+
+    assertEquals("identical: a", table.get(2, 2).toString());
+    assertEquals("addition: black", table.get(2, 3).toString());
+    assertEquals("identical: cat", table.get(2, 4).toString());
+  }
+
+  //  public void testJoin() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  //    Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(3, 4) };
+  //    Table table = wordAlignmentTable("a full blood cat", "a fullblood cat", tuples);
+  //    assertEquals("identical: a", table.get(1, 2).toString());
+  //    assertEquals("join: full blood -> fullblood", table.get(1, 4).toString());
+  //    assertEquals("identical: cat", table.get(1, 6).toString());
+  //  }
 
   public void testDivision() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(3, 4) };
@@ -70,6 +85,18 @@ public class TupleToTableTest extends TestCase {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
     BlockStructure variant = new StringInputPlugin(witnessString).readFile();
     TupleToTable tupleToTable = new TupleToTable(base, variant, tuples);
+    Table table = tupleToTable.getTable();
+    return table;
+  }
+
+  private Table wordAlignmentTable(String baseString, String[] witnessStrings, Tuple[][] tuplesArray) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    BlockStructure base = new StringInputPlugin(baseString).readFile();
+    List<BlockStructure> witnessList = new ArrayList<BlockStructure>() {};
+    for (String witnessString : witnessStrings) {
+      BlockStructure variant = new StringInputPlugin(witnessString).readFile();
+      witnessList.add(variant);
+    }
+    TupleToTable tupleToTable = new TupleToTable(base, witnessList, tuplesArray);
     Table table = tupleToTable.getTable();
     return table;
   }
