@@ -4,9 +4,9 @@ import org.apache.wicket.protocol.http.WebApplication;
 
 public class CollateXApplication extends WebApplication {
 
-	@Override
-	public Class getHomePage() {
-		return Homepage.class;
-	}
+  @Override
+  public Class getHomePage() {
+    return Homepage.class;
+  }
 
 }

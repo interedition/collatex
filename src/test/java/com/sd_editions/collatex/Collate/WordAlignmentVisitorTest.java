@@ -33,21 +33,21 @@ public class WordAlignmentVisitorTest extends TestCase {
 
   public void testAlignmentPhaseWithMultipleWitneses() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     final String base = "a black cat";
-    final String[] witnessArray = new String[]{"on a white mat", "on a black mat", "a small black cat"};
+    final String[] witnessArray = new String[] { "on a white mat", "on a black mat", "a small black cat" };
     assertResultIsExpected(base, witnessArray, "[[[1,2],[3,4]],[[1,2],[2,3],[3,4]],[[1,1],[2,3],[3,4]]]");
   }
 
-//  public void testAlignmentPhase_join() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-//    final String base = "a full blood cat";
-//    final String witness = "a fullblood cat";
-//    assertResultIsExpected(base, witness, "[[1,1],[2,2],[3,2][4,3]]");
-//  }
-//
-//  public void testAlignmentPhase_division() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-//    final String base = "a fullblood cat";
-//    final String witness = "a full blood cat";
-//    assertResultIsExpected(base, witness, "[[1,1],[2,2],[2,3][3,4]]");
-//  }
+  //  public void testAlignmentPhase_join() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  //    final String base = "a full blood cat";
+  //    final String witness = "a fullblood cat";
+  //    assertResultIsExpected(base, witness, "[[1,1],[2,2],[3,2][4,3]]");
+  //  }
+  //
+  //  public void testAlignmentPhase_division() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  //    final String base = "a fullblood cat";
+  //    final String witness = "a full blood cat";
+  //    assertResultIsExpected(base, witness, "[[1,1],[2,2],[2,3][3,4]]");
+  //  }
 
   private Tuple[] phase1Table(String baseString, String witnessString) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
@@ -68,13 +68,13 @@ public class WordAlignmentVisitorTest extends TestCase {
   private Tuple[][] phase1Table(String baseString, String[] witnessArray) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
     List<Tuple[]> resultList = new ArrayList<Tuple[]>();
-    for (String witnessString: witnessArray){
+    for (String witnessString : witnessArray) {
       BlockStructure witness = new StringInputPlugin(witnessString).readFile();
       WordAlignmentVisitor visitor = new WordAlignmentVisitor(witness);
       base.accept(visitor);
       resultList.add(visitor.getResult());
     }
-    return resultList.toArray(new Tuple[][]{});
+    return resultList.toArray(new Tuple[][] {});
   }
 
   private String resultAsString(Tuple[] array) {

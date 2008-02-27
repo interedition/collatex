@@ -102,7 +102,7 @@ public class TextAlignmentTest extends TestCase {
     assertEquals("identical: that", table.get(1, 2).toString());
     assertEquals("identical: guy", table.get(1, 4).toString());
     assertEquals("identical: is", table.get(1, 6).toString());
-//    assertEquals("addition: one", table.get(1, 7).toString());
+    //    assertEquals("addition: one", table.get(1, 7).toString());
     assertEquals("division: superfly -> super fly", table.get(1, 8).toString());
     assertEquals("addition: catcher", table.get(1, 9).toString());
   }

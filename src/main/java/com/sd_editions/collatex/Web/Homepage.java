@@ -74,7 +74,7 @@ public class Homepage extends WebPage {
       List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
       witnessList.add(witnessStructure1);
       witnessList.add(witnessStructure2);
-      Tuple[][] results = new Tuple[][] {result1,result2};
+      Tuple[][] results = new Tuple[][] { result1, result2 };
       Table alignment = new TupleToTable(baseStructure, witnessList, results).getTable();
       this.html = alignment.toHTML();
     }

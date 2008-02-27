@@ -50,11 +50,11 @@ public class BlockStructureTest extends TestCase {
     }
     //Make sure we have only 1 block in the BlockStructureCascadeException
     assertEquals(document.getNumberOfBlocks(), 1);
-    //Word 1 shouldn't have any 
+    //Word 1 shouldn't have any
     this.checkBlockHasNoRelations(word1);
-    //Word 2 shouldn't have any 
+    //Word 2 shouldn't have any
     this.checkBlockHasNoRelations(word2);
-    //Word 3 shouldn't have any 
+    //Word 3 shouldn't have any
     this.checkBlockHasNoRelations(word3);
     //Set word1 to the root element
     document.setChildBlock(word1, word2);
