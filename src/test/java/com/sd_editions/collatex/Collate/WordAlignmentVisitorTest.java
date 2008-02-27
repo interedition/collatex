@@ -80,8 +80,8 @@ public class WordAlignmentVisitorTest extends TestCase {
   private String resultAsString(Tuple[] array) {
     StringBuffer result = new StringBuffer("[");
     String join = "";
-    for (int i = 0; i < array.length; i++) {
-      result.append(join + array[i].toString());
+    for (Tuple element : array) {
+      result.append(join + element.toString());
       join = ",";
     }
     result.append("]");
@@ -91,8 +91,8 @@ public class WordAlignmentVisitorTest extends TestCase {
   private String resultAsString(Tuple[][] array) {
     StringBuffer result = new StringBuffer("[");
     String join = "";
-    for (int i = 0; i < array.length; i++) {
-      result.append(join + resultAsString(array[i]));
+    for (Tuple[] element : array) {
+      result.append(join + resultAsString(element));
       join = ",";
     }
     result.append("]");
