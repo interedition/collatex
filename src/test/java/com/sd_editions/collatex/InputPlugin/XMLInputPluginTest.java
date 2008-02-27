@@ -19,5 +19,9 @@ public class XMLInputPluginTest extends TestCase {
 		BlockStructureListIterator<? extends Block> listIterator = document.listIterator();
 		assertEquals("<l number=\"1\">", listIterator.next().toString());
 		assertEquals("<w>The</w>", listIterator.next().toString());
+		assertEquals("<w>prologe</w>", listIterator.next().toString());
+		assertEquals("<w>of</w>", listIterator.next().toString());
+		assertEquals("<w>the</w>", listIterator.next().toString());
 	}
+	
 }

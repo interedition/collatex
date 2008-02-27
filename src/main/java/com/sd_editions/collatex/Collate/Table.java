@@ -122,7 +122,8 @@ public class Table extends Block {
     }
     alignmentTableHTML += "</tr>";
     alignmentTableHTML += showRow(0, "Base");
-    alignmentTableHTML += showRow(1, "Witness");
+    alignmentTableHTML += showRow(1, "Witness 1");
+    alignmentTableHTML += showRow(2, "Witness 2");
     alignmentTableHTML += "</table>";
     return alignmentTableHTML;
   }
