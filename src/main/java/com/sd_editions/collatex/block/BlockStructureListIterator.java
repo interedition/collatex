@@ -114,7 +114,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
     }
   }
 
-  //  /** 
+  //  /**
   //   * Get a next block
   //   */
   //  private Block getNextBlock(Block thisBlock) {
@@ -136,6 +136,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
   /**
    * toString method, for debugging only.
    */
+  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append("nextBlock = " + this.nextBlock + "\n");

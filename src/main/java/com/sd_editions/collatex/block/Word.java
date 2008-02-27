@@ -26,22 +26,24 @@ public class Word extends Block {
     return this.content;
   }
 
+  @Override
   public String toString() {
     return "<w>" + this.content + "</w>";
   }
 
+  @Override
   public void accept(IntBlockVisitor visitor) {
     visitor.visitWord(this);
   }
 
   public boolean alignsWith(Word the_other) {
-  	return alignmentFactor(the_other) < 2;
+    return alignmentFactor(the_other) < 2;
   }
-  
+
   public int alignmentFactor(Word the_other) {
-  	String left = getContent().toLowerCase();
-  	String right = the_other.getContent().toLowerCase();
-    return StringUtils.getLevenshteinDistance(left, right);  	
+    String left = getContent().toLowerCase();
+    String right = the_other.getContent().toLowerCase();
+    return StringUtils.getLevenshteinDistance(left, right);
   }
 
 }

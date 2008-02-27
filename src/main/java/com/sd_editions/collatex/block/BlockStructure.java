@@ -47,7 +47,7 @@ public class BlockStructure {
    * @param root The root Block for this structure
    * @param cascade If true then this will remove all Blocks already in the structure if any exist, default's to false
    *
-   * @throws BlockStructureCascadeException thrown if the structure already contains a root element and 
+   * @throws BlockStructureCascadeException thrown if the structure already contains a root element and
    *		 cascade is set to false
    *
    */
@@ -96,7 +96,7 @@ public class BlockStructure {
    *
    * @param pBlock The Block that have its next sibling set
    * @param nBlock The Block to set as the next sibling
-   * 
+   *
    */
   public void setNextSibling(Block pBlock, Block nBlock) {
     if (pBlock.hasNextSibling()) {
@@ -214,6 +214,7 @@ public class BlockStructure {
     return new BlockStructureListIterator(this);
   }
 
+  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     //Loop through all the blocks
