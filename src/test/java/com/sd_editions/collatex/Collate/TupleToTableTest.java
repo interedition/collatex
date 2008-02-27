@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
-import com.sd_editions.collatex.Block.Word;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
 public class TupleToTableTest extends TestCase {
