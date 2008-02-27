@@ -20,6 +20,7 @@ import com.sd_editions.collatex.Collate.TupleToTable;
 import com.sd_editions.collatex.Collate.WordAlignmentVisitor;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
+@SuppressWarnings("serial")
 public class Homepage extends WebPage {
 
   public Homepage() {
@@ -38,49 +39,49 @@ public class Homepage extends WebPage {
   @SuppressWarnings("serial")
   class ModelForView implements Serializable {
     private String base;
-    private String witness1;
-    private String witness2;
+    private String[] witnesses;
     private String html;
 
-    public ModelForView(String base, String[] witnesses) {
-      this.base = base;
-      this.witness1 = witnesses[0];
-      this.witness2 = witnesses[1];
+    public ModelForView(String newBase, String[] newWitnesses) {
+      this.base = newBase;
+      this.witnesses = newWitnesses;
       fillAlignmentTable();
     }
 
-    private void fillAlignmentTable() {
-      BlockStructure baseStructure;
-      BlockStructure witnessStructure1;
-      BlockStructure witnessStructure2;
+    void fillAlignmentTable() {
+      BlockStructure baseStructure = string2BlockStructure(base);
+      List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
+      List<Tuple[]> resultList = new ArrayList<Tuple[]>();
+      for (String witness : witnesses) {
+        BlockStructure witnessStructure = string2BlockStructure(witness);
+        WordAlignmentVisitor visitor = new WordAlignmentVisitor(witnessStructure);
+        baseStructure.accept(visitor);
+        witnessList.add(witnessStructure);
+        resultList.add(visitor.getResult());
+      }
+
+      Tuple[][] results = resultList.toArray(new Tuple[][] {});
+      Table alignment = new TupleToTable(baseStructure, witnessList, results).getTable();
+      this.html = alignment.toHTML();
+    }
+
+    BlockStructure string2BlockStructure(String string) {
+      BlockStructure result = null;
       try {
-        baseStructure = new StringInputPlugin(base).readFile();
-        witnessStructure1 = new StringInputPlugin(witness1).readFile();
-        witnessStructure2 = new StringInputPlugin(witness2).readFile();
-      } catch (FileNotFoundException e) { // TODO: work away those exceptions.. they are not relevant for Strings
+        result = new StringInputPlugin(string).readFile();
+        // TODO: work away those exceptions.. they are not relevant for Strings
+      } catch (FileNotFoundException e) {
         throw new RuntimeException(e);
       } catch (IOException e) {
         throw new RuntimeException(e);
       } catch (BlockStructureCascadeException e) {
         throw new RuntimeException(e);
       }
-
-      WordAlignmentVisitor visitor1 = new WordAlignmentVisitor(witnessStructure1);
-      baseStructure.accept(visitor1);
-      Tuple[] result1 = visitor1.getResult();
-      WordAlignmentVisitor visitor2 = new WordAlignmentVisitor(witnessStructure2);
-      baseStructure.accept(visitor2);
-      Tuple[] result2 = visitor2.getResult();
-      List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
-      witnessList.add(witnessStructure1);
-      witnessList.add(witnessStructure2);
-      Tuple[][] results = new Tuple[][] { result1, result2 };
-      Table alignment = new TupleToTable(baseStructure, witnessList, results).getTable();
-      this.html = alignment.toHTML();
+      return result;
     }
 
-    public void setBase(String base) {
-      this.base = base;
+    public void setBase(String newBase) {
+      this.base = newBase;
     }
 
     public String getBase() {
@@ -88,23 +89,23 @@ public class Homepage extends WebPage {
     }
 
     public void setWitness1(String witness) {
-      this.witness1 = witness;
+      this.witnesses[0] = witness;
     }
 
     public String getWitness1() {
-      return witness1;
+      return witnesses[0];
     }
 
     public void setWitness2(String witness) {
-      this.witness2 = witness;
+      this.witnesses[1] = witness;
     }
 
     public String getWitness2() {
-      return witness2;
+      return witnesses[1];
     }
 
-    public void setHtml(String html) {
-      this.html = html;
+    public void setHtml(String newHtml) {
+      this.html = newHtml;
     }
 
     public String getHtml() {
@@ -114,12 +115,11 @@ public class Homepage extends WebPage {
 
   @SuppressWarnings("serial")
   class AlignmentForm extends Form {
-
     private final ModelForView modelForView;
 
-    public AlignmentForm(String id, ModelForView modelForView) {
+    public AlignmentForm(String id, ModelForView myModelForView) {
       super(id);
-      this.modelForView = modelForView;
+      this.modelForView = myModelForView;
       add(new TextField("base", new PropertyModel(modelForView, "base")));
       add(new TextField("witness1", new PropertyModel(modelForView, "witness1")));
       add(new TextField("witness2", new PropertyModel(modelForView, "witness2")));
