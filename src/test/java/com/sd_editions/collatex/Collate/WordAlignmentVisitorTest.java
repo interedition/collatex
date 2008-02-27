@@ -2,6 +2,8 @@ package com.sd_editions.collatex.Collate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -29,6 +31,12 @@ public class WordAlignmentVisitorTest extends TestCase {
     assertResultIsExpected(base, witness, "[[1,2],[3,4]]");
   }
 
+  public void testAlignmentPhaseWithMultipleWitneses() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    final String base = "a black cat";
+    final String[] witnessArray = new String[]{"on a white mat", "on a black mat", "a small black cat"};
+    assertResultIsExpected(base, witnessArray, "[[[1,2],[3,4]],[[1,2],[2,3],[3,4]],[[1,1],[2,3],[3,4]]]");
+  }
+
 //  public void testAlignmentPhase_join() throws FileNotFoundException, IOException, BlockStructureCascadeException {
 //    final String base = "a full blood cat";
 //    final String witness = "a fullblood cat";
@@ -53,11 +61,38 @@ public class WordAlignmentVisitorTest extends TestCase {
     assertEquals(expected, resultAsString(phase1Table(base, witness)));
   }
 
+  private void assertResultIsExpected(final String base, final String[] witness, String expected) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    assertEquals(expected, resultAsString(phase1Table(base, witness)));
+  }
+
+  private Tuple[][] phase1Table(String baseString, String[] witnessArray) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    BlockStructure base = new StringInputPlugin(baseString).readFile();
+    List<Tuple[]> resultList = new ArrayList<Tuple[]>();
+    for (String witnessString: witnessArray){
+      BlockStructure witness = new StringInputPlugin(witnessString).readFile();
+      WordAlignmentVisitor visitor = new WordAlignmentVisitor(witness);
+      base.accept(visitor);
+      resultList.add(visitor.getResult());
+    }
+    return resultList.toArray(new Tuple[][]{});
+  }
+
   private String resultAsString(Tuple[] array) {
     StringBuffer result = new StringBuffer("[");
     String join = "";
     for (int i = 0; i < array.length; i++) {
       result.append(join + array[i].toString());
+      join = ",";
+    }
+    result.append("]");
+    return result.toString();
+  }
+
+  private String resultAsString(Tuple[][] array) {
+    StringBuffer result = new StringBuffer("[");
+    String join = "";
+    for (int i = 0; i < array.length; i++) {
+      result.append(join + resultAsString(array[i]));
       join = ",";
     }
     result.append("]");
