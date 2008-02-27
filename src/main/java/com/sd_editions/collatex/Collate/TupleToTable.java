@@ -10,62 +10,62 @@ import com.sd_editions.collatex.Block.Word;
 public class TupleToTable {
 
   private Table table;
-  private final Line base;
-  private final Tuple[][] tuplesArray;
+  private Line base = null;
+  private final Tuple[][] tupleMatrix;
   private List<BlockStructure> witnessList;
 
-  public TupleToTable(BlockStructure base1, BlockStructure variant, Tuple[] tuples1) {
-    this.tuplesArray = new Tuple[][] { tuples1 };
-    this.base = (Line) base1.getRootBlock();
+  public TupleToTable(BlockStructure newBase, BlockStructure witness, Tuple[] newTupleArray) {
+    this.tupleMatrix = new Tuple[][] { newTupleArray };
     this.witnessList = new ArrayList<BlockStructure>();
-    this.witnessList.add(variant);
-    this.table = new Table(this.base);
-    fillTable();
+    this.witnessList.add(witness);
+    construct(newBase);
   }
 
-  public TupleToTable(BlockStructure base2, List<BlockStructure> witnessList, Tuple[][] tuplesArray) {
-    this.tuplesArray = tuplesArray;
-    this.base = (Line) base2.getRootBlock();
-    this.witnessList = witnessList;
-    //    this.witness = (Line) variant.getRootBlock();
+  public TupleToTable(BlockStructure newBase, List<BlockStructure> newWitnessList, Tuple[][] newTupleMatrix) {
+    this.tupleMatrix = newTupleMatrix;
+    this.witnessList = newWitnessList;
+    construct(newBase);
+  }
+
+  void construct(BlockStructure newBase) {
+    this.base = (Line) newBase.getRootBlock();
     this.table = new Table(this.base);
     fillTable();
   }
 
   private void fillTable() {
-    int baseIndex = 0;
-    int witnessIndex = 0;
-    for (int i = 0; i < tuplesArray.length; i++) {
-      Tuple[] tuples = tuplesArray[i];
-      int witnessNr = i + 1;
+    int currentBaseIndex = 0;
+    int currentWitnessIndex = 0;
+    for (int i = 0; i < tupleMatrix.length; i++) {
+      Tuple[] tuples = tupleMatrix[i];
+      int witnessNumber = i + 1;
       Line witness = (Line) witnessList.get(i).getRootBlock();
-      for (int j = 0; j < tuples.length; j++) {
-        System.out.println("j: " + j + "; baseIndex: " + baseIndex + "; witnessIndex: " + witnessIndex);
-        Tuple tuple = tuples[j];
-        int difBaseIndex = tuple.baseIndex - baseIndex;
-        int difWitnessIndex = tuple.witnessIndex - witnessIndex;
-        if (difBaseIndex > 1 && difWitnessIndex > 1) {
-          List<Word> replacementWords = witness.getPhrase(witnessIndex + 1, tuple.witnessIndex - 1);
-          table.setReplacement(witnessNr, baseIndex + 1, replacementWords);
-        } else if (difBaseIndex > 1 && difWitnessIndex == 1) {
-          table.setOmission(witnessNr, baseIndex + 1, tuple.baseIndex);
-        } else if (difBaseIndex == 1 && difWitnessIndex > 1) {
-          List<Word> additionalWords = witness.getPhrase(witnessIndex + 1, tuple.witnessIndex - 1);
-          table.setFrontAddition(witnessNr, baseIndex + 1, additionalWords);
+      for (Tuple tuple : tuples) {
+        System.out.println("baseIndex: " + currentBaseIndex + "; witnessIndex: " + currentWitnessIndex);
+        int baseIndexDif = tuple.baseIndex - currentBaseIndex;
+        int witnessIndexDif = tuple.witnessIndex - currentWitnessIndex;
+        if (baseIndexDif > 1 && witnessIndexDif > 1) {
+          List<Word> replacementWords = witness.getPhrase(currentWitnessIndex + 1, tuple.witnessIndex - 1);
+          table.setReplacement(witnessNumber, currentBaseIndex + 1, replacementWords);
+        } else if (baseIndexDif > 1 && witnessIndexDif == 1) {
+          table.setOmission(witnessNumber, currentBaseIndex + 1, tuple.baseIndex);
+        } else if (baseIndexDif == 1 && witnessIndexDif > 1) {
+          List<Word> additionalWords = witness.getPhrase(currentWitnessIndex + 1, tuple.witnessIndex - 1);
+          table.setFrontAddition(witnessNumber, currentBaseIndex + 1, additionalWords);
         }
-        baseIndex = tuple.baseIndex;
-        witnessIndex = tuple.witnessIndex;
-        table.setIdenticalOrVariant(witnessNr, baseIndex, witness.get(witnessIndex));
+        currentBaseIndex = tuple.baseIndex;
+        currentWitnessIndex = tuple.witnessIndex;
+        table.setIdenticalOrVariant(witnessNumber, currentBaseIndex, witness.get(currentWitnessIndex));
       }
-      int difBaseIndex = base.size() - baseIndex;
-      int difWitnessIndex = witness.size() - witnessIndex;
-      if (difBaseIndex > 0 && difWitnessIndex > 0) {
-        table.setReplacement(witnessNr, baseIndex + 1, witness.getPhrase(witnessIndex + 1, witness.size()));
-      } else if (difBaseIndex > 0 && difWitnessIndex == 0) {
-        table.setOmission(witnessNr, baseIndex + 1, base.size() + 1);
-      } else if (difBaseIndex == 0 && difWitnessIndex > 0) {
-        List<Word> additionalWords = witness.getPhrase(witnessIndex + 1, witness.size());
-        table.setBackAddition(witnessNr, baseIndex, additionalWords);
+      int baseIndexDif = base.size() - currentBaseIndex;
+      int witnessIndexDif = witness.size() - currentWitnessIndex;
+      if (baseIndexDif > 0 && witnessIndexDif > 0) {
+        table.setReplacement(witnessNumber, currentBaseIndex + 1, witness.getPhrase(currentWitnessIndex + 1, witness.size()));
+      } else if (baseIndexDif > 0 && witnessIndexDif == 0) {
+        table.setOmission(witnessNumber, currentBaseIndex + 1, base.size() + 1);
+      } else if (baseIndexDif == 0 && witnessIndexDif > 0) {
+        List<Word> additionalWords = witness.getPhrase(currentWitnessIndex + 1, witness.size());
+        table.setBackAddition(witnessNumber, currentBaseIndex, additionalWords);
       }
     }
   }
