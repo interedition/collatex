@@ -34,9 +34,9 @@ public class TupleToTable {
   }
 
   private void fillTable() {
-    int currentBaseIndex = 0;
-    int currentWitnessIndex = 0;
     for (int i = 0; i < tupleMatrix.length; i++) {
+      int currentBaseIndex = 0;
+      int currentWitnessIndex = 0;
       Tuple[] tuples = tupleMatrix[i];
       int witnessNumber = i + 1;
       Line witness = (Line) witnessList.get(i).getRootBlock();
