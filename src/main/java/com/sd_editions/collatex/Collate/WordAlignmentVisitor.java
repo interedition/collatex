@@ -13,6 +13,7 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
   private ArrayList<Tuple> result;
   private int baseIndex = 1;
   private int witnessIndex = 1;
+  private int countDistance = 3;
 
   public WordAlignmentVisitor(BlockStructure variant) {
     this.witnessBlock = variant.getRootBlock();
@@ -46,6 +47,20 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     }
     // TODO: move to next line etc...
   }
+  
+  public void lookForBetterMatch(Word baseWord, Word witnessWord) {
+    int count = this.countDistance;
+    
+    while (witnessWord.hasNextSibling() && count > 0) {
+      witnessWord = (Word) witnessWord.getNextSibling();
+      witnessIndex++;
+      witnessBlock = witnessBlock.getNextSibling();
+      count--;
+      if (baseWord.alignmentFactor(witnessWord) == 0) {
+        result.add(new Tuple(baseIndex, witnessIndex));
+      }
+    }
+  }
 
   public void visitWord(Word baseWord) {
     Word witnessWord = (Word) witnessBlock;
@@ -55,9 +70,15 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
       return;
     }
     if (baseWord.alignsWith(witnessWord)) {
-      result.add(new Tuple(baseIndex, witnessIndex));
-      witnessIndex++;
-      witnessBlock = witnessBlock.getNextSibling();
+      System.out.println(baseWord +"---"+witnessWord );
+      //Look if there is a better match maybe
+      if (baseWord.alignmentFactor(witnessWord) == 1) {
+        lookForBetterMatch(baseWord,witnessWord);
+      } else {
+        result.add(new Tuple(baseIndex, witnessIndex));
+        witnessIndex++;
+        witnessBlock = witnessBlock.getNextSibling();
+      }
     } else {
       // now, first try to find a match in the witnessBlock for the baseWord
       Block savedWitnessPosition = witnessBlock;
@@ -86,6 +107,10 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
   public Tuple[] getResult() {
     //    System.out.println("getResult: " + result);
     return result.toArray(new Tuple[] {});
+  }
+
+  public void setCountDistance(int countDistance) {
+    this.countDistance = countDistance;
   }
 
 }
