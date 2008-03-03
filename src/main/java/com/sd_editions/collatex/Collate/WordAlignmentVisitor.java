@@ -71,14 +71,14 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     }
     if (baseWord.alignsWith(witnessWord)) {
       System.out.println(baseWord +"---"+witnessWord );
-      //Look if there is a better match maybe
+      //look, if there're a better match maybe
       if (baseWord.alignmentFactor(witnessWord) == 1) {
         lookForBetterMatch(baseWord,witnessWord);
-      } else {
+      }
         result.add(new Tuple(baseIndex, witnessIndex));
         witnessIndex++;
         witnessBlock = witnessBlock.getNextSibling();
-      }
+
     } else {
       // now, first try to find a match in the witnessBlock for the baseWord
       Block savedWitnessPosition = witnessBlock;
@@ -89,10 +89,10 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
         witnessIndex++;
         witnessBlock = witnessBlock.getNextSibling();
         if (baseWord.alignsWith(witnessWord)) {
-          result.add(new Tuple(baseIndex, witnessIndex));
-          witnessIndex++;
-          witnessBlock = witnessWord.getNextSibling();
-          foundMatchInWitness = true;
+         result.add(new Tuple(baseIndex, witnessIndex));
+         witnessIndex++;
+         witnessBlock = witnessWord.getNextSibling();
+         foundMatchInWitness = true;
         }
       }
       if (!foundMatchInWitness) {
