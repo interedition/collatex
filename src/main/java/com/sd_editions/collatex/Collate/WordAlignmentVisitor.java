@@ -47,10 +47,12 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     }
     // TODO: move to next line etc...
   }
-  
-  public void lookForBetterMatch(Word baseWord, Word witnessWord) {
+
+  public boolean lookForBetterMatch(Word baseWord, Word witnessWord) {
     int count = this.countDistance;
-    
+    Word witnessWordOld = witnessWord;
+    int witnessIndexOld = witnessIndex;
+    Block witnessBlockOld = witnessBlock;
     while (witnessWord.hasNextSibling() && count > 0) {
       witnessWord = (Word) witnessWord.getNextSibling();
       witnessIndex++;
@@ -58,8 +60,13 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
       count--;
       if (baseWord.alignmentFactor(witnessWord) == 0) {
         result.add(new Tuple(baseIndex, witnessIndex));
+        return true;
       }
     }
+    witnessIndex = witnessIndexOld;
+    witnessWord = witnessWordOld;
+    witnessBlock = witnessBlockOld;
+    return false;
   }
 
   public void visitWord(Word baseWord) {
@@ -69,15 +76,19 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     if (witnessWord == null) {
       return;
     }
+
     if (baseWord.alignsWith(witnessWord)) {
-      System.out.println(baseWord +"---"+witnessWord );
+      System.out.println(baseWord + "-1-" + witnessWord);
       //look, if there're a better match maybe
+      boolean foundBetterMatch = false;
       if (baseWord.alignmentFactor(witnessWord) == 1) {
-        lookForBetterMatch(baseWord,witnessWord);
+        foundBetterMatch = lookForBetterMatch(baseWord, witnessWord);
       }
+      if (!foundBetterMatch) {
         result.add(new Tuple(baseIndex, witnessIndex));
         witnessIndex++;
         witnessBlock = witnessBlock.getNextSibling();
+      }
 
     } else {
       // now, first try to find a match in the witnessBlock for the baseWord
@@ -89,10 +100,13 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
         witnessIndex++;
         witnessBlock = witnessBlock.getNextSibling();
         if (baseWord.alignsWith(witnessWord)) {
-         result.add(new Tuple(baseIndex, witnessIndex));
-         witnessIndex++;
-         witnessBlock = witnessWord.getNextSibling();
-         foundMatchInWitness = true;
+          //look, if there're a better match
+          System.out.println(baseWord + "-2-" + witnessWord);
+          lookForBetterMatch(baseWord, witnessWord);
+          result.add(new Tuple(baseIndex, witnessIndex));
+          witnessIndex++;
+          witnessBlock = witnessWord.getNextSibling();
+          foundMatchInWitness = true;
         }
       }
       if (!foundMatchInWitness) {
