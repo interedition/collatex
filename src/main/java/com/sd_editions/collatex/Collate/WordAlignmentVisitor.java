@@ -102,10 +102,15 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
         if (baseWord.alignsWith(witnessWord)) {
           //look, if there're a better match
           System.out.println(baseWord + "-2-" + witnessWord);
-          lookForBetterMatch(baseWord, witnessWord);
-          result.add(new Tuple(baseIndex, witnessIndex));
-          witnessIndex++;
-          witnessBlock = witnessWord.getNextSibling();
+          boolean foundBetterMatch = false;
+          if (baseWord.alignmentFactor(witnessWord) == 1) {
+            foundBetterMatch = lookForBetterMatch(baseWord, witnessWord);
+          }
+          if (!foundBetterMatch) {
+            result.add(new Tuple(baseIndex, witnessIndex));
+            witnessIndex++;
+            witnessBlock = witnessBlock.getNextSibling();
+          }
           foundMatchInWitness = true;
         }
       }
