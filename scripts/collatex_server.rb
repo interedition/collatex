@@ -16,7 +16,7 @@ def program_is_running?
 end
 
 def get_jars
-  Dir.glob(File.join("lib","*.jar")) + Dir.glob(File.join("bin","*.jar"))
+  Dir.glob(File.join("lib","*.jar"))
 end
 
 def check_setup
@@ -46,6 +46,7 @@ def stop
   if program_is_running?
     `kill #{get_pid}`
     sleep(2)
+    
     puts "done!"
   else
     puts "#{PROGRAM_CLASS} was not running."

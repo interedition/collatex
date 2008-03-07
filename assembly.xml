@@ -15,13 +15,6 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>target</directory>
-      <outputDirectory>bin/</outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
       <directory>scripts</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
@@ -37,7 +30,6 @@
       <scope>runtime</scope>
       <excludes>
         <exclude>junit:junit</exclude>
-        <exclude>com.sd_editions.collatex:CollateX</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
