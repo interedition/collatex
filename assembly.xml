@@ -23,9 +23,9 @@
     </fileSet>
     <fileSet>
       <directory>scripts</directory>
-      <outputDirectory>scripts/</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <includes>
-        <include>*</include>
+        <include>collatex_server.rb</include>
       </includes>
     </fileSet>
   </fileSets>

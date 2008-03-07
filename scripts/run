@@ -1,1 +1,0 @@
-java -cp `scripts/getjars.sh lib`:`scripts/getjars.sh bin` com.sd_editions.collatex.Web.CollateXServer
