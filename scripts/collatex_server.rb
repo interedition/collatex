@@ -43,10 +43,18 @@ end
 
 def stop
   print "stopping #{PROGRAM}... "
+  pid=get_pid
   if program_is_running?
-    `kill #{get_pid}`
-    sleep(2)
-    
+    `kill #{pid}`
+    sleep(5)
+    if program_is_running?
+      `kill -9 #{pid}`
+      sleep(5)
+      if program_is_running?
+      	puts "it appears I'm unable to stop #{PROGRAM}"
+      	exit(-1)
+      end
+    end
     puts "done!"
   else
     puts "#{PROGRAM_CLASS} was not running."
@@ -73,3 +81,4 @@ case ARGV[0]
   else
     puts "usage: #{__FILE__} {start|stop|restart|status}"
 end
+
