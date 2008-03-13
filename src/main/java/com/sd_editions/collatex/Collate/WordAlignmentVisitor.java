@@ -108,8 +108,9 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
           }
           if (!foundBetterMatch) {
             result.add(new Tuple(baseIndex, witnessIndex));
-            witnessIndex++;
-            witnessBlock = witnessBlock.getNextSibling();
+            witnessBlock = savedWitnessPosition;
+            witnessWord = (Word) savedWitnessPosition;
+            witnessIndex = savedWitnessIndex;
           }
           foundMatchInWitness = true;
         }
