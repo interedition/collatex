@@ -65,6 +65,21 @@ public class TupleToTableTest extends TestCase {
   //    assertEquals("join: full blood -> fullblood", table.get(1, 4).toString());
   //    assertEquals("identical: cat", table.get(1, 6).toString());
   //  }
+  
+  /*public void testPhraseVariant2() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(2,4), new Tuple(3,3), new Tuple(4,2), new Tuple(5,5), new Tuple(6,6), new Tuple(7,7), new Tuple(8,8), new Tuple(9,9) };
+    Table table = wordAlignmentTable("the drought of march hath perced to the root", "the march of drought  hath perced to the root", tuples);
+    assertEquals("identical: the", table.get(1, 2).toString());
+    assertEquals("replacement: drought / march", table.get(1, 4).toString());
+    assertEquals("identical: of", table.get(1,6).toString());
+    assertEquals("replacement: march / drought", table.get(1, 8).toString());
+    assertEquals("identical: hath", table.get(1, 10).toString());
+    assertEquals("identical: perced", table.get(1, 12).toString());
+    assertEquals("identical: to", table.get(1, 14).toString());
+    assertEquals("identical: the", table.get(1, 16).toString());
+    assertEquals("identical: root", table.get(1, 18).toString());
+  }
+  */
 
   public void testDivision() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(3, 4) };

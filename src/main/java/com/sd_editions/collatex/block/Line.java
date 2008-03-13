@@ -59,11 +59,11 @@ public class Line extends Block {
     return i;
   }
 
-  public List<Word> getPhrase(int i, int length) {
+  public List<Word> getPhrase(int i, int j) {
     List<Word> result = new ArrayList<Word>();
     Word word = get(i);
     result.add(word);
-    for (int k = 0; k < length -1 ; k++) {
+    for (int k = i; k < j; k++) {
       word = (Word) word.getNextSibling();
       result.add(word);
     }

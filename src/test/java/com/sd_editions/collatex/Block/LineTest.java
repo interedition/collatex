@@ -57,7 +57,7 @@ public class LineTest extends TestCase {
     assertEquals(2, phrase.size());
     assertEquals(word1, phrase.get(0));
     assertEquals(word2, phrase.get(1));
-    phrase = line.getPhrase(2, 3);
+    phrase = line.getPhrase(2, 4);
     assertEquals(3, phrase.size());
     assertEquals(word2, phrase.get(0));
     assertEquals(word3, phrase.get(1));

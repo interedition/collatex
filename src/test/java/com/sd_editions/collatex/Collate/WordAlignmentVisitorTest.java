@@ -49,11 +49,17 @@ public class WordAlignmentVisitorTest extends TestCase {
   //    assertResultIsExpected(base, witness, "[[1,1],[2,2],[2,3][3,4]]");
   //  }
   
-  public void testAlignmentPhrase_variant() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    final String base = "a cat and dog";
-    final String[] witnessArray = new String[] { "a cat or dog and" };
-    assertResultIsExpected(base, witnessArray, "[[[1,1],[2,2],[3,5],[4,4]]]");
-  }
+//  public void testAlignmentPhrase_variant() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+//    final String base = "a cat and dog";
+//    final String[] witnessArray = new String[] { "a cat or dog and" };
+//    assertResultIsExpected(base, witnessArray, "[[[1,1],[2,2],[3,5],[4,4]]]");
+//  }
+//  
+//  public void testAlignmentPhrase_variant2() throws FileNotFoundException, IOException, BlockStructureCascadeException {
+//    final String base = "the drought of march hath perced to the root";
+//    final String[] witnessArray = new String[] { "the march of drought hath perced to the root" };
+//    assertResultIsExpected(base, witnessArray, "[[[1,1],[2,4],[3,3],[4,2],[5,5],[6,6],[7,7],[8,8],[9,9]]]");
+//  }
 
 
   private Tuple[] phase1Table(String baseString, String witnessString) throws FileNotFoundException, IOException, BlockStructureCascadeException {
