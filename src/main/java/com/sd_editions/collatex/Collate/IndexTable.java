@@ -1,16 +1,17 @@
 package com.sd_editions.collatex.Collate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Word;
 
+
 public class IndexTable {
-  private HashMap<String, ArrayList<Integer>> indTable;
+  private LinkedHashMap<String, ArrayList<Integer>> indTable;
   private TreeMap<String, ArrayList<Integer>> indTableSorted;
   private Block base = null;
   private int baseIndex = 1;
@@ -24,19 +25,20 @@ public class IndexTable {
   }
 
   public void newHashMap() {
-    this.indTable = new HashMap<String, ArrayList<Integer>>();
+    this.indTable = new LinkedHashMap<String, ArrayList<Integer>>();
   }
 
   public void newHashMap(BlockStructure bs) {
-    this.indTable = new HashMap<String, ArrayList<Integer>>();
+    this.indTable = new LinkedHashMap<String, ArrayList<Integer>>();
     construct(bs);
   }
 
-  public HashMap<String, ArrayList<Integer>> getIndexTable() {
+  public LinkedHashMap<String, ArrayList<Integer>> getIndexTable() {
     return indTable;
   }
 
   public boolean proofIfWordExist(Word w) {
+    //return this.indTable.containsKey(w.getContent().CASE_INSENSITIVE_ORDER);
     Iterator<String> itKey = this.indTable.keySet().iterator();
     while (itKey.hasNext()) {
       if (itKey.next().equalsIgnoreCase(w.getContent())) {
