@@ -17,7 +17,6 @@ public class Tuple implements Comparable {
     return witnessIndex;
   }
 
-  @Override
   public int compareTo(Object obj) {
     Tuple tmp = (Tuple) obj;
     double newer = tmp.baseIndex + (double) tmp.witnessIndex / 10;
