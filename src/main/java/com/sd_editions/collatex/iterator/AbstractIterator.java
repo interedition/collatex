@@ -5,28 +5,28 @@ import java.util.NoSuchElementException;
 
 public abstract class AbstractIterator implements Iterator {
 
-	private Boolean hasNext;
+  private Boolean hasNext;
 
-	final public Object next() {
-		if (!hasNext()) {
-			throw new NoSuchElementException();
-		}
-		hasNext = null;
-		return doNext();
-	}
+  final public Object next() {
+    if (!hasNext()) {
+      throw new NoSuchElementException();
+    }
+    hasNext = null;
+    return doNext();
+  }
 
-	final public boolean hasNext() {
-		if (hasNext == null) {
-			hasNext = new Boolean(doHasNext());
-		}
-		return hasNext.booleanValue();
-	}
+  final public boolean hasNext() {
+    if (hasNext == null) {
+      hasNext = new Boolean(doHasNext());
+    }
+    return hasNext.booleanValue();
+  }
 
-	public void remove() {
-		throw new UnsupportedOperationException();
-	}
+  public void remove() {
+    throw new UnsupportedOperationException();
+  }
 
-	protected abstract Object doNext();
+  protected abstract Object doNext();
 
-	protected abstract boolean doHasNext();
+  protected abstract boolean doHasNext();
 }

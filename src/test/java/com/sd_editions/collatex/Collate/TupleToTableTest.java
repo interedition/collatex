@@ -52,7 +52,7 @@ public class TupleToTableTest extends TestCase {
     assertEquals("addition: calico", table.get(1, 3).toString());
     assertEquals("identical: cat", table.get(1, 4).toString());
 
-//    assertEquals("addition: many", table.get(2, 1).toString()); TODO: fix it so this works!
+    //    assertEquals("addition: many", table.get(2, 1).toString()); TODO: fix it so this works!
     assertEquals("identical: a", table.get(2, 2).toString());
     assertEquals("addition: black", table.get(2, 3).toString());
     assertEquals("identical: cat", table.get(2, 4).toString());
@@ -65,7 +65,7 @@ public class TupleToTableTest extends TestCase {
   //    assertEquals("join: full blood -> fullblood", table.get(1, 4).toString());
   //    assertEquals("identical: cat", table.get(1, 6).toString());
   //  }
-  
+
   /*public void testPhraseVariant2() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(2,4), new Tuple(3,3), new Tuple(4,2), new Tuple(5,5), new Tuple(6,6), new Tuple(7,7), new Tuple(8,8), new Tuple(9,9) };
     Table table = wordAlignmentTable("the drought of march hath perced to the root", "the march of drought  hath perced to the root", tuples);
@@ -96,7 +96,7 @@ public class TupleToTableTest extends TestCase {
     assertEquals("division: hotblooded -> hot blood ed", table.get(1, 4).toString());
     assertEquals("identical: teacher", table.get(1, 6).toString());
   }
-  
+
   public void testBetterMatch() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(2, 3), new Tuple(3, 4) };
     Table table = wordAlignmentTable("a black cat", "a blank black cat", tuples);
@@ -105,7 +105,7 @@ public class TupleToTableTest extends TestCase {
     assertEquals("identical: black", table.get(1, 4).toString());
     assertEquals("identical: cat", table.get(1, 6).toString());
   }
-  
+
   public void testBetterMatch2() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     Tuple[] tuples = new Tuple[] { new Tuple(1, 1), new Tuple(2, 4), new Tuple(3, 5) };
     Table table = wordAlignmentTable("a black cat", "a blank big black cat", tuples);

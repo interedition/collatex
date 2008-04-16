@@ -9,7 +9,6 @@ import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Word;
 
-
 public class IndexTable {
   private LinkedHashMap<String, ArrayList<Integer>> indTable;
   private TreeMap<String, ArrayList<Integer>> indTableSorted;
@@ -19,7 +18,7 @@ public class IndexTable {
   public IndexTable() {
     newHashMap();
   }
-  
+
   public IndexTable(BlockStructure bs) {
     newHashMap(bs);
   }
@@ -58,9 +57,9 @@ public class IndexTable {
     arrL.add(ind);
     this.indTable.put(str, arrL);
   }
-  
-  public void makeSortedMap()  {
-    this.indTableSorted = new TreeMap<String, ArrayList<Integer>> (indTable);
+
+  public void makeSortedMap() {
+    this.indTableSorted = new TreeMap<String, ArrayList<Integer>>(indTable);
   }
 
   public TreeMap<String, ArrayList<Integer>> getIndexTableSorted() {

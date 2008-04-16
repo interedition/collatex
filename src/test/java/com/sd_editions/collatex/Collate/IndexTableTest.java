@@ -9,19 +9,19 @@ import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
-public class IndexTableTest extends TestCase  {
-  
+public class IndexTableTest extends TestCase {
+
   public void testIndexTable() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin("a red cat or black cat sat").readFile();
     IndexTable iTabbase = new IndexTable(base);
     assertEquals("{cat=[3, 6], red=[2], sat=[7], or=[4], a=[1], black=[5]}", iTabbase.getIndexTable().toString());
   }
-  
+
   public void testIndexTableSorted() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin("a red cat or black cat sat").readFile();
     IndexTable iTabbase = new IndexTable(base);
     iTabbase.makeSortedMap();
     assertEquals("{a=[1], black=[5], cat=[3, 6], or=[4], red=[2], sat=[7]}", iTabbase.getIndexTableSorted().toString());
   }
-  
+
 }

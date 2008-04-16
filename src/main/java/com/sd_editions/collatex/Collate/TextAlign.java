@@ -204,7 +204,6 @@ public class TextAlign {
     int pos1eq = 0;
     int pos2eq = 0;
     int posfirstuneq = 0;
-    int min = 2;
     int i = 2;
     int j = 2;
     int z = 1;

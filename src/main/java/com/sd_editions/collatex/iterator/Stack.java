@@ -2,11 +2,11 @@ package com.sd_editions.collatex.iterator;
 
 public interface Stack {
 
-	Object peek();
+  Object peek();
 
-	Object pop();
+  Object pop();
 
-	void push(Object object);
+  void push(Object object);
 
-	boolean isEmpty();
+  boolean isEmpty();
 }
