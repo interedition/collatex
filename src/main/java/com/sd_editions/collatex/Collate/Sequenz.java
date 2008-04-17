@@ -3,7 +3,7 @@ package com.sd_editions.collatex.Collate;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Sequenz implements Comparable {
+public class Sequenz implements Comparable<Sequenz> {
 
   private ArrayList<Tuple> seq;
 
@@ -29,9 +29,8 @@ public class Sequenz implements Comparable {
     }
   }
 
-  @Override
-  public int compareTo(Object obj) {
-    Sequenz tmp = (Sequenz) obj;
+
+  public int compareTo(Sequenz tmp) {
     if (this.seq.size() > tmp.seq.size()) {
       return -1;
     } else if (this.seq.size() < tmp.seq.size()) {
