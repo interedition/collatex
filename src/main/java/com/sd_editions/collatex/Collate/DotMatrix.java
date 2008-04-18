@@ -84,7 +84,11 @@ public class DotMatrix {
       for (int v = 0; v < seq2.size(); v++) {
         if (anz == seq1.size()) {
           anz = 0;
-          seq1.add(help);
+          Sequenz longestSeq = new Sequenz();
+          longestSeq.addTupelArray(seq1.toArray(new Tuple[seq1.size()]));
+          if (!(help.baseIndex < longestSeq.getMinIndexBase() && help.witnessIndex > longestSeq.getMaxIndexWitn())) {
+            seq1.add(help);
+          }
         }
         for (int h = 0; h < seq1.size(); h++) {
           //System.out.println(seq2.get(v).baseIndex+"<-base->"+seq1.get(h).baseIndex);
