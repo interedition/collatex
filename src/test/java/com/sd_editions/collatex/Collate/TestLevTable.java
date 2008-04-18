@@ -172,8 +172,8 @@ public class TestLevTable extends TestCase {
     System.out.println();
   }
 
-  public void getTuples(LevTable levTab) throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    Tuple[] arrT = levTab.getTuples();
+  public void getTup(LevTable levTab) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+    Tuple[] arrT = levTab.getLevTuples();
     for (int i = 0; i < arrT.length; i++) {
       if (i == 0) {
         System.out.print("Tuples = ");
@@ -190,7 +190,7 @@ public class TestLevTable extends TestCase {
     levTab.toString();
     getIndexTableBase(iTabbase);
     getIndexTableWitn(iTabwitness);
-    getTuples(levTab);
+    getTup(levTab);
   }
 
 }
