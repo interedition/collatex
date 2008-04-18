@@ -80,6 +80,7 @@ public class DotMatrix {
     Tuple help = new Tuple(0, 0);
     ArrayList<Tuple> seq1 = allSequenz.get(0).getSeq();
     for (int i = 1; i < allSequenz.size(); i++) {
+      anz = 0;
       ArrayList<Tuple> seq2 = allSequenz.get(i).getSeq();
       for (int v = 0; v < seq2.size(); v++) {
         if (anz == seq1.size()) {
@@ -87,6 +88,8 @@ public class DotMatrix {
           seq1.add(help);
         }
         for (int h = 0; h < seq1.size(); h++) {
+          //System.out.println(seq2.get(v).baseIndex+"<-base->"+seq1.get(h).baseIndex);
+          //System.out.println(seq2.get(v).witnessIndex+"<-witn->"+seq1.get(h).witnessIndex);
           if (seq2.get(v).baseIndex == seq1.get(h).baseIndex || seq2.get(v).witnessIndex == seq1.get(h).witnessIndex) {
             break;
           }
