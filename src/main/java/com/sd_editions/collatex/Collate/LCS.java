@@ -9,9 +9,9 @@ public class LCS {
   private Tuple[] LCS;
   private DotMatrix dotM;
 
-  public LCS(BlockStructure base, List<BlockStructure> witnesses) {
+  public LCS(BlockStructure base, List<BlockStructure> witnesses, int i) {
     IndexTable iTabbase = new IndexTable(base);
-    IndexTable iTabwitness = new IndexTable(witnesses.get(0));
+    IndexTable iTabwitness = new IndexTable(witnesses.get(i));
     iTabbase.makeSortedMap();
     iTabwitness.makeSortedMap();
     LevTable levTab = new LevTable(iTabbase.getIndexTableSorted(), iTabwitness.getIndexTableSorted());
