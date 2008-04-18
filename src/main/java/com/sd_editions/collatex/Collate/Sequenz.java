@@ -6,9 +6,19 @@ import java.util.Iterator;
 public class Sequenz implements Comparable<Sequenz> {
 
   private ArrayList<Tuple> seq;
+  private int minIndexBase = 9999999;
+  private int maxIndexWitn = 0;
 
   public Sequenz() {
     this.seq = new ArrayList<Tuple>();
+  }
+
+  public int getMinIndexBase() {
+    return minIndexBase;
+  }
+
+  public int getMaxIndexWitn() {
+    return maxIndexWitn;
   }
 
   public ArrayList<Tuple> getSeq() {
@@ -19,16 +29,25 @@ public class Sequenz implements Comparable<Sequenz> {
     return this.seq.size();
   }
 
+  public void isBiggerOrLower(int baseIndex, int witnIndex) {
+    if (this.minIndexBase > baseIndex) {
+      this.minIndexBase = baseIndex;
+    }
+    if (this.maxIndexWitn < witnIndex) {
+      this.maxIndexWitn = witnIndex;
+    }
+  }
+
   public void addNext(Tuple next) {
+    isBiggerOrLower(next.baseIndex, next.witnessIndex);
     this.seq.add(next);
   }
 
   public void addTupelArray(Tuple[] next) {
-    for (int i = 0; i < next.length; i++) {
-      addNext(next[i]);
+    for (Tuple element : next) {
+      addNext(element);
     }
   }
-
 
   public int compareTo(Sequenz tmp) {
     if (this.seq.size() > tmp.seq.size()) {
