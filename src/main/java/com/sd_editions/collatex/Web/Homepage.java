@@ -14,6 +14,7 @@ import org.apache.wicket.model.PropertyModel;
 
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
+import com.sd_editions.collatex.Collate.LCS;
 import com.sd_editions.collatex.Collate.Table;
 import com.sd_editions.collatex.Collate.Tuple;
 import com.sd_editions.collatex.Collate.TupleToTable;
@@ -24,7 +25,13 @@ import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 public class Homepage extends WebPage {
 
   public Homepage() {
-    ModelForView model = new ModelForView("a big black cat came in", new String[] { "on a tiny black mat", "with a small black cat" });
+    //ModelForView model = new ModelForView("the drought of march hath perced to the root", new String[] { "the march of the drought hath perced to the root", "the march of the drought hath perced to the root" });
+    //ModelForView model = new ModelForView("the big bug had a big head", new String[] { "the bug had a small head", "the bug had a small head" });
+    ModelForView model = new ModelForView("the bug big had a big head", new String[] { "the bug had a small head", "the bug had a small head" });
+    //ModelForView model = new ModelForView("the black cat sat on the mat", new String[] { "the cat sat on the black mat", "the cat sat on the black mat" });
+    //ModelForView model = new ModelForView("a cat or dog", new String[] { "a cat and dog and", "a cat and dog and" });
+    //ModelForView model = new ModelForView("Auch hier hab ich wieder ein Plätzchen", new String[] { "Ich hab auch hier wieder ein Pläzchen", "Ich hab auch hier wieder ein Pläzchen" });
+    //ModelForView model = new ModelForView("the black cat on the table", new String[] { "the black saw the black cat on the table", "the black saw the black cat on the table" });
 
     add(new Label("base", new PropertyModel(model, "base")));
     add(new Label("witness1", new PropertyModel(model, "witness1")));
@@ -45,7 +52,24 @@ public class Homepage extends WebPage {
     public ModelForView(String newBase, String[] newWitnesses) {
       this.base = newBase;
       this.witnesses = newWitnesses;
-      fillAlignmentTable();
+      fillAlignmentTable_LCS();
+    }
+
+    void fillAlignmentTable_LCS() {
+      BlockStructure baseStructure = string2BlockStructure(base);
+      List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
+      List<Tuple[]> resultList = new ArrayList<Tuple[]>();
+      int i = 0;
+      for (String witness : witnesses) {
+        BlockStructure witnessStructure = string2BlockStructure(witness);
+        witnessList.add(witnessStructure);
+        LCS tupSeq = new LCS(baseStructure, witnessList, i);
+        resultList.add(tupSeq.getLCS());
+        i++;
+      }
+      Tuple[][] results = resultList.toArray(new Tuple[][] {});
+      Table alignment = new TupleToTable(baseStructure, witnessList, results).getTable();
+      this.html = alignment.toHTML();
     }
 
     void fillAlignmentTable() {
@@ -128,7 +152,8 @@ public class Homepage extends WebPage {
     @Override
     protected void onSubmit() {
       // NOTE: this can be moved to model!
-      modelForView.fillAlignmentTable();
+      //modelForView.fillAlignmentTable();
+      modelForView.fillAlignmentTable_LCS();
     }
 
   }
