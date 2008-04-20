@@ -6,19 +6,29 @@ import java.util.Iterator;
 public class Sequenz implements Comparable<Sequenz> {
 
   private ArrayList<Tuple> seq;
-  private int minIndexBase = 9999999;
-  private int maxIndexWitn = 0;
+  private int maxBase = 0;
+  private int minBase = 9999999;
+  private int maxWitn = 0;
+  private int minWitn = 9999999;
 
   public Sequenz() {
     this.seq = new ArrayList<Tuple>();
   }
 
-  public int getMinIndexBase() {
-    return minIndexBase;
+  public int getMaxBase() {
+    return maxBase;
   }
 
-  public int getMaxIndexWitn() {
-    return maxIndexWitn;
+  public int getMinBase() {
+    return minBase;
+  }
+
+  public int getMaxWitn() {
+    return maxWitn;
+  }
+
+  public int getMinWitn() {
+    return minWitn;
   }
 
   public ArrayList<Tuple> getSeq() {
@@ -29,17 +39,23 @@ public class Sequenz implements Comparable<Sequenz> {
     return this.seq.size();
   }
 
-  public void isBiggerOrLower(int baseIndex, int witnIndex) {
-    if (this.minIndexBase > baseIndex) {
-      this.minIndexBase = baseIndex;
+  private void setMaxMinIndexValues(int baseIndex, int witnIndex) {
+    if (this.maxBase < baseIndex) {
+      this.maxBase = baseIndex;
     }
-    if (this.maxIndexWitn < witnIndex) {
-      this.maxIndexWitn = witnIndex;
+    if (this.minBase > baseIndex) {
+      this.minBase = baseIndex;
+    }
+    if (this.maxWitn < witnIndex) {
+      this.maxWitn = witnIndex;
+    }
+    if (this.minWitn > witnIndex) {
+      this.minWitn = witnIndex;
     }
   }
 
   public void addNext(Tuple next) {
-    isBiggerOrLower(next.baseIndex, next.witnessIndex);
+    setMaxMinIndexValues(next.baseIndex, next.witnessIndex);
     this.seq.add(next);
   }
 
