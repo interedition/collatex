@@ -81,18 +81,17 @@ public class DotMatrix {
     ArrayList<Tuple> seq1 = allSequenz.get(0).getSeq();
     for (int i = 1; i < allSequenz.size(); i++) {
       ArrayList<Tuple> seq2 = allSequenz.get(i).getSeq();
-      for (int v = 0; v < seq2.size(); v++) {
+      for (int v = seq2.size() - 1; v >= 0; v--) {
         if (anz == seq1.size()) {
           anz = 0;
           Sequenz longestSeq = new Sequenz();
           longestSeq.addTupelArray(seq1.toArray(new Tuple[seq1.size()]));
-          if (!(help.baseIndex < longestSeq.getMinIndexBase() && help.witnessIndex > longestSeq.getMaxIndexWitn())) {
+          //if (!(help.baseIndex < longestSeq.getMinBase() && help.witnessIndex > longestSeq.getMaxWitn())) {
+          if (help.baseIndex < longestSeq.getMinBase() & help.witnessIndex < longestSeq.getMinWitn() || help.baseIndex > longestSeq.getMaxBase() & help.witnessIndex > longestSeq.getMaxWitn()) {
             seq1.add(help);
           }
         }
         for (int h = 0; h < seq1.size(); h++) {
-          //System.out.println(seq2.get(v).baseIndex+"<-base->"+seq1.get(h).baseIndex);
-          //System.out.println(seq2.get(v).witnessIndex+"<-witn->"+seq1.get(h).witnessIndex);
           if (seq2.get(v).baseIndex == seq1.get(h).baseIndex || seq2.get(v).witnessIndex == seq1.get(h).witnessIndex) {
             anz = 0;
             break;
@@ -107,6 +106,7 @@ public class DotMatrix {
       seq1.add(help);
     }
     Collections.sort(seq1);
+    System.out.println("LCS_vor: " + seq1.toString());
     seq1 = removeSeqenzIrregularities(seq1);
     this.LCS = seq1.toArray(new Tuple[seq1.size()]);
     showLCS();
@@ -119,6 +119,7 @@ public class DotMatrix {
     for (int i = 0; i < seq1.size(); i++) {
       if (j < seq1.size()) {
         if (seq1.get(j).witnessIndex < seq1.get(i).witnessIndex) {
+          //&& seq1.get(j).baseIndex < seq1.get(i).baseIndex) {
           revisedSeq1.remove(j);
           i--;
         } else {
