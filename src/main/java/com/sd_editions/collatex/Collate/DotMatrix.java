@@ -76,34 +76,23 @@ public class DotMatrix {
   @SuppressWarnings("unchecked")
   public void searchLCS() {
 
-    int anz = 0;
+    Sequenz longestSeq = new Sequenz();
     Tuple help = new Tuple(0, 0);
     ArrayList<Tuple> seq1 = allSequenz.get(0).getSeq();
     for (int i = 1; i < allSequenz.size(); i++) {
       ArrayList<Tuple> seq2 = allSequenz.get(i).getSeq();
       for (int v = seq2.size() - 1; v >= 0; v--) {
-        if (anz == seq1.size()) {
-          anz = 0;
-          Sequenz longestSeq = new Sequenz();
+        for (int h = 0; h < seq1.size(); h++) {
+          if (seq2.get(v).baseIndex == seq1.get(h).baseIndex || seq2.get(v).witnessIndex == seq1.get(h).witnessIndex) {
+            break;
+          }
+          help = seq2.get(v);
           longestSeq.addTupelArray(seq1.toArray(new Tuple[seq1.size()]));
-          //if (!(help.baseIndex < longestSeq.getMinBase() && help.witnessIndex > longestSeq.getMaxWitn())) {
           if (help.baseIndex < longestSeq.getMinBase() & help.witnessIndex < longestSeq.getMinWitn() || help.baseIndex > longestSeq.getMaxBase() & help.witnessIndex > longestSeq.getMaxWitn()) {
             seq1.add(help);
           }
         }
-        for (int h = 0; h < seq1.size(); h++) {
-          if (seq2.get(v).baseIndex == seq1.get(h).baseIndex || seq2.get(v).witnessIndex == seq1.get(h).witnessIndex) {
-            anz = 0;
-            break;
-          }
-          help = seq2.get(v);
-          anz++;
-        }
       }
-    }
-    if (anz == seq1.size()) {
-      anz = 0;
-      seq1.add(help);
     }
     Collections.sort(seq1);
     System.out.println("LCS_vor: " + seq1.toString());
