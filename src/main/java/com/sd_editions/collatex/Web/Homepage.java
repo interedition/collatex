@@ -30,7 +30,7 @@ public class Homepage extends WebPage {
     ModelForView model = new ModelForView("the bug big had a big head", new String[] { "the bug had a small head", "the bug had a small head" });
     //ModelForView model = new ModelForView("the black cat sat on the mat", new String[] { "the cat sat on the black mat", "the cat sat on the black mat" });
     //ModelForView model = new ModelForView("a cat or dog", new String[] { "a cat and dog and", "a cat and dog and" });
-    //ModelForView model = new ModelForView("Auch hier hab ich wieder ein Plätzchen", new String[] { "Ich hab auch hier wieder ein Pläzchen", "Ich hab auch hier wieder ein Pläzchen" });
+    //ModelForView model = new ModelForView("Auch hier hab ich wieder ein Plï¿½tzchen", new String[] { "Ich hab auch hier wieder ein Plï¿½zchen", "Ich hab auch hier wieder ein Plï¿½zchen" });
     //ModelForView model = new ModelForView("the black cat on the table", new String[] { "the black saw the black cat on the table", "the black saw the black cat on the table" });
 
     add(new Label("base", new PropertyModel(model, "base")));
@@ -39,7 +39,11 @@ public class Homepage extends WebPage {
 
     Label label = new Label("alignment", new PropertyModel(model, "html"));
     label.setEscapeModelStrings(false);
+    Label label2 = new Label("alignment2", new PropertyModel(model, "html2"));
+    label2.setEscapeModelStrings(false);
+
     add(label);
+    add(label2);
     add(new AlignmentForm("alignmentform", model));
   }
 
@@ -48,11 +52,13 @@ public class Homepage extends WebPage {
     private String base;
     private String[] witnesses;
     private String html;
+    private String html2;
 
     public ModelForView(String newBase, String[] newWitnesses) {
       this.base = newBase;
       this.witnesses = newWitnesses;
       fillAlignmentTable_LCS();
+      fillAlignmentTable();
     }
 
     void fillAlignmentTable_LCS() {
@@ -86,7 +92,7 @@ public class Homepage extends WebPage {
 
       Tuple[][] results = resultList.toArray(new Tuple[][] {});
       Table alignment = new TupleToTable(baseStructure, witnessList, results).getTable();
-      this.html = alignment.toHTML();
+      this.html2 = alignment.toHTML();
     }
 
     BlockStructure string2BlockStructure(String string) {
@@ -135,7 +141,13 @@ public class Homepage extends WebPage {
     public String getHtml() {
       return html;
     }
+
+    public String getHtml2() {
+      return html2;
+    }
+
   }
+  
 
   @SuppressWarnings("serial")
   class AlignmentForm extends Form {
@@ -152,7 +164,7 @@ public class Homepage extends WebPage {
     @Override
     protected void onSubmit() {
       // NOTE: this can be moved to model!
-      //modelForView.fillAlignmentTable();
+      modelForView.fillAlignmentTable();
       modelForView.fillAlignmentTable_LCS();
     }
 
