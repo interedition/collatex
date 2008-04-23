@@ -6,11 +6,11 @@ import java.util.Collections;
 
 public class DotMatrix {
 
-  public ArrayList<Sequenz> allSequenz;
-  public Tuple[] LCS;
-  int[][] dotMatrix;
-  public ArrayList<Double> mark;
-  int maxH, maxV;
+  private ArrayList<Sequenz> allSequenz;
+  private Tuple[] LCS = new Tuple[] {};
+  private int[][] dotMatrix;
+  private ArrayList<Double> mark;
+  private int maxH, maxV;
 
   public DotMatrix(Tuple[] arrT, int maxHor, int maxVer) {
     this.maxH = maxHor;
@@ -19,11 +19,10 @@ public class DotMatrix {
     allSequenz = new ArrayList<Sequenz>();
     createDotMatrix(arrT);
     searchAllSequenzes();
-    searchLCS();
-  }
-
-  public Tuple[] getTuples() {
-    return allSequenz.toArray(new Tuple[] {});
+    if (!allSequenz.isEmpty()) {
+      beforeSearchLCS();
+      searchLCS();
+    }
   }
 
   public Tuple[] getLCS() {
@@ -73,8 +72,94 @@ public class DotMatrix {
     showAllSequenz();
   }
 
+  //remove matched Tuple in allSequenz from index 1 to end before call searchLCS()
+  //and remodel allSequenz
+  public void beforeSearchLCS() {
+
+    boolean merk = false;
+    ArrayList<Tuple> seq1 = allSequenz.get(0).getSeq();
+    for (int i = 1; i < allSequenz.size(); i++) {
+      if (merk) {
+        i--;
+      }
+      merk = false;
+      Collections.sort(allSequenz);
+      removeIdleSequenz();
+      //showAllSequenz();
+      ArrayList<Tuple> seq2 = allSequenz.get(i).getSeq();
+      for (int v = 0; v < seq2.size(); v++) {
+        //System.out.println(seq2.get(v).toString());
+        if (merk) {
+          merk = false;
+          i--;
+          break;
+        }
+        for (int h = 0; h < seq1.size(); h++) {
+          //System.out.println(seq1.get(h).toString());
+          if (seq2.get(v).baseIndex == seq1.get(h).baseIndex || seq2.get(v).witnessIndex == seq1.get(h).witnessIndex) {
+            allSequenz.get(i).getSeq().remove(v);
+            merk = true;
+            break;
+          }
+        }
+      }
+    }
+
+    //showAllSequenz();
+    Collections.sort(allSequenz);
+    removeIdleSequenz();
+    //showAllSequenz();
+  }
+
+  public void removeIdleSequenz() {
+    for (int i = 0; i < allSequenz.size(); i++) {
+      //System.out.println(allSequenz.get(i).getSeq().toString());
+      if (allSequenz.get(i).getSeq().isEmpty()) {
+        allSequenz = new ArrayList<Sequenz>(allSequenz.subList(0, i));
+      }
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public void searchLCS() {
+
+    int count = 0;
+    Tuple help = new Tuple(0, 0);
+    ArrayList<Tuple> seq1 = allSequenz.get(0).getSeq();
+    Sequenz longestSeq = new Sequenz();
+    longestSeq.addTupelArray(seq1.toArray(new Tuple[seq1.size()]));
+    for (int i = 1; i < allSequenz.size(); i++) {
+      ArrayList<Tuple> seq2 = allSequenz.get(i).getSeq();
+      for (int v = 0; v < seq2.size(); v++) {
+        if (count == longestSeq.getSize() && help.baseIndex != 0) {
+          seq1.add(help);
+          longestSeq.addNext(help);
+        }
+        count = 0;
+        help = seq2.get(v);
+        for (int h = 0; h < seq1.size(); h++) {
+          if ((seq2.get(v).baseIndex > seq1.get(h).baseIndex) && (seq2.get(v).witnessIndex > seq1.get(h).witnessIndex) || (seq2.get(v).baseIndex < seq1.get(h).baseIndex)
+              && (seq2.get(v).witnessIndex < seq1.get(h).witnessIndex)) {
+            count++;
+          }
+        }
+      }
+      if (count == longestSeq.getSize() && help.baseIndex != 0) {
+        count = 0;
+        seq1.add(help);
+        longestSeq.addNext(help);
+      }
+
+    }
+    Collections.sort(seq1);
+    System.out.println("LCS_vor: " + seq1.toString());
+    seq1 = removeSeqenzIrregularities(seq1);
+    this.LCS = seq1.toArray(new Tuple[seq1.size()]);
+    showLCS();
+  }
+
+  @SuppressWarnings("unchecked")
+  public void searchLCS_old() {
 
     Sequenz longestSeq = new Sequenz();
     Tuple help = new Tuple(0, 0);
