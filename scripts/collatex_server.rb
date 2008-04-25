@@ -34,6 +34,7 @@ def start
   classpath=get_jars.join(':')
   command="java -cp #{classpath} #{PROGRAM_CLASS} >> #{LOG_DIR}/#{PROGRAM}.log 2>> #{LOG_DIR}/#{PROGRAM}.err &"
   `#{command}`
+  sleep(2)
   if !program_is_running?
   	puts "oops! Something seems to have gone wrong, check the logs in #{LOG_DIR}"
   else
