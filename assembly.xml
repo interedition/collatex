@@ -19,6 +19,8 @@
       <outputDirectory>/</outputDirectory>
       <includes>
         <include>collatex_server.rb</include>
+        <fileMode>0777</fileMode>
+        <lineEnding>unix</lineEnding>
       </includes>
     </fileSet>
   </fileSets>
