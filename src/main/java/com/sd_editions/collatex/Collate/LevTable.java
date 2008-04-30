@@ -2,6 +2,7 @@ package com.sd_editions.collatex.Collate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -36,6 +37,10 @@ public class LevTable {
     return bas.alignmentFactor(witn);
   }
 
+  public int getLevDistRelativ(int levDist, int strLength) {
+    return 1 - (levDist / strLength) * 100;
+  }
+
   public Tuple[] getLevTuples() {
     ArrayList<Tuple> arrL = tableToTuple();
     tuples = new Tuple[this.anz];
@@ -50,11 +55,10 @@ public class LevTable {
       if (tuples[i].witnessIndex > this.maxV) {
         this.maxV = tuples[i].witnessIndex;
       }
-      //System.out.println(this.maxH+"---"+this.maxV+""+tuples[i]);
       i++;
     }
-    /* Sort array */
-    Arrays.sort(tuples);
+    /* Sort */
+    Collections.sort(Arrays.asList(tuples));
     showLevTable();
     return tuples;
   }
@@ -77,6 +81,7 @@ public class LevTable {
   }
 
   @SuppressWarnings("boxing")
+  //Search match-Cells and save it in tableToTuple-Object
   public ArrayList<Tuple> tableToTuple() {
     int pos_h = 0;
     int pos_v = 0;
@@ -90,6 +95,9 @@ public class LevTable {
           //if match, go to the next column  
           //break;
         } else if ((Integer) array[v][h] == 1 && !merk_1) {
+          if ((Integer) array[v][h + 1] == 0) {
+            break;
+          }
           //note just the first 1-match in a column
           pos_h = h;
           pos_v = v;
@@ -119,6 +127,7 @@ public class LevTable {
   }
 
   @SuppressWarnings("boxing")
+  //Fill the Array-Cells with Lev-Distanz-Values
   public void fillArrayCells() {
     String[] base = mapToStringArray(this.base, this.base.size());
     String[] witn = mapToStringArray(this.witness, this.witness.size());
