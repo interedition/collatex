@@ -2,7 +2,9 @@ package com.sd_editions.collatex.Collate;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class DotMatrix {
 
@@ -85,17 +87,14 @@ public class DotMatrix {
       merk = false;
       Collections.sort(allSequenz);
       removeIdleSequenz();
-      //showAllSequenz();
       ArrayList<Tuple> seq2 = allSequenz.get(i).getSeq();
       for (int v = 0; v < seq2.size(); v++) {
-        //System.out.println(seq2.get(v).toString());
         if (merk) {
           merk = false;
           i--;
           break;
         }
         for (int h = 0; h < seq1.size(); h++) {
-          //System.out.println(seq1.get(h).toString());
           if (seq2.get(v).baseIndex == seq1.get(h).baseIndex || seq2.get(v).witnessIndex == seq1.get(h).witnessIndex) {
             allSequenz.get(i).getSeq().remove(v);
             merk = true;
@@ -104,16 +103,12 @@ public class DotMatrix {
         }
       }
     }
-
-    //showAllSequenz();
     Collections.sort(allSequenz);
     removeIdleSequenz();
-    //showAllSequenz();
   }
 
   public void removeIdleSequenz() {
     for (int i = 0; i < allSequenz.size(); i++) {
-      //System.out.println(allSequenz.get(i).getSeq().toString());
       if (allSequenz.get(i).getSeq().isEmpty()) {
         allSequenz = new ArrayList<Sequenz>(allSequenz.subList(0, i));
       }
@@ -153,55 +148,10 @@ public class DotMatrix {
     }
     Collections.sort(seq1);
     System.out.println("LCS_vor: " + seq1.toString());
-    seq1 = removeSeqenzIrregularities(seq1);
     this.LCS = seq1.toArray(new Tuple[seq1.size()]);
+    Comparator<Tuple> byBaseIndex = new TupelComparatorBI();
+    Arrays.sort(LCS, byBaseIndex);
     showLCS();
-  }
-
-  @SuppressWarnings("unchecked")
-  public void searchLCS_old() {
-
-    Sequenz longestSeq = new Sequenz();
-    Tuple help = new Tuple(0, 0);
-    ArrayList<Tuple> seq1 = allSequenz.get(0).getSeq();
-    for (int i = 1; i < allSequenz.size(); i++) {
-      ArrayList<Tuple> seq2 = allSequenz.get(i).getSeq();
-      for (int v = seq2.size() - 1; v >= 0; v--) {
-        for (int h = 0; h < seq1.size(); h++) {
-          if (seq2.get(v).baseIndex == seq1.get(h).baseIndex || seq2.get(v).witnessIndex == seq1.get(h).witnessIndex) {
-            break;
-          }
-          help = seq2.get(v);
-          longestSeq.addTupelArray(seq1.toArray(new Tuple[seq1.size()]));
-          if (help.baseIndex < longestSeq.getMinBase() & help.witnessIndex < longestSeq.getMinWitn() || help.baseIndex > longestSeq.getMaxBase() & help.witnessIndex > longestSeq.getMaxWitn()) {
-            seq1.add(help);
-          }
-        }
-      }
-    }
-    Collections.sort(seq1);
-    System.out.println("LCS_vor: " + seq1.toString());
-    seq1 = removeSeqenzIrregularities(seq1);
-    this.LCS = seq1.toArray(new Tuple[seq1.size()]);
-    showLCS();
-  }
-
-  public ArrayList<Tuple> removeSeqenzIrregularities(ArrayList<Tuple> seq1) {
-    ArrayList<Tuple> revisedSeq1 = new ArrayList<Tuple>();
-    revisedSeq1 = seq1;
-    int j = 1;
-    for (int i = 0; i < seq1.size(); i++) {
-      if (j < seq1.size()) {
-        if (seq1.get(j).witnessIndex < seq1.get(i).witnessIndex) {
-          //&& seq1.get(j).baseIndex < seq1.get(i).baseIndex) {
-          revisedSeq1.remove(j);
-          i--;
-        } else {
-          j++;
-        }
-      }
-    }
-    return revisedSeq1;
   }
 
   public void showLCS() {
