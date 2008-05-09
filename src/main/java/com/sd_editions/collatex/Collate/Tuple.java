@@ -1,8 +1,8 @@
 package com.sd_editions.collatex.Collate;
 
 public class Tuple implements Comparable {
-  int baseIndex;
-  int witnessIndex;
+  public int baseIndex;
+  public int witnessIndex;
 
   public Tuple(int baseIndex, int witnessIndex) {
     this.baseIndex = baseIndex;

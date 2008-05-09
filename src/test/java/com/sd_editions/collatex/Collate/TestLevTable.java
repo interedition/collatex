@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
+import com.sd_editions.collatex.functional.Functions;
 
 public class TestLevTable extends TestCase {
 
@@ -64,8 +65,8 @@ public class TestLevTable extends TestCase {
   }
 
   public void testIndexTableSorted4() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    BlockStructure base = new StringInputPlugin("Ich hab auch hier wieder ein Pläzchen").readFile();
-    BlockStructure witness = new StringInputPlugin("Auch hier hab ich wieder ein Plätzchen").readFile();
+    BlockStructure base = new StringInputPlugin("Ich hab auch hier wieder ein Plï¿½zchen").readFile();
+    BlockStructure witness = new StringInputPlugin("Auch hier hab ich wieder ein Plï¿½tzchen").readFile();
     IndexTable iTabbase = new IndexTable(base);
     IndexTable iTabwitness = new IndexTable(witness);
     iTabbase.makeSortedMap();
@@ -77,8 +78,8 @@ public class TestLevTable extends TestCase {
   }
 
   public void testIndexTableSorted5() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    BlockStructure base = new StringInputPlugin("Auch hier hab ich wieder ein Plätzchen").readFile();
-    BlockStructure witness = new StringInputPlugin("Ich hab auch hier wieder ein Pläzchen").readFile();
+    BlockStructure base = new StringInputPlugin("Auch hier hab ich wieder ein Plï¿½tzchen").readFile();
+    BlockStructure witness = new StringInputPlugin("Ich hab auch hier wieder ein Plï¿½zchen").readFile();
     IndexTable iTabbase = new IndexTable(base);
     IndexTable iTabwitness = new IndexTable(witness);
     iTabbase.makeSortedMap();
@@ -173,7 +174,7 @@ public class TestLevTable extends TestCase {
   }
 
   public void getTup(LevTable levTab) throws FileNotFoundException, IOException, BlockStructureCascadeException {
-    Tuple[] arrT = levTab.getLevTuples();
+    Tuple[] arrT = Functions.getLevTuples(levTab).getTuplesArray();
     for (int i = 0; i < arrT.length; i++) {
       if (i == 0) {
         System.out.print("Tuples = ");

@@ -3,6 +3,8 @@ package com.sd_editions.collatex.Collate;
 import java.util.List;
 
 import com.sd_editions.collatex.Block.BlockStructure;
+import com.sd_editions.collatex.functional.Functions;
+import com.sd_editions.collatex.functional.TuplesArrayAndMaxHAndMaxV;
 
 public class LCS {
 
@@ -16,7 +18,8 @@ public class LCS {
     iTabwitness.makeSortedMap();
     LevTable levTab = new LevTable(iTabbase.getIndexTableSorted(), iTabwitness.getIndexTableSorted());
     levTab.fillArrayCells();
-    this.dotM = new DotMatrix(levTab.getLevTuples(), levTab.getMaxH(), levTab.getMaxV());
+    TuplesArrayAndMaxHAndMaxV tuplesArray = Functions.getLevTuples(levTab); 
+    this.dotM = new DotMatrix(tuplesArray.getTuplesArray(), tuplesArray.getMaxH(), tuplesArray.getMaxV());
     this.LCS = dotM.getLCS();
   }
 

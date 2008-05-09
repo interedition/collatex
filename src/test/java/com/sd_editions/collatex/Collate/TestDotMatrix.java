@@ -8,6 +8,8 @@ import junit.framework.TestCase;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
+import com.sd_editions.collatex.functional.Functions;
+import com.sd_editions.collatex.functional.TuplesArrayAndMaxHAndMaxV;
 
 public class TestDotMatrix extends TestCase {
 
@@ -20,7 +22,8 @@ public class TestDotMatrix extends TestCase {
     iTabwitness.makeSortedMap();
     LevTable levTab = new LevTable(iTabbase.getIndexTableSorted(), iTabwitness.getIndexTableSorted());
     levTab.fillArrayCells();
-    DotMatrix dotM = new DotMatrix(levTab.getLevTuples(), levTab.getMaxH(), levTab.getMaxV());
+    TuplesArrayAndMaxHAndMaxV levTuples = Functions.getLevTuples(levTab);
+    DotMatrix dotM = new DotMatrix(levTuples.getTuplesArray(), levTuples.getMaxH(), levTuples.getMaxV());
     dotM.toString();
   }
 
@@ -33,7 +36,8 @@ public class TestDotMatrix extends TestCase {
     iTabwitness.makeSortedMap();
     LevTable levTab = new LevTable(iTabbase.getIndexTableSorted(), iTabwitness.getIndexTableSorted());
     levTab.fillArrayCells();
-    DotMatrix dotM = new DotMatrix(levTab.getLevTuples(), levTab.getMaxH(), levTab.getMaxV());
+    TuplesArrayAndMaxHAndMaxV levTuples = Functions.getLevTuples(levTab);
+    DotMatrix dotM = new DotMatrix(levTuples.getTuplesArray(), levTuples.getMaxH(), levTuples.getMaxV());
     dotM.toString();
   }
 
@@ -46,7 +50,8 @@ public class TestDotMatrix extends TestCase {
     iTabwitness.makeSortedMap();
     LevTable levTab = new LevTable(iTabbase.getIndexTableSorted(), iTabwitness.getIndexTableSorted());
     levTab.fillArrayCells();
-    DotMatrix dotM = new DotMatrix(levTab.getLevTuples(), levTab.getMaxH(), levTab.getMaxV());
+    TuplesArrayAndMaxHAndMaxV levTuples = Functions.getLevTuples(levTab);
+    DotMatrix dotM = new DotMatrix(levTuples.getTuplesArray(), levTuples.getMaxH(), levTuples.getMaxV());
     dotM.toString();
   }
 
@@ -59,14 +64,15 @@ public class TestDotMatrix extends TestCase {
     iTabwitness.makeSortedMap();
     LevTable levTab = new LevTable(iTabbase.getIndexTableSorted(), iTabwitness.getIndexTableSorted());
     levTab.fillArrayCells();
-    DotMatrix dotM = new DotMatrix(levTab.getLevTuples(), levTab.getMaxH(), levTab.getMaxV());
+    TuplesArrayAndMaxHAndMaxV levTuples = Functions.getLevTuples(levTab);
+    DotMatrix dotM = new DotMatrix(levTuples.getTuplesArray(), levTuples.getMaxH(), levTuples.getMaxV());
     dotM.toString();
   }
 
   /*  
    public void testSeqenzMatrix_4() throws FileNotFoundException, IOException, BlockStructureCascadeException {
-     BlockStructure base = new StringInputPlugin("Auch hier hab ich wieder ein Plätzchen").readFile();
-     BlockStructure witness = new StringInputPlugin("Ich hab auch hier wieder ein Pläzchen").readFile();
+     BlockStructure base = new StringInputPlugin("Auch hier hab ich wieder ein Plï¿½tzchen").readFile();
+     BlockStructure witness = new StringInputPlugin("Ich hab auch hier wieder ein Plï¿½zchen").readFile();
      IndexTable iTabbase = new IndexTable(base);
      IndexTable iTabwitness = new IndexTable(witness);
      iTabbase.makeSortedMap();
