@@ -38,7 +38,7 @@ public class Functions {
           //if match, go to the next column  
           //break;
         } else if ((Integer) input.array[v][h] == 1 && !merk_1) {
-          if ((Integer) input.array[v][h + 1] == 0) {
+          if ( h < input.base.size() && (Integer) input.array[v][h + 1] == 0) {
             break;
           }
           //note just the first 1-match in a column
