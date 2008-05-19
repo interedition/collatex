@@ -39,21 +39,22 @@ public class DotMatrix {
   }
 
   @SuppressWarnings("boxing")
-  public Double getRound(Double d) {
+  public Double getRound2(Double d) {
     BigDecimal bigDecimal = new BigDecimal(d);
     bigDecimal = bigDecimal.setScale(1, BigDecimal.ROUND_DOWN);
-    return bigDecimal.doubleValue();
+    return d;
   }
 
-  public Double getRound2(Double d) {
-    return new Double((String.valueOf(d).substring(0, String.valueOf(d).toString().indexOf(".") + 2)));
+  public Double getRound(Double d) {
+    Double newD = new Double((String.valueOf(d).substring(0, String.valueOf(d).toString().indexOf(".") + 2)));
+    return newD;
   }
 
   public void searchAllSequenzes() {
 
     int nH, nV = 0;
-    for (int h = 1; h < this.maxH + 3; h++) {
-      for (int v = 1; v < this.maxV + 3; v++) {
+    for (int h = 1; h < this.maxH + 1; h++) {
+      for (int v = 1; v < this.maxV + 1; v++) {
         if (dotMatrix[h][v] == 1 && !mark.contains(getRound(new Double(h + v * 0.1)))) {
           Sequenz seq = new Sequenz();
           seq.addNext(new Tuple(h, v));
@@ -72,6 +73,7 @@ public class DotMatrix {
     }
     Collections.sort(allSequenz);
     showAllSequenz();
+    System.out.println("markArray: "+mark.toString());
   }
 
   //remove matched Tuple in allSequenz from index 1 to end before call searchLCS()
