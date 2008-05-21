@@ -38,4 +38,11 @@ public class WordMatchesTest extends TestCase {
     assertEquals(matchCoordinate2, testWordMatches.getLevMatches().get(1));
   }
 
+  public void testToString() throws Exception {
+    testWordMatches.addExactMatch(new WordCoordinate(1, 2));
+    testWordMatches.addExactMatch(new WordCoordinate(3, 4));
+    testWordMatches.addLevMatch(new WordCoordinate(1, 3));
+    testWordMatches.addLevMatch(new WordCoordinate(2, 4));
+    assertEquals("testWord: exact=[[1,2], [3,4]], lev=[[1,3], [2,4]]", testWordMatches.toString());
+  }
 }

@@ -32,4 +32,9 @@ public class WordMatches {
     return levMatches;
   }
 
+  @Override
+  public String toString() {
+    return word + ": exact=" + exactMatches + ", lev=" + levMatches;
+  }
+
 }
