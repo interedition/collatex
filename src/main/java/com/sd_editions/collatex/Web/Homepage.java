@@ -1,7 +1,5 @@
 package com.sd_editions.collatex.Web;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,16 +8,16 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.PropertyModel;
 
 import com.sd_editions.collatex.Block.BlockStructure;
-import com.sd_editions.collatex.Block.BlockStructureCascadeException;
+import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.Collate.LCS;
 import com.sd_editions.collatex.Collate.Table;
 import com.sd_editions.collatex.Collate.Tuple;
 import com.sd_editions.collatex.Collate.TupleToTable;
 import com.sd_editions.collatex.Collate.WordAlignmentVisitor;
-import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
 @SuppressWarnings("serial")
 public class Homepage extends WebPage {
@@ -47,6 +45,7 @@ public class Homepage extends WebPage {
     add(label);
     add(label2);
     add(new AlignmentForm("alignmentform", model));
+    add(new BookmarkablePageLink("usecaselink", UseCasePage.class));
   }
 
   @SuppressWarnings("serial")
@@ -64,12 +63,12 @@ public class Homepage extends WebPage {
     }
 
     void fillAlignmentTable_LCS() {
-      BlockStructure baseStructure = string2BlockStructure(base.toLowerCase());
+      BlockStructure baseStructure = Util.string2BlockStructure(base.toLowerCase());
       List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
       List<Tuple[]> resultList = new ArrayList<Tuple[]>();
       int i = 0;
       for (String witness : witnesses) {
-        BlockStructure witnessStructure = string2BlockStructure(witness.toLowerCase());
+        BlockStructure witnessStructure = Util.string2BlockStructure(witness.toLowerCase());
         witnessList.add(witnessStructure);
         LCS tupSeq = new LCS(baseStructure, witnessList, i);
         resultList.add(tupSeq.getLCS());
@@ -81,11 +80,11 @@ public class Homepage extends WebPage {
     }
 
     void fillAlignmentTable() {
-      BlockStructure baseStructure = string2BlockStructure(base);
+      BlockStructure baseStructure = Util.string2BlockStructure(base);
       List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
       List<Tuple[]> resultList = new ArrayList<Tuple[]>();
       for (String witness : witnesses) {
-        BlockStructure witnessStructure = string2BlockStructure(witness);
+        BlockStructure witnessStructure = Util.string2BlockStructure(witness);
         WordAlignmentVisitor visitor = new WordAlignmentVisitor(witnessStructure);
         baseStructure.accept(visitor);
         witnessList.add(witnessStructure);
@@ -95,21 +94,6 @@ public class Homepage extends WebPage {
       Tuple[][] results = resultList.toArray(new Tuple[][] {});
       Table alignment = new TupleToTable(baseStructure, witnessList, results).getTable();
       this.html2 = alignment.toHTML();
-    }
-
-    BlockStructure string2BlockStructure(String string) {
-      BlockStructure result = null;
-      try {
-        result = new StringInputPlugin(string).readFile();
-        // TODO: work away those exceptions.. they are not relevant for Strings
-      } catch (FileNotFoundException e) {
-        throw new RuntimeException(e);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      } catch (BlockStructureCascadeException e) {
-        throw new RuntimeException(e);
-      }
-      return result;
     }
 
     public void setBase(String newBase) {
