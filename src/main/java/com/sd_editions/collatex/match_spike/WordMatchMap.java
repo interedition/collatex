@@ -53,7 +53,7 @@ public class WordMatchMap {
   }
 
   private String normalizeWord(String word) {
-    return word.toLowerCase().replaceAll("\\W", "");
+    return word.toLowerCase().replaceAll("[,.:; ]", "");
   }
 
   public List<String> getWords() {
@@ -87,4 +87,5 @@ public class WordMatchMap {
     if (wordMatches == null) return null;
     return wordMatches.getLevMatches();
   }
+
 }

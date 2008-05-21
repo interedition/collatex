@@ -18,7 +18,7 @@ public class WordMatchMapTest extends TestCase {
     List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
     witnessList.add(Util.string2BlockStructure("The rain in Spain falls mainly on the plain."));
     witnessList.add(Util.string2BlockStructure("Da rain in Spain usually falls on the plains."));
-    witnessList.add(Util.string2BlockStructure("When it rains in Spain, get away from the plains."));
+    witnessList.add(Util.string2BlockStructure("When it rains in Spain, get, ööh, away from the plains."));
     testWordMatchMap = new WordMatchMap(witnessList);
   }
 
@@ -26,8 +26,12 @@ public class WordMatchMapTest extends TestCase {
     List<String> words = testWordMatchMap.getWords();
     assertNotNull(words);
     //    System.out.println(words);
-    assertEquals(17, words.size()); // 17 unique words
+    assertEquals(18, words.size()); // 18 unique words
     assertTrue(words.contains("spain"));
+  }
+
+  public void testNormalizeWord() throws Exception {
+    assertTrue(testWordMatchMap.getWords().contains("ööh"));
   }
 
   public final void testLevMatches() {
