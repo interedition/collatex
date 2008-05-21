@@ -20,7 +20,7 @@ public class UseCasePage extends WebPage {
     usecases.add(new String[] { "the big bug had a big head", "the bug big had a big head", "the bug had a small head" });
     usecases.add(new String[] { "the black cat sat on the mat", "the cat sat on the black mat", "the cat sat on the black mat" });
     usecases.add(new String[] { "a cat or dog", "a cat and dog and", "a cat and dog and" });
-    usecases.add(new String[] { "Auch hier hab ich wieder ein Pl‰tzchen", "Ich hab auch hier wieder ein Pl‰zchen", "Ich hab auch hier wieder ein Pl‰zchen" });
+    usecases.add(new String[] { "Auch hier hab ich wieder ein Pl√§tzchen", "Ich hab auch hier wieder ein Pl√§zchen", "Ich hab auch hier wieder ein Pl√§zchen" });
     usecases.add(new String[] { "the black cat on the table", "the black saw the black cat on the table", "the black saw the black cat on the table" });
     usecases.add(new String[] { "the black cat and the black mat", "the black dog and the black mat", "the black dog and the black mat" });
 

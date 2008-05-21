@@ -29,7 +29,7 @@ public class Homepage extends WebPage {
     //ModelForView model = new ModelForView("the bug big had a big head", new String[] { "the bug had a small head", "the bug had a small head" });
     //ModelForView model = new ModelForView("the black cat sat on the mat", new String[] { "the cat sat on the black mat", "the cat sat on the black mat" });
     //ModelForView model = new ModelForView("a cat or dog", new String[] { "a cat and dog and", "a cat and dog and" });
-    //ModelForView model = new ModelForView("Auch hier hab ich wieder ein Pl�tzchen", new String[] { "Ich hab auch hier wieder ein Pl�zchen", "Ich hab auch hier wieder ein Pl�zchen" });
+    //ModelForView model = new ModelForView("Auch hier hab ich wieder ein Plätzchen", new String[] { "Ich hab auch hier wieder ein Pläzchen", "Ich hab auch hier wieder ein Pläzchen" });
     //ModelForView model = new ModelForView("the black cat on the table", new String[] { "the black saw the black cat on the table", "the black saw the black cat on the table" });
     //ModelForView model = new ModelForView("the black cat and the black mat", new String[] { "the black dog and the black mat", "the black dog and the black mat" });
 

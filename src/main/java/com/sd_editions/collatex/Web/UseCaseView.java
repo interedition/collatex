@@ -3,7 +3,6 @@ package com.sd_editions.collatex.Web;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
@@ -26,7 +25,7 @@ public class UseCaseView {
   }
 
   public String toHtml() {
-    String html = "<ol>";
+    String html = "<ol start=\"0\">";
     int color = 1;
     HashMap<String, Integer> colorMap = new HashMap<String, Integer>();
     for (BlockStructure witness : witnessList) {
@@ -36,7 +35,7 @@ public class UseCaseView {
         Block block = iterator.next();
         if (block instanceof Word) {
           String word = ((Word) block).getContent();
-          String normalizedWord = word.toLowerCase(Locale.GERMAN);
+          String normalizedWord = word.toLowerCase();
           if (!colorMap.containsKey(normalizedWord)) {
             colorMap.put(normalizedWord, new Integer(color++));
           }
