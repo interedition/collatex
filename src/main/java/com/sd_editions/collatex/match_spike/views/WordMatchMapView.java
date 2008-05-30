@@ -1,6 +1,6 @@
-package com.sd_editions.collatex.Web;
+package com.sd_editions.collatex.match_spike.views;
 
-import com.sd_editions.collatex.match_spike.WordCoordinate;
+import com.google.common.base.Join;
 import com.sd_editions.collatex.match_spike.WordMatchMap;
 
 public class WordMatchMapView {
@@ -16,18 +16,19 @@ public class WordMatchMapView {
       string += "<tr>";
       string += "<th align=\"left\">&quot;" + word + "&quot;</th>";
       string += "<td align=\"right\">exact matches</td><td>";
-      String sep = "";
-      for (WordCoordinate c : map.getExactMatches(word)) {
-        string += sep + c.toString();
-        sep = ", ";
-      }
+      string += Join.join(", ", map.getExactMatches(word));
+      //      for (WordCoordinate c : map.getExactMatches(word)) {
+      //        string += sep + c.toString();
+      //        sep = ", ";
+      //      }
       string += "</td></tr>";
       string += "<tr><td colspan=\"2\" align=\"right\">Levenshtein matches</td><td>";
-      sep = "";
-      for (WordCoordinate c : map.getLevMatches(word)) {
-        string += sep + c.toString();
-        sep = ", ";
-      }
+      string += Join.join(", ", map.getLevMatches(word));
+      //      sep = "";
+      //      for (WordCoordinate c : map.getLevMatches(word)) {
+      //        string += sep + c.toString();
+      //        sep = ", ";
+      //      }
       string += "</td></tr>";
     }
     string += "</table>";

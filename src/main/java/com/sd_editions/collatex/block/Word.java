@@ -2,24 +2,15 @@ package com.sd_editions.collatex.Block;
 
 import org.apache.commons.lang.StringUtils;
 
-/**
- *
- *
- *
- *
- *
- *
- *
- */
 public class Word extends Block {
   private String content;
 
-  public Word(String content) {
-    this.content = content;
+  public Word(String newContent) {
+    this.content = newContent;
   }
 
-  public void setContent(String content) {
-    this.content = content;
+  public void setContent(String newContent) {
+    this.content = newContent;
   }
 
   public String getContent() {

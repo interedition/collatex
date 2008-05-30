@@ -2,6 +2,7 @@ package com.sd_editions.collatex.Collate;
 
 import java.util.ArrayList;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.IntBlockVisitor;
@@ -21,13 +22,13 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
 
   public WordAlignmentVisitor(Word variant) {
     this.witnessBlock = variant;
-    this.result = new ArrayList<Tuple>();
+    this.result = Lists.newArrayList();
     createResult();
   }
 
   @SuppressWarnings("serial")
   private void createResult() {
-    result = new ArrayList<Tuple>() {};
+    result = Lists.newArrayList();
   }
 
   public void visitBlockStructure(BlockStructure blockStructure) {

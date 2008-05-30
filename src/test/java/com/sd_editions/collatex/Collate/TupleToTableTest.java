@@ -2,11 +2,11 @@ package com.sd_editions.collatex.Collate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
@@ -126,7 +126,7 @@ public class TupleToTableTest extends TestCase {
   @SuppressWarnings("serial")
   private Table wordAlignmentTable(String baseString, String[] witnessStrings, Tuple[][] tuplesArray) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
-    List<BlockStructure> witnessList = new ArrayList<BlockStructure>() {};
+    List<BlockStructure> witnessList = Lists.newArrayList();
     for (String witnessString : witnessStrings) {
       witnessList.add(new StringInputPlugin(witnessString).readFile());
     }

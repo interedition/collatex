@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
@@ -35,11 +36,11 @@ public class TextAlign {
   private ArrayList<ArrayList<String>> alignInfoTable;
 
   public TextAlign() {
-    base = new ArrayList<String>();
-    wit = new ArrayList<String>();
-    txtOrig = new ArrayList<BlockStructure>();
-    txtAlign = new ArrayList<ArrayList<String>>();
-    alignInfoTable = new ArrayList<ArrayList<String>>();
+    base = Lists.newArrayList();
+    wit = Lists.newArrayList();
+    txtOrig = Lists.newArrayList();
+    txtAlign = Lists.newArrayList();
+    alignInfoTable = Lists.newArrayList();
   }
 
   protected BlockStructure getTxtOrigBase() throws IndexOutOfBoundsException {
@@ -137,7 +138,7 @@ public class TextAlign {
   }
 
   public ArrayList<String> getContentofBlock(BlockStructure bs) {
-    ArrayList<String> arrL = new ArrayList<String>();
+    ArrayList<String> arrL = Lists.newArrayList();
     BlockStructureListIterator<? extends Block> it = bs.listIterator();
 
     while (it.hasNext()) {
@@ -161,11 +162,7 @@ public class TextAlign {
   }
 
   public boolean proofCollate(int i, int j) {
-    if (i > ((this.base.size()) - 1) || j > ((this.wit.size()) - 1)) {
-      return false;
-    } else {
-      return true;
-    }
+    return !(i > ((this.base.size()) - 1) || j > ((this.wit.size()) - 1));
   }
 
   public void base2Slot() {
@@ -195,7 +192,7 @@ public class TextAlign {
   }
 
   public ArrayList<String> collateBase2Wit() {
-    ArrayList<String> arrLnew = new ArrayList<String>();
+    ArrayList<String> arrLnew = Lists.newArrayList();
     StringBuffer sb = new StringBuffer();
     boolean collate = true;
     boolean muneq = false;

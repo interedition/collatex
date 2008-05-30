@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.google.common.collect.Lists;
+
 public class DotMatrix {
 
   private ArrayList<Sequenz> allSequenz;
@@ -17,8 +19,8 @@ public class DotMatrix {
   public DotMatrix(Tuple[] arrT, int maxHor, int maxVer) {
     this.maxH = maxHor;
     this.maxV = maxVer;
-    mark = new ArrayList<Double>();
-    allSequenz = new ArrayList<Sequenz>();
+    mark = Lists.newArrayList();
+    allSequenz = Lists.newArrayList();
     createDotMatrix(arrT);
     searchAllSequenzes();
     if (!allSequenz.isEmpty()) {
@@ -73,7 +75,7 @@ public class DotMatrix {
     }
     Collections.sort(allSequenz);
     showAllSequenz();
-    System.out.println("markArray: "+mark.toString());
+    System.out.println("markArray: " + mark.toString());
   }
 
   //remove matched Tuple in allSequenz from index 1 to end before call searchLCS()
@@ -112,7 +114,7 @@ public class DotMatrix {
   public void removeIdleSequenz() {
     for (int i = 0; i < allSequenz.size(); i++) {
       if (allSequenz.get(i).getSeq().isEmpty()) {
-        allSequenz = new ArrayList<Sequenz>(allSequenz.subList(0, i));
+        allSequenz = Lists.newArrayList(allSequenz.subList(0, i));
       }
     }
   }

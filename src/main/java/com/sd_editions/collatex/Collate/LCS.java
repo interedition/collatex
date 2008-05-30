@@ -18,7 +18,7 @@ public class LCS {
     iTabwitness.makeSortedMap();
     LevTable levTab = new LevTable(iTabbase.getIndexTableSorted(), iTabwitness.getIndexTableSorted());
     levTab.fillArrayCells();
-    TuplesArrayAndMaxHAndMaxV tuplesArray = Functions.getLevTuples(levTab); 
+    TuplesArrayAndMaxHAndMaxV tuplesArray = Functions.getLevTuples(levTab);
     this.dotM = new DotMatrix(tuplesArray.getTuplesArray(), tuplesArray.getMaxH(), tuplesArray.getMaxV());
     this.LCS = dotM.getLCS();
   }

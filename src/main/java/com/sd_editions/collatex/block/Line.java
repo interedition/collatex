@@ -1,7 +1,8 @@
 package com.sd_editions.collatex.Block;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 /**
  *
@@ -60,7 +61,7 @@ public class Line extends Block {
   }
 
   public List<Word> getPhrase(int i, int j) {
-    List<Word> result = new ArrayList<Word>();
+    List<Word> result = Lists.newArrayList();
     Word word = get(i);
     result.add(word);
     for (int k = i; k < j; k++) {

@@ -43,6 +43,6 @@ public class WordMatchesTest extends TestCase {
     testWordMatches.addExactMatch(new WordCoordinate(3, 4));
     testWordMatches.addLevMatch(new WordCoordinate(1, 3));
     testWordMatches.addLevMatch(new WordCoordinate(2, 4));
-    assertEquals("testWord: exact=[[1,2], [3,4]], lev=[[1,3], [2,4]]", testWordMatches.toString());
+    assertEquals("testWord: exact=[[B,3], [D,5]], lev=[[B,4], [C,5]]", testWordMatches.toString());
   }
 }

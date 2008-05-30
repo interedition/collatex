@@ -8,7 +8,7 @@ import com.sd_editions.collatex.Collate.Tuple;
 public class TuplesArrayAndMaxHAndMaxV {
   private Tuple[] tuples;
   private int maxH, maxV;
-  
+
   public TuplesArrayAndMaxHAndMaxV(int anz) {
     this.tuples = new Tuple[anz];
   }
@@ -26,7 +26,7 @@ public class TuplesArrayAndMaxHAndMaxV {
   }
 
   public void set(int i, Tuple next) {
-    tuples[i]=next;
+    tuples[i] = next;
     if (next.baseIndex > maxH) {
       maxH = next.baseIndex;
     }
@@ -34,11 +34,9 @@ public class TuplesArrayAndMaxHAndMaxV {
       maxV = next.witnessIndex;
     }
   }
-  
+
   public void sort() {
     Collections.sort(Arrays.asList(tuples));
   }
-
-
 
 }

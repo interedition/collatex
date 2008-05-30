@@ -3,15 +3,16 @@ package com.sd_editions.collatex.functional;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Collate.Tuple;
 
 public class TuplesList {
   ArrayList<Tuple> arrL;
 
   public TuplesList() {
-    this.arrL = new ArrayList<Tuple>();
+    this.arrL = Lists.newArrayList();
   }
-  
+
   public int size() {
     return arrL.size();
   }

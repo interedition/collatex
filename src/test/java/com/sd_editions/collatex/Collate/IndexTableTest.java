@@ -19,7 +19,7 @@ public class IndexTableTest extends TestCase {
     BlockStructure base = new StringInputPlugin("a red cat or black cat sat").readFile();
     IndexTable iTabbase = new IndexTable(base);
     LinkedHashMap<String, ArrayList<Integer>> iTable = iTabbase.getIndexTable();
-    assertEquals(Arrays.asList(3,6), iTable.get("cat"));
+    assertEquals(Arrays.asList(3, 6), iTable.get("cat"));
     assertEquals(Arrays.asList(2), iTable.get("red"));
     assertEquals(Arrays.asList(7), iTable.get("sat"));
     assertEquals(Arrays.asList(4), iTable.get("or"));

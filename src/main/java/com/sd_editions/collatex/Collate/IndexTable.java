@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Word;
@@ -24,11 +26,11 @@ public class IndexTable {
   }
 
   public void newHashMap() {
-    this.indTable = new LinkedHashMap<String, ArrayList<Integer>>();
+    this.indTable = Maps.newLinkedHashMap();
   }
 
   public void newHashMap(BlockStructure bs) {
-    this.indTable = new LinkedHashMap<String, ArrayList<Integer>>();
+    this.indTable = Maps.newLinkedHashMap();
     construct(bs);
   }
 
@@ -53,7 +55,7 @@ public class IndexTable {
   }
 
   public void addNext(String str, Integer ind) {
-    ArrayList<Integer> arrL = new ArrayList<Integer>();
+    ArrayList<Integer> arrL = Lists.newArrayList();
     arrL.add(ind);
     this.indTable.put(str, arrL);
   }

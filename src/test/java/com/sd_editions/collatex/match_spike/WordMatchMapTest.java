@@ -1,10 +1,10 @@
 package com.sd_editions.collatex.match_spike;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Util;
 
@@ -15,7 +15,7 @@ public class WordMatchMapTest extends TestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
+    List<BlockStructure> witnessList = Lists.newArrayList();
     witnessList.add(Util.string2BlockStructure("The rain in Spain falls mainly on the plain."));
     witnessList.add(Util.string2BlockStructure("Da rain in Spain usually falls on the plains."));
     witnessList.add(Util.string2BlockStructure("When it rains in Spain, get, ööh, away from the plains."));

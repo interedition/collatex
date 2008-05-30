@@ -1,7 +1,6 @@
 package com.sd_editions.collatex.Web;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.markup.html.WebPage;
@@ -11,6 +10,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.PropertyModel;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.Collate.LCS;
@@ -64,8 +64,8 @@ public class Homepage extends WebPage {
 
     void fillAlignmentTable_LCS() {
       BlockStructure baseStructure = Util.string2BlockStructure(base.toLowerCase());
-      List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
-      List<Tuple[]> resultList = new ArrayList<Tuple[]>();
+      List<BlockStructure> witnessList = Lists.newArrayList();
+      List<Tuple[]> resultList = Lists.newArrayList();
       int i = 0;
       for (String witness : witnesses) {
         BlockStructure witnessStructure = Util.string2BlockStructure(witness.toLowerCase());
@@ -81,8 +81,8 @@ public class Homepage extends WebPage {
 
     void fillAlignmentTable() {
       BlockStructure baseStructure = Util.string2BlockStructure(base);
-      List<BlockStructure> witnessList = new ArrayList<BlockStructure>();
-      List<Tuple[]> resultList = new ArrayList<Tuple[]>();
+      List<BlockStructure> witnessList = Lists.newArrayList();
+      List<Tuple[]> resultList = Lists.newArrayList();
       for (String witness : witnesses) {
         BlockStructure witnessStructure = Util.string2BlockStructure(witness);
         WordAlignmentVisitor visitor = new WordAlignmentVisitor(witnessStructure);

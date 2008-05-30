@@ -1,8 +1,8 @@
 package com.sd_editions.collatex.Collate;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Line;
 import com.sd_editions.collatex.Block.Word;
@@ -16,7 +16,7 @@ public class TupleToTable {
 
   public TupleToTable(BlockStructure newBase, BlockStructure witness, Tuple[] newTupleArray) {
     this.tupleMatrix = new Tuple[][] { newTupleArray };
-    this.witnessList = new ArrayList<BlockStructure>();
+    this.witnessList = Lists.newArrayList();
     this.witnessList.add(witness);
     construct(newBase);
   }

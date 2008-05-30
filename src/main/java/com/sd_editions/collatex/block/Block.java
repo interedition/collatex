@@ -2,6 +2,8 @@ package com.sd_editions.collatex.Block;
 
 import java.util.HashMap;
 
+import com.google.common.collect.Maps;
+
 /**
  * Our basic block class.
  * This shouldn't be used itself, use one of its subclasses or create your own
@@ -22,7 +24,7 @@ public abstract class Block {
   private Block endParent;
 
   public Block() {
-    this.attributes = new HashMap<String, String>();
+    this.attributes = Maps.newHashMap();
   }
 
   public String getName() {

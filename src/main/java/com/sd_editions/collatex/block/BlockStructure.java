@@ -2,6 +2,8 @@ package com.sd_editions.collatex.Block;
 
 import java.util.HashSet;
 
+import com.google.common.collect.Sets;
+
 /**
  * Maintains an association between Blocks.
  *
@@ -11,7 +13,7 @@ public class BlockStructure {
   Block rootBlock;
 
   public BlockStructure() {
-    this.blocks = new HashSet<Block>();
+    this.blocks = Sets.newHashSet();
   }
 
   /**

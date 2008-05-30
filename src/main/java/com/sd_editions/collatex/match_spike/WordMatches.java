@@ -1,12 +1,13 @@
 package com.sd_editions.collatex.match_spike;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 public class WordMatches {
   private String word;
-  private List<WordCoordinate> exactMatches = new ArrayList<WordCoordinate>();
-  private List<WordCoordinate> levMatches = new ArrayList<WordCoordinate>();
+  private List<WordCoordinate> exactMatches = Lists.newArrayList();
+  private List<WordCoordinate> levMatches = Lists.newArrayList();
 
   public WordMatches(String newWord) {
     this.word = newWord;

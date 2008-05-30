@@ -19,7 +19,7 @@ public class Functions {
     }
     /* Sort */
     tuplesArray.sort();
-//    showLevTable();
+    //    showLevTable();
     return tuplesArray;
   }
 
@@ -63,6 +63,5 @@ public class Functions {
       }
     }
   }
-
 
 }

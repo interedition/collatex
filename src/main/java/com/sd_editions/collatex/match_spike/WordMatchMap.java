@@ -1,10 +1,11 @@
 package com.sd_editions.collatex.match_spike;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureListIterator;
@@ -14,7 +15,7 @@ public class WordMatchMap {
   private HashMap<String, WordMatches> map;
 
   public WordMatchMap(List<BlockStructure> witnessList) {
-    this.map = new HashMap<String, WordMatches>();
+    this.map = Maps.newHashMap();
 
     int witnessIndex = 0;
     for (BlockStructure blockStructure : witnessList) {
@@ -57,7 +58,7 @@ public class WordMatchMap {
   }
 
   public List<String> getWords() {
-    return new ArrayList<String>(map.keySet());
+    return Lists.newArrayList(map.keySet());
   }
 
   public List<WordCoordinate> getExactMatches(String word) {
@@ -68,7 +69,7 @@ public class WordMatchMap {
 
   public int[] getExactMatchesForWitness(String word, int i) {
     List<WordCoordinate> exactMatches = getExactMatches(word);
-    List<Integer> positionList = new ArrayList<Integer>();
+    List<Integer> positionList = Lists.newArrayList();
     for (WordCoordinate wordCoordinate : exactMatches) {
       if (wordCoordinate.witnessNumber == i) {
         positionList.add(new Integer(wordCoordinate.positionInWitness));

@@ -2,11 +2,11 @@ package com.sd_editions.collatex.Collate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureCascadeException;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
@@ -79,7 +79,7 @@ public class WordAlignmentVisitorTest extends TestCase {
 
   private Tuple[][] phase1Table(String baseString, String[] witnessArray) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
-    List<Tuple[]> resultList = new ArrayList<Tuple[]>();
+    List<Tuple[]> resultList = Lists.newArrayList();
     for (String witnessString : witnessArray) {
       BlockStructure witness = new StringInputPlugin(witnessString).readFile();
       WordAlignmentVisitor visitor = new WordAlignmentVisitor(witness);

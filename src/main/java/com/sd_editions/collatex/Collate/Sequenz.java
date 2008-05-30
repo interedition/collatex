@@ -3,12 +3,14 @@ package com.sd_editions.collatex.Collate;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.google.common.collect.Lists;
+
 public class Sequenz implements Comparable<Sequenz> {
 
   private ArrayList<Tuple> seq;
 
   public Sequenz() {
-    this.seq = new ArrayList<Tuple>();
+    this.seq = Lists.newArrayList();
   }
 
   public ArrayList<Tuple> getSeq() {
