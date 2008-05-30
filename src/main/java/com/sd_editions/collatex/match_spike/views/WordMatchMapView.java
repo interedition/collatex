@@ -11,28 +11,18 @@ public class WordMatchMapView {
   }
 
   public String toHtml() {
-    String string = "<table>";
+    StringBuffer string = new StringBuffer("<table>");
     for (String word : map.getWords()) {
-      string += "<tr>";
-      string += "<th align=\"left\">&quot;" + word + "&quot;</th>";
-      string += "<td align=\"right\">exact matches</td><td>";
-      string += Join.join(", ", map.getExactMatches(word));
-      //      for (WordCoordinate c : map.getExactMatches(word)) {
-      //        string += sep + c.toString();
-      //        sep = ", ";
-      //      }
-      string += "</td></tr>";
-      string += "<tr><td colspan=\"2\" align=\"right\">Levenshtein matches</td><td>";
-      string += Join.join(", ", map.getLevMatches(word));
-      //      sep = "";
-      //      for (WordCoordinate c : map.getLevMatches(word)) {
-      //        string += sep + c.toString();
-      //        sep = ", ";
-      //      }
-      string += "</td></tr>";
+      string.append("<tr>");
+      string.append("<th align=\"left\">&quot;" + word + "&quot;</th>");
+      string.append("<td align=\"right\">exact matches</td><td>");
+      string.append(Join.join(", ", map.getExactMatches(word)));
+      string.append("</td></tr>");
+      string.append("<tr><td colspan=\"2\" align=\"right\">Levenshtein matches</td><td>");
+      string.append(Join.join(", ", map.getLevMatches(word)));
+      string.append("</td></tr>");
     }
-    string += "</table>";
-    return string;
+    string.append("</table>");
+    return string.toString();
   }
-
 }
