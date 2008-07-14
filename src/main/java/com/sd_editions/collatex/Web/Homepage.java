@@ -23,8 +23,11 @@ import com.sd_editions.collatex.Collate.WordAlignmentVisitor;
 public class Homepage extends WebPage {
 
   public Homepage() {
-    ModelForView model = new ModelForView("the drought of march hath perced to the root", new String[] { "the march of the drought hath perced to the root",
-        "the march of drought hath perced to the root" });
+
+    ModelForView model = new ModelForView("the drought of march hath perced to the root and is this the right", new String[] { "the first march of drought pierced to the root and this is the ",
+        "the first march of drought hath perced to the root" });
+    //ModelForView model = new ModelForView("When April with his showers sweet with fruit The drought of March has pierced unto the root", new String[] {
+    //  "When showers sweet with April fruit The March of drought has pierced to the root", "When showers sweet with April fruit The drought of March has pierced the rood" });
     //ModelForView model = new ModelForView("the big bug had a big head", new String[] { "the bug had a small head", "the bug had a small head" });
     //ModelForView model = new ModelForView("the bug big had a big head", new String[] { "the bug had a small head", "the bug had a small head" });
     //ModelForView model = new ModelForView("the black cat sat on the mat", new String[] { "the cat sat on the black mat", "the cat sat on the black mat" });
@@ -32,6 +35,7 @@ public class Homepage extends WebPage {
     //ModelForView model = new ModelForView("Auch hier hab ich wieder ein Plätzchen", new String[] { "Ich hab auch hier wieder ein Pläzchen", "Ich hab auch hier wieder ein Pläzchen" });
     //ModelForView model = new ModelForView("the black cat on the table", new String[] { "the black saw the black cat on the table", "the black saw the black cat on the table" });
     //ModelForView model = new ModelForView("the black cat and the black mat", new String[] { "the black dog and the black mat", "the black dog and the black mat" });
+    //ModelForView model = new ModelForView("the very first march of drought hath", new String[] { "the drought of march hath", "the drought of march hath" });
 
     add(new Label("base", new PropertyModel(model, "base")));
     add(new Label("witness1", new PropertyModel(model, "witness1")));
@@ -51,7 +55,7 @@ public class Homepage extends WebPage {
   @SuppressWarnings("serial")
   class ModelForView implements Serializable {
     private String base;
-    private String[] witnesses;
+    private final String[] witnesses;
     private String html;
     private String html2;
 
