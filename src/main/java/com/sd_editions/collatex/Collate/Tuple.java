@@ -3,10 +3,20 @@ package com.sd_editions.collatex.Collate;
 public class Tuple implements Comparable {
   public int baseIndex;
   public int witnessIndex;
+  private boolean isTransposTupel;
 
   public Tuple(int baseIndex, int witnessIndex) {
     this.baseIndex = baseIndex;
     this.witnessIndex = witnessIndex;
+    this.isTransposTupel = false;
+  }
+
+  public boolean isTransposTupel() {
+    return isTransposTupel;
+  }
+
+  public void markAsTransposTupel() {
+    this.isTransposTupel = true;
   }
 
   public int getBaseIndex() {
@@ -36,18 +46,6 @@ public class Tuple implements Comparable {
         return 1;
 
       }
-    }
-    return 0;
-  }
-
-  public int compareTo_old(Object obj) {
-    Tuple tmp = (Tuple) obj;
-    double newer = tmp.baseIndex + (double) tmp.witnessIndex / 10;
-    double me = this.baseIndex + (double) this.witnessIndex / 10;
-    if (me < newer) {
-      return -1;
-    } else if (me > newer) {
-      return 1;
     }
     return 0;
   }
