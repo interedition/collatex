@@ -8,6 +8,7 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.match_spike.views.UseCaseView;
 
 @SuppressWarnings("serial")
 public class UseCasePage extends WebPage {

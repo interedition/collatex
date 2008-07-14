@@ -279,7 +279,7 @@ public class DotMatrix {
     Collections.sort(seq1);
     //System.out.println("LCS_vor_Sort: " + seq1.toString());
     this.LCS = seq1.toArray(new Tuple[seq1.size()]);
-    Comparator<Tuple> byBaseIndex = new TupelComparatorBI();
+    Comparator<Tuple> byBaseIndex = new TupleComparatorBI();
     Arrays.sort(LCS, byBaseIndex);
     showLCS("-");
   }
