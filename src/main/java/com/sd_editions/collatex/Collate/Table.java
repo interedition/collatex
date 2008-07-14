@@ -93,13 +93,21 @@ public class Table extends Block {
     }
   }
 
-  public void setIdenticalOrVariant(int witness, int baseIndex, Word witnessWord) {
+  public void setIdenticalOrVariant(int witness, int baseIndex, Word witnessWord, Tuple tup) {
     Word baseWord = base.get(baseIndex);
     Cell alignment;
     if (baseWord.alignmentFactor(witnessWord) == 0) {
-      alignment = new AlignmentIdentical(baseWord, witnessWord);
+      if (tup.isTransposTupel()) {
+        alignment = new Transposition(witnessWord);
+      } else {
+        alignment = new AlignmentIdentical(baseWord, witnessWord);
+      }
     } else {
-      alignment = new AlignmentVariant(baseWord, witnessWord);
+      if (tup.isTransposTupel()) {
+        alignment = new Transposition(witnessWord);
+      } else {
+        alignment = new AlignmentVariant(baseWord, witnessWord);
+      }
     }
     addAlignmentInformationToResult(witness, baseIndex, 2, alignment);
   }
@@ -109,8 +117,14 @@ public class Table extends Block {
     setCell(witness, column + offset, alignment);
   }
 
+  public void removeAlignmentInformationFromResult(int witness, int baseIndex, int offset) {
+    int column = baseIndex * 2 - 2;
+    cells[witness][column + offset] = null;
+  }
+
   public void setCell(int witness, int column, Cell alignment) {
     cells[witness][column] = alignment;
+    //System.out.println("setCell(): " + alignment.toString() + "-->" + "[" + witness + "]" + "[" + column + "]");
   }
 
   public String toHTML() {
