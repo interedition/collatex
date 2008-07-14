@@ -12,7 +12,7 @@ public class TupleToTable {
   private Table table;
   private Line base = null;
   private final Tuple[][] tupleMatrix;
-  private List<BlockStructure> witnessList;
+  private final List<BlockStructure> witnessList;
 
   public TupleToTable(BlockStructure newBase, BlockStructure witness, Tuple[] newTupleArray) {
     this.tupleMatrix = new Tuple[][] { newTupleArray };
@@ -55,8 +55,9 @@ public class TupleToTable {
         }
         currentBaseIndex = tuple.baseIndex;
         currentWitnessIndex = tuple.witnessIndex;
-        table.setIdenticalOrVariant(witnessNumber, currentBaseIndex, witness.get(currentWitnessIndex));
+        table.setIdenticalOrVariant(witnessNumber, currentBaseIndex, witness.get(currentWitnessIndex), tuple);
       }
+
       int baseIndexDif = base.size() - currentBaseIndex;
       int witnessIndexDif = witness.size() - currentWitnessIndex;
       if (baseIndexDif > 0 && witnessIndexDif > 0) {
