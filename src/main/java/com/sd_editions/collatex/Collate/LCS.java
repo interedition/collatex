@@ -8,8 +8,8 @@ import com.sd_editions.collatex.functional.TuplesArrayAndMaxHAndMaxV;
 
 public class LCS {
 
-  private Tuple[] LCS;
-  private DotMatrix dotM;
+  private final Tuple[] LCS;
+  private final DotMatrix dotM;
 
   public LCS(BlockStructure base, List<BlockStructure> witnesses, int i) {
     IndexTable iTabbase = new IndexTable(base);
