@@ -7,10 +7,20 @@ import com.google.common.collect.Lists;
 
 public class Sequenz implements Comparable<Sequenz> {
 
-  private ArrayList<Tuple> seq;
+  private final ArrayList<Tuple> seq;
+  private int isTransposSeqValue;
 
   public Sequenz() {
     this.seq = Lists.newArrayList();
+    this.isTransposSeqValue = 0;
+  }
+
+  public int getTransposSeqValue() {
+    return isTransposSeqValue;
+  }
+
+  public void setTransposSeqValue() {
+    this.isTransposSeqValue = 1;
   }
 
   public ArrayList<Tuple> getSeq() {
@@ -32,13 +42,47 @@ public class Sequenz implements Comparable<Sequenz> {
   }
 
   public int compareTo(Sequenz tmp) {
+    //1. length 2.TransPosSeq or no 3.differenz betwein baseIndex and witnessIndex
     if (this.seq.size() > tmp.seq.size()) {
       return -1;
     } else if (this.seq.size() < tmp.seq.size()) {
       return 1;
     } else if (this.seq.size() == tmp.seq.size()) {
-      double newer = 1 / (Math.abs(tmp.getSeq().get(0).baseIndex - tmp.getSeq().get(0).witnessIndex) + 1.0);
-      double me = 1 / (Math.abs(this.getSeq().get(0).baseIndex - this.getSeq().get(0).witnessIndex) + 1.0);
+      if (this.getTransposSeqValue() > tmp.getTransposSeqValue()) {
+        return -1;
+      } else if (this.seq.size() < tmp.seq.size()) {
+        return 1;
+      } else if (this.seq.size() == tmp.seq.size()) {
+        double newer = tmp.getSeq().get(0).baseIndex - tmp.getSeq().get(0).witnessIndex;
+        double me = this.getSeq().get(0).baseIndex - this.getSeq().get(0).witnessIndex;
+        if (me == newer) {
+          return 0;
+        } else if (me < newer) {
+          return -1;
+        } else if (me > newer) {
+          return 1;
+        }
+        return 0;
+      }
+      return 0;
+    }
+    return 0;
+  }
+
+  public int compareTo_old(Sequenz tmp) {
+    if (this.seq.size() > tmp.seq.size()) {
+      return -1;
+    } else if (this.seq.size() < tmp.seq.size()) {
+      return 1;
+    } else if (this.seq.size() == tmp.seq.size()) {
+      //double newer_p2 = 100.0 + (10 / levSumOfSeq + 1.0);
+      //double me_p2 = 100.0 + (10 / levSumOfSeq + 1.0);
+      //double newer_p1 = 1 / (Math.abs(tmp.getSeq().get(0).baseIndex - tmp.getSeq().get(0).witnessIndex) + 1.0);
+      //double me_p1 = 1 / (Math.abs(this.getSeq().get(0).baseIndex - this.getSeq().get(0).witnessIndex) + 1.0);
+      double newer_p1 = tmp.getSeq().get(0).baseIndex - tmp.getSeq().get(0).witnessIndex;
+      double me_p1 = this.getSeq().get(0).baseIndex - this.getSeq().get(0).witnessIndex;
+      double newer = newer_p1;
+      double me = me_p1;
       if (me == newer) {
         return 0;
       } else if (me > newer) {
