@@ -1,6 +1,8 @@
-package com.sd_editions.collatex.Web;
+package com.sd_editions.collatex.match_spike.views;
 
 import junit.framework.TestCase;
+
+import com.sd_editions.collatex.match_spike.views.UseCaseView;
 
 public class UseCaseViewTest extends TestCase {
 

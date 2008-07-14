@@ -45,4 +45,14 @@ public class WordMatchesTest extends TestCase {
     testWordMatches.addLevMatch(new WordCoordinate(2, 4));
     assertEquals("testWord: exact=[[B,3], [D,5]], lev=[[B,4], [C,5]]", testWordMatches.toString());
   }
+
+  public void testGetPermutations() throws Exception {
+    testWordMatches.addExactMatch(new WordCoordinate(1, 2));
+    testWordMatches.addExactMatch(new WordCoordinate(1, 3));
+    testWordMatches.addExactMatch(new WordCoordinate(2, 0));
+    testWordMatches.addExactMatch(new WordCoordinate(2, 4));
+    testWordMatches.addExactMatch(new WordCoordinate(3, 4));
+    String expected = "[testWord: exact=[[B,3], [C,1], [D,5]], lev=[], testWord: exact=[[B,3], [C,5], [D,5]], lev=[], testWord: exact=[[B,4], [C,1], [D,5]], lev=[], testWord: exact=[[B,4], [C,5], [D,5]], lev=[]]";
+    assertEquals(expected, testWordMatches.getPermutations().toString());
+  }
 }

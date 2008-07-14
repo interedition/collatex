@@ -20,4 +20,16 @@ public class Util {
     }
     return result;
   }
+
+  public static void p(String text) {
+    System.out.println('"' + text + '"');
+  }
+
+  public static void p(int i) {
+    System.out.println(i);
+  }
+
+  public static void p(Object o) {
+    System.out.println("<" + o + ">");
+  }
 }
