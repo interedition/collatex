@@ -1,16 +1,16 @@
 package com.sd_editions.collatex.match_spike.views;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
+import com.google.common.base.Join;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureListIterator;
 import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.Block.Word;
-import com.sd_editions.collatex.match_spike.ColorMapper;
+import com.sd_editions.collatex.match_spike.ColorMatrix;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.match_spike.WordMatchMap;
 
@@ -47,77 +47,74 @@ public class UseCaseView {
     for (BlockStructure blockStructure : witnessList) {
       cols = Math.max(cols, blockStructure.getNumberOfBlocks());
     }
-    Util.p(cols);
+    //    Util.p(cols);
     WordColorTuple[][] wcm = new WordColorTuple[witnessList.size()][cols];
-    ColorMapper colorMap = new ColorMapper(wordMatchMap);
 
     for (int witness_index = 0; witness_index < witnessList.size(); witness_index++) {
       BlockStructure witness = witnessList.get(witness_index);
-      Util.p(witness);
+      //      Util.p(witness);
       BlockStructureListIterator<? extends Block> listIterator = witness.listIterator();
       listIterator.next(); // first blockstructure is always a sentence
       for (int word_index = 0; word_index < wcm.length; word_index++) {
-        Util.p(word_index);
+        //        Util.p(word_index);
         if (listIterator.hasNext()) {
           wcm[witness_index][word_index] = null;
         } else {
           final Word next = (Word) listIterator.next();
           String word = (next).getContent();
-          Util.p(word);
+          //          Util.p(word);
           String normalizedWord = word.toLowerCase();
-          String color = "color" + colorMap.determineColor(normalizedWord, witness_index, word_index);
-          wcm[witness_index][word_index] = new WordColorTuple(word, color);
+          //          String color = "color" + colorMap.determineColor(normalizedWord, witness_index, word_index);
+          //          wcm[witness_index][word_index] = new WordColorTuple(word, color);
         }
       }
     }
   }
+
+  //  public String toHtml() {
+  //    String html = "<ol type=\"A\">";
+  //    int color = 1;
+  //    HashMap<String, Integer> colorMap = Maps.newHashMap();
+  //    for (BlockStructure witness : witnessList) {
+  //      html += "<li>";
+  //      BlockStructureListIterator<? extends Block> iterator = witness.listIterator();
+  //      while (iterator.hasNext()) {
+  //        Block block = iterator.next();
+  //        if (block instanceof Word) {
+  //          String word = ((Word) block).getContent();
+  //          String normalizedWord = word.toLowerCase();
+  //          if (!colorMap.containsKey(normalizedWord)) colorMap.put(normalizedWord, new Integer(color++));
+  //          html += "<span class=\"color" + colorMap.get(normalizedWord) + "\">" + word + "</span> ";
+  //        }
+  //      }
+  //      html += "</li>";
+  //    }
+  //    html += "</ol>";
+  //    html += new WordMatchMapView(wordMatchMap).toHtml();
+  //    return html;
+  //  }
 
   public String toHtml() {
-    String html = "<ol type=\"A\">";
-    int color = 1;
-    HashMap<String, Integer> colorMap = Maps.newHashMap();
-    for (BlockStructure witness : witnessList) {
-      html += "<li>";
-      BlockStructureListIterator<? extends Block> iterator = witness.listIterator();
-      while (iterator.hasNext()) {
-        Block block = iterator.next();
-        if (block instanceof Word) {
-          String word = ((Word) block).getContent();
-          String normalizedWord = word.toLowerCase();
-          if (!colorMap.containsKey(normalizedWord)) colorMap.put(normalizedWord, new Integer(color++));
-          html += "<span class=\"color" + colorMap.get(normalizedWord) + "\">" + word + "</span> ";
+    String html = new WordMatchMapView(wordMatchMap).toHtml();
+    Set<ColorMatrix> colorMatrixPermutations = wordMatchMap.getColorMatrixPermutations();
+    html += "<h4>Permutations:</h4>";
+    html += "<ol>";
+    for (ColorMatrix colorMatrix : colorMatrixPermutations) {
+      html += "<li><ol type=\"A\">";
+      for (int row = 0; row < colorMatrix.getHeight(); row++) {
+        html += "<li>";
+        List<String> htmlWords = Lists.newArrayList();
+        for (int col = 0; col < colorMatrix.getWidth(); col++) {
+          String word = wordMatchMap.witnessWordsMatrix[row][col];
+          if (word != null) htmlWords.add(new WordColorTuple(word, "color" + colorMatrix.getCell(row, col)).toHtml());
         }
+        html += Join.join(" ", htmlWords);
+        html += "</br></li>";
       }
-      html += "</li>";
+      html += "<pre>" + colorMatrix.toString() + "</pre>";
+      html += "</ol></li>";
     }
     html += "</ol>";
-    html += new WordMatchMapView(wordMatchMap).toHtml();
-    return html;
-  }
-
-  public String toHtml2() {
-    String html = "<ol type=\"A\">";
-    int color = 1;
-    HashMap<String, Integer> colorMap = Maps.newHashMap();
-    int witnessIndex = 0;
-    for (BlockStructure witness : witnessList) {
-      html += "<li>";
-      BlockStructureListIterator<? extends Block> iterator = witness.listIterator();
-      while (iterator.hasNext()) {
-        Block block = iterator.next();
-        if (block instanceof Word) {
-          String word = ((Word) block).getContent();
-          String normalizedWord = word.toLowerCase();
-          wordMatchMap.getExactMatchesForWitness(normalizedWord, witnessIndex);
-          if (!colorMap.containsKey(normalizedWord)) colorMap.put(normalizedWord, new Integer(color++));
-          html += "<span class=\"color" + colorMap.get(normalizedWord) + "\">" + word + "</span> ";
-        }
-      }
-      html += "</li>";
-      witnessIndex++;
-    }
-    html += "</ol>";
-    html += new WordMatchMapView(wordMatchMap).toHtml();
     return html;
   }
 }
