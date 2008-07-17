@@ -2,7 +2,7 @@ package com.sd_editions.collatex.match_spike.views;
 
 import junit.framework.TestCase;
 
-import com.sd_editions.collatex.match_spike.views.UseCaseView;
+import com.sd_editions.collatex.Block.Util;
 
 public class UseCaseViewTest extends TestCase {
 
@@ -17,6 +17,7 @@ public class UseCaseViewTest extends TestCase {
 
   public void testToHtml() {
     String html = testUseCaseView.toHtml();
+    Util.p(html);
     assertTrue(html.contains("<span class=\"color1\">The</span> <span class=\"color2\">big</span> <span class=\"color3\">dog</span>"));
     assertTrue(html.contains("<span class=\"color1\">the</span> <span class=\"color4\">little</span> <span class=\"color3\">dog</span>"));
     assertTrue(html.contains("<span class=\"color1\">the</span> <span class=\"color2\">big</span> <span class=\"color5\">cat</span>"));
