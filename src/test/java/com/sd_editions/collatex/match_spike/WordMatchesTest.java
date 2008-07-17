@@ -24,7 +24,7 @@ public class WordMatchesTest extends TestCase {
     WordCoordinate matchCoordinate = new WordCoordinate(1, 2);
     testWordMatches.addExactMatch(matchCoordinate);
     assertEquals(1, testWordMatches.getExactMatches().size());
-    assertEquals(matchCoordinate, testWordMatches.getExactMatches().get(0));
+    assertEquals(matchCoordinate, testWordMatches.getExactMatches().toArray()[0]);
   }
 
   public final void testAddLevMatch() {
@@ -34,8 +34,8 @@ public class WordMatchesTest extends TestCase {
     testWordMatches.addLevMatch(matchCoordinate1);
     testWordMatches.addLevMatch(matchCoordinate2);
     assertEquals(2, testWordMatches.getLevMatches().size());
-    assertEquals(matchCoordinate1, testWordMatches.getLevMatches().get(0));
-    assertEquals(matchCoordinate2, testWordMatches.getLevMatches().get(1));
+    assertEquals(matchCoordinate1, testWordMatches.getLevMatches().toArray()[0]);
+    assertEquals(matchCoordinate2, testWordMatches.getLevMatches().toArray()[1]);
   }
 
   public void testToString() throws Exception {

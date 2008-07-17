@@ -1,6 +1,7 @@
 package com.sd_editions.collatex.match_spike;
 
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -35,13 +36,13 @@ public class WordMatchMapTest extends TestCase {
   }
 
   public final void testLevMatches() {
-    List<WordCoordinate> levMatches = testWordMatchMap.getLevMatches("rain");
+    Set<WordCoordinate> levMatches = testWordMatchMap.getLevMatches("rain");
     assertEquals(1, levMatches.size());
-    assertEquals(new WordCoordinate(2, 2), levMatches.get(0)); // "rains"
+    assertEquals(new WordCoordinate(2, 2), levMatches.toArray()[0]); // "rains"
   }
 
   public final void testExactMatches() {
-    List<WordCoordinate> exactMatches = testWordMatchMap.getExactMatches("spain");
+    Set<WordCoordinate> exactMatches = testWordMatchMap.getExactMatches("spain");
     assertEquals(3, exactMatches.size());
   }
 
@@ -49,6 +50,56 @@ public class WordMatchMapTest extends TestCase {
     final int[] exactMatchesForWitness0 = testWordMatchMap.getExactMatchesForWitness("the", 0);
     assertEquals(0, exactMatchesForWitness0[0]);
     assertEquals(7, exactMatchesForWitness0[1]);
+  }
+
+  public final void testGetColorMatrixPermutations0() {
+    Set<ColorMatrix> colorMatrixPermutations = testWordMatchMap.getColorMatrixPermutations();
+    //    for (String word : testWordMatchMap.getWords()) {
+    //      Util.p(word);
+    //      SortedArraySet<WordCoordinate> allmatches = testWordMatchMap.getExactMatches(word);
+    //      allmatches.addAll(testWordMatchMap.getLevMatches(word));
+    //      Util.p(allmatches);
+    //    }
+    assertEquals(33, colorMatrixPermutations.size());
+    ColorMatrix firstMatrix = colorMatrixPermutations.iterator().next();
+    assertEquals(3, firstMatrix.getHeight());
+    assertEquals(11, firstMatrix.getWidth());
+    assertEquals(1, firstMatrix.getCell(0, 0));
+    printMatrices(colorMatrixPermutations);
+  }
+
+  public final void testGetColorMatrixPermutations1() {
+    Set<ColorMatrix> colorMatrixPermutations = makePermutations(new String[] { "A black cat.", "A black dog", "One white dog" });
+    assertEquals(1, colorMatrixPermutations.size());
+    ColorMatrix cm1 = new ColorMatrix(new int[][] { { 1, 2, 3 }, { 1, 2, 4 }, { 5, 6, 4 } });
+    assertEquals(cm1, colorMatrixPermutations.iterator().next());
+  }
+
+  public final void testGetColorMatrixPermutations2() {
+    Set<ColorMatrix> colorMatrixPermutations = makePermutations(new String[] { "A black cat.", "A black block" });
+    printMatrices(colorMatrixPermutations);
+    assertEquals(2, colorMatrixPermutations.size());
+    ColorMatrix cm1 = new ColorMatrix(new int[][] { { 1, 2, 3 }, { 1, 2, 4 } });
+    ColorMatrix cm2 = new ColorMatrix(new int[][] { { 1, 2, 3 }, { 1, 4, 2 } });
+    assertEquals(cm1, colorMatrixPermutations.iterator().next());
+    assertEquals(cm2, colorMatrixPermutations.iterator().next());
+    assertTrue(colorMatrixPermutations.contains(cm1));
+    assertTrue(colorMatrixPermutations.contains(cm2));
+  }
+
+  private void printMatrices(Set<ColorMatrix> colorMatrixPermutations) {
+    int i = 1;
+    for (ColorMatrix colormatrix : colorMatrixPermutations) {
+      Util.p(i++ + "\n" + colormatrix);
+    }
+  }
+
+  private Set<ColorMatrix> makePermutations(String[] witnesses) {
+    List<BlockStructure> witnessList = Lists.newArrayList();
+    for (String witness : witnesses) {
+      witnessList.add(Util.string2BlockStructure(witness));
+    }
+    return new WordMatchMap(witnessList).getColorMatrixPermutations();
   }
 
 }
