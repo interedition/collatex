@@ -6,12 +6,14 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
+import com.google.common.collect.SortedArraySet;
 import com.google.common.collect.TreeMultimap;
 
 public class WordMatches {
   private final String word;
-  private final List<WordCoordinate> exactMatches = Lists.newArrayList();
-  private final List<WordCoordinate> levMatches = Lists.newArrayList();
+  private final SortedArraySet<WordCoordinate> exactMatches = Sets.newSortedArraySet();
+  private final SortedArraySet<WordCoordinate> levMatches = Sets.newSortedArraySet();
 
   public WordMatches(String newWord) {
     this.word = newWord;
@@ -29,16 +31,16 @@ public class WordMatches {
     levMatches.add(matchCoordinate);
   }
 
-  public List<WordCoordinate> getExactMatches() {
+  public SortedArraySet<WordCoordinate> getExactMatches() {
     return exactMatches;
   }
 
-  public List<WordCoordinate> getLevMatches() {
+  public SortedArraySet<WordCoordinate> getLevMatches() {
     return levMatches;
   }
 
-  public List<WordCoordinate> getAllMatches() {
-    List<WordCoordinate> all = exactMatches;
+  public Set<WordCoordinate> getAllMatches() {
+    Set<WordCoordinate> all = exactMatches;
     all.addAll(levMatches);
     return all;
   }

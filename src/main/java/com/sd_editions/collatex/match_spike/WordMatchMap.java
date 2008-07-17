@@ -1,19 +1,20 @@
 package com.sd_editions.collatex.match_spike;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.collect.SortedArraySet;
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureListIterator;
 import com.sd_editions.collatex.Block.Word;
 
 public class WordMatchMap {
-  private static final int NO_COLOR_ASSIGNED = 0;
-  private static final int END_OF_WITNESS = -1;
   private final Map<String, WordMatches> wordMatchMap;
   public String[][] witnessWordsMatrix;
 
@@ -30,13 +31,14 @@ public class WordMatchMap {
       while (iterator.hasNext()) {
         Object object = iterator.next();
         if (object instanceof Word) {
-          String word = normalizeWord(((Word) object).getContent());
-          WordMatches currentMatches = new WordMatches(word);
-          if (this.wordMatchMap.containsKey(word)) {
-            currentMatches = this.wordMatchMap.get(word);
+          String word = ((Word) object).getContent();
+          String nWord = normalizeWord(word);
+          WordMatches currentMatches = new WordMatches(nWord);
+          if (this.wordMatchMap.containsKey(nWord)) {
+            currentMatches = this.wordMatchMap.remove(nWord);
           }
           currentMatches.addExactMatch(new WordCoordinate(witnessIndex, wordIndex));
-          this.wordMatchMap.put(word, currentMatches);
+          this.wordMatchMap.put(nWord, currentMatches);
           witnessWordsMatrix[witnessIndex][wordIndex] = word;
           wordIndex++;
         }
@@ -65,7 +67,7 @@ public class WordMatchMap {
   private int maximumWordsInWitness(List<BlockStructure> witnessList) {
     int cols = 0;
     for (BlockStructure blockStructure : witnessList) {
-      cols = Math.max(cols, blockStructure.getNumberOfBlocks());
+      cols = Math.max(cols, blockStructure.getNumberOfBlocks() - 1);
     }
     return cols;
   }
@@ -78,14 +80,14 @@ public class WordMatchMap {
     return Lists.newArrayList(wordMatchMap.keySet());
   }
 
-  public List<WordCoordinate> getExactMatches(String word) {
+  public SortedArraySet<WordCoordinate> getExactMatches(String word) {
     final WordMatches wordMatches = wordMatchMap.get(word);
     if (wordMatches == null) return null;
     return wordMatchMap.get(word).getExactMatches();
   }
 
   public int[] getExactMatchesForWitness(String word, int i) {
-    List<WordCoordinate> exactMatches = getExactMatches(word);
+    Set<WordCoordinate> exactMatches = getExactMatches(word);
     List<Integer> positionList = Lists.newArrayList();
     for (WordCoordinate wordCoordinate : exactMatches) {
       if (wordCoordinate.witnessNumber == i) {
@@ -100,7 +102,7 @@ public class WordMatchMap {
     return positionArray;
   }
 
-  public List<WordCoordinate> getLevMatches(String word) {
+  public SortedArraySet<WordCoordinate> getLevMatches(String word) {
     final WordMatches wordMatches = wordMatchMap.get(word);
     if (wordMatches == null) return null;
     return wordMatches.getLevMatches();
@@ -142,47 +144,59 @@ public class WordMatchMap {
   //  }
 
   @SuppressWarnings("boxing")
-  public List<int[][]> getColorMatrixPermutations() {
-    // colormatrix is a matrix, where each row corresponds with a witness,
+  public Set<ColorMatrix> getColorMatrixPermutations() {
+    // colormatrix is a matrix where each row corresponds with a witness,
     // and each colum corresponds with a word in a witness.
-    // each cell contains a word i top indicate which words match
+    // each cell contains a color index to indicate which words match
 
     // start with a matrix filled with NO_COLOR_ASSIGNED (0) for words, and END_OF_WITNESS (-1) at the end of rows to fill out the row.
     String[] witness1Words = witnessWordsMatrix[0];
-    int[][] colormatrix = new int[witnessWordsMatrix.length][witness1Words.length];
-    for (int witnessId = 0; witnessId < colormatrix.length; witnessId++) {
-      for (int wordId = 0; wordId < colormatrix[witnessId].length; wordId++) {
-        colormatrix[witnessId][wordId] = (witnessWordsMatrix[witnessId][wordId] == null) ? END_OF_WITNESS : NO_COLOR_ASSIGNED;
+    ColorMatrix colormatrix = new ColorMatrix(witnessWordsMatrix.length, witness1Words.length);
+    for (int witnessId = 0; witnessId < colormatrix.getHeight(); witnessId++) {
+      for (int wordId = 0; wordId < colormatrix.getWidth(); wordId++) {
+        colormatrix.setCell(witnessId, wordId, (witnessWordsMatrix[witnessId][wordId] == null) ? ColorMatrix.END_OF_WITNESS : ColorMatrix.NO_COLOR_ASSIGNED);
       }
     }
-    return getColorMatrixPermutations(colormatrix, wordMatchMap, 1);
+    return getColorMatrixPermutations(colormatrix, wordMatchMap, 1, 0, 0);
   }
 
   @SuppressWarnings("boxing")
-  public List<int[][]> getColorMatrixPermutations(int[][] colormatrix, Map<String, WordMatches> wordMatchMap, int initialColorId) {
+  private Set<ColorMatrix> getColorMatrixPermutations(ColorMatrix initialColormatrix, Map<String, WordMatches> wordMatchMap1, int initialColorId, int startWitnessId, int initialWordId) {
+    ColorMatrix colormatrix = new ColorMatrix(initialColormatrix);
+    int startWordId = initialWordId;
     int colorId = initialColorId;
-    List<int[][]> list = Lists.newArrayList();
-    for (int witnessId = 0; witnessId < colormatrix.length; witnessId++) {
-      for (int wordId = 0; wordId < colormatrix[witnessId].length; wordId++) {
-        if (colormatrix[witnessId][wordId] == END_OF_WITNESS) {
+    Set<ColorMatrix> set = Sets.newHashSet();
+    for (int witnessId = startWitnessId; witnessId < colormatrix.getHeight(); witnessId++) {
+      for (int wordId = startWordId; wordId < colormatrix.getWidth(); wordId++) {
+        if (colormatrix.getCell(witnessId, wordId) == ColorMatrix.END_OF_WITNESS) {
           break;
-        } else if (colormatrix[witnessId][wordId] == NO_COLOR_ASSIGNED) {
-          colormatrix[witnessId][wordId] = colorId;
+        } else if (colormatrix.getCell(witnessId, wordId) == ColorMatrix.NO_COLOR_ASSIGNED) {
+          colormatrix.setCell(witnessId, wordId, colorId);
           // give the matching words in other rows the same color
-          String word = witnessWordsMatrix[witnessId][wordId];
-          WordMatches wordMatches = wordMatchMap.get(word);
+          String word = normalizeWord(witnessWordsMatrix[witnessId][wordId]);
+          WordMatches wordMatches = wordMatchMap1.get(word);
           List<WordMatches> permutations = wordMatches.getPermutations();
-          for (WordMatches permutation : permutations) {
-            Map<String, WordMatches> tmpWordMatchMap = wordMatchMap;
-            tmpWordMatchMap.remove(word);
-            tmpWordMatchMap.put(word, permutation);
-            list.addAll(getColorMatrixPermutations(colormatrix, tmpWordMatchMap, colorId));
+          if (permutations.size() > 1) {
+            for (WordMatches permutation : permutations) {
+              Map<String, WordMatches> tmpWordMatchMap = new HashMap<String, WordMatches>(wordMatchMap1);
+              tmpWordMatchMap.remove(word);
+              tmpWordMatchMap.put(word, permutation);
+              set.addAll(getColorMatrixPermutations(colormatrix, tmpWordMatchMap, colorId + 1, witnessId, wordId));
+            }
+          } else {
+            WordMatches permutation = permutations.get(0);
+            for (WordCoordinate match : permutation.getAllMatches()) {
+              if (colormatrix.getCell(match.witnessNumber, match.positionInWitness) == ColorMatrix.NO_COLOR_ASSIGNED) {
+                colormatrix.setCell(match.witnessNumber, match.positionInWitness, colorId);
+              }
+            }
+            set.add(colormatrix);
           }
           colorId++;
         }
       }
+      startWordId = 0;
     }
-
-    return list;
+    return set;
   }
 }
