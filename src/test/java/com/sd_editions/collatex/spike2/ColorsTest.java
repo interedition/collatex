@@ -22,6 +22,8 @@ public class ColorsTest extends TestCase {
     assertEquals(Sets.newHashSet(1, 2, 4, 6, 3), colors.getColorsPerWitness(3));
     Comparison c1 = colors.compareWitness(1, 2);
     assertEquals(Lists.newArrayList("and", "white"), c1.getAddedWords());
+    Comparison c2 = colors.compareWitness(1, 3);
+    assertEquals(Lists.newArrayList("and", "green"), c2.getAddedWords());
   }
 
   //  public void testColors() {
