@@ -50,4 +50,8 @@ public class Colors {
   public SortedSet<Integer> getColorsPerWitness(int i) {
     return colorsPerWitness.get(i);
   }
+
+  public Comparison compareWitness(int i, int j) {
+    return new Comparison(getColorsPerWitness(i), getColorsPerWitness(j), colors);
+  }
 }

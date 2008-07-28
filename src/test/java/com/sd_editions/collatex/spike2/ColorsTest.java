@@ -2,6 +2,7 @@ package com.sd_editions.collatex.spike2;
 
 import junit.framework.TestCase;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class ColorsTest extends TestCase {
@@ -19,6 +20,8 @@ public class ColorsTest extends TestCase {
     assertEquals(Sets.newHashSet(1, 2, 3), colors.getColorsPerWitness(1));
     assertEquals(Sets.newHashSet(1, 2, 4, 5, 3), colors.getColorsPerWitness(2));
     assertEquals(Sets.newHashSet(1, 2, 4, 6, 3), colors.getColorsPerWitness(3));
+    Comparison c1 = colors.compareWitness(1, 2);
+    assertEquals(Lists.newArrayList("and", "white"), c1.getAddedWords());
   }
 
   //  public void testColors() {
