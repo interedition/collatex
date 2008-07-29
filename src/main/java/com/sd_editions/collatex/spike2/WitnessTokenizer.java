@@ -1,35 +1,26 @@
 package com.sd_editions.collatex.spike2;
 
-import java.io.IOException;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
+import com.sd_editions.collatex.iterator.ArrayIterator;
 
 public class WitnessTokenizer {
-  private final StreamTokenizer st;
+  private final ArrayIterator iterator;
+  private final boolean normalize;
 
-  public WitnessTokenizer(String witness) {
-    StringReader reader = new StringReader(witness);
-    st = new StreamTokenizer(reader);
-    st.eolIsSignificant(true);
+  public WitnessTokenizer(String witness, boolean _normalize) {
+    this.normalize = _normalize;
+    String[] tokens = witness.split("\\s+");
+    iterator = new ArrayIterator(tokens);
   }
 
   public boolean hasNextToken() {
-    try {
-      boolean next = (st.nextToken() != StreamTokenizer.TT_EOF);
-      st.pushBack();
-      return next;
-    } catch (IOException io) {
-      throw new RuntimeException(io);
-    }
+    return iterator.hasNext();
   }
 
   public String nextToken() {
-    try {
-      st.nextToken();
-      String value = st.sval;
-      return value;
-    } catch (IOException io) {
-      throw new RuntimeException(io);
+    String token = (String) iterator.next();
+    if (normalize) {
+      token = token.replaceAll("\\p{Punct}", "").toLowerCase();
     }
+    return token;
   }
 }

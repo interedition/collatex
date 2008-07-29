@@ -35,6 +35,6 @@ public class Index {
   }
 
   public WitnessTokenizer createTokenizerFor(String witness) {
-    return new WitnessTokenizer(witness);
+    return new WitnessTokenizer(witness, true);
   }
 }

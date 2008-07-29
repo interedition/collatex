@@ -7,6 +7,11 @@ public class IndexTest extends TestCase {
     String[] witnesses = new String[] { "very simple", "simple indeed" };
     Index index = new Index(witnesses);
     assertEquals(3, index.numberOfEntries());
+  }
 
+  public void testNormalize() {
+    String[] witnesses = new String[] { "Normalize  normalize" };
+    Index index = new Index(witnesses);
+    assertEquals(1, index.numberOfEntries());
   }
 }
