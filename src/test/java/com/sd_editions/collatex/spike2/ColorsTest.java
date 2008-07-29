@@ -11,9 +11,9 @@ public class ColorsTest extends TestCase {
     String[] witnesses = new String[] { "The black cat", "The black and white cat", "The black and green cat" };
     Colors colors = new Colors(witnesses);
     assertEquals(6, colors.numberOfColors());
-    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(1).getWords());
-    assertEquals(Sets.newHashSet(1, 2, 4, 5, 3), colors.getWitnessIndex(2).getWords());
-    assertEquals(Sets.newHashSet(1, 2, 4, 6, 3), colors.getWitnessIndex(3).getWords());
+    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(1).getWordCodes());
+    assertEquals(Sets.newHashSet(1, 2, 4, 5, 3), colors.getWitnessIndex(2).getWordCodes());
+    assertEquals(Sets.newHashSet(1, 2, 4, 6, 3), colors.getWitnessIndex(3).getWordCodes());
     Comparison c1 = colors.compareWitness(1, 2);
     assertEquals(Lists.newArrayList("and", "white"), c1.getAddedWords());
     Comparison c2 = colors.compareWitness(1, 3);
@@ -27,9 +27,9 @@ public class ColorsTest extends TestCase {
     String[] witnesses = new String[] { "the black cat", "THE BLACK CAT", "The black cat" };
     Colors colors = new Colors(witnesses);
     assertEquals(3, colors.numberOfColors());
-    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(1).getWords());
-    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(2).getWords());
-    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(3).getWords());
+    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(1).getWordCodes());
+    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(2).getWordCodes());
+    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(3).getWordCodes());
   }
 
   public void testThirdUseCasePeter() {

@@ -14,10 +14,10 @@ public class Comparison {
   private final Set<Integer> removed_words;
 
   public Comparison(WitnessIndex witnessIndex, WitnessIndex witnessIndex2) {
-    added_words = Sets.newLinkedHashSet(witnessIndex2.getWords());
-    added_words.removeAll(witnessIndex.getWords());
-    removed_words = Sets.newLinkedHashSet(witnessIndex.getWords());
-    removed_words.removeAll(witnessIndex2.getWords());
+    added_words = Sets.newLinkedHashSet(witnessIndex2.getWordCodes());
+    added_words.removeAll(witnessIndex.getWordCodes());
+    removed_words = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
+    removed_words.removeAll(witnessIndex2.getWordCodes());
     this.colors = witnessIndex.getIndex();
   }
 

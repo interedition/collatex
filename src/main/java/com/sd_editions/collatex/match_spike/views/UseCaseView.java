@@ -12,6 +12,7 @@ import com.sd_editions.collatex.match_spike.ColorMatrix;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.match_spike.WordMatchMap;
 import com.sd_editions.collatex.spike2.Colors;
+import com.sd_editions.collatex.spike2.WitnessIndex;
 
 public class UseCaseView {
 
@@ -134,13 +135,14 @@ public class UseCaseView {
     for (int row = 0; row < colors2.numberOfWitnesses(); row++) {
       html += "<li>";
       List<String> htmlWords = Lists.newArrayList();
-      Set<Integer> colorsPerWitness = colors2.getWitnessIndex(row + 1).getWords();
+      WitnessIndex witnessIndex = colors2.getWitnessIndex(row + 1);
+      Set<Integer> colorsPerWitness = witnessIndex.getWordCodes();
       final Iterator<Integer> iterator = colorsPerWitness.iterator();
       //      System.out.println(Join.join(",", wordMatchMap.witnessWordsMatrix[row]));
       //      System.out.println(colorsPerWitness);
       for (int col = 0; col < colorsPerWitness.size(); col++) {
         //        System.out.println(col);
-        String word = wordMatchMap.witnessWordsMatrix[row][col];
+        String word = witnessIndex.getWords().get(col);
         if (word != null) {
           htmlWords.add(new WordColorTuple(word, "color" + iterator.next()).toHtml());
         }
