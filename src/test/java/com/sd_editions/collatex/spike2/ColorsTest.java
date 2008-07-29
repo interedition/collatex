@@ -24,8 +24,9 @@ public class ColorsTest extends TestCase {
     assertEquals(Lists.newArrayList("and", "white"), c1.getAddedWords());
     Comparison c2 = colors.compareWitness(1, 3);
     assertEquals(Lists.newArrayList("and", "green"), c2.getAddedWords());
+    Comparison c3 = colors.compareWitness(2, 3);
+    assertEquals(Lists.newArrayList("white/green"), c3.getReplacedWords());
   }
-
   //  public void testColors() {
   //    String[] witnesses = new String[] { "A black cat.", "A black dog", "One white dog" };
   //    Colors colors = new Colors(witnesses);
