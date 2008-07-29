@@ -6,11 +6,8 @@ import java.util.Set;
 
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
-import com.sd_editions.collatex.Block.BlockStructureListIterator;
 import com.sd_editions.collatex.Block.Util;
-import com.sd_editions.collatex.Block.Word;
 import com.sd_editions.collatex.match_spike.ColorMatrix;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.match_spike.WordMatchMap;
@@ -18,10 +15,12 @@ import com.sd_editions.collatex.spike2.Colors;
 
 public class UseCaseView {
 
+  private final Colors colors;
+
   private final WordMatchMap wordMatchMap;
   private final List<BlockStructure> witnessList;
-  private final Colors colors;
-  private final Set<ColorMatrix> colorMatrixPermutations;
+
+  //  private final Set<ColorMatrix> colorMatrixPermutations;
 
   //  private final List<List<int[]>> matchMatrixList;
 
@@ -32,9 +31,9 @@ public class UseCaseView {
       witnessList.add(Util.string2BlockStructure(witness));
     }
     wordMatchMap = new WordMatchMap(witnessList);
-    //    matchMatrixList = makeMatchMatrixList();
-    fillWordMatrix();
-    colorMatrixPermutations = wordMatchMap.getColorMatrixPermutations();
+    //    //    matchMatrixList = makeMatchMatrixList();
+    //    fillWordMatrix();
+    //    colorMatrixPermutations = wordMatchMap.getColorMatrixPermutations();
   }
 
   //  public List<List<int[]>> makeMatchMatrixList() {
@@ -48,34 +47,34 @@ public class UseCaseView {
   //    return matrixList;
   //  }
 
-  private void fillWordMatrix() {
-    int cols = 0;
-    for (BlockStructure blockStructure : witnessList) {
-      cols = Math.max(cols, blockStructure.getNumberOfBlocks());
-    }
-    //    Util.p(cols);
-    WordColorTuple[][] wcm = new WordColorTuple[witnessList.size()][cols];
-
-    for (int witness_index = 0; witness_index < witnessList.size(); witness_index++) {
-      BlockStructure witness = witnessList.get(witness_index);
-      //      Util.p(witness);
-      BlockStructureListIterator<? extends Block> listIterator = witness.listIterator();
-      listIterator.next(); // first blockstructure is always a sentence
-      for (int word_index = 0; word_index < wcm.length; word_index++) {
-        //        Util.p(word_index);
-        if (listIterator.hasNext()) {
-          wcm[witness_index][word_index] = null;
-        } else {
-          final Word next = (Word) listIterator.next();
-          String word = (next).getContent();
-          //          Util.p(word);
-          String normalizedWord = word.toLowerCase();
-          //          String color = "color" + colorMap.determineColor(normalizedWord, witness_index, word_index);
-          //          wcm[witness_index][word_index] = new WordColorTuple(word, color);
-        }
-      }
-    }
-  }
+  //  private void fillWordMatrix() {
+  //    int cols = 0;
+  //    for (BlockStructure blockStructure : witnessList) {
+  //      cols = Math.max(cols, blockStructure.getNumberOfBlocks());
+  //    }
+  //    //    Util.p(cols);
+  //    WordColorTuple[][] wcm = new WordColorTuple[witnessList.size()][cols];
+  //
+  //    for (int witness_index = 0; witness_index < witnessList.size(); witness_index++) {
+  //      BlockStructure witness = witnessList.get(witness_index);
+  //      //      Util.p(witness);
+  //      BlockStructureListIterator<? extends Block> listIterator = witness.listIterator();
+  //      listIterator.next(); // first blockstructure is always a sentence
+  //      for (int word_index = 0; word_index < wcm.length; word_index++) {
+  //        //        Util.p(word_index);
+  //        if (listIterator.hasNext()) {
+  //          wcm[witness_index][word_index] = null;
+  //        } else {
+  //          final Word next = (Word) listIterator.next();
+  //          String word = (next).getContent();
+  //          //          Util.p(word);
+  //          String normalizedWord = word.toLowerCase();
+  //          //          String color = "color" + colorMap.determineColor(normalizedWord, witness_index, word_index);
+  //          //          wcm[witness_index][word_index] = new WordColorTuple(word, color);
+  //        }
+  //      }
+  //    }
+  //  }
 
   //  public String toHtml() {
   //    String html = "<ol type=\"A\">";
@@ -124,24 +123,23 @@ public class UseCaseView {
   //    return html;
   //  }
   public String toHtml() {
-    String html = new WordMatchMapView(wordMatchMap).toHtml();
-    html += colorsView(colors);
+    String html = "<h4>Colors:</h4>" + colorsView(colors);
+    //    html += "<h4>Matches:</h4>" + new WordMatchMapView(wordMatchMap).toHtml();
     //    html += permutationsView(colorMatrixPermutations);
     return html;
   }
 
   private String colorsView(Colors colors2) {
-    String html = "<h4>Colors:</h4>";
-    html += "<ol type=\"A\">";
+    String html = "<ol type=\"A\">";
     for (int row = 0; row < colors2.numberOfWitnesses(); row++) {
       html += "<li>";
       List<String> htmlWords = Lists.newArrayList();
       Set<Integer> colorsPerWitness = colors2.getWitnessIndex(row + 1).getWords();
       final Iterator<Integer> iterator = colorsPerWitness.iterator();
-      System.out.println(Join.join(",", wordMatchMap.witnessWordsMatrix[row]));
-      System.out.println(colorsPerWitness);
+      //      System.out.println(Join.join(",", wordMatchMap.witnessWordsMatrix[row]));
+      //      System.out.println(colorsPerWitness);
       for (int col = 0; col < colorsPerWitness.size(); col++) {
-        System.out.println(col);
+        //        System.out.println(col);
         String word = wordMatchMap.witnessWordsMatrix[row][col];
         if (word != null) {
           htmlWords.add(new WordColorTuple(word, "color" + iterator.next()).toHtml());

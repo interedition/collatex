@@ -10,6 +10,6 @@ public class WordColorTuple {
   }
 
   public String toHtml() {
-    return "<span class=\"" + color + "\">" + word + "</span>";
+    return "<span class=\"" + color + "\" title=\"" + color + "\">" + word + "</span>";
   }
 }
