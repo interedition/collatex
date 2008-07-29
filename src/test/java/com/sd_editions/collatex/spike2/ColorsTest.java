@@ -6,20 +6,20 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class ColorsTest extends TestCase {
-  public void testVerySimple() {
-    String[] witnesses = new String[] { "very simple", "simple indeed" };
-    Colors colors = new Colors(witnesses);
-    assertEquals(3, colors.numberOfColors());
-  }
+  //  public void testVerySimple() {
+  //    String[] witnesses = new String[] { "very simple", "simple indeed" };
+  //    Colors colors = new Colors(witnesses);
+  //    assertEquals(3, colors.numberOfColors());
+  //  }
 
   @SuppressWarnings("boxing")
   public void testFirstUseCasePeter() {
     String[] witnesses = new String[] { "The black cat", "The black and white cat", "The black and green cat" };
     Colors colors = new Colors(witnesses);
     assertEquals(6, colors.numberOfColors());
-    assertEquals(Sets.newHashSet(1, 2, 3), colors.getColorsPerWitness(1));
-    assertEquals(Sets.newHashSet(1, 2, 4, 5, 3), colors.getColorsPerWitness(2));
-    assertEquals(Sets.newHashSet(1, 2, 4, 6, 3), colors.getColorsPerWitness(3));
+    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(1).getWords());
+    assertEquals(Sets.newHashSet(1, 2, 4, 5, 3), colors.getWitnessIndex(2).getWords());
+    assertEquals(Sets.newHashSet(1, 2, 4, 6, 3), colors.getWitnessIndex(3).getWords());
     Comparison c1 = colors.compareWitness(1, 2);
     assertEquals(Lists.newArrayList("and", "white"), c1.getAddedWords());
     Comparison c2 = colors.compareWitness(1, 3);
@@ -29,10 +29,14 @@ public class ColorsTest extends TestCase {
   }
 
   public void testThirdUseCasePeter() {
-    String[] witnesses = new String[] { "He was agast so", "He was agast" };
+    String[] witnesses = new String[] { "He was agast so", "He was agast", "So he was agast" };
     Colors colors = new Colors(witnesses);
     Comparison c1 = colors.compareWitness(1, 2);
     assertEquals(Lists.newArrayList("so"), c1.getRemovedWords());
+    //    Comparison c2 = colors.compareWitness(1, 3);
+    //    assertTrue(c2.getRemovedWords().toString(), c2.getRemovedWords().isEmpty());
+    //    assertTrue(c2.getAddedWords().toString(), c2.getAddedWords().isEmpty());
+
   }
 
   //  public void testColors() {

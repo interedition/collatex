@@ -1,44 +1,32 @@
 package com.sd_editions.collatex.spike2;
 
-import java.util.SortedSet;
+import java.util.List;
 
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.TreeMultimap;
+import com.google.common.collect.Lists;
 
 public class Colors {
 
   private final Index index;
-  private final TreeMultimap<Integer, Integer> colorsPerWitness;
+  private final List<WitnessIndex> witnessIndexes;
 
-  @SuppressWarnings("boxing")
   public Colors(String[] witnesses) {
     index = new Index(witnesses);
-    //    System.out.println(colors);
-    // pass two determine colors per witness
-    colorsPerWitness = Multimaps.newTreeMultimap();
-    int witnessIndex = 0;
+    this.witnessIndexes = Lists.newArrayList();
     for (String witness : witnesses) {
-      witnessIndex++;
-      WitnessTokenizer tokenizer = new WitnessTokenizer(witness);
-      while (tokenizer.hasNextToken()) {
-        String token = tokenizer.nextToken();
-        int color = index.getIndexof(token);
-        colorsPerWitness.put(witnessIndex, color);
-      }
+      WitnessIndex witnessIndex = new WitnessIndex(witness, index);
+      witnessIndexes.add(witnessIndex);
     }
-
   }
 
   public int numberOfColors() {
     return index.numberOfEntries();
   }
 
-  @SuppressWarnings("boxing")
-  public SortedSet<Integer> getColorsPerWitness(int i) {
-    return colorsPerWitness.get(i);
+  public WitnessIndex getWitnessIndex(int i) {
+    return witnessIndexes.get(i - 1);
   }
 
   public Comparison compareWitness(int i, int j) {
-    return new Comparison(getColorsPerWitness(i), getColorsPerWitness(j), index);
+    return new Comparison(getWitnessIndex(i), getWitnessIndex(j));
   }
 }

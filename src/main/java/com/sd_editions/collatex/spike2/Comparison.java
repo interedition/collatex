@@ -3,27 +3,22 @@ package com.sd_editions.collatex.spike2;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class Comparison {
 
-  private final SortedSet<Integer> colorsPerWitness;
-  private final SortedSet<Integer> colorsPerWitness2;
   private final Index colors;
   private final Set<Integer> added_words;
   private final Set<Integer> removed_words;
 
-  public Comparison(@SuppressWarnings("hiding") SortedSet<Integer> colorsPerWitness, @SuppressWarnings("hiding") SortedSet<Integer> colorsPerWitness2, Index index) {
-    this.colorsPerWitness = colorsPerWitness;
-    this.colorsPerWitness2 = colorsPerWitness2;
-    this.colors = index;
-    added_words = Sets.newLinkedHashSet(colorsPerWitness2);
-    added_words.removeAll(colorsPerWitness);
-    removed_words = Sets.newLinkedHashSet(colorsPerWitness);
-    removed_words.removeAll(colorsPerWitness2);
+  public Comparison(WitnessIndex witnessIndex, WitnessIndex witnessIndex2) {
+    added_words = Sets.newLinkedHashSet(witnessIndex2.getWords());
+    added_words.removeAll(witnessIndex.getWords());
+    removed_words = Sets.newLinkedHashSet(witnessIndex.getWords());
+    removed_words.removeAll(witnessIndex2.getWords());
+    this.colors = witnessIndex.getIndex();
   }
 
   public List<String> getAddedWords() {
