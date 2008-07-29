@@ -29,4 +29,8 @@ public class Colors {
   public Comparison compareWitness(int i, int j) {
     return new Comparison(getWitnessIndex(i), getWitnessIndex(j));
   }
+
+  public int numberOfWitnesses() {
+    return witnessIndexes.size();
+  }
 }

@@ -28,6 +28,16 @@ public class ColorsTest extends TestCase {
     assertEquals(Lists.newArrayList("white/green"), c3.getReplacedWords());
   }
 
+  @SuppressWarnings("boxing")
+  public void testUseCase2() {
+    String[] witnesses = new String[] { "the black cat", "THE BLACK CAT", "The black cat" };
+    Colors colors = new Colors(witnesses);
+    assertEquals(3, colors.numberOfColors());
+    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(1).getWords());
+    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(2).getWords());
+    assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(3).getWords());
+  }
+
   public void testThirdUseCasePeter() {
     String[] witnesses = new String[] { "He was agast so", "He was agast", "So he was agast" };
     Colors colors = new Colors(witnesses);

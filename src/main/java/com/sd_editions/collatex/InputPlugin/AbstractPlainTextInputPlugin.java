@@ -38,9 +38,9 @@ public abstract class AbstractPlainTextInputPlugin implements IntInputPlugin {
         pLine = nLine;
         break;
       case StreamTokenizer.TT_WORD:
-        // Found a work, add it to our block
+        // Found a word, add it to our block
         Word word = new Word(st.sval);
-        // This add the word to the last sibling of the line.
+        // This adds the word to the last sibling of the line.
         document.setChildBlock(pLine, word);
         break;
       }

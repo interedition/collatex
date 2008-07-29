@@ -14,4 +14,16 @@ public class WitnessTokenizerTest extends TestCase {
     assertEquals("cat.", tokenizer.nextToken());
     assertFalse(tokenizer.hasNextToken());
   }
+
+  public void test2() {
+    String witness = "Alas, Horatio, I knew him well.";
+    WitnessTokenizer tokenizer = new WitnessTokenizer(witness);
+    assertTrue(tokenizer.hasNextToken());
+    assertEquals("Alas", tokenizer.nextToken());
+    assertTrue(tokenizer.hasNextToken());
+    assertEquals("Horatio", tokenizer.nextToken());
+    assertTrue(tokenizer.hasNextToken());
+    assertEquals("I", tokenizer.nextToken());
+    assertFalse(tokenizer.hasNextToken());
+  }
 }
