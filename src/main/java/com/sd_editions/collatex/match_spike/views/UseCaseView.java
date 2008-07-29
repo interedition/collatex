@@ -1,6 +1,5 @@
 package com.sd_editions.collatex.match_spike.views;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -8,11 +7,11 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Util;
+import com.sd_editions.collatex.Web.ColorsView;
 import com.sd_editions.collatex.match_spike.ColorMatrix;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.match_spike.WordMatchMap;
 import com.sd_editions.collatex.spike2.Colors;
-import com.sd_editions.collatex.spike2.WitnessIndex;
 
 public class UseCaseView {
 
@@ -124,33 +123,9 @@ public class UseCaseView {
   //    return html;
   //  }
   public String toHtml() {
-    String html = "<h4>Colors:</h4>" + colorsView(colors);
+    String html = "<h4>Colors:</h4>" + new ColorsView(colors).toHtml();
     //    html += "<h4>Matches:</h4>" + new WordMatchMapView(wordMatchMap).toHtml();
     //    html += permutationsView(colorMatrixPermutations);
-    return html;
-  }
-
-  private String colorsView(Colors colors2) {
-    String html = "<ol type=\"A\">";
-    for (int row = 0; row < colors2.numberOfWitnesses(); row++) {
-      html += "<li>";
-      List<String> htmlWords = Lists.newArrayList();
-      WitnessIndex witnessIndex = colors2.getWitnessIndex(row + 1);
-      Set<Integer> colorsPerWitness = witnessIndex.getWordCodes();
-      final Iterator<Integer> iterator = colorsPerWitness.iterator();
-      //      System.out.println(Join.join(",", wordMatchMap.witnessWordsMatrix[row]));
-      //      System.out.println(colorsPerWitness);
-      for (int col = 0; col < colorsPerWitness.size(); col++) {
-        //        System.out.println(col);
-        String word = witnessIndex.getWords().get(col);
-        if (word != null) {
-          htmlWords.add(new WordColorTuple(word, "color" + iterator.next()).toHtml());
-        }
-      }
-      html += Join.join(" ", htmlWords);
-      html += "</br></li>";
-    }
-    html += "</ol>";
     return html;
   }
 
