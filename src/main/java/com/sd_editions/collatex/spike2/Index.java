@@ -13,7 +13,7 @@ public class Index {
     // pass one determine colors
     Set<String> words = Sets.newLinkedHashSet();
     for (String witness : witnesses) {
-      WitnessTokenizer tokenizer = new WitnessTokenizer(witness);
+      WitnessTokenizer tokenizer = createTokenizerFor(witness);
       while (tokenizer.hasNextToken()) {
         String token = tokenizer.nextToken();
         words.add(token);
@@ -32,5 +32,9 @@ public class Index {
 
   public String getWord(int color) {
     return entries.get(color - 1);
+  }
+
+  public WitnessTokenizer createTokenizerFor(String witness) {
+    return new WitnessTokenizer(witness);
   }
 }

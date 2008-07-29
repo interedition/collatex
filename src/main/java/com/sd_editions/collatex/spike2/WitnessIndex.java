@@ -11,8 +11,7 @@ public class WitnessIndex {
   @SuppressWarnings("boxing")
   public WitnessIndex(String witness, Index _index) {
     index = _index;
-    WitnessTokenizer tokenizer = new WitnessTokenizer(witness); // notice that the tokenizer should be the same!
-    // maybe ask from index?
+    WitnessTokenizer tokenizer = index.createTokenizerFor(witness);
     words = Sets.newLinkedHashSet();
     while (tokenizer.hasNextToken()) {
       String token = tokenizer.nextToken();
