@@ -40,7 +40,7 @@ public class Comparison {
     return colors.get(color - 1);
   }
 
-  public Object getReplacedWords() {
+  public List<String> getReplacedWords() {
     // NOTE: this far too simple!
     List<String> replacements = Lists.newArrayList();
     if (added_words.size() == removed_words.size()) {
@@ -51,5 +51,13 @@ public class Comparison {
       }
     }
     return replacements;
+  }
+
+  public List<String> getRemovedWords() {
+    List<String> removals = Lists.newArrayList();
+    for (Integer color : removed_words) {
+      removals.add(getWordForColor(color));
+    }
+    return removals;
   }
 }

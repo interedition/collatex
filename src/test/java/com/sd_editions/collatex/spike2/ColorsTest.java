@@ -27,6 +27,14 @@ public class ColorsTest extends TestCase {
     Comparison c3 = colors.compareWitness(2, 3);
     assertEquals(Lists.newArrayList("white/green"), c3.getReplacedWords());
   }
+
+  public void testThirdUseCasePeter() {
+    String[] witnesses = new String[] { "He was agast so", "He was agast" };
+    Colors colors = new Colors(witnesses);
+    Comparison c1 = colors.compareWitness(1, 2);
+    assertEquals(Lists.newArrayList("so"), c1.getRemovedWords());
+  }
+
   //  public void testColors() {
   //    String[] witnesses = new String[] { "A black cat.", "A black dog", "One white dog" };
   //    Colors colors = new Colors(witnesses);
