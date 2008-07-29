@@ -12,19 +12,18 @@ public class Comparison {
 
   private final SortedSet<Integer> colorsPerWitness;
   private final SortedSet<Integer> colorsPerWitness2;
-  private final List<String> colors;
+  private final Index colors;
   private final Set<Integer> added_words;
   private final Set<Integer> removed_words;
 
-  public Comparison(@SuppressWarnings("hiding") SortedSet<Integer> colorsPerWitness, @SuppressWarnings("hiding") SortedSet<Integer> colorsPerWitness2, @SuppressWarnings("hiding") List<String> colors) {
+  public Comparison(@SuppressWarnings("hiding") SortedSet<Integer> colorsPerWitness, @SuppressWarnings("hiding") SortedSet<Integer> colorsPerWitness2, Index index) {
     this.colorsPerWitness = colorsPerWitness;
     this.colorsPerWitness2 = colorsPerWitness2;
-    this.colors = colors;
+    this.colors = index;
     added_words = Sets.newLinkedHashSet(colorsPerWitness2);
     added_words.removeAll(colorsPerWitness);
     removed_words = Sets.newLinkedHashSet(colorsPerWitness);
     removed_words.removeAll(colorsPerWitness2);
-
   }
 
   public List<String> getAddedWords() {
@@ -37,7 +36,7 @@ public class Comparison {
 
   @SuppressWarnings("boxing")
   private String getWordForColor(Integer color) {
-    return colors.get(color - 1);
+    return colors.getWord(color);
   }
 
   public List<String> getReplacedWords() {

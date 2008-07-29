@@ -1,31 +1,18 @@
 package com.sd_editions.collatex.spike2;
 
-import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 
 public class Colors {
 
-  private final List<String> colors; // position in list determines color
+  private final Index index;
   private final TreeMultimap<Integer, Integer> colorsPerWitness;
 
   @SuppressWarnings("boxing")
   public Colors(String[] witnesses) {
-    // pass one determine colors
-    Set<String> words = Sets.newLinkedHashSet();
-    for (String witness : witnesses) {
-      WitnessTokenizer tokenizer = new WitnessTokenizer(witness);
-      while (tokenizer.hasNextToken()) {
-        String token = tokenizer.nextToken();
-        words.add(token);
-      }
-    }
-    colors = Lists.newArrayList(words);
+    index = new Index(witnesses);
     //    System.out.println(colors);
     // pass two determine colors per witness
     colorsPerWitness = Multimaps.newTreeMultimap();
@@ -35,7 +22,7 @@ public class Colors {
       WitnessTokenizer tokenizer = new WitnessTokenizer(witness);
       while (tokenizer.hasNextToken()) {
         String token = tokenizer.nextToken();
-        int color = colors.indexOf(token) + 1;
+        int color = index.getIndexof(token);
         colorsPerWitness.put(witnessIndex, color);
       }
     }
@@ -43,7 +30,7 @@ public class Colors {
   }
 
   public int numberOfColors() {
-    return colors.size();
+    return index.numberOfEntries();
   }
 
   @SuppressWarnings("boxing")
@@ -52,6 +39,6 @@ public class Colors {
   }
 
   public Comparison compareWitness(int i, int j) {
-    return new Comparison(getColorsPerWitness(i), getColorsPerWitness(j), colors);
+    return new Comparison(getColorsPerWitness(i), getColorsPerWitness(j), index);
   }
 }
