@@ -1,9 +1,11 @@
 package com.sd_editions.collatex.spike2;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class WitnessIndex {
@@ -17,10 +19,15 @@ public class WitnessIndex {
 
     WitnessTokenizer tokenizer = index.createNormalizedTokenizerFor(witness);
     wordCodes = Sets.newLinkedHashSet();
+    Map<String, Integer> occurrences = Maps.newHashMap();
     while (tokenizer.hasNextToken()) {
       String token = tokenizer.nextToken();
-      int color = index.getIndexof(token);
-      wordCodes.add(color);
+      if (occurrences.get(token) == null)
+        occurrences.put(token, 1);
+      else
+        occurrences.put(token, occurrences.get(token) + 1);
+      int code = index.getIndexof(token, occurrences.get(token));
+      wordCodes.add(code);
     }
 
     tokenizer = index.createTokenizerFor(witness);

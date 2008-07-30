@@ -18,7 +18,7 @@ public class Colors {
     }
   }
 
-  public int numberOfColors() {
+  public int numberOfUniqueWords() {
     return index.numberOfEntries();
   }
 

@@ -26,12 +26,16 @@ public class Index {
     return normalizedEntries.size();
   }
 
-  public int getIndexof(String token) {
-    return normalizedEntries.indexOf(token) + 1;
+  public int getIndexof(String word) {
+    return normalizedEntries.indexOf(word) + 1;
   }
 
-  public String getWord(int color) {
-    return normalizedEntries.get(color - 1);
+  public int getIndexof(String word, int occurrence) {
+    return (occurrence - 1) * normalizedEntries.size() + getIndexof(word);
+  }
+
+  public String getWord(int index) {
+    return normalizedEntries.get(index - 1);
   }
 
   public WitnessTokenizer createNormalizedTokenizerFor(String witness) {
