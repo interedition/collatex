@@ -6,15 +6,15 @@ import java.util.List;
 
 import com.sd_editions.collatex.Block.Word;
 
-public class Addition extends Cell {
+public class AdditionCell extends Cell {
 
   private final List<Word> additions;
 
-  public Addition(List<Word> additions) {
+  public AdditionCell(List<Word> additions) {
     this.additions = additions;
   }
 
-  public Addition(Word witnessWord) {
+  public AdditionCell(Word witnessWord) {
     this(Collections.singletonList(witnessWord));
   }
 

@@ -42,12 +42,12 @@ public class Table extends Block {
   }
 
   public void setFrontAddition(int witness, int baseIndex, List<Word> witnessWords) {
-    Cell addition = new Addition(witnessWords);
+    Cell addition = new AdditionCell(witnessWords);
     addAlignmentInformationToResult(witness, baseIndex, 1, addition);
   }
 
   public void setBackAddition(int witness, int baseIndex, List<Word> witnessWords) {
-    Cell addition = new Addition(witnessWords);
+    Cell addition = new AdditionCell(witnessWords);
     addAlignmentInformationToResult(witness, baseIndex, 3, addition);
   }
 
@@ -81,11 +81,11 @@ public class Table extends Block {
     if (joinFound) {
       System.out.println(joinStartIndex + "," + joinEndIndex);
       if (joinStartIndex > 0) {
-        addAlignmentInformationToResult(witness, baseIndex, 1, new Addition(replacementWords.subList(0, joinStartIndex - 1)));
+        addAlignmentInformationToResult(witness, baseIndex, 1, new AdditionCell(replacementWords.subList(0, joinStartIndex - 1)));
       }
       addAlignmentInformationToResult(witness, baseIndex, 2, new Division(base.get(baseIndex), replacementWords.subList(joinStartIndex, joinEndIndex + 1)));
       if (joinEndIndex < replacementWords.size()) {
-        addAlignmentInformationToResult(witness, baseIndex, 3, new Addition(replacementWords.subList(joinEndIndex + 1, replacementWords.size())));
+        addAlignmentInformationToResult(witness, baseIndex, 3, new AdditionCell(replacementWords.subList(joinEndIndex + 1, replacementWords.size())));
       }
     } else {
       replacement = new Replacement(base.get(baseIndex), replacementWords);

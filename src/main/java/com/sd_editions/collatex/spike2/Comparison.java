@@ -7,6 +7,8 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.spike2.collate.Addition;
+import com.sd_editions.collatex.spike2.collate.Removal;
 import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class Comparison {
@@ -29,10 +31,10 @@ public class Comparison {
     this.colors = witnessIndex.getIndex();
     modifications = Lists.newArrayList();
     for (Integer added_word : added_words) {
-      modifications.add(new com.sd_editions.collatex.spike2.collate.Addition(added_word, witnessIndex2.getPosition(added_word)));
+      modifications.add(new Addition(added_word, witnessIndex2.getPosition(added_word)));
     }
     for (Integer removed_word : removed_words) {
-      modifications.add(new com.sd_editions.collatex.spike2.collate.Removal(removed_word, witnessIndex.getPosition(removed_word)));
+      modifications.add(new Removal(removed_word, witnessIndex.getPosition(removed_word)));
     }
   }
 
