@@ -14,9 +14,11 @@ public class Comparison {
   private final Index colors;
   private final Set<Integer> added_words;
   private final Set<Integer> removed_words;
+  private final List<Modification> modifications;
   private final WitnessIndex witnessIndex;
   private final WitnessIndex witnessIndex2;
 
+  @SuppressWarnings("boxing")
   public Comparison(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
     this.witnessIndex = _witnessIndex;
     this.witnessIndex2 = _witnessIndex2;
@@ -25,8 +27,16 @@ public class Comparison {
     removed_words = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
     removed_words.removeAll(witnessIndex2.getWordCodes());
     this.colors = witnessIndex.getIndex();
+    modifications = Lists.newArrayList();
+    for (Integer added_word : added_words) {
+      modifications.add(new com.sd_editions.collatex.spike2.collate.Addition(added_word, witnessIndex2.getPosition(added_word)));
+    }
+    for (Integer removed_word : removed_words) {
+      modifications.add(new com.sd_editions.collatex.spike2.collate.Removal(removed_word, witnessIndex.getPosition(removed_word)));
+    }
   }
 
+  //TODO: remove!
   public List<String> getAddedWords() {
     List<String> additions = Lists.newArrayList();
     for (Integer color : added_words) {
@@ -35,9 +45,14 @@ public class Comparison {
     return additions;
   }
 
+  //TODO: remove!
   @SuppressWarnings("boxing")
   private String getWordForColor(Integer color) {
     return colors.getWord(color);
+  }
+
+  public List<Modification> getModifications() {
+    return modifications;
   }
 
   public List<String> getReplacedWords() {
@@ -53,6 +68,7 @@ public class Comparison {
     return replacements;
   }
 
+  //TODO: remove!
   public List<String> getRemovedWords() {
     List<String> removals = Lists.newArrayList();
     for (Integer color : removed_words) {

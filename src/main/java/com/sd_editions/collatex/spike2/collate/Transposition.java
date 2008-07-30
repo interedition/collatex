@@ -1,6 +1,8 @@
 package com.sd_editions.collatex.spike2.collate;
 
-public class Transposition {
+import com.sd_editions.collatex.spike2.Modification;
+
+public class Transposition extends Modification {
   private final int transposedWord;
   private final int transpositionDistance;
 
