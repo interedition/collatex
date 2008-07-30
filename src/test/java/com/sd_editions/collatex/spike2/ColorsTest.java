@@ -1,9 +1,12 @@
 package com.sd_editions.collatex.spike2;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class ColorsTest extends TestCase {
   @SuppressWarnings("boxing")
@@ -40,18 +43,10 @@ public class ColorsTest extends TestCase {
     Comparison c2 = colors.compareWitness(1, 3);
     assertTrue(c2.getRemovedWords().toString(), c2.getRemovedWords().isEmpty());
     assertTrue(c2.getAddedWords().toString(), c2.getAddedWords().isEmpty());
-
+    List<Transposition> transpositions = c2.getTranspositions();
+    Transposition transposition = transpositions.get(0);
+    assertEquals(4, transposition.getTransposedWord());
+    assertEquals(3, transposition.getTranspositionDistance());
   }
-
-  //  public void testColors() {
-  //    String[] witnesses = new String[] { "A black cat.", "A black dog", "One white dog" };
-  //    Colors colors = new Colors(witnesses);
-  //  }
-  //  //  public final void testGetColorMatrixPermutations1() {
-  //  //    //    Set<ColorMatrix> colorMatrixPermutations = makePermutations(new String[] { "A black cat.", "A black dog", "One white dog" });
-  //  //    //    assertEquals(1, colorMatrixPermutations.size());
-  //  //    //    ColorMatrix cm1 = new ColorMatrix(new int[][] { { 1, 2, 3 }, { 1, 2, 4 }, { 5, 6, 4 } });
-  //  //    //    assertEquals(cm1, colorMatrixPermutations.iterator().next());
-  //  //    //  }
 
 }

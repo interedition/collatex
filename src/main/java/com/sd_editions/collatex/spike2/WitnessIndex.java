@@ -41,4 +41,18 @@ public class WitnessIndex {
   public Index getIndex() {
     return index;
   }
+
+  public int getPosition(Integer word) {
+    return getWordCodesList().indexOf(word);
+  }
+
+  @SuppressWarnings("boxing")
+  public int getWordOnPosition(Integer position) {
+    return getWordCodesList().get(position);
+  }
+
+  public List<Integer> getWordCodesList() {
+    List<Integer> list = Lists.newArrayList(wordCodes);
+    return list;
+  }
 }

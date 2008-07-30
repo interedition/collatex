@@ -1,19 +1,25 @@
 package com.sd_editions.collatex.spike2;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class Comparison {
 
   private final Index colors;
   private final Set<Integer> added_words;
   private final Set<Integer> removed_words;
+  private final WitnessIndex witnessIndex;
+  private final WitnessIndex witnessIndex2;
 
-  public Comparison(WitnessIndex witnessIndex, WitnessIndex witnessIndex2) {
+  public Comparison(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
+    this.witnessIndex = _witnessIndex;
+    this.witnessIndex2 = _witnessIndex2;
     added_words = Sets.newLinkedHashSet(witnessIndex2.getWordCodes());
     added_words.removeAll(witnessIndex.getWordCodes());
     removed_words = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
@@ -53,5 +59,42 @@ public class Comparison {
       removals.add(getWordForColor(color));
     }
     return removals;
+  }
+
+  @SuppressWarnings("boxing")
+  public List<Transposition> getTranspositions() {
+    List<Integer> distances = calculateDistancesBetweenWitnesses(witnessIndex, witnessIndex2);
+    int maxTransposition = Collections.max(distances);
+    int positionInFirstWitnessOfTransposedWord = distances.indexOf(maxTransposition);
+    int transposedWord = witnessIndex.getWordOnPosition(positionInFirstWitnessOfTransposedWord);
+    int positionInSecondWitnessOfTransposedWord = witnessIndex2.getPosition(transposedWord);
+    List<Integer> witnessAsModified = Lists.newArrayList(witnessIndex.getWordCodes());
+    witnessAsModified.remove(positionInFirstWitnessOfTransposedWord);
+    witnessAsModified.add(positionInSecondWitnessOfTransposedWord, transposedWord);
+    List<Transposition> transpositions = Lists.newArrayList();
+    transpositions.add(new Transposition(transposedWord, maxTransposition));
+    // TODO: make it a while loop!
+    //        List<Integer> newDistances = calculateDistanceWithList(witnessIndex2, witnessAsModified);
+    //    maxTransposition = Collections.max(newDistances);
+
+    return transpositions;
+  }
+
+  private List<Integer> calculateDistancesBetweenWitnesses(WitnessIndex witness1, WitnessIndex witness2) {
+    List<Integer> words = witness1.getWordCodesList();
+    return calculateDistanceWithList(witness2, words);
+  }
+
+  @SuppressWarnings("boxing")
+  private List<Integer> calculateDistanceWithList(WitnessIndex witness2, List<Integer> words) {
+    List<Integer> distances = Lists.newArrayList();
+    int sourcePosition = 0;
+    for (Integer word : words) {
+      int destPosition = witness2.getPosition(word);
+      int distance = Math.abs(destPosition - sourcePosition);
+      distances.add(distance);
+      sourcePosition++;
+    }
+    return distances;
   }
 }
