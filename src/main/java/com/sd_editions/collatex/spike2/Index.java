@@ -30,7 +30,7 @@ public class Index {
     return normalizedEntries.indexOf(word) + 1;
   }
 
-  public int getIndexof(String word, int occurrence) {
+  public int getCodeFor(String word, int occurrence) {
     return (occurrence - 1) * normalizedEntries.size() + getIndexof(word);
   }
 

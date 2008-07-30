@@ -84,7 +84,7 @@ public class Comparison {
     List<Integer> distances = calculateDistancesBetweenWitnesses(witnessIndex, witnessIndex2);
     int maxTransposition = Collections.max(distances);
     int positionInFirstWitnessOfTransposedWord = distances.indexOf(maxTransposition);
-    int transposedWord = witnessIndex.getWordOnPosition(positionInFirstWitnessOfTransposedWord);
+    int transposedWord = witnessIndex.getWordCodeOnPosition(positionInFirstWitnessOfTransposedWord);
     int positionInSecondWitnessOfTransposedWord = witnessIndex2.getPosition(transposedWord);
     List<Integer> witnessAsModified = Lists.newArrayList(witnessIndex.getWordCodes());
     witnessAsModified.remove(positionInFirstWitnessOfTransposedWord);

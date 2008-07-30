@@ -8,12 +8,12 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
 
+@SuppressWarnings("boxing")
 public class WitnessIndex {
   private final Set<Integer> wordCodes;
   private final List<String> words;
   private final Index index;
 
-  @SuppressWarnings("boxing")
   public WitnessIndex(String witness, Index _index) {
     index = _index;
 
@@ -23,7 +23,7 @@ public class WitnessIndex {
     while (tokenizer.hasNextToken()) {
       String token = tokenizer.nextToken();
       occurrences.add(token);
-      int code = index.getIndexof(token, occurrences.count(token));
+      int code = index.getCodeFor(token, occurrences.count(token));
       wordCodes.add(code);
     }
 
@@ -46,17 +46,20 @@ public class WitnessIndex {
     return index;
   }
 
-  public int getPosition(Integer word) {
-    return getWordCodesList().indexOf(word);
+  public int getPosition(Integer wordCode) {
+    return getWordCodesList().indexOf(wordCode);
   }
 
-  @SuppressWarnings("boxing")
-  public int getWordOnPosition(Integer position) {
+  public int getWordCodeOnPosition(Integer position) {
     return getWordCodesList().get(position);
   }
 
   public List<Integer> getWordCodesList() {
     List<Integer> list = Lists.newArrayList(wordCodes);
     return list;
+  }
+
+  public String getWordOnPosition(int position) {
+    return words.get(position);
   }
 }

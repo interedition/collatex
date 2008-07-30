@@ -8,8 +8,13 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.spike2.Colors;
+import com.sd_editions.collatex.spike2.Comparison;
+import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.WitnessIndex;
+import com.sd_editions.collatex.spike2.collate.Addition;
+import com.sd_editions.collatex.spike2.collate.Removal;
 
+@SuppressWarnings("boxing")
 public class ColorsView {
 
   private final Colors colors;
@@ -19,6 +24,10 @@ public class ColorsView {
   }
 
   public String toHtml() {
+    return coloredWitnesses() + modifications();
+  }
+
+  private String coloredWitnesses() {
     String html = "<ol type=\"A\">";
     for (int row = 0; row < colors.numberOfWitnesses(); row++) {
       html += "<li>";
@@ -26,10 +35,7 @@ public class ColorsView {
       WitnessIndex witnessIndex = colors.getWitnessIndex(row + 1);
       Set<Integer> colorsPerWitness = witnessIndex.getWordCodes();
       final Iterator<Integer> iterator = colorsPerWitness.iterator();
-      //      System.out.println(Join.join(",", wordMatchMap.witnessWordsMatrix[row]));
-      //      System.out.println(colorsPerWitness);
       for (int col = 0; col < colorsPerWitness.size(); col++) {
-        //        System.out.println(col);
         String word = witnessIndex.getWords().get(col);
         if (word != null) {
           htmlWords.add(new WordColorTuple(word, "color" + iterator.next()).toHtml());
@@ -42,4 +48,51 @@ public class ColorsView {
     return html;
   }
 
+  private String modifications() {
+    String html = "";
+    final int numberOfWitnesses = colors.numberOfWitnesses();
+    for (int base = 1; base < numberOfWitnesses; base++) {
+      for (int w = base + 1; w <= numberOfWitnesses; w++) {
+        html += "Comparing witness " + base + " with witness " + w + ":<ul>";
+        Comparison compareWitness = colors.compareWitness(base, w);
+        List<Modification> modifications = compareWitness.getModifications();
+        if (modifications.isEmpty()) {
+          html += "no additions or removals";
+        } else {
+          for (Modification modification : modifications) {
+            if (modification instanceof Addition) {
+              html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
+            } else if (modification instanceof Removal) {
+              html += "<li>" + removalView((Removal) modification, base) + "</li>";
+            }
+          }
+        }
+        html += "</ul>";
+      }
+    }
+    return html;
+  }
+
+  private String removalView(Removal removal, int base) {
+    WitnessIndex baseIndex = colors.getWitnessIndex(base);
+    int position = removal.getPosition();
+    return "<i>" + baseIndex.getWordOnPosition(position) + "</i> at position " + (position + 1) + " removed ";
+  }
+
+  private String additionView(Addition addition, int base, int w) {
+    WitnessIndex baseIndex = colors.getWitnessIndex(base);
+    WitnessIndex witnessIndex = colors.getWitnessIndex(w);
+    int position = addition.getPosition();
+    String html = "<i>" + witnessIndex.getWordOnPosition(position) + "</i> added ";
+    List<String> baseWords = baseIndex.getWords();
+    List<String> witnessWords = witnessIndex.getWords();
+    if (position == 0) {
+      html += "before <i>" + baseWords.get(0) + "</i>";
+    } else if (position == witnessWords.size() - 1) {
+      html += " after <i>" + baseWords.get(baseWords.size() - 1) + "</i>";
+    } else {
+      html += "between <i>" + witnessWords.get(position - 1) + "</i> and <i>" + witnessWords.get(position + 1) + "</i>";
+    }
+    return html;
+  }
 }

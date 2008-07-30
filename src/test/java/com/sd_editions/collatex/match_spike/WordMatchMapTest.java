@@ -26,7 +26,6 @@ public class WordMatchMapTest extends TestCase {
   public final void testWords() {
     List<String> words = testWordMatchMap.getWords();
     assertNotNull(words);
-    //    System.out.println(words);
     assertEquals(18, words.size()); // 18 unique words
     assertTrue(words.contains("spain"));
   }
