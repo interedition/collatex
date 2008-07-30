@@ -13,6 +13,7 @@ import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.WitnessIndex;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
+import com.sd_editions.collatex.spike2.collate.Transposition;
 
 @SuppressWarnings("boxing")
 public class ColorsView {
@@ -28,7 +29,7 @@ public class ColorsView {
   }
 
   private String coloredWitnesses() {
-    String html = "<ol type=\"A\">";
+    String html = "<ol>";
     for (int row = 0; row < colors.numberOfWitnesses(); row++) {
       html += "<li>";
       List<String> htmlWords = Lists.newArrayList();
@@ -57,13 +58,15 @@ public class ColorsView {
         Comparison compareWitness = colors.compareWitness(base, w);
         List<Modification> modifications = compareWitness.getModifications();
         if (modifications.isEmpty()) {
-          html += "no additions or removals";
+          html += "no additions, removals or transpositions";
         } else {
           for (Modification modification : modifications) {
             if (modification instanceof Addition) {
               html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
             } else if (modification instanceof Removal) {
               html += "<li>" + removalView((Removal) modification, base) + "</li>";
+            } else if (modification instanceof Transposition) {
+              html += "<li>" + transpositionView((Transposition) modification, base, w) + "</li>";
             }
           }
         }
@@ -71,6 +74,11 @@ public class ColorsView {
       }
     }
     return html;
+  }
+
+  private String transpositionView(Transposition transposition, int base, int w) {
+    //    return "<i>" + "</i> transposed from position " + transposition. + " to " + y;
+    return "<i>" + transposition.getTransposedWord() + "</i> transposed over distance " + transposition.getTranspositionDistance();
   }
 
   private String removalView(Removal removal, int base) {
