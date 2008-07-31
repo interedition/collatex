@@ -17,20 +17,19 @@ public class Comparison {
   private final WitnessIndex witnessIndex;
   private final WitnessIndex witnessIndex2;
 
-  @SuppressWarnings("boxing")
   public Comparison(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
     this.witnessIndex = _witnessIndex;
     this.witnessIndex2 = _witnessIndex2;
     modifications = Lists.newArrayList();
-    // hier gaan we dus weer die tuple array van vroeger bepalen
-    // bepaal de matches..
-    // dat is een set van integers...
-    // bepaal daarna de posities in de beide witnesses waar matches voorkomen
-    // sorteer voor beide posities van links naar rechts..
-    // voila daar is je tuple array
+    List<PositionTuple> tuples = calculateTuples();
+    calculateModifications(tuples);
+  }
+
+  @SuppressWarnings("boxing")
+  private List<PositionTuple> calculateTuples() {
     Set<Integer> matches = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
     matches.retainAll(witnessIndex2.getWordCodes());
-    System.out.println(matches);
+    //    System.out.println(matches);
     List<Integer> matchPositionsInWitness1 = Lists.newArrayList();
     List<Integer> matchPositionsInWitness2 = Lists.newArrayList();
     for (Integer match : matches) {
@@ -46,13 +45,17 @@ public class Comparison {
       tuples.add(new PositionTuple(position, position2));
       i++;
     }
+    return tuples;
+  }
+
+  private void calculateModifications(List<PositionTuple> tuples) {
     int currentBaseIndex = 0;
     int currentWitnessIndex = 0;
     for (PositionTuple tuple : tuples) {
-      System.out.println("baseIndex: " + currentBaseIndex + "; witnessIndex: " + currentWitnessIndex);
+      //      System.out.println("baseIndex: " + currentBaseIndex + "; witnessIndex: " + currentWitnessIndex);
       int baseIndexDif = tuple.baseIndex - currentBaseIndex;
       int witnessIndexDif = tuple.witnessIndex - currentWitnessIndex;
-      System.out.println("differences: " + baseIndexDif + "; " + witnessIndexDif);
+      //      System.out.println("differences: " + baseIndexDif + "; " + witnessIndexDif);
       if (baseIndexDif > 1 && witnessIndexDif > 1) {
         //        List<Word> replacementWords = witness.getPhrase(currentWitnessIndex + 1, tuple.witnessIndex - 1);
         //        table.setReplacement(witnessNumber, currentBaseIndex + 1, replacementWords);
@@ -67,7 +70,6 @@ public class Comparison {
       }
       currentBaseIndex = tuple.baseIndex;
       currentWitnessIndex = tuple.witnessIndex;
-      //      table.setIdenticalOrVariant(witnessNumber, currentBaseIndex, witness.get(currentWitnessIndex), tuple);
     }
 
     int baseIndexDif = witnessIndex.size() - currentBaseIndex;
@@ -88,6 +90,7 @@ public class Comparison {
     return modifications;
   }
 
+  // TODO: not correct!
   @SuppressWarnings("boxing")
   public List<Transposition> getTranspositions() {
     List<Integer> distances = calculateDistancesBetweenWitnesses(witnessIndex, witnessIndex2);
