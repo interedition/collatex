@@ -13,9 +13,9 @@ import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.WitnessIndex;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
+import com.sd_editions.collatex.spike2.collate.Replacement;
 import com.sd_editions.collatex.spike2.collate.Transposition;
 
-@SuppressWarnings("boxing")
 public class ColorsView {
 
   private final Colors colors;
@@ -67,6 +67,8 @@ public class ColorsView {
               html += "<li>" + removalView((Removal) modification, base) + "</li>";
             } else if (modification instanceof Transposition) {
               html += "<li>" + transpositionView((Transposition) modification, base, w) + "</li>";
+            } else if (modification instanceof Replacement) {
+              html += "<li>" + replacementView((Replacement) modification, base, w) + "</li>";
             }
           }
         }
@@ -74,6 +76,10 @@ public class ColorsView {
       }
     }
     return html;
+  }
+
+  private String replacementView(Replacement replacement, int base, int w) {
+    return "<i>" + replacement.toString() + "</i>"; // TODO: TEMP!
   }
 
   private String transpositionView(Transposition transposition, int base, int w) {
@@ -84,7 +90,7 @@ public class ColorsView {
   private String removalView(Removal removal, int base) {
     WitnessIndex baseIndex = colors.getWitnessIndex(base);
     int position = removal.getPosition();
-    return "<i>" + baseIndex.getWordOnPosition(position) + "</i> at position " + (position + 1) + " removed ";
+    return "<i>" + baseIndex.getWordOnPosition(position) + "</i> at position " + (position) + " removed ";
   }
 
   private String additionView(Addition addition, int base, int w) {
@@ -94,12 +100,12 @@ public class ColorsView {
     String html = "<i>" + witnessIndex.getWordOnPosition(position) + "</i> added ";
     List<String> baseWords = baseIndex.getWords();
     List<String> witnessWords = witnessIndex.getWords();
-    if (position == 0) {
+    if (position == 1) {
       html += "before <i>" + baseWords.get(0) + "</i>";
-    } else if (position == witnessWords.size() - 1) {
+    } else if (position == witnessWords.size()) {
       html += " after <i>" + baseWords.get(baseWords.size() - 1) + "</i>";
     } else {
-      html += "between <i>" + witnessWords.get(position - 1) + "</i> and <i>" + witnessWords.get(position + 1) + "</i>";
+      html += "between <i>" + witnessWords.get(position - 2) + "</i> and <i>" + witnessWords.get(position) + "</i>";
     }
     return html;
   }

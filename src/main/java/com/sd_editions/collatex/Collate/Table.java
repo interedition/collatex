@@ -88,7 +88,7 @@ public class Table extends Block {
         addAlignmentInformationToResult(witness, baseIndex, 3, new AdditionCell(replacementWords.subList(joinEndIndex + 1, replacementWords.size())));
       }
     } else {
-      replacement = new Replacement(base.get(baseIndex), replacementWords);
+      replacement = new ReplacementCell(base.get(baseIndex), replacementWords);
       addAlignmentInformationToResult(witness, baseIndex, 2, replacement);
     }
   }

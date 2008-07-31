@@ -5,16 +5,16 @@ import java.util.List;
 
 import com.sd_editions.collatex.Block.Word;
 
-public class Replacement extends Cell {
+public class ReplacementCell extends Cell {
 
   private final Word baseWord;
   private List<Word> replacementWords;
 
-  public Replacement(Word baseWord, Word replacementWord) {
+  public ReplacementCell(Word baseWord, Word replacementWord) {
     this(baseWord, Collections.singletonList(replacementWord));
   }
 
-  public Replacement(Word baseWord, List<Word> replacementWords) {
+  public ReplacementCell(Word baseWord, List<Word> replacementWords) {
     this.baseWord = baseWord;
     this.replacementWords = replacementWords;
   }

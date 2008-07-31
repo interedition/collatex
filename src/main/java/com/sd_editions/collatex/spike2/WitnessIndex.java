@@ -47,11 +47,11 @@ public class WitnessIndex {
   }
 
   public int getPosition(Integer wordCode) {
-    return getWordCodesList().indexOf(wordCode);
+    return getWordCodesList().indexOf(wordCode) + 1;
   }
 
   public int getWordCodeOnPosition(Integer position) {
-    return getWordCodesList().get(position);
+    return getWordCodesList().get(position - 1);
   }
 
   public List<Integer> getWordCodesList() {
@@ -60,6 +60,10 @@ public class WitnessIndex {
   }
 
   public String getWordOnPosition(int position) {
-    return words.get(position);
+    return words.get(position - 1);
+  }
+
+  public int size() {
+    return wordCodes.size();
   }
 }

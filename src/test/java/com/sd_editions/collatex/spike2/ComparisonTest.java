@@ -11,7 +11,7 @@ public class ComparisonTest extends TestCase {
     Comparison comparison = colors.compareWitness(1, 2);
     List<Modification> modifications = comparison.getModifications();
     assertEquals(1, modifications.size());
-    assertEquals("addition: calico position: 1", modifications.get(0).toString());
+    assertEquals("addition: calico position: 2", modifications.get(0).toString());
   }
 
   public void testAddition_AtTheEnd() {
@@ -19,7 +19,7 @@ public class ComparisonTest extends TestCase {
     Comparison comparison = colors.compareWitness(1, 2);
     List<Modification> modifications = comparison.getModifications();
     assertEquals(1, modifications.size());
-    assertEquals("addition: lost position: 2", modifications.get(0).toString());
+    assertEquals("addition: lost position: 3", modifications.get(0).toString());
   }
 
   public void testAddition_AtTheStart() {
@@ -27,15 +27,51 @@ public class ComparisonTest extends TestCase {
     Comparison comparison = colors.compareWitness(1, 2);
     List<Modification> modifications = comparison.getModifications();
     assertEquals(1, modifications.size());
-    assertEquals("addition: not position: 0", modifications.get(0).toString());
+    assertEquals("addition: not position: 1", modifications.get(0).toString());
   }
 
-  //  public void testReplacementVariant() {
-  //    Colors colors = new Colors("black cat", "white cat");
-  //    //    Comparison comparison = colors.compareWitness(1, 2);
-  //    //    List<PositionTuple> matches = comparison.getMatches();
-  //    //    List<PositionTuple> expected = Lists.newArrayList(new PositionTuple(1, 1));
-  //    //    assertEquals(expected, matches);
-  //  }
+  public void testOmission_InTheMiddle() {
+    Colors colors = new Colors("a white working horse", "a horse");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("omission: white", modifications.get(0).toString());
+    //    assertEquals("omission: working", modifications.get(1).toString());
+  }
+
+  public void testOmission_AtTheStart() {
+    Colors colors = new Colors("an almost certain death", "certain death");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("omission: an", modifications.get(0).toString());
+    //    assertEquals("omission: almost", modifications.get(1).toString());
+  }
+
+  public void testOmission_AtTheEnd() {
+    Colors colors = new Colors("a calico, or tortoiseshell cat", "a calico");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("omission: or", modifications.get(0).toString());
+    //    assertEquals("omission: tortoiseshell", modifications.get(0).toString());
+    //    assertEquals("omission: cat", modifications.get(0).toString());
+  }
+
+  public void testReplacementVariantAtTheStart() {
+    Colors colors = new Colors("black cat", "white cat");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("replacement: black / white position: 1", modifications.get(0).toString());
+  }
+
+  public void testReplacementVariantAtTheEnd() {
+    Colors colors = new Colors("it's black", "it's white");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("replacement: black / white position: 2", modifications.get(0).toString());
+  }
 
 }

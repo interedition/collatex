@@ -4,19 +4,17 @@ import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.WitnessIndex;
 
 public class Addition extends Modification {
-  private final int addedWord;
   private final int position;
   private final WitnessIndex witnessIndex2;
 
-  @SuppressWarnings("boxing")
-  public Addition(int _addedWord, WitnessIndex _witnessIndex2) {
-    this.addedWord = _addedWord;
+  public Addition(int _position, WitnessIndex _witnessIndex2) {
     this.witnessIndex2 = _witnessIndex2;
-    this.position = witnessIndex2.getPosition(addedWord);
+    this.position = _position;
   }
 
+  @SuppressWarnings("boxing")
   public int getAddedWord() {
-    return addedWord;
+    return witnessIndex2.getWordCodeOnPosition(position);
   }
 
   public int getPosition() {
