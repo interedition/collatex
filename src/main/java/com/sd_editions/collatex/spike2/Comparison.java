@@ -31,7 +31,7 @@ public class Comparison {
     this.colors = witnessIndex.getIndex();
     modifications = Lists.newArrayList();
     for (Integer added_word : added_words) {
-      modifications.add(new Addition(added_word, witnessIndex2.getPosition(added_word)));
+      modifications.add(new Addition(added_word, witnessIndex2));
     }
     for (Integer removed_word : removed_words) {
       modifications.add(new Removal(removed_word, witnessIndex.getPosition(removed_word)));

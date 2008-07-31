@@ -9,7 +9,7 @@ public class Colors {
   private final Index index;
   private final List<WitnessIndex> witnessIndexes;
 
-  public Colors(String[] witnesses) {
+  public Colors(String... witnesses) {
     index = new Index(witnesses);
     this.witnessIndexes = Lists.newArrayList();
     for (String witness : witnesses) {
