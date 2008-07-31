@@ -1,7 +1,6 @@
 package com.sd_editions.collatex.spike2;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -14,9 +13,6 @@ import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class Comparison {
 
-  private final Index colors;
-  private final Set<Integer> added_words;
-  private final Set<Integer> removed_words;
   private final List<Modification> modifications;
   private final WitnessIndex witnessIndex;
   private final WitnessIndex witnessIndex2;
@@ -25,19 +21,7 @@ public class Comparison {
   public Comparison(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
     this.witnessIndex = _witnessIndex;
     this.witnessIndex2 = _witnessIndex2;
-    added_words = Sets.newLinkedHashSet(witnessIndex2.getWordCodes());
-    added_words.removeAll(witnessIndex.getWordCodes());
-    removed_words = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
-    removed_words.removeAll(witnessIndex2.getWordCodes());
-    this.colors = witnessIndex.getIndex();
     modifications = Lists.newArrayList();
-    //    for (Integer added_word : added_words) {
-    //      modifications.add(new Addition(added_word, witnessIndex2));
-    //    }
-    //    for (Integer removed_word : removed_words) {
-    //      modifications.add(new Removal(removed_word, witnessIndex.getPosition(removed_word)));
-    //    }
-
     // hier gaan we dus weer die tuple array van vroeger bepalen
     // bepaal de matches..
     // dat is een set van integers...
@@ -101,45 +85,8 @@ public class Comparison {
     }
   }
 
-  //TODO: remove!
-  public List<String> getAddedWords() {
-    List<String> additions = Lists.newArrayList();
-    for (Integer color : added_words) {
-      additions.add(getWordForColor(color));
-    }
-    return additions;
-  }
-
-  //TODO: remove!
-  @SuppressWarnings("boxing")
-  private String getWordForColor(Integer color) {
-    return colors.getWord(color);
-  }
-
   public List<Modification> getModifications() {
     return modifications;
-  }
-
-  public List<String> getReplacedWords() {
-    // NOTE: this far too simple!
-    List<String> replacements = Lists.newArrayList();
-    if (added_words.size() == removed_words.size()) {
-      Iterator<Integer> rem = removed_words.iterator();
-      for (Integer add : added_words) {
-        Integer remove = rem.next();
-        replacements.add(getWordForColor(remove) + "/" + getWordForColor(add));
-      }
-    }
-    return replacements;
-  }
-
-  //TODO: remove!
-  public List<String> getRemovedWords() {
-    List<String> removals = Lists.newArrayList();
-    for (Integer color : removed_words) {
-      removals.add(getWordForColor(color));
-    }
-    return removals;
   }
 
   @SuppressWarnings("boxing")
