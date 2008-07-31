@@ -74,4 +74,10 @@ public class ComparisonTest extends TestCase {
     assertEquals("replacement: black / white position: 2", modifications.get(0).toString());
   }
 
+  public void testTranspositionsShouldNotBeCountedAsAdditions() {
+    Colors colors = new Colors("a b", "b a");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(0, modifications.size());
+  }
 }

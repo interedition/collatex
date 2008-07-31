@@ -37,7 +37,8 @@ public class Comparison {
       matchPositionsInWitness1.add(witnessIndex.getPosition(match));
       matchPositionsInWitness2.add(witnessIndex2.getPosition(match));
     }
-    // sorting can be done later!
+    Collections.sort(matchPositionsInWitness1);
+    Collections.sort(matchPositionsInWitness2);
     List<PositionTuple> tuples = Lists.newArrayList();
     int i = 0;
     for (Integer position : matchPositionsInWitness1) {
