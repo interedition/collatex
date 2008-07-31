@@ -95,17 +95,15 @@ public class ColorsView {
 
   private String additionView(Addition addition, int base, int w) {
     WitnessIndex baseIndex = colors.getWitnessIndex(base);
-    WitnessIndex witnessIndex = colors.getWitnessIndex(w);
-    int position = addition.getPosition();
-    String html = "<i>" + witnessIndex.getWordOnPosition(position) + "</i> added ";
+    String html = "<i>" + addition.getAddedWords() + "</i> added ";
     List<String> baseWords = baseIndex.getWords();
-    List<String> witnessWords = witnessIndex.getWords();
+    int position = addition.getPosition();
     if (position == 1) {
       html += "before <i>" + baseWords.get(0) + "</i>";
-    } else if (position == witnessWords.size()) {
+    } else if (position > baseWords.size()) {
       html += " after <i>" + baseWords.get(baseWords.size() - 1) + "</i>";
     } else {
-      html += "between <i>" + witnessWords.get(position - 2) + "</i> and <i>" + witnessWords.get(position) + "</i>";
+      html += "between <i>" + baseWords.get(position - 2) + "</i> and <i>" + baseWords.get(position - 1) + "</i>";
     }
     return html;
   }

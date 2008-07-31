@@ -1,28 +1,28 @@
 package com.sd_editions.collatex.spike2.collate;
 
 import com.sd_editions.collatex.spike2.Modification;
-import com.sd_editions.collatex.spike2.WitnessIndex;
+import com.sd_editions.collatex.spike2.Phrase;
 
 public class Addition extends Modification {
+  private final Phrase phrase;
   private final int position;
-  private final WitnessIndex witnessIndex2;
 
-  public Addition(int _position, WitnessIndex _witnessIndex2) {
-    this.witnessIndex2 = _witnessIndex2;
+  public Addition(int _position, Phrase _phrase) {
     this.position = _position;
-  }
-
-  @SuppressWarnings("boxing")
-  public int getAddedWord() {
-    return witnessIndex2.getWordCodeOnPosition(position);
+    this.phrase = _phrase;
   }
 
   public int getPosition() {
     return position;
   }
 
+  public String getAddedWords() {
+    return phrase.toString();
+  }
+
   @Override
   public String toString() {
-    return "addition: " + witnessIndex2.getWordOnPosition(position) + " position: " + position;
+    return "addition: " + phrase.toString() + " position: " + position;
   }
+
 }

@@ -21,16 +21,7 @@ public class Replacement extends Modification {
   public String toString() {
     String baseWord = witnessIndex.getWordOnPosition(i); // TODO: must become a phrase!
     String replacementWord = witnessIndex2.getWordOnPosition(j); // TODO: muse become a phrase!
-    return "replacement: " + baseWord + " / " + replacementWord + " position: " + i/*replacementsAsString()*/;
+    return "replacement: " + baseWord + " / " + replacementWord + " position: " + i;
   }
-  //  private String replacementsAsString() {
-  //    String replacementString = "";
-  //    String divider = "";
-  //    for (Word replacement : replacementWords) {
-  //      replacementString += divider + replacement.getContent();
-  //      divider = " ";
-  //    }
-  //    return replacementString;
-  //  }
 
 }

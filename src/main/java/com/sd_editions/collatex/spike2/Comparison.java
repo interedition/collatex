@@ -62,9 +62,8 @@ public class Comparison {
         modifications.add(new Removal(witnessIndex, currentBaseIndex + 1, tuple.baseIndex));
         //        table.setOmission(witnessNumber, currentBaseIndex + 1, tuple.baseIndex);
       } else if (baseIndexDif == 1 && witnessIndexDif > 1) {
-        //        List<Word> additionalWords = witness.getPhrase(currentWitnessIndex + 1, tuple.witnessIndex - 1);
-        //        table.setFrontAddition(witnessNumber, currentBaseIndex + 1, additionalWords);
-        modifications.add(new Addition(currentWitnessIndex + 1, witnessIndex2)); // TODO: should become a phrase!
+        Phrase addition = witnessIndex2.createPhrase(currentWitnessIndex + 1, tuple.witnessIndex - 1);
+        modifications.add(new Addition(currentBaseIndex + 1, addition));
       }
       currentBaseIndex = tuple.baseIndex;
       currentWitnessIndex = tuple.witnessIndex;
@@ -80,9 +79,8 @@ public class Comparison {
       //      table.setOmission(witnessNumber, currentBaseIndex + 1, base.size() + 1);
       modifications.add(new Removal(witnessIndex, currentBaseIndex + 1, witnessIndex.size() + 1));
     } else if (baseIndexDif == 0 && witnessIndexDif > 0) {
-      //      List<Word> additionalWords = witness.getPhrase(currentWitnessIndex + 1, witness.size());
-      //      table.setBackAddition(witnessNumber, currentBaseIndex, additionalWords);
-      modifications.add(new Addition(currentWitnessIndex + 1, witnessIndex2)); // TODO: should become a phrase!
+      Phrase addition = witnessIndex2.createPhrase(currentWitnessIndex + 1, witnessIndex2.size());
+      modifications.add(new Addition(currentBaseIndex + 1, addition));
     }
   }
 

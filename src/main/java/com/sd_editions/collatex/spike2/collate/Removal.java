@@ -26,6 +26,6 @@ public class Removal extends Modification {
 
   @Override
   public String toString() {
-    return "omission: " + witnessIndex.getWordOnPosition(start_position);
+    return "omission: " + witnessIndex.getWordOnPosition(start_position) + " position: " + start_position;
   }
 }
