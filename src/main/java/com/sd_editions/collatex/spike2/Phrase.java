@@ -32,4 +32,8 @@ public class Phrase {
     return replacementString;
   }
 
+  public int getStartPosition() {
+    return start_position;
+  }
+
 }

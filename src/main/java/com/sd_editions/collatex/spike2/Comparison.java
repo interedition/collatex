@@ -62,8 +62,7 @@ public class Comparison {
         // TODO: currentBaseIndex should also be a range!
         modifications.add(new Replacement(witnessIndex, currentBaseIndex + 1, witnessIndex2, currentWitnessIndex + 1, tuple.witnessIndex - 1));
       } else if (baseIndexDif > 1 && witnessIndexDif == 1) {
-        modifications.add(new Removal(witnessIndex, currentBaseIndex + 1, tuple.baseIndex));
-        //        table.setOmission(witnessNumber, currentBaseIndex + 1, tuple.baseIndex);
+        modifications.add(new Removal(witnessIndex.createPhrase(currentBaseIndex + 1, tuple.baseIndex - 1)));
       } else if (baseIndexDif == 1 && witnessIndexDif > 1) {
         Phrase addition = witnessIndex2.createPhrase(currentWitnessIndex + 1, tuple.witnessIndex - 1);
         modifications.add(new Addition(currentBaseIndex + 1, addition));
@@ -78,8 +77,7 @@ public class Comparison {
       //      table.setReplacement(witnessNumber, currentBaseIndex + 1, witness.getPhrase(currentWitnessIndex + 1, witness.size()));
       modifications.add(new Replacement(witnessIndex, currentBaseIndex + 1, witnessIndex2, currentWitnessIndex + 1, witnessIndex2.size()));
     } else if (baseIndexDif > 0 && witnessIndexDif == 0) {
-      //      table.setOmission(witnessNumber, currentBaseIndex + 1, base.size() + 1);
-      modifications.add(new Removal(witnessIndex, currentBaseIndex + 1, witnessIndex.size() + 1));
+      modifications.add(new Removal(witnessIndex.createPhrase(currentBaseIndex + 1, witnessIndex.size())));
     } else if (baseIndexDif == 0 && witnessIndexDif > 0) {
       Phrase addition = witnessIndex2.createPhrase(currentWitnessIndex + 1, witnessIndex2.size());
       modifications.add(new Addition(currentBaseIndex + 1, addition));

@@ -88,9 +88,8 @@ public class ColorsView {
   }
 
   private String removalView(Removal removal, int base) {
-    WitnessIndex baseIndex = colors.getWitnessIndex(base);
     int position = removal.getPosition();
-    return "<i>" + baseIndex.getWordOnPosition(position) + "</i> at position " + (position) + " removed ";
+    return "<i>" + removal.getRemovedWords() + "</i> at position " + (position) + " removed ";
   }
 
   private String additionView(Addition addition, int base, int w) {

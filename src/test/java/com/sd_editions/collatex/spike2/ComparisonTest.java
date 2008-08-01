@@ -35,8 +35,7 @@ public class ComparisonTest extends TestCase {
     Comparison comparison = colors.compareWitness(1, 2);
     List<Modification> modifications = comparison.getModifications();
     assertEquals(1, modifications.size());
-    assertEquals("omission: white position: 2", modifications.get(0).toString());
-    //    assertEquals("omission: working", modifications.get(1).toString());
+    assertEquals("omission: white working position: 2", modifications.get(0).toString());
   }
 
   public void testOmission_AtTheStart() {
@@ -44,8 +43,7 @@ public class ComparisonTest extends TestCase {
     Comparison comparison = colors.compareWitness(1, 2);
     List<Modification> modifications = comparison.getModifications();
     assertEquals(1, modifications.size());
-    assertEquals("omission: an position: 1", modifications.get(0).toString());
-    //    assertEquals("omission: almost", modifications.get(1).toString());
+    assertEquals("omission: an almost position: 1", modifications.get(0).toString());
   }
 
   public void testOmission_AtTheEnd() {
@@ -53,9 +51,7 @@ public class ComparisonTest extends TestCase {
     Comparison comparison = colors.compareWitness(1, 2);
     List<Modification> modifications = comparison.getModifications();
     assertEquals(1, modifications.size());
-    assertEquals("omission: or position: 3", modifications.get(0).toString());
-    //    assertEquals("omission: tortoiseshell", modifications.get(0).toString());
-    //    assertEquals("omission: cat", modifications.get(0).toString());
+    assertEquals("omission: or tortoiseshell cat position: 3", modifications.get(0).toString());
   }
 
   public void testReplacementVariantAtTheStart() {
@@ -97,12 +93,28 @@ public class ComparisonTest extends TestCase {
     assertEquals("addition: c d position: 3", modifications.get(0).toString());
   }
 
+  public void testPhraseOmissionAtTheStart() {
+    Colors colors = new Colors("a b c d", "c d");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("omission: a b position: 1", modifications.get(0).toString());
+  }
+
+  public void testPhraseOmissionAtTheEnd() {
+    Colors colors = new Colors("a b c d", "a b");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("omission: c d position: 3", modifications.get(0).toString());
+  }
+
   public void testCombineAdditionAndRemovalToTestPositions() {
     Colors colors = new Colors("a b c", "c d e");
     Comparison comparison = colors.compareWitness(1, 2);
     List<Modification> modifications = comparison.getModifications();
     assertEquals(2, modifications.size());
-    assertEquals("omission: a position: 1", modifications.get(0).toString()); // TODO: introduce phrase in Removal!
+    assertEquals("omission: a b position: 1", modifications.get(0).toString());
     assertEquals("addition: d e position: 4", modifications.get(1).toString());
   }
 
@@ -112,7 +124,7 @@ public class ComparisonTest extends TestCase {
     List<Modification> modifications = comparison.getModifications();
     assertEquals(2, modifications.size());
     assertEquals("addition: a b position: 1", modifications.get(0).toString());
-    assertEquals("omission: d position: 2", modifications.get(1).toString()); // TODO: introduce phrase in Removal!
+    assertEquals("omission: d e position: 2", modifications.get(1).toString());
   }
 
 }
