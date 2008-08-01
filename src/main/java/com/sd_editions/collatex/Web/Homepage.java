@@ -1,14 +1,12 @@
 package com.sd_editions.collatex.Web;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.PropertyModel;
 
 import com.google.common.collect.Lists;
@@ -19,7 +17,6 @@ import com.sd_editions.collatex.Collate.Table;
 import com.sd_editions.collatex.Collate.Tuple;
 import com.sd_editions.collatex.Collate.TupleToTable;
 import com.sd_editions.collatex.Collate.WordAlignmentVisitor;
-import com.sd_editions.collatex.spike2.Colors;
 
 @SuppressWarnings("serial")
 public class Homepage extends WebPage {
@@ -51,13 +48,6 @@ public class Homepage extends WebPage {
     add(label);
     add(label2);
     add(new AlignmentForm("alignmentform", model));
-    add(new BookmarkablePageLink("usecaselink", UseCasePage.class));
-
-    List<String> witnessList = Lists.newArrayList();
-    witnessList.add(model.base);
-    witnessList.addAll(Arrays.asList(model.witnesses));
-    Colors colors = new Colors(witnessList.toArray(new String[] {}));
-    add(new Label("colorview", new ColorsView(colors).toHtml()).setEscapeModelStrings(false));
   }
 
   @SuppressWarnings("serial")

@@ -6,7 +6,7 @@ public class CollateXApplication extends WebApplication {
 
   @Override
   public Class getHomePage() {
-    return Homepage.class;
+    return ColorsPage.class;
   }
 
 }
