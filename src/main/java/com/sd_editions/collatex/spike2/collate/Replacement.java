@@ -1,27 +1,34 @@
 package com.sd_editions.collatex.spike2.collate;
 
 import com.sd_editions.collatex.spike2.Modification;
-import com.sd_editions.collatex.spike2.WitnessIndex;
+import com.sd_editions.collatex.spike2.Phrase;
 
 public class Replacement extends Modification {
+  private final Phrase original;
+  private final Phrase replacement;
 
-  private final WitnessIndex witnessIndex;
-  private final WitnessIndex witnessIndex2;
-  private final int i;
-  private final int j;
-
-  public Replacement(WitnessIndex _witnessIndex, int _i, WitnessIndex _witnessIndex2, int _j, int k) {
-    this.witnessIndex = _witnessIndex;
-    this.i = _i;
-    this.witnessIndex2 = _witnessIndex2;
-    this.j = _j;
+  public Replacement(Phrase _original, Phrase _replacement) {
+    this.original = _original;
+    this.replacement = _replacement;
   }
 
   @Override
   public String toString() {
-    String baseWord = witnessIndex.getWordOnPosition(i); // TODO: must become a phrase!
-    String replacementWord = witnessIndex2.getWordOnPosition(j); // TODO: muse become a phrase!
-    return "replacement: " + baseWord + " / " + replacementWord + " position: " + i;
+    String baseWords = original.toString();
+    String replacementWords = replacement.toString();
+    return "replacement: " + baseWords + " / " + replacementWords + " position: " + original.getStartPosition();
+  }
+
+  public int getPosition() {
+    return original.getStartPosition();
+  }
+
+  public String getOriginalWords() {
+    return original.toString();
+  }
+
+  public String getReplacementWords() {
+    return replacement.toString();
   }
 
 }

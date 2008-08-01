@@ -57,10 +57,9 @@ public class Comparison {
       int witnessIndexDif = tuple.witnessIndex - currentWitnessIndex;
       //      System.out.println("differences: " + baseIndexDif + "; " + witnessIndexDif);
       if (baseIndexDif > 1 && witnessIndexDif > 1) {
-        //        List<Word> replacementWords = witness.getPhrase(currentWitnessIndex + 1, tuple.witnessIndex - 1);
-        //        table.setReplacement(witnessNumber, currentBaseIndex + 1, replacementWords);
-        // TODO: currentBaseIndex should also be a range!
-        modifications.add(new Replacement(witnessIndex, currentBaseIndex + 1, witnessIndex2, currentWitnessIndex + 1, tuple.witnessIndex - 1));
+        Phrase original = witnessIndex.createPhrase(currentBaseIndex + 1, tuple.baseIndex - 1);
+        Phrase replacement = witnessIndex2.createPhrase(currentWitnessIndex + 1, tuple.witnessIndex - 1);
+        modifications.add(new Replacement(original, replacement));
       } else if (baseIndexDif > 1 && witnessIndexDif == 1) {
         modifications.add(new Removal(witnessIndex.createPhrase(currentBaseIndex + 1, tuple.baseIndex - 1)));
       } else if (baseIndexDif == 1 && witnessIndexDif > 1) {
@@ -74,8 +73,9 @@ public class Comparison {
     int baseIndexDif = witnessIndex.size() - currentBaseIndex;
     int witnessIndexDif = witnessIndex2.size() - currentWitnessIndex;
     if (baseIndexDif > 0 && witnessIndexDif > 0) {
-      //      table.setReplacement(witnessNumber, currentBaseIndex + 1, witness.getPhrase(currentWitnessIndex + 1, witness.size()));
-      modifications.add(new Replacement(witnessIndex, currentBaseIndex + 1, witnessIndex2, currentWitnessIndex + 1, witnessIndex2.size()));
+      Phrase original = witnessIndex.createPhrase(currentWitnessIndex + 1, witnessIndex.size());
+      Phrase replacement = witnessIndex2.createPhrase(currentWitnessIndex + 1, witnessIndex2.size());
+      modifications.add(new Replacement(original, replacement));
     } else if (baseIndexDif > 0 && witnessIndexDif == 0) {
       modifications.add(new Removal(witnessIndex.createPhrase(currentBaseIndex + 1, witnessIndex.size())));
     } else if (baseIndexDif == 0 && witnessIndexDif > 0) {

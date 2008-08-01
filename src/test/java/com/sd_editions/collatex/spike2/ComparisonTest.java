@@ -109,6 +109,22 @@ public class ComparisonTest extends TestCase {
     assertEquals("omission: c d position: 3", modifications.get(0).toString());
   }
 
+  public void testPhraseVariantReplacementAtTheStart() {
+    Colors colors = new Colors("a b c d", "e f g c d");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("replacement: a b / e f g position: 1", modifications.get(0).toString());
+  }
+
+  public void testPhraseVariantReplacementAtTheEnd() {
+    Colors colors = new Colors("a b c d", "a b e f g");
+    Comparison comparison = colors.compareWitness(1, 2);
+    List<Modification> modifications = comparison.getModifications();
+    assertEquals(1, modifications.size());
+    assertEquals("replacement: c d / e f g position: 3", modifications.get(0).toString());
+  }
+
   public void testCombineAdditionAndRemovalToTestPositions() {
     Colors colors = new Colors("a b c", "c d e");
     Comparison comparison = colors.compareWitness(1, 2);
