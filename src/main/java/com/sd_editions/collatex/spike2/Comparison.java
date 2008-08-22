@@ -9,7 +9,6 @@ import com.google.common.collect.Sets;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
 import com.sd_editions.collatex.spike2.collate.Replacement;
-import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class Comparison {
 
@@ -88,41 +87,4 @@ public class Comparison {
     return modifications;
   }
 
-  // TODO: not correct!
-  @SuppressWarnings("boxing")
-  public List<Transposition> getTranspositions() {
-    List<Integer> distances = calculateDistancesBetweenWitnesses(witnessIndex, witnessIndex2);
-    int maxTransposition = Collections.max(distances);
-    int positionInFirstWitnessOfTransposedWord = 1 + distances.indexOf(maxTransposition);
-    int transposedWord = witnessIndex.getWordCodeOnPosition(positionInFirstWitnessOfTransposedWord);
-    int positionInSecondWitnessOfTransposedWord = 1 + witnessIndex2.getPosition(transposedWord);
-    List<Integer> witnessAsModified = Lists.newArrayList(witnessIndex.getWordCodes());
-    witnessAsModified.remove(positionInFirstWitnessOfTransposedWord - 1);
-    witnessAsModified.add(positionInSecondWitnessOfTransposedWord - 1, transposedWord);
-    List<Transposition> transpositions = Lists.newArrayList();
-    transpositions.add(new Transposition(transposedWord, maxTransposition));
-    // TODO: make it a while loop!
-    //        List<Integer> newDistances = calculateDistanceWithList(witnessIndex2, witnessAsModified);
-    //    maxTransposition = Collections.max(newDistances);
-
-    return transpositions;
-  }
-
-  private List<Integer> calculateDistancesBetweenWitnesses(WitnessIndex witness1, WitnessIndex witness2) {
-    List<Integer> words = witness1.getWordCodesList();
-    return calculateDistanceWithList(witness2, words);
-  }
-
-  @SuppressWarnings("boxing")
-  private List<Integer> calculateDistanceWithList(WitnessIndex witness2, List<Integer> words) {
-    List<Integer> distances = Lists.newArrayList();
-    int sourcePosition = 1;
-    for (Integer word : words) {
-      int destPosition = witness2.getPosition(word);
-      int distance = Math.abs(destPosition - sourcePosition);
-      distances.add(distance);
-      sourcePosition++;
-    }
-    return distances;
-  }
 }

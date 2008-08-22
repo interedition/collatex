@@ -30,6 +30,10 @@ public class Colors {
     return new Comparison(getWitnessIndex(i), getWitnessIndex(j));
   }
 
+  public TranspositionDetection detectTranspositions(int i, int j) {
+    return new TranspositionDetection(getWitnessIndex(i), getWitnessIndex(j));
+  }
+
   public int numberOfWitnesses() {
     return witnessIndexes.size();
   }

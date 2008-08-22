@@ -1,11 +1,8 @@
 package com.sd_editions.collatex.spike2;
 
-import java.util.List;
-
 import junit.framework.TestCase;
 
 import com.google.common.collect.Sets;
-import com.sd_editions.collatex.spike2.collate.Transposition;
 
 @SuppressWarnings("boxing")
 public class ColorsTest extends TestCase {
@@ -33,19 +30,19 @@ public class ColorsTest extends TestCase {
     assertEquals(Sets.newHashSet(1, 2, 3), colors.getWitnessIndex(3).getWordCodes());
   }
 
-  public void testThirdUseCasePeter() {
-    String[] witnesses = new String[] { "He was agast so", "He was agast", "So he was agast" };
-    Colors colors = new Colors(witnesses);
-    //    Comparison c1 = colors.compareWitness(1, 2);
-    //    assertEquals(Lists.newArrayList("so"), c1.getRemovedWords());
-    Comparison c2 = colors.compareWitness(1, 3);
-    //    assertTrue(c2.getRemovedWords().toString(), c2.getRemovedWords().isEmpty());
-    //    assertTrue(c2.getAddedWords().toString(), c2.getAddedWords().isEmpty());
-    List<Transposition> transpositions = c2.getTranspositions();
-    Transposition transposition = transpositions.get(0);
-    assertEquals(4, transposition.getTransposedWord());
-    assertEquals(3, transposition.getTranspositionDistance());
-  }
+  //  public void testThirdUseCasePeter() {
+  //    String[] witnesses = new String[] { "He was agast so", "He was agast", "So he was agast" };
+  //    Colors colors = new Colors(witnesses);
+  //    Comparison c1 = colors.compareWitness(1, 2);
+  //    assertEquals(Lists.newArrayList("so"), c1.getRemovedWords());
+  //    Comparison c2 = colors.compareWitness(1, 3);
+  //    assertTrue(c2.getRemovedWords().toString(), c2.getRemovedWords().isEmpty());
+  //    assertTrue(c2.getAddedWords().toString(), c2.getAddedWords().isEmpty());
+  //    List<Transposition> transpositions = c2.getTranspositions();
+  //    Transposition transposition = transpositions.get(0);
+  //    assertEquals(4, transposition.getTransposedWord());
+  //    assertEquals(3, transposition.getTranspositionDistance());
+  //  }
 
   public void testUseCase4() {
     String[] witnesses = new String[] { "the green bike in the green", "the red bike in the street" };
