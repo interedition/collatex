@@ -10,16 +10,10 @@ import com.sd_editions.collatex.spike2.collate.Replacement;
 public class Comparison {
 
   private final List<Modification> modifications;
-  private final WitnessIndex witnessIndex;
-  private final WitnessIndex witnessIndex2;
-  private final Matches matches;
 
-  public Comparison(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
-    this.witnessIndex = _witnessIndex;
-    this.witnessIndex2 = _witnessIndex2;
+  public Comparison(Matches _matches) {
     modifications = Lists.newArrayList();
-    matches = new Matches(witnessIndex, witnessIndex2);
-    List<Gap> gaps = getMatches().getGaps();
+    List<Gap> gaps = _matches.getGaps();
     calculateModifications(gaps);
   }
 
@@ -37,10 +31,6 @@ public class Comparison {
 
   public List<Modification> getModifications() {
     return modifications;
-  }
-
-  public Matches getMatches() {
-    return matches;
   }
 
 }

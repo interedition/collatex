@@ -7,8 +7,7 @@ import junit.framework.TestCase;
 public class MatchesTest extends TestCase {
   public void testGaps() {
     Colors colors = new Colors("a b y c z d", "a x b c n d");
-    Comparison compareWitness = colors.compareWitness(1, 2);
-    Matches matches = compareWitness.getMatches();
+    Matches matches = colors.getMatches(1, 2);
     List<Gap> gaps = matches.getGaps();
     // we assume that empty gaps are possible at the beginning and the end..
     // to keep the algorithms simple... we could always filter away empty gaps later
@@ -43,8 +42,7 @@ public class MatchesTest extends TestCase {
 
   public void testGapAtTheEnd() {
     Colors colors = new Colors("a b", "a c");
-    Comparison compareWitness = colors.compareWitness(1, 2);
-    Matches matches = compareWitness.getMatches();
+    Matches matches = colors.getMatches(1, 2);
     List<Gap> gaps = matches.getGaps();
     Gap gapAtTheEnd = gaps.get(1);
     assertEquals(1, gapAtTheEnd.distanceBase);

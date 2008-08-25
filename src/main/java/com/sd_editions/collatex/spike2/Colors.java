@@ -27,7 +27,11 @@ public class Colors {
   }
 
   public Comparison compareWitness(int i, int j) {
-    return new Comparison(getWitnessIndex(i), getWitnessIndex(j));
+    return new Comparison(getMatches(i, j));
+  }
+
+  public Matches getMatches(int i, int j) {
+    return new Matches(getWitnessIndex(i), getWitnessIndex(j));
   }
 
   public TranspositionDetection detectTranspositions(int i, int j) {
