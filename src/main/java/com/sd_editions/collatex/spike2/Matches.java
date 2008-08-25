@@ -21,29 +21,6 @@ public class Matches {
     //    System.out.println(matches);
   }
 
-  // these should become the gaps... for now sorted by position
-  // TODO: make private when comparison is rewritten!
-  @SuppressWarnings("boxing")
-  public List<PositionTuple> getMatchesSortedByPosition() {
-    List<Integer> matchPositionsInWitness1 = Lists.newArrayList();
-    List<Integer> matchPositionsInWitness2 = Lists.newArrayList();
-    for (Integer match : matches) {
-      matchPositionsInWitness1.add(witnessIndex.getPosition(match));
-      matchPositionsInWitness2.add(witnessIndex2.getPosition(match));
-    }
-    Collections.sort(matchPositionsInWitness1);
-    Collections.sort(matchPositionsInWitness2);
-    List<PositionTuple> tuples = Lists.newArrayList();
-    int i = 0;
-    for (Integer position : matchPositionsInWitness1) {
-      Integer position2 = matchPositionsInWitness2.get(i);
-      tuples.add(new PositionTuple(position, position2));
-      i++;
-    }
-    return tuples;
-
-  }
-
   public List<Gap> getGaps() {
     List<Gap> gaps = Lists.newArrayList();
     List<PositionTuple> tuples = getMatchesSortedByPosition();
@@ -70,5 +47,36 @@ public class Matches {
     gapAtTheEnd.witnessBeginPosition = currentWitnessIndex;
     gapAtTheEnd.witnessEndPosition = witnessIndex2.size();
     return gaps;
+  }
+
+  @SuppressWarnings("boxing")
+  private List<PositionTuple> getMatchesSortedByPosition() {
+    List<Integer> matchPositionsInWitness1 = Lists.newArrayList();
+    List<Integer> matchPositionsInWitness2 = Lists.newArrayList();
+    for (Integer match : matches) {
+      matchPositionsInWitness1.add(witnessIndex.getPosition(match));
+      matchPositionsInWitness2.add(witnessIndex2.getPosition(match));
+    }
+    Collections.sort(matchPositionsInWitness1);
+    Collections.sort(matchPositionsInWitness2);
+    List<PositionTuple> tuples = Lists.newArrayList();
+    int i = 0;
+    for (Integer position : matchPositionsInWitness1) {
+      Integer position2 = matchPositionsInWitness2.get(i);
+      tuples.add(new PositionTuple(position, position2));
+      i++;
+    }
+    return tuples;
+  }
+
+  public class PositionTuple {
+    public final int baseIndex;
+    public final int witnessIndex;
+
+    public PositionTuple(int _positionWitness1, int _positionWitness2) {
+      this.baseIndex = _positionWitness1;
+      this.witnessIndex = _positionWitness2;
+    }
+
   }
 }
