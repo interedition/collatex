@@ -29,7 +29,7 @@ public class Matches {
     for (PositionTuple tuple : tuples) {
       int baseIndexDif = tuple.baseIndex - currentBaseIndex;
       int witnessIndexDif = tuple.witnessIndex - currentWitnessIndex;
-      Gap gap = new Gap(baseIndexDif, witnessIndexDif);
+      Gap gap = new Gap(baseIndexDif, witnessIndexDif, witnessIndex, witnessIndex2);
       gaps.add(gap);
       gap.baseBeginPosition = currentBaseIndex;
       gap.baseEndPosition = tuple.baseIndex - 1;
@@ -40,7 +40,7 @@ public class Matches {
     }
     int baseIndexDif = witnessIndex.size() - currentBaseIndex + 1;
     int witnessIndexDif = witnessIndex2.size() - currentWitnessIndex + 1;
-    Gap gapAtTheEnd = new Gap(baseIndexDif, witnessIndexDif);
+    Gap gapAtTheEnd = new Gap(baseIndexDif, witnessIndexDif, witnessIndex, witnessIndex2);
     gaps.add(gapAtTheEnd);
     gapAtTheEnd.baseBeginPosition = currentBaseIndex;
     gapAtTheEnd.baseEndPosition = witnessIndex.size();

@@ -26,14 +26,11 @@ public class Comparison {
   private void calculateModifications(List<Gap> gaps) {
     for (Gap gap : gaps) {
       if (gap.distanceBase > 0 && gap.distanceWitness > 0) {
-        Phrase original = witnessIndex.createPhrase(gap.baseBeginPosition, gap.baseEndPosition);
-        Phrase replacement = witnessIndex2.createPhrase(gap.witnessBeginPosition, gap.witnessEndPosition);
-        modifications.add(new Replacement(original, replacement));
+        modifications.add(new Replacement(gap.createBasePhrase(), gap.createWitnessPhrase()));
       } else if (gap.distanceBase > 0 && gap.distanceWitness == 0) {
-        modifications.add(new Removal(witnessIndex.createPhrase(gap.baseBeginPosition, gap.baseEndPosition)));
+        modifications.add(new Removal(gap.createBasePhrase()));
       } else if (gap.distanceBase == 0 && gap.distanceWitness > 0) {
-        Phrase addition = witnessIndex2.createPhrase(gap.witnessBeginPosition, gap.witnessEndPosition);
-        modifications.add(new Addition(gap.baseBeginPosition, addition));
+        modifications.add(new Addition(gap.baseBeginPosition, gap.createWitnessPhrase()));
       }
     }
   }
