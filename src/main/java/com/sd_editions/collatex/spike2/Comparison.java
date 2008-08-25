@@ -12,13 +12,14 @@ public class Comparison {
   private final List<Modification> modifications;
   private final WitnessIndex witnessIndex;
   private final WitnessIndex witnessIndex2;
+  private final Matches matches;
 
   public Comparison(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
     this.witnessIndex = _witnessIndex;
     this.witnessIndex2 = _witnessIndex2;
     modifications = Lists.newArrayList();
-    Matches matchesClass = new Matches(witnessIndex, witnessIndex2);
-    List<PositionTuple> tuples = matchesClass.getMatchesSortedByPosition();
+    matches = new Matches(witnessIndex, witnessIndex2);
+    List<PositionTuple> tuples = getMatches().getMatchesSortedByPosition();
     calculateModifications(tuples);
   }
 
@@ -60,6 +61,10 @@ public class Comparison {
 
   public List<Modification> getModifications() {
     return modifications;
+  }
+
+  public Matches getMatches() {
+    return matches;
   }
 
 }

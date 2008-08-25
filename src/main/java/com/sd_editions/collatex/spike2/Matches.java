@@ -22,6 +22,7 @@ public class Matches {
   }
 
   // these should become the gaps... for now sorted by position
+  // TODO: make private when comparison is rewritten!
   @SuppressWarnings("boxing")
   public List<PositionTuple> getMatchesSortedByPosition() {
     List<Integer> matchPositionsInWitness1 = Lists.newArrayList();
@@ -43,4 +44,31 @@ public class Matches {
 
   }
 
+  public List<Gap> getGaps() {
+    List<Gap> gaps = Lists.newArrayList();
+    List<PositionTuple> tuples = getMatchesSortedByPosition();
+    int currentBaseIndex = 1;
+    int currentWitnessIndex = 1;
+    for (PositionTuple tuple : tuples) {
+      int baseIndexDif = tuple.baseIndex - currentBaseIndex;
+      int witnessIndexDif = tuple.witnessIndex - currentWitnessIndex;
+      Gap gap = new Gap(baseIndexDif, witnessIndexDif);
+      gaps.add(gap);
+      gap.baseBeginPosition = currentBaseIndex;
+      gap.baseEndPosition = tuple.baseIndex - 1;
+      gap.witnessBeginPosition = currentWitnessIndex;
+      gap.witnessEndPosition = tuple.witnessIndex - 1;
+      currentBaseIndex = 1 + tuple.baseIndex;
+      currentWitnessIndex = 1 + tuple.witnessIndex;
+    }
+    int baseIndexDif = witnessIndex.size() - currentBaseIndex + 1;
+    int witnessIndexDif = witnessIndex2.size() - currentWitnessIndex + 1;
+    Gap gapAtTheEnd = new Gap(baseIndexDif, witnessIndexDif);
+    gaps.add(gapAtTheEnd);
+    gapAtTheEnd.baseBeginPosition = currentBaseIndex;
+    gapAtTheEnd.baseEndPosition = witnessIndex.size();
+    gapAtTheEnd.witnessBeginPosition = currentWitnessIndex;
+    gapAtTheEnd.witnessEndPosition = witnessIndex2.size();
+    return gaps;
+  }
 }
