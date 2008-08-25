@@ -30,23 +30,19 @@ public class Matches {
     for (PositionTuple tuple : tuples) {
       int baseIndexDif = tuple.baseIndex - currentBaseIndex;
       int witnessIndexDif = tuple.witnessIndex - currentWitnessIndex;
-      Gap gap = new Gap(baseIndexDif, witnessIndexDif, witnessIndex, witnessIndex2);
+      TheRealGap baseGap = new TheRealGap(witnessIndex, baseIndexDif, currentBaseIndex, tuple.baseIndex - 1);
+      TheRealGap witnessGap = new TheRealGap(witnessIndex2, witnessIndexDif, currentWitnessIndex, tuple.witnessIndex - 1);
+      Gap gap = new Gap(baseGap, witnessGap);
       gaps.add(gap);
-      gap.baseBeginPosition = currentBaseIndex;
-      gap.baseEndPosition = tuple.baseIndex - 1;
-      gap.witnessBeginPosition = currentWitnessIndex;
-      gap.witnessEndPosition = tuple.witnessIndex - 1;
       currentBaseIndex = 1 + tuple.baseIndex;
       currentWitnessIndex = 1 + tuple.witnessIndex;
     }
     int baseIndexDif = witnessIndex.size() - currentBaseIndex + 1;
     int witnessIndexDif = witnessIndex2.size() - currentWitnessIndex + 1;
-    Gap gapAtTheEnd = new Gap(baseIndexDif, witnessIndexDif, witnessIndex, witnessIndex2);
+    TheRealGap baseGap = new TheRealGap(witnessIndex, baseIndexDif, currentBaseIndex, witnessIndex.size());
+    TheRealGap witnessGap = new TheRealGap(witnessIndex2, witnessIndexDif, currentWitnessIndex, witnessIndex2.size());
+    Gap gapAtTheEnd = new Gap(baseGap, witnessGap);
     gaps.add(gapAtTheEnd);
-    gapAtTheEnd.baseBeginPosition = currentBaseIndex;
-    gapAtTheEnd.baseEndPosition = witnessIndex.size();
-    gapAtTheEnd.witnessBeginPosition = currentWitnessIndex;
-    gapAtTheEnd.witnessEndPosition = witnessIndex2.size();
     return Lists.newArrayList(Iterables.filter(gaps, new NonEmptyGapPredicate())); // TODO: this can be done easier!
   }
 

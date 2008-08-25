@@ -11,24 +11,24 @@ public class MatchesTest extends TestCase {
     List<Gap> gaps = matches.getGaps();
     // test x
     Gap gap1 = gaps.get(0);
-    assertFalse(gap1.gapInBase());
-    assertTrue(gap1.gapInWitness());
-    assertEquals(2, gap1.witnessBeginPosition);
-    assertEquals(2, gap1.witnessEndPosition);
+    assertFalse(gap1.base.hasGap());
+    assertTrue(gap1.witness.hasGap());
+    assertEquals(2, gap1.witness.beginPosition);
+    assertEquals(2, gap1.witness.endPosition);
     // test y
     Gap gap2 = gaps.get(1);
-    assertTrue(gap2.gapInBase());
-    assertFalse(gap2.gapInWitness());
-    assertEquals(3, gap2.baseBeginPosition);
-    assertEquals(3, gap2.baseEndPosition);
+    assertTrue(gap2.base.hasGap());
+    assertFalse(gap2.witness.hasGap());
+    assertEquals(3, gap2.base.beginPosition);
+    assertEquals(3, gap2.base.endPosition);
     // test z and n
     Gap gap3 = gaps.get(2);
-    assertTrue(gap3.gapInBase());
-    assertTrue(gap3.gapInWitness());
-    assertEquals(5, gap3.baseBeginPosition);
-    assertEquals(5, gap3.baseEndPosition);
-    assertEquals(5, gap3.witnessBeginPosition);
-    assertEquals(5, gap3.witnessEndPosition);
+    assertTrue(gap3.base.hasGap());
+    assertTrue(gap3.witness.hasGap());
+    assertEquals(5, gap3.base.beginPosition);
+    assertEquals(5, gap3.base.endPosition);
+    assertEquals(5, gap3.witness.beginPosition);
+    assertEquals(5, gap3.witness.endPosition);
   }
 
   public void testGapAtTheEnd() {
@@ -36,12 +36,12 @@ public class MatchesTest extends TestCase {
     Matches matches = colors.getMatches(1, 2);
     List<Gap> gaps = matches.getGaps();
     Gap gapAtTheEnd = gaps.get(0);
-    assertTrue(gapAtTheEnd.gapInBase());
-    assertTrue(gapAtTheEnd.gapInWitness());
-    assertEquals(2, gapAtTheEnd.baseBeginPosition);
-    assertEquals(2, gapAtTheEnd.baseEndPosition);
-    assertEquals(2, gapAtTheEnd.witnessBeginPosition);
-    assertEquals(2, gapAtTheEnd.witnessEndPosition);
+    assertTrue(gapAtTheEnd.base.hasGap());
+    assertTrue(gapAtTheEnd.witness.hasGap());
+    assertEquals(2, gapAtTheEnd.base.beginPosition);
+    assertEquals(2, gapAtTheEnd.base.endPosition);
+    assertEquals(2, gapAtTheEnd.witness.beginPosition);
+    assertEquals(2, gapAtTheEnd.witness.endPosition);
   }
 
   // TODO: test gaps of more than 1 word
