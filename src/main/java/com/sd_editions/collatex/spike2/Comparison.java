@@ -1,11 +1,8 @@
 package com.sd_editions.collatex.spike2;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
 import com.sd_editions.collatex.spike2.collate.Replacement;
@@ -20,31 +17,9 @@ public class Comparison {
     this.witnessIndex = _witnessIndex;
     this.witnessIndex2 = _witnessIndex2;
     modifications = Lists.newArrayList();
-    List<PositionTuple> tuples = calculateTuples();
+    Matches matchesClass = new Matches(witnessIndex, witnessIndex2);
+    List<PositionTuple> tuples = matchesClass.getMatchesSortedByPosition();
     calculateModifications(tuples);
-  }
-
-  @SuppressWarnings("boxing")
-  private List<PositionTuple> calculateTuples() {
-    Set<Integer> matches = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
-    matches.retainAll(witnessIndex2.getWordCodes());
-    //    System.out.println(matches);
-    List<Integer> matchPositionsInWitness1 = Lists.newArrayList();
-    List<Integer> matchPositionsInWitness2 = Lists.newArrayList();
-    for (Integer match : matches) {
-      matchPositionsInWitness1.add(witnessIndex.getPosition(match));
-      matchPositionsInWitness2.add(witnessIndex2.getPosition(match));
-    }
-    Collections.sort(matchPositionsInWitness1);
-    Collections.sort(matchPositionsInWitness2);
-    List<PositionTuple> tuples = Lists.newArrayList();
-    int i = 0;
-    for (Integer position : matchPositionsInWitness1) {
-      Integer position2 = matchPositionsInWitness2.get(i);
-      tuples.add(new PositionTuple(position, position2));
-      i++;
-    }
-    return tuples;
   }
 
   private void calculateModifications(List<PositionTuple> tuples) {
