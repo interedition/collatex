@@ -26,8 +26,14 @@ public class Colors {
     return witnessIndexes.get(i - 1);
   }
 
-  public Comparison compareWitness(int i, int j) {
-    return new Comparison(getMatches(i, j));
+  public List<Modification> compareWitness(int i, int j) {
+    Matches matches = getMatches(i, j);
+    List<MisMatch> mismatches = matches.getMismatches();
+    List<Modification> modifications = Lists.newArrayList();
+    for (MisMatch mismatch : mismatches) {
+      modifications.add(mismatch.analyse());
+    }
+    return modifications;
   }
 
   public Matches getMatches(int i, int j) {

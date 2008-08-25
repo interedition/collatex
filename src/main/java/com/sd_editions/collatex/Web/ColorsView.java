@@ -8,7 +8,6 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.spike2.Colors;
-import com.sd_editions.collatex.spike2.Comparison;
 import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.WitnessIndex;
 import com.sd_editions.collatex.spike2.collate.Addition;
@@ -55,8 +54,7 @@ public class ColorsView {
     for (int base = 1; base < numberOfWitnesses; base++) {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html += "Comparing witness " + base + " with witness " + w + ":<ul>";
-        Comparison compareWitness = colors.compareWitness(base, w);
-        List<Modification> modifications = compareWitness.getModifications();
+        List<Modification> modifications = colors.compareWitness(base, w);
         if (modifications.isEmpty()) {
           html += "no additions, removals or transpositions";
         } else {
