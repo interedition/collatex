@@ -15,13 +15,13 @@ public class MisMatch {
 
   public Modification analyse() {
     if (base.hasGap() && witness.hasGap()) {
-      return new Replacement(base.createPhrase(), witness.createPhrase());
+      return new Replacement(base, witness);
     }
     if (base.hasGap() && !witness.hasGap()) {
-      return new Removal(base.createPhrase());
+      return new Removal(base);
     }
     if (!base.hasGap() && witness.hasGap()) {
-      return new Addition(base.beginPosition, witness.createPhrase());
+      return new Addition(base.getStartPosition(), witness);
     }
     throw new RuntimeException("This mismatch is not valid: there are no modifications!");
   }

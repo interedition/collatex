@@ -6,19 +6,19 @@ import com.google.common.collect.Lists;
 
 public class Phrase {
   private final WitnessIndex witnessIndex;
-  private final int start_position;
-  private final int end_position;
+  private final int startPosition;
+  private final int endPosition;
 
-  public Phrase(WitnessIndex _witnessIndex, int _start_position, int _end_position) {
+  public Phrase(WitnessIndex _witnessIndex, int _startPosition, int _endPosition) {
     witnessIndex = _witnessIndex;
-    start_position = _start_position;
-    end_position = _end_position;
+    startPosition = _startPosition;
+    endPosition = _endPosition;
   }
 
   @Override
   public String toString() {
     List<String> words = Lists.newArrayList();
-    for (int k = start_position; k <= end_position; k++) {
+    for (int k = getStartPosition(); k <= getEndPosition(); k++) {
       String word = witnessIndex.getWordOnPosition(k);
       words.add(word);
     }
@@ -33,7 +33,11 @@ public class Phrase {
   }
 
   public int getStartPosition() {
-    return start_position;
+    return startPosition;
+  }
+
+  public int getEndPosition() {
+    return endPosition;
   }
 
 }
