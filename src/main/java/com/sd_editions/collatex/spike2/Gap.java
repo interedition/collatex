@@ -1,5 +1,9 @@
 package com.sd_editions.collatex.spike2;
 
+import com.sd_editions.collatex.spike2.collate.Addition;
+import com.sd_editions.collatex.spike2.collate.Removal;
+import com.sd_editions.collatex.spike2.collate.Replacement;
+
 public class Gap {
   private final WitnessIndex base;
   private final WitnessIndex witness;
@@ -31,6 +35,23 @@ public class Gap {
 
   public boolean gapInWitness() {
     return sizeInWitness > 0;
+  }
+
+  public Modification analyse() {
+    if (gapInBase() && gapInWitness()) {
+      return new Replacement(createBasePhrase(), createWitnessPhrase());
+    }
+    if (gapInBase() && !gapInWitness()) {
+      return new Removal(createBasePhrase());
+    }
+    if (!gapInBase() && gapInWitness()) {
+      return new Addition(baseBeginPosition, createWitnessPhrase());
+    }
+    throw new RuntimeException("This gap is empty: there are no modifications!");
+  }
+
+  public boolean isEmpty() {
+    return !gapInBase() && !gapInWitness();
   }
 
 }

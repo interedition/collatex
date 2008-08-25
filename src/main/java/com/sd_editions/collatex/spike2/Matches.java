@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -46,7 +47,7 @@ public class Matches {
     gapAtTheEnd.baseEndPosition = witnessIndex.size();
     gapAtTheEnd.witnessBeginPosition = currentWitnessIndex;
     gapAtTheEnd.witnessEndPosition = witnessIndex2.size();
-    return gaps;
+    return Lists.newArrayList(Iterables.filter(gaps, new NonEmptyGapPredicate())); // TODO: this can be done easier!
   }
 
   @SuppressWarnings("boxing")
