@@ -12,32 +12,32 @@ public class MatchesTest extends TestCase {
     // we assume that empty gaps are possible at the beginning and the end..
     // to keep the algorithms simple... we could always filter away empty gaps later
     Gap gap0 = gaps.get(0);
-    assertEquals(0, gap0.distanceBase);
-    assertEquals(0, gap0.distanceWitness);
+    assertFalse(gap0.gapInBase());
+    assertFalse(gap0.gapInWitness());
     // test x
     Gap gap1 = gaps.get(1);
-    assertEquals(0, gap1.distanceBase);
-    assertEquals(1, gap1.distanceWitness);
+    assertFalse(gap1.gapInBase());
+    assertTrue(gap1.gapInWitness());
     assertEquals(2, gap1.witnessBeginPosition);
     assertEquals(2, gap1.witnessEndPosition);
     // test y
     Gap gap2 = gaps.get(2);
-    assertEquals(1, gap2.distanceBase);
-    assertEquals(0, gap2.distanceWitness);
+    assertTrue(gap2.gapInBase());
+    assertFalse(gap2.gapInWitness());
     assertEquals(3, gap2.baseBeginPosition);
     assertEquals(3, gap2.baseEndPosition);
     // test z and n
     Gap gap3 = gaps.get(3);
-    assertEquals(1, gap3.distanceBase);
-    assertEquals(1, gap3.distanceWitness);
+    assertTrue(gap3.gapInBase());
+    assertTrue(gap3.gapInWitness());
     assertEquals(5, gap3.baseBeginPosition);
     assertEquals(5, gap3.baseEndPosition);
     assertEquals(5, gap3.witnessBeginPosition);
     assertEquals(5, gap3.witnessEndPosition);
     // empty gap at the end
     Gap gap4 = gaps.get(4);
-    assertEquals(0, gap4.distanceBase);
-    assertEquals(0, gap4.distanceWitness);
+    assertFalse(gap4.gapInBase());
+    assertFalse(gap4.gapInWitness());
   }
 
   public void testGapAtTheEnd() {
@@ -45,8 +45,8 @@ public class MatchesTest extends TestCase {
     Matches matches = colors.getMatches(1, 2);
     List<Gap> gaps = matches.getGaps();
     Gap gapAtTheEnd = gaps.get(1);
-    assertEquals(1, gapAtTheEnd.distanceBase);
-    assertEquals(1, gapAtTheEnd.distanceWitness);
+    assertTrue(gapAtTheEnd.gapInBase());
+    assertTrue(gapAtTheEnd.gapInWitness());
     assertEquals(2, gapAtTheEnd.baseBeginPosition);
     assertEquals(2, gapAtTheEnd.baseEndPosition);
     assertEquals(2, gapAtTheEnd.witnessBeginPosition);

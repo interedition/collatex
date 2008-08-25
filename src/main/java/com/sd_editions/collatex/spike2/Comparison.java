@@ -19,11 +19,11 @@ public class Comparison {
 
   private void calculateModifications(List<Gap> gaps) {
     for (Gap gap : gaps) {
-      if (gap.distanceBase > 0 && gap.distanceWitness > 0) {
+      if (gap.gapInBase() && gap.gapInWitness()) {
         modifications.add(new Replacement(gap.createBasePhrase(), gap.createWitnessPhrase()));
-      } else if (gap.distanceBase > 0 && gap.distanceWitness == 0) {
+      } else if (gap.gapInBase() && !gap.gapInWitness()) {
         modifications.add(new Removal(gap.createBasePhrase()));
-      } else if (gap.distanceBase == 0 && gap.distanceWitness > 0) {
+      } else if (!gap.gapInBase() && gap.gapInWitness()) {
         modifications.add(new Addition(gap.baseBeginPosition, gap.createWitnessPhrase()));
       }
     }
