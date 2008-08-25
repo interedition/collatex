@@ -10,9 +10,9 @@ public class Comparison {
 
   public Comparison(Matches _matches) {
     modifications = Lists.newArrayList();
-    List<Gap> gaps = _matches.getGaps();
-    for (Gap gap : gaps) {
-      modifications.add(gap.analyse());
+    List<MisMatch> mismatches = _matches.getMismatches();
+    for (MisMatch mismatch : mismatches) {
+      modifications.add(mismatch.analyse());
     }
   }
 

@@ -22,28 +22,28 @@ public class Matches {
     //    System.out.println(matches);
   }
 
-  public List<Gap> getGaps() {
-    List<Gap> gaps = Lists.newArrayList();
+  public List<MisMatch> getMismatches() {
+    List<MisMatch> mismatches = Lists.newArrayList();
     List<PositionTuple> tuples = getMatchesSortedByPosition();
     int currentBaseIndex = 1;
     int currentWitnessIndex = 1;
     for (PositionTuple tuple : tuples) {
       int baseIndexDif = tuple.baseIndex - currentBaseIndex;
       int witnessIndexDif = tuple.witnessIndex - currentWitnessIndex;
-      TheRealGap baseGap = new TheRealGap(witnessIndex, baseIndexDif, currentBaseIndex, tuple.baseIndex - 1);
-      TheRealGap witnessGap = new TheRealGap(witnessIndex2, witnessIndexDif, currentWitnessIndex, tuple.witnessIndex - 1);
-      Gap gap = new Gap(baseGap, witnessGap);
-      gaps.add(gap);
+      Gap baseGap = new Gap(witnessIndex, baseIndexDif, currentBaseIndex, tuple.baseIndex - 1);
+      Gap witnessGap = new Gap(witnessIndex2, witnessIndexDif, currentWitnessIndex, tuple.witnessIndex - 1);
+      MisMatch mismatch = new MisMatch(baseGap, witnessGap);
+      mismatches.add(mismatch);
       currentBaseIndex = 1 + tuple.baseIndex;
       currentWitnessIndex = 1 + tuple.witnessIndex;
     }
     int baseIndexDif = witnessIndex.size() - currentBaseIndex + 1;
     int witnessIndexDif = witnessIndex2.size() - currentWitnessIndex + 1;
-    TheRealGap baseGap = new TheRealGap(witnessIndex, baseIndexDif, currentBaseIndex, witnessIndex.size());
-    TheRealGap witnessGap = new TheRealGap(witnessIndex2, witnessIndexDif, currentWitnessIndex, witnessIndex2.size());
-    Gap gapAtTheEnd = new Gap(baseGap, witnessGap);
-    gaps.add(gapAtTheEnd);
-    return Lists.newArrayList(Iterables.filter(gaps, new NonEmptyGapPredicate())); // TODO: this can be done easier!
+    Gap baseGap = new Gap(witnessIndex, baseIndexDif, currentBaseIndex, witnessIndex.size());
+    Gap witnessGap = new Gap(witnessIndex2, witnessIndexDif, currentWitnessIndex, witnessIndex2.size());
+    MisMatch mismatchAtTheEnd = new MisMatch(baseGap, witnessGap);
+    mismatches.add(mismatchAtTheEnd);
+    return Lists.newArrayList(Iterables.filter(mismatches, new ValidMismatchPredicate())); // TODO: this can be done easier!
   }
 
   @SuppressWarnings("boxing")

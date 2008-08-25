@@ -1,33 +1,24 @@
 package com.sd_editions.collatex.spike2;
 
-import com.sd_editions.collatex.spike2.collate.Addition;
-import com.sd_editions.collatex.spike2.collate.Removal;
-import com.sd_editions.collatex.spike2.collate.Replacement;
-
 public class Gap {
-  final TheRealGap base;
-  final TheRealGap witness;
+  private final WitnessIndex witness;
+  private final int size;
+  final int beginPosition;
+  final int endPosition;
 
-  public Gap(TheRealGap _base, TheRealGap _witness) {
-    this.base = _base;
+  public Gap(WitnessIndex _witness, int _size, int _beginPosition, int _endPosition) {
     this.witness = _witness;
+    this.size = _size;
+    this.beginPosition = _beginPosition;
+    this.endPosition = _endPosition;
   }
 
-  public Modification analyse() {
-    if (base.hasGap() && witness.hasGap()) {
-      return new Replacement(base.createPhrase(), witness.createPhrase());
-    }
-    if (base.hasGap() && !witness.hasGap()) {
-      return new Removal(base.createPhrase());
-    }
-    if (!base.hasGap() && witness.hasGap()) {
-      return new Addition(base.beginPosition, witness.createPhrase());
-    }
-    throw new RuntimeException("This gap is empty: there are no modifications!");
+  public Phrase createPhrase() {
+    return witness.createPhrase(beginPosition, endPosition);
   }
 
-  public boolean isEmpty() {
-    return !base.hasGap() && !witness.hasGap();
+  public boolean hasGap() {
+    return size > 0;
   }
 
 }
