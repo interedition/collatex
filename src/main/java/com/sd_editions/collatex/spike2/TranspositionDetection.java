@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -20,23 +22,35 @@ public class TranspositionDetection {
     this.phrases = detectTranspositions();
   }
 
-  @SuppressWarnings("boxing")
   private List<Phrase> detectTranspositions() {
-    Set<Integer> matches = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
-    matches.retainAll(witnessIndex2.getWordCodes());
-    //    System.out.println(matches);
+    Set<Integer> matches = matches();
     List<Integer> matchesSequenceInBase = Lists.newArrayList(matches);
-    List<Integer> matchesSequenceInWitness = Lists.newArrayList();
-    for (int i = 1; i <= witnessIndex2.size(); i++) {
-      Integer wordCode = witnessIndex2.getWordCodeOnPosition(i);
-      if (matches.contains(wordCode)) {
-        matchesSequenceInWitness.add(wordCode);
-      }
-    }
+    List<Integer> matchesSequenceInWitness = sortMatchesByPosition(matches, witnessIndex2);
     //    System.out.println(matchesSequenceInBase);
     //    System.out.println(matchesSequenceInWitness);
 
     return calculatePhrases(matchesSequenceInBase, matchesSequenceInWitness, witnessIndex);
+  }
+
+  // Integers are word codes
+  private Set<Integer> matches() {
+    Set<Integer> matches = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
+    matches.retainAll(witnessIndex2.getWordCodes());
+    //    System.out.println(matches);
+    return matches;
+  }
+
+  // step 1 take the matches
+  // step 2 walk over the witness index and filter away everything that is not a match
+
+  protected static List<Integer> sortMatchesByPosition(final Set<Integer> matches, WitnessIndex witness) {
+    List<Integer> wordCodesList = witness.getWordCodesList();
+    List<Integer> onlyMatches = Lists.newArrayList(Iterables.filter(wordCodesList, new Predicate<Integer>() {
+      public boolean apply(Integer wordCode) {
+        return matches.contains(wordCode);
+      }
+    }));
+    return onlyMatches;
   }
 
   @SuppressWarnings("boxing")
