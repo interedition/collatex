@@ -12,10 +12,10 @@ public class TranspositionTest extends TestCase {
   public void testSequenceExpectations() {
     List<Integer> sequence = Lists.newArrayList(1, 2, 3, 4, 5);
     Map<Integer, Integer> sequenceExpectations = TranspositionDetection.calculateSequenceExpectations(sequence);
-    assertEquals(new Integer(2), sequenceExpectations.get(1));
-    assertEquals(new Integer(3), sequenceExpectations.get(2));
-    assertEquals(new Integer(4), sequenceExpectations.get(3));
-    assertEquals(new Integer(5), sequenceExpectations.get(4));
+    assertEquals(new Integer(1), sequenceExpectations.get(2));
+    assertEquals(new Integer(2), sequenceExpectations.get(3));
+    assertEquals(new Integer(3), sequenceExpectations.get(4));
+    assertEquals(new Integer(4), sequenceExpectations.get(5));
   }
 
   public void testPhrases1() {

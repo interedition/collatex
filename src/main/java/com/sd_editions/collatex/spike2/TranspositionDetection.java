@@ -1,10 +1,12 @@
 package com.sd_editions.collatex.spike2;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -22,14 +24,14 @@ public class TranspositionDetection {
     this.phrases = detectTranspositions();
   }
 
-  private List<Phrase> detectTranspositions() {
+  protected List<Phrase> detectTranspositions() {
     Set<Integer> matches = matches();
-    List<Integer> matchesSequenceInBase = Lists.newArrayList(matches);
-    List<Integer> matchesSequenceInWitness = sortMatchesByPosition(matches, witnessIndex2);
-    //    System.out.println(matchesSequenceInBase);
-    //    System.out.println(matchesSequenceInWitness);
-
-    return calculatePhrases(matchesSequenceInBase, matchesSequenceInWitness, witnessIndex);
+    List<Integer> sequenceOfMatchesInBase = Lists.newArrayList(matches);
+    List<Integer> sequenceOfMatchesInWitness = sortMatchesByPosition(matches, witnessIndex2);
+    System.out.println(sequenceOfMatchesInBase);
+    System.out.println(sequenceOfMatchesInWitness);
+    List<Phrase> testInSequence = testInSequence(sequenceOfMatchesInBase, sequenceOfMatchesInWitness);
+    return testInSequence;
   }
 
   // Integers are word codes
@@ -53,55 +55,100 @@ public class TranspositionDetection {
     return onlyMatches;
   }
 
-  @SuppressWarnings("boxing")
-  private List<Phrase> calculatePhrases(List<Integer> matchesSequenceInBase, List<Integer> matchesSequenceInWitness, WitnessIndex base) {
-    List<Phrase> _phrases = Lists.newArrayList();
-    Map<Integer, Integer> expectations = calculateSequenceExpectations(matchesSequenceInBase);
-    Integer expected = expectations.get(matchesSequenceInWitness.get(0));
-    Integer beginPosition = 1;
-    Integer position = 2;
-    Iterator<Integer> i = matchesSequenceInWitness.iterator();
-    i.next();
-    while (i.hasNext()) {
-      Integer actual = i.next();
-      if (actual != expected) {
-        // we detected a transposition
-        _phrases.add(createPhrase(beginPosition, position - 1, matchesSequenceInWitness, base));
-        beginPosition = position;
-        expected = expectations.get(actual);
-      } else {
-        expected = expectations.get(expected);
-      }
-      position++;
-
-    }
-    _phrases.add(createPhrase(beginPosition, position - 1, matchesSequenceInWitness, base));
-    return _phrases;
-  }
-
-  private Phrase createPhrase(Integer beginPosition, Integer endPosition, List<Integer> matchesSequenceInWitness, WitnessIndex base) {
-    //    System.out.println("We detected a phrase from " + beginPosition + " to " + endPosition);
-    Integer beginWordCode = matchesSequenceInWitness.get(beginPosition - 1);
-    Integer endWordCode = matchesSequenceInWitness.get(endPosition - 1);
-    int beginPositionInBase = base.getPosition(beginWordCode);
-    int endPositionInBase = base.getPosition(endWordCode);
-    Phrase phrase = base.createPhrase(beginPositionInBase, endPositionInBase);
-    return phrase;
-  }
-
+  // build expectation map --> Note: this method is not completely functional --> use inject/fold
   // TODO: in theory there could be no matches... that case should be handled earlier
   // or there could be only one match!
   protected static Map<Integer, Integer> calculateSequenceExpectations(List<Integer> matchesSequenceInBase) {
-    // build expectation map
     Map<Integer, Integer> expectations = Maps.newHashMap();
     Iterator<Integer> i = matchesSequenceInBase.iterator();
     Integer previous = i.next();
     while (i.hasNext()) {
       Integer next = i.next();
-      expectations.put(previous, next);
+      expectations.put(next, previous);
       previous = next;
     }
     return expectations;
+  }
+
+  // step 1
+  // given a sequence map 
+  // and a sequence of matches
+  // 
+
+  //  public class MatchInfo {
+  //    public MatchInfo(Integer wordCode, boolean inSequence) {
+  //      this.wordCode = wordCode;
+  //      this.inSequence = inSequence;
+  //    }
+  //
+  //    Integer wordCode;
+  //    boolean inSequence;
+  //  }
+
+  protected List<Phrase> testInSequence(List<Integer> sequenceOfMatchesInBase, List<Integer> sequenceOfMatchesInWitness) {
+    final Map<Integer, Integer> baseExpectations = calculateSequenceExpectations(sequenceOfMatchesInBase);
+    final Map<Integer, Integer> witnessExpectations = calculateSequenceExpectations(sequenceOfMatchesInWitness);
+    final Set<Integer> transposedMatches = Sets.newHashSet(Iterables.filter(sequenceOfMatchesInBase, new Predicate<Integer>() {
+      public boolean apply(Integer current) {
+        Integer expectedNext = baseExpectations.get(current);
+        Integer actualNext = witnessExpectations.get(current);
+        return expectedNext != actualNext;
+      }
+    }));
+    List<Integer> sequenceOfTransposedMatchesInBase = Lists.newArrayList(Iterables.filter(sequenceOfMatchesInBase, new Predicate<Integer>() {
+      public boolean apply(Integer wordCodeMatch) {
+        return transposedMatches.contains(wordCodeMatch);
+      }
+    }));
+    System.out.println(sequenceOfTransposedMatchesInBase);
+    List<Phrase> makePhrases = makePhrases(sequenceOfTransposedMatchesInBase, witnessIndex2);
+    return makePhrases;
+  }
+
+  class Sequence {
+    @SuppressWarnings("boxing")
+    public Sequence(int _wordCode, int begin, int end) {
+      this.wordCode = _wordCode;
+      this.startPosition = begin;
+      this.endPosition = end;
+    }
+
+    Integer wordCode;
+    Integer startPosition;
+    Integer endPosition;
+
+    @Override
+    public String toString() {
+      return wordCode + " -> (" + startPosition + " - " + endPosition + ")";
+    }
+  }
+
+  @SuppressWarnings("boxing")
+  protected List<Phrase> makePhrases(List<Integer> sequenceOfTransposedMatchesInBase, final WitnessIndex witness) {
+    // step 1: zet 1 sequence of transposed matches to positions, sort them
+    // step 2: fold ... initial value of folding is a list with one phrase from 1 to size of witness
+    // step 3: in fold make new phrase where necessary
+    List<Integer> positionsThatStartARange = Lists.newArrayList(Iterables.transform(sequenceOfTransposedMatchesInBase, new Function<Integer, Integer>() {
+      public Integer apply(Integer wordCodeThatStartsRange) {
+        return witness.getPosition(wordCodeThatStartsRange);
+      }
+    }));
+    Collections.sort(positionsThatStartARange);
+    positionsThatStartARange.remove(new Integer(1)); // TODO: not so nice
+    List<Sequence> sequences = Lists.newArrayList();
+    sequences.add(new Sequence(witness.getWordCodeOnPosition(1), 1, witness.size())); // TODO: not so nice
+    for (Integer position : positionsThatStartARange) {
+      Sequence last = sequences.get(sequences.size() - 1);
+      last.endPosition = position - 1;
+      sequences.add(new Sequence(witness.getWordCodeOnPosition(position), position, witness.size()));
+    }
+    System.out.println(sequences);
+    List<Phrase> _phrases = Lists.newArrayList();
+    for (Sequence sequence : sequences) {
+      _phrases.add(witness.createPhrase(sequence.startPosition, sequence.endPosition));
+    }
+    return _phrases;
+
   }
 
   public List<Phrase> getPhrases() {
