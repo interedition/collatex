@@ -1,48 +1,48 @@
 package com.sd_editions.collatex.spike2;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 public class Trans {
 
-  private final Integer[] integers;
-  private final Integer[] integers2;
-  private final TransTuple[] tuples;
-  private final Set<TransTuple2> transpositions;
+  private final Integer[] base;
+  private final Integer[] witness;
+  private final List<TransTuple> tuples;
+  private final Set<Transposition> transpositions;
 
   public Trans(Integer[] integers, Integer[] integers2) {
-    this.integers = integers;
-    this.integers2 = integers2;
+    this.base = integers;
+    this.witness = integers2;
     this.tuples = calculateTuples();
     this.transpositions = calculateTranspositions();
-
   }
 
-  private Set<TransTuple2> calculateTranspositions() {
-    TransTuple2[] tuples2 = new TransTuple2[integers.length];
-    for (int i = 0; i < integers.length; i++) {
-      tuples2[i] = new TransTuple2(integers[i], integers2[i], i + 1);
+  private Set<Transposition> calculateTranspositions() {
+    List<TransTuple> _tuples = getTuples();
+    List<Transposition> asT2 = Lists.newArrayList();
+    for (TransTuple tuple : _tuples) {
+      asT2.add(new Transposition(tuple));
     }
-    List<TransTuple2> asList = Arrays.asList(tuples2);
-    Set<TransTuple2> transpositions1 = new HashSet<TransTuple2>(asList);
-    return transpositions1;
+    return Sets.newHashSet(asT2);
   }
 
-  private TransTuple[] calculateTuples() {
-    TransTuple[] tuples = new TransTuple[integers.length];
-    for (int i = 0; i < integers.length; i++) {
-      tuples[i] = new TransTuple(integers[i], integers2[i], i + 1);
+  private List<TransTuple> calculateTuples() {
+    TransTuple[] tuples = new TransTuple[base.length];
+    for (int i = 0; i < base.length; i++) {
+      tuples[i] = new TransTuple(base[i], witness[i], i + 1);
     }
+    return Arrays.asList(tuples);
+  }
+
+  public List<TransTuple> getTuples() {
     return tuples;
   }
 
-  public TransTuple[] getTuples() {
-    return tuples;
-  }
-
-  public Set<TransTuple2> getTranspositions() {
+  public Set<Transposition> getTranspositions() {
     return transpositions;
   }
 
