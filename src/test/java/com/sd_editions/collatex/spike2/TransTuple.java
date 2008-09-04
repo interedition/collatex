@@ -1,8 +1,8 @@
 package com.sd_editions.collatex.spike2;
 
 public class TransTuple {
-  private final Integer base;
-  private final Integer witness;
+  protected final Integer base;
+  protected final Integer witness;
   private final Integer position;
 
   public TransTuple(Integer base, Integer witness, Integer position) {
