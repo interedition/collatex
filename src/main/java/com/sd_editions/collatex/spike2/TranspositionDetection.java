@@ -102,6 +102,7 @@ public class TranspositionDetection {
     }));
     System.out.println(sequenceOfTransposedMatchesInBase);
     List<Phrase> makePhrases = makePhrases(sequenceOfTransposedMatchesInBase, witnessIndex2);
+    makePhrases(sequenceOfTransposedMatchesInBase, witnessIndex);
     return makePhrases;
   }
 
@@ -125,9 +126,21 @@ public class TranspositionDetection {
 
   @SuppressWarnings("boxing")
   protected List<Phrase> makePhrases(List<Integer> sequenceOfTransposedMatchesInBase, final WitnessIndex witness) {
-    // step 1: zet 1 sequence of transposed matches to positions, sort them
-    // step 2: fold ... initial value of folding is a list with one phrase from 1 to size of witness
-    // step 3: in fold make new phrase where necessary
+    List<Sequence> sequences = createSequenceList(sequenceOfTransposedMatchesInBase, witness);
+    List<Phrase> _phrases = Lists.newArrayList();
+    for (Sequence sequence : sequences) {
+      _phrases.add(witness.createPhrase(sequence.startPosition, sequence.endPosition));
+    }
+    return _phrases;
+
+  }
+
+  // step 1: zet 1 sequence of transposed matches to positions, sort them
+  // step 2: fold ... initial value of folding is a list with one phrase from 1 to size of witness
+  // step 3: in fold make new phrase where necessary
+
+  @SuppressWarnings("boxing")
+  private List<Sequence> createSequenceList(List<Integer> sequenceOfTransposedMatchesInBase, final WitnessIndex witness) {
     List<Integer> positionsThatStartARange = Lists.newArrayList(Iterables.transform(sequenceOfTransposedMatchesInBase, new Function<Integer, Integer>() {
       public Integer apply(Integer wordCodeThatStartsRange) {
         return witness.getPosition(wordCodeThatStartsRange);
@@ -143,12 +156,7 @@ public class TranspositionDetection {
       sequences.add(new Sequence(witness.getWordCodeOnPosition(position), position, witness.size()));
     }
     System.out.println(sequences);
-    List<Phrase> _phrases = Lists.newArrayList();
-    for (Sequence sequence : sequences) {
-      _phrases.add(witness.createPhrase(sequence.startPosition, sequence.endPosition));
-    }
-    return _phrases;
-
+    return sequences;
   }
 
   public List<Phrase> getPhrases() {
