@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.spike2.Colors;
 import com.sd_editions.collatex.spike2.Modification;
+import com.sd_editions.collatex.spike2.TranspositionDetection;
 import com.sd_editions.collatex.spike2.WitnessIndex;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
@@ -55,6 +56,10 @@ public class ColorsView {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html += "Comparing witness " + base + " with witness " + w + ":<ul>";
         List<Modification> modifications = colors.compareWitness(base, w);
+        TranspositionDetection detectTranspositions = colors.detectTranspositions(base, w);
+        List<Transposition> transpositions = detectTranspositions.getTranspositions();
+        modifications.addAll(transpositions);
+
         if (modifications.isEmpty()) {
           html += "no additions, removals or transpositions";
         } else {
@@ -83,7 +88,7 @@ public class ColorsView {
 
   private String transpositionView(Transposition transposition, int base, int w) {
     //    return "<i>" + "</i> transposed from position " + transposition. + " to " + y;
-    return "<i>" + transposition.getTransposedWord() + "</i> transposed over distance " + transposition.getTranspositionDistance();
+    return "<i>" + transposition.getLeft() + "</i> transposed with " + transposition.getRight();
   }
 
   private String removalView(Removal removal, int base) {

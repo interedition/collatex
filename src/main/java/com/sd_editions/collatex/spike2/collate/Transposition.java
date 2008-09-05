@@ -1,26 +1,27 @@
 package com.sd_editions.collatex.spike2.collate;
 
 import com.sd_editions.collatex.spike2.Modification;
+import com.sd_editions.collatex.spike2.Phrase;
 
 public class Transposition extends Modification {
-  private final String transposedWord;
-  private final int transpositionDistance;
+  private final Phrase base;
+  private final Phrase witness;
 
-  public Transposition(String word, int _transpositionDistance) {
-    this.transposedWord = word;
-    this.transpositionDistance = _transpositionDistance;
-  }
-
-  public String getTransposedWord() {
-    return transposedWord;
-  }
-
-  public int getTranspositionDistance() {
-    return transpositionDistance;
+  public Transposition(Phrase base, Phrase witness) {
+    this.base = base;
+    this.witness = witness;
   }
 
   @Override
   public String toString() {
-    return "transposition: " + getTransposedWord() + " distance: " + getTranspositionDistance();
+    return "transposition: " + base + " switches position with " + witness;
+  }
+
+  public String getLeft() {
+    return base.toString();
+  }
+
+  public String getRight() {
+    return witness.toString();
   }
 }

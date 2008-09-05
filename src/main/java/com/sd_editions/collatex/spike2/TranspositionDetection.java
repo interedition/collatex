@@ -12,12 +12,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionDetection {
   //  private final List<Phrase> phrases;
   private final WitnessIndex witnessIndex;
   private final WitnessIndex witnessIndex2;
-  private final List<TranspositionModification> transpositions;
+  private final List<Transposition> transpositions;
 
   public TranspositionDetection(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
     this.witnessIndex = _witnessIndex;
@@ -25,7 +26,7 @@ public class TranspositionDetection {
     this.transpositions = detectTranspositions();
   }
 
-  protected List<TranspositionModification> detectTranspositions() {
+  protected List<Transposition> detectTranspositions() {
     Set<Integer> matches = matches();
     List<Integer> sequenceOfMatchesInBase = Lists.newArrayList(matches);
     List<Integer> sequenceOfMatchesInWitness = sortMatchesByPosition(matches, witnessIndex2);
@@ -39,7 +40,7 @@ public class TranspositionDetection {
     Trans trans = new Trans(sequenceOfTransposedMatchesInBase, sequenceOfTransposedMatchesInWitness);
     //    System.out.println(trans.getTuples());
     Set<TranspositionTuple> transpositionTuples = trans.getTranspositions();
-    List<TranspositionModification> modifications = Lists.newArrayList();
+    List<Transposition> modifications = Lists.newArrayList();
     for (TranspositionTuple transposition : transpositionTuples) {
       int leftPosition = witnessIndex.getPosition(transposition.getLeft());
       int rightPosition = witnessIndex.getPosition(transposition.getRight());
@@ -49,7 +50,7 @@ public class TranspositionDetection {
       }
       Phrase base = witnessIndex.createPhrase(leftPosition, leftPosition);
       Phrase witness = witnessIndex.createPhrase(rightPosition, rightPosition);
-      modifications.add(new TranspositionModification(base, witness));
+      modifications.add(new Transposition(base, witness));
     }
     return modifications;
   }
@@ -76,10 +77,11 @@ public class TranspositionDetection {
   }
 
   // build expectation map --> Note: this method is not completely functional --> use inject/fold
-  // TODO: in theory there could be no matches... that case should be handled earlier
-  // or there could be only one match!
   protected static Map<Integer, Integer> calculateSequenceExpectations(List<Integer> matchesSequenceInBase) {
     Map<Integer, Integer> expectations = Maps.newHashMap();
+    if (matchesSequenceInBase.isEmpty()) {
+      return expectations;
+    }
     Iterator<Integer> i = matchesSequenceInBase.iterator();
     Integer previous = i.next();
     while (i.hasNext()) {
@@ -188,7 +190,7 @@ public class TranspositionDetection {
   //    return phrases;
   //  }
   //
-  public List<TranspositionModification> getTranspositions() {
+  public List<Transposition> getTranspositions() {
     return transpositions;
   }
 

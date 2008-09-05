@@ -6,6 +6,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionTest extends TestCase {
   @SuppressWarnings("boxing")
@@ -18,24 +19,34 @@ public class TranspositionTest extends TestCase {
     assertEquals(new Integer(4), sequenceExpectations.get(5));
   }
 
+  public void testSequenceExpectationsWithoutItems() {
+    List<Integer> sequence = Lists.newArrayList();
+    Map<Integer, Integer> sequenceExpectations = TranspositionDetection.calculateSequenceExpectations(sequence);
+    assertTrue(sequenceExpectations.isEmpty());
+    //    assertEquals(new Integer(1), sequenceExpectations.get(2));
+    //    assertEquals(new Integer(2), sequenceExpectations.get(3));
+    //    assertEquals(new Integer(3), sequenceExpectations.get(4));
+    //    assertEquals(new Integer(4), sequenceExpectations.get(5));
+  }
+
   public void testTransposition1() {
     Colors colors = new Colors("a b c d e", "a c d b e");
     TranspositionDetection detection = colors.detectTranspositions(1, 2);
-    List<TranspositionModification> transpositions = detection.getTranspositions();
+    List<Transposition> transpositions = detection.getTranspositions();
     assertEquals("transposition: b switches position with c", transpositions.get(0).toString()); // c --> "c d"
   }
 
   public void testTransposition2() {
     Colors colors = new Colors("a b x c d ", "a c d x b");
     TranspositionDetection detection = colors.detectTranspositions(1, 2);
-    List<TranspositionModification> transpositions = detection.getTranspositions();
+    List<Transposition> transpositions = detection.getTranspositions();
     assertEquals("transposition: b switches position with c", transpositions.get(0).toString()); // c --> "c d"
   }
 
   public void testTransposition3() {
     Colors colors = new Colors("a b x c d ", "c d x a b");
     TranspositionDetection detection = colors.detectTranspositions(1, 2);
-    List<TranspositionModification> transpositions = detection.getTranspositions();
+    List<Transposition> transpositions = detection.getTranspositions();
     assertEquals("transposition: a switches position with c", transpositions.get(0).toString()); // a --> "a b" && c --> "c d"
   }
 
