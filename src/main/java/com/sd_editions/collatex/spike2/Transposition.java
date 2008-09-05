@@ -14,11 +14,25 @@ public class Transposition {
       return false;
     }
     Transposition tuple2 = (Transposition) obj;
-    return tuple2.tuple.base.equals(tuple.witness) && tuple2.tuple.witness.equals(tuple.base);
+    return tuple2.getLeft().equals(getRight()) && tuple2.getRight().equals(getLeft());
   }
 
   @Override
   public int hashCode() {
-    return tuple.base.hashCode() + tuple.witness.hashCode();
+    return getLeft().hashCode() + getRight().hashCode();
   }
+
+  @Override
+  public String toString() {
+    return tuple.toString();
+  }
+
+  Integer getRight() {
+    return tuple.witness;
+  }
+
+  Integer getLeft() {
+    return tuple.base;
+  }
+
 }

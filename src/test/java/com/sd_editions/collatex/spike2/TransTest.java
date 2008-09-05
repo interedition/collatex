@@ -5,14 +5,23 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import com.google.common.collect.Lists;
+
 public class TransTest extends TestCase {
 
+  @SuppressWarnings("boxing")
   public void testTrans() {
-    Trans trans = new Trans(new Integer[] { 1, 2 }, new Integer[] { 2, 1 });
+    Trans trans = new Trans(Lists.newArrayList(1, 2), Lists.newArrayList(2, 1));
     List<TransTuple> tuples = trans.getTuples();
     assertEquals(new TransTuple(1, 2, 1), tuples.get(0));
     assertEquals(new TransTuple(2, 1, 2), tuples.get(1));
     Set<Transposition> transpositions = trans.getTranspositions();
     assertEquals(1, transpositions.size());
+  }
+
+  public void testNoTransposition() {
+    Trans trans = new Trans(Lists.newArrayList(1), Lists.newArrayList(1));
+    Set<Transposition> transpositions = trans.getTranspositions();
+    assertEquals(0, transpositions.size());
   }
 }

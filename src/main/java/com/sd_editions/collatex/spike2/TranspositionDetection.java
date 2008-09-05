@@ -14,24 +14,44 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class TranspositionDetection {
-  private final List<Phrase> phrases;
+  //  private final List<Phrase> phrases;
   private final WitnessIndex witnessIndex;
   private final WitnessIndex witnessIndex2;
+  private final List<TranspositionModification> transpositions;
 
   public TranspositionDetection(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
     this.witnessIndex = _witnessIndex;
     this.witnessIndex2 = _witnessIndex2;
-    this.phrases = detectTranspositions();
+    this.transpositions = detectTranspositions();
   }
 
-  protected List<Phrase> detectTranspositions() {
+  protected List<TranspositionModification> detectTranspositions() {
     Set<Integer> matches = matches();
     List<Integer> sequenceOfMatchesInBase = Lists.newArrayList(matches);
     List<Integer> sequenceOfMatchesInWitness = sortMatchesByPosition(matches, witnessIndex2);
-    System.out.println(sequenceOfMatchesInBase);
-    System.out.println(sequenceOfMatchesInWitness);
-    List<Phrase> testInSequence = testInSequence(sequenceOfMatchesInBase, sequenceOfMatchesInWitness);
-    return testInSequence;
+    //    System.out.println(sequenceOfMatchesInBase);
+    //    System.out.println(sequenceOfMatchesInWitness);
+    Set<Integer> transposedMatches = calculateTransposedMatches(sequenceOfMatchesInBase, sequenceOfMatchesInWitness);
+    List<Integer> sequenceOfTransposedMatchesInBase = Lists.newArrayList(transposedMatches);
+    List<Integer> sequenceOfTransposedMatchesInWitness = sortMatchesByPosition(transposedMatches, witnessIndex2);
+    //    System.out.println(sequenceOfTransposedMatchesInBase);
+    //    System.out.println(sequenceOfTransposedMatchesInWitness);
+    Trans trans = new Trans(sequenceOfTransposedMatchesInBase, sequenceOfTransposedMatchesInWitness);
+    //    System.out.println(trans.getTuples());
+    Set<Transposition> transpositionTuples = trans.getTranspositions();
+    List<TranspositionModification> modifications = Lists.newArrayList();
+    for (Transposition transposition : transpositionTuples) {
+      int leftPosition = witnessIndex.getPosition(transposition.getLeft());
+      int rightPosition = witnessIndex.getPosition(transposition.getRight());
+      if (leftPosition > rightPosition) {
+        leftPosition = witnessIndex.getPosition(transposition.getRight());
+        rightPosition = witnessIndex.getPosition(transposition.getLeft());
+      }
+      Phrase base = witnessIndex.createPhrase(leftPosition, leftPosition);
+      Phrase witness = witnessIndex.createPhrase(rightPosition, rightPosition);
+      modifications.add(new TranspositionModification(base, witness));
+    }
+    return modifications;
   }
 
   // Integers are word codes
@@ -86,15 +106,7 @@ public class TranspositionDetection {
   //  }
 
   protected List<Phrase> testInSequence(List<Integer> sequenceOfMatchesInBase, List<Integer> sequenceOfMatchesInWitness) {
-    final Map<Integer, Integer> baseExpectations = calculateSequenceExpectations(sequenceOfMatchesInBase);
-    final Map<Integer, Integer> witnessExpectations = calculateSequenceExpectations(sequenceOfMatchesInWitness);
-    final Set<Integer> transposedMatches = Sets.newHashSet(Iterables.filter(sequenceOfMatchesInBase, new Predicate<Integer>() {
-      public boolean apply(Integer current) {
-        Integer expectedNext = baseExpectations.get(current);
-        Integer actualNext = witnessExpectations.get(current);
-        return expectedNext != actualNext;
-      }
-    }));
+    final Set<Integer> transposedMatches = calculateTransposedMatches(sequenceOfMatchesInBase, sequenceOfMatchesInWitness);
     List<Integer> sequenceOfTransposedMatchesInBase = Lists.newArrayList(Iterables.filter(sequenceOfMatchesInBase, new Predicate<Integer>() {
       public boolean apply(Integer wordCodeMatch) {
         return transposedMatches.contains(wordCodeMatch);
@@ -104,6 +116,19 @@ public class TranspositionDetection {
     List<Phrase> makePhrases = makePhrases(sequenceOfTransposedMatchesInBase, witnessIndex2);
     makePhrases(sequenceOfTransposedMatchesInBase, witnessIndex);
     return makePhrases;
+  }
+
+  private Set<Integer> calculateTransposedMatches(List<Integer> sequenceOfMatchesInBase, List<Integer> sequenceOfMatchesInWitness) {
+    final Map<Integer, Integer> baseExpectations = calculateSequenceExpectations(sequenceOfMatchesInBase);
+    final Map<Integer, Integer> witnessExpectations = calculateSequenceExpectations(sequenceOfMatchesInWitness);
+    final Set<Integer> transposedMatches = Sets.newLinkedHashSet(Iterables.filter(sequenceOfMatchesInBase, new Predicate<Integer>() {
+      public boolean apply(Integer current) {
+        Integer expectedNext = baseExpectations.get(current);
+        Integer actualNext = witnessExpectations.get(current);
+        return expectedNext != actualNext;
+      }
+    }));
+    return transposedMatches;
   }
 
   class Sequence {
@@ -159,8 +184,12 @@ public class TranspositionDetection {
     return sequences;
   }
 
-  public List<Phrase> getPhrases() {
-    return phrases;
+  //  public List<Phrase> getPhrases() {
+  //    return phrases;
+  //  }
+  //
+  public List<TranspositionModification> getTranspositions() {
+    return transpositions;
   }
 
 }
