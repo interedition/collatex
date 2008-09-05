@@ -38,9 +38,9 @@ public class TranspositionDetection {
     //    System.out.println(sequenceOfTransposedMatchesInWitness);
     Trans trans = new Trans(sequenceOfTransposedMatchesInBase, sequenceOfTransposedMatchesInWitness);
     //    System.out.println(trans.getTuples());
-    Set<Transposition> transpositionTuples = trans.getTranspositions();
+    Set<TranspositionTuple> transpositionTuples = trans.getTranspositions();
     List<TranspositionModification> modifications = Lists.newArrayList();
-    for (Transposition transposition : transpositionTuples) {
+    for (TranspositionTuple transposition : transpositionTuples) {
       int leftPosition = witnessIndex.getPosition(transposition.getLeft());
       int rightPosition = witnessIndex.getPosition(transposition.getRight());
       if (leftPosition > rightPosition) {

@@ -15,13 +15,13 @@ public class TransTest extends TestCase {
     List<TransTuple> tuples = trans.getTuples();
     assertEquals(new TransTuple(1, 2, 1), tuples.get(0));
     assertEquals(new TransTuple(2, 1, 2), tuples.get(1));
-    Set<Transposition> transpositions = trans.getTranspositions();
+    Set<TranspositionTuple> transpositions = trans.getTranspositions();
     assertEquals(1, transpositions.size());
   }
 
   public void testNoTransposition() {
     Trans trans = new Trans(Lists.newArrayList(1), Lists.newArrayList(1));
-    Set<Transposition> transpositions = trans.getTranspositions();
+    Set<TranspositionTuple> transpositions = trans.getTranspositions();
     assertEquals(0, transpositions.size());
   }
 }

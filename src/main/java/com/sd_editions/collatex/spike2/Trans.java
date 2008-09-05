@@ -13,7 +13,7 @@ public class Trans {
   private final List<Integer> base;
   private final List<Integer> witness;
   private final List<TransTuple> tuples;
-  private final Set<Transposition> transpositions;
+  private final Set<TranspositionTuple> transpositions;
 
   public Trans(List<Integer> integers, List<Integer> integers2) {
     this.base = integers;
@@ -22,16 +22,16 @@ public class Trans {
     this.transpositions = calculateTranspositions();
   }
 
-  private Set<Transposition> calculateTranspositions() {
+  private Set<TranspositionTuple> calculateTranspositions() {
     List<TransTuple> _tuples = getTuples();
     List<TransTuple> _filteredTuples = Lists.newArrayList(Iterables.filter(_tuples, new Predicate<TransTuple>() {
       public boolean apply(TransTuple tuple) {
         return tuple.base != tuple.witness;
       }
     }));
-    List<Transposition> asT2 = Lists.newArrayList();
+    List<TranspositionTuple> asT2 = Lists.newArrayList();
     for (TransTuple tuple : _filteredTuples) {
-      asT2.add(new Transposition(tuple));
+      asT2.add(new TranspositionTuple(tuple));
     }
     return Sets.newHashSet(asT2);
   }
@@ -49,7 +49,7 @@ public class Trans {
     return tuples;
   }
 
-  public Set<Transposition> getTranspositions() {
+  public Set<TranspositionTuple> getTranspositions() {
     return transpositions;
   }
 

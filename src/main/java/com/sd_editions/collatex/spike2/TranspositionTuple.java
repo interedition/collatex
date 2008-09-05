@@ -1,19 +1,19 @@
 package com.sd_editions.collatex.spike2;
 
-public class Transposition {
+public class TranspositionTuple {
 
   private final TransTuple tuple;
 
-  public Transposition(TransTuple tuple) {
+  public TranspositionTuple(TransTuple tuple) {
     this.tuple = tuple;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Transposition)) {
+    if (!(obj instanceof TranspositionTuple)) {
       return false;
     }
-    Transposition tuple2 = (Transposition) obj;
+    TranspositionTuple tuple2 = (TranspositionTuple) obj;
     return tuple2.getLeft().equals(getRight()) && tuple2.getRight().equals(getLeft());
   }
 
