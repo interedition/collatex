@@ -33,27 +33,11 @@ public class Matches {
   }
 
   public List<Gap> getGapsForBase() {
-    return getGapsForWitness(base);
+    return base.getGaps(matches());
   }
 
   public List<Gap> getGapsForWitness() {
-    return getGapsForWitness(witness);
-  }
-
-  @SuppressWarnings("boxing")
-  private List<Gap> getGapsForWitness(WitnessIndex witnessIndex) {
-    int currentIndex = 1;
-    List<Integer> positions = witnessIndex.getPositionsOfMatchesInSequence(matches());
-    List<Gap> gaps = Lists.newArrayList();
-    for (Integer position : positions) {
-      int indexDif = position - currentIndex;
-      gaps.add(new Gap(witnessIndex, indexDif, currentIndex, position - 1));
-      currentIndex = 1 + position;
-    }
-    int IndexDif = witnessIndex.size() - currentIndex + 1;
-    gaps.add(new Gap(witnessIndex, IndexDif, currentIndex, witnessIndex.size()));
-    System.out.println(gaps);
-    return gaps;
+    return witness.getGaps(matches());
   }
 
   public List<MisMatch> getMisMatches() {

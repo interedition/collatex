@@ -96,4 +96,18 @@ public class WitnessIndex {
     return matchPositions;
   }
 
+  public List<Gap> getGaps(Set<Integer> matches) {
+    int currentIndex = 1;
+    List<Integer> positions = getPositionsOfMatchesInSequence(matches);
+    List<Gap> gaps = Lists.newArrayList();
+    for (Integer position : positions) {
+      int indexDif = position - currentIndex;
+      gaps.add(new Gap(this, indexDif, currentIndex, position - 1));
+      currentIndex = 1 + position;
+    }
+    int IndexDif = size() - currentIndex + 1;
+    gaps.add(new Gap(this, IndexDif, currentIndex, size()));
+    return gaps;
+  }
+
 }
