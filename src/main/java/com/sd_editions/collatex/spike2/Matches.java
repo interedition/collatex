@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -26,25 +25,12 @@ public class Matches {
     return matches;
   }
 
-  // step 1 take the matches
-  // step 2 walk over the witness index and filter away everything that is not a match
-
-  protected static List<Integer> sortMatchesByPosition(final Set<Integer> matches, WitnessIndex witness) {
-    List<Integer> wordCodesList = witness.getWordCodesList();
-    List<Integer> onlyMatches = Lists.newArrayList(Iterables.filter(wordCodesList, new Predicate<Integer>() {
-      public boolean apply(Integer wordCode) {
-        return matches.contains(wordCode);
-      }
-    }));
-    return onlyMatches;
-  }
-
   public List<Integer> getSequenceOfMatchesInBase() {
     return Lists.newArrayList(matches());
   }
 
   public List<Integer> getSequenceOfMatchesInWitness() {
-    return sortMatchesByPosition(matches(), witness);
+    return witness.sortMatchesByPosition(matches());
   }
 
   public List<Gap> getGapsForBase() {

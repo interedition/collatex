@@ -3,6 +3,8 @@ package com.sd_editions.collatex.spike2;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
@@ -70,4 +72,18 @@ public class WitnessIndex {
   public Phrase createPhrase(int i, int j) {
     return new Phrase(this, i, j);
   }
+
+  // step 1 take the matches
+  // step 2 walk over the witness index and filter away everything that is not a match
+
+  public List<Integer> sortMatchesByPosition(final Set<Integer> matches) {
+    List<Integer> wordCodesList = getWordCodesList();
+    List<Integer> onlyMatches = Lists.newArrayList(Iterables.filter(wordCodesList, new Predicate<Integer>() {
+      public boolean apply(Integer wordCode) {
+        return matches.contains(wordCode);
+      }
+    }));
+    return onlyMatches;
+  }
+
 }
