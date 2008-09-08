@@ -27,9 +27,9 @@ public class TranspositionDetection {
   }
 
   protected List<Transposition> detectTranspositions() {
-    Set<Integer> matches = matches();
-    List<Integer> sequenceOfMatchesInBase = Lists.newArrayList(matches);
-    List<Integer> sequenceOfMatchesInWitness = sortMatchesByPosition(matches, witnessIndex2);
+    NewMatches matches = new NewMatches(witnessIndex, witnessIndex2);
+    List<Integer> sequenceOfMatchesInBase = matches.getSequenceOfMatchesInBase();
+    List<Integer> sequenceOfMatchesInWitness = matches.getSequenceOfMatchesInWitness();
     //    System.out.println(sequenceOfMatchesInBase);
     //    System.out.println(sequenceOfMatchesInWitness);
     Set<Integer> transposedMatches = calculateTransposedMatches(sequenceOfMatchesInBase, sequenceOfMatchesInWitness);
