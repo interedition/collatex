@@ -8,7 +8,7 @@ public class MatchesTest extends TestCase {
   public void testMismatches() {
     Colors colors = new Colors("a b y c z d", "a x b c n d");
     Matches matches = colors.getMatches(1, 2);
-    List<MisMatch> mismatches = matches.getMismatches();
+    List<MisMatch> mismatches = matches.getMisMatches();
     // test x
     MisMatch mismatch1 = mismatches.get(0);
     assertFalse(mismatch1.base.hasGap());
@@ -34,7 +34,7 @@ public class MatchesTest extends TestCase {
   public void testMismatchAtTheEnd() {
     Colors colors = new Colors("a b", "a c");
     Matches matches = colors.getMatches(1, 2);
-    List<MisMatch> mismatches = matches.getMismatches();
+    List<MisMatch> mismatches = matches.getMisMatches();
     MisMatch mismatchAtTheEnd = mismatches.get(0);
     assertTrue(mismatchAtTheEnd.base.hasGap());
     assertTrue(mismatchAtTheEnd.witness.hasGap());

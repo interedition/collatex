@@ -28,7 +28,7 @@ public class Colors {
 
   public List<Modification> compareWitness(int i, int j) {
     Matches matches = getMatches(i, j);
-    List<MisMatch> mismatches = matches.getMismatches();
+    List<MisMatch> mismatches = matches.getMisMatches();
     List<Modification> modifications = Lists.newArrayList();
     for (MisMatch mismatch : mismatches) {
       modifications.add(mismatch.analyse());

@@ -27,7 +27,7 @@ public class TranspositionDetection {
   }
 
   protected List<Transposition> detectTranspositions() {
-    NewMatches matches = new NewMatches(witnessIndex, witnessIndex2);
+    Matches matches = new Matches(witnessIndex, witnessIndex2);
     List<Integer> sequenceOfMatchesInBase = matches.getSequenceOfMatchesInBase();
     List<Integer> sequenceOfMatchesInWitness = matches.getSequenceOfMatchesInWitness();
     //    System.out.println(sequenceOfMatchesInBase);
