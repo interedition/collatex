@@ -13,17 +13,28 @@ public class MisMatch {
     this.witness = _witness;
   }
 
-  public Modification analyse() {
-    if (base.hasGap() && witness.hasGap()) {
-      return new Replacement(base, witness);
-    }
-    if (base.hasGap() && !witness.hasGap()) {
-      return new Removal(base);
-    }
-    if (!base.hasGap() && witness.hasGap()) {
-      return new Addition(base.getStartPosition(), witness);
-    }
-    throw new RuntimeException("This mismatch is not valid: there are no modifications!");
+  Addition createAddition() {
+    return new Addition(base.getStartPosition(), witness);
+  }
+
+  Removal createOmission() {
+    return new Removal(base);
+  }
+
+  Replacement createReplacement() {
+    return new Replacement(base, witness);
+  }
+
+  boolean isAddition() {
+    return !base.hasGap() && witness.hasGap();
+  }
+
+  boolean isOmission() {
+    return base.hasGap() && !witness.hasGap();
+  }
+
+  boolean isReplacement() {
+    return base.hasGap() && witness.hasGap();
   }
 
   public boolean isValid() {
