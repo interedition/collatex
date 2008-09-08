@@ -1,6 +1,5 @@
 package com.sd_editions.collatex.spike2;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +43,7 @@ public class Matches {
   @SuppressWarnings("boxing")
   private List<Gap> getGapsForWitness(WitnessIndex witnessIndex) {
     int currentIndex = 1;
-    List<Integer> positions = getPositionsOfMatchesInSequence(witnessIndex);
+    List<Integer> positions = witnessIndex.getPositionsOfMatchesInSequence(matches());
     List<Gap> gaps = Lists.newArrayList();
     for (Integer position : positions) {
       int indexDif = position - currentIndex;
@@ -55,16 +54,6 @@ public class Matches {
     gaps.add(new Gap(witnessIndex, IndexDif, currentIndex, witnessIndex.size()));
     System.out.println(gaps);
     return gaps;
-  }
-
-  @SuppressWarnings("boxing")
-  private List<Integer> getPositionsOfMatchesInSequence(WitnessIndex witnessIndex) {
-    List<Integer> matchPositions = Lists.newArrayList();
-    for (Integer match : matches()) {
-      matchPositions.add(witnessIndex.getPosition(match));
-    }
-    Collections.sort(matchPositions);
-    return matchPositions;
   }
 
   public List<MisMatch> getMisMatches() {

@@ -1,5 +1,6 @@
 package com.sd_editions.collatex.spike2;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -84,6 +85,15 @@ public class WitnessIndex {
       }
     }));
     return onlyMatches;
+  }
+
+  public List<Integer> getPositionsOfMatchesInSequence(Set<Integer> matches) {
+    List<Integer> matchPositions = Lists.newArrayList();
+    for (Integer match : matches) {
+      matchPositions.add(getPosition(match));
+    }
+    Collections.sort(matchPositions);
+    return matchPositions;
   }
 
 }
