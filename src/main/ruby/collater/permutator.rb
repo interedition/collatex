@@ -33,7 +33,7 @@ class Permutator
   	  permutations << degroup(tuplegroups)
   	else
   		i = start_group
-  		while (tuplegroups[i].size==1 && i<tuplegroups.size)
+  		while (tuplegroups[i].size==1 && i<tuplegroups.size-1)
   		  i+=1
   	  end
   	  if (i<tuplegroups.size)
@@ -68,7 +68,3 @@ class Permutator
 	end
 	
 end
-
-#permutator = Permutator.new([[1,2],[5,6],[1,3],[3,3],[2,1],[2,4],[3,4]])
-#permutator.grouped_tuples.each{|g| p g}
-#p permutator.permutations
