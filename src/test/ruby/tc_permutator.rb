@@ -83,4 +83,24 @@ class TC_Permutator < Test::Unit::TestCase
   	]
   	assert_equal(expected_permutations, permutator.permutations.sort)
   end
+
+  def test_permutate4
+  	permutator = Permutator.new([[1,1],[2,2],[3,2]])
+  	permutator.process
+  	expected_permutations = [
+  	  [[1,1],[2,2]],
+  	  [[1,1],[3,2]]
+  	]
+  	assert_equal(expected_permutations, permutator.permutations.sort)
+  end
+
+  def test_permutate5
+  	permutator = Permutator.new([[1,1],[2,2],[2,3]])
+  	permutator.process
+  	expected_permutations = [
+  	  [[1,1],[2,2]],
+  	  [[1,1],[2,3]]
+  	]
+  	assert_equal(expected_permutations, permutator.permutations.sort)
+  end
 end
