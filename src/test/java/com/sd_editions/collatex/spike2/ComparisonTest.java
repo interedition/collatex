@@ -125,8 +125,8 @@ public class ComparisonTest extends TestCase {
     Colors colors = new Colors("c d e", "a b c");
     List<Modification> modifications = colors.compareWitness(1, 2);
     assertEquals(2, modifications.size());
-    assertEquals("addition: a b position: 1", modifications.get(0).toString());
-    assertEquals("omission: d e position: 2", modifications.get(1).toString());
+    assertEquals("omission: d e position: 2", modifications.get(0).toString());
+    assertEquals("addition: a b position: 1", modifications.get(1).toString());
   }
 
   //  public void testTransposition() {
