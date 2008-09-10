@@ -2,7 +2,6 @@ package com.sd_editions.collatex.spike2;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Function;
@@ -14,8 +13,8 @@ import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionDetection {
   //  private final List<Phrase> phrases;
-  private final WitnessIndex witnessIndex;
-  private final WitnessIndex witnessIndex2;
+  final WitnessIndex witnessIndex;
+  final WitnessIndex witnessIndex2;
   private final List<Transposition> transpositions;
 
   public TranspositionDetection(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
@@ -25,13 +24,11 @@ public class TranspositionDetection {
   }
 
   public static List<MatchSequence> calculateMatchSequences(WitnessIndex base, WitnessIndex witness, Set<Integer> matches) {
-    Map<Integer, Integer> sequenceExpectationsBase = base.calculateSequenceExpectations();
-    Map<Integer, Integer> sequenceExpectationsWitness = witness.calculateSequenceExpectations();
     List<MatchSequence> sequences = Lists.newArrayList();
     MatchSequence sequence = new MatchSequence();
     for (Integer match : matches) {
-      Integer expected = sequenceExpectationsBase.get(match);
-      Integer actual = sequenceExpectationsWitness.get(match);
+      Integer expected = base.getPreviousWordCode(match);
+      Integer actual = witness.getPreviousWordCode(match);
       if (expected != actual || !expected.equals(actual)) {
         if (!sequence.isEmpty()) {
           sequences.add(sequence);
@@ -144,12 +141,10 @@ public class TranspositionDetection {
   }
 
   private Set<Integer> calculateTransposedMatches(List<Integer> sequenceOfMatchesInBase) {
-    final Map<Integer, Integer> baseExpectations = witnessIndex.calculateSequenceExpectations();
-    final Map<Integer, Integer> witnessExpectations = witnessIndex2.calculateSequenceExpectations();
     final Set<Integer> transposedMatches = Sets.newLinkedHashSet(Iterables.filter(sequenceOfMatchesInBase, new Predicate<Integer>() {
       public boolean apply(Integer current) {
-        Integer expectedNext = baseExpectations.get(current);
-        Integer actualNext = witnessExpectations.get(current);
+        Integer expectedNext = witnessIndex.getPreviousWordCode(current);
+        Integer actualNext = witnessIndex2.getPreviousWordCode(current);
         return expectedNext != actualNext;
       }
     }));

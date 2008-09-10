@@ -19,6 +19,7 @@ public class WitnessIndex {
   private final Set<Integer> wordCodes;
   private final List<String> words;
   private final Index index;
+  private final Map<Integer, Integer> expectations;
 
   public WitnessIndex(String witness, Index _index) {
     index = _index;
@@ -38,6 +39,7 @@ public class WitnessIndex {
     while (tokenizer.hasNextToken()) {
       words.add(tokenizer.nextToken());
     }
+    this.expectations = calculateSequenceExpectations();
   }
 
   public Set<Integer> getWordCodes() {
@@ -119,20 +121,24 @@ public class WitnessIndex {
     return gaps;
   }
 
-  public Map<Integer, Integer> calculateSequenceExpectations() {
+  private Map<Integer, Integer> calculateSequenceExpectations() {
     List<Integer> _wordCodes = getWordCodesList();
-    Map<Integer, Integer> expectations = Maps.newHashMap();
+    Map<Integer, Integer> _expectations = Maps.newHashMap();
     if (wordCodes.isEmpty()) {
-      return expectations;
+      return _expectations;
     }
     Iterator<Integer> i = _wordCodes.iterator();
     Integer previous = i.next();
     while (i.hasNext()) {
       Integer next = i.next();
-      expectations.put(next, previous);
+      _expectations.put(next, previous);
       previous = next;
     }
-    return expectations;
+    return _expectations;
+  }
+
+  public Integer getPreviousWordCode(Integer wordCode) {
+    return expectations.get(wordCode);
   }
 
 }
