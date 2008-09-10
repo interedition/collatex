@@ -62,8 +62,14 @@ public class WitnessIndex {
     return list;
   }
 
+  //TODO: remove!
   public String getWordOnPosition(int position) {
     return words.get(position - 1);
+  }
+
+  //TODO: after remove, rename!
+  public Word getNewWordOnPosition(int position) {
+    return new Word(words.get(position - 1), position);
   }
 
   public int size() {

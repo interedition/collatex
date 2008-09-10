@@ -1,6 +1,7 @@
 package com.sd_editions.collatex.spike2;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -90,5 +91,12 @@ public class Colors {
 
   public int numberOfWitnesses() {
     return witnessIndexes.size();
+  }
+
+  public List<MatchSequence> getMatchSequences(int i, int j) {
+    WitnessIndex base = getWitnessIndex(i);
+    WitnessIndex witness = getWitnessIndex(j);
+    Set<Integer> matches = getMatches(i, j).matches();
+    return TranspositionDetection.calculateMatchSequences(base, witness, matches);
   }
 }
