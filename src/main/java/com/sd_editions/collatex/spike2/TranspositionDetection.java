@@ -1,7 +1,6 @@
 package com.sd_editions.collatex.spike2;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,7 +9,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.spike2.collate.Transposition;
 
@@ -26,15 +24,43 @@ public class TranspositionDetection {
     this.transpositions = detectTranspositions();
   }
 
+  public static List<MatchSequence> calculateMatchSequences(WitnessIndex base, WitnessIndex witness, Set<Integer> matches) {
+    Map<Integer, Integer> sequenceExpectationsBase = base.calculateSequenceExpectations();
+    Map<Integer, Integer> sequenceExpectationsWitness = witness.calculateSequenceExpectations();
+    List<MatchSequence> sequences = Lists.newArrayList();
+    MatchSequence sequence = new MatchSequence();
+    for (Integer match : matches) {
+      Integer expected = sequenceExpectationsBase.get(match);
+      Integer actual = sequenceExpectationsWitness.get(match);
+      if (expected != actual || !expected.equals(actual)) {
+        if (!sequence.isEmpty()) {
+          sequences.add(sequence);
+        }
+        sequence = new MatchSequence();
+      }
+      sequence.add(convertWordCodeToMatch(base, witness, match));
+    }
+    if (!sequence.isEmpty()) {
+      sequences.add(sequence);
+    }
+    return sequences;
+  }
+
+  private static Match convertWordCodeToMatch(WitnessIndex base, WitnessIndex witness, Integer match) {
+    Word word1 = base.getNewWordOnPosition(base.getPosition(match));
+    Word word2 = witness.getNewWordOnPosition(witness.getPosition(match));
+    return new Match(word1, word2);
+  }
+
   protected List<Transposition> detectTranspositions() {
     Matches matches = new Matches(witnessIndex, witnessIndex2);
 
     List<Integer> sequenceOfMatchesInBase = matches.getSequenceOfMatchesInBase();
-    List<Integer> sequenceOfMatchesInWitness = matches.getSequenceOfMatchesInWitness();
+    //    List<Integer> sequenceOfMatchesInWitness = matches.getSequenceOfMatchesInWitness();
     //System.out.println(sequenceOfMatchesInBase);
     //System.out.println(sequenceOfMatchesInWitness);
 
-    Set<Integer> transposedMatches = calculateTransposedMatches(sequenceOfMatchesInBase, sequenceOfMatchesInWitness);
+    Set<Integer> transposedMatches = calculateTransposedMatches(sequenceOfMatchesInBase);
     List<Integer> sequenceOfTransposedMatchesInBase = Lists.newArrayList(transposedMatches);
     List<Integer> sequenceOfTransposedMatchesInWitness = sortMatchesByPosition(transposedMatches, witnessIndex2);
     //System.out.println(sequenceOfTransposedMatchesInBase);
@@ -76,14 +102,6 @@ public class TranspositionDetection {
     }
   }
 
-  // Integers are word codes
-  private Set<Integer> matches() {
-    Set<Integer> matches = Sets.newLinkedHashSet(witnessIndex.getWordCodes());
-    matches.retainAll(witnessIndex2.getWordCodes());
-    //    System.out.println(matches);
-    return matches;
-  }
-
   // step 1 take the matches
   // step 2 walk over the witness index and filter away everything that is not a match
 
@@ -95,24 +113,6 @@ public class TranspositionDetection {
       }
     }));
     return onlyMatches;
-  }
-
-  // build expectation map --> Note: this method is not completely functional --> use inject/fold
-  // TODO parameter should be called ALL THE WORD CODES!
-  // TODO: move method to WitnessIndex
-  protected static Map<Integer, Integer> calculateSequenceExpectations(List<Integer> matchesSequenceInBase) {
-    Map<Integer, Integer> expectations = Maps.newHashMap();
-    if (matchesSequenceInBase.isEmpty()) {
-      return expectations;
-    }
-    Iterator<Integer> i = matchesSequenceInBase.iterator();
-    Integer previous = i.next();
-    while (i.hasNext()) {
-      Integer next = i.next();
-      expectations.put(next, previous);
-      previous = next;
-    }
-    return expectations;
   }
 
   // step 1
@@ -130,8 +130,8 @@ public class TranspositionDetection {
   //    boolean inSequence;
   //  }
 
-  protected List<Phrase> testInSequence(List<Integer> sequenceOfMatchesInBase, List<Integer> sequenceOfMatchesInWitness) {
-    final Set<Integer> transposedMatches = calculateTransposedMatches(sequenceOfMatchesInBase, sequenceOfMatchesInWitness);
+  protected List<Phrase> testInSequence(List<Integer> sequenceOfMatchesInBase) {
+    final Set<Integer> transposedMatches = calculateTransposedMatches(sequenceOfMatchesInBase);
     List<Integer> sequenceOfTransposedMatchesInBase = Lists.newArrayList(Iterables.filter(sequenceOfMatchesInBase, new Predicate<Integer>() {
       public boolean apply(Integer wordCodeMatch) {
         return transposedMatches.contains(wordCodeMatch);
@@ -143,9 +143,9 @@ public class TranspositionDetection {
     return makePhrases;
   }
 
-  private Set<Integer> calculateTransposedMatches(List<Integer> sequenceOfMatchesInBase, List<Integer> sequenceOfMatchesInWitness) {
-    final Map<Integer, Integer> baseExpectations = calculateSequenceExpectations(sequenceOfMatchesInBase);
-    final Map<Integer, Integer> witnessExpectations = calculateSequenceExpectations(sequenceOfMatchesInWitness);
+  private Set<Integer> calculateTransposedMatches(List<Integer> sequenceOfMatchesInBase) {
+    final Map<Integer, Integer> baseExpectations = witnessIndex.calculateSequenceExpectations();
+    final Map<Integer, Integer> witnessExpectations = witnessIndex2.calculateSequenceExpectations();
     final Set<Integer> transposedMatches = Sets.newLinkedHashSet(Iterables.filter(sequenceOfMatchesInBase, new Predicate<Integer>() {
       public boolean apply(Integer current) {
         Integer expectedNext = baseExpectations.get(current);
@@ -199,31 +199,4 @@ public class TranspositionDetection {
     return transpositions;
   }
 
-  public static List<MatchSequence> calculateMatchSequences(WitnessIndex base, WitnessIndex witness, Set<Integer> matches) {
-    Map<Integer, Integer> sequenceExpectationsBase = calculateSequenceExpectations(base.getWordCodesList());
-    Map<Integer, Integer> sequenceExpectationsWitness = calculateSequenceExpectations(witness.getWordCodesList());
-    List<MatchSequence> sequences = Lists.newArrayList();
-    MatchSequence sequence = new MatchSequence();
-    for (Integer match : matches) {
-      Integer expected = sequenceExpectationsBase.get(match);
-      Integer actual = sequenceExpectationsWitness.get(match);
-      if (expected != actual || !expected.equals(actual)) {
-        if (!sequence.isEmpty()) {
-          sequences.add(sequence);
-        }
-        sequence = new MatchSequence();
-      }
-      sequence.add(convertWordCodeToMatch(base, witness, match));
-    }
-    if (!sequence.isEmpty()) {
-      sequences.add(sequence);
-    }
-    return sequences;
-  }
-
-  private static Match convertWordCodeToMatch(WitnessIndex base, WitnessIndex witness, Integer match) {
-    Word word1 = base.getNewWordOnPosition(base.getPosition(match));
-    Word word2 = witness.getNewWordOnPosition(witness.getPosition(match));
-    return new Match(word1, word2);
-  }
 }

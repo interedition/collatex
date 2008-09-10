@@ -1,34 +1,12 @@
 package com.sd_editions.collatex.spike2;
 
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
-import com.google.common.collect.Lists;
 import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionTest extends TestCase {
-  @SuppressWarnings("boxing")
-  public void testSequenceExpectations() {
-    List<Integer> sequence = Lists.newArrayList(1, 2, 3, 4, 5);
-    Map<Integer, Integer> sequenceExpectations = TranspositionDetection.calculateSequenceExpectations(sequence);
-    assertEquals(new Integer(1), sequenceExpectations.get(2));
-    assertEquals(new Integer(2), sequenceExpectations.get(3));
-    assertEquals(new Integer(3), sequenceExpectations.get(4));
-    assertEquals(new Integer(4), sequenceExpectations.get(5));
-  }
-
-  public void testSequenceExpectationsWithoutItems() {
-    List<Integer> sequence = Lists.newArrayList();
-    Map<Integer, Integer> sequenceExpectations = TranspositionDetection.calculateSequenceExpectations(sequence);
-    assertTrue(sequenceExpectations.isEmpty());
-    //    assertEquals(new Integer(1), sequenceExpectations.get(2));
-    //    assertEquals(new Integer(2), sequenceExpectations.get(3));
-    //    assertEquals(new Integer(3), sequenceExpectations.get(4));
-    //    assertEquals(new Integer(4), sequenceExpectations.get(5));
-  }
-
   public void testTransposition1() {
     Colors colors = new Colors("a b c d e", "a c d b e");
     TranspositionDetection detection = colors.detectTranspositions(1, 2);

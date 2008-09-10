@@ -1,12 +1,15 @@
 package com.sd_editions.collatex.spike2;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
@@ -114,6 +117,22 @@ public class WitnessIndex {
     int IndexDif = size() - currentIndex + 1;
     gaps.add(new Gap(this, IndexDif, currentIndex, size()));
     return gaps;
+  }
+
+  public Map<Integer, Integer> calculateSequenceExpectations() {
+    List<Integer> _wordCodes = getWordCodesList();
+    Map<Integer, Integer> expectations = Maps.newHashMap();
+    if (wordCodes.isEmpty()) {
+      return expectations;
+    }
+    Iterator<Integer> i = _wordCodes.iterator();
+    Integer previous = i.next();
+    while (i.hasNext()) {
+      Integer next = i.next();
+      expectations.put(next, previous);
+      previous = next;
+    }
+    return expectations;
   }
 
 }
