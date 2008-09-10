@@ -1,6 +1,7 @@
 require 'text'
-
+require 'set'
 require 'collater/match_permutator'
+
 
 class Array
 	def each_pair
@@ -14,6 +15,7 @@ end
 
 class Match
 	attr_reader :word1, :word2, :levenshtein_distance
+
   def initialize(word1,word2,levdistance=0)
     @word1=word1
     @word2=word2
@@ -23,6 +25,21 @@ class Match
   def to_s
   	"Match: #{word1} #{word2} #{levenshtein_distance}"
   end
+	
+	def eql?(other)
+		(self.word1.eql?(other.word1) || self.word1.eql?(other.word2)) &&
+		(self.word2.eql?(other.word1) || self.word2.eql?(other.word2))
+  end
+
+	def hash
+		word1.normalized.hash + word2.normalized.hash
+	end
+end
+
+class Transposition < Match 
+	def to_s
+		"Transposition: '#{word1.original}' <=> '#{word2.original}'"
+	end
 end
 
 class Word
@@ -152,11 +169,11 @@ class WitnessPair
    end
  
    def calculate_transpositions(matchsequences)
-   	 transpositions=[]
-   	 matchsequences_in_base = matchsequences.collect{ |mg| mg.collect{ |m| m.word1 }}
-   	 matchsequences_in_witness = matchsequences.sort{|a,b| a[0].word2.position <=> b[0].word2.position }.collect{ |mg| mg.collect{ |m| m.word2 }}
-   	 i=0; matchbase = matchsequences_in_base.collect{|g| i+=1; Word.new(g.collect{|w| w.original }.join(' '),i)}
-   	 i=0;matchwitness = matchsequences_in_witness.collect{|g| i+=1; Word.new(g.collect{|w| w.original }.join(' '),i)}
+   	 transpositions=Set.new
+   	 matchsequences_in_base = matchsequences.collect{ |mg| mg.collect{ |m| m.word1 } }
+   	 matchsequences_in_witness = matchsequences.sort{ |a,b| a[0].word2.position <=> b[0].word2.position }.collect{ |mg| mg.collect{ |m| m.word2 }}
+   	 i=0; matchbase = matchsequences_in_base.collect{ |g| i+=1; Word.new(g.collect{|w| w.original }.join(' '),i) }
+   	 i=0; matchwitness = matchsequences_in_witness.collect{ |g| i+=1; Word.new(g.collect{|w| w.original }.join(' '),i) }
    	 matchbase.each_with_index do |w1,i1|
    	   w1_in_witness = matchwitness.find{|w| w.matches_with?(w1) }
    	   position1_in_witness = matchwitness.index(w1_in_witness)
@@ -165,7 +182,7 @@ class WitnessPair
    	   w2 = matchbase[position1_in_witness]
    	   w2_in_witness = matchwitness.find{|w| w.matches_with?(w2) }
    	   position2_in_witness = matchwitness.index(w2_in_witness)
-   	   transpositions << [w1,w2] if position2_in_witness.eql? i1
+   	   transpositions << Transposition.new(w1,w2) if (position2_in_witness.eql? i1) # && !(transpositions.include? Transposition.new(w2,w1)))
    	 end
    	 return transpositions
    end
@@ -218,4 +235,4 @@ class Main
 	end
 end
 
-Main.new
+#Main.new

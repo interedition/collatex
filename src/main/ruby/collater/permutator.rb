@@ -66,5 +66,5 @@ class Permutator
 	def degroup(tuplegroups)
 		tuplegroups.collect{ |tg| tg[0] }
 	end
-	
+
 end
