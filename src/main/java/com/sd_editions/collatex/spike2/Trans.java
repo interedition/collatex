@@ -10,43 +10,23 @@ import com.google.common.collect.Sets;
 
 public class Trans {
 
-  private final List<Integer> base;
-  private final List<Integer> witness;
-  private final List<TransTuple> tuples;
   private final Set<TranspositionTuple> transpositions;
 
-  public Trans(List<Integer> integers, List<Integer> integers2) {
-    this.base = integers;
-    this.witness = integers2;
-    this.tuples = calculateTuples();
-    this.transpositions = calculateTranspositions();
+  public Trans(List<MatchSequence> sequences) {
+    this.transpositions = calculateTranspositions(sequences);
   }
 
-  private Set<TranspositionTuple> calculateTranspositions() {
-    List<TransTuple> _tuples = getTuples();
-    List<TransTuple> _filteredTuples = Lists.newArrayList(Iterables.filter(_tuples, new Predicate<TransTuple>() {
-      public boolean apply(TransTuple tuple) {
-        return tuple.base != tuple.witness;
+  private Set<TranspositionTuple> calculateTranspositions(List<MatchSequence> sequences) {
+    List<MatchSequence> filteredMatchSequence = Lists.newArrayList(Iterables.filter(sequences, new Predicate<MatchSequence>() {
+      public boolean apply(MatchSequence sequence) {
+        return sequence.getBasePosition() != sequence.getWitnessPosition();
       }
     }));
-    List<TranspositionTuple> asT2 = Lists.newArrayList();
-    for (TransTuple tuple : _filteredTuples) {
-      asT2.add(new TranspositionTuple(tuple));
+    List<TranspositionTuple> asTranspositionTuples = Lists.newArrayList();
+    for (MatchSequence sequence : filteredMatchSequence) {
+      asTranspositionTuples.add(new TranspositionTuple(sequence));
     }
-    return Sets.newHashSet(asT2);
-  }
-
-  @SuppressWarnings("boxing")
-  private List<TransTuple> calculateTuples() {
-    List<TransTuple> _tuples = Lists.newArrayList();
-    for (int i = 0; i < base.size(); i++) {
-      _tuples.add(new TransTuple(base.get(i), witness.get(i), i + 1));
-    }
-    return _tuples;
-  }
-
-  public List<TransTuple> getTuples() {
-    return tuples;
+    return Sets.newHashSet(asTranspositionTuples);
   }
 
   public Set<TranspositionTuple> getTranspositions() {

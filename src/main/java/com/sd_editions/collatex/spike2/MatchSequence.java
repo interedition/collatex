@@ -23,4 +23,14 @@ public class MatchSequence {
   public boolean isEmpty() {
     return sequence.isEmpty();
   }
+
+  @SuppressWarnings("boxing")
+  public Integer getWitnessPosition() {
+    return sequence.get(0).getWitnessWord().position;
+  }
+
+  public Integer getBasePosition() {
+    return sequence.get(0).getBaseWord().position;
+  }
+
 }

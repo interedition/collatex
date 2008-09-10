@@ -15,4 +15,12 @@ public class Match {
   public String toString() {
     return "(" + word1.position + "->" + word2.position + ")";
   }
+
+  public Word getWitnessWord() {
+    return word2;
+  }
+
+  public Word getBaseWord() {
+    return word1;
+  }
 }
