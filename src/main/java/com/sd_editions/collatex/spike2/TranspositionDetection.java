@@ -28,15 +28,18 @@ public class TranspositionDetection {
 
   protected List<Transposition> detectTranspositions() {
     Matches matches = new Matches(witnessIndex, witnessIndex2);
+
     List<Integer> sequenceOfMatchesInBase = matches.getSequenceOfMatchesInBase();
     List<Integer> sequenceOfMatchesInWitness = matches.getSequenceOfMatchesInWitness();
-    //    System.out.println(sequenceOfMatchesInBase);
-    //    System.out.println(sequenceOfMatchesInWitness);
+    //System.out.println(sequenceOfMatchesInBase);
+    //System.out.println(sequenceOfMatchesInWitness);
+
     Set<Integer> transposedMatches = calculateTransposedMatches(sequenceOfMatchesInBase, sequenceOfMatchesInWitness);
     List<Integer> sequenceOfTransposedMatchesInBase = Lists.newArrayList(transposedMatches);
     List<Integer> sequenceOfTransposedMatchesInWitness = sortMatchesByPosition(transposedMatches, witnessIndex2);
-    //    System.out.println(sequenceOfTransposedMatchesInBase);
-    //    System.out.println(sequenceOfTransposedMatchesInWitness);
+    //System.out.println(sequenceOfTransposedMatchesInBase);
+    //System.out.println(sequenceOfTransposedMatchesInWitness);
+
     Trans trans = new Trans(sequenceOfTransposedMatchesInBase, sequenceOfTransposedMatchesInWitness);
     //    System.out.println(trans.getTuples());
     Set<TranspositionTuple> transpositionTuples = trans.getTranspositions();
@@ -53,6 +56,24 @@ public class TranspositionDetection {
       modifications.add(new Transposition(base, witness));
     }
     return modifications;
+  }
+
+  static class Sequence {
+    @SuppressWarnings("boxing")
+    public Sequence(int _wordCode, int begin, int end) {
+      this.wordCode = _wordCode;
+      this.startPosition = begin;
+      this.endPosition = end;
+    }
+
+    Integer wordCode;
+    Integer startPosition;
+    Integer endPosition;
+
+    @Override
+    public String toString() {
+      return wordCode + " -> (" + startPosition + " - " + endPosition + ")";
+    }
   }
 
   // Integers are word codes
@@ -77,6 +98,8 @@ public class TranspositionDetection {
   }
 
   // build expectation map --> Note: this method is not completely functional --> use inject/fold
+  // TODO parameter should be called ALL THE WORD CODES!
+  // TODO: move method to WitnessIndex
   protected static Map<Integer, Integer> calculateSequenceExpectations(List<Integer> matchesSequenceInBase) {
     Map<Integer, Integer> expectations = Maps.newHashMap();
     if (matchesSequenceInBase.isEmpty()) {
@@ -133,24 +156,6 @@ public class TranspositionDetection {
     return transposedMatches;
   }
 
-  class Sequence {
-    @SuppressWarnings("boxing")
-    public Sequence(int _wordCode, int begin, int end) {
-      this.wordCode = _wordCode;
-      this.startPosition = begin;
-      this.endPosition = end;
-    }
-
-    Integer wordCode;
-    Integer startPosition;
-    Integer endPosition;
-
-    @Override
-    public String toString() {
-      return wordCode + " -> (" + startPosition + " - " + endPosition + ")";
-    }
-  }
-
   @SuppressWarnings("boxing")
   protected List<Phrase> makePhrases(List<Integer> sequenceOfTransposedMatchesInBase, final WitnessIndex witness) {
     List<Sequence> sequences = createSequenceList(sequenceOfTransposedMatchesInBase, witness);
@@ -194,4 +199,31 @@ public class TranspositionDetection {
     return transpositions;
   }
 
+  public static List<MatchSequence> calculateMatchSequences(WitnessIndex base, WitnessIndex witness, Set<Integer> matches) {
+    Map<Integer, Integer> sequenceExpectationsBase = calculateSequenceExpectations(base.getWordCodesList());
+    Map<Integer, Integer> sequenceExpectationsWitness = calculateSequenceExpectations(witness.getWordCodesList());
+    List<MatchSequence> sequences = Lists.newArrayList();
+    MatchSequence sequence = new MatchSequence();
+    for (Integer match : matches) {
+      Integer expected = sequenceExpectationsBase.get(match);
+      Integer actual = sequenceExpectationsWitness.get(match);
+      if (expected != actual || !expected.equals(actual)) {
+        if (!sequence.isEmpty()) {
+          sequences.add(sequence);
+        }
+        sequence = new MatchSequence();
+      }
+      sequence.add(convertWordCodeToMatch(base, witness, match));
+    }
+    if (!sequence.isEmpty()) {
+      sequences.add(sequence);
+    }
+    return sequences;
+  }
+
+  private static Match convertWordCodeToMatch(WitnessIndex base, WitnessIndex witness, Integer match) {
+    Word word1 = base.getNewWordOnPosition(base.getPosition(match));
+    Word word2 = witness.getNewWordOnPosition(witness.getPosition(match));
+    return new Match(word1, word2);
+  }
 }

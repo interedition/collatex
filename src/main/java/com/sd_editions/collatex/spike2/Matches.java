@@ -17,7 +17,7 @@ public class Matches {
   }
 
   // Integers are word codes
-  private Set<Integer> matches() {
+  public Set<Integer> matches() {
     Set<Integer> matches = Sets.newLinkedHashSet(base.getWordCodes());
     matches.retainAll(witness.getWordCodes());
     //    System.out.println(matches);
