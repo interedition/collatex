@@ -98,41 +98,6 @@ class WitnessPair
 #    end
   end
   
-#  def calculate_permutations(matches)
-#  	permutations=[]
-#  	
-#  	all_matching_basewords = matches.collect{|m| m.word1 }.uniq
-#  	matches_per_baseword = all_matching_basewords.collect do |w|
-#  	  [w, matches.find_all{|m| m.word1.eql? w}.collect{|m| [ m.word2, m.levenshtein_distance]} ]
-#  	end
-#  	matches_per_baseword.each{|m| p m }
-#    permutations = []
-#    permutate(matches_per_baseword, permutations)
-#  	return permutations
-#  end
-#  
-#  def permutate(match_array, permutations)
-#  	match_array.each{|m| p m }
-#  	match_array.each_with_index do |e,i|
-#  		matches_in_witness = e[1]
-#  	  if (matches_in_witness.size > 1)
-#  	  	matches_in_witness.each do |mw|
-#  	  		new_array = Marshal.load(Marshal.dump(match_array)) # deep clone
-#  	  		new_array[i]=[e[0],[mw]]
-#  	  		puts "permutating..."
-#  	  		permutate(new_array, permutations)
-#  	  	end
-#  	  end
-#  	end
-#  	permutation_matches = match_array.collect{|m| Match.new(m[0],m[1][0][0], m[1][0][1])}
-#  	matchsequences = calculate_matchsequences(permutation_matches)
-#  	permutations << {
-#  	  :matches => permutation_matches,
-#  	  :matchsequences => matchsequences,
-#  	  :transpositions => calculate_transpositions(matchsequences)
-#  	}
-#  end
-  
   def calculate_matches(w1,w2)
     matches=[]
     w1.words.each do |word1|
