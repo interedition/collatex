@@ -29,7 +29,7 @@ public class TranspositionDetection {
     for (Match match : matches) {
       Integer expected = base.getPreviousWordCode(match.wordCode);
       Integer actual = witness.getPreviousWordCode(match.wordCode);
-      if (expected != actual || !expected.equals(actual)) {
+      if (expected != actual || expected != null && !expected.equals(actual)) {
         if (!sequence.isEmpty()) {
           sequences.add(sequence);
         }

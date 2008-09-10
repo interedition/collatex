@@ -5,8 +5,56 @@ import java.util.List;
 import junit.framework.TestCase;
 
 public class MatchSequenceTest extends TestCase {
+  public void testSimple() {
+    String base = "a b";
+    String witness = "a b";
+    Colors colors = new Colors(base, witness);
+    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    assertEquals("[(1->1), (2->2)]", sequences.get(0).toString());
+    assertEquals(1, sequences.size());
+  }
+
+  public void testAddition() {
+    String base = "a b";
+    String witness = "a c b";
+    Colors colors = new Colors(base, witness);
+    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    assertEquals("[(1->1)]", sequences.get(0).toString());
+    assertEquals("[(2->3)]", sequences.get(1).toString());
+    assertEquals(2, sequences.size());
+  }
+
+  public void testOmission() {
+    String base = "a c b";
+    String witness = "a b";
+    Colors colors = new Colors(base, witness);
+    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    assertEquals("[(1->1)]", sequences.get(0).toString());
+    assertEquals("[(3->2)]", sequences.get(1).toString());
+    assertEquals(2, sequences.size());
+  }
+
+  public void testReplacement() {
+    String base = "a b";
+    String witness = "a c";
+    Colors colors = new Colors(base, witness);
+    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    assertEquals("[(1->1)]", sequences.get(0).toString());
+    assertEquals(1, sequences.size());
+  }
+
+  public void testTransposition() {
+    String base = "a b";
+    String witness = "b a";
+    Colors colors = new Colors(base, witness);
+    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    assertEquals("[(1->2)]", sequences.get(0).toString());
+    assertEquals("[(2->1)]", sequences.get(1).toString());
+    assertEquals(2, sequences.size());
+  }
+
   //Note: this test should NOT lead to a transposition
-  public void testNotATranspositionBecauseGroupsAreNotContinuous() {
+  public void testComplex() {
     String base = "The black dog chases a red cat.";
     String witness = "A red cat chases the yellow dog";
     Colors colors = new Colors(base, witness);
