@@ -96,7 +96,7 @@ public class Colors {
   public List<MatchSequence> getMatchSequences(int i, int j) {
     WitnessIndex base = getWitnessIndex(i);
     WitnessIndex witness = getWitnessIndex(j);
-    Set<Integer> matches = getMatches(i, j).matches();
+    Set<Match> matches = getMatches(i, j).matches();
     return TranspositionDetection.calculateMatchSequences(base, witness, matches);
   }
 }

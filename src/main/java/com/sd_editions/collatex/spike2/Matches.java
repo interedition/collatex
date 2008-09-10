@@ -17,27 +17,42 @@ public class Matches {
   }
 
   // Integers are word codes
-  public Set<Integer> matches() {
-    Set<Integer> matches = Sets.newLinkedHashSet(base.getWordCodes());
-    matches.retainAll(witness.getWordCodes());
-    //    System.out.println(matches);
+  public Set<Match> matches() {
+    Set<Integer> matchesAsWordCodes = matchesAsWordCodes();
+    Set<Match> matches = Sets.newLinkedHashSet();
+    for (Integer matchAsWordCode : matchesAsWordCodes) {
+      matches.add(convertWordCodeToMatch(base, witness, matchAsWordCode));
+    }
     return matches;
   }
 
+  private Set<Integer> matchesAsWordCodes() {
+    Set<Integer> matchesAsWordCodes = Sets.newLinkedHashSet(base.getWordCodes());
+    matchesAsWordCodes.retainAll(witness.getWordCodes());
+    //    System.out.println(matchesAsWordCodes);
+    return matchesAsWordCodes;
+  }
+
+  private static Match convertWordCodeToMatch(WitnessIndex base, WitnessIndex witness, Integer match) {
+    Word word1 = base.getNewWordOnPosition(base.getPosition(match));
+    Word word2 = witness.getNewWordOnPosition(witness.getPosition(match));
+    return new Match(word1, word2, match);
+  }
+
   public List<Integer> getSequenceOfMatchesInBase() {
-    return Lists.newArrayList(matches());
+    return Lists.newArrayList(matchesAsWordCodes());
   }
 
   public List<Integer> getSequenceOfMatchesInWitness() {
-    return witness.sortMatchesByPosition(matches());
+    return witness.sortMatchesByPosition(matchesAsWordCodes());
   }
 
   public List<Gap> getGapsForBase() {
-    return base.getGaps(matches());
+    return base.getGaps(matchesAsWordCodes());
   }
 
   public List<Gap> getGapsForWitness() {
-    return witness.getGaps(matches());
+    return witness.getGaps(matchesAsWordCodes());
   }
 
   public List<MisMatch> getMisMatches() {

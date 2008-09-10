@@ -23,30 +23,24 @@ public class TranspositionDetection {
     this.transpositions = detectTranspositions();
   }
 
-  public static List<MatchSequence> calculateMatchSequences(WitnessIndex base, WitnessIndex witness, Set<Integer> matches) {
+  public static List<MatchSequence> calculateMatchSequences(WitnessIndex base, WitnessIndex witness, Set<Match> matches) {
     List<MatchSequence> sequences = Lists.newArrayList();
     MatchSequence sequence = new MatchSequence();
-    for (Integer match : matches) {
-      Integer expected = base.getPreviousWordCode(match);
-      Integer actual = witness.getPreviousWordCode(match);
+    for (Match match : matches) {
+      Integer expected = base.getPreviousWordCode(match.wordCode);
+      Integer actual = witness.getPreviousWordCode(match.wordCode);
       if (expected != actual || !expected.equals(actual)) {
         if (!sequence.isEmpty()) {
           sequences.add(sequence);
         }
         sequence = new MatchSequence();
       }
-      sequence.add(convertWordCodeToMatch(base, witness, match));
+      sequence.add(match);
     }
     if (!sequence.isEmpty()) {
       sequences.add(sequence);
     }
     return sequences;
-  }
-
-  private static Match convertWordCodeToMatch(WitnessIndex base, WitnessIndex witness, Integer match) {
-    Word word1 = base.getNewWordOnPosition(base.getPosition(match));
-    Word word2 = witness.getNewWordOnPosition(witness.getPosition(match));
-    return new Match(word1, word2);
   }
 
   protected List<Transposition> detectTranspositions() {
