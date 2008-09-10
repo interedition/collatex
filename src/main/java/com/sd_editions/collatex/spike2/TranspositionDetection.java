@@ -30,16 +30,12 @@ public class TranspositionDetection {
       Integer expected = base.getPreviousWordCode(match.wordCode);
       Integer actual = witness.getPreviousWordCode(match.wordCode);
       if (expected != actual || expected != null && !expected.equals(actual)) {
-        if (!sequence.isEmpty()) {
-          sequences.add(sequence);
-        }
+        if (!sequence.isEmpty()) sequences.add(sequence);
         sequence = new MatchSequence();
       }
       sequence.add(match);
     }
-    if (!sequence.isEmpty()) {
-      sequences.add(sequence);
-    }
+    if (!sequence.isEmpty()) sequences.add(sequence);
     return sequences;
   }
 

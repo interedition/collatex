@@ -35,12 +35,13 @@ public class MatchSequenceTest extends TestCase {
   }
 
   public void testReplacement() {
-    String base = "a b";
-    String witness = "a c";
+    String base = "a b c";
+    String witness = "a d c";
     Colors colors = new Colors(base, witness);
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1)]", sequences.get(0).toString());
-    assertEquals(1, sequences.size());
+    assertEquals("[(3->3)]", sequences.get(1).toString());
+    assertEquals(2, sequences.size());
   }
 
   public void testTransposition() {
