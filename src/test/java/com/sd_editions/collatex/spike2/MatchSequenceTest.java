@@ -80,11 +80,25 @@ public class MatchSequenceTest extends TestCase {
     Match d = new Match(new Word("D", 4), new Word("D", 1), 4);
     Match e = new Match(new Word("E", 5), new Word("E", 2), 5);
     MatchSequence sequence2 = new MatchSequence(d, e);
-    List<MatchSequence> matchSequences = Lists.newArrayList();
-    matchSequences.add(sequence);
-    matchSequences.add(sequence2);
+    List<MatchSequence> matchSequences = Lists.newArrayList(sequence, sequence2);
     List<MatchSequence> arrayForWitness = TranspositionDetection.sortSequencesForWitness(matchSequences);
     assertEquals(Lists.newArrayList(sequence2, sequence), arrayForWitness);
   }
 
+  public void testConvertMatchSequencesToTuples() {
+    Match a = new Match(new Word("A", 1), new Word("A", 3), 1);
+    Match b = new Match(new Word("B", 2), new Word("B", 4), 2);
+    Match c = new Match(new Word("C", 3), new Word("C", 5), 3);
+    MatchSequence sequence = new MatchSequence(a, b, c);
+    Match d = new Match(new Word("D", 4), new Word("D", 1), 4);
+    Match e = new Match(new Word("E", 5), new Word("E", 2), 5);
+    MatchSequence sequence2 = new MatchSequence(d, e);
+    List<MatchSequence> matchSequencesForBase = Lists.newArrayList(sequence, sequence2);
+    List<MatchSequence> matchSequencesForWitness = Lists.newArrayList(sequence2, sequence);
+    List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
+    Tuple2<MatchSequence> expected1 = new Tuple2<MatchSequence>(sequence, sequence2);
+    Tuple2<MatchSequence> expected2 = new Tuple2<MatchSequence>(sequence2, sequence);
+    assertEquals(expected1, matchSequenceTuples.get(0));
+    assertEquals(expected2, matchSequenceTuples.get(1));
+  }
 }

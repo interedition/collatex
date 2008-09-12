@@ -47,11 +47,21 @@ public class TranspositionDetection {
     return matchSequencesForWitness;
   }
 
+  public static List<Tuple2<MatchSequence>> calculateSequenceTuples(List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
+    List<Tuple2<MatchSequence>> tuples = Lists.newArrayList();
+    for (int i = 0; i < matchSequencesForBase.size(); i++) {
+      Tuple2<MatchSequence> tuple = new Tuple2<MatchSequence>(matchSequencesForBase.get(i), matchSequencesForWitness.get(i));
+      tuples.add(tuple);
+    }
+    return tuples;
+  }
+
   protected List<Transposition> detectTranspositions() {
     Matches matches = new Matches(witnessIndex, witnessIndex2);
 
     List<MatchSequence> matchSequencesForBase = calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
     List<MatchSequence> matchSequencesForWitness = sortSequencesForWitness(matchSequencesForBase);
+    List<Tuple2<MatchSequence>> matchSequenceTuples = calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
 
     Trans trans = new Trans(matchSequencesForBase);
     //    System.out.println(trans.getTuples());
