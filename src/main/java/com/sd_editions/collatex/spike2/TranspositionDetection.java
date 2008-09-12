@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.spike2;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -33,12 +35,25 @@ public class TranspositionDetection {
     return sequences;
   }
 
+  protected static List<MatchSequence> sortSequencesForWitness(List<MatchSequence> matchSequences) {
+    Comparator<MatchSequence> comparator = new Comparator<MatchSequence>() {
+      @SuppressWarnings("boxing")
+      public int compare(MatchSequence o1, MatchSequence o2) {
+        return o1.getWitnessPosition() - o2.getWitnessPosition();
+      }
+    };
+    List<MatchSequence> matchSequencesForWitness = Lists.newArrayList(matchSequences);
+    Collections.sort(matchSequencesForWitness, comparator);
+    return matchSequencesForWitness;
+  }
+
   protected List<Transposition> detectTranspositions() {
     Matches matches = new Matches(witnessIndex, witnessIndex2);
 
-    List<MatchSequence> calculateMatchSequences = calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
+    List<MatchSequence> matchSequencesForBase = calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
+    List<MatchSequence> matchSequencesForWitness = sortSequencesForWitness(matchSequencesForBase);
 
-    Trans trans = new Trans(calculateMatchSequences);
+    Trans trans = new Trans(matchSequencesForBase);
     //    System.out.println(trans.getTuples());
     Set<TranspositionTuple> transpositionTuples = trans.getTranspositions();
     List<Transposition> modifications = Lists.newArrayList();

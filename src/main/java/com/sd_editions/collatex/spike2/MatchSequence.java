@@ -7,8 +7,8 @@ import com.google.common.collect.Lists;
 public class MatchSequence {
   private final List<Match> sequence;
 
-  public MatchSequence() {
-    sequence = Lists.newArrayList();
+  public MatchSequence(Match... matches) {
+    sequence = Lists.newArrayList(matches);
   }
 
   @Override
