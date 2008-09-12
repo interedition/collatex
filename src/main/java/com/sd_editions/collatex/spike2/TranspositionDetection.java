@@ -8,6 +8,7 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionDetection {
@@ -67,6 +68,14 @@ public class TranspositionDetection {
     return filteredMatchSequences;
   }
 
+  protected static Set<TranspositionTuple> calculateTranspositions(List<Tuple2<MatchSequence>> possibleTranspositionTuples) {
+    List<TranspositionTuple> asTranspositionTuples = Lists.newArrayList();
+    for (Tuple2<MatchSequence> sequence : possibleTranspositionTuples) {
+      asTranspositionTuples.add(new TranspositionTuple(sequence));
+    }
+    return Sets.newHashSet(asTranspositionTuples);
+  }
+
   protected List<Transposition> detectTranspositions() {
     Matches matches = new Matches(witnessIndex, witnessIndex2);
 
@@ -74,10 +83,9 @@ public class TranspositionDetection {
     List<MatchSequence> matchSequencesForWitness = sortSequencesForWitness(matchSequencesForBase);
     List<Tuple2<MatchSequence>> matchSequenceTuples = calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = filterAwayRealMatches(matchSequenceTuples);
+    Set<TranspositionTuple> transpositionTuples = calculateTranspositions(possibleTranspositionTuples);
 
-    Trans trans = new Trans(matchSequencesForBase);
-    //    System.out.println(trans.getTuples());
-    Set<TranspositionTuple> transpositionTuples = trans.getTranspositions();
+    //
     List<Transposition> modifications = Lists.newArrayList();
     for (TranspositionTuple transposition : transpositionTuples) {
       int leftPosition = witnessIndex.getPosition(transposition.getLeft());

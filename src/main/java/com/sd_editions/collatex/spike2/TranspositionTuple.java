@@ -2,10 +2,10 @@ package com.sd_editions.collatex.spike2;
 
 public class TranspositionTuple {
 
-  private final MatchSequence matchSequence;
+  private final Tuple2<MatchSequence> tuple;
 
-  public TranspositionTuple(MatchSequence matchSequence) {
-    this.matchSequence = matchSequence;
+  public TranspositionTuple(Tuple2<MatchSequence> tuple) {
+    this.tuple = tuple;
   }
 
   @Override
@@ -24,15 +24,15 @@ public class TranspositionTuple {
 
   @Override
   public String toString() {
-    return matchSequence.toString();
+    return tuple.toString();
   }
 
   Integer getRight() {
-    return matchSequence.getWitnessPosition();
+    return tuple.right.getFirstMatch().wordCode;
   }
 
   Integer getLeft() {
-    return matchSequence.getBasePosition();
+    return tuple.left.getFirstMatch().wordCode;
   }
 
 }
