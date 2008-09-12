@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.spike2.collate.Transposition;
 
@@ -56,12 +58,22 @@ public class TranspositionDetection {
     return tuples;
   }
 
+  public static List<Tuple2<MatchSequence>> filterAwayRealMatches(List<Tuple2<MatchSequence>> possibleMatches) {
+    List<Tuple2<MatchSequence>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence>>() {
+      public boolean apply(Tuple2<MatchSequence> tuple) {
+        return tuple.left.getFirstMatch().wordCode != tuple.right.getFirstMatch().wordCode;
+      }
+    }));
+    return filteredMatchSequences;
+  }
+
   protected List<Transposition> detectTranspositions() {
     Matches matches = new Matches(witnessIndex, witnessIndex2);
 
     List<MatchSequence> matchSequencesForBase = calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
     List<MatchSequence> matchSequencesForWitness = sortSequencesForWitness(matchSequencesForBase);
     List<Tuple2<MatchSequence>> matchSequenceTuples = calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
+    List<Tuple2<MatchSequence>> possibleTranspositionTuples = filterAwayRealMatches(matchSequenceTuples);
 
     Trans trans = new Trans(matchSequencesForBase);
     //    System.out.println(trans.getTuples());

@@ -24,13 +24,26 @@ public class MatchSequence {
     return sequence.isEmpty();
   }
 
-  @SuppressWarnings("boxing")
-  public Integer getWitnessPosition() {
-    return sequence.get(0).getWitnessWord().position;
+  public Match getFirstMatch() {
+    return sequence.get(0);
   }
 
+  @SuppressWarnings("boxing")
+  public Integer getWitnessPosition() {
+    return getFirstWitnessWord().position;
+  }
+
+  @SuppressWarnings("boxing")
   public Integer getBasePosition() {
-    return sequence.get(0).getBaseWord().position;
+    return getFirstBaseWord().position;
+  }
+
+  private Word getFirstWitnessWord() {
+    return getFirstMatch().getWitnessWord();
+  }
+
+  private Word getFirstBaseWord() {
+    return getFirstMatch().getBaseWord();
   }
 
 }

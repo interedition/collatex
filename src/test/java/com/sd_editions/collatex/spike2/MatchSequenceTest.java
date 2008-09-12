@@ -85,6 +85,7 @@ public class MatchSequenceTest extends TestCase {
     assertEquals(Lists.newArrayList(sequence2, sequence), arrayForWitness);
   }
 
+  @SuppressWarnings("boxing")
   public void testConvertMatchSequencesToTuples() {
     Match a = new Match(new Word("A", 1), new Word("A", 3), 1);
     Match b = new Match(new Word("B", 2), new Word("B", 4), 2);
@@ -100,5 +101,24 @@ public class MatchSequenceTest extends TestCase {
     Tuple2<MatchSequence> expected2 = new Tuple2<MatchSequence>(sequence2, sequence);
     assertEquals(expected1, matchSequenceTuples.get(0));
     assertEquals(expected2, matchSequenceTuples.get(1));
+  }
+
+  // A B C
+  // B A C
+  @SuppressWarnings("boxing")
+  public void testFilterAwayRealMatches() {
+    Match a = new Match(new Word("A", 1), new Word("A", 2), 1);
+    Match b = new Match(new Word("B", 2), new Word("B", 1), 2);
+    Match c = new Match(new Word("C", 3), new Word("C", 3), 3);
+    MatchSequence sequenceA = new MatchSequence(a);
+    MatchSequence sequenceB = new MatchSequence(b);
+    MatchSequence sequenceC = new MatchSequence(c);
+    Tuple2<MatchSequence> tuple1 = new Tuple2<MatchSequence>(sequenceA, sequenceB);
+    Tuple2<MatchSequence> tuple2 = new Tuple2<MatchSequence>(sequenceB, sequenceA);
+    Tuple2<MatchSequence> tuple3 = new Tuple2<MatchSequence>(sequenceC, sequenceC);
+    List<Tuple2<MatchSequence>> tuples = Lists.newArrayList(tuple1, tuple2, tuple3);
+    List<Tuple2<MatchSequence>> expected = Lists.newArrayList(tuple1, tuple2);
+    List<Tuple2<MatchSequence>> actual = TranspositionDetection.filterAwayRealMatches(tuples);
+    assertEquals(expected, actual);
   }
 }
