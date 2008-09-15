@@ -46,4 +46,13 @@ public class MatchSequence {
     return getFirstMatch().getBaseWord();
   }
 
+  public String baseToString() {
+    String result = "";
+    String delimiter = "";
+    for (Match match : sequence) {
+      result += delimiter + match.getBaseWord().toString();
+      delimiter = " ";
+    }
+    return result;
+  }
 }

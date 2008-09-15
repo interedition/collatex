@@ -8,4 +8,9 @@ public class Word {
     this.original = original;
     this.position = position;
   }
+
+  @Override
+  public String toString() {
+    return original;
+  }
 }

@@ -85,17 +85,10 @@ public class TranspositionDetection {
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = filterAwayRealMatches(matchSequenceTuples);
     Set<TranspositionTuple> transpositionTuples = calculateTranspositions(possibleTranspositionTuples);
 
-    //
     List<Transposition> modifications = Lists.newArrayList();
     for (TranspositionTuple transposition : transpositionTuples) {
-      int leftPosition = witnessIndex.getPosition(transposition.getLeft());
-      int rightPosition = witnessIndex.getPosition(transposition.getRight());
-      if (leftPosition > rightPosition) {
-        leftPosition = witnessIndex.getPosition(transposition.getRight());
-        rightPosition = witnessIndex.getPosition(transposition.getLeft());
-      }
-      Phrase base = witnessIndex.createPhrase(leftPosition, leftPosition);
-      Phrase witness = witnessIndex.createPhrase(rightPosition, rightPosition);
+      MatchSequence base = transposition.getLeftSequence();
+      MatchSequence witness = transposition.getRightSequence();
       modifications.add(new Transposition(base, witness));
     }
     return modifications;

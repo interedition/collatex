@@ -88,7 +88,7 @@ public class ColorsView {
 
   private String transpositionView(Transposition transposition, int base, int w) {
     //    return "<i>" + "</i> transposed from position " + transposition. + " to " + y;
-    return "<i>" + transposition.getLeft() + "</i> transposed with " + transposition.getRight();
+    return "<i>" + transposition.getLeft() + "</i> transposed with <i>" + transposition.getRight() + "</i>";
   }
 
   private String removalView(Removal removal, int base) {

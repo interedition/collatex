@@ -27,6 +27,14 @@ public class TranspositionTuple {
     return tuple.toString();
   }
 
+  MatchSequence getLeftSequence() {
+    return tuple.left;
+  }
+
+  MatchSequence getRightSequence() {
+    return tuple.right;
+  }
+
   Integer getRight() {
     return tuple.right.getFirstMatch().wordCode;
   }

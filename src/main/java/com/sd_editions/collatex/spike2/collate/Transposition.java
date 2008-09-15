@@ -1,27 +1,27 @@
 package com.sd_editions.collatex.spike2.collate;
 
+import com.sd_editions.collatex.spike2.MatchSequence;
 import com.sd_editions.collatex.spike2.Modification;
-import com.sd_editions.collatex.spike2.Phrase;
 
 public class Transposition extends Modification {
-  private final Phrase base;
-  private final Phrase witness;
+  private final MatchSequence base;
+  private final MatchSequence witness;
 
-  public Transposition(Phrase base, Phrase witness) {
-    this.base = base;
-    this.witness = witness;
+  public Transposition(MatchSequence _base, MatchSequence _witness) {
+    this.base = _base;
+    this.witness = _witness;
   }
 
   @Override
   public String toString() {
-    return "transposition: " + base + " switches position with " + witness;
+    return "transposition: " + getLeft() + " switches position with " + getRight();
   }
 
   public String getLeft() {
-    return base.toString();
+    return base.baseToString();
   }
 
   public String getRight() {
-    return witness.toString();
+    return witness.baseToString();
   }
 }
