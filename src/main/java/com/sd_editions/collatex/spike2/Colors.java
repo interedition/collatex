@@ -86,7 +86,7 @@ public class Colors {
     return new Matches(getWitnessIndex(i), getWitnessIndex(j));
   }
 
-  public List<Transposition> detectTranspositions(int i, int j) {
+  public Modifications detectTranspositions(int i, int j) {
     WitnessIndex witnessIndex = getWitnessIndex(i);
     WitnessIndex witnessIndex2 = getWitnessIndex(j);
     Matches matches = new Matches(witnessIndex, witnessIndex2);
@@ -95,7 +95,8 @@ public class Colors {
     List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
     List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-    return TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
+    List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
+    return new Modifications(transpositions);
   }
 
   public int numberOfWitnesses() {

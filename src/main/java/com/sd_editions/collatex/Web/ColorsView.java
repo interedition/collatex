@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.spike2.Colors;
 import com.sd_editions.collatex.spike2.Modification;
+import com.sd_editions.collatex.spike2.Modifications;
 import com.sd_editions.collatex.spike2.WitnessIndex;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
@@ -55,7 +56,8 @@ public class ColorsView {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html += "Comparing witness " + base + " with witness " + w + ":<ul>";
         List<Modification> modifications = colors.compareWitness(base, w);
-        List<Transposition> transpositions = colors.detectTranspositions(base, w);
+        Modifications detectTranspositions = colors.detectTranspositions(base, w);
+        List<Transposition> transpositions = detectTranspositions.getTranspositions();
         modifications.addAll(transpositions);
 
         if (modifications.isEmpty()) {
