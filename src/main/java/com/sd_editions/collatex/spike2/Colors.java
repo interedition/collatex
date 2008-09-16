@@ -34,11 +34,13 @@ public class Colors {
   }
 
   public Modifications compareWitness(int i, int j) {
+    //Note: this only leads to one permutation of the possible matches..
     WitnessIndex witnessIndex = getWitnessIndex(i);
     WitnessIndex witnessIndex2 = getWitnessIndex(j);
     Matches matches = new Matches(witnessIndex, witnessIndex2);
+    Set<Match> permutation = matches.matches();
 
-    List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
+    List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequences(witnessIndex, witnessIndex2, permutation);
     List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
     List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
