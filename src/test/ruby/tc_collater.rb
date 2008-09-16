@@ -36,4 +36,12 @@ class TC_CollateR < Test::Unit::TestCase
   	assert_equal("Transposition: 'a b' <=> 'c d'", transpositions.to_a.first.to_s)
   end
 
+#  def test_complex
+#  	wp = WitnessPair.new(Witness.new("The black dog chases a red cat."), Witness.new("A red cat chases the yellow dog"))
+#  	mp = wp.matchpermutations.first
+#  	matchsequences = wp.calculate_matchsequences(mp)
+#  	transpositions = wp.calculate_transpositions(matchsequences)
+#  	assert_equal(0,transpositions.size)
+#  end
+
 end
