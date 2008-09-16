@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
 import com.sd_editions.collatex.spike2.collate.Replacement;
+import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class Colors {
 
@@ -85,8 +86,25 @@ public class Colors {
     return new Matches(getWitnessIndex(i), getWitnessIndex(j));
   }
 
-  public TranspositionDetection detectTranspositions(int i, int j) {
-    return new TranspositionDetection(getWitnessIndex(i), getWitnessIndex(j));
+  public List<Transposition> detectTranspositions(int i, int j) {
+    WitnessIndex witnessIndex = getWitnessIndex(i);
+    WitnessIndex witnessIndex2 = getWitnessIndex(j);
+    Matches matches = new Matches(witnessIndex, witnessIndex2);
+
+    List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
+    List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
+    List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
+    List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
+    Set<TranspositionTuple> transpositionTuples = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
+
+    //TODO: move this to calculate transpositions (cause this an implementation detail)
+    List<Transposition> modifications = Lists.newArrayList();
+    for (TranspositionTuple transposition : transpositionTuples) {
+      MatchSequence base = transposition.getLeftSequence();
+      MatchSequence witness = transposition.getRightSequence();
+      modifications.add(new Transposition(base, witness));
+    }
+    return modifications;
   }
 
   public int numberOfWitnesses() {

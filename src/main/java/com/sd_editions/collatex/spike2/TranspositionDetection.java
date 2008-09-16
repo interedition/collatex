@@ -9,17 +9,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionDetection {
   final WitnessIndex witnessIndex;
   final WitnessIndex witnessIndex2;
-  private final List<Transposition> transpositions;
 
   public TranspositionDetection(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
     this.witnessIndex = _witnessIndex;
     this.witnessIndex2 = _witnessIndex2;
-    this.transpositions = detectTranspositions();
   }
 
   public static List<MatchSequence> calculateMatchSequences(WitnessIndex base, WitnessIndex witness, Set<Match> matches) {
@@ -83,28 +80,6 @@ public class TranspositionDetection {
       asTranspositionTuples.add(new TranspositionTuple(sequence));
     }
     return Sets.newHashSet(asTranspositionTuples);
-  }
-
-  protected List<Transposition> detectTranspositions() {
-    Matches matches = new Matches(witnessIndex, witnessIndex2);
-
-    List<MatchSequence> matchSequencesForBase = calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
-    List<MatchSequence> matchSequencesForWitness = sortSequencesForWitness(matchSequencesForBase);
-    List<Tuple2<MatchSequence>> matchSequenceTuples = calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
-    List<Tuple2<MatchSequence>> possibleTranspositionTuples = filterAwayRealMatches(matchSequenceTuples);
-    Set<TranspositionTuple> transpositionTuples = calculateTranspositions(possibleTranspositionTuples);
-
-    List<Transposition> modifications = Lists.newArrayList();
-    for (TranspositionTuple transposition : transpositionTuples) {
-      MatchSequence base = transposition.getLeftSequence();
-      MatchSequence witness = transposition.getRightSequence();
-      modifications.add(new Transposition(base, witness));
-    }
-    return modifications;
-  }
-
-  public List<Transposition> getTranspositions() {
-    return transpositions;
   }
 
 }
