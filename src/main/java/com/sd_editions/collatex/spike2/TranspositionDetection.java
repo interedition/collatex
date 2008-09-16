@@ -90,4 +90,17 @@ public class TranspositionDetection {
     }
     return modifications;
   }
+
+  public static List<MatchSequence> getMatches(List<Tuple2<MatchSequence>> possibleMatches) {
+    List<Tuple2<MatchSequence>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence>>() {
+      public boolean apply(Tuple2<MatchSequence> tuple) {
+        return tuple.left.getFirstMatch().wordCode == tuple.right.getFirstMatch().wordCode;
+      }
+    }));
+    List<MatchSequence> realMatches = Lists.newArrayList();
+    for (Tuple2<MatchSequence> tuple2 : filteredMatchSequences) {
+      realMatches.add(tuple2.left);
+    }
+    return realMatches;
+  }
 }
