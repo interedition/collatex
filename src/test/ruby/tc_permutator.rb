@@ -5,8 +5,8 @@ class TC_Permutator < Test::Unit::TestCase
 	def test_group
 		permutator = Permutator.new([])
 		raw_tuples = [[1,2],[1,3],[2,1],[2,3],[3,4]]
-		expected = [[[1,2],[1,3]],[[2,1],[2,3]],[[3,4]]]
-		assert_equal(expected, permutator.group(raw_tuples))
+		expected = [[[1,2],[1,3]],[[1,3],[2,3]],[[2,1],[2,3]],[[3,4]]]
+		assert_equal(expected, permutator.group(raw_tuples).sort)
 	end
 
 	def test_degroup
@@ -103,5 +103,11 @@ class TC_Permutator < Test::Unit::TestCase
   	]
   	assert_equal(expected_permutations, permutator.permutations.sort)
   end
+ 
+#  def test_delete_subsets
+#  	s = Set.new([[1],[1,2,3],[2,3],[3,4],[4]])
+#  	expected = [[1,2,3],[3,4]]
+#  	assert_equal(expected, s.delete_subsets.to_a.sort)
+#  end
 
 end
