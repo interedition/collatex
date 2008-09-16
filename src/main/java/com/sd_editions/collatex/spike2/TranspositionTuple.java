@@ -36,11 +36,11 @@ public class TranspositionTuple {
   }
 
   Integer getRight() {
-    return tuple.right.getFirstMatch().wordCode;
+    return getRightSequence().getFirstMatch().wordCode;
   }
 
   Integer getLeft() {
-    return tuple.left.getFirstMatch().wordCode;
+    return getLeftSequence().getFirstMatch().wordCode;
   }
 
 }
