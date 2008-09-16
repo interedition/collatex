@@ -90,7 +90,7 @@ class Permutator
   	  permutations << degroup(tuplegroups)
   	else
   		i = start_group
-  		while (!tuplegroups[i].nil? && tuplegroups[i].size==1 && i<tuplegroups.size-1)
+  		while (tuplegroups[i].size==1 && i<tuplegroups.size-1)
   		  i+=1
   	  end
   	  if (i<tuplegroups.size)

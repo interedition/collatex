@@ -164,7 +164,7 @@ class CollateR
 	    puts wp
 	    wp.matches.each{|m| p [m.word1.original,m.word2.original]}
 	    puts "permutations:"
-	    wp.matchpermutations.each{|mp| p mp.collect{|m| ["#{m.word1.original}(#{m.word1.position})","#{m.word2.original}(#{m.word2.position})"]}}
+	    wp.matchpermutations.each{|mp| p mp.sort{|a,b| a.word1.position <=> b.word1.position }.collect{|m| ["#{m.word1.original}(#{m.word1.position})","#{m.word2.original}(#{m.word2.position})"]}}
 #	    puts "matchsequences:"
 #	    wp.matchsequences.each {|mg| p mg.collect{|m| m.word1.original}.join(' ')}
 #	    puts "Transpositions:"
@@ -199,5 +199,3 @@ class Main
 		usecases.each { |u| CollateR.new(u) }		
 	end
 end
-
-#Main.new
