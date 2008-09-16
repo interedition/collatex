@@ -34,13 +34,21 @@ public class Colors {
   }
 
   public Modifications compareWitness(int i, int j) {
-    Matches matches = getMatches(i, j);
+    WitnessIndex witnessIndex = getWitnessIndex(i);
+    WitnessIndex witnessIndex2 = getWitnessIndex(j);
+    Matches matches = new Matches(witnessIndex, witnessIndex2);
+
+    List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
+    List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
+    List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
+    List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
+    List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
+
     List<MisMatch> mismatches = matches.getMisMatches();
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(getOmissions(mismatches));
     modifications.addAll(getAdditions(mismatches));
     modifications.addAll(getReplacements(mismatches));
-    List<Transposition> transpositions = Lists.newArrayList();
     return new Modifications(modifications, transpositions);
   }
 
@@ -85,20 +93,6 @@ public class Colors {
 
   public Matches getMatches(int i, int j) {
     return new Matches(getWitnessIndex(i), getWitnessIndex(j));
-  }
-
-  public Modifications detectTranspositions(int i, int j) {
-    WitnessIndex witnessIndex = getWitnessIndex(i);
-    WitnessIndex witnessIndex2 = getWitnessIndex(j);
-    Matches matches = new Matches(witnessIndex, witnessIndex2);
-
-    List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequences(witnessIndex, witnessIndex2, matches.matches());
-    List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
-    List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
-    List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-    List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
-    List<Modification> modifications = Lists.newArrayList();
-    return new Modifications(modifications, transpositions);
   }
 
   public int numberOfWitnesses() {

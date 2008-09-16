@@ -9,21 +9,21 @@ import com.sd_editions.collatex.spike2.collate.Transposition;
 public class TranspositionTest extends TestCase {
   public void testTransposition1() {
     Colors colors = new Colors("a b c d e", "a c d b e");
-    Modifications modifications = colors.detectTranspositions(1, 2);
+    Modifications modifications = colors.compareWitness(1, 2);
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals("transposition: b switches position with c d", transpositions.get(0).toString());
   }
 
   public void testTransposition2() {
     Colors colors = new Colors("a b x c d ", "a c d x b");
-    Modifications modifications = colors.detectTranspositions(1, 2);
+    Modifications modifications = colors.compareWitness(1, 2);
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals("transposition: b switches position with c d", transpositions.get(0).toString());
   }
 
   public void testTransposition3() {
     Colors colors = new Colors("a b x c d ", "c d x a b");
-    Modifications modifications = colors.detectTranspositions(1, 2);
+    Modifications modifications = colors.compareWitness(1, 2);
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals("transposition: a b switches position with c d", transpositions.get(0).toString());
   }
@@ -33,7 +33,7 @@ public class TranspositionTest extends TestCase {
     String base = "The black dog chases a red cat.";
     String witness = "A red cat chases the yellow dog";
     Colors colors = new Colors(base, witness);
-    Modifications modifications = colors.detectTranspositions(1, 2);
+    Modifications modifications = colors.compareWitness(1, 2);
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals(0, transpositions.size());
   }

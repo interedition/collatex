@@ -57,8 +57,7 @@ public class ColorsView {
         html += "Comparing witness " + base + " with witness " + w + ":<ul>";
         Modifications modificationsT = colors.compareWitness(base, w);
         List<Modification> modifications = modificationsT.getModifications();
-        Modifications detectTranspositions = colors.detectTranspositions(base, w);
-        List<Transposition> transpositions = detectTranspositions.getTranspositions();
+        List<Transposition> transpositions = modificationsT.getTranspositions();
         modifications.addAll(transpositions);
 
         if (modifications.isEmpty()) {
