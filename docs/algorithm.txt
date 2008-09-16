@@ -1,0 +1,16 @@
+- step zero: calculate the permutations
+
+- step one: take one permutation 
+  result: Set<Match>
+
+- step two: determine the match sequences
+  result: List<MatchSequence>
+
+- step three: determine the real matches
+
+- step four: determine the transpositions
+  result: List<Transposition>
+
+- step 5: determine the gaps between the match sequences (from the real matches and the transpositions)
+
+- step 6: analyse each gap to determine wheter it is an addition, ommission or replacement
