@@ -14,12 +14,14 @@ public class TranspositionTuple {
       return false;
     }
     TranspositionTuple tuple2 = (TranspositionTuple) obj;
-    return tuple2.getLeft().equals(getRight()) && tuple2.getRight().equals(getLeft());
+    boolean result = tuple2.getLeftWordCode().equals(getRightWordCode()) && tuple2.getRightWordCode().equals(getLeftWordCode());
+    //    System.out.println("comparing: " + this.toString() + " && " + tuple2.toString() + " result: " + result);
+    return result;
   }
 
   @Override
   public int hashCode() {
-    return getLeft().hashCode() + getRight().hashCode();
+    return getLeftWordCode().hashCode() + getRightWordCode().hashCode();
   }
 
   @Override
@@ -35,11 +37,11 @@ public class TranspositionTuple {
     return tuple.right;
   }
 
-  Integer getRight() {
+  Integer getRightWordCode() {
     return getRightSequence().getFirstMatch().wordCode;
   }
 
-  Integer getLeft() {
+  Integer getLeftWordCode() {
     return getLeftSequence().getFirstMatch().wordCode;
   }
 

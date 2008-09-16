@@ -22,4 +22,9 @@ public class Tuple2<T> {
   public int hashCode() {
     return left.hashCode() + right.hashCode();
   }
+
+  @Override
+  public String toString() {
+    return "{" + left.toString() + "; " + right.toString() + "}";
+  }
 }

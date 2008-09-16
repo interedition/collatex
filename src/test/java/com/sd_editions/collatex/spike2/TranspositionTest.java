@@ -28,6 +28,16 @@ public class TranspositionTest extends TestCase {
     assertEquals("transposition: a b switches position with c d", transpositions.get(0).toString());
   }
 
+  //Note: this test should NOT lead to a transposition
+  public void testComplex() {
+    String base = "The black dog chases a red cat.";
+    String witness = "A red cat chases the yellow dog";
+    Colors colors = new Colors(base, witness);
+    TranspositionDetection detection = colors.detectTranspositions(1, 2);
+    List<Transposition> transpositions = detection.getTranspositions();
+    assertEquals(0, transpositions.size());
+  }
+
   //
 
   //  public void testPhrases1() {
