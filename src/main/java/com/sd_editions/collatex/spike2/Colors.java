@@ -48,8 +48,8 @@ public class Colors {
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(getOmissions(mismatches));
     modifications.addAll(getAdditions(mismatches));
-    modifications.addAll(getReplacements(mismatches));
-    return new Modifications(modifications, transpositions);
+    List<Replacement> replacements = getReplacements(mismatches);
+    return new Modifications(modifications, transpositions, replacements);
   }
 
   public List<Addition> getAdditions(List<MisMatch> mismatches) {
