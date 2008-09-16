@@ -9,6 +9,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionDetection {
   final WitnessIndex witnessIndex;
@@ -65,7 +66,7 @@ public class TranspositionDetection {
     return filteredMatchSequences;
   }
 
-  protected static Set<TranspositionTuple> calculateTranspositions(final List<Tuple2<MatchSequence>> possibleTranspositionTuples) {
+  protected static List<Transposition> calculateTranspositions(final List<Tuple2<MatchSequence>> possibleTranspositionTuples) {
     // here we go and filter.. so that only transpositions are kept..
     // later on we filter away duplicates
     List<Tuple2<MatchSequence>> matchSequencesInTransposition = Lists.newArrayList(Iterables.filter(possibleTranspositionTuples, new Predicate<Tuple2<MatchSequence>>() {
@@ -74,12 +75,19 @@ public class TranspositionDetection {
         return possibleTranspositionTuples.contains(mirror);
       }
     }));
-    // this is to filter away duplicates...
+    // this is to filter away duplicates... --> wrap them in TranpositionTuples
     List<TranspositionTuple> asTranspositionTuples = Lists.newArrayList();
     for (Tuple2<MatchSequence> sequence : matchSequencesInTransposition) {
       asTranspositionTuples.add(new TranspositionTuple(sequence));
     }
-    return Sets.newHashSet(asTranspositionTuples);
+    Set<TranspositionTuple> transpositionTuples = Sets.newHashSet(asTranspositionTuples);
+    // Unwrap them and map them to Transpositions..
+    List<Transposition> modifications = Lists.newArrayList();
+    for (TranspositionTuple transposition : transpositionTuples) {
+      MatchSequence base = transposition.getLeftSequence();
+      MatchSequence witness = transposition.getRightSequence();
+      modifications.add(new Transposition(base, witness));
+    }
+    return modifications;
   }
-
 }

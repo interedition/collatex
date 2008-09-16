@@ -95,16 +95,7 @@ public class Colors {
     List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
     List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-    Set<TranspositionTuple> transpositionTuples = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
-
-    //TODO: move this to calculate transpositions (cause this an implementation detail)
-    List<Transposition> modifications = Lists.newArrayList();
-    for (TranspositionTuple transposition : transpositionTuples) {
-      MatchSequence base = transposition.getLeftSequence();
-      MatchSequence witness = transposition.getRightSequence();
-      modifications.add(new Transposition(base, witness));
-    }
-    return modifications;
+    return TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
   }
 
   public int numberOfWitnesses() {
