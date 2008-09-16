@@ -33,14 +33,15 @@ public class Colors {
     return witnessIndexes.get(i - 1);
   }
 
-  public List<Modification> compareWitness(int i, int j) {
+  public Modifications compareWitness(int i, int j) {
     Matches matches = getMatches(i, j);
     List<MisMatch> mismatches = matches.getMisMatches();
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(getOmissions(mismatches));
     modifications.addAll(getAdditions(mismatches));
     modifications.addAll(getReplacements(mismatches));
-    return modifications;
+    List<Transposition> transpositions = Lists.newArrayList();
+    return new Modifications(modifications, transpositions);
   }
 
   public List<Addition> getAdditions(List<MisMatch> mismatches) {
@@ -96,7 +97,8 @@ public class Colors {
     List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
     List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
-    return new Modifications(transpositions);
+    List<Modification> modifications = Lists.newArrayList();
+    return new Modifications(modifications, transpositions);
   }
 
   public int numberOfWitnesses() {
