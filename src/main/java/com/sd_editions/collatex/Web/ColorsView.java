@@ -55,15 +55,12 @@ public class ColorsView {
     for (int base = 1; base < numberOfWitnesses; base++) {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html += "Comparing witness " + base + " with witness " + w + ":<ul>";
-        Modifications modificationsT = colors.compareWitness(base, w);
-        List<Modification> modifications = modificationsT.getModifications();
-        List<Transposition> transpositions = modificationsT.getTranspositions();
-        modifications.addAll(transpositions);
-
-        if (modifications.isEmpty()) {
+        Modifications modifications = colors.compareWitness(base, w);
+        List<Modification> modificationsL = modifications.getModifications();
+        if (modificationsL.isEmpty()) {
           html += "no additions, removals or transpositions";
         } else {
-          for (Modification modification : modifications) {
+          for (Modification modification : modificationsL) {
             if (modification instanceof Addition) {
               html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
             } else if (modification instanceof Removal) {
