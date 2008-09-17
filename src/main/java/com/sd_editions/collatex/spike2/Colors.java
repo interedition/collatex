@@ -46,9 +46,6 @@ public class Colors {
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
     List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
 
-    List<MatchSequence> realMatches = TranspositionDetection.getMatches(matchSequenceTuples);
-    //TODO: use the realMatches and transpositions to calculate the mismatches with!
-
     List<MisMatch> mismatches = matches.getMisMatches();
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(getOmissions(mismatches));
