@@ -40,7 +40,7 @@ public class Colors {
     Matches matches = new Matches(witnessIndex, witnessIndex2);
     Set<Match> permutation = matches.matches();
 
-    List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequences(witnessIndex, witnessIndex2, permutation);
+    List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);
     List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
     List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
@@ -105,6 +105,6 @@ public class Colors {
     WitnessIndex base = getWitnessIndex(i);
     WitnessIndex witness = getWitnessIndex(j);
     Set<Match> matches = getMatches(i, j).matches();
-    return TranspositionDetection.calculateMatchSequences(base, witness, matches);
+    return TranspositionDetection.calculateMatchSequencesForgetNonMatches(matches);
   }
 }

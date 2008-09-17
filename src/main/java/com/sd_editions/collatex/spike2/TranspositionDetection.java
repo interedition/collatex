@@ -3,11 +3,13 @@ package com.sd_editions.collatex.spike2;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.spike2.collate.Transposition;
 
@@ -20,12 +22,19 @@ public class TranspositionDetection {
     this.witnessIndex2 = _witnessIndex2;
   }
 
-  public static List<MatchSequence> calculateMatchSequences(WitnessIndex base, WitnessIndex witness, Set<Match> matches) {
+  public static List<MatchSequence> calculateMatchSequencesForgetNonMatches(Set<Match> matches) {
+    // sort Matches for the base --> that is already done (it is a linked hash set)
+    List<Match> matchesSortedForBase = sortMatchesForBase(matches);
+    // sort Matches for the witness
+    List<Match> matchesSortedForWitness = sortMatchesForWitness(matches);
+    // now compare..
+    Map<Match, Match> previousMatchMapBase = buildPreviousMatchMap(matchesSortedForBase);
+    Map<Match, Match> previousMatchMapWitness = buildPreviousMatchMap(matchesSortedForWitness);
     List<MatchSequence> sequences = Lists.newArrayList();
     MatchSequence sequence = new MatchSequence();
     for (Match match : matches) {
-      Integer expected = base.getPreviousWordCode(match.wordCode);
-      Integer actual = witness.getPreviousWordCode(match.wordCode);
+      Match expected = previousMatchMapBase.get(match);
+      Match actual = previousMatchMapWitness.get(match);
       if (expected != actual || expected != null && !expected.equals(actual)) {
         if (!sequence.isEmpty()) sequences.add(sequence);
         sequence = new MatchSequence();
@@ -34,6 +43,35 @@ public class TranspositionDetection {
     }
     if (!sequence.isEmpty()) sequences.add(sequence);
     return sequences;
+  }
+
+  private static List<Match> sortMatchesForBase(Set<Match> matches) {
+    List<Match> matchesSortedForBase = Lists.newArrayList();
+    for (Match match : matches) {
+      matchesSortedForBase.add(match);
+    }
+    return matchesSortedForBase;
+  }
+
+  private static Map<Match, Match> buildPreviousMatchMap(List<Match> matches) {
+    Map<Match, Match> previousMatches = Maps.newHashMap();
+    Match previousMatch = null;
+    for (Match match : matches) {
+      previousMatches.put(match, previousMatch);
+      previousMatch = match;
+    }
+    return previousMatches;
+  }
+
+  protected static List<Match> sortMatchesForWitness(Set<Match> matches) {
+    Comparator<Match> comparator = new Comparator<Match>() {
+      public int compare(Match o1, Match o2) {
+        return o1.getWitnessWord().position - o2.getWitnessWord().position;
+      }
+    };
+    List<Match> matchesForWitness = Lists.newArrayList(matches);
+    Collections.sort(matchesForWitness, comparator);
+    return matchesForWitness;
   }
 
   protected static List<MatchSequence> sortSequencesForWitness(List<MatchSequence> matchSequences) {

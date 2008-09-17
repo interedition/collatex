@@ -21,9 +21,8 @@ public class MatchSequenceTest extends TestCase {
     String witness = "a c b";
     Colors colors = new Colors(base, witness);
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
-    assertEquals("[(1->1)]", sequences.get(0).toString());
-    assertEquals("[(2->3)]", sequences.get(1).toString());
-    assertEquals(2, sequences.size());
+    assertEquals("[(1->1), (2->3)]", sequences.get(0).toString());
+    assertEquals(1, sequences.size());
   }
 
   public void testOmission() {
@@ -31,9 +30,8 @@ public class MatchSequenceTest extends TestCase {
     String witness = "a b";
     Colors colors = new Colors(base, witness);
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
-    assertEquals("[(1->1)]", sequences.get(0).toString());
-    assertEquals("[(3->2)]", sequences.get(1).toString());
-    assertEquals(2, sequences.size());
+    assertEquals("[(1->1), (3->2)]", sequences.get(0).toString());
+    assertEquals(1, sequences.size());
   }
 
   public void testReplacement() {
@@ -41,9 +39,8 @@ public class MatchSequenceTest extends TestCase {
     String witness = "a d c";
     Colors colors = new Colors(base, witness);
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
-    assertEquals("[(1->1)]", sequences.get(0).toString());
-    assertEquals("[(3->3)]", sequences.get(1).toString());
-    assertEquals(2, sequences.size());
+    assertEquals("[(1->1), (3->3)]", sequences.get(0).toString());
+    assertEquals(1, sequences.size());
   }
 
   public void testTransposition() {
@@ -56,16 +53,25 @@ public class MatchSequenceTest extends TestCase {
     assertEquals(2, sequences.size());
   }
 
-  //Note: this test should NOT lead to a transposition
+  //Note: this test should lead to a transposition :-)
   public void testComplex() {
     String base = "The black dog chases a red cat.";
     String witness = "A red cat chases the yellow dog";
     Colors colors = new Colors(base, witness);
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
-    assertEquals("[(1->5)]", sequences.get(0).toString());
-    assertEquals("[(3->7)]", sequences.get(1).toString());
-    assertEquals("[(4->4)]", sequences.get(2).toString());
-    assertEquals("[(5->1), (6->2), (7->3)]", sequences.get(3).toString());
+    assertEquals("[(1->5), (3->7)]", sequences.get(0).toString());
+    assertEquals("[(4->4)]", sequences.get(1).toString());
+    assertEquals("[(5->1), (6->2), (7->3)]", sequences.get(2).toString());
+    assertEquals(3, sequences.size());
+  }
+
+  public void testTranspositionExample1() {
+    Colors colors = new Colors("a b c d e", "a c d b e");
+    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    assertEquals("[(1->1)]", sequences.get(0).toString());
+    assertEquals("[(2->4)]", sequences.get(1).toString());
+    assertEquals("[(3->2), (4->3)]", sequences.get(2).toString());
+    assertEquals("[(5->5)]", sequences.get(3).toString());
     assertEquals(4, sequences.size());
   }
 
