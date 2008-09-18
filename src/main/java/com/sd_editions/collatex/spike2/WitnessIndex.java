@@ -14,10 +14,10 @@ import com.google.common.collect.Sets;
 @SuppressWarnings("boxing")
 public class WitnessIndex extends Witness {
   private final Set<Integer> wordCodes;
-  private final List<String> words;
   private final Index index;
 
   public WitnessIndex(String witness, Index _index) {
+    super(witness);
     index = _index;
 
     WitnessTokenizer tokenizer = index.createNormalizedTokenizerFor(witness);
@@ -29,20 +29,10 @@ public class WitnessIndex extends Witness {
       int code = index.getCodeFor(token, occurrences.count(token));
       wordCodes.add(code);
     }
-
-    tokenizer = index.createTokenizerFor(witness);
-    words = Lists.newArrayList();
-    while (tokenizer.hasNextToken()) {
-      words.add(tokenizer.nextToken());
-    }
   }
 
   public Set<Integer> getWordCodes() {
     return wordCodes;
-  }
-
-  public List<String> getWords() {
-    return words;
   }
 
   public Index getIndex() {
@@ -60,17 +50,6 @@ public class WitnessIndex extends Witness {
   public List<Integer> getWordCodesList() {
     List<Integer> list = Lists.newArrayList(wordCodes);
     return list;
-  }
-
-  //TODO: remove!
-  @Override
-  public String getWordOnPosition(int position) {
-    return words.get(position - 1);
-  }
-
-  //TODO: after remove, rename!
-  public Word getNewWordOnPosition(int position) {
-    return new Word(words.get(position - 1), position);
   }
 
   public int size() {

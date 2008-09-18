@@ -19,7 +19,7 @@ public class Phrase {
   public String toString() {
     List<String> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      String word = witness.getWordOnPosition(k);
+      String word = witness.getWordOnPosition(k).toString();
       words.add(word);
     }
 

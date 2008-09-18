@@ -11,6 +11,7 @@ import com.sd_editions.collatex.spike2.Colors;
 import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.Modifications;
 import com.sd_editions.collatex.spike2.WitnessIndex;
+import com.sd_editions.collatex.spike2.Word;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
 import com.sd_editions.collatex.spike2.collate.Replacement;
@@ -37,7 +38,7 @@ public class ColorsView {
       Set<Integer> colorsPerWitness = witnessIndex.getWordCodes();
       final Iterator<Integer> iterator = colorsPerWitness.iterator();
       for (int col = 0; col < colorsPerWitness.size(); col++) {
-        String word = witnessIndex.getWords().get(col);
+        String word = witnessIndex.getWords().get(col).toString();
         if (word != null) {
           htmlWords.add(new WordColorTuple(word, "color" + iterator.next()).toHtml());
         }
@@ -96,7 +97,7 @@ public class ColorsView {
   private String additionView(Addition addition, int base, int w) {
     WitnessIndex baseIndex = colors.getWitnessIndex(base);
     String html = "<i>" + addition.getAddedWords() + "</i> added ";
-    List<String> baseWords = baseIndex.getWords();
+    List<Word> baseWords = baseIndex.getWords();
     int position = addition.getPosition();
     if (position == 1) {
       html += "before <i>" + baseWords.get(0) + "</i>";
