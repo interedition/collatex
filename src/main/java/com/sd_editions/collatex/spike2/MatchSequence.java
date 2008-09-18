@@ -55,4 +55,8 @@ public class MatchSequence {
     }
     return result;
   }
+
+  public List<Match> getMatches() {
+    return sequence;
+  }
 }

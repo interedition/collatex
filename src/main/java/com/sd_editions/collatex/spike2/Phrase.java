@@ -5,12 +5,12 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 public class Phrase {
-  private final WitnessIndex witnessIndex;
+  private final Witness witness;
   private final int startPosition;
   private final int endPosition;
 
-  public Phrase(WitnessIndex _witnessIndex, int _startPosition, int _endPosition) {
-    witnessIndex = _witnessIndex;
+  public Phrase(Witness _witness, int _startPosition, int _endPosition) {
+    witness = _witness;
     startPosition = _startPosition;
     endPosition = _endPosition;
   }
@@ -19,7 +19,7 @@ public class Phrase {
   public String toString() {
     List<String> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      String word = witnessIndex.getWordOnPosition(k);
+      String word = witness.getWordOnPosition(k);
       words.add(word);
     }
 

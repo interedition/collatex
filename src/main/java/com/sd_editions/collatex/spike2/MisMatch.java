@@ -41,4 +41,17 @@ public class MisMatch {
     return base.hasGap() || witness.hasGap();
   }
 
+  public Modification analyse() {
+    if (isAddition()) {
+      return createAddition();
+    }
+    if (isOmission()) {
+      return createOmission();
+    }
+    if (isReplacement()) {
+      return createReplacement();
+    }
+    throw new RuntimeException("Not a modification!");
+  }
+
 }

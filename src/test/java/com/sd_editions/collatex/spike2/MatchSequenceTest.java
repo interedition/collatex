@@ -147,4 +147,23 @@ public class MatchSequenceTest extends TestCase {
     assertEquals(expected, actual);
   }
 
+  // a b
+  // a c b
+  @SuppressWarnings("boxing")
+  public void testModificationsBetweenMatchSequences() {
+    Word aB = new Word("A", 1);
+    Word bB = new Word("B", 1);
+    Word aW = new Word("A", 1);
+    Word cW = new Word("C", 2);
+    Word bW = new Word("B", 3);
+    Witness base = new Witness(aB, bB);
+    Witness witness = new Witness(aW, cW, bW);
+    Match a = new Match(aB, aW, 1);
+    Match b = new Match(bB, bW, 2);
+    MatchSequence sequence = new MatchSequence(a, b);
+    List<MatchSequence> sequences = Lists.newArrayList(sequence);
+    List<Modification> modificationsInMatchSequences = MatchSequences.getModificationsInMatchSequences(base, witness, sequences);
+    assertEquals(1, modificationsInMatchSequences.size());
+    assertEquals("addition: C position: 2", modificationsInMatchSequences.get(0).toString());
+  }
 }

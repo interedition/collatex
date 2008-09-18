@@ -12,7 +12,7 @@ import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
 
 @SuppressWarnings("boxing")
-public class WitnessIndex {
+public class WitnessIndex extends Witness {
   private final Set<Integer> wordCodes;
   private final List<String> words;
   private final Index index;
@@ -63,6 +63,7 @@ public class WitnessIndex {
   }
 
   //TODO: remove!
+  @Override
   public String getWordOnPosition(int position) {
     return words.get(position - 1);
   }

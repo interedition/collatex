@@ -53,7 +53,7 @@ public class TranspositionDetection {
     return matchesSortedForBase;
   }
 
-  private static Map<Match, Match> buildPreviousMatchMap(List<Match> matches) {
+  public static Map<Match, Match> buildPreviousMatchMap(List<Match> matches) {
     Map<Match, Match> previousMatches = Maps.newHashMap();
     Match previousMatch = null;
     for (Match match : matches) {
