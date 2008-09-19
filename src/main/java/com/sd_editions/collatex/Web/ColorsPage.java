@@ -1,6 +1,7 @@
 package com.sd_editions.collatex.Web;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -9,6 +10,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.PropertyModel;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.spike2.Colors;
 
 @SuppressWarnings("serial")
@@ -43,10 +45,19 @@ class ColorsModel implements Serializable {
   }
 
   public void generateHTML() {
-    Colors colors = new Colors(witness1, witness2, witness3);
+    List<String> witnesses = Lists.newArrayList();
+    add(witness1, witnesses);
+    add(witness2, witnesses);
+    add(witness3, witnesses);
+    Colors colors = new Colors(witnesses);
     this.html = new ColorsView(colors).toHtml();
   }
 
+  private void add(String witness, List<String> witnesses) {
+    if (!witness.isEmpty()) {
+      witnesses.add(witness);
+    }
+  }
 }
 
 @SuppressWarnings("serial")
