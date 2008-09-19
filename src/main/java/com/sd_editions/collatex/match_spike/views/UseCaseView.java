@@ -1,15 +1,11 @@
 package com.sd_editions.collatex.match_spike.views;
 
 import java.util.List;
-import java.util.Set;
 
-import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.Web.ColorsView;
-import com.sd_editions.collatex.match_spike.ColorMatrix;
-import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.match_spike.WordMatchMap;
 import com.sd_editions.collatex.spike2.Colors;
 
@@ -126,28 +122,6 @@ public class UseCaseView {
     String html = "<h4>Colors:</h4>" + new ColorsView(colors).toHtml();
     //    html += "<h4>Matches:</h4>" + new WordMatchMapView(wordMatchMap).toHtml();
     //    html += permutationsView(colorMatrixPermutations);
-    return html;
-  }
-
-  private String permutationsView(Set<ColorMatrix> colorMatrixPermutations) {
-    String html = "<h4>Permutations:</h4>";
-    html += "<ol>";
-    for (ColorMatrix colorMatrix : colorMatrixPermutations) {
-      html += "<li><ol type=\"A\">";
-      for (int row = 0; row < colorMatrix.getHeight(); row++) {
-        html += "<li>";
-        List<String> htmlWords = Lists.newArrayList();
-        for (int col = 0; col < colorMatrix.getWidth(); col++) {
-          String word = wordMatchMap.witnessWordsMatrix[row][col];
-          if (word != null) htmlWords.add(new WordColorTuple(word, "color" + colorMatrix.getCell(row, col)).toHtml());
-        }
-        html += Join.join(" ", htmlWords);
-        html += "</br></li>";
-      }
-      html += "<pre>" + colorMatrix.toString() + "</pre>";
-      html += "</ol></li>";
-    }
-    html += "</ol>";
     return html;
   }
 }

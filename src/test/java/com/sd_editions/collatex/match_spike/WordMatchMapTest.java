@@ -93,12 +93,4 @@ public class WordMatchMapTest extends TestCase {
     }
   }
 
-  private Set<ColorMatrix> makePermutations(String[] witnesses) {
-    List<BlockStructure> witnessList = Lists.newArrayList();
-    for (String witness : witnesses) {
-      witnessList.add(Util.string2BlockStructure(witness));
-    }
-    return new WordMatchMap(witnessList).getColorMatrixPermutations();
-  }
-
 }

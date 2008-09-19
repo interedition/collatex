@@ -37,26 +37,28 @@ public class Colors {
     return witnessIndexes.get(i - 1);
   }
 
-  public Modifications compareWitness(int i, int j) {
-    //Note: this only leads to one permutation of the possible matches..
+  public List<Modifications> compareWitness(int i, int j) {
+    List<Modifications> modificationsList = Lists.newArrayList();
     WitnessIndex witnessIndex = getWitnessIndex(i);
     WitnessIndex witnessIndex2 = getWitnessIndex(j);
     Matches matches = new Matches(witnessIndex, witnessIndex2);
-    Set<Match> permutation = matches.matches();
+    List<Set<Match>> permutationList = matches.permutations();
+    for (Set<Match> permutation : permutationList) {
+      //Note: this only leads to one permutation of the possible matches..
+      List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);
+      List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
+      List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
+      List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
+      List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
 
-    List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);
-    List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
-    List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
-    List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-    List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
-
-    List<Modification> modifications = Lists.newArrayList();
-    modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase, matchSequencesForWitness));
-    modifications.addAll(MatchSequences.getModificationsInMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase));
-    return new Modifications(modifications, transpositions);
+      List<Modification> modifications = Lists.newArrayList();
+      modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase, matchSequencesForWitness));
+      modifications.addAll(MatchSequences.getModificationsInMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase));
+      modificationsList.add(new Modifications(modifications, transpositions));
+    }
+    return modificationsList;
   }
 
-  //TODO: remove!
   public List<Addition> getAdditions(List<MisMatch> mismatches) {
     List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
       public boolean apply(MisMatch arg0) {
@@ -70,7 +72,6 @@ public class Colors {
     return additions;
   }
 
-  //TODO: remove!
   public List<Removal> getOmissions(List<MisMatch> mismatches) {
     List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
       public boolean apply(MisMatch arg0) {
@@ -84,7 +85,6 @@ public class Colors {
     return omissions;
   }
 
-  //TODO: remove!
   public List<Replacement> getReplacements(List<MisMatch> mismatches) {
     List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
       public boolean apply(MisMatch arg0) {

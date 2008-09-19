@@ -4,9 +4,9 @@ public class Word {
   private final String original;
   final int position;
 
-  public Word(String original, int position) {
-    this.original = original;
-    this.position = position;
+  public Word(String _original, int _position) {
+    this.original = _original;
+    this.position = _position;
   }
 
   @Override

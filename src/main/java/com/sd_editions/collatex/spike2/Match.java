@@ -5,10 +5,13 @@ public class Match {
   private final Word word2;
   public final Integer wordCode;
 
-  public Match(Word word12, Word word22, Integer wordCode) {
+  //  public final Integer levenshteinDistance;
+
+  @SuppressWarnings("boxing")
+  public Match(Word word12, Word word22, Integer _wordCode) {
     word1 = word12;
     word2 = word22;
-    this.wordCode = wordCode;
+    this.wordCode = _wordCode;
   }
 
   @Override
@@ -22,5 +25,9 @@ public class Match {
 
   public Word getBaseWord() {
     return word1;
+  }
+
+  public boolean equals(Match other) {
+    return this.word1.equals(other.word1) && this.word2.equals(other.word2) && this.wordCode.equals(other.wordCode);
   }
 }

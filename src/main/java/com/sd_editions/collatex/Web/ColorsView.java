@@ -55,25 +55,30 @@ public class ColorsView {
     final int numberOfWitnesses = colors.numberOfWitnesses();
     for (int base = 1; base < numberOfWitnesses; base++) {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
-        html += "Comparing witness " + base + " with witness " + w + ":<ul>";
-        Modifications modifications = colors.compareWitness(base, w);
-        List<Modification> modificationsL = modifications.getModifications();
-        if (modificationsL.isEmpty()) {
-          html += "no additions, removals or transpositions";
-        } else {
-          for (Modification modification : modificationsL) {
-            if (modification instanceof Addition) {
-              html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
-            } else if (modification instanceof Removal) {
-              html += "<li>" + removalView((Removal) modification, base) + "</li>";
-            } else if (modification instanceof Transposition) {
-              html += "<li>" + transpositionView((Transposition) modification, base, w) + "</li>";
-            } else if (modification instanceof Replacement) {
-              html += "<li>" + replacementView((Replacement) modification, base, w) + "</li>";
+        html += "Comparing witness " + base + " with witness " + w + ":<ol>";
+        List<Modifications> modificationsList = colors.compareWitness(base, w);
+        int pn = 1;
+        for (Modifications modifications : modificationsList) {
+          html += "Permutation " + pn++ + "<ul>";
+          List<Modification> modificationsL = modifications.getModifications();
+          if (modificationsL.isEmpty()) {
+            html += "no additions, removals or transpositions";
+          } else {
+            for (Modification modification : modificationsL) {
+              if (modification instanceof Addition) {
+                html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
+              } else if (modification instanceof Removal) {
+                html += "<li>" + removalView((Removal) modification, base) + "</li>";
+              } else if (modification instanceof Transposition) {
+                html += "<li>" + transpositionView((Transposition) modification, base, w) + "</li>";
+              } else if (modification instanceof Replacement) {
+                html += "<li>" + replacementView((Replacement) modification, base, w) + "</li>";
+              }
             }
           }
+          html += "</ul>";
         }
-        html += "</ul>";
+        html += "</ol>";
       }
     }
     return html;

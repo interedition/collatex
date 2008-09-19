@@ -8,23 +8,23 @@ import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionTest extends TestCase {
   public void testTransposition1() {
-    Colors colors = new Colors("a b c d e", "a c d b e");
-    Modifications modifications = colors.compareWitness(1, 2);
+    Modifications modifications = getModifications("a b c d e", "a c d b e");
     List<Transposition> transpositions = modifications.getTranspositions();
+    assertEquals(1, transpositions.size());
     assertEquals("transposition: b switches position with c d", transpositions.get(0).toString());
   }
 
   public void testTransposition2() {
-    Colors colors = new Colors("a b x c d ", "a c d x b");
-    Modifications modifications = colors.compareWitness(1, 2);
+    Modifications modifications = getModifications("a b x c d ", "a c d x b");
     List<Transposition> transpositions = modifications.getTranspositions();
+    assertEquals(1, transpositions.size());
     assertEquals("transposition: b switches position with c d", transpositions.get(0).toString());
   }
 
   public void testTransposition3() {
-    Colors colors = new Colors("a b x c d ", "c d x a b");
-    Modifications modifications = colors.compareWitness(1, 2);
+    Modifications modifications = getModifications("a b x c d ", "c d x a b");
     List<Transposition> transpositions = modifications.getTranspositions();
+    assertEquals(1, transpositions.size());
     assertEquals("transposition: a b switches position with c d", transpositions.get(0).toString());
   }
 
@@ -32,8 +32,7 @@ public class TranspositionTest extends TestCase {
   public void testComplex() {
     String base = "The black dog chases a red cat.";
     String witness = "A red cat chases the yellow dog";
-    Colors colors = new Colors(base, witness);
-    Modifications modifications = colors.compareWitness(1, 2);
+    Modifications modifications = getModifications(base, witness);
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals(1, transpositions.size());
     // TODO: add expected Transposition
@@ -75,5 +74,10 @@ public class TranspositionTest extends TestCase {
   //    assertEquals("a b", phrases.get(2).toString());
   //    //    assertEquals("transposition: a b switches position with c d", modifications.get(0).toString());
   //  }
+  private Modifications getModifications(String base, String witness) {
+    List<Modifications> permutations = new Colors(base, witness).compareWitness(1, 2);
+    assertEquals(1, permutations.size());
+    return permutations.get(0);
+  }
 
 }

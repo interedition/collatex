@@ -1,12 +1,16 @@
 package com.sd_editions.collatex.spike2;
 
+import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class Matches {
   private final WitnessIndex base;
   private final WitnessIndex witness;
+  private List<Set<Match>> permutations;
 
   public Matches(WitnessIndex _base, WitnessIndex _witness) {
     this.base = _base;
@@ -36,4 +40,10 @@ public class Matches {
     return new Match(word1, word2, match);
   }
 
+  public List<Set<Match>> permutations() {
+    if (permutations == null) permutations = new MatchPermutator(matches()).permutations();
+    //    Util.p(matches());
+    //    Util.p(permutations);
+    return permutations;
+  }
 }

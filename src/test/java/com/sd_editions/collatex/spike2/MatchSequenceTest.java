@@ -185,7 +185,7 @@ public class MatchSequenceTest extends TestCase {
 
   public void testModificationsInBetweenMatchSequences() {
     Colors colors = new Colors("a b y c z d", "a x b c n d");
-    Modifications compareWitness = colors.compareWitness(1, 2);
+    Modifications compareWitness = colors.compareWitness(1, 2).get(0);
     assertEquals(3, compareWitness.size());
     assertEquals("addition: x position: 2", compareWitness.get(0).toString());
     assertEquals("omission: y position: 3", compareWitness.get(1).toString());
@@ -194,7 +194,7 @@ public class MatchSequenceTest extends TestCase {
 
   public void testModificationAtTheEnd() {
     Colors colors = new Colors("a b", "a c");
-    Modifications compareWitness = colors.compareWitness(1, 2);
+    Modifications compareWitness = colors.compareWitness(1, 2).get(0);
     assertEquals(1, compareWitness.size());
     assertEquals("replacement: b / c position: 2", compareWitness.get(0).toString());
   }
