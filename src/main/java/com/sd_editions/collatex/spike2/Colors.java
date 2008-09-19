@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
 import com.sd_editions.collatex.spike2.collate.Replacement;
@@ -15,11 +16,13 @@ public class Colors {
 
   private final Index index;
   private final List<WitnessIndex> witnessIndexes;
+  private final String[] witnessStrings;
 
-  public Colors(String... witnesses) {
-    index = new Index(witnesses);
+  public Colors(String... _witnessStrings) {
+    this.witnessStrings = _witnessStrings;
+    index = new Index(witnessStrings);
     this.witnessIndexes = Lists.newArrayList();
-    for (String witness : witnesses) {
+    for (String witness : witnessStrings) {
       WitnessIndex witnessIndex = new WitnessIndex(witness, index);
       witnessIndexes.add(witnessIndex);
     }
@@ -41,8 +44,10 @@ public class Colors {
     List<Modifications> modificationsList = Lists.newArrayList();
     WitnessIndex witnessIndex = getWitnessIndex(i);
     WitnessIndex witnessIndex2 = getWitnessIndex(j);
-    Matches matches = new Matches(witnessIndex, witnessIndex2);
+    //    Matches matches = new Matches(witnessIndex, witnessIndex2);
+    Matches matches = new Matches(new Witness(witnessStrings[i - 1]), new Witness(witnessStrings[j - 1]));
     List<Set<Match>> permutationList = matches.permutations();
+    Util.p(permutationList);
     for (Set<Match> permutation : permutationList) {
       //Note: this only leads to one permutation of the possible matches..
       List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);

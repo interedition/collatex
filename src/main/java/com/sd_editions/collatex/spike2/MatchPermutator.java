@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.spike2;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -7,6 +9,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.Block.Util;
 
 public class MatchPermutator {
 
@@ -23,10 +26,13 @@ public class MatchPermutator {
 
   @SuppressWarnings("boxing")
   protected List<Match[]> group(Set<Match> matches) {
+    List<Match> matchList = Lists.sortedCopy(Lists.newArrayList(matches));
+
     List<Match[]> groups = Lists.newArrayList();
     List<Integer> t0 = Lists.newArrayList();
     List<Integer> t1 = Lists.newArrayList();
-    for (Match match : matches) {
+    for (Match match : matchList) {
+      Util.p(match);
       Iterable<Match> group0 = Lists.newArrayList();
       Iterable<Match> group1 = Lists.newArrayList();
       final int basePosition = match.getBaseWord().position;
@@ -38,6 +44,7 @@ public class MatchPermutator {
           }
         };
         group0 = Iterables.filter(matches, basePositionPredicate);
+        Util.p(group0);
         t0.add(basePosition);
       }
       if (!t1.contains(witnessPosition)) {
@@ -47,12 +54,20 @@ public class MatchPermutator {
           }
         };
         group1 = Iterables.filter(matches, witnessPositionPredicate);
+        Util.p(group1);
         t1.add(witnessPosition);
       }
       Set<Match> set0 = Sets.newLinkedHashSet(group0);
       Set<Match> set1 = Sets.newLinkedHashSet(group1);
       Match[] matchGroup0 = Iterables.newArray(group0, Match.class);
+      final Comparator<Match> comparator = new Comparator<Match>() {
+        public int compare(Match m1, Match m2) {
+          return m1.getBaseWord().position - m2.getBaseWord().position;
+        }
+      };
+      Arrays.sort(matchGroup0, comparator);
       Match[] matchGroup1 = Iterables.newArray(group1, Match.class);
+      Arrays.sort(matchGroup1, comparator);
       if (set0.containsAll(set1) && matchGroup0.length > 0) {
         groups.add(matchGroup0);
       } else if (set1.containsAll(set0) && matchGroup1.length > 0) {

@@ -59,7 +59,7 @@ public class ColorsView {
         List<Modifications> modificationsList = colors.compareWitness(base, w);
         int pn = 1;
         for (Modifications modifications : modificationsList) {
-          html += "Permutation " + pn++ + "<ul>";
+          html += "Permutation " + pn++ + "/" + modificationsList.size() + "<ul>";
           List<Modification> modificationsL = modifications.getModifications();
           if (modificationsL.isEmpty()) {
             html += "no additions, removals or transpositions";

@@ -29,6 +29,10 @@ public class Util {
     System.out.println(i);
   }
 
+  public static void p(long l) {
+    System.out.println(l);
+  }
+
   public static void p(Object o) {
     System.out.println("<" + o + ">");
   }

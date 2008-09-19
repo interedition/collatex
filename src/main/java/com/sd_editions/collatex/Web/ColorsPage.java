@@ -17,7 +17,6 @@ import com.sd_editions.collatex.spike2.Colors;
 public class ColorsPage extends WebPage {
 
   public ColorsPage() {
-
     ColorsModel model = new ColorsModel("the drought of march hath perced to the root and is this the right", "the first march of drought pierced to the root and this is the ",
         "the first march of drought hath perced to the root");
     add(new Label("colorview", new PropertyModel(model, "html")).setEscapeModelStrings(false));

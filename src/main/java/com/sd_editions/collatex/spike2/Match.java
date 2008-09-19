@@ -1,14 +1,18 @@
 package com.sd_editions.collatex.spike2;
 
-public class Match {
+public class Match implements Comparable<Match> {
   private final Word word1;
   private final Word word2;
+  public final long levenshteinDistance;
 
-  //  public final Integer levenshteinDistance;
+  public Match(Word baseWord, Word witnessWord) {
+    this(baseWord, witnessWord, 0);
+  }
 
-  public Match(Word word12, Word word22) {
-    word1 = word12;
-    word2 = word22;
+  public Match(Word baseWord, Word witnessWord, long distance) {
+    this.word1 = baseWord;
+    this.word2 = witnessWord;
+    this.levenshteinDistance = distance;
   }
 
   @Override
@@ -31,5 +35,9 @@ public class Match {
   @Override
   public int hashCode() {
     return word1.hashCode() + word2.hashCode();
+  }
+
+  public int compareTo(Match m2) {
+    return getBaseWord().position - m2.getBaseWord().position;
   }
 }
