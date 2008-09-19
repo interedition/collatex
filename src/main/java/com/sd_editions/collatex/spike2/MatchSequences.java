@@ -35,4 +35,52 @@ public class MatchSequences {
     return results;
   }
 
+  public static List<Modification> getModificationsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
+    List<Gap> gapsBase = getGabsFromInBetweenMatchSequencesForBase(base, sequencesBase);
+    List<Gap> gapsWitness = getGabsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
+    List<Modification> results = Lists.newArrayList();
+    for (int i = 0; i < gapsBase.size(); i++) {
+      Gap gapBase = gapsBase.get(i);
+      Gap gapWitness = gapsWitness.get(i);
+      if (gapBase.hasGap() || gapWitness.hasGap()) {
+        MisMatch misMatch = new MisMatch(gapBase, gapWitness);
+        Modification modification = misMatch.analyse();
+        results.add(modification);
+      }
+    }
+    return results;
+  }
+
+  // this method is made for the base... 
+  @SuppressWarnings("boxing")
+  private static List<Gap> getGabsFromInBetweenMatchSequencesForBase(Witness witness, List<MatchSequence> sequences) {
+    int currentIndex = 1;
+    List<Gap> gaps = Lists.newArrayList();
+    for (MatchSequence sequence : sequences) {
+      int position = sequence.getBasePosition();
+      int indexDif = position - currentIndex;
+      gaps.add(new Gap(witness, indexDif, currentIndex, position - 1));
+      currentIndex = 1 + sequence.getLastMatch().getBaseWord().position;
+    }
+    int IndexDif = witness.size() - currentIndex + 1;
+    gaps.add(new Gap(witness, IndexDif, currentIndex, witness.size()));
+    return gaps;
+  }
+
+  // this method is made for the witness...
+  @SuppressWarnings("boxing")
+  private static List<Gap> getGabsFromInBetweenMatchSequencesForWitness(Witness witness, List<MatchSequence> sequences) {
+    int currentIndex = 1;
+    List<Gap> gaps = Lists.newArrayList();
+    for (MatchSequence sequence : sequences) {
+      int position = sequence.getWitnessPosition();
+      int indexDif = position - currentIndex;
+      gaps.add(new Gap(witness, indexDif, currentIndex, position - 1));
+      currentIndex = 1 + sequence.getLastMatch().getWitnessWord().position;
+    }
+    int IndexDif = witness.size() - currentIndex + 1;
+    gaps.add(new Gap(witness, IndexDif, currentIndex, witness.size()));
+    return gaps;
+  }
+
 }

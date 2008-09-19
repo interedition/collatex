@@ -52,10 +52,6 @@ public class WitnessIndex extends Witness {
     return list;
   }
 
-  public int size() {
-    return wordCodes.size();
-  }
-
   public Phrase createPhrase(int i, int j) {
     return new Phrase(this, i, j);
   }

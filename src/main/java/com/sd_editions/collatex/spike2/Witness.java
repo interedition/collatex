@@ -28,4 +28,8 @@ public class Witness {
   public Word getWordOnPosition(int position) {
     return words.get(position - 1);
   }
+
+  public int size() {
+    return words.size();
+  }
 }

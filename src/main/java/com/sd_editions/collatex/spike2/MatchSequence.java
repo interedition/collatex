@@ -59,4 +59,8 @@ public class MatchSequence {
   public List<Match> getMatches() {
     return sequence;
   }
+
+  public Match getLastMatch() {
+    return sequence.get(sequence.size() - 1);
+  }
 }

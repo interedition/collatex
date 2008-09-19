@@ -46,12 +46,10 @@ public class Colors {
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
     List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
 
-    List<MisMatch> mismatches = matches.getMisMatches();
     List<Modification> modifications = Lists.newArrayList();
-    modifications.addAll(getOmissions(mismatches));
-    modifications.addAll(getAdditions(mismatches));
-    List<Replacement> replacements = getReplacements(mismatches);
-    return new Modifications(modifications, transpositions, replacements);
+    modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase, matchSequencesForWitness));
+    modifications.addAll(MatchSequences.getModificationsInMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase));
+    return new Modifications(modifications, transpositions);
   }
 
   public List<Addition> getAdditions(List<MisMatch> mismatches) {
@@ -102,8 +100,8 @@ public class Colors {
   }
 
   public List<MatchSequence> getMatchSequences(int i, int j) {
-    WitnessIndex base = getWitnessIndex(i);
-    WitnessIndex witness = getWitnessIndex(j);
+    //    WitnessIndex base = getWitnessIndex(i);
+    //    WitnessIndex witness = getWitnessIndex(j);
     Set<Match> matches = getMatches(i, j).matches();
     return TranspositionDetection.calculateMatchSequencesForgetNonMatches(matches);
   }
