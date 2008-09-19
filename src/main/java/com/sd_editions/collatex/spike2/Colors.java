@@ -25,6 +25,10 @@ public class Colors {
     }
   }
 
+  public Colors(List<String> witnesses) {
+    this(witnesses.toArray(new String[witnesses.size()]));
+  }
+
   public int numberOfUniqueWords() {
     return index.numberOfEntries();
   }
@@ -52,6 +56,7 @@ public class Colors {
     return new Modifications(modifications, transpositions);
   }
 
+  //TODO: remove!
   public List<Addition> getAdditions(List<MisMatch> mismatches) {
     List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
       public boolean apply(MisMatch arg0) {
@@ -65,6 +70,7 @@ public class Colors {
     return additions;
   }
 
+  //TODO: remove!
   public List<Removal> getOmissions(List<MisMatch> mismatches) {
     List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
       public boolean apply(MisMatch arg0) {
@@ -78,6 +84,7 @@ public class Colors {
     return omissions;
   }
 
+  //TODO: remove!
   public List<Replacement> getReplacements(List<MisMatch> mismatches) {
     List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
       public boolean apply(MisMatch arg0) {
