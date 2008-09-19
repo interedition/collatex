@@ -1,9 +1,7 @@
 package com.sd_editions.collatex.spike2;
 
-import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class Matches {
@@ -36,14 +34,6 @@ public class Matches {
     Word word1 = base.getWordOnPosition(base.getPosition(match));
     Word word2 = witness.getWordOnPosition(witness.getPosition(match));
     return new Match(word1, word2, match);
-  }
-
-  public List<Integer> getSequenceOfMatchesInBase() {
-    return Lists.newArrayList(matchesAsWordCodes());
-  }
-
-  public List<Integer> getSequenceOfMatchesInWitness() {
-    return witness.sortMatchesByPosition(matchesAsWordCodes());
   }
 
 }
