@@ -79,13 +79,13 @@ public class MatchSequenceTest extends TestCase {
   // de abc
   @SuppressWarnings("boxing")
   public void testSortSequencesForWitness() {
-    Match a = new Match(new Word("A", 1), new Word("A", 3), 1);
-    Match b = new Match(new Word("B", 2), new Word("B", 4), 2);
-    Match c = new Match(new Word("C", 3), new Word("C", 5), 3);
-    MatchSequence sequence = new MatchSequence(a, b, c);
-    Match d = new Match(new Word("D", 4), new Word("D", 1), 4);
-    Match e = new Match(new Word("E", 5), new Word("E", 2), 5);
-    MatchSequence sequence2 = new MatchSequence(d, e);
+    Match a = new Match(new Word("A", 1), new Word("A", 3));
+    Match b = new Match(new Word("B", 2), new Word("B", 4));
+    Match c = new Match(new Word("C", 3), new Word("C", 5));
+    MatchSequence sequence = new MatchSequence(1, a, b, c);
+    Match d = new Match(new Word("D", 4), new Word("D", 1));
+    Match e = new Match(new Word("E", 5), new Word("E", 2));
+    MatchSequence sequence2 = new MatchSequence(2, d, e);
     List<MatchSequence> matchSequences = Lists.newArrayList(sequence, sequence2);
     List<MatchSequence> arrayForWitness = TranspositionDetection.sortSequencesForWitness(matchSequences);
     assertEquals(Lists.newArrayList(sequence2, sequence), arrayForWitness);
@@ -93,13 +93,13 @@ public class MatchSequenceTest extends TestCase {
 
   @SuppressWarnings("boxing")
   public void testConvertMatchSequencesToTuples() {
-    Match a = new Match(new Word("A", 1), new Word("A", 3), 1);
-    Match b = new Match(new Word("B", 2), new Word("B", 4), 2);
-    Match c = new Match(new Word("C", 3), new Word("C", 5), 3);
-    MatchSequence sequence = new MatchSequence(a, b, c);
-    Match d = new Match(new Word("D", 4), new Word("D", 1), 4);
-    Match e = new Match(new Word("E", 5), new Word("E", 2), 5);
-    MatchSequence sequence2 = new MatchSequence(d, e);
+    Match a = new Match(new Word("A", 1), new Word("A", 3));
+    Match b = new Match(new Word("B", 2), new Word("B", 4));
+    Match c = new Match(new Word("C", 3), new Word("C", 5));
+    MatchSequence sequence = new MatchSequence(1, a, b, c);
+    Match d = new Match(new Word("D", 4), new Word("D", 1));
+    Match e = new Match(new Word("E", 5), new Word("E", 2));
+    MatchSequence sequence2 = new MatchSequence(2, d, e);
     List<MatchSequence> matchSequencesForBase = Lists.newArrayList(sequence, sequence2);
     List<MatchSequence> matchSequencesForWitness = Lists.newArrayList(sequence2, sequence);
     List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
@@ -113,12 +113,12 @@ public class MatchSequenceTest extends TestCase {
   // B A C
   @SuppressWarnings( { "boxing", "unchecked" })
   public void testFilterAwayRealMatches() {
-    Match a = new Match(new Word("A", 1), new Word("A", 2), 1);
-    Match b = new Match(new Word("B", 2), new Word("B", 1), 2);
-    Match c = new Match(new Word("C", 3), new Word("C", 3), 3);
-    MatchSequence sequenceA = new MatchSequence(a);
-    MatchSequence sequenceB = new MatchSequence(b);
-    MatchSequence sequenceC = new MatchSequence(c);
+    Match a = new Match(new Word("A", 1), new Word("A", 2));
+    Match b = new Match(new Word("B", 2), new Word("B", 1));
+    Match c = new Match(new Word("C", 3), new Word("C", 3));
+    MatchSequence sequenceA = new MatchSequence(1, a);
+    MatchSequence sequenceB = new MatchSequence(2, b);
+    MatchSequence sequenceC = new MatchSequence(3, c);
     Tuple2<MatchSequence> tuple1 = new Tuple2<MatchSequence>(sequenceA, sequenceB);
     Tuple2<MatchSequence> tuple2 = new Tuple2<MatchSequence>(sequenceB, sequenceA);
     Tuple2<MatchSequence> tuple3 = new Tuple2<MatchSequence>(sequenceC, sequenceC);
@@ -132,12 +132,12 @@ public class MatchSequenceTest extends TestCase {
   // B A C
   @SuppressWarnings( { "boxing", "unchecked" })
   public void testGetRealMatches() {
-    Match a = new Match(new Word("A", 1), new Word("A", 2), 1);
-    Match b = new Match(new Word("B", 2), new Word("B", 1), 2);
-    Match c = new Match(new Word("C", 3), new Word("C", 3), 3);
-    MatchSequence sequenceA = new MatchSequence(a);
-    MatchSequence sequenceB = new MatchSequence(b);
-    MatchSequence sequenceC = new MatchSequence(c);
+    Match a = new Match(new Word("A", 1), new Word("A", 2));
+    Match b = new Match(new Word("B", 2), new Word("B", 1));
+    Match c = new Match(new Word("C", 3), new Word("C", 3));
+    MatchSequence sequenceA = new MatchSequence(1, a);
+    MatchSequence sequenceB = new MatchSequence(2, b);
+    MatchSequence sequenceC = new MatchSequence(3, c);
     Tuple2<MatchSequence> tuple1 = new Tuple2<MatchSequence>(sequenceA, sequenceB);
     Tuple2<MatchSequence> tuple2 = new Tuple2<MatchSequence>(sequenceB, sequenceA);
     Tuple2<MatchSequence> tuple3 = new Tuple2<MatchSequence>(sequenceC, sequenceC);
@@ -158,9 +158,9 @@ public class MatchSequenceTest extends TestCase {
     Word bW = new Word("B", 3);
     Witness base = new Witness(aB, bB);
     Witness witness = new Witness(aW, cW, bW);
-    Match a = new Match(aB, aW, 1);
-    Match b = new Match(bB, bW, 2);
-    MatchSequence sequence = new MatchSequence(a, b);
+    Match a = new Match(aB, aW);
+    Match b = new Match(bB, bW);
+    MatchSequence sequence = new MatchSequence(1, a, b);
     List<MatchSequence> sequences = Lists.newArrayList(sequence);
     List<Modification> modificationsInMatchSequences = MatchSequences.getModificationsInMatchSequences(base, witness, sequences);
     assertEquals(1, modificationsInMatchSequences.size());
@@ -175,9 +175,9 @@ public class MatchSequenceTest extends TestCase {
     Word bW = new Word("B", 2);
     Witness base = new Witness(aB, bB);
     Witness witness = new Witness(aW, bW);
-    Match a = new Match(aB, aW, 1);
-    Match b = new Match(bB, bW, 2);
-    MatchSequence sequence = new MatchSequence(a, b);
+    Match a = new Match(aB, aW);
+    Match b = new Match(bB, bW);
+    MatchSequence sequence = new MatchSequence(1, a, b);
     List<MatchSequence> sequences = Lists.newArrayList(sequence);
     List<Modification> modificationsInMatchSequences = MatchSequences.getModificationsInMatchSequences(base, witness, sequences);
     assertEquals(0, modificationsInMatchSequences.size());

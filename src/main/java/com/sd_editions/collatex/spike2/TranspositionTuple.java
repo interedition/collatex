@@ -4,8 +4,8 @@ public class TranspositionTuple {
 
   private final Tuple2<MatchSequence> tuple;
 
-  public TranspositionTuple(Tuple2<MatchSequence> tuple) {
-    this.tuple = tuple;
+  public TranspositionTuple(Tuple2<MatchSequence> _tuple) {
+    this.tuple = _tuple;
   }
 
   @Override
@@ -38,11 +38,11 @@ public class TranspositionTuple {
   }
 
   Integer getRightWordCode() {
-    return getRightSequence().getFirstMatch().wordCode;
+    return getRightSequence().code;
   }
 
   Integer getLeftWordCode() {
-    return getLeftSequence().getFirstMatch().wordCode;
+    return getLeftSequence().code;
   }
 
 }

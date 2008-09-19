@@ -3,15 +3,12 @@ package com.sd_editions.collatex.spike2;
 public class Match {
   private final Word word1;
   private final Word word2;
-  public final Integer wordCode;
 
   //  public final Integer levenshteinDistance;
 
-  @SuppressWarnings("boxing")
-  public Match(Word word12, Word word22, Integer _wordCode) {
+  public Match(Word word12, Word word22) {
     word1 = word12;
     word2 = word22;
-    this.wordCode = _wordCode;
   }
 
   @Override
@@ -28,6 +25,11 @@ public class Match {
   }
 
   public boolean equals(Match other) {
-    return this.word1.equals(other.word1) && this.word2.equals(other.word2) && this.wordCode.equals(other.wordCode);
+    return this.word1.equals(other.word1) && this.word2.equals(other.word2);
+  }
+
+  @Override
+  public int hashCode() {
+    return word1.hashCode() + word2.hashCode();
   }
 }

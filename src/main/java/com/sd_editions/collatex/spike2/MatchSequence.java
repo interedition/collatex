@@ -6,9 +6,11 @@ import com.google.common.collect.Lists;
 
 public class MatchSequence {
   private final List<Match> sequence;
+  final Integer code;
 
-  public MatchSequence(Match... matches) {
+  public MatchSequence(Integer _code, Match... matches) {
     sequence = Lists.newArrayList(matches);
+    code = _code;
   }
 
   @Override

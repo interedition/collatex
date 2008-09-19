@@ -19,16 +19,15 @@ public class MatchPermutatorTest extends TestCase {
   private Match match_2_3;
   private Match match_3_4;
 
-  @SuppressWarnings("boxing")
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     testSet = Sets.newHashSet();
-    match_1_2 = new Match(new Word("een", 1), new Word("een", 2), 1);
-    match_1_3 = new Match(new Word("een", 1), new Word("tween", 3), 1);
-    match_2_1 = new Match(new Word("twee", 2), new Word("twee", 1), 2);
-    match_2_3 = new Match(new Word("twee", 2), new Word("tween", 3), 2);
-    match_3_4 = new Match(new Word("drie", 3), new Word("drie", 4), 3);
+    match_1_2 = new Match(new Word("een", 1), new Word("een", 2));
+    match_1_3 = new Match(new Word("een", 1), new Word("tween", 3));
+    match_2_1 = new Match(new Word("twee", 2), new Word("twee", 1));
+    match_2_3 = new Match(new Word("twee", 2), new Word("tween", 3));
+    match_3_4 = new Match(new Word("drie", 3), new Word("drie", 4));
     testSet.add(match_1_2);
     testSet.add(match_1_3);
     testSet.add(match_2_1);

@@ -3,8 +3,6 @@ package com.sd_editions.collatex.spike2;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class Matches {
@@ -37,7 +35,7 @@ public class Matches {
   private static Match convertWordCodeToMatch(WitnessIndex base, WitnessIndex witness, Integer match) {
     Word word1 = base.getWordOnPosition(base.getPosition(match));
     Word word2 = witness.getWordOnPosition(witness.getPosition(match));
-    return new Match(word1, word2, match);
+    return new Match(word1, word2);
   }
 
   public List<Set<Match>> permutations() {

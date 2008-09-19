@@ -22,6 +22,7 @@ public class TranspositionDetection {
     this.witnessIndex2 = _witnessIndex2;
   }
 
+  @SuppressWarnings("boxing")
   public static List<MatchSequence> calculateMatchSequencesForgetNonMatches(Set<Match> matches) {
     // sort Matches for the base --> that is already done (it is a linked hash set)
     List<Match> matchesSortedForBase = sortMatchesForBase(matches);
@@ -31,13 +32,13 @@ public class TranspositionDetection {
     Map<Match, Match> previousMatchMapBase = buildPreviousMatchMap(matchesSortedForBase);
     Map<Match, Match> previousMatchMapWitness = buildPreviousMatchMap(matchesSortedForWitness);
     List<MatchSequence> sequences = Lists.newArrayList();
-    MatchSequence sequence = new MatchSequence();
+    MatchSequence sequence = new MatchSequence(sequences.size());
     for (Match match : matches) {
       Match expected = previousMatchMapBase.get(match);
       Match actual = previousMatchMapWitness.get(match);
       if (expected != actual || expected != null && !expected.equals(actual)) {
         if (!sequence.isEmpty()) sequences.add(sequence);
-        sequence = new MatchSequence();
+        sequence = new MatchSequence(sequences.size());
       }
       sequence.add(match);
     }
@@ -98,7 +99,7 @@ public class TranspositionDetection {
   public static List<Tuple2<MatchSequence>> filterAwayRealMatches(List<Tuple2<MatchSequence>> possibleMatches) {
     List<Tuple2<MatchSequence>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence>>() {
       public boolean apply(Tuple2<MatchSequence> tuple) {
-        return tuple.left.getFirstMatch().wordCode != tuple.right.getFirstMatch().wordCode;
+        return tuple.left.code != tuple.right.code;
       }
     }));
     return filteredMatchSequences;
@@ -132,7 +133,7 @@ public class TranspositionDetection {
   public static List<MatchSequence> getMatches(List<Tuple2<MatchSequence>> possibleMatches) {
     List<Tuple2<MatchSequence>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence>>() {
       public boolean apply(Tuple2<MatchSequence> tuple) {
-        return tuple.left.getFirstMatch().wordCode == tuple.right.getFirstMatch().wordCode;
+        return tuple.left.code == tuple.right.code;
       }
     }));
     List<MatchSequence> realMatches = Lists.newArrayList();
