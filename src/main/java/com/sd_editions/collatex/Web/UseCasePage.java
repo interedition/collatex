@@ -19,6 +19,8 @@ public class UseCasePage extends WebPage {
     usecases.add(new String[] { "The black cat", "The black and white cat", "The black and green cat", "The black very special cat", "The black not very special cat" });
     usecases.add(new String[] { "He was agast, so", "He was agast", "So he was agast", "He was so agast", "He was agast and feerd", "So was he agast" });
 
+    usecases.add(new String[] { "The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog" });
+
     usecases.add(new String[] { "a cat or dog", "a cat and dog and", "a cat and dog and" });
     usecases.add(new String[] { "Auch hier hab ich wieder ein Plätzchen", "Ich hab auch hier wieder ein Pläzchen", "Ich hab auch hier wieder ein Pläzchen" });
     usecases.add(new String[] { "the big bug had a big head", "the bug big had a big head", "the bug had a small head" });
