@@ -19,15 +19,12 @@ public class MatchSequences {
           int baseEndPosition = next.getBaseWord().position;
           int witnessStartPosition = previous.getWitnessWord().position;
           int witnessEndPosition = next.getWitnessWord().position;
-          int diffBase = baseEndPosition - baseStartPosition;
-          int diffWitness = witnessEndPosition - witnessStartPosition;
-          if (diffBase != 0 || diffWitness != 0) {
-            Gap gapBase = new Gap(base, diffBase, baseStartPosition + 1, baseEndPosition - 1);
-            Gap gapWitness = new Gap(witness, diffWitness, witnessStartPosition + 1, witnessEndPosition - 1);
+          int gapSizeBase = baseEndPosition - baseStartPosition - 1;
+          int gapSizeWitness = witnessEndPosition - witnessStartPosition - 1;
+          if (gapSizeBase != 0 || gapSizeWitness != 0) {
+            Gap gapBase = new Gap(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1);
+            Gap gapWitness = new Gap(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1);
             MisMatch misMatch = new MisMatch(gapBase, gapWitness);
-            System.out.println(misMatch.isAddition());
-            System.out.println(misMatch.isOmission());
-            System.out.println(misMatch.isReplacement());
             Modification modification = misMatch.analyse();
             results.add(modification);
           }
