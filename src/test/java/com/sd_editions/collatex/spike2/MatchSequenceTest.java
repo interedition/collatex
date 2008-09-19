@@ -150,7 +150,7 @@ public class MatchSequenceTest extends TestCase {
   // a b
   // a c b
   @SuppressWarnings("boxing")
-  public void testModificationsBetweenMatchSequences() {
+  public void testModificationsInMatchSequences() {
     Word aB = new Word("A", 1);
     Word bB = new Word("B", 2);
     Word aW = new Word("A", 1);
@@ -168,7 +168,7 @@ public class MatchSequenceTest extends TestCase {
   }
 
   @SuppressWarnings("boxing")
-  public void testNoModificationsBetweenMatchSequences() {
+  public void testNoModificationsInMatchSequences() {
     Word aB = new Word("A", 1);
     Word bB = new Word("B", 2);
     Word aW = new Word("A", 1);
@@ -182,5 +182,23 @@ public class MatchSequenceTest extends TestCase {
     List<Modification> modificationsInMatchSequences = MatchSequences.getModificationsInMatchSequences(base, witness, sequences);
     assertEquals(0, modificationsInMatchSequences.size());
   }
+
+  public void testModificationsInBetweenMatchSequences() {
+    Colors colors = new Colors("a b y c z d", "a x b c n d");
+    Modifications compareWitness = colors.compareWitness(1, 2);
+    assertEquals(3, compareWitness.size());
+    assertEquals("addition: x position: 2", compareWitness.get(0).toString());
+    assertEquals("omission: y position: 3", compareWitness.get(1).toString());
+    assertEquals("replacement: z / n position: 5", compareWitness.get(2).toString());
+  }
+
+  public void testModificationAtTheEnd() {
+    Colors colors = new Colors("a b", "a c");
+    Modifications compareWitness = colors.compareWitness(1, 2);
+    assertEquals(1, compareWitness.size());
+    assertEquals("replacement: b / c position: 2", compareWitness.get(0).toString());
+  }
+
+  // TODO: test gaps of more than 1 word?
 
 }
