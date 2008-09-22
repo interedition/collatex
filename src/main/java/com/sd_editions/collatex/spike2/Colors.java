@@ -47,7 +47,6 @@ public class Colors {
     //    Matches matches = new Matches(witnessIndex, witnessIndex2);
     Matches matches = new Matches(new Witness(witnessStrings[i - 1]), new Witness(witnessStrings[j - 1]));
     List<Set<Match>> permutationList = matches.permutations();
-    Util.p(permutationList);
     for (Set<Match> permutation : permutationList) {
       //Note: this only leads to one permutation of the possible matches..
       List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);

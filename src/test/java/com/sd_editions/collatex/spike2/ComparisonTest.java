@@ -111,7 +111,6 @@ public class ComparisonTest extends TestCase {
     assertEquals(2, modifications.size());
     assertEquals("addition: a b position: 1", modifications.get(0).toString());
     assertEquals("omission: d e position: 2", modifications.get(1).toString());
-
   }
 
   //  public void testTransposition() {

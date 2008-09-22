@@ -17,40 +17,23 @@ public class Matches {
     this.matches = findMatches();
   }
 
-  //def calculate_matches(w1,w2)
   private Set<Match> findMatches() {
-    //    matches=[]
     Set<Match> matchSet = Sets.newHashSet();
-    //    w1.words.each do |word1|
     for (Word baseWord : base.getWords()) {
-      //      w2.words.each do |word2|
       for (Word witnessWord : witness.getWords()) {
-        //       if (word1.normalized.eql? word2.normalized)
         if (baseWord.normalized.equals(witnessWord.normalized)) {
-          //         matches << Match.new(word1,word2)
           matchSet.add(new Match(baseWord, witnessWord));
-          //       else
-          //        } else {
-          ////          //         lev_distance = word1.distance_to(word2)
-          ////          long levDistance = baseWord.distanceTo(witnessWord);
-          ////          //         matches << Match.new(word1,word2,lev_distance) if (lev_distance<0.5)
-          ////          Util.p(levDistance);
-          ////          if (levDistance < 0.5) matchSet.add(new Match(baseWord, witnessWord, levDistance));
-          ////          //       end
+        } else {
+          float levDistance = baseWord.distanceTo(witnessWord);
+          if (levDistance < 0.5) matchSet.add(new Match(baseWord, witnessWord, levDistance));
         }
-        //      end
       }
-      //    end
     }
-    //    return matches
     return matchSet;
-    //  end
   }
 
   public List<Set<Match>> permutations() {
     if (permutations == null) permutations = new MatchPermutator(matches).permutations();
-    //    Util.p(matches());
-    //    Util.p(permutations);
     return permutations;
   }
 

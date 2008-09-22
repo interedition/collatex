@@ -15,7 +15,6 @@ public class UseCasePage extends WebPage {
 
   public UseCasePage() {
     List<String[]> usecases = Lists.newArrayList();
-    usecases.add(new String[] { "The black cat", "The black and white cat", "The black and green cat" });
     usecases.add(new String[] { "The black cat", "The black and white cat", "The black and green cat", "The black very special cat", "The black not very special cat" });
     usecases.add(new String[] { "He was agast, so", "He was agast", "So he was agast", "He was so agast", "He was agast and feerd", "So was he agast" });
 

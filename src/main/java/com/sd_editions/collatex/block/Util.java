@@ -29,7 +29,7 @@ public class Util {
     System.out.println(i);
   }
 
-  public static void p(long l) {
+  public static void p(float l) {
     System.out.println(l);
   }
 

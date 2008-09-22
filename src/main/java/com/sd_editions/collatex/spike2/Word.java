@@ -13,11 +13,11 @@ public class Word {
     this.position = _position;
   }
 
-  public long distanceTo(Word otherWord) {
+  public float distanceTo(Word otherWord) {
     String w1 = normalized;
     String w2 = otherWord.normalized;
-    long lev = StringUtils.getLevenshteinDistance(w1, w2);
-    long normalizedLev = (2 * lev) / (w1.length() + w2.length());
+    float lev = StringUtils.getLevenshteinDistance(w1, w2);
+    float normalizedLev = (2 * lev) / (w1.length() + w2.length());
     return normalizedLev;
   }
 

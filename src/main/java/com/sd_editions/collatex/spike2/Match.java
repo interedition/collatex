@@ -3,16 +3,16 @@ package com.sd_editions.collatex.spike2;
 public class Match implements Comparable<Match> {
   private final Word word1;
   private final Word word2;
-  public final long levenshteinDistance;
+  public final float levenshteinDistance;
 
   public Match(Word baseWord, Word witnessWord) {
     this(baseWord, witnessWord, 0);
   }
 
-  public Match(Word baseWord, Word witnessWord, long distance) {
+  public Match(Word baseWord, Word witnessWord, float levDistance) {
     this.word1 = baseWord;
     this.word2 = witnessWord;
-    this.levenshteinDistance = distance;
+    this.levenshteinDistance = levDistance;
   }
 
   @Override
