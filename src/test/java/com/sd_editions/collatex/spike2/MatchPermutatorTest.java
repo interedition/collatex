@@ -22,7 +22,7 @@ public class MatchPermutatorTest extends TestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    testSet = Sets.newHashSet();
+    testSet = Sets.newLinkedHashSet();
     match_1_2 = new Match(new Word("een", 1), new Word("een", 2));
     match_1_3 = new Match(new Word("een", 1), new Word("tween", 3));
     match_2_1 = new Match(new Word("twee", 2), new Word("twee", 1));
@@ -65,6 +65,15 @@ public class MatchPermutatorTest extends TestCase {
     assertEquals(expected.size(), fixCell.size());
     assertEquals(matchArrayListToString(expected), matchArrayListToString(fixCell));
     //end
+  }
+
+  // this test asserts that there are no duplicate matches 
+  public void testFixCell2() {
+    List<MatchGroup> groupedMatches = Lists.newArrayList(new MatchGroup(match_1_2, match_1_3), new MatchGroup(match_1_3, match_3_4), new MatchGroup(match_1_2, match_3_4));
+    List<MatchGroup> expected = Lists.newArrayList(new MatchGroup(match_1_2), new MatchGroup(match_3_4));
+    List<MatchGroup> fixCell = permutator.fixCell(groupedMatches, 0, match_1_2);
+    assertEquals(expected.size(), fixCell.size());
+    assertEquals(matchArrayListToString(expected), matchArrayListToString(fixCell));
   }
 
   String matchArrayListToString(List<MatchGroup> group) {

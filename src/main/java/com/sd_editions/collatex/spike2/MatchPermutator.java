@@ -75,7 +75,7 @@ public class MatchPermutator {
         if (matchGroup1.size() > 0) groups.add(matchGroup1);
       }
     }
-    System.out.println(groups);
+    //    System.out.println(groups);
     return groups;
   }
 
@@ -113,7 +113,7 @@ public class MatchPermutator {
   //  def fix_cell(_matchgroups, index, match)
   List<MatchGroup> fixCell(List<MatchGroup> _matchgroups, int index, Match match) {
     //    new_groups = []
-    Set<MatchGroup> newGroups = Sets.newLinkedHashSet(); // TODO: add test!
+    Set<MatchGroup> newGroups = Sets.newLinkedHashSet();
     //    _matchgroups.each_with_index do |mg,i|
     int i = 0;
     for (MatchGroup mg : _matchgroups) {
