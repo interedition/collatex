@@ -37,40 +37,39 @@ public class MatchPermutatorTest extends TestCase {
   }
 
   public void testGroup1() {
-    List<Match[]> group = permutator.group(testSet);
+    List<MatchGroup> group = permutator.group(testSet);
     String groupString = matchArrayListToString(group);
     assertTrue(groupString.contains("[(1->2),(1->3)]"));
     assertTrue(groupString.contains("[(1->3),(2->3)]"));
     assertTrue(groupString.contains("[(2->1),(2->3)]"));
     assertTrue(groupString.contains("[(3->4)]"));
-    //    assertEquals(4, group.size());
+    assertEquals(4, group.size());
   }
 
   public void testDegroup() {
-    //  grouped_tuples = [[[1,2]],[[2,1]],[[3,4]]]
-    List<Match[]> groupedMatches = Lists.newArrayList(new Match[] { match_1_2 }, new Match[] { match_2_1 }, new Match[] { match_3_4 });
-    //  expected = [[1,2],[2,1],[3,4]]
+    //      grouped_tuples = [[[1,2]],[[2,1]],[[3,4]]]
+    List<MatchGroup> groupedMatches = Lists.newArrayList(new MatchGroup(match_1_2), new MatchGroup(match_2_1), new MatchGroup(match_3_4)); //      expected = [[1,2],[2,1],[3,4]]
     Set<Match> expected = Sets.newHashSet(match_1_2, match_2_1, match_3_4);
-    //  assert_equal(expected, permutator.degroup(grouped_tuples))
+    //      assert_equal(expected, permutator.degroup(grouped_tuples))
     assertEquals(expected, permutator.degroup(groupedMatches));
   }
 
   //def test_fix_cell1
   public void testFixCell1() {
-    //  grouped_tuples = [[[1,2],[1,3]],[[2,1],[2,3]],[[3,4]]]
-    List<Match[]> groupedMatches = Lists.newArrayList(new Match[] { match_1_2, match_1_3 }, new Match[] { match_2_1, match_2_3 }, new Match[] { match_3_4 });
-    //  expected=[[[1,3]],[[2,1]],[[3,4]]]
-    List<Match[]> expected = Lists.newArrayList(new Match[] { match_1_3 }, new Match[] { match_2_1 }, new Match[] { match_3_4 });
-    //  assert_equal(expected, permutator.fix_cell(grouped_tuples, 0, [1,3]))
-    List<Match[]> fixCell = permutator.fixCell(groupedMatches, 0, match_1_3);
+    //      grouped_tuples = [[[1,2],[1,3]],[[2,1],[2,3]],[[3,4]]]
+    List<MatchGroup> groupedMatches = Lists.newArrayList(new MatchGroup(match_1_2, match_1_3), new MatchGroup(match_2_1, match_2_3), new MatchGroup(match_3_4));
+    //      expected=[[[1,3]],[[2,1]],[[3,4]]]
+    List<MatchGroup> expected = Lists.newArrayList(new MatchGroup(match_1_3), new MatchGroup(match_2_1), new MatchGroup(match_3_4));
+    //      assert_equal(expected, permutator.fix_cell(grouped_tuples, 0, [1,3]))
+    List<MatchGroup> fixCell = permutator.fixCell(groupedMatches, 0, match_1_3);
     assertEquals(expected.size(), fixCell.size());
     assertEquals(matchArrayListToString(expected), matchArrayListToString(fixCell));
     //end
   }
 
-  String matchArrayListToString(List<Match[]> group) {
+  String matchArrayListToString(List<MatchGroup> group) {
     List<String> matchArrayStrings = Lists.newArrayList();
-    for (Match[] matchA : group) {
+    for (MatchGroup matchA : group) {
       List<String> matchStrings = Lists.newArrayList();
       for (Match match : matchA) {
         matchStrings.add(match.toString());
