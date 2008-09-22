@@ -3,6 +3,7 @@ package com.sd_editions.collatex.spike2;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class Matches {
@@ -18,7 +19,7 @@ public class Matches {
   }
 
   private Set<Match> findMatches() {
-    Set<Match> matchSet = Sets.newHashSet();
+    Set<Match> matchSet = Sets.newLinkedHashSet();
     for (Word baseWord : base.getWords()) {
       for (Word witnessWord : witness.getWords()) {
         if (baseWord.normalized.equals(witnessWord.normalized)) {
@@ -69,4 +70,13 @@ public class Matches {
     return new Match(word1, word2);
   }
 
+  public static List<Modification> getLevenshteinMatches(Set<Match> permutation) {
+    List<Modification> levenshtein = Lists.newArrayList();
+    for (Match match : permutation) {
+      if (match.levenshteinDistance > 0) {
+        levenshtein.add(new LevenshteinMatch(match));
+      }
+    }
+    return levenshtein;
+  }
 }

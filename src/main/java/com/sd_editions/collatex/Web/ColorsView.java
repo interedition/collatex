@@ -8,6 +8,7 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.spike2.Colors;
+import com.sd_editions.collatex.spike2.LevenshteinMatch;
 import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.Modifications;
 import com.sd_editions.collatex.spike2.WitnessIndex;
@@ -65,7 +66,9 @@ public class ColorsView {
             html += "no additions, removals or transpositions";
           } else {
             for (Modification modification : modificationsL) {
-              if (modification instanceof Addition) {
+              if (modification instanceof LevenshteinMatch) {
+                html += "<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>";
+              } else if (modification instanceof Addition) {
                 html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
               } else if (modification instanceof Removal) {
                 html += "<li>" + removalView((Removal) modification, base) + "</li>";
@@ -82,6 +85,10 @@ public class ColorsView {
       }
     }
     return html;
+  }
+
+  private String levenshteinMatch(LevenshteinMatch modification) {
+    return "<i>" + modification.base() + "</i> matches with <i>" + modification.witness() + "</i>";
   }
 
   private String replacementView(Replacement replacement, int base, int w) {

@@ -6,7 +6,6 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
 import com.sd_editions.collatex.spike2.collate.Replacement;
@@ -56,6 +55,7 @@ public class Colors {
       List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
 
       List<Modification> modifications = Lists.newArrayList();
+      modifications.addAll(Matches.getLevenshteinMatches(permutation));
       modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase, matchSequencesForWitness));
       modifications.addAll(MatchSequences.getModificationsInMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase));
       modificationsList.add(new Modifications(modifications, transpositions));
