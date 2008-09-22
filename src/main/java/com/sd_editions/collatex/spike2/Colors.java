@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.spike2;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -60,6 +62,13 @@ public class Colors {
       modifications.addAll(MatchSequences.getModificationsInMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase));
       modificationsList.add(new Modifications(modifications, transpositions));
     }
+    Comparator<Modifications> comparator = new Comparator<Modifications>() {
+
+      public int compare(Modifications o1, Modifications o2) {
+        return o1.size() - o2.size();
+      }
+    };
+    Collections.sort(modificationsList, comparator);
     return modificationsList;
   }
 
