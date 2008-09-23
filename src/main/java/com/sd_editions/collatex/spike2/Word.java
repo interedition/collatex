@@ -3,9 +3,9 @@ package com.sd_editions.collatex.spike2;
 import org.apache.commons.lang.StringUtils;
 
 public class Word {
-  private final String original;
-  public String normalized;
-  final int position;
+  public final String original;
+  public final String normalized;
+  public final int position;
 
   public Word(String _original, int _position) {
     this.original = _original;

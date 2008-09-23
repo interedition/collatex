@@ -15,22 +15,22 @@ import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class Colors {
 
-  public final String[] witnessStrings;
+  public final List<Witness> witnesses;
   private final Index index;
   private final List<WitnessIndex> witnessIndexes;
 
   public Colors(String... _witnessStrings) {
-    this.witnessStrings = _witnessStrings;
-    index = new Index(witnessStrings);
+    this.witnesses = Lists.newArrayList();
+    this.index = new Index(_witnessStrings);
     this.witnessIndexes = Lists.newArrayList();
-    for (String witness : witnessStrings) {
-      WitnessIndex witnessIndex = new WitnessIndex(witness, index);
-      witnessIndexes.add(witnessIndex);
+    for (String witnessString : _witnessStrings) {
+      this.witnesses.add(new Witness(witnessString));
+      this.witnessIndexes.add(new WitnessIndex(witnessString, index));
     }
   }
 
-  public Colors(List<String> witnesses) {
-    this(witnesses.toArray(new String[witnesses.size()]));
+  public Colors(List<String> _witnessStrings) {
+    this(_witnessStrings.toArray(new String[_witnessStrings.size()]));
   }
 
   public int numberOfUniqueWords() {
@@ -46,7 +46,7 @@ public class Colors {
     WitnessIndex witnessIndex = getWitnessIndex(i);
     WitnessIndex witnessIndex2 = getWitnessIndex(j);
     //    Matches matches = new Matches(witnessIndex, witnessIndex2);
-    Matches matches = new Matches(new Witness(witnessStrings[i - 1]), new Witness(witnessStrings[j - 1]));
+    Matches matches = new Matches(witnesses.get(i - 1), witnesses.get(j - 1));
     List<Set<Match>> permutationList = matches.permutations();
     for (Set<Match> permutation : permutationList) {
       //Note: this only leads to one permutation of the possible matches..
@@ -60,7 +60,7 @@ public class Colors {
       modifications.addAll(Matches.getLevenshteinMatches(permutation));
       modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase, matchSequencesForWitness));
       modifications.addAll(MatchSequences.getModificationsInMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase));
-      modificationsList.add(new Modifications(modifications, transpositions));
+      modificationsList.add(new Modifications(modifications, transpositions, permutation));
     }
     Comparator<Modifications> comparator = new Comparator<Modifications>() {
 
@@ -116,7 +116,7 @@ public class Colors {
   }
 
   public int numberOfWitnesses() {
-    return witnessIndexes.size();
+    return witnesses.size();
   }
 
   public List<MatchSequence> getMatchSequences(int i, int j) {

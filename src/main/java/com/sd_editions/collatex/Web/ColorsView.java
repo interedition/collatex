@@ -2,15 +2,19 @@ package com.sd_editions.collatex.Web;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.spike2.Colors;
 import com.sd_editions.collatex.spike2.LevenshteinMatch;
+import com.sd_editions.collatex.spike2.Match;
 import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.Modifications;
+import com.sd_editions.collatex.spike2.Witness;
 import com.sd_editions.collatex.spike2.WitnessIndex;
 import com.sd_editions.collatex.spike2.Word;
 import com.sd_editions.collatex.spike2.collate.Addition;
@@ -33,7 +37,7 @@ public class ColorsView {
   private String witnesses() {
     String html = "<ol>";
     for (int row = 0; row < colors.numberOfWitnesses(); row++) {
-      html += "<li>" + colors.witnessStrings[row] + "</li>";
+      html += "<li>" + colors.witnesses.get(row).sentence + "</li>";
     }
     html += "</ol>";
     return html;
@@ -70,30 +74,69 @@ public class ColorsView {
         int pn = 1;
         for (Modifications modifications : modificationsList) {
           html += "Permutation " + pn++ + "/" + modificationsList.size() + "<ul>";
-          List<Modification> modificationsL = modifications.getModifications();
-          if (modificationsL.isEmpty()) {
-            html += "no additions, removals or transpositions";
-          } else {
-            for (Modification modification : modificationsL) {
-              if (modification instanceof LevenshteinMatch) {
-                html += "<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>";
-              } else if (modification instanceof Addition) {
-                html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
-              } else if (modification instanceof Removal) {
-                html += "<li>" + removalView((Removal) modification, base) + "</li>";
-              } else if (modification instanceof Transposition) {
-                html += "<li>" + transpositionView((Transposition) modification, base, w) + "</li>";
-              } else if (modification instanceof Replacement) {
-                html += "<li>" + replacementView((Replacement) modification, base, w) + "</li>";
-              }
-            }
-          }
+          html += witnessPairView(base, w, modifications);
+          html += modificationsView(base, w, modifications);
           html += "</ul>";
         }
         html += "</ol>";
       }
     }
     return html;
+  }
+
+  private String modificationsView(int base, int w, Modifications modifications) {
+    String html = "<li>Modifications:</li><ul>";
+    List<Modification> modificationsL = modifications.getModifications();
+    if (modificationsL.isEmpty()) {
+      html += "<li>no additions, removals or transpositions</li>";
+    } else {
+      for (Modification modification : modificationsL) {
+        if (modification instanceof LevenshteinMatch) {
+          html += "<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>";
+        } else if (modification instanceof Addition) {
+          html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
+        } else if (modification instanceof Removal) {
+          html += "<li>" + removalView((Removal) modification, base) + "</li>";
+        } else if (modification instanceof Transposition) {
+          html += "<li>" + transpositionView((Transposition) modification, base, w) + "</li>";
+        } else if (modification instanceof Replacement) {
+          html += "<li>" + replacementView((Replacement) modification, base, w) + "</li>";
+        }
+      }
+    }
+    html += "</ul>";
+    return html;
+  }
+
+  @SuppressWarnings("boxing")
+  private String witnessPairView(int base, int w, Modifications modifications) {
+    StringBuffer html = new StringBuffer("<li>Colored Witnesses:<ol>");
+    html.append("<li value=\"" + base + "\">");
+    Witness witness1 = colors.witnesses.get(base - 1);
+    int colorcounter = 1;
+    int basePosition = 1;
+    List<String> words = Lists.newArrayList();
+    Map<Integer, Integer> witnessWordColors = Maps.newHashMap();
+    for (Word word1 : witness1.getWords()) {
+      Match match = modifications.getMatchAtBasePosition(basePosition);
+      if (match != null) witnessWordColors.put(match.getWitnessWord().position, colorcounter);
+      words.add(new WordColorTuple(word1.original, "color" + colorcounter++).toHtml());
+      basePosition++;
+    }
+    html.append(Join.join(" ", words));
+    html.append("</li>");
+    html.append("<li value=\"" + w + "\">");
+    Witness witness2 = colors.witnesses.get(w - 1);
+    words = Lists.newArrayList();
+    int witnessPosition = 1;
+    for (Word word2 : witness2.getWords()) {
+      int color = (witnessWordColors.containsKey(witnessPosition)) ? witnessWordColors.get(witnessPosition) : colorcounter++;
+      words.add(new WordColorTuple(word2.original, "color" + color).toHtml());
+      witnessPosition++;
+    }
+    html.append(Join.join(" ", words));
+    html.append("</li></ol></li>");
+    return html.toString();
   }
 
   private String levenshteinMatch(LevenshteinMatch modification) {
