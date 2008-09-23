@@ -111,31 +111,49 @@ public class ColorsView {
   @SuppressWarnings("boxing")
   private String witnessPairView(int base, int w, Modifications modifications) {
     StringBuffer html = new StringBuffer("<li>Colored Witnesses:<ol>");
+
     html.append("<li value=\"" + base + "\">");
     Witness witness1 = colors.witnesses.get(base - 1);
-    int colorcounter = 1;
-    int basePosition = 1;
+    int colorcounter = 0;
     List<String> words = Lists.newArrayList();
-    Map<Integer, Integer> witnessWordColors = Maps.newHashMap();
+    Map<Word, Integer> matchedWitnessWordColors = Maps.newHashMap();
+    int lastMatchedWitnessPosition = -1;
     for (Word word1 : witness1.getWords()) {
-      Match match = modifications.getMatchAtBasePosition(basePosition);
-      if (match != null) witnessWordColors.put(match.getWitnessWord().position, colorcounter);
-      words.add(new WordColorTuple(word1.original, "color" + colorcounter++).toHtml());
-      basePosition++;
+      Match match = modifications.getMatchAtBasePosition(word1.position);
+      if (match == null) {
+        if (lastMatchedWitnessPosition != -1) colorcounter++;
+        lastMatchedWitnessPosition = -1;
+      } else {
+        Word witnessWord = match.getWitnessWord();
+        int matchedWitnessPosition = witnessWord.position;
+        if (lastMatchedWitnessPosition + 1 != matchedWitnessPosition) colorcounter++;
+        matchedWitnessWordColors.put(witnessWord, colorcounter);
+        lastMatchedWitnessPosition = matchedWitnessPosition;
+      }
+      words.add(new WordColorTuple(word1.original, "color" + colorcounter).toHtml());
     }
     html.append(Join.join(" ", words));
     html.append("</li>");
+
     html.append("<li value=\"" + w + "\">");
     Witness witness2 = colors.witnesses.get(w - 1);
     words = Lists.newArrayList();
-    int witnessPosition = 1;
+    boolean lastWitnessWordWasAMatch = true;
     for (Word word2 : witness2.getWords()) {
-      int color = (witnessWordColors.containsKey(witnessPosition)) ? witnessWordColors.get(witnessPosition) : colorcounter++;
+      int color;
+      boolean thisWitnessWordIsAMatch = matchedWitnessWordColors.containsKey(word2);
+      if (thisWitnessWordIsAMatch) {
+        color = matchedWitnessWordColors.get(word2);
+      } else {
+        if (lastWitnessWordWasAMatch) colorcounter++;
+        color = colorcounter;
+      }
       words.add(new WordColorTuple(word2.original, "color" + color).toHtml());
-      witnessPosition++;
+      lastWitnessWordWasAMatch = thisWitnessWordIsAMatch;
     }
     html.append(Join.join(" ", words));
     html.append("</li></ol></li>");
+
     return html.toString();
   }
 
