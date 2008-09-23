@@ -119,7 +119,7 @@ public class UseCaseView {
   //    return html;
   //  }
   public String toHtml() {
-    String html = "<h4>Colors:</h4>" + new ColorsView(colors).toHtml();
+    String html = "<h4>Matches:</h4>" + new ColorsView(colors).toHtml();
     //    html += "<h4>Matches:</h4>" + new WordMatchMapView(wordMatchMap).toHtml();
     //    html += permutationsView(colorMatrixPermutations);
     return html;

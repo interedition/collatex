@@ -2,6 +2,8 @@ package com.sd_editions.collatex.Web;
 
 import java.util.List;
 
+import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -39,13 +41,25 @@ public class UseCasePage extends WebPage {
     usecases.add(new String[] { "When April with his showers sweet with fruit The drought of March has pierced unto the root",
         "When showers sweet with April fruit The March of drought has pierced to the root", "When showers sweet with April fruit The drought of March has pierced the rood" });
 
+    final ListView usecaseTabListView = new ListView("tabs", usecases) {
+      @Override
+      public void populateItem(final ListItem listItem) {
+        int num = listItem.getIndex() + 1;
+        listItem.add(new Label("link_to_usecase", "<a href=\"#usecase-" + num + "\">" + num + "</a>").setEscapeModelStrings(false));
+      }
+    };
+    add(usecaseTabListView);
+
     final ListView usecaseListView = new ListView("usecases", usecases) {
       @Override
       public void populateItem(final ListItem listItem) {
         final String[] usecase = (String[]) listItem.getModelObject();
         int num = listItem.getIndex() + 1;
-        listItem.add(new Label("head", "<a name=\"" + num + "\">Use Case #" + num + "</a>").setEscapeModelStrings(false));
-        listItem.add(new Label("witnesses", makeView(listItem.getIndex(), usecase)).setEscapeModelStrings(false));
+        WebMarkupContainer usecaseDiv = new WebMarkupContainer("usecase_div");
+        usecaseDiv.add(new SimpleAttributeModifier("id", "usecase-" + num));
+        listItem.add(usecaseDiv);
+        usecaseDiv.add(new Label("head", "<a name=\"" + num + "\">Usecase #" + num + "</a>").setEscapeModelStrings(false));
+        usecaseDiv.add(new Label("witnesses", makeView(listItem.getIndex(), usecase)).setEscapeModelStrings(false));
       }
 
       private String makeView(int index, String[] usecase) {

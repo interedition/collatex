@@ -27,7 +27,16 @@ public class ColorsView {
   }
 
   public String toHtml() {
-    return coloredWitnesses() + modifications();
+    return witnesses() + modifications();
+  }
+
+  private String witnesses() {
+    String html = "<ol>";
+    for (int row = 0; row < colors.numberOfWitnesses(); row++) {
+      html += "<li>" + colors.witnessStrings[row] + "</li>";
+    }
+    html += "</ol>";
+    return html;
   }
 
   private String coloredWitnesses() {
@@ -56,7 +65,7 @@ public class ColorsView {
     final int numberOfWitnesses = colors.numberOfWitnesses();
     for (int base = 1; base < numberOfWitnesses; base++) {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
-        html += "Comparing witness " + base + " with witness " + w + ":<ol>";
+        html += "Comparing witnesses " + base + " and " + w + ":<ol>";
         List<Modifications> modificationsList = colors.compareWitness(base, w);
         int pn = 1;
         for (Modifications modifications : modificationsList) {

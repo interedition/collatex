@@ -15,9 +15,9 @@ import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class Colors {
 
+  public final String[] witnessStrings;
   private final Index index;
   private final List<WitnessIndex> witnessIndexes;
-  private final String[] witnessStrings;
 
   public Colors(String... _witnessStrings) {
     this.witnessStrings = _witnessStrings;
