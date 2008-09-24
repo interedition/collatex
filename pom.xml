@@ -4,7 +4,7 @@
 	<groupId>com.sd_editions.collatex</groupId>
 	<artifactId>CollateX</artifactId>
 	<name>CollateX</name>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<url>http://www.sourceforge.net/projects/collatex
 	</url>
 	<build>

@@ -18,28 +18,31 @@
 <body>
 <h1>CollateX</h1>
 
-<div>
-<button id="hideButton" onclick="hideSecondary();" disabled>Show only the first/"best" permutation</button>
-<button id="showButton" onclick="showSecondary();">Show all permutations</button>
-</div>
-
-<h4>Witnesses</h4>
-
-<span wicket:id="colorview">color_view</span>
-
-<form wicket:id="alignmentform">
-  Enter witness 1: <input type="text" size="100" wicket:id="witness1"/><br/>
-  Enter witness 2: <input type="text" size="100" wicket:id="witness2"/><br/>
-  Enter witness 3: <input type="text" size="100" wicket:id="witness3"/><br/>
-  <input type="submit"/>
-</form>
-
-<br/><br/>
-<a href="#" wicket:id="usecaselink">Standard Use Cases</a><br/><br/>
+<a href="#" wicket:id="usecaselink">Standard Use Cases</a> &nbsp;&nbsp;&nbsp;
 <a href="#" wicket:id="previous">Previous algorithms</a>
 
 <hr/>
 
+<form wicket:id="alignmentform">
+Enter witness 1: <input type="text" size="100" wicket:id="witness1"/><br/>
+Enter witness 2: <input type="text" size="100" wicket:id="witness2"/><br/>
+Enter witness 3: <input type="text" size="100" wicket:id="witness3"/><br/>
+<input type="submit"/>
+</form>
+
+<hr/>
+
+<div>
+<button id="hideButton" onclick="hideSecondary();" disabled>Just show the first/"best" permutation</button>
+<button id="showButton" onclick="showSecondary();">Show all permutations</button>
+</div>
+
+<hr/>
+
+<h4>Witnesses:</h4>
+<span wicket:id="colorview">color_view</span>
+
+<hr/>
 </body>
 
 </html>
