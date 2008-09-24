@@ -50,6 +50,7 @@ public class IndexTable {
     return false;
   }
 
+  @SuppressWarnings("boxing")
   public void addIndex(Word w) {
     this.indTable.get(w.getContent()).add(this.baseIndex);
   }
@@ -73,6 +74,7 @@ public class IndexTable {
     fillIndexTable();
   }
 
+  @SuppressWarnings("boxing")
   private void fillIndexTable() {
     Word w = (Word) base.getFirstChild();
 

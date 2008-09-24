@@ -31,14 +31,14 @@ public class BlockStructureTest extends TestCase {
     String threeContent = "Third Word";
     String fourContent = "Fourth Word";
     String fifthContent = "Fifth Word";
-    String sixthContent = "Sixth Content";
+    //    String sixthContent = "Sixth Content";
 
     Word word1 = new Word(firstContent);
     Word word2 = new Word(twoContent);
     Word word3 = new Word(threeContent);
     Word word4 = new Word(fourContent);
     Word word5 = new Word(fifthContent);
-    Word word6 = new Word(sixthContent);
+    //    Word word6 = new Word(sixthContent);
 
     //Create our BlockStructure to hold the words
     BlockStructure document = new BlockStructure();

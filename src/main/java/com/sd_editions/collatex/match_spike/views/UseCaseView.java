@@ -13,7 +13,6 @@ public class UseCaseView {
 
   private final Colors colors;
 
-  private final WordMatchMap wordMatchMap;
   private final List<BlockStructure> witnessList;
 
   //  private final Set<ColorMatrix> colorMatrixPermutations;
@@ -26,10 +25,7 @@ public class UseCaseView {
     for (String witness : usecase) {
       witnessList.add(Util.string2BlockStructure(witness));
     }
-    wordMatchMap = new WordMatchMap(witnessList);
-    //    //    matchMatrixList = makeMatchMatrixList();
-    //    fillWordMatrix();
-    //    colorMatrixPermutations = wordMatchMap.getColorMatrixPermutations();
+    new WordMatchMap(witnessList);
   }
 
   //  public List<List<int[]>> makeMatchMatrixList() {

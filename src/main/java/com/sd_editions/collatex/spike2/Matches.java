@@ -50,11 +50,11 @@ public class Matches {
   // Integers are word codes
   public Set<Match> matches() {
     Set<Integer> matchesAsWordCodes = matchesAsWordCodes();
-    Set<Match> matches = Sets.newLinkedHashSet();
+    Set<Match> matchSet = Sets.newLinkedHashSet();
     for (Integer matchAsWordCode : matchesAsWordCodes) {
-      matches.add(convertWordCodeToMatch(baseIndex, witnessIndex, matchAsWordCode));
+      matchSet.add(convertWordCodeToMatch(baseIndex, witnessIndex, matchAsWordCode));
     }
-    return matches;
+    return matchSet;
   }
 
   private Set<Integer> matchesAsWordCodes() {

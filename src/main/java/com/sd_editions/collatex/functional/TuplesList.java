@@ -6,7 +6,7 @@ import java.util.Iterator;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Collate.Tuple;
 
-public class TuplesList {
+public class TuplesList implements Iterable<Tuple> {
   ArrayList<Tuple> arrL;
 
   public TuplesList() {

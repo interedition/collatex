@@ -1,13 +1,13 @@
 package com.sd_editions.collatex.Collate;
 
-public class Tuple implements Comparable {
+public class Tuple implements Comparable<Tuple> {
   public int baseIndex;
   public int witnessIndex;
   private boolean isTransposTupel;
 
-  public Tuple(int baseIndex, int witnessIndex) {
-    this.baseIndex = baseIndex;
-    this.witnessIndex = witnessIndex;
+  public Tuple(int baseIndex1, int witnessIndex1) {
+    this.baseIndex = baseIndex1;
+    this.witnessIndex = witnessIndex1;
     this.isTransposTupel = false;
   }
 
@@ -27,8 +27,7 @@ public class Tuple implements Comparable {
     return witnessIndex;
   }
 
-  public int compareTo(Object obj) {
-    Tuple tmp = (Tuple) obj;
+  public int compareTo(Tuple tmp) {
     int newer = Math.abs(tmp.baseIndex - tmp.witnessIndex);
     int me = Math.abs(this.baseIndex - this.witnessIndex);
     if (me < newer) {

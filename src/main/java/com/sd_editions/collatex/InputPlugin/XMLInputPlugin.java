@@ -21,8 +21,8 @@ import com.sd_editions.collatex.Block.Word;
 public class XMLInputPlugin implements IntInputPlugin {
   private final File xmlFile;
 
-  public XMLInputPlugin(File xmlFile) {
-    this.xmlFile = xmlFile;
+  public XMLInputPlugin(File xmlFile1) {
+    this.xmlFile = xmlFile1;
   }
 
   public BlockStructure readFile() throws FileNotFoundException, IOException, BlockStructureCascadeException {
@@ -45,7 +45,7 @@ public class XMLInputPlugin implements IntInputPlugin {
 
   public class SAXHandler extends DefaultHandler2 {
 
-    private BlockStructure document;
+    private final BlockStructure document;
     private int lineCount;
     private Line pLine;
     private StringBuffer text;
@@ -60,6 +60,7 @@ public class XMLInputPlugin implements IntInputPlugin {
     }
 
     @Override
+    @SuppressWarnings("unused")
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
       if (name.equals("l")) {
         lineCount++;
@@ -85,6 +86,7 @@ public class XMLInputPlugin implements IntInputPlugin {
     }
 
     @Override
+    @SuppressWarnings("unused")
     public void endElement(String uri, String localName, String name) throws SAXException {
       if (name.equals("w")) {
         Word word = new Word(text.toString());
@@ -93,6 +95,7 @@ public class XMLInputPlugin implements IntInputPlugin {
     }
 
     @Override
+    @SuppressWarnings("unused")
     public InputSource getExternalSubset(String name, String baseURI) throws SAXException, IOException {
       String entities = "<!ENTITY Base ' '>"; // TODO: replace base with?
       entities += "<!ENTITY paraph ' '>"; // TODO: replace paraph with?

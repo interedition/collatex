@@ -13,6 +13,7 @@ public class TupleComparatorBI implements Comparator<Tuple> {
     return 0;
   }
 
+  @SuppressWarnings("boxing")
   private double transformTuple(Tuple r) {
     Double str1 = new Double(Integer.toString(r.getBaseIndex()));
     Double str2 = new Double(Integer.toString(r.getWitnessIndex()));

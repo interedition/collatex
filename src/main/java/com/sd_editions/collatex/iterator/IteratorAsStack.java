@@ -5,11 +5,11 @@ import java.util.NoSuchElementException;
 
 public class IteratorAsStack implements Stack {
 
-  private Iterator delegate;
+  private final Iterator<?> delegate;
   private Object topElement;
   private boolean topElementSet = false;
 
-  public IteratorAsStack(Iterator iterator) {
+  public IteratorAsStack(Iterator<?> iterator) {
     this.delegate = iterator;
   }
 
@@ -24,7 +24,8 @@ public class IteratorAsStack implements Stack {
     return result;
   }
 
-  public void push(Object object) {
+  public void push(@SuppressWarnings("unused")
+  Object object) {
     throw new UnsupportedOperationException();
   }
 

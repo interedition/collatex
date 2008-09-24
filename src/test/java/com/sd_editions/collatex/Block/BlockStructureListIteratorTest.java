@@ -27,6 +27,7 @@ public class BlockStructureListIteratorTest extends TestCase {
     return new TestSuite(BlockStructureListIteratorTest.class);
   }
 
+  @SuppressWarnings("null")
   public void testIteratorBasic() {
     //Create a basic BlockStructure
     Line line = new Line(1);
@@ -50,7 +51,7 @@ public class BlockStructureListIteratorTest extends TestCase {
     document.setNextSibling(word4, word5);
     document.setNextSibling(word5, word6);
 
-    BlockStructureListIterator it = document.listIterator();
+    BlockStructureListIterator<?> it = document.listIterator();
     //We should be able to get an iterator
     assertNotNull(it);
     //There should be a next element

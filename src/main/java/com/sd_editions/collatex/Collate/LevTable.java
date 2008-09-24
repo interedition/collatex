@@ -20,8 +20,8 @@ public class LevTable {
   }
 
   @SuppressWarnings("boxing")
-  public Integer getLevDist(String base, String wit) {
-    Word bas = new Word(base);
+  public Integer getLevDist(String base1, String wit) {
+    Word bas = new Word(base1);
     Word witn = new Word(wit);
     return bas.alignmentFactor(witn);
   }
@@ -55,24 +55,24 @@ public class LevTable {
   @SuppressWarnings("boxing")
   //Fill the Array-Cells with Lev-Distanz-Values
   public void fillArrayCells() {
-    String[] base = mapToStringArray(this.base, this.base.size());
+    String[] baseArray = mapToStringArray(this.base, this.base.size());
     String[] witn = mapToStringArray(this.witness, this.witness.size());
     for (int v = 0; v < this.witness.size() + 1; v++) {
       for (int h = 0; h < this.base.size() + 1; h++) {
         if (v == 0 && h == 0) {
           array[v][h] = "";
         } else if (v == 0) {
-          array[v][h] = base[h];
+          array[v][h] = baseArray[h];
         } else if (h == 0) {
           array[v][h] = witn[v];
         } else {
-          if (getLevDist(base[h], witn[v]) == 0) {
+          if (getLevDist(baseArray[h], witn[v]) == 0) {
             //this.anz++;
             //break;
-          } else if (getLevDist(base[h], witn[v]) == 1) {
+          } else if (getLevDist(baseArray[h], witn[v]) == 1) {
             //this.anz++;
           } else {}
-          array[v][h] = getLevDist(base[h], witn[v]);
+          array[v][h] = getLevDist(baseArray[h], witn[v]);
         }
       }
     }

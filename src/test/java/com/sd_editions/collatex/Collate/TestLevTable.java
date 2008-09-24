@@ -163,17 +163,17 @@ public class TestLevTable extends TestCase {
     return table;
   }
 
-  public void getIndexTableBase(IndexTable iTabbase) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  public void getIndexTableBase(IndexTable iTabbase) {
     System.out.println();
     System.out.println("Base :" + "\t" + iTabbase.getIndexTableSorted().toString());
   }
 
-  public void getIndexTableWitn(IndexTable iTabwitness) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  public void getIndexTableWitn(IndexTable iTabwitness) {
     System.out.println("Witn :" + "\t" + iTabwitness.getIndexTableSorted().toString());
     System.out.println();
   }
 
-  public void getTup(LevTable levTab) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  public void getTup(LevTable levTab) {
     Tuple[] arrT = Functions.getLevTuples(levTab).getTuplesArray();
     for (int i = 0; i < arrT.length; i++) {
       if (i == 0) {
@@ -187,7 +187,7 @@ public class TestLevTable extends TestCase {
     System.out.println("-------------------------------------------------------------------");
   }
 
-  public void getOut(LevTable levTab, IndexTable iTabbase, IndexTable iTabwitness) throws FileNotFoundException, IOException, BlockStructureCascadeException {
+  public void getOut(LevTable levTab, IndexTable iTabbase, IndexTable iTabwitness) {
     levTab.toString();
     getIndexTableBase(iTabbase);
     getIndexTableWitn(iTabwitness);

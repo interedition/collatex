@@ -10,8 +10,8 @@ public class AdditionCell extends Cell {
 
   private final List<Word> additions;
 
-  public AdditionCell(List<Word> additions) {
-    this.additions = additions;
+  public AdditionCell(List<Word> additions1) {
+    this.additions = additions1;
   }
 
   public AdditionCell(Word witnessWord) {
@@ -25,8 +25,8 @@ public class AdditionCell extends Cell {
 
   private String additionsToString() {
     String additionsAsString = "";
-    for (Iterator iterator = additions.iterator(); iterator.hasNext();) {
-      Word addition = (Word) iterator.next();
+    for (Iterator<Word> iterator = additions.iterator(); iterator.hasNext();) {
+      Word addition = iterator.next();
       additionsAsString += addition.getContent();
       if (iterator.hasNext()) {
         additionsAsString += " ";

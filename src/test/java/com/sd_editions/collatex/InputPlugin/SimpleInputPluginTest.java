@@ -31,6 +31,7 @@ public class SimpleInputPluginTest extends TestCase {
     return new TestSuite(SimpleInputPluginTest.class);
   }
 
+  @SuppressWarnings("null")
   public void testSimpleInputPlugin() {
     String example1 = "examples/inputfiles/example1.txt";
     BlockStructure bs = null;

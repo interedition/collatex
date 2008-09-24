@@ -1,40 +1,34 @@
 <assembly>
-
-  <id>deployable</id>
-
-  <formats>
-    <format>zip</format>
-  </formats>
-
-  <fileSets>
-    <fileSet>
-      <includes>
-        <include>README*</include>
-        <include>LICENSE*</include>
-        <include>NOTICE*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>scripts</directory>
-      <outputDirectory>/</outputDirectory>
-      <includes>
-        <include>collatex_server.rb</include>
-      </includes>
-      <fileMode>0777</fileMode>
-      <lineEnding>unix</lineEnding>
-    </fileSet>
-  </fileSets>
-
-  <dependencySets>
-    <dependencySet>
-      <outputDirectory>lib/</outputDirectory>
-      <unpack>false</unpack>
-      <scope>runtime</scope>
-      <excludes>
-        <exclude>junit:junit</exclude>
-      </excludes>
-    </dependencySet>
-  </dependencySets>
-
+	<id>deployable</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<fileSets>
+		<fileSet>
+			<includes>
+				<include>README*</include>
+				<include>LICENSE*</include>
+				<include>NOTICE*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>scripts</directory>
+			<outputDirectory>/</outputDirectory>
+			<includes>
+				<include>collatex_server.rb</include>
+			</includes>
+			<fileMode>0777</fileMode>
+			<lineEnding>unix</lineEnding>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib/</outputDirectory>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<excludes>
+				<exclude>junit:junit</exclude>
+			</excludes>
+		</dependencySet>
+	</dependencySets>
 </assembly>
-

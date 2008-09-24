@@ -3,7 +3,7 @@ package com.sd_editions.collatex.iterator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public abstract class AbstractIterator implements Iterator {
+public abstract class AbstractIterator implements Iterator<Object> {
 
   private Boolean hasNext;
 

@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 public class BlockStructureListIterator<E> implements ListIterator<E> {
 
-  private BlockStructure bs;
+  private final BlockStructure bs;
   private Block previousBlock;
   private Block nextBlock;
 
@@ -40,6 +40,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
    *
    * @return The next Block in the BlockStructure
    */
+  @SuppressWarnings("unchecked")
   public E next() {
     if (this.nextBlock == null) {
       throw new NoSuchElementException();
@@ -68,6 +69,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
    *
    * @return The previous block
    */
+  @SuppressWarnings("unchecked")
   public E previous() {
     //Right the previous block is the previous previous of the next block
     Block pBlock = this.getPreviousBlock(this.nextBlock);

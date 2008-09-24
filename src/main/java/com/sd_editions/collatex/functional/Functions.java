@@ -60,8 +60,7 @@ public class Functions {
 
     //Sort-Start
     Sequenz seq1 = new Sequenz();
-    for (Iterator iterator = tuples.iterator(); iterator.hasNext();) {
-      Tuple type = (Tuple) iterator.next();
+    for (Tuple type : tuples) {
       seq1.addNext(type);
     }
     ArrayList<Tuple> arrList_1 = seq1.getSeq();
@@ -90,8 +89,7 @@ public class Functions {
     TuplesList newTuples2 = new TuplesList();
     //Sort-Start
     Sequenz seq2 = new Sequenz();
-    for (Iterator iterator = newTuples.iterator(); iterator.hasNext();) {
-      Tuple type = (Tuple) iterator.next();
+    for (Tuple type : newTuples) {
       seq2.addNext(type);
     }
     ArrayList<Tuple> arrList_2 = seq2.getSeq();
@@ -114,8 +112,7 @@ public class Functions {
         newTuples2.add(tup22);
       }
     }
-    for (Iterator iterator = newTuples2.iterator(); iterator.hasNext();) {
-      Tuple tuple = (Tuple) iterator.next();
+    for (Tuple tuple : newTuples2) {
       System.out.println("newTuples2" + tuple.toString());
     }
     //**********************************

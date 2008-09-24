@@ -11,10 +11,8 @@ public class Tuple2<T> {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Tuple2)) {
-      return false;
-    }
-    Tuple2 other_tuple = (Tuple2) obj;
+    if (!(obj instanceof Tuple2)) return false;
+    Tuple2<?> other_tuple = (Tuple2<?>) obj;
     return other_tuple.left.equals(left) && other_tuple.right.equals(right);
   }
 

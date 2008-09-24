@@ -1,9 +1,7 @@
 package com.sd_editions.collatex.Web;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
@@ -43,27 +41,6 @@ public class ColorsView {
     return html;
   }
 
-  private String coloredWitnesses() {
-    String html = "<ol>";
-    for (int row = 0; row < colors.numberOfWitnesses(); row++) {
-      html += "<li>";
-      List<String> htmlWords = Lists.newArrayList();
-      WitnessIndex witnessIndex = colors.getWitnessIndex(row + 1);
-      Set<Integer> colorsPerWitness = witnessIndex.getWordCodes();
-      final Iterator<Integer> iterator = colorsPerWitness.iterator();
-      for (int col = 0; col < colorsPerWitness.size(); col++) {
-        String word = witnessIndex.getWords().get(col).toString();
-        if (word != null) {
-          htmlWords.add(new WordColorTuple(word, "color" + iterator.next()).toHtml());
-        }
-      }
-      html += Join.join(" ", htmlWords);
-      html += "</br></li>";
-    }
-    html += "</ol>";
-    return html;
-  }
-
   private String modifications() {
     String html = "";
     final int numberOfWitnesses = colors.numberOfWitnesses();
@@ -75,7 +52,7 @@ public class ColorsView {
         for (Modifications modifications : modificationsList) {
           html += "Permutation " + pn++ + "/" + modificationsList.size() + "<ul>";
           html += witnessPairView(base, w, modifications);
-          html += modificationsView(base, w, modifications);
+          html += modificationsView(base, modifications);
           html += "</ul>";
         }
         html += "</ol>";
@@ -84,7 +61,7 @@ public class ColorsView {
     return html;
   }
 
-  private String modificationsView(int base, int w, Modifications modifications) {
+  private String modificationsView(int base, Modifications modifications) {
     String html = "<li>Modifications:</li><ul>";
     List<Modification> modificationsL = modifications.getModifications();
     if (modificationsL.isEmpty()) {
@@ -94,13 +71,13 @@ public class ColorsView {
         if (modification instanceof LevenshteinMatch) {
           html += "<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>";
         } else if (modification instanceof Addition) {
-          html += "<li>" + additionView((Addition) modification, base, w) + "</li>";
+          html += "<li>" + additionView((Addition) modification, base) + "</li>";
         } else if (modification instanceof Removal) {
-          html += "<li>" + removalView((Removal) modification, base) + "</li>";
+          html += "<li>" + removalView((Removal) modification) + "</li>";
         } else if (modification instanceof Transposition) {
-          html += "<li>" + transpositionView((Transposition) modification, base, w) + "</li>";
+          html += "<li>" + transpositionView((Transposition) modification) + "</li>";
         } else if (modification instanceof Replacement) {
-          html += "<li>" + replacementView((Replacement) modification, base, w) + "</li>";
+          html += "<li>" + replacementView((Replacement) modification) + "</li>";
         }
       }
     }
@@ -161,22 +138,22 @@ public class ColorsView {
     return "<i>" + modification.base() + "</i> matches with <i>" + modification.witness() + "</i>";
   }
 
-  private String replacementView(Replacement replacement, int base, int w) {
+  private String replacementView(Replacement replacement) {
     int position = replacement.getPosition();
     return "<i>" + replacement.getOriginalWords() + "</i> replaced by <i>" + replacement.getReplacementWords() + "</i> at position " + position; // TODO: TEMP!
   }
 
-  private String transpositionView(Transposition transposition, int base, int w) {
+  private String transpositionView(Transposition transposition) {
     //    return "<i>" + "</i> transposed from position " + transposition. + " to " + y;
     return "<i>" + transposition.getLeft() + "</i> transposed with <i>" + transposition.getRight() + "</i>";
   }
 
-  private String removalView(Removal removal, int base) {
+  private String removalView(Removal removal) {
     int position = removal.getPosition();
     return "<i>" + removal.getRemovedWords() + "</i> at position " + (position) + " removed ";
   }
 
-  private String additionView(Addition addition, int base, int w) {
+  private String additionView(Addition addition, int base) {
     WitnessIndex baseIndex = colors.getWitnessIndex(base);
     String html = "<i>" + addition.getAddedWords() + "</i> added ";
     List<Word> baseWords = baseIndex.getWords();
