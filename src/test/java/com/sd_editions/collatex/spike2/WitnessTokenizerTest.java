@@ -25,4 +25,15 @@ public class WitnessTokenizerTest extends TestCase {
     assertTrue(tokenizer.hasNextToken());
     assertEquals("I", tokenizer.nextToken());
   }
+
+  public void test3() {
+    String witness = "ταυτα ειπων ο ιϲ̅ εξηλθεν ϲυν τοιϲ μαθηταιϲ αυτου περαν του χειμαρρου των κεδρων οπου ην κηποϲ ειϲ ον ειϲηλθεν αυτοϲ και οι μαθηται αυτου";
+    WitnessTokenizer tokenizer = new WitnessTokenizer(witness, false);
+    assertTrue(tokenizer.hasNextToken());
+    assertEquals("ταυτα", tokenizer.nextToken());
+    assertTrue(tokenizer.hasNextToken());
+    assertEquals("ειπων", tokenizer.nextToken());
+    assertTrue(tokenizer.hasNextToken());
+    assertEquals("ο", tokenizer.nextToken());
+  }
 }

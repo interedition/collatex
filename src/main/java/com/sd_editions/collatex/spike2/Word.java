@@ -9,7 +9,7 @@ public class Word {
 
   public Word(String _original, int _position) {
     this.original = _original;
-    this.normalized = original.toLowerCase().replaceAll("\\W", "");
+    this.normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
     this.position = _position;
   }
 
