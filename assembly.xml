@@ -27,6 +27,12 @@
         <include>*.jar</include>
       </includes>
     </fileSet>
+    <fileSet>
+      <directory>site</directory>
+      <includes>
+        <include>*</include>
+      </includes>
+    </fileSet>
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
