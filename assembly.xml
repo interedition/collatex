@@ -30,7 +30,7 @@
     <fileSet>
       <directory>site</directory>
       <includes>
-        <include>*</include>
+        <include>**/*</include>
       </includes>
     </fileSet>
 	</fileSets>
