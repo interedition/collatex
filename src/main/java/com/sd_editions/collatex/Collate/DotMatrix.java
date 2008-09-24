@@ -103,7 +103,7 @@ public class DotMatrix {
             }
           }
           if (seq2.getSize() > 1) {
-            System.out.println("TransPosSeq " + anz + ": " + seq2.toString());
+            //            System.out.println("TransPosSeq " + anz + ": " + seq2.toString());
             //rearrangeTransposTupel(seq2);
             seq2.setTransposSeqValue();
             allSequenz.add(seq2);

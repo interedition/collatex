@@ -33,56 +33,58 @@ public class ColorsView {
   }
 
   private String witnesses() {
-    String html = "<ol>";
+    StringBuffer html = new StringBuffer("<ol>");
     for (int row = 0; row < colors.numberOfWitnesses(); row++) {
-      html += "<li>" + colors.witnesses.get(row).sentence + "</li>";
+      html.append("<li>" + colors.witnesses.get(row).sentence + "</li>");
     }
-    html += "</ol>";
-    return html;
+    html.append("</ol>");
+    return html.toString();
   }
 
   private String modifications() {
-    String html = "";
+    StringBuffer html = new StringBuffer();
     final int numberOfWitnesses = colors.numberOfWitnesses();
     for (int base = 1; base < numberOfWitnesses; base++) {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
-        html += "Comparing witnesses " + base + " and " + w + ":<ol>";
+        html.append("Comparing witnesses " + base + " and " + w + ":<ol>");
         List<Modifications> modificationsList = colors.compareWitness(base, w);
         int pn = 1;
         for (Modifications modifications : modificationsList) {
-          html += "Permutation " + pn++ + "/" + modificationsList.size() + "<ul>";
-          html += witnessPairView(base, w, modifications);
-          html += modificationsView(base, modifications);
-          html += "</ul>";
+          if (pn > 1) html.append("<span class=\"secondary\">");
+          html.append("Permutation " + pn++ + "/" + modificationsList.size() + "<ul>");
+          html.append(witnessPairView(base, w, modifications));
+          html.append(modificationsView(base, modifications));
+          html.append("<br/></ul>");
+          if (pn > 1) html.append("</span>");
         }
-        html += "</ol>";
+        html.append("</ol>");
       }
     }
-    return html;
+    return html.toString();
   }
 
   private String modificationsView(int base, Modifications modifications) {
-    String html = "<li>Modifications:</li><ul>";
+    StringBuffer html = new StringBuffer("<li>Modifications:</li><ul>");
     List<Modification> modificationsL = modifications.getModifications();
     if (modificationsL.isEmpty()) {
-      html += "<li>no additions, removals or transpositions</li>";
+      html.append("<li>no additions, removals or transpositions</li>");
     } else {
       for (Modification modification : modificationsL) {
         if (modification instanceof LevenshteinMatch) {
-          html += "<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>";
+          html.append("<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>");
         } else if (modification instanceof Addition) {
-          html += "<li>" + additionView((Addition) modification, base) + "</li>";
+          html.append("<li>" + additionView((Addition) modification, base) + "</li>");
         } else if (modification instanceof Removal) {
-          html += "<li>" + removalView((Removal) modification) + "</li>";
+          html.append("<li>" + removalView((Removal) modification) + "</li>");
         } else if (modification instanceof Transposition) {
-          html += "<li>" + transpositionView((Transposition) modification) + "</li>";
+          html.append("<li>" + transpositionView((Transposition) modification) + "</li>");
         } else if (modification instanceof Replacement) {
-          html += "<li>" + replacementView((Replacement) modification) + "</li>";
+          html.append("<li>" + replacementView((Replacement) modification) + "</li>");
         }
       }
     }
-    html += "</ul>";
-    return html;
+    html.append("</ul>");
+    return html.toString();
   }
 
   @SuppressWarnings("boxing")
@@ -155,16 +157,16 @@ public class ColorsView {
 
   private String additionView(Addition addition, int base) {
     WitnessIndex baseIndex = colors.getWitnessIndex(base);
-    String html = "<i>" + addition.getAddedWords() + "</i> added ";
+    StringBuffer html = new StringBuffer("<i>" + addition.getAddedWords() + "</i> added ");
     List<Word> baseWords = baseIndex.getWords();
     int position = addition.getPosition();
     if (position == 1) {
-      html += "before <i>" + baseWords.get(0) + "</i>";
+      html.append("before <i>" + baseWords.get(0) + "</i>");
     } else if (position > baseWords.size()) {
-      html += " after <i>" + baseWords.get(baseWords.size() - 1) + "</i>";
+      html.append(" after <i>" + baseWords.get(baseWords.size() - 1) + "</i>");
     } else {
-      html += "between <i>" + baseWords.get(position - 2) + "</i> and <i>" + baseWords.get(position - 1) + "</i>";
+      html.append("between <i>" + baseWords.get(position - 2) + "</i> and <i>" + baseWords.get(position - 1) + "</i>");
     }
-    return html;
+    return html.toString();
   }
 }

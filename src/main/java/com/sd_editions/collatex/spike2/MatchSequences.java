@@ -21,9 +21,8 @@ public class MatchSequences {
           int witnessEndPosition = next.getWitnessWord().position;
           int gapSizeBase = baseEndPosition - baseStartPosition - 1;
           int gapSizeWitness = witnessEndPosition - witnessStartPosition - 1;
-          // WORKAROUND!!! --> SOMETHING IS WRONG IN THE MATCHES!
           if (gapSizeBase != 0 || gapSizeWitness != 0) {
-            System.out.println(gapSizeBase + ":" + gapSizeWitness);
+            //            System.out.println(gapSizeBase + ":" + gapSizeWitness);
             Gap gapBase = new Gap(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1);
             Gap gapWitness = new Gap(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1);
             MisMatch misMatch = new MisMatch(gapBase, gapWitness);
