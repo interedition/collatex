@@ -14,12 +14,12 @@ import com.google.common.collect.Sets;
 import com.sd_editions.collatex.spike2.collate.Transposition;
 
 public class TranspositionDetection {
-  final WitnessIndex witnessIndex;
-  final WitnessIndex witnessIndex2;
+  final Witness witness;
+  final Witness witness2;
 
-  public TranspositionDetection(WitnessIndex _witnessIndex, WitnessIndex _witnessIndex2) {
-    this.witnessIndex = _witnessIndex;
-    this.witnessIndex2 = _witnessIndex2;
+  public TranspositionDetection(Witness _witness, Witness _witness2) {
+    this.witness = _witness;
+    this.witness2 = _witness2;
   }
 
   @SuppressWarnings("boxing")

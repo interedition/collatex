@@ -13,7 +13,6 @@ import com.sd_editions.collatex.spike2.Match;
 import com.sd_editions.collatex.spike2.Modification;
 import com.sd_editions.collatex.spike2.Modifications;
 import com.sd_editions.collatex.spike2.Witness;
-import com.sd_editions.collatex.spike2.WitnessIndex;
 import com.sd_editions.collatex.spike2.Word;
 import com.sd_editions.collatex.spike2.collate.Addition;
 import com.sd_editions.collatex.spike2.collate.Removal;
@@ -156,7 +155,7 @@ public class ColorsView {
   }
 
   private String additionView(Addition addition, int base) {
-    WitnessIndex baseIndex = colors.getWitnessIndex(base);
+    Witness baseIndex = colors.getWitness(base);
     StringBuffer html = new StringBuffer("<i>" + addition.getAddedWords() + "</i> added ");
     List<Word> baseWords = baseIndex.getWords();
     int position = addition.getPosition();

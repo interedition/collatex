@@ -17,15 +17,12 @@ public class Colors {
 
   public final List<Witness> witnesses;
   private final Index index;
-  private final List<WitnessIndex> witnessIndexes;
 
   public Colors(String... _witnessStrings) {
     this.witnesses = Lists.newArrayList();
     this.index = new Index(_witnessStrings);
-    this.witnessIndexes = Lists.newArrayList();
     for (String witnessString : _witnessStrings) {
       this.witnesses.add(new Witness(witnessString));
-      this.witnessIndexes.add(new WitnessIndex(witnessString, index));
     }
   }
 
@@ -37,16 +34,12 @@ public class Colors {
     return index.numberOfEntries();
   }
 
-  public WitnessIndex getWitnessIndex(int i) {
-    return witnessIndexes.get(i - 1);
-  }
-
   public List<Modifications> compareWitness(int i, int j) {
     List<Modifications> modificationsList = Lists.newArrayList();
-    WitnessIndex witnessIndex = getWitnessIndex(i);
-    WitnessIndex witnessIndex2 = getWitnessIndex(j);
     //    Matches matches = new Matches(witnessIndex, witnessIndex2);
-    Matches matches = new Matches(witnesses.get(i - 1), witnesses.get(j - 1));
+    Witness base = getWitness(i);
+    Witness witness = getWitness(j);
+    Matches matches = new Matches(base, witness);
     List<Set<Match>> permutationList = matches.permutations();
     for (Set<Match> permutation : permutationList) {
       //Note: this only leads to one permutation of the possible matches..
@@ -58,8 +51,8 @@ public class Colors {
 
       List<Modification> modifications = Lists.newArrayList();
       modifications.addAll(Matches.getLevenshteinMatches(permutation));
-      modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase, matchSequencesForWitness));
-      modifications.addAll(MatchSequences.getModificationsInMatchSequences(witnessIndex, witnessIndex2, matchSequencesForBase));
+      modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
+      modifications.addAll(MatchSequences.getModificationsInMatchSequences(base, witness, matchSequencesForBase));
       modificationsList.add(new Modifications(modifications, transpositions, permutation));
     }
     Comparator<Modifications> comparator = new Comparator<Modifications>() {
@@ -112,7 +105,11 @@ public class Colors {
   }
 
   public Matches getMatches(int i, int j) {
-    return new Matches(getWitnessIndex(i), getWitnessIndex(j));
+    return new Matches(getWitness(i), getWitness(j));
+  }
+
+  public Witness getWitness(int i) {
+    return witnesses.get(i - 1);
   }
 
   public int numberOfWitnesses() {
@@ -120,9 +117,11 @@ public class Colors {
   }
 
   public List<MatchSequence> getMatchSequences(int i, int j) {
-    //    WitnessIndex base = getWitnessIndex(i);
-    //    WitnessIndex witness = getWitnessIndex(j);
-    Set<Match> matches = getMatches(i, j).matches();
+    Witness base = getWitness(i);
+    Witness witness = getWitness(j);
+    Matches xmatches = new Matches(base, witness);
+    List<Set<Match>> permutationList = xmatches.permutations();
+    Set<Match> matches = permutationList.get(0);
     return TranspositionDetection.calculateMatchSequencesForgetNonMatches(matches);
   }
 }
