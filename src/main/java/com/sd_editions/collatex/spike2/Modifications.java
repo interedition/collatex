@@ -43,4 +43,11 @@ public class Modifications {
     return null;
   }
 
+  public Match getMatchAtWitnessPosition(int witnessPosition) {
+    for (Match match : matches) {
+      if (match.getWitnessWord().position == witnessPosition) return match;
+    }
+    return null;
+  }
+
 }
