@@ -16,11 +16,9 @@ import com.sd_editions.collatex.spike2.collate.Transposition;
 public class Colors {
 
   public final List<Witness> witnesses;
-  private final Index index;
 
   public Colors(String... _witnessStrings) {
     this.witnesses = Lists.newArrayList();
-    this.index = new Index(_witnessStrings);
     for (String witnessString : _witnessStrings) {
       this.witnesses.add(new Witness(witnessString));
     }
@@ -28,10 +26,6 @@ public class Colors {
 
   public Colors(List<String> _witnessStrings) {
     this(_witnessStrings.toArray(new String[_witnessStrings.size()]));
-  }
-
-  public int numberOfUniqueWords() {
-    return index.numberOfEntries();
   }
 
   public List<Modifications> compareWitness(int i, int j) {
