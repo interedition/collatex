@@ -11,7 +11,6 @@ import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.spike2.Colors;
 import com.sd_editions.collatex.spike2.Match;
 import com.sd_editions.collatex.spike2.Matches;
-import com.sd_editions.collatex.spike2.Modifications;
 import com.sd_editions.collatex.spike2.Witness;
 import com.sd_editions.collatex.spike2.Word;
 
@@ -23,75 +22,51 @@ public class AlignmentView {
   }
 
   public String toHtml() {
-    return coloredWitnesses(); // + modifications();
-  }
-
-  @SuppressWarnings("boxing")
-  private String coloredWitnesses() {
-    List<Modifications> permutations = colors.compareWitness(1, 2);
-    Modifications modifications = permutations.get(0);
-    Witness base = colors.witnesses.get(0);
+    Map<Word, Alignment> bla = determineAlignment();
     StringBuilder html = new StringBuilder();
-    int colorcounter = 0;
-    List<String> words = Lists.newArrayList();
-    Map<Integer, Integer> baseWordPositionToColor = Maps.newHashMap();
-    for (Word word1 : base.getWords()) {
-      //      Match match = modifications.getMatchAtBasePosition(word1.position);
-      //      if (match == null) {
-      //        words.add(word1.original);
-      //      } else {
-      colorcounter++;
-      Word baseWord = word1; //match.getBaseWord();
-      baseWordPositionToColor.put(baseWord.position, colorcounter);
-      words.add(new WordColorTuple(word1.original, "color" + colorcounter).toHtml());
-      //      }
-    }
-    html.append(Join.join(" ", words));
-    html.append("<br/>");
-    for (int number = 2; number <= colors.numberOfWitnesses(); number++) {
-      Witness witness = colors.getWitness(number);
-      permutations = colors.compareWitness(1, number);
-      modifications = permutations.get(0);
-      html.append(colorAWitness(witness, modifications, baseWordPositionToColor));
+    for (int i = 0; i < colors.numberOfWitnesses(); i++) {
+      Witness witness = colors.witnesses.get(i);
+      html.append(colorWitness(bla, witness));
     }
     return html.toString();
   }
 
-  @SuppressWarnings("boxing")
-  private String colorAWitness(Witness witness, Modifications modifications, Map<Integer, Integer> baseWordPositionToColor) {
+  public Map<Word, Alignment> determineAlignment() {
+    int colorCounter = 1;
+    Map<Word, Alignment> wordToAlignment = Maps.newHashMap();
+    for (int i = 2; i <= colors.numberOfWitnesses(); i++) {
+      Matches matches = colors.getMatches(1, i);
+      Set<Match> set = matches.permutations().get(0);
+      for (Match match : set) {
+        Word baseWord = match.getBaseWord();
+        Alignment alignment = wordToAlignment.get(baseWord);
+        if (alignment == null) {
+          alignment = new Alignment(colorCounter++);
+        }
+        Word witnessWord = match.getWitnessWord();
+        alignment.add(baseWord);
+        alignment.add(witnessWord);
+        wordToAlignment.put(baseWord, alignment);
+        wordToAlignment.put(witnessWord, alignment);
+      }
+    }
+    return wordToAlignment;
+  }
+
+  private String colorWitness(Map<Word, Alignment> bla, Witness base) {
     StringBuilder html = new StringBuilder();
-    List<String> words;
-    words = Lists.newArrayList();
-    for (Word word2 : witness.getWords()) {
-      Match match = modifications.getMatchAtWitnessPosition(word2.position);
-      if (match == null) {
-        words.add(word2.original);
+    List<String> words = Lists.newArrayList();
+    for (Word word : base.getWords()) {
+      Alignment alignment = bla.get(word);
+      if (alignment != null) {
+        words.add(new WordColorTuple(word.original, "color" + alignment.color).toHtml());
       } else {
-        System.out.println("!!" + match.getBaseWord().position);
-        System.out.println("##" + baseWordPositionToColor.keySet());
-        int color = baseWordPositionToColor.get(match.getBaseWord().position);
-        words.add(new WordColorTuple(word2.original, "color" + color).toHtml());
+        words.add(word.original);
       }
     }
     html.append(Join.join(" ", words));
     html.append("<br/>");
-    //    html.append("</li></ol></li>");
+
     return html.toString();
-
-  }
-
-  public List<Alignment> determineAlignment() {
-    Matches matches = colors.getMatches(1, 2);
-    Set<Match> set = matches.permutations().get(0);
-    List<Alignment> alignments = Lists.newArrayList();
-    for (Match match : set) {
-      Alignment alignment = new Alignment();
-      Word baseWord = match.getBaseWord();
-      Word witnessWord = match.getWitnessWord();
-      alignment.add(baseWord);
-      alignment.add(witnessWord);
-      alignments.add(alignment);
-    }
-    return alignments;
   }
 }
