@@ -2,6 +2,7 @@ package com.sd_editions.collatex.Web;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
@@ -9,6 +10,7 @@ import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match_spike.WordColorTuple;
 import com.sd_editions.collatex.spike2.Colors;
 import com.sd_editions.collatex.spike2.Match;
+import com.sd_editions.collatex.spike2.Matches;
 import com.sd_editions.collatex.spike2.Modifications;
 import com.sd_editions.collatex.spike2.Witness;
 import com.sd_editions.collatex.spike2.Word;
@@ -76,5 +78,20 @@ public class AlignmentView {
     //    html.append("</li></ol></li>");
     return html.toString();
 
+  }
+
+  public List<Alignment> determineAlignment() {
+    Matches matches = colors.getMatches(1, 2);
+    Set<Match> set = matches.permutations().get(0);
+    List<Alignment> alignments = Lists.newArrayList();
+    for (Match match : set) {
+      Alignment alignment = new Alignment();
+      Word baseWord = match.getBaseWord();
+      Word witnessWord = match.getWitnessWord();
+      alignment.add(baseWord);
+      alignment.add(witnessWord);
+      alignments.add(alignment);
+    }
+    return alignments;
   }
 }
