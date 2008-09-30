@@ -22,11 +22,11 @@ public class AlignmentView {
   }
 
   public String toHtml() {
-    Map<Word, Alignment> bla = determineAlignment();
+    Map<Word, Alignment> alignment = determineAlignment();
     StringBuilder html = new StringBuilder();
     for (int i = 0; i < colors.numberOfWitnesses(); i++) {
       Witness witness = colors.witnesses.get(i);
-      html.append(colorWitness(bla, witness));
+      html.append(colorWitness(alignment, witness));
     }
     return html.toString();
   }
@@ -34,30 +34,32 @@ public class AlignmentView {
   public Map<Word, Alignment> determineAlignment() {
     int colorCounter = 1;
     Map<Word, Alignment> wordToAlignment = Maps.newHashMap();
-    for (int i = 2; i <= colors.numberOfWitnesses(); i++) {
-      Matches matches = colors.getMatches(1, i);
-      Set<Match> set = matches.permutations().get(0);
-      for (Match match : set) {
-        Word baseWord = match.getBaseWord();
-        Alignment alignment = wordToAlignment.get(baseWord);
-        if (alignment == null) {
-          alignment = new Alignment(colorCounter++);
+    for (int i = 1; i < colors.numberOfWitnesses(); i++) {
+      for (int j = i + 1; j <= colors.numberOfWitnesses(); j++) {
+        Matches matches = colors.getMatches(i, j);
+        Set<Match> set = matches.permutations().get(0);
+        for (Match match : set) {
+          Word baseWord = match.getBaseWord();
+          Alignment alignment = wordToAlignment.get(baseWord);
+          if (alignment == null) {
+            alignment = new Alignment(colorCounter++);
+          }
+          Word witnessWord = match.getWitnessWord();
+          alignment.add(baseWord);
+          alignment.add(witnessWord);
+          wordToAlignment.put(baseWord, alignment);
+          wordToAlignment.put(witnessWord, alignment);
         }
-        Word witnessWord = match.getWitnessWord();
-        alignment.add(baseWord);
-        alignment.add(witnessWord);
-        wordToAlignment.put(baseWord, alignment);
-        wordToAlignment.put(witnessWord, alignment);
       }
     }
     return wordToAlignment;
   }
 
-  private String colorWitness(Map<Word, Alignment> bla, Witness base) {
+  private String colorWitness(Map<Word, Alignment> alignmentMap, Witness base) {
     StringBuilder html = new StringBuilder();
     List<String> words = Lists.newArrayList();
     for (Word word : base.getWords()) {
-      Alignment alignment = bla.get(word);
+      Alignment alignment = alignmentMap.get(word);
       if (alignment != null) {
         words.add(new WordColorTuple(word.original, "color" + alignment.color).toHtml());
       } else {

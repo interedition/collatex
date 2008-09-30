@@ -44,7 +44,11 @@ public class AlignmentTest extends TestCase {
         bla);
   }
 
-  //  public void testAlignmentDS() {
-  //    Colors colors = new Colors("a a", "a b a", "a b c");
-  //  }
+  public void testAlignmentMultipleWitnesses() {
+    Colors colors = new Colors("a", "a b", "a b c", "a b c d");
+    AlignmentView view = new AlignmentView(colors);
+    Map<Word, Alignment> determineAlignment = view.determineAlignment();
+    Set<Alignment> alignments = Sets.newLinkedHashSet(determineAlignment.values());
+    assertEquals(3, alignments.size());
+  }
 }
