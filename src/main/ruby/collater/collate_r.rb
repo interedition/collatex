@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'text'
 require 'set'
 require 'collater/match_permutator'

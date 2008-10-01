@@ -37,4 +37,24 @@ public class Util {
     System.out.println("<" + o + ">");
   }
 
+  public static void p(String label, Object o) {
+    System.out.print(label + ": ");
+    p(o);
+  }
+
+  public static void p(String label, String o) {
+    System.out.print(label + ": ");
+    p(o);
+  }
+
+  public static void p(String label, int o) {
+    System.out.print(label + ": ");
+    p(o);
+  }
+
+  public static void p(String label, float o) {
+    System.out.print(label + ": ");
+    p(o);
+  }
+
 }

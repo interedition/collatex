@@ -1,16 +1,26 @@
+class PMatch
+  attr_reader :match
+
+  def initialize(match)
+    @match = match
+    @fixed = false
+  end  
+  
+  def fixed?
+    @fixed
+  end
+end
+
 class MatchPermutator
 	attr_reader :grouped_matches, :permutations
 	
 	def initialize(match_array)
 		@matches = match_array
-		@grouped_matches = []
 		@permutations = []
 	end
 	
 	def process
-		@grouped_matches = group(@matches)
-		@grouped_matches.each{|mg| puts "group:"; mg.each{|m| p ["#{m.word1.original} (#{m.word1.position})","#{m.word2.original} (#{m.word2.position})"]}}
-		permutate(@grouped_matches,0,@permutations)
+		permutate(@matches,0,@permutations)
 	end
 	
 	def group(matches)

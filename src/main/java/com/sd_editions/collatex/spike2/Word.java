@@ -26,4 +26,15 @@ public class Word {
     return original;
   }
 
+  @Override
+  public int hashCode() {
+    return original.hashCode() * (10 ^ position);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Word)) return false;
+    Word other = (Word) obj;
+    return other.original.equals(this.original) && (other.position == this.position);
+  }
 }

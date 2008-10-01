@@ -113,6 +113,27 @@ public class ComparisonTest extends TestCase {
     assertEquals("omission: d e position: 2", modifications.get(1).toString());
   }
 
+  public void testSymmetry1() {
+    symmetryTest("and then, the black cat and the black dog", "the black cat and the black dog");
+  }
+
+  public void testSymmetry2() {
+    symmetryTest("the black cat and the black dog, and then", "the black cat and the black dog");
+  }
+
+  public void testSymmetry3() {
+    symmetryTest("the black cat and the black dog", "the calico cat and the red dog");
+  }
+
+  private void symmetryTest(String string1, String string2) {
+    Colors colors = new Colors(string1, string2);
+    //    Util.p("ORIGINAL");
+    List<Modifications> permutations = colors.compareWitness(1, 2);
+    //    Util.p("MIRROR");
+    List<Modifications> mirrorPermutations = colors.compareWitness(2, 1);
+    assertEquals(permutations.size(), mirrorPermutations.size());
+  }
+
   //  public void testTransposition() {
   //    Colors colors = new Colors("a b c d e f", "a c d b e g");
   //    Comparison comparison = colors.compareWitness(1, 2);

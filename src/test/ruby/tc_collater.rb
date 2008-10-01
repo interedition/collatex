@@ -1,3 +1,4 @@
+require 'test'
 require 'collater/collate_r'
 
 class TC_CollateR < Test::Unit::TestCase

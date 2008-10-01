@@ -36,7 +36,6 @@ public class Colors {
     Matches matches = new Matches(base, witness);
     List<Set<Match>> permutationList = matches.permutations();
     for (Set<Match> permutation : permutationList) {
-      //Note: this only leads to one permutation of the possible matches..
       List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);
       List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
       List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
@@ -50,7 +49,6 @@ public class Colors {
       modificationsList.add(new Modifications(modifications, transpositions, permutation));
     }
     Comparator<Modifications> comparator = new Comparator<Modifications>() {
-
       public int compare(Modifications o1, Modifications o2) {
         return o1.size() - o2.size();
       }
