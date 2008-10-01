@@ -8,25 +8,29 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.Block.Util;
 
 public class MatchPermutator {
 
   private final Set<Match> possibleMatches;
-  private final List<Set<Match>> permutations;
+  private final Set<Set<Match>> permutations;
 
   public MatchPermutator(Set<Match> allPossibleMatches) {
     possibleMatches = allPossibleMatches;
-    //    Util.p("possibleMatches", possibleMatches);
+    Util.p("possibleMatches", possibleMatches);
     List<PMatch> pmatches = Lists.newArrayList();
     for (Match match : possibleMatches) {
       pmatches.add(new PMatch(match));
     }
-    permutations = Lists.newArrayList();
+    permutations = Sets.newHashSet();
     permutate(pmatches);
     //    Util.p("permutations", permutations);
   }
 
   private void permutate(Iterable<PMatch> pmatches) {
+    //    for (PMatch pmatch : pmatches) {
+    //      if (!pmatch.isFixed() && Lists.newArrayList(findAlternatives(pmatches, pmatch)).size() == 1) pmatch.fix();
+    //    }
     Predicate<PMatch> unFixedMatch = new Predicate<PMatch>() {
       public boolean apply(PMatch pmatch) {
         return !pmatch.isFixed();
@@ -44,31 +48,39 @@ public class MatchPermutator {
       for (PMatch pm : pmatches) {
         permutation.add(pm.match);
       }
-      //      Util.p("permutation", permutation);
+      Util.p("permutation", permutation);
       //      Util.p("");
       permutations.add(permutation);
     } else {
       Iterable<PMatch> alternatives = findAlternatives(pmatches, pmatch);
-      //      Util.p("alternatives for " + pmatch, alternatives);
+      Util.p("alternatives for " + pmatch, alternatives);
       for (PMatch alternative : alternatives) {
-        //        Util.p("alternative", alternative);
-        Iterable<PMatch> newPMatches = fixCell(pmatches, alternative);
-        //        Util.p("permutate with", newPMatches);
+        Util.p("alternative", alternative);
+        Iterable<PMatch> newPMatches = fixPMatch(pmatches, alternative);
+        Util.p("permutate with", newPMatches);
         //        Util.p("");
         permutate(newPMatches);
       }
     }
-
   }
 
-  Iterable<PMatch> fixCell(Iterable<PMatch> pmatches, final PMatch alternative) {
-    alternative.fix();
+  Iterable<PMatch> fixPMatch(Iterable<PMatch> pmatches, final PMatch alternative) {
     Predicate<PMatch> fixedAndNonConflictingPMatches = new Predicate<PMatch>() {
       public boolean apply(PMatch pm) {
         return pm.isFixed() || (!pm.getBaseWord().equals(alternative.getBaseWord()) && !pm.getWitnessWord().equals(alternative.getWitnessWord()));
       }
     };
-    return Iterables.filter(pmatches, fixedAndNonConflictingPMatches);
+    List<PMatch> newPMatches = Lists.newArrayList();
+    for (PMatch pmatch : pmatches) {
+      if (pmatch.equals(alternative)) {
+        PMatch copy = pmatch.copy();
+        copy.fix();
+        newPMatches.add(copy);
+      } else if (fixedAndNonConflictingPMatches.apply(pmatch)) {
+        newPMatches.add(pmatch.copy());
+      }
+    }
+    return newPMatches;
   }
 
   Iterable<PMatch> findAlternatives(Iterable<PMatch> pmatches, final PMatch pmatch) {
@@ -139,7 +151,7 @@ public class MatchPermutator {
   //  }
 
   public List<Set<Match>> permutations() {
-    return permutations;
+    return Lists.newArrayList(permutations);
   }
 
 }

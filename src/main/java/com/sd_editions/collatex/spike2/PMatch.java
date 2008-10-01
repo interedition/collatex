@@ -29,4 +29,14 @@ public class PMatch {
   public String toString() {
     return "[" + getBaseWord().position + "->" + getWitnessWord().position + "]" + (this.isFixed() ? " (fixed)" : " (potential)");
   }
+
+  public float getLevDistance() {
+    return match.levenshteinDistance;
+  }
+
+  public PMatch copy() {
+    PMatch copy = new PMatch(this.match);
+    if (this.isFixed()) copy.fix();
+    return copy;
+  }
 }
