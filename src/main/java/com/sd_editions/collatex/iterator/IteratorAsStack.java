@@ -24,8 +24,8 @@ public class IteratorAsStack implements Stack {
     return result;
   }
 
-  public void push(@SuppressWarnings("unused")
-  Object object) {
+  @SuppressWarnings("unused")
+  public void push(Object object) {
     throw new UnsupportedOperationException();
   }
 
