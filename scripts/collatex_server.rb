@@ -1,4 +1,4 @@
-#!/bin/env ruby
+#!/usr/bin/env ruby
 # script for starting/stopping the CollateX webserver
 
 require 'ftools'

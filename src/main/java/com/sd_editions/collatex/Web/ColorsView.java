@@ -51,7 +51,9 @@ public class ColorsView {
         for (Modifications modifications : modificationsList) {
           if (pn > 1) html.append("<span class=\"secondary\">");
           html.append("Permutation " + pn++ + "/" + modificationsList.size() + "<ul>");
+          html.append("<span class=\"colored\">");
           html.append(witnessPairView(base, w, modifications));
+          html.append("</span>");
           html.append(modificationsView(base, modifications));
           html.append("<br/></ul>");
           if (pn > 1) html.append("</span>");
