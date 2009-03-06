@@ -8,7 +8,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.sd_editions.collatex.Block.Util;
 
 public class MatchPermutator {
 
@@ -17,7 +16,7 @@ public class MatchPermutator {
 
   public MatchPermutator(Set<Match> allPossibleMatches) {
     possibleMatches = allPossibleMatches;
-    Util.p("possibleMatches", possibleMatches);
+    //    Util.p("possibleMatches", possibleMatches);
     List<PMatch> pmatches = Lists.newArrayList();
     for (Match match : possibleMatches) {
       pmatches.add(new PMatch(match));
@@ -48,16 +47,16 @@ public class MatchPermutator {
       for (PMatch pm : pmatches) {
         permutation.add(pm.match);
       }
-      Util.p("permutation", permutation);
+      //      Util.p("permutation", permutation);
       //      Util.p("");
       permutations.add(permutation);
     } else {
       Iterable<PMatch> alternatives = findAlternatives(pmatches, pmatch);
-      Util.p("alternatives for " + pmatch, alternatives);
+      //      Util.p("alternatives for " + pmatch, alternatives);
       for (PMatch alternative : alternatives) {
-        Util.p("alternative", alternative);
+        //        Util.p("alternative", alternative);
         Iterable<PMatch> newPMatches = fixPMatch(pmatches, alternative);
-        Util.p("permutate with", newPMatches);
+        //        Util.p("permutate with", newPMatches);
         //        Util.p("");
         permutate(newPMatches);
       }

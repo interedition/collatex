@@ -32,11 +32,11 @@ public class ColorsView {
   }
 
   private String witnesses() {
-    StringBuffer html = new StringBuffer("<ol>");
-    for (int row = 0; row < colors.numberOfWitnesses(); row++) {
-      html.append("<li>" + colors.witnesses.get(row).sentence + "</li>");
+    StringBuffer html = new StringBuffer("<b>Base</b>: " + colors.witnesses.get(0).sentence + "<br/>");
+    for (int row = 1; row < colors.numberOfWitnesses(); row++) {
+      html.append("<b>Witness " + row + "</b>: " + colors.witnesses.get(row).sentence + "<br/>");
     }
-    html.append("</ol>");
+    html.append("<br/>");
     return html.toString();
   }
 
@@ -44,14 +44,15 @@ public class ColorsView {
     StringBuffer html = new StringBuffer();
     final int numberOfWitnesses = colors.numberOfWitnesses();
     for (int base = 1; base < numberOfWitnesses; base++) {
+      if (base > 1) html.append("<span class=\"secondary\">");
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
-        html.append("Comparing witnesses " + base + " and " + w + ":<ol>");
+        html.append("Comparing base - witness " + (w - 1) + ":<ol>");
         List<Modifications> modificationsList = colors.compareWitness(base, w);
         int pn = 1;
         for (Modifications modifications : modificationsList) {
           if (pn > 1) html.append("<span class=\"secondary\">");
-          html.append("Permutation " + pn++ + "/" + modificationsList.size() + "<ul>");
-          html.append("<span class=\"colored\">");
+          html.append("<span class=\"secondary\">Permutation " + pn++ + "/" + modificationsList.size() + "</span><ul>");
+          html.append("<span class=\"colored\" style=\"display:none\">");
           html.append(witnessPairView(base, w, modifications));
           html.append("</span>");
           html.append(modificationsView(base, modifications));
@@ -60,6 +61,7 @@ public class ColorsView {
         }
         html.append("</ol>");
       }
+      if (base > 1) html.append("</span>");
     }
     return html.toString();
   }

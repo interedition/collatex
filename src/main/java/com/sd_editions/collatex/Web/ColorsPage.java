@@ -11,7 +11,6 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.PropertyModel;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.spike2.Colors;
 
 @SuppressWarnings("serial")
@@ -48,7 +47,7 @@ class ColorsModel implements Serializable {
     add(witness1, witnesses);
     add(witness2, witnesses);
     add(witness3, witnesses);
-    Util.p(witnesses);
+    //    Util.p(witnesses);
     Colors colors = new Colors(witnesses);
     this.html = new ColorsView(colors).toHtml();
   }

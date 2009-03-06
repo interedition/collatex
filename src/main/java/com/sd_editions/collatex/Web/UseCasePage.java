@@ -40,7 +40,8 @@ public class UseCasePage extends WebPage {
     usecases.add(new String[] { "Almost every aspect of what scholarly editors do may be changed",
         "Hardly any aspect of what stupid editors do in the privacy of their own home may be changed again and again",
         "very many aspects of what scholarly editors do in the livingrooms of their own home may not be changed" });
-    usecases.add(new String[] { "Du kennst von Alters her meine Art, mich anzubauen, irgend mir an einem vertraulichen Orte ein Hüttchen aufzuschlagen, und da mit aller Einschränkung zu herbergen.",
+    usecases.add(new String[] {
+        "Du kennst von Alters her meine Art, mich anzubauen, irgend mir an einem vertraulichen Orte ein Hüttchen aufzuschlagen, und da mit aller Einschränkung zu herbergen.",
         "Du kennst von Altersher meine Art, mich anzubauen, mir irgend an einem vertraulichen Ort ein Hüttchen aufzuschlagen, und da mit aller Einschränkung zu herbergen." });
     usecases.add(new String[] { "Auch hier hab ich wieder ein Plätzchen", "Ich hab auch hier wieder ein Pläzchen", "Ich hab auch hier wieder ein Pläzchen" });
     usecases.add(new String[] { "ταυτα ειπων ο ιϲ̅ εξηλθεν ϲυν τοιϲ μαθηταιϲ αυτου περαν του χειμαρρου των κεδρων οπου ην κηποϲ ειϲ ον ειϲηλθεν αυτοϲ και οι μαθηται αυτου",
