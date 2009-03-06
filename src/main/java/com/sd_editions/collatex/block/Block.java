@@ -14,7 +14,7 @@ public abstract class Block {
   /* The Block's name */
   private String name;
   /* Any attributes associated with this block */
-  private HashMap<String, String> attributes;
+  private final HashMap<String, String> attributes;
   /* Basic XML like association with other Blocks */
   private Block firstChild;
   private Block lastChild;
