@@ -11,7 +11,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.PropertyModel;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.spike2.Colors;
+import com.sd_editions.collatex.permutations.Colors;
 
 @SuppressWarnings("serial")
 public class ColorsPage extends WebPage {

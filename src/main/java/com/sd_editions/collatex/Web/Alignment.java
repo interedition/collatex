@@ -3,7 +3,7 @@ package com.sd_editions.collatex.Web;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.spike2.Word;
+import com.sd_editions.collatex.permutations.Word;
 
 public class Alignment {
   private final List<Word> words;

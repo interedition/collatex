@@ -10,7 +10,7 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.match_spike.views.UseCaseView;
+import com.sd_editions.collatex.match.views.UseCaseView;
 
 @SuppressWarnings("serial")
 public class UseCasePage extends WebPage {
@@ -44,9 +44,9 @@ public class UseCasePage extends WebPage {
         "Du kennst von Alters her meine Art, mich anzubauen, irgend mir an einem vertraulichen Orte ein Hüttchen aufzuschlagen, und da mit aller Einschränkung zu herbergen.",
         "Du kennst von Altersher meine Art, mich anzubauen, mir irgend an einem vertraulichen Ort ein Hüttchen aufzuschlagen, und da mit aller Einschränkung zu herbergen." });
     usecases.add(new String[] { "Auch hier hab ich wieder ein Plätzchen", "Ich hab auch hier wieder ein Pläzchen", "Ich hab auch hier wieder ein Pläzchen" });
-    usecases.add(new String[] { "ταυτα ειπων ο ιϲ̅ εξηλθεν ϲυν τοιϲ μαθηταιϲ αυτου περαν του χειμαρρου των κεδρων οπου ην κηποϲ ειϲ ον ειϲηλθεν αυτοϲ και οι μαθηται αυτου",
-        "ταυτα ειπων ― ιϲ̅ εξηλθεν ϲυν τοιϲ μαθηταιϲ αυτου περαν του χειμαρρου των κεδρων οπου ην κηποϲ ειϲ ον ειϲηλθεν αυτοϲ και οι μαθηται αυτου",
-        "ταυτα ειπων ο ιη̅ϲ εξηλθεν ϲυν τοιϲ μαθηταιϲ αυτου περαν του χειμαρρου του κεδρου οπου ην κηποϲ ειϲ ον ειϲηλθεν αυτοϲ και οι μαθηται αυτου" });
+    //    usecases.add(new String[] { "ταυτα ειπων ο ιϲ̅ εξηλθεν ϲυν τοιϲ μαθηταιϲ αυτου περαν του χειμαρρου των κεδρων οπου ην κηποϲ ειϲ ον ειϲηλθεν αυτοϲ και οι μαθηται αυτου",
+    //        "ταυτα ειπων ― ιϲ̅ εξηλθεν ϲυν τοιϲ μαθηταιϲ αυτου περαν του χειμαρρου των κεδρων οπου ην κηποϲ ειϲ ον ειϲηλθεν αυτοϲ και οι μαθηται αυτου",
+    //        "ταυτα ειπων ο ιη̅ϲ εξηλθεν ϲυν τοιϲ μαθηταιϲ αυτου περαν του χειμαρρου του κεδρου οπου ην κηποϲ ειϲ ον ειϲηλθεν αυτοϲ και οι μαθηται αυτου" });
 
     final ListView usecaseTabListView = new ListView("tabs", usecases) {
       @Override

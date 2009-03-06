@@ -7,12 +7,12 @@ import java.util.Set;
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sd_editions.collatex.match_spike.WordColorTuple;
-import com.sd_editions.collatex.spike2.Colors;
-import com.sd_editions.collatex.spike2.Match;
-import com.sd_editions.collatex.spike2.Matches;
-import com.sd_editions.collatex.spike2.Witness;
-import com.sd_editions.collatex.spike2.Word;
+import com.sd_editions.collatex.match.WordColorTuple;
+import com.sd_editions.collatex.permutations.Colors;
+import com.sd_editions.collatex.permutations.Match;
+import com.sd_editions.collatex.permutations.Matches;
+import com.sd_editions.collatex.permutations.Witness;
+import com.sd_editions.collatex.permutations.Word;
 
 public class AlignmentView {
   private final Colors colors;

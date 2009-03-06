@@ -6,18 +6,18 @@ import java.util.Map;
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sd_editions.collatex.match_spike.WordColorTuple;
-import com.sd_editions.collatex.spike2.Colors;
-import com.sd_editions.collatex.spike2.LevenshteinMatch;
-import com.sd_editions.collatex.spike2.Match;
-import com.sd_editions.collatex.spike2.Modification;
-import com.sd_editions.collatex.spike2.Modifications;
-import com.sd_editions.collatex.spike2.Witness;
-import com.sd_editions.collatex.spike2.Word;
-import com.sd_editions.collatex.spike2.collate.Addition;
-import com.sd_editions.collatex.spike2.collate.Removal;
-import com.sd_editions.collatex.spike2.collate.Replacement;
-import com.sd_editions.collatex.spike2.collate.Transposition;
+import com.sd_editions.collatex.match.WordColorTuple;
+import com.sd_editions.collatex.permutations.Colors;
+import com.sd_editions.collatex.permutations.LevenshteinMatch;
+import com.sd_editions.collatex.permutations.Match;
+import com.sd_editions.collatex.permutations.Modification;
+import com.sd_editions.collatex.permutations.Modifications;
+import com.sd_editions.collatex.permutations.Witness;
+import com.sd_editions.collatex.permutations.Word;
+import com.sd_editions.collatex.permutations.collate.Addition;
+import com.sd_editions.collatex.permutations.collate.Removal;
+import com.sd_editions.collatex.permutations.collate.Replacement;
+import com.sd_editions.collatex.permutations.collate.Transposition;
 
 public class ColorsView {
 
