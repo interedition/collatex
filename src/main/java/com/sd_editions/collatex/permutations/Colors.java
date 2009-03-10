@@ -38,14 +38,8 @@ public class Colors {
     for (Set<Match> permutation : permutationList) {
       List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);
       List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
-      List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
-      List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-      List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
-
-      List<Modification> modifications = Lists.newArrayList();
-      modifications.addAll(Matches.getLevenshteinMatches(permutation));
-      modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
-      modifications.addAll(MatchSequences.getModificationsInMatchSequences(base, witness, matchSequencesForBase));
+      List<Transposition> transpositions = determineTranspositions(matchSequencesForBase, matchSequencesForWitness);
+      List<Modification> modifications = determineModifications(base, witness, permutation, matchSequencesForBase, matchSequencesForWitness);
       modificationsList.add(new Modifications(modifications, transpositions, permutation));
     }
     Comparator<Modifications> comparator = new Comparator<Modifications>() {
@@ -55,6 +49,21 @@ public class Colors {
     };
     Collections.sort(modificationsList, comparator);
     return modificationsList;
+  }
+
+  private List<Modification> determineModifications(Witness base, Witness witness, Set<Match> permutation, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
+    List<Modification> modifications = Lists.newArrayList();
+    modifications.addAll(Matches.getLevenshteinMatches(permutation));
+    modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
+    modifications.addAll(MatchSequences.getModificationsInMatchSequences(base, witness, matchSequencesForBase));
+    return modifications;
+  }
+
+  private List<Transposition> determineTranspositions(List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
+    List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
+    List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
+    List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
+    return transpositions;
   }
 
   public List<Addition> getAdditions(List<MisMatch> mismatches) {
