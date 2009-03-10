@@ -42,13 +42,17 @@ public class CollateCore {
       List<Modification> modifications = determineModifications(base, witness, permutation, matchSequencesForBase, matchSequencesForWitness);
       modificationsList.add(new Modifications(modifications, transpositions, permutation));
     }
+    sortPermutationsByRelevance(modificationsList);
+    return modificationsList;
+  }
+
+  private void sortPermutationsByRelevance(List<Modifications> modificationsList) {
     Comparator<Modifications> comparator = new Comparator<Modifications>() {
       public int compare(Modifications o1, Modifications o2) {
         return o1.size() - o2.size();
       }
     };
     Collections.sort(modificationsList, comparator);
-    return modificationsList;
   }
 
   private List<Modification> determineModifications(Witness base, Witness witness, Set<Match> permutation, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
