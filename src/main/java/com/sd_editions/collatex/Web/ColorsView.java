@@ -67,10 +67,10 @@ public class ColorsView {
   }
 
   private String modificationsView(int base, Modifications modifications) {
-    StringBuffer html = new StringBuffer("<li>Modifications:</li><ul>");
+    StringBuffer html = new StringBuffer("<span class=\"secondary\"><li>Modifications:</li></span><ul>");
     List<Modification> modificationsL = modifications.getModifications();
     if (modificationsL.isEmpty()) {
-      html.append("<li>no additions, removals or transpositions</li>");
+      html.append("<li>no additions, omissions or transpositions</li>");
     } else {
       for (Modification modification : modificationsL) {
         if (modification instanceof LevenshteinMatch) {
