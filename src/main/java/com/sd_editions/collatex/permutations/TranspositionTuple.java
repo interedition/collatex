@@ -14,7 +14,7 @@ public class TranspositionTuple {
       return false;
     }
     TranspositionTuple tuple2 = (TranspositionTuple) obj;
-    boolean result = tuple2.getLeftWordCode().equals(getRightWordCode()) && tuple2.getRightWordCode().equals(getLeftWordCode());
+    boolean result = tuple2.getLeftWordCode().equals(getLeftWordCode()) && tuple2.getRightWordCode().equals(getRightWordCode());
     //    System.out.println("comparing: " + this.toString() + " && " + tuple2.toString() + " result: " + result);
     return result;
   }

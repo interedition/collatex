@@ -4,30 +4,28 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.sd_editions.collatex.permutations.CollateCore;
-import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 public class TranspositionTest extends TestCase {
   public void testTransposition1() {
     Modifications modifications = getModifications("a b c d e", "a c d b e");
     List<Transposition> transpositions = modifications.getTranspositions();
-    assertEquals(1, transpositions.size());
-    assertEquals("transposition: b switches position with c d", transpositions.get(0).toString());
+    assertEquals(2, transpositions.size());
+    assertEquals("transposition: b switches position with c d", transpositions.get(1).toString());
   }
 
   public void testTransposition2() {
     Modifications modifications = getModifications("a b x c d ", "a c d x b");
     List<Transposition> transpositions = modifications.getTranspositions();
-    assertEquals(1, transpositions.size());
-    assertEquals("transposition: b switches position with c d", transpositions.get(0).toString());
+    assertEquals(2, transpositions.size());
+    assertEquals("transposition: b switches position with c d", transpositions.get(1).toString());
   }
 
   public void testTransposition3() {
     Modifications modifications = getModifications("a b x c d ", "c d x a b");
     List<Transposition> transpositions = modifications.getTranspositions();
-    assertEquals(1, transpositions.size());
-    assertEquals("transposition: a b switches position with c d", transpositions.get(0).toString());
+    assertEquals(2, transpositions.size());
+    assertEquals("transposition: a b switches position with c d", transpositions.get(1).toString());
   }
 
   //Note: this test should lead to a transposition :-)
@@ -36,7 +34,7 @@ public class TranspositionTest extends TestCase {
     String witness = "A red cat chases the yellow dog";
     Modifications modifications = getModifications(base, witness);
     List<Transposition> transpositions = modifications.getTranspositions();
-    assertEquals(1, transpositions.size());
+    assertEquals(2, transpositions.size());
     // TODO: add expected Transposition
   }
 
