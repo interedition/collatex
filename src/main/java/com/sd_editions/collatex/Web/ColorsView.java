@@ -7,7 +7,7 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.WordColorTuple;
-import com.sd_editions.collatex.permutations.Colors;
+import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.LevenshteinMatch;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.Modification;
@@ -21,9 +21,9 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 
 public class ColorsView {
 
-  private final Colors colors;
+  private final CollateCore colors;
 
-  public ColorsView(Colors _colors) {
+  public ColorsView(CollateCore _colors) {
     this.colors = _colors;
   }
 

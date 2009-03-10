@@ -2,7 +2,7 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.List;
 
-import com.sd_editions.collatex.permutations.Colors;
+import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Modifications;
 
 import junit.framework.TestCase;
@@ -129,7 +129,7 @@ public class ComparisonTest extends TestCase {
   }
 
   private void symmetryTest(String string1, String string2) {
-    Colors colors = new Colors(string1, string2);
+    CollateCore colors = new CollateCore(string1, string2);
     //    Util.p("ORIGINAL");
     List<Modifications> permutations = colors.compareWitness(1, 2);
     //    Util.p("MIRROR");
@@ -156,7 +156,7 @@ public class ComparisonTest extends TestCase {
   //  }
 
   private Modifications getModifications(String base, String witness) {
-    List<Modifications> permutations = new Colors(base, witness).compareWitness(1, 2);
+    List<Modifications> permutations = new CollateCore(base, witness).compareWitness(1, 2);
     assertEquals(1, permutations.size());
     return permutations.get(0);
   }

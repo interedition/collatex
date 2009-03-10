@@ -8,16 +8,16 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.WordColorTuple;
-import com.sd_editions.collatex.permutations.Colors;
+import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.Matches;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 
 public class AlignmentView {
-  private final Colors colors;
+  private final CollateCore colors;
 
-  public AlignmentView(Colors _colors) {
+  public AlignmentView(CollateCore _colors) {
     this.colors = _colors;
   }
 

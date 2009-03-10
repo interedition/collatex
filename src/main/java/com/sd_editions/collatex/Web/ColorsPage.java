@@ -11,7 +11,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.PropertyModel;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.Colors;
+import com.sd_editions.collatex.permutations.CollateCore;
 
 @SuppressWarnings("serial")
 public class ColorsPage extends WebPage {
@@ -51,7 +51,7 @@ class ColorsModel implements Serializable {
     add(witness3, witnesses);
     add(witness4, witnesses);
     //    Util.p(witnesses);
-    Colors colors = new Colors(witnesses);
+    CollateCore colors = new CollateCore(witnesses);
     this.html = new ColorsView(colors).toHtml();
   }
 

@@ -13,18 +13,18 @@ import com.sd_editions.collatex.permutations.collate.Removal;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
-public class Colors {
+public class CollateCore {
 
   public final List<Witness> witnesses;
 
-  public Colors(String... _witnessStrings) {
+  public CollateCore(String... _witnessStrings) {
     this.witnesses = Lists.newArrayList();
     for (String witnessString : _witnessStrings) {
       this.witnesses.add(new Witness(witnessString));
     }
   }
 
-  public Colors(List<String> _witnessStrings) {
+  public CollateCore(List<String> _witnessStrings) {
     this(_witnessStrings.toArray(new String[_witnessStrings.size()]));
   }
 

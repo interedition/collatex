@@ -4,7 +4,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.sd_editions.collatex.permutations.Colors;
+import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
@@ -77,7 +77,7 @@ public class TranspositionTest extends TestCase {
   //    //    assertEquals("transposition: a b switches position with c d", modifications.get(0).toString());
   //  }
   private Modifications getModifications(String base, String witness) {
-    List<Modifications> permutations = new Colors(base, witness).compareWitness(1, 2);
+    List<Modifications> permutations = new CollateCore(base, witness).compareWitness(1, 2);
     assertEquals(1, permutations.size());
     return permutations.get(0);
   }

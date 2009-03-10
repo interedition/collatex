@@ -9,12 +9,12 @@ import junit.framework.TestCase;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Web.Alignment;
 import com.sd_editions.collatex.Web.AlignmentView;
-import com.sd_editions.collatex.permutations.Colors;
+import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Word;
 
 public class AlignmentTest extends TestCase {
   public void testAlignmentSimply() {
-    Colors colors = new Colors("a", "b");
+    CollateCore colors = new CollateCore("a", "b");
     AlignmentView view = new AlignmentView(colors);
     Map<Word, Alignment> determineAlignment = view.determineAlignment();
     Collection<Alignment> alignments = determineAlignment.values();
@@ -22,7 +22,7 @@ public class AlignmentTest extends TestCase {
   }
 
   public void testAlignmentOne() {
-    Colors colors = new Colors("a", "a");
+    CollateCore colors = new CollateCore("a", "a");
     AlignmentView view = new AlignmentView(colors);
     Map<Word, Alignment> determineAlignment = view.determineAlignment();
     Set<Alignment> alignments = Sets.newLinkedHashSet(determineAlignment.values());
@@ -30,7 +30,7 @@ public class AlignmentTest extends TestCase {
   }
 
   public void testAlignmentTwo() {
-    Colors colors = new Colors("a b", "a b");
+    CollateCore colors = new CollateCore("a b", "a b");
     AlignmentView view = new AlignmentView(colors);
     Map<Word, Alignment> determineAlignment = view.determineAlignment();
     Set<Alignment> alignments = Sets.newLinkedHashSet(determineAlignment.values());
@@ -38,7 +38,7 @@ public class AlignmentTest extends TestCase {
   }
 
   public void testAlignmentTwoAsHTML() {
-    Colors colors = new Colors("a b c", "a b c");
+    CollateCore colors = new CollateCore("a b c", "a b c");
     AlignmentView view = new AlignmentView(colors);
     String bla = view.toHtml();
     assertEquals(
@@ -47,7 +47,7 @@ public class AlignmentTest extends TestCase {
   }
 
   public void testAlignmentMultipleWitnesses() {
-    Colors colors = new Colors("a", "a b", "a b c", "a b c d");
+    CollateCore colors = new CollateCore("a", "a b", "a b c", "a b c d");
     AlignmentView view = new AlignmentView(colors);
     Map<Word, Alignment> determineAlignment = view.determineAlignment();
     Set<Alignment> alignments = Sets.newLinkedHashSet(determineAlignment.values());
