@@ -18,7 +18,7 @@ public class ColorsPage extends WebPage {
 
   public ColorsPage() {
     ColorsModel model = new ColorsModel("the drought of march hath perced to the root and is this the right", "the first march of drought pierced to the root and this is the ",
-        "the first march of drought hath perced to the root");
+        "the first march of drought hath perced to the root", "");
     add(new Label("colorview", new PropertyModel(model, "html")).setEscapeModelStrings(false));
     add(new ColorsForm("alignmentform", model));
     add(new BookmarkablePageLink("usecaselink", UseCasePage.class));
@@ -33,12 +33,14 @@ class ColorsModel implements Serializable {
   public String witness1;
   public String witness2;
   public String witness3;
+  public String witness4;
   public String html;
 
-  public ColorsModel(String _witness1, String _witness2, String _witness3) {
+  public ColorsModel(String _witness1, String _witness2, String _witness3, String _witness4) {
     this.witness1 = _witness1;
     this.witness2 = _witness2;
     this.witness3 = _witness3;
+    this.witness4 = _witness4;
     generateHTML();
   }
 
@@ -47,6 +49,7 @@ class ColorsModel implements Serializable {
     add(witness1, witnesses);
     add(witness2, witnesses);
     add(witness3, witnesses);
+    add(witness4, witnesses);
     //    Util.p(witnesses);
     Colors colors = new Colors(witnesses);
     this.html = new ColorsView(colors).toHtml();
@@ -69,6 +72,7 @@ class ColorsForm extends Form {
     add(new TextField("witness1", new PropertyModel(modelForView, "witness1")).setConvertEmptyInputStringToNull(false));
     add(new TextField("witness2", new PropertyModel(modelForView, "witness2")).setConvertEmptyInputStringToNull(false));
     add(new TextField("witness3", new PropertyModel(modelForView, "witness3")).setConvertEmptyInputStringToNull(false));
+    add(new TextField("witness4", new PropertyModel(modelForView, "witness4")).setConvertEmptyInputStringToNull(false));
   }
 
   @Override
