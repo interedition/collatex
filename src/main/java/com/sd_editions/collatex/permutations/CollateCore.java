@@ -30,7 +30,6 @@ public class CollateCore {
 
   public List<Modifications> compareWitness(int i, int j) {
     List<Modifications> modificationsList = Lists.newArrayList();
-    //    Matches matches = new Matches(witnessIndex, witnessIndex2);
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
     Matches matches = new Matches(base, witness);
