@@ -37,8 +37,8 @@ public class MatchSequences {
   }
 
   public static List<Modification> getModificationsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
-    List<Gap> gapsBase = getGabsFromInBetweenMatchSequencesForBase(base, sequencesBase);
-    List<Gap> gapsWitness = getGabsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
+    List<Gap> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
+    List<Gap> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
     List<Modification> results = Lists.newArrayList();
     for (int i = 0; i < gapsBase.size(); i++) {
       Gap gapBase = gapsBase.get(i);
@@ -54,7 +54,7 @@ public class MatchSequences {
 
   // this method is made for the base... 
   @SuppressWarnings("boxing")
-  private static List<Gap> getGabsFromInBetweenMatchSequencesForBase(Witness witness, List<MatchSequence> sequences) {
+  private static List<Gap> getGapsFromInBetweenMatchSequencesForBase(Witness witness, List<MatchSequence> sequences) {
     int currentIndex = 1;
     List<Gap> gaps = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
@@ -70,7 +70,7 @@ public class MatchSequences {
 
   // this method is made for the witness...
   @SuppressWarnings("boxing")
-  private static List<Gap> getGabsFromInBetweenMatchSequencesForWitness(Witness witness, List<MatchSequence> sequences) {
+  private static List<Gap> getGapsFromInBetweenMatchSequencesForWitness(Witness witness, List<MatchSequence> sequences) {
     int currentIndex = 1;
     List<Gap> gaps = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
