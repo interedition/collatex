@@ -29,7 +29,7 @@ public class XMLAlignmentView {
         } else if (modification instanceof Addition) {
           xml.append(additionView((Addition) modification, base));
         } else if (modification instanceof Removal) {
-          xml.append("<li>" + removalView((Removal) modification) + "</li>");
+          xml.append(removalView((Removal) modification));
         } else if (modification instanceof Transposition) {
           xml.append("<li>" + transpositionView((Transposition) modification) + "</li>");
         } else if (modification instanceof Replacement) {
@@ -52,8 +52,7 @@ public class XMLAlignmentView {
   }
 
   private String removalView(Removal modification) {
-    // TODO Auto-generated method stub
-    return null;
+    return "<omission position=\"" + modification.getPosition() + "\">" + modification.getRemovedWords() + "</omission>";
   }
 
   private String additionView(Addition modification, int base) {
