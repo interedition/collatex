@@ -24,7 +24,7 @@ public class Modifications {
   public List<Modification> getModifications() {
     List<Modification> addedUp = Lists.newArrayList();
     addedUp.addAll(modifications);
-    addedUp.addAll(transpositions);
+    //    addedUp.addAll(transpositions);
     return addedUp;
   }
 
@@ -47,6 +47,11 @@ public class Modifications {
     for (Match match : matches) {
       if (match.getWitnessWord().position == witnessPosition) return match;
     }
+    return null;
+  }
+
+  public String toXML() {
+    // TODO Auto-generated method stub
     return null;
   }
 
