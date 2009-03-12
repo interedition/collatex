@@ -16,14 +16,19 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 
 public class XMLAlignmentViewTest {
 
+  private XMLAlignmentView setupAlignmentView(Modification modification) {
+    List<Modification> modificationsList = Lists.newArrayList(modification);
+    Modifications modifications = new Modifications(modificationsList, null, null);
+    XMLAlignmentView alignmentView = new XMLAlignmentView(modifications);
+    return alignmentView;
+  }
+
   @Test
   public void testModificationsView() {
     Addition addition = new Addition(1, new Phrase(new Witness("some addition its longer than that"), 1, 2));
-    List<Modification> modificationsList = Lists.newArrayList((Modification) addition);
-    Modifications modifications = new Modifications(modificationsList, null, null);
-    XMLAlignmentView alignmentView = new XMLAlignmentView(modifications);
-    String result = alignmentView.modificationsView(-1);
+    XMLAlignmentView alignmentView = setupAlignmentView(addition);
 
+    String result = alignmentView.modificationsView(-1);
     String expected = "<modifications><addition position=\"1\">some addition</addition></modifications>";
     assertEquals(expected, result);
 
@@ -31,10 +36,9 @@ public class XMLAlignmentViewTest {
 
   @Test
   public void testModificationsViewOmissions() {
-    Omission removal = new Omission(new Phrase(new Witness("some deletion has occurred"), 2, 2));
-    List<Modification> modificationList = Lists.newArrayList((Modification) removal);
-    Modifications modifications = new Modifications(modificationList, null, null);
-    XMLAlignmentView alignmentView = new XMLAlignmentView(modifications);
+    Omission omission = new Omission(new Phrase(new Witness("some deletion has occurred"), 2, 2));
+    XMLAlignmentView alignmentView = setupAlignmentView(omission);
+
     String result = alignmentView.modificationsView(-1);
     String expected = "<modifications><omission position=\"2\">deletion</omission></modifications>";
     assertEquals(expected, result);
