@@ -6,7 +6,7 @@ import com.sd_editions.collatex.permutations.LevenshteinMatch;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.collate.Addition;
-import com.sd_editions.collatex.permutations.collate.Removal;
+import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
@@ -28,8 +28,8 @@ public class XMLAlignmentView {
           xml.append("<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>");
         } else if (modification instanceof Addition) {
           xml.append(additionView((Addition) modification, base));
-        } else if (modification instanceof Removal) {
-          xml.append(removalView((Removal) modification));
+        } else if (modification instanceof Omission) {
+          xml.append(removalView((Omission) modification));
         } else if (modification instanceof Transposition) {
           xml.append("<li>" + transpositionView((Transposition) modification) + "</li>");
         } else if (modification instanceof Replacement) {
@@ -51,7 +51,7 @@ public class XMLAlignmentView {
     return null;
   }
 
-  private String removalView(Removal modification) {
+  private String removalView(Omission modification) {
     return "<omission position=\"" + modification.getPosition() + "\">" + modification.getRemovedWords() + "</omission>";
   }
 

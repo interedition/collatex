@@ -12,7 +12,7 @@ import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.Phrase;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.collate.Addition;
-import com.sd_editions.collatex.permutations.collate.Removal;
+import com.sd_editions.collatex.permutations.collate.Omission;
 
 public class XMLAlignmentViewTest {
 
@@ -31,7 +31,7 @@ public class XMLAlignmentViewTest {
 
   @Test
   public void testModificationsViewOmissions() {
-    Removal removal = new Removal(new Phrase(new Witness("some deletion has occurred"), 2, 2));
+    Omission removal = new Omission(new Phrase(new Witness("some deletion has occurred"), 2, 2));
     List<Modification> modificationList = Lists.newArrayList((Modification) removal);
     Modifications modifications = new Modifications(modificationList, null, null);
     XMLAlignmentView alignmentView = new XMLAlignmentView(modifications);
