@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.permutations.collate;
 
+import java.text.MessageFormat;
+
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Phrase;
 
@@ -23,6 +25,10 @@ public class Addition extends Modification {
   @Override
   public String toString() {
     return "addition: " + phrase.toString() + " position: " + position;
+  }
+
+  public String toXML() {
+    return MessageFormat.format("<addition position=\"{1}\">{0}</addition>", phrase.toString(), String.valueOf(getPosition()));
   }
 
 }
