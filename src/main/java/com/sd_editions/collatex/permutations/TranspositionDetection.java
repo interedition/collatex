@@ -11,6 +11,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 public class TranspositionDetection {
@@ -108,6 +109,7 @@ public class TranspositionDetection {
   protected static List<Transposition> calculateTranspositions(final List<Tuple2<MatchSequence>> possibleTranspositionTuples) {
     // here we go and filter.. so that only transpositions are kept..
     // later on we filter away duplicates
+    Util.p(possibleTranspositionTuples);
     List<Tuple2<MatchSequence>> matchSequencesInTransposition = Lists.newArrayList(Iterables.filter(possibleTranspositionTuples, new Predicate<Tuple2<MatchSequence>>() {
       public boolean apply(Tuple2<MatchSequence> tuple) {
         Tuple2<MatchSequence> mirror = new Tuple2<MatchSequence>(tuple.right, tuple.left);

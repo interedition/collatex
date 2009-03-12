@@ -28,6 +28,18 @@ public class TranspositionTest extends TestCase {
     assertEquals("transposition: a b switches position with c d", transpositions.get(1).toString());
   }
 
+  public void testTranspositionOf3Groups() {
+    Modifications modifications = getModifications("ab ccc d e", "d ccc e ab");
+    List<Transposition> transpositions = modifications.getTranspositions();
+    assertEquals(4, transpositions.size());
+  }
+
+  // ab ccc d e
+  // d ccc e ab
+  // (1-2 -> 6-7) (3-5 -> 2-4) (6 -> 1) (7 -> 5)
+  // 6 3 7 1
+  // 3 2 4 1
+
   //Note: this test should lead to a transposition :-)
   public void testComplex() {
     String base = "The black dog chases a red cat.";

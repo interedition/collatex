@@ -1,7 +1,7 @@
 package com.sd_editions.collatex.permutations;
 
 import com.sd_editions.collatex.permutations.collate.Addition;
-import com.sd_editions.collatex.permutations.collate.Removal;
+import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
 public class MisMatch {
@@ -17,8 +17,8 @@ public class MisMatch {
     return new Addition(base.getStartPosition(), witness);
   }
 
-  Removal createOmission() {
-    return new Removal(base);
+  Omission createOmission() {
+    return new Omission(base);
   }
 
   Replacement createReplacement() {

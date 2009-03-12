@@ -15,7 +15,7 @@ import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 import com.sd_editions.collatex.permutations.collate.Addition;
-import com.sd_editions.collatex.permutations.collate.Removal;
+import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
@@ -32,9 +32,9 @@ public class ColorsView {
   }
 
   private String witnesses() {
-    StringBuffer html = new StringBuffer("<b>Base</b>: " + colors.witnesses.get(0).sentence + "<br/>");
-    for (int row = 1; row < colors.numberOfWitnesses(); row++) {
-      html.append("<b>Witness " + row + "</b>: " + colors.witnesses.get(row).sentence + "<br/>");
+    StringBuffer html = new StringBuffer("");
+    for (int row = 0; row < colors.numberOfWitnesses(); row++) {
+      html.append("<b>Witness " + (row + 1) + "</b>: " + colors.witnesses.get(row).sentence + "<br/>");
     }
     html.append("<br/>");
     return html.toString();
@@ -44,9 +44,9 @@ public class ColorsView {
     StringBuffer html = new StringBuffer();
     final int numberOfWitnesses = colors.numberOfWitnesses();
     for (int base = 1; base < numberOfWitnesses; base++) {
-      if (base > 1) html.append("<span class=\"secondary\">");
+      //      if (base > 1) html.append("<span class=\"secondary\">");
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
-        html.append("Comparing base - witness " + (w - 1) + ":<ol>");
+        html.append("Comparing witness " + base + " - witness " + (w) + ":<ol>");
         List<Modifications> modificationsList = colors.compareWitness(base, w);
         int pn = 1;
         for (Modifications modifications : modificationsList) {
@@ -57,7 +57,7 @@ public class ColorsView {
           html.append("</span>");
           html.append(modificationsView(base, modifications));
           html.append("<br/></ul>");
-          if (pn > 1) html.append("</span>");
+          //          if (pn > 1) html.append("</span>");
         }
         html.append("</ol>");
       }
@@ -77,8 +77,8 @@ public class ColorsView {
           html.append("<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>");
         } else if (modification instanceof Addition) {
           html.append("<li>" + additionView((Addition) modification, base) + "</li>");
-        } else if (modification instanceof Removal) {
-          html.append("<li>" + removalView((Removal) modification) + "</li>");
+        } else if (modification instanceof Omission) {
+          html.append("<li>" + removalView((Omission) modification) + "</li>");
         } else if (modification instanceof Transposition) {
           html.append("<li>" + transpositionView((Transposition) modification) + "</li>");
         } else if (modification instanceof Replacement) {
@@ -153,7 +153,7 @@ public class ColorsView {
     return "<i>" + transposition.getLeft() + "</i> transposed with <i>" + transposition.getRight() + "</i>";
   }
 
-  private String removalView(Removal removal) {
+  private String removalView(Omission removal) {
     int position = removal.getPosition();
     return "<i>" + removal.getRemovedWords() + "</i> at position " + (position) + " removed ";
   }
