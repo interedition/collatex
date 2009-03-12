@@ -10,7 +10,7 @@ public class Omission extends Modification {
     this.phrase = _phrase;
   }
 
-  public String getRemovedWords() {
+  public String getOmittedWords() {
     return phrase.toString();
   }
 

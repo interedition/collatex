@@ -155,7 +155,7 @@ public class ColorsView {
 
   private String removalView(Omission removal) {
     int position = removal.getPosition();
-    return "<i>" + removal.getRemovedWords() + "</i> at position " + (position) + " removed ";
+    return "<i>" + removal.getOmittedWords() + "</i> at position " + (position) + " removed ";
   }
 
   private String additionView(Addition addition, int base) {

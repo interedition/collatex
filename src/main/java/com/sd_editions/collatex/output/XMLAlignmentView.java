@@ -52,7 +52,7 @@ public class XMLAlignmentView {
   }
 
   private String removalView(Omission modification) {
-    return "<omission position=\"" + modification.getPosition() + "\">" + modification.getRemovedWords() + "</omission>";
+    return "<omission position=\"" + modification.getPosition() + "\">" + modification.getOmittedWords() + "</omission>";
   }
 
   private String additionView(Addition modification, int base) {
