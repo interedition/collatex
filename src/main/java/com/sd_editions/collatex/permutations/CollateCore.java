@@ -57,7 +57,7 @@ public class CollateCore {
 
   private List<Modification> determineModifications(Witness base, Witness witness, Set<Match> permutation, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
     List<Modification> modifications = Lists.newArrayList();
-    modifications.addAll(Matches.getLevenshteinMatches(permutation));
+    modifications.addAll(Matches.getWordDistanceMatches(permutation));
     modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
     modifications.addAll(MatchSequences.getModificationsInMatchSequences(base, witness, matchSequencesForBase));
     return modifications;

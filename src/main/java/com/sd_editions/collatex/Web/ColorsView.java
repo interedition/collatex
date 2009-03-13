@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.WordColorTuple;
 import com.sd_editions.collatex.permutations.CollateCore;
-import com.sd_editions.collatex.permutations.LevenshteinMatch;
+import com.sd_editions.collatex.permutations.WordDistanceMatch;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
@@ -73,8 +73,8 @@ public class ColorsView {
       html.append("<li>no additions, omissions or transpositions</li>");
     } else {
       for (Modification modification : modificationsL) {
-        if (modification instanceof LevenshteinMatch) {
-          html.append("<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>");
+        if (modification instanceof WordDistanceMatch) {
+          html.append("<li>" + wordDistanceMatch((WordDistanceMatch) modification) + "</li>");
         } else if (modification instanceof Addition) {
           html.append("<li>" + additionView((Addition) modification, base) + "</li>");
         } else if (modification instanceof Omission) {
@@ -139,7 +139,7 @@ public class ColorsView {
     return html.toString();
   }
 
-  private String levenshteinMatch(LevenshteinMatch modification) {
+  private String wordDistanceMatch(WordDistanceMatch modification) {
     return "<i>" + modification.base() + "</i> matches with <i>" + modification.witness() + "</i>";
   }
 

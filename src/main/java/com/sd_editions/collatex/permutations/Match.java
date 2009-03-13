@@ -3,7 +3,7 @@ package com.sd_editions.collatex.permutations;
 public class Match implements Comparable<Match> {
   private final Word word1;
   private final Word word2;
-  public final float levenshteinDistance;
+  public final float wordDistance;
 
   public Match(Word baseWord, Word witnessWord) {
     this(baseWord, witnessWord, 0);
@@ -12,7 +12,7 @@ public class Match implements Comparable<Match> {
   public Match(Word baseWord, Word witnessWord, float levDistance) {
     this.word1 = baseWord;
     this.word2 = witnessWord;
-    this.levenshteinDistance = levDistance;
+    this.wordDistance = levDistance;
   }
 
   @Override
