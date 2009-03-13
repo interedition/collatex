@@ -8,7 +8,7 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.match.Levenshtein;
+import com.sd_editions.collatex.match.worddistance.Levenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;

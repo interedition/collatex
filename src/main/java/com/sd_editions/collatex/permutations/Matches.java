@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.sd_editions.collatex.match.WordDistance;
+import com.sd_editions.collatex.match.worddistance.WordDistance;
 
 public class Matches {
   private final Witness base;
