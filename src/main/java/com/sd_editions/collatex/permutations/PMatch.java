@@ -31,7 +31,7 @@ public class PMatch {
   }
 
   public float getLevDistance() {
-    return match.levenshteinDistance;
+    return match.wordDistance;
   }
 
   public PMatch copy() {

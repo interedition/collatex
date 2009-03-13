@@ -41,13 +41,13 @@ public class Matches {
     return permutations;
   }
 
-  public static List<Modification> getLevenshteinMatches(Set<Match> permutation) {
-    List<Modification> levenshtein = Lists.newArrayList();
+  public static List<Modification> getWordDistanceMatches(Set<Match> permutation) {
+    List<Modification> wordDistanceMatches = Lists.newArrayList();
     for (Match match : permutation) {
-      if (match.levenshteinDistance > 0) {
-        levenshtein.add(new LevenshteinMatch(match));
+      if (match.wordDistance > 0) {
+        wordDistanceMatches.add(new WordDistanceMatch(match));
       }
     }
-    return levenshtein;
+    return wordDistanceMatches;
   }
 }
