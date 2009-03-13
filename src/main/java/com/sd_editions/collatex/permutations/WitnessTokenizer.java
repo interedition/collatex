@@ -1,14 +1,17 @@
 package com.sd_editions.collatex.permutations;
 
+import java.util.regex.Pattern;
+
 import com.sd_editions.collatex.iterator.ArrayIterator;
 
 public class WitnessTokenizer {
   private final ArrayIterator iterator;
   private final boolean normalize;
-
+  private final static Pattern SPLITTER = Pattern.compile("\\s+");
+  
   public WitnessTokenizer(String witness, boolean _normalize) {
     this.normalize = _normalize;
-    String[] tokens = witness.split("\\s+");
+    String[] tokens = SPLITTER.split(witness);
     iterator = new ArrayIterator(tokens);
   }
 
