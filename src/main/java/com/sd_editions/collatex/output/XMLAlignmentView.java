@@ -2,9 +2,9 @@ package com.sd_editions.collatex.output;
 
 import java.util.List;
 
-import com.sd_editions.collatex.permutations.LevenshteinMatch;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
+import com.sd_editions.collatex.permutations.WordDistanceMatch;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
@@ -24,8 +24,8 @@ public class XMLAlignmentView {
     List<Modification> modificationsL = modifications.getModifications();
     if (!modificationsL.isEmpty()) {
       for (Modification modification : modificationsL) {
-        if (modification instanceof LevenshteinMatch) {
-          xml.append("<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>");
+        if (modification instanceof WordDistanceMatch) {
+          xml.append("<li>" + wordDistanceMatch((WordDistanceMatch) modification) + "</li>");
         } else if (modification instanceof Addition) {
           xml.append(additionView((Addition) modification, base));
         } else if (modification instanceof Omission) {
@@ -59,7 +59,7 @@ public class XMLAlignmentView {
     return "<addition position=\"" + modification.getPosition() + "\">" + modification.getAddedWords() + "</addition>";
   }
 
-  private String levenshteinMatch(LevenshteinMatch modification) {
+  private String wordDistanceMatch(WordDistanceMatch modification) {
     // TODO Auto-generated method stub
     return null;
   }

@@ -8,6 +8,7 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.match.worddistance.Levenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
@@ -32,7 +33,7 @@ public class CollateCore {
     List<Modifications> modificationsList = Lists.newArrayList();
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
-    Matches matches = new Matches(base, witness);
+    Matches matches = new Matches(base, witness, new Levenshtein());
     List<Set<Match>> permutationList = matches.permutations();
     for (Set<Match> permutation : permutationList) {
       List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);
@@ -56,7 +57,7 @@ public class CollateCore {
 
   private List<Modification> determineModifications(Witness base, Witness witness, Set<Match> permutation, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
     List<Modification> modifications = Lists.newArrayList();
-    modifications.addAll(Matches.getLevenshteinMatches(permutation));
+    modifications.addAll(Matches.getWordDistanceMatches(permutation));
     modifications.addAll(MatchSequences.getModificationsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
     modifications.addAll(MatchSequences.getModificationsInMatchSequences(base, witness, matchSequencesForBase));
     return modifications;
@@ -109,7 +110,7 @@ public class CollateCore {
   }
 
   public Matches getMatches(int i, int j) {
-    return new Matches(getWitness(i), getWitness(j));
+    return new Matches(getWitness(i), getWitness(j), new Levenshtein());
   }
 
   public Witness getWitness(int i) {
@@ -123,7 +124,7 @@ public class CollateCore {
   public List<MatchSequence> getMatchSequences(int i, int j) {
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
-    Matches xmatches = new Matches(base, witness);
+    Matches xmatches = new Matches(base, witness, new Levenshtein());
     List<Set<Match>> permutationList = xmatches.permutations();
     Set<Match> matches = permutationList.get(0);
     return TranspositionDetection.calculateMatchSequencesForgetNonMatches(matches);

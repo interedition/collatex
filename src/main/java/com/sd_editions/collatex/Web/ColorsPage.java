@@ -17,8 +17,7 @@ import com.sd_editions.collatex.permutations.CollateCore;
 public class ColorsPage extends WebPage {
 
   public ColorsPage() {
-    ColorsModel model = new ColorsModel("the drought of march hath perced to the root and is this the right", "the first march of drought pierced to the root and this is the ",
-        "the first march of drought hath perced to the root", "");
+    ColorsModel model = new ColorsModel("base", "", "", "");
     add(new Label("colorview", new PropertyModel(model, "html")).setEscapeModelStrings(false));
     add(new ColorsForm("alignmentform", model));
     add(new BookmarkablePageLink("usecaselink", UseCasePage.class));

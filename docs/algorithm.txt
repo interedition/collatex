@@ -1,5 +1,5 @@
 We start with a set of witnesses, that need to be compared
-Each witness is tokenized (split into seperate words), so each witness can be seen as a sequence of words.
+Each witness is tokenized (split into separate words), so each witness can be seen as a sequence of words.
 From the set of witnesses, we apply the algorithm to each pair:
 
 - step a: determine the potential matches: 

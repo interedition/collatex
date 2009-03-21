@@ -1,10 +1,10 @@
 package com.sd_editions.collatex.permutations;
 
-public class LevenshteinMatch extends Modification {
+public class WordDistanceMatch extends Modification {
 
   private final Match match;
 
-  public LevenshteinMatch(Match _match) {
+  public WordDistanceMatch(Match _match) {
     this.match = _match;
   }
 

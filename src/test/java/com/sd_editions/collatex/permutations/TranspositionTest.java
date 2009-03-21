@@ -11,6 +11,7 @@ public class TranspositionTest extends TestCase {
     Modifications modifications = getModifications("a b c d e", "a c d b e");
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals(2, transpositions.size());
+    assertEquals("transposition: c d switches position with b", transpositions.get(0).toString());
     assertEquals("transposition: b switches position with c d", transpositions.get(1).toString());
   }
 
@@ -18,6 +19,7 @@ public class TranspositionTest extends TestCase {
     Modifications modifications = getModifications("a b x c d ", "a c d x b");
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals(2, transpositions.size());
+    assertEquals("transposition: c d switches position with b", transpositions.get(0).toString());
     assertEquals("transposition: b switches position with c d", transpositions.get(1).toString());
   }
 
@@ -25,8 +27,22 @@ public class TranspositionTest extends TestCase {
     Modifications modifications = getModifications("a b x c d ", "c d x a b");
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals(2, transpositions.size());
+    assertEquals("transposition: c d switches position with a b", transpositions.get(0).toString());
     assertEquals("transposition: a b switches position with c d", transpositions.get(1).toString());
   }
+
+  //TODO: Improve transposition detection and make this test work!
+  //  public void testTranspositionOf3Groups() {
+  //    Modifications modifications = getModifications("ab ccc d e", "d ccc e ab");
+  //    List<Transposition> transpositions = modifications.getTranspositions();
+  //    assertEquals(4, transpositions.size());
+  //  }
+
+  // ab ccc d e
+  // d ccc e ab
+  // (1-2 -> 6-7) (3-5 -> 2-4) (6 -> 1) (7 -> 5)
+  // 6 3 7 1
+  // 3 2 4 1
 
   //Note: this test should lead to a transposition :-)
   public void testComplex() {

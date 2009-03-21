@@ -5,16 +5,19 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.match.worddistance.WordDistance;
 
 public class Matches {
   private final Witness base;
   private final Witness witness;
   private List<Set<Match>> permutations;
   private final Set<Match> matches;
+  private final WordDistance distanceMeasure;
 
-  public Matches(Witness _base, Witness _witness) {
+  public Matches(Witness _base, Witness _witness, WordDistance distanceMeasure) {
     this.base = _base;
     this.witness = _witness;
+    this.distanceMeasure = distanceMeasure;
     this.matches = findMatches();
   }
 
@@ -25,8 +28,8 @@ public class Matches {
         if (baseWord.normalized.equals(witnessWord.normalized)) {
           matchSet.add(new Match(baseWord, witnessWord));
         } else {
-          float levDistance = baseWord.distanceTo(witnessWord);
-          if (levDistance < 0.5) matchSet.add(new Match(baseWord, witnessWord, levDistance));
+          float editDistance = distanceMeasure.distance(baseWord.normalized, witnessWord.normalized);
+          if (editDistance < 0.5) matchSet.add(new Match(baseWord, witnessWord, editDistance));
         }
       }
     }
@@ -38,13 +41,13 @@ public class Matches {
     return permutations;
   }
 
-  public static List<Modification> getLevenshteinMatches(Set<Match> permutation) {
-    List<Modification> levenshtein = Lists.newArrayList();
+  public static List<Modification> getWordDistanceMatches(Set<Match> permutation) {
+    List<Modification> wordDistanceMatches = Lists.newArrayList();
     for (Match match : permutation) {
-      if (match.levenshteinDistance > 0) {
-        levenshtein.add(new LevenshteinMatch(match));
+      if (match.wordDistance > 0) {
+        wordDistanceMatches.add(new WordDistanceMatch(match));
       }
     }
-    return levenshtein;
+    return wordDistanceMatches;
   }
 }
