@@ -3,14 +3,14 @@ package com.sd_editions.collatex.permutations.collate;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Phrase;
 
-public class Removal extends Modification {
+public class Omission extends Modification {
   private final Phrase phrase;
 
-  public Removal(Phrase _phrase) {
+  public Omission(Phrase _phrase) {
     this.phrase = _phrase;
   }
 
-  public String getRemovedWords() {
+  public String getOmittedWords() {
     return phrase.toString();
   }
 

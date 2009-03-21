@@ -15,7 +15,7 @@ import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 import com.sd_editions.collatex.permutations.collate.Addition;
-import com.sd_editions.collatex.permutations.collate.Removal;
+import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
@@ -77,8 +77,8 @@ public class ColorsView {
           html.append("<li>" + levenshteinMatch((LevenshteinMatch) modification) + "</li>");
         } else if (modification instanceof Addition) {
           html.append("<li>" + additionView((Addition) modification, base) + "</li>");
-        } else if (modification instanceof Removal) {
-          html.append("<li>" + removalView((Removal) modification) + "</li>");
+        } else if (modification instanceof Omission) {
+          html.append("<li>" + removalView((Omission) modification) + "</li>");
         } else if (modification instanceof Transposition) {
           html.append("<li>" + transpositionView((Transposition) modification) + "</li>");
         } else if (modification instanceof Replacement) {
@@ -153,9 +153,9 @@ public class ColorsView {
     return "<i>" + transposition.getLeft() + "</i> transposed with <i>" + transposition.getRight() + "</i>";
   }
 
-  private String removalView(Removal removal) {
+  private String removalView(Omission removal) {
     int position = removal.getPosition();
-    return "<i>" + removal.getRemovedWords() + "</i> at position " + (position) + " removed ";
+    return "<i>" + removal.getOmittedWords() + "</i> at position " + (position) + " removed ";
   }
 
   private String additionView(Addition addition, int base) {
