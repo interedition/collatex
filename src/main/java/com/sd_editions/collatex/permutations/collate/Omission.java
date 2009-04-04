@@ -1,5 +1,6 @@
 package com.sd_editions.collatex.permutations.collate;
 
+import com.sd_editions.collatex.match.views.ModificationVisitor;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Phrase;
 
@@ -21,5 +22,10 @@ public class Omission extends Modification {
   @Override
   public String toString() {
     return "omission: " + phrase.toString() + " position: " + phrase.getStartPosition();
+  }
+
+  @Override
+  public void accept(ModificationVisitor modificationVisitor) {
+    modificationVisitor.visitOmission(this);
   }
 }
