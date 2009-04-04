@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.match.views.ModificationVisitor;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 public class Modifications {
@@ -48,6 +49,17 @@ public class Modifications {
       if (match.getWitnessWord().position == witnessPosition) return match;
     }
     return null;
+  }
+
+  public Set<Match> getMatches() {
+    return matches;
+  }
+
+  public void accept(ModificationVisitor modificationVisitor) {
+    for (Modification modification : modifications) {
+      modification.accept(modificationVisitor);
+    }
+
   }
 
 }

@@ -1,5 +1,6 @@
 package com.sd_editions.collatex.permutations.collate;
 
+import com.sd_editions.collatex.match.views.ModificationVisitor;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Phrase;
 
@@ -23,6 +24,11 @@ public class Addition extends Modification {
   @Override
   public String toString() {
     return "addition: " + phrase.toString() + " position: " + position;
+  }
+
+  @Override
+  public void accept(ModificationVisitor modificationVisitor) {
+    modificationVisitor.visitAddition(this);
   }
 
 }
