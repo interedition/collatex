@@ -1,5 +1,6 @@
 package com.sd_editions.collatex.permutations.collate;
 
+import com.sd_editions.collatex.match.views.ModificationVisitor;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Phrase;
 
@@ -29,6 +30,11 @@ public class Replacement extends Modification {
 
   public String getReplacementWords() {
     return replacement.toString();
+  }
+
+  @Override
+  public void accept(ModificationVisitor modificationVisitor) {
+    modificationVisitor.visitReplacement(this);
   }
 
 }

@@ -32,6 +32,14 @@ public class AlignmentTableViewTest {
     assertEquals(expected, getGoing(w1, w2));
   }
 
+  @Test
+  public void testReplacement() {
+    String w1 = "a c b";
+    String w2 = "a d b";
+    String expected = "<xml>a <app><lemma>c</lemma><reading>d</reading></app> b</xml>";
+    assertEquals(expected, getGoing(w1, w2));
+  }
+
   public String getGoing(String w1, String w2) {
     // TODO: make a constructor for Witness, Witness
     //    Witness base = new Witness(w1);

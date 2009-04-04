@@ -2,6 +2,7 @@ package com.sd_editions.collatex.match.views;
 
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
+import com.sd_editions.collatex.permutations.collate.Replacement;
 
 public class ModificationVisitor {
 
@@ -23,6 +24,14 @@ public class ModificationVisitor {
     String omittedWords = omission.getOmittedWords();
     AppElement app = new AppElement(omittedWords);
     table.setApp(omission.getPosition() * 2 - 1, app);
+  }
+
+  // TODO: should lemma/reading be just a String?
+  public void visitReplacement(Replacement replacement) {
+    String lemma = replacement.getOriginalWords();
+    String reading = replacement.getReplacementWords();
+    AppElement app = new AppElement(lemma, reading);
+    table.setApp(replacement.getPosition() * 2 - 1, app);
   }
 
 }
