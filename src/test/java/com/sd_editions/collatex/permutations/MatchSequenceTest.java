@@ -97,7 +97,7 @@ public class MatchSequenceTest extends TestCase {
     Match e = new Match(new Word("E", 5), new Word("E", 2));
     MatchSequence sequence2 = new MatchSequence(2, d, e);
     List<MatchSequence> matchSequences = Lists.newArrayList(sequence, sequence2);
-    List<MatchSequence> arrayForWitness = TranspositionDetection.sortSequencesForWitness(matchSequences);
+    List<MatchSequence> arrayForWitness = SequenceDetection.sortSequencesForWitness(matchSequences);
     assertEquals(Lists.newArrayList(sequence2, sequence), arrayForWitness);
   }
 

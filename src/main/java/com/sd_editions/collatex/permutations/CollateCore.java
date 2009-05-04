@@ -37,7 +37,7 @@ public class CollateCore {
     List<Set<Match>> permutationList = matches.permutations();
     for (Set<Match> permutation : permutationList) {
       List<MatchSequence> matchSequencesForBase = SequenceDetection.calculateMatchSequences(permutation);
-      List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
+      List<MatchSequence> matchSequencesForWitness = SequenceDetection.sortSequencesForWitness(matchSequencesForBase);
       List<Transposition> transpositions = determineTranspositions(matchSequencesForBase, matchSequencesForWitness);
       List<Modification> modifications = determineModifications(base, witness, permutation, matchSequencesForBase, matchSequencesForWitness);
       modificationsList.add(new Modifications(modifications, transpositions, permutation));

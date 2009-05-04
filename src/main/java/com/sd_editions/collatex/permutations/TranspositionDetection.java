@@ -1,7 +1,5 @@
 package com.sd_editions.collatex.permutations;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -19,18 +17,6 @@ public class TranspositionDetection {
   public TranspositionDetection(Witness _witness, Witness _witness2) {
     this.witness = _witness;
     this.witness2 = _witness2;
-  }
-
-  protected static List<MatchSequence> sortSequencesForWitness(List<MatchSequence> matchSequences) {
-    Comparator<MatchSequence> comparator = new Comparator<MatchSequence>() {
-      @SuppressWarnings("boxing")
-      public int compare(MatchSequence o1, MatchSequence o2) {
-        return o1.getWitnessPosition() - o2.getWitnessPosition();
-      }
-    };
-    List<MatchSequence> matchSequencesForWitness = Lists.newArrayList(matchSequences);
-    Collections.sort(matchSequencesForWitness, comparator);
-    return matchSequencesForWitness;
   }
 
   public static List<Tuple2<MatchSequence>> calculateSequenceTuples(List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {

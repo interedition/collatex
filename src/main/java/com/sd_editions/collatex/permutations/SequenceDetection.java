@@ -64,4 +64,16 @@ public class SequenceDetection {
     return previousMatches;
   }
 
+  protected static List<MatchSequence> sortSequencesForWitness(List<MatchSequence> matchSequences) {
+    Comparator<MatchSequence> comparator = new Comparator<MatchSequence>() {
+      @SuppressWarnings("boxing")
+      public int compare(MatchSequence o1, MatchSequence o2) {
+        return o1.getWitnessPosition() - o2.getWitnessPosition();
+      }
+    };
+    List<MatchSequence> matchSequencesForWitness = Lists.newArrayList(matchSequences);
+    Collections.sort(matchSequencesForWitness, comparator);
+    return matchSequencesForWitness;
+  }
+
 }
