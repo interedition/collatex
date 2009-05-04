@@ -39,15 +39,19 @@ public class MatchSequences {
   public static List<Modification> getModificationsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
     List<Gap> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
     List<Gap> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
-    List<Modification> results = Lists.newArrayList();
+    List<MisMatch> variants = Lists.newArrayList();
     for (int i = 0; i < gapsBase.size(); i++) {
       Gap gapBase = gapsBase.get(i);
       Gap gapWitness = gapsWitness.get(i);
       if (gapBase.hasGap() || gapWitness.hasGap()) {
         MisMatch misMatch = new MisMatch(gapBase, gapWitness);
-        Modification modification = misMatch.analyse();
-        results.add(modification);
+        variants.add(misMatch);
       }
+    }
+    List<Modification> results = Lists.newArrayList();
+    for (MisMatch misMatch : variants) {
+      Modification modification = misMatch.analyse();
+      results.add(modification);
     }
     return results;
   }
