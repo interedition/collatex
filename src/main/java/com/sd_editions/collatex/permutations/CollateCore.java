@@ -38,8 +38,10 @@ public class CollateCore {
     for (Set<Match> permutation : permutationList) {
       List<MatchSequence> matchSequencesForBase = SequenceDetection.calculateMatchSequences(permutation);
       List<MatchSequence> matchSequencesForWitness = SequenceDetection.sortSequencesForWitness(matchSequencesForBase);
+      List<MisMatch> unmatches = determineUnmatches(base, witness, matchSequencesForBase, matchSequencesForWitness);
+
       List<Transposition> transpositions = determineTranspositions(matchSequencesForBase, matchSequencesForWitness);
-      List<Modification> modifications = determineModifications(base, witness, permutation, matchSequencesForBase, matchSequencesForWitness);
+      List<Modification> modifications = determineModifications(permutation, unmatches);
       modificationsList.add(new Modifications(modifications, transpositions, permutation));
     }
     sortPermutationsByRelevance(modificationsList);
@@ -55,15 +57,18 @@ public class CollateCore {
     Collections.sort(modificationsList, comparator);
   }
 
-  private List<Modification> determineModifications(Witness base, Witness witness, Set<Match> permutation, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
+  private List<Modification> determineModifications(Set<Match> permutation, List<MisMatch> determineUnmatches) {
+    List<Modification> modifications = Lists.newArrayList();
+    modifications.addAll(Matches.getWordDistanceMatches(permutation));
+    modifications.addAll(MatchSequences.analyseVariants(determineUnmatches));
+    return modifications;
+  }
+
+  private List<MisMatch> determineUnmatches(Witness base, Witness witness, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
     List<MisMatch> variants2 = Lists.newArrayList();
     variants2.addAll(MatchSequences.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
     variants2.addAll(MatchSequences.getVariantsInMatchSequences(base, witness, matchSequencesForBase));
-
-    List<Modification> modifications = Lists.newArrayList();
-    modifications.addAll(Matches.getWordDistanceMatches(permutation));
-    modifications.addAll(MatchSequences.analyseVariants(variants2));
-    return modifications;
+    return variants2;
   }
 
   private List<Transposition> determineTranspositions(List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
