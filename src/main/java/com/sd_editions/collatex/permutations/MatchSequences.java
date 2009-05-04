@@ -36,12 +36,7 @@ public class MatchSequences {
     return results;
   }
 
-  public static List<Modification> getModificationsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
-    List<MisMatch> variants = getVariantsInBetweenMatchSequences(base, witness, sequencesBase, sequencesWitness);
-    return analyseVariants(variants);
-  }
-
-  private static List<Modification> analyseVariants(List<MisMatch> variants) {
+  static List<Modification> analyseVariants(List<MisMatch> variants) {
     List<Modification> results = Lists.newArrayList();
     for (MisMatch misMatch : variants) {
       Modification modification = misMatch.analyse();
@@ -50,7 +45,7 @@ public class MatchSequences {
     return results;
   }
 
-  private static List<MisMatch> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
+  static List<MisMatch> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
     List<Gap> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
     List<Gap> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
     List<MisMatch> variants = Lists.newArrayList();
