@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 
 public class MatchSequences {
   public static List<Modification> getModificationsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
-    List<Modification> results = Lists.newArrayList();
+    List<MisMatch> variants = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
       List<Match> matches = sequence.getMatches();
       if (matches.size() > 1) {
@@ -26,13 +26,13 @@ public class MatchSequences {
             Gap gapBase = new Gap(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1);
             Gap gapWitness = new Gap(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1);
             MisMatch misMatch = new MisMatch(gapBase, gapWitness);
-            Modification modification = misMatch.analyse();
-            results.add(modification);
+            variants.add(misMatch);
           }
           previous = next;
         }
       }
     }
+    List<Modification> results = analyseVariants(variants);
     return results;
   }
 
