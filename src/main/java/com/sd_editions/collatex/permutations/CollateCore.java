@@ -36,7 +36,7 @@ public class CollateCore {
     Matches matches = new Matches(base, witness, new Levenshtein());
     List<Set<Match>> permutationList = matches.permutations();
     for (Set<Match> permutation : permutationList) {
-      List<MatchSequence> matchSequencesForBase = TranspositionDetection.calculateMatchSequencesForgetNonMatches(permutation);
+      List<MatchSequence> matchSequencesForBase = SequenceDetection.calculateMatchSequences(permutation);
       List<MatchSequence> matchSequencesForWitness = TranspositionDetection.sortSequencesForWitness(matchSequencesForBase);
       List<Transposition> transpositions = determineTranspositions(matchSequencesForBase, matchSequencesForWitness);
       List<Modification> modifications = determineModifications(base, witness, permutation, matchSequencesForBase, matchSequencesForWitness);
@@ -131,6 +131,6 @@ public class CollateCore {
     Matches xmatches = new Matches(base, witness, new Levenshtein());
     List<Set<Match>> permutationList = xmatches.permutations();
     Set<Match> matches = permutationList.get(0);
-    return TranspositionDetection.calculateMatchSequencesForgetNonMatches(matches);
+    return SequenceDetection.calculateMatchSequences(matches);
   }
 }
