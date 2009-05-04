@@ -61,7 +61,9 @@ public class CollateCore {
     List<MisMatch> variants = MatchSequences.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness);
     List<Modification> mod1 = MatchSequences.analyseVariants(variants);
     modifications.addAll(mod1);
-    modifications.addAll(MatchSequences.getModificationsInMatchSequences(base, witness, matchSequencesForBase));
+    List<MisMatch> variants1 = MatchSequences.getVariantsInMatchSequences(base, witness, matchSequencesForBase);
+    List<Modification> mod2 = MatchSequences.analyseVariants(variants1);
+    modifications.addAll(mod2);
     return modifications;
   }
 

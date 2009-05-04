@@ -6,13 +6,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 public class MatchSequences {
-  public static List<Modification> getModificationsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
-    List<MisMatch> variants = getVariantsInMatchSequences(base, witness, sequences);
-    List<Modification> results = analyseVariants(variants);
-    return results;
-  }
-
-  private static List<MisMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
+  static List<MisMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
     List<MisMatch> variants = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
       List<Match> matches = sequence.getMatches();
