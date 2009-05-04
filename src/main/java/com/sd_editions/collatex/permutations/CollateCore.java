@@ -56,14 +56,13 @@ public class CollateCore {
   }
 
   private List<Modification> determineModifications(Witness base, Witness witness, Set<Match> permutation, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
+    List<MisMatch> variants2 = Lists.newArrayList();
+    variants2.addAll(MatchSequences.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
+    variants2.addAll(MatchSequences.getVariantsInMatchSequences(base, witness, matchSequencesForBase));
+
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(Matches.getWordDistanceMatches(permutation));
-    List<MisMatch> variants = MatchSequences.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness);
-    List<Modification> mod1 = MatchSequences.analyseVariants(variants);
-    modifications.addAll(mod1);
-    List<MisMatch> variants1 = MatchSequences.getVariantsInMatchSequences(base, witness, matchSequencesForBase);
-    List<Modification> mod2 = MatchSequences.analyseVariants(variants1);
-    modifications.addAll(mod2);
+    modifications.addAll(MatchSequences.analyseVariants(variants2));
     return modifications;
   }
 
