@@ -33,6 +33,19 @@ public class CollateCore {
     List<Modifications> modificationsList = Lists.newArrayList();
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
+    List<MatchUnmatch> matchUnmatchList = doCompareWitnesses(base, witness);
+
+    for (MatchUnmatch matchUnmatch : matchUnmatchList) {
+      List<Transposition> transpositions = determineTranspositions(matchUnmatch.getMatchSequencesForBase(), matchUnmatch.getMatchSequencesForWitness());
+      List<Modification> modifications = determineModifications(matchUnmatch.getPermutation(), determineUnmatches(base, witness, matchUnmatch.getMatchSequencesForBase(), matchUnmatch
+          .getMatchSequencesForWitness()));
+      modificationsList.add(new Modifications(modifications, transpositions, matchUnmatch.getPermutation()));
+    }
+    sortPermutationsByRelevance(modificationsList);
+    return modificationsList;
+  }
+
+  public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
     Matches matches = new Matches(base, witness, new Levenshtein());
     List<Set<Match>> permutationList = matches.permutations();
     List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
@@ -43,15 +56,7 @@ public class CollateCore {
       List<MisMatch> unmatches = determineUnmatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
       matchUnmatchList.add(new MatchUnmatch(permutation, matchSequencesByBase, matchSequencesByWitness, unmatches));
     }
-
-    for (MatchUnmatch matchUnmatch : matchUnmatchList) {
-      List<Transposition> transpositions = determineTranspositions(matchUnmatch.getMatchSequencesForBase(), matchUnmatch.getMatchSequencesForWitness());
-      List<Modification> modifications = determineModifications(matchUnmatch.getPermutation(), determineUnmatches(base, witness, matchUnmatch.getMatchSequencesForBase(), matchUnmatch
-          .getMatchSequencesForWitness()));
-      modificationsList.add(new Modifications(modifications, transpositions, matchUnmatch.getPermutation()));
-    }
-    sortPermutationsByRelevance(modificationsList);
-    return modificationsList;
+    return matchUnmatchList;
   }
 
   private void sortPermutationsByRelevance(List<Modifications> modificationsList) {
