@@ -17,8 +17,9 @@ public class XMLAppOutputTest {
   @Test
   public void testSimpleSubstitutionOutput() {
     CollateCore collateCore = new CollateCore("the black cat and the black mat", "the black dog and the black mat");
-    List<MatchUnmatch> matchUnmatch = collateCore.doCompareWitnesses(collateCore.getWitness(1), collateCore.getWitness(2));
-    AppAlignmentTable alignmentTable = new AppAlignmentTable(matchUnmatch);
+    List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(collateCore.getWitness(1), collateCore.getWitness(2));
+    // FIXME find out which is the best permutation, not just take the first one 
+    AppAlignmentTable alignmentTable = new AppAlignmentTable(matchUnmatchList.get(0));
     String xml = alignmentTable.toXML();
     assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B #C\">dog</rdg></app>  and the black mat</collation>", xml);
   }

@@ -8,6 +8,14 @@ public class MisMatch {
   final Gap base;
   final Gap witness;
 
+  public Gap getBase() {
+    return base;
+  }
+
+  public Gap getWitness() {
+    return witness;
+  }
+
   public MisMatch(Gap _base, Gap _witness) {
     this.base = _base;
     this.witness = _witness;
