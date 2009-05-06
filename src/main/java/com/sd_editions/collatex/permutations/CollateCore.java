@@ -2,12 +2,15 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.worddistance.Levenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -139,7 +142,20 @@ public class CollateCore {
   }
 
   public Witness generateBase() {
-
-    return null;
+    Witness base = getWitness(0);
+    Witness witness = getWitness(1);
+    HashMap<String, Set<Word>> normalizedWordMatches = Maps.newHashMap();
+    Set<Word> matches = Sets.newHashSet();
+    for (Word baseword : base.getWords()) {
+      for (Word witnessword : witness.getWords()) {
+        if (baseword.normalized.equals(witnessword.normalized)) {
+          matches.add(baseword);
+          matches.add(witnessword);
+          normalizedWordMatches.put(baseword.normalized, matches);
+        }
+      }
+    }
+    Witness generatedBase = new Witness();
+    return generatedBase;
   }
 }
