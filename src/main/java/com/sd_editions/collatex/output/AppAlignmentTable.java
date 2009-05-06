@@ -20,7 +20,7 @@ public class AppAlignmentTable {
 
     for (Match match : matchUnmatch.getPermutation()) {
       Word matchedWord = match.getBaseWord();
-      cells[matchedWord.position * 2 - 1] = new TextElement(matchedWord);
+      cells[matchedWord.position * 2 + 1] = new TextElement(matchedWord);
     }
 
     for (MisMatch unmatch : matchUnmatch.getUnmatches()) {

@@ -67,6 +67,20 @@ public class CollateCore {
     return matchUnmatchList;
   }
 
+  /**
+   * Temporary heuristics for the best collation without relying on the analyzation stage.
+   * 
+   * Looking for a new home ...
+   */
+  public void sortPermutationsByUnmatches(List<MatchUnmatch> matchUnmatchList) {
+    Comparator<MatchUnmatch> comparator = new Comparator<MatchUnmatch>() {
+      public int compare(MatchUnmatch o1, MatchUnmatch o2) {
+        return o1.getUnmatches().size() - o2.getUnmatches().size();
+      }
+    };
+    Collections.sort(matchUnmatchList, comparator);
+  }
+
   private void sortPermutationsByRelevance(List<Modifications> modificationsList) {
     Comparator<Modifications> comparator = new Comparator<Modifications>() {
       public int compare(Modifications o1, Modifications o2) {

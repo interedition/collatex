@@ -12,6 +12,14 @@ import com.sd_editions.collatex.permutations.Gap;
  */
 public class AppElementTEI extends Element {
 
+  public Gap getBase() {
+    return base;
+  }
+
+  public Gap getWitness() {
+    return witness;
+  }
+
   private final Gap base;
   private final Gap witness;
 
@@ -26,8 +34,14 @@ public class AppElementTEI extends Element {
     if (base == null) {
       xml.append(base.toString());
     } else {
-      xml.append("<rdg wit=\"#A\">").append(base.toString()).append("</rdg>");
-      xml.append("<rdg wit=\"#B\">").append(witness.toString()).append("</rdg>");
+      if (base.toString().isEmpty())
+        xml.append("<rdg wit=\"#A\"/>");
+      else
+        xml.append("<rdg wit=\"#A\">").append(base.toString()).append("</rdg>");
+      if (witness.toString().isEmpty())
+        xml.append("<rdg wit=\"#B\"/>");
+      else
+        xml.append("<rdg wit=\"#B\">").append(witness.toString()).append("</rdg>");
       // FIXME insert real witness ID here
     }
     xml.append("</app>");
