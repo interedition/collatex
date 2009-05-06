@@ -8,20 +8,23 @@ import com.google.common.collect.Lists;
 
 public class Witness {
   public final String sentence;
+  public final String id;
   private final List<Word> words;
 
   public Witness(String witnessId, String witness) {
+    this.id = witnessId;
     this.sentence = witness;
     WitnessTokenizer tokenizer = new WitnessTokenizer(witness, false);
     this.words = Lists.newArrayList();
     int position = 1;
     while (tokenizer.hasNextToken()) {
-      this.words.add(new Word(witnessId, tokenizer.nextToken(), position));
+      this.words.add(new Word(this.id, tokenizer.nextToken(), position));
       position++;
     }
   }
 
   public Witness(Word... _words) {
+    this.id = _words[0].getWitnessId();
     this.sentence = Join.join(" ", _words);
     this.words = Lists.newArrayList(_words);
   }
