@@ -8,10 +8,10 @@ public class WitnessTokenizer {
   private final ArrayIterator iterator;
   private final boolean normalize;
   private final static Pattern SPLITTER = Pattern.compile("\\s+");
-  
+
   public WitnessTokenizer(String witness, boolean _normalize) {
     this.normalize = _normalize;
-    String[] tokens = SPLITTER.split(witness);
+    String[] tokens = SPLITTER.split(witness.trim());
     iterator = new ArrayIterator(tokens);
   }
 

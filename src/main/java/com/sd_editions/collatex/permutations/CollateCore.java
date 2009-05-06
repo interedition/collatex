@@ -1,5 +1,6 @@
 package com.sd_editions.collatex.permutations;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -21,6 +22,13 @@ public class CollateCore {
   public CollateCore(String... _witnessStrings) {
     this.witnesses = Lists.newArrayList();
     for (String witnessString : _witnessStrings) {
+      this.witnesses.add(new Witness(witnessString));
+    }
+  }
+
+  public CollateCore(InputStream... _witnessStrings) {
+    this.witnesses = Lists.newArrayList();
+    for (InputStream witnessString : _witnessStrings) {
       this.witnesses.add(new Witness(witnessString));
     }
   }
