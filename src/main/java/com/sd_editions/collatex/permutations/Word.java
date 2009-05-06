@@ -1,12 +1,13 @@
 package com.sd_editions.collatex.permutations;
 
-
 public class Word {
+  private final String witnessId;
   public final String original;
   public final String normalized;
   public final int position;
 
-  public Word(String _original, int _position) {
+  public Word(String _witnessId, String _original, int _position) {
+    this.witnessId = _witnessId;
     this.original = _original;
     this.normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
     this.position = _position;
@@ -27,5 +28,9 @@ public class Word {
     if (!(obj instanceof Word)) return false;
     Word other = (Word) obj;
     return other.original.equals(this.original) && (other.position == this.position);
+  }
+
+  public String getWitnessId() {
+    return witnessId;
   }
 }

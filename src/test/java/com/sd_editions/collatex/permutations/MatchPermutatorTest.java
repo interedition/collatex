@@ -8,10 +8,6 @@ import junit.framework.TestCase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.sd_editions.collatex.permutations.Match;
-import com.sd_editions.collatex.permutations.MatchPermutator;
-import com.sd_editions.collatex.permutations.PMatch;
-import com.sd_editions.collatex.permutations.Word;
 
 public class MatchPermutatorTest extends TestCase {
 
@@ -32,11 +28,13 @@ public class MatchPermutatorTest extends TestCase {
   protected void setUp() throws Exception {
     super.setUp();
     testSet = Sets.newLinkedHashSet();
-    match_1_2 = new Match(new Word("een", 1), new Word("een", 2));
-    match_1_3 = new Match(new Word("een", 1), new Word("tween", 3));
-    match_2_1 = new Match(new Word("twee", 2), new Word("twee", 1));
-    match_2_3 = new Match(new Word("twee", 2), new Word("tween", 3));
-    match_3_4 = new Match(new Word("drie", 3), new Word("drie", 4));
+    String witnessId1 = "A";
+    String witnessId2 = "B";
+    match_1_2 = new Match(new Word(witnessId1, "een", 1), new Word(witnessId2, "een", 2));
+    match_1_3 = new Match(new Word(witnessId1, "een", 1), new Word(witnessId2, "tween", 3));
+    match_2_1 = new Match(new Word(witnessId1, "twee", 2), new Word(witnessId2, "twee", 1));
+    match_2_3 = new Match(new Word(witnessId1, "twee", 2), new Word(witnessId2, "tween", 3));
+    match_3_4 = new Match(new Word(witnessId1, "drie", 3), new Word(witnessId2, "drie", 4));
     pmatch_1_2 = new PMatch(match_1_2);
     pmatch_1_3 = new PMatch(match_1_3);
     pmatch_2_1 = new PMatch(match_2_1);
