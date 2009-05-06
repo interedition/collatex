@@ -2,14 +2,12 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.worddistance.Levenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -140,11 +138,11 @@ public class CollateCore {
     return SequenceDetection.calculateMatchSequences(matches);
   }
 
-  public HashMap<String, MultiMatch> generateBase() {
+  public MultiMatchMap getMultiMatchMap() {
     // initialize with the first 2 witnesses
     Witness base = getWitness(1);
     Witness witness = getWitness(2);
-    HashMap<String, MultiMatch> multiMatchesPerNormalizedWord = Maps.newHashMap();
+    MultiMatchMap multiMatchesPerNormalizedWord = new MultiMatchMap();
     for (Word baseword : base.getWords()) {
       String normalized = baseword.normalized;
       if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
