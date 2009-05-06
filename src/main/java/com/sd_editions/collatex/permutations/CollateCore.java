@@ -137,4 +137,9 @@ public class CollateCore {
     Set<Match> matches = permutationList.get(0);
     return SequenceDetection.calculateMatchSequences(matches);
   }
+
+  public Witness generateBase() {
+
+    return null;
+  }
 }

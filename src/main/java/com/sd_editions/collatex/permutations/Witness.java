@@ -1,6 +1,7 @@
 package com.sd_editions.collatex.permutations;
 
 import java.util.List;
+import java.util.Random;
 
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
@@ -9,13 +10,13 @@ public class Witness {
   public final String sentence;
   private final List<Word> words;
 
-  public Witness(String witness) {
+  public Witness(String witnessId, String witness) {
     this.sentence = witness;
     WitnessTokenizer tokenizer = new WitnessTokenizer(witness, false);
     this.words = Lists.newArrayList();
     int position = 1;
     while (tokenizer.hasNextToken()) {
-      this.words.add(new Word(tokenizer.nextToken(), position));
+      this.words.add(new Word(witnessId, tokenizer.nextToken(), position));
       position++;
     }
   }
@@ -23,6 +24,11 @@ public class Witness {
   public Witness(Word... _words) {
     this.sentence = Join.join(" ", _words);
     this.words = Lists.newArrayList(_words);
+  }
+
+  public Witness(String witness) {
+    /* no witnessId? generate a random one */
+    this(Long.toString(Math.abs(new Random().nextLong()), 5), witness);
   }
 
   public List<Word> getWords() {
