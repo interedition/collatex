@@ -34,15 +34,19 @@ public class AppElementTEI extends Element {
     if (base == null) {
       xml.append(base.toString());
     } else {
+
+      xml.append("<rdg wit=\"#").append(base.getWitness().id).append('"');
       if (base.toString().isEmpty())
-        xml.append("<rdg wit=\"#A\"/>");
+        xml.append("/>");
       else
-        xml.append("<rdg wit=\"#A\">").append(base.toString()).append("</rdg>");
+        xml.append(">").append(base.toString()).append("</rdg>");
+
+      xml.append("<rdg wit=\"#").append(witness.getWitness().id).append('"');
       if (witness.toString().isEmpty())
-        xml.append("<rdg wit=\"#B\"/>");
+        xml.append("/>");
       else
-        xml.append("<rdg wit=\"#B\">").append(witness.toString()).append("</rdg>");
-      // FIXME insert real witness ID here
+        xml.append('>').append(witness.toString()).append("</rdg>");
+
     }
     xml.append("</app>");
     return xml.toString();

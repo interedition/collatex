@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.MatchUnmatch;
+import com.sd_editions.collatex.permutations.Witness;
 
 public class XMLAppOutputTest {
 
@@ -34,12 +35,10 @@ public class XMLAppOutputTest {
   }
 
   private String collateWitnessStrings(String witnessA, String witnessB) {
-    CollateCore collateCore = new CollateCore(witnessA, witnessB);
-    List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(collateCore.getWitness(1), collateCore.getWitness(2));
+    CollateCore collateCore = new CollateCore(witnessA, witnessB); // ignored actually.
+    List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(new Witness("A", witnessA), new Witness("B", witnessB));
 
     collateCore.sortPermutationsByUnmatches(matchUnmatchList);
-
-    // FIXME find out which is the best permutation, not just take the first one
 
     for (MatchUnmatch matchUnmatch : matchUnmatchList) {
       System.out.println(new AppAlignmentTable(matchUnmatch).toXML());
