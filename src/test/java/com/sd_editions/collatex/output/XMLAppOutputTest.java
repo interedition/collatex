@@ -21,6 +21,6 @@ public class XMLAppOutputTest {
     // FIXME find out which is the best permutation, not just take the first one 
     AppAlignmentTable alignmentTable = new AppAlignmentTable(matchUnmatchList.get(0));
     String xml = alignmentTable.toXML();
-    assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B #C\">dog</rdg></app>  and the black mat</collation>", xml);
+    assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B\">dog</rdg></app> and the black mat</collation>", xml);
   }
 }

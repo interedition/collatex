@@ -1,12 +1,12 @@
 package com.sd_editions.collatex.output;
 
-import com.sd_editions.collatex.match.views.AppElement;
 import com.sd_editions.collatex.match.views.Element;
 import com.sd_editions.collatex.match.views.TextElement;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.MatchUnmatch;
 import com.sd_editions.collatex.permutations.MisMatch;
 import com.sd_editions.collatex.permutations.Word;
+import com.sd_editions.collatex.views.AppElementTEI;
 
 public class AppAlignmentTable {
 
@@ -25,7 +25,7 @@ public class AppAlignmentTable {
 
     for (MisMatch unmatch : matchUnmatch.getUnmatches()) {
       // FIXME somehow propagate Bram's witness id here after merge
-      cells[unmatch.getBase().getStartPosition() * 2] = new AppElement(unmatch.getBase().toString(), unmatch.getWitness().toString());
+      cells[unmatch.getBase().getStartPosition() * 2] = new AppElementTEI(unmatch.getBase(), unmatch.getWitness());
     }
 
   }
