@@ -163,6 +163,24 @@ public class CollateCore {
         }
       }
     }
+    // go over the rest of the witnesses, comparing the normalizedwords from the multimatches
+    for (int i = 3; i <= witnesses.size(); i++) {
+      witness = getWitness(i);
+      for (String normalized : multiMatchesPerNormalizedWord.keySet()) {
+        boolean normalizedHasMatchInThisWitness = false;
+        for (Word witnessword : witness.getWords()) {
+          if (normalized.equals(witnessword.normalized)) {
+            MultiMatch mm = multiMatchesPerNormalizedWord.get(normalized);
+            mm.addMatchingWord(witnessword);
+            multiMatchesPerNormalizedWord.put(normalized, mm);
+            normalizedHasMatchInThisWitness = true;
+          }
+        }
+        if (!normalizedHasMatchInThisWitness) {
+          multiMatchesPerNormalizedWord.remove(normalized);
+        }
+      }
+    }
     return multiMatchesPerNormalizedWord;
   }
 }
