@@ -21,12 +21,8 @@ public class XMLAppOutputTest {
     assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B\">dog</rdg></app> and the black mat</collation>", xml);
   }
 
-  /* ## Simple addition/deletion
-  A: the black cat on the white table
-  B: the black saw the black cat on the table
-
-  <collation>the <app><rdg wit="#A"/><rdg wit="#B">saw the black</rdg></app> cat on the <app><rdg wit="#A">white</rdg><rdg wit="#B"/></app> table</collation> 
-
+  /**
+   * Second example from #6. Tests addition, deletion and multiple words in one variant 
    */
   @Test
   public void testSimpleAddDelOutput() {
