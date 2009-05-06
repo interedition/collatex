@@ -140,9 +140,10 @@ public class CollateCore {
     return SequenceDetection.calculateMatchSequences(matches);
   }
 
-  public Witness generateBase() {
-    Witness base = getWitness(0);
-    Witness witness = getWitness(1);
+  public HashMap<String, MultiMatch> generateBase() {
+    // initialize with the first 2 witnesses
+    Witness base = getWitness(1);
+    Witness witness = getWitness(2);
     HashMap<String, MultiMatch> multiMatchesPerNormalizedWord = Maps.newHashMap();
     for (Word baseword : base.getWords()) {
       String normalized = baseword.normalized;
@@ -162,7 +163,6 @@ public class CollateCore {
         }
       }
     }
-    Witness generatedBase = new Witness();
-    return generatedBase;
+    return multiMatchesPerNormalizedWord;
   }
 }
