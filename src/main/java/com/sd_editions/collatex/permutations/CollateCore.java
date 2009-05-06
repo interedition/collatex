@@ -3,12 +3,14 @@ package com.sd_editions.collatex.permutations;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.worddistance.Levenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -169,5 +171,49 @@ public class CollateCore {
     List<Set<Match>> permutationList = xmatches.permutations();
     Set<Match> matches = permutationList.get(0);
     return SequenceDetection.calculateMatchSequences(matches);
+  }
+
+  public HashMap<String, MultiMatch> generateBase() {
+    // initialize with the first 2 witnesses
+    Witness base = getWitness(1);
+    Witness witness = getWitness(2);
+    HashMap<String, MultiMatch> multiMatchesPerNormalizedWord = Maps.newHashMap();
+    for (Word baseword : base.getWords()) {
+      String normalized = baseword.normalized;
+      if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
+        multiMatchesPerNormalizedWord.get(normalized).addMatchingWord(baseword);
+      }
+      for (Word witnessword : witness.getWords()) {
+        if (normalized.equals(witnessword.normalized)) {
+          MultiMatch mm;
+          if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
+            mm = multiMatchesPerNormalizedWord.get(normalized);
+            mm.addMatchingWord(witnessword);
+          } else {
+            mm = new MultiMatch(baseword, witnessword);
+          }
+          multiMatchesPerNormalizedWord.put(normalized, mm);
+        }
+      }
+    }
+    // go over the rest of the witnesses, comparing the normalizedwords from the multimatches
+    for (int i = 3; i <= witnesses.size(); i++) {
+      witness = getWitness(i);
+      for (String normalized : multiMatchesPerNormalizedWord.keySet()) {
+        boolean normalizedHasMatchInThisWitness = false;
+        for (Word witnessword : witness.getWords()) {
+          if (normalized.equals(witnessword.normalized)) {
+            MultiMatch mm = multiMatchesPerNormalizedWord.get(normalized);
+            mm.addMatchingWord(witnessword);
+            multiMatchesPerNormalizedWord.put(normalized, mm);
+            normalizedHasMatchInThisWitness = true;
+          }
+        }
+        if (!normalizedHasMatchInThisWitness) {
+          multiMatchesPerNormalizedWord.remove(normalized);
+        }
+      }
+    }
+    return multiMatchesPerNormalizedWord;
   }
 }

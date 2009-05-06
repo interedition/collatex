@@ -3,6 +3,7 @@ package com.sd_editions.collatex.permutations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Random;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,25 +23,35 @@ import com.google.common.collect.Lists;
 
 public class Witness {
   public final String sentence;
+  public final String id;
   private final List<Word> words;
 
-  public Witness(String witness) {
+  public Witness(String witnessId, String witness) {
+    this.id = witnessId;
     this.sentence = witness;
     WitnessTokenizer tokenizer = new WitnessTokenizer(witness, false);
     this.words = Lists.newArrayList();
     int position = 1;
     while (tokenizer.hasNextToken()) {
-      this.words.add(new Word(tokenizer.nextToken(), position));
+      this.words.add(new Word(this.id, tokenizer.nextToken(), position));
       position++;
     }
   }
 
   public Witness(Word... _words) {
+    this.id = _words[0].getWitnessId();
     this.sentence = Join.join(" ", _words);
     this.words = Lists.newArrayList(_words);
   }
 
+  public Witness(String witness) {
+    /* no witnessId? generate a random one */
+    this(Long.toString(Math.abs(new Random().nextLong()), 5), witness);
+  }
+
   public Witness(InputStream xmlInputStream) {
+    /* no witnessId? generate a random one */
+    this.id = Long.toString(Math.abs(new Random().nextLong()), 5);
     this.words = Lists.newArrayList();
     Document doc = null;
     doc = getXmlDocument(xmlInputStream);
@@ -76,13 +87,13 @@ public class Witness {
       }
       Witness w = new Witness(builder1.toString());
       for (Word word : w.getWords()) {
-        words.add(new Word(word.toString(), counter++));
+        words.add(new Word(this.id, word.toString(), counter++));
       }
     } else { // get text from prepared 'w' elements 
       int counter = 0;
       for (int i = 0; i < nodes.getLength(); i++) {
         String value = nodes.item(i).getTextContent();
-        words.add(new Word(value, counter++));
+        words.add(new Word(this.id, value, counter++));
       }
     }
     sentence = Join.join(" ", words);

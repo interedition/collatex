@@ -5,18 +5,11 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.CollateCore;
-import com.sd_editions.collatex.permutations.Match;
-import com.sd_editions.collatex.permutations.MatchSequence;
-import com.sd_editions.collatex.permutations.MatchSequences;
-import com.sd_editions.collatex.permutations.Modification;
-import com.sd_editions.collatex.permutations.Modifications;
-import com.sd_editions.collatex.permutations.TranspositionDetection;
-import com.sd_editions.collatex.permutations.Tuple2;
-import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.Word;
 
 public class MatchSequenceTest extends TestCase {
+  private final String witnessId1 = "alpha";
+  private final String witnessId2 = "beta";
+
   public void testSimple() {
     String base = "a b";
     String witness = "a b";
@@ -89,12 +82,12 @@ public class MatchSequenceTest extends TestCase {
   // de abc
   @SuppressWarnings("boxing")
   public void testSortSequencesForWitness() {
-    Match a = new Match(new Word("A", 1), new Word("A", 3));
-    Match b = new Match(new Word("B", 2), new Word("B", 4));
-    Match c = new Match(new Word("C", 3), new Word("C", 5));
+    Match a = new Match(new Word(witnessId1, "A", 1), new Word(witnessId2, "A", 3));
+    Match b = new Match(new Word(witnessId1, "B", 2), new Word(witnessId2, "B", 4));
+    Match c = new Match(new Word(witnessId1, "C", 3), new Word(witnessId2, "C", 5));
     MatchSequence sequence = new MatchSequence(1, a, b, c);
-    Match d = new Match(new Word("D", 4), new Word("D", 1));
-    Match e = new Match(new Word("E", 5), new Word("E", 2));
+    Match d = new Match(new Word(witnessId1, "D", 4), new Word(witnessId2, "D", 1));
+    Match e = new Match(new Word(witnessId1, "E", 5), new Word(witnessId2, "E", 2));
     MatchSequence sequence2 = new MatchSequence(2, d, e);
     List<MatchSequence> matchSequences = Lists.newArrayList(sequence, sequence2);
     List<MatchSequence> arrayForWitness = SequenceDetection.sortSequencesForWitness(matchSequences);
@@ -103,12 +96,12 @@ public class MatchSequenceTest extends TestCase {
 
   @SuppressWarnings("boxing")
   public void testConvertMatchSequencesToTuples() {
-    Match a = new Match(new Word("A", 1), new Word("A", 3));
-    Match b = new Match(new Word("B", 2), new Word("B", 4));
-    Match c = new Match(new Word("C", 3), new Word("C", 5));
+    Match a = new Match(new Word(witnessId1, "A", 1), new Word(witnessId2, "A", 3));
+    Match b = new Match(new Word(witnessId1, "B", 2), new Word(witnessId2, "B", 4));
+    Match c = new Match(new Word(witnessId1, "C", 3), new Word(witnessId2, "C", 5));
     MatchSequence sequence = new MatchSequence(1, a, b, c);
-    Match d = new Match(new Word("D", 4), new Word("D", 1));
-    Match e = new Match(new Word("E", 5), new Word("E", 2));
+    Match d = new Match(new Word(witnessId1, "D", 4), new Word(witnessId2, "D", 1));
+    Match e = new Match(new Word(witnessId1, "E", 5), new Word(witnessId2, "E", 2));
     MatchSequence sequence2 = new MatchSequence(2, d, e);
     List<MatchSequence> matchSequencesForBase = Lists.newArrayList(sequence, sequence2);
     List<MatchSequence> matchSequencesForWitness = Lists.newArrayList(sequence2, sequence);
@@ -123,9 +116,9 @@ public class MatchSequenceTest extends TestCase {
   // B A C
   @SuppressWarnings( { "boxing", "unchecked" })
   public void testFilterAwayRealMatches() {
-    Match a = new Match(new Word("A", 1), new Word("A", 2));
-    Match b = new Match(new Word("B", 2), new Word("B", 1));
-    Match c = new Match(new Word("C", 3), new Word("C", 3));
+    Match a = new Match(new Word(witnessId1, "A", 1), new Word(witnessId2, "A", 2));
+    Match b = new Match(new Word(witnessId1, "B", 2), new Word(witnessId2, "B", 1));
+    Match c = new Match(new Word(witnessId1, "C", 3), new Word(witnessId2, "C", 3));
     MatchSequence sequenceA = new MatchSequence(1, a);
     MatchSequence sequenceB = new MatchSequence(2, b);
     MatchSequence sequenceC = new MatchSequence(3, c);
@@ -142,9 +135,9 @@ public class MatchSequenceTest extends TestCase {
   // B A C
   @SuppressWarnings( { "boxing", "unchecked" })
   public void testGetRealMatches() {
-    Match a = new Match(new Word("A", 1), new Word("A", 2));
-    Match b = new Match(new Word("B", 2), new Word("B", 1));
-    Match c = new Match(new Word("C", 3), new Word("C", 3));
+    Match a = new Match(new Word(witnessId1, "A", 1), new Word(witnessId2, "A", 2));
+    Match b = new Match(new Word(witnessId1, "B", 2), new Word(witnessId2, "B", 1));
+    Match c = new Match(new Word(witnessId1, "C", 3), new Word(witnessId2, "C", 3));
     MatchSequence sequenceA = new MatchSequence(1, a);
     MatchSequence sequenceB = new MatchSequence(2, b);
     MatchSequence sequenceC = new MatchSequence(3, c);
@@ -161,11 +154,11 @@ public class MatchSequenceTest extends TestCase {
   // a c b
   @SuppressWarnings("boxing")
   public void testModificationsInMatchSequences() {
-    Word aB = new Word("A", 1);
-    Word bB = new Word("B", 2);
-    Word aW = new Word("A", 1);
-    Word cW = new Word("C", 2);
-    Word bW = new Word("B", 3);
+    Word aB = new Word(witnessId1, "A", 1);
+    Word bB = new Word(witnessId1, "B", 2);
+    Word aW = new Word(witnessId2, "A", 1);
+    Word cW = new Word(witnessId2, "C", 2);
+    Word bW = new Word(witnessId2, "B", 3);
     Witness base = new Witness(aB, bB);
     Witness witness = new Witness(aW, cW, bW);
     Match a = new Match(aB, aW);
@@ -181,10 +174,10 @@ public class MatchSequenceTest extends TestCase {
 
   @SuppressWarnings("boxing")
   public void testNoModificationsInMatchSequences() {
-    Word aB = new Word("A", 1);
-    Word bB = new Word("B", 2);
-    Word aW = new Word("A", 1);
-    Word bW = new Word("B", 2);
+    Word aB = new Word(witnessId1, "A", 1);
+    Word bB = new Word(witnessId1, "B", 2);
+    Word aW = new Word(witnessId2, "A", 1);
+    Word bW = new Word(witnessId2, "B", 2);
     Witness base = new Witness(aB, bB);
     Witness witness = new Witness(aW, bW);
     Match a = new Match(aB, aW);
