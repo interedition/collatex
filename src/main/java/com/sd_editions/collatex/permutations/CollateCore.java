@@ -10,7 +10,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.worddistance.Levenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -144,14 +143,22 @@ public class CollateCore {
   public Witness generateBase() {
     Witness base = getWitness(0);
     Witness witness = getWitness(1);
-    HashMap<String, Set<Word>> normalizedWordMatches = Maps.newHashMap();
-    Set<Word> matches = Sets.newHashSet();
+    HashMap<String, MultiMatch> multiMatchesPerNormalizedWord = Maps.newHashMap();
     for (Word baseword : base.getWords()) {
+      String normalized = baseword.normalized;
+      if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
+        multiMatchesPerNormalizedWord.get(normalized).addMatchingWord(baseword);
+      }
       for (Word witnessword : witness.getWords()) {
-        if (baseword.normalized.equals(witnessword.normalized)) {
-          matches.add(baseword);
-          matches.add(witnessword);
-          normalizedWordMatches.put(baseword.normalized, matches);
+        if (normalized.equals(witnessword.normalized)) {
+          MultiMatch mm;
+          if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
+            mm = multiMatchesPerNormalizedWord.get(normalized);
+            mm.addMatchingWord(witnessword);
+          } else {
+            mm = new MultiMatch(baseword, witnessword);
+          }
+          multiMatchesPerNormalizedWord.put(normalized, mm);
         }
       }
     }
