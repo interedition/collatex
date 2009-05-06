@@ -2,9 +2,6 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.List;
 
-import com.sd_editions.collatex.permutations.CollateCore;
-import com.sd_editions.collatex.permutations.Modifications;
-
 import junit.framework.TestCase;
 
 public class ComparisonTest extends TestCase {
@@ -13,6 +10,13 @@ public class ComparisonTest extends TestCase {
     Modifications modifications = getModifications("a cat", "a calico cat");
     assertEquals(1, modifications.size());
     assertEquals("addition: calico position: 2", modifications.get(0).toString());
+  }
+
+  public void testWorCount() {
+    Witness w1 = new Witness("\t\n  a cat");
+    Witness w2 = new Witness("a cat");
+    assertEquals(w1.size(), w2.size());
+
   }
 
   public void testAddition_AtTheEnd() {
