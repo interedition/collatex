@@ -4,13 +4,21 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.MatchUnmatch;
-import com.sd_editions.collatex.permutations.Witness;
+import com.sd_editions.collatex.permutations.WitnessBuilder;
 
 public class XMLAppOutputTest {
+
+  private WitnessBuilder builder;
+
+  @BeforeClass
+  public void setUp() {
+    builder = new WitnessBuilder();
+  }
 
   /**
    * The first example from #6 (http://arts-itsee.bham.ac.uk/trac/interedition/ticket/6) (without witness C for now)
@@ -38,7 +46,7 @@ public class XMLAppOutputTest {
 
   private String collateWitnessStrings(String witnessA, String witnessB) {
     CollateCore collateCore = new CollateCore(witnessA, witnessB); // ignored actually.
-    List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(new Witness("A", witnessA), new Witness("B", witnessB));
+    List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(builder.build("A", witnessA), builder.build("B", witnessB));
 
     collateCore.sortPermutationsByUnmatches(matchUnmatchList);
 
