@@ -31,12 +31,14 @@ public class TranspositionTest extends TestCase {
     assertEquals("transposition: a b switches position with c d", transpositions.get(1).toString());
   }
 
-  //TODO: Improve transposition detection and make this test work!
-  //  public void testTranspositionOf3Groups() {
-  //    Modifications modifications = getModifications("ab ccc d e", "d ccc e ab");
-  //    List<Transposition> transpositions = modifications.getTranspositions();
-  //    assertEquals(4, transpositions.size());
-  //  }
+  public void testTranspositionOf3Groups() {
+    Modifications modifications = getModifications("ab ccc d e", "d ccc e ab");
+    List<Transposition> transpositions = modifications.getTranspositions();
+    assertEquals(3, transpositions.size());
+    assertEquals("transposition: d switches position with ab", transpositions.get(0).toString());
+    assertEquals("transposition: e switches position with d", transpositions.get(1).toString());
+    assertEquals("transposition: ab switches position with e", transpositions.get(2).toString());
+  }
 
   // ab ccc d e
   // d ccc e ab
@@ -44,14 +46,14 @@ public class TranspositionTest extends TestCase {
   // 6 3 7 1
   // 3 2 4 1
 
-  //Note: this test should lead to a transposition :-)
   public void testComplex() {
     String base = "The black dog chases a red cat.";
     String witness = "A red cat chases the yellow dog";
     Modifications modifications = getModifications(base, witness);
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals(2, transpositions.size());
-    // TODO: add expected Transposition
+    assertEquals("transposition: a red cat. switches position with The dog", transpositions.get(0).toString());
+    assertEquals("transposition: The dog switches position with a red cat.", transpositions.get(1).toString());
   }
 
   //

@@ -113,7 +113,7 @@ public class CollateCore {
   private List<Transposition> determineTranspositions(List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
     List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-    List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
+    List<Transposition> transpositions = TranspositionDetection.createTranspositions(possibleTranspositionTuples);
     return transpositions;
   }
 
