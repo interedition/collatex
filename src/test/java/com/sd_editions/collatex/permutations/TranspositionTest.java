@@ -31,12 +31,14 @@ public class TranspositionTest extends TestCase {
     assertEquals("transposition: a b switches position with c d", transpositions.get(1).toString());
   }
 
-  //TODO: Improve transposition detection and make this test work!
-  //  public void testTranspositionOf3Groups() {
-  //    Modifications modifications = getModifications("ab ccc d e", "d ccc e ab");
-  //    List<Transposition> transpositions = modifications.getTranspositions();
-  //    assertEquals(4, transpositions.size());
-  //  }
+  public void testTranspositionOf3Groups() {
+    Modifications modifications = getModifications("ab ccc d e", "d ccc e ab");
+    List<Transposition> transpositions = modifications.getTranspositions();
+    assertEquals(3, transpositions.size());
+    assertEquals("transposition: d switches position with ab", transpositions.get(0).toString());
+    assertEquals("transposition: e switches position with d", transpositions.get(1).toString());
+    assertEquals("transposition: ab switches position with e", transpositions.get(2).toString());
+  }
 
   // ab ccc d e
   // d ccc e ab
