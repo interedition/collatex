@@ -13,12 +13,14 @@ import com.sd_editions.collatex.permutations.Phrase;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
+import com.sd_editions.collatex.permutations.collate.Transposition;
 
 public class XMLAlignmentViewTest {
 
   private XMLAlignmentView setupAlignmentView(Modification modification) {
     List<Modification> modificationsList = Lists.newArrayList(modification);
-    Modifications modifications = new Modifications(modificationsList, null, null);
+    List<Transposition> transpositionList = Lists.newArrayList();
+    Modifications modifications = new Modifications(modificationsList, transpositionList, null);
     XMLAlignmentView alignmentView = new XMLAlignmentView(modifications);
     return alignmentView;
   }
