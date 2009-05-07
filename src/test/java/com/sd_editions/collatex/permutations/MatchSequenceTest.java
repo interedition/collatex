@@ -9,11 +9,18 @@ import com.google.common.collect.Lists;
 public class MatchSequenceTest extends TestCase {
   private final String witnessId1 = "alpha";
   private final String witnessId2 = "beta";
+  private WitnessBuilder builder;
+
+  @Override
+  protected void setUp() throws Exception {
+    builder = new WitnessBuilder();
+    super.setUp();
+  }
 
   public void testSimple() {
     String base = "a b";
     String witness = "a b";
-    CollateCore colors = new CollateCore(base, witness);
+    CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1), (2->2)]", sequences.get(0).toString());
     assertEquals(1, sequences.size());
@@ -22,7 +29,7 @@ public class MatchSequenceTest extends TestCase {
   public void testAddition() {
     String base = "a b";
     String witness = "a c b";
-    CollateCore colors = new CollateCore(base, witness);
+    CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1), (2->3)]", sequences.get(0).toString());
     assertEquals(1, sequences.size());
@@ -31,7 +38,7 @@ public class MatchSequenceTest extends TestCase {
   public void testOmission() {
     String base = "a c b";
     String witness = "a b";
-    CollateCore colors = new CollateCore(base, witness);
+    CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1), (3->2)]", sequences.get(0).toString());
     assertEquals(1, sequences.size());
@@ -40,7 +47,7 @@ public class MatchSequenceTest extends TestCase {
   public void testReplacement() {
     String base = "a b c";
     String witness = "a d c";
-    CollateCore colors = new CollateCore(base, witness);
+    CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1), (3->3)]", sequences.get(0).toString());
     assertEquals(1, sequences.size());
@@ -49,7 +56,7 @@ public class MatchSequenceTest extends TestCase {
   public void testTransposition() {
     String base = "a b";
     String witness = "b a";
-    CollateCore colors = new CollateCore(base, witness);
+    CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->2)]", sequences.get(0).toString());
     assertEquals("[(2->1)]", sequences.get(1).toString());
@@ -60,7 +67,7 @@ public class MatchSequenceTest extends TestCase {
   public void testComplex() {
     String base = "The black dog chases a red cat.";
     String witness = "A red cat chases the yellow dog";
-    CollateCore colors = new CollateCore(base, witness);
+    CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->5), (3->7)]", sequences.get(0).toString());
     assertEquals("[(4->4)]", sequences.get(1).toString());
@@ -69,7 +76,7 @@ public class MatchSequenceTest extends TestCase {
   }
 
   public void testTranspositionExample1() {
-    CollateCore colors = new CollateCore("a b c d e", "a c d b e");
+    CollateCore colors = new CollateCore(builder.buildWitnesses("a b c d e", "a c d b e"));
     List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1)]", sequences.get(0).toString());
     assertEquals("[(2->4)]", sequences.get(1).toString());
@@ -191,7 +198,7 @@ public class MatchSequenceTest extends TestCase {
   }
 
   public void testModificationsInBetweenMatchSequences() {
-    CollateCore colors = new CollateCore("a b y c z d", "a x b c n d");
+    CollateCore colors = new CollateCore(builder.buildWitnesses("a b y c z d", "a x b c n d"));
     Modifications compareWitness = colors.compareWitness(1, 2).get(0);
     assertEquals(3, compareWitness.size());
     assertEquals("addition: x position: 2", compareWitness.get(0).toString());
@@ -200,7 +207,7 @@ public class MatchSequenceTest extends TestCase {
   }
 
   public void testModificationAtTheEnd() {
-    CollateCore colors = new CollateCore("a b", "a c");
+    CollateCore colors = new CollateCore(builder.buildWitnesses("a b", "a c"));
     Modifications compareWitness = colors.compareWitness(1, 2).get(0);
     assertEquals(1, compareWitness.size());
     assertEquals("replacement: b / c position: 2", compareWitness.get(0).toString());

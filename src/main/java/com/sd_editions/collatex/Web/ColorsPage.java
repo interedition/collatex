@@ -12,6 +12,7 @@ import org.apache.wicket.model.PropertyModel;
 
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.CollateCore;
+import com.sd_editions.collatex.permutations.WitnessBuilder;
 
 @SuppressWarnings("serial")
 public class ColorsPage extends WebPage {
@@ -50,7 +51,7 @@ class ColorsModel implements Serializable {
     add(witness3, witnesses);
     add(witness4, witnesses);
     //    Util.p(witnesses);
-    CollateCore colors = new CollateCore(witnesses);
+    CollateCore colors = new CollateCore(new WitnessBuilder().buildWitnesses(witnesses.toArray(new String[0])));
     this.html = new ColorsView(colors).toHtml();
   }
 

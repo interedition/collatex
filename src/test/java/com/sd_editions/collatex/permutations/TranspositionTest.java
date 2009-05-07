@@ -7,6 +7,15 @@ import junit.framework.TestCase;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 public class TranspositionTest extends TestCase {
+
+  private WitnessBuilder builder;
+
+  @Override
+  protected void setUp() throws Exception {
+    builder = new WitnessBuilder();
+    super.setUp();
+  }
+
   public void testTransposition1() {
     Modifications modifications = getModifications("a b c d e", "a c d b e");
     List<Transposition> transpositions = modifications.getTranspositions();
@@ -91,7 +100,7 @@ public class TranspositionTest extends TestCase {
   //    //    assertEquals("transposition: a b switches position with c d", modifications.get(0).toString());
   //  }
   private Modifications getModifications(String base, String witness) {
-    List<Modifications> permutations = new CollateCore(base, witness).compareWitness(1, 2);
+    List<Modifications> permutations = new CollateCore(builder.buildWitnesses(base, witness)).compareWitness(1, 2);
     assertEquals(1, permutations.size());
     return permutations.get(0);
   }
