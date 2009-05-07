@@ -14,7 +14,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sd_editions.collatex.match.worddistance.Levenshtein;
+import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
@@ -60,7 +60,7 @@ public class CollateCore {
   }
 
   public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
-    Matches matches = new Matches(base, witness, new Levenshtein());
+    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
     List<Set<Match>> permutationList = matches.permutations();
     List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
 
@@ -157,7 +157,7 @@ public class CollateCore {
   }
 
   public Matches getMatches(int i, int j) {
-    return new Matches(getWitness(i), getWitness(j), new Levenshtein());
+    return new Matches(getWitness(i), getWitness(j), new NormalizedLevenshtein());
   }
 
   public Witness getWitness(int i) {
@@ -171,7 +171,7 @@ public class CollateCore {
   public List<MatchSequence> getMatchSequences(int i, int j) {
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
-    Matches xmatches = new Matches(base, witness, new Levenshtein());
+    Matches xmatches = new Matches(base, witness, new NormalizedLevenshtein());
     List<Set<Match>> permutationList = xmatches.permutations();
     Set<Match> matches = permutationList.get(0);
     return SequenceDetection.calculateMatchSequences(matches);
