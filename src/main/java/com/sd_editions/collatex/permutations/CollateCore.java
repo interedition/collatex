@@ -1,10 +1,13 @@
 package com.sd_editions.collatex.permutations;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -21,15 +24,17 @@ public class CollateCore {
 
   public CollateCore(String... _witnessStrings) {
     this.witnesses = Lists.newArrayList();
+    WitnessBuilder builder = new WitnessBuilder();
     for (String witnessString : _witnessStrings) {
-      this.witnesses.add(new Witness(witnessString));
+      this.witnesses.add(builder.build(witnessString));
     }
   }
 
-  public CollateCore(InputStream... _witnessStrings) {
+  public CollateCore(InputStream... _witnessStrings) throws SAXException, IOException {
     this.witnesses = Lists.newArrayList();
+    WitnessBuilder builder = new WitnessBuilder();
     for (InputStream witnessString : _witnessStrings) {
-      this.witnesses.add(new Witness(witnessString));
+      this.witnesses.add(builder.build(witnessString));
     }
   }
 
@@ -53,22 +58,34 @@ public class CollateCore {
     return modificationsList;
   }
 
-  //  public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
-  public List<MatchUnmatch> doCompareWitnesses(Witness... witnesses) {
-    MultiMatchMap matches = new MultiMatchMap(Lists.newArrayList(witnesses));
-    List<Set<MultiMatch>> permutationList = matches.permutations();
-
-    // TODO: use all witnesses in the determineUnmatches
-    Witness base = witnesses[0];
-    Witness witness = witnesses[1];
+  public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
+    //  public List<MatchUnmatch> doCompareWitnesses(Witness... witnesses) {
+    Matches matches = new Matches(base, witness, new Levenshtein());
+    //    MultiMatchMap matches = new MultiMatchMap(Lists.newArrayList(witnesses));
+    List<Set<Match>> permutationList = matches.permutations();
     List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
-    for (Set<MultiMatch> permutation : permutationList) {
+
+    for (Set<Match> permutation : permutationList) {
       List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
       List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
       List<MisMatch> unmatches = determineUnmatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
       matchUnmatchList.add(new MatchUnmatch(permutation, matchSequencesByBase, matchSequencesByWitness, unmatches));
     }
     return matchUnmatchList;
+  }
+
+  /**
+     * Temporary heuristics for the best collation without relying on the analyzation stage.
+     * 
+     * Looking for a new home ...
+     */
+  public void sortPermutationsByUnmatches(List<MatchUnmatch> matchUnmatchList) {
+    Comparator<MatchUnmatch> comparator = new Comparator<MatchUnmatch>() {
+      public int compare(MatchUnmatch o1, MatchUnmatch o2) {
+        return o1.getUnmatches().size() - o2.getUnmatches().size();
+      }
+    };
+    Collections.sort(matchUnmatchList, comparator);
   }
 
   private void sortPermutationsByRelevance(List<Modifications> modificationsList) {

@@ -7,7 +7,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.worddistance.WordDistance;
 
-@Deprecated
 public class Matches {
   private final Witness base;
   private final Witness witness;

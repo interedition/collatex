@@ -32,6 +32,10 @@ public class Phrase {
     return replacementString;
   }
 
+  public Witness getWitness() {
+    return witness;
+  }
+
   public int getStartPosition() {
     return startPosition;
   }
