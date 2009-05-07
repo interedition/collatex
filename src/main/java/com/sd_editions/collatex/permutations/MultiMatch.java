@@ -19,8 +19,7 @@ public class MultiMatch {
 
   public void addMatchingWord(Word word) {
     if (word.normalized.equals(this.name)) {
-      String witnessId = word.getWitnessId();
-      similarWordsPerWitness.get(witnessId).add(word);
+      similarWordsPerWitness.get(word.getWitnessId()).add(word);
     }
   }
 

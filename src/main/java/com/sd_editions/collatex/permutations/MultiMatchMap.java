@@ -15,11 +15,11 @@ public class MultiMatchMap {
   private final LinkedHashMap<String, MultiMatch> mmm;
   private List<Set<MultiMatch>> permutations;
 
-  public MultiMatchMap(List<Witness> witnesses) {
+  public MultiMatchMap(Witness... witnesses) {
     this.mmm = Maps.newLinkedHashMap();
     // initialize with the first 2 witnesses
-    Witness witness0 = witnesses.get(0);
-    Witness witness1 = witnesses.get(1);
+    Witness witness0 = witnesses[0];
+    Witness witness1 = witnesses[1];
     for (Word word0 : witness0.getWords()) {
       String normalized = word0.normalized;
       if (this.containsKey(normalized)) {
@@ -39,8 +39,8 @@ public class MultiMatchMap {
       }
     }
     // go over the rest of the witnesses, comparing the normalizedwords from the multimatches
-    for (int i = 2; i < witnesses.size(); i++) {
-      witness1 = witnesses.get(i);
+    for (int i = 2; i < witnesses.length; i++) {
+      witness1 = witnesses[i];
       Set<String> keySet = Sets.newLinkedHashSet(this.keySet());
       for (String normalized : keySet) {
         boolean normalizedHasMatchInThisWitness = false;

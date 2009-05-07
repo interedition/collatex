@@ -74,11 +74,10 @@ public class CollateCore {
     return matchUnmatchList;
   }
 
-  /**
-     * Temporary heuristics for the best collation without relying on the analyzation stage.
-     * 
-     * Looking for a new home ...
-     */
+  /*
+   * Temporary heuristics for the best collation without relying on the analyzation stage.
+   * Looking for a new home ...
+   */
   public void sortPermutationsByUnmatches(List<MatchUnmatch> matchUnmatchList) {
     Comparator<MatchUnmatch> comparator = new Comparator<MatchUnmatch>() {
       public int compare(MatchUnmatch o1, MatchUnmatch o2) {
@@ -179,7 +178,4 @@ public class CollateCore {
     return SequenceDetection.calculateMatchSequences(matches);
   }
 
-  public MultiMatchMap getMultiMatchMap() {
-    return new MultiMatchMap(witnesses);
-  }
 }
