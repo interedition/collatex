@@ -13,37 +13,38 @@ import com.google.common.collect.Sets;
 
 public class MultiMatchMap {
   private final LinkedHashMap<String, MultiMatch> mmm;
+  private List<Set<MultiMatch>> permutations;
 
-  public MultiMatchMap(List<Witness> witnesses) {
+  public MultiMatchMap(Witness... witnesses) {
     this.mmm = Maps.newLinkedHashMap();
     // initialize with the first 2 witnesses
-    Witness base = witnesses.get(0);
-    Witness witness = witnesses.get(1);
-    for (Word baseword : base.getWords()) {
-      String normalized = baseword.normalized;
+    Witness witness0 = witnesses[0];
+    Witness witness1 = witnesses[1];
+    for (Word word0 : witness0.getWords()) {
+      String normalized = word0.normalized;
       if (this.containsKey(normalized)) {
-        this.get(normalized).addMatchingWord(baseword);
+        this.get(normalized).addMatchingWord(word0);
       }
-      for (Word witnessword : witness.getWords()) {
-        if (normalized.equals(witnessword.normalized)) {
+      for (Word word1 : witness1.getWords()) {
+        if (normalized.equals(word1.normalized)) {
           MultiMatch mm;
           if (this.containsKey(normalized)) {
             mm = this.get(normalized);
-            mm.addMatchingWord(witnessword);
+            mm.addMatchingWord(word1);
           } else {
-            mm = new MultiMatch(baseword, witnessword);
+            mm = new MultiMatch(word0, word1);
           }
           this.put(normalized, mm);
         }
       }
     }
     // go over the rest of the witnesses, comparing the normalizedwords from the multimatches
-    for (int i = 2; i < witnesses.size(); i++) {
-      witness = witnesses.get(i);
+    for (int i = 2; i < witnesses.length; i++) {
+      witness1 = witnesses[i];
       Set<String> keySet = Sets.newLinkedHashSet(this.keySet());
       for (String normalized : keySet) {
         boolean normalizedHasMatchInThisWitness = false;
-        for (Word witnessword : witness.getWords()) {
+        for (Word witnessword : witness1.getWords()) {
           if (normalized.equals(witnessword.normalized)) {
             MultiMatch mm = this.get(normalized);
             mm.addMatchingWord(witnessword);
@@ -62,9 +63,9 @@ public class MultiMatchMap {
     return Join.join(" ", mmm.keySet());
   }
 
-  public List<Set<Match>> permutations() {
-    // TODO Auto-generated method stub
-    return null;
+  public List<Set<MultiMatch>> permutations() {
+    if (permutations == null) permutations = new MultiMatchPermutator(mmm).permutations();
+    return permutations;
   }
 
   /* Delegated methods after here */

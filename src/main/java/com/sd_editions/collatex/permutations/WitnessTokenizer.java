@@ -11,7 +11,7 @@ public class WitnessTokenizer {
 
   public WitnessTokenizer(String witness, boolean _normalize) {
     this.normalize = _normalize;
-    String[] tokens = SPLITTER.split(witness.trim());
+    String[] tokens = witness.isEmpty() ? new String[0] : SPLITTER.split(witness.trim());
     iterator = new ArrayIterator(tokens);
   }
 

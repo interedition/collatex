@@ -7,6 +7,7 @@ public class Word {
   public final int position;
 
   public Word(String _witnessId, String _original, int _position) {
+    if (_original.isEmpty()) throw new IllegalArgumentException("Word cannot be empty!");
     this.witnessId = _witnessId;
     this.original = _original;
     this.normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
@@ -33,4 +34,5 @@ public class Word {
   public String getWitnessId() {
     return witnessId;
   }
+
 }
