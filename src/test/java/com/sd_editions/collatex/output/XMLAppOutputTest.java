@@ -30,6 +30,12 @@ public class XMLAppOutputTest {
     assertEquals("<collation>the black <app><rdg wit=\"#A\"/><rdg wit=\"#B\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B\"/></app> table</collation>", xml);
   }
 
+  @Test
+  public void testMultiSubstitutionOutput() {
+    String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat");
+    assertEquals("<collation>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B\">big white dog</rdg></app> and the black mat</collation>", xml);
+  }
+
   private String collateWitnessStrings(String witnessA, String witnessB) {
     CollateCore collateCore = new CollateCore(witnessA, witnessB); // ignored actually.
     List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(new Witness("A", witnessA), new Witness("B", witnessB));
