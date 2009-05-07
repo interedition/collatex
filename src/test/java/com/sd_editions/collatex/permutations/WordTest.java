@@ -14,4 +14,13 @@ public class WordTest extends TestCase {
     Word word = new Word(witnessId, "ειπων", 2);
     assertEquals("ειπων", word.normalized);
   }
+
+  public void testEmpty() {
+    try {
+      new Word(witnessId, "", 3);
+      fail();
+    } catch (IllegalArgumentException iae) {
+      assertEquals(iae.getMessage(), "Word cannot be empty!");
+    }
+  }
 }

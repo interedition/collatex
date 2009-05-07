@@ -6,6 +6,14 @@ import junit.framework.TestCase;
 
 public class ComparisonTest extends TestCase {
 
+  private WitnessBuilder builder;
+
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    builder = new WitnessBuilder();
+  }
+
   public void testAddition_InTheMiddle() {
     Modifications modifications = getModifications("a cat", "a calico cat");
     assertEquals(1, modifications.size());
@@ -13,8 +21,8 @@ public class ComparisonTest extends TestCase {
   }
 
   public void testWorCount() {
-    Witness w1 = new Witness("\t\n  a cat");
-    Witness w2 = new Witness("a cat");
+    Witness w1 = builder.build("\t\n  a cat");
+    Witness w2 = builder.build("a cat");
     assertEquals(w1.size(), w2.size());
 
   }
