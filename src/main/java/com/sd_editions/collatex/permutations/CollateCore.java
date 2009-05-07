@@ -1,11 +1,14 @@
 package com.sd_editions.collatex.permutations;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -23,15 +26,16 @@ public class CollateCore {
 
   public CollateCore(String... _witnessStrings) {
     this.witnesses = Lists.newArrayList();
+    WitnessBuilder builder = new WitnessBuilder();
     for (String witnessString : _witnessStrings) {
-      this.witnesses.add(new Witness(witnessString));
+      this.witnesses.add(builder.build(witnessString));
     }
   }
 
-  public CollateCore(InputStream... _witnessStrings) {
+  public CollateCore(InputStream... _witnessStrings) throws SAXException, IOException {
     this.witnesses = Lists.newArrayList();
     for (InputStream witnessString : _witnessStrings) {
-      this.witnesses.add(new Witness(witnessString));
+      this.witnesses.add(new WitnessBuilder().build(witnessString));
     }
   }
 
