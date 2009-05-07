@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.worddistance.Levenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -183,7 +184,8 @@ public class CollateCore {
     // go over the rest of the witnesses, comparing the normalizedwords from the multimatches
     for (int i = 3; i <= witnesses.size(); i++) {
       witness = getWitness(i);
-      for (String normalized : multiMatchesPerNormalizedWord.keySet()) {
+      Set<String> keySet = Sets.newLinkedHashSet(multiMatchesPerNormalizedWord.keySet());
+      for (String normalized : keySet) {
         boolean normalizedHasMatchInThisWitness = false;
         for (Word witnessword : witness.getWords()) {
           if (normalized.equals(witnessword.normalized)) {

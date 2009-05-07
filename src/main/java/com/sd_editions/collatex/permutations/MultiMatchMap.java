@@ -1,7 +1,7 @@
 package com.sd_editions.collatex.permutations;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -10,14 +10,14 @@ import com.google.common.base.Join;
 import com.google.common.collect.Maps;
 
 public class MultiMatchMap {
-  private final HashMap<String, MultiMatch> mmm;
+  private final LinkedHashMap<String, MultiMatch> mmm;
 
   public MultiMatchMap() {
-    this.mmm = Maps.newHashMap();
+    this.mmm = Maps.newLinkedHashMap();
   }
 
   public String getNormalizedMatchSentence() {
-    return Join.join(" ", keySet());
+    return Join.join(" ", mmm.keySet());
   }
 
   /* Delegated methods after here */
