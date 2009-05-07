@@ -9,7 +9,6 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.worddistance.Levenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -55,6 +54,12 @@ public class CollateCore {
   }
 
   public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
+    //    public List<MatchUnmatch> doCompareWitnesses(Witness... witnesses) {
+    //    MultiMatchMap matches = new MultiMatchMap(Lists.newArrayList(witnesses));
+    //    // TODO: use all witnesses in the determineUnmatches
+    //    Witness base = witnesses[0];
+    //    Witness witness = witnesses[1];
+
     Matches matches = new Matches(base, witness, new Levenshtein());
     List<Set<Match>> permutationList = matches.permutations();
     List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
@@ -149,6 +154,7 @@ public class CollateCore {
     return witnesses.size();
   }
 
+  @Deprecated
   public List<MatchSequence> getMatchSequences(int i, int j) {
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
@@ -159,47 +165,6 @@ public class CollateCore {
   }
 
   public MultiMatchMap getMultiMatchMap() {
-    // initialize with the first 2 witnesses
-    Witness base = getWitness(1);
-    Witness witness = getWitness(2);
-    MultiMatchMap multiMatchesPerNormalizedWord = new MultiMatchMap();
-    for (Word baseword : base.getWords()) {
-      String normalized = baseword.normalized;
-      if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
-        multiMatchesPerNormalizedWord.get(normalized).addMatchingWord(baseword);
-      }
-      for (Word witnessword : witness.getWords()) {
-        if (normalized.equals(witnessword.normalized)) {
-          MultiMatch mm;
-          if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
-            mm = multiMatchesPerNormalizedWord.get(normalized);
-            mm.addMatchingWord(witnessword);
-          } else {
-            mm = new MultiMatch(baseword, witnessword);
-          }
-          multiMatchesPerNormalizedWord.put(normalized, mm);
-        }
-      }
-    }
-    // go over the rest of the witnesses, comparing the normalizedwords from the multimatches
-    for (int i = 3; i <= witnesses.size(); i++) {
-      witness = getWitness(i);
-      Set<String> keySet = Sets.newLinkedHashSet(multiMatchesPerNormalizedWord.keySet());
-      for (String normalized : keySet) {
-        boolean normalizedHasMatchInThisWitness = false;
-        for (Word witnessword : witness.getWords()) {
-          if (normalized.equals(witnessword.normalized)) {
-            MultiMatch mm = multiMatchesPerNormalizedWord.get(normalized);
-            mm.addMatchingWord(witnessword);
-            multiMatchesPerNormalizedWord.put(normalized, mm);
-            normalizedHasMatchInThisWitness = true;
-          }
-        }
-        if (!normalizedHasMatchInThisWitness) {
-          multiMatchesPerNormalizedWord.remove(normalized);
-        }
-      }
-    }
-    return multiMatchesPerNormalizedWord;
+    return new MultiMatchMap(witnesses);
   }
 }

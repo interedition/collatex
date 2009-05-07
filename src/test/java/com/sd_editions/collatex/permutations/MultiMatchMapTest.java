@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class CollateCoreTest extends TestCase {
+public class MultiMatchMapTest extends TestCase {
   @Test
   public void testDetermineBase() {
     CollateCore collateCore = new CollateCore("The Black Cat", "The Cat and the Dog", "The White Cat");
