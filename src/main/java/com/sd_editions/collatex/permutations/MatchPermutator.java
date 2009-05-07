@@ -9,6 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+@Deprecated
 public class MatchPermutator {
 
   private final Set<Match> possibleMatches;

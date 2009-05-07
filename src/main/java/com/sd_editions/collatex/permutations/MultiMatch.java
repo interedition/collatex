@@ -28,6 +28,10 @@ public class MultiMatch {
     return (List<Word>) similarWordsPerWitness.get(witnessId);
   }
 
+  public List<Word> getWords() {
+    return (List<Word>) similarWordsPerWitness.values();
+  }
+
   /*
    * matches01 = determine matches in witness 0,1
    * initialMatchSet = matches01

@@ -53,18 +53,16 @@ public class CollateCore {
     return modificationsList;
   }
 
-  public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
-    //    public List<MatchUnmatch> doCompareWitnesses(Witness... witnesses) {
-    //    MultiMatchMap matches = new MultiMatchMap(Lists.newArrayList(witnesses));
-    //    // TODO: use all witnesses in the determineUnmatches
-    //    Witness base = witnesses[0];
-    //    Witness witness = witnesses[1];
+  //  public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
+  public List<MatchUnmatch> doCompareWitnesses(Witness... witnesses) {
+    MultiMatchMap matches = new MultiMatchMap(Lists.newArrayList(witnesses));
+    List<Set<MultiMatch>> permutationList = matches.permutations();
 
-    Matches matches = new Matches(base, witness, new Levenshtein());
-    List<Set<Match>> permutationList = matches.permutations();
+    // TODO: use all witnesses in the determineUnmatches
+    Witness base = witnesses[0];
+    Witness witness = witnesses[1];
     List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
-
-    for (Set<Match> permutation : permutationList) {
+    for (Set<MultiMatch> permutation : permutationList) {
       List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
       List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
       List<MisMatch> unmatches = determineUnmatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
