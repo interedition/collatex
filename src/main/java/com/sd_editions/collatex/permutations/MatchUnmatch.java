@@ -35,7 +35,6 @@ public class MatchUnmatch {
   }
 
   public double getVariationMeasure() {
-
     return 1000.0 * matchSequencesForBase.size() + 10.0 * unmatches.size() + getWordDistanceSum();
   }
 
