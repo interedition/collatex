@@ -12,6 +12,8 @@ import junit.framework.TestCase;
 
 import org.xml.sax.SAXException;
 
+import com.sd_editions.collatex.permutations.WitnessBuilder.ContentType;
+
 public class WitnessBuilderTest extends TestCase {
 
   private static final String PLAIN_TEXT_A = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse non libero sed augue porttitor blandit nec id nunc. Maecenas sit amet mauris ante.";
@@ -83,47 +85,54 @@ public class WitnessBuilderTest extends TestCase {
     assertEquals("Invalid number of words!", words1.size(), words2.size());
 
     for (int i = 0; i < words1.size(); i++) {
-      assertEquals("Words on the same position are not equal!", words1.get(i).toString(), words2.get(i).toString());
+      assertEquals("Words on the same position are not equal!", words1.get(i), words2.get(i));
+
     }
   }
 
   public void testXmlA() throws SAXException, IOException {
     Witness w1 = witnessBuilder.build(PLAIN_TEXT_A);
     Witness w2 = null;
-    w2 = witnessBuilder.build(xmlSimpleA);
+    w2 = witnessBuilder.build(xmlSimpleA, ContentType.TEXT_XML);
     Witness w3 = null;
-    w3 = witnessBuilder.build(xmlTokenA);
+    w3 = witnessBuilder.build(xmlTokenA, ContentType.TEXT_XML);
     compareWitnesses(w1, w2);
     compareWitnesses(w1, w3);
   }
 
   public void testXmlB() throws SAXException, IOException {
     Witness w1 = witnessBuilder.build(PLAIN_TEXT_B);
-    Witness w2 = witnessBuilder.build(xmlSimpleB);
-    Witness w3 = witnessBuilder.build(xmlTokenB);
+    Witness w2 = witnessBuilder.build(xmlSimpleB, ContentType.TEXT_XML);
+    Witness w3 = witnessBuilder.build(xmlTokenB, ContentType.TEXT_XML);
 
     compareWitnesses(w1, w2);
     compareWitnesses(w1, w3);
   }
 
   public void testXMLFileA() throws SAXException, IOException {
-    Witness w1 = witnessBuilder.build(xmlFileSimpleA);
-    Witness w2 = witnessBuilder.build(xmlFileTokenA);
+    Witness w1 = witnessBuilder.build(xmlFileSimpleA, ContentType.TEXT_XML);
+    Witness w2 = witnessBuilder.build(xmlFileTokenA, ContentType.TEXT_XML);
+    Witness w3 = witnessBuilder.build(plainTextFileA, ContentType.TEXT_PLAIN);
 
     compareWitnesses(w1, w2);
+    compareWitnesses(w1, w3);
+    compareWitnesses(w2, w3);
   }
 
   public void testXMLFileB() throws SAXException, IOException {
-    Witness w1 = witnessBuilder.build(xmlFileSimpleB);
-    Witness w2 = witnessBuilder.build(xmlFileTokenB);
+    Witness w1 = witnessBuilder.build(xmlFileSimpleB, ContentType.TEXT_XML);
+    Witness w2 = witnessBuilder.build(xmlFileTokenB, ContentType.TEXT_XML);
+    Witness w3 = witnessBuilder.build(plainTextFileB, ContentType.TEXT_PLAIN);
 
     compareWitnesses(w1, w2);
+    compareWitnesses(w1, w3);
+    compareWitnesses(w2, w3);
   }
 
   public void testEmptyStream() {
     Witness w = null;
     try {
-      w = witnessBuilder.build(new ByteArrayInputStream(new byte[0]));
+      w = witnessBuilder.build(new ByteArrayInputStream(new byte[0]), ContentType.TEXT_XML);
       fail();
     } catch (SAXException e) {
       //
@@ -136,7 +145,7 @@ public class WitnessBuilderTest extends TestCase {
   public void testNullStream() {
     try {
       try {
-        Witness w = witnessBuilder.build((InputStream) null);
+        Witness w = witnessBuilder.build((InputStream) null, ContentType.TEXT_XML);
       } catch (SAXException e) {
         fail();
       } catch (IOException e) {
@@ -151,7 +160,7 @@ public class WitnessBuilderTest extends TestCase {
   public void testBrokenXml() {
     Witness brokenW = null;
     try {
-      brokenW = witnessBuilder.build(brokenXmlSimpleA);
+      brokenW = witnessBuilder.build(brokenXmlSimpleA, ContentType.TEXT_XML);
       fail();
     } catch (SAXException e) {
       //
@@ -162,13 +171,13 @@ public class WitnessBuilderTest extends TestCase {
 
   public void testEmptyXml() {
     try {
-      Witness w = witnessBuilder.build(emptyXml);
+      Witness w = witnessBuilder.build(emptyXml, ContentType.TEXT_XML);
+      assertEquals(w.sentence, "");
+      assertEquals(w.getWords().size(), 0);
     } catch (SAXException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      fail();
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      fail();
     }
   }
 
@@ -178,4 +187,22 @@ public class WitnessBuilderTest extends TestCase {
     assertEquals(witness.getWords().size(), 0);
   }
 
+  public void testValueOfContentType() {
+    assertEquals(ContentType.value("text/xml"), ContentType.TEXT_XML);
+    assertEquals(ContentType.value("text/plain"), ContentType.TEXT_PLAIN);
+    assertEquals(ContentType.value(""), null);
+  }
+
+  public void testWrongContentType() {
+    try {
+      Witness w = witnessBuilder.build(emptyXml, ContentType.value("xxx"));
+      fail();
+    } catch (SAXException e) {
+      fail();
+    } catch (IOException e) {
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals(e.getMessage(), "Given content type is unsupported!");
+    }
+  }
 }
