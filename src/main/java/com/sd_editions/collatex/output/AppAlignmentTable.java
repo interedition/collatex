@@ -5,13 +5,16 @@ import com.sd_editions.collatex.match.views.TextElement;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.MatchUnmatch;
 import com.sd_editions.collatex.permutations.MisMatch;
+import com.sd_editions.collatex.permutations.MultiMatch;
+import com.sd_editions.collatex.permutations.MultiMatchUnmatch;
 import com.sd_editions.collatex.permutations.Word;
 import com.sd_editions.collatex.views.AppElementTEI;
 
 public class AppAlignmentTable {
 
-  private final MatchUnmatch matchUnmatch;
+  private MatchUnmatch matchUnmatch;
   private final Element[] cells;
+  private MultiMatchUnmatch multiMatchUnmatch;
 
   public AppAlignmentTable(MatchUnmatch _matchUnmatch) {
     // FIXME we should decide somewhere _which_ of the permutations we chose. 
@@ -25,6 +28,22 @@ public class AppAlignmentTable {
 
     for (MisMatch unmatch : matchUnmatch.getUnmatches()) {
       // FIXME somehow propagate Bram's witness id here after merge
+      cells[unmatch.getBase().getStartPosition() * 2] = new AppElementTEI(unmatch.getBase(), unmatch.getWitness());
+    }
+
+  }
+
+  public AppAlignmentTable(MultiMatchUnmatch _multiMatchUnmatch) {
+    // FIXME we should decide somewhere _which_ of the permutations we chose. 
+    this.multiMatchUnmatch = _multiMatchUnmatch;
+    cells = new Element[100]; // FIXME use maximum number of words per witness -- but need witness here
+
+    for (MultiMatch mmatch : multiMatchUnmatch.getMatches()) {
+      Word matchedWord = mmatch.getWords().get(0);
+      cells[matchedWord.position * 2 + 1] = new TextElement(matchedWord);
+    }
+
+    for (MisMatch unmatch : multiMatchUnmatch.getUnmatches()) {
       cells[unmatch.getBase().getStartPosition() * 2] = new AppElementTEI(unmatch.getBase(), unmatch.getWitness());
     }
 

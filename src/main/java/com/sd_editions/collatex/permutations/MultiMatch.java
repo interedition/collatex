@@ -19,13 +19,16 @@ public class MultiMatch {
 
   public void addMatchingWord(Word word) {
     if (word.normalized.equals(this.name)) {
-      String witnessId = word.getWitnessId();
-      similarWordsPerWitness.get(witnessId).add(word);
+      similarWordsPerWitness.get(word.getWitnessId()).add(word);
     }
   }
 
   public List<Word> getOccurancesInWitness(String witnessId) {
     return (List<Word>) similarWordsPerWitness.get(witnessId);
+  }
+
+  public List<Word> getWords() {
+    return (List<Word>) similarWordsPerWitness.values();
   }
 
   /*

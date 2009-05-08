@@ -2,7 +2,9 @@ package com.sd_editions.collatex.Block;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 
+import com.google.common.base.Join;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
 public class Util {
@@ -35,6 +37,10 @@ public class Util {
 
   public static void p(Object o) {
     System.out.println("<" + o + ">");
+  }
+
+  public static void p(Collection c) {
+    System.out.println("[" + Join.join(",", c) + "]");
   }
 
   public static void p(String label, Object o) {

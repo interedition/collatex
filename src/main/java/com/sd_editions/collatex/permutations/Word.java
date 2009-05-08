@@ -34,4 +34,5 @@ public class Word {
   public String getWitnessId() {
     return witnessId;
   }
+
 }

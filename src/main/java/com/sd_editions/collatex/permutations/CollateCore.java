@@ -2,14 +2,12 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -43,8 +41,8 @@ public class CollateCore {
   public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
     Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
     List<Set<Match>> permutationList = matches.permutations();
-    List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
 
+    List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
     for (Set<Match> permutation : permutationList) {
       List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
       List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
@@ -54,9 +52,19 @@ public class CollateCore {
     return matchUnmatchList;
   }
 
-  /**
-   * Temporary heuristics for the best collation without relying on the analyzation stage.
-   * 
+  public List<List<MatchUnmatch>> getAllMatchUnmatchPermutations() {
+    List<List<MatchUnmatch>> matchUnmatchPermutationsForAllWitnessPairs = Lists.newArrayList();
+    final int numberOfWitnesses = numberOfWitnesses();
+    for (int w1 = 0; w1 < numberOfWitnesses - 1; w1++) {
+      for (int w2 = w1 + 1; w2 < numberOfWitnesses; w2++) {
+        matchUnmatchPermutationsForAllWitnessPairs.add(doCompareWitnesses(witnesses.get(w1), witnesses.get(w2)));
+      }
+    }
+    return matchUnmatchPermutationsForAllWitnessPairs;
+  }
+
+  /*
+   * Temporary heuristics for the best collation without relying on the analysis stage.
    * Looking for a new home ...
    */
   public void sortPermutationsByUnmatches(List<MatchUnmatch> matchUnmatchList) {
@@ -149,6 +157,7 @@ public class CollateCore {
     return witnesses.size();
   }
 
+  @Deprecated
   public List<MatchSequence> getMatchSequences(int i, int j) {
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
@@ -158,47 +167,4 @@ public class CollateCore {
     return SequenceDetection.calculateMatchSequences(matches);
   }
 
-  public HashMap<String, MultiMatch> generateBase() {
-    // initialize with the first 2 witnesses
-    Witness base = getWitness(1);
-    Witness witness = getWitness(2);
-    HashMap<String, MultiMatch> multiMatchesPerNormalizedWord = Maps.newHashMap();
-    for (Word baseword : base.getWords()) {
-      String normalized = baseword.normalized;
-      if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
-        multiMatchesPerNormalizedWord.get(normalized).addMatchingWord(baseword);
-      }
-      for (Word witnessword : witness.getWords()) {
-        if (normalized.equals(witnessword.normalized)) {
-          MultiMatch mm;
-          if (multiMatchesPerNormalizedWord.containsKey(normalized)) {
-            mm = multiMatchesPerNormalizedWord.get(normalized);
-            mm.addMatchingWord(witnessword);
-          } else {
-            mm = new MultiMatch(baseword, witnessword);
-          }
-          multiMatchesPerNormalizedWord.put(normalized, mm);
-        }
-      }
-    }
-    // go over the rest of the witnesses, comparing the normalizedwords from the multimatches
-    for (int i = 3; i <= witnesses.size(); i++) {
-      witness = getWitness(i);
-      for (String normalized : multiMatchesPerNormalizedWord.keySet()) {
-        boolean normalizedHasMatchInThisWitness = false;
-        for (Word witnessword : witness.getWords()) {
-          if (normalized.equals(witnessword.normalized)) {
-            MultiMatch mm = multiMatchesPerNormalizedWord.get(normalized);
-            mm.addMatchingWord(witnessword);
-            multiMatchesPerNormalizedWord.put(normalized, mm);
-            normalizedHasMatchInThisWitness = true;
-          }
-        }
-        if (!normalizedHasMatchInThisWitness) {
-          multiMatchesPerNormalizedWord.remove(normalized);
-        }
-      }
-    }
-    return multiMatchesPerNormalizedWord;
-  }
 }
