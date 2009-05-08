@@ -36,11 +36,14 @@ public class MatchUnmatch {
 
   public double getVariationMeasure() {
 
+    return 1000.0 * matchSequencesForBase.size() + 10.0 * unmatches.size() + getWordDistanceSum();
+  }
+
+  public float getWordDistanceSum() {
     float wordDistanceSum = 0f;
     for (MatchSequence matchSequence : matchSequencesForBase)
       for (Match match : matchSequence.getMatches())
         wordDistanceSum += match.wordDistance;
-
-    return 1000.0 * matchSequencesForBase.size() + 10.0 * unmatches.size() + wordDistanceSum;
+    return wordDistanceSum;
   }
 }
