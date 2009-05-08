@@ -33,4 +33,14 @@ public class MatchUnmatch {
   public List<MisMatch> getUnmatches() {
     return unmatches;
   }
+
+  public double getVariationMeasure() {
+
+    float wordDistanceSum = 0f;
+    for (MatchSequence matchSequence : matchSequencesForBase)
+      for (Match match : matchSequence.getMatches())
+        wordDistanceSum += match.wordDistance;
+
+    return 1000.0 * matchSequencesForBase.size() + 10.0 * unmatches.size() + wordDistanceSum;
+  }
 }

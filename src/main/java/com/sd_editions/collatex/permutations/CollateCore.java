@@ -68,6 +68,15 @@ public class CollateCore {
     Collections.sort(matchUnmatchList, comparator);
   }
 
+  public void sortPermutationsByVariation(List<MatchUnmatch> matchUnmatchList) {
+    Comparator<MatchUnmatch> comparator = new Comparator<MatchUnmatch>() {
+      public int compare(MatchUnmatch o1, MatchUnmatch o2) {
+        return Double.compare(o1.getVariationMeasure(), o2.getVariationMeasure());
+      }
+    };
+    Collections.sort(matchUnmatchList, comparator);
+  }
+
   private void sortPermutationsByRelevance(List<Modifications> modificationsList) {
     Comparator<Modifications> comparator = new Comparator<Modifications>() {
       public int compare(Modifications o1, Modifications o2) {
