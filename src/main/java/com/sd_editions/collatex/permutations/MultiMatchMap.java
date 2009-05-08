@@ -2,7 +2,6 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -13,7 +12,6 @@ import com.google.common.collect.Sets;
 
 public class MultiMatchMap {
   private final LinkedHashMap<String, MultiMatch> mmm;
-  private List<Set<MultiMatch>> permutations;
 
   public MultiMatchMap(Witness... witnesses) {
     this.mmm = Maps.newLinkedHashMap();
@@ -61,11 +59,6 @@ public class MultiMatchMap {
 
   public String getNormalizedMatchSentence() {
     return Join.join(" ", mmm.keySet());
-  }
-
-  public List<Set<MultiMatch>> permutations() {
-    if (permutations == null) permutations = new MultiMatchPermutator(mmm).permutations();
-    return permutations;
   }
 
   /* Delegated methods after here */

@@ -59,12 +59,10 @@ public class CollateCore {
   }
 
   public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
-    //  public List<MatchUnmatch> doCompareWitnesses(Witness... witnesses) {
     Matches matches = new Matches(base, witness, new Levenshtein());
-    //    MultiMatchMap matches = new MultiMatchMap(Lists.newArrayList(witnesses));
     List<Set<Match>> permutationList = matches.permutations();
-    List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
 
+    List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
     for (Set<Match> permutation : permutationList) {
       List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
       List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
@@ -74,8 +72,19 @@ public class CollateCore {
     return matchUnmatchList;
   }
 
+  public List<List<MatchUnmatch>> getAllMatchUnmatchPermutations() {
+    List<List<MatchUnmatch>> matchUnmatchPermutationsForAllWitnessPairs = Lists.newArrayList();
+    final int numberOfWitnesses = numberOfWitnesses();
+    for (int w1 = 0; w1 < numberOfWitnesses - 1; w1++) {
+      for (int w2 = w1 + 1; w2 < numberOfWitnesses; w2++) {
+        matchUnmatchPermutationsForAllWitnessPairs.add(doCompareWitnesses(witnesses.get(w1), witnesses.get(w2)));
+      }
+    }
+    return matchUnmatchPermutationsForAllWitnessPairs;
+  }
+
   /*
-   * Temporary heuristics for the best collation without relying on the analyzation stage.
+   * Temporary heuristics for the best collation without relying on the analysis stage.
    * Looking for a new home ...
    */
   public void sortPermutationsByUnmatches(List<MatchUnmatch> matchUnmatchList) {
