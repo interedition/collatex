@@ -66,4 +66,12 @@ public class CollateCoreTest extends TestCase {
   private void println(String string) {
     System.out.println(string);
   }
+
+  @Test
+  public void testSortByVariation() {
+    CollateCore collateCore = new CollateCore(builder.buildWitnesses("I bought this glass, because it matches those dinner plates.", "I bought those glasses."));
+    List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(collateCore.getWitness(1), collateCore.getWitness(2));
+    collateCore.sortPermutationsByVariation(matchUnmatchList);
+    assertEquals("[(1->1), (2->2), (3->3), (4->4)]", matchUnmatchList.get(0).getPermutation().toString());
+  }
 }
