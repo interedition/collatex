@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.WordColorTuple;
 import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Match;
+import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.Witness;
@@ -65,12 +66,13 @@ public class ColorsView {
       //      if (base > 1) html.append("<span class=\"secondary\">");
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html.append("Comparing witness " + base + " - witness " + (w) + ":<ol>");
-        List<Modifications> modificationsList = colors.compareWitness(base, w);
+        List<MatchNonMatch> matchNonMatchList = colors.doCompareWitnesses(colors.getWitness(base), colors.getWitness(w));
         int pn = 1;
-        for (Modifications modifications : modificationsList) {
+        for (MatchNonMatch matchNonMatch : matchNonMatchList) {
           if (pn > 1) html.append("<span class=\"secondary\">");
-          html.append("<span class=\"secondary\">Permutation " + pn++ + "/" + modificationsList.size() + "</span><ul>");
+          html.append("<span class=\"secondary\">Permutation " + pn++ + "/" + matchNonMatchList.size() + "</span><ul>");
           html.append("<span class=\"colored\" style=\"display:none\">");
+          Modifications modifications = colors.getModifications(matchNonMatch);
           html.append(witnessPairView(base, w, modifications));
           html.append("</span>");
           html.append(modificationsView(base, modifications));
