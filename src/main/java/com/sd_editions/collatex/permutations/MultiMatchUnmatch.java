@@ -7,6 +7,7 @@ import java.util.Set;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class MultiMatchUnmatch {
@@ -17,11 +18,6 @@ public class MultiMatchUnmatch {
   public MultiMatchUnmatch(MatchUnmatch... _matchUnmatches) {
     this.matches = determineAllCommonMatches(_matchUnmatches);
     this.unmatches = determineUnmatches();
-  }
-
-  private List<MisMatch> determineUnmatches() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   private Set<MultiMatch> determineAllCommonMatches(MatchUnmatch... matchUnmatches) {
@@ -72,6 +68,14 @@ public class MultiMatchUnmatch {
     }
 
     return commonMatches;
+  }
+
+  private List<MisMatch> determineUnmatches() {
+    List<MisMatch> misMatchList = Lists.newArrayList();
+    for (MultiMatch multiMatch : this.matches) {
+
+    }
+    return misMatchList;
   }
 
   public Set<MultiMatch> getMatches() {
