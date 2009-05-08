@@ -22,6 +22,7 @@ public class CollateCore {
     this.witnesses = Lists.newArrayList(_witnesses);
   }
 
+  @Deprecated
   public List<Modifications> compareWitness(int i, int j) {
     List<Modifications> modificationsList = Lists.newArrayList();
     Witness base = getWitness(i);
@@ -29,13 +30,17 @@ public class CollateCore {
     List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(base, witness);
 
     for (MatchNonMatch matchNonMatch : matchNonMatchList) {
-      List<Transposition> transpositions = determineTranspositions(matchNonMatch.getMatchSequencesForBase(), matchNonMatch.getMatchSequencesForWitness());
-      List<Modification> modifications = determineModifications(matchNonMatch.getMatches(), determineNonMatches(base, witness, matchNonMatch.getMatchSequencesForBase(), matchNonMatch
-          .getMatchSequencesForWitness()));
-      modificationsList.add(new Modifications(modifications, transpositions, matchNonMatch.getMatches()));
+      modificationsList.add(getModifications(matchNonMatch));
     }
     sortPermutationsByRelevance(modificationsList);
     return modificationsList;
+  }
+
+  public Modifications getModifications(MatchNonMatch matchNonMatch) {
+    List<Transposition> transpositions = determineTranspositions(matchNonMatch.getMatchSequencesForBase(), matchNonMatch.getMatchSequencesForWitness());
+    List<Modification> modificationList = determineModifications(matchNonMatch.getMatches(), matchNonMatch.getNonMatches());
+    Modifications modifications = new Modifications(modificationList, transpositions, matchNonMatch.getMatches());
+    return modifications;
   }
 
   public List<MatchNonMatch> doCompareWitnesses(Witness base, Witness witness) {
@@ -49,6 +54,7 @@ public class CollateCore {
       List<NonMatch> nonMatches = determineNonMatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
       matchNonMatchList.add(new MatchNonMatch(permutation, matchSequencesByBase, matchSequencesByWitness, nonMatches));
     }
+    sortPermutationsByVariation(matchNonMatchList);
     return matchNonMatchList;
   }
 
