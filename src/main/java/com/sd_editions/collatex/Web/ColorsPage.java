@@ -18,12 +18,13 @@ import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.WitnessBuilder;
+import com.sd_editions.collatex.permutations.WitnessBuilder.ContentType;
 
 @SuppressWarnings("serial")
 public class ColorsPage extends WebPage {
 
   public ColorsPage() {
-    ColorsModel model = new ColorsModel("base", "", "", "");
+    ColorsModel model = new ColorsModel("", "", "", "");
     add(new Label("colorview", new PropertyModel(model, "html")).setEscapeModelStrings(false));
     add(new ColorsForm("alignmentform", model));
     add(new BookmarkablePageLink("usecaselink", UseCasePage.class));
@@ -40,10 +41,10 @@ class ColorsModel implements Serializable {
   public String witness3;
   public String witness4;
   public String html;
-  public FileUpload witnessFile1;
-  public FileUpload witnessFile2;
-  public FileUpload witnessFile3;
-  public FileUpload witnessFile4;
+  public transient FileUpload witnessFile1;
+  public transient FileUpload witnessFile2;
+  public transient FileUpload witnessFile3;
+  public transient FileUpload witnessFile4;
 
   public ColorsModel(String _witness1, String _witness2, String _witness3, String _witness4) {
     this.witness1 = _witness1;
@@ -54,20 +55,19 @@ class ColorsModel implements Serializable {
   }
 
   public void generateHTML() {
-    List<String> messages = Lists.newArrayList();
-    Witness[] witnesses = getWitnesses(messages);
-    //    Util.p(witnesses);
-    CollateCore colors = new CollateCore(witnesses);
-    ColorsView colorsView = new ColorsView(colors);
-    colorsView.addMessages(messages);
-    this.html = colorsView.toHtml();
+    this.html = getView().toHtml();
 
   }
 
   private void add(String witness, FileUpload witnessFile, List<Witness> witnesses, List<String> messages) {
     if (witnessFile != null) {
       try {
-        witnesses.add(new WitnessBuilder().build(witnessFile.getInputStream()));
+        ContentType type = WitnessBuilder.ContentType.value(witnessFile.getContentType());
+        if (type != null) {
+          witnesses.add(new WitnessBuilder().build(witnessFile.getInputStream(), type));
+        } else {
+          messages.add("Invalid content type of file: " + witnessFile.getClientFileName());
+        }
       } catch (SAXException e) {
         messages.add("Invalid file: " + witnessFile.getClientFileName());
       } catch (IOException e) {
@@ -80,18 +80,15 @@ class ColorsModel implements Serializable {
     }
   }
 
-  public Witness[] getWitnesses(List<String> messages) {
+  public ColorsView getView() {
+    List<String> messages = Lists.newArrayList();
     List<Witness> witnesses = Lists.newArrayList();
     add(witness1, witnessFile1, witnesses, messages);
     add(witness2, witnessFile2, witnesses, messages);
     add(witness3, witnessFile3, witnesses, messages);
     add(witness4, witnessFile4, witnesses, messages);
-    witnessFile1 = null;
-    witnessFile2 = null;
-    witnessFile3 = null;
-    witnessFile4 = null;
 
-    return witnesses.toArray(new Witness[0]);
+    return new ColorsView(new CollateCore(witnesses.toArray(new Witness[0])), messages);
   }
 }
 
@@ -115,7 +112,6 @@ class ColorsForm extends Form {
 
   @Override
   protected void onSubmit() {
-    //    modelForView.uploadFiles();
     modelForView.generateHTML();
   }
 }

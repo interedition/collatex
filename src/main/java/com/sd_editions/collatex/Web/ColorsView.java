@@ -25,6 +25,11 @@ public class ColorsView {
 
   private final List<String> messages;
 
+  public ColorsView(CollateCore _colors, List<String> messages) {
+    this.colors = _colors;
+    this.messages = messages;
+  }
+
   public ColorsView(CollateCore _colors) {
     this.colors = _colors;
     this.messages = Lists.newArrayList();
@@ -42,10 +47,6 @@ public class ColorsView {
       buffer.append(msg + "<br/>");
     }
     return buffer.toString();
-  }
-
-  public void addMessages(List<String> messages) {
-    this.messages.addAll(messages);
   }
 
   private String witnesses() {
