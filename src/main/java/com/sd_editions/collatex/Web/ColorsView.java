@@ -8,12 +8,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.WordColorTuple;
 import com.sd_editions.collatex.permutations.CollateCore;
-import com.sd_editions.collatex.permutations.WordDistanceMatch;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
+import com.sd_editions.collatex.permutations.WordDistanceMatch;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
@@ -23,16 +23,33 @@ public class ColorsView {
 
   private final CollateCore colors;
 
+  private final List<String> messages;
+
   public ColorsView(CollateCore _colors) {
     this.colors = _colors;
+    this.messages = Lists.newArrayList();
   }
 
   public String toHtml() {
-    return witnesses() + modifications();
+    return messages() + witnesses() + modifications();
+  }
+
+  private String messages() {
+    if (messages.isEmpty()) return "";
+    StringBuffer buffer = new StringBuffer();
+    buffer.append("<h4>Messages:</h4>");
+    for (String msg : messages) {
+      buffer.append(msg + "<br/>");
+    }
+    return buffer.toString();
+  }
+
+  public void addMessages(List<String> messages) {
+    this.messages.addAll(messages);
   }
 
   private String witnesses() {
-    StringBuffer html = new StringBuffer("");
+    StringBuffer html = new StringBuffer("<h4>Witnesses:</h4>");
     for (int row = 0; row < colors.numberOfWitnesses(); row++) {
       html.append("<b>Witness " + (row + 1) + "</b>: " + colors.witnesses.get(row).sentence + "<br/>");
     }

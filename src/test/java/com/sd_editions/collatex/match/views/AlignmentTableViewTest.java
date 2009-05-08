@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Modifications;
+import com.sd_editions.collatex.permutations.WitnessBuilder;
 
 public class AlignmentTableViewTest {
   @Test
@@ -44,7 +45,8 @@ public class AlignmentTableViewTest {
     // TODO: make a constructor for Witness, Witness
     //    Witness base = new Witness(w1);
     //    Witness witness = new Witness(w2);
-    CollateCore core = new CollateCore(w1, w2);
+    WitnessBuilder builder = new WitnessBuilder();
+    CollateCore core = new CollateCore(builder.build(w1), builder.build(w2));
     Modifications modifications = core.compareWitness(1, 2).get(0);
     AlignmentTable table = new AlignmentTable(modifications);
     String xml = table.toXML();

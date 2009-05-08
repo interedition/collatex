@@ -45,7 +45,8 @@ public class XMLAppOutputTest {
   }
 
   private String collateWitnessStrings(String witnessA, String witnessB) {
-    CollateCore collateCore = new CollateCore(witnessA, witnessB); // ignored actually.
+    WitnessBuilder builder = new WitnessBuilder();
+    CollateCore collateCore = new CollateCore(builder.build(witnessA), builder.build(witnessB)); // ignored actually.
     List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(builder.build("A", witnessA), builder.build("B", witnessB));
 
     collateCore.sortPermutationsByUnmatches(matchUnmatchList);

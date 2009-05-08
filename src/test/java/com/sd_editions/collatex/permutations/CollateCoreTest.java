@@ -10,9 +10,17 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
 public class CollateCoreTest extends TestCase {
+  private WitnessBuilder builder;
+
+  @Override
+  protected void setUp() throws Exception {
+    builder = new WitnessBuilder();
+    super.setUp();
+  }
+
   @Test
   public void testGetAllMatchUnmatchPermutations() {
-    CollateCore cc = new CollateCore("The black car", "The dark car", "the dark day");
+    CollateCore cc = new CollateCore(builder.buildWitnesses("The black car", "The dark car", "the dark day"));
     List<List<MatchUnmatch>> allMatchUnmatchPermutations = cc.getAllMatchUnmatchPermutations();
     // there should be 3 witness pairs
     assertEquals(3, allMatchUnmatchPermutations.size());
@@ -23,7 +31,7 @@ public class CollateCoreTest extends TestCase {
 
   @Test
   public void testGetAllMatchUnmatchPermutations1() {
-    CollateCore cc = new CollateCore("The cat chases the dog and mouse", "The dog chases the cat and mouse", "the dog and mouse chase the cat");
+    CollateCore cc = new CollateCore(builder.buildWitnesses("The cat chases the dog and mouse", "The dog chases the cat and mouse", "the dog and mouse chase the cat"));
     List<List<MatchUnmatch>> allMatchUnmatchPermutations = cc.getAllMatchUnmatchPermutations();
     showAllMatchUnmatchPermutations(allMatchUnmatchPermutations);
     assertEquals(3, allMatchUnmatchPermutations.size());

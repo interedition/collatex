@@ -5,9 +5,17 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 public class MultiMatchMapTest extends TestCase {
+
+  private WitnessBuilder builder;
+
+  @Override
+  protected void setUp() throws Exception {
+    builder = new WitnessBuilder();
+    super.setUp();
+  }
+
   @Test
   public void testDetermineBase() {
-    WitnessBuilder builder = new WitnessBuilder();
     Witness witness1 = builder.build("The Black Cat");
     Witness witness2 = builder.build("The Cat and the Dog");
     Witness witness3 = builder.build("The White Cat");
@@ -28,7 +36,6 @@ public class MultiMatchMapTest extends TestCase {
 
   @Test
   public void testMultiMatchShrinksAtThirdWitness() {
-    WitnessBuilder builder = new WitnessBuilder();
     Witness witness1 = builder.build("The Black Cat");
     Witness witness2 = builder.build("The black dog and white cat");
     Witness witness3 = builder.build("The White Cat");

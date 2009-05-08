@@ -1,24 +1,29 @@
 package com.sd_editions.collatex.match.worddistance;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
 
-public class NormalizedLevenshteinTest extends TestCase {
+public class NormalizedLevenshteinTest {
+
+  private static final float THRESHOLD = 0.5f;
+
   @Test
-  public void testNormalizedLevenshtein() {
+  public void testThisThoseDistance() {
     NormalizedLevenshtein normalizedLevenshtein = new NormalizedLevenshtein();
-    Levenshtein levenshtein = new Levenshtein();
-
-    Util.p(levenshtein.distance("this", "those"));
-    Util.p(normalizedLevenshtein.distance("this", "those"));
-
-    Util.p(levenshtein.distance("glass", "glasses"));
-    Util.p(normalizedLevenshtein.distance("glass", "glasses"));
-
-    Util.p(levenshtein.distance("glasses", "plates"));
-    Util.p(normalizedLevenshtein.distance("glasses", "plates"));
+    float thisThoseDistance = normalizedLevenshtein.distance("this", "those");
+    Util.p("this" + " ~ " + "those" + ":" + thisThoseDistance);
+    assertTrue("this ~ those > threshold: " + thisThoseDistance, thisThoseDistance < THRESHOLD);
   }
+
+  @Test
+  public void testSomethingElseDistance() {
+    NormalizedLevenshtein normalizedLevenshtein = new NormalizedLevenshtein();
+    float somethingElseDistance = normalizedLevenshtein.distance("something", "else");
+    Util.p("something" + " ~ " + "else" + ":" + somethingElseDistance);
+    assertTrue("something ~ else < threshold: " + somethingElseDistance, somethingElseDistance > THRESHOLD);
+  }
+
 }

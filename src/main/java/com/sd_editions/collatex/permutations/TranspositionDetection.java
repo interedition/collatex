@@ -37,6 +37,22 @@ public class TranspositionDetection {
     return filteredMatchSequences;
   }
 
+  /**
+   * simpler replacement for {@link #createTranspositions(List)}
+   */
+  public static List<Transposition> createTranspositions(List<Tuple2<MatchSequence>> possibleTranspositionTuples) {
+    List<Transposition> transpositions;
+    transpositions = Lists.newArrayList();
+    for (Tuple2<MatchSequence> possibleTranspositionTuple : possibleTranspositionTuples) {
+      transpositions.add(new Transposition(possibleTranspositionTuple.right, possibleTranspositionTuple.left));
+    }
+    return transpositions;
+  }
+
+  /**
+   * @deprecated use {@link #createTranspositions(List)} instead
+   */
+  @Deprecated
   protected static List<Transposition> calculateTranspositions(final List<Tuple2<MatchSequence>> possibleTranspositionTuples) {
     // here we go and filter.. so that only transpositions are kept..
     // later on we filter away duplicates

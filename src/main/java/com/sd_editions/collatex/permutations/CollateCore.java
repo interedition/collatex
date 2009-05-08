@@ -1,18 +1,14 @@
 package com.sd_editions.collatex.permutations;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import org.xml.sax.SAXException;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.match.worddistance.Levenshtein;
+import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
@@ -22,24 +18,8 @@ public class CollateCore {
 
   public final List<Witness> witnesses;
 
-  public CollateCore(String... _witnessStrings) {
-    this.witnesses = Lists.newArrayList();
-    WitnessBuilder builder = new WitnessBuilder();
-    for (String witnessString : _witnessStrings) {
-      this.witnesses.add(builder.build(witnessString));
-    }
-  }
-
-  public CollateCore(InputStream... _witnessStrings) throws SAXException, IOException {
-    this.witnesses = Lists.newArrayList();
-    WitnessBuilder builder = new WitnessBuilder();
-    for (InputStream witnessString : _witnessStrings) {
-      this.witnesses.add(builder.build(witnessString));
-    }
-  }
-
-  public CollateCore(List<String> _witnessStrings) {
-    this(_witnessStrings.toArray(new String[_witnessStrings.size()]));
+  public CollateCore(Witness... _witnesses) {
+    this.witnesses = Lists.newArrayList(_witnesses);
   }
 
   public List<Modifications> compareWitness(int i, int j) {
@@ -59,7 +39,7 @@ public class CollateCore {
   }
 
   public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
-    Matches matches = new Matches(base, witness, new Levenshtein());
+    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
     List<Set<Match>> permutationList = matches.permutations();
 
     List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
@@ -122,7 +102,7 @@ public class CollateCore {
   private List<Transposition> determineTranspositions(List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
     List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-    List<Transposition> transpositions = TranspositionDetection.calculateTranspositions(possibleTranspositionTuples);
+    List<Transposition> transpositions = TranspositionDetection.createTranspositions(possibleTranspositionTuples);
     return transpositions;
   }
 
@@ -166,7 +146,7 @@ public class CollateCore {
   }
 
   public Matches getMatches(int i, int j) {
-    return new Matches(getWitness(i), getWitness(j), new Levenshtein());
+    return new Matches(getWitness(i), getWitness(j), new NormalizedLevenshtein());
   }
 
   public Witness getWitness(int i) {
@@ -181,7 +161,7 @@ public class CollateCore {
   public List<MatchSequence> getMatchSequences(int i, int j) {
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
-    Matches xmatches = new Matches(base, witness, new Levenshtein());
+    Matches xmatches = new Matches(base, witness, new NormalizedLevenshtein());
     List<Set<Match>> permutationList = xmatches.permutations();
     Set<Match> matches = permutationList.get(0);
     return SequenceDetection.calculateMatchSequences(matches);

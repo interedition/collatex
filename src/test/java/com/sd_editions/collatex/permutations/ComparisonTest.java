@@ -141,7 +141,7 @@ public class ComparisonTest extends TestCase {
   }
 
   private void symmetryTest(String string1, String string2) {
-    CollateCore colors = new CollateCore(string1, string2);
+    CollateCore colors = new CollateCore(builder.build(string1), builder.build(string2));
     //    Util.p("ORIGINAL");
     List<Modifications> permutations = colors.compareWitness(1, 2);
     //    Util.p("MIRROR");
@@ -168,7 +168,7 @@ public class ComparisonTest extends TestCase {
   //  }
 
   private Modifications getModifications(String base, String witness) {
-    List<Modifications> permutations = new CollateCore(base, witness).compareWitness(1, 2);
+    List<Modifications> permutations = new CollateCore(builder.build(base), builder.build(witness)).compareWitness(1, 2);
     assertEquals(1, permutations.size());
     return permutations.get(0);
   }

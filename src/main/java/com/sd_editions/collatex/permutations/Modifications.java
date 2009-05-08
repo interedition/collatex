@@ -25,7 +25,7 @@ public class Modifications {
   public List<Modification> getModifications() {
     List<Modification> addedUp = Lists.newArrayList();
     addedUp.addAll(modifications);
-    //    addedUp.addAll(transpositions);
+    addedUp.addAll(transpositions);
     return addedUp;
   }
 
