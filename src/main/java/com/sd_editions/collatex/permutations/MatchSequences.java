@@ -6,8 +6,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 public class MatchSequences {
-  static List<MisMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
-    List<MisMatch> variants = Lists.newArrayList();
+  static List<NonMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
+    List<NonMatch> variants = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
       List<Match> matches = sequence.getMatches();
       if (matches.size() > 1) {
@@ -25,8 +25,8 @@ public class MatchSequences {
             //            System.out.println(gapSizeBase + ":" + gapSizeWitness);
             Gap gapBase = new Gap(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1);
             Gap gapWitness = new Gap(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1);
-            MisMatch misMatch = new MisMatch(gapBase, gapWitness);
-            variants.add(misMatch);
+            NonMatch nonMatch = new NonMatch(gapBase, gapWitness);
+            variants.add(nonMatch);
           }
           previous = next;
         }
@@ -35,25 +35,25 @@ public class MatchSequences {
     return variants;
   }
 
-  static List<Modification> analyseVariants(List<MisMatch> variants) {
+  static List<Modification> analyseVariants(List<NonMatch> variants) {
     List<Modification> results = Lists.newArrayList();
-    for (MisMatch misMatch : variants) {
-      Modification modification = misMatch.analyse();
+    for (NonMatch nonMatch : variants) {
+      Modification modification = nonMatch.analyse();
       results.add(modification);
     }
     return results;
   }
 
-  static List<MisMatch> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
+  static List<NonMatch> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
     List<Gap> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
     List<Gap> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
-    List<MisMatch> variants = Lists.newArrayList();
+    List<NonMatch> variants = Lists.newArrayList();
     for (int i = 0; i < gapsBase.size(); i++) {
       Gap gapBase = gapsBase.get(i);
       Gap gapWitness = gapsWitness.get(i);
       if (gapBase.hasGap() || gapWitness.hasGap()) {
-        MisMatch misMatch = new MisMatch(gapBase, gapWitness);
-        variants.add(misMatch);
+        NonMatch nonMatch = new NonMatch(gapBase, gapWitness);
+        variants.add(nonMatch);
       }
     }
     return variants;

@@ -8,7 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sd_editions.collatex.permutations.CollateCore;
-import com.sd_editions.collatex.permutations.MatchUnmatch;
+import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.WitnessBuilder;
 
 public class XMLAppOutputTest {
@@ -47,15 +47,15 @@ public class XMLAppOutputTest {
   private String collateWitnessStrings(String witnessA, String witnessB) {
     WitnessBuilder builder = new WitnessBuilder();
     CollateCore collateCore = new CollateCore(builder.build(witnessA), builder.build(witnessB)); // ignored actually.
-    List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(builder.build("A", witnessA), builder.build("B", witnessB));
+    List<MatchNonMatch> matchNonMatchList = collateCore.doCompareWitnesses(builder.build("A", witnessA), builder.build("B", witnessB));
 
-    collateCore.sortPermutationsByUnmatches(matchUnmatchList);
+    collateCore.sortPermutationsByNonMatches(matchNonMatchList);
 
-    for (MatchUnmatch matchUnmatch : matchUnmatchList) {
-      System.out.println(new AppAlignmentTable(matchUnmatch).toXML());
+    for (MatchNonMatch matchNonMatch : matchNonMatchList) {
+      System.out.println(new AppAlignmentTable(matchNonMatch).toXML());
     }
 
-    AppAlignmentTable alignmentTable = new AppAlignmentTable(matchUnmatchList.get(0));
+    AppAlignmentTable alignmentTable = new AppAlignmentTable(matchNonMatchList.get(0));
     String xml = alignmentTable.toXML();
     return xml;
   }

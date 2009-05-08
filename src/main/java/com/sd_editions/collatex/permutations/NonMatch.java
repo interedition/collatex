@@ -4,7 +4,7 @@ import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
-public class MisMatch {
+public class NonMatch {
   final Gap base;
   final Gap witness;
 
@@ -16,7 +16,7 @@ public class MisMatch {
     return witness;
   }
 
-  public MisMatch(Gap _base, Gap _witness) {
+  public NonMatch(Gap _base, Gap _witness) {
     this.base = _base;
     this.witness = _witness;
   }

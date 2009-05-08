@@ -172,7 +172,7 @@ public class MatchSequenceTest extends TestCase {
     Match b = new Match(bB, bW);
     MatchSequence sequence = new MatchSequence(1, a, b);
     List<MatchSequence> sequences = Lists.newArrayList(sequence);
-    List<MisMatch> variants = MatchSequences.getVariantsInMatchSequences(base, witness, sequences);
+    List<NonMatch> variants = MatchSequences.getVariantsInMatchSequences(base, witness, sequences);
     List<Modification> results = MatchSequences.analyseVariants(variants);
     List<Modification> modificationsInMatchSequences = results;
     assertEquals(1, modificationsInMatchSequences.size());
@@ -191,7 +191,7 @@ public class MatchSequenceTest extends TestCase {
     Match b = new Match(bB, bW);
     MatchSequence sequence = new MatchSequence(1, a, b);
     List<MatchSequence> sequences = Lists.newArrayList(sequence);
-    List<MisMatch> variants = MatchSequences.getVariantsInMatchSequences(base, witness, sequences);
+    List<NonMatch> variants = MatchSequences.getVariantsInMatchSequences(base, witness, sequences);
     List<Modification> results = MatchSequences.analyseVariants(variants);
     List<Modification> modificationsInMatchSequences = results;
     assertEquals(0, modificationsInMatchSequences.size());

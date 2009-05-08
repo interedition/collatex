@@ -15,22 +15,22 @@ public class MatchesView {
 
   public String renderPermutations(Witness witnessA, Witness witnessB) {
     CollateCore collateCore = new CollateCore(witnessA, witnessB);
-    List<MatchUnmatch> matchUnmatches = collateCore.doCompareWitnesses(witnessA, witnessB);
-    collateCore.sortPermutationsByVariation(matchUnmatches);
+    List<MatchNonMatch> matchNonMatches = collateCore.doCompareWitnesses(witnessA, witnessB);
+    collateCore.sortPermutationsByVariation(matchNonMatches);
 
     StringBuilder result = new StringBuilder();
     result.append("Witness A: ").append(witnessA.sentence).append('\n');
     result.append("Witness B: ").append(witnessB.sentence).append('\n');
-    for (MatchUnmatch matchUnmatch : matchUnmatches)
-      result.append(renderPermutation(matchUnmatch));
+    for (MatchNonMatch matchNonMatch : matchNonMatches)
+      result.append(renderPermutation(matchNonMatch));
     return result.toString();
   }
 
-  private String renderPermutation(MatchUnmatch matchUnmatch) {
+  private String renderPermutation(MatchNonMatch matchNonMatch) {
     StringBuilder result = new StringBuilder();
 
-    result.append(" * Permutation: ").append(matchUnmatch.getPermutation()).append('\n');
-    List<MatchSequence> sequencesForBase = matchUnmatch.getMatchSequencesForBase();
+    result.append(" * Permutation: ").append(matchNonMatch.getMatches()).append('\n');
+    List<MatchSequence> sequencesForBase = matchNonMatch.getMatchSequencesForBase();
     for (MatchSequence matchSequence : sequencesForBase) {
       result.append("    * MatchSequence: ").append(matchSequence).append('\n');
       List<Match> matches = matchSequence.getMatches();
@@ -41,15 +41,15 @@ public class MatchesView {
       }
     }
 
-    for (MisMatch unmatch : matchUnmatch.getUnmatches()) {
-      result.append("    * Non-Match: ").append(unmatch.getBase()).append(" ~> ").append(unmatch.getWitness());
+    for (NonMatch nonMatch : matchNonMatch.getNonMatches()) {
+      result.append("    * Non-Match: ").append(nonMatch.getBase()).append(" ~> ").append(nonMatch.getWitness());
       result.append('\n');
     }
 
     result.append("   Summary: ").append(sequencesForBase.size()).append(" match sequences,\t");
-    result.append(matchUnmatch.getUnmatches().size()).append(" non-matches,\t");
-    result.append(matchUnmatch.getWordDistanceSum()).append(" summarized word distance,\t");
-    result.append(matchUnmatch.getVariationMeasure()).append(" variance\n");
+    result.append(matchNonMatch.getNonMatches().size()).append(" non-matches,\t");
+    result.append(matchNonMatch.getWordDistanceSum()).append(" summarized word distance,\t");
+    result.append(matchNonMatch.getVariationMeasure()).append(" variance\n");
     result.append('\n');
     return result.toString();
   }

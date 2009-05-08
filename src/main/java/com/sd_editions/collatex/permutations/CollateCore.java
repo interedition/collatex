@@ -26,63 +26,63 @@ public class CollateCore {
     List<Modifications> modificationsList = Lists.newArrayList();
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
-    List<MatchUnmatch> matchUnmatchList = doCompareWitnesses(base, witness);
+    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(base, witness);
 
-    for (MatchUnmatch matchUnmatch : matchUnmatchList) {
-      List<Transposition> transpositions = determineTranspositions(matchUnmatch.getMatchSequencesForBase(), matchUnmatch.getMatchSequencesForWitness());
-      List<Modification> modifications = determineModifications(matchUnmatch.getPermutation(), determineUnmatches(base, witness, matchUnmatch.getMatchSequencesForBase(), matchUnmatch
+    for (MatchNonMatch matchNonMatch : matchNonMatchList) {
+      List<Transposition> transpositions = determineTranspositions(matchNonMatch.getMatchSequencesForBase(), matchNonMatch.getMatchSequencesForWitness());
+      List<Modification> modifications = determineModifications(matchNonMatch.getMatches(), determineNonMatches(base, witness, matchNonMatch.getMatchSequencesForBase(), matchNonMatch
           .getMatchSequencesForWitness()));
-      modificationsList.add(new Modifications(modifications, transpositions, matchUnmatch.getPermutation()));
+      modificationsList.add(new Modifications(modifications, transpositions, matchNonMatch.getMatches()));
     }
     sortPermutationsByRelevance(modificationsList);
     return modificationsList;
   }
 
-  public List<MatchUnmatch> doCompareWitnesses(Witness base, Witness witness) {
+  public List<MatchNonMatch> doCompareWitnesses(Witness base, Witness witness) {
     Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
     List<Set<Match>> permutationList = matches.permutations();
 
-    List<MatchUnmatch> matchUnmatchList = Lists.newArrayList();
+    List<MatchNonMatch> matchNonMatchList = Lists.newArrayList();
     for (Set<Match> permutation : permutationList) {
       List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
       List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
-      List<MisMatch> unmatches = determineUnmatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
-      matchUnmatchList.add(new MatchUnmatch(permutation, matchSequencesByBase, matchSequencesByWitness, unmatches));
+      List<NonMatch> nonMatches = determineNonMatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
+      matchNonMatchList.add(new MatchNonMatch(permutation, matchSequencesByBase, matchSequencesByWitness, nonMatches));
     }
-    return matchUnmatchList;
+    return matchNonMatchList;
   }
 
-  public List<List<MatchUnmatch>> getAllMatchUnmatchPermutations() {
-    List<List<MatchUnmatch>> matchUnmatchPermutationsForAllWitnessPairs = Lists.newArrayList();
+  public List<List<MatchNonMatch>> getAllMatchNonMatchPermutations() {
+    List<List<MatchNonMatch>> matchNonMatchPermutationsForAllWitnessPairs = Lists.newArrayList();
     final int numberOfWitnesses = numberOfWitnesses();
     for (int w1 = 0; w1 < numberOfWitnesses - 1; w1++) {
       for (int w2 = w1 + 1; w2 < numberOfWitnesses; w2++) {
-        matchUnmatchPermutationsForAllWitnessPairs.add(doCompareWitnesses(witnesses.get(w1), witnesses.get(w2)));
+        matchNonMatchPermutationsForAllWitnessPairs.add(doCompareWitnesses(witnesses.get(w1), witnesses.get(w2)));
       }
     }
-    return matchUnmatchPermutationsForAllWitnessPairs;
+    return matchNonMatchPermutationsForAllWitnessPairs;
   }
 
   /*
    * Temporary heuristics for the best collation without relying on the analysis stage.
    * Looking for a new home ...
    */
-  public void sortPermutationsByUnmatches(List<MatchUnmatch> matchUnmatchList) {
-    Comparator<MatchUnmatch> comparator = new Comparator<MatchUnmatch>() {
-      public int compare(MatchUnmatch o1, MatchUnmatch o2) {
-        return o1.getUnmatches().size() - o2.getUnmatches().size();
+  public void sortPermutationsByNonMatches(List<MatchNonMatch> matchNonMatchList) {
+    Comparator<MatchNonMatch> comparator = new Comparator<MatchNonMatch>() {
+      public int compare(MatchNonMatch o1, MatchNonMatch o2) {
+        return o1.getNonMatches().size() - o2.getNonMatches().size();
       }
     };
-    Collections.sort(matchUnmatchList, comparator);
+    Collections.sort(matchNonMatchList, comparator);
   }
 
-  public void sortPermutationsByVariation(List<MatchUnmatch> matchUnmatchList) {
-    Comparator<MatchUnmatch> comparator = new Comparator<MatchUnmatch>() {
-      public int compare(MatchUnmatch o1, MatchUnmatch o2) {
+  public void sortPermutationsByVariation(List<MatchNonMatch> matchNonMatchList) {
+    Comparator<MatchNonMatch> comparator = new Comparator<MatchNonMatch>() {
+      public int compare(MatchNonMatch o1, MatchNonMatch o2) {
         return Double.compare(o1.getVariationMeasure(), o2.getVariationMeasure());
       }
     };
-    Collections.sort(matchUnmatchList, comparator);
+    Collections.sort(matchNonMatchList, comparator);
   }
 
   private void sortPermutationsByRelevance(List<Modifications> modificationsList) {
@@ -94,15 +94,15 @@ public class CollateCore {
     Collections.sort(modificationsList, comparator);
   }
 
-  private List<Modification> determineModifications(Set<Match> permutation, List<MisMatch> determineUnmatches) {
+  private List<Modification> determineModifications(Set<Match> permutation, List<NonMatch> determineNonMatches) {
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(Matches.getWordDistanceMatches(permutation));
-    modifications.addAll(MatchSequences.analyseVariants(determineUnmatches));
+    modifications.addAll(MatchSequences.analyseVariants(determineNonMatches));
     return modifications;
   }
 
-  private List<MisMatch> determineUnmatches(Witness base, Witness witness, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
-    List<MisMatch> variants2 = Lists.newArrayList();
+  private List<NonMatch> determineNonMatches(Witness base, Witness witness, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
+    List<NonMatch> variants2 = Lists.newArrayList();
     variants2.addAll(MatchSequences.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
     variants2.addAll(MatchSequences.getVariantsInMatchSequences(base, witness, matchSequencesForBase));
     return variants2;
@@ -115,41 +115,41 @@ public class CollateCore {
     return transpositions;
   }
 
-  public List<Addition> getAdditions(List<MisMatch> mismatches) {
-    List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
-      public boolean apply(MisMatch arg0) {
+  public List<Addition> getAdditions(List<NonMatch> nonMatches) {
+    List<NonMatch> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<NonMatch>() {
+      public boolean apply(NonMatch arg0) {
         return arg0.isAddition();
       }
     }));
     List<Addition> additions = Lists.newArrayList();
-    for (MisMatch misMatch : mismatches_filter) {
-      additions.add(misMatch.createAddition());
+    for (NonMatch nonMatch : nonMatches_filter) {
+      additions.add(nonMatch.createAddition());
     }
     return additions;
   }
 
-  public List<Omission> getOmissions(List<MisMatch> mismatches) {
-    List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
-      public boolean apply(MisMatch arg0) {
+  public List<Omission> getOmissions(List<NonMatch> nonMatches) {
+    List<NonMatch> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<NonMatch>() {
+      public boolean apply(NonMatch arg0) {
         return arg0.isOmission();
       }
     }));
     List<Omission> omissions = Lists.newArrayList();
-    for (MisMatch misMatch : mismatches_filter) {
-      omissions.add(misMatch.createOmission());
+    for (NonMatch nonMatch : nonMatches_filter) {
+      omissions.add(nonMatch.createOmission());
     }
     return omissions;
   }
 
-  public List<Replacement> getReplacements(List<MisMatch> mismatches) {
-    List<MisMatch> mismatches_filter = Lists.newArrayList(Iterables.filter(mismatches, new Predicate<MisMatch>() {
-      public boolean apply(MisMatch arg0) {
+  public List<Replacement> getReplacements(List<NonMatch> nonMatches) {
+    List<NonMatch> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<NonMatch>() {
+      public boolean apply(NonMatch arg0) {
         return arg0.isReplacement();
       }
     }));
     List<Replacement> replacements = Lists.newArrayList();
-    for (MisMatch misMatch : mismatches_filter) {
-      replacements.add(misMatch.createReplacement());
+    for (NonMatch nonMatch : nonMatches_filter) {
+      replacements.add(nonMatch.createReplacement());
     }
     return replacements;
   }

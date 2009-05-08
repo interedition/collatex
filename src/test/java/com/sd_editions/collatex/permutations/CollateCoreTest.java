@@ -19,31 +19,31 @@ public class CollateCoreTest extends TestCase {
   }
 
   @Test
-  public void testGetAllMatchUnmatchPermutations() {
+  public void testGetAllMatchNonMatchPermutations() {
     CollateCore cc = new CollateCore(builder.buildWitnesses("The black car", "The dark car", "the dark day"));
-    List<List<MatchUnmatch>> allMatchUnmatchPermutations = cc.getAllMatchUnmatchPermutations();
+    List<List<MatchNonMatch>> allMatchNonMatchPermutations = cc.getAllMatchNonMatchPermutations();
     // there should be 3 witness pairs
-    assertEquals(3, allMatchUnmatchPermutations.size());
-    List<MatchUnmatch> list = allMatchUnmatchPermutations.get(0);
+    assertEquals(3, allMatchNonMatchPermutations.size());
+    List<MatchNonMatch> list = allMatchNonMatchPermutations.get(0);
     assertEquals(1, list.size());
-    showAllMatchUnmatchPermutations(allMatchUnmatchPermutations);
+    showAllMatchNonMatchPermutations(allMatchNonMatchPermutations);
   }
 
   @Test
-  public void testGetAllMatchUnmatchPermutations1() {
+  public void testGetAllMatchNonMatchPermutations1() {
     CollateCore cc = new CollateCore(builder.buildWitnesses("The cat chases the dog and mouse", "The dog chases the cat and mouse", "the dog and mouse chase the cat"));
-    List<List<MatchUnmatch>> allMatchUnmatchPermutations = cc.getAllMatchUnmatchPermutations();
-    showAllMatchUnmatchPermutations(allMatchUnmatchPermutations);
-    assertEquals(3, allMatchUnmatchPermutations.size());
+    List<List<MatchNonMatch>> allMatchNonMatchPermutations = cc.getAllMatchNonMatchPermutations();
+    showAllMatchNonMatchPermutations(allMatchNonMatchPermutations);
+    assertEquals(3, allMatchNonMatchPermutations.size());
   }
 
-  void showAllMatchUnmatchPermutations(List<List<MatchUnmatch>> allMatchUnmatchPermutations) {
-    for (List<MatchUnmatch> list : allMatchUnmatchPermutations) {
-      println("witness pair " + allMatchUnmatchPermutations.indexOf(list));
-      for (MatchUnmatch matchUnmatch : list) {
-        println("  matchUnmatch " + list.indexOf(matchUnmatch));
-        List<MatchSequence> matchSequencesForBase = matchUnmatch.getMatchSequencesForBase();
-        List<MisMatch> unmatches = matchUnmatch.getUnmatches();
+  void showAllMatchNonMatchPermutations(List<List<MatchNonMatch>> allMatchNonMatchPermutations) {
+    for (List<MatchNonMatch> list : allMatchNonMatchPermutations) {
+      println("witness pair " + allMatchNonMatchPermutations.indexOf(list));
+      for (MatchNonMatch matchNonMatch : list) {
+        println("  matchNonMatch " + list.indexOf(matchNonMatch));
+        List<MatchSequence> matchSequencesForBase = matchNonMatch.getMatchSequencesForBase();
+        List<NonMatch> nonMatches = matchNonMatch.getNonMatches();
         for (MatchSequence matchSequence : matchSequencesForBase) {
           println("    matchSequenceForBase " + matchSequencesForBase.indexOf(matchSequence));
           List<Match> matches = matchSequence.getMatches();
@@ -70,8 +70,8 @@ public class CollateCoreTest extends TestCase {
   @Test
   public void testSortByVariation() {
     CollateCore collateCore = new CollateCore(builder.buildWitnesses("I bought this glass, because it matches those dinner plates.", "I bought those glasses."));
-    List<MatchUnmatch> matchUnmatchList = collateCore.doCompareWitnesses(collateCore.getWitness(1), collateCore.getWitness(2));
-    collateCore.sortPermutationsByVariation(matchUnmatchList);
-    assertEquals("[(1->1), (2->2), (3->3), (4->4)]", matchUnmatchList.get(0).getPermutation().toString());
+    List<MatchNonMatch> matchNonMatchList = collateCore.doCompareWitnesses(collateCore.getWitness(1), collateCore.getWitness(2));
+    collateCore.sortPermutationsByVariation(matchNonMatchList);
+    assertEquals("[(1->1), (2->2), (3->3), (4->4)]", matchNonMatchList.get(0).getMatches().toString());
   }
 }
