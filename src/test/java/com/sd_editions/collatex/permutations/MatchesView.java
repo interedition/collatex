@@ -16,6 +16,7 @@ public class MatchesView {
   public String renderPermutations(Witness witnessA, Witness witnessB) {
     CollateCore collateCore = new CollateCore(witnessA, witnessB);
     List<MatchUnmatch> matchUnmatches = collateCore.doCompareWitnesses(witnessA, witnessB);
+    collateCore.sortPermutationsByVariation(matchUnmatches);
 
     StringBuilder result = new StringBuilder();
     result.append("Witness A: ").append(witnessA.sentence).append('\n');
