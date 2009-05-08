@@ -7,9 +7,18 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 public class CollateCoreTest extends TestCase {
+
+  private WitnessBuilder builder;
+
+  @Override
+  protected void setUp() throws Exception {
+    builder = new WitnessBuilder();
+    super.setUp();
+  }
+
   @Test
   public void testDetermineBase() {
-    CollateCore collateCore = new CollateCore("The Black Cat", "The Cat and the Dog", "The White Cat");
+    CollateCore collateCore = new CollateCore(builder.buildWitnesses("The Black Cat", "The Cat and the Dog", "The White Cat"));
     String witnessId1 = collateCore.getWitness(1).id;
     String witnessId2 = collateCore.getWitness(2).id;
     String witnessId3 = collateCore.getWitness(3).id;
@@ -29,7 +38,7 @@ public class CollateCoreTest extends TestCase {
 
   @Test
   public void testMultiMatchShrinksAtThirdWitness() {
-    CollateCore collateCore = new CollateCore("The Black Cat", "The black dog and white cat", "The White Cat");
+    CollateCore collateCore = new CollateCore(builder.buildWitnesses("The Black Cat", "The black dog and white cat", "The White Cat"));
     String witnessId1 = collateCore.getWitness(1).id;
     String witnessId2 = collateCore.getWitness(2).id;
     String witnessId3 = collateCore.getWitness(3).id;
