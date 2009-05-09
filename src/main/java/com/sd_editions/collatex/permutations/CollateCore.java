@@ -58,6 +58,12 @@ public class CollateCore {
     return matchNonMatchList;
   }
 
+  public MatchNonMatch compareWitnesses(Witness w1, Witness w2) {
+    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(w1, w2);
+    sortPermutationsByVariation(matchNonMatchList);
+    return matchNonMatchList.get(0);
+  }
+
   public List<List<MatchNonMatch>> getAllMatchNonMatchPermutations() {
     List<List<MatchNonMatch>> matchNonMatchPermutationsForAllWitnessPairs = Lists.newArrayList();
     final int numberOfWitnesses = numberOfWitnesses();
