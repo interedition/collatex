@@ -22,3 +22,10 @@ function toggleColored() {
     s[i].toggle();
   }
 }
+
+function toggleVariance() {
+	  var s = $$('.variance');
+	  for ( var i = 0; i < s.length; i++) {
+	    s[i].toggle();
+	  }
+	}

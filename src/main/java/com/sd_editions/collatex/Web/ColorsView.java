@@ -61,6 +61,7 @@ public class ColorsView {
 
   private String modifications() {
     StringBuffer html = new StringBuffer();
+    MatchesView matchesView = new MatchesView();
     final int numberOfWitnesses = colors.numberOfWitnesses();
     for (int base = 1; base < numberOfWitnesses; base++) {
       if (base > 1) html.append("<span class=\"secondary\">");
@@ -77,6 +78,7 @@ public class ColorsView {
           html.append("</span>");
           html.append(modificationsView(base, modifications));
           html.append("<br/></ul>");
+          html.append(matchesView.renderPermutation(matchNonMatch));
           if (pn > 1) html.append("</span>");
         }
         html.append("</ol>");
