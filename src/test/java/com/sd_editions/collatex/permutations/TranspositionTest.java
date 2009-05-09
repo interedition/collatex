@@ -61,8 +61,8 @@ public class TranspositionTest extends TestCase {
     Modifications modifications = getModifications(base, witness);
     List<Transposition> transpositions = modifications.getTranspositions();
     assertEquals(2, transpositions.size());
-    assertEquals("transposition: a red cat. switches position with The dog", transpositions.get(0).toString());
-    assertEquals("transposition: The dog switches position with a red cat.", transpositions.get(1).toString());
+    assertEquals("transposition: a red cat. switches position with The ... dog", transpositions.get(0).toString());
+    assertEquals("transposition: The ... dog switches position with a red cat.", transpositions.get(1).toString());
   }
 
   //
