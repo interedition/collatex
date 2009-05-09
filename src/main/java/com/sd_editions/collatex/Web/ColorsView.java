@@ -61,9 +61,10 @@ public class ColorsView {
 
   private String modifications() {
     StringBuffer html = new StringBuffer();
+    MatchesView matchesView = new MatchesView();
     final int numberOfWitnesses = colors.numberOfWitnesses();
     for (int base = 1; base < numberOfWitnesses; base++) {
-      //      if (base > 1) html.append("<span class=\"secondary\">");
+      if (base > 1) html.append("<span class=\"secondary\">");
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html.append("Comparing witness " + base + " - witness " + (w) + ":<ol>");
         List<MatchNonMatch> matchNonMatchList = colors.doCompareWitnesses(colors.getWitness(base), colors.getWitness(w));
@@ -77,7 +78,8 @@ public class ColorsView {
           html.append("</span>");
           html.append(modificationsView(base, modifications));
           html.append("<br/></ul>");
-          //          if (pn > 1) html.append("</span>");
+          html.append(matchesView.renderPermutation(matchNonMatch));
+          if (pn > 1) html.append("</span>");
         }
         html.append("</ol>");
       }
