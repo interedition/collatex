@@ -21,16 +21,12 @@ public class XMLAppOutputTest {
     builder = new WitnessBuilder();
   }
 
-  //  @Test
-  public void xtestThreeWitnesses() {
+  @Test
+  public void testThreeWitnesses() {
     Witness w1 = builder.build("the black cat");
     Witness w2 = builder.build("the white and black cat");
     Witness w3 = builder.build("the white cat");
-    CollateCore core = new CollateCore(w1, w2, w3);
-    MatchNonMatch mnm1 = core.compareWitnesses(w1, w2);
-    MatchNonMatch mnm2 = core.compareWitnesses(w2, w3);
-    MatchNonMatch mnm3 = core.compareWitnesses(w1, w3);
-    MagicClass magic = new MagicClass(mnm1, mnm2, mnm3);
+    MagicClass magic = new MagicClass(w1, w2, w3);
     MagicTable table = magic.createAppAlignmentTable();
     String expected = "<xml>the <app><rdg wit='#B #C'>black </rdg><rdg wit='#A'></rdg></app><app><rdg wit='#B'>and </rdg><rdg wit='#A #c'></rdg></app><app><rdg wit='#A #B'>white </rdg><rdg wit='#C'></rdg></app>cat</xml>"
         .replaceAll("\\'", "\\\\");
