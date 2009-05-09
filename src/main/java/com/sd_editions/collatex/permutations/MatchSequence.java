@@ -51,8 +51,12 @@ public class MatchSequence {
   public String baseToString() {
     String result = "";
     String delimiter = "";
-    for (Match match : sequence) {
-      result += delimiter + match.getBaseWord().toString();
+    for (int i = 0; i < sequence.size(); i++) {
+      Word baseWord = sequence.get(i).getBaseWord();
+      if (i > 0 && (baseWord.position - sequence.get(i - 1).getBaseWord().position) > 1) {
+        result += delimiter + "...";
+      }
+      result += delimiter + baseWord.toString();
       delimiter = " ";
     }
     return result;
