@@ -16,6 +16,13 @@ public class MagicClass {
   }
 
   public MagicTable createAppAlignmentTable() {
+    // vul hier de alignment table met words witness1
+    // maak van de alignment table de superbase
+    // dan compare de witness 2 met de superbase
+    // voeg de matches en de additions toe aan de aligntable
+    // maak van de alignment table een super base
+    // compare de volgende witness etc
+
     CollateCore core = new CollateCore();
     Witness w1 = witnesses[0];
     Witness w2 = witnesses[1];

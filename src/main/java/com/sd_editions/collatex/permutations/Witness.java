@@ -32,4 +32,16 @@ public class Witness {
   public int size() {
     return words.size();
   }
+
+  // Note: part copied from Phrase
+  @Override
+  public String toString() {
+    String replacementString = "";
+    String divider = "";
+    for (Word word : words) {
+      replacementString += divider + word;
+      divider = " ";
+    }
+    return replacementString;
+  }
 }
