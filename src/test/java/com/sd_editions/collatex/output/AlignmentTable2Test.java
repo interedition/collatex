@@ -28,7 +28,6 @@ public class AlignmentTable2Test {
     assertEquals(expected, table.toString());
   }
 
-  // TODO: test empty witness
   @Test
   public void testStringOutputTwoWitnesses() {
     WitnessBuilder builder = new WitnessBuilder();
@@ -42,6 +41,20 @@ public class AlignmentTable2Test {
     table.addMatch(w2, w2.getWordOnPosition(3));
     String expected = "A: the|black|cat\n";
     expected += "B: the|black|cat";
+    assertEquals(expected, table.toString());
+  }
+
+  @Test
+  public void testStringOutputEmptyCells() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the");
+    AlignmentTable2 table = new AlignmentTable2();
+    table.addFirstWitness(w1);
+    // TODO: word contains id also, which refers to Witness
+    table.addMatch(w2, w2.getWordOnPosition(1));
+    String expected = "A: the|black|cat\n";
+    expected += "B: the| | ";
     assertEquals(expected, table.toString());
   }
 }

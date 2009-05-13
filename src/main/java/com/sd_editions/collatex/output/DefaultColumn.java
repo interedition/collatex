@@ -40,11 +40,12 @@ public class DefaultColumn extends Column {
     return result;
   }
 
-  // TODO: think about empty columns here!
-
   @Override
   public Word getWord(Witness witness) {
-    // Note: Change map to <Witness, Word> ?r
+    // Note: Change map to <Witness, Word> ?
+    if (!wordsProWitness.containsKey(witness.id)) {
+      return new EmptyWord();
+    }
     Word result = wordsProWitness.get(witness.id);
     return result;
   }
