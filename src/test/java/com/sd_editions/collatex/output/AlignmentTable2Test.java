@@ -17,4 +17,15 @@ public class AlignmentTable2Test {
     Witness superBase = alignmentTable.createSuperBase();
     assertEquals("the first witness", superBase.toString());
   }
+
+  @Test
+  public void testStringOutputOneWitness() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness w1 = builder.build("A", "the black cat");
+    AlignmentTable2 table = new AlignmentTable2();
+    table.addFirstWitness(w1);
+    String expected = "A: the|black|cat";
+    assertEquals(expected, table.toString());
+  }
+
 }

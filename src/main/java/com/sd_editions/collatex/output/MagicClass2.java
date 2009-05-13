@@ -43,6 +43,10 @@ public class MagicClass2 {
 
     CollateCore core = new CollateCore();
     MatchNonMatch compresult = core.compareWitnesses(w1, w2);
+    System.out.println(compresult.getMatches());
+    // eerst addition verwerken
+    // daarna matches 
+    // noteer in metadata column match, near match, variants
     return table;
   }
 }

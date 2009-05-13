@@ -13,9 +13,11 @@ import com.sd_editions.collatex.permutations.Word;
 // is easier to have a Column be a list<word>
 public class AlignmentTable2 {
   private final List<Column> columns;
+  private final List<Witness> witnesses;
 
   public AlignmentTable2() {
     this.columns = Lists.newArrayList();
+    this.witnesses = Lists.newArrayList();
   }
 
   public void add(DefaultColumn defaultColumn) {
@@ -38,6 +40,23 @@ public class AlignmentTable2 {
     for (Word word : w1.getWords()) {
       add(new DefaultColumn(word));
     }
+    witnesses.add(w1);
   }
 
+  public String toXML() {
+    return "<xml></xml>";
+  }
+
+  @Override
+  public String toString() {
+    // TODO: make this work for multiple witnesses!
+    Witness witness = witnesses.get(0);
+    String collectedStrings = witness.id + ": ";
+    String delim = "";
+    for (Column column : columns) {
+      collectedStrings += delim + column.getWord(witness).toString();
+      delim = "|";
+    }
+    return collectedStrings;
+  }
 }

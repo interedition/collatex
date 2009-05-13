@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 
 public class DefaultColumn extends Column {
@@ -26,6 +27,7 @@ public class DefaultColumn extends Column {
 
   }
 
+  // NOTE: maybe method name is not the best choice!
   @Override
   public String toString() {
     Collection<Word> values = wordsProWitness.values();
@@ -35,6 +37,15 @@ public class DefaultColumn extends Column {
       result += delim + word.original;
       delim += " ";
     }
+    return result;
+  }
+
+  // TODO: think about empty columns here!
+
+  @Override
+  public Word getWord(Witness witness) {
+    // Note: Change map to <Witness, Word> ?
+    Word result = wordsProWitness.get(witness.id);
     return result;
   }
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.Gap;
+import com.sd_editions.collatex.permutations.Witness;
+import com.sd_editions.collatex.permutations.Word;
 
 public class AppColumn extends Column {
 
@@ -25,6 +27,11 @@ public class AppColumn extends Column {
     }
 
     xml.append("</app>");
+  }
+
+  @Override
+  public Word getWord(Witness witness) {
+    throw new UnsupportedOperationException();
   }
 
 }
