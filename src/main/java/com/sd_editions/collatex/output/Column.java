@@ -9,4 +9,6 @@ public abstract class Column {
 
   public abstract Word getWord(Witness witness);
 
+  public abstract void addMatch(Witness witness, Word word);
+
 }

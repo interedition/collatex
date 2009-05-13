@@ -49,14 +49,26 @@ public class AlignmentTable2 {
 
   @Override
   public String toString() {
-    // TODO: make this work for multiple witnesses!
-    Witness witness = witnesses.get(0);
-    String collectedStrings = witness.id + ": ";
-    String delim = "";
-    for (Column column : columns) {
-      collectedStrings += delim + column.getWord(witness).toString();
-      delim = "|";
+    String collectedStrings = "";
+    String linebreak = "";
+    for (Witness witness : witnesses) {
+      collectedStrings += linebreak + witness.id + ": ";
+      linebreak = "\n";
+      String delim = "";
+      for (Column column : columns) {
+        collectedStrings += delim + column.getWord(witness).toString();
+        delim = "|";
+      }
     }
     return collectedStrings;
+  }
+
+  public void addMatch(Witness w2, Word wordOnPosition) {
+    Column column = columns.get(wordOnPosition.position - 1);
+    column.addMatch(w2, wordOnPosition);
+    // TODO: an ordered set instead of list would be nice here
+    if (!witnesses.contains(w2)) {
+      witnesses.add(w2);
+    }
   }
 }

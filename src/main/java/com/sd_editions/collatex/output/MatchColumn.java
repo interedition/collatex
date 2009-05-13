@@ -21,4 +21,9 @@ public class MatchColumn extends Column {
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public void addMatch(Witness witness, Word word) {
+    throw new UnsupportedOperationException();
+  }
+
 }

@@ -44,9 +44,14 @@ public class DefaultColumn extends Column {
 
   @Override
   public Word getWord(Witness witness) {
-    // Note: Change map to <Witness, Word> ?
+    // Note: Change map to <Witness, Word> ?r
     Word result = wordsProWitness.get(witness.id);
     return result;
+  }
+
+  @Override
+  public void addMatch(Witness witness, Word word) {
+    wordsProWitness.put(witness.id, word);
   }
 
 }
