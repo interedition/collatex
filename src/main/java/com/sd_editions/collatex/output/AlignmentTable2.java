@@ -56,11 +56,18 @@ public class AlignmentTable2 {
       linebreak = "\n";
       String delim = "";
       for (Column column : columns) {
-        collectedStrings += delim + column.getWord(witness).toString();
+        collectedStrings += delim + cellToString(witness, column);
         delim = "|";
       }
     }
     return collectedStrings;
+  }
+
+  private String cellToString(Witness witness, Column column) {
+    if (!column.containsWitness(witness)) {
+      return " ";
+    }
+    return column.getWord(witness).toString();
   }
 
   public void addMatch(Witness w2, Word wordOnPosition) {

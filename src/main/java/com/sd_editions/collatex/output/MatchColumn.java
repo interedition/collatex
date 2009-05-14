@@ -26,4 +26,9 @@ public class MatchColumn extends Column {
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public boolean containsWitness(Witness witness) {
+    throw new UnsupportedOperationException();
+  }
+
 }

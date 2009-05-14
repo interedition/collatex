@@ -11,4 +11,6 @@ public abstract class Column {
 
   public abstract void addMatch(Witness witness, Word word);
 
+  public abstract boolean containsWitness(Witness witness);
+
 }

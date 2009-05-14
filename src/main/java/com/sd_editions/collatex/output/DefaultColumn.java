@@ -2,12 +2,14 @@ package com.sd_editions.collatex.output;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 
 public class DefaultColumn extends Column {
+  // Note: Change map to <Witness, Word> ?
   Map<String, Word> wordsProWitness;
 
   // NOTE: how to handle multiple words in a reading
@@ -42,9 +44,8 @@ public class DefaultColumn extends Column {
 
   @Override
   public Word getWord(Witness witness) {
-    // Note: Change map to <Witness, Word> ?
-    if (!wordsProWitness.containsKey(witness.id)) {
-      return new EmptyWord();
+    if (!containsWitness(witness)) {
+      throw new NoSuchElementException();
     }
     Word result = wordsProWitness.get(witness.id);
     return result;
@@ -53,6 +54,10 @@ public class DefaultColumn extends Column {
   @Override
   public void addMatch(Witness witness, Word word) {
     wordsProWitness.put(witness.id, word);
+  }
+
+  public boolean containsWitness(Witness witness) {
+    return wordsProWitness.containsKey(witness.id);
   }
 
 }
