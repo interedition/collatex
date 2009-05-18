@@ -3,8 +3,8 @@ package com.sd_editions.collatex.output;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.permutations.Superbase;
 import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.WitnessBuilder;
 import com.sd_editions.collatex.permutations.Word;
 
 // Note: for the TEI xml output it is easier to
@@ -24,17 +24,28 @@ public class AlignmentTable2 {
     columns.add(defaultColumn);
   }
 
-  public Witness createSuperBase() {
-    WitnessBuilder builder = new WitnessBuilder();
-    String collectedStrings = "";
-    String delim = "";
+  public Superbase createSuperbase() {
+    Superbase superbase = new Superbase();
     for (Column column : columns) {
-      collectedStrings += delim + column.toString();
-      delim = " ";
+      // Note: for now we pretend every column is a Match column
+      // so we only take the first word for the superbase
+      Word matchWord = column.getWords().iterator().next();
+      superbase.addWord(matchWord, column);
     }
-    Witness superWitness = builder.build("superbase", collectedStrings);
-    return superWitness;
+    return superbase;
   }
+
+  //  public Witness createSuperBase() {
+  //    WitnessBuilder builder = new WitnessBuilder();
+  //    String collectedStrings = "";
+  //    String delim = "";
+  //    for (Column column : columns) {
+  //      collectedStrings += delim + column.toString();
+  //      delim = " ";
+  //    }
+  //    Witness superWitness = builder.build("superbase", collectedStrings);
+  //    return superWitness;
+  //  }
 
   void addFirstWitness(Witness w1) {
     for (Word word : w1.getWords()) {

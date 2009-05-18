@@ -1,6 +1,7 @@
 package com.sd_editions.collatex.output;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.Gap;
@@ -41,6 +42,11 @@ public class AppColumn extends Column {
 
   @Override
   public boolean containsWitness(Witness witness) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Collection<Word> getWords() {
     throw new UnsupportedOperationException();
   }
 

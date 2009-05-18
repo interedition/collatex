@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.output;
 
+import java.util.Collection;
+
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 
@@ -28,6 +30,11 @@ public class MatchColumn extends Column {
 
   @Override
   public boolean containsWitness(Witness witness) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Collection<Word> getWords() {
     throw new UnsupportedOperationException();
   }
 

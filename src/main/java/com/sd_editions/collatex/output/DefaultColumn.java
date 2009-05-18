@@ -56,8 +56,15 @@ public class DefaultColumn extends Column {
     wordsProWitness.put(witness.id, word);
   }
 
+  @Override
   public boolean containsWitness(Witness witness) {
     return wordsProWitness.containsKey(witness.id);
+  }
+
+  @Override
+  public Collection<Word> getWords() {
+    Collection<Word> values = wordsProWitness.values();
+    return values;
   }
 
 }

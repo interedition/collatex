@@ -14,8 +14,8 @@ public class AlignmentTable2Test {
     Witness a = builder.build("A", "the first witness");
     AlignmentTable2 alignmentTable = new AlignmentTable2();
     alignmentTable.addFirstWitness(a);
-    Witness superBase = alignmentTable.createSuperBase();
-    assertEquals("the first witness", superBase.toString());
+    Witness superbase = alignmentTable.createSuperbase();
+    assertEquals("the first witness", superbase.toString());
   }
 
   @Test
