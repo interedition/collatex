@@ -81,12 +81,15 @@ public class AlignmentTable2 {
     return column.getWord(witness).toString();
   }
 
-  public void addMatch(Witness w2, Word wordOnPosition) {
-    Column column = columns.get(wordOnPosition.position - 1);
-    column.addMatch(w2, wordOnPosition);
+  public void addMatch(Witness witness, Word word, Column column) {
+    column.addMatch(witness, word);
     // TODO: an ordered set instead of list would be nice here
-    if (!witnesses.contains(w2)) {
-      witnesses.add(w2);
+    if (!witnesses.contains(witness)) {
+      witnesses.add(witness);
     }
+  }
+
+  public List<Column> getColumns() {
+    return columns;
   }
 }

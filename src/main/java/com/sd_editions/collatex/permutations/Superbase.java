@@ -19,7 +19,11 @@ public class Superbase extends Witness {
 
   public Column getColumnFor(Word word) {
     int indexOf = getWords().indexOf(word);
-    return columnForEachWord.get(indexOf);
+    Column column = columnForEachWord.get(indexOf);
+    if (column == null) {
+      throw new RuntimeException(word.toString() + " not in alignment table!");
+    }
+    return column;
   }
 
   //  public void setColumn(int position, Column column) {

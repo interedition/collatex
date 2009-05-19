@@ -29,6 +29,19 @@ public class MagicClass2Test {
     assertEquals(expected, table.toString());
   }
 
+  @Test
+  public void testOmission() {
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the cat");
+    Witness w3 = builder.build("C", "the black cat");
+    MagicClass2 magic = new MagicClass2(w1, w2, w3);
+    AlignmentTable2 table = magic.createAlignmentTable();
+    String expected = "A: the|black|cat\n";
+    expected += "B: the| |cat\n";
+    expected += "C: the|black|cat";
+    assertEquals(expected, table.toString());
+  }
+
   // this is an addition.. not the easiest test
   //  @Test
   //  public void testTwoWitnesses() {

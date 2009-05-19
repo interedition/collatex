@@ -67,11 +67,13 @@ public class MagicClass2 {
     Set<Match> matches = compresult.getMatches();
     for (Match match : matches) {
       Word baseWord = match.getBaseWord();
-      Column columnFor = superbase.getColumnFor(baseWord);
+      Column column = superbase.getColumnFor(baseWord);
       Word witnessWord = match.getWitnessWord();
       // Note: go through table here or direct through column?
       // columnFor.addMatch(witness, witnessWord);
-      table.addMatch(witness, witnessWord);
+      // if you go directly the table is not notified about
+      // the fact that a witness is added
+      table.addMatch(witness, witnessWord, column);
     }
   }
 

@@ -36,9 +36,12 @@ public class AlignmentTable2Test {
     AlignmentTable2 table = new AlignmentTable2();
     table.addFirstWitness(w1);
     // TODO: word contains id also, which refers to Witness
-    table.addMatch(w2, w2.getWordOnPosition(1));
-    table.addMatch(w2, w2.getWordOnPosition(2));
-    table.addMatch(w2, w2.getWordOnPosition(3));
+    Column c1 = table.getColumns().get(0);
+    Column c2 = table.getColumns().get(1);
+    Column c3 = table.getColumns().get(2);
+    table.addMatch(w2, w2.getWordOnPosition(1), c1);
+    table.addMatch(w2, w2.getWordOnPosition(2), c2);
+    table.addMatch(w2, w2.getWordOnPosition(3), c3);
     String expected = "A: the|black|cat\n";
     expected += "B: the|black|cat";
     assertEquals(expected, table.toString());
@@ -51,8 +54,9 @@ public class AlignmentTable2Test {
     Witness w2 = builder.build("B", "the");
     AlignmentTable2 table = new AlignmentTable2();
     table.addFirstWitness(w1);
+    Column column = table.getColumns().get(0);
     // TODO: word contains id also, which refers to Witness
-    table.addMatch(w2, w2.getWordOnPosition(1));
+    table.addMatch(w2, w2.getWordOnPosition(1), column);
     String expected = "A: the|black|cat\n";
     expected += "B: the| | ";
     assertEquals(expected, table.toString());
