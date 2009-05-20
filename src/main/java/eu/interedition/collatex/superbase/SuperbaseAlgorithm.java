@@ -1,17 +1,16 @@
-package com.sd_editions.collatex.output;
+package eu.interedition.collatex.superbase;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.NonMatch;
-import com.sd_editions.collatex.permutations.Superbase;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
+
 
 public class SuperbaseAlgorithm {
   private final List<Witness> witnesses;
@@ -77,13 +76,9 @@ public class SuperbaseAlgorithm {
       // the fact that a witness is added
       table.addMatch(witness, witnessWord, column);
     }
-    // TODO: i need a method for the replacements
-    List<NonMatch> replacements = Lists.newArrayList();
-    for (NonMatch nonMatch : compresult.getNonMatches()) {
-      if (nonMatch.isReplacement()) {
-        replacements.add(nonMatch);
-      }
-    }
+
+    List<NonMatch> replacements = compresult.getReplacements();
+
     // TODO: hou rekening met additions aan het begin!
 
     // Note: Damn Ik will bij een Gap eigenlijk weten
@@ -100,6 +95,7 @@ public class SuperbaseAlgorithm {
       table.addVariant(column, witness, wordInWitness);
     }
   }
+
   // NOTE: THIS WAS THE OLD METHOD MEANT FOR ADDITIONS!
   //  private void addExtraWitnessToAlignmentTable(AlignmentTable2 table, MatchNonMatch compresult) {
   //    List<NonMatch> nonMatches = compresult.getNonMatches();
@@ -127,4 +123,5 @@ public class SuperbaseAlgorithm {
   //    // TODO Auto-generated method stub
   //
   //  }
+
 }

@@ -1,9 +1,8 @@
-package com.sd_editions.collatex.output;
+package eu.interedition.collatex.superbase;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.Superbase;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 

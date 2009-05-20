@@ -1,9 +1,11 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.superbase;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.output.Column;
+import com.sd_editions.collatex.permutations.Witness;
+import com.sd_editions.collatex.permutations.Word;
+
 
 public class Superbase extends Witness {
   private final List<Column> columnForEachWord;

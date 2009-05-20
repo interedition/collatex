@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.output;
+package eu.interedition.collatex.superbase;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -10,6 +10,8 @@ import org.junit.Test;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.WitnessBuilder;
 import com.sd_editions.collatex.permutations.Word;
+
+import eu.interedition.collatex.superbase.DefaultColumn;
 
 public class DefaultColumnTest {
   @Test(expected = NoSuchElementException.class)

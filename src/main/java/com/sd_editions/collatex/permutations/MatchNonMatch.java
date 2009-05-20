@@ -3,6 +3,8 @@ package com.sd_editions.collatex.permutations;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+
 public class MatchNonMatch {
 
   private final List<MatchSequence> matchSequencesForBase;
@@ -44,5 +46,15 @@ public class MatchNonMatch {
       for (Match match : matchSequence.getMatches())
         wordDistanceSum += match.wordDistance;
     return wordDistanceSum;
+  }
+
+  public List<NonMatch> getReplacements() {
+    List<NonMatch> replacements = Lists.newArrayList();
+    for (NonMatch nonMatch : getNonMatches()) {
+      if (nonMatch.isReplacement()) {
+        replacements.add(nonMatch);
+      }
+    }
+    return replacements;
   }
 }

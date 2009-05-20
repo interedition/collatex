@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.output;
+package eu.interedition.collatex.superbase;
 
 import java.util.Collection;
 import java.util.Map;
