@@ -17,4 +17,6 @@ public abstract class Column {
 
   public abstract Collection<Word> getWords();
 
+  public abstract void addVariant(Witness witness, Word wordInWitness);
+
 }

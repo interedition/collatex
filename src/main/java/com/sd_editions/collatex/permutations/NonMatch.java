@@ -41,7 +41,7 @@ public class NonMatch {
     return base.hasGap() && !witness.hasGap();
   }
 
-  boolean isReplacement() {
+  public boolean isReplacement() {
     return base.hasGap() && witness.hasGap();
   }
 

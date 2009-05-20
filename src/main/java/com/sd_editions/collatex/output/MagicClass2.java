@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.MatchNonMatch;
+import com.sd_editions.collatex.permutations.NonMatch;
 import com.sd_editions.collatex.permutations.Superbase;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
@@ -75,8 +77,29 @@ public class MagicClass2 {
       // the fact that a witness is added
       table.addMatch(witness, witnessWord, column);
     }
-  }
+    // TODO: i need a method for the replacements
+    List<NonMatch> replacements = Lists.newArrayList();
+    for (NonMatch nonMatch : compresult.getNonMatches()) {
+      if (nonMatch.isReplacement()) {
+        replacements.add(nonMatch);
+      }
+    }
+    // TODO: hou rekening met additions aan het begin!
 
+    // Note: Damn Ik will bij een Gap eigenlijk weten
+    // welke match er voor en er na komt,
+    // zodat ik weet na of voor of tussen welke columns
+    // ik de variants moet plaatsen
+    for (NonMatch replacement : replacements) {
+      // Note: wacht variants de eerste versie 
+      // zal gewoon op genomen zijn in de superbase!
+      // TODO: hou rekening met langere additions!
+      Word wordInOriginal = replacement.getBase().getFirstWord();
+      Word wordInWitness = replacement.getWitness().getFirstWord();
+      Column column = superbase.getColumnFor(wordInOriginal);
+      table.addVariant(column, witness, wordInWitness);
+    }
+  }
   // NOTE: THIS WAS THE OLD METHOD MEANT FOR ADDITIONS!
   //  private void addExtraWitnessToAlignmentTable(AlignmentTable2 table, MatchNonMatch compresult) {
   //    List<NonMatch> nonMatches = compresult.getNonMatches();

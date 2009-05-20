@@ -67,4 +67,10 @@ public class DefaultColumn extends Column {
     return values;
   }
 
+  // TODO: do something with the fact that it is a variant!
+  @Override
+  public void addVariant(Witness witness, Word wordInWitness) {
+    wordsProWitness.put(witness.id, wordInWitness);
+  }
+
 }

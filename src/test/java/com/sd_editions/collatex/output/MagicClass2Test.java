@@ -42,6 +42,24 @@ public class MagicClass2Test {
     assertEquals(expected, table.toString());
   }
 
+  @Test
+  public void testVariant() {
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the white cat");
+    Witness w3 = builder.build("C", "the green cat");
+    MagicClass2 magic = new MagicClass2(w1, w2, w3);
+    AlignmentTable2 table = magic.createAlignmentTable();
+    String expected = "A: the|black|cat\n";
+    expected += "B: the|white|cat\n";
+    expected += "C: the|green|cat";
+    assertEquals(expected, table.toString());
+  }
+
+  // TODO: test a variant with multiple words
+  // TODO: hint: more words than the original string it replaces
+
+  // TODO: test a variant where one words turns out
+  // todo: to be a match later
   // this is an addition.. not the easiest test
   //  @Test
   //  public void testTwoWitnesses() {

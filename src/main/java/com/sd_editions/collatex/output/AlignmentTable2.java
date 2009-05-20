@@ -83,6 +83,10 @@ public class AlignmentTable2 {
 
   public void addMatch(Witness witness, Word word, Column column) {
     column.addMatch(witness, word);
+    addWitness(witness);
+  }
+
+  private void addWitness(Witness witness) {
     // TODO: an ordered set instead of list would be nice here
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
@@ -91,5 +95,10 @@ public class AlignmentTable2 {
 
   public List<Column> getColumns() {
     return columns;
+  }
+
+  public void addVariant(Column column, Witness witness, Word wordInWitness) {
+    column.addVariant(witness, wordInWitness);
+    addWitness(witness);
   }
 }
