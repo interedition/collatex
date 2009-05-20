@@ -13,7 +13,7 @@ import com.sd_editions.collatex.permutations.Superbase;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 
-public class MagicClass2 {
+public class SuperbaseAlgorithm {
   private final List<Witness> witnesses;
 
   // NOTE: instead of comparing each of the witnesses with
@@ -29,7 +29,7 @@ public class MagicClass2 {
   // dan is lastig want dan moet je dingen gaan
   // bijhouden 
 
-  public MagicClass2(Witness... _witnesses) {
+  public SuperbaseAlgorithm(Witness... _witnesses) {
     this.witnesses = Arrays.asList(_witnesses);
   }
 
