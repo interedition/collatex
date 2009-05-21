@@ -38,4 +38,8 @@ public class Gap extends Phrase {
     return words;
   }
 
+  public Word getNextWord() {
+    return next;
+  }
+
 }

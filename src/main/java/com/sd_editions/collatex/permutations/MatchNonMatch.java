@@ -57,4 +57,14 @@ public class MatchNonMatch {
     }
     return replacements;
   }
+
+  public List<NonMatch> getAdditions() {
+    List<NonMatch> additions = Lists.newArrayList();
+    for (NonMatch nonMatch : nonMatches) {
+      if (nonMatch.isAddition()) {
+        additions.add(nonMatch);
+      }
+    }
+    return additions;
+  }
 }

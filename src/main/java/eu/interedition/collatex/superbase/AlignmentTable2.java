@@ -100,4 +100,14 @@ public class AlignmentTable2 {
     column.addVariant(witness, wordInWitness);
     addWitness(witness);
   }
+
+  public void addMatchBefore(Column column, Witness witness, Word firstWord) {
+    int indexOf = columns.indexOf(column);
+    if (indexOf == -1) {
+      throw new RuntimeException("Unexpected error: Column not found!");
+    }
+    Column extraColumn = new DefaultColumn(firstWord);
+    columns.add(indexOf, extraColumn);
+    addWitness(witness);
+  }
 }

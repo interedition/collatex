@@ -8,9 +8,6 @@ import org.junit.Test;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.WitnessBuilder;
 
-import eu.interedition.collatex.superbase.AlignmentTable2;
-import eu.interedition.collatex.superbase.SuperbaseAlgorithm;
-
 public class SuperbaseAlgorithmTest {
   private static WitnessBuilder builder;
 
@@ -58,19 +55,18 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
-  // TODO
-  //  @Test
-  //  public void testAddition() {
-  //    Witness w1 = builder.build("A", "the cat");
-  //    Witness w2 = builder.build("B", "the black cat");
-  //    Witness w3 = builder.build("C", "the cat");
-  //    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A: the| |cat\n";
-  //    expected += "B: the|black|cat\n";
-  //    expected += "C: the| |cat";
-  //    assertEquals(expected, table.toString());
-  //  }
+  @Test
+  public void testAddition() {
+    Witness w1 = builder.build("A", "the cat");
+    Witness w2 = builder.build("B", "the black cat");
+    Witness w3 = builder.build("C", "the cat");
+    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3);
+    AlignmentTable2 table = magic.createAlignmentTable();
+    String expected = "A: the| |cat\n";
+    expected += "B: the|black|cat\n";
+    expected += "C: the| |cat";
+    assertEquals(expected, table.toString());
+  }
 
   // TODO: test a variant with multiple words
   // TODO: hint: more words than the original string it replaces
