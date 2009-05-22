@@ -110,4 +110,10 @@ public class AlignmentTable2 {
     columns.add(indexOf, extraColumn);
     addWitness(witness);
   }
+
+  public void addMatchAtTheEnd(Witness witness, Word firstWord) {
+    Column extraColumn = new DefaultColumn(firstWord);
+    columns.add(extraColumn);
+    addWitness(witness);
+  }
 }

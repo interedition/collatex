@@ -20,10 +20,6 @@ public class Gap extends Phrase {
     return size > 0;
   }
 
-  public Word getPreviousWord() {
-    return previous;
-  }
-
   public Word getFirstWord() {
     return getWords().get(0);
   }
@@ -39,7 +35,25 @@ public class Gap extends Phrase {
   }
 
   public Word getNextWord() {
+    if (isAtTheEnd()) {
+      throw new RuntimeException("There is no next word!");
+    }
     return next;
+  }
+
+  public Word getPreviousWord() {
+    if (isAtTheFront()) {
+      throw new RuntimeException("There is no previous word!");
+    }
+    return previous;
+  }
+
+  public boolean isAtTheEnd() {
+    return next == null;
+  }
+
+  public boolean isAtTheFront() {
+    return previous == null;
   }
 
 }

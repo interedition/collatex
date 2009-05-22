@@ -58,16 +58,18 @@ public class SuperbaseAlgorithmTest {
   @Test
   public void testAddition() {
     Witness w1 = builder.build("A", "the cat");
-    Witness w2 = builder.build("B", "the black cat");
-    Witness w3 = builder.build("C", "the cat");
-    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3);
+    Witness w2 = builder.build("B", "before the cat");
+    Witness w3 = builder.build("C", "the black cat");
+    Witness w4 = builder.build("D", "the cat walks");
+    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3, w4);
     AlignmentTable2 table = magic.createAlignmentTable();
-    String expected = "A: the| |cat\n";
-    expected += "B: the|black|cat\n";
-    expected += "C: the| |cat";
+    String expected = "A:  |the| |cat| \n";
+    expected += "B: before|the| |cat| \n";
+    expected += "C:  |the|black|cat| \n";
+    expected += "D:  |the| |cat|walks";
+
     assertEquals(expected, table.toString());
   }
-
   // TODO: test a variant with multiple words
   // TODO: hint: more words than the original string it replaces
 

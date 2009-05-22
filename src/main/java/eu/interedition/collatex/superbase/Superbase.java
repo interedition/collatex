@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.Word;
 
-
 public class Superbase extends Witness {
   private final List<Column> columnForEachWord;
 
@@ -21,6 +20,9 @@ public class Superbase extends Witness {
 
   public Column getColumnFor(Word word) {
     int indexOf = getWords().indexOf(word);
+    if (indexOf == -1) {
+      throw new RuntimeException("Unexpected error: no column found for word: " + word);
+    }
     Column column = columnForEachWord.get(indexOf);
     if (column == null) {
       throw new RuntimeException(word.toString() + " not in alignment table!");

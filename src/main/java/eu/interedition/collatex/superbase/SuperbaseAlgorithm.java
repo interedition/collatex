@@ -47,19 +47,23 @@ public class SuperbaseAlgorithm {
 
     CollateCore core = new CollateCore();
     MatchNonMatch compresult = core.compareWitnesses(superbase, w2);
-    System.out.println(compresult.getMatches());
     addExtraWitnessToAlignmentTable(table, compresult, superbase, w2);
 
     // do the second comparison
     Witness w3 = witnesses.get(2);
 
     compresult = core.compareWitnesses(superbase, w3);
-    System.out.println(compresult.getMatches());
     addExtraWitnessToAlignmentTable(table, compresult, superbase, w3);
 
-    // eerst addition verwerken
-    // daarna matches 
-    // noteer in metadata column match, near match, variants
+    if (witnesses.size() > 3) {
+      // do the third comparison
+      Witness w4 = witnesses.get(3);
+
+      compresult = core.compareWitnesses(superbase, w4);
+      addExtraWitnessToAlignmentTable(table, compresult, superbase, w4);
+    }
+
+    // TODO: noteer in metadata column match, near match, variants
     return table;
   }
 
@@ -80,16 +84,7 @@ public class SuperbaseAlgorithm {
     }
 
     List<NonMatch> replacements = compresult.getReplacements();
-
-    // TODO: hou rekening met additions aan het begin!
-
-    // Note: Damn Ik will bij een Gap eigenlijk weten
-    // welke match er voor en er na komt,
-    // zodat ik weet na of voor of tussen welke columns
-    // ik de variants moet plaatsen
     for (NonMatch replacement : replacements) {
-      // Note: wacht variants de eerste versie 
-      // zal gewoon op genomen zijn in de superbase!
       // TODO: hou rekening met langere additions!
       Word wordInOriginal = replacement.getBase().getFirstWord();
       Word wordInWitness = replacement.getWitness().getFirstWord();
@@ -98,15 +93,20 @@ public class SuperbaseAlgorithm {
     }
 
     List<NonMatch> additions = compresult.getAdditions();
-    // Note: additions can occur at several places
-    // this code only handles additions in the middle
     for (NonMatch addition : additions) {
-      Word nextWord = addition.getBase().getNextWord();
-      Column column = superbase.getColumnFor(nextWord);
-      // NOTE: right now only the first word is taken
-      // TODO: should work with the whole phrase
-      Word firstWord = addition.getWitness().getFirstWord();
-      table.addMatchBefore(column, witness, firstWord);
+      if (addition.getBase().isAtTheEnd()) {
+        // NOTE: right now only the first word is taken
+        // TODO: should work with the whole phrase
+        Word firstWord = addition.getWitness().getFirstWord();
+        table.addMatchAtTheEnd(witness, firstWord);
+      } else {
+        Word nextWord = addition.getBase().getNextWord();
+        Column column = superbase.getColumnFor(nextWord);
+        // NOTE: right now only the first word is taken
+        // TODO: should work with the whole phrase
+        Word firstWord = addition.getWitness().getFirstWord();
+        table.addMatchBefore(column, witness, firstWord);
+      }
     }
   }
 
