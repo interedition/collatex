@@ -110,26 +110,4 @@ public class SuperbaseAlgorithm {
     }
   }
 
-  // NOTE: THIS WAS THE OLD METHOD MEANT FOR ADDITIONS!
-  //  private void addExtraWitnessToAlignmentTable(AlignmentTable2 table, MatchNonMatch compresult) {
-  //    List<NonMatch> nonMatches = compresult.getNonMatches();
-  //    // I need a method that only returns additions
-  //    // TODO: the position stuff is probably wrong!
-  //    // I need to know between which matches this addition occurs!
-  //    // It should be possible to store that information
-  //    // when the detection occurs
-  //    // there should also be a methods that gives me the 
-  //    // individual words of a phrase
-  //    // And I should remember which column each of the 
-  //    // words of the superbase belongs to
-  //    for (NonMatch addition : additions) {
-  //      Gap witness = addition.getWitness();
-  //      //      for (Word word : witness.g) {
-  //      //        
-  //      //      }
-  //    }
-  //    // TODO Auto-generated method stub
-  //
-  //  }
-
 }
