@@ -28,7 +28,11 @@ public class SuperbaseAlgorithm {
   // bijhouden 
 
   public SuperbaseAlgorithm(Witness... _witnesses) {
-    this.witnesses = Arrays.asList(_witnesses);
+    this(Arrays.asList(_witnesses));
+  }
+
+  public SuperbaseAlgorithm(List<Witness> _witnesses) {
+    this.witnesses = _witnesses;
   }
 
   public AlignmentTable2 createAlignmentTable() {
@@ -37,32 +41,35 @@ public class SuperbaseAlgorithm {
 
     AlignmentTable2 table;
     table = new AlignmentTable2();
-    Witness w1 = witnesses.get(0);
-    table.addFirstWitness(w1);
-    // make the superbase from the alignment table
-    Superbase superbase = table.createSuperbase();
+    if (witnesses.size() > 0) {
+      Witness w1 = witnesses.get(0);
+      table.addFirstWitness(w1);
+      // make the superbase from the alignment table
+      Superbase superbase = table.createSuperbase();
 
-    // do the first comparison
-    Witness w2 = witnesses.get(1);
+      // do the first comparison
+      Witness w2 = witnesses.get(1);
 
-    CollateCore core = new CollateCore();
-    MatchNonMatch compresult = core.compareWitnesses(superbase, w2);
-    addExtraWitnessToAlignmentTable(table, compresult, superbase, w2);
+      CollateCore core = new CollateCore();
+      MatchNonMatch compresult = core.compareWitnesses(superbase, w2);
+      addExtraWitnessToAlignmentTable(table, compresult, superbase, w2);
 
-    // do the second comparison
-    Witness w3 = witnesses.get(2);
+      if (witnesses.size() > 2) {
+        // do the second comparison
+        Witness w3 = witnesses.get(2);
 
-    compresult = core.compareWitnesses(superbase, w3);
-    addExtraWitnessToAlignmentTable(table, compresult, superbase, w3);
+        compresult = core.compareWitnesses(superbase, w3);
+        addExtraWitnessToAlignmentTable(table, compresult, superbase, w3);
 
-    if (witnesses.size() > 3) {
-      // do the third comparison
-      Witness w4 = witnesses.get(3);
+        if (witnesses.size() > 3) {
+          // do the third comparison
+          Witness w4 = witnesses.get(3);
 
-      compresult = core.compareWitnesses(superbase, w4);
-      addExtraWitnessToAlignmentTable(table, compresult, superbase, w4);
+          compresult = core.compareWitnesses(superbase, w4);
+          addExtraWitnessToAlignmentTable(table, compresult, superbase, w4);
+        }
+      }
     }
-
     // TODO: noteer in metadata column match, near match, variants
     return table;
   }

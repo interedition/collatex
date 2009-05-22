@@ -20,24 +20,35 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.superbase.SuperbaseAlgorithm;
+
 public class ColorsView {
 
   private final CollateCore colors;
 
   private final List<String> messages;
 
-  public ColorsView(CollateCore _colors, List<String> messages) {
-    this.colors = _colors;
-    this.messages = messages;
+  private final List<Witness> witnesses;
+
+  public ColorsView(List<String> _messages, List<Witness> _witnesses) {
+    this.witnesses = _witnesses;
+    this.colors = new CollateCore(_witnesses); // this is legacy!
+    this.messages = _messages;
   }
 
-  public ColorsView(CollateCore _colors) {
-    this.colors = _colors;
+  public ColorsView(Witness... _witnesses) {
+    this.witnesses = Lists.newArrayList(_witnesses);
+    this.colors = new CollateCore(_witnesses); // this is legacy!
     this.messages = Lists.newArrayList();
   }
 
   public String toHtml() {
-    return messages() + witnesses() + modifications();
+    return messages() + witnesses() + alignment() + modifications();
+  }
+
+  private String alignment() {
+    SuperbaseAlgorithm algorithm = new SuperbaseAlgorithm(witnesses);
+    return algorithm.createAlignmentTable().toString().replaceAll("\n", "<br/>") + "<br/>";
   }
 
   private String messages() {

@@ -15,7 +15,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.WitnessBuilder;
 import com.sd_editions.collatex.permutations.WitnessBuilder.ContentType;
@@ -88,7 +87,7 @@ class ColorsModel implements Serializable {
     add(witness3, witnessFile3, witnesses, messages);
     add(witness4, witnessFile4, witnesses, messages);
 
-    return new ColorsView(new CollateCore(witnesses.toArray(new Witness[0])), messages);
+    return new ColorsView(messages, witnesses);
   }
 }
 

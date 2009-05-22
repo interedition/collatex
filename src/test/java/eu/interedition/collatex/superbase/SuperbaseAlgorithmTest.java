@@ -25,7 +25,7 @@ public class SuperbaseAlgorithmTest {
     AlignmentTable2 table = magic.createAlignmentTable();
     String expected = "A: the|black|cat\n";
     expected += "B: the|black|cat\n";
-    expected += "C: the|black|cat";
+    expected += "C: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
 
@@ -38,7 +38,7 @@ public class SuperbaseAlgorithmTest {
     AlignmentTable2 table = magic.createAlignmentTable();
     String expected = "A: the|black|cat\n";
     expected += "B: the| |cat\n";
-    expected += "C: the|black|cat";
+    expected += "C: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
 
@@ -51,7 +51,7 @@ public class SuperbaseAlgorithmTest {
     AlignmentTable2 table = magic.createAlignmentTable();
     String expected = "A: the|black|cat\n";
     expected += "B: the|white|cat\n";
-    expected += "C: the|green|cat";
+    expected += "C: the|green|cat\n";
     assertEquals(expected, table.toString());
   }
 
@@ -66,7 +66,7 @@ public class SuperbaseAlgorithmTest {
     String expected = "A:  |the| |cat| \n";
     expected += "B: before|the| |cat| \n";
     expected += "C:  |the|black|cat| \n";
-    expected += "D:  |the| |cat|walks";
+    expected += "D:  |the| |cat|walks\n";
 
     assertEquals(expected, table.toString());
   }

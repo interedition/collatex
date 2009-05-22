@@ -7,9 +7,6 @@ import org.junit.Test;
 import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.WitnessBuilder;
 
-import eu.interedition.collatex.superbase.AlignmentTable2;
-import eu.interedition.collatex.superbase.Column;
-
 public class AlignmentTable2Test {
   @Test
   public void testCreateSuperBase() {
@@ -27,7 +24,7 @@ public class AlignmentTable2Test {
     Witness w1 = builder.build("A", "the black cat");
     AlignmentTable2 table = new AlignmentTable2();
     table.addFirstWitness(w1);
-    String expected = "A: the|black|cat";
+    String expected = "A: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
 
@@ -46,7 +43,7 @@ public class AlignmentTable2Test {
     table.addMatch(w2, w2.getWordOnPosition(2), c2);
     table.addMatch(w2, w2.getWordOnPosition(3), c3);
     String expected = "A: the|black|cat\n";
-    expected += "B: the|black|cat";
+    expected += "B: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
 
@@ -61,7 +58,7 @@ public class AlignmentTable2Test {
     // TODO: word contains id also, which refers to Witness
     table.addMatch(w2, w2.getWordOnPosition(1), column);
     String expected = "A: the|black|cat\n";
-    expected += "B: the| | ";
+    expected += "B: the| | \n";
     assertEquals(expected, table.toString());
   }
 }

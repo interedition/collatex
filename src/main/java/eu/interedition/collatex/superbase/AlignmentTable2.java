@@ -60,15 +60,14 @@ public class AlignmentTable2 {
   @Override
   public String toString() {
     String collectedStrings = "";
-    String linebreak = "";
     for (Witness witness : witnesses) {
-      collectedStrings += linebreak + witness.id + ": ";
-      linebreak = "\n";
+      collectedStrings += witness.id + ": ";
       String delim = "";
       for (Column column : columns) {
         collectedStrings += delim + cellToString(witness, column);
         delim = "|";
       }
+      collectedStrings += "\n";
     }
     return collectedStrings;
   }
