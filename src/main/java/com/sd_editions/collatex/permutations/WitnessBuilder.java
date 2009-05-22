@@ -64,7 +64,7 @@ public class WitnessBuilder {
     /* no witnessId? generate a random one */
     Witness[] witnesses = new Witness[_witnesses.length];
     for (int i = 0; i < witnesses.length; i++) {
-      witnesses[i] = build(_witnesses[i]);
+      witnesses[i] = build("" + (i + 1), _witnesses[i]);
     }
     return witnesses;
   }

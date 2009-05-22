@@ -8,6 +8,7 @@ import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.Web.ColorsView;
 import com.sd_editions.collatex.match.WordMatchMap;
 import com.sd_editions.collatex.permutations.CollateCore;
+import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.WitnessBuilder;
 
 public class UseCaseView {
@@ -16,13 +17,16 @@ public class UseCaseView {
 
   private final List<BlockStructure> witnessList;
 
+  private final Witness[] witnesses;
+
   //  private final Set<ColorMatrix> colorMatrixPermutations;
 
   //  private final List<List<int[]>> matchMatrixList;
 
   public UseCaseView(String[] usecase) {
     WitnessBuilder builder = new WitnessBuilder();
-    colors = new CollateCore(builder.buildWitnesses(usecase));
+    witnesses = builder.buildWitnesses(usecase);
+    colors = new CollateCore(witnesses);
     witnessList = Lists.newArrayList();
     for (String witness : usecase) {
       witnessList.add(Util.string2BlockStructure(witness));
@@ -117,7 +121,7 @@ public class UseCaseView {
   //    return html;
   //  }
   public String toHtml() {
-    String html = "<h4>Base/Witnesses:</h4>" + new ColorsView(colors).toHtml();
+    String html = "<h4>Base/Witnesses:</h4>" + new ColorsView(witnesses).toHtml();
     //    html += "<h4>Matches:</h4>" + new WordMatchMapView(wordMatchMap).toHtml();
     //    html += permutationsView(colorMatrixPermutations);
     return html;

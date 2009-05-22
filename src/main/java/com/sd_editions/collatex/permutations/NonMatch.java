@@ -33,7 +33,7 @@ public class NonMatch {
     return new Replacement(base, witness);
   }
 
-  boolean isAddition() {
+  public boolean isAddition() {
     return !base.hasGap() && witness.hasGap();
   }
 
@@ -41,7 +41,7 @@ public class NonMatch {
     return base.hasGap() && !witness.hasGap();
   }
 
-  boolean isReplacement() {
+  public boolean isReplacement() {
     return base.hasGap() && witness.hasGap();
   }
 

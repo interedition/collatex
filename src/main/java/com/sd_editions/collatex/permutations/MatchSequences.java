@@ -15,16 +15,20 @@ public class MatchSequences {
         Match previous = i.next();
         while (i.hasNext()) {
           Match next = i.next();
-          int baseStartPosition = previous.getBaseWord().position;
-          int baseEndPosition = next.getBaseWord().position;
-          int witnessStartPosition = previous.getWitnessWord().position;
-          int witnessEndPosition = next.getWitnessWord().position;
+          Word previousWordBase = previous.getBaseWord();
+          Word nextWordBase = next.getBaseWord();
+          int baseStartPosition = previousWordBase.position;
+          int baseEndPosition = nextWordBase.position;
+          Word previousWordWitness = previous.getWitnessWord();
+          Word nextWordWitness = next.getWitnessWord();
+          int witnessStartPosition = previousWordWitness.position;
+          int witnessEndPosition = nextWordWitness.position;
           int gapSizeBase = baseEndPosition - baseStartPosition - 1;
           int gapSizeWitness = witnessEndPosition - witnessStartPosition - 1;
           if (gapSizeBase != 0 || gapSizeWitness != 0) {
             //            System.out.println(gapSizeBase + ":" + gapSizeWitness);
-            Gap gapBase = new Gap(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1);
-            Gap gapWitness = new Gap(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1);
+            Gap gapBase = new Gap(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1, previousWordBase, nextWordBase);
+            Gap gapWitness = new Gap(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1, previousWordWitness, nextWordWitness);
             NonMatch nonMatch = new NonMatch(gapBase, gapWitness);
             variants.add(nonMatch);
           }
@@ -63,15 +67,20 @@ public class MatchSequences {
   @SuppressWarnings("boxing")
   private static List<Gap> getGapsFromInBetweenMatchSequencesForBase(Witness witness, List<MatchSequence> sequences) {
     int currentIndex = 1;
+    Word previousWord = null;
+    Word nextWord = null;
     List<Gap> gaps = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
       int position = sequence.getBasePosition();
       int indexDif = position - currentIndex;
-      gaps.add(new Gap(witness, indexDif, currentIndex, position - 1));
-      currentIndex = 1 + sequence.getLastMatch().getBaseWord().position;
+      nextWord = sequence.getFirstMatch().getBaseWord();
+      gaps.add(new Gap(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
+      previousWord = sequence.getLastMatch().getBaseWord();
+      currentIndex = 1 + previousWord.position;
     }
     int IndexDif = witness.size() - currentIndex + 1;
-    gaps.add(new Gap(witness, IndexDif, currentIndex, witness.size()));
+    nextWord = null;
+    gaps.add(new Gap(witness, IndexDif, currentIndex, witness.size(), previousWord, nextWord));
     return gaps;
   }
 
@@ -79,15 +88,20 @@ public class MatchSequences {
   @SuppressWarnings("boxing")
   private static List<Gap> getGapsFromInBetweenMatchSequencesForWitness(Witness witness, List<MatchSequence> sequences) {
     int currentIndex = 1;
+    Word previousWord = null;
+    Word nextWord = null;
     List<Gap> gaps = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
       int position = sequence.getWitnessPosition();
       int indexDif = position - currentIndex;
-      gaps.add(new Gap(witness, indexDif, currentIndex, position - 1));
-      currentIndex = 1 + sequence.getLastMatch().getWitnessWord().position;
+      nextWord = sequence.getFirstMatch().getWitnessWord();
+      gaps.add(new Gap(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
+      previousWord = sequence.getLastMatch().getWitnessWord();
+      currentIndex = 1 + previousWord.position;
     }
     int IndexDif = witness.size() - currentIndex + 1;
-    gaps.add(new Gap(witness, IndexDif, currentIndex, witness.size()));
+    nextWord = null;
+    gaps.add(new Gap(witness, IndexDif, currentIndex, witness.size(), previousWord, nextWord));
     return gaps;
   }
 

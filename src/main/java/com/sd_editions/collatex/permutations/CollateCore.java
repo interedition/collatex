@@ -19,7 +19,11 @@ public class CollateCore {
   public final List<Witness> witnesses;
 
   public CollateCore(Witness... _witnesses) {
-    this.witnesses = Lists.newArrayList(_witnesses);
+    this(Lists.newArrayList(_witnesses));
+  }
+
+  public CollateCore(List<Witness> _witnesses) {
+    this.witnesses = _witnesses;
   }
 
   @Deprecated
