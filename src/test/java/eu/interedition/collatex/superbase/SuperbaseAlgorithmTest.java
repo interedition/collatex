@@ -70,6 +70,58 @@ public class SuperbaseAlgorithmTest {
 
     assertEquals(expected, table.toString());
   }
+
+  // TODO: make the tostring on the alignmenttable
+  // TODO: work with multiple spaces for an empty cell
+  // TODO: fix the gap bug for the last gap
+
+  @Test
+  public void testGenSuperbase() {
+    Witness w1 = builder.build("A", "the cat");
+    Witness w2 = builder.build("B", "before the cat");
+    Witness w3 = builder.build("C", "the black cat");
+    Witness w4 = builder.build("D", "just before midnight the cat walks");
+    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3, w4);
+    AlignmentTable2 table = magic.createAlignmentTable();
+    String expected = "A:  | | |the| |cat| \n";
+    expected += "B:  |before| |the| |cat| \n";
+    expected += "C:  | | |the|black|cat| \n";
+    expected += "D: just|before|midnight|the| |cat|walks\n";
+
+    assertEquals(expected, table.toString());
+  }
+
+  //  @Test
+  //  public void testVariation() {
+  //    Witness w1 = builder.build("A", "the black cat");
+  //    Witness w2 = builder.build("B", "the black and white cat");
+  //    Witness w3 = builder.build("C", "the black very special cat");
+  //    Witness w4 = builder.build("D", "the black not very special cat");
+  //    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3, w4);
+  //    AlignmentTable2 table = magic.createAlignmentTable();
+  //    String expected = "A: the|black| | | |cat\n";
+  //    expected += "B: the|black| |and|white|cat\n";
+  //    expected += "C: the|black| |very|special|cat\n";
+  //    expected += "D: the|black|not|very|special|cat\n";
+  //
+  //    assertEquals(expected, table.toString());
+  //  }
+  //
+  //  @Test
+  //  public void testWitnessReorder() {
+  //    Witness w1 = builder.build("A", "the black cat");
+  //    Witness w2 = builder.build("B", "the black and white cat");
+  //    Witness w3 = builder.build("C", "the black not very special cat");
+  //    Witness w4 = builder.build("D", "the black very special cat");
+  //    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3, w4);
+  //    AlignmentTable2 table = magic.createAlignmentTable();
+  //    String expected = "A: the|black| | | |cat\n";
+  //    expected += "B: the|black|and|white| |cat\n";
+  //    expected += "C: the|black|not|very|special|cat\n";
+  //    expected += "D: the|black| |very|special|cat\n";
+  //
+  //    assertEquals(expected, table.toString());
+  //  }
   // TODO: test a variant with multiple words
   // TODO: hint: more words than the original string it replaces
 

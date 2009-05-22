@@ -58,12 +58,18 @@ public class SuperbaseAlgorithm {
         // do the second comparison
         Witness w3 = witnesses.get(2);
 
+        // make the superbase from the alignment table
+        superbase = table.createSuperbase();
+
         compresult = core.compareWitnesses(superbase, w3);
         addExtraWitnessToAlignmentTable(table, compresult, superbase, w3);
 
         if (witnesses.size() > 3) {
           // do the third comparison
           Witness w4 = witnesses.get(3);
+
+          // make the superbase from the alignment table
+          superbase = table.createSuperbase();
 
           compresult = core.compareWitnesses(superbase, w4);
           addExtraWitnessToAlignmentTable(table, compresult, superbase, w4);

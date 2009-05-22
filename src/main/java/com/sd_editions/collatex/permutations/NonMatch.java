@@ -49,6 +49,18 @@ public class NonMatch {
     return base.hasGap() || witness.hasGap();
   }
 
+  @Override
+  public String toString() {
+    String result = "NonMatch: addition: " + isAddition() + " base: " + base;
+    if (base.isAtTheEnd()) {
+      result += "; nextWord: none";
+    } else {
+      result += "; nextWord: " + base.getNextWord();
+    }
+    result += "; witness: " + witness;
+    return result;
+  }
+
   public Modification analyse() {
     if (isAddition()) {
       return createAddition();

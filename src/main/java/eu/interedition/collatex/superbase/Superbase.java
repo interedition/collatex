@@ -14,7 +14,8 @@ public class Superbase extends Witness {
   }
 
   public void addWord(Word word, Column column) {
-    getWords().add(word);
+    Word newWord = new Word("sb", word.original, getWords().size() + 1);
+    getWords().add(newWord);
     columnForEachWord.add(column);
   }
 
