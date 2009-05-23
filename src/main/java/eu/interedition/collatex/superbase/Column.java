@@ -14,7 +14,7 @@ public class Column {
   protected Map<String, Word> wordsProWitness;
 
   public Column(Word word) {
-    wordsProWitness = Maps.newHashMap();
+    wordsProWitness = Maps.newLinkedHashMap();
     wordsProWitness.put(word.getWitnessId(), word);
   }
 
@@ -58,6 +58,11 @@ public class Column {
 
   public void addVariant(Witness witness, Word wordInWitness) {
     wordsProWitness.put(witness.id, wordInWitness);
+  }
+
+  public void addToSuperbase(Superbase superbase) {
+    for (Word word : wordsProWitness.values())
+      superbase.addWord(word, this);
   }
 
 }

@@ -31,6 +31,8 @@ public class AlignmentTable2 {
       // so we only take the first word for the superbase
       Word matchWord = column.getWords().iterator().next();
       superbase.addWord(matchWord, column);
+      // TODO move this to the columns
+      // TODO handle match & variant to table differently, so that columns store all variants & match columns may become variant columns (if !match added)
     }
     return superbase;
   }

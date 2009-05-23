@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
@@ -61,7 +60,7 @@ public class SuperbaseAlgorithm {
     for (NonMatch replacement : replacements) {
       // TODO: hou rekening met langere additions!
       Word wordInOriginal = replacement.getBase().getFirstWord();
-      Word wordInWitness = replacement.getWitness().getFirstWord();
+      Word wordInWitness = replacement.getWitness().getFirstWord(); // if witness is longer -> extra columns
       Column column = superbase.getColumnFor(wordInOriginal);
       table.addVariant(column, witness, wordInWitness);
     }
@@ -69,7 +68,7 @@ public class SuperbaseAlgorithm {
     List<NonMatch> additions = compresult.getAdditions();
     for (NonMatch addition : additions) {
       // NOTE: right now only the first word is taken
-      // TODO: should work with the whole phrase
+      // TODO: should work with the whole phrase 
       Word firstWord = addition.getWitness().getFirstWord();
 
       if (addition.getBase().isAtTheEnd()) {
