@@ -10,11 +10,11 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
-import com.sd_editions.collatex.permutations.Phrase;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.collation.Phrase;
 import eu.interedition.collatex.input.WitnessBuilder;
 
 public class XMLAlignmentViewTest {

@@ -2,7 +2,8 @@ package com.sd_editions.collatex.views;
 
 import com.sd_editions.collatex.match.views.AppElement;
 import com.sd_editions.collatex.match.views.Element;
-import com.sd_editions.collatex.permutations.Gap;
+
+import eu.interedition.collatex.collation.Gap;
 
 /**
  *  Apparatus element serializing to the output format specified in ticket #6. 

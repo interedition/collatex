@@ -1,10 +1,10 @@
 package eu.interedition.collatex.collation;
 
-import com.sd_editions.collatex.permutations.Gap;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
+
 
 public class NonMatch {
   final Gap base;

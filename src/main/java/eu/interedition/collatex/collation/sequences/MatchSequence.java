@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.collation.sequences;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import eu.interedition.collatex.input.Word;
 
 public class MatchSequence {
   private final List<Match> sequence;
-  final Integer code;
+  public final Integer code;
 
   public MatchSequence(Integer _code, Match... matches) {
     sequence = Lists.newArrayList(matches);

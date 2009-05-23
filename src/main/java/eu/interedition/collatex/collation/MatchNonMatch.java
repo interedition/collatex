@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.MatchSequence;
+
+import eu.interedition.collatex.collation.sequences.MatchSequence;
 
 public class MatchNonMatch {
 

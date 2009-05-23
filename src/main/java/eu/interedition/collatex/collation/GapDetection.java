@@ -1,16 +1,16 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.collation;
 
 import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.permutations.Modification;
 
-import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
-public class MatchSequences {
+public class GapDetection {
   public static List<NonMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
     List<NonMatch> variants = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
@@ -44,6 +44,7 @@ public class MatchSequences {
     return variants;
   }
 
+  @Deprecated
   public static List<Modification> analyseVariants(List<NonMatch> variants) {
     List<Modification> results = Lists.newArrayList();
     for (NonMatch nonMatch : variants) {

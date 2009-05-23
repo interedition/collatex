@@ -10,6 +10,7 @@ import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
 import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 

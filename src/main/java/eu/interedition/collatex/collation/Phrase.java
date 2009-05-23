@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.collation;
 
 import java.util.List;
 

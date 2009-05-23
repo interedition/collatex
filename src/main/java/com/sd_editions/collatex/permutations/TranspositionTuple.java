@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.permutations;
 
+import eu.interedition.collatex.collation.sequences.MatchSequence;
+
 public class TranspositionTuple {
 
   private final Tuple2<MatchSequence> tuple;

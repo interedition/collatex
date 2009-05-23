@@ -9,12 +9,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
-import com.sd_editions.collatex.permutations.MatchSequence;
-import com.sd_editions.collatex.permutations.MatchSequences;
 import com.sd_editions.collatex.permutations.Matches;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
-import com.sd_editions.collatex.permutations.SequenceDetection;
 import com.sd_editions.collatex.permutations.TranspositionDetection;
 import com.sd_editions.collatex.permutations.Tuple2;
 import com.sd_editions.collatex.permutations.collate.Addition;
@@ -22,6 +19,8 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.collation.sequences.MatchSequence;
+import eu.interedition.collatex.collation.sequences.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
 
 public class CollateCore {
@@ -123,14 +122,14 @@ public class CollateCore {
   private List<Modification> determineModifications(Set<Match> permutation, List<NonMatch> determineNonMatches) {
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(Matches.getWordDistanceMatches(permutation));
-    modifications.addAll(MatchSequences.analyseVariants(determineNonMatches));
+    modifications.addAll(GapDetection.analyseVariants(determineNonMatches));
     return modifications;
   }
 
   private List<NonMatch> determineNonMatches(Witness base, Witness witness, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
     List<NonMatch> variants2 = Lists.newArrayList();
-    variants2.addAll(MatchSequences.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
-    variants2.addAll(MatchSequences.getVariantsInMatchSequences(base, witness, matchSequencesForBase));
+    variants2.addAll(GapDetection.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
+    variants2.addAll(GapDetection.getVariantsInMatchSequences(base, witness, matchSequencesForBase));
     return variants2;
   }
 
