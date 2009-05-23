@@ -5,7 +5,6 @@ import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
-
 public class NonMatch {
   final Gap base;
   final Gap witness;
@@ -14,6 +13,7 @@ public class NonMatch {
     return base;
   }
 
+  // TODO rename method -- it does return a Gap, not a Witness
   public Gap getWitness() {
     return witness;
   }

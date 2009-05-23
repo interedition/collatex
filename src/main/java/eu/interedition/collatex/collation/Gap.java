@@ -28,7 +28,7 @@ public class Gap extends Phrase {
   }
 
   // TODO: move up to Phrase?
-  private List<Word> getWords() {
+  public List<Word> getWords() {
     List<Word> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
       Word word = getWitness().getWordOnPosition(k);

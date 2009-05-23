@@ -112,11 +112,11 @@ public class AlignmentTable2Test {
       Word firstWord = addition.getWitness().getFirstWord();
 
       if (addition.getBase().isAtTheEnd()) {
-        table.addMatchAtTheEnd(witness, firstWord);
+        table.addVariantAtTheEnd(witness, addition.getWitness());
       } else {
         Word nextWord = addition.getBase().getNextWord();
         Column column = superbase.getColumnFor(nextWord);
-        table.addMatchBefore(column, witness, firstWord);
+        table.addVariantBefore(column, witness, addition.getBase());
       }
     }
   }

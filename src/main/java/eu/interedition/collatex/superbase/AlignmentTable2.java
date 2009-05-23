@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.collation.CollateCore;
+import eu.interedition.collatex.collation.Gap;
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
 import eu.interedition.collatex.collation.NonMatch;
@@ -123,16 +124,13 @@ public class AlignmentTable2 {
 
     List<NonMatch> additions = compresult.getAdditions();
     for (NonMatch addition : additions) {
-      // NOTE: right now only the first word is taken
-      // TODO: should work with the whole phrase 
-      Word firstWord = addition.getWitness().getFirstWord();
 
       if (addition.getBase().isAtTheEnd()) {
-        addMatchAtTheEnd(witness, firstWord);
+        addVariantAtTheEnd(witness, addition.getWitness());
       } else {
         Word nextWord = addition.getBase().getNextWord();
         Column column = superbase.getColumnFor(nextWord);
-        addMatchBefore(column, witness, firstWord);
+        addVariantBefore(column, witness, addition.getWitness());
       }
     }
   }
@@ -146,19 +144,25 @@ public class AlignmentTable2 {
     addWitnessToInternalList(witness);
   }
 
-  public void addMatchBefore(Column column, Witness witness, Word firstWord) {
+  public void addVariantBefore(Column column, Witness witness, Gap gap) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
       throw new RuntimeException("Unexpected error: Column not found!");
     }
-    Column extraColumn = new Column(witness, firstWord);
-    columns.add(indexOf, extraColumn);
+
+    for (Word word : gap.getWords()) {
+      Column extraColumn = new Column(witness, word);
+      columns.add(indexOf, extraColumn);
+      indexOf++;
+    }
     addWitnessToInternalList(witness);
   }
 
-  public void addMatchAtTheEnd(Witness witness, Word firstWord) {
-    Column extraColumn = new Column(witness, firstWord);
-    columns.add(extraColumn);
+  public void addVariantAtTheEnd(Witness witness, Gap gap) {
+    for (Word word : gap.getWords()) {
+      Column extraColumn = new Column(witness, word);
+      columns.add(extraColumn);
+    }
     addWitnessToInternalList(witness);
   }
 }
