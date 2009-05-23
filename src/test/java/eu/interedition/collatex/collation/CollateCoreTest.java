@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.collation;
 
 import java.util.List;
 
@@ -8,7 +8,12 @@ import org.junit.Test;
 
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.permutations.MatchSequence;
 
+import eu.interedition.collatex.collation.CollateCore;
+import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.WitnessBuilder;
 
 public class CollateCoreTest extends TestCase {

@@ -2,12 +2,12 @@ package com.sd_editions.collatex.Web;
 
 import java.util.List;
 
-import com.sd_editions.collatex.permutations.CollateCore;
-import com.sd_editions.collatex.permutations.Match;
-import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.MatchSequence;
-import com.sd_editions.collatex.permutations.NonMatch;
 
+import eu.interedition.collatex.collation.CollateCore;
+import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 

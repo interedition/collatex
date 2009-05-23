@@ -7,6 +7,8 @@ import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.views.ModificationVisitor;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.collation.Match;
+
 public class Modifications {
   private final List<Transposition> transpositions;
   private final List<Modification> modifications;

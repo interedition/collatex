@@ -5,11 +5,13 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
 public class MatchSequences {
-  static List<NonMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
+  public static List<NonMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
     List<NonMatch> variants = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
       List<Match> matches = sequence.getMatches();
@@ -42,7 +44,7 @@ public class MatchSequences {
     return variants;
   }
 
-  static List<Modification> analyseVariants(List<NonMatch> variants) {
+  public static List<Modification> analyseVariants(List<NonMatch> variants) {
     List<Modification> results = Lists.newArrayList();
     for (NonMatch nonMatch : variants) {
       Modification modification = nonMatch.analyse();
@@ -51,7 +53,7 @@ public class MatchSequences {
     return results;
   }
 
-  static List<NonMatch> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
+  public static List<NonMatch> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
     List<Gap> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
     List<Gap> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
     List<NonMatch> variants = Lists.newArrayList();

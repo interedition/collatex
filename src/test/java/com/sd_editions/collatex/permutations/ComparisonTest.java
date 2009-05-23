@@ -2,6 +2,7 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.List;
 
+import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 

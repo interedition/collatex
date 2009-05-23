@@ -1,9 +1,10 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.collation;
 
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.sd_editions.collatex.permutations.MatchSequence;
 
 public class MatchNonMatch {
 

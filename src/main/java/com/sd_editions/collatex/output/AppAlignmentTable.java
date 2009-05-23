@@ -2,13 +2,13 @@ package com.sd_editions.collatex.output;
 
 import com.sd_editions.collatex.match.views.Element;
 import com.sd_editions.collatex.match.views.TextElement;
-import com.sd_editions.collatex.permutations.Match;
-import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.MultiMatch;
 import com.sd_editions.collatex.permutations.MultiMatchNonMatch;
-import com.sd_editions.collatex.permutations.NonMatch;
 import com.sd_editions.collatex.views.AppElementTEI;
 
+import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Word;
 
 public class AppAlignmentTable {

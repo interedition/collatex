@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Web.Alignment;
 import com.sd_editions.collatex.Web.AlignmentView;
 
+import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
 

@@ -9,6 +9,8 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex.collation.Match;
+
 public class MatchGroup implements Iterable<Match> {
 
   private final ArrayList<Match> matches;

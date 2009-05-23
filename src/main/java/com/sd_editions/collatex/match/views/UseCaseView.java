@@ -7,8 +7,8 @@ import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.Web.ColorsView;
 import com.sd_editions.collatex.match.WordMatchMap;
-import com.sd_editions.collatex.permutations.CollateCore;
 
+import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 

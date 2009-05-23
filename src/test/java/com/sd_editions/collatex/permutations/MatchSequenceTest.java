@@ -6,6 +6,9 @@ import junit.framework.TestCase;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.collation.CollateCore;
+import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;

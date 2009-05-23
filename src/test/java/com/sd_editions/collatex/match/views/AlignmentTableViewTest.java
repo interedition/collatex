@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Modifications;
 
+import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.WitnessBuilder;
 
 public class AlignmentTableViewTest {

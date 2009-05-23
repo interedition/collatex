@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.collation;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,6 +9,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
+import com.sd_editions.collatex.permutations.MatchSequence;
+import com.sd_editions.collatex.permutations.MatchSequences;
+import com.sd_editions.collatex.permutations.Matches;
+import com.sd_editions.collatex.permutations.Modification;
+import com.sd_editions.collatex.permutations.Modifications;
+import com.sd_editions.collatex.permutations.SequenceDetection;
+import com.sd_editions.collatex.permutations.TranspositionDetection;
+import com.sd_editions.collatex.permutations.Tuple2;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;

@@ -2,9 +2,9 @@ package com.sd_editions.collatex.match.views;
 
 import java.util.Set;
 
-import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.Modifications;
 
+import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.input.Word;
 
 public class AlignmentTable {

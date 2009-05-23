@@ -9,6 +9,8 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex.collation.Match;
+
 public class SequenceDetection {
 
   @SuppressWarnings("boxing")
@@ -64,7 +66,7 @@ public class SequenceDetection {
     return previousMatches;
   }
 
-  protected static List<MatchSequence> sortSequencesForWitness(List<MatchSequence> matchSequences) {
+  public static List<MatchSequence> sortSequencesForWitness(List<MatchSequence> matchSequences) {
     Comparator<MatchSequence> comparator = new Comparator<MatchSequence>() {
       @SuppressWarnings("boxing")
       public int compare(MatchSequence o1, MatchSequence o2) {
