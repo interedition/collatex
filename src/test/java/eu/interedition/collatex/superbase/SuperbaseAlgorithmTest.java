@@ -47,11 +47,15 @@ public class SuperbaseAlgorithmTest {
     Witness w1 = builder.build("A", "the black cat");
     Witness w2 = builder.build("B", "the white cat");
     Witness w3 = builder.build("C", "the green cat");
-    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3);
+    Witness w4 = builder.build("D", "the red cat");
+    Witness w5 = builder.build("E", "the yellow cat");
+    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3, w4, w5);
     AlignmentTable2 table = magic.createAlignmentTable();
     String expected = "A: the|black|cat\n";
     expected += "B: the|white|cat\n";
     expected += "C: the|green|cat\n";
+    expected += "D: the|red|cat\n";
+    expected += "E: the|yellow|cat\n";
     assertEquals(expected, table.toString());
   }
 

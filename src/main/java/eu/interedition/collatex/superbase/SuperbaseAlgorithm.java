@@ -1,6 +1,7 @@
 package eu.interedition.collatex.superbase;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -28,28 +29,14 @@ public class SuperbaseAlgorithm {
   }
 
   public AlignmentTable2 createAlignmentTable() {
-    // fill alignment table with words from the first
-    // witness
-
     AlignmentTable2 table = new AlignmentTable2();
-    if (witnesses.size() > 0) {
-      Witness w1 = witnesses.get(0);
-      table.addFirstWitness(w1);
-
-      // do the first comparison
-      Witness w2 = witnesses.get(1);
-      addWitnessToAlignmentTable(table, w2);
-
-      if (witnesses.size() > 2) {
-        // do the second comparison
-        Witness w3 = witnesses.get(2);
-        addWitnessToAlignmentTable(table, w3);
-
-        if (witnesses.size() > 3) {
-          // do the third comparison
-          Witness w4 = witnesses.get(3);
-          addWitnessToAlignmentTable(table, w4);
-        }
+    if (!witnesses.isEmpty()) {
+      Iterator<Witness> i = witnesses.iterator();
+      Witness witness = i.next();
+      table.addFirstWitness(witness);
+      while (i.hasNext()) {
+        witness = i.next();
+        addWitnessToAlignmentTable(table, witness);
       }
     }
     return table;
