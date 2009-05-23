@@ -1,9 +1,11 @@
 package eu.interedition.collatex.superbase;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.input.Witness;
@@ -12,10 +14,12 @@ import eu.interedition.collatex.input.Word;
 public class Column {
 
   protected Map<String, Word> wordsProWitness;
+  private final List<Word> variants;
 
-  public Column(Word word) {
-    wordsProWitness = Maps.newLinkedHashMap();
-    wordsProWitness.put(word.getWitnessId(), word);
+  public Column(Witness firstWitness, Word word) {
+    wordsProWitness = Maps.newHashMap();
+    variants = Lists.newLinkedList();
+    addVariant(firstWitness, word);
   }
 
   public void toXML(StringBuilder builder) {
@@ -58,11 +62,12 @@ public class Column {
 
   public void addVariant(Witness witness, Word wordInWitness) {
     wordsProWitness.put(witness.id, wordInWitness);
+    variants.add(wordInWitness);
   }
 
   public void addToSuperbase(Superbase superbase) {
-    for (Word word : wordsProWitness.values())
-      superbase.addWord(word, this);
+    for (Word variant : variants)
+      superbase.addWord(variant, this);
   }
 
 }

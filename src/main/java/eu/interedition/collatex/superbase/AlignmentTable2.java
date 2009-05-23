@@ -51,7 +51,7 @@ public class AlignmentTable2 {
 
   void addFirstWitness(Witness w1) {
     for (Word word : w1.getWords()) {
-      add(new Column(word));
+      add(new Column(w1, word));
     }
     witnesses.add(w1);
   }
@@ -112,13 +112,13 @@ public class AlignmentTable2 {
     if (indexOf == -1) {
       throw new RuntimeException("Unexpected error: Column not found!");
     }
-    Column extraColumn = new Column(firstWord);
+    Column extraColumn = new Column(witness, firstWord);
     columns.add(indexOf, extraColumn);
     addWitness(witness);
   }
 
   public void addMatchAtTheEnd(Witness witness, Word firstWord) {
-    Column extraColumn = new Column(firstWord);
+    Column extraColumn = new Column(witness, firstWord);
     columns.add(extraColumn);
     addWitness(witness);
   }

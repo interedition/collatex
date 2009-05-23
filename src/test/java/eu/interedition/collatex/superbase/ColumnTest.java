@@ -19,7 +19,7 @@ public class ColumnTest {
     Witness witness = builder.build("A", "a test string");
     Witness witnessB = builder.build("B", "different");
     Word word = witness.getWordOnPosition(1);
-    Column column = new Column(word);
+    Column column = new Column(witness, word);
     column.getWord(witnessB);
   }
 
@@ -29,7 +29,7 @@ public class ColumnTest {
     Witness witness = builder.build("A", "a test string");
     Witness witnessB = builder.build("B", "different");
     Word word = witness.getWordOnPosition(1);
-    Column column = new Column(word);
+    Column column = new Column(witness, word);
     assertTrue(column.containsWitness(witness));
     assertFalse(column.containsWitness(witnessB));
   }
@@ -43,11 +43,29 @@ public class ColumnTest {
     Word word = witness.getWordOnPosition(1);
     Word wordB = witnessB.getWordOnPosition(1);
     Word wordC = witnessC.getWordOnPosition(1);
-    Column column = new Column(word);
+    Column column = new Column(witness, word);
     column.addVariant(witnessB, wordB);
     column.addVariant(witnessC, wordC);
     Superbase superbase = new Superbase();
     column.addToSuperbase(superbase);
     assertEquals("first second third", superbase.toString());
   }
+
+  @Test
+  public void testInverseWordMap2() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness witness = builder.build("A", "first");
+    Witness witnessB = builder.build("B", "match");
+    Witness witnessC = builder.build("C", "match");
+    Word word = witness.getWordOnPosition(1);
+    Word wordB = witnessB.getWordOnPosition(1);
+    Word wordC = witnessC.getWordOnPosition(1);
+    Column column = new Column(witness, word);
+    column.addVariant(witnessB, wordB);
+    column.addMatch(witnessC, wordC);
+    Superbase superbase = new Superbase();
+    column.addToSuperbase(superbase);
+    assertEquals("first match", superbase.toString());
+  }
+
 }
