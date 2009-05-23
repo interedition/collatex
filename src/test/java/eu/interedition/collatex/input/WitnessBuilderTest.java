@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.input;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -12,7 +12,11 @@ import junit.framework.TestCase;
 
 import org.xml.sax.SAXException;
 
-import com.sd_editions.collatex.permutations.WitnessBuilder.ContentType;
+
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.input.WitnessBuilder.ContentType;
 
 public class WitnessBuilderTest extends TestCase {
 

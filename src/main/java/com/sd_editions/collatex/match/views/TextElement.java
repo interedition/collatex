@@ -1,6 +1,6 @@
 package com.sd_editions.collatex.match.views;
 
-import com.sd_editions.collatex.permutations.Word;
+import eu.interedition.collatex.input.Word;
 
 public class TextElement extends Element {
 

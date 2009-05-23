@@ -5,6 +5,8 @@ import java.util.List;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
+import eu.interedition.collatex.input.Word;
+
 public class MultiMatch {
   public final String name;
   private final Multimap<String, Word> similarWordsPerWitness;

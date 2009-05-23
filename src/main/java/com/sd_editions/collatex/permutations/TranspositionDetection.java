@@ -10,6 +10,8 @@ import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.input.Witness;
+
 public class TranspositionDetection {
   final Witness witness;
   final Witness witness2;

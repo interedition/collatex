@@ -2,7 +2,7 @@ package com.sd_editions.collatex.output;
 
 import org.junit.BeforeClass;
 
-import com.sd_editions.collatex.permutations.WitnessBuilder;
+import eu.interedition.collatex.input.WitnessBuilder;
 
 public class XMLAppOutputTest {
 

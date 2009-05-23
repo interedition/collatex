@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.input.Witness;
+
 public class Phrase {
   private final Witness witness;
   private final int startPosition;

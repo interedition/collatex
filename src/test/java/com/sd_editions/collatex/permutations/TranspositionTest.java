@@ -6,6 +6,8 @@ import junit.framework.TestCase;
 
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.input.WitnessBuilder;
+
 public class TranspositionTest extends TestCase {
 
   private WitnessBuilder builder;

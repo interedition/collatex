@@ -9,6 +9,8 @@ import junit.framework.TestCase;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex.input.Word;
+
 public class MatchPermutatorTest extends TestCase {
 
   private MatchPermutator permutator;

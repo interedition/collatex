@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.input;
 
 public class Word {
   private final String witnessId;

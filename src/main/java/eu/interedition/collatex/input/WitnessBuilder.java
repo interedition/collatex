@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.input;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +8,7 @@ import java.util.Random;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
+
 
 public class WitnessBuilder {
 

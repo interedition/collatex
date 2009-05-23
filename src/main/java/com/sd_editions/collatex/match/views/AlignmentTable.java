@@ -4,7 +4,8 @@ import java.util.Set;
 
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.Modifications;
-import com.sd_editions.collatex.permutations.Word;
+
+import eu.interedition.collatex.input.Word;
 
 public class AlignmentTable {
 

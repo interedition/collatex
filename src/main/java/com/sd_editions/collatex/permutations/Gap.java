@@ -4,6 +4,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
+
 public class Gap extends Phrase {
   private final int size;
   private final Word previous;

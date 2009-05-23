@@ -6,6 +6,9 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessBuilder;
+
 /**
  * not really a test case: maybe refactor into the web application 
  */

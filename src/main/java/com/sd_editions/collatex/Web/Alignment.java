@@ -3,7 +3,8 @@ package com.sd_editions.collatex.Web;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.Word;
+
+import eu.interedition.collatex.input.Word;
 
 public class Alignment {
   private final List<Word> words;

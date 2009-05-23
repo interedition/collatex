@@ -5,8 +5,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.WitnessBuilder;
+
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessBuilder;
 
 public class SuperbaseAlgorithmTest {
   private static WitnessBuilder builder;

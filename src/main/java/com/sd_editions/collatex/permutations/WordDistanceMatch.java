@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.permutations;
 
+import eu.interedition.collatex.input.Word;
+
 public class WordDistanceMatch extends Modification {
 
   private final Match match;

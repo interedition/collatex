@@ -9,8 +9,9 @@ import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.NonMatch;
-import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.Word;
+
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
 
 public class SuperbaseAlgorithm {
   private final List<Witness> witnesses;

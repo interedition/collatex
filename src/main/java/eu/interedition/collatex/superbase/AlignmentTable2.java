@@ -3,8 +3,9 @@ package eu.interedition.collatex.superbase;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.Word;
+
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
 
 // Note: for the TEI xml output it is easier to
 // have a Column be a list<phrase>

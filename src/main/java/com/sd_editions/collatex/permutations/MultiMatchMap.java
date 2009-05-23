@@ -10,6 +10,9 @@ import com.google.common.base.Join;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
+
 public class MultiMatchMap {
   private final LinkedHashMap<String, MultiMatch> mmm;
 

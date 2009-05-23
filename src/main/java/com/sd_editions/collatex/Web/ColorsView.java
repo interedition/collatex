@@ -12,14 +12,14 @@ import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
-import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.Word;
 import com.sd_editions.collatex.permutations.WordDistanceMatch;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.superbase.SuperbaseAlgorithm;
 
 public class ColorsView {

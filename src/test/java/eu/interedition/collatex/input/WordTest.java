@@ -1,5 +1,6 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.input;
 
+import eu.interedition.collatex.input.Word;
 import junit.framework.TestCase;
 
 public class WordTest extends TestCase {

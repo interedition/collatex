@@ -1,6 +1,6 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.input;
 
-import com.sd_editions.collatex.permutations.WitnessTokenizer;
+import eu.interedition.collatex.input.WitnessTokenizer;
 
 import junit.framework.TestCase;
 

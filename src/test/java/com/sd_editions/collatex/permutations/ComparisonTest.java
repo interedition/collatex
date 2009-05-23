@@ -2,6 +2,9 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.List;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessBuilder;
+
 import junit.framework.TestCase;
 
 public class ComparisonTest extends TestCase {

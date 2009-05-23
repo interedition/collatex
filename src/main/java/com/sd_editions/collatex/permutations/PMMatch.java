@@ -6,6 +6,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Join;
 import com.google.common.collect.Iterables;
 
+import eu.interedition.collatex.input.Word;
+
 /* Possible MultiMatch */
 public class PMMatch {
   final MultiMatch match;

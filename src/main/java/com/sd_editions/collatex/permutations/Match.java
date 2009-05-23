@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.permutations;
 
+import eu.interedition.collatex.input.Word;
+
 public class Match implements Comparable<Match> {
   private final Word word1;
   private final Word word2;

@@ -5,6 +5,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
+
 public class MatchSequences {
   static List<NonMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
     List<NonMatch> variants = Lists.newArrayList();

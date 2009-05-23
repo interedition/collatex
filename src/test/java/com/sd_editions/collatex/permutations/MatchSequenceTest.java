@@ -6,6 +6,10 @@ import junit.framework.TestCase;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.Word;
+
 public class MatchSequenceTest extends TestCase {
   private final String witnessId1 = "alpha";
   private final String witnessId2 = "beta";

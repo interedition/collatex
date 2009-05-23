@@ -9,6 +9,8 @@ import org.junit.Test;
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.input.WitnessBuilder;
+
 public class CollateCoreTest extends TestCase {
   private WitnessBuilder builder;
 

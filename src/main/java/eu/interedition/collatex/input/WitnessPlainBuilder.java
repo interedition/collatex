@@ -1,9 +1,10 @@
-package com.sd_editions.collatex.permutations;
+package eu.interedition.collatex.input;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 
 public class WitnessPlainBuilder extends WitnessStreamBuilder {
 

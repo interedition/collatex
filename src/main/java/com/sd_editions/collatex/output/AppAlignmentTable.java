@@ -7,8 +7,9 @@ import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.MultiMatch;
 import com.sd_editions.collatex.permutations.MultiMatchNonMatch;
 import com.sd_editions.collatex.permutations.NonMatch;
-import com.sd_editions.collatex.permutations.Word;
 import com.sd_editions.collatex.views.AppElementTEI;
+
+import eu.interedition.collatex.input.Word;
 
 public class AppAlignmentTable {
 

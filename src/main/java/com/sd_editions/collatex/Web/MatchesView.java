@@ -7,8 +7,9 @@ import com.sd_editions.collatex.permutations.Match;
 import com.sd_editions.collatex.permutations.MatchNonMatch;
 import com.sd_editions.collatex.permutations.MatchSequence;
 import com.sd_editions.collatex.permutations.NonMatch;
-import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.WitnessBuilder;
+
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessBuilder;
 
 public class MatchesView {
 

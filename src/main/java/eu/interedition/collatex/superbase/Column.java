@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.google.common.collect.Maps;
-import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.Word;
+
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
 
 public class Column {
 

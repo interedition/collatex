@@ -15,9 +15,10 @@ import org.apache.wicket.model.PropertyModel;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.Witness;
-import com.sd_editions.collatex.permutations.WitnessBuilder;
-import com.sd_editions.collatex.permutations.WitnessBuilder.ContentType;
+
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.WitnessBuilder.ContentType;
 
 @SuppressWarnings("serial")
 public class ColorsPage extends WebPage {

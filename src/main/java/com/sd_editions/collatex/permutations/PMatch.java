@@ -1,5 +1,7 @@
 package com.sd_editions.collatex.permutations;
 
+import eu.interedition.collatex.input.Word;
+
 public class PMatch {
   final Match match;
   private boolean fixed;

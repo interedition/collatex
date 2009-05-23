@@ -10,6 +10,9 @@ import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Web.Alignment;
 import com.sd_editions.collatex.Web.AlignmentView;
 
+import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.Word;
+
 public class AlignmentTest extends TestCase {
 
   private WitnessBuilder builder;

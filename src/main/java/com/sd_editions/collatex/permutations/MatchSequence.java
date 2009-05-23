@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.input.Word;
+
 public class MatchSequence {
   private final List<Match> sequence;
   final Integer code;

@@ -6,7 +6,8 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.permutations.CollateCore;
 import com.sd_editions.collatex.permutations.Modifications;
-import com.sd_editions.collatex.permutations.WitnessBuilder;
+
+import eu.interedition.collatex.input.WitnessBuilder;
 
 public class AlignmentTableViewTest {
   @Test

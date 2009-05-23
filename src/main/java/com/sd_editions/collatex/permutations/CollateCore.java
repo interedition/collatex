@@ -14,6 +14,8 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.input.Witness;
+
 public class CollateCore {
 
   public final List<Witness> witnesses;
