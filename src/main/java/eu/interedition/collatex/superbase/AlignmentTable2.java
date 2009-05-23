@@ -79,6 +79,10 @@ public class AlignmentTable2 {
     return column.getWord(witness).toString();
   }
 
+  // Note: go through table here or direct through column?
+  // columnFor.addMatch(witness, witnessWord);
+  // if you go directly the table is not notified about
+  // the fact that a witness is added
   public void addMatch(Witness witness, Word word, Column column) {
     column.addMatch(witness, word);
     addWitness(witness);
