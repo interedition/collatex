@@ -19,8 +19,8 @@ public class AlignmentTable2 {
     this.witnesses = Lists.newArrayList();
   }
 
-  public void add(DefaultColumn defaultColumn) {
-    columns.add(defaultColumn);
+  public void add(Column column) {
+    columns.add(column);
   }
 
   public Superbase createSuperbase() {
@@ -48,7 +48,7 @@ public class AlignmentTable2 {
 
   void addFirstWitness(Witness w1) {
     for (Word word : w1.getWords()) {
-      add(new DefaultColumn(word));
+      add(new Column(word));
     }
     witnesses.add(w1);
   }
@@ -109,13 +109,13 @@ public class AlignmentTable2 {
     if (indexOf == -1) {
       throw new RuntimeException("Unexpected error: Column not found!");
     }
-    Column extraColumn = new DefaultColumn(firstWord);
+    Column extraColumn = new Column(firstWord);
     columns.add(indexOf, extraColumn);
     addWitness(witness);
   }
 
   public void addMatchAtTheEnd(Witness witness, Word firstWord) {
-    Column extraColumn = new DefaultColumn(firstWord);
+    Column extraColumn = new Column(firstWord);
     columns.add(extraColumn);
     addWitness(witness);
   }

@@ -11,16 +11,14 @@ import com.sd_editions.collatex.permutations.Witness;
 import com.sd_editions.collatex.permutations.WitnessBuilder;
 import com.sd_editions.collatex.permutations.Word;
 
-import eu.interedition.collatex.superbase.DefaultColumn;
-
-public class DefaultColumnTest {
+public class ColumnTest {
   @Test(expected = NoSuchElementException.class)
   public void testGetWordNonExistingGivesException() {
     WitnessBuilder builder = new WitnessBuilder();
     Witness witness = builder.build("A", "a test string");
     Witness witnessB = builder.build("B", "different");
     Word word = witness.getWordOnPosition(1);
-    DefaultColumn column = new DefaultColumn(word);
+    Column column = new Column(word);
     column.getWord(witnessB);
   }
 
@@ -30,7 +28,7 @@ public class DefaultColumnTest {
     Witness witness = builder.build("A", "a test string");
     Witness witnessB = builder.build("B", "different");
     Word word = witness.getWordOnPosition(1);
-    DefaultColumn column = new DefaultColumn(word);
+    Column column = new Column(word);
     assertTrue(column.containsWitness(witness));
     assertFalse(column.containsWitness(witnessB));
   }
