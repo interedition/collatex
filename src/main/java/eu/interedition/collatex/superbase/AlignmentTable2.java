@@ -1,9 +1,14 @@
 package eu.interedition.collatex.superbase;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.collation.CollateCore;
+import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
@@ -27,12 +32,7 @@ public class AlignmentTable2 {
   public Superbase createSuperbase() {
     Superbase superbase = new Superbase();
     for (Column column : columns) {
-      // Note: for now we pretend every column is a Match column
-      // so we only take the first word for the superbase
-      Word matchWord = column.getWords().iterator().next();
-      superbase.addWord(matchWord, column);
-      // TODO move this to the columns
-      // TODO handle match & variant to table differently, so that columns store all variants & match columns may become variant columns (if !match added)
+      column.addToSuperbase(superbase);
     }
     return superbase;
   }
@@ -88,13 +88,52 @@ public class AlignmentTable2 {
   // the fact that a witness is added
   public void addMatch(Witness witness, Word word, Column column) {
     column.addMatch(witness, word);
-    addWitness(witness);
+    addWitnessToInternalList(witness);
   }
 
-  private void addWitness(Witness witness) {
+  private void addWitnessToInternalList(Witness witness) {
     // TODO: an ordered set instead of list would be nice here
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
+    }
+  }
+
+  public void addWitness(Witness witness) {
+    // make the superbase from the alignment table
+    Superbase superbase = createSuperbase();
+    CollateCore core = new CollateCore();
+    MatchNonMatch compresult = core.compareWitnesses(superbase, witness);
+
+    Set<Match> matches = compresult.getMatches();
+    for (Match match : matches) {
+      Word baseWord = match.getBaseWord();
+      Column column = superbase.getColumnFor(baseWord);
+      Word witnessWord = match.getWitnessWord();
+      addMatch(witness, witnessWord, column);
+    }
+
+    List<NonMatch> replacements = compresult.getReplacements();
+    for (NonMatch replacement : replacements) {
+      // TODO: hou rekening met langere additions!
+      Word wordInOriginal = replacement.getBase().getFirstWord();
+      Word wordInWitness = replacement.getWitness().getFirstWord(); // if witness is longer -> extra columns
+      Column column = superbase.getColumnFor(wordInOriginal);
+      addVariant(column, witness, wordInWitness);
+    }
+
+    List<NonMatch> additions = compresult.getAdditions();
+    for (NonMatch addition : additions) {
+      // NOTE: right now only the first word is taken
+      // TODO: should work with the whole phrase 
+      Word firstWord = addition.getWitness().getFirstWord();
+
+      if (addition.getBase().isAtTheEnd()) {
+        addMatchAtTheEnd(witness, firstWord);
+      } else {
+        Word nextWord = addition.getBase().getNextWord();
+        Column column = superbase.getColumnFor(nextWord);
+        addMatchBefore(column, witness, firstWord);
+      }
     }
   }
 
@@ -104,7 +143,7 @@ public class AlignmentTable2 {
 
   public void addVariant(Column column, Witness witness, Word wordInWitness) {
     column.addVariant(witness, wordInWitness);
-    addWitness(witness);
+    addWitnessToInternalList(witness);
   }
 
   public void addMatchBefore(Column column, Witness witness, Word firstWord) {
@@ -114,12 +153,12 @@ public class AlignmentTable2 {
     }
     Column extraColumn = new Column(witness, firstWord);
     columns.add(indexOf, extraColumn);
-    addWitness(witness);
+    addWitnessToInternalList(witness);
   }
 
   public void addMatchAtTheEnd(Witness witness, Word firstWord) {
     Column extraColumn = new Column(witness, firstWord);
     columns.add(extraColumn);
-    addWitness(witness);
+    addWitnessToInternalList(witness);
   }
 }

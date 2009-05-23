@@ -2,11 +2,18 @@ package eu.interedition.collatex.superbase;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Test;
 
-
+import eu.interedition.collatex.collation.CollateCore;
+import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.Word;
 
 public class AlignmentTable2Test {
   @Test
@@ -17,6 +24,18 @@ public class AlignmentTable2Test {
     alignmentTable.addFirstWitness(a);
     Witness superbase = alignmentTable.createSuperbase();
     assertEquals("the first witness", superbase.toString());
+  }
+
+  @Test
+  public void testCreateSuperBaseWithVariation() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness a = builder.build("A", "the first witness");
+    Witness b = builder.build("B", "the second witness");
+    AlignmentTable2 alignmentTable = new AlignmentTable2();
+    alignmentTable.addFirstWitness(a);
+    alignmentTable.addWitness(b);
+    Witness superbase = alignmentTable.createSuperbase();
+    assertEquals("the first second witness", superbase.toString());
   }
 
   @Test
@@ -61,5 +80,44 @@ public class AlignmentTable2Test {
     String expected = "A: the|black|cat\n";
     expected += "B: the| | \n";
     assertEquals(expected, table.toString());
+  }
+
+  private static void addWitnessToAlignmentTable(AlignmentTable2 table, Witness witness) {
+    // make the superbase from the alignment table
+    Superbase superbase = table.createSuperbase();
+    CollateCore core = new CollateCore();
+    MatchNonMatch compresult = core.compareWitnesses(superbase, witness);
+
+    Set<Match> matches = compresult.getMatches();
+    for (Match match : matches) {
+      Word baseWord = match.getBaseWord();
+      Column column = superbase.getColumnFor(baseWord);
+      Word witnessWord = match.getWitnessWord();
+      table.addMatch(witness, witnessWord, column);
+    }
+
+    List<NonMatch> replacements = compresult.getReplacements();
+    for (NonMatch replacement : replacements) {
+      // TODO: hou rekening met langere additions!
+      Word wordInOriginal = replacement.getBase().getFirstWord();
+      Word wordInWitness = replacement.getWitness().getFirstWord(); // if witness is longer -> extra columns
+      Column column = superbase.getColumnFor(wordInOriginal);
+      table.addVariant(column, witness, wordInWitness);
+    }
+
+    List<NonMatch> additions = compresult.getAdditions();
+    for (NonMatch addition : additions) {
+      // NOTE: right now only the first word is taken
+      // TODO: should work with the whole phrase 
+      Word firstWord = addition.getWitness().getFirstWord();
+
+      if (addition.getBase().isAtTheEnd()) {
+        table.addMatchAtTheEnd(witness, firstWord);
+      } else {
+        Word nextWord = addition.getBase().getNextWord();
+        Column column = superbase.getColumnFor(nextWord);
+        table.addMatchBefore(column, witness, firstWord);
+      }
+    }
   }
 }
