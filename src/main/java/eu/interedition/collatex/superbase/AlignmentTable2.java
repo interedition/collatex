@@ -1,5 +1,7 @@
 package eu.interedition.collatex.superbase;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -116,22 +118,45 @@ public class AlignmentTable2 {
     List<NonMatch> replacements = compresult.getReplacements();
     for (NonMatch replacement : replacements) {
       // TODO: hou rekening met langere additions!
-      Word wordInOriginal = replacement.getBase().getFirstWord();
-      Word wordInWitness = replacement.getWitness().getFirstWord(); // if witness is longer -> extra columns
-      Column column = superbase.getColumnFor(wordInOriginal);
-      addVariant(column, witness, wordInWitness);
+
+      Iterator<Word> baseIterator = replacement.getBase().getWords().iterator();
+      Iterator<Word> witnessIterator = replacement.getWitness().getWords().iterator();
+      while (baseIterator.hasNext()) {
+        Word wordInOriginal = baseIterator.next();
+        Column column = superbase.getColumnFor(wordInOriginal);
+        if (witnessIterator.hasNext()) {
+          Word wordInWitness = witnessIterator.next();
+          addVariant(column, witness, wordInWitness);
+        }
+      }
+      // still have words in the witness? add new columns after the last one from the base
+      if (witnessIterator.hasNext()) {
+        LinkedList<Word> remainingWitnessWords = Lists.newLinkedList(witnessIterator);
+        addVariantAtGap(superbase, witness, replacement.getBase(), remainingWitnessWords);
+      }
+
+      //      Word wordInOriginal = replacement.getBase().getFirstWord();
+      //      Word wordInWitness = replacement.getWitness().getFirstWord(); // if witness is longer -> extra columns
+      //      Column column = superbase.getColumnFor(wordInOriginal);
+      //      addVariant(column, witness, wordInWitness);
     }
 
     List<NonMatch> additions = compresult.getAdditions();
     for (NonMatch addition : additions) {
 
-      if (addition.getBase().isAtTheEnd()) {
-        addVariantAtTheEnd(witness, addition.getWitness());
-      } else {
-        Word nextWord = addition.getBase().getNextWord();
-        Column column = superbase.getColumnFor(nextWord);
-        addVariantBefore(column, witness, addition.getWitness());
-      }
+      List<Word> witnessWords = addition.getWitness().getWords();
+      Gap base = addition.getBase();
+      addVariantAtGap(superbase, witness, base, witnessWords);
+    }
+  }
+
+  private void addVariantAtGap(Superbase superbase, Witness witness, Gap baseGap, List<Word> witnessWords) {
+    if (baseGap.isAtTheEnd()) {
+      addVariantAtTheEnd(witness, witnessWords);
+    } else {
+      Word nextWord = baseGap.getNextWord();
+      Column column = superbase.getColumnFor(nextWord);
+      addVariantBefore(column, witness, witnessWords);
     }
   }
 
@@ -144,13 +169,13 @@ public class AlignmentTable2 {
     addWitnessToInternalList(witness);
   }
 
-  public void addVariantBefore(Column column, Witness witness, Gap gap) {
+  public void addVariantBefore(Column column, Witness witness, List<Word> witnessWords) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
       throw new RuntimeException("Unexpected error: Column not found!");
     }
 
-    for (Word word : gap.getWords()) {
+    for (Word word : witnessWords) {
       Column extraColumn = new Column(witness, word);
       columns.add(indexOf, extraColumn);
       indexOf++;
@@ -158,8 +183,8 @@ public class AlignmentTable2 {
     addWitnessToInternalList(witness);
   }
 
-  public void addVariantAtTheEnd(Witness witness, Gap gap) {
-    for (Word word : gap.getWords()) {
+  public void addVariantAtTheEnd(Witness witness, List<Word> witnessWords) {
+    for (Word word : witnessWords) {
       Column extraColumn = new Column(witness, word);
       columns.add(extraColumn);
     }
