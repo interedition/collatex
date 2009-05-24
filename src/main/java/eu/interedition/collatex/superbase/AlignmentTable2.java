@@ -126,7 +126,11 @@ public class AlignmentTable2 {
         Column column = superbase.getColumnFor(wordInOriginal);
         if (witnessIterator.hasNext()) {
           Word wordInWitness = witnessIterator.next();
-          addVariant(column, witness, wordInWitness);
+          if (column.containsWitness(witness)) { // already have something in here from the matches phase
+            addVariantBefore(column, witness, Lists.newArrayList(wordInWitness)); // FIXME but this doesn't handle longer sequences ...
+          } else {
+            addVariant(column, witness, wordInWitness);
+          }
         }
       }
       // still have words in the witness? add new columns after the last one from the base
