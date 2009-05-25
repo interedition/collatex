@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 
@@ -96,21 +95,21 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
-  //  @Test
-  //  public void testVariation() {
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the black and white cat");
-  //    Witness w3 = builder.build("C", "the black very special cat");
-  //    Witness w4 = builder.build("D", "the black not very special cat");
-  //    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3, w4);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A: the|black| | | |cat\n";
-  //    expected += "B: the|black| |and|white|cat\n";
-  //    expected += "C: the|black| |very|special|cat\n";
-  //    expected += "D: the|black|not|very|special|cat\n";
-  //
-  //    assertEquals(expected, table.toString());
-  //  }
+  @Test
+  public void testVariation() {
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the black and white cat");
+    Witness w3 = builder.build("C", "the black very special cat");
+    Witness w4 = builder.build("D", "the black not very special cat");
+    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3, w4);
+    AlignmentTable2 table = magic.createAlignmentTable();
+    String expected = "A: the|black| | | |cat\n";
+    expected += "B: the|black| |and|white|cat\n";
+    expected += "C: the|black| |very|special|cat\n";
+    expected += "D: the|black|not|very|special|cat\n";
+
+    assertEquals(expected, table.toString());
+  }
   //
   //  @Test
   //  public void testWitnessReorder() {
