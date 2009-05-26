@@ -12,6 +12,7 @@ import eu.interedition.collatex.collation.Gap;
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
 import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
@@ -107,9 +108,28 @@ public class AlignmentTable2 {
     CollateCore core = new CollateCore();
     MatchNonMatch compresult = core.compareWitnesses(superbase, witness);
 
+    List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesForBase();
+    List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesForWitness();
+    // I just need it as a list of matches
+    // Note: this list must be already present somewhere
+    // you might as well take the set of matches 
+    List<Match> matchesOrderedForTheWitness = Lists.newArrayList();
+    for (MatchSequence matchSeq : matchSequencesForWitness) {
+      for (Match match : matchSeq.getMatches()) {
+        matchesOrderedForTheWitness.add(match);
+      }
+    }
+    List<Match> matchesOrderedForTheBase = Lists.newArrayList();
+    for (MatchSequence matchSeq : matchSequencesForBase) {
+      for (Match match : matchSeq.getMatches()) {
+        matchesOrderedForTheBase.add(match);
+      }
+    }
     Set<Match> matches = compresult.getMatches();
     for (Match match : matches) {
-      Word baseWord = match.getBaseWord();
+      int indexOfMatchInWitness = matchesOrderedForTheWitness.indexOf(match);
+      Match transposedmatch = matchesOrderedForTheBase.get(indexOfMatchInWitness);
+      Word baseWord = transposedmatch.getBaseWord();
       Column column = superbase.getColumnFor(baseWord);
       Word witnessWord = match.getWitnessWord();
       addMatch(witness, witnessWord, column);

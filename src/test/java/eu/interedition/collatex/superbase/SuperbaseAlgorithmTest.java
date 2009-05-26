@@ -110,6 +110,20 @@ public class SuperbaseAlgorithmTest {
 
     assertEquals(expected, table.toString());
   }
+
+  @Test
+  public void testTransposition() {
+    Witness w1 = builder.build("A", "the cat is black");
+    Witness w2 = builder.build("B", "black is the cat");
+    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2);
+    AlignmentTable2 table = magic.createAlignmentTable();
+    String expected;
+    expected = "A: the|cat|is|black\n";
+    expected += "B: black|is|the|cat\n";
+
+    assertEquals(expected, table.toString());
+  }
+
   //
   //  @Test
   //  public void testWitnessReorder() {
