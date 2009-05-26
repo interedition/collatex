@@ -11,12 +11,14 @@ public class Gap extends Phrase {
   private final int size;
   private final Word previous;
   private final Word next;
+  private final Match nextMatch;
 
-  public Gap(Witness _witness, int _size, int _beginPosition, int _endPosition, Word _previous, Word _next) {
+  public Gap(Witness _witness, int _size, int _beginPosition, int _endPosition, Word _previous, Word _next, Match _nextMatch) {
     super(_witness, _beginPosition, _endPosition);
     this.size = _size;
     this.previous = _previous;
     this.next = _next;
+    this.nextMatch = _nextMatch;
   }
 
   public boolean hasGap() {
@@ -57,6 +59,13 @@ public class Gap extends Phrase {
 
   public boolean isAtTheFront() {
     return previous == null;
+  }
+
+  public Match getNextMatch() {
+    if (isAtTheEnd()) {
+      throw new RuntimeException("There is no next match!");
+    }
+    return nextMatch;
   }
 
 }
