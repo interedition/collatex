@@ -20,6 +20,8 @@ import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.superbase.AlignmentTable2;
+import eu.interedition.collatex.superbase.Column;
 import eu.interedition.collatex.superbase.SuperbaseAlgorithm;
 
 public class ColorsView {
@@ -48,7 +50,25 @@ public class ColorsView {
 
   private String alignment() {
     SuperbaseAlgorithm algorithm = new SuperbaseAlgorithm(witnesses);
-    return algorithm.createAlignmentTable().toString().replaceAll("\n", "<br/>") + "<br/>";
+    AlignmentTable2 alignmentTable = algorithm.createAlignmentTable();
+
+    StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
+
+    for (Witness witness : witnesses) {
+      tableHTML.append("<tr>");
+      tableHTML.append("<th>Witness ").append(witness.id).append(":</th>");
+      for (Column column : alignmentTable.getColumns()) {
+        tableHTML.append("<td>");
+        if (column.containsWitness(witness)) {
+          tableHTML.append(column.getWord(witness));
+        }
+        tableHTML.append("</td>");
+      }
+      tableHTML.append("</tr>\n");
+    }
+    tableHTML.append("</table>\n</div>\n\n");
+    //    return alignmentTable.toString().replaceAll("\n", "<br/>") + "<br/>";
+    return tableHTML.toString();
   }
 
   private String messages() {
@@ -71,7 +91,7 @@ public class ColorsView {
   }
 
   private String modifications() {
-    StringBuffer html = new StringBuffer();
+    StringBuffer html = new StringBuffer("<h4>Modifications:</h4>");
     MatchesView matchesView = new MatchesView();
     final int numberOfWitnesses = colors.numberOfWitnesses();
     for (int base = 1; base < numberOfWitnesses; base++) {
