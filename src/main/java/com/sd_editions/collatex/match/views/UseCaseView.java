@@ -122,7 +122,7 @@ public class UseCaseView {
   //    return html;
   //  }
   public String toHtml() {
-    String html = "<h4>Base/Witnesses:</h4>" + new ColorsView(witnesses).toHtml();
+    String html = new ColorsView(witnesses).toHtml();
     //    html += "<h4>Matches:</h4>" + new WordMatchMapView(wordMatchMap).toHtml();
     //    html += permutationsView(colorMatrixPermutations);
     return html;
