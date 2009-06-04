@@ -30,7 +30,12 @@ public class Match implements Comparable<Match> {
     return word1;
   }
 
-  public boolean equals(Match other) {
+  @Override
+  public boolean equals(Object _other) {
+    if (!(_other instanceof Match)) {
+      return false;
+    }
+    Match other = (Match) _other;
     return this.word1.equals(other.word1) && this.word2.equals(other.word2);
   }
 
