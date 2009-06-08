@@ -15,7 +15,7 @@ public class SequenceDetection {
 
   @SuppressWarnings("boxing")
   public static List<MatchSequence> calculateMatchSequences(Set<Match> matches) {
-    // sort Matches for the base --> that is already done (it is a linked hash set)
+    // sort Matches for the base
     List<Match> matchesSortedForBase = SequenceDetection.sortMatchesForBase(matches);
     // sort Matches for the witness
     List<Match> matchesSortedForWitness = SequenceDetection.sortMatchesForWitness(matches);
@@ -24,7 +24,7 @@ public class SequenceDetection {
     Map<Match, Match> previousMatchMapWitness = SequenceDetection.buildPreviousMatchMap(matchesSortedForWitness);
     List<MatchSequence> sequences = Lists.newArrayList();
     MatchSequence sequence = new MatchSequence(sequences.size());
-    for (Match match : matches) {
+    for (Match match : matchesSortedForBase) {
       Match expected = previousMatchMapBase.get(match);
       Match actual = previousMatchMapWitness.get(match);
       if (expected != actual || expected != null && !expected.equals(actual)) {
@@ -37,11 +37,16 @@ public class SequenceDetection {
     return sequences;
   }
 
+  // Note: THE previous METHOD ASSUMED AN ORDER IN THE SET!
+  // TODO: add test!
   private static List<Match> sortMatchesForBase(Set<Match> matches) {
-    List<Match> matchesSortedForBase = Lists.newArrayList();
-    for (Match match : matches) {
-      matchesSortedForBase.add(match);
-    }
+    Comparator<Match> comparator = new Comparator<Match>() {
+      public int compare(Match o1, Match o2) {
+        return o1.getBaseWord().position - o2.getBaseWord().position;
+      }
+    };
+    List<Match> matchesSortedForBase = Lists.newArrayList(matches);
+    Collections.sort(matchesSortedForBase, comparator);
     return matchesSortedForBase;
   }
 

@@ -71,11 +71,37 @@ public class Matcher {
     List<Permutation> permutations = getPermutationsForMatchGroup(fixedMatches, matchGroup);
     Permutation bestPermutation = selectBestPossiblePermutation(a, b, permutations);
     fixedMatches.add(bestPermutation.getPossibleMatch());
+    // TODO: filter away possible matches which contain position which are occupied by the chosen permutation
+    matchGroupsForPossibleMatches = filterAwayNoLongerPossibleMatches(bestPermutation.getPossibleMatch(), matchGroupsForPossibleMatches);
+    iterator = matchGroupsForPossibleMatches.iterator();
     matchGroup = iterator.next();
-    matchGroup = iterator.next();
-    matchGroup = iterator.next();
+    //    matchGroup = iterator.next();
+    //    matchGroup = iterator.next();
     System.out.println(matchGroup);
+    permutations = getPermutationsForMatchGroup(fixedMatches, matchGroup);
+    bestPermutation = selectBestPossiblePermutation(a, b, permutations);
+    System.out.println(bestPermutation.getPossibleMatch());
+    System.out.println(bestPermutation.getMatchSequences());
+    System.out.println(bestPermutation.getNonMatches(a, b)); // THIS ONE GOES WRONG!
     return permutations;
+  }
+
+  private Set<MatchGroup> filterAwayNoLongerPossibleMatches(Match selectedMatch, Set<MatchGroup> matchGroupsForPossibleMatches) {
+    Set<MatchGroup> results = Sets.newLinkedHashSet();
+    for (MatchGroup group : matchGroupsForPossibleMatches) {
+      MatchGroup newGroup = new MatchGroup();
+      for (Match match : group) {
+        if (match.getBaseWord().equals(selectedMatch.getBaseWord()) || match.getWitnessWord().equals(selectedMatch.getWitnessWord())) {
+          // do nothing... this one should be filtered away
+        } else {
+          newGroup.add(match);
+        }
+      }
+      if (!newGroup.isEmpty()) {
+        results.add(newGroup);
+      }
+    }
+    return results;
   }
 
   private List<Permutation> getPermutationsForMatchGroup(Set<Match> exactMatches, MatchGroup matchGroup) {
