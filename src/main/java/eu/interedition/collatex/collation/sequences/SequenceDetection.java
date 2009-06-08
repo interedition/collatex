@@ -17,8 +17,10 @@ public class SequenceDetection {
   public static List<MatchSequence> calculateMatchSequences(Set<Match> matches) {
     // sort Matches for the base --> that is already done (it is a linked hash set)
     List<Match> matchesSortedForBase = SequenceDetection.sortMatchesForBase(matches);
+    System.out.println(">>MatchesForBase: " + matchesSortedForBase);
     // sort Matches for the witness
     List<Match> matchesSortedForWitness = SequenceDetection.sortMatchesForWitness(matches);
+    System.out.println(">>MatchesForWitness: " + matchesSortedForWitness);
     // now compare..
     Map<Match, Match> previousMatchMapBase = SequenceDetection.buildPreviousMatchMap(matchesSortedForBase);
     Map<Match, Match> previousMatchMapWitness = SequenceDetection.buildPreviousMatchMap(matchesSortedForWitness);
@@ -34,14 +36,20 @@ public class SequenceDetection {
       sequence.add(match);
     }
     if (!sequence.isEmpty()) sequences.add(sequence);
+    System.out.println("Sequences>>" + sequences);
     return sequences;
   }
 
+  // THE OLD METHOD ASSUMED AN ORDER IN THE SET!
+  // TODO: add test!
   private static List<Match> sortMatchesForBase(Set<Match> matches) {
-    List<Match> matchesSortedForBase = Lists.newArrayList();
-    for (Match match : matches) {
-      matchesSortedForBase.add(match);
-    }
+    Comparator<Match> comparator = new Comparator<Match>() {
+      public int compare(Match o1, Match o2) {
+        return o1.getBaseWord().position - o2.getBaseWord().position;
+      }
+    };
+    List<Match> matchesSortedForBase = Lists.newArrayList(matches);
+    Collections.sort(matchesSortedForBase, comparator);
     return matchesSortedForBase;
   }
 

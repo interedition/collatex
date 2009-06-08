@@ -63,4 +63,12 @@ public class MatchGroup implements Iterable<Match> {
   public String toString() {
     return matches.toString();
   }
+
+  public void addAll(Iterable<Match> _matches) {
+    matches.addAll(Lists.newArrayList(_matches));
+  }
+
+  public boolean isEmpty() {
+    return matches.isEmpty();
+  }
 }
