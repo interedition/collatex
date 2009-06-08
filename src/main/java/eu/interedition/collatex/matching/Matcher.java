@@ -37,6 +37,7 @@ public class Matcher {
     return new Result(exactMatches, possibleMatches);
   }
 
+  // TODO: re-enable near matches!
   private Set<Match> findMatches(Witness base, Witness witness) {
     Set<Match> matchSet = Sets.newLinkedHashSet();
     for (Word baseWord : base.getWords()) {
@@ -61,8 +62,8 @@ public class Matcher {
     return Iterables.filter(pmatches, unfixedAlternativeToGivenPMatch);
   }
 
-  // TODO: rename, test separately
-  public List<Permutation> getPossiblePermutationsForMatchGroup(Witness a, Witness b, int i) {
+  // TODO: test separately
+  public Permutation getBestPermutation(Witness a, Witness b) {
     Result result = match(a, b);
     Set<Match> fixedMatches = result.getExactMatches();
     Set<MatchGroup> matchGroupsForPossibleMatches = result.getPossibleMatches();
@@ -71,19 +72,13 @@ public class Matcher {
     List<Permutation> permutations = getPermutationsForMatchGroup(fixedMatches, matchGroup);
     Permutation bestPermutation = selectBestPossiblePermutation(a, b, permutations);
     fixedMatches.add(bestPermutation.getPossibleMatch());
-    // TODO: filter away possible matches which contain position which are occupied by the chosen permutation
     matchGroupsForPossibleMatches = filterAwayNoLongerPossibleMatches(bestPermutation.getPossibleMatch(), matchGroupsForPossibleMatches);
     iterator = matchGroupsForPossibleMatches.iterator();
     matchGroup = iterator.next();
-    //    matchGroup = iterator.next();
-    //    matchGroup = iterator.next();
     System.out.println(matchGroup);
     permutations = getPermutationsForMatchGroup(fixedMatches, matchGroup);
     bestPermutation = selectBestPossiblePermutation(a, b, permutations);
-    System.out.println(bestPermutation.getPossibleMatch());
-    System.out.println(bestPermutation.getMatchSequences());
-    System.out.println(bestPermutation.getNonMatches(a, b)); // THIS ONE GOES WRONG!
-    return permutations;
+    return bestPermutation;
   }
 
   private Set<MatchGroup> filterAwayNoLongerPossibleMatches(Match selectedMatch, Set<MatchGroup> matchGroupsForPossibleMatches) {
@@ -108,10 +103,6 @@ public class Matcher {
     List<Permutation> permutationsForMatchGroup = Lists.newArrayList();
     for (Match possibleMatch : matchGroup) {
       Permutation permutation = new Permutation(exactMatches, possibleMatch);
-      //      Set<Match> permutation = Sets.newLinkedHashSet();
-      //      permutation.addAll(exactMatches);
-      //      permutation.add(possibleMatch);
-      // System.out.println(permutation);
       permutationsForMatchGroup.add(permutation);
     }
     return permutationsForMatchGroup;
@@ -120,7 +111,7 @@ public class Matcher {
   private Permutation selectBestPossiblePermutation(Witness a, Witness b, List<Permutation> permutations) {
     Permutation bestPermutation = null;
 
-    // NOTE: this can be done in a nicer with the min function!
+    // NOTE: this can be done in a nicer way with the min function!
     for (Permutation permutation : permutations) {
       List<NonMatch> nonMatches = permutation.getNonMatches(a, b);
       if (bestPermutation == null || nonMatches.size() < bestPermutation.getNonMatches(a, b).size()) {
