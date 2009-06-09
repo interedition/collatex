@@ -2,11 +2,13 @@ package eu.interedition.collatex.matching;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.permutations.MatchGroup;
 
@@ -19,14 +21,19 @@ public class Matcher {
 
   public Result match(Witness a, Witness b) {
     Set<Match> allMatches = findMatches(a, b);
-    Set<MatchGroup> possibleMatches = Sets.newLinkedHashSet();
     // group matches by common base word or common witness word
     Set<Match> exactMatches = Sets.newLinkedHashSet();
     for (Match match : allMatches) {
       Iterable<Match> alternatives = findAlternatives(allMatches, match);
       if (!alternatives.iterator().hasNext()) {
         exactMatches.add(match);
-      } else {
+      }
+    }
+
+    Set<MatchGroup> possibleMatches = Sets.newLinkedHashSet();
+    for (Match match : allMatches) {
+      Iterable<Match> alternatives = findAlternatives(allMatches, match);
+      if (alternatives.iterator().hasNext()) {
         // start MatchGroup van de iterator
         MatchGroup group = new MatchGroup();
         group.add(match);
@@ -34,7 +41,10 @@ public class Matcher {
         possibleMatches.add(group);
       }
     }
-    return new Result(exactMatches, possibleMatches);
+
+    // Note: this is very much like a key multi value map!
+    Map<Integer, MatchGroup> matchGroupsForBase = Maps.newLinkedHashMap();
+    return new Result(exactMatches, possibleMatches, matchGroupsForBase);
   }
 
   // TODO: re-enable near matches!
