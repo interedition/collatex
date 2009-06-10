@@ -30,6 +30,8 @@ public class Matcher {
       }
     }
 
+    // Note: this is very much like a key multi value map!
+    Map<Integer, MatchGroup> matchGroupsForBase = Maps.newLinkedHashMap();
     Set<MatchGroup> possibleMatches = Sets.newLinkedHashSet();
     for (Match match : allMatches) {
       Iterable<Match> alternatives = findAlternatives(allMatches, match);
@@ -42,8 +44,6 @@ public class Matcher {
       }
     }
 
-    // Note: this is very much like a key multi value map!
-    Map<Integer, MatchGroup> matchGroupsForBase = Maps.newLinkedHashMap();
     return new Result(exactMatches, possibleMatches, matchGroupsForBase);
   }
 
