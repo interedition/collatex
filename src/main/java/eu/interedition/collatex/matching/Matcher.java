@@ -1,14 +1,11 @@
 package eu.interedition.collatex.matching;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.permutations.MatchGroup;
 
@@ -19,32 +16,21 @@ import eu.interedition.collatex.input.Word;
 
 public class Matcher {
 
-  public Result match(Witness a, Witness b) {
+  public PossibleMatches match(Witness a, Witness b) {
     Set<Match> allMatches = findMatches(a, b);
     // group matches by common base word or common witness word
     Set<Match> exactMatches = Sets.newLinkedHashSet();
     for (Match match : allMatches) {
-      Iterable<Match> alternatives = findAlternatives(allMatches, match);
+      Iterable<Match> alternatives = PossibleMatches.findAlternativesBase(allMatches, match);
       if (!alternatives.iterator().hasNext()) {
         exactMatches.add(match);
       }
     }
 
-    // Note: this is very much like a key multi value map!
-    Map<Integer, MatchGroup> matchGroupsForBase = Maps.newLinkedHashMap();
-    Set<MatchGroup> possibleMatches = Sets.newLinkedHashSet();
-    for (Match match : allMatches) {
-      Iterable<Match> alternatives = findAlternatives(allMatches, match);
-      if (alternatives.iterator().hasNext()) {
-        // start MatchGroup van de iterator
-        MatchGroup group = new MatchGroup();
-        group.add(match);
-        group.addAll(alternatives);
-        possibleMatches.add(group);
-      }
-    }
-
-    return new Result(exactMatches, possibleMatches, matchGroupsForBase);
+    Set<Match> unfixedMatches = Sets.newLinkedHashSet(allMatches);
+    unfixedMatches.removeAll(exactMatches);
+    PossibleMatches posMatches = new PossibleMatches(exactMatches, unfixedMatches);
+    return posMatches;
   }
 
   // TODO: re-enable near matches!
@@ -63,34 +49,43 @@ public class Matcher {
     return matchSet;
   }
 
-  Iterable<Match> findAlternatives(Iterable<Match> pmatches, final Match pmatch) {
-    Predicate<Match> unfixedAlternativeToGivenPMatch = new Predicate<Match>() {
-      public boolean apply(Match pm) {
-        return pm != pmatch && (pm.getBaseWord().equals(pmatch.getBaseWord()) /* || pm.getWitnessWord().equals(pmatch.getWitnessWord())*/);
-      }
-    };
-    return Iterables.filter(pmatches, unfixedAlternativeToGivenPMatch);
-  }
-
   // TODO: test separately
   public Permutation getBestPermutation(Witness a, Witness b) {
-    Result result = match(a, b);
-    Set<Match> fixedMatches = result.getExactMatches();
-    Set<MatchGroup> matchGroupsForPossibleMatches = result.getPossibleMatches();
-    Iterator<MatchGroup> iterator = matchGroupsForPossibleMatches.iterator();
-    MatchGroup matchGroup = iterator.next();
-    List<Permutation> permutations = getPermutationsForMatchGroup(fixedMatches, matchGroup);
+    PossibleMatches matches = match(a, b);
+    Set<Match> fixedMatches = matches.getFixedMatches();
+    Set<Word> unfixedWords = matches.getUnfixedWords();
+    Word next = unfixedWords.iterator().next();
+    System.out.println("next word that is going to be matched: " + next + " at position: " + next.position);
+    Collection<Match> unfixedMatches = matches.getMatchesThatLinkFrom(next);
+    List<Permutation> permutations = getPermutationsForUnfixedMatches(fixedMatches, unfixedMatches);
     Permutation bestPermutation = selectBestPossiblePermutation(a, b, permutations);
-    fixedMatches.add(bestPermutation.getPossibleMatch());
-    matchGroupsForPossibleMatches = filterAwayNoLongerPossibleMatches(bestPermutation.getPossibleMatch(), matchGroupsForPossibleMatches);
-    iterator = matchGroupsForPossibleMatches.iterator();
-    matchGroup = iterator.next();
-    System.out.println(matchGroup);
-    permutations = getPermutationsForMatchGroup(fixedMatches, matchGroup);
+    matches = matches.fixMatch(bestPermutation.getPossibleMatch());
+    fixedMatches = matches.getFixedMatches();
+    unfixedWords = matches.getUnfixedWords();
+    next = unfixedWords.iterator().next();
+    System.out.println("next word that is going to be matched: " + next + " at position: " + next.position);
+    unfixedMatches = matches.getMatchesThatLinkFrom(next);
+    permutations = getPermutationsForUnfixedMatches(fixedMatches, unfixedMatches);
     bestPermutation = selectBestPossiblePermutation(a, b, permutations);
+
     return bestPermutation;
   }
 
+  private List<Permutation> getPermutationsForUnfixedMatches(Set<Match> fixedMatches, Collection<Match> unfixedMatches) {
+    List<Permutation> permutationsForMatchGroup = Lists.newArrayList();
+    for (Match possibleMatch : unfixedMatches) {
+      Permutation permutation = new Permutation(fixedMatches, possibleMatch);
+      permutationsForMatchGroup.add(permutation);
+    }
+    return permutationsForMatchGroup;
+  }
+
+  private void filterAwayNoLongerPossibleMatches(Map<Integer, MatchGroup> possibleMatchesNew, Match match) {
+    // TODO: the integer as key is no real fun!
+    possibleMatchesNew.remove(match.getBaseWord().position);
+  }
+
+  // TODO: remove!
   private Set<MatchGroup> filterAwayNoLongerPossibleMatches(Match selectedMatch, Set<MatchGroup> matchGroupsForPossibleMatches) {
     Set<MatchGroup> results = Sets.newLinkedHashSet();
     for (MatchGroup group : matchGroupsForPossibleMatches) {
@@ -109,14 +104,7 @@ public class Matcher {
     return results;
   }
 
-  private List<Permutation> getPermutationsForMatchGroup(Set<Match> exactMatches, MatchGroup matchGroup) {
-    List<Permutation> permutationsForMatchGroup = Lists.newArrayList();
-    for (Match possibleMatch : matchGroup) {
-      Permutation permutation = new Permutation(exactMatches, possibleMatch);
-      permutationsForMatchGroup.add(permutation);
-    }
-    return permutationsForMatchGroup;
-  }
+  //  private List<Permutation> getPermutationsForMatchGroup(Set<Match> exactMatches, MatchGroup matchGroup) {}
 
   private Permutation selectBestPossiblePermutation(Witness a, Witness b, List<Permutation> permutations) {
     Permutation bestPermutation = null;

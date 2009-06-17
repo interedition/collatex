@@ -11,29 +11,40 @@ public class Result {
 
   private final Set<Match> exactMatches;
   private final Set<MatchGroup> possibleMatches; // TODO: remove!
-  private final Map<Integer, MatchGroup> matchGroupsForBase;
 
-  public Result(Set<Match> _exactMatches, Set<MatchGroup> _possibleMatches, Map<Integer, MatchGroup> _matchGroupsForBase) {
+  //  private final Map<Integer, MatchGroup> matchGroupsForBase;
+  //  private final Map<Integer, MatchGroup> matchGroupsForWitness;
+
+  public Result(Set<Match> _exactMatches, Set<MatchGroup> _possibleMatches) {
     this.exactMatches = _exactMatches;
     this.possibleMatches = _possibleMatches;
-    this.matchGroupsForBase = _matchGroupsForBase;
+    //    this.matchGroupsForBase = _matchGroupsForBase;
+    //    this.matchGroupsForWitness = _matchGroupsForWitness;
   }
 
   public Set<Match> getExactMatches() {
     return exactMatches;
   }
 
-  public Set<MatchGroup> getPossibleMatches() {
-    return possibleMatches;
-  }
+  //  public Set<MatchGroup> getPossibleMatches() {
+  //    return possibleMatches;
+  //  }
 
   // Note: maybe it should be Word instead of int?
   public MatchGroup getMatchGroupForBaseWord(int i) {
-    return matchGroupsForBase.get(new Integer(i));
+    throw new UnsupportedOperationException();
+    //return matchGroupsForBase.get(new Integer(i));
   }
 
+  // Note: maybe it should be Word instead of int?
   public MatchGroup getMatchGroupForWitnessWord(int i) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
+    //return matchGroupsForWitness.get(new Integer(i));
+  }
+
+  public Map<Integer, MatchGroup> getPossibleMatchesNew() {
+    throw new UnsupportedOperationException();
+    //return matchGroupsForBase;
+
   }
 }
