@@ -11,7 +11,6 @@ import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
 
 public class PossibleMatchesTest {
-  // TODO: make test work; remove ignore annotation!
   @Test
   public void testPossibleMatchesAsAMap() {
     WitnessBuilder builder = new WitnessBuilder();
@@ -24,13 +23,8 @@ public class PossibleMatchesTest {
     Collection<Match> linked = result.getMatchesThatLinkFrom(zijn);
     Assert.assertEquals("[(1->2), (1->5), (1->8)]", linked.toString());
 
-    // Note: minor; why is the sequence not from lowest to highest?
-
-    // TODO: enable!
-    //    Word zijnB = b.getWordOnPosition(2);
-    //    Collection<Match> links = result.getMatchesThatLinkTo(zijnB);
-    //    Assert.assertEquals("[(5->2), (1->2)]", links.toString());
-
+    Word zijnB = b.getWordOnPosition(2);
+    Collection<Match> links = result.getMatchesThatLinkTo(zijnB);
+    Assert.assertEquals("[(1->2), (5->2)]", links.toString());
   }
-
 }

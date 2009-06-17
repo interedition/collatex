@@ -26,21 +26,6 @@ public class MatchingTest {
     Assert.assertTrue(exactMatches.contains(expected));
   }
 
-  //  @Test
-  //  @Ignore
-  //  public void testPossibleMatches() {
-  //    WitnessBuilder builder = new WitnessBuilder();
-  //    Witness a = builder.build("zijn hond liep aan zijn hand");
-  //    Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-  //    Matcher matcher = new Matcher();
-  //    Result result = matcher.match(a, b);
-  //    Set<MatchGroup> possibleMatches = result.getPossibleMatches();
-  //    Iterator<MatchGroup> iterator = possibleMatches.iterator();
-  //    MatchGroup next = iterator.next();
-  //    Assert.assertEquals("[(1->2), (1->5), (1->8)]", next.toString());
-  //    System.out.println(next);
-  //  }
-
   @Test
   public void testSelectBestMatchFromPossibleMatches() {
     WitnessBuilder builder = new WitnessBuilder();
