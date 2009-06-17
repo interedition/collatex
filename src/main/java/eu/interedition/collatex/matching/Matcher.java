@@ -2,12 +2,10 @@ package eu.interedition.collatex.matching;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.sd_editions.collatex.permutations.MatchGroup;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.NonMatch;
@@ -79,32 +77,6 @@ public class Matcher {
     }
     return permutationsForMatchGroup;
   }
-
-  private void filterAwayNoLongerPossibleMatches(Map<Integer, MatchGroup> possibleMatchesNew, Match match) {
-    // TODO: the integer as key is no real fun!
-    possibleMatchesNew.remove(match.getBaseWord().position);
-  }
-
-  // TODO: remove!
-  private Set<MatchGroup> filterAwayNoLongerPossibleMatches(Match selectedMatch, Set<MatchGroup> matchGroupsForPossibleMatches) {
-    Set<MatchGroup> results = Sets.newLinkedHashSet();
-    for (MatchGroup group : matchGroupsForPossibleMatches) {
-      MatchGroup newGroup = new MatchGroup();
-      for (Match match : group) {
-        if (match.getBaseWord().equals(selectedMatch.getBaseWord()) || match.getWitnessWord().equals(selectedMatch.getWitnessWord())) {
-          // do nothing... this one should be filtered away
-        } else {
-          newGroup.add(match);
-        }
-      }
-      if (!newGroup.isEmpty()) {
-        results.add(newGroup);
-      }
-    }
-    return results;
-  }
-
-  //  private List<Permutation> getPermutationsForMatchGroup(Set<Match> exactMatches, MatchGroup matchGroup) {}
 
   private Permutation selectBestPossiblePermutation(Witness a, Witness b, List<Permutation> permutations) {
     Permutation bestPermutation = null;
