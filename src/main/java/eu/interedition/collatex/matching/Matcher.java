@@ -50,6 +50,14 @@ public class Matcher {
   // TODO: test separately
   public Permutation getBestPermutation(Witness a, Witness b) {
     PossibleMatches matches = match(a, b);
+    Permutation bestPermutation = permutationLoop(a, b, matches);
+    matches = matches.fixMatch(bestPermutation.getPossibleMatch());
+    bestPermutation = permutationLoop(a, b, matches);
+    return bestPermutation;
+  }
+
+  // TODO: rename!
+  private Permutation permutationLoop(Witness a, Witness b, final PossibleMatches matches) {
     Set<Match> fixedMatches = matches.getFixedMatches();
     Set<Word> unfixedWords = matches.getUnfixedWords();
     Word next = unfixedWords.iterator().next();
@@ -57,15 +65,6 @@ public class Matcher {
     Collection<Match> unfixedMatches = matches.getMatchesThatLinkFrom(next);
     List<Permutation> permutations = getPermutationsForUnfixedMatches(fixedMatches, unfixedMatches);
     Permutation bestPermutation = selectBestPossiblePermutation(a, b, permutations);
-    matches = matches.fixMatch(bestPermutation.getPossibleMatch());
-    fixedMatches = matches.getFixedMatches();
-    unfixedWords = matches.getUnfixedWords();
-    next = unfixedWords.iterator().next();
-    System.out.println("next word that is going to be matched: " + next + " at position: " + next.position);
-    unfixedMatches = matches.getMatchesThatLinkFrom(next);
-    permutations = getPermutationsForUnfixedMatches(fixedMatches, unfixedMatches);
-    bestPermutation = selectBestPossiblePermutation(a, b, permutations);
-
     return bestPermutation;
   }
 
