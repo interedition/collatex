@@ -3,6 +3,7 @@ package eu.interedition.collatex.matching;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.collation.Match;
@@ -23,6 +24,20 @@ public class MatchingTest {
     Match expected = new Match(a.getWordOnPosition(2), b.getWordOnPosition(6));
     System.out.println(exactMatches);
     Assert.assertTrue(exactMatches.contains(expected));
+  }
+
+  // TODO: make this test run!
+  @Test
+  @Ignore
+  public void testNoPermutationsOnlyExactMatches() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness a = builder.build("deze zinnen zijn hetzelfde");
+    Witness b = builder.build("deze zinnen zijn hetzelfde met een aanvulling");
+    Matcher matcher = new Matcher();
+    Permutation permutation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = permutation.getMatches();
+    String expected = "[(1->1), (2->2), (3->3), (4->4)]";
+    Assert.assertEquals(expected, matches.toString());
   }
 
   @Test
