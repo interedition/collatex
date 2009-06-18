@@ -3,7 +3,6 @@ package eu.interedition.collatex.matching;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.collation.Match;
@@ -54,8 +53,6 @@ public class MatchingTest {
     Assert.assertEquals(3, permutation.getMatchSequences().size());
   }
 
-  // TODO: make this test work!
-  @Ignore
   @Test
   public void testMatchingFromBtoA() {
     WitnessBuilder builder = new WitnessBuilder();
