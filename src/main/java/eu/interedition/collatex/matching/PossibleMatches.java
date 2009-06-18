@@ -102,4 +102,8 @@ public class PossibleMatches {
     return results;
   }
 
+  public boolean hasUnfixedWords() {
+    return !baseToWitness.keySet().isEmpty();
+  }
+
 }

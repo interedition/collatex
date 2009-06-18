@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
@@ -48,11 +49,17 @@ public class Matcher {
   }
 
   // TODO: test separately
+  // TODO: there is a problem here when there are no permutations!
   public Permutation getBestPermutation(Witness a, Witness b) {
     PossibleMatches matches = match(a, b);
-    Permutation bestPermutation = permutationLoop(a, b, matches);
-    matches = matches.fixMatch(bestPermutation.getPossibleMatch());
-    bestPermutation = permutationLoop(a, b, matches);
+    Permutation bestPermutation = null;
+    while (matches.hasUnfixedWords()) {
+      bestPermutation = permutationLoop(a, b, matches);
+      matches = matches.fixMatch(bestPermutation.getPossibleMatch());
+    }
+    if (bestPermutation == null) {
+      throw new RuntimeException("There are no permutations!");
+    }
     return bestPermutation;
   }
 
@@ -80,10 +87,12 @@ public class Matcher {
   private Permutation selectBestPossiblePermutation(Witness a, Witness b, List<Permutation> permutations) {
     Permutation bestPermutation = null;
 
+    // TODO: add test for lowest number of matchsequences (transpositions)
     // NOTE: this can be done in a nicer way with the min function!
     for (Permutation permutation : permutations) {
       List<NonMatch> nonMatches = permutation.getNonMatches(a, b);
-      if (bestPermutation == null || nonMatches.size() < bestPermutation.getNonMatches(a, b).size()) {
+      List<MatchSequence> matchSequences = permutation.getMatchSequences();
+      if (bestPermutation == null || matchSequences.size() < bestPermutation.getMatchSequences().size() || nonMatches.size() < bestPermutation.getNonMatches(a, b).size()) {
         bestPermutation = permutation;
       }
     }

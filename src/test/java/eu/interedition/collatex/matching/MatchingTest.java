@@ -41,7 +41,6 @@ public class MatchingTest {
   }
 
   @Test
-  @Ignore
   public void testTreeTimesZijnAlsoWorks() {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("zijn hond liep aan zijn hand op zijn dag");
@@ -49,7 +48,7 @@ public class MatchingTest {
     Matcher matcher = new Matcher();
     Permutation permutation = matcher.getBestPermutation(a, b);
     Set<Match> matches = permutation.getMatches();
-    String expected = "[(2->6), (3->4), (4->7), (6->9), (9->12), (1->5), (5->8)]";
+    String expected = "[(2->6), (3->4), (4->7), (6->9), (9->12), (1->5), (5->8), (7->10), (8->11)]";
     Assert.assertEquals(expected, matches.toString());
     Assert.assertEquals(1, permutation.getNonMatches(a, b).size());
     Assert.assertEquals(3, permutation.getMatchSequences().size());
