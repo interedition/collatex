@@ -3,7 +3,6 @@ package eu.interedition.collatex.matching;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.collation.Match;
@@ -26,16 +25,14 @@ public class MatchingTest {
     Assert.assertTrue(exactMatches.contains(expected));
   }
 
-  // TODO: make this test run!
   @Test
-  @Ignore
   public void testNoPermutationsOnlyExactMatches() {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("deze zinnen zijn hetzelfde");
     Witness b = builder.build("deze zinnen zijn hetzelfde met een aanvulling");
     Matcher matcher = new Matcher();
-    Permutation permutation = matcher.getBestPermutation(a, b);
-    Set<Match> matches = permutation.getMatches();
+    Collation collation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = collation.getMatches();
     String expected = "[(1->1), (2->2), (3->3), (4->4)]";
     Assert.assertEquals(expected, matches.toString());
   }
@@ -46,12 +43,12 @@ public class MatchingTest {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Matcher matcher = new Matcher();
-    Permutation permutation = matcher.getBestPermutation(a, b);
-    Set<Match> matches = permutation.getMatches();
+    Collation collation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = collation.getMatches();
     String expected = "[(2->6), (3->4), (4->7), (6->9), (1->5), (5->8)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, permutation.getNonMatches(a, b).size());
-    Assert.assertEquals(3, permutation.getMatchSequences().size());
+    Assert.assertEquals(1, collation.getNonMatches(a, b).size());
+    Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
   @Test
@@ -60,12 +57,12 @@ public class MatchingTest {
     Witness a = builder.build("zijn hond liep aan zijn hand op zijn dag");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand op zijn dag");
     Matcher matcher = new Matcher();
-    Permutation permutation = matcher.getBestPermutation(a, b);
-    Set<Match> matches = permutation.getMatches();
+    Collation collation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = collation.getMatches();
     String expected = "[(2->6), (3->4), (4->7), (6->9), (9->12), (1->5), (5->8), (7->10), (8->11)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, permutation.getNonMatches(a, b).size());
-    Assert.assertEquals(3, permutation.getMatchSequences().size());
+    Assert.assertEquals(1, collation.getNonMatches(a, b).size());
+    Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
   @Test
@@ -74,12 +71,12 @@ public class MatchingTest {
     Witness a = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Witness b = builder.build("zijn hond liep aan zijn hand");
     Matcher matcher = new Matcher();
-    Permutation permutation = matcher.getBestPermutation(a, b);
-    Set<Match> matches = permutation.getMatches();
+    Collation collation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = collation.getMatches();
     String expected = "[(4->3), (6->2), (7->4), (9->6), (5->1), (8->5)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, permutation.getNonMatches(a, b).size());
-    Assert.assertEquals(3, permutation.getMatchSequences().size());
+    Assert.assertEquals(1, collation.getNonMatches(a, b).size());
+    Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
 }

@@ -49,9 +49,13 @@ public class Matcher {
   }
 
   // TODO: test separately
-  // TODO: there is a problem here when there are no permutations!
-  public Permutation getBestPermutation(Witness a, Witness b) {
+  // TODO: rename!
+  public Collation getBestPermutation(Witness a, Witness b) {
     PossibleMatches matches = match(a, b);
+    if (!matches.hasUnfixedWords()) {
+      Collation collation = new Collation(matches.getFixedMatches());
+      return collation;
+    }
     Permutation bestPermutation = null;
     while (matches.hasUnfixedWords()) {
       bestPermutation = permutationLoop(a, b, matches);
@@ -60,7 +64,8 @@ public class Matcher {
     if (bestPermutation == null) {
       throw new RuntimeException("There are no permutations!");
     }
-    return bestPermutation;
+    Collation collation = bestPermutation.getCollation();
+    return collation;
   }
 
   // TODO: rename!

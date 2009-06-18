@@ -16,10 +16,16 @@ public class Collation {
 
   private final List<MatchSequence> sequencesBase;
   private final List<MatchSequence> sequencesWitness;
+  private final Set<Match> matches;
 
-  public Collation(Set<Match> matches) {
-    sequencesBase = SequenceDetection.calculateMatchSequences(matches);
-    sequencesWitness = SequenceDetection.sortSequencesForWitness(sequencesBase);
+  public Collation(Set<Match> _matches) {
+    this.matches = _matches;
+    this.sequencesBase = SequenceDetection.calculateMatchSequences(matches);
+    this.sequencesWitness = SequenceDetection.sortSequencesForWitness(sequencesBase);
+  }
+
+  public Set<Match> getMatches() {
+    return matches;
   }
 
   public List<MatchSequence> getMatchSequences() {

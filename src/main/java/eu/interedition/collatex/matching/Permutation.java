@@ -12,14 +12,13 @@ import eu.interedition.collatex.input.Witness;
 
 public class Permutation {
   private final Match possibleMatch;
-  private final Set<Match> matches; // TODO: remove here!
   private final Collation collation;
 
   public Permutation(Set<Match> _fixedMatches, Match _possibleMatch) {
     this.possibleMatch = _possibleMatch;
-    this.matches = Sets.newLinkedHashSet();
-    this.matches.addAll(_fixedMatches);
-    this.matches.add(_possibleMatch);
+    Set<Match> matches = Sets.newLinkedHashSet();
+    matches.addAll(_fixedMatches);
+    matches.add(_possibleMatch);
     this.collation = new Collation(matches);
   }
 
@@ -27,7 +26,7 @@ public class Permutation {
     return getCollation().getMatchSequences();
   }
 
-  private Collation getCollation() {
+  Collation getCollation() {
     return collation;
   }
 
@@ -45,6 +44,6 @@ public class Permutation {
 
   // Note: only used in tests!
   public Set<Match> getMatches() {
-    return matches;
+    return getCollation().getMatches();
   }
 }
