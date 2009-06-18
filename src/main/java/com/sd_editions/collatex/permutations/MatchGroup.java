@@ -71,4 +71,8 @@ public class MatchGroup implements Iterable<Match> {
   public boolean isEmpty() {
     return matches.isEmpty();
   }
+
+  public void remove(Match m) {
+    matches.remove(m);
+  }
 }

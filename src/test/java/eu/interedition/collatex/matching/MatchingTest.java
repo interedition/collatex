@@ -1,35 +1,29 @@
 package eu.interedition.collatex.matching;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
-
-import com.sd_editions.collatex.permutations.MatchGroup;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 
 public class MatchingTest {
+
   @Test
-  public void testExactMatchesAndPossibleMatches() {
+  // Note: this exact matches test could be fleshed out more!
+  public void testExactMatches() {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Matcher matcher = new Matcher();
-    Result result = matcher.match(a, b);
-    Set<Match> exactMatches = result.getExactMatches();
+    PossibleMatches matches = matcher.match(a, b);
+    Set<Match> exactMatches = matches.getFixedMatches();
     Match expected = new Match(a.getWordOnPosition(2), b.getWordOnPosition(6));
     System.out.println(exactMatches);
     Assert.assertTrue(exactMatches.contains(expected));
-    Set<MatchGroup> possibleMatches = result.getPossibleMatches();
-    Iterator<MatchGroup> iterator = possibleMatches.iterator();
-    MatchGroup next = iterator.next();
-    Assert.assertEquals("[(1->2), (1->5), (1->8)]", next.toString());
-    System.out.println(next);
   }
 
   @Test
@@ -38,9 +32,42 @@ public class MatchingTest {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Matcher matcher = new Matcher();
-    List<Permutation> permutations = matcher.getPossiblePermutationsForMatchGroup(a, b, 1);
+    Permutation permutation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = permutation.getMatches();
+    String expected = "[(2->6), (3->4), (4->7), (6->9), (1->5), (5->8)]";
+    Assert.assertEquals(expected, matches.toString());
+    Assert.assertEquals(1, permutation.getNonMatches(a, b).size());
+    Assert.assertEquals(3, permutation.getMatchSequences().size());
+  }
 
-    //selectBestPossiblePermutation(a, b, permutations);
+  @Test
+  public void testTreeTimesZijnAlsoWorks() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness a = builder.build("zijn hond liep aan zijn hand op zijn dag");
+    Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand op zijn dag");
+    Matcher matcher = new Matcher();
+    Permutation permutation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = permutation.getMatches();
+    String expected = "[(2->6), (3->4), (4->7), (6->9), (9->12), (1->5), (5->8), (7->10), (8->11)]";
+    Assert.assertEquals(expected, matches.toString());
+    Assert.assertEquals(1, permutation.getNonMatches(a, b).size());
+    Assert.assertEquals(3, permutation.getMatchSequences().size());
+  }
+
+  // TODO: make this test work!
+  @Ignore
+  @Test
+  public void testMatchingFromBtoA() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness a = builder.build("op zijn pad liep zijn hond aan zijn hand");
+    Witness b = builder.build("zijn hond liep aan zijn hand");
+    Matcher matcher = new Matcher();
+    Permutation permutation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = permutation.getMatches();
+    String expected = "[(4->3), (6->2), (7->4), (9->6), (5->1), (8->5)]";
+    Assert.assertEquals(expected, matches.toString());
+    Assert.assertEquals(1, permutation.getNonMatches(a, b).size());
+    Assert.assertEquals(3, permutation.getMatchSequences().size());
   }
 
 }

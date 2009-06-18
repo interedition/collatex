@@ -15,18 +15,16 @@ public class SequenceDetection {
 
   @SuppressWarnings("boxing")
   public static List<MatchSequence> calculateMatchSequences(Set<Match> matches) {
-    // sort Matches for the base --> that is already done (it is a linked hash set)
+    // sort Matches for the base
     List<Match> matchesSortedForBase = SequenceDetection.sortMatchesForBase(matches);
-    System.out.println(">>MatchesForBase: " + matchesSortedForBase);
     // sort Matches for the witness
     List<Match> matchesSortedForWitness = SequenceDetection.sortMatchesForWitness(matches);
-    System.out.println(">>MatchesForWitness: " + matchesSortedForWitness);
     // now compare..
     Map<Match, Match> previousMatchMapBase = SequenceDetection.buildPreviousMatchMap(matchesSortedForBase);
     Map<Match, Match> previousMatchMapWitness = SequenceDetection.buildPreviousMatchMap(matchesSortedForWitness);
     List<MatchSequence> sequences = Lists.newArrayList();
     MatchSequence sequence = new MatchSequence(sequences.size());
-    for (Match match : matches) {
+    for (Match match : matchesSortedForBase) {
       Match expected = previousMatchMapBase.get(match);
       Match actual = previousMatchMapWitness.get(match);
       if (expected != actual || expected != null && !expected.equals(actual)) {
@@ -36,11 +34,10 @@ public class SequenceDetection {
       sequence.add(match);
     }
     if (!sequence.isEmpty()) sequences.add(sequence);
-    System.out.println("Sequences>>" + sequences);
     return sequences;
   }
 
-  // THE OLD METHOD ASSUMED AN ORDER IN THE SET!
+  // Note: THE previous METHOD ASSUMED AN ORDER IN THE SET!
   // TODO: add test!
   private static List<Match> sortMatchesForBase(Set<Match> matches) {
     Comparator<Match> comparator = new Comparator<Match>() {
