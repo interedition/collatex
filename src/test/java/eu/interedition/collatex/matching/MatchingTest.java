@@ -26,6 +26,20 @@ public class MatchingTest {
     Assert.assertTrue(exactMatches.contains(expected));
   }
 
+  // TODO: make this test run!
+  @Test
+  @Ignore
+  public void testNoPermutationsOnlyExactMatches() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness a = builder.build("deze zinnen zijn hetzelfde");
+    Witness b = builder.build("deze zinnen zijn hetzelfde met een aanvulling");
+    Matcher matcher = new Matcher();
+    Permutation permutation = matcher.getBestPermutation(a, b);
+    Set<Match> matches = permutation.getMatches();
+    String expected = "[(1->1), (2->2), (3->3), (4->4)]";
+    Assert.assertEquals(expected, matches.toString());
+  }
+
   @Test
   public void testSelectBestMatchFromPossibleMatches() {
     WitnessBuilder builder = new WitnessBuilder();
@@ -54,8 +68,6 @@ public class MatchingTest {
     Assert.assertEquals(3, permutation.getMatchSequences().size());
   }
 
-  // TODO: make this test work!
-  @Ignore
   @Test
   public void testMatchingFromBtoA() {
     WitnessBuilder builder = new WitnessBuilder();
