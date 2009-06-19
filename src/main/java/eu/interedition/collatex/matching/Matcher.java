@@ -51,31 +51,27 @@ public class Matcher {
   // TODO: test separately
   // TODO: rename!
   public Collation getBestPermutation(Witness a, Witness b) {
-    Alignment matches = match(a, b);
-    if (!matches.hasUnfixedWords()) {
-      Collation collation = new Collation(matches.getFixedMatches());
+    Alignment alignment = match(a, b);
+    // TODO: remove if!
+    if (!alignment.hasUnfixedWords()) {
+      Collation collation = new Collation(alignment.getFixedMatches());
       return collation;
     }
-    Permutation bestPermutation = null;
-    while (matches.hasUnfixedWords()) {
-      bestPermutation = permutationLoop(a, b, matches);
-      matches = matches.fixMatch(bestPermutation.getPossibleMatch());
+    while (alignment.hasUnfixedWords()) {
+      alignment = permutationLoop(a, b, alignment);
     }
-    if (bestPermutation == null) {
-      throw new RuntimeException("There are no permutations!");
-    }
-    Collation collation = bestPermutation.getCollation();
+    Collation collation = new Collation(alignment.getFixedMatches());
     return collation;
   }
 
   // TODO: rename!
-  private Permutation permutationLoop(Witness a, Witness b, final Alignment matches) {
-    Set<Match> fixedMatches = matches.getFixedMatches();
-    Set<Word> unfixedWords = matches.getUnfixedWords();
+  private Alignment permutationLoop(Witness a, Witness b, final Alignment alignment) {
+    Set<Match> fixedMatches = alignment.getFixedMatches();
+    Set<Word> unfixedWords = alignment.getUnfixedWords();
     Word nextBase = unfixedWords.iterator().next();
-    Collection<Match> unfixedMatchesFrom = matches.getMatchesThatLinkFrom(nextBase);
+    Collection<Match> unfixedMatchesFrom = alignment.getMatchesThatLinkFrom(nextBase);
     Word nextWitness = unfixedMatchesFrom.iterator().next().getWitnessWord();
-    Collection<Match> unfixedMatchesTo = matches.getMatchesThatLinkTo(nextWitness);
+    Collection<Match> unfixedMatchesTo = alignment.getMatchesThatLinkTo(nextWitness);
     Collection<Match> unfixedMatches;
     if (unfixedMatchesFrom.size() > unfixedMatchesTo.size()) {
       unfixedMatches = unfixedMatchesFrom;
@@ -84,35 +80,38 @@ public class Matcher {
       unfixedMatches = unfixedMatchesTo;
       System.out.println("next word that is going to be matched: " + nextWitness + " at position: " + nextWitness.position);
     }
-    List<Permutation> permutations = getPermutationsForUnfixedMatches(fixedMatches, unfixedMatches);
-    Permutation bestPermutation = selectBestPossiblePermutation(a, b, permutations);
-    return bestPermutation;
+    List<Alignment> alignments = getAlignmentsForUnfixedMatches(alignment, unfixedMatches);
+    Alignment bestAlignment = selectBestPossibleAlignment(a, b, alignments);
+    return bestAlignment;
   }
 
-  private List<Permutation> getPermutationsForUnfixedMatches(Set<Match> fixedMatches, Collection<Match> unfixedMatches) {
-    List<Permutation> permutationsForMatchGroup = Lists.newArrayList();
+  // TODO: naming here is not cool!
+  private List<Alignment> getAlignmentsForUnfixedMatches(Alignment previousAlignment, Collection<Match> unfixedMatches) {
+    List<Alignment> permutationsForMatchGroup = Lists.newArrayList();
     for (Match possibleMatch : unfixedMatches) {
-      Permutation permutation = new Permutation(fixedMatches, possibleMatch);
-      permutationsForMatchGroup.add(permutation);
+      Alignment alignment = previousAlignment.fixMatch(possibleMatch);
+      permutationsForMatchGroup.add(alignment);
     }
     return permutationsForMatchGroup;
   }
 
-  private Permutation selectBestPossiblePermutation(Witness a, Witness b, List<Permutation> permutations) {
-    Permutation bestPermutation = null;
+  // TODO: move all the collation creation out of the way!
+  private Alignment selectBestPossibleAlignment(Witness a, Witness b, List<Alignment> alignments) {
+    Alignment bestAlignment = null;
+    Collation bestCollation = null;
 
     // TODO: add test for lowest number of matchsequences (transpositions)
     // NOTE: this can be done in a nicer way with the min function!
-    for (Permutation permutation : permutations) {
-      List<NonMatch> nonMatches = permutation.getNonMatches(a, b);
-      List<MatchSequence> matchSequences = permutation.getMatchSequences();
-      if (bestPermutation == null || matchSequences.size() < bestPermutation.getMatchSequences().size() || nonMatches.size() < bestPermutation.getNonMatches(a, b).size()) {
-        bestPermutation = permutation;
+    for (Alignment alignment : alignments) {
+      Collation collation = new Collation(alignment.getFixedMatches());
+      List<NonMatch> nonMatches = collation.getNonMatches(a, b);
+      List<MatchSequence> matchSequences = collation.getMatchSequences();
+      if (bestAlignment == null || bestCollation == null || matchSequences.size() < bestCollation.getMatchSequences().size() || nonMatches.size() < bestCollation.getNonMatches(a, b).size()) {
+        bestAlignment = alignment;
+        bestCollation = new Collation(bestAlignment.getFixedMatches());
       }
     }
-    if (bestPermutation == null) throw new RuntimeException("Unexpected error!");
-    //System.out.println(bestPermutation.getPossibleMatch());
-    return bestPermutation;
+    if (bestAlignment == null) throw new RuntimeException("Unexpected error!");
+    return bestAlignment;
   }
-
 }
