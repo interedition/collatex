@@ -15,7 +15,16 @@ import eu.interedition.collatex.input.Word;
 
 public class Matcher {
 
-  public Alignment match(Witness a, Witness b) {
+  public Collation collate(Witness a, Witness b) {
+    Alignment alignment = align(a, b);
+    while (alignment.hasUnfixedWords()) {
+      alignment = permutate(a, b, alignment);
+    }
+    Collation collation = new Collation(alignment.getFixedMatches());
+    return collation;
+  }
+
+  public Alignment align(Witness a, Witness b) {
     Set<Match> allMatches = findMatches(a, b);
     // group matches by common base word or common witness word
     Set<Match> exactMatches = Sets.newLinkedHashSet();
@@ -48,20 +57,14 @@ public class Matcher {
     return matchSet;
   }
 
-  // TODO: test separately
-  // TODO: rename!
-  public Collation getBestPermutation(Witness a, Witness b) {
-    Alignment alignment = match(a, b);
-    while (alignment.hasUnfixedWords()) {
-      alignment = permutationLoop(a, b, alignment);
-    }
-    Collation collation = new Collation(alignment.getFixedMatches());
-    return collation;
+  private Alignment permutate(Witness a, Witness b, final Alignment alignment) {
+    Collection<Match> unfixedMatches = getMatchesToPermutateWith(alignment);
+    List<Alignment> alignments = getAlignmentsForUnfixedMatches(alignment, unfixedMatches);
+    Alignment bestAlignment = selectBestPossibleAlignment(a, b, alignments);
+    return bestAlignment;
   }
 
-  // TODO: rename!
-  private Alignment permutationLoop(Witness a, Witness b, final Alignment alignment) {
-    Set<Match> fixedMatches = alignment.getFixedMatches();
+  private Collection<Match> getMatchesToPermutateWith(final Alignment alignment) {
     Set<Word> unfixedWords = alignment.getUnfixedWords();
     Word nextBase = unfixedWords.iterator().next();
     Collection<Match> unfixedMatchesFrom = alignment.getMatchesThatLinkFrom(nextBase);
@@ -75,9 +78,7 @@ public class Matcher {
       unfixedMatches = unfixedMatchesTo;
       System.out.println("next word that is going to be matched: " + nextWitness + " at position: " + nextWitness.position);
     }
-    List<Alignment> alignments = getAlignmentsForUnfixedMatches(alignment, unfixedMatches);
-    Alignment bestAlignment = selectBestPossibleAlignment(a, b, alignments);
-    return bestAlignment;
+    return unfixedMatches;
   }
 
   // TODO: naming here is not cool!

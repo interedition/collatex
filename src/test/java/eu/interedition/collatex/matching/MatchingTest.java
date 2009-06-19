@@ -18,7 +18,7 @@ public class MatchingTest {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Matcher matcher = new Matcher();
-    Alignment matches = matcher.match(a, b);
+    Alignment matches = matcher.align(a, b);
     Set<Match> exactMatches = matches.getFixedMatches();
     Match expected = new Match(a.getWordOnPosition(2), b.getWordOnPosition(6));
     System.out.println(exactMatches);
@@ -31,7 +31,7 @@ public class MatchingTest {
     Witness a = builder.build("deze zinnen zijn hetzelfde");
     Witness b = builder.build("deze zinnen zijn hetzelfde met een aanvulling");
     Matcher matcher = new Matcher();
-    Collation collation = matcher.getBestPermutation(a, b);
+    Collation collation = matcher.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(1->1), (2->2), (3->3), (4->4)]";
     Assert.assertEquals(expected, matches.toString());
@@ -43,7 +43,7 @@ public class MatchingTest {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Matcher matcher = new Matcher();
-    Collation collation = matcher.getBestPermutation(a, b);
+    Collation collation = matcher.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(2->6), (3->4), (4->7), (6->9), (1->5), (5->8)]";
     Assert.assertEquals(expected, matches.toString());
@@ -57,7 +57,7 @@ public class MatchingTest {
     Witness a = builder.build("zijn hond liep aan zijn hand op zijn dag");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand op zijn dag");
     Matcher matcher = new Matcher();
-    Collation collation = matcher.getBestPermutation(a, b);
+    Collation collation = matcher.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(2->6), (3->4), (4->7), (6->9), (9->12), (1->5), (5->8), (7->10), (8->11)]";
     Assert.assertEquals(expected, matches.toString());
@@ -71,7 +71,7 @@ public class MatchingTest {
     Witness a = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Witness b = builder.build("zijn hond liep aan zijn hand");
     Matcher matcher = new Matcher();
-    Collation collation = matcher.getBestPermutation(a, b);
+    Collation collation = matcher.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(4->3), (6->2), (7->4), (9->6), (5->1), (8->5)]";
     Assert.assertEquals(expected, matches.toString());
