@@ -17,7 +17,7 @@ public class PossibleMatchesTest {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Matcher matcher = new Matcher();
-    PossibleMatches result = matcher.match(a, b);
+    Alignment result = matcher.match(a, b);
 
     Word zijn = a.getWordOnPosition(1);
     Collection<Match> linked = result.getMatchesThatLinkFrom(zijn);

@@ -12,15 +12,14 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.input.Word;
 
-// TODO: remove the word possible from the name
-public class PossibleMatches {
+public class Alignment {
   private final Set<Match> fixedMatches;
   private final Set<Match> unfixedMatches;
 
   private final Multimap<Word, Match> baseToWitness;
   private final Multimap<Word, Match> witnessToBase;
 
-  public PossibleMatches(Set<Match> _fixedMatches, Set<Match> _unfixedMatches) {
+  public Alignment(Set<Match> _fixedMatches, Set<Match> _unfixedMatches) {
     this.fixedMatches = _fixedMatches;
     this.unfixedMatches = _unfixedMatches;
     this.baseToWitness = groupMatchesForBase(unfixedMatches);
@@ -45,12 +44,12 @@ public class PossibleMatches {
     return witnessToBase.get(word);
   }
 
-  public PossibleMatches fixMatch(Match match) {
+  public Alignment fixMatch(Match match) {
     Set<Match> newFixedMatches = Sets.newLinkedHashSet();
     newFixedMatches.addAll(fixedMatches);
     newFixedMatches.add(match);
     Set<Match> newUnfixedMatches = filterAwayNoLongerPossibleMatches(unfixedMatches, match);
-    PossibleMatches matches = new PossibleMatches(newFixedMatches, newUnfixedMatches);
+    Alignment matches = new Alignment(newFixedMatches, newUnfixedMatches);
     return matches;
   }
 

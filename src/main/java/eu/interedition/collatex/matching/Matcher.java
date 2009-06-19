@@ -15,12 +15,12 @@ import eu.interedition.collatex.input.Word;
 
 public class Matcher {
 
-  public PossibleMatches match(Witness a, Witness b) {
+  public Alignment match(Witness a, Witness b) {
     Set<Match> allMatches = findMatches(a, b);
     // group matches by common base word or common witness word
     Set<Match> exactMatches = Sets.newLinkedHashSet();
     for (Match match : allMatches) {
-      Iterable<Match> alternatives = PossibleMatches.findAlternativesBase(allMatches, match);
+      Iterable<Match> alternatives = Alignment.findAlternativesBase(allMatches, match);
       if (!alternatives.iterator().hasNext()) {
         exactMatches.add(match);
       }
@@ -28,7 +28,7 @@ public class Matcher {
 
     Set<Match> unfixedMatches = Sets.newLinkedHashSet(allMatches);
     unfixedMatches.removeAll(exactMatches);
-    PossibleMatches posMatches = new PossibleMatches(exactMatches, unfixedMatches);
+    Alignment posMatches = new Alignment(exactMatches, unfixedMatches);
     return posMatches;
   }
 
@@ -51,7 +51,7 @@ public class Matcher {
   // TODO: test separately
   // TODO: rename!
   public Collation getBestPermutation(Witness a, Witness b) {
-    PossibleMatches matches = match(a, b);
+    Alignment matches = match(a, b);
     if (!matches.hasUnfixedWords()) {
       Collation collation = new Collation(matches.getFixedMatches());
       return collation;
@@ -69,7 +69,7 @@ public class Matcher {
   }
 
   // TODO: rename!
-  private Permutation permutationLoop(Witness a, Witness b, final PossibleMatches matches) {
+  private Permutation permutationLoop(Witness a, Witness b, final Alignment matches) {
     Set<Match> fixedMatches = matches.getFixedMatches();
     Set<Word> unfixedWords = matches.getUnfixedWords();
     Word nextBase = unfixedWords.iterator().next();

@@ -18,7 +18,7 @@ public class MatchingTest {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Matcher matcher = new Matcher();
-    PossibleMatches matches = matcher.match(a, b);
+    Alignment matches = matcher.match(a, b);
     Set<Match> exactMatches = matches.getFixedMatches();
     Match expected = new Match(a.getWordOnPosition(2), b.getWordOnPosition(6));
     System.out.println(exactMatches);
