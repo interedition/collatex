@@ -52,11 +52,6 @@ public class Matcher {
   // TODO: rename!
   public Collation getBestPermutation(Witness a, Witness b) {
     Alignment alignment = match(a, b);
-    // TODO: remove if!
-    if (!alignment.hasUnfixedWords()) {
-      Collation collation = new Collation(alignment.getFixedMatches());
-      return collation;
-    }
     while (alignment.hasUnfixedWords()) {
       alignment = permutationLoop(a, b, alignment);
     }
