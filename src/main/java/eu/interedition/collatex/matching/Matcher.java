@@ -6,6 +6,8 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
+import com.sd_editions.collatex.match.worddistance.WordDistance;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.NonMatch;
@@ -15,8 +17,10 @@ import eu.interedition.collatex.input.Word;
 
 public class Matcher {
 
+  // TODO: move this method out of this class!
   public Collation collate(Witness a, Witness b) {
     Alignment alignment = align(a, b);
+    // TODO: move this loop to the align method!
     while (alignment.hasUnfixedWords()) {
       alignment = permutate(a, b, alignment);
     }
@@ -24,8 +28,9 @@ public class Matcher {
     return collation;
   }
 
+  // Note: The WordDistance parameter should be parameterized!
   public Alignment align(Witness a, Witness b) {
-    Set<Match> allMatches = findMatches(a, b);
+    Set<Match> allMatches = findMatches(a, b, new NormalizedLevenshtein());
     // group matches by common base word or common witness word
     Set<Match> exactMatches = Sets.newLinkedHashSet();
     for (Match match : allMatches) {
@@ -41,16 +46,15 @@ public class Matcher {
     return posMatches;
   }
 
-  // TODO: re-enable near matches!
-  private Set<Match> findMatches(Witness base, Witness witness) {
+  private Set<Match> findMatches(Witness base, Witness witness, WordDistance distanceMeasure) {
     Set<Match> matchSet = Sets.newLinkedHashSet();
     for (Word baseWord : base.getWords()) {
       for (Word witnessWord : witness.getWords()) {
         if (baseWord.normalized.equals(witnessWord.normalized)) {
           matchSet.add(new Match(baseWord, witnessWord));
-          //        } else {
-          //          float editDistance = distanceMeasure.distance(baseWord.normalized, witnessWord.normalized);
-          //          if (editDistance < 0.5) matchSet.add(new Match(baseWord, witnessWord, editDistance));
+        } else {
+          float editDistance = distanceMeasure.distance(baseWord.normalized, witnessWord.normalized);
+          if (editDistance < 0.5) matchSet.add(new Match(baseWord, witnessWord, editDistance));
         }
       }
     }
@@ -65,20 +69,33 @@ public class Matcher {
   }
 
   private Collection<Match> getMatchesToPermutateWith(final Alignment alignment) {
-    Set<Word> unfixedWords = alignment.getUnfixedWords();
-    Word nextBase = unfixedWords.iterator().next();
+    Word nextBase = selectNextUnfixedWordToAlign(alignment);
     Collection<Match> unfixedMatchesFrom = alignment.getMatchesThatLinkFrom(nextBase);
     Word nextWitness = unfixedMatchesFrom.iterator().next().getWitnessWord();
     Collection<Match> unfixedMatchesTo = alignment.getMatchesThatLinkTo(nextWitness);
     Collection<Match> unfixedMatches;
     if (unfixedMatchesFrom.size() > unfixedMatchesTo.size()) {
       unfixedMatches = unfixedMatchesFrom;
-      System.out.println("next word that is going to be matched: " + nextBase + " at position: " + nextBase.position);
+      //      System.out.println("next word that is going to be matched: (from a) " + nextBase + " at position: " + nextBase.position);
     } else {
       unfixedMatches = unfixedMatchesTo;
-      System.out.println("next word that is going to be matched: " + nextWitness + " at position: " + nextWitness.position);
+      //      System.out.println("next word that is going to be matched: (from b) " + nextWitness + " at position: " + nextWitness.position);
     }
     return unfixedMatches;
+  }
+
+  private Word selectNextUnfixedWordToAlign(final Alignment alignment) {
+    // Check whether there are unfixed near matches.
+    // Align them first!
+    // Note: this is probably not generic enough!
+    if (!alignment.getUnfixedNearMatches().isEmpty()) {
+      Word nextNearFromBase = alignment.getUnfixedNearMatches().iterator().next().getBaseWord();
+      return nextNearFromBase;
+    }
+
+    Set<Word> unfixedWords = alignment.getUnfixedWords();
+    Word nextBase = unfixedWords.iterator().next();
+    return nextBase;
   }
 
   // TODO: naming here is not cool!
@@ -86,9 +103,31 @@ public class Matcher {
     List<Alignment> permutationsForMatchGroup = Lists.newArrayList();
     for (Match possibleMatch : unfixedMatches) {
       Alignment alignment = previousAlignment.fixMatch(possibleMatch);
+      alignment = fixTheOnlyOtherPossibleMatch(unfixedMatches, possibleMatch, alignment);
       permutationsForMatchGroup.add(alignment);
     }
     return permutationsForMatchGroup;
+  }
+
+  private Alignment fixTheOnlyOtherPossibleMatch(Collection<Match> unfixedMatches, Match possibleMatch, final Alignment alignment) {
+    Alignment result = alignment;
+    if (unfixedMatches.size() == 2) {
+      Set<Match> temp = Sets.newLinkedHashSet(unfixedMatches);
+      temp.remove(possibleMatch);
+      Match matchToSearch = temp.iterator().next();
+      Set<Match> unfixedMatchesInNewAlignment = alignment.getUnfixedMatches();
+      Match matchToFix = null;
+      for (Match matchToCheck : unfixedMatchesInNewAlignment) {
+        if (matchToFix == null && (matchToCheck.getBaseWord().equals(matchToSearch.getBaseWord()) || matchToCheck.getWitnessWord().equals(matchToSearch.getWitnessWord()))) {
+          matchToFix = matchToCheck;
+        }
+      }
+      if (matchToFix != null) {
+        //        System.out.println("Also fixed match " + matchToFix);
+        result = alignment.fixMatch(matchToFix);
+      }
+    }
+    return result;
   }
 
   // TODO: move all the collation creation out of the way!
@@ -102,6 +141,7 @@ public class Matcher {
       Collation collation = new Collation(alignment.getFixedMatches(), a, b);
       List<NonMatch> nonMatches = collation.getNonMatches();
       List<MatchSequence> matchSequences = collation.getMatchSequences();
+      //      System.out.println(alignment.getFixedMatches().toString() + ":" + matchSequences.size() + ":" + nonMatches.size());
       if (bestAlignment == null || bestCollation == null || matchSequences.size() < bestCollation.getMatchSequences().size() || nonMatches.size() < bestCollation.getNonMatches().size()) {
         bestAlignment = alignment;
         bestCollation = new Collation(bestAlignment.getFixedMatches(), a, b);

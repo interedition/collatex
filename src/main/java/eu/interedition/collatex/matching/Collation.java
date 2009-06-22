@@ -19,6 +19,7 @@ public class Collation {
   private final Set<Match> matches;
   private final List<NonMatch> nonMatches;
 
+  // Note: this constructor should take only an Alignment object as parameter!
   public Collation(Set<Match> _matches, Witness a, Witness b) {
     this.matches = _matches;
     this.sequencesBase = SequenceDetection.calculateMatchSequences(matches);

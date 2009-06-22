@@ -1,10 +1,12 @@
 package eu.interedition.collatex.matching;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
@@ -103,6 +105,20 @@ public class Alignment {
 
   public boolean hasUnfixedWords() {
     return !baseToWitness.keySet().isEmpty();
+  }
+
+  public List<Match> getUnfixedNearMatches() {
+    List<Match> nearMatches = Lists.newArrayList();
+    for (Match match : unfixedMatches) {
+      if (match.wordDistance > 0) {
+        nearMatches.add(match);
+      }
+    }
+    return nearMatches;
+  }
+
+  public Set<Match> getUnfixedMatches() {
+    return unfixedMatches;
   }
 
 }

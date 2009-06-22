@@ -12,7 +12,6 @@ import eu.interedition.collatex.input.WitnessBuilder;
 public class MatchingTest {
 
   @Test
-  // Note: this exact matches test could be fleshed out more!
   public void testExactMatches() {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("zijn hond liep aan zijn hand");
@@ -20,9 +19,20 @@ public class MatchingTest {
     Matcher matcher = new Matcher();
     Alignment matches = matcher.align(a, b);
     Set<Match> exactMatches = matches.getFixedMatches();
-    Match expected = new Match(a.getWordOnPosition(2), b.getWordOnPosition(6));
-    System.out.println(exactMatches);
-    Assert.assertTrue(exactMatches.contains(expected));
+    String expected = "[(3->4), (4->7)]";
+    Assert.assertEquals(expected, exactMatches.toString());
+  }
+
+  @Test
+  // TODO: test near matches separate?
+  public void testNearMatch() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness a = builder.build("a near match");
+    Witness b = builder.build("a nar match");
+    Matcher matcher = new Matcher();
+    Alignment matches = matcher.align(a, b);
+    Set<Match> fixedMatches = matches.getFixedMatches();
+    Assert.assertEquals("[(1->1), (2->2), (3->3)]", fixedMatches.toString());
   }
 
   @Test
@@ -45,7 +55,7 @@ public class MatchingTest {
     Matcher matcher = new Matcher();
     Collation collation = matcher.collate(a, b);
     Set<Match> matches = collation.getMatches();
-    String expected = "[(2->6), (3->4), (4->7), (6->9), (1->5), (5->8)]";
+    String expected = "[(3->4), (4->7), (2->6), (6->9), (1->5), (5->8)]";
     Assert.assertEquals(expected, matches.toString());
     Assert.assertEquals(1, collation.getNonMatches().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
@@ -59,7 +69,7 @@ public class MatchingTest {
     Matcher matcher = new Matcher();
     Collation collation = matcher.collate(a, b);
     Set<Match> matches = collation.getMatches();
-    String expected = "[(2->6), (3->4), (4->7), (6->9), (9->12), (1->5), (5->8), (7->10), (8->11)]";
+    String expected = "[(3->4), (4->7), (9->12), (2->6), (6->9), (1->5), (5->8), (7->10), (8->11)]";
     Assert.assertEquals(expected, matches.toString());
     Assert.assertEquals(1, collation.getNonMatches().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
@@ -73,7 +83,7 @@ public class MatchingTest {
     Matcher matcher = new Matcher();
     Collation collation = matcher.collate(a, b);
     Set<Match> matches = collation.getMatches();
-    String expected = "[(4->3), (6->2), (7->4), (9->6), (5->1), (8->5)]";
+    String expected = "[(4->3), (7->4), (6->2), (9->6), (5->1), (8->5)]";
     Assert.assertEquals(expected, matches.toString());
     Assert.assertEquals(1, collation.getNonMatches().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
