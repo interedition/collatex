@@ -7,14 +7,14 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Gap;
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.MatchNonMatch;
 import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.matching.Collation;
+import eu.interedition.collatex.matching.Matcher;
 
 // Note: for the TEI xml output it is easier to
 // have a Column be a list<phrase>
@@ -105,9 +105,11 @@ public class AlignmentTable2 {
   public void addWitness(Witness witness) {
     // make the superbase from the alignment table
     Superbase superbase = createSuperbase();
-    CollateCore core = new CollateCore();
-    MatchNonMatch compresult = core.compareWitnesses(superbase, witness);
-
+    // NOTE: OLD COLLATION CODE!
+    //    CollateCore core = new CollateCore();
+    //    MatchNonMatch compresult = core.compareWitnesses(superbase, witness);
+    Matcher matcher = new Matcher();
+    Collation compresult = matcher.collate(superbase, witness);
     List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesForBase();
     List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesForWitness();
     // I just need it as a list of matches

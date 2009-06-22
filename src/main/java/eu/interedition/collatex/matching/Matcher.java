@@ -20,7 +20,7 @@ public class Matcher {
     while (alignment.hasUnfixedWords()) {
       alignment = permutate(a, b, alignment);
     }
-    Collation collation = new Collation(alignment.getFixedMatches());
+    Collation collation = new Collation(alignment.getFixedMatches(), a, b);
     return collation;
   }
 
@@ -99,12 +99,12 @@ public class Matcher {
     // TODO: add test for lowest number of matchsequences (transpositions)
     // NOTE: this can be done in a nicer way with the min function!
     for (Alignment alignment : alignments) {
-      Collation collation = new Collation(alignment.getFixedMatches());
-      List<NonMatch> nonMatches = collation.getNonMatches(a, b);
+      Collation collation = new Collation(alignment.getFixedMatches(), a, b);
+      List<NonMatch> nonMatches = collation.getNonMatches();
       List<MatchSequence> matchSequences = collation.getMatchSequences();
-      if (bestAlignment == null || bestCollation == null || matchSequences.size() < bestCollation.getMatchSequences().size() || nonMatches.size() < bestCollation.getNonMatches(a, b).size()) {
+      if (bestAlignment == null || bestCollation == null || matchSequences.size() < bestCollation.getMatchSequences().size() || nonMatches.size() < bestCollation.getNonMatches().size()) {
         bestAlignment = alignment;
-        bestCollation = new Collation(bestAlignment.getFixedMatches());
+        bestCollation = new Collation(bestAlignment.getFixedMatches(), a, b);
       }
     }
     if (bestAlignment == null) throw new RuntimeException("Unexpected error!");

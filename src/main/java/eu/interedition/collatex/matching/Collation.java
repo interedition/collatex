@@ -17,11 +17,17 @@ public class Collation {
   private final List<MatchSequence> sequencesBase;
   private final List<MatchSequence> sequencesWitness;
   private final Set<Match> matches;
+  private final List<NonMatch> nonMatches;
 
-  public Collation(Set<Match> _matches) {
+  public Collation(Set<Match> _matches, Witness a, Witness b) {
     this.matches = _matches;
     this.sequencesBase = SequenceDetection.calculateMatchSequences(matches);
     this.sequencesWitness = SequenceDetection.sortSequencesForWitness(sequencesBase);
+    List<NonMatch> nonMatches1 = GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesBase, sequencesWitness);
+    List<NonMatch> nonMatches2 = GapDetection.getVariantsInMatchSequences(a, b, sequencesBase);
+    nonMatches = Lists.newArrayList();
+    nonMatches.addAll(nonMatches1);
+    nonMatches.addAll(nonMatches2);
   }
 
   public Set<Match> getMatches() {
@@ -32,14 +38,36 @@ public class Collation {
     return sequencesBase;
   }
 
-  //TODO: move witness a, witness b up!
-  public List<NonMatch> getNonMatches(Witness a, Witness b) {
-    List<NonMatch> nonMatches1 = GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesBase, sequencesWitness);
-    List<NonMatch> nonMatches2 = GapDetection.getVariantsInMatchSequences(a, b, sequencesBase);
-    List<NonMatch> result = Lists.newArrayList();
-    result.addAll(nonMatches1);
-    result.addAll(nonMatches2);
-    return result;
+  public List<NonMatch> getNonMatches() {
+    return nonMatches;
+  }
+
+  public List<MatchSequence> getMatchSequencesForBase() {
+    return getMatchSequences();
+  }
+
+  public List<MatchSequence> getMatchSequencesForWitness() {
+    return sequencesWitness;
+  }
+
+  public List<NonMatch> getAdditions() {
+    List<NonMatch> additions = Lists.newArrayList();
+    for (NonMatch nonMatch : nonMatches) {
+      if (nonMatch.isAddition()) {
+        additions.add(nonMatch);
+      }
+    }
+    return additions;
+  }
+
+  public List<NonMatch> getReplacements() {
+    List<NonMatch> replacements = Lists.newArrayList();
+    for (NonMatch nonMatch : getNonMatches()) {
+      if (nonMatch.isReplacement()) {
+        replacements.add(nonMatch);
+      }
+    }
+    return replacements;
   }
 
 }

@@ -47,7 +47,7 @@ public class MatchingTest {
     Set<Match> matches = collation.getMatches();
     String expected = "[(2->6), (3->4), (4->7), (6->9), (1->5), (5->8)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, collation.getNonMatches(a, b).size());
+    Assert.assertEquals(1, collation.getNonMatches().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
@@ -61,7 +61,7 @@ public class MatchingTest {
     Set<Match> matches = collation.getMatches();
     String expected = "[(2->6), (3->4), (4->7), (6->9), (9->12), (1->5), (5->8), (7->10), (8->11)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, collation.getNonMatches(a, b).size());
+    Assert.assertEquals(1, collation.getNonMatches().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
@@ -75,7 +75,7 @@ public class MatchingTest {
     Set<Match> matches = collation.getMatches();
     String expected = "[(4->3), (6->2), (7->4), (9->6), (5->1), (8->5)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, collation.getNonMatches(a, b).size());
+    Assert.assertEquals(1, collation.getNonMatches().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
