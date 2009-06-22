@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
@@ -31,10 +33,12 @@ public class Matcher {
   // Note: The WordDistance parameter should be parameterized!
   public Alignment align(Witness a, Witness b) {
     Set<Match> allMatches = findMatches(a, b, new NormalizedLevenshtein());
-    // group matches by common base word or common witness word
+
+    // Note: this code is not the simplest thing that 
+    // could possibly work!
     Set<Match> exactMatches = Sets.newLinkedHashSet();
     for (Match match : allMatches) {
-      Iterable<Match> alternatives = Alignment.findAlternativesBase(allMatches, match);
+      Iterable<Match> alternatives = Matcher.findAlternatives(allMatches, match);
       if (!alternatives.iterator().hasNext()) {
         exactMatches.add(match);
       }
@@ -42,8 +46,8 @@ public class Matcher {
 
     Set<Match> unfixedMatches = Sets.newLinkedHashSet(allMatches);
     unfixedMatches.removeAll(exactMatches);
-    Alignment posMatches = new Alignment(exactMatches, unfixedMatches);
-    return posMatches;
+    Alignment alignment = new Alignment(exactMatches, unfixedMatches);
+    return alignment;
   }
 
   private Set<Match> findMatches(Witness base, Witness witness, WordDistance distanceMeasure) {
@@ -149,5 +153,14 @@ public class Matcher {
     }
     if (bestAlignment == null) throw new RuntimeException("Unexpected error!");
     return bestAlignment;
+  }
+
+  private static Iterable<Match> findAlternatives(Iterable<Match> pmatches, final Match pmatch) {
+    Predicate<Match> unfixedAlternativeToGivenPMatch = new Predicate<Match>() {
+      public boolean apply(Match pm) {
+        return pm != pmatch && (pm.getBaseWord().equals(pmatch.getBaseWord()) || pm.getWitnessWord().equals(pmatch.getWitnessWord()));
+      }
+    };
+    return Iterables.filter(pmatches, unfixedAlternativeToGivenPMatch);
   }
 }

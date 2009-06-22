@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -55,26 +53,7 @@ public class Alignment {
     return matches;
   }
 
-  // TODO: move!
-  public static Iterable<Match> findAlternativesBase(Iterable<Match> pmatches, final Match pmatch) {
-    Predicate<Match> unfixedAlternativeToGivenPMatch = new Predicate<Match>() {
-      public boolean apply(Match pm) {
-        return pm != pmatch && (pm.getBaseWord().equals(pmatch.getBaseWord()) /* || pm.getWitnessWord().equals(pmatch.getWitnessWord())*/);
-      }
-    };
-    return Iterables.filter(pmatches, unfixedAlternativeToGivenPMatch);
-  }
-
-  // TODO: move!
-  Iterable<Match> findAlternativesWitness(Iterable<Match> pmatches, final Match pmatch) {
-    Predicate<Match> unfixedAlternativeToGivenPMatch = new Predicate<Match>() {
-      public boolean apply(Match pm) {
-        return pm != pmatch && (pm.getWitnessWord().equals(pmatch.getWitnessWord()));
-      }
-    };
-    return Iterables.filter(pmatches, unfixedAlternativeToGivenPMatch);
-  }
-
+  // group matches by common base word or common witness word
   private Multimap<Word, Match> groupMatchesForBase(Set<Match> _matches) {
     Multimap<Word, Match> matchGroupsForBase = Multimaps.newLinkedListMultimap();
     for (Match match : _matches) {

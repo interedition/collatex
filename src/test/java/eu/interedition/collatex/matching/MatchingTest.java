@@ -89,4 +89,30 @@ public class MatchingTest {
     Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
+  // Note: in test there are no exact matches!
+  // so there are multiple alignments that
+  // are both equally valid!
+  @Test
+  public void testMatchingFromAtoBandBtoAMixed() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness a = builder.build("a a b");
+    Witness b = builder.build("a b b");
+    Matcher matcher = new Matcher();
+    Collation collation = matcher.collate(a, b);
+    Set<Match> matches = collation.getMatches();
+    String expected = "[(1->1), (3->3)]";
+    Assert.assertEquals(expected, matches.toString());
+  }
+
+  @Test
+  public void testMatchingFromAtoBandBtoAMixedCFixed() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness a = builder.build("a a c b");
+    Witness b = builder.build("a b c b");
+    Matcher matcher = new Matcher();
+    Collation collation = matcher.collate(a, b);
+    Set<Match> matches = collation.getMatches();
+    String expected = "[(3->3), (1->1), (4->4)]";
+    Assert.assertEquals(expected, matches.toString());
+  }
 }
