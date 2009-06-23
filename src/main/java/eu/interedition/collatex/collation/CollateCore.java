@@ -57,24 +57,26 @@ public class CollateCore {
   }
 
   public List<MatchNonMatch> doCompareWitnesses(Witness base, Witness witness) {
-    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
-    List<Set<Match>> permutationList = matches.permutations();
-
-    List<MatchNonMatch> matchNonMatchList = Lists.newArrayList();
-    for (Set<Match> permutation : permutationList) {
-      List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
-      List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
-      List<NonMatch> nonMatches = determineNonMatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
-      matchNonMatchList.add(new MatchNonMatch(permutation, matchSequencesByBase, matchSequencesByWitness, nonMatches));
-    }
-    sortPermutationsByVariation(matchNonMatchList);
-    return matchNonMatchList;
+    throw new UnsupportedOperationException();
+    //    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
+    //    List<Set<Match>> permutationList = matches.permutations();
+    //
+    //    List<MatchNonMatch> matchNonMatchList = Lists.newArrayList();
+    //    for (Set<Match> permutation : permutationList) {
+    //      List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
+    //      List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
+    //      List<NonMatch> nonMatches = determineNonMatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
+    //      matchNonMatchList.add(new MatchNonMatch(permutation, matchSequencesByBase, matchSequencesByWitness, nonMatches));
+    //    }
+    //    sortPermutationsByVariation(matchNonMatchList);
+    //    return matchNonMatchList;
   }
 
   public MatchNonMatch compareWitnesses(Witness w1, Witness w2) {
-    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(w1, w2);
-    sortPermutationsByVariation(matchNonMatchList);
-    return matchNonMatchList.get(0);
+    throw new UnsupportedOperationException();
+    //    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(w1, w2);
+    //    sortPermutationsByVariation(matchNonMatchList);
+    //    return matchNonMatchList.get(0);
   }
 
   public List<List<MatchNonMatch>> getAllMatchNonMatchPermutations() {

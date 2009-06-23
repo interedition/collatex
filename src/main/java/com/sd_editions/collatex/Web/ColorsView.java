@@ -17,9 +17,11 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.matching.Collation;
+import eu.interedition.collatex.matching.Matcher;
 import eu.interedition.collatex.superbase.AlignmentTable2;
 import eu.interedition.collatex.superbase.Column;
 import eu.interedition.collatex.superbase.SuperbaseAlgorithm;
@@ -92,36 +94,62 @@ public class ColorsView {
 
   private String modifications() {
     StringBuffer html = new StringBuffer("<h4>Modifications:</h4>");
-    MatchesView matchesView = new MatchesView();
-    final int numberOfWitnesses = colors.numberOfWitnesses();
+    final int numberOfWitnesses = witnesses.size();
     for (int base = 1; base < numberOfWitnesses; base++) {
-      if (base > 1) html.append("<span class=\"secondary\">");
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
-        html.append("Comparing witness " + base + " - witness " + (w) + ":<ol>");
-        List<MatchNonMatch> matchNonMatchList = colors.doCompareWitnesses(colors.getWitness(base), colors.getWitness(w));
-        int pn = 1;
-        for (MatchNonMatch matchNonMatch : matchNonMatchList) {
-          if (pn > 1) html.append("<span class=\"secondary\">");
-          html.append("<span class=\"secondary\">Permutation " + pn++ + "/" + matchNonMatchList.size() + "</span><ul>");
-          html.append("<span class=\"colored\" style=\"display:none\">");
-          Modifications modifications = colors.getModifications(matchNonMatch);
-          html.append(witnessPairView(base, w, modifications));
-          html.append("</span>");
-          html.append(modificationsView(base, modifications));
-          html.append("<br/></ul>");
-          html.append(matchesView.renderPermutation(matchNonMatch));
-          if (pn > 1) html.append("</span>");
+        html.append("Comparing witness " + base + " - witness " + (w) + ":");
+        Matcher matcher = new Matcher();
+        Witness a = witnesses.get(base - 1);
+        Witness b = witnesses.get(w - 1);
+        Collation collate = matcher.collate(a, b);
+        List<NonMatch> nonMatches = collate.getNonMatches();
+        List<Modification> modifications = Lists.newArrayList();
+        for (NonMatch nm : nonMatches) {
+          Modification modification = nm.analyse();
+          modifications.add(modification);
         }
-        html.append("</ol>");
+        //        TranspositionDetection detection = new TranspositionDetection();
+        //        detection.
+        html.append(modificationsView(base, modifications));
+        html.append("<br/>");
+        //      //      
       }
-      if (base > 1) html.append("</span>");
     }
     return html.toString();
   }
 
-  private String modificationsView(int base, Modifications modifications) {
+  //  private String modifications() {
+  //    StringBuffer html = new StringBuffer("<h4>Modifications:</h4>");
+  //    MatchesView matchesView = new MatchesView();
+  //    final int numberOfWitnesses = colors.numberOfWitnesses();
+  //    for (int base = 1; base < numberOfWitnesses; base++) {
+  //      if (base > 1) html.append("<span class=\"secondary\">");
+  //      for (int w = base + 1; w <= numberOfWitnesses; w++) {
+  //        html.append("Comparing witness " + base + " - witness " + (w) + ":<ol>");
+  //        List<MatchNonMatch> matchNonMatchList = colors.doCompareWitnesses(colors.getWitness(base), colors.getWitness(w));
+  //        int pn = 1;
+  //        for (MatchNonMatch matchNonMatch : matchNonMatchList) {
+  //          if (pn > 1) html.append("<span class=\"secondary\">");
+  //          html.append("<span class=\"secondary\">Permutation " + pn++ + "/" + matchNonMatchList.size() + "</span><ul>");
+  //          html.append("<span class=\"colored\" style=\"display:none\">");
+  //          Modifications modifications = colors.getModifications(matchNonMatch);
+  //          html.append(witnessPairView(base, w, modifications));
+  //          html.append("</span>");
+  //          html.append(modificationsView(base, modifications));
+  //          html.append("<br/></ul>");
+  //          html.append(matchesView.renderPermutation(matchNonMatch));
+  //          if (pn > 1) html.append("</span>");
+  //        }
+  //        html.append("</ol>");
+  //      }
+  //      if (base > 1) html.append("</span>");
+  //    }
+  //    return html.toString();
+  //  }
+
+  private String modificationsView(int base, List<Modification> modificationsL) {
     StringBuffer html = new StringBuffer("<span class=\"secondary\"><li>Modifications:</li></span><ul>");
-    List<Modification> modificationsL = modifications.getModifications();
+    //    List<Modification> modificationsL = modifications.getModifications();
     if (modificationsL.isEmpty()) {
       html.append("<li>no additions, omissions or transpositions</li>");
     } else {
