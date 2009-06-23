@@ -1,4 +1,4 @@
-package com.sd_editions.collatex.match.worddistance;
+package eu.interedition.collatex.match.worddistance;
 
 import org.apache.commons.lang.StringUtils;
 

@@ -1,10 +1,12 @@
-package com.sd_editions.collatex.match.worddistance;
+package eu.interedition.collatex.match.worddistance;
 
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
+
+import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 
 public class NormalizedLevenshteinTest {
 

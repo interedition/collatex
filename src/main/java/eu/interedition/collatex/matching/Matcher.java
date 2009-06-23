@@ -8,14 +8,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
-import com.sd_editions.collatex.match.worddistance.WordDistance;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
+import eu.interedition.collatex.match.worddistance.WordDistance;
 
 public class Matcher {
 

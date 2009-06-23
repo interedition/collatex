@@ -8,7 +8,6 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.match.worddistance.NormalizedLevenshtein;
 import com.sd_editions.collatex.permutations.Matches;
 import com.sd_editions.collatex.permutations.Modification;
 import com.sd_editions.collatex.permutations.Modifications;
@@ -22,6 +21,7 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.collation.sequences.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 
 public class CollateCore {
 
