@@ -6,22 +6,24 @@ import com.sd_editions.collatex.permutations.collate.Replacement;
 
 import eu.interedition.collatex.visualization.Modification;
 
+// TODO: rename class to Gap!
 public class NonMatch {
-  final Gap base;
-  final Gap witness;
+  final Phrase base;
+  final Phrase witness;
 
-  public Gap getBase() {
+  public NonMatch(Phrase _base, Phrase _witness) {
+    this.base = _base;
+    this.witness = _witness;
+  }
+
+  // TODO: rename method -- it does return a Phrase, not a Witness
+  public Phrase getBase() {
     return base;
   }
 
-  // TODO rename method -- it does return a Gap, not a Witness
-  public Gap getWitness() {
+  // TODO: rename method -- it does return a Gap, not a Witness
+  public Phrase getWitness() {
     return witness;
-  }
-
-  public NonMatch(Gap _base, Gap _witness) {
-    this.base = _base;
-    this.witness = _witness;
   }
 
   Addition createAddition() {

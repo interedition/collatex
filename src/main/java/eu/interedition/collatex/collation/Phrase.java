@@ -12,12 +12,19 @@ public class Phrase {
   private final int startPosition;
   private final int endPosition;
   private final int size;
+  private final Word previous;
+  private final Word next;
+  private final Match nextMatch;
 
-  public Phrase(Witness _witness, int _size, int _startPosition, int _endPosition) {
+  // TODO: It is pretty obvious: too many parameters here!
+  public Phrase(Witness _witness, int _size, int _startPosition, int _endPosition, Word _previous, Word _next, Match _nextMatch) {
     witness = _witness;
     this.size = _size;
+    this.next = _next;
+    this.previous = _previous;
     startPosition = _startPosition;
     endPosition = _endPosition;
+    this.nextMatch = _nextMatch;
   }
 
   public boolean hasGap() {
@@ -60,6 +67,40 @@ public class Phrase {
       words.add(word);
     }
     return words;
+  }
+
+  public Word getFirstWord() {
+    return getWords().get(0);
+  }
+
+  public Word getNextWord() {
+    if (isAtTheEnd()) {
+      throw new RuntimeException("There is no next word!");
+    }
+    return next;
+  }
+
+  public boolean isAtTheEnd() {
+    return next == null;
+  }
+
+  public Word getPreviousWord() {
+    if (isAtTheFront()) {
+      throw new RuntimeException("There is no previous word!");
+    }
+    return previous;
+  }
+
+  public boolean isAtTheFront() {
+    return previous == null;
+  }
+
+  // TODO: either getNextWord should be removed or getNextMatch should be removed!
+  public Match getNextMatch() {
+    if (isAtTheEnd()) {
+      throw new RuntimeException("There is no next match!");
+    }
+    return nextMatch;
   }
 
 }

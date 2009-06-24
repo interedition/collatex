@@ -13,7 +13,9 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.Phrase;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Modifications;
 
@@ -36,7 +38,10 @@ public class XMLAlignmentViewTest {
 
   @Test
   public void testModificationsView() {
-    Addition addition = new Addition(1, new Phrase(builder.build("some addition its longer than that"), 2, 1, 2));
+    Witness witness = builder.build("some addition its longer than that");
+    Word next = witness.getWordOnPosition(3);
+    Word previous = null;
+    Addition addition = new Addition(1, new Phrase(witness, 2, 1, 2, previous, next, null));
     XMLAlignmentView alignmentView = setupAlignmentView(addition);
 
     String result = alignmentView.modificationsView(-1);
@@ -47,7 +52,10 @@ public class XMLAlignmentViewTest {
 
   @Test
   public void testModificationsViewOmissions() {
-    Omission omission = new Omission(new Phrase(builder.build("some deletion has occurred"), 1, 2, 2));
+    Witness witness = builder.build("some deletion has occurred");
+    Word next = witness.getWordOnPosition(3);
+    Word previous = witness.getWordOnPosition(1);
+    Omission omission = new Omission(new Phrase(witness, 1, 2, 2, previous, next, null));
     XMLAlignmentView alignmentView = setupAlignmentView(omission);
 
     String result = alignmentView.modificationsView(-1);

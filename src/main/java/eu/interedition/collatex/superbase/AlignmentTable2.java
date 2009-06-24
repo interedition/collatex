@@ -7,9 +7,9 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.collation.Gap;
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.Phrase;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
@@ -169,8 +169,8 @@ public class AlignmentTable2 {
     for (NonMatch addition : additions) {
 
       List<Word> witnessWords = addition.getWitness().getWords();
-      Gap base = addition.getBase();
-      Gap witnessGap = addition.getWitness();
+      Phrase base = addition.getBase();
+      Phrase witnessGap = addition.getWitness();
       addVariantAtGap(superbase, witness, base, witnessGap, witnessWords, matchesOrderedForTheWitness, matchesOrderedForTheBase);
     }
   }
@@ -183,7 +183,8 @@ public class AlignmentTable2 {
     return column;
   }
 
-  private void addVariantAtGap(Superbase superbase, Witness witness, Gap baseGap, Gap witnessGap, List<Word> witnessWords, List<Match> matchesOrderedForTheWitness, List<Match> matchesOrderedForTheBase) {
+  private void addVariantAtGap(Superbase superbase, Witness witness, Phrase baseGap, Phrase witnessGap, List<Word> witnessWords, List<Match> matchesOrderedForTheWitness,
+      List<Match> matchesOrderedForTheBase) {
     if (baseGap.isAtTheEnd()) {
       addVariantAtTheEnd(witness, witnessWords);
     } else {
