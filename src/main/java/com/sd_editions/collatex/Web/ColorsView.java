@@ -15,7 +15,6 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.matching.Collation;
@@ -25,6 +24,7 @@ import eu.interedition.collatex.superbase.Column;
 import eu.interedition.collatex.superbase.SuperbaseAlgorithm;
 import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Modifications;
+import eu.interedition.collatex.visualization.Visualization;
 
 public class ColorsView {
 
@@ -102,17 +102,9 @@ public class ColorsView {
         Witness a = witnesses.get(base - 1);
         Witness b = witnesses.get(w - 1);
         Collation collate = matcher.collate(a, b);
-        List<NonMatch> nonMatches = collate.getNonMatches();
-        List<Modification> modifications = Lists.newArrayList();
-        for (NonMatch nm : nonMatches) {
-          Modification modification = nm.analyse();
-          modifications.add(modification);
-        }
-        //        TranspositionDetection detection = new TranspositionDetection();
-        //        detection.
+        Modifications modifications = Visualization.getModifications(collate);
         html.append(modificationsView(base, modifications));
         html.append("<br/>");
-        //      //      
       }
     }
     return html.toString();
@@ -147,9 +139,9 @@ public class ColorsView {
   //    return html.toString();
   //  }
 
-  private String modificationsView(int base, List<Modification> modificationsL) {
+  private String modificationsView(int base, Modifications modifications) {
     StringBuffer html = new StringBuffer("<span class=\"secondary\"><li>Modifications:</li></span><ul>");
-    //    List<Modification> modificationsL = modifications.getModifications();
+    List<Modification> modificationsL = modifications.getModifications();
     if (modificationsL.isEmpty()) {
       html.append("<li>no additions, omissions or transpositions</li>");
     } else {
