@@ -1,42 +1,22 @@
 package eu.interedition.collatex.collation;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
 public class Gap extends Phrase {
-  private final int size;
   private final Word previous;
   private final Word next;
   private final Match nextMatch;
 
   public Gap(Witness _witness, int _size, int _beginPosition, int _endPosition, Word _previous, Word _next, Match _nextMatch) {
-    super(_witness, _beginPosition, _endPosition);
-    this.size = _size;
+    super(_witness, _size, _beginPosition, _endPosition);
     this.previous = _previous;
     this.next = _next;
     this.nextMatch = _nextMatch;
   }
 
-  public boolean hasGap() {
-    return size > 0;
-  }
-
   public Word getFirstWord() {
     return getWords().get(0);
-  }
-
-  // TODO: move up to Phrase?
-  public List<Word> getWords() {
-    List<Word> words = Lists.newArrayList();
-    for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      Word word = getWitness().getWordOnPosition(k);
-      words.add(word);
-    }
-    return words;
   }
 
   public Word getNextWord() {

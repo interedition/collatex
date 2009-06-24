@@ -3,7 +3,7 @@ package com.sd_editions.collatex.views;
 import com.sd_editions.collatex.match.views.AppElement;
 import com.sd_editions.collatex.match.views.Element;
 
-import eu.interedition.collatex.collation.Gap;
+import eu.interedition.collatex.collation.Phrase;
 
 /**
  *  Apparatus element serializing to the output format specified in ticket #6. 
@@ -13,18 +13,18 @@ import eu.interedition.collatex.collation.Gap;
  */
 public class AppElementTEI extends Element {
 
-  public Gap getBase() {
+  public Phrase getBase() {
     return base;
   }
 
-  public Gap getWitness() {
+  public Phrase getWitness() {
     return witness;
   }
 
-  private final Gap base;
-  private final Gap witness;
+  private final Phrase base;
+  private final Phrase witness;
 
-  public AppElementTEI(Gap _base, Gap _witness) {
+  public AppElementTEI(Phrase _base, Phrase _witness) {
     this.base = _base;
     this.witness = _witness;
   }

@@ -36,7 +36,7 @@ public class XMLAlignmentViewTest {
 
   @Test
   public void testModificationsView() {
-    Addition addition = new Addition(1, new Phrase(builder.build("some addition its longer than that"), 1, 2));
+    Addition addition = new Addition(1, new Phrase(builder.build("some addition its longer than that"), 2, 1, 2));
     XMLAlignmentView alignmentView = setupAlignmentView(addition);
 
     String result = alignmentView.modificationsView(-1);
@@ -47,7 +47,7 @@ public class XMLAlignmentViewTest {
 
   @Test
   public void testModificationsViewOmissions() {
-    Omission omission = new Omission(new Phrase(builder.build("some deletion has occurred"), 2, 2));
+    Omission omission = new Omission(new Phrase(builder.build("some deletion has occurred"), 1, 2, 2));
     XMLAlignmentView alignmentView = setupAlignmentView(omission);
 
     String result = alignmentView.modificationsView(-1);
