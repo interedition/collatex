@@ -8,8 +8,8 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.collation.Phrase;
+import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
@@ -135,8 +135,8 @@ public class AlignmentTable2 {
       addMatch(witness, witnessWord, column);
     }
 
-    List<NonMatch> replacements = compresult.getReplacements();
-    for (NonMatch replacement : replacements) {
+    List<Gap> replacements = compresult.getReplacements();
+    for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!
 
       Iterator<Word> baseIterator = replacement.getBase().getWords().iterator();
@@ -165,8 +165,8 @@ public class AlignmentTable2 {
       //      addVariant(column, witness, wordInWitness);
     }
 
-    List<NonMatch> additions = compresult.getAdditions();
-    for (NonMatch addition : additions) {
+    List<Gap> additions = compresult.getAdditions();
+    for (Gap addition : additions) {
 
       List<Word> witnessWords = addition.getWitness().getWords();
       Phrase base = addition.getBase();

@@ -1,17 +1,17 @@
-package eu.interedition.collatex.collation;
+package eu.interedition.collatex.collation.gaps;
 
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
+import eu.interedition.collatex.collation.Phrase;
 import eu.interedition.collatex.visualization.Modification;
 
-// TODO: rename class to Gap!
-public class NonMatch {
+public class Gap {
   final Phrase base;
   final Phrase witness;
 
-  public NonMatch(Phrase _base, Phrase _witness) {
+  public Gap(Phrase _base, Phrase _witness) {
     this.base = _base;
     this.witness = _witness;
   }
@@ -26,15 +26,15 @@ public class NonMatch {
     return witness;
   }
 
-  Addition createAddition() {
+  public Addition createAddition() {
     return new Addition(base.getStartPosition(), witness);
   }
 
-  Omission createOmission() {
+  public Omission createOmission() {
     return new Omission(base);
   }
 
-  Replacement createReplacement() {
+  public Replacement createReplacement() {
     return new Replacement(base, witness);
   }
 
@@ -42,7 +42,7 @@ public class NonMatch {
     return !base.hasGap() && witness.hasGap();
   }
 
-  boolean isOmission() {
+  public boolean isOmission() {
     return base.hasGap() && !witness.hasGap();
   }
 

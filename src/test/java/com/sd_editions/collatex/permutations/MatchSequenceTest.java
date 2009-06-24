@@ -7,9 +7,9 @@ import junit.framework.TestCase;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.GapDetection;
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.gaps.Gap;
+import eu.interedition.collatex.collation.gaps.GapDetection;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.collation.sequences.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
@@ -184,7 +184,7 @@ public class MatchSequenceTest extends TestCase {
     Match b = new Match(bB, bW);
     MatchSequence sequence = new MatchSequence(1, a, b);
     List<MatchSequence> sequences = Lists.newArrayList(sequence);
-    List<NonMatch> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
+    List<Gap> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
     List<Modification> results = GapDetection.analyseVariants(variants);
     List<Modification> modificationsInMatchSequences = results;
     assertEquals(1, modificationsInMatchSequences.size());
@@ -203,7 +203,7 @@ public class MatchSequenceTest extends TestCase {
     Match b = new Match(bB, bW);
     MatchSequence sequence = new MatchSequence(1, a, b);
     List<MatchSequence> sequences = Lists.newArrayList(sequence);
-    List<NonMatch> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
+    List<Gap> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
     List<Modification> results = GapDetection.analyseVariants(variants);
     List<Modification> modificationsInMatchSequences = results;
     assertEquals(0, modificationsInMatchSequences.size());

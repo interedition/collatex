@@ -9,9 +9,9 @@ import com.sd_editions.collatex.permutations.TranspositionDetection;
 import com.sd_editions.collatex.permutations.Tuple2;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
-import eu.interedition.collatex.collation.GapDetection;
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.gaps.Gap;
+import eu.interedition.collatex.collation.gaps.GapDetection;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.matching.Collation;
 
@@ -24,7 +24,7 @@ public class Visualization {
     return modifications;
   }
 
-  public static List<Modification> determineModifications(Set<Match> permutation, List<NonMatch> determineNonMatches) {
+  public static List<Modification> determineModifications(Set<Match> permutation, List<Gap> determineNonMatches) {
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(Matches.getWordDistanceMatches(permutation));
     modifications.addAll(GapDetection.analyseVariants(determineNonMatches));

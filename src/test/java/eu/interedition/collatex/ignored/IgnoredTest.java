@@ -16,7 +16,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.WitnessBuilder;
 
@@ -55,7 +55,7 @@ public class IgnoredTest {
       for (MatchNonMatch matchNonMatch : list) {
         println("  matchNonMatch " + list.indexOf(matchNonMatch));
         List<MatchSequence> matchSequencesForBase = matchNonMatch.getMatchSequencesForBase();
-        List<NonMatch> nonMatches = matchNonMatch.getNonMatches();
+        List<Gap> nonMatches = matchNonMatch.getNonMatches();
         for (MatchSequence matchSequence : matchSequencesForBase) {
           println("    matchSequenceForBase " + matchSequencesForBase.indexOf(matchSequence));
           List<Match> matches = matchSequence.getMatches();

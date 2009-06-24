@@ -1,18 +1,20 @@
-package eu.interedition.collatex.collation;
+package eu.interedition.collatex.collation.gaps;
 
 import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.Phrase;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.visualization.Modification;
 
 public class GapDetection {
-  public static List<NonMatch> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
-    List<NonMatch> variants = Lists.newArrayList();
+  public static List<Gap> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
+    List<Gap> variants = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
       List<Match> matches = sequence.getMatches();
       if (matches.size() > 1) {
@@ -34,7 +36,7 @@ public class GapDetection {
             //            System.out.println(gapSizeBase + ":" + gapSizeWitness);
             Phrase gapBase = new Phrase(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1, previousWordBase, nextWordBase, next);
             Phrase gapWitness = new Phrase(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1, previousWordWitness, nextWordWitness, next);
-            NonMatch nonMatch = new NonMatch(gapBase, gapWitness);
+            Gap nonMatch = new Gap(gapBase, gapWitness);
             variants.add(nonMatch);
           }
           previous = next;
@@ -45,24 +47,24 @@ public class GapDetection {
   }
 
   @Deprecated
-  public static List<Modification> analyseVariants(List<NonMatch> variants) {
+  public static List<Modification> analyseVariants(List<Gap> variants) {
     List<Modification> results = Lists.newArrayList();
-    for (NonMatch nonMatch : variants) {
+    for (Gap nonMatch : variants) {
       Modification modification = nonMatch.analyse();
       results.add(modification);
     }
     return results;
   }
 
-  public static List<NonMatch> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
+  public static List<Gap> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
     List<Phrase> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
     List<Phrase> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
-    List<NonMatch> variants = Lists.newArrayList();
+    List<Gap> variants = Lists.newArrayList();
     for (int i = 0; i < gapsBase.size(); i++) {
       Phrase gapBase = gapsBase.get(i);
       Phrase gapWitness = gapsWitness.get(i);
       if (gapBase.hasGap() || gapWitness.hasGap()) {
-        NonMatch nonMatch = new NonMatch(gapBase, gapWitness);
+        Gap nonMatch = new Gap(gapBase, gapWitness);
         variants.add(nonMatch);
       }
     }

@@ -8,7 +8,7 @@ import com.sd_editions.collatex.views.AppElementTEI;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Word;
 
 public class AppAlignmentTable {
@@ -27,7 +27,7 @@ public class AppAlignmentTable {
       cells[matchedWord.position * 2 + 1] = new TextElement(matchedWord);
     }
 
-    for (NonMatch nonMatch : matchNonMatch.getNonMatches()) {
+    for (Gap nonMatch : matchNonMatch.getNonMatches()) {
       // FIXME somehow propagate Bram's witness id here after merge
       cells[nonMatch.getBase().getStartPosition() * 2] = new AppElementTEI(nonMatch.getBase(), nonMatch.getWitness());
     }
@@ -44,7 +44,7 @@ public class AppAlignmentTable {
       cells[matchedWord.position * 2 + 1] = new TextElement(matchedWord);
     }
 
-    for (NonMatch nonMatch : multiMatchNonMatch.getNonMatches()) {
+    for (Gap nonMatch : multiMatchNonMatch.getNonMatches()) {
       cells[nonMatch.getBase().getStartPosition() * 2] = new AppElementTEI(nonMatch.getBase(), nonMatch.getWitness());
     }
 

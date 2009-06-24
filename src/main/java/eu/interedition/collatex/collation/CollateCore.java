@@ -13,6 +13,8 @@ import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
+import eu.interedition.collatex.collation.gaps.Gap;
+import eu.interedition.collatex.collation.gaps.GapDetection;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.collation.sequences.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
@@ -119,47 +121,47 @@ public class CollateCore {
     Collections.sort(modificationsList, comparator);
   }
 
-  private List<NonMatch> determineNonMatches(Witness base, Witness witness, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
-    List<NonMatch> variants2 = Lists.newArrayList();
+  private List<Gap> determineNonMatches(Witness base, Witness witness, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
+    List<Gap> variants2 = Lists.newArrayList();
     variants2.addAll(GapDetection.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
     variants2.addAll(GapDetection.getVariantsInMatchSequences(base, witness, matchSequencesForBase));
     return variants2;
   }
 
-  public List<Addition> getAdditions(List<NonMatch> nonMatches) {
-    List<NonMatch> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<NonMatch>() {
-      public boolean apply(NonMatch arg0) {
+  public List<Addition> getAdditions(List<Gap> nonMatches) {
+    List<Gap> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<Gap>() {
+      public boolean apply(Gap arg0) {
         return arg0.isAddition();
       }
     }));
     List<Addition> additions = Lists.newArrayList();
-    for (NonMatch nonMatch : nonMatches_filter) {
+    for (Gap nonMatch : nonMatches_filter) {
       additions.add(nonMatch.createAddition());
     }
     return additions;
   }
 
-  public List<Omission> getOmissions(List<NonMatch> nonMatches) {
-    List<NonMatch> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<NonMatch>() {
-      public boolean apply(NonMatch arg0) {
+  public List<Omission> getOmissions(List<Gap> nonMatches) {
+    List<Gap> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<Gap>() {
+      public boolean apply(Gap arg0) {
         return arg0.isOmission();
       }
     }));
     List<Omission> omissions = Lists.newArrayList();
-    for (NonMatch nonMatch : nonMatches_filter) {
+    for (Gap nonMatch : nonMatches_filter) {
       omissions.add(nonMatch.createOmission());
     }
     return omissions;
   }
 
-  public List<Replacement> getReplacements(List<NonMatch> nonMatches) {
-    List<NonMatch> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<NonMatch>() {
-      public boolean apply(NonMatch arg0) {
+  public List<Replacement> getReplacements(List<Gap> nonMatches) {
+    List<Gap> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<Gap>() {
+      public boolean apply(Gap arg0) {
         return arg0.isReplacement();
       }
     }));
     List<Replacement> replacements = Lists.newArrayList();
-    for (NonMatch nonMatch : nonMatches_filter) {
+    for (Gap nonMatch : nonMatches_filter) {
       replacements.add(nonMatch.createReplacement());
     }
     return replacements;

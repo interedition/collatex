@@ -12,12 +12,12 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Word;
 
 public class MultiMatchNonMatch {
 
-  private final List<NonMatch> nonMatches;
+  private final List<Gap> nonMatches;
   private final Set<MultiMatch> matches;
 
   public MultiMatchNonMatch(MatchNonMatch... _matchNonMatches) {
@@ -75,8 +75,8 @@ public class MultiMatchNonMatch {
     return commonMatches;
   }
 
-  private List<NonMatch> determineNonMatches() {
-    List<NonMatch> nonMatchList = Lists.newArrayList();
+  private List<Gap> determineNonMatches() {
+    List<Gap> nonMatchList = Lists.newArrayList();
     for (MultiMatch multiMatch : this.matches) {
 
     }
@@ -87,7 +87,7 @@ public class MultiMatchNonMatch {
     return matches;
   }
 
-  public List<NonMatch> getNonMatches() {
+  public List<Gap> getNonMatches() {
     return nonMatches;
   }
 }

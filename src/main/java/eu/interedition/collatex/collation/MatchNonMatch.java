@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 
 // TODO: replace this class by Collation class!!!!
@@ -12,10 +13,10 @@ public class MatchNonMatch {
 
   private final List<MatchSequence> matchSequencesForBase;
   private final List<MatchSequence> matchSequencesForWitness;
-  private final List<NonMatch> nonMatches;
+  private final List<Gap> nonMatches;
   private final Set<Match> matches;
 
-  public MatchNonMatch(Set<Match> _matches, List<MatchSequence> _matchSequencesForBase, List<MatchSequence> _matchSequencesForWitness, List<NonMatch> _nonMatches) {
+  public MatchNonMatch(Set<Match> _matches, List<MatchSequence> _matchSequencesForBase, List<MatchSequence> _matchSequencesForWitness, List<Gap> _nonMatches) {
     super();
     this.matches = _matches;
     this.matchSequencesForBase = _matchSequencesForBase;
@@ -35,7 +36,7 @@ public class MatchNonMatch {
     return matchSequencesForWitness;
   }
 
-  public List<NonMatch> getNonMatches() {
+  public List<Gap> getNonMatches() {
     return nonMatches;
   }
 
@@ -51,9 +52,9 @@ public class MatchNonMatch {
     return wordDistanceSum;
   }
 
-  public List<NonMatch> getReplacements() {
-    List<NonMatch> replacements = Lists.newArrayList();
-    for (NonMatch nonMatch : getNonMatches()) {
+  public List<Gap> getReplacements() {
+    List<Gap> replacements = Lists.newArrayList();
+    for (Gap nonMatch : getNonMatches()) {
       if (nonMatch.isReplacement()) {
         replacements.add(nonMatch);
       }
@@ -61,9 +62,9 @@ public class MatchNonMatch {
     return replacements;
   }
 
-  public List<NonMatch> getAdditions() {
-    List<NonMatch> additions = Lists.newArrayList();
-    for (NonMatch nonMatch : nonMatches) {
+  public List<Gap> getAdditions() {
+    List<Gap> additions = Lists.newArrayList();
+    for (Gap nonMatch : nonMatches) {
       if (nonMatch.isAddition()) {
         additions.add(nonMatch);
       }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
@@ -46,7 +46,7 @@ public class MatchesView {
       result.append("</li>");
     }
 
-    for (NonMatch nonMatch : matchNonMatch.getNonMatches()) {
+    for (Gap nonMatch : matchNonMatch.getNonMatches()) {
       result.append("<li>Non-Match: ").append(nonMatch.getBase()).append(" ~> ").append(nonMatch.getWitness());
       result.append("</li>");
     }

@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
@@ -143,7 +143,7 @@ public class Matcher {
     // NOTE: this can be done in a nicer way with the min function!
     for (Alignment alignment : alignments) {
       Collation collation = new Collation(alignment.getFixedMatches(), a, b);
-      List<NonMatch> nonMatches = collation.getNonMatches();
+      List<Gap> nonMatches = collation.getNonMatches();
       List<MatchSequence> matchSequences = collation.getMatchSequences();
       //      System.out.println(alignment.getFixedMatches().toString() + ":" + matchSequences.size() + ":" + nonMatches.size());
       if (bestAlignment == null || bestCollation == null || matchSequences.size() < bestCollation.getMatchSequences().size() || nonMatches.size() < bestCollation.getNonMatches().size()) {

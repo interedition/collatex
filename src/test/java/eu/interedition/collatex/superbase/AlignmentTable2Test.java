@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.NonMatch;
+import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
@@ -96,8 +96,8 @@ public class AlignmentTable2Test {
       table.addMatch(witness, witnessWord, column);
     }
 
-    List<NonMatch> replacements = compresult.getReplacements();
-    for (NonMatch replacement : replacements) {
+    List<Gap> replacements = compresult.getReplacements();
+    for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!
       Word wordInOriginal = replacement.getBase().getFirstWord();
       Word wordInWitness = replacement.getWitness().getFirstWord(); // if witness is longer -> extra columns
@@ -105,8 +105,8 @@ public class AlignmentTable2Test {
       table.addVariant(column, witness, wordInWitness);
     }
 
-    List<NonMatch> additions = compresult.getAdditions();
-    for (NonMatch addition : additions) {
+    List<Gap> additions = compresult.getAdditions();
+    for (Gap addition : additions) {
       // NOTE: right now only the first word is taken
       // TODO: should work with the whole phrase 
       Word firstWord = addition.getWitness().getFirstWord();
