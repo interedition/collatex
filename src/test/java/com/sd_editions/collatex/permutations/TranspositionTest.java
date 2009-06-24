@@ -8,6 +8,7 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.visualization.Modifications;
 
 public class TranspositionTest extends TestCase {
 
@@ -105,9 +106,8 @@ public class TranspositionTest extends TestCase {
   //    //    assertEquals("transposition: a b switches position with c d", modifications.get(0).toString());
   //  }
   private Modifications getModifications(String base, String witness) {
-    List<Modifications> permutations = new CollateCore(builder.buildWitnesses(base, witness)).compareWitness(1, 2);
-    assertEquals(1, permutations.size());
-    return permutations.get(0);
+    Modifications permutations = new CollateCore(builder.buildWitnesses(base, witness)).compareWitness(1, 2);
+    return permutations;
   }
 
 }

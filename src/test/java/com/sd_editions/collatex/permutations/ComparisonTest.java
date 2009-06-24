@@ -1,12 +1,10 @@
 package com.sd_editions.collatex.permutations;
 
-import java.util.List;
-
+import junit.framework.TestCase;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
-
-import junit.framework.TestCase;
+import eu.interedition.collatex.visualization.Modifications;
 
 public class ComparisonTest extends TestCase {
 
@@ -132,27 +130,6 @@ public class ComparisonTest extends TestCase {
     assertEquals("omission: d e position: 2", modifications.get(1).toString());
   }
 
-  public void testSymmetry1() {
-    symmetryTest("and then, the black cat and the black dog", "the black cat and the black dog");
-  }
-
-  public void testSymmetry2() {
-    symmetryTest("the black cat and the black dog, and then", "the black cat and the black dog");
-  }
-
-  public void testSymmetry3() {
-    symmetryTest("the black cat and the black dog", "the calico cat and the red dog");
-  }
-
-  private void symmetryTest(String string1, String string2) {
-    CollateCore colors = new CollateCore(builder.build(string1), builder.build(string2));
-    //    Util.p("ORIGINAL");
-    List<Modifications> permutations = colors.compareWitness(1, 2);
-    //    Util.p("MIRROR");
-    List<Modifications> mirrorPermutations = colors.compareWitness(2, 1);
-    assertEquals(permutations.size(), mirrorPermutations.size());
-  }
-
   //  public void testTransposition() {
   //    Colors colors = new Colors("a b c d e f", "a c d b e g");
   //    Comparison comparison = colors.compareWitness(1, 2);
@@ -172,9 +149,8 @@ public class ComparisonTest extends TestCase {
   //  }
 
   private Modifications getModifications(String base, String witness) {
-    List<Modifications> permutations = new CollateCore(builder.build(base), builder.build(witness)).compareWitness(1, 2);
-    assertEquals(1, permutations.size());
-    return permutations.get(0);
+    Modifications permutations = new CollateCore(builder.build(base), builder.build(witness)).compareWitness(1, 2);
+    return permutations;
   }
 
 }

@@ -1,9 +1,9 @@
 package com.sd_editions.collatex.permutations.collate;
 
 import com.sd_editions.collatex.match.views.ModificationVisitor;
-import com.sd_editions.collatex.permutations.Modification;
 
 import eu.interedition.collatex.collation.Phrase;
+import eu.interedition.collatex.visualization.Modification;
 
 public class Replacement extends Modification {
   private final Phrase original;

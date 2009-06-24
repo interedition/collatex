@@ -4,10 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.sd_editions.collatex.permutations.Modifications;
-
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.visualization.Modifications;
 
 public class AlignmentTableViewTest {
   @Test
@@ -48,7 +47,7 @@ public class AlignmentTableViewTest {
     //    Witness witness = new Witness(w2);
     WitnessBuilder builder = new WitnessBuilder();
     CollateCore core = new CollateCore(builder.build(w1), builder.build(w2));
-    Modifications modifications = core.compareWitness(1, 2).get(0);
+    Modifications modifications = core.compareWitness(1, 2);
     AlignmentTable table = new AlignmentTable(modifications);
     String xml = table.toXML();
     return xml;

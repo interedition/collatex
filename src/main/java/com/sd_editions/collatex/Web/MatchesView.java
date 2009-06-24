@@ -2,8 +2,6 @@ package com.sd_editions.collatex.Web;
 
 import java.util.List;
 
-
-import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
 import eu.interedition.collatex.collation.NonMatch;
@@ -16,15 +14,15 @@ public class MatchesView {
   private final WitnessBuilder builder = new WitnessBuilder();
 
   public String renderPermutations(Witness witnessA, Witness witnessB) {
-    CollateCore collateCore = new CollateCore(witnessA, witnessB);
-    List<MatchNonMatch> matchNonMatches = collateCore.doCompareWitnesses(witnessA, witnessB);
-    collateCore.sortPermutationsByVariation(matchNonMatches);
+    //    CollateCore collateCore = new CollateCore(witnessA, witnessB);
+    //    List<MatchNonMatch> matchNonMatches = collateCore.doCompareWitnesses(witnessA, witnessB);
+    //    collateCore.sortPermutationsByVariation(matchNonMatches);
 
     StringBuilder result = new StringBuilder();
-    result.append("Witness A: ").append(witnessA.sentence).append('\n');
-    result.append("Witness B: ").append(witnessB.sentence).append('\n');
-    for (MatchNonMatch matchNonMatch : matchNonMatches)
-      result.append(renderPermutation(matchNonMatch));
+    //    result.append("Witness A: ").append(witnessA.sentence).append('\n');
+    //    result.append("Witness B: ").append(witnessB.sentence).append('\n');
+    //    for (MatchNonMatch matchNonMatch : matchNonMatches)
+    //      result.append(renderPermutation(matchNonMatch));
     return result.toString();
   }
 

@@ -10,6 +10,7 @@ import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.WordDistance;
+import eu.interedition.collatex.visualization.Modification;
 
 public class Matches {
   private final Witness base;

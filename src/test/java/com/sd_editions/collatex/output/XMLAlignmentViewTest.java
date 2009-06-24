@@ -8,14 +8,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.permutations.Modification;
-import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.Phrase;
 import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.visualization.Modification;
+import eu.interedition.collatex.visualization.Modifications;
 
 public class XMLAlignmentViewTest {
 

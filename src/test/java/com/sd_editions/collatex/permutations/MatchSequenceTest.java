@@ -7,14 +7,16 @@ import junit.framework.TestCase;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.GapDetection;
+import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.collation.sequences.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.visualization.Modification;
+import eu.interedition.collatex.visualization.Modifications;
 
 public class MatchSequenceTest extends TestCase {
   private final String witnessId1 = "alpha";
@@ -209,7 +211,7 @@ public class MatchSequenceTest extends TestCase {
 
   public void testModificationsInBetweenMatchSequences() {
     CollateCore colors = new CollateCore(builder.buildWitnesses("a b y c z d", "a x b c n d"));
-    Modifications compareWitness = colors.compareWitness(1, 2).get(0);
+    Modifications compareWitness = colors.compareWitness(1, 2);
     assertEquals(3, compareWitness.size());
     assertEquals("addition: x position: 2", compareWitness.get(0).toString());
     assertEquals("omission: y position: 3", compareWitness.get(1).toString());
@@ -218,7 +220,7 @@ public class MatchSequenceTest extends TestCase {
 
   public void testModificationAtTheEnd() {
     CollateCore colors = new CollateCore(builder.buildWitnesses("a b", "a c"));
-    Modifications compareWitness = colors.compareWitness(1, 2).get(0);
+    Modifications compareWitness = colors.compareWitness(1, 2);
     assertEquals(1, compareWitness.size());
     assertEquals("replacement: b / c position: 2", compareWitness.get(0).toString());
   }

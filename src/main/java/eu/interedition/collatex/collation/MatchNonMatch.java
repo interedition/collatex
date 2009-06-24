@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 
+// TODO: replace this class by Collation class!!!!
 public class MatchNonMatch {
 
   private final List<MatchSequence> matchSequencesForBase;

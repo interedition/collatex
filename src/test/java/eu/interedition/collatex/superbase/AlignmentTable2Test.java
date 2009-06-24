@@ -9,11 +9,11 @@ import org.junit.Test;
 
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.MatchNonMatch;
 import eu.interedition.collatex.collation.NonMatch;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.matching.Collation;
 
 public class AlignmentTable2Test {
   @Test
@@ -86,7 +86,7 @@ public class AlignmentTable2Test {
     // make the superbase from the alignment table
     Superbase superbase = table.createSuperbase();
     CollateCore core = new CollateCore();
-    MatchNonMatch compresult = core.compareWitnesses(superbase, witness);
+    Collation compresult = core.compareWitnesses(superbase, witness);
 
     Set<Match> matches = compresult.getMatches();
     for (Match match : matches) {

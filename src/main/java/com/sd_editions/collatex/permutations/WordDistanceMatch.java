@@ -2,6 +2,7 @@ package com.sd_editions.collatex.permutations;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.visualization.Modification;
 
 public class WordDistanceMatch extends Modification {
 

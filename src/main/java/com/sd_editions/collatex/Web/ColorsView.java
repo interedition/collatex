@@ -7,8 +7,6 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.WordColorTuple;
-import com.sd_editions.collatex.permutations.Modification;
-import com.sd_editions.collatex.permutations.Modifications;
 import com.sd_editions.collatex.permutations.WordDistanceMatch;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -25,6 +23,8 @@ import eu.interedition.collatex.matching.Matcher;
 import eu.interedition.collatex.superbase.AlignmentTable2;
 import eu.interedition.collatex.superbase.Column;
 import eu.interedition.collatex.superbase.SuperbaseAlgorithm;
+import eu.interedition.collatex.visualization.Modification;
+import eu.interedition.collatex.visualization.Modifications;
 
 public class ColorsView {
 

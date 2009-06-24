@@ -9,19 +9,18 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.Matches;
-import com.sd_editions.collatex.permutations.Modification;
-import com.sd_editions.collatex.permutations.Modifications;
-import com.sd_editions.collatex.permutations.TranspositionDetection;
-import com.sd_editions.collatex.permutations.Tuple2;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
-import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.collation.sequences.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
+import eu.interedition.collatex.matching.Collation;
+import eu.interedition.collatex.matching.Matcher;
+import eu.interedition.collatex.visualization.Modifications;
+import eu.interedition.collatex.visualization.Visualization;
 
 public class CollateCore {
 
@@ -36,58 +35,57 @@ public class CollateCore {
   }
 
   @Deprecated
-  public List<Modifications> compareWitness(int i, int j) {
-    List<Modifications> modificationsList = Lists.newArrayList();
+  public Modifications compareWitness(int i, int j) {
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
-    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(base, witness);
-
-    for (MatchNonMatch matchNonMatch : matchNonMatchList) {
-      modificationsList.add(getModifications(matchNonMatch));
-    }
-    sortPermutationsByRelevance(modificationsList);
-    return modificationsList;
-  }
-
-  public Modifications getModifications(MatchNonMatch matchNonMatch) {
-    List<Transposition> transpositions = determineTranspositions(matchNonMatch.getMatchSequencesForBase(), matchNonMatch.getMatchSequencesForWitness());
-    List<Modification> modificationList = determineModifications(matchNonMatch.getMatches(), matchNonMatch.getNonMatches());
-    Modifications modifications = new Modifications(modificationList, transpositions, matchNonMatch.getMatches());
+    Collation collation = compareWitnesses(base, witness);
+    Modifications modifications = Visualization.getModifications(collation);
     return modifications;
+    //    List<Modifications> modificationsList = Lists.newArrayList();
+    //    List<Collation> matchNonMatchList = doCompareWitnesses(base, witness);
+    //
+    //    for (Collation matchNonMatch : matchNonMatchList) {
+    //      modificationsList.add(Visualization.getModifications(matchNonMatch));
+    //    }
+    //    sortPermutationsByRelevance(modificationsList);
+    //    return modificationsList;
   }
 
-  // TODO: remove this method!!!!
-  public List<MatchNonMatch> doCompareWitnesses(Witness base, Witness witness) {
-    // throw new UnsupportedOperationException();
-    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
-    List<Set<Match>> permutationList = matches.permutations();
-
-    List<MatchNonMatch> matchNonMatchList = Lists.newArrayList();
-    for (Set<Match> permutation : permutationList) {
-      List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
-      List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
-      List<NonMatch> nonMatches = determineNonMatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
-      matchNonMatchList.add(new MatchNonMatch(permutation, matchSequencesByBase, matchSequencesByWitness, nonMatches));
-    }
-    sortPermutationsByVariation(matchNonMatchList);
-    return matchNonMatchList;
+  public Collation doCompareWitnesses(Witness base, Witness witness) {
+    Matcher matcher = new Matcher();
+    Collation collation = matcher.collate(base, witness);
+    return collation;
+    //    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
+    //    List<Set<Match>> permutationList = matches.permutations();
+    //
+    //    List<MatchNonMatch> matchNonMatchList = Lists.newArrayList();
+    //    for (Set<Match> permutation : permutationList) {
+    //      List<MatchSequence> matchSequencesByBase = SequenceDetection.calculateMatchSequences(permutation);
+    //      List<MatchSequence> matchSequencesByWitness = SequenceDetection.sortSequencesForWitness(matchSequencesByBase);
+    //      List<NonMatch> nonMatches = determineNonMatches(base, witness, matchSequencesByBase, SequenceDetection.sortSequencesForWitness(matchSequencesByBase));
+    //      matchNonMatchList.add(new MatchNonMatch(permutation, matchSequencesByBase, matchSequencesByWitness, nonMatches));
+    //    }
+    //    sortPermutationsByVariation(matchNonMatchList);
+    // return matchNonMatchList;
   }
 
-  public MatchNonMatch compareWitnesses(Witness w1, Witness w2) {
-    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(w1, w2);
-    sortPermutationsByVariation(matchNonMatchList);
-    return matchNonMatchList.get(0);
+  public Collation compareWitnesses(Witness w1, Witness w2) {
+    return doCompareWitnesses(w1, w2);
+    //    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(w1, w2);
+    //    sortPermutationsByVariation(matchNonMatchList);
+    //    return matchNonMatchList.get(0);
   }
 
   public List<List<MatchNonMatch>> getAllMatchNonMatchPermutations() {
-    List<List<MatchNonMatch>> matchNonMatchPermutationsForAllWitnessPairs = Lists.newArrayList();
-    final int numberOfWitnesses = numberOfWitnesses();
-    for (int w1 = 0; w1 < numberOfWitnesses - 1; w1++) {
-      for (int w2 = w1 + 1; w2 < numberOfWitnesses; w2++) {
-        matchNonMatchPermutationsForAllWitnessPairs.add(doCompareWitnesses(witnesses.get(w1), witnesses.get(w2)));
-      }
-    }
-    return matchNonMatchPermutationsForAllWitnessPairs;
+    throw new UnsupportedOperationException();
+    //    List<List<MatchNonMatch>> matchNonMatchPermutationsForAllWitnessPairs = Lists.newArrayList();
+    //    final int numberOfWitnesses = numberOfWitnesses();
+    //    for (int w1 = 0; w1 < numberOfWitnesses - 1; w1++) {
+    //      for (int w2 = w1 + 1; w2 < numberOfWitnesses; w2++) {
+    //        matchNonMatchPermutationsForAllWitnessPairs.add(doCompareWitnesses(witnesses.get(w1), witnesses.get(w2)));
+    //      }
+    //    }
+    //    return matchNonMatchPermutationsForAllWitnessPairs;
   }
 
   /*
@@ -121,25 +119,11 @@ public class CollateCore {
     Collections.sort(modificationsList, comparator);
   }
 
-  private List<Modification> determineModifications(Set<Match> permutation, List<NonMatch> determineNonMatches) {
-    List<Modification> modifications = Lists.newArrayList();
-    modifications.addAll(Matches.getWordDistanceMatches(permutation));
-    modifications.addAll(GapDetection.analyseVariants(determineNonMatches));
-    return modifications;
-  }
-
   private List<NonMatch> determineNonMatches(Witness base, Witness witness, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
     List<NonMatch> variants2 = Lists.newArrayList();
     variants2.addAll(GapDetection.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
     variants2.addAll(GapDetection.getVariantsInMatchSequences(base, witness, matchSequencesForBase));
     return variants2;
-  }
-
-  private List<Transposition> determineTranspositions(List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
-    List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
-    List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-    List<Transposition> transpositions = TranspositionDetection.createTranspositions(possibleTranspositionTuples);
-    return transpositions;
   }
 
   public List<Addition> getAdditions(List<NonMatch> nonMatches) {
