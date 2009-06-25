@@ -35,7 +35,6 @@ public class ColorsPage extends WebPage {
 
 @SuppressWarnings("serial")
 class ColorsModel implements Serializable {
-
   public String witness1;
   public String witness2;
   public String witness3;
@@ -56,7 +55,6 @@ class ColorsModel implements Serializable {
 
   public void generateHTML() {
     this.html = getView().toHtml();
-
   }
 
   private void add(String witness, FileUpload witnessFile, List<Witness> witnesses, List<String> messages) {
@@ -64,7 +62,9 @@ class ColorsModel implements Serializable {
       try {
         ContentType type = WitnessBuilder.ContentType.value(witnessFile.getContentType());
         if (type != null) {
-          witnesses.add(new WitnessBuilder().build(witnessFile.getInputStream(), type));
+          // 
+          Witness build = new WitnessBuilder().build(witnessFile.getInputStream(), type);
+          witnesses.add(build);
         } else {
           messages.add("Invalid content type of file: " + witnessFile.getClientFileName());
         }
@@ -87,8 +87,13 @@ class ColorsModel implements Serializable {
     add(witness2, witnessFile2, witnesses, messages);
     add(witness3, witnessFile3, witnesses, messages);
     add(witness4, witnessFile4, witnesses, messages);
-
-    return new ColorsView(messages, witnesses);
+    List<Witness> witnessesWithId = Lists.newArrayList();
+    for (int i = 0; i < witnesses.size(); i++) {
+      Witness witness = witnesses.get(i);
+      Witness witnessWithId = new Witness(new Integer(i + 1).toString(), witness.getWords());
+      witnessesWithId.add(witnessWithId);
+    }
+    return new ColorsView(messages, witnessesWithId);
   }
 }
 
@@ -107,7 +112,6 @@ class ColorsForm extends Form {
     add(new FileUploadField("witnessFile2", new PropertyModel(modelForView, "witnessFile2")));
     add(new FileUploadField("witnessFile3", new PropertyModel(modelForView, "witnessFile3")));
     add(new FileUploadField("witnessFile4", new PropertyModel(modelForView, "witnessFile4")));
-
   }
 
   @Override

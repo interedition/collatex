@@ -21,6 +21,12 @@ public class Witness {
     this.words = Lists.newArrayList(_words);
   }
 
+  public Witness(String _id, List<Word> _words) {
+    this.sentence = Join.join(" ", _words);
+    this.id = _id;
+    this.words = _words;
+  }
+
   public List<Word> getWords() {
     return words;
   }
