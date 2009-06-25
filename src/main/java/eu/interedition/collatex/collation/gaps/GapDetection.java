@@ -10,7 +10,6 @@ import eu.interedition.collatex.collation.Phrase;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.visualization.Modification;
 
 public class GapDetection {
   public static List<Gap> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
@@ -34,9 +33,9 @@ public class GapDetection {
           int gapSizeWitness = witnessEndPosition - witnessStartPosition - 1;
           if (gapSizeBase != 0 || gapSizeWitness != 0) {
             //            System.out.println(gapSizeBase + ":" + gapSizeWitness);
-            Phrase gapBase = new Phrase(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1, previousWordBase, nextWordBase, next);
-            Phrase gapWitness = new Phrase(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1, previousWordWitness, nextWordWitness, next);
-            Gap nonMatch = new Gap(gapBase, gapWitness);
+            Phrase gapBase = new Phrase(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1, previousWordBase, nextWordBase);
+            Phrase gapWitness = new Phrase(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1, previousWordWitness, nextWordWitness);
+            Gap nonMatch = new Gap(gapBase, gapWitness, next);
             variants.add(nonMatch);
           }
           previous = next;
@@ -46,29 +45,32 @@ public class GapDetection {
     return variants;
   }
 
-  @Deprecated
-  public static List<Modification> analyseVariants(List<Gap> variants) {
-    List<Modification> results = Lists.newArrayList();
-    for (Gap nonMatch : variants) {
-      Modification modification = nonMatch.analyse();
-      results.add(modification);
-    }
-    return results;
-  }
-
   public static List<Gap> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
     List<Phrase> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
     List<Phrase> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
+    List<Match> nextMatchesWitness = getNextMatchesWitness(sequencesWitness);
     List<Gap> variants = Lists.newArrayList();
     for (int i = 0; i < gapsBase.size(); i++) {
       Phrase gapBase = gapsBase.get(i);
       Phrase gapWitness = gapsWitness.get(i);
+      Match nextMatch = nextMatchesWitness.get(i);
       if (gapBase.hasGap() || gapWitness.hasGap()) {
-        Gap nonMatch = new Gap(gapBase, gapWitness);
+        Gap nonMatch = new Gap(gapBase, gapWitness, nextMatch);
         variants.add(nonMatch);
       }
     }
     return variants;
+  }
+
+  private static List<Match> getNextMatchesWitness(List<MatchSequence> sequencesWitness) {
+    List<Match> nextMatches = Lists.newArrayList();
+    for (MatchSequence sequence : sequencesWitness) {
+      Match nextMatch = sequence.getFirstMatch();
+      nextMatches.add(nextMatch);
+    }
+    // Note: the last gap does not have a next match!
+    nextMatches.add(null);
+    return nextMatches;
   }
 
   // TODO: rename gaps to phrases
@@ -84,14 +86,13 @@ public class GapDetection {
       int indexDif = position - currentIndex;
       Match nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getBaseWord();
-      gaps.add(new Phrase(witness, indexDif, currentIndex, position - 1, previousWord, nextWord, nextMatch));
+      gaps.add(new Phrase(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
       previousWord = sequence.getLastMatch().getBaseWord();
       currentIndex = 1 + previousWord.position;
     }
     int IndexDif = witness.size() - currentIndex + 1;
     nextWord = null;
-    Match nextMatch = null;
-    gaps.add(new Phrase(witness, IndexDif, currentIndex, witness.size(), previousWord, nextWord, nextMatch));
+    gaps.add(new Phrase(witness, IndexDif, currentIndex, witness.size(), previousWord, nextWord));
     return gaps;
   }
 
@@ -108,14 +109,13 @@ public class GapDetection {
       int indexDif = position - currentIndex;
       Match nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getWitnessWord();
-      gaps.add(new Phrase(witness, indexDif, currentIndex, position - 1, previousWord, nextWord, nextMatch));
+      gaps.add(new Phrase(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
       previousWord = sequence.getLastMatch().getWitnessWord();
       currentIndex = 1 + previousWord.position;
     }
     int IndexDif = witness.size() - currentIndex + 1;
     nextWord = null;
-    Match nextMatch = null;
-    gaps.add(new Phrase(witness, IndexDif, currentIndex, witness.size(), previousWord, nextWord, nextMatch));
+    gaps.add(new Phrase(witness, IndexDif, currentIndex, witness.size(), previousWord, nextWord));
     return gaps;
   }
 

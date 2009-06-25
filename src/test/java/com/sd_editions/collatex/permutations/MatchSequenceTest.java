@@ -17,6 +17,7 @@ import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Modifications;
+import eu.interedition.collatex.visualization.Visualization;
 
 public class MatchSequenceTest extends TestCase {
   private final String witnessId1 = "alpha";
@@ -185,7 +186,7 @@ public class MatchSequenceTest extends TestCase {
     MatchSequence sequence = new MatchSequence(1, a, b);
     List<MatchSequence> sequences = Lists.newArrayList(sequence);
     List<Gap> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
-    List<Modification> results = GapDetection.analyseVariants(variants);
+    List<Modification> results = Visualization.analyseVariants(variants);
     List<Modification> modificationsInMatchSequences = results;
     assertEquals(1, modificationsInMatchSequences.size());
     assertEquals("addition: C position: 2", modificationsInMatchSequences.get(0).toString());
@@ -204,7 +205,7 @@ public class MatchSequenceTest extends TestCase {
     MatchSequence sequence = new MatchSequence(1, a, b);
     List<MatchSequence> sequences = Lists.newArrayList(sequence);
     List<Gap> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
-    List<Modification> results = GapDetection.analyseVariants(variants);
+    List<Modification> results = Visualization.analyseVariants(variants);
     List<Modification> modificationsInMatchSequences = results;
     assertEquals(0, modificationsInMatchSequences.size());
   }

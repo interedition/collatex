@@ -8,7 +8,6 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.collation.Match;
-import eu.interedition.collatex.collation.Phrase;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
@@ -156,7 +155,7 @@ public class AlignmentTable2 {
       // still have words in the witness? add new columns after the last one from the base
       if (witnessIterator.hasNext()) {
         LinkedList<Word> remainingWitnessWords = Lists.newLinkedList(witnessIterator);
-        addVariantAtGap(superbase, witness, replacement.getBase(), replacement.getWitness(), remainingWitnessWords, matchesOrderedForTheWitness, matchesOrderedForTheBase);
+        addVariantAtGap(superbase, witness, replacement, remainingWitnessWords, matchesOrderedForTheWitness, matchesOrderedForTheBase);
       }
 
       //      Word wordInOriginal = replacement.getBase().getFirstWord();
@@ -169,9 +168,7 @@ public class AlignmentTable2 {
     for (Gap addition : additions) {
 
       List<Word> witnessWords = addition.getWitness().getWords();
-      Phrase base = addition.getBase();
-      Phrase witnessGap = addition.getWitness();
-      addVariantAtGap(superbase, witness, base, witnessGap, witnessWords, matchesOrderedForTheWitness, matchesOrderedForTheBase);
+      addVariantAtGap(superbase, witness, addition, witnessWords, matchesOrderedForTheWitness, matchesOrderedForTheBase);
     }
   }
 
@@ -183,14 +180,13 @@ public class AlignmentTable2 {
     return column;
   }
 
-  private void addVariantAtGap(Superbase superbase, Witness witness, Phrase baseGap, Phrase witnessGap, List<Word> witnessWords, List<Match> matchesOrderedForTheWitness,
-      List<Match> matchesOrderedForTheBase) {
-    if (baseGap.isAtTheEnd()) {
+  private void addVariantAtGap(Superbase superbase, Witness witness, Gap gap, List<Word> witnessWords, List<Match> matchesOrderedForTheWitness, List<Match> matchesOrderedForTheBase) {
+    if (gap.getBase().isAtTheEnd()) {
       addVariantAtTheEnd(witness, witnessWords);
     } else {
-      // I should take the witness match here!
+      // I should take the next witness match here!
       // It is strange that above I take the base gap!
-      Match nextMatch = witnessGap.getNextMatch();
+      Match nextMatch = gap.getNextMatch();
       Column column = getColumnForThisMatch(superbase, matchesOrderedForTheWitness, matchesOrderedForTheBase, nextMatch);
       addVariantBefore(column, witness, witnessWords);
     }

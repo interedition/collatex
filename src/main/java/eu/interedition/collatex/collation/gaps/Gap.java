@@ -4,16 +4,19 @@ import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
+import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.Phrase;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Gap {
   final Phrase base;
   final Phrase witness;
+  final Match next;
 
-  public Gap(Phrase _base, Phrase _witness) {
+  public Gap(Phrase _base, Phrase _witness, Match _next) {
     this.base = _base;
     this.witness = _witness;
+    this.next = _next;
   }
 
   // TODO: rename method -- it does return a Phrase, not a Witness
@@ -77,6 +80,12 @@ public class Gap {
       return createReplacement();
     }
     throw new RuntimeException("Not a modification!");
+  }
+
+  // Note: this the next match after the gap for the second witness!
+  // TODO: make defensive!
+  public Match getNextMatch() {
+    return next;
   }
 
 }

@@ -41,7 +41,7 @@ public class XMLAlignmentViewTest {
     Witness witness = builder.build("some addition its longer than that");
     Word next = witness.getWordOnPosition(3);
     Word previous = null;
-    Addition addition = new Addition(1, new Phrase(witness, 2, 1, 2, previous, next, null));
+    Addition addition = new Addition(1, new Phrase(witness, 2, 1, 2, previous, next));
     XMLAlignmentView alignmentView = setupAlignmentView(addition);
 
     String result = alignmentView.modificationsView(-1);
@@ -55,7 +55,7 @@ public class XMLAlignmentViewTest {
     Witness witness = builder.build("some deletion has occurred");
     Word next = witness.getWordOnPosition(3);
     Word previous = witness.getWordOnPosition(1);
-    Omission omission = new Omission(new Phrase(witness, 1, 2, 2, previous, next, null));
+    Omission omission = new Omission(new Phrase(witness, 1, 2, 2, previous, next));
     XMLAlignmentView alignmentView = setupAlignmentView(omission);
 
     String result = alignmentView.modificationsView(-1);

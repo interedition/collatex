@@ -11,7 +11,6 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
-import eu.interedition.collatex.collation.gaps.GapDetection;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.matching.Collation;
 
@@ -27,7 +26,7 @@ public class Visualization {
   public static List<Modification> determineModifications(Set<Match> permutation, List<Gap> determineNonMatches) {
     List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(Matches.getWordDistanceMatches(permutation));
-    modifications.addAll(GapDetection.analyseVariants(determineNonMatches));
+    modifications.addAll(Visualization.analyseVariants(determineNonMatches));
     return modifications;
   }
 
@@ -36,6 +35,16 @@ public class Visualization {
     List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
     List<Transposition> transpositions = TranspositionDetection.createTranspositions(possibleTranspositionTuples);
     return transpositions;
+  }
+
+  @Deprecated
+  public static List<Modification> analyseVariants(List<Gap> variants) {
+    List<Modification> results = Lists.newArrayList();
+    for (Gap nonMatch : variants) {
+      Modification modification = nonMatch.analyse();
+      results.add(modification);
+    }
+    return results;
   }
 
 }
