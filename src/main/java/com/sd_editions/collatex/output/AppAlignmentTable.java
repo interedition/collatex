@@ -29,7 +29,7 @@ public class AppAlignmentTable {
 
     for (Gap nonMatch : matchNonMatch.getGaps()) {
       // FIXME somehow propagate Bram's witness id here after merge
-      cells[nonMatch.getBase().getStartPosition() * 2] = new AppElementTEI(nonMatch.getBase(), nonMatch.getWitness());
+      cells[nonMatch.getPhraseA().getStartPosition() * 2] = new AppElementTEI(nonMatch.getPhraseA(), nonMatch.getPhraseB());
     }
 
   }
@@ -45,7 +45,7 @@ public class AppAlignmentTable {
     }
 
     for (Gap nonMatch : multiMatchNonMatch.getNonMatches()) {
-      cells[nonMatch.getBase().getStartPosition() * 2] = new AppElementTEI(nonMatch.getBase(), nonMatch.getWitness());
+      cells[nonMatch.getPhraseA().getStartPosition() * 2] = new AppElementTEI(nonMatch.getPhraseA(), nonMatch.getPhraseB());
     }
 
   }

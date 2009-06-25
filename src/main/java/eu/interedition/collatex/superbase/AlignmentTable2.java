@@ -139,8 +139,8 @@ public class AlignmentTable2 {
     for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!
 
-      Iterator<Word> baseIterator = replacement.getBase().getWords().iterator();
-      Iterator<Word> witnessIterator = replacement.getWitness().getWords().iterator();
+      Iterator<Word> baseIterator = replacement.getPhraseA().getWords().iterator();
+      Iterator<Word> witnessIterator = replacement.getPhraseB().getWords().iterator();
       while (baseIterator.hasNext()) {
         Word wordInOriginal = baseIterator.next();
         Column column = superbase.getColumnFor(wordInOriginal);
@@ -168,7 +168,7 @@ public class AlignmentTable2 {
     List<Gap> additions = compresult.getAdditions();
     for (Gap addition : additions) {
 
-      List<Word> witnessWords = addition.getWitness().getWords();
+      List<Word> witnessWords = addition.getPhraseB().getWords();
       addVariantAtGap(superbase, witness, addition, witnessWords, matchesOrderedForTheWitness, matchesOrderedForTheBase);
     }
   }
@@ -182,7 +182,7 @@ public class AlignmentTable2 {
   }
 
   private void addVariantAtGap(Superbase superbase, Witness witness, Gap gap, List<Word> witnessWords, List<Match> matchesOrderedForTheWitness, List<Match> matchesOrderedForTheBase) {
-    if (gap.getBase().isAtTheEnd()) {
+    if (gap.getPhraseA().isAtTheEnd()) {
       addVariantAtTheEnd(witness, witnessWords);
     } else {
       // I should take the next witness match here!

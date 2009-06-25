@@ -99,8 +99,8 @@ public class AlignmentTable2Test {
     List<Gap> replacements = compresult.getReplacements();
     for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!
-      Word wordInOriginal = replacement.getBase().getFirstWord();
-      Word wordInWitness = replacement.getWitness().getFirstWord(); // if witness is longer -> extra columns
+      Word wordInOriginal = replacement.getPhraseA().getFirstWord();
+      Word wordInWitness = replacement.getPhraseB().getFirstWord(); // if witness is longer -> extra columns
       Column column = superbase.getColumnFor(wordInOriginal);
       table.addVariant(column, witness, wordInWitness);
     }
@@ -109,14 +109,14 @@ public class AlignmentTable2Test {
     for (Gap addition : additions) {
       // NOTE: right now only the first word is taken
       // TODO: should work with the whole phrase 
-      Word firstWord = addition.getWitness().getFirstWord();
+      Word firstWord = addition.getPhraseB().getFirstWord();
 
-      if (addition.getBase().isAtTheEnd()) {
-        table.addVariantAtTheEnd(witness, addition.getWitness().getWords());
+      if (addition.getPhraseA().isAtTheEnd()) {
+        table.addVariantAtTheEnd(witness, addition.getPhraseB().getWords());
       } else {
-        Word nextWord = addition.getBase().getNextWord();
+        Word nextWord = addition.getPhraseA().getNextWord();
         Column column = superbase.getColumnFor(nextWord);
-        table.addVariantBefore(column, witness, addition.getBase().getWords());
+        table.addVariantBefore(column, witness, addition.getPhraseA().getWords());
       }
     }
   }

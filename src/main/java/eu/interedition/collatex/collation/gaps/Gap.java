@@ -9,63 +9,61 @@ import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Gap {
-  final Phrase base;
-  final Phrase witness;
+  final Phrase phraseA;
+  final Phrase phraseB;
   final Match next;
 
-  public Gap(Phrase _base, Phrase _witness, Match _next) {
-    this.base = _base;
-    this.witness = _witness;
+  public Gap(Phrase _phraseA, Phrase _phraseB, Match _next) {
+    this.phraseA = _phraseA;
+    this.phraseB = _phraseB;
     this.next = _next;
   }
 
-  // TODO: rename method -- it does return a Phrase, not a Witness
-  public Phrase getBase() {
-    return base;
+  public Phrase getPhraseA() {
+    return phraseA;
   }
 
-  // TODO: rename method -- it does return a Gap, not a Witness
-  public Phrase getWitness() {
-    return witness;
+  public Phrase getPhraseB() {
+    return phraseB;
   }
 
   public Addition createAddition() {
-    return new Addition(base.getStartPosition(), witness);
+    return new Addition(phraseA.getStartPosition(), phraseB);
   }
 
   public Omission createOmission() {
-    return new Omission(base);
+    return new Omission(phraseA);
   }
 
   public Replacement createReplacement() {
-    return new Replacement(base, witness);
+    return new Replacement(phraseA, phraseB);
   }
 
   public boolean isAddition() {
-    return !base.hasGap() && witness.hasGap();
+    return !phraseA.hasGap() && phraseB.hasGap();
   }
 
   public boolean isOmission() {
-    return base.hasGap() && !witness.hasGap();
+    return phraseA.hasGap() && !phraseB.hasGap();
   }
 
   public boolean isReplacement() {
-    return base.hasGap() && witness.hasGap();
+    return phraseA.hasGap() && phraseB.hasGap();
   }
 
   public boolean isValid() {
-    return base.hasGap() || witness.hasGap();
+    return phraseA.hasGap() || phraseB.hasGap();
   }
 
   @Override
   public String toString() {
-    String result = "NonMatch: addition: " + isAddition() + " base: " + base;
-    if (base.isAtTheEnd()) {
+    String result = "NonMatch: addition: " + isAddition() + " base: " + phraseA;
+    if (phraseA.isAtTheEnd()) {
       result += "; nextWord: none";
     } else {
-      result += "; nextWord: " + base.getNextWord();
+      result += "; nextWord: " + phraseA.getNextWord();
     }
-    result += "; witness: " + witness;
+    result += "; witness: " + phraseB;
     return result;
   }
 
@@ -83,8 +81,10 @@ public class Gap {
   }
 
   // Note: this the next match after the gap for the second witness!
-  // TODO: make defensive!
   public Match getNextMatch() {
+    if (next == null) {
+      throw new RuntimeException("There is no next match!");
+    }
     return next;
   }
 

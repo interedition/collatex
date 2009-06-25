@@ -49,7 +49,7 @@ public class MatchesView {
     }
 
     for (Gap nonMatch : matchNonMatch.getGaps()) {
-      result.append("    * Non-Match: ").append(nonMatch.getBase()).append(" ~> ").append(nonMatch.getWitness());
+      result.append("    * Non-Match: ").append(nonMatch.getPhraseA()).append(" ~> ").append(nonMatch.getPhraseB());
       result.append('\n');
     }
 
