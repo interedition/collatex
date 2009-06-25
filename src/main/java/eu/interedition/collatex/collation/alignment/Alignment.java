@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matching;
+package eu.interedition.collatex.collation.alignment;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,7 +9,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.input.Word;
 
 public class Alignment {

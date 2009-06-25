@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.input.Word;
 
 public class MatchSequence {

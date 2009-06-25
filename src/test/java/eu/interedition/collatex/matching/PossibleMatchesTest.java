@@ -5,7 +5,9 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.alignment.Alignment;
+import eu.interedition.collatex.collation.alignment.Match;
+import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;

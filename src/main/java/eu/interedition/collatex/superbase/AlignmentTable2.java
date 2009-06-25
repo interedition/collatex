@@ -7,13 +7,13 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.Collation;
+import eu.interedition.collatex.collation.alignment.Match;
+import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.matching.Collation;
-import eu.interedition.collatex.matching.Matcher;
 
 // Note: for the TEI xml output it is easier to
 // have a Column be a list<phrase>

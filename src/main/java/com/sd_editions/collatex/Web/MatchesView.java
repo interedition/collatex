@@ -2,8 +2,8 @@ package com.sd_editions.collatex.Web;
 
 import java.util.List;
 
-import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;

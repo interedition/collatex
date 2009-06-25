@@ -14,8 +14,8 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.WitnessBuilder;

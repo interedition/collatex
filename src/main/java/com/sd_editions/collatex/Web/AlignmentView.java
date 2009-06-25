@@ -11,7 +11,7 @@ import com.sd_editions.collatex.match.WordColorTuple;
 import com.sd_editions.collatex.permutations.Matches;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 

@@ -14,11 +14,11 @@ import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.Collation;
+import eu.interedition.collatex.collation.alignment.Match;
+import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.matching.Collation;
-import eu.interedition.collatex.matching.Matcher;
 import eu.interedition.collatex.superbase.AlignmentTable2;
 import eu.interedition.collatex.superbase.Column;
 import eu.interedition.collatex.superbase.SuperbaseAlgorithm;

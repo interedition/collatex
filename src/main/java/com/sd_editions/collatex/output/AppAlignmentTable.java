@@ -6,8 +6,8 @@ import com.sd_editions.collatex.permutations.MultiMatch;
 import com.sd_editions.collatex.permutations.MultiMatchNonMatch;
 import com.sd_editions.collatex.views.AppElementTEI;
 
-import eu.interedition.collatex.collation.Match;
 import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Word;
 

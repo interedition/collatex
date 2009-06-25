@@ -8,12 +8,12 @@ import java.util.Set;
 import org.junit.Test;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.Collation;
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.matching.Collation;
 
 public class AlignmentTable2Test {
   @Test

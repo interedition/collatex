@@ -9,10 +9,10 @@ import com.sd_editions.collatex.permutations.TranspositionDetection;
 import com.sd_editions.collatex.permutations.Tuple2;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.Collation;
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
-import eu.interedition.collatex.matching.Collation;
 
 public class Visualization {
 

@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matching;
+package eu.interedition.collatex.collation.alignment;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,7 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;

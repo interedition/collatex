@@ -9,7 +9,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.alignment.Match;
 
 public class SequenceDetection {
 

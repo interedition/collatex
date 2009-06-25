@@ -1,11 +1,9 @@
-package eu.interedition.collatex.collation;
+package eu.interedition.collatex.input;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.Word;
 
 public class Phrase {
   private final Witness witness;

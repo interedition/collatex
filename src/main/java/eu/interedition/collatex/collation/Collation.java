@@ -1,11 +1,11 @@
-package eu.interedition.collatex.matching;
+package eu.interedition.collatex.collation;
 
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.gaps.GapDetection;
 import eu.interedition.collatex.collation.sequences.MatchSequence;

@@ -13,14 +13,14 @@ import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
+import eu.interedition.collatex.collation.alignment.Match;
+import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.gaps.GapDetection;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.collation.sequences.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
-import eu.interedition.collatex.matching.Collation;
-import eu.interedition.collatex.matching.Matcher;
 import eu.interedition.collatex.visualization.Modifications;
 import eu.interedition.collatex.visualization.Visualization;
 

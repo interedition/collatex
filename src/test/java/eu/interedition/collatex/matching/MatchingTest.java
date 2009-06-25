@@ -7,7 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.Match;
+import eu.interedition.collatex.collation.Collation;
+import eu.interedition.collatex.collation.alignment.Alignment;
+import eu.interedition.collatex.collation.alignment.Match;
+import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 
