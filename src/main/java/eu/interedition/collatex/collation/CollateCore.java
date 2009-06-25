@@ -39,11 +39,6 @@ public class CollateCore {
 
   public static Collation collate(Witness a, Witness b) {
     Alignment alignment = Matcher.align(a, b);
-    //TODO: move the while to the Matcher class!
-    while (alignment.hasUnfixedWords()) {
-      alignment = Matcher.permutate(a, b, alignment);
-    }
-
     Collation collation = new Collation(alignment.getFixedMatches(), a, b);
     return collation;
   }

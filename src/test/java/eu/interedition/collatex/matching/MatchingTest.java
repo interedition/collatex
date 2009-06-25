@@ -27,8 +27,9 @@ public class MatchingTest {
   public void testExactMatches() {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    Alignment matches = Matcher.align(a, b);
-    Set<Match> exactMatches = matches.getFixedMatches();
+    Alignment alignment = Matcher.align(a, b);
+    Alignment firstAlignment = alignment.getPrevious().getPrevious().getPrevious().getPrevious();
+    Set<Match> exactMatches = firstAlignment.getFixedMatches();
     String expected = "[(3->4), (4->7)]";
     Assert.assertEquals(expected, exactMatches.toString());
   }

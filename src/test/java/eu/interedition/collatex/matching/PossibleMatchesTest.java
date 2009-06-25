@@ -18,15 +18,14 @@ public class PossibleMatchesTest {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    Matcher matcher = new Matcher();
-    Alignment result = matcher.align(a, b);
-
+    Alignment result = Matcher.align(a, b);
+    Alignment firstAlignment = result.getPrevious().getPrevious().getPrevious().getPrevious();
     Word zijn = a.getWordOnPosition(1);
-    Collection<Match> linked = result.getMatchesThatLinkFrom(zijn);
+    Collection<Match> linked = firstAlignment.getMatchesThatLinkFrom(zijn);
     Assert.assertEquals("[(1->2), (1->5), (1->8)]", linked.toString());
 
     Word zijnB = b.getWordOnPosition(2);
-    Collection<Match> links = result.getMatchesThatLinkTo(zijnB);
+    Collection<Match> links = firstAlignment.getMatchesThatLinkTo(zijnB);
     Assert.assertEquals("[(1->2), (5->2)]", links.toString());
   }
 }

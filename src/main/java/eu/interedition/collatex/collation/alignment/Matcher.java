@@ -38,6 +38,10 @@ public class Matcher {
 
     Alignment alignment = new Alignment(exactMatches, unfixedMatches);
 
+    while (alignment.hasUnfixedWords()) {
+      alignment = Matcher.permutate(a, b, alignment);
+    }
+
     return alignment;
   }
 

@@ -17,14 +17,21 @@ public class Alignment {
 
   private final Multimap<Word, Match> baseToWitness;
   private final Multimap<Word, Match> witnessToBase;
+  private final Alignment previous;
 
   public Alignment(Set<Match> _fixedMatches, Set<Match> _unfixedMatches) {
+    this(_fixedMatches, _unfixedMatches, null);
+
+    //    System.out.println(fixedMatches.toString());
+    //    System.out.println(unfixedMatches.toString());
+  }
+
+  public Alignment(Set<Match> _fixedMatches, Set<Match> _unfixedMatches, Alignment _previous) {
     this.fixedMatches = _fixedMatches;
     this.unfixedMatches = _unfixedMatches;
     this.baseToWitness = groupMatchesForBase(unfixedMatches);
     this.witnessToBase = groupMatchesForWitness(unfixedMatches);
-    //    System.out.println(fixedMatches.toString());
-    //    System.out.println(unfixedMatches.toString());
+    this.previous = _previous;
   }
 
   public Set<Match> getFixedMatches() {
@@ -48,7 +55,7 @@ public class Alignment {
     newFixedMatches.addAll(fixedMatches);
     newFixedMatches.add(match);
     Set<Match> newUnfixedMatches = filterAwayNoLongerPossibleMatches(unfixedMatches, match);
-    Alignment matches = new Alignment(newFixedMatches, newUnfixedMatches);
+    Alignment matches = new Alignment(newFixedMatches, newUnfixedMatches, this);
     return matches;
   }
 
@@ -97,6 +104,10 @@ public class Alignment {
 
   public Set<Match> getUnfixedMatches() {
     return unfixedMatches;
+  }
+
+  public Alignment getPrevious() {
+    return previous;
   }
 
 }
