@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
@@ -33,11 +33,11 @@ public class MatchesView {
     return result.toString();
   }
 
-  private String renderPermutation(MatchNonMatch matchNonMatch) {
+  private String renderPermutation(Collation matchNonMatch) {
     StringBuilder result = new StringBuilder();
 
     result.append(" * Permutation: ").append(matchNonMatch.getMatches()).append('\n');
-    List<MatchSequence> sequencesForBase = matchNonMatch.getMatchSequencesForBase();
+    List<MatchSequence> sequencesForBase = matchNonMatch.getMatchSequencesOrderedForWitnessA();
     for (MatchSequence matchSequence : sequencesForBase) {
       result.append("    * MatchSequence: ").append(matchSequence).append('\n');
       List<Match> matches = matchSequence.getMatches();
@@ -48,13 +48,13 @@ public class MatchesView {
       }
     }
 
-    for (Gap nonMatch : matchNonMatch.getNonMatches()) {
+    for (Gap nonMatch : matchNonMatch.getGaps()) {
       result.append("    * Non-Match: ").append(nonMatch.getBase()).append(" ~> ").append(nonMatch.getWitness());
       result.append('\n');
     }
 
     result.append("   Summary: ").append(sequencesForBase.size()).append(" match sequences,\t");
-    result.append(matchNonMatch.getNonMatches().size()).append(" non-matches,\t");
+    result.append(matchNonMatch.getGaps().size()).append(" non-matches,\t");
     result.append(matchNonMatch.getWordDistanceSum()).append(" summarized word distance,\t");
     result.append(matchNonMatch.getVariationMeasure()).append(" variance\n");
     result.append('\n');

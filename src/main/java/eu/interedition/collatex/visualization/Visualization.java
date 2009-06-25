@@ -17,8 +17,8 @@ import eu.interedition.collatex.collation.sequences.MatchSequence;
 public class Visualization {
 
   public static Modifications getModifications(Collation collation) {
-    List<Transposition> transpositions = Visualization.determineTranspositions(collation.getMatchSequencesForBase(), collation.getMatchSequencesForWitness());
-    List<Modification> modificationList = Visualization.determineModifications(collation.getMatches(), collation.getNonMatches());
+    List<Transposition> transpositions = Visualization.determineTranspositions(collation.getMatchSequencesOrderedForWitnessA(), collation.getMatchSequencesOrderedForWitnessB());
+    List<Modification> modificationList = Visualization.determineModifications(collation.getMatches(), collation.getGaps());
     Modifications modifications = new Modifications(modificationList, transpositions, collation.getMatches());
     return modifications;
   }

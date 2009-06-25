@@ -27,8 +27,7 @@ public class MatchingTest {
   public void testExactMatches() {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    Matcher matcher = new Matcher();
-    Alignment matches = matcher.align(a, b);
+    Alignment matches = Matcher.align(a, b);
     Set<Match> exactMatches = matches.getFixedMatches();
     String expected = "[(3->4), (4->7)]";
     Assert.assertEquals(expected, exactMatches.toString());
@@ -39,8 +38,7 @@ public class MatchingTest {
   public void testNearMatch() {
     Witness a = builder.build("a near match");
     Witness b = builder.build("a nar match");
-    Matcher matcher = new Matcher();
-    Alignment matches = matcher.align(a, b);
+    Alignment matches = Matcher.align(a, b);
     Set<Match> fixedMatches = matches.getFixedMatches();
     Assert.assertEquals("[(1->1), (2->2), (3->3)]", fixedMatches.toString());
   }
@@ -49,8 +47,7 @@ public class MatchingTest {
   public void testNoPermutationsOnlyExactMatches() {
     Witness a = builder.build("deze zinnen zijn hetzelfde");
     Witness b = builder.build("deze zinnen zijn hetzelfde met een aanvulling");
-    Matcher matcher = new Matcher();
-    Collation collation = matcher.collate(a, b);
+    Collation collation = CollateCore.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(1->1), (2->2), (3->3), (4->4)]";
     Assert.assertEquals(expected, matches.toString());
@@ -60,12 +57,11 @@ public class MatchingTest {
   public void testSelectBestMatchFromPossibleMatches() {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    Matcher matcher = new Matcher();
-    Collation collation = matcher.collate(a, b);
+    Collation collation = CollateCore.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(3->4), (4->7), (2->6), (6->9), (1->5), (5->8)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, collation.getNonMatches().size());
+    Assert.assertEquals(1, collation.getGaps().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
@@ -73,12 +69,11 @@ public class MatchingTest {
   public void testTreeTimesZijnAlsoWorks() {
     Witness a = builder.build("zijn hond liep aan zijn hand op zijn dag");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand op zijn dag");
-    Matcher matcher = new Matcher();
-    Collation collation = matcher.collate(a, b);
+    Collation collation = CollateCore.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(3->4), (4->7), (9->12), (2->6), (6->9), (1->5), (5->8), (7->10), (8->11)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, collation.getNonMatches().size());
+    Assert.assertEquals(1, collation.getGaps().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
@@ -86,12 +81,11 @@ public class MatchingTest {
   public void testMatchingFromBtoA() {
     Witness a = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Witness b = builder.build("zijn hond liep aan zijn hand");
-    Matcher matcher = new Matcher();
-    Collation collation = matcher.collate(a, b);
+    Collation collation = CollateCore.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(4->3), (7->4), (6->2), (9->6), (5->1), (8->5)]";
     Assert.assertEquals(expected, matches.toString());
-    Assert.assertEquals(1, collation.getNonMatches().size());
+    Assert.assertEquals(1, collation.getGaps().size());
     Assert.assertEquals(3, collation.getMatchSequences().size());
   }
 
@@ -102,8 +96,7 @@ public class MatchingTest {
   public void testMatchingFromAtoBandBtoAMixed() {
     Witness a = builder.build("a a b");
     Witness b = builder.build("a b b");
-    Matcher matcher = new Matcher();
-    Collation collation = matcher.collate(a, b);
+    Collation collation = CollateCore.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(1->1), (3->3)]";
     Assert.assertEquals(expected, matches.toString());
@@ -113,8 +106,7 @@ public class MatchingTest {
   public void testMatchingFromAtoBandBtoAMixedCFixed() {
     Witness a = builder.build("a a c b");
     Witness b = builder.build("a b c b");
-    Matcher matcher = new Matcher();
-    Collation collation = matcher.collate(a, b);
+    Collation collation = CollateCore.collate(a, b);
     Set<Match> matches = collation.getMatches();
     String expected = "[(3->3), (1->1), (4->4)]";
     Assert.assertEquals(expected, matches.toString());

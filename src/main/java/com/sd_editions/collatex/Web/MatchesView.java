@@ -2,7 +2,7 @@ package com.sd_editions.collatex.Web;
 
 import java.util.List;
 
-import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
@@ -26,11 +26,11 @@ public class MatchesView {
     return result.toString();
   }
 
-  public String renderPermutation(MatchNonMatch matchNonMatch) {
+  public String renderPermutation(Collation matchNonMatch) {
     StringBuilder result = new StringBuilder();
 
     result.append("<span class=\"variance\" style=\"display:none\">Permutation: ").append(matchNonMatch.getMatches()).append('\n');
-    List<MatchSequence> sequencesForBase = matchNonMatch.getMatchSequencesForBase();
+    List<MatchSequence> sequencesForBase = matchNonMatch.getMatchSequencesOrderedForWitnessA();
     result.append("<ul>");
     for (MatchSequence matchSequence : sequencesForBase) {
       result.append("<li>MatchSequence: ").append(matchSequence);
@@ -46,13 +46,13 @@ public class MatchesView {
       result.append("</li>");
     }
 
-    for (Gap nonMatch : matchNonMatch.getNonMatches()) {
+    for (Gap nonMatch : matchNonMatch.getGaps()) {
       result.append("<li>Non-Match: ").append(nonMatch.getBase()).append(" ~> ").append(nonMatch.getWitness());
       result.append("</li>");
     }
     result.append("</ul>");
     result.append("Summary: ").append(sequencesForBase.size()).append(" match sequences,\t");
-    result.append(matchNonMatch.getNonMatches().size()).append(" non-matches,\t");
+    result.append(matchNonMatch.getGaps().size()).append(" non-matches,\t");
     result.append(matchNonMatch.getWordDistanceSum()).append(" summarized word distance,\t");
     result.append(matchNonMatch.getVariationMeasure()).append(" variance\n");
     result.append("</span>");

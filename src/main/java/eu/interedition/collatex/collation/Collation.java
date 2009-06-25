@@ -14,21 +14,21 @@ import eu.interedition.collatex.input.Witness;
 
 public class Collation {
 
-  private final List<MatchSequence> sequencesBase;
-  private final List<MatchSequence> sequencesWitness;
+  private final List<MatchSequence> sequencesA;
+  private final List<MatchSequence> sequencesB;
   private final Set<Match> matches;
-  private final List<Gap> nonMatches;
+  private final List<Gap> gaps;
 
   // Note: this constructor should take only an Alignment object as parameter!
   public Collation(Set<Match> _matches, Witness a, Witness b) {
     this.matches = _matches;
-    this.sequencesBase = SequenceDetection.calculateMatchSequences(matches);
-    this.sequencesWitness = SequenceDetection.sortSequencesForWitness(sequencesBase);
-    List<Gap> nonMatches1 = GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesBase, sequencesWitness);
-    List<Gap> nonMatches2 = GapDetection.getVariantsInMatchSequences(a, b, sequencesBase);
-    nonMatches = Lists.newArrayList();
-    nonMatches.addAll(nonMatches1);
-    nonMatches.addAll(nonMatches2);
+    this.sequencesA = SequenceDetection.calculateMatchSequences(matches);
+    this.sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
+    List<Gap> gaps1 = GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB);
+    List<Gap> gaps2 = GapDetection.getVariantsInMatchSequences(a, b, sequencesA);
+    gaps = Lists.newArrayList();
+    gaps.addAll(gaps1);
+    gaps.addAll(gaps2);
   }
 
   public Set<Match> getMatches() {
@@ -36,26 +36,38 @@ public class Collation {
   }
 
   public List<MatchSequence> getMatchSequences() {
-    return sequencesBase;
+    return sequencesA;
   }
 
-  public List<Gap> getNonMatches() {
-    return nonMatches;
+  public List<Gap> getGaps() {
+    return gaps;
   }
 
-  public List<MatchSequence> getMatchSequencesForBase() {
+  public List<MatchSequence> getMatchSequencesOrderedForWitnessA() {
     return getMatchSequences();
   }
 
-  public List<MatchSequence> getMatchSequencesForWitness() {
-    return sequencesWitness;
+  public List<MatchSequence> getMatchSequencesOrderedForWitnessB() {
+    return sequencesB;
+  }
+
+  public double getVariationMeasure() {
+    return 1000.0 * (sequencesA.size() - 1) + 10.0 * gaps.size() + getWordDistanceSum();
+  }
+
+  public float getWordDistanceSum() {
+    float wordDistanceSum = 0f;
+    for (MatchSequence matchSequence : sequencesA)
+      for (Match match : matchSequence.getMatches())
+        wordDistanceSum += match.wordDistance;
+    return wordDistanceSum;
   }
 
   public List<Gap> getAdditions() {
     List<Gap> additions = Lists.newArrayList();
-    for (Gap nonMatch : nonMatches) {
-      if (nonMatch.isAddition()) {
-        additions.add(nonMatch);
+    for (Gap gap : gaps) {
+      if (gap.isAddition()) {
+        additions.add(gap);
       }
     }
     return additions;
@@ -63,9 +75,9 @@ public class Collation {
 
   public List<Gap> getReplacements() {
     List<Gap> replacements = Lists.newArrayList();
-    for (Gap nonMatch : getNonMatches()) {
-      if (nonMatch.isReplacement()) {
-        replacements.add(nonMatch);
+    for (Gap gap : gaps) {
+      if (gap.isReplacement()) {
+        replacements.add(gap);
       }
     }
     return replacements;

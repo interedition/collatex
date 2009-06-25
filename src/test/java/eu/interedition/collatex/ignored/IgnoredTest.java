@@ -14,7 +14,7 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
@@ -32,10 +32,10 @@ public class IgnoredTest {
   @Ignore
   public void testGetAllMatchNonMatchPermutations() {
     CollateCore cc = new CollateCore(builder.buildWitnesses("The black car", "The dark car", "the dark day"));
-    List<List<MatchNonMatch>> allMatchNonMatchPermutations = cc.getAllMatchNonMatchPermutations();
+    List<List<Collation>> allMatchNonMatchPermutations = cc.getAllMatchNonMatchPermutations();
     // there should be 3 witness pairs
     assertEquals(3, allMatchNonMatchPermutations.size());
-    List<MatchNonMatch> list = allMatchNonMatchPermutations.get(0);
+    List<Collation> list = allMatchNonMatchPermutations.get(0);
     assertEquals(1, list.size());
     showAllMatchNonMatchPermutations(allMatchNonMatchPermutations);
   }
@@ -44,18 +44,18 @@ public class IgnoredTest {
   @Ignore
   public void testGetAllMatchNonMatchPermutations1() {
     CollateCore cc = new CollateCore(builder.buildWitnesses("The cat chases the dog and mouse", "The dog chases the cat and mouse", "the dog and mouse chase the cat"));
-    List<List<MatchNonMatch>> allMatchNonMatchPermutations = cc.getAllMatchNonMatchPermutations();
+    List<List<Collation>> allMatchNonMatchPermutations = cc.getAllMatchNonMatchPermutations();
     showAllMatchNonMatchPermutations(allMatchNonMatchPermutations);
     assertEquals(3, allMatchNonMatchPermutations.size());
   }
 
-  void showAllMatchNonMatchPermutations(List<List<MatchNonMatch>> allMatchNonMatchPermutations) {
-    for (List<MatchNonMatch> list : allMatchNonMatchPermutations) {
+  void showAllMatchNonMatchPermutations(List<List<Collation>> allMatchNonMatchPermutations) {
+    for (List<Collation> list : allMatchNonMatchPermutations) {
       println("witness pair " + allMatchNonMatchPermutations.indexOf(list));
-      for (MatchNonMatch matchNonMatch : list) {
+      for (Collation matchNonMatch : list) {
         println("  matchNonMatch " + list.indexOf(matchNonMatch));
-        List<MatchSequence> matchSequencesForBase = matchNonMatch.getMatchSequencesForBase();
-        List<Gap> nonMatches = matchNonMatch.getNonMatches();
+        List<MatchSequence> matchSequencesForBase = matchNonMatch.getMatchSequencesOrderedForWitnessA();
+        List<Gap> nonMatches = matchNonMatch.getGaps();
         for (MatchSequence matchSequence : matchSequencesForBase) {
           println("    matchSequenceForBase " + matchSequencesForBase.indexOf(matchSequence));
           List<Match> matches = matchSequence.getMatches();

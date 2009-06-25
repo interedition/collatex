@@ -13,6 +13,7 @@ import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
+import eu.interedition.collatex.collation.alignment.Alignment;
 import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.collation.gaps.Gap;
@@ -36,6 +37,17 @@ public class CollateCore {
     this.witnesses = _witnesses;
   }
 
+  public static Collation collate(Witness a, Witness b) {
+    Alignment alignment = Matcher.align(a, b);
+    //TODO: move the while to the Matcher class!
+    while (alignment.hasUnfixedWords()) {
+      alignment = Matcher.permutate(a, b, alignment);
+    }
+
+    Collation collation = new Collation(alignment.getFixedMatches(), a, b);
+    return collation;
+  }
+
   @Deprecated
   public Modifications compareWitness(int i, int j) {
     Witness base = getWitness(i);
@@ -54,8 +66,7 @@ public class CollateCore {
   }
 
   public Collation doCompareWitnesses(Witness base, Witness witness) {
-    Matcher matcher = new Matcher();
-    Collation collation = matcher.collate(base, witness);
+    Collation collation = CollateCore.collate(base, witness);
     return collation;
     //    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
     //    List<Set<Match>> permutationList = matches.permutations();
@@ -78,7 +89,8 @@ public class CollateCore {
     //    return matchNonMatchList.get(0);
   }
 
-  public List<List<MatchNonMatch>> getAllMatchNonMatchPermutations() {
+  // TODO: remove!
+  public List<List<Collation>> getAllMatchNonMatchPermutations() {
     throw new UnsupportedOperationException();
     //    List<List<MatchNonMatch>> matchNonMatchPermutationsForAllWitnessPairs = Lists.newArrayList();
     //    final int numberOfWitnesses = numberOfWitnesses();
@@ -94,18 +106,18 @@ public class CollateCore {
    * Temporary heuristics for the best collation without relying on the analysis stage.
    * Looking for a new home ...
    */
-  public void sortPermutationsByNonMatches(List<MatchNonMatch> matchNonMatchList) {
-    Comparator<MatchNonMatch> comparator = new Comparator<MatchNonMatch>() {
-      public int compare(MatchNonMatch o1, MatchNonMatch o2) {
-        return o1.getNonMatches().size() - o2.getNonMatches().size();
+  public void sortPermutationsByNonMatches(List<Collation> matchNonMatchList) {
+    Comparator<Collation> comparator = new Comparator<Collation>() {
+      public int compare(Collation o1, Collation o2) {
+        return o1.getGaps().size() - o2.getGaps().size();
       }
     };
     Collections.sort(matchNonMatchList, comparator);
   }
 
-  public void sortPermutationsByVariation(List<MatchNonMatch> matchNonMatchList) {
-    Comparator<MatchNonMatch> comparator = new Comparator<MatchNonMatch>() {
-      public int compare(MatchNonMatch o1, MatchNonMatch o2) {
+  public void sortPermutationsByVariation(List<Collation> matchNonMatchList) {
+    Comparator<Collation> comparator = new Comparator<Collation>() {
+      public int compare(Collation o1, Collation o2) {
         return Double.compare(o1.getVariationMeasure(), o2.getVariationMeasure());
       }
     };

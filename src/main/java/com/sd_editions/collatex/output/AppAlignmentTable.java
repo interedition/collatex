@@ -6,18 +6,18 @@ import com.sd_editions.collatex.permutations.MultiMatch;
 import com.sd_editions.collatex.permutations.MultiMatchNonMatch;
 import com.sd_editions.collatex.views.AppElementTEI;
 
-import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Word;
 
 public class AppAlignmentTable {
 
-  private MatchNonMatch matchNonMatch;
+  private Collation matchNonMatch;
   private final Element[] cells;
   private MultiMatchNonMatch multiMatchNonMatch;
 
-  public AppAlignmentTable(MatchNonMatch _matchNonMatch) {
+  public AppAlignmentTable(Collation _matchNonMatch) {
     // FIXME we should decide somewhere _which_ of the permutations we chose. 
     this.matchNonMatch = _matchNonMatch;
     cells = new Element[100]; // FIXME use maximum number of words per witness -- but need witness here
@@ -27,7 +27,7 @@ public class AppAlignmentTable {
       cells[matchedWord.position * 2 + 1] = new TextElement(matchedWord);
     }
 
-    for (Gap nonMatch : matchNonMatch.getNonMatches()) {
+    for (Gap nonMatch : matchNonMatch.getGaps()) {
       // FIXME somehow propagate Bram's witness id here after merge
       cells[nonMatch.getBase().getStartPosition() * 2] = new AppElementTEI(nonMatch.getBase(), nonMatch.getWitness());
     }

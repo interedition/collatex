@@ -10,7 +10,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.collation.MatchNonMatch;
+import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Word;
@@ -20,12 +20,12 @@ public class MultiMatchNonMatch {
   private final List<Gap> nonMatches;
   private final Set<MultiMatch> matches;
 
-  public MultiMatchNonMatch(MatchNonMatch... _matchNonMatches) {
+  public MultiMatchNonMatch(Collation... _matchNonMatches) {
     this.matches = determineAllCommonMatches(_matchNonMatches);
     this.nonMatches = determineNonMatches();
   }
 
-  private Set<MultiMatch> determineAllCommonMatches(MatchNonMatch... matchNonMatches) {
+  private Set<MultiMatch> determineAllCommonMatches(Collation... matchNonMatches) {
     // These nonMatches should all have the same base
     Set<MultiMatch> commonMatches = Sets.newHashSet();
     // initialize with the first matchset

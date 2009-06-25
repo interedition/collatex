@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.alignment.Matcher;
@@ -108,9 +109,9 @@ public class AlignmentTable2 {
     //    CollateCore core = new CollateCore();
     //    MatchNonMatch compresult = core.compareWitnesses(superbase, witness);
     Matcher matcher = new Matcher();
-    Collation compresult = matcher.collate(superbase, witness);
-    List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesForBase();
-    List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesForWitness();
+    Collation compresult = CollateCore.collate(superbase, witness);
+    List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesOrderedForWitnessA();
+    List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesOrderedForWitnessB();
     // I just need it as a list of matches
     // Note: this list must be already present somewhere
     // you might as well take the set of matches

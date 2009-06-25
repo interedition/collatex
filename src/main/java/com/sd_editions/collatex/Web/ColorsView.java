@@ -101,7 +101,7 @@ public class ColorsView {
         Matcher matcher = new Matcher();
         Witness a = witnesses.get(base - 1);
         Witness b = witnesses.get(w - 1);
-        Collation collate = matcher.collate(a, b);
+        Collation collate = CollateCore.collate(a, b);
         Modifications modifications = Visualization.getModifications(collate);
         html.append(modificationsView(base, modifications));
         html.append("<br/>");
