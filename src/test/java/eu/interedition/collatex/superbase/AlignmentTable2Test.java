@@ -7,6 +7,7 @@ import org.junit.Test;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 
+// TODO: introduce witnessSet class here!
 public class AlignmentTable2Test {
   @Test
   public void testCreateSuperBase() {
