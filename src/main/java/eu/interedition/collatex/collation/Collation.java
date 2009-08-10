@@ -83,4 +83,20 @@ public class Collation {
     return replacements;
   }
 
+  //  // I just need it as a list of matches
+  //  List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesOrderedForWitnessA();
+  //  List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesOrderedForWitnessB();
+  //  List<Match> matchesOrderedForTheWitness = Lists.newArrayList();
+  //  for (MatchSequence matchSeq : matchSequencesForWitness) {
+  //    for (Match match : matchSeq.getMatches()) {
+  //      matchesOrderedForTheWitness.add(match);
+  //    }
+  //  }
+  //  List<Match> matchesOrderedForTheBase = Lists.newArrayList();
+  //  for (MatchSequence matchSeq : matchSequencesForBase) {
+  //    for (Match match : matchSeq.getMatches()) {
+  //      matchesOrderedForTheBase.add(match);
+  //    }
+  //  }
+
 }

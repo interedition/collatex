@@ -10,9 +10,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.collation.gaps.Gap;
-import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
@@ -41,18 +39,8 @@ public class AlignmentTable2 {
     return superbase;
   }
 
-  //  public Witness createSuperBase() {
-  //    WitnessBuilder builder = new WitnessBuilder();
-  //    String collectedStrings = "";
-  //    String delim = "";
-  //    for (Column column : columns) {
-  //      collectedStrings += delim + column.toString();
-  //      delim = " ";
-  //    }
-  //    Witness superWitness = builder.build("superbase", collectedStrings);
-  //    return superWitness;
-  //  }
-
+  // Note: this is a strange method from a user point of view..
+  // whether a witness is the first or not should be an implementation detail
   void addFirstWitness(Witness w1) {
     for (Word word : w1.getWords()) {
       add(new Column(w1, word));
@@ -105,36 +93,22 @@ public class AlignmentTable2 {
   public void addWitness(Witness witness) {
     // make the superbase from the alignment table
     Superbase superbase = createSuperbase();
-    // NOTE: OLD COLLATION CODE!
-    //    CollateCore core = new CollateCore();
-    //    MatchNonMatch compresult = core.compareWitnesses(superbase, witness);
-    Matcher matcher = new Matcher();
     Collation compresult = CollateCore.collate(superbase, witness);
-    List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesOrderedForWitnessA();
-    List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesOrderedForWitnessB();
-    // I just need it as a list of matches
-    // Note: this list must be already present somewhere
-    // you might as well take the set of matches
-    // TODO: I could push this to the CompResult
-    List<Match> matchesOrderedForTheWitness = Lists.newArrayList();
-    for (MatchSequence matchSeq : matchSequencesForWitness) {
-      for (Match match : matchSeq.getMatches()) {
-        matchesOrderedForTheWitness.add(match);
-      }
-    }
-    List<Match> matchesOrderedForTheBase = Lists.newArrayList();
-    for (MatchSequence matchSeq : matchSequencesForBase) {
-      for (Match match : matchSeq.getMatches()) {
-        matchesOrderedForTheBase.add(match);
-      }
-    }
-    Set<Match> matches = compresult.getMatches();
-    for (Match match : matches) {
-      Column column = getColumnForThisMatch(superbase, matchesOrderedForTheWitness, matchesOrderedForTheBase, match);
-      Word witnessWord = match.getWitnessWord();
-      addMatch(witness, witnessWord, column);
-    }
 
+    addMatchesToSuperbase(witness, superbase, compresult);
+    addReplacementsToSuperbase(witness, superbase, compresult);
+    addAdditionsToSuperbase(witness, superbase, compresult);
+  }
+
+  private void addAdditionsToSuperbase(Witness witness, Superbase superbase, Collation compresult) {
+    List<Gap> additions = compresult.getAdditions();
+    for (Gap addition : additions) {
+      List<Word> witnessWords = addition.getPhraseB().getWords();
+      addVariantAtGap(superbase, witness, addition, witnessWords);
+    }
+  }
+
+  private void addReplacementsToSuperbase(Witness witness, Superbase superbase, Collation compresult) {
     List<Gap> replacements = compresult.getReplacements();
     for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!
@@ -156,39 +130,40 @@ public class AlignmentTable2 {
       // still have words in the witness? add new columns after the last one from the base
       if (witnessIterator.hasNext()) {
         LinkedList<Word> remainingWitnessWords = Lists.newLinkedList(witnessIterator);
-        addVariantAtGap(superbase, witness, replacement, remainingWitnessWords, matchesOrderedForTheWitness, matchesOrderedForTheBase);
+        addVariantAtGap(superbase, witness, replacement, remainingWitnessWords);
       }
-
-      //      Word wordInOriginal = replacement.getBase().getFirstWord();
-      //      Word wordInWitness = replacement.getWitness().getFirstWord(); // if witness is longer -> extra columns
-      //      Column column = superbase.getColumnFor(wordInOriginal);
-      //      addVariant(column, witness, wordInWitness);
-    }
-
-    List<Gap> additions = compresult.getAdditions();
-    for (Gap addition : additions) {
-
-      List<Word> witnessWords = addition.getPhraseB().getWords();
-      addVariantAtGap(superbase, witness, addition, witnessWords, matchesOrderedForTheWitness, matchesOrderedForTheBase);
     }
   }
 
-  private Column getColumnForThisMatch(Superbase superbase, List<Match> matchesOrderedForTheWitness, List<Match> matchesOrderedForTheBase, Match match) {
-    int indexOfMatchInWitness = matchesOrderedForTheWitness.indexOf(match);
-    Match transposedmatch = matchesOrderedForTheBase.get(indexOfMatchInWitness);
-    Word baseWord = transposedmatch.getBaseWord();
+  private void addMatchesToSuperbase(Witness witness, Superbase superbase, Collation compresult) {
+    Set<Match> matches = compresult.getMatches();
+    for (Match match : matches) {
+      Column column = getColumnForThisMatch(superbase, match);
+      Word witnessWord = match.getWitnessWord();
+      addMatch(witness, witnessWord, column);
+    }
+  }
+
+  // Note: I could move this method to the superbase class!
+  private Column getColumnForThisMatch(Superbase superbase, Match match) {
+    // Note: this piece of code was meant to handle transposed matches!
+    // matchesOrderedForTheWitness and matchesOrderedForTheBase were parameters!
+    //    int indexOfMatchInWitness = matchesOrderedForTheWitness.indexOf(match);
+    //    Match transposedmatch = matchesOrderedForTheBase.get(indexOfMatchInWitness);
+    //    Word baseWord = transposedmatch.getBaseWord();
+    Word baseWord = match.getBaseWord();
     Column column = superbase.getColumnFor(baseWord);
     return column;
   }
 
-  private void addVariantAtGap(Superbase superbase, Witness witness, Gap gap, List<Word> witnessWords, List<Match> matchesOrderedForTheWitness, List<Match> matchesOrderedForTheBase) {
+  private void addVariantAtGap(Superbase superbase, Witness witness, Gap gap, List<Word> witnessWords) {
     if (gap.getPhraseA().isAtTheEnd()) {
       addVariantAtTheEnd(witness, witnessWords);
     } else {
       // I should take the next witness match here!
       // It is strange that above I take the base gap!
       Match nextMatch = gap.getNextMatch();
-      Column column = getColumnForThisMatch(superbase, matchesOrderedForTheWitness, matchesOrderedForTheBase, nextMatch);
+      Column column = getColumnForThisMatch(superbase, nextMatch);
       addVariantBefore(column, witness, witnessWords);
     }
   }

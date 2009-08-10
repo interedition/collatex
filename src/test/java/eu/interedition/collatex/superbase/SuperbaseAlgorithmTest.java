@@ -8,6 +8,9 @@ import org.junit.Test;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
 
+// Note: this test are very similar to the alignment table 2 tests!
+// Note: since the superbase algorithm class becomes more like a container, and does not contain any 
+// Note: responsibility the tests should just move to there!
 public class SuperbaseAlgorithmTest {
   private static WitnessBuilder builder;
 
@@ -112,19 +115,6 @@ public class SuperbaseAlgorithmTest {
   }
 
   @Test
-  public void testTransposition() {
-    Witness w1 = builder.build("A", "the cat is black");
-    Witness w2 = builder.build("B", "black is the cat");
-    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2);
-    AlignmentTable2 table = magic.createAlignmentTable();
-    String expected;
-    expected = "A: the|cat|is|black\n";
-    expected += "B: black|is|the|cat\n";
-
-    assertEquals(expected, table.toString());
-  }
-
-  @Test
   public void testWitnessReorder() {
     Witness w1 = builder.build("A", "the black cat");
     Witness w2 = builder.build("B", "the black and white cat");
@@ -156,21 +146,6 @@ public class SuperbaseAlgorithmTest {
   //
   //    assertEquals(expected, table.toString());
   //  }
-
-  @Test
-  public void testAdditionInCombinationWithTransposition() {
-    Witness w1 = builder.build("A", "the cat is very happy");
-    Witness w2 = builder.build("B", "very happy is the cat");
-    Witness w3 = builder.build("C", "very delitied and happy is the cat");
-    SuperbaseAlgorithm magic = new SuperbaseAlgorithm(w1, w2, w3);
-    AlignmentTable2 table = magic.createAlignmentTable();
-    String expected;
-    expected = "A: the| | |cat|is|very|happy\n";
-    expected += "B: very| | |happy|is|the|cat\n";
-    expected += "C: very|delitied|and|happy|is|the|cat\n";
-
-    assertEquals(expected, table.toString());
-  }
 
   // TODO: test a variant with multiple words
   // TODO: hint: more words than the original string it replaces

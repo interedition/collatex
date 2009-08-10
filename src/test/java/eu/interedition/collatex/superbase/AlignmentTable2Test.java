@@ -2,18 +2,10 @@ package eu.interedition.collatex.superbase;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Test;
 
-import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.Collation;
-import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
-import eu.interedition.collatex.input.Word;
 
 public class AlignmentTable2Test {
   @Test
@@ -82,42 +74,16 @@ public class AlignmentTable2Test {
     assertEquals(expected, table.toString());
   }
 
-  private static void addWitnessToAlignmentTable(AlignmentTable2 table, Witness witness) {
-    // make the superbase from the alignment table
-    Superbase superbase = table.createSuperbase();
-    CollateCore core = new CollateCore();
-    Collation compresult = core.compareWitnesses(superbase, witness);
-
-    Set<Match> matches = compresult.getMatches();
-    for (Match match : matches) {
-      Word baseWord = match.getBaseWord();
-      Column column = superbase.getColumnFor(baseWord);
-      Word witnessWord = match.getWitnessWord();
-      table.addMatch(witness, witnessWord, column);
-    }
-
-    List<Gap> replacements = compresult.getReplacements();
-    for (Gap replacement : replacements) {
-      // TODO: hou rekening met langere additions!
-      Word wordInOriginal = replacement.getPhraseA().getFirstWord();
-      Word wordInWitness = replacement.getPhraseB().getFirstWord(); // if witness is longer -> extra columns
-      Column column = superbase.getColumnFor(wordInOriginal);
-      table.addVariant(column, witness, wordInWitness);
-    }
-
-    List<Gap> additions = compresult.getAdditions();
-    for (Gap addition : additions) {
-      // NOTE: right now only the first word is taken
-      // TODO: should work with the whole phrase 
-      Word firstWord = addition.getPhraseB().getFirstWord();
-
-      if (addition.getPhraseA().isAtTheEnd()) {
-        table.addVariantAtTheEnd(witness, addition.getPhraseB().getWords());
-      } else {
-        Word nextWord = addition.getPhraseA().getNextWord();
-        Column column = superbase.getColumnFor(nextWord);
-        table.addVariantBefore(column, witness, addition.getPhraseA().getWords());
-      }
-    }
+  @Test
+  public void testTranspositionsAreNotStoredInAlignmentTable() {
+    WitnessBuilder builder = new WitnessBuilder();
+    Witness w1 = builder.build("A", "the black and white cat");
+    Witness w2 = builder.build("B", "the white and black cat");
+    AlignmentTable2 table = new AlignmentTable2();
+    table.addFirstWitness(w1);
+    table.addWitness(w2);
+    String expected = "A: the|black|and|white|cat\n";
+    expected += "B: the|black|and|white|cat\n";
+    assertEquals(expected, table.toString());
   }
 }

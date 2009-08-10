@@ -6,6 +6,7 @@ import java.util.List;
 
 import eu.interedition.collatex.input.Witness;
 
+// Note: this class has become more like a container for all the witnesses!
 public class SuperbaseAlgorithm {
   private final List<Witness> witnesses;
 
@@ -22,6 +23,7 @@ public class SuperbaseAlgorithm {
     this.witnesses = _witnesses;
   }
 
+  // Note: if the addWitness method becomes smarter the special case for the first witness can disappear here!
   public AlignmentTable2 createAlignmentTable() {
     AlignmentTable2 table = new AlignmentTable2();
     if (!witnesses.isEmpty()) {
