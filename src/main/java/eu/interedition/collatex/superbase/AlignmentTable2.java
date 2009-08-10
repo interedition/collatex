@@ -39,6 +39,18 @@ public class AlignmentTable2 {
     return superbase;
   }
 
+  public void addWitness(Witness witness) {
+    addWitnessToInternalList(witness);
+
+    // make the superbase from the alignment table
+    Superbase superbase = createSuperbase();
+    Collation compresult = CollateCore.collate(superbase, witness);
+
+    addMatchesToSuperbase(witness, superbase, compresult);
+    addReplacementsToSuperbase(witness, superbase, compresult);
+    addAdditionsToSuperbase(witness, superbase, compresult);
+  }
+
   // Note: this is a strange method from a user point of view..
   // whether a witness is the first or not should be an implementation detail
   void addFirstWitness(Witness w1) {
@@ -80,7 +92,6 @@ public class AlignmentTable2 {
   // the fact that a witness is added
   public void addMatch(Witness witness, Word word, Column column) {
     column.addMatch(witness, word);
-    addWitnessToInternalList(witness);
   }
 
   private void addWitnessToInternalList(Witness witness) {
@@ -88,16 +99,6 @@ public class AlignmentTable2 {
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
     }
-  }
-
-  public void addWitness(Witness witness) {
-    // make the superbase from the alignment table
-    Superbase superbase = createSuperbase();
-    Collation compresult = CollateCore.collate(superbase, witness);
-
-    addMatchesToSuperbase(witness, superbase, compresult);
-    addReplacementsToSuperbase(witness, superbase, compresult);
-    addAdditionsToSuperbase(witness, superbase, compresult);
   }
 
   private void addAdditionsToSuperbase(Witness witness, Superbase superbase, Collation compresult) {
@@ -174,7 +175,6 @@ public class AlignmentTable2 {
 
   public void addVariant(Column column, Witness witness, Word wordInWitness) {
     column.addVariant(witness, wordInWitness);
-    addWitnessToInternalList(witness);
   }
 
   public void addVariantBefore(Column column, Witness witness, List<Word> witnessWords) {
@@ -188,7 +188,6 @@ public class AlignmentTable2 {
       columns.add(indexOf, extraColumn);
       indexOf++;
     }
-    addWitnessToInternalList(witness);
   }
 
   public void addVariantAtTheEnd(Witness witness, List<Word> witnessWords) {
@@ -196,6 +195,5 @@ public class AlignmentTable2 {
       Column extraColumn = new Column(witness, word);
       columns.add(extraColumn);
     }
-    addWitnessToInternalList(witness);
   }
 }
