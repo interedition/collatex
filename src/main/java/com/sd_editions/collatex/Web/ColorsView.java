@@ -18,10 +18,10 @@ import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.superbase.AlignmentTable2;
 import eu.interedition.collatex.superbase.Column;
-import eu.interedition.collatex.superbase.SuperbaseAlgorithm;
 import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Modifications;
 import eu.interedition.collatex.visualization.Visualization;
@@ -51,7 +51,7 @@ public class ColorsView {
   }
 
   private String alignment() {
-    SuperbaseAlgorithm algorithm = new SuperbaseAlgorithm(witnesses);
+    WitnessSet algorithm = new WitnessSet(witnesses);
     AlignmentTable2 alignmentTable = algorithm.createAlignmentTable();
 
     StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");

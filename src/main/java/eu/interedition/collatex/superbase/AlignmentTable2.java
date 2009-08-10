@@ -18,6 +18,12 @@ import eu.interedition.collatex.input.Word;
 // have a Column be a list<phrase>
 // However, for building the alignment table it
 // is easier to have a Column be a list<word>
+
+// NOTE: instead of comparing each of the witnesses with
+// each other.. the solution chosen here is based on a
+// superbase. So that every witness is compared against
+// the super base which is constructed after each compare
+
 public class AlignmentTable2 {
   private final List<Column> columns;
   private final List<Witness> witnesses;
