@@ -47,8 +47,8 @@ public class Column {
     return result;
   }
 
-  public void addMatch(Witness witness, Word word) {
-    wordsProWitness.put(witness.id, word);
+  public void addMatch(Word word) {
+    wordsProWitness.put(word.getWitnessId(), word);
   }
 
   public boolean containsWitness(Witness witness) {

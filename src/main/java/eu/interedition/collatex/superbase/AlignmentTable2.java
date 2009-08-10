@@ -46,7 +46,7 @@ public class AlignmentTable2 {
     Superbase superbase = createSuperbase();
     Collation compresult = CollateCore.collate(superbase, witness);
 
-    addMatchesToSuperbase(witness, superbase, compresult);
+    addMatchesToSuperbase(superbase, compresult);
     addReplacementsToSuperbase(witness, superbase, compresult);
     addAdditionsToSuperbase(witness, superbase, compresult);
   }
@@ -84,14 +84,6 @@ public class AlignmentTable2 {
       return " ";
     }
     return column.getWord(witness).toString();
-  }
-
-  // Note: go through table here or direct through column?
-  // columnFor.addMatch(witness, witnessWord);
-  // if you go directly the table is not notified about
-  // the fact that a witness is added
-  public void addMatch(Witness witness, Word word, Column column) {
-    column.addMatch(witness, word);
   }
 
   private void addWitnessToInternalList(Witness witness) {
@@ -136,12 +128,12 @@ public class AlignmentTable2 {
     }
   }
 
-  private void addMatchesToSuperbase(Witness witness, Superbase superbase, Collation compresult) {
+  private void addMatchesToSuperbase(Superbase superbase, Collation compresult) {
     Set<Match> matches = compresult.getMatches();
     for (Match match : matches) {
       Column column = getColumnForThisMatch(superbase, match);
       Word witnessWord = match.getWitnessWord();
-      addMatch(witness, witnessWord, column);
+      column.addMatch(witnessWord);
     }
   }
 

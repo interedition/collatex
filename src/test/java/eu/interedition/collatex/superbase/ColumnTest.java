@@ -62,7 +62,7 @@ public class ColumnTest {
     Word wordC = witnessC.getWordOnPosition(1);
     Column column = new Column(witness, word);
     column.addVariant(witnessB, wordB);
-    column.addMatch(witnessC, wordC);
+    column.addMatch(wordC);
     Superbase superbase = new Superbase();
     column.addToSuperbase(superbase);
     assertEquals("first match", superbase.toString());
