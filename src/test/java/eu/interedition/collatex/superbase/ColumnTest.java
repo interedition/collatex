@@ -19,7 +19,7 @@ public class ColumnTest {
     Witness witness = builder.build("A", "a test string");
     Witness witnessB = builder.build("B", "different");
     Word word = witness.getWordOnPosition(1);
-    Column column = new Column(witness, word);
+    Column column = new Column(word);
     column.getWord(witnessB);
   }
 
@@ -29,7 +29,7 @@ public class ColumnTest {
     Witness witness = builder.build("A", "a test string");
     Witness witnessB = builder.build("B", "different");
     Word word = witness.getWordOnPosition(1);
-    Column column = new Column(witness, word);
+    Column column = new Column(word);
     assertTrue(column.containsWitness(witness));
     assertFalse(column.containsWitness(witnessB));
   }
@@ -43,9 +43,9 @@ public class ColumnTest {
     Word word = witness.getWordOnPosition(1);
     Word wordB = witnessB.getWordOnPosition(1);
     Word wordC = witnessC.getWordOnPosition(1);
-    Column column = new Column(witness, word);
-    column.addVariant(witnessB, wordB);
-    column.addVariant(witnessC, wordC);
+    Column column = new Column(word);
+    column.addVariant(wordB);
+    column.addVariant(wordC);
     Superbase superbase = new Superbase();
     column.addToSuperbase(superbase);
     assertEquals("first second third", superbase.toString());
@@ -60,8 +60,8 @@ public class ColumnTest {
     Word word = witness.getWordOnPosition(1);
     Word wordB = witnessB.getWordOnPosition(1);
     Word wordC = witnessC.getWordOnPosition(1);
-    Column column = new Column(witness, word);
-    column.addVariant(witnessB, wordB);
+    Column column = new Column(word);
+    column.addVariant(wordB);
     column.addMatch(wordC);
     Superbase superbase = new Superbase();
     column.addToSuperbase(superbase);

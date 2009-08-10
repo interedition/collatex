@@ -48,14 +48,14 @@ public class AlignmentTable2 {
 
     addMatchesToSuperbase(superbase, compresult);
     addReplacementsToSuperbase(witness, superbase, compresult);
-    addAdditionsToSuperbase(witness, superbase, compresult);
+    addAdditionsToSuperbase(superbase, compresult);
   }
 
   // Note: this is a strange method from a user point of view..
   // whether a witness is the first or not should be an implementation detail
   void addFirstWitness(Witness w1) {
     for (Word word : w1.getWords()) {
-      add(new Column(w1, word));
+      add(new Column(word));
     }
     witnesses.add(w1);
   }
@@ -93,11 +93,11 @@ public class AlignmentTable2 {
     }
   }
 
-  private void addAdditionsToSuperbase(Witness witness, Superbase superbase, Collation compresult) {
+  private void addAdditionsToSuperbase(Superbase superbase, Collation compresult) {
     List<Gap> additions = compresult.getAdditions();
     for (Gap addition : additions) {
       List<Word> witnessWords = addition.getPhraseB().getWords();
-      addVariantAtGap(superbase, witness, addition, witnessWords);
+      addVariantAtGap(superbase, addition, witnessWords);
     }
   }
 
@@ -114,16 +114,16 @@ public class AlignmentTable2 {
         if (witnessIterator.hasNext()) {
           Word wordInWitness = witnessIterator.next();
           if (column.containsWitness(witness)) { // already have something in here from the matches phase
-            addVariantBefore(column, witness, Lists.newArrayList(wordInWitness)); // FIXME but this doesn't handle longer sequences ...
+            addVariantBefore(column, Lists.newArrayList(wordInWitness)); // FIXME but this doesn't handle longer sequences ...
           } else {
-            addVariant(column, witness, wordInWitness);
+            column.addVariant(wordInWitness);
           }
         }
       }
       // still have words in the witness? add new columns after the last one from the base
       if (witnessIterator.hasNext()) {
         LinkedList<Word> remainingWitnessWords = Lists.newLinkedList(witnessIterator);
-        addVariantAtGap(superbase, witness, replacement, remainingWitnessWords);
+        addVariantAtGap(superbase, replacement, remainingWitnessWords);
       }
     }
   }
@@ -149,15 +149,15 @@ public class AlignmentTable2 {
     return column;
   }
 
-  private void addVariantAtGap(Superbase superbase, Witness witness, Gap gap, List<Word> witnessWords) {
+  private void addVariantAtGap(Superbase superbase, Gap gap, List<Word> witnessWords) {
     if (gap.getPhraseA().isAtTheEnd()) {
-      addVariantAtTheEnd(witness, witnessWords);
+      addVariantAtTheEnd(witnessWords);
     } else {
       // I should take the next witness match here!
       // It is strange that above I take the base gap!
       Match nextMatch = gap.getNextMatch();
       Column column = getColumnForThisMatch(superbase, nextMatch);
-      addVariantBefore(column, witness, witnessWords);
+      addVariantBefore(column, witnessWords);
     }
   }
 
@@ -165,26 +165,22 @@ public class AlignmentTable2 {
     return columns;
   }
 
-  public void addVariant(Column column, Witness witness, Word wordInWitness) {
-    column.addVariant(witness, wordInWitness);
-  }
-
-  public void addVariantBefore(Column column, Witness witness, List<Word> witnessWords) {
+  public void addVariantBefore(Column column, List<Word> witnessWords) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
       throw new RuntimeException("Unexpected error: Column not found!");
     }
 
     for (Word word : witnessWords) {
-      Column extraColumn = new Column(witness, word);
+      Column extraColumn = new Column(word);
       columns.add(indexOf, extraColumn);
       indexOf++;
     }
   }
 
-  public void addVariantAtTheEnd(Witness witness, List<Word> witnessWords) {
+  public void addVariantAtTheEnd(List<Word> witnessWords) {
     for (Word word : witnessWords) {
-      Column extraColumn = new Column(witness, word);
+      Column extraColumn = new Column(word);
       columns.add(extraColumn);
     }
   }

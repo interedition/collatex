@@ -16,10 +16,19 @@ public class Column {
   protected Map<String, Word> wordsProWitness;
   private final List<Word> variants;
 
-  public Column(Witness firstWitness, Word word) {
+  public Column(Word word) {
     wordsProWitness = Maps.newHashMap();
     variants = Lists.newLinkedList();
-    addVariant(firstWitness, word);
+    addVariant(word);
+  }
+
+  public void addMatch(Word word) {
+    wordsProWitness.put(word.getWitnessId(), word);
+  }
+
+  public void addVariant(Word word) {
+    wordsProWitness.put(word.getWitnessId(), word);
+    variants.add(word);
   }
 
   public void toXML(StringBuilder builder) {
@@ -39,6 +48,10 @@ public class Column {
     return result;
   }
 
+  public boolean containsWitness(Witness witness) {
+    return wordsProWitness.containsKey(witness.id);
+  }
+
   public Word getWord(Witness witness) {
     if (!containsWitness(witness)) {
       throw new NoSuchElementException();
@@ -47,22 +60,9 @@ public class Column {
     return result;
   }
 
-  public void addMatch(Word word) {
-    wordsProWitness.put(word.getWitnessId(), word);
-  }
-
-  public boolean containsWitness(Witness witness) {
-    return wordsProWitness.containsKey(witness.id);
-  }
-
   public Collection<Word> getWords() {
     Collection<Word> values = wordsProWitness.values();
     return values;
-  }
-
-  public void addVariant(Witness witness, Word wordInWitness) {
-    wordsProWitness.put(witness.id, wordInWitness);
-    variants.add(wordInWitness);
   }
 
   public void addToSuperbase(Superbase superbase) {
