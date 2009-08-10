@@ -1,7 +1,6 @@
 package eu.interedition.collatex.superbase;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import eu.interedition.collatex.input.Witness;
@@ -23,17 +22,10 @@ public class SuperbaseAlgorithm {
     this.witnesses = _witnesses;
   }
 
-  // Note: if the addWitness method becomes smarter the special case for the first witness can disappear here!
   public AlignmentTable2 createAlignmentTable() {
     AlignmentTable2 table = new AlignmentTable2();
-    if (!witnesses.isEmpty()) {
-      Iterator<Witness> i = witnesses.iterator();
-      Witness witness = i.next();
-      table.addFirstWitness(witness);
-      while (i.hasNext()) {
-        witness = i.next();
-        table.addWitness(witness);
-      }
+    for (Witness witness : witnesses) {
+      table.addWitness(witness);
     }
     return table;
   }

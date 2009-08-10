@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
@@ -18,6 +19,17 @@ public class Superbase extends Witness {
     Word newWord = new Word("sb", word.original, getWords().size() + 1);
     getWords().add(newWord);
     columnForEachWord.add(column);
+  }
+
+  public Column getColumnFor(Match match) {
+    // Note: this piece of code was meant to handle transposed matches!
+    // matchesOrderedForTheWitness and matchesOrderedForTheBase were parameters!
+    //    int indexOfMatchInWitness = matchesOrderedForTheWitness.indexOf(match);
+    //    Match transposedmatch = matchesOrderedForTheBase.get(indexOfMatchInWitness);
+    //    Word baseWord = transposedmatch.getBaseWord();
+    Word baseWord = match.getBaseWord();
+    Column column = getColumnFor(baseWord);
+    return column;
   }
 
   public Column getColumnFor(Word word) {

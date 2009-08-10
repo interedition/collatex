@@ -14,7 +14,7 @@ import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
-// Note: for the TEI xml output it is easier to
+// Note: for the TEI XML output it is easier to
 // have a Column be a list<phrase>
 // However, for building the alignment table it
 // is easier to have a Column be a list<word>
@@ -31,6 +31,26 @@ public class AlignmentTable2 {
     columns.add(column);
   }
 
+  public void addVariantBefore(Column column, List<Word> witnessWords) {
+    int indexOf = columns.indexOf(column);
+    if (indexOf == -1) {
+      throw new RuntimeException("Unexpected error: Column not found!");
+    }
+
+    for (Word word : witnessWords) {
+      Column extraColumn = new Column(word);
+      columns.add(indexOf, extraColumn);
+      indexOf++;
+    }
+  }
+
+  public void addVariantAtTheEnd(List<Word> witnessWords) {
+    for (Word word : witnessWords) {
+      Column extraColumn = new Column(word);
+      columns.add(extraColumn);
+    }
+  }
+
   public Superbase createSuperbase() {
     Superbase superbase = new Superbase();
     for (Column column : columns) {
@@ -40,24 +60,27 @@ public class AlignmentTable2 {
   }
 
   public void addWitness(Witness witness) {
+    if (witnesses.isEmpty()) {
+      for (Word word : witness.getWords()) {
+        add(new Column(word));
+      }
+      witnesses.add(witness);
+      return;
+    }
+
     addWitnessToInternalList(witness);
 
     // make the superbase from the alignment table
     Superbase superbase = createSuperbase();
     Collation compresult = CollateCore.collate(superbase, witness);
 
-    addMatchesToSuperbase(superbase, compresult);
-    addReplacementsToSuperbase(witness, superbase, compresult);
-    addAdditionsToSuperbase(superbase, compresult);
+    addMatchesToAlignmentTable(superbase, compresult);
+    addReplacementsToAlignmentTable(witness, superbase, compresult);
+    addAdditionsToAlignmentTable(superbase, compresult);
   }
 
-  // Note: this is a strange method from a user point of view..
-  // whether a witness is the first or not should be an implementation detail
-  void addFirstWitness(Witness w1) {
-    for (Word word : w1.getWords()) {
-      add(new Column(word));
-    }
-    witnesses.add(w1);
+  public List<Column> getColumns() {
+    return columns;
   }
 
   public String toXML() {
@@ -93,7 +116,7 @@ public class AlignmentTable2 {
     }
   }
 
-  private void addAdditionsToSuperbase(Superbase superbase, Collation compresult) {
+  private void addAdditionsToAlignmentTable(Superbase superbase, Collation compresult) {
     List<Gap> additions = compresult.getAdditions();
     for (Gap addition : additions) {
       List<Word> witnessWords = addition.getPhraseB().getWords();
@@ -101,7 +124,8 @@ public class AlignmentTable2 {
     }
   }
 
-  private void addReplacementsToSuperbase(Witness witness, Superbase superbase, Collation compresult) {
+  // TODO: addReplacements.. should look like addAdditions method!
+  private void addReplacementsToAlignmentTable(Witness witness, Superbase superbase, Collation compresult) {
     List<Gap> replacements = compresult.getReplacements();
     for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!
@@ -128,60 +152,23 @@ public class AlignmentTable2 {
     }
   }
 
-  private void addMatchesToSuperbase(Superbase superbase, Collation compresult) {
+  private void addMatchesToAlignmentTable(Superbase superbase, Collation compresult) {
     Set<Match> matches = compresult.getMatches();
     for (Match match : matches) {
-      Column column = getColumnForThisMatch(superbase, match);
+      Column column = superbase.getColumnFor(match);
       Word witnessWord = match.getWitnessWord();
       column.addMatch(witnessWord);
     }
-  }
-
-  // Note: I could move this method to the superbase class!
-  private Column getColumnForThisMatch(Superbase superbase, Match match) {
-    // Note: this piece of code was meant to handle transposed matches!
-    // matchesOrderedForTheWitness and matchesOrderedForTheBase were parameters!
-    //    int indexOfMatchInWitness = matchesOrderedForTheWitness.indexOf(match);
-    //    Match transposedmatch = matchesOrderedForTheBase.get(indexOfMatchInWitness);
-    //    Word baseWord = transposedmatch.getBaseWord();
-    Word baseWord = match.getBaseWord();
-    Column column = superbase.getColumnFor(baseWord);
-    return column;
   }
 
   private void addVariantAtGap(Superbase superbase, Gap gap, List<Word> witnessWords) {
     if (gap.getPhraseA().isAtTheEnd()) {
       addVariantAtTheEnd(witnessWords);
     } else {
-      // I should take the next witness match here!
-      // It is strange that above I take the base gap!
       Match nextMatch = gap.getNextMatch();
-      Column column = getColumnForThisMatch(superbase, nextMatch);
+      Column column = superbase.getColumnFor(nextMatch);
       addVariantBefore(column, witnessWords);
     }
   }
 
-  public List<Column> getColumns() {
-    return columns;
-  }
-
-  public void addVariantBefore(Column column, List<Word> witnessWords) {
-    int indexOf = columns.indexOf(column);
-    if (indexOf == -1) {
-      throw new RuntimeException("Unexpected error: Column not found!");
-    }
-
-    for (Word word : witnessWords) {
-      Column extraColumn = new Column(word);
-      columns.add(indexOf, extraColumn);
-      indexOf++;
-    }
-  }
-
-  public void addVariantAtTheEnd(List<Word> witnessWords) {
-    for (Word word : witnessWords) {
-      Column extraColumn = new Column(word);
-      columns.add(extraColumn);
-    }
-  }
 }

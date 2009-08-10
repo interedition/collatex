@@ -13,7 +13,7 @@ public class AlignmentTable2Test {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("A", "the first witness");
     AlignmentTable2 alignmentTable = new AlignmentTable2();
-    alignmentTable.addFirstWitness(a);
+    alignmentTable.addWitness(a);
     Witness superbase = alignmentTable.createSuperbase();
     assertEquals("the first witness", superbase.toString());
   }
@@ -24,7 +24,7 @@ public class AlignmentTable2Test {
     Witness a = builder.build("A", "the first witness");
     Witness b = builder.build("B", "the second witness");
     AlignmentTable2 alignmentTable = new AlignmentTable2();
-    alignmentTable.addFirstWitness(a);
+    alignmentTable.addWitness(a);
     alignmentTable.addWitness(b);
     Witness superbase = alignmentTable.createSuperbase();
     assertEquals("the first second witness", superbase.toString());
@@ -35,7 +35,7 @@ public class AlignmentTable2Test {
     WitnessBuilder builder = new WitnessBuilder();
     Witness w1 = builder.build("A", "the black cat");
     AlignmentTable2 table = new AlignmentTable2();
-    table.addFirstWitness(w1);
+    table.addWitness(w1);
     String expected = "A: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
@@ -46,7 +46,7 @@ public class AlignmentTable2Test {
     Witness w1 = builder.build("A", "the black cat");
     Witness w2 = builder.build("B", "the black cat");
     AlignmentTable2 table = new AlignmentTable2();
-    table.addFirstWitness(w1);
+    table.addWitness(w1);
     table.addWitness(w2);
     // TODO: add match test can be moved to a column test class? 
     //    // TODO: word contains id also, which refers to Witness
@@ -67,7 +67,7 @@ public class AlignmentTable2Test {
     Witness w1 = builder.build("A", "the black cat");
     Witness w2 = builder.build("B", "the");
     AlignmentTable2 table = new AlignmentTable2();
-    table.addFirstWitness(w1);
+    table.addWitness(w1);
     table.addWitness(w2);
     // TODO: add match test can be moved to column class?
     //    Column column = table.getColumns().get(0);
@@ -84,7 +84,7 @@ public class AlignmentTable2Test {
     Witness w1 = builder.build("A", "the black and white cat");
     Witness w2 = builder.build("B", "the white and black cat");
     AlignmentTable2 table = new AlignmentTable2();
-    table.addFirstWitness(w1);
+    table.addWitness(w1);
     table.addWitness(w2);
     String expected = "A: the|black|and|white|cat\n";
     expected += "B: the|black|and|white|cat\n";
