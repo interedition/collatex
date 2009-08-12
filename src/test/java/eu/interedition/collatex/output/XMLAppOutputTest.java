@@ -1,8 +1,15 @@
-package com.sd_editions.collatex.output;
+package eu.interedition.collatex.output;
+
+import junit.framework.Assert;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.WitnessSet;
+import eu.interedition.collatex.superbase.AlignmentTable2;
 
 public class XMLAppOutputTest {
 
@@ -11,6 +18,30 @@ public class XMLAppOutputTest {
   @BeforeClass
   public static void setUp() {
     builder = new WitnessBuilder();
+  }
+
+  @Test
+  public void testAllWitnessesEqual() {
+    Witness w1 = builder.build("the black cat");
+    Witness w2 = builder.build("the black cat");
+    Witness w3 = builder.build("the black cat");
+    WitnessSet set = new WitnessSet(w1, w2, w3);
+    AlignmentTable2 table = set.createAlignmentTable();
+    String expected = "<collation>the black cat</collation>";
+    Assert.assertEquals(expected, table.toXML());
+  }
+
+  @Test
+  @Ignore
+  public void testThreeWitnesses() {
+    Witness w1 = builder.build("the black cat");
+    Witness w2 = builder.build("the white and black cat");
+    Witness w3 = builder.build("the white cat");
+    WitnessSet set = new WitnessSet(w1, w2, w3);
+    AlignmentTable2 table = set.createAlignmentTable();
+    String expected = "<xml>the <app><rdg wit='#B #C'>black </rdg><rdg wit='#A'></rdg></app><app><rdg wit='#B'>and </rdg><rdg wit='#A #c'></rdg></app><app><rdg wit='#A #B'>white </rdg><rdg wit='#C'></rdg></app>cat</xml>"
+        .replaceAll("\\'", "\\\\");
+    Assert.assertEquals(expected, table.toXML());
   }
 
   //  @Test
@@ -22,18 +53,6 @@ public class XMLAppOutputTest {
   //    String expected = "A: the| | |black|cat";
   //    expected += "B: the|white|and|black|cat";
   //    table.toString();
-  //  }
-
-  //  @Test
-  //  public void testThreeWitnesses() {
-  //    Witness w1 = builder.build("the black cat");
-  //    Witness w2 = builder.build("the white and black cat");
-  //    Witness w3 = builder.build("the white cat");
-  //    MagicClass2 magic = new MagicClass2(w1, w2, w3);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "<xml>the <app><rdg wit='#B #C'>black </rdg><rdg wit='#A'></rdg></app><app><rdg wit='#B'>and </rdg><rdg wit='#A #c'></rdg></app><app><rdg wit='#A #B'>white </rdg><rdg wit='#C'></rdg></app>cat</xml>"
-  //        .replaceAll("\\'", "\\\\");
-  //    assertEquals(expected, table.toXML());
   //  }
 
   /**

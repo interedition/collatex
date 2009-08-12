@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-
 public class Phrase {
   private final Witness witness;
   private final int startPosition;
@@ -14,6 +13,10 @@ public class Phrase {
   private final Word next;
 
   // TODO: It is pretty obvious: too many parameters here!
+  // Note: probably two constructors needed...
+  // Note: one where the phrase resembles the words between two other words of the witness
+  // Note: one where the start and end words of the phrase are given
+
   public Phrase(Witness _witness, int _size, int _startPosition, int _endPosition, Word _previous, Word _next) {
     witness = _witness;
     this.size = _size;
@@ -21,6 +24,15 @@ public class Phrase {
     this.previous = _previous;
     startPosition = _startPosition;
     endPosition = _endPosition;
+  }
+
+  public Phrase(Witness _witness, Word beginWord, Word endWord) {
+    this.witness = _witness;
+    this.size = -1; // !!!
+    this.next = null; // !!!
+    this.previous = null; // !!!
+    this.startPosition = beginWord.position;
+    this.endPosition = endWord.position;
   }
 
   //TODO: rename method!

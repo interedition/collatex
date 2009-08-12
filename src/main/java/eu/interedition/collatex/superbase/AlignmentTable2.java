@@ -13,6 +13,7 @@ import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.output.AppAlignmentTable;
 
 // Note: for the TEI XML output it is easier to
 // have a Column be a list<phrase>
@@ -89,8 +90,13 @@ public class AlignmentTable2 {
     return columns;
   }
 
+  public List<Witness> getWitnesses() {
+    return witnesses;
+  }
+
   public String toXML() {
-    return "<xml></xml>";
+    AppAlignmentTable app = new AppAlignmentTable(this);
+    return app.toXML();
   }
 
   @Override
@@ -176,5 +182,4 @@ public class AlignmentTable2 {
       addVariantBefore(column, witnessWords);
     }
   }
-
 }
