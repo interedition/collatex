@@ -31,16 +31,47 @@ public class XMLAppOutputTest {
     Assert.assertEquals(expected, table.toXML());
   }
 
+  /**
+   * The first example from #6 (http://arts-itsee.bham.ac.uk/trac/interedition/ticket/6) (without witness C for now)
+   */
+  @Test
+  public void testSimpleSubstitutionOutput() {
+    String xml = collateWitnessStrings("the black cat and the black mat", "the black dog and the black mat");
+    Assert.assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B\">dog</rdg></app> and the black mat</collation>", xml);
+  }
+
+  private String collateWitnessStrings(String a, String b) {
+    Witness w1 = builder.build("A", a);
+    Witness w2 = builder.build("B", b);
+    WitnessSet set = new WitnessSet(w1, w2);
+    AlignmentTable2 table = set.createAlignmentTable();
+    return table.toXML();
+  }
+
+  // Note: too hard right now
   @Test
   @Ignore
-  public void testThreeWitnesses() {
-    Witness w1 = builder.build("the black cat");
-    Witness w2 = builder.build("the white and black cat");
-    Witness w3 = builder.build("the white cat");
+  public void testCrossVariation() {
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the white and black cat");
+    Witness w3 = builder.build("C", "the white cat");
     WitnessSet set = new WitnessSet(w1, w2, w3);
     AlignmentTable2 table = set.createAlignmentTable();
-    String expected = "<xml>the <app><rdg wit='#B #C'>black </rdg><rdg wit='#A'></rdg></app><app><rdg wit='#B'>and </rdg><rdg wit='#A #c'></rdg></app><app><rdg wit='#A #B'>white </rdg><rdg wit='#C'></rdg></app>cat</xml>"
+    String expected = "<collation>the <app><rdg wit='#B #C'>black </rdg><rdg wit='#A'></rdg></app><app><rdg wit='#B'>and </rdg><rdg wit='#A #c'></rdg></app><app><rdg wit='#A #B'>white </rdg><rdg wit='#C'></rdg></app>cat</collation>"
         .replaceAll("\\'", "\\\\");
+    Assert.assertEquals(expected, table.toXML());
+  }
+
+  // Note: expectations are not totally clear at the moment
+  @Test
+  @Ignore
+  public void testAWordMissingAtTheEnd() {
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the black cat");
+    Witness w3 = builder.build("C", "the black");
+    WitnessSet set = new WitnessSet(w1, w2, w3);
+    AlignmentTable2 table = set.createAlignmentTable();
+    String expected = "<collation>the black <app><rdg wit=\"A B\"> cat</rdg><rdg wit=\"C\"/></app></collation>";
     Assert.assertEquals(expected, table.toXML());
   }
 
@@ -55,14 +86,6 @@ public class XMLAppOutputTest {
   //    table.toString();
   //  }
 
-  /**
-   * The first example from #6 (http://arts-itsee.bham.ac.uk/trac/interedition/ticket/6) (without witness C for now)
-   */
-  //  @Test
-  //  public void testSimpleSubstitutionOutput() {
-  //    String xml = collateWitnessStrings("the black cat and the black mat", "the black dog and the black mat");
-  //    assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B\">dog</rdg></app> and the black mat</collation>", xml);
-  //  }
   //
   //  /**
   //   * Second example from #6. Tests addition, deletion and multiple words in one variant 

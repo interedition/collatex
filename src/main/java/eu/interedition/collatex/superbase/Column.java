@@ -13,22 +13,31 @@ import eu.interedition.collatex.input.Word;
 
 public class Column {
 
-  protected Map<String, Word> wordsProWitness;
-  private final List<Word> variants;
+  protected final Map<String, Word> wordsProWitness;
+  private final List<Word> variants; // TODO: rename to unique words!
+  private ColumnState state;
 
   public Column(Word word) {
     wordsProWitness = Maps.newHashMap();
     variants = Lists.newLinkedList();
-    addVariant(word);
+    initColumn(word);
+  }
+
+  private void initColumn(Word word) {
+    wordsProWitness.put(word.getWitnessId(), word);
+    variants.add(word);
+    state = ColumnState.NEW;
   }
 
   public void addMatch(Word word) {
     wordsProWitness.put(word.getWitnessId(), word);
+    state = state.addMatch();
   }
 
   public void addVariant(Word word) {
     wordsProWitness.put(word.getWitnessId(), word);
     variants.add(word);
+    state = state.addVariant();
   }
 
   public void toXML(StringBuilder builder) {
@@ -69,5 +78,13 @@ public class Column {
     for (Word variant : variants)
       superbase.addWord(variant, this);
   }
+
+  public ColumnState getColumnState() {
+    return state;
+  }
+
+  //  public Set<String> getSigli() {
+  //    return wordsProWitness.keySet();
+  //  }
 
 }

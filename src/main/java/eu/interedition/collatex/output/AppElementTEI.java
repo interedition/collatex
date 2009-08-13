@@ -2,10 +2,11 @@ package eu.interedition.collatex.output;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.sd_editions.collatex.match.views.AppElement;
 import com.sd_editions.collatex.match.views.Element;
 
@@ -42,24 +43,51 @@ public class AppElementTEI extends Element {
 
   @Override
   public String toXML() {
-    Set<String> results = Sets.newLinkedHashSet();
-    Collection<Phrase> values = phrases.values();
-    for (Phrase p : values) {
-      results.add(p.toString());
+    Multimap<String, String> renderedPhraseToWitnessID = Multimaps.newArrayListMultimap();
+    for (Entry<String, Phrase> entry : phrases.entrySet()) {
+      renderedPhraseToWitnessID.put(entry.getValue().toString(), entry.getKey());
     }
+    if (renderedPhraseToWitnessID.keySet().size() == 1) {
+      return renderedPhraseToWitnessID.keys().iterator().next();
+    }
+    //Set<String> results = Sets.newLinkedHashSet();
+    //    Collection<Phrase> values = phrases.values();
+    //    for (Phrase p : values) {
+    //      results.add(p.toString());
+    //    }
     // detect the lemma
-    if (results.size() == 1) {
-      return results.iterator().next();
+    //    if (results.size() == 1) {
+    //      return results.iterator().next();
+    //    }
+
+    // this was just for debug purposes
+    //    for (String renderedPhrase : renderedPhraseToWitnessID.keySet()) {
+    //      Collection<String> sigli = renderedPhraseToWitnessID.get(renderedPhrase);
+    //      System.out.println(sigli.toString() + ":" + renderedPhrase);
+    //    }
+
+    StringBuilder xml = new StringBuilder("<app>");
+
+    for (String renderedPhrase : renderedPhraseToWitnessID.keySet()) {
+      Collection<String> sigli = renderedPhraseToWitnessID.get(renderedPhrase);
+      //  System.out.println(sigli.toString() + ":" + renderedPhrase);
+
+      xml.append("<rdg wit=\"").append(renderSigli(sigli)).append('"');
+      if (renderedPhrase.isEmpty()) {
+        xml.append("/>");
+      } else
+        xml.append('>').append(renderedPhrase).append("</rdg>");
+
     }
+    xml.append("</app>");
 
-    throw new RuntimeException("App is not yet implemented!");
+    return xml.toString();
 
-    //    StringBuilder xml = new StringBuilder("<app>");
     //    if (base == null) {
     //      xml.append(base.toString());
     //    } else {
     //
-    //      xml.append("<rdg wit=\"#").append(base.getWitness().id).append('"');
+
     //      if (base.toString().isEmpty())
     //        xml.append("/>");
     //      else
@@ -74,6 +102,18 @@ public class AppElementTEI extends Element {
     //    }
     //    xml.append("</app>");
     //    return xml.toString();
+  }
+
+  private String renderSigli(Collection<String> sigli) {
+    StringBuilder b = new StringBuilder();
+    String delimiter = "";
+    for (String sigil : sigli) {
+      b.append(delimiter);
+      b.append("#");
+      b.append(sigil);
+      delimiter = " ";
+    }
+    return b.toString();
   }
 
   public void addWord(Witness witness2, Word word) {

@@ -19,16 +19,31 @@ public class AppAlignmentTable {
     this.alignmentTable = _alignmentTable;
     this.cells = Lists.newArrayList();
 
+    mergeColumns();
+  }
+
+  // Note: to merge or not to merge? that is the question
+  private void mergeColumns() {
     List<Column> columns = alignmentTable.getColumns();
-    AppElementTEI mergedColumn = new AppElementTEI(null, null);
-    cells.add(mergedColumn);
-    // Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
+    AppElementTEI mergedColumn = null;
+    Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
     for (Column column : columns) {
+
+      if (previousColumn == null || !previousColumn.getColumnState().equals(column.getColumnState())) {
+        mergedColumn = new AppElementTEI(null, null);
+        cells.add(mergedColumn);
+      }
+
       List<Witness> witnesses = alignmentTable.getWitnesses();
       for (Witness witness : witnesses) {
-        Word word = column.getWord(witness);
-        mergedColumn.addWord(witness, word);
+        if (column.containsWitness(witness)) {
+          Word word = column.getWord(witness);
+          mergedColumn.addWord(witness, word);
+        }
       }
+
+      previousColumn = column;
+
     }
   }
 
@@ -50,17 +65,16 @@ public class AppAlignmentTable {
   //  }
 
   public String toXML() {
-
     StringBuilder result = new StringBuilder(); // FIXME initialize length
     result.append("<collation>");
-
+    String delimiter = "";
     for (Element cell : cells) {
       if (cell != null) {
+        result.append(delimiter); // FIXME can we just introduce whitespace here!?
         result.append(cell.toXML());
-        // result.append(' '); // FIXME can we just introduce whitespace here!? 
+        delimiter = " ";
       }
     }
-    //    result.deleteCharAt(result.length() - 1); // Note: this line here is beacause of the always added ' '
 
     result.append("</collation>");
 
