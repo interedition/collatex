@@ -26,8 +26,10 @@ public class AppElementTEI extends Element {
   private final Phrase witness;
 
   private final Map<String, Phrase> phrases;
+  private final AppAlignmentTable appAlignmentTable;
 
-  public AppElementTEI(Phrase _base, Phrase _witness) {
+  public AppElementTEI(AppAlignmentTable _appAlignmentTable1, Phrase _base, Phrase _witness) {
+    this.appAlignmentTable = _appAlignmentTable1;
     this.base = _base;
     this.witness = _witness;
     this.phrases = Maps.newHashMap();
@@ -47,7 +49,7 @@ public class AppElementTEI extends Element {
     for (Entry<String, Phrase> entry : phrases.entrySet()) {
       renderedPhraseToWitnessID.put(entry.getValue().toString(), entry.getKey());
     }
-    if (renderedPhraseToWitnessID.keySet().size() == 1) {
+    if (renderedPhraseToWitnessID.keySet().size() == 1 && !hasEmptyCells()) {
       return renderedPhraseToWitnessID.keys().iterator().next();
     }
     //Set<String> results = Sets.newLinkedHashSet();
@@ -102,6 +104,10 @@ public class AppElementTEI extends Element {
     //    }
     //    xml.append("</app>");
     //    return xml.toString();
+  }
+
+  private boolean hasEmptyCells() {
+    return appAlignmentTable.getWitnesses().size() != phrases.size();
   }
 
   private String renderSigli(Collection<String> sigli) {

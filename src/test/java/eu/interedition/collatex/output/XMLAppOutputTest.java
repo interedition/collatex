@@ -40,6 +40,17 @@ public class XMLAppOutputTest {
     Assert.assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B\">dog</rdg></app> and the black mat</collation>", xml);
   }
 
+  // TODO: work on the rendering of empty cells!!
+  //  /**
+  //   * Second example from #6. Tests addition, deletion and multiple words in one variant 
+  //   */
+  //  @Test
+  //  public void testSimpleAddDelOutput() {
+  //    String xml = collateWitnessStrings("the black cat on the white table", "the black saw the black cat on the table");
+  //    Assert.assertEquals("<collation>the black <app><rdg wit=\"#A\"/><rdg wit=\"#B\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B\"/></app> table</collation>",
+  //        xml);
+  //  }
+
   private String collateWitnessStrings(String a, String b) {
     Witness w1 = builder.build("A", a);
     Witness w2 = builder.build("B", b);
@@ -86,15 +97,6 @@ public class XMLAppOutputTest {
   //    table.toString();
   //  }
 
-  //
-  //  /**
-  //   * Second example from #6. Tests addition, deletion and multiple words in one variant 
-  //   */
-  //  @Test
-  //  public void testSimpleAddDelOutput() {
-  //    String xml = collateWitnessStrings("the black cat on the white table", "the black saw the black cat on the table");
-  //    assertEquals("<collation>the black <app><rdg wit=\"#A\"/><rdg wit=\"#B\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B\"/></app> table</collation>", xml);
-  //  }
   //
   //  @Test
   //  public void testMultiSubstitutionOutput() {

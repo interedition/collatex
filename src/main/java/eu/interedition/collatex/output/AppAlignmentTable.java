@@ -30,7 +30,7 @@ public class AppAlignmentTable {
     for (Column column : columns) {
 
       if (previousColumn == null || !previousColumn.getColumnState().equals(column.getColumnState())) {
-        mergedColumn = new AppElementTEI(null, null);
+        mergedColumn = new AppElementTEI(this, null, null);
         cells.add(mergedColumn);
       }
 
@@ -79,6 +79,10 @@ public class AppAlignmentTable {
     result.append("</collation>");
 
     return result.toString();
+  }
+
+  public List<Witness> getWitnesses() {
+    return alignmentTable.getWitnesses();
   }
 
 }

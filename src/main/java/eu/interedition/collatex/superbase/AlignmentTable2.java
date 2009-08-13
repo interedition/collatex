@@ -182,4 +182,5 @@ public class AlignmentTable2 {
       addVariantBefore(column, witnessWords);
     }
   }
+
 }
