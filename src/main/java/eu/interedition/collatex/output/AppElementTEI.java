@@ -1,12 +1,17 @@
 package eu.interedition.collatex.output;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.views.AppElement;
 import com.sd_editions.collatex.match.views.Element;
 
@@ -45,10 +50,12 @@ public class AppElementTEI extends Element {
 
   @Override
   public String toXML() {
+    // group together similar phrases
     Multimap<String, String> renderedPhraseToWitnessID = Multimaps.newArrayListMultimap();
     for (Entry<String, Phrase> entry : phrases.entrySet()) {
       renderedPhraseToWitnessID.put(entry.getValue().toString(), entry.getKey());
     }
+    // There is no app tag needed!
     if (renderedPhraseToWitnessID.keySet().size() == 1 && !hasEmptyCells()) {
       return renderedPhraseToWitnessID.keys().iterator().next();
     }
@@ -68,13 +75,35 @@ public class AppElementTEI extends Element {
     //      System.out.println(sigli.toString() + ":" + renderedPhrase);
     //    }
 
-    StringBuilder xml = new StringBuilder("<app>");
+    // add the empty sigli to the multimap
+    Set<String> emptySigli = getEmptyCells();
+    for (String sigil : emptySigli) {
+      renderedPhraseToWitnessID.put("", sigil);
+    }
 
+    Map<String, String> renderSigli = renderSigli(renderedPhraseToWitnessID);
+    return renderTheAppTag(renderSigli);
+  }
+
+  private Map<String, String> renderSigli(Multimap<String, String> renderedPhraseToWitnessID) {
+    // convert the multimap to a normal map  (by rendering the multiple sigli to a single string)
+    Map<String, String> sigliToRenderedPhrase = Maps.newLinkedHashMap();
     for (String renderedPhrase : renderedPhraseToWitnessID.keySet()) {
       Collection<String> sigli = renderedPhraseToWitnessID.get(renderedPhrase);
-      //  System.out.println(sigli.toString() + ":" + renderedPhrase);
+      String renderedSigli = renderSigli(sigli);
+      sigliToRenderedPhrase.put(renderedSigli, renderedPhrase);
+    }
+    return sigliToRenderedPhrase;
+  }
 
-      xml.append("<rdg wit=\"").append(renderSigli(sigli)).append('"');
+  private String renderTheAppTag(Map<String, String> sigliPhrase) {
+    // do the actual rendering
+    StringBuilder xml = new StringBuilder("<app>");
+    List<String> keys = Lists.newArrayList(sigliPhrase.keySet());
+    Collections.sort(keys);
+    for (String sigli : keys) {
+      xml.append("<rdg wit=\"").append(sigli).append('"');
+      String renderedPhrase = sigliPhrase.get(sigli);
       if (renderedPhrase.isEmpty()) {
         xml.append("/>");
       } else
@@ -104,6 +133,17 @@ public class AppElementTEI extends Element {
     //    }
     //    xml.append("</app>");
     //    return xml.toString();
+  }
+
+  private Set<String> getEmptyCells() {
+    List<Witness> witnesses = appAlignmentTable.getWitnesses();
+    Set<String> sigliInTable = Sets.newLinkedHashSet();
+    for (Witness witness : witnesses) {
+      sigliInTable.add(witness.id);
+    }
+    Set<String> emptySigli = Sets.newLinkedHashSet(sigliInTable);
+    emptySigli.removeAll(phrases.keySet());
+    return emptySigli;
   }
 
   private boolean hasEmptyCells() {
