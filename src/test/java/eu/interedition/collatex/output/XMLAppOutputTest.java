@@ -3,7 +3,6 @@ package eu.interedition.collatex.output;
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.input.Witness;
@@ -30,6 +29,17 @@ public class XMLAppOutputTest {
     String expected = "<collation>the black cat</collation>";
     Assert.assertEquals(expected, table.toXML());
   }
+
+  //  @Test
+  //  public void testNearMatches() {
+  //    Witness w1 = builder.build("A", "the black cat");
+  //    Witness w2 = builder.build("B", "the blak cat");
+  //    Witness w3 = builder.build("C", "the black cat");
+  //    WitnessSet set = new WitnessSet(w1, w2, w3);
+  //    AlignmentTable2 table = set.createAlignmentTable();
+  //    String expected = "<collation>the black cat</collation>";
+  //    Assert.assertEquals(expected, table.toXML());
+  //  }
 
   // Note: There are some problems with whitespace here!
   @Test
@@ -62,6 +72,12 @@ public class XMLAppOutputTest {
         xml);
   }
 
+  //  @Test
+  //  public void testMultiSubstitutionOutput() {
+  //    String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat");
+  //    Assert.assertEquals("<collation>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B\">big white dog</rdg></app> and the black mat</collation>", xml);
+  //  }
+
   private String collateWitnessStrings(String a, String b) {
     Witness w1 = builder.build("A", a);
     Witness w2 = builder.build("B", b);
@@ -70,17 +86,16 @@ public class XMLAppOutputTest {
     return table.toXML();
   }
 
-  // Note: too hard right now
+  // Note: There might be some problems with whitespace here!
   @Test
-  @Ignore
   public void testCrossVariation() {
     Witness w1 = builder.build("A", "the black cat");
     Witness w2 = builder.build("B", "the white and black cat");
     Witness w3 = builder.build("C", "the white cat");
     WitnessSet set = new WitnessSet(w1, w2, w3);
     AlignmentTable2 table = set.createAlignmentTable();
-    String expected = "<collation>the <app><rdg wit='#B #C'>black </rdg><rdg wit='#A'></rdg></app><app><rdg wit='#B'>and </rdg><rdg wit='#A #c'></rdg></app><app><rdg wit='#A #B'>white </rdg><rdg wit='#C'></rdg></app>cat</collation>"
-        .replaceAll("\\'", "\\\\");
+    String expected = "<collation>the <app><rdg wit='#A'/><rdg wit='#B #C'>white</rdg></app> <app><rdg wit='#A #C'/><rdg wit='#B'>and</rdg></app> <app><rdg wit='#A #B'>black</rdg><rdg wit='#C'/></app> cat</collation>"
+        .replaceAll("\\'", "\\\"");
     Assert.assertEquals(expected, table.toXML());
   }
 
@@ -95,12 +110,6 @@ public class XMLAppOutputTest {
   //    table.toString();
   //  }
 
-  //
-  //  @Test
-  //  public void testMultiSubstitutionOutput() {
-  //    String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat");
-  //    assertEquals("<collation>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B\">big white dog</rdg></app> and the black mat</collation>", xml);
-  //  }
   //
   //  private String collateWitnessStrings(String witnessA, String witnessB) {
   //    WitnessBuilder builder = new WitnessBuilder();
