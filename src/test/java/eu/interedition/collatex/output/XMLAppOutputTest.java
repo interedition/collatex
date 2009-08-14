@@ -31,6 +31,18 @@ public class XMLAppOutputTest {
     Assert.assertEquals(expected, table.toXML());
   }
 
+  // Note: There are some problems with whitespace here!
+  @Test
+  public void testAWordMissingAtTheEnd() {
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the black cat");
+    Witness w3 = builder.build("C", "the black");
+    WitnessSet set = new WitnessSet(w1, w2, w3);
+    AlignmentTable2 table = set.createAlignmentTable();
+    String expected = "<collation>the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app></collation>";
+    Assert.assertEquals(expected, table.toXML());
+  }
+
   /**
    * The first example from #6 (http://arts-itsee.bham.ac.uk/trac/interedition/ticket/6) (without witness C for now)
    */
@@ -69,19 +81,6 @@ public class XMLAppOutputTest {
     AlignmentTable2 table = set.createAlignmentTable();
     String expected = "<collation>the <app><rdg wit='#B #C'>black </rdg><rdg wit='#A'></rdg></app><app><rdg wit='#B'>and </rdg><rdg wit='#A #c'></rdg></app><app><rdg wit='#A #B'>white </rdg><rdg wit='#C'></rdg></app>cat</collation>"
         .replaceAll("\\'", "\\\\");
-    Assert.assertEquals(expected, table.toXML());
-  }
-
-  // Note: expectations are not totally clear at the moment
-  @Test
-  @Ignore
-  public void testAWordMissingAtTheEnd() {
-    Witness w1 = builder.build("A", "the black cat");
-    Witness w2 = builder.build("B", "the black cat");
-    Witness w3 = builder.build("C", "the black");
-    WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = set.createAlignmentTable();
-    String expected = "<collation>the black <app><rdg wit=\"A B\"> cat</rdg><rdg wit=\"C\"/></app></collation>";
     Assert.assertEquals(expected, table.toXML());
   }
 

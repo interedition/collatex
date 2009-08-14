@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -83,8 +84,8 @@ public class Column {
     return state;
   }
 
-  //  public Set<String> getSigli() {
-  //    return wordsProWitness.keySet();
-  //  }
+  public Set<String> getSigli() {
+    return wordsProWitness.keySet();
+  }
 
 }

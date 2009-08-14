@@ -28,8 +28,8 @@ public class AppAlignmentTable {
     AppElementTEI mergedColumn = null;
     Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
     for (Column column : columns) {
-
-      if (previousColumn == null || !previousColumn.getColumnState().equals(column.getColumnState())) {
+      boolean needNewCell = previousColumn == null || !previousColumn.getColumnState().equals(column.getColumnState()) || !column.getSigli().equals(previousColumn.getSigli());
+      if (needNewCell) {
         mergedColumn = new AppElementTEI(this, null, null);
         cells.add(mergedColumn);
       }
