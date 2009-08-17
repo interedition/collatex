@@ -19,38 +19,12 @@ public class XMLAppOutputTest {
     builder = new WitnessBuilder();
   }
 
-  @Test
-  public void testAllWitnessesEqual() {
-    Witness w1 = builder.build("the black cat");
-    Witness w2 = builder.build("the black cat");
-    Witness w3 = builder.build("the black cat");
-    WitnessSet set = new WitnessSet(w1, w2, w3);
+  private String collateWitnessStrings(String a, String b) {
+    Witness w1 = builder.build("A", a);
+    Witness w2 = builder.build("B", b);
+    WitnessSet set = new WitnessSet(w1, w2);
     AlignmentTable2 table = set.createAlignmentTable();
-    String expected = "<collation>the black cat</collation>";
-    Assert.assertEquals(expected, table.toXML());
-  }
-
-  //  @Test
-  //  public void testNearMatches() {
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the blak cat");
-  //    Witness w3 = builder.build("C", "the black cat");
-  //    WitnessSet set = new WitnessSet(w1, w2, w3);
-  //    AlignmentTable2 table = set.createAlignmentTable();
-  //    String expected = "<collation>the black cat</collation>";
-  //    Assert.assertEquals(expected, table.toXML());
-  //  }
-
-  // Note: There are some problems with whitespace here!
-  @Test
-  public void testAWordMissingAtTheEnd() {
-    Witness w1 = builder.build("A", "the black cat");
-    Witness w2 = builder.build("B", "the black cat");
-    Witness w3 = builder.build("C", "the black");
-    WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = set.createAlignmentTable();
-    String expected = "<collation>the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app></collation>";
-    Assert.assertEquals(expected, table.toXML());
+    return table.toXML();
   }
 
   /**
@@ -72,18 +46,34 @@ public class XMLAppOutputTest {
         xml);
   }
 
-  //  @Test
-  //  public void testMultiSubstitutionOutput() {
-  //    String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat");
-  //    Assert.assertEquals("<collation>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B\">big white dog</rdg></app> and the black mat</collation>", xml);
-  //  }
+  @Test
+  public void testMultiSubstitutionOutput() {
+    String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat");
+    Assert.assertEquals("<collation>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B\">big white dog</rdg></app> and the black mat</collation>", xml);
+  }
 
-  private String collateWitnessStrings(String a, String b) {
-    Witness w1 = builder.build("A", a);
-    Witness w2 = builder.build("B", b);
-    WitnessSet set = new WitnessSet(w1, w2);
+  // Additional unit tests (not present in ticket #6)
+  @Test
+  public void testAllWitnessesEqual() {
+    Witness w1 = builder.build("the black cat");
+    Witness w2 = builder.build("the black cat");
+    Witness w3 = builder.build("the black cat");
+    WitnessSet set = new WitnessSet(w1, w2, w3);
     AlignmentTable2 table = set.createAlignmentTable();
-    return table.toXML();
+    String expected = "<collation>the black cat</collation>";
+    Assert.assertEquals(expected, table.toXML());
+  }
+
+  // Note: There are some problems with whitespace here!
+  @Test
+  public void testAWordMissingAtTheEnd() {
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the black cat");
+    Witness w3 = builder.build("C", "the black");
+    WitnessSet set = new WitnessSet(w1, w2, w3);
+    AlignmentTable2 table = set.createAlignmentTable();
+    String expected = "<collation>the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app></collation>";
+    Assert.assertEquals(expected, table.toXML());
   }
 
   // Note: There might be some problems with whitespace here!
@@ -99,31 +89,25 @@ public class XMLAppOutputTest {
     Assert.assertEquals(expected, table.toXML());
   }
 
-  //  @Test
-  //  public void testTwoWitnesses() {
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the white and black cat");
-  //    MagicClass2 magic = new MagicClass2(w1, w2);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A: the| | |black|cat";
-  //    expected += "B: the|white|and|black|cat";
-  //    table.toString();
-  //  }
+  // Note: There might be some problems with whitespace here!
+  @Test
+  public void testAddition() {
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the white and black cat");
+    WitnessSet set = new WitnessSet(w1, w2);
+    AlignmentTable2 table = set.createAlignmentTable();
+    String expected = "<collation>the <app><rdg wit=\"#A\"/><rdg wit=\"#B\">white and</rdg></app> black cat</collation>";
+    Assert.assertEquals(expected, table.toXML());
+  }
 
-  //
-  //  private String collateWitnessStrings(String witnessA, String witnessB) {
-  //    WitnessBuilder builder = new WitnessBuilder();
-  //    CollateCore collateCore = new CollateCore(builder.build(witnessA), builder.build(witnessB)); // ignored actually.
-  //    List<MatchNonMatch> matchNonMatchList = collateCore.doCompareWitnesses(builder.build("A", witnessA), builder.build("B", witnessB));
-  //
-  //    collateCore.sortPermutationsByNonMatches(matchNonMatchList);
-  //
-  //    for (MatchNonMatch matchNonMatch : matchNonMatchList) {
-  //      System.out.println(new AppAlignmentTable(matchNonMatch).toXML());
-  //    }
-  //
-  //    AppAlignmentTable alignmentTable = new AppAlignmentTable(matchNonMatchList.get(0));
-  //    String xml = alignmentTable.toXML();
-  //    return xml;
+  //  @Test
+  //  public void testNearMatches() {
+  //    Witness w1 = builder.build("A", "the black cat");
+  //    Witness w2 = builder.build("B", "the blak cat");
+  //    Witness w3 = builder.build("C", "the black cat");
+  //    WitnessSet set = new WitnessSet(w1, w2, w3);
+  //    AlignmentTable2 table = set.createAlignmentTable();
+  //    String expected = "<collation>the black cat</collation>";
+  //    Assert.assertEquals(expected, table.toXML());
   //  }
 }

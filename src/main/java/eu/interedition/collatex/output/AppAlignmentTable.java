@@ -9,6 +9,7 @@ import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.superbase.AlignmentTable2;
 import eu.interedition.collatex.superbase.Column;
+import eu.interedition.collatex.superbase.ColumnState;
 
 public class AppAlignmentTable {
 
@@ -29,6 +30,9 @@ public class AppAlignmentTable {
     Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
     for (Column column : columns) {
       boolean needNewCell = previousColumn == null || !previousColumn.getColumnState().equals(column.getColumnState()) || !column.getSigli().equals(previousColumn.getSigli());
+      if (previousColumn != null && previousColumn.getColumnState() == ColumnState.VARIANT && column.getColumnState() == ColumnState.NEW) {
+        needNewCell = false;
+      }
       if (needNewCell) {
         mergedColumn = new AppElementTEI(this, null, null);
         cells.add(mergedColumn);
