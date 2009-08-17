@@ -30,7 +30,8 @@ public class AppAlignmentTable {
     Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
     for (Column column : columns) {
       boolean needNewCell = previousColumn == null || !previousColumn.getColumnState().equals(column.getColumnState()) || !column.getSigli().equals(previousColumn.getSigli());
-      if (previousColumn != null && previousColumn.getColumnState() == ColumnState.VARIANT && column.getColumnState() == ColumnState.NEW) {
+      if (previousColumn != null && previousColumn.getColumnState() == ColumnState.VARIANT && previousColumn.getSigli().size() > column.getSigli().size()
+          && previousColumn.getSigli().containsAll(column.getSigli())) {
         needNewCell = false;
       }
       if (needNewCell) {

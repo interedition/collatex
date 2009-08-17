@@ -19,10 +19,11 @@ public class XMLAppOutputTest {
     builder = new WitnessBuilder();
   }
 
-  private String collateWitnessStrings(String a, String b) {
+  private String collateWitnessStrings(String a, String b, String c) {
     Witness w1 = builder.build("A", a);
     Witness w2 = builder.build("B", b);
-    WitnessSet set = new WitnessSet(w1, w2);
+    Witness w3 = builder.build("C", c);
+    WitnessSet set = new WitnessSet(w1, w2, w3);
     AlignmentTable2 table = set.createAlignmentTable();
     return table.toXML();
   }
@@ -32,8 +33,8 @@ public class XMLAppOutputTest {
    */
   @Test
   public void testSimpleSubstitutionOutput() {
-    String xml = collateWitnessStrings("the black cat and the black mat", "the black dog and the black mat");
-    Assert.assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B\">dog</rdg></app> and the black mat</collation>", xml);
+    String xml = collateWitnessStrings("the black cat and the black mat", "the black dog and the black mat", "the black dog and the black mat");
+    Assert.assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B #C\">dog</rdg></app> and the black mat</collation>", xml);
   }
 
   /**
@@ -41,15 +42,15 @@ public class XMLAppOutputTest {
    */
   @Test
   public void testSimpleAddDelOutput() {
-    String xml = collateWitnessStrings("the black cat on the white table", "the black saw the black cat on the table");
-    Assert.assertEquals("<collation>the black <app><rdg wit=\"#A\"/><rdg wit=\"#B\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B\"/></app> table</collation>",
-        xml);
+    String xml = collateWitnessStrings("the black cat on the white table", "the black saw the black cat on the table", "the black saw the black cat on the table");
+    Assert.assertEquals(
+        "<collation>the black <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B #C\"/></app> table</collation>", xml);
   }
 
   @Test
   public void testMultiSubstitutionOutput() {
-    String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat");
-    Assert.assertEquals("<collation>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B\">big white dog</rdg></app> and the black mat</collation>", xml);
+    String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat", "the big white dog and the black mat");
+    Assert.assertEquals("<collation>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B #C\">big white dog</rdg></app> and the black mat</collation>", xml);
   }
 
   // Additional unit tests (not present in ticket #6)
