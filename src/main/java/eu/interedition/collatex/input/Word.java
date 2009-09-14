@@ -1,5 +1,7 @@
 package eu.interedition.collatex.input;
 
+import eu.interedition.collatex.tokenization.Token;
+
 public class Word {
   private final String witnessId;
   public final String original;
@@ -12,6 +14,16 @@ public class Word {
     this.original = _original;
     this.normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
     this.position = _position;
+  }
+
+  // TODO: notice the duplication here!
+  // TODO: store punctuation!
+  // TODO: extract regularization!
+  public Word(String witnessId2, Token nextToken, int position2) {
+    this.witnessId = witnessId2;
+    this.original = nextToken.getOriginal();
+    this.position = position2;
+    this.normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
   }
 
   @Override

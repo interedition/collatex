@@ -9,6 +9,8 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.tokenization.WitnessTokenizer;
+
 
 public class WitnessBuilder {
 

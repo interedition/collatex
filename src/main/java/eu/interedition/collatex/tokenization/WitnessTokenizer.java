@@ -1,9 +1,10 @@
-package eu.interedition.collatex.input;
+package eu.interedition.collatex.tokenization;
 
 import java.util.regex.Pattern;
 
 import com.sd_editions.collatex.iterator.ArrayIterator;
 
+// NOTE: normalize == remove punctuation!
 public class WitnessTokenizer {
   private final ArrayIterator iterator;
   private final boolean normalize;
@@ -19,11 +20,12 @@ public class WitnessTokenizer {
     return iterator.hasNext();
   }
 
-  public String nextToken() {
+  public Token nextToken() {
     String token = (String) iterator.next();
     if (normalize) {
       token = token.replaceAll("\\p{Punct}", "").toLowerCase();
     }
-    return token;
+    Token t = new Token(token);
+    return t;
   }
 }
