@@ -12,10 +12,6 @@ import junit.framework.TestCase;
 
 import org.xml.sax.SAXException;
 
-
-import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
-import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.WitnessBuilder.ContentType;
 
 public class WitnessBuilderTest extends TestCase {
@@ -176,7 +172,6 @@ public class WitnessBuilderTest extends TestCase {
   public void testEmptyXml() {
     try {
       Witness w = witnessBuilder.build(emptyXml, ContentType.TEXT_XML);
-      assertEquals(w.sentence, "");
       assertEquals(w.getWords().size(), 0);
     } catch (SAXException e) {
       fail();
@@ -187,7 +182,6 @@ public class WitnessBuilderTest extends TestCase {
 
   public void testEmptyWitnessFromString() {
     Witness witness = witnessBuilder.build("");
-    assertEquals(witness.sentence, "");
     assertEquals(witness.getWords().size(), 0);
   }
 

@@ -3,11 +3,9 @@ package eu.interedition.collatex.input;
 import java.util.List;
 import java.util.Random;
 
-import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
 public class Witness {
-  public final String sentence;
   public final String id;
   private final List<Word> words;
 
@@ -17,12 +15,10 @@ public class Witness {
       this.id = Long.toString(Math.abs(new Random().nextLong()), 5);
     else
       this.id = _words[0].getWitnessId();
-    this.sentence = Join.join(" ", _words);
     this.words = Lists.newArrayList(_words);
   }
 
   public Witness(String _id, List<Word> _words) {
-    this.sentence = Join.join(" ", _words);
     this.id = _id;
     this.words = _words;
   }

@@ -8,6 +8,7 @@ public class Word {
   public final String normalized;
   public final int position;
 
+  // TODO: add puntuctuation!!
   public Word(String _witnessId, String _original, int _position) {
     if (_original.isEmpty()) throw new IllegalArgumentException("Word cannot be empty!");
     this.witnessId = _witnessId;

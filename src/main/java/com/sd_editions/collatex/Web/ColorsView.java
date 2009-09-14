@@ -86,7 +86,7 @@ public class ColorsView {
   private String witnesses() {
     StringBuffer html = new StringBuffer("<h4>Witnesses:</h4>");
     for (int row = 0; row < colors.numberOfWitnesses(); row++) {
-      html.append("<b>Witness " + (row + 1) + "</b>: " + colors.witnesses.get(row).sentence + "<br/>");
+      html.append("<b>Witness " + (row + 1) + "</b>: " + colors.witnesses.get(row).toString() + "<br/>");
     }
     html.append("<br/>");
     return html.toString();
