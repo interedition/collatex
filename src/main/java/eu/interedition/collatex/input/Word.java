@@ -1,14 +1,16 @@
 package eu.interedition.collatex.input;
 
+import eu.interedition.collatex.input.visitors.ICollationResource;
+import eu.interedition.collatex.input.visitors.IResourceVisitor;
 import eu.interedition.collatex.tokenization.Token;
 
-public class Word {
+public class Word implements ICollationResource {
   private final String witnessId;
   public final String original;
   public final String normalized;
   public final int position;
 
-  // TODO: add puntuctuation!!
+  // TODO: add punctuation!!
   public Word(String _witnessId, String _original, int _position) {
     if (_original.isEmpty()) throw new IllegalArgumentException("Word cannot be empty!");
     this.witnessId = _witnessId;
@@ -20,10 +22,10 @@ public class Word {
   // TODO: notice the duplication here!
   // TODO: store punctuation!
   // TODO: extract regularization!
-  public Word(String witnessId2, Token nextToken, int position2) {
-    this.witnessId = witnessId2;
+  public Word(String _witnessId, Token nextToken, int _position) {
+    this.witnessId = _witnessId;
     this.original = nextToken.getOriginal();
-    this.position = position2;
+    this.position = _position;
     this.normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
   }
 
@@ -46,6 +48,11 @@ public class Word {
 
   public String getWitnessId() {
     return witnessId;
+  }
+
+  @Override
+  public void accept(IResourceVisitor visitor) {
+    visitor.visitWord(this);
   }
 
 }

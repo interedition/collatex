@@ -5,7 +5,10 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
-public class Witness {
+import eu.interedition.collatex.input.visitors.ICollationResource;
+import eu.interedition.collatex.input.visitors.IResourceVisitor;
+
+public class Witness implements ICollationResource {
   public final String id;
   private final List<Word> words;
 
@@ -45,5 +48,14 @@ public class Witness {
       divider = " ";
     }
     return replacementString;
+  }
+
+  public void accept(IResourceVisitor visitor) {
+    visitor.visitWitness(this);
+    List<Word> words2 = getWords();
+    for (Word word : words2) {
+      visitor.visitWord(word);
+    }
+    visitor.postVisitWitness(this);
   }
 }
