@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class MultiMatchMapTest extends TestCase {
 

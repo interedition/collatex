@@ -7,8 +7,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.WitnessSet;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class FutureTranspositionHolderTest {
 

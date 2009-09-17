@@ -7,7 +7,7 @@ import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class MatchesView {
 

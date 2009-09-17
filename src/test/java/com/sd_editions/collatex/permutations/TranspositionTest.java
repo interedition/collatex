@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.visualization.Modifications;
 
 public class TranspositionTest extends TestCase {

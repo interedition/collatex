@@ -11,7 +11,7 @@ import eu.interedition.collatex.collation.alignment.Match;
 import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 /**
  * not really a test case: maybe refactor into the web application 

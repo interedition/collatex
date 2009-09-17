@@ -1,4 +1,4 @@
-package eu.interedition.collatex.input;
+package eu.interedition.collatex.input.builders;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +9,8 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.tokenization.WitnessTokenizer;
 
 

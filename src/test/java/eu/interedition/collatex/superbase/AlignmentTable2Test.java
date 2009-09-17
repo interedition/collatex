@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 // TODO: introduce witnessSet class here!
 public class AlignmentTable2Test {

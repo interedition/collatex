@@ -14,8 +14,8 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Modifications;
 

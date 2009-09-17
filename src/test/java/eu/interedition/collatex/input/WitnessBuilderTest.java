@@ -12,7 +12,8 @@ import junit.framework.TestCase;
 
 import org.xml.sax.SAXException;
 
-import eu.interedition.collatex.input.WitnessBuilder.ContentType;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
+import eu.interedition.collatex.input.builders.WitnessBuilder.ContentType;
 
 public class WitnessBuilderTest extends TestCase {
 

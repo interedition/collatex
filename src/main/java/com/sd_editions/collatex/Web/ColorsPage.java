@@ -17,8 +17,8 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
-import eu.interedition.collatex.input.WitnessBuilder.ContentType;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
+import eu.interedition.collatex.input.builders.WitnessBuilder.ContentType;
 
 @SuppressWarnings("serial")
 public class ColorsPage extends WebPage {

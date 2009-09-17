@@ -1,9 +1,11 @@
-package eu.interedition.collatex.input;
+package eu.interedition.collatex.input.builders;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import eu.interedition.collatex.input.Witness;
 
 
 public class WitnessPlainBuilder extends WitnessStreamBuilder {

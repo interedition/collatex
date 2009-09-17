@@ -9,8 +9,8 @@ import java.util.NoSuchElementException;
 import org.junit.Test;
 
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class ColumnTest {
   @Test(expected = NoSuchElementException.class)

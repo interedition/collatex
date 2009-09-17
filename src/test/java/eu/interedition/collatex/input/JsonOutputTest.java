@@ -4,6 +4,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.input.visitors.JSonVisitor;
 
 public class JsonOutputTest {

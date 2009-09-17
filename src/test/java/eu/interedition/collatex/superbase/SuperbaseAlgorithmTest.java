@@ -6,8 +6,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessBuilder;
 import eu.interedition.collatex.input.WitnessSet;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 // Note: this test are very similar to the alignment table 2 tests!
 // Note: since the superbase algorithm class becomes more like a container, and does not contain any 
