@@ -13,10 +13,10 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Collation;
-import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;

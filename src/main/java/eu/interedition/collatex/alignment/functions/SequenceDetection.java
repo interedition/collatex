@@ -1,4 +1,4 @@
-package eu.interedition.collatex.collation.sequences;
+package eu.interedition.collatex.alignment.functions;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,7 +9,8 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.collation.alignment.Match;
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.MatchSequence;
 
 public class SequenceDetection {
 

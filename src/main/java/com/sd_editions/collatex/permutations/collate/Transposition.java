@@ -1,7 +1,7 @@
 package com.sd_editions.collatex.permutations.collate;
 
 
-import eu.interedition.collatex.collation.sequences.MatchSequence;
+import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Transposition extends Modification {

@@ -1,4 +1,4 @@
-package eu.interedition.collatex.collation.alignment;
+package eu.interedition.collatex.alignment;
 
 import java.util.Collection;
 import java.util.List;

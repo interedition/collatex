@@ -1,4 +1,4 @@
-package eu.interedition.collatex.collation.alignment;
+package eu.interedition.collatex.alignment;
 
 import eu.interedition.collatex.input.Word;
 

@@ -9,7 +9,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.collation.alignment.Match;
+import eu.interedition.collatex.alignment.Match;
 
 public class MatchGroup implements Iterable<Match> {
 

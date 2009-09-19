@@ -6,11 +6,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.interedition.collatex.alignment.Alignment;
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.collation.Collation;
-import eu.interedition.collatex.collation.alignment.Alignment;
-import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.collation.alignment.Matcher;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 

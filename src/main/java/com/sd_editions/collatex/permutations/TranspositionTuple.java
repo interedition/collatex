@@ -1,6 +1,6 @@
 package com.sd_editions.collatex.permutations;
 
-import eu.interedition.collatex.collation.sequences.MatchSequence;
+import eu.interedition.collatex.alignment.MatchSequence;
 
 public class TranspositionTuple {
 

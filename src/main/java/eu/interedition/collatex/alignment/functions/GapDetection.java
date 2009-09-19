@@ -1,13 +1,14 @@
-package eu.interedition.collatex.collation.gaps;
+package eu.interedition.collatex.alignment.functions;
 
 import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.collation.sequences.MatchSequence;
-import eu.interedition.collatex.input.Phrase;
+import eu.interedition.collatex.alignment.Gap;
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 

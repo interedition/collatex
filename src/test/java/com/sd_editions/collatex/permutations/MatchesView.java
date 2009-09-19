@@ -6,10 +6,10 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
 
+import eu.interedition.collatex.alignment.Gap;
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.collation.Collation;
-import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.collation.gaps.Gap;
-import eu.interedition.collatex.collation.sequences.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 

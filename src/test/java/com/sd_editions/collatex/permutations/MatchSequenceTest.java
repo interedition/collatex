@@ -6,12 +6,12 @@ import junit.framework.TestCase;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.alignment.Gap;
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.alignment.functions.GapDetection;
+import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.collation.gaps.Gap;
-import eu.interedition.collatex.collation.gaps.GapDetection;
-import eu.interedition.collatex.collation.sequences.MatchSequence;
-import eu.interedition.collatex.collation.sequences.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;

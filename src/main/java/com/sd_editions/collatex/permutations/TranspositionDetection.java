@@ -10,7 +10,7 @@ import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
-import eu.interedition.collatex.collation.sequences.MatchSequence;
+import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 
 public class TranspositionDetection {

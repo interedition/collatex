@@ -1,11 +1,9 @@
-package eu.interedition.collatex.collation.gaps;
+package eu.interedition.collatex.alignment;
 
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
-import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Gap {

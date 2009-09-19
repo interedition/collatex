@@ -2,7 +2,7 @@ package com.sd_editions.collatex.permutations.collate;
 
 import com.sd_editions.collatex.match.views.ModificationVisitor;
 
-import eu.interedition.collatex.input.Phrase;
+import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Omission extends Modification {

@@ -15,7 +15,7 @@ import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.views.AppElement;
 import com.sd_editions.collatex.match.views.Element;
 
-import eu.interedition.collatex.input.Phrase;
+import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 

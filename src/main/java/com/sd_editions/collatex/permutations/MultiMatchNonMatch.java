@@ -10,9 +10,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex.alignment.Gap;
+import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.collation.Collation;
-import eu.interedition.collatex.collation.alignment.Match;
-import eu.interedition.collatex.collation.gaps.Gap;
 import eu.interedition.collatex.input.Word;
 
 public class MultiMatchNonMatch {

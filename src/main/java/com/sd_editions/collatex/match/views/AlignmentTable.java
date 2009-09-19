@@ -3,7 +3,7 @@ package com.sd_editions.collatex.match.views;
 import java.util.Set;
 
 
-import eu.interedition.collatex.collation.alignment.Match;
+import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.visualization.Modifications;
 
