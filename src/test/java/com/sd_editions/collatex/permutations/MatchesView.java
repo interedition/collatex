@@ -6,10 +6,10 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
 
+import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -33,7 +33,7 @@ public class MatchesView {
     return result.toString();
   }
 
-  private String renderPermutation(Collation matchNonMatch) {
+  private String renderPermutation(Alignment matchNonMatch) {
     StringBuilder result = new StringBuilder();
 
     result.append(" * Permutation: ").append(matchNonMatch.getMatches()).append('\n');

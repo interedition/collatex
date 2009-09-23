@@ -14,6 +14,7 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
 import eu.interedition.collatex.alignment.Alignment;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
@@ -37,9 +38,9 @@ public class CollateCore {
     this.witnesses = _witnesses;
   }
 
-  public static Collation collate(Witness a, Witness b) {
-    Alignment alignment = Matcher.align(a, b);
-    Collation collation = new Collation(alignment.getFixedMatches(), a, b);
+  public static Alignment collate(Witness a, Witness b) {
+    UnfixedAlignment alignment = Matcher.align(a, b);
+    Alignment collation = new Alignment(alignment.getFixedMatches(), a, b);
     return collation;
   }
 
@@ -47,7 +48,7 @@ public class CollateCore {
   public Modifications compareWitness(int i, int j) {
     Witness base = getWitness(i);
     Witness witness = getWitness(j);
-    Collation collation = compareWitnesses(base, witness);
+    Alignment collation = compareWitnesses(base, witness);
     Modifications modifications = Visualization.getModifications(collation);
     return modifications;
     //    List<Modifications> modificationsList = Lists.newArrayList();
@@ -60,8 +61,8 @@ public class CollateCore {
     //    return modificationsList;
   }
 
-  public Collation doCompareWitnesses(Witness base, Witness witness) {
-    Collation collation = CollateCore.collate(base, witness);
+  public Alignment doCompareWitnesses(Witness base, Witness witness) {
+    Alignment collation = CollateCore.collate(base, witness);
     return collation;
     //    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
     //    List<Set<Match>> permutationList = matches.permutations();
@@ -77,7 +78,7 @@ public class CollateCore {
     // return matchNonMatchList;
   }
 
-  public Collation compareWitnesses(Witness w1, Witness w2) {
+  public Alignment compareWitnesses(Witness w1, Witness w2) {
     return doCompareWitnesses(w1, w2);
     //    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(w1, w2);
     //    sortPermutationsByVariation(matchNonMatchList);
@@ -85,7 +86,7 @@ public class CollateCore {
   }
 
   // TODO: remove!
-  public List<List<Collation>> getAllMatchNonMatchPermutations() {
+  public List<List<Alignment>> getAllMatchNonMatchPermutations() {
     throw new UnsupportedOperationException();
     //    List<List<MatchNonMatch>> matchNonMatchPermutationsForAllWitnessPairs = Lists.newArrayList();
     //    final int numberOfWitnesses = numberOfWitnesses();
@@ -101,18 +102,18 @@ public class CollateCore {
    * Temporary heuristics for the best collation without relying on the analysis stage.
    * Looking for a new home ...
    */
-  public void sortPermutationsByNonMatches(List<Collation> matchNonMatchList) {
-    Comparator<Collation> comparator = new Comparator<Collation>() {
-      public int compare(Collation o1, Collation o2) {
+  public void sortPermutationsByNonMatches(List<Alignment> matchNonMatchList) {
+    Comparator<Alignment> comparator = new Comparator<Alignment>() {
+      public int compare(Alignment o1, Alignment o2) {
         return o1.getGaps().size() - o2.getGaps().size();
       }
     };
     Collections.sort(matchNonMatchList, comparator);
   }
 
-  public void sortPermutationsByVariation(List<Collation> matchNonMatchList) {
-    Comparator<Collation> comparator = new Comparator<Collation>() {
-      public int compare(Collation o1, Collation o2) {
+  public void sortPermutationsByVariation(List<Alignment> matchNonMatchList) {
+    Comparator<Alignment> comparator = new Comparator<Alignment>() {
+      public int compare(Alignment o1, Alignment o2) {
         return Double.compare(o1.getVariationMeasure(), o2.getVariationMeasure());
       }
     };

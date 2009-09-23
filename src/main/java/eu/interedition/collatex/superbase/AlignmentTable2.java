@@ -7,10 +7,10 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.output.AppAlignmentTable;
@@ -79,7 +79,7 @@ public class AlignmentTable2 {
 
     // make the superbase from the alignment table
     Superbase superbase = createSuperbase();
-    Collation compresult = CollateCore.collate(superbase, witness);
+    Alignment compresult = CollateCore.collate(superbase, witness);
 
     addMatchesToAlignmentTable(superbase, compresult);
     addReplacementsToAlignmentTable(witness, superbase, compresult);
@@ -128,7 +128,7 @@ public class AlignmentTable2 {
     }
   }
 
-  private void addAdditionsToAlignmentTable(Superbase superbase, Collation compresult) {
+  private void addAdditionsToAlignmentTable(Superbase superbase, Alignment compresult) {
     List<Gap> additions = compresult.getAdditions();
     for (Gap addition : additions) {
       List<Word> witnessWords = addition.getPhraseB().getWords();
@@ -137,7 +137,7 @@ public class AlignmentTable2 {
   }
 
   // TODO: addReplacements.. should look like addAdditions method!
-  private void addReplacementsToAlignmentTable(Witness witness, Superbase superbase, Collation compresult) {
+  private void addReplacementsToAlignmentTable(Witness witness, Superbase superbase, Alignment compresult) {
     List<Gap> replacements = compresult.getReplacements();
     for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!
@@ -164,7 +164,7 @@ public class AlignmentTable2 {
     }
   }
 
-  private void addMatchesToAlignmentTable(Superbase superbase, Collation compresult) {
+  private void addMatchesToAlignmentTable(Superbase superbase, Alignment compresult) {
     Set<Match> matches = compresult.getMatches();
     for (Match match : matches) {
       Column column = superbase.getColumnFor(match);

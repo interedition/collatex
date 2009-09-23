@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.interedition.collatex.alignment.Alignment;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.input.Witness;
@@ -18,8 +18,8 @@ public class PossibleMatchesTest {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    Alignment result = Matcher.align(a, b);
-    Alignment firstAlignment = result.getPrevious().getPrevious().getPrevious().getPrevious();
+    UnfixedAlignment result = Matcher.align(a, b);
+    UnfixedAlignment firstAlignment = result.getPrevious().getPrevious().getPrevious().getPrevious();
     Word zijn = a.getWordOnPosition(1);
     Collection<Match> linked = firstAlignment.getMatchesThatLinkFrom(zijn);
     Assert.assertEquals("[(1->2), (1->5), (1->8)]", linked.toString());

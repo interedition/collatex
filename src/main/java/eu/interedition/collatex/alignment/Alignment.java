@@ -1,113 +1,99 @@
 package eu.interedition.collatex.alignment;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.alignment.functions.GapDetection;
+import eu.interedition.collatex.alignment.functions.SequenceDetection;
+import eu.interedition.collatex.input.Witness;
 
 public class Alignment {
-  private final Set<Match> fixedMatches;
-  private final Set<Match> unfixedMatches;
 
-  private final Multimap<Word, Match> baseToWitness;
-  private final Multimap<Word, Match> witnessToBase;
-  private final Alignment previous;
+  private final List<MatchSequence> sequencesA;
+  private final List<MatchSequence> sequencesB;
+  private final Set<Match> matches;
+  private final List<Gap> gaps;
 
-  public Alignment(Set<Match> _fixedMatches, Set<Match> _unfixedMatches) {
-    this(_fixedMatches, _unfixedMatches, null);
-
-    //    System.out.println(fixedMatches.toString());
-    //    System.out.println(unfixedMatches.toString());
+  // Note: this constructor should take an UnfixedAlignment object as parameter!
+  public Alignment(Set<Match> _matches, Witness a, Witness b) {
+    this.matches = _matches;
+    this.sequencesA = SequenceDetection.calculateMatchSequences(matches);
+    this.sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
+    List<Gap> gaps1 = GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB);
+    List<Gap> gaps2 = GapDetection.getVariantsInMatchSequences(a, b, sequencesA);
+    gaps = Lists.newArrayList();
+    gaps.addAll(gaps1);
+    gaps.addAll(gaps2);
   }
 
-  public Alignment(Set<Match> _fixedMatches, Set<Match> _unfixedMatches, Alignment _previous) {
-    this.fixedMatches = _fixedMatches;
-    this.unfixedMatches = _unfixedMatches;
-    this.baseToWitness = groupMatchesForBase(unfixedMatches);
-    this.witnessToBase = groupMatchesForWitness(unfixedMatches);
-    this.previous = _previous;
-  }
-
-  public Set<Match> getFixedMatches() {
-    return fixedMatches;
-  }
-
-  public Set<Word> getUnfixedWords() {
-    return baseToWitness.keySet();
-  }
-
-  public Collection<Match> getMatchesThatLinkFrom(Word word) {
-    return baseToWitness.get(word);
-  }
-
-  public Collection<Match> getMatchesThatLinkTo(Word word) {
-    return witnessToBase.get(word);
-  }
-
-  public Alignment fixMatch(Match match) {
-    Set<Match> newFixedMatches = Sets.newLinkedHashSet();
-    newFixedMatches.addAll(fixedMatches);
-    newFixedMatches.add(match);
-    Set<Match> newUnfixedMatches = filterAwayNoLongerPossibleMatches(unfixedMatches, match);
-    Alignment matches = new Alignment(newFixedMatches, newUnfixedMatches, this);
+  public Set<Match> getMatches() {
     return matches;
   }
 
-  // group matches by common base word or common witness word
-  private Multimap<Word, Match> groupMatchesForBase(Set<Match> _matches) {
-    Multimap<Word, Match> matchGroupsForBase = Multimaps.newLinkedListMultimap();
-    for (Match match : _matches) {
-      matchGroupsForBase.put(match.getBaseWord(), match);
-    }
-    return matchGroupsForBase;
+  public List<MatchSequence> getMatchSequences() {
+    return sequencesA;
   }
 
-  private Multimap<Word, Match> groupMatchesForWitness(Set<Match> _matches) {
-    Multimap<Word, Match> groupMatchesForWitness = Multimaps.newLinkedListMultimap();
-    for (Match match : _matches) {
-      groupMatchesForWitness.put(match.getWitnessWord(), match);
-    }
-    return groupMatchesForWitness;
+  public List<Gap> getGaps() {
+    return gaps;
   }
 
-  private Set<Match> filterAwayNoLongerPossibleMatches(Set<Match> unfixedMatches2, Match possibleMatch) {
-    Set<Match> results = Sets.newLinkedHashSet();
-    for (Match match : unfixedMatches2) {
-      if (match.getBaseWord().equals(possibleMatch.getBaseWord()) || match.getWitnessWord().equals(possibleMatch.getWitnessWord())) {
-        // do nothing... this one should be filtered away
-      } else {
-        results.add(match);
+  public List<MatchSequence> getMatchSequencesOrderedForWitnessA() {
+    return getMatchSequences();
+  }
+
+  public List<MatchSequence> getMatchSequencesOrderedForWitnessB() {
+    return sequencesB;
+  }
+
+  public double getVariationMeasure() {
+    return 1000.0 * (sequencesA.size() - 1) + 10.0 * gaps.size() + getWordDistanceSum();
+  }
+
+  public float getWordDistanceSum() {
+    float wordDistanceSum = 0f;
+    for (MatchSequence matchSequence : sequencesA)
+      for (Match match : matchSequence.getMatches())
+        wordDistanceSum += match.wordDistance;
+    return wordDistanceSum;
+  }
+
+  public List<Gap> getAdditions() {
+    List<Gap> additions = Lists.newArrayList();
+    for (Gap gap : gaps) {
+      if (gap.isAddition()) {
+        additions.add(gap);
       }
     }
-    return results;
+    return additions;
   }
 
-  public boolean hasUnfixedWords() {
-    return !baseToWitness.keySet().isEmpty();
-  }
-
-  public List<Match> getUnfixedNearMatches() {
-    List<Match> nearMatches = Lists.newArrayList();
-    for (Match match : unfixedMatches) {
-      if (match.wordDistance > 0) {
-        nearMatches.add(match);
+  public List<Gap> getReplacements() {
+    List<Gap> replacements = Lists.newArrayList();
+    for (Gap gap : gaps) {
+      if (gap.isReplacement()) {
+        replacements.add(gap);
       }
     }
-    return nearMatches;
+    return replacements;
   }
 
-  public Set<Match> getUnfixedMatches() {
-    return unfixedMatches;
-  }
-
-  public Alignment getPrevious() {
-    return previous;
-  }
+  //  // I just need it as a list of matches
+  //  List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesOrderedForWitnessA();
+  //  List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesOrderedForWitnessB();
+  //  List<Match> matchesOrderedForTheWitness = Lists.newArrayList();
+  //  for (MatchSequence matchSeq : matchSequencesForWitness) {
+  //    for (Match match : matchSeq.getMatches()) {
+  //      matchesOrderedForTheWitness.add(match);
+  //    }
+  //  }
+  //  List<Match> matchesOrderedForTheBase = Lists.newArrayList();
+  //  for (MatchSequence matchSeq : matchSequencesForBase) {
+  //    for (Match match : matchSeq.getMatches()) {
+  //      matchesOrderedForTheBase.add(match);
+  //    }
+  //  }
 
 }

@@ -10,10 +10,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.alignment.Alignment;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
@@ -22,7 +22,7 @@ import eu.interedition.collatex.match.worddistance.WordDistance;
 public class Matcher {
 
   // Note: The WordDistance parameter should be parameterized!
-  public static Alignment align(Witness a, Witness b) {
+  public static UnfixedAlignment align(Witness a, Witness b) {
     Set<Match> allMatches = findMatches(a, b, new NormalizedLevenshtein());
 
     // Note: this code is not the simplest thing that 
@@ -38,7 +38,7 @@ public class Matcher {
     Set<Match> unfixedMatches = Sets.newLinkedHashSet(allMatches);
     unfixedMatches.removeAll(exactMatches);
 
-    Alignment alignment = new Alignment(exactMatches, unfixedMatches);
+    UnfixedAlignment alignment = new UnfixedAlignment(exactMatches, unfixedMatches);
 
     while (alignment.hasUnfixedWords()) {
       alignment = Matcher.permutate(a, b, alignment);
@@ -62,14 +62,14 @@ public class Matcher {
     return matchSet;
   }
 
-  public static Alignment permutate(Witness a, Witness b, final Alignment alignment) {
+  public static UnfixedAlignment permutate(Witness a, Witness b, final UnfixedAlignment alignment) {
     Collection<Match> unfixedMatches = getMatchesToPermutateWith(alignment);
-    List<Alignment> alignments = getAlignmentsForUnfixedMatches(alignment, unfixedMatches);
-    Alignment bestAlignment = selectBestPossibleAlignment(a, b, alignments);
+    List<UnfixedAlignment> alignments = getAlignmentsForUnfixedMatches(alignment, unfixedMatches);
+    UnfixedAlignment bestAlignment = selectBestPossibleAlignment(a, b, alignments);
     return bestAlignment;
   }
 
-  private static Collection<Match> getMatchesToPermutateWith(final Alignment alignment) {
+  private static Collection<Match> getMatchesToPermutateWith(final UnfixedAlignment alignment) {
     Word nextBase = selectNextUnfixedWordToAlign(alignment);
     Collection<Match> unfixedMatchesFrom = alignment.getMatchesThatLinkFrom(nextBase);
     Word nextWitness = unfixedMatchesFrom.iterator().next().getWitnessWord();
@@ -85,7 +85,7 @@ public class Matcher {
     return unfixedMatches;
   }
 
-  private static Word selectNextUnfixedWordToAlign(final Alignment alignment) {
+  private static Word selectNextUnfixedWordToAlign(final UnfixedAlignment alignment) {
     // Check whether there are unfixed near matches.
     // Align them first!
     // Note: this is probably not generic enough!
@@ -100,18 +100,18 @@ public class Matcher {
   }
 
   // TODO: naming here is not cool!
-  private static List<Alignment> getAlignmentsForUnfixedMatches(Alignment previousAlignment, Collection<Match> unfixedMatches) {
-    List<Alignment> permutationsForMatchGroup = Lists.newArrayList();
+  private static List<UnfixedAlignment> getAlignmentsForUnfixedMatches(UnfixedAlignment previousAlignment, Collection<Match> unfixedMatches) {
+    List<UnfixedAlignment> permutationsForMatchGroup = Lists.newArrayList();
     for (Match possibleMatch : unfixedMatches) {
-      Alignment alignment = previousAlignment.fixMatch(possibleMatch);
+      UnfixedAlignment alignment = previousAlignment.fixMatch(possibleMatch);
       alignment = fixTheOnlyOtherPossibleMatch(unfixedMatches, possibleMatch, alignment);
       permutationsForMatchGroup.add(alignment);
     }
     return permutationsForMatchGroup;
   }
 
-  private static Alignment fixTheOnlyOtherPossibleMatch(Collection<Match> unfixedMatches, Match possibleMatch, final Alignment alignment) {
-    Alignment result = alignment;
+  private static UnfixedAlignment fixTheOnlyOtherPossibleMatch(Collection<Match> unfixedMatches, Match possibleMatch, final UnfixedAlignment alignment) {
+    UnfixedAlignment result = alignment;
     if (unfixedMatches.size() == 2) {
       Set<Match> temp = Sets.newLinkedHashSet(unfixedMatches);
       temp.remove(possibleMatch);
@@ -132,20 +132,20 @@ public class Matcher {
   }
 
   // TODO: move all the collation creation out of the way!
-  private static Alignment selectBestPossibleAlignment(Witness a, Witness b, List<Alignment> alignments) {
-    Alignment bestAlignment = null;
-    Collation bestCollation = null;
+  private static UnfixedAlignment selectBestPossibleAlignment(Witness a, Witness b, List<UnfixedAlignment> alignments) {
+    UnfixedAlignment bestAlignment = null;
+    Alignment bestCollation = null;
 
     // TODO: add test for lowest number of matchsequences (transpositions)
     // NOTE: this can be done in a nicer way with the min function!
-    for (Alignment alignment : alignments) {
-      Collation collation = new Collation(alignment.getFixedMatches(), a, b);
+    for (UnfixedAlignment alignment : alignments) {
+      Alignment collation = new Alignment(alignment.getFixedMatches(), a, b);
       List<Gap> nonMatches = collation.getGaps();
       List<MatchSequence> matchSequences = collation.getMatchSequences();
       //      System.out.println(alignment.getFixedMatches().toString() + ":" + matchSequences.size() + ":" + nonMatches.size());
       if (bestAlignment == null || bestCollation == null || matchSequences.size() < bestCollation.getMatchSequences().size() || nonMatches.size() < bestCollation.getGaps().size()) {
         bestAlignment = alignment;
-        bestCollation = new Collation(bestAlignment.getFixedMatches(), a, b);
+        bestCollation = new Alignment(bestAlignment.getFixedMatches(), a, b);
       }
     }
     if (bestAlignment == null) throw new RuntimeException("Unexpected error!");

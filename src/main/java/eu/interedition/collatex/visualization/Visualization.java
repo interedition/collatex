@@ -9,14 +9,14 @@ import com.sd_editions.collatex.permutations.TranspositionDetection;
 import com.sd_editions.collatex.permutations.Tuple2;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.collation.Collation;
 
 public class Visualization {
 
-  public static Modifications getModifications(Collation collation) {
+  public static Modifications getModifications(Alignment collation) {
     List<Transposition> transpositions = Visualization.determineTranspositions(collation.getMatchSequencesOrderedForWitnessA(), collation.getMatchSequencesOrderedForWitnessB());
     List<Modification> modificationList = Visualization.determineModifications(collation.getMatches(), collation.getGaps());
     Modifications modifications = new Modifications(modificationList, transpositions, collation.getMatches());

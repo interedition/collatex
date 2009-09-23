@@ -2,10 +2,10 @@ package com.sd_editions.collatex.Web;
 
 import java.util.List;
 
+import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.collation.Collation;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -26,7 +26,7 @@ public class MatchesView {
     return result.toString();
   }
 
-  public String renderPermutation(Collation matchNonMatch) {
+  public String renderPermutation(Alignment matchNonMatch) {
     StringBuilder result = new StringBuilder();
 
     result.append("<span class=\"variance\" style=\"display:none\">Permutation: ").append(matchNonMatch.getMatches()).append('\n');
