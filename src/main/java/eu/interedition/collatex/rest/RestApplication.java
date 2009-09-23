@@ -21,6 +21,8 @@ public class RestApplication extends Application {
     Router router = new Router(getContext());
     router.attach("/tokenizer", TokenizerResource.class);
     router.attach("/alignment", AlignmentResource.class);
+    router.attach("/segmentation", SegmentationResource.class);
+    router.attach("/jsoninput", ParserResource.class);
     //      router.attachDefault(ServiceResource.class);
     //      router.attach("/authors", AuthorsResource.class);
     //      router.attach("/author/{name}", AuthorResource.class);
