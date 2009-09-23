@@ -26,13 +26,11 @@ public class JSONObjectTableVisitor implements IAlignmentTableVisitor {
 
   public void visitWord(String sigel, Word word) {
     JSONObject jsonObject2 = _columns.get(_columns.size() - 1);
-    jsonObject2.put(sigel, word.original);
-  }
-
-  public void postVisitColumn(Column column) {
-  //    JSONObject object = new JSONObject();
-  //    object.put("sigli", column.getSigli());
-  //    _columns.add(object);
+    // Note: this code is duplicated from the other JSON visitor!!
+    JSONObject w1 = new JSONObject();
+    w1.put("token", word.original);
+    ////
+    jsonObject2.put(sigel, w1);
   }
 
   @Override
