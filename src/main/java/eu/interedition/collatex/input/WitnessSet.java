@@ -3,7 +3,7 @@ package eu.interedition.collatex.input;
 import java.util.Arrays;
 import java.util.List;
 
-import eu.interedition.collatex.superbase.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 
 public class WitnessSet {
   private final List<Witness> witnesses;

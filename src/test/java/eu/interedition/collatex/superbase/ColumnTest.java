@@ -8,6 +8,8 @@ import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
+import eu.interedition.collatex.alignment.multiple_witness.Column;
+import eu.interedition.collatex.alignment.multiple_witness.Superbase;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;

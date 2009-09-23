@@ -5,11 +5,11 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.views.Element;
 
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.Column;
+import eu.interedition.collatex.alignment.multiple_witness.ColumnState;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.superbase.AlignmentTable2;
-import eu.interedition.collatex.superbase.Column;
-import eu.interedition.collatex.superbase.ColumnState;
 
 public class AppAlignmentTable {
 

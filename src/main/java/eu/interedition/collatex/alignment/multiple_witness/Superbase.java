@@ -1,4 +1,4 @@
-package eu.interedition.collatex.superbase;
+package eu.interedition.collatex.alignment.multiple_witness;
 
 import java.util.List;
 
