@@ -1,4 +1,4 @@
-package eu.interedition.collatex.rest;
+package eu.interedition.collatex.rest.examples;
 
 public class Item {
 

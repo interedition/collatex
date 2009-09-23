@@ -13,7 +13,7 @@ import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.output.AppAlignmentTable;
+import eu.interedition.collatex.parallel_segmentation.AppAlignmentTable;
 
 // Note: for the TEI XML output it is easier to
 // have a Column be a list<phrase>

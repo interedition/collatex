@@ -1,4 +1,4 @@
-package eu.interedition.collatex.output;
+package eu.interedition.collatex.parallel_segmentation;
 
 import java.util.Collection;
 import java.util.Collections;
