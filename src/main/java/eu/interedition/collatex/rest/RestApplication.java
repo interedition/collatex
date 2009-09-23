@@ -19,6 +19,7 @@ public class RestApplication extends Application {
   @Override
   public synchronized Restlet createRoot() {
     Router router = new Router(getContext());
+    router.attach("/tokenizer", TokenizerResource.class);
     //      router.attachDefault(ServiceResource.class);
     //      router.attach("/authors", AuthorsResource.class);
     //      router.attach("/author/{name}", AuthorResource.class);
