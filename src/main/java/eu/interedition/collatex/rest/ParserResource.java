@@ -1,18 +1,18 @@
 package eu.interedition.collatex.rest;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.ResourceException;
+import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
@@ -28,15 +28,19 @@ public class ParserResource extends ServerResource {
     getVariants().put(Method.POST, Arrays.asList(TYPES));
   }
 
-  @Override
-  protected Representation post(Representation entity) throws ResourceException {
+  @Post
+  public Representation acceptItem(Representation entity) {
     System.err.println("Handeling POST!");
+
+    Form form = new Form(entity);
+    String firstValue = form.getFirstValue("request");
+
     List<Word> words = Lists.newArrayList();
     int position = 1;
 
     JsonRepresentation jsonRepresentation;
     try {
-      jsonRepresentation = new JsonRepresentation(entity);
+      jsonRepresentation = new JsonRepresentation(firstValue);
       JSONArray jsonArray = jsonRepresentation.getJsonArray();
       for (int i = 0; i < jsonArray.length(); i++) {
         JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -45,9 +49,9 @@ public class ParserResource extends ServerResource {
         position++;
         words.add(word);
       }
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+      //    } catch (IOException e) {
+      //      e.printStackTrace();
+      //      throw new RuntimeException(e);
     } catch (JSONException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
