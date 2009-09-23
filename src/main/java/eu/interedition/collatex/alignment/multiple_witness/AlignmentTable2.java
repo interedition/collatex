@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
@@ -183,4 +184,11 @@ public class AlignmentTable2 {
     }
   }
 
+  public void accept(IAlignmentTableVisitor visitor) {
+    visitor.visitTable(this);
+    for (Column column : columns) {
+      column.accept(visitor);
+    }
+    visitor.postVisitTable(this);
+  }
 }

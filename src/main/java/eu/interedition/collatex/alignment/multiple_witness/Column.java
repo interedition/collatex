@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
@@ -19,7 +20,7 @@ public class Column {
   private ColumnState state;
 
   public Column(Word word) {
-    wordsProWitness = Maps.newHashMap();
+    wordsProWitness = Maps.newLinkedHashMap();
     variants = Lists.newLinkedList();
     initColumn(word);
   }
@@ -86,6 +87,15 @@ public class Column {
 
   public Set<String> getSigli() {
     return wordsProWitness.keySet();
+  }
+
+  public void accept(IAlignmentTableVisitor visitor) {
+    visitor.visitColumn(this);
+    Set<String> sigli = this.getSigli();
+    for (String sigel : sigli) {
+      Word word = wordsProWitness.get(sigel);
+      visitor.visitWord(sigel, word);
+    }
   }
 
 }

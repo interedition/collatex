@@ -20,6 +20,7 @@ public class RestApplication extends Application {
   public synchronized Restlet createRoot() {
     Router router = new Router(getContext());
     router.attach("/tokenizer", TokenizerResource.class);
+    router.attach("/alignment", AlignmentResource.class);
     //      router.attachDefault(ServiceResource.class);
     //      router.attach("/authors", AuthorsResource.class);
     //      router.attach("/author/{name}", AuthorResource.class);
