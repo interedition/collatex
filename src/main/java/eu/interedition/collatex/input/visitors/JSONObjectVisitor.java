@@ -21,7 +21,7 @@ public class JSONObjectVisitor implements IResourceVisitor {
 
   @Override
   public void postVisitWitness(Witness witness) {
-    _jsonObject.put("words", _words);
+    _jsonObject.put("tokens", _words);
   }
 
   @Override
@@ -40,7 +40,7 @@ public class JSONObjectVisitor implements IResourceVisitor {
   @Override
   public void visitWord(Word word) {
     JSONObject w1 = new JSONObject();
-    w1.put("content", word.original);
+    w1.put("token", word.original);
     _words.add(w1);
   }
 

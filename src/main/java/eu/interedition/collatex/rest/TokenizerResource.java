@@ -28,7 +28,7 @@ public class TokenizerResource extends ServerResource {
     String witnessString = getQuery().getFirstValue("witness");
     //    System.err.println("!!" + witnessString);
     WitnessBuilder builder = new WitnessBuilder();
-    Witness witness = builder.build("id", witnessString);
+    Witness witness = builder.build("witness", witnessString);
     JSONObjectVisitor visitor = new JSONObjectVisitor();
     witness.accept(visitor);
     JSONObject jsonObject = visitor.getJSONObject();
