@@ -10,6 +10,10 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.builders.WitnessBuilder;
+import eu.interedition.collatex.input.visitors.JSonVisitor;
+
 public class TokenizerResource extends ServerResource {
 
   private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
@@ -22,10 +26,18 @@ public class TokenizerResource extends ServerResource {
   public Representation get(Variant variant) throws ResourceException {
     System.err.println("##" + getQuery().getNames());
 
-    String witness = getQuery().getFirstValue("witness");
+    String witnessString = getQuery().getFirstValue("witness");
 
-    System.err.println("!!" + witness);
-    CharSequence text = witness;
+    System.err.println("!!" + witnessString);
+
+    WitnessBuilder builder = new WitnessBuilder();
+
+    Witness witness = builder.build("id", witnessString);
+
+    JSonVisitor visitor = new JSonVisitor();
+    witness.accept(visitor);
+
+    CharSequence text = visitor.getResult();
     //CharSequence text = "Welkom bij de tokenizer";
     MediaType mediaType = MediaType.TEXT_PLAIN;
     StringRepresentation result = new StringRepresentation(text, mediaType);

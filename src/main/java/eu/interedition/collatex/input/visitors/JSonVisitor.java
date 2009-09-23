@@ -17,7 +17,6 @@ public class JSonVisitor implements IResourceVisitor {
     builder = new StringBuilder();
   }
 
-  // TODO: add Witness ID!
   @Override
   public void visitWitness(Witness witness) {
     // Note: this way is not really pretty
@@ -26,7 +25,7 @@ public class JSonVisitor implements IResourceVisitor {
     // an alternative would be to collect all the words
     // in a buffer and then join them in a post method
     witnessSplitter = "";
-    builder.append("{ words: [");
+    builder.append("{ id: " + witness.id + ", words: [");
   }
 
   public void postVisitWitness(Witness witness) {
