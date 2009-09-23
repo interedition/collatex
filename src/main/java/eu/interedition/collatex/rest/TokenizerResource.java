@@ -20,7 +20,13 @@ public class TokenizerResource extends ServerResource {
 
   @Override
   public Representation get(Variant variant) throws ResourceException {
-    CharSequence text = "Welkom bij de tokenizer";
+    System.err.println("##" + getQuery().getNames());
+
+    String witness = getQuery().getFirstValue("witness");
+
+    System.err.println("!!" + witness);
+    CharSequence text = witness;
+    //CharSequence text = "Welkom bij de tokenizer";
     MediaType mediaType = MediaType.TEXT_PLAIN;
     StringRepresentation result = new StringRepresentation(text, mediaType);
     return result;
