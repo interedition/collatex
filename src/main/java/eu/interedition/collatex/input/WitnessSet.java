@@ -40,4 +40,13 @@ public class WitnessSet {
     WitnessSet set = new WitnessSet(witnesses);
     return set;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (Witness witness : witnesses) {
+      builder.append(witness.id + ": " + witness.toString() + "\n");
+    }
+    return builder.toString();
+  }
 }
