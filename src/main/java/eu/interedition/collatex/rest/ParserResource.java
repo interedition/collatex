@@ -6,15 +6,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.restlet.data.Form;
-import org.restlet.data.MediaType;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.visitors.JSONObjectTableVisitor;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
@@ -30,9 +30,15 @@ public class ParserResource extends ServerResource {
 
     JsonRepresentation jsonRepresentation;
     jsonRepresentation = new JsonRepresentation(firstValue);
-    WitnessSet createSet = createSet(jsonRepresentation);
-    Representation representation = new StringRepresentation(createSet.toString(), MediaType.TEXT_PLAIN);
-    // Representation representation = null;
+    WitnessSet set = createSet(jsonRepresentation);
+
+    // Note: duplication with AlignmentResource!
+    AlignmentTable2 alignmentTable = set.createAlignmentTable();
+    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
+    alignmentTable.accept(visitor);
+    net.sf.json.JSONObject jsonObject = visitor.getJSONObject();
+    Representation representation = new JsonLibRepresentation(jsonObject);
+
     return representation;
 
   }
