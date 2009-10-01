@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -19,7 +20,6 @@ import org.restlet.resource.ServerResource;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
-import eu.interedition.collatex.alignment.multiple_witness.visitors.JSONObjectTableVisitor;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
@@ -62,6 +62,9 @@ public class DemoResource extends ServerResource {
   public Representation get(Variant variant) throws ResourceException {
     //    Representation representation = new StringRepresentation(readFileToString);
     AlignmentTable2 alignmentTable = set.createAlignmentTable();
+    // HTML
+    String html = AlignmentTable2.alignmentTableToHTML(alignmentTable);
+    Representation representation = new StringRepresentation("<html><body>" + html + "</body></html>", MediaType.TEXT_HTML);
     // TEI
     //    String xml = alignmentTable.toXML();
     //    //    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
@@ -72,10 +75,10 @@ public class DemoResource extends ServerResource {
     // Representation representation = null;
 
     // JSON
-    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
-    alignmentTable.accept(visitor);
-    net.sf.json.JSONObject jsonObject = visitor.getJSONObject();
-    Representation representation = new JsonLibRepresentation(jsonObject);
+    //    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
+    //    alignmentTable.accept(visitor);
+    //    net.sf.json.JSONObject jsonObject = visitor.getJSONObject();
+    //    Representation representation = new JsonLibRepresentation(jsonObject);
     return representation;
   }
   //    try {

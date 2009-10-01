@@ -95,6 +95,8 @@ public class AlignmentTable2 {
     return witnesses;
   }
 
+  // TODO: move this to a visitor!
+  // TODO: separate in two steps: segmentation and xml rendering
   public String toXML() {
     AppAlignmentTable app = new AppAlignmentTable(this);
     return app.toXML();
@@ -184,11 +186,34 @@ public class AlignmentTable2 {
     }
   }
 
+  // TODO: add visitor who walks over the witnesses
+  // Note: this is a visitor who walks over the columns!
   public void accept(IAlignmentTableVisitor visitor) {
     visitor.visitTable(this);
     for (Column column : columns) {
       column.accept(visitor);
     }
     visitor.postVisitTable(this);
+  }
+
+  // TODO: move this functionalitity to a visitor!
+  public static String alignmentTableToHTML(AlignmentTable2 alignmentTable) {
+    StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
+
+    for (Witness witness : alignmentTable.getWitnesses()) {
+      tableHTML.append("<tr>");
+      tableHTML.append("<th>Witness ").append(witness.id).append(":</th>");
+      for (Column column : alignmentTable.getColumns()) {
+        tableHTML.append("<td>");
+        if (column.containsWitness(witness)) {
+          tableHTML.append(column.getWord(witness).normalized); // TODO: add escaping!
+        }
+        tableHTML.append("</td>");
+      }
+      tableHTML.append("</tr>\n");
+    }
+    tableHTML.append("</table>\n</div>\n\n");
+    //    return alignmentTable.toString().replaceAll("\n", "<br/>") + "<br/>";
+    return tableHTML.toString();
   }
 }
