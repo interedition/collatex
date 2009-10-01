@@ -62,6 +62,16 @@ public class DemoResource extends ServerResource {
   public Representation get(Variant variant) throws ResourceException {
     //    Representation representation = new StringRepresentation(readFileToString);
     AlignmentTable2 alignmentTable = set.createAlignmentTable();
+    // TEI
+    //    String xml = alignmentTable.toXML();
+    //    //    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
+    //    //    alignmentTable.accept(visitor);
+    //    //    JSONObject jsonObject = visitor.getJSONObject();
+    //    //    Representation representation = new JsonLibRepresentation(jsonObject);
+    //    Representation representation = new StringRepresentation(xml, MediaType.APPLICATION_XML);
+    // Representation representation = null;
+
+    // JSON
     JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
     alignmentTable.accept(visitor);
     net.sf.json.JSONObject jsonObject = visitor.getJSONObject();
