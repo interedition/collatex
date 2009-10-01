@@ -17,7 +17,6 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
-import eu.interedition.collatex.alignment.multiple_witness.Column;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
@@ -54,23 +53,7 @@ public class ColorsView {
     WitnessSet algorithm = new WitnessSet(witnesses);
     AlignmentTable2 alignmentTable = algorithm.createAlignmentTable();
 
-    StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
-
-    for (Witness witness : witnesses) {
-      tableHTML.append("<tr>");
-      tableHTML.append("<th>Witness ").append(witness.id).append(":</th>");
-      for (Column column : alignmentTable.getColumns()) {
-        tableHTML.append("<td>");
-        if (column.containsWitness(witness)) {
-          tableHTML.append(column.getWord(witness));
-        }
-        tableHTML.append("</td>");
-      }
-      tableHTML.append("</tr>\n");
-    }
-    tableHTML.append("</table>\n</div>\n\n");
-    //    return alignmentTable.toString().replaceAll("\n", "<br/>") + "<br/>";
-    return tableHTML.toString();
+    return AlignmentTable2.alignmentTableToHTML(alignmentTable);
   }
 
   private String messages() {
