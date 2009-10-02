@@ -20,7 +20,7 @@ import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.segments.AlignmentTable3;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
@@ -66,7 +66,7 @@ public class DemoResource extends ServerResource {
 
     // limit the number of witnesses by cutting something of the list (just a temp measure!)
 
-    witnesses = witnesses.subList(0, 5);
+    witnesses = witnesses.subList(0, 2);
 
     set = new WitnessSet(witnesses);
   }
@@ -74,9 +74,9 @@ public class DemoResource extends ServerResource {
   @Override
   public Representation get(Variant variant) throws ResourceException {
     //    Representation representation = new StringRepresentation(readFileToString);
-    AlignmentTable2 alignmentTable = set.createAlignmentTable();
+    AlignmentTable3 alignmentTable = AlignmentTable3.create(set);
     // HTML
-    String html = AlignmentTable2.alignmentTableToHTML(alignmentTable);
+    String html = AlignmentTable3.alignmentTableToHTML(alignmentTable);
     Representation representation = new StringRepresentation("<html><body>" + html + "</body></html>", MediaType.TEXT_HTML);
     // TEI
     //    String xml = alignmentTable.toXML();

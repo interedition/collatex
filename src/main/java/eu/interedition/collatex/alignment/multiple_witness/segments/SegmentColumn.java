@@ -2,12 +2,14 @@ package eu.interedition.collatex.alignment.multiple_witness.segments;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
 public class SegmentColumn {
@@ -18,6 +20,7 @@ public class SegmentColumn {
   public SegmentColumn(Segment segment) {
     this._segment = segment;
     this._segmentsProWitness = Maps.newLinkedHashMap();
+    addMatch(segment); // TODO: make this add variant!
   }
 
   @Override
@@ -49,5 +52,16 @@ public class SegmentColumn {
     }
     Segment newSegment = new Segment(witnessWords);
     addMatch(newSegment);
+  }
+
+  public boolean containsWitness(Witness witness) {
+    return _segmentsProWitness.containsKey(witness.id);
+  }
+
+  public Segment getSegment(Witness witness) {
+    if (!containsWitness(witness)) {
+      throw new NoSuchElementException();
+    }
+    return _segmentsProWitness.get(witness.id);
   }
 }

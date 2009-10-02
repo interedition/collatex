@@ -103,4 +103,28 @@ public class AlignmentTable3 {
     _columns.add(segmentColumn);
   }
 
+  public static String alignmentTableToHTML(AlignmentTable3 alignmentTable) {
+    StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
+
+    for (Witness witness : alignmentTable.getWitnesses()) {
+      tableHTML.append("<tr>");
+      tableHTML.append("<th>Witness ").append(witness.id).append(":</th>");
+      for (SegmentColumn column : alignmentTable.getColumns()) {
+        tableHTML.append("<td>");
+        if (column.containsWitness(witness)) {
+          tableHTML.append(column.getSegment(witness)); // TODO: add escaping!
+        }
+        tableHTML.append("</td>");
+      }
+      tableHTML.append("</tr>\n");
+    }
+    tableHTML.append("</table>\n</div>\n\n");
+    //    return alignmentTable.toString().replaceAll("\n", "<br/>") + "<br/>";
+    return tableHTML.toString();
+  }
+
+  private List<Witness> getWitnesses() {
+    return _witnesses;
+  }
+
 }
