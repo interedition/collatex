@@ -3,6 +3,7 @@ package eu.interedition.collatex.rest;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,10 +44,17 @@ public class DemoResource extends ServerResource {
     List<Witness> witnesses = Lists.newArrayList();
     WitnessBuilder builder = new WitnessBuilder();
     try {
+      List<String> sortedKeys = Lists.newArrayList();
       JSONObject jsonObject = new JSONObject(readFileToString);
       Iterator<String> keys = jsonObject.keys();
       while (keys.hasNext()) {
         String key = keys.next();
+        sortedKeys.add(key);
+      }
+
+      Collections.sort(sortedKeys);
+
+      for (String key : sortedKeys) {
         String text = jsonObject.getString(key);
         Witness witness = builder.build(key, text);
         witnesses.add(witness);
