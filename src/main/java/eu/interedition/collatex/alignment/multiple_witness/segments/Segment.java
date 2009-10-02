@@ -28,4 +28,8 @@ public class Segment {
     return _words;
   }
 
+  public String getWitnessId() {
+    return getWords().get(0).getWitnessId();
+  }
+
 }

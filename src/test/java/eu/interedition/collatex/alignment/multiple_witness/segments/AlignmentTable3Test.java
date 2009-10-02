@@ -3,7 +3,6 @@ package eu.interedition.collatex.alignment.multiple_witness.segments;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.input.Witness;
@@ -28,8 +27,6 @@ public class AlignmentTable3Test {
     assertEquals(expected, table.toString());
   }
 
-  // TODO: make work!
-  @Ignore
   @Test
   public void testEverythingMatches() {
     Witness w1 = builder.build("A", "the black cat");

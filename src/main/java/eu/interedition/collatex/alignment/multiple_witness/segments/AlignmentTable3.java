@@ -4,6 +4,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.alignment.Alignment;
+import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
@@ -52,11 +55,37 @@ public class AlignmentTable3 {
       return;
     }
 
-    // TODO add stuff for alignment!
-    List<Word> words = witness.getWords();
-    Segment segment = new Segment(words);
-    addColumn(new SegmentColumn(segment));
+    // make the superbase from the alignment table
+    SegmentSuperbase superbase = SegmentSuperbase.create(this);
+    Alignment compresult = CollateCore.collate(superbase, witness);
+
+    addMatchesToAlignmentTable(superbase, compresult);
     _witnesses.add(witness);
+
+    // TODO add stuff for alignment!
+
+  }
+
+  private void addMatchesToAlignmentTable(SegmentSuperbase superbase, Alignment alignment) {
+    List<MatchSequence> matchSequencesOrderedForWitnessA = alignment.getMatchSequencesOrderedForWitnessA();
+    for (MatchSequence seq : matchSequencesOrderedForWitnessA) {
+      SegmentColumn segmentColumn = superbase.getColumnFor(seq.getFirstMatch().getBaseWord());
+      // TODO: directly implement size() on column?
+      if (segmentColumn.getSegment().getWords().size() == (seq.getMatches().size())) {
+        // we have complete alignment; remember there could be added words!
+        segmentColumn.addMatchSequenceToColumn(seq);
+      } else {
+        throw new RuntimeException("Incomplete match! we have to split up Segments, and add Columns!");
+      }
+    }
+    //    Set<Match> matches = compresult.getMatches();
+    //    for (Match match : matches) {
+    //      Column column = superbase.getColumnFor(match);
+    //      Word witnessWord = match.getWitnessWord();
+    //      column.addMatch(witnessWord);
+    //    }
+
+    // TODO Auto-generated method stub
 
   }
 
