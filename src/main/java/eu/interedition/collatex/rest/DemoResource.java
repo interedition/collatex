@@ -63,6 +63,11 @@ public class DemoResource extends ServerResource {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+
+    // limit the number of witnesses by cutting something of the list (just a temp measure!)
+
+    witnesses = witnesses.subList(0, 5);
+
     set = new WitnessSet(witnesses);
   }
 

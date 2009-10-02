@@ -14,7 +14,7 @@ public class JsonOutputTest {
     Witness w1 = builder.build("id", "a b c d");
     JSONObjectVisitor visitor = new JSONObjectVisitor();
     w1.accept(visitor);
-    String expected = "{\"ID\":\"id\",\"words\":[{\"content\":\"a\"},{\"content\":\"b\"},{\"content\":\"c\"},{\"content\":\"d\"}]}";
+    String expected = "{\"ID\":\"id\",\"tokens\":[{\"token\":\"a\"},{\"token\":\"b\"},{\"token\":\"c\"},{\"token\":\"d\"}]}";
     String result = visitor.getJSONObject().toString();
     Assert.assertEquals(expected, result);
   }
