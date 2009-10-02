@@ -13,4 +13,8 @@ public class SegmentColumn {
   public String toString() {
     return _segment.toString();
   }
+
+  public void addToSuperbase(SegmentSuperbase superbase) {
+    superbase.addSegment(_segment, this);
+  }
 }

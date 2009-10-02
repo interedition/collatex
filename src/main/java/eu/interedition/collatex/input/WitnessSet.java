@@ -9,21 +9,22 @@ import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class WitnessSet {
-  private final List<Witness> witnesses;
+  private final List<Witness> _witnesses;
 
-  public WitnessSet(Witness... _witnesses) {
-    this(Arrays.asList(_witnesses));
+  public WitnessSet(Witness... witnesses) {
+    this(Arrays.asList(witnesses));
   }
 
-  public WitnessSet(List<Witness> _witnesses) {
-    this.witnesses = _witnesses;
+  public WitnessSet(List<Witness> witnesses) {
+    this._witnesses = witnesses;
   }
 
   // TODO: move this to alignmentTable2! 
   // TODO: make this a factory method!
+  // Note: already done for AlignmentTable3!
   public AlignmentTable2 createAlignmentTable() {
     AlignmentTable2 table = new AlignmentTable2();
-    for (Witness witness : witnesses) {
+    for (Witness witness : _witnesses) {
       table.addWitness(witness);
     }
     return table;
@@ -44,9 +45,13 @@ public class WitnessSet {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    for (Witness witness : witnesses) {
+    for (Witness witness : _witnesses) {
       builder.append(witness.id + ": " + witness.toString() + "\n");
     }
     return builder.toString();
+  }
+
+  public List<Witness> getWitnesses() {
+    return _witnesses;
   }
 }

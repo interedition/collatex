@@ -24,4 +24,8 @@ public class Segment {
     return replacementString;
   }
 
+  public List<Word> getWords() {
+    return _words;
+  }
+
 }
