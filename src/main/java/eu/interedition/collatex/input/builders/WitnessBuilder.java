@@ -13,7 +13,6 @@ import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.tokenization.WitnessTokenizer;
 
-
 public class WitnessBuilder {
 
   public enum ContentType {
@@ -50,7 +49,7 @@ public class WitnessBuilder {
   }
 
   public Witness build(String witnessId, String witness) {
-    WitnessTokenizer tokenizer = new WitnessTokenizer(witness, false);
+    WitnessTokenizer tokenizer = new WitnessTokenizer(witness, true);
     List<Word> words = Lists.newArrayList();
     int position = 1;
     while (tokenizer.hasNextToken()) {

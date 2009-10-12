@@ -1,14 +1,16 @@
 package eu.interedition.collatex.tokenization;
 
 public class Token {
+  private final String _original;
   private final String _text;
   private final String _punctuation;
 
   public Token(String orginal) {
-    this(orginal, "");
+    this(orginal, "", "");
   }
 
-  public Token(String text, String punctuation) {
+  public Token(String original, String text, String punctuation) {
+    this._original = original;
     this._text = text;
     this._punctuation = punctuation;
   }
@@ -19,5 +21,9 @@ public class Token {
 
   public String getPunctuation() {
     return _punctuation;
+  }
+
+  public String getOriginal() {
+    return _original;
   }
 }

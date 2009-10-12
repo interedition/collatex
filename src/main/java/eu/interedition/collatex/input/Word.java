@@ -21,12 +21,11 @@ public class Word implements ICollationResource {
 
   // TODO: notice the duplication here!
   // TODO: store punctuation!
-  // TODO: extract regularization!
   public Word(String _witnessId, Token nextToken, int _position) {
     this.witnessId = _witnessId;
-    this.original = nextToken.getText();
     this.position = _position;
-    this.normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
+    this.original = nextToken.getOriginal();
+    this.normalized = nextToken.getText();
   }
 
   @Override
