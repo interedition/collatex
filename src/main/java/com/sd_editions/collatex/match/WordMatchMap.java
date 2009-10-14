@@ -143,7 +143,6 @@ public class WordMatchMap {
   //    return colormatrix;
   //  }
 
-  @SuppressWarnings("boxing")
   public Set<ColorMatrix> getColorMatrixPermutations() {
     // colormatrix is a matrix where each row corresponds with a witness,
     // and each colum corresponds with a word in a witness.
@@ -160,7 +159,6 @@ public class WordMatchMap {
     return getColorMatrixPermutations(colormatrix, wordMatchMap, 1, 0, 0);
   }
 
-  @SuppressWarnings("boxing")
   private Set<ColorMatrix> getColorMatrixPermutations(ColorMatrix initialColormatrix, Map<String, WordMatches> wordMatchMap1, int initialColorId, int startWitnessId, int initialWordId) {
     ColorMatrix colormatrix = new ColorMatrix(initialColormatrix);
     int startWordId = initialWordId;

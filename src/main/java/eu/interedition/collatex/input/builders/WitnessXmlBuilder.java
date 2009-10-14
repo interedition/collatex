@@ -3,7 +3,6 @@ package eu.interedition.collatex.input.builders;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Random;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +19,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.Util;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
@@ -41,7 +41,7 @@ public class WitnessXmlBuilder extends WitnessStreamBuilder {
 
   @Override
   public Witness build(InputStream inputStream) throws SAXException, IOException {
-    String id = Long.toString(Math.abs(new Random().nextLong()), 5);
+    String id = Util.generateRandomId();
     Document doc = getXmlDocument(inputStream);
 
     XPath xpath = factory.newXPath();

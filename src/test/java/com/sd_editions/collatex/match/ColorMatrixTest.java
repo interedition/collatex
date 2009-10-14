@@ -15,7 +15,6 @@ public class ColorMatrixTest extends TestCase {
     testColorMatrix = new ColorMatrix(2, 3);
   }
 
-  @SuppressWarnings("boxing")
   public void testSetGetCell() {
     assertEquals(0, testColorMatrix.getCell(0, 0));
     testColorMatrix.setCell(0, 0, 1);

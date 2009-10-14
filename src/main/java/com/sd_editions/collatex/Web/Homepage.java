@@ -50,6 +50,7 @@ public class Homepage extends WebPage {
   }
 
   static class ModelForView implements Serializable {
+    private static final long serialVersionUID = 7286132981954186752L;
     private String base;
     private final String[] witnesses;
     private String html;

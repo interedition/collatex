@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.views.UseCaseView;
 
 public class UseCasePage extends WebPage {
+  private static final long serialVersionUID = 1448683054731871377L;
 
   public UseCasePage() {
     List<String[]> usecases = Lists.newArrayList();

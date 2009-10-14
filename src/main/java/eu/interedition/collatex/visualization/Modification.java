@@ -5,9 +5,6 @@ import com.sd_editions.collatex.match.views.ModificationVisitor;
 public abstract class Modification {
 
   // TODO: make abstract!
-  public void accept(ModificationVisitor modificationVisitor) {
-  // TODO Auto-generated method stub
-
-  }
+  public void accept(ModificationVisitor modificationVisitor) {}
 
 }

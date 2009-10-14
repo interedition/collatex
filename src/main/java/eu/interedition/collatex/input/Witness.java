@@ -1,10 +1,10 @@
 package eu.interedition.collatex.input;
 
 import java.util.List;
-import java.util.Random;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.Util;
 import eu.interedition.collatex.input.visitors.ICollationResource;
 import eu.interedition.collatex.input.visitors.IResourceVisitor;
 
@@ -15,7 +15,7 @@ public class Witness implements ICollationResource {
   public Witness(Word... _words) {
     if (_words == null) throw new IllegalArgumentException("List of words cannot be null.");
     if (_words.length == 0)
-      this.id = Long.toString(Math.abs(new Random().nextLong()), 5);
+      this.id = Util.generateRandomId();
     else
       this.id = _words[0].getWitnessId();
     this.words = Lists.newArrayList(_words);
