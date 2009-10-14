@@ -20,7 +20,7 @@ import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.alignment.multiple_witness.segments.AlignmentTable3;
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
@@ -74,10 +74,10 @@ public class DemoResource extends ServerResource {
   @Override
   public Representation get(Variant variant) throws ResourceException {
     //    Representation representation = new StringRepresentation(readFileToString);
-    AlignmentTable3 alignmentTable = AlignmentTable3.create(set);
+    AlignmentTable2 alignmentTable = set.createAlignmentTable();
     // HTML
-    String html = AlignmentTable3.alignmentTableToHTML(alignmentTable);
-    Representation representation = new StringRepresentation("<html><body>" + html + "</body></html>", MediaType.TEXT_HTML);
+    String html = "<html><body> " + witnessesAsString(set) + AlignmentTable2.alignmentTableToHTML(alignmentTable) + "</body></html>";
+    Representation representation = new StringRepresentation(html, MediaType.TEXT_HTML);
     // TEI
     //    String xml = alignmentTable.toXML();
     //    //    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
@@ -94,6 +94,7 @@ public class DemoResource extends ServerResource {
     //    Representation representation = new JsonLibRepresentation(jsonObject);
     return representation;
   }
+
   //    try {
   //      JSONArray witnessArray = jsonRepresentation.getJsonArray();
   //      for (int w = 0; w < witnessArray.length(); w++) {
@@ -110,6 +111,15 @@ public class DemoResource extends ServerResource {
   //      e.printStackTrace();
   //      throw new RuntimeException(e);
   //    }
+
+  private String witnessesAsString(WitnessSet set2) {
+    StringBuilder builder = new StringBuilder();
+    for (Witness w : set2.getWitnesses()) {
+      builder.append(w.toString() + "<br/>");
+    }
+    // TODO Auto-generated method stub
+    return builder.toString();
+  }
 
   //    public Witness createWitness(JSONObject object) throws JSONException {
   //      String id = object.getString("id");
