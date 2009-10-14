@@ -12,7 +12,6 @@ import org.apache.wicket.markup.html.list.ListView;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.views.UseCaseView;
 
-@SuppressWarnings("serial")
 public class UseCasePage extends WebPage {
 
   public UseCasePage() {

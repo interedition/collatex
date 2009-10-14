@@ -1,10 +1,12 @@
 package com.sd_editions.collatex.Collate;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class TupleComparatorBI implements Comparator<Tuple> {
+public class TupleComparatorBI implements Comparator<Tuple>, Serializable {
+  private static final long serialVersionUID = 2724931576152430838L;
+
   public int compare(Tuple tupA, Tuple tupB) {
-    //
     double valTup_A = transformTuple(tupA);
     double valTup_B = transformTuple(tupB);
     if (valTup_A < valTup_B) return -1;

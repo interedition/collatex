@@ -18,7 +18,6 @@ import com.sd_editions.collatex.Collate.Tuple;
 import com.sd_editions.collatex.Collate.TupleToTable;
 import com.sd_editions.collatex.Collate.WordAlignmentVisitor;
 
-@SuppressWarnings("serial")
 public class Homepage extends WebPage {
 
   public Homepage() {
@@ -50,8 +49,7 @@ public class Homepage extends WebPage {
     add(new AlignmentForm("alignmentform", model));
   }
 
-  @SuppressWarnings("serial")
-  class ModelForView implements Serializable {
+  static class ModelForView implements Serializable {
     private String base;
     private final String[] witnesses;
     private String html;
@@ -136,8 +134,7 @@ public class Homepage extends WebPage {
 
   }
 
-  @SuppressWarnings("serial")
-  class AlignmentForm extends Form {
+  static class AlignmentForm extends Form {
     private final ModelForView modelForView;
 
     public AlignmentForm(String id, ModelForView myModelForView) {

@@ -32,8 +32,8 @@ public class WordCoordinate implements Comparable<WordCoordinate> {
 
   public int compareTo(WordCoordinate o) {
     if (this.getWitnessNumber() == o.getWitnessNumber()) {
-      return new Integer(this.getPositionInWitness()).compareTo(Integer.valueOf(o.getPositionInWitness()));
+      return Integer.valueOf(this.getPositionInWitness()).compareTo(Integer.valueOf(o.getPositionInWitness()));
     }
-    return new Integer(this.getWitnessNumber()).compareTo(Integer.valueOf(o.getWitnessNumber()));
+    return Integer.valueOf(this.getWitnessNumber()).compareTo(Integer.valueOf(o.getWitnessNumber()));
   }
 }
