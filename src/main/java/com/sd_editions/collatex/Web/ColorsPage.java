@@ -90,7 +90,7 @@ class ColorsModel implements Serializable {
     List<Witness> witnessesWithId = Lists.newArrayList();
     for (int i = 0; i < witnesses.size(); i++) {
       Witness witness = witnesses.get(i);
-      Witness witnessWithId = new Witness(new Integer(i + 1).toString(), witness.getWords());
+      Witness witnessWithId = new Witness(Integer.valueOf(i + 1).toString(), witness.getWords());
       witnessesWithId.add(witnessWithId);
     }
     return new ColorsView(messages, witnessesWithId);

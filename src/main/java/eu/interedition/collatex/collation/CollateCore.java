@@ -14,11 +14,10 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
 import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.alignment.functions.GapDetection;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
@@ -118,22 +117,6 @@ public class CollateCore {
       }
     };
     Collections.sort(matchNonMatchList, comparator);
-  }
-
-  private void sortPermutationsByRelevance(List<Modifications> modificationsList) {
-    Comparator<Modifications> comparator = new Comparator<Modifications>() {
-      public int compare(Modifications o1, Modifications o2) {
-        return o1.size() - o2.size();
-      }
-    };
-    Collections.sort(modificationsList, comparator);
-  }
-
-  private List<Gap> determineNonMatches(Witness base, Witness witness, List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
-    List<Gap> variants2 = Lists.newArrayList();
-    variants2.addAll(GapDetection.getVariantsInBetweenMatchSequences(base, witness, matchSequencesForBase, matchSequencesForWitness));
-    variants2.addAll(GapDetection.getVariantsInMatchSequences(base, witness, matchSequencesForBase));
-    return variants2;
   }
 
   public List<Addition> getAdditions(List<Gap> nonMatches) {

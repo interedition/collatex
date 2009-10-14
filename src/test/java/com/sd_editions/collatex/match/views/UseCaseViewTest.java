@@ -3,7 +3,6 @@ package com.sd_editions.collatex.match.views;
 import junit.framework.TestCase;
 
 import com.sd_editions.collatex.Block.Util;
-import com.sd_editions.collatex.match.views.UseCaseView;
 
 public class UseCaseViewTest extends TestCase {
 

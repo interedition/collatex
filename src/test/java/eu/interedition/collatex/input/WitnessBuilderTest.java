@@ -146,7 +146,7 @@ public class WitnessBuilderTest extends TestCase {
   public void testNullStream() {
     try {
       try {
-        Witness w = witnessBuilder.build((InputStream) null, ContentType.TEXT_XML);
+        witnessBuilder.build((InputStream) null, ContentType.TEXT_XML);
       } catch (SAXException e) {
         fail();
       } catch (IOException e) {
@@ -159,9 +159,8 @@ public class WitnessBuilderTest extends TestCase {
   }
 
   public void testBrokenXml() {
-    Witness brokenW = null;
     try {
-      brokenW = witnessBuilder.build(brokenXmlSimpleA, ContentType.TEXT_XML);
+      witnessBuilder.build(brokenXmlSimpleA, ContentType.TEXT_XML);
       fail();
     } catch (SAXException e) {
       //
@@ -194,7 +193,7 @@ public class WitnessBuilderTest extends TestCase {
 
   public void testWrongContentType() {
     try {
-      Witness w = witnessBuilder.build(emptyXml, ContentType.value("xxx"));
+      witnessBuilder.build(emptyXml, ContentType.value("xxx"));
       fail();
     } catch (SAXException e) {
       fail();

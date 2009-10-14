@@ -3,8 +3,6 @@ package com.sd_editions.collatex.match;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sd_editions.collatex.match.ColorMatrix;
-
 import junit.framework.TestCase;
 
 public class ColorMatrixTest extends TestCase {

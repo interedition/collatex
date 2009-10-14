@@ -1,15 +1,9 @@
 package com.sd_editions.collatex.permutations;
 
-import java.util.List;
-
 import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.Gap;
-import eu.interedition.collatex.alignment.Match;
-import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -30,34 +24,6 @@ public class MatchesView {
     //    result.append("Witness B: ").append(witnessB.sentence).append('\n');
     //    for (MatchNonMatch matchNonMatch : matchNonMatches)
     //      result.append(renderPermutation(matchNonMatch));
-    return result.toString();
-  }
-
-  private String renderPermutation(Alignment matchNonMatch) {
-    StringBuilder result = new StringBuilder();
-
-    result.append(" * Permutation: ").append(matchNonMatch.getMatches()).append('\n');
-    List<MatchSequence> sequencesForBase = matchNonMatch.getMatchSequencesOrderedForWitnessA();
-    for (MatchSequence matchSequence : sequencesForBase) {
-      result.append("    * MatchSequence: ").append(matchSequence).append('\n');
-      List<Match> matches = matchSequence.getMatches();
-      for (Match match : matches) {
-        result.append("     * Match: ").append(match);
-        result.append(": ").append(match.getBaseWord()).append(" -> ").append(match.getWitnessWord());
-        result.append(", word distance: ").append(match.wordDistance).append('\n');
-      }
-    }
-
-    for (Gap nonMatch : matchNonMatch.getGaps()) {
-      result.append("    * Non-Match: ").append(nonMatch.getPhraseA()).append(" ~> ").append(nonMatch.getPhraseB());
-      result.append('\n');
-    }
-
-    result.append("   Summary: ").append(sequencesForBase.size()).append(" match sequences,\t");
-    result.append(matchNonMatch.getGaps().size()).append(" non-matches,\t");
-    result.append(matchNonMatch.getWordDistanceSum()).append(" summarized word distance,\t");
-    result.append(matchNonMatch.getVariationMeasure()).append(" variance\n");
-    result.append('\n');
     return result.toString();
   }
 

@@ -23,7 +23,6 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
-
 public class WitnessXmlBuilder extends WitnessStreamBuilder {
 
   DocumentBuilder builder = null;

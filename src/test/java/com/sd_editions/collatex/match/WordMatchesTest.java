@@ -1,8 +1,5 @@
 package com.sd_editions.collatex.match;
 
-import com.sd_editions.collatex.match.WordCoordinate;
-import com.sd_editions.collatex.match.WordMatches;
-
 import junit.framework.TestCase;
 
 public class WordMatchesTest extends TestCase {

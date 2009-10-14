@@ -6,8 +6,6 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
-
 public class NormalizedLevenshteinTest {
 
   private static final float THRESHOLD = 0.5f;

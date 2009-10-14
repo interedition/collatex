@@ -1,12 +1,8 @@
 package com.sd_editions.collatex.Web;
 
 import java.util.List;
-import java.util.Map;
 
-import com.google.common.base.Join;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.sd_editions.collatex.match.WordColorTuple;
 import com.sd_editions.collatex.permutations.WordDistanceMatch;
 import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
@@ -14,7 +10,6 @@ import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.collation.CollateCore;
@@ -81,7 +76,7 @@ public class ColorsView {
     for (int base = 1; base < numberOfWitnesses; base++) {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html.append("Comparing witness " + base + " - witness " + (w) + ":");
-        Matcher matcher = new Matcher();
+        new Matcher();
         Witness a = witnesses.get(base - 1);
         Witness b = witnesses.get(w - 1);
         Alignment collate = CollateCore.collate(a, b);
@@ -143,55 +138,6 @@ public class ColorsView {
       }
     }
     html.append("</ul>");
-    return html.toString();
-  }
-
-  @SuppressWarnings("boxing")
-  private String witnessPairView(int base, int w, Modifications modifications) {
-    StringBuffer html = new StringBuffer("<li>Colored Witnesses:<ol>");
-
-    html.append("<li value=\"" + base + "\">");
-    Witness witness1 = colors.witnesses.get(base - 1);
-    int colorcounter = 0;
-    List<String> words = Lists.newArrayList();
-    Map<Word, Integer> matchedWitnessWordColors = Maps.newHashMap();
-    int lastMatchedWitnessPosition = -1;
-    for (Word word1 : witness1.getWords()) {
-      Match match = modifications.getMatchAtBasePosition(word1.position);
-      if (match == null) {
-        if (lastMatchedWitnessPosition != -1) colorcounter++;
-        lastMatchedWitnessPosition = -1;
-      } else {
-        Word witnessWord = match.getWitnessWord();
-        int matchedWitnessPosition = witnessWord.position;
-        if (lastMatchedWitnessPosition + 1 != matchedWitnessPosition) colorcounter++;
-        matchedWitnessWordColors.put(witnessWord, colorcounter);
-        lastMatchedWitnessPosition = matchedWitnessPosition;
-      }
-      words.add(new WordColorTuple(word1.original, "color" + colorcounter).toHtml());
-    }
-    html.append(Join.join(" ", words));
-    html.append("</li>");
-
-    html.append("<li value=\"" + w + "\">");
-    Witness witness2 = colors.witnesses.get(w - 1);
-    words = Lists.newArrayList();
-    boolean lastWitnessWordWasAMatch = true;
-    for (Word word2 : witness2.getWords()) {
-      int color;
-      boolean thisWitnessWordIsAMatch = matchedWitnessWordColors.containsKey(word2);
-      if (thisWitnessWordIsAMatch) {
-        color = matchedWitnessWordColors.get(word2);
-      } else {
-        if (lastWitnessWordWasAMatch) colorcounter++;
-        color = colorcounter;
-      }
-      words.add(new WordColorTuple(word2.original, "color" + color).toHtml());
-      lastWitnessWordWasAMatch = thisWitnessWordIsAMatch;
-    }
-    html.append(Join.join(" ", words));
-    html.append("</li></ol></li>");
-
     return html.toString();
   }
 

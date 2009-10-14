@@ -14,7 +14,6 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.collation.CollateCore;
@@ -55,7 +54,7 @@ public class IgnoredTest {
       for (Alignment matchNonMatch : list) {
         println("  matchNonMatch " + list.indexOf(matchNonMatch));
         List<MatchSequence> matchSequencesForBase = matchNonMatch.getMatchSequencesOrderedForWitnessA();
-        List<Gap> nonMatches = matchNonMatch.getGaps();
+        matchNonMatch.getGaps();
         for (MatchSequence matchSequence : matchSequencesForBase) {
           println("    matchSequenceForBase " + matchSequencesForBase.indexOf(matchSequence));
           List<Match> matches = matchSequence.getMatches();
@@ -69,10 +68,6 @@ public class IgnoredTest {
         }
       }
     }
-  }
-
-  private void print(String string) {
-    System.out.print(string);
   }
 
   private void println(String string) {
@@ -98,7 +93,7 @@ public class IgnoredTest {
   }
 
   private void symmetryTest(String string1, String string2) {
-    CollateCore colors = new CollateCore(builder.build(string1), builder.build(string2));
+    new CollateCore(builder.build(string1), builder.build(string2));
     Assert.fail();
     //    Util.p("ORIGINAL");
     //    List<Modifications> permutations = colors.compareWitness(1, 2);
