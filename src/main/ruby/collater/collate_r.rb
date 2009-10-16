@@ -35,6 +35,7 @@ class Match
 	def hash
 		word1.normalized.hash + word2.normalized.hash
 	end
+	
 end
 
 class Transposition < Match 
