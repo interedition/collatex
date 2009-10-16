@@ -10,16 +10,14 @@ import eu.interedition.collatex.alignment.multiple_witness.ColumnState;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
-public class AppAlignmentTable {
+public class TeiParallelSegmentationTable {
 
   // TODO: move away the AlignmentTable 2 here!
-  // TODO: remove dependency on Element class
-  // TODO: rename AppElementTei to ColumnWithSegments
 
   private final AlignmentTable2 alignmentTable;
-  private final List<AppElementTEI> cells;
+  private final List<SegmentColumn2> cells;
 
-  public AppAlignmentTable(AlignmentTable2 _alignmentTable) {
+  public TeiParallelSegmentationTable(AlignmentTable2 _alignmentTable) {
     this.alignmentTable = _alignmentTable;
     this.cells = Lists.newArrayList();
 
@@ -29,7 +27,7 @@ public class AppAlignmentTable {
   // Note: to merge or not to merge? that is the question
   private void mergeColumns() {
     List<Column> columns = alignmentTable.getColumns();
-    AppElementTEI mergedColumn = null;
+    SegmentColumn2 mergedColumn = null;
     Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
     for (Column column : columns) {
       boolean needNewCell = previousColumn == null || !previousColumn.getColumnState().equals(column.getColumnState()) || !column.getSigli().equals(previousColumn.getSigli());
@@ -38,7 +36,7 @@ public class AppAlignmentTable {
         needNewCell = false;
       }
       if (needNewCell) {
-        mergedColumn = new AppElementTEI(this, null, null);
+        mergedColumn = new SegmentColumn2(this, null, null);
         cells.add(mergedColumn);
       }
 
@@ -76,7 +74,7 @@ public class AppAlignmentTable {
     StringBuilder result = new StringBuilder(); // FIXME initialize length
     result.append("<collation>");
     String delimiter = "";
-    for (AppElementTEI cell : cells) {
+    for (SegmentColumn2 cell : cells) {
       if (cell != null) {
         result.append(delimiter); // FIXME can we just introduce whitespace here!?
         result.append(cell.toXML());

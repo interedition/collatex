@@ -14,7 +14,7 @@ import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTa
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.parallel_segmentation.AppAlignmentTable;
+import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTable;
 
 // Note: for the TEI XML output it is easier to
 // have a Column be a list<phrase>
@@ -98,7 +98,7 @@ public class AlignmentTable2 {
   // TODO: move this to a visitor!
   // TODO: separate in two steps: segmentation and xml rendering
   public String toXML() {
-    AppAlignmentTable app = new AppAlignmentTable(this);
+    TeiParallelSegmentationTable app = new TeiParallelSegmentationTable(this);
     return app.toXML();
   }
 

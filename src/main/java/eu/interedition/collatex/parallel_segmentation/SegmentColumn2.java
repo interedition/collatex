@@ -25,15 +25,15 @@ import eu.interedition.collatex.input.Word;
  *  TODO This should probably merged with {@link AppElement}, but doing so immediately would
  *       break support for the old output format
  */
-public class AppElementTEI extends Element {
+public class SegmentColumn2 extends Element {
 
   private final Phrase base;
   private final Phrase witness;
 
   private final Map<String, Phrase> phrases;
-  private final AppAlignmentTable appAlignmentTable;
+  private final TeiParallelSegmentationTable appAlignmentTable;
 
-  public AppElementTEI(AppAlignmentTable _appAlignmentTable1, Phrase _base, Phrase _witness) {
+  public SegmentColumn2(TeiParallelSegmentationTable _appAlignmentTable1, Phrase _base, Phrase _witness) {
     this.appAlignmentTable = _appAlignmentTable1;
     this.base = _base;
     this.witness = _witness;
