@@ -12,20 +12,19 @@ import eu.interedition.collatex.input.Word;
 
 public class TeiParallelSegmentationTable {
 
-  // TODO: move away the AlignmentTable 2 here!
-
-  private final AlignmentTable2 alignmentTable;
+  // TODO: rename cells to _columns!
   private final List<SegmentColumn2> cells;
+  private final List<Witness> _witnesses;
 
-  public TeiParallelSegmentationTable(AlignmentTable2 _alignmentTable) {
-    this.alignmentTable = _alignmentTable;
+  // TODO: make this a static constructor!
+  public TeiParallelSegmentationTable(AlignmentTable2 alignmentTable) {
     this.cells = Lists.newArrayList();
-
-    mergeColumns();
+    this._witnesses = alignmentTable.getWitnesses();
+    mergeColumns(alignmentTable);
   }
 
   // Note: to merge or not to merge? that is the question
-  private void mergeColumns() {
+  private void mergeColumns(AlignmentTable2 alignmentTable) {
     List<Column> columns = alignmentTable.getColumns();
     SegmentColumn2 mergedColumn = null;
     Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
@@ -70,6 +69,7 @@ public class TeiParallelSegmentationTable {
   //
   //  }
 
+  // TODO: rename cell here!
   public String toXML() {
     StringBuilder result = new StringBuilder(); // FIXME initialize length
     result.append("<collation>");
@@ -88,7 +88,7 @@ public class TeiParallelSegmentationTable {
   }
 
   public List<Witness> getWitnesses() {
-    return alignmentTable.getWitnesses();
+    return _witnesses;
   }
 
 }
