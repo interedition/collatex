@@ -29,7 +29,7 @@ public class AlignmentTableSegmentator {
         needNewCell = false;
       }
       if (needNewCell) {
-        mergedColumn = new SegmentColumn2(alignmentTable.getWitnesses(), null, null);
+        mergedColumn = new SegmentColumn2(alignmentTable.getWitnesses());
         mergedColumns.add(mergedColumn);
       }
   
