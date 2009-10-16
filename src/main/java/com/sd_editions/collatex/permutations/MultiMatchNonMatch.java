@@ -37,9 +37,7 @@ public class MultiMatchNonMatch {
     };
     commonMatches.addAll((Collection<MultiMatch>) Iterables.transform(matchNonMatches[0].getMatches(), match2multimatch));
 
-    // now, for the rest of the nonMatches, check the basewords from the matchset against the basewords from the commonmatches
-    // add witnessword to the multimatch if the baseword is found, delete the multimatch if it's not found.
-    Function<MultiMatch, Word> extractBaseWord = new Function<MultiMatch, Word>() {
+    new Function<MultiMatch, Word>() {
       @Override
       public Word apply(MultiMatch multimatch) {
         return multimatch.getWords().get(0);

@@ -241,7 +241,6 @@ public class DotMatrix {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public void searchLCS() {
 
     boolean takeAllSeqTupIfFirstOK = false;

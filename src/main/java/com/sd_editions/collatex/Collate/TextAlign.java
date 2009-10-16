@@ -19,21 +19,21 @@ import com.sd_editions.collatex.InputPlugin.XMLInputPlugin;
 
 public class TextAlign {
 
-  private static String slot = new String("");
+  private static String slot = "";
 
   protected ArrayList<String> base; // Is needed for comparison
   protected ArrayList<String> wit; // Is needed for comparison
 
   //a collection that contains at first the original Base (index 0)
   //and all original witnesses (index 1..n) sources
-  private ArrayList<BlockStructure> txtOrig;
+  private final ArrayList<BlockStructure> txtOrig;
   //a collection that contains at first the aligned Base (index 0)
   //and all aligned witnesses (index 1..n) sources
-  private ArrayList<ArrayList<String>> txtAlign;
+  private final ArrayList<ArrayList<String>> txtAlign;
 
   // a collection that contains all witnesses align Informations
   // against the base
-  private ArrayList<ArrayList<String>> alignInfoTable;
+  private final ArrayList<ArrayList<String>> alignInfoTable;
 
   public TextAlign() {
     base = Lists.newArrayList();

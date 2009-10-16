@@ -5,8 +5,8 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;

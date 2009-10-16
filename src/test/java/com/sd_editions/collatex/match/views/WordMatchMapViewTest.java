@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.match.WordMatchMap;
-import com.sd_editions.collatex.match.views.WordMatchMapView;
 
 public class WordMatchMapViewTest extends TestCase {
   private WordMatchMapView testView;

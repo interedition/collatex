@@ -12,8 +12,8 @@ import org.apache.wicket.markup.html.list.ListView;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.views.UseCaseView;
 
-@SuppressWarnings("serial")
 public class UseCasePage extends WebPage {
+  private static final long serialVersionUID = 1448683054731871377L;
 
   public UseCasePage() {
     List<String[]> usecases = Lists.newArrayList();

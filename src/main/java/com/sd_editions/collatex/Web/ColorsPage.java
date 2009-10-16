@@ -20,8 +20,9 @@ import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.input.builders.WitnessBuilder.ContentType;
 
-@SuppressWarnings("serial")
 public class ColorsPage extends WebPage {
+
+  private static final long serialVersionUID = -1975157744504290764L;
 
   public ColorsPage() {
     ColorsModel model = new ColorsModel("", "", "", "");
@@ -33,8 +34,8 @@ public class ColorsPage extends WebPage {
 
 }
 
-@SuppressWarnings("serial")
 class ColorsModel implements Serializable {
+  private static final long serialVersionUID = -7243042041409256262L;
   public String witness1;
   public String witness2;
   public String witness3;
@@ -90,14 +91,13 @@ class ColorsModel implements Serializable {
     List<Witness> witnessesWithId = Lists.newArrayList();
     for (int i = 0; i < witnesses.size(); i++) {
       Witness witness = witnesses.get(i);
-      Witness witnessWithId = new Witness(new Integer(i + 1).toString(), witness.getWords());
+      Witness witnessWithId = new Witness(Integer.valueOf(i + 1).toString(), witness.getWords());
       witnessesWithId.add(witnessWithId);
     }
     return new ColorsView(messages, witnessesWithId);
   }
 }
 
-@SuppressWarnings("serial")
 class ColorsForm extends Form {
   private final ColorsModel modelForView;
 

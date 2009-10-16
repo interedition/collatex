@@ -43,7 +43,7 @@ public class XMLInputPlugin implements IntInputPlugin {
   //Do nothing for the moment
   }
 
-  public class SAXHandler extends DefaultHandler2 {
+  public static class SAXHandler extends DefaultHandler2 {
 
     private final BlockStructure document;
     private int lineCount;

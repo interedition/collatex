@@ -52,7 +52,7 @@ public class WordMatchMap {
       for (String word2 : allWords) {
         Word w1 = new Word(word1);
         Word w2 = new Word(word2);
-        if (w1.alignsWith(w2) && word1 != word2) {
+        if (w1.alignsWith(w2) && !word1.equals(word2)) {
           WordMatches currentMatches1 = this.wordMatchMap.get(word1);
           WordMatches currentMatches2 = this.wordMatchMap.get(word2);
           for (WordCoordinate match2 : currentMatches2.getExactMatches()) {
@@ -91,7 +91,7 @@ public class WordMatchMap {
     List<Integer> positionList = Lists.newArrayList();
     for (WordCoordinate wordCoordinate : exactMatches) {
       if (wordCoordinate.witnessNumber == i) {
-        positionList.add(new Integer(wordCoordinate.positionInWitness));
+        positionList.add(Integer.valueOf(wordCoordinate.positionInWitness));
       }
     }
     int[] positionArray = new int[positionList.size()];
@@ -143,7 +143,6 @@ public class WordMatchMap {
   //    return colormatrix;
   //  }
 
-  @SuppressWarnings("boxing")
   public Set<ColorMatrix> getColorMatrixPermutations() {
     // colormatrix is a matrix where each row corresponds with a witness,
     // and each colum corresponds with a word in a witness.
@@ -160,7 +159,6 @@ public class WordMatchMap {
     return getColorMatrixPermutations(colormatrix, wordMatchMap, 1, 0, 0);
   }
 
-  @SuppressWarnings("boxing")
   private Set<ColorMatrix> getColorMatrixPermutations(ColorMatrix initialColormatrix, Map<String, WordMatches> wordMatchMap1, int initialColorId, int startWitnessId, int initialWordId) {
     ColorMatrix colormatrix = new ColorMatrix(initialColormatrix);
     int startWordId = initialWordId;

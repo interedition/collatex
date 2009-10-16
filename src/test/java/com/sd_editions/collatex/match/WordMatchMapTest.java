@@ -8,9 +8,6 @@ import junit.framework.TestCase;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.Util;
-import com.sd_editions.collatex.match.ColorMatrix;
-import com.sd_editions.collatex.match.WordCoordinate;
-import com.sd_editions.collatex.match.WordMatchMap;
 
 public class WordMatchMapTest extends TestCase {
 

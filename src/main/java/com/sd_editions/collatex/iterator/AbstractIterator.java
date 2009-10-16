@@ -17,7 +17,7 @@ public abstract class AbstractIterator implements Iterator<Object> {
 
   final public boolean hasNext() {
     if (hasNext == null) {
-      hasNext = new Boolean(doHasNext());
+      hasNext = Boolean.valueOf(doHasNext());
     }
     return hasNext.booleanValue();
   }

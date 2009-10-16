@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;

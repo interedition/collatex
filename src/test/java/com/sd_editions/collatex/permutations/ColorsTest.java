@@ -2,7 +2,6 @@ package com.sd_editions.collatex.permutations;
 
 import junit.framework.TestCase;
 
-@SuppressWarnings("boxing")
 public class ColorsTest extends TestCase {
   public void testFirstUseCasePeter() {
   //    String[] witnesses = new String[] { "The black cat", "The black and white cat", "The black and green cat" };

@@ -1,10 +1,9 @@
 package eu.interedition.collatex.input;
 
-import eu.interedition.collatex.input.Word;
 import junit.framework.TestCase;
 
 public class WordTest extends TestCase {
-  private final String witnessId = "A";
+  private final static String witnessId = "A";
 
   public void testNormalize1() {
     Word word = new Word(witnessId, "Hello,", 1);

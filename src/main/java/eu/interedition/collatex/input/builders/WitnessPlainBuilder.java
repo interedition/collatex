@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 
 import eu.interedition.collatex.input.Witness;
 
-
 public class WitnessPlainBuilder extends WitnessStreamBuilder {
 
   @Override

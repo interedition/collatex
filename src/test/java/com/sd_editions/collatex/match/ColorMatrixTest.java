@@ -3,8 +3,6 @@ package com.sd_editions.collatex.match;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sd_editions.collatex.match.ColorMatrix;
-
 import junit.framework.TestCase;
 
 public class ColorMatrixTest extends TestCase {
@@ -17,7 +15,6 @@ public class ColorMatrixTest extends TestCase {
     testColorMatrix = new ColorMatrix(2, 3);
   }
 
-  @SuppressWarnings("boxing")
   public void testSetGetCell() {
     assertEquals(0, testColorMatrix.getCell(0, 0));
     testColorMatrix.setCell(0, 0, 1);

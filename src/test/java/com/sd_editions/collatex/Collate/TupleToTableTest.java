@@ -123,7 +123,6 @@ public class TupleToTableTest extends TestCase {
     return table;
   }
 
-  @SuppressWarnings("serial")
   private Table wordAlignmentTable(String baseString, String[] witnessStrings, Tuple[][] tuplesArray) throws FileNotFoundException, IOException, BlockStructureCascadeException {
     BlockStructure base = new StringInputPlugin(baseString).readFile();
     List<BlockStructure> witnessList = Lists.newArrayList();

@@ -3,12 +3,12 @@ package eu.interedition.collatex.input.builders;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Random;
 
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.Util;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.tokenization.WitnessTokenizer;
@@ -61,7 +61,7 @@ public class WitnessBuilder {
 
   public Witness build(String witness) {
     /* no witnessId? generate a random one */
-    return build(Long.toString(Math.abs(new Random().nextLong()), 5), witness);
+    return build(Util.generateRandomId(), witness);
   }
 
   public Witness[] buildWitnesses(String... _witnesses) {

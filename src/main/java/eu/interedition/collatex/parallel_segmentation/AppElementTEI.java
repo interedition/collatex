@@ -138,8 +138,8 @@ public class AppElementTEI extends Element {
   private Set<String> getEmptyCells() {
     List<Witness> witnesses = appAlignmentTable.getWitnesses();
     Set<String> sigliInTable = Sets.newLinkedHashSet();
-    for (Witness witness : witnesses) {
-      sigliInTable.add(witness.id);
+    for (Witness witness1 : witnesses) {
+      sigliInTable.add(witness1.id);
     }
     Set<String> emptySigli = Sets.newLinkedHashSet(sigliInTable);
     emptySigli.removeAll(phrases.keySet());

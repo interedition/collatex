@@ -26,7 +26,6 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     createResult();
   }
 
-  @SuppressWarnings("serial")
   private void createResult() {
     result = Lists.newArrayList();
   }
