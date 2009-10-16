@@ -18,13 +18,13 @@ public class TeiParallelSegmentationTable {
 
   // TODO: make this a static constructor!
   public TeiParallelSegmentationTable(AlignmentTable2 alignmentTable) {
-    this.cells = Lists.newArrayList();
     this._witnesses = alignmentTable.getWitnesses();
-    mergeColumns(alignmentTable);
+    this.cells = mergeColumns(alignmentTable);
   }
 
   // Note: to merge or not to merge? that is the question
-  private void mergeColumns(AlignmentTable2 alignmentTable) {
+  private static List<SegmentColumn2> mergeColumns(AlignmentTable2 alignmentTable) {
+    List<SegmentColumn2> mergedColumns = Lists.newArrayList();
     List<Column> columns = alignmentTable.getColumns();
     SegmentColumn2 mergedColumn = null;
     Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
@@ -35,8 +35,8 @@ public class TeiParallelSegmentationTable {
         needNewCell = false;
       }
       if (needNewCell) {
-        mergedColumn = new SegmentColumn2(_witnesses, null, null);
-        cells.add(mergedColumn);
+        mergedColumn = new SegmentColumn2(alignmentTable.getWitnesses(), null, null);
+        mergedColumns.add(mergedColumn);
       }
 
       List<Witness> witnesses = alignmentTable.getWitnesses();
@@ -50,6 +50,7 @@ public class TeiParallelSegmentationTable {
       previousColumn = column;
 
     }
+    return mergedColumns;
   }
 
   //  public AppAlignmentTable(Collation _matchNonMatch) {
