@@ -3,7 +3,6 @@ package eu.interedition.collatex.parallel_segmentation;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.match.views.Element;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.Column;
@@ -13,8 +12,12 @@ import eu.interedition.collatex.input.Word;
 
 public class AppAlignmentTable {
 
+  // TODO: move away the AlignmentTable 2 here!
+  // TODO: remove dependency on Element class
+  // TODO: rename AppElementTei to ColumnWithSegments
+
   private final AlignmentTable2 alignmentTable;
-  private final List<Element> cells;
+  private final List<AppElementTEI> cells;
 
   public AppAlignmentTable(AlignmentTable2 _alignmentTable) {
     this.alignmentTable = _alignmentTable;
@@ -73,7 +76,7 @@ public class AppAlignmentTable {
     StringBuilder result = new StringBuilder(); // FIXME initialize length
     result.append("<collation>");
     String delimiter = "";
-    for (Element cell : cells) {
+    for (AppElementTEI cell : cells) {
       if (cell != null) {
         result.append(delimiter); // FIXME can we just introduce whitespace here!?
         result.append(cell.toXML());
