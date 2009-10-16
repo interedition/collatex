@@ -14,11 +14,9 @@ public class TeiParallelSegmentationTable {
 
   // TODO: rename cells to _columns!
   private final List<SegmentColumn2> cells;
-  private final List<Witness> _witnesses;
 
   // TODO: make this a static constructor!
   public TeiParallelSegmentationTable(AlignmentTable2 alignmentTable) {
-    this._witnesses = alignmentTable.getWitnesses();
     this.cells = mergeColumns(alignmentTable);
   }
 
@@ -87,9 +85,4 @@ public class TeiParallelSegmentationTable {
 
     return result.toString();
   }
-
-  public List<Witness> getWitnesses() {
-    return _witnesses;
-  }
-
 }
