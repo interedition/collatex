@@ -35,7 +35,7 @@ public class TeiParallelSegmentationTable {
         needNewCell = false;
       }
       if (needNewCell) {
-        mergedColumn = new SegmentColumn2(this, null, null);
+        mergedColumn = new SegmentColumn2(_witnesses, null, null);
         cells.add(mergedColumn);
       }
 

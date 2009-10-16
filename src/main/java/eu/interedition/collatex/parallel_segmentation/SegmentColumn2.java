@@ -13,7 +13,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.match.views.AppElement;
-import com.sd_editions.collatex.match.views.Element;
 
 import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.input.Witness;
@@ -25,19 +24,21 @@ import eu.interedition.collatex.input.Word;
  *  TODO This should probably merged with {@link AppElement}, but doing so immediately would
  *       break support for the old output format
  */
-public class SegmentColumn2 extends Element {
 
+public class SegmentColumn2 {
+
+  // TODO: remove!
   private final Phrase base;
   private final Phrase witness;
 
   private final Map<String, Phrase> phrases;
-  private final TeiParallelSegmentationTable appAlignmentTable;
+  private final List<Witness> _witnesses;
 
-  public SegmentColumn2(TeiParallelSegmentationTable _appAlignmentTable1, Phrase _base, Phrase _witness) {
-    this.appAlignmentTable = _appAlignmentTable1;
+  public SegmentColumn2(List<Witness> witnesses, Phrase _base, Phrase _witness) {
     this.base = _base;
     this.witness = _witness;
     this.phrases = Maps.newHashMap();
+    this._witnesses = witnesses;
   }
 
   public Phrase getBase() {
@@ -48,7 +49,6 @@ public class SegmentColumn2 extends Element {
     return witness;
   }
 
-  @Override
   public String toXML() {
     // group together similar phrases
     Multimap<String, String> renderedPhraseToWitnessID = Multimaps.newArrayListMultimap();
@@ -136,9 +136,8 @@ public class SegmentColumn2 extends Element {
   }
 
   private Set<String> getEmptyCells() {
-    List<Witness> witnesses = appAlignmentTable.getWitnesses();
     Set<String> sigliInTable = Sets.newLinkedHashSet();
-    for (Witness witness1 : witnesses) {
+    for (Witness witness1 : _witnesses) {
       sigliInTable.add(witness1.id);
     }
     Set<String> emptySigli = Sets.newLinkedHashSet(sigliInTable);
@@ -147,7 +146,7 @@ public class SegmentColumn2 extends Element {
   }
 
   private boolean hasEmptyCells() {
-    return appAlignmentTable.getWitnesses().size() != phrases.size();
+    return _witnesses.size() != phrases.size();
   }
 
   private String renderSigli(Collection<String> sigli) {
