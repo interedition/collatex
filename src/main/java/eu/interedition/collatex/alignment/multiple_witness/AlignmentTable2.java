@@ -1,15 +1,10 @@
 package eu.interedition.collatex.alignment.multiple_witness;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.Gap;
-import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
@@ -36,10 +31,13 @@ public class AlignmentTable2 {
     this.witnesses = Lists.newArrayList();
   }
 
+  // allowed
+  // Note: should this be public?
   public void add(Column column) {
     columns.add(column);
   }
 
+  // allowed
   public void addVariantBefore(Column column, List<Word> witnessWords) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
@@ -53,6 +51,7 @@ public class AlignmentTable2 {
     }
   }
 
+  // allowed
   public void addVariantAtTheEnd(List<Word> witnessWords) {
     for (Word word : witnessWords) {
       Column extraColumn = new Column(word);
@@ -60,6 +59,7 @@ public class AlignmentTable2 {
     }
   }
 
+  // allowed
   public Superbase createSuperbase() {
     Superbase superbase = new Superbase();
     for (Column column : columns) {
@@ -68,6 +68,7 @@ public class AlignmentTable2 {
     return superbase;
   }
 
+  // not allowed... move away!
   public void addWitness(Witness witness) {
     if (witnesses.isEmpty()) {
       for (Word word : witness.getWords()) {
@@ -83,9 +84,9 @@ public class AlignmentTable2 {
     Superbase superbase = createSuperbase();
     Alignment compresult = CollateCore.collate(superbase, witness);
 
-    addMatchesToAlignmentTable(superbase, compresult);
-    addReplacementsToAlignmentTable(witness, superbase, compresult);
-    addAdditionsToAlignmentTable(superbase, compresult);
+    AlignmentTableCreator.addMatchesToAlignmentTable(superbase, compresult);
+    AlignmentTableCreator.addReplacementsToAlignmentTable(this, witness, superbase, compresult);
+    AlignmentTableCreator.addAdditionsToAlignmentTable(this, superbase, compresult);
   }
 
   public List<Column> getColumns() {
@@ -129,61 +130,6 @@ public class AlignmentTable2 {
     // TODO: an ordered set instead of list would be nice here
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
-    }
-  }
-
-  private void addAdditionsToAlignmentTable(Superbase superbase, Alignment compresult) {
-    List<Gap> additions = compresult.getAdditions();
-    for (Gap addition : additions) {
-      List<Word> witnessWords = addition.getPhraseB().getWords();
-      addVariantAtGap(superbase, addition, witnessWords);
-    }
-  }
-
-  // TODO: addReplacements.. should look like addAdditions method!
-  private void addReplacementsToAlignmentTable(Witness witness, Superbase superbase, Alignment compresult) {
-    List<Gap> replacements = compresult.getReplacements();
-    for (Gap replacement : replacements) {
-      // TODO: hou rekening met langere additions!
-
-      Iterator<Word> baseIterator = replacement.getPhraseA().getWords().iterator();
-      Iterator<Word> witnessIterator = replacement.getPhraseB().getWords().iterator();
-      while (baseIterator.hasNext()) {
-        Word wordInOriginal = baseIterator.next();
-        Column column = superbase.getColumnFor(wordInOriginal);
-        if (witnessIterator.hasNext()) {
-          Word wordInWitness = witnessIterator.next();
-          if (column.containsWitness(witness)) { // already have something in here from the matches phase
-            addVariantBefore(column, Lists.newArrayList(wordInWitness)); // FIXME but this doesn't handle longer sequences ...
-          } else {
-            column.addVariant(wordInWitness);
-          }
-        }
-      }
-      // still have words in the witness? add new columns after the last one from the base
-      if (witnessIterator.hasNext()) {
-        LinkedList<Word> remainingWitnessWords = Lists.newLinkedList(witnessIterator);
-        addVariantAtGap(superbase, replacement, remainingWitnessWords);
-      }
-    }
-  }
-
-  private void addMatchesToAlignmentTable(Superbase superbase, Alignment compresult) {
-    Set<Match> matches = compresult.getMatches();
-    for (Match match : matches) {
-      Column column = superbase.getColumnFor(match);
-      Word witnessWord = match.getWitnessWord();
-      column.addMatch(witnessWord);
-    }
-  }
-
-  private void addVariantAtGap(Superbase superbase, Gap gap, List<Word> witnessWords) {
-    if (gap.getPhraseA().isAtTheEnd()) {
-      addVariantAtTheEnd(witnessWords);
-    } else {
-      Match nextMatch = gap.getNextMatch();
-      Column column = superbase.getColumnFor(nextMatch);
-      addVariantBefore(column, witnessWords);
     }
   }
 
