@@ -21,8 +21,15 @@ import eu.interedition.collatex.match.worddistance.WordDistance;
 
 public class Matcher {
 
+  public static Alignment align(Witness a, Witness b) {
+    UnfixedAlignment alignment = align2(a, b);
+    Alignment collation = new Alignment(alignment.getFixedMatches(), a, b);
+    return collation;
+  }
+
+  // TODO: make private!
   // Note: The WordDistance parameter should be parameterized!
-  public static UnfixedAlignment align(Witness a, Witness b) {
+  public static UnfixedAlignment align2(Witness a, Witness b) {
     Set<Match> allMatches = findMatches(a, b, new NormalizedLevenshtein());
 
     // Note: this code is not the simplest thing that 
@@ -160,4 +167,5 @@ public class Matcher {
     };
     return Iterables.filter(pmatches, unfixedAlternativeToGivenPMatch);
   }
+
 }

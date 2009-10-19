@@ -18,7 +18,7 @@ public class PossibleMatchesTest {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    UnfixedAlignment result = Matcher.align(a, b);
+    UnfixedAlignment result = Matcher.align2(a, b);
     UnfixedAlignment firstAlignment = result.getPrevious().getPrevious().getPrevious().getPrevious();
     Word zijn = a.getWordOnPosition(1);
     Collection<Match> linked = firstAlignment.getMatchesThatLinkFrom(zijn);

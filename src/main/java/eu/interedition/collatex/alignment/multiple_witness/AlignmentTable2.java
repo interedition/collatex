@@ -5,8 +5,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.Alignment;
+import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
-import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.parallel_segmentation.AlignmentTableSegmentator;
@@ -82,11 +82,11 @@ public class AlignmentTable2 {
 
     // make the superbase from the alignment table
     Superbase superbase = createSuperbase();
-    Alignment compresult = CollateCore.collate(superbase, witness);
+    Alignment alignment = Matcher.align(superbase, witness);
 
-    AlignmentTableCreator.addMatchesToAlignmentTable(superbase, compresult);
-    AlignmentTableCreator.addReplacementsToAlignmentTable(this, witness, superbase, compresult);
-    AlignmentTableCreator.addAdditionsToAlignmentTable(this, superbase, compresult);
+    AlignmentTableCreator.addMatchesToAlignmentTable(superbase, alignment);
+    AlignmentTableCreator.addReplacementsToAlignmentTable(this, witness, superbase, alignment);
+    AlignmentTableCreator.addAdditionsToAlignmentTable(this, superbase, alignment);
   }
 
   public List<Column> getColumns() {

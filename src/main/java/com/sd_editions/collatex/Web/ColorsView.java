@@ -78,8 +78,8 @@ public class ColorsView {
         new Matcher();
         Witness a = witnesses.get(base - 1);
         Witness b = witnesses.get(w - 1);
-        Alignment collate = CollateCore.collate(a, b);
-        Modifications modifications = Visualization.getModifications(collate);
+        Alignment align = Matcher.align(a, b);
+        Modifications modifications = Visualization.getModifications(align);
         html.append(modificationsView(base, modifications));
         html.append("<br/>");
       }
