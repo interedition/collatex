@@ -45,9 +45,8 @@ public class ColorsView {
   }
 
   private String alignment() {
-    WitnessSet algorithm = new WitnessSet(witnesses);
-    AlignmentTable2 alignmentTable = algorithm.createAlignmentTable();
-
+    WitnessSet set = new WitnessSet(witnesses);
+    AlignmentTable2 alignmentTable = WitnessSet.createAlignmentTable(set);
     return AlignmentTable2.alignmentTableToHTML(alignmentTable);
   }
 

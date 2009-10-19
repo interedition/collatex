@@ -19,12 +19,10 @@ public class WitnessSet {
     this._witnesses = witnesses;
   }
 
-  // TODO: move this to alignmentTable2! 
-  // TODO: make this a factory method!
-  // Note: already done for AlignmentTable3!
-  public AlignmentTable2 createAlignmentTable() {
+  // TODO: move this to alignmentTable2 or AlignmentTableCreator! 
+  public static AlignmentTable2 createAlignmentTable(WitnessSet set) {
     AlignmentTable2 table = new AlignmentTable2();
-    for (Witness witness : _witnesses) {
+    for (Witness witness : set.getWitnesses()) {
       table.addWitness(witness);
     }
     return table;

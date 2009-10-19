@@ -33,7 +33,7 @@ public class ParserResource extends ServerResource {
     WitnessSet set = createSet(jsonRepresentation);
 
     // Note: duplication with AlignmentResource!
-    AlignmentTable2 alignmentTable = set.createAlignmentTable();
+    AlignmentTable2 alignmentTable = WitnessSet.createAlignmentTable(set);
     JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
     alignmentTable.accept(visitor);
     net.sf.json.JSONObject jsonObject = visitor.getJSONObject();

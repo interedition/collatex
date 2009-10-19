@@ -24,7 +24,7 @@ public class XMLAppOutputTest {
     Witness w2 = builder.build("B", b);
     Witness w3 = builder.build("C", c);
     WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = set.createAlignmentTable();
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     return table.toXML();
   }
 
@@ -60,7 +60,7 @@ public class XMLAppOutputTest {
     Witness w2 = builder.build("the black cat");
     Witness w3 = builder.build("the black cat");
     WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = set.createAlignmentTable();
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "<collation>the black cat</collation>";
     Assert.assertEquals(expected, table.toXML());
   }
@@ -72,7 +72,7 @@ public class XMLAppOutputTest {
     Witness w2 = builder.build("B", "the black cat");
     Witness w3 = builder.build("C", "the black");
     WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = set.createAlignmentTable();
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "<collation>the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app></collation>";
     Assert.assertEquals(expected, table.toXML());
   }
@@ -84,7 +84,7 @@ public class XMLAppOutputTest {
     Witness w2 = builder.build("B", "the white and black cat");
     Witness w3 = builder.build("C", "the white cat");
     WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = set.createAlignmentTable();
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "<collation>the <app><rdg wit='#A'/><rdg wit='#B #C'>white</rdg></app> <app><rdg wit='#A #C'/><rdg wit='#B'>and</rdg></app> <app><rdg wit='#A #B'>black</rdg><rdg wit='#C'/></app> cat</collation>"
         .replaceAll("\\'", "\\\"");
     Assert.assertEquals(expected, table.toXML());
@@ -96,7 +96,7 @@ public class XMLAppOutputTest {
     Witness w1 = builder.build("A", "the black cat");
     Witness w2 = builder.build("B", "the white and black cat");
     WitnessSet set = new WitnessSet(w1, w2);
-    AlignmentTable2 table = set.createAlignmentTable();
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "<collation>the <app><rdg wit=\"#A\"/><rdg wit=\"#B\">white and</rdg></app> black cat</collation>";
     Assert.assertEquals(expected, table.toXML());
   }

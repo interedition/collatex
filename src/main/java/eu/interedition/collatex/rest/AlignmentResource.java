@@ -29,7 +29,7 @@ public class AlignmentResource extends ServerResource {
     //    System.err.println("!!" + witnessString);
     String[] witnessStrings = getQuery().getValuesArray("witness");
     WitnessSet set = WitnessSet.createWitnessSet(witnessStrings);
-    AlignmentTable2 alignmentTable = set.createAlignmentTable();
+    AlignmentTable2 alignmentTable = WitnessSet.createAlignmentTable(set);
     JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
     alignmentTable.accept(visitor);
     JSONObject jsonObject = visitor.getJSONObject();

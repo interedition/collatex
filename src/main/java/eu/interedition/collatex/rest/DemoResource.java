@@ -74,7 +74,7 @@ public class DemoResource extends ServerResource {
   @Override
   public Representation get(Variant variant) throws ResourceException {
     //    Representation representation = new StringRepresentation(readFileToString);
-    AlignmentTable2 alignmentTable = set.createAlignmentTable();
+    AlignmentTable2 alignmentTable = WitnessSet.createAlignmentTable(set);
     // HTML
     String html = "<html><body> " + witnessesAsString(set) + AlignmentTable2.alignmentTableToHTML(alignmentTable) + "</body></html>";
     Representation representation = new StringRepresentation(html, MediaType.TEXT_HTML);

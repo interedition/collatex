@@ -26,8 +26,8 @@ public class SuperbaseAlgorithmTest {
     Witness w1 = builder.build("A", "the black cat");
     Witness w2 = builder.build("B", "the black cat");
     Witness w3 = builder.build("C", "the black cat");
-    WitnessSet magic = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = magic.createAlignmentTable();
+    WitnessSet set = new WitnessSet(w1, w2, w3);
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
     expected += "B: the|black|cat\n";
     expected += "C: the|black|cat\n";
@@ -39,8 +39,8 @@ public class SuperbaseAlgorithmTest {
     Witness w1 = builder.build("A", "the black cat");
     Witness w2 = builder.build("B", "the cat");
     Witness w3 = builder.build("C", "the black cat");
-    WitnessSet magic = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = magic.createAlignmentTable();
+    WitnessSet set = new WitnessSet(w1, w2, w3);
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
     expected += "B: the| |cat\n";
     expected += "C: the|black|cat\n";
@@ -54,8 +54,8 @@ public class SuperbaseAlgorithmTest {
     Witness w3 = builder.build("C", "the green cat");
     Witness w4 = builder.build("D", "the red cat");
     Witness w5 = builder.build("E", "the yellow cat");
-    WitnessSet magic = new WitnessSet(w1, w2, w3, w4, w5);
-    AlignmentTable2 table = magic.createAlignmentTable();
+    WitnessSet set = new WitnessSet(w1, w2, w3, w4, w5);
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
     expected += "B: the|white|cat\n";
     expected += "C: the|green|cat\n";
@@ -70,8 +70,8 @@ public class SuperbaseAlgorithmTest {
     Witness w2 = builder.build("B", "before the cat");
     Witness w3 = builder.build("C", "the black cat");
     Witness w4 = builder.build("D", "the cat walks");
-    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-    AlignmentTable2 table = magic.createAlignmentTable();
+    WitnessSet set = new WitnessSet(w1, w2, w3, w4);
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "A:  |the| |cat| \n";
     expected += "B: before|the| |cat| \n";
     expected += "C:  |the|black|cat| \n";
@@ -90,8 +90,8 @@ public class SuperbaseAlgorithmTest {
     Witness w2 = builder.build("B", "before the cat");
     Witness w3 = builder.build("C", "the black cat");
     Witness w4 = builder.build("D", "just before midnight the cat walks");
-    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-    AlignmentTable2 table = magic.createAlignmentTable();
+    WitnessSet set = new WitnessSet(w1, w2, w3, w4);
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "A:  | | |the| |cat| \n";
     expected += "B:  |before| |the| |cat| \n";
     expected += "C:  | | |the|black|cat| \n";
@@ -106,8 +106,8 @@ public class SuperbaseAlgorithmTest {
     Witness w2 = builder.build("B", "the black and white cat");
     Witness w3 = builder.build("C", "the black very special cat");
     Witness w4 = builder.build("D", "the black not very special cat");
-    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-    AlignmentTable2 table = magic.createAlignmentTable();
+    WitnessSet set = new WitnessSet(w1, w2, w3, w4);
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "A: the|black| | | |cat\n";
     expected += "B: the|black| |and|white|cat\n";
     expected += "C: the|black| |very|special|cat\n";
@@ -122,8 +122,8 @@ public class SuperbaseAlgorithmTest {
     Witness w2 = builder.build("B", "the black and white cat");
     Witness w3 = builder.build("C", "the black not very special cat");
     Witness w4 = builder.build("D", "the black very special cat");
-    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-    AlignmentTable2 table = magic.createAlignmentTable();
+    WitnessSet set = new WitnessSet(w1, w2, w3, w4);
+    AlignmentTable2 table = WitnessSet.createAlignmentTable(set);
     String expected = "A: the|black| | | |cat\n";
     expected += "B: the|black|and|white| |cat\n";
     expected += "C: the|black|not|very|special|cat\n";
