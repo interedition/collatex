@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class WitnessSet {
@@ -17,17 +16,6 @@ public class WitnessSet {
 
   public WitnessSet(List<Witness> witnesses) {
     this._witnesses = witnesses;
-  }
-
-  // TODO: move this to alignmentTable2! 
-  // TODO: make this a factory method!
-  // Note: already done for AlignmentTable3!
-  public AlignmentTable2 createAlignmentTable() {
-    AlignmentTable2 table = new AlignmentTable2();
-    for (Witness witness : _witnesses) {
-      table.addWitness(witness);
-    }
-    return table;
   }
 
   public static WitnessSet createWitnessSet(String[] witnessStrings) {

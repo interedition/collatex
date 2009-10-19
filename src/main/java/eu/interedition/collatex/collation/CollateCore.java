@@ -17,7 +17,6 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.input.Witness;
@@ -35,12 +34,6 @@ public class CollateCore {
 
   public CollateCore(List<Witness> _witnesses) {
     this.witnesses = _witnesses;
-  }
-
-  public static Alignment collate(Witness a, Witness b) {
-    UnfixedAlignment alignment = Matcher.align(a, b);
-    Alignment collation = new Alignment(alignment.getFixedMatches(), a, b);
-    return collation;
   }
 
   @Deprecated
@@ -61,8 +54,8 @@ public class CollateCore {
   }
 
   public Alignment doCompareWitnesses(Witness base, Witness witness) {
-    Alignment collation = CollateCore.collate(base, witness);
-    return collation;
+    Alignment alignment = Matcher.align(base, witness);
+    return alignment;
     //    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
     //    List<Set<Match>> permutationList = matches.permutations();
     //

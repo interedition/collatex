@@ -19,10 +19,21 @@ import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex.match.worddistance.WordDistance;
 
+// TODO: extract matching functionality from this class
+// TODO: rename class to Aligner or something like that
 public class Matcher {
 
-  // Note: The WordDistance parameter should be parameterized!
-  public static UnfixedAlignment align(Witness a, Witness b) {
+  public static Alignment align(Witness a, Witness b) {
+    UnfixedAlignment unfixedAlignment = createFirstUnfixedAlignment(a, b);
+
+    while (unfixedAlignment.hasUnfixedWords()) {
+      unfixedAlignment = Matcher.permutate(a, b, unfixedAlignment);
+    }
+    Alignment alignment = new Alignment(unfixedAlignment.getFixedMatches(), a, b);
+    return alignment;
+  }
+
+  public static UnfixedAlignment createFirstUnfixedAlignment(Witness a, Witness b) {
     Set<Match> allMatches = findMatches(a, b, new NormalizedLevenshtein());
 
     // Note: this code is not the simplest thing that 
@@ -38,13 +49,8 @@ public class Matcher {
     Set<Match> unfixedMatches = Sets.newLinkedHashSet(allMatches);
     unfixedMatches.removeAll(exactMatches);
 
-    UnfixedAlignment alignment = new UnfixedAlignment(exactMatches, unfixedMatches);
-
-    while (alignment.hasUnfixedWords()) {
-      alignment = Matcher.permutate(a, b, alignment);
-    }
-
-    return alignment;
+    UnfixedAlignment unfixedAlignment = new UnfixedAlignment(exactMatches, unfixedMatches);
+    return unfixedAlignment;
   }
 
   private static Set<Match> findMatches(Witness base, Witness witness, WordDistance distanceMeasure) {
@@ -160,4 +166,5 @@ public class Matcher {
     };
     return Iterables.filter(pmatches, unfixedAlternativeToGivenPMatch);
   }
+
 }

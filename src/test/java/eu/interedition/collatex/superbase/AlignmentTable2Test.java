@@ -5,18 +5,19 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
-// TODO: introduce witnessSet class here!
 public class AlignmentTable2Test {
   @Test
   public void testCreateSuperBase() {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("A", "the first witness");
-    AlignmentTable2 alignmentTable = new AlignmentTable2();
-    alignmentTable.addWitness(a);
-    Witness superbase = alignmentTable.createSuperbase();
+    WitnessSet set = new WitnessSet(a);
+    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
+    Witness superbase = table.createSuperbase();
     assertEquals("the first witness", superbase.toString());
   }
 
@@ -25,19 +26,18 @@ public class AlignmentTable2Test {
     WitnessBuilder builder = new WitnessBuilder();
     Witness a = builder.build("A", "the first witness");
     Witness b = builder.build("B", "the second witness");
-    AlignmentTable2 alignmentTable = new AlignmentTable2();
-    alignmentTable.addWitness(a);
-    alignmentTable.addWitness(b);
-    Witness superbase = alignmentTable.createSuperbase();
+    WitnessSet set = new WitnessSet(a, b);
+    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
+    Witness superbase = table.createSuperbase();
     assertEquals("the first second witness", superbase.toString());
   }
 
   @Test
   public void testStringOutputOneWitness() {
     WitnessBuilder builder = new WitnessBuilder();
-    Witness w1 = builder.build("A", "the black cat");
-    AlignmentTable2 table = new AlignmentTable2();
-    table.addWitness(w1);
+    Witness a = builder.build("A", "the black cat");
+    WitnessSet set = new WitnessSet(a);
+    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
@@ -45,11 +45,10 @@ public class AlignmentTable2Test {
   @Test
   public void testStringOutputTwoWitnesses() {
     WitnessBuilder builder = new WitnessBuilder();
-    Witness w1 = builder.build("A", "the black cat");
-    Witness w2 = builder.build("B", "the black cat");
-    AlignmentTable2 table = new AlignmentTable2();
-    table.addWitness(w1);
-    table.addWitness(w2);
+    Witness a = builder.build("A", "the black cat");
+    Witness b = builder.build("B", "the black cat");
+    WitnessSet set = new WitnessSet(a, b);
+    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     // TODO: add match test can be moved to a column test class? 
     //    // TODO: word contains id also, which refers to Witness
     //    Column c1 = table.getColumns().get(0);
@@ -66,11 +65,10 @@ public class AlignmentTable2Test {
   @Test
   public void testStringOutputEmptyCells() {
     WitnessBuilder builder = new WitnessBuilder();
-    Witness w1 = builder.build("A", "the black cat");
-    Witness w2 = builder.build("B", "the");
-    AlignmentTable2 table = new AlignmentTable2();
-    table.addWitness(w1);
-    table.addWitness(w2);
+    Witness a = builder.build("A", "the black cat");
+    Witness b = builder.build("B", "the");
+    WitnessSet set = new WitnessSet(a, b);
+    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     // TODO: add match test can be moved to column class?
     //    Column column = table.getColumns().get(0);
     // TODO: word contains id also, which refers to Witness
@@ -83,11 +81,10 @@ public class AlignmentTable2Test {
   @Test
   public void testTranspositionsAreNotStoredInAlignmentTable() {
     WitnessBuilder builder = new WitnessBuilder();
-    Witness w1 = builder.build("A", "the black and white cat");
-    Witness w2 = builder.build("B", "the white and black cat");
-    AlignmentTable2 table = new AlignmentTable2();
-    table.addWitness(w1);
-    table.addWitness(w2);
+    Witness a = builder.build("A", "the black and white cat");
+    Witness b = builder.build("B", "the white and black cat");
+    WitnessSet set = new WitnessSet(a, b);
+    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black|and|white|cat\n";
     expected += "B: the|black|and|white|cat\n";
     assertEquals(expected, table.toString());

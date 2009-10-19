@@ -1,20 +1,14 @@
 package eu.interedition.collatex.alignment.multiple_witness;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.Gap;
-import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
-import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.parallel_segmentation.AppAlignmentTable;
+import eu.interedition.collatex.parallel_segmentation.AlignmentTableSegmentator;
+import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTable;
 
 // Note: for the TEI XML output it is easier to
 // have a Column be a list<phrase>
@@ -35,6 +29,7 @@ public class AlignmentTable2 {
     this.witnesses = Lists.newArrayList();
   }
 
+  // Note: should this be public?
   public void add(Column column) {
     columns.add(column);
   }
@@ -67,26 +62,6 @@ public class AlignmentTable2 {
     return superbase;
   }
 
-  public void addWitness(Witness witness) {
-    if (witnesses.isEmpty()) {
-      for (Word word : witness.getWords()) {
-        add(new Column(word));
-      }
-      witnesses.add(witness);
-      return;
-    }
-
-    addWitnessToInternalList(witness);
-
-    // make the superbase from the alignment table
-    Superbase superbase = createSuperbase();
-    Alignment compresult = CollateCore.collate(superbase, witness);
-
-    addMatchesToAlignmentTable(superbase, compresult);
-    addReplacementsToAlignmentTable(witness, superbase, compresult);
-    addAdditionsToAlignmentTable(superbase, compresult);
-  }
-
   public List<Column> getColumns() {
     return columns;
   }
@@ -98,7 +73,7 @@ public class AlignmentTable2 {
   // TODO: move this to a visitor!
   // TODO: separate in two steps: segmentation and xml rendering
   public String toXML() {
-    AppAlignmentTable app = new AppAlignmentTable(this);
+    TeiParallelSegmentationTable app = AlignmentTableSegmentator.createTeiParrallelSegmentationTable(this);
     return app.toXML();
   }
 
@@ -124,65 +99,14 @@ public class AlignmentTable2 {
     return column.getWord(witness).toString();
   }
 
-  private void addWitnessToInternalList(Witness witness) {
+  // TODO: is this check still necessary?
+  // TODO: I dont think one witness is ever
+  // TODO: added twice to the table!
+  // TODO: rename to add witness?
+  void addWitnessToInternalList(Witness witness) {
     // TODO: an ordered set instead of list would be nice here
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
-    }
-  }
-
-  private void addAdditionsToAlignmentTable(Superbase superbase, Alignment compresult) {
-    List<Gap> additions = compresult.getAdditions();
-    for (Gap addition : additions) {
-      List<Word> witnessWords = addition.getPhraseB().getWords();
-      addVariantAtGap(superbase, addition, witnessWords);
-    }
-  }
-
-  // TODO: addReplacements.. should look like addAdditions method!
-  private void addReplacementsToAlignmentTable(Witness witness, Superbase superbase, Alignment compresult) {
-    List<Gap> replacements = compresult.getReplacements();
-    for (Gap replacement : replacements) {
-      // TODO: hou rekening met langere additions!
-
-      Iterator<Word> baseIterator = replacement.getPhraseA().getWords().iterator();
-      Iterator<Word> witnessIterator = replacement.getPhraseB().getWords().iterator();
-      while (baseIterator.hasNext()) {
-        Word wordInOriginal = baseIterator.next();
-        Column column = superbase.getColumnFor(wordInOriginal);
-        if (witnessIterator.hasNext()) {
-          Word wordInWitness = witnessIterator.next();
-          if (column.containsWitness(witness)) { // already have something in here from the matches phase
-            addVariantBefore(column, Lists.newArrayList(wordInWitness)); // FIXME but this doesn't handle longer sequences ...
-          } else {
-            column.addVariant(wordInWitness);
-          }
-        }
-      }
-      // still have words in the witness? add new columns after the last one from the base
-      if (witnessIterator.hasNext()) {
-        LinkedList<Word> remainingWitnessWords = Lists.newLinkedList(witnessIterator);
-        addVariantAtGap(superbase, replacement, remainingWitnessWords);
-      }
-    }
-  }
-
-  private void addMatchesToAlignmentTable(Superbase superbase, Alignment compresult) {
-    Set<Match> matches = compresult.getMatches();
-    for (Match match : matches) {
-      Column column = superbase.getColumnFor(match);
-      Word witnessWord = match.getWitnessWord();
-      column.addMatch(witnessWord);
-    }
-  }
-
-  private void addVariantAtGap(Superbase superbase, Gap gap, List<Word> witnessWords) {
-    if (gap.getPhraseA().isAtTheEnd()) {
-      addVariantAtTheEnd(witnessWords);
-    } else {
-      Match nextMatch = gap.getNextMatch();
-      Column column = superbase.getColumnFor(nextMatch);
-      addVariantBefore(column, witnessWords);
     }
   }
 
@@ -196,7 +120,7 @@ public class AlignmentTable2 {
     visitor.postVisitTable(this);
   }
 
-  // TODO: move this functionalitity to a visitor!
+  // TODO: move this functionality to a visitor!
   public static String alignmentTableToHTML(AlignmentTable2 alignmentTable) {
     StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
 

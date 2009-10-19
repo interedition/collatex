@@ -12,6 +12,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.alignment.multiple_witness.visitors.JSONObjectTableVisitor;
 import eu.interedition.collatex.input.WitnessSet;
 
@@ -29,7 +30,7 @@ public class AlignmentResource extends ServerResource {
     //    System.err.println("!!" + witnessString);
     String[] witnessStrings = getQuery().getValuesArray("witness");
     WitnessSet set = WitnessSet.createWitnessSet(witnessStrings);
-    AlignmentTable2 alignmentTable = set.createAlignmentTable();
+    AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
     JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
     alignmentTable.accept(visitor);
     JSONObject jsonObject = visitor.getJSONObject();

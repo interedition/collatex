@@ -12,6 +12,7 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
@@ -45,9 +46,8 @@ public class ColorsView {
   }
 
   private String alignment() {
-    WitnessSet algorithm = new WitnessSet(witnesses);
-    AlignmentTable2 alignmentTable = algorithm.createAlignmentTable();
-
+    WitnessSet set = new WitnessSet(witnesses);
+    AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
     return AlignmentTable2.alignmentTableToHTML(alignmentTable);
   }
 
@@ -79,8 +79,8 @@ public class ColorsView {
         new Matcher();
         Witness a = witnesses.get(base - 1);
         Witness b = witnesses.get(w - 1);
-        Alignment collate = CollateCore.collate(a, b);
-        Modifications modifications = Visualization.getModifications(collate);
+        Alignment align = Matcher.align(a, b);
+        Modifications modifications = Visualization.getModifications(align);
         html.append(modificationsView(base, modifications));
         html.append("<br/>");
       }
