@@ -8,12 +8,11 @@ import org.junit.Test;
 
 import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Match;
-import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.functions.Matcher;
-import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
+// TODO: rename to Alignment Test!
 public class MatchingTest {
 
   private WitnessBuilder builder;
@@ -24,23 +23,12 @@ public class MatchingTest {
   }
 
   @Test
-  public void testExactMatches() {
-    Witness a = builder.build("zijn hond liep aan zijn hand");
-    Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    UnfixedAlignment alignment = Matcher.align2(a, b);
-    UnfixedAlignment firstAlignment = alignment.getPrevious().getPrevious().getPrevious().getPrevious();
-    Set<Match> exactMatches = firstAlignment.getFixedMatches();
-    String expected = "[(3->4), (4->7)]";
-    Assert.assertEquals(expected, exactMatches.toString());
-  }
-
-  @Test
   // TODO: assert near matches separate?
   public void testNearMatch() {
     Witness a = builder.build("a near match");
     Witness b = builder.build("a nar match");
-    UnfixedAlignment matches = Matcher.align2(a, b);
-    Set<Match> fixedMatches = matches.getFixedMatches();
+    Alignment alignment = Matcher.align(a, b);
+    Set<Match> fixedMatches = alignment.getMatches();
     Assert.assertEquals("[(1->1), (2->2), (3->3)]", fixedMatches.toString());
   }
 
@@ -117,9 +105,8 @@ public class MatchingTest {
   public void testAlignmentTreadExactMatchesAndNearMatchesEqually() {
     Witness a = builder.build("I bought this glass, because it matches those dinner plates.");
     Witness b = builder.build("I bought those glasses.");
-    CollateCore collateCore = new CollateCore();
-    Alignment collation = collateCore.doCompareWitnesses(a, b);
-    Assert.assertEquals("[(1->1), (2->2), (3->3), (4->4)]", collation.getMatches().toString());
+    Alignment alignment = Matcher.align(a, b);
+    Assert.assertEquals("[(1->1), (2->2), (3->3), (4->4)]", alignment.getMatches().toString());
   }
 
 }
