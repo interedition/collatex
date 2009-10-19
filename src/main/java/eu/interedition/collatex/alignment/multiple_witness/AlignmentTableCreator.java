@@ -10,10 +10,40 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
 
 public class AlignmentTableCreator {
+
+  public static AlignmentTable2 createAlignmentTable(WitnessSet set) {
+    AlignmentTable2 table = new AlignmentTable2();
+    for (Witness witness : set.getWitnesses()) {
+      AlignmentTableCreator.addWitness(table, witness);
+    }
+    return table;
+  }
+
+  static void addWitness(AlignmentTable2 table, Witness witness) {
+    if (table.getWitnesses().isEmpty()) {
+      for (Word word : witness.getWords()) {
+        table.add(new Column(word));
+      }
+      table.getWitnesses().add(witness);
+      return;
+    }
+
+    table.addWitnessToInternalList(witness);
+
+    // make the superbase from the alignment table
+    Superbase superbase = table.createSuperbase();
+    Alignment alignment = Matcher.align(superbase, witness);
+
+    addMatchesToAlignmentTable(superbase, alignment);
+    addReplacementsToAlignmentTable(table, witness, superbase, alignment);
+    addAdditionsToAlignmentTable(table, superbase, alignment);
+  }
 
   static void addAdditionsToAlignmentTable(AlignmentTable2 table, Superbase superbase, Alignment compresult) {
     List<Gap> additions = compresult.getAdditions();
@@ -28,7 +58,7 @@ public class AlignmentTableCreator {
     List<Gap> replacements = compresult.getReplacements();
     for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!
-  
+
       Iterator<Word> baseIterator = replacement.getPhraseA().getWords().iterator();
       Iterator<Word> witnessIterator = replacement.getPhraseB().getWords().iterator();
       while (baseIterator.hasNext()) {

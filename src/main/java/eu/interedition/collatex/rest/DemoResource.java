@@ -21,6 +21,7 @@ import org.restlet.resource.ServerResource;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
@@ -74,7 +75,7 @@ public class DemoResource extends ServerResource {
   @Override
   public Representation get(Variant variant) throws ResourceException {
     //    Representation representation = new StringRepresentation(readFileToString);
-    AlignmentTable2 alignmentTable = WitnessSet.createAlignmentTable(set);
+    AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
     // HTML
     String html = "<html><body> " + witnessesAsString(set) + AlignmentTable2.alignmentTableToHTML(alignmentTable) + "</body></html>";
     Representation representation = new StringRepresentation(html, MediaType.TEXT_HTML);

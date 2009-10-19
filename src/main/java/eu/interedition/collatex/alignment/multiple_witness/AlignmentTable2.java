@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
@@ -31,13 +29,11 @@ public class AlignmentTable2 {
     this.witnesses = Lists.newArrayList();
   }
 
-  // allowed
   // Note: should this be public?
   public void add(Column column) {
     columns.add(column);
   }
 
-  // allowed
   public void addVariantBefore(Column column, List<Word> witnessWords) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
@@ -51,7 +47,6 @@ public class AlignmentTable2 {
     }
   }
 
-  // allowed
   public void addVariantAtTheEnd(List<Word> witnessWords) {
     for (Word word : witnessWords) {
       Column extraColumn = new Column(word);
@@ -59,34 +54,12 @@ public class AlignmentTable2 {
     }
   }
 
-  // allowed
   public Superbase createSuperbase() {
     Superbase superbase = new Superbase();
     for (Column column : columns) {
       column.addToSuperbase(superbase);
     }
     return superbase;
-  }
-
-  // not allowed... move away!
-  public void addWitness(Witness witness) {
-    if (witnesses.isEmpty()) {
-      for (Word word : witness.getWords()) {
-        add(new Column(word));
-      }
-      witnesses.add(witness);
-      return;
-    }
-
-    addWitnessToInternalList(witness);
-
-    // make the superbase from the alignment table
-    Superbase superbase = createSuperbase();
-    Alignment alignment = Matcher.align(superbase, witness);
-
-    AlignmentTableCreator.addMatchesToAlignmentTable(superbase, alignment);
-    AlignmentTableCreator.addReplacementsToAlignmentTable(this, witness, superbase, alignment);
-    AlignmentTableCreator.addAdditionsToAlignmentTable(this, superbase, alignment);
   }
 
   public List<Column> getColumns() {
@@ -126,7 +99,11 @@ public class AlignmentTable2 {
     return column.getWord(witness).toString();
   }
 
-  private void addWitnessToInternalList(Witness witness) {
+  // TODO: is this check still necessary?
+  // TODO: I dont think one witness is ever
+  // TODO: added twice to the table!
+  // TODO: rename to add witness?
+  void addWitnessToInternalList(Witness witness) {
     // TODO: an ordered set instead of list would be nice here
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
@@ -143,7 +120,7 @@ public class AlignmentTable2 {
     visitor.postVisitTable(this);
   }
 
-  // TODO: move this functionalitity to a visitor!
+  // TODO: move this functionality to a visitor!
   public static String alignmentTableToHTML(AlignmentTable2 alignmentTable) {
     StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
 

@@ -14,6 +14,7 @@ import org.restlet.resource.ServerResource;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.alignment.multiple_witness.visitors.JSONObjectTableVisitor;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
@@ -33,7 +34,7 @@ public class ParserResource extends ServerResource {
     WitnessSet set = createSet(jsonRepresentation);
 
     // Note: duplication with AlignmentResource!
-    AlignmentTable2 alignmentTable = WitnessSet.createAlignmentTable(set);
+    AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
     JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
     alignmentTable.accept(visitor);
     net.sf.json.JSONObject jsonObject = visitor.getJSONObject();

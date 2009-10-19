@@ -11,6 +11,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
+import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.input.WitnessSet;
 
 public class SegmentationResource extends ServerResource {
@@ -27,7 +28,7 @@ public class SegmentationResource extends ServerResource {
     //    System.err.println("!!" + witnessString);
     String[] witnessStrings = getQuery().getValuesArray("witness");
     WitnessSet set = WitnessSet.createWitnessSet(witnessStrings);
-    AlignmentTable2 alignmentTable = WitnessSet.createAlignmentTable(set);
+    AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
     // TODO: make a visitor out of this! (this is actually tei parallel segmentation)
     String xml = alignmentTable.toXML();
     //    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
