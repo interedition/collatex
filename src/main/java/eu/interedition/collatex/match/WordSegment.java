@@ -18,6 +18,7 @@ public class WordSegment {
   public String title;
   private final Multimap<String, List<Word>> wordsPerWitness = Multimaps.newArrayListMultimap();
   private int size;
+  public List<String> wordsInSegments;
 
   public WordSegment(String _title) {
     this.title = _title;
@@ -33,14 +34,15 @@ public class WordSegment {
     return title;
   }
 
-  public void grow(HashMap<String, Witness> witnessHash) {
+  public void grow(HashMap<String, Witness> witnessHash, List<String> _wordsInSegments) {
+    this.wordsInSegments = _wordsInSegments;
     boolean nextWordsMatch = true;
     while (nextWordsMatch) {
       Set<String> nextWordSet = Sets.newHashSet();
       Map<String, Word> nextWords = Maps.newHashMap();
       for (List<Word> wordList : wordsPerWitness.values()) {
         Word nextWord = getNextWord(wordList, witnessHash);
-        if (nextWord == null) {
+        if (nextWord == null || this.wordsInSegments.contains(SegmentExtractor.wordIdentifier(nextWord))) {
           nextWordSet.add(null);
         } else {
           nextWords.put(nextWord.getWitnessId(), nextWord);
@@ -49,14 +51,11 @@ public class WordSegment {
       }
       nextWordsMatch = (nextWordSet.size() == 1 && !nextWordSet.contains(null));
       if (nextWordsMatch) {
-        //        Collection<Entry<String, List<Word>>> entries = wordsPerWitness.entries();
-        //        for (Entry<String, List<Word>> entry : entries) {
-        //          
-        //        }
-
-        //        for (Entry<String, List<Word>> entry : wordsPerWitness.entrySet()) {
-        //          entry.getValue().add(nextWords.get(entry.getKey()));
-        //        }
+        for (java.util.Map.Entry<String, List<Word>> entry : wordsPerWitness.entries()) {
+          Word nextWord = nextWords.get(entry.getKey());
+          this.wordsInSegments.add(SegmentExtractor.wordIdentifier(nextWord));
+          entry.getValue().add(nextWord);
+        }
         this.title += " " + nextWordSet.iterator().next();
         this.size++;
       }

@@ -1,10 +1,11 @@
 package eu.interedition.collatex.match;
 
 import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
@@ -12,11 +13,15 @@ import eu.interedition.collatex.input.Word;
 public class SegmentExtractor {
 
   private static HashMap<String, Witness> witnessHash = Maps.newHashMap();
+  private static List<String> possibleWordsInSegments;
+  private static List<String> wordsInSegments;
 
-  public static Set<WordSegment> extractSegmentSet(Witness... witnesses) {
-    Set<WordSegment> segmentSet = Sets.newHashSet();
+  public static List<WordSegment> extractSegments(Witness... witnesses) {
+    possibleWordsInSegments = Lists.newArrayList();
+    wordsInSegments = Lists.newArrayList();
 
     for (Witness witness : witnesses) {
+      Util.p(witness);
       witnessHash.put(witness.id, witness);
     }
 
@@ -28,53 +33,64 @@ public class SegmentExtractor {
       for (int position1 = 1; position1 < witnessSize1; position1++) {
         Word baseWord0 = witness1.getWordOnPosition(position1);
         Word baseWord1 = witness1.getWordOnPosition(position1 + 1);
-        wordpairs.addWordPair(baseWord0, baseWord1);
-        //        List<Word> pair1 = Lists.newArrayList(word0, word1);
         String normalized0 = baseWord0.normalized;
         String normalized1 = baseWord1.normalized;
-        //        String segmentTitle = normalized0 + " " + normalized1;
+        if (wordsNotInSegments(baseWord0, baseWord1)) {
+          boolean matchingPairFound = false;
+          addPairOccurancesInWitness(wordpairs, witness1, witnessSize1, position1, baseWord0, baseWord1, normalized0, normalized1);
 
-        // Check if this pair appears again in this witness 
-        //        WordSegment ws = null;
-        for (int position2 = position1 + 2; position2 < witnessSize1; position2++) {
-          if (pairFound(normalized0, normalized1, witness1, position2)) {
-            wordpairs.addWordPair(baseWord0, baseWord1);
-            //            if (ws == null) {
-            //              ws = new WordSegment(segmentTitle);
-            //              ws.addWitnessPair(witness1.id, pair1);
-            //            }
-            //            ws.addWitnessPair(witness1.id, Lists.newArrayList(witness1.getWordOnPosition(position2), witness1.getWordOnPosition(position2 + 1)));
-          }
-        }
-
-        // check the other witnesses for the same pair
-        for (int j = witness_index + 1; j < witnesses.length; j++) {
-          Witness witness2 = witnesses[j];
-          int witnessSize2 = witness2.size();
-          for (int position2 = 1; position2 < witnessSize2; position2++) {
-            if (pairFound(normalized0, normalized1, witness2, position2)) {
-              //              if (ws == null) {
-              //                ws = new WordSegment(segmentTitle);
-              //                ws.addWitnessPair(witness1.id, pair1);
-              //              }
-              //              ws.addWitnessPair(witness2.id, Lists.newArrayList(witness2.getWordOnPosition(position2), witness2.getWordOnPosition(position2 + 1)));
+          // Check if this pair appears again in the other witnesses
+          for (int i = witness_index + 1; i < witnesses.length; i++) {
+            Witness witness2 = witnesses[i];
+            int witnessSize2 = witness2.size();
+            for (int position2 = 1; position2 < witnessSize2; position2++) {
+              Word word0 = witness2.getWordOnPosition(position2);
+              Word word1 = witness2.getWordOnPosition(position2 + 1);
+              if (wordsNotInSegments(word0, word1) && pairFound(normalized0, normalized1, witness2, position2)) {
+                matchingPairFound = true;
+                addPairOccurancesInWitness(wordpairs, witness2, witnessSize2, position2, word0, word1, normalized0, normalized1);
+              }
             }
+            if (matchingPairFound) wordsInSegments.addAll(possibleWordsInSegments);
           }
         }
-        //        if (ws != null) {
-        //          ws.grow(witnessHash);
-        //          segmentSet.add(ws);
-        //          position1 += (ws.size() - 1);
-        //        }
       }
       witness_index++;
     }
 
-    return segmentSet;
+    return wordpairs.getWordSegments(wordsInSegments);
+  }
+
+  private static void addPairOccurancesInWitness(WordPairCollection wordpairs, Witness witness, int witnessSize, int position, Word baseWord0, Word baseWord1, String normalized0, String normalized1) {
+    addWordPair(wordpairs, baseWord0, baseWord1);
+    for (int position1 = position + 2; position1 < witnessSize; position1++) {
+      if (pairFound(normalized0, normalized1, witness, position1)) {
+        Word word0 = witness.getWordOnPosition(position1);
+        Word word1 = witness.getWordOnPosition(position1 + 1);
+        if (wordsNotInSegments(word0, word1)) {
+          addWordPair(wordpairs, word0, word1);
+        }
+      }
+    }
+  }
+
+  private static void addWordPair(WordPairCollection wordpairs, Word baseWord0, Word baseWord1) {
+    possibleWordsInSegments.add(wordIdentifier(baseWord0));
+    possibleWordsInSegments.add(wordIdentifier(baseWord1));
+    wordpairs.addWordPair(baseWord0, baseWord1);
+  }
+
+  private static boolean wordsNotInSegments(Word baseWord0, Word baseWord1) {
+    return !(wordsInSegments.contains(wordIdentifier(baseWord0)) || wordsInSegments.contains(wordIdentifier(baseWord1)));
   }
 
   private static boolean pairFound(String normalized0, String normalized1, Witness witness2, int position2) {
     return (witness2.getWordOnPosition(position2).normalized.equals(normalized0)) && //
         (witness2.getWordOnPosition(position2 + 1).normalized.equals(normalized1));
   }
+
+  public static String wordIdentifier(Word word) {
+    return word.getWitnessId() + "." + word.position;
+  }
+
 }
