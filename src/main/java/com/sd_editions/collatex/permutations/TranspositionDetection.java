@@ -11,13 +11,13 @@ import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 
 public class TranspositionDetection {
-  final Witness witness;
-  final Witness witness2;
+  final Segment witness;
+  final Segment witness2;
 
-  public TranspositionDetection(Witness _witness, Witness _witness2) {
+  public TranspositionDetection(Segment _witness, Segment _witness2) {
     this.witness = _witness;
     this.witness2 = _witness2;
   }

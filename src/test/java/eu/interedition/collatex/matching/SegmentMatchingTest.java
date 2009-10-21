@@ -13,7 +13,7 @@ import org.junit.Before;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.match.SegmentExtractor;
 import eu.interedition.collatex.match.WordSegment;
@@ -34,8 +34,8 @@ public class SegmentMatchingTest {
 
   //  @Test
   public void testExtractSegments1() {
-    Witness a = builder.build("a", "zijn hond liep aan zijn hand");
-    Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
+    Segment a = builder.build("a", "zijn hond liep aan zijn hand");
+    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
 
     List<WordSegment> segments = SegmentExtractor.extractSegments(a, b);
     assert1(segments);
@@ -51,8 +51,8 @@ public class SegmentMatchingTest {
 
   //  @Test
   public void testExtractSegments2() {
-    Witness a = builder.build("a", "zijn hond liep aan zijn hand op zijn dag");
-    Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand op zijn dag");
+    Segment a = builder.build("a", "zijn hond liep aan zijn hand op zijn dag");
+    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand op zijn dag");
 
     List<WordSegment> segments = SegmentExtractor.extractSegments(a, b);
     assert2(segments);
@@ -68,9 +68,9 @@ public class SegmentMatchingTest {
 
   //  @Test
   public void testExtractSegments3() {
-    Witness a = builder.build("a", "zijn hond liep aan zijn hand");
-    Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
-    Witness c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
+    Segment a = builder.build("a", "zijn hond liep aan zijn hand");
+    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
+    Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
 
     List<WordSegment> segments = SegmentExtractor.extractSegments(a, b, c);
     assert3(segments);

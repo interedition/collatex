@@ -19,27 +19,27 @@ import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex.visualization.Modifications;
 import eu.interedition.collatex.visualization.Visualization;
 
 public class CollateCore {
 
-  public final List<Witness> witnesses;
+  public final List<Segment> witnesses;
 
-  public CollateCore(Witness... _witnesses) {
+  public CollateCore(Segment... _witnesses) {
     this(Lists.newArrayList(_witnesses));
   }
 
-  public CollateCore(List<Witness> _witnesses) {
+  public CollateCore(List<Segment> _witnesses) {
     this.witnesses = _witnesses;
   }
 
   @Deprecated
   public Modifications compareWitness(int i, int j) {
-    Witness base = getWitness(i);
-    Witness witness = getWitness(j);
+    Segment base = getWitness(i);
+    Segment witness = getWitness(j);
     Alignment collation = compareWitnesses(base, witness);
     Modifications modifications = Visualization.getModifications(collation);
     return modifications;
@@ -53,7 +53,7 @@ public class CollateCore {
     //    return modificationsList;
   }
 
-  public Alignment doCompareWitnesses(Witness base, Witness witness) {
+  public Alignment doCompareWitnesses(Segment base, Segment witness) {
     Alignment alignment = Matcher.align(base, witness);
     return alignment;
     //    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
@@ -70,7 +70,7 @@ public class CollateCore {
     // return matchNonMatchList;
   }
 
-  public Alignment compareWitnesses(Witness w1, Witness w2) {
+  public Alignment compareWitnesses(Segment w1, Segment w2) {
     return doCompareWitnesses(w1, w2);
     //    List<MatchNonMatch> matchNonMatchList = doCompareWitnesses(w1, w2);
     //    sortPermutationsByVariation(matchNonMatchList);
@@ -155,7 +155,7 @@ public class CollateCore {
     return new Matches(getWitness(i), getWitness(j), new NormalizedLevenshtein());
   }
 
-  public Witness getWitness(int i) {
+  public Segment getWitness(int i) {
     return witnesses.get(i - 1);
   }
 
@@ -165,8 +165,8 @@ public class CollateCore {
 
   @Deprecated
   public List<MatchSequence> getMatchSequences(int i, int j) {
-    Witness base = getWitness(i);
-    Witness witness = getWitness(j);
+    Segment base = getWitness(i);
+    Segment witness = getWitness(j);
     Matches xmatches = new Matches(base, witness, new NormalizedLevenshtein());
     List<Set<Match>> permutationList = xmatches.permutations();
     Set<Match> matches = permutationList.get(0);

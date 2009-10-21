@@ -9,11 +9,11 @@ import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.Phrase;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class GapDetection {
-  public static List<Gap> getVariantsInMatchSequences(Witness base, Witness witness, List<MatchSequence> sequences) {
+  public static List<Gap> getVariantsInMatchSequences(Segment base, Segment witness, List<MatchSequence> sequences) {
     List<Gap> variants = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
       List<Match> matches = sequence.getMatches();
@@ -46,7 +46,7 @@ public class GapDetection {
     return variants;
   }
 
-  public static List<Gap> getVariantsInBetweenMatchSequences(Witness base, Witness witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
+  public static List<Gap> getVariantsInBetweenMatchSequences(Segment base, Segment witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
     List<Phrase> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
     List<Phrase> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
     List<Match> nextMatchesWitness = getNextMatchesWitness(sequencesWitness);
@@ -77,7 +77,7 @@ public class GapDetection {
   // TODO: rename gaps to phrases
   // this method is made for the base... 
   @SuppressWarnings("boxing")
-  private static List<Phrase> getGapsFromInBetweenMatchSequencesForBase(Witness witness, List<MatchSequence> sequences) {
+  private static List<Phrase> getGapsFromInBetweenMatchSequencesForBase(Segment witness, List<MatchSequence> sequences) {
     int currentIndex = 1;
     Word previousWord = null;
     Word nextWord = null;
@@ -100,7 +100,7 @@ public class GapDetection {
   // TODO: rename gaps to phrases
   // this method is made for the witness...
   @SuppressWarnings("boxing")
-  private static List<Phrase> getGapsFromInBetweenMatchSequencesForWitness(Witness witness, List<MatchSequence> sequences) {
+  private static List<Phrase> getGapsFromInBetweenMatchSequencesForWitness(Segment witness, List<MatchSequence> sequences) {
     int currentIndex = 1;
     Word previousWord = null;
     Word nextWord = null;

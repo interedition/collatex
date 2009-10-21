@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class MultiMatchMapTest extends TestCase {
@@ -19,9 +19,9 @@ public class MultiMatchMapTest extends TestCase {
 
   @Test
   public void testDetermineBase() {
-    Witness witness1 = builder.build("The Black Cat");
-    Witness witness2 = builder.build("The Cat and the Dog");
-    Witness witness3 = builder.build("The White Cat");
+    Segment witness1 = builder.build("The Black Cat");
+    Segment witness2 = builder.build("The Cat and the Dog");
+    Segment witness3 = builder.build("The White Cat");
     MultiMatchMap mmm = new MultiMatchMap(witness1, witness2, witness3);
     assertEquals(2, mmm.keySet().size());
     assertTrue(mmm.containsKey("the"));
@@ -39,9 +39,9 @@ public class MultiMatchMapTest extends TestCase {
 
   @Test
   public void testMultiMatchShrinksAtThirdWitness() {
-    Witness witness1 = builder.build("The Black Cat");
-    Witness witness2 = builder.build("The black dog and white cat");
-    Witness witness3 = builder.build("The White Cat");
+    Segment witness1 = builder.build("The Black Cat");
+    Segment witness2 = builder.build("The black dog and white cat");
+    Segment witness3 = builder.build("The White Cat");
     MultiMatchMap mmm = new MultiMatchMap(witness1, witness2, witness3);
     assertEquals(2, mmm.keySet().size());
     assertTrue(mmm.containsKey("the"));

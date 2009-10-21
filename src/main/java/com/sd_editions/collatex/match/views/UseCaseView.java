@@ -9,7 +9,7 @@ import com.sd_editions.collatex.Web.ColorsView;
 import com.sd_editions.collatex.match.WordMatchMap;
 
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class UseCaseView {
@@ -18,7 +18,7 @@ public class UseCaseView {
 
   private final List<BlockStructure> witnessList;
 
-  private final Witness[] witnesses;
+  private final Segment[] witnesses;
 
   //  private final Set<ColorMatrix> colorMatrixPermutations;
 

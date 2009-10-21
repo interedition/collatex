@@ -9,17 +9,17 @@ import java.util.Map.Entry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class WordPairCollection {
   protected final Map<String, Map<String, List<List<Word>>>> wordPairs = Maps.newHashMap();
-  private final HashMap<String, Witness> witnessHash;
+  private final HashMap<String, Segment> witnessHash;
   public List<String> wordsInSegments;
 
   //  private final List<String> wordsInSegments = Lists.newArrayList();
 
-  public WordPairCollection(HashMap<String, Witness> _witnessHash) {
+  public WordPairCollection(HashMap<String, Segment> _witnessHash) {
     this.witnessHash = _witnessHash;
   }
 
@@ -77,8 +77,8 @@ public class WordPairCollection {
             wordSegment.addWitnessPair(entry3.getKey(), entry3.getValue());
           }
         } else {
-//          Entry<String, List<Word>> entry3 = pairPerWitness.entrySet().iterator().next();
-//          wordSegment.addWitnessPair(entry3.getKey(), entry3.getValue());
+          //          Entry<String, List<Word>> entry3 = pairPerWitness.entrySet().iterator().next();
+          //          wordSegment.addWitnessPair(entry3.getKey(), entry3.getValue());
         }
         wordSegment.grow(witnessHash, wordsInSegments);
         wordsInSegments = wordSegment.wordsInSegments;
@@ -98,7 +98,7 @@ public class WordPairCollection {
 
   private Word getNextWord(List<Word> wordList) {
     Word lastWord = wordList.get(wordList.size() - 1);
-    Witness witness = witnessHash.get(lastWord.getWitnessId());
+    Segment witness = witnessHash.get(lastWord.getWitnessId());
     boolean witnessHasMoreWords = lastWord.position < witness.size();
     Word nextWord = witnessHasMoreWords ? witness.getWordOnPosition(lastWord.position + 1) : null;
     return nextWord;

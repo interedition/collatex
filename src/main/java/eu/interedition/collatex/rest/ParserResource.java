@@ -1,24 +1,18 @@
 package eu.interedition.collatex.rest;
 
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.restlet.data.Form;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.alignment.multiple_witness.visitors.JSONObjectTableVisitor;
-import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
-import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.input.builders.WitnessJsonBuilder;
 
 public class ParserResource extends ServerResource {
 
@@ -31,7 +25,14 @@ public class ParserResource extends ServerResource {
 
     JsonRepresentation jsonRepresentation;
     jsonRepresentation = new JsonRepresentation(firstValue);
-    WitnessSet set = createSet(jsonRepresentation);
+    JSONArray jsonArray;
+    WitnessSet set;
+    try {
+      jsonArray = jsonRepresentation.getJsonArray();
+      set = WitnessJsonBuilder.createSet(jsonArray);
+    } catch (JSONException e) {
+      throw new RuntimeException(e);
+    }
 
     // Note: duplication with AlignmentResource!
     AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
@@ -42,43 +43,6 @@ public class ParserResource extends ServerResource {
 
     return representation;
 
-  }
-
-  public WitnessSet createSet(JsonRepresentation jsonRepresentation) {
-    List<Witness> witnesses = Lists.newArrayList();
-    try {
-      JSONArray witnessArray = jsonRepresentation.getJsonArray();
-      for (int w = 0; w < witnessArray.length(); w++) {
-        JSONObject jsonObject = witnessArray.getJSONObject(w);
-        Witness createWitness = createWitness(jsonObject);
-        witnesses.add(createWitness);
-      }
-      WitnessSet set = new WitnessSet(witnesses);
-      return set;
-      //    } catch (IOException e) {
-      //      e.printStackTrace();
-      //      throw new RuntimeException(e);
-    } catch (JSONException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    }
-
-  }
-
-  public Witness createWitness(JSONObject object) throws JSONException {
-    String id = object.getString("id");
-    JSONArray jsonArray = object.getJSONArray("tokens");
-    List<Word> words = Lists.newArrayList();
-    int position = 1;
-    for (int i = 0; i < jsonArray.length(); i++) {
-      JSONObject jsonObject = jsonArray.getJSONObject(i);
-      String token = jsonObject.getString("token");
-      Word word = new Word(id, token, position);
-      position++;
-      words.add(word);
-    }
-    Witness witness = new Witness(id, words);
-    return witness;
   }
 
 }

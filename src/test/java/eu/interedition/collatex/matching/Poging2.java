@@ -16,12 +16,12 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class Poging2 {
-  private final Witness[] witnesses;
-  private static Map<String, Witness> witnessHash = Maps.newHashMap();
+  private final Segment[] witnesses;
+  private static Map<String, Segment> witnessHash = Maps.newHashMap();
   private Map<String, Map<String, List<Integer>>> sequences;
 
   Function<Word, Integer> extractPosition = new Function<Word, Integer>() {
@@ -31,10 +31,10 @@ public class Poging2 {
     }
   };
 
-  public Poging2(Witness... _witnesses) {
+  public Poging2(Segment... _witnesses) {
     this.witnesses = _witnesses;
 
-    for (Witness witness : witnesses) {
+    for (Segment witness : witnesses) {
       witnessHash.put(witness.id, witness);
     }
   }
@@ -96,7 +96,7 @@ public class Poging2 {
 
   Map<String, Map<String, List<Integer>>> getOneWordSequences() {
     Map<String, Map<String, List<Integer>>> oneWordSequences = Maps.newHashMap();
-    for (Witness witness : witnesses) {
+    for (Segment witness : witnesses) {
       //      Util.p(witness);
       for (Word word : witness.getWords()) {
         final String wordToMatch = word.normalized;
@@ -121,7 +121,7 @@ public class Poging2 {
   public Map<String, List<Integer>> matchingWordPositionsPerWitness(String wordToMatch) {
     Predicate<Word> matchingPredicate = matchingPredicate(wordToMatch);
     Map<String, List<Integer>> map = Maps.newHashMap();
-    for (Witness witness : witnesses) {
+    for (Segment witness : witnesses) {
       String witnessId = witness.id;
       Iterable<Word> matchingWords = Iterables.filter(witness.getWords(), matchingPredicate);
       Iterable<Integer> matchingWordPositions = Iterables.transform(matchingWords, extractPosition);

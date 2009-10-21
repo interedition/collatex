@@ -9,15 +9,15 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class SegmentColumn {
-  protected final Map<String, Segment> _segmentsProWitness;
+  protected final Map<String, OldSegment> _segmentsProWitness;
   // TODO: add other segments!
-  private final Segment _segment;
+  private final OldSegment _segment;
 
-  public SegmentColumn(Segment segment) {
+  public SegmentColumn(OldSegment segment) {
     this._segment = segment;
     this._segmentsProWitness = Maps.newLinkedHashMap();
     addMatch(segment); // TODO: make this add variant!
@@ -33,11 +33,11 @@ public class SegmentColumn {
   }
 
   // TODO: what if multiple... take the first one?
-  public Segment getSegment() {
+  public OldSegment getSegment() {
     return _segment;
   }
 
-  public void addMatch(Segment segment) {
+  public void addMatch(OldSegment segment) {
     _segmentsProWitness.put(segment.getWitnessId(), segment);
     // TODO: add match to columnstate
   }
@@ -50,15 +50,15 @@ public class SegmentColumn {
     for (Match match : matches) {
       witnessWords.add(match.getWitnessWord());
     }
-    Segment newSegment = new Segment(witnessWords);
+    OldSegment newSegment = new OldSegment(witnessWords);
     addMatch(newSegment);
   }
 
-  public boolean containsWitness(Witness witness) {
+  public boolean containsWitness(Segment witness) {
     return _segmentsProWitness.containsKey(witness.id);
   }
 
-  public Segment getSegment(Witness witness) {
+  public OldSegment getSegment(Segment witness) {
     if (!containsWitness(witness)) {
       throw new NoSuchElementException();
     }

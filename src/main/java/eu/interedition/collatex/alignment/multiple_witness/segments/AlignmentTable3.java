@@ -7,18 +7,18 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.functions.Matcher;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
 
 public class AlignmentTable3 {
 
-  private final List<Witness> _witnesses;
+  private final List<Segment> _witnesses;
   private final List<SegmentColumn> _columns;
 
   public static AlignmentTable3 create(WitnessSet set) {
     AlignmentTable3 table = new AlignmentTable3();
-    for (Witness witness : set.getWitnesses()) {
+    for (Segment witness : set.getWitnesses()) {
       table.addWitness(witness);
     }
     return table;
@@ -27,7 +27,7 @@ public class AlignmentTable3 {
   @Override
   public String toString() {
     String collectedStrings = "";
-    for (Witness witness : _witnesses) {
+    for (Segment witness : _witnesses) {
       collectedStrings += witness.id + ": ";
       String delim = "";
       for (SegmentColumn column : _columns) {
@@ -46,10 +46,10 @@ public class AlignmentTable3 {
   }
 
   // TODO: could make this protected?
-  public void addWitness(Witness witness) {
+  public void addWitness(Segment witness) {
     if (_witnesses.isEmpty()) {
       List<Word> words = witness.getWords();
-      Segment segment = new Segment(words);
+      OldSegment segment = new OldSegment(words);
       addColumn(new SegmentColumn(segment));
       _witnesses.add(witness);
       return;
@@ -95,7 +95,7 @@ public class AlignmentTable3 {
   }
 
   // TODO: add stuff!
-  private String cellToString(Witness witness, SegmentColumn column) {
+  private String cellToString(Segment witness, SegmentColumn column) {
     return column.toString();
   }
 
@@ -106,7 +106,7 @@ public class AlignmentTable3 {
   public static String alignmentTableToHTML(AlignmentTable3 alignmentTable) {
     StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
 
-    for (Witness witness : alignmentTable.getWitnesses()) {
+    for (Segment witness : alignmentTable.getWitnesses()) {
       tableHTML.append("<tr>");
       tableHTML.append("<th>Witness ").append(witness.id).append(":</th>");
       for (SegmentColumn column : alignmentTable.getColumns()) {
@@ -123,7 +123,7 @@ public class AlignmentTable3 {
     return tableHTML.toString();
   }
 
-  private List<Witness> getWitnesses() {
+  private List<Segment> getWitnesses() {
     return _witnesses;
   }
 

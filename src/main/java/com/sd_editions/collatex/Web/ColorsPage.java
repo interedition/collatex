@@ -16,7 +16,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.input.builders.WitnessBuilder.ContentType;
 
@@ -58,13 +58,13 @@ class ColorsModel implements Serializable {
     this.html = getView().toHtml();
   }
 
-  private void add(String witness, FileUpload witnessFile, List<Witness> witnesses, List<String> messages) {
+  private void add(String witness, FileUpload witnessFile, List<Segment> witnesses, List<String> messages) {
     if (witnessFile != null) {
       try {
         ContentType type = WitnessBuilder.ContentType.value(witnessFile.getContentType());
         if (type != null) {
           // 
-          Witness build = new WitnessBuilder().build(witnessFile.getInputStream(), type);
+          Segment build = new WitnessBuilder().build(witnessFile.getInputStream(), type);
           witnesses.add(build);
         } else {
           messages.add("Invalid content type of file: " + witnessFile.getClientFileName());
@@ -83,15 +83,15 @@ class ColorsModel implements Serializable {
 
   public ColorsView getView() {
     List<String> messages = Lists.newArrayList();
-    List<Witness> witnesses = Lists.newArrayList();
+    List<Segment> witnesses = Lists.newArrayList();
     add(witness1, witnessFile1, witnesses, messages);
     add(witness2, witnessFile2, witnesses, messages);
     add(witness3, witnessFile3, witnesses, messages);
     add(witness4, witnessFile4, witnesses, messages);
-    List<Witness> witnessesWithId = Lists.newArrayList();
+    List<Segment> witnessesWithId = Lists.newArrayList();
     for (int i = 0; i < witnesses.size(); i++) {
-      Witness witness = witnesses.get(i);
-      Witness witnessWithId = new Witness(Integer.valueOf(i + 1).toString(), witness.getWords());
+      Segment witness = witnesses.get(i);
+      Segment witnessWithId = new Segment(Integer.valueOf(i + 1).toString(), witness.getWords());
       witnessesWithId.add(witnessWithId);
     }
     return new ColorsView(messages, witnessesWithId);

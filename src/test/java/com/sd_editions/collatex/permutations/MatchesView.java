@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 /**
@@ -14,7 +14,7 @@ public class MatchesView {
 
   private final WitnessBuilder builder = new WitnessBuilder();
 
-  public String renderPermutations(Witness witnessA, Witness witnessB) {
+  public String renderPermutations(Segment witnessA, Segment witnessB) {
     //    CollateCore collateCore = new CollateCore(witnessA, witnessB);
     //    List<MatchNonMatch> matchNonMatches = collateCore.doCompareWitnesses(witnessA, witnessB);
     //    collateCore.sortPermutationsByVariation(matchNonMatches);
@@ -29,7 +29,7 @@ public class MatchesView {
 
   @Test
   public void showPermutationsTara() {
-    Witness[] witnesses = builder.buildWitnesses("I bought this glass, because it matches those dinner plates.", "I bought those glasses.");
+    Segment[] witnesses = builder.buildWitnesses("I bought this glass, because it matches those dinner plates.", "I bought those glasses.");
     Util.p(renderPermutations(witnesses[0], witnesses[1]));
   }
 }

@@ -10,7 +10,7 @@ import org.junit.Test;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.alignment.functions.Matcher;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -25,8 +25,8 @@ public class PossibleMatchesTest {
 
   @Test
   public void testExactMatchesAreFixed() {
-    Witness a = builder.build("zijn hond liep aan zijn hand");
-    Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
+    Segment a = builder.build("zijn hond liep aan zijn hand");
+    Segment b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     UnfixedAlignment unfixedAlignment = Matcher.createFirstUnfixedAlignment(a, b);
     Set<Match> exactMatches = unfixedAlignment.getFixedMatches();
     String expected = "[(3->4), (4->7)]";
@@ -35,8 +35,8 @@ public class PossibleMatchesTest {
 
   @Test
   public void testPossibleMatchesAsAMap() {
-    Witness a = builder.build("zijn hond liep aan zijn hand");
-    Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
+    Segment a = builder.build("zijn hond liep aan zijn hand");
+    Segment b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     UnfixedAlignment unfixedAlignment = Matcher.createFirstUnfixedAlignment(a, b);
     Word zijn = a.getWordOnPosition(1);
     Collection<Match> linked = unfixedAlignment.getMatchesThatLinkFrom(zijn);

@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class Column {
@@ -59,11 +59,11 @@ public class Column {
     return result;
   }
 
-  public boolean containsWitness(Witness witness) {
+  public boolean containsWitness(Segment witness) {
     return wordsProWitness.containsKey(witness.id);
   }
 
-  public Word getWord(Witness witness) {
+  public Word getWord(Segment witness) {
     if (!containsWitness(witness)) {
       throw new NoSuchElementException();
     }

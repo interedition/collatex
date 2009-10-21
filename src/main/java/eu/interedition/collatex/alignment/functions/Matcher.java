@@ -14,7 +14,7 @@ import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.UnfixedAlignment;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex.match.worddistance.WordDistance;
@@ -23,7 +23,7 @@ import eu.interedition.collatex.match.worddistance.WordDistance;
 // TODO: rename class to Aligner or something like that
 public class Matcher {
 
-  public static Alignment align(Witness a, Witness b) {
+  public static Alignment align(Segment a, Segment b) {
     UnfixedAlignment unfixedAlignment = createFirstUnfixedAlignment(a, b);
 
     while (unfixedAlignment.hasUnfixedWords()) {
@@ -33,7 +33,7 @@ public class Matcher {
     return alignment;
   }
 
-  public static UnfixedAlignment createFirstUnfixedAlignment(Witness a, Witness b) {
+  public static UnfixedAlignment createFirstUnfixedAlignment(Segment a, Segment b) {
     Set<Match> allMatches = findMatches(a, b, new NormalizedLevenshtein());
 
     // Note: this code is not the simplest thing that 
@@ -53,7 +53,7 @@ public class Matcher {
     return unfixedAlignment;
   }
 
-  private static Set<Match> findMatches(Witness base, Witness witness, WordDistance distanceMeasure) {
+  private static Set<Match> findMatches(Segment base, Segment witness, WordDistance distanceMeasure) {
     Set<Match> matchSet = Sets.newLinkedHashSet();
     for (Word baseWord : base.getWords()) {
       for (Word witnessWord : witness.getWords()) {
@@ -68,7 +68,7 @@ public class Matcher {
     return matchSet;
   }
 
-  public static UnfixedAlignment permutate(Witness a, Witness b, final UnfixedAlignment alignment) {
+  public static UnfixedAlignment permutate(Segment a, Segment b, final UnfixedAlignment alignment) {
     Collection<Match> unfixedMatches = getMatchesToPermutateWith(alignment);
     List<UnfixedAlignment> alignments = getAlignmentsForUnfixedMatches(alignment, unfixedMatches);
     UnfixedAlignment bestAlignment = selectBestPossibleAlignment(a, b, alignments);
@@ -138,7 +138,7 @@ public class Matcher {
   }
 
   // TODO: move all the collation creation out of the way!
-  private static UnfixedAlignment selectBestPossibleAlignment(Witness a, Witness b, List<UnfixedAlignment> alignments) {
+  private static UnfixedAlignment selectBestPossibleAlignment(Segment a, Segment b, List<UnfixedAlignment> alignments) {
     UnfixedAlignment bestAlignment = null;
     Alignment bestCollation = null;
 

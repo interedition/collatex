@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.Column;
 import eu.interedition.collatex.alignment.multiple_witness.ColumnState;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class AlignmentTableSegmentator {
@@ -33,8 +33,8 @@ public class AlignmentTableSegmentator {
         mergedColumns.add(mergedColumn);
       }
   
-      List<Witness> witnesses = alignmentTable.getWitnesses();
-      for (Witness witness : witnesses) {
+      List<Segment> witnesses = alignmentTable.getWitnesses();
+      for (Segment witness : witnesses) {
         if (column.containsWitness(witness)) {
           Word word = column.getWord(witness);
           mergedColumn.addWord(witness, word);

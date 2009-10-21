@@ -15,23 +15,23 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class WordPairCollectionTest {
   private WordPairCollection wpc;
   private Map<String, Map<String, List<List<Word>>>> wordPairs;
-  private Witness a;
-  private Witness b;
+  private Segment a;
+  private Segment b;
 
   @Before
   public void SetUp() {
     WitnessBuilder builder = new WitnessBuilder();
     a = builder.build("op zijn pad liep zijn hond aan zijn hand op zijn dag");
     b = builder.build("zijn hond liep aan zijn hand op zijn dag");
-    HashMap<String, Witness> witnessHash = Maps.newHashMap();
-    for (Witness witness : Lists.newArrayList(a, b)) {
+    HashMap<String, Segment> witnessHash = Maps.newHashMap();
+    for (Segment witness : Lists.newArrayList(a, b)) {
       witnessHash.put(witness.id, witness);
     }
     wpc = new WordPairCollection(witnessHash);

@@ -5,11 +5,11 @@ import java.util.List;
 import eu.interedition.collatex.input.Word;
 
 // Note: this class looks a bit like Phrase!
-public class Segment {
+public class OldSegment {
 
   private final List<Word> _words;
 
-  public Segment(List<Word> words) {
+  public OldSegment(List<Word> words) {
     this._words = words;
   }
 

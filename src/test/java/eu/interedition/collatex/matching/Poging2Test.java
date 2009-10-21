@@ -10,7 +10,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class Poging2Test {
@@ -23,9 +23,9 @@ public class Poging2Test {
 
   @Test
   public void testMatchingWordPositionsPerWitness() {
-    Witness a = builder.build("a", "zijn hond liep aan zijn hand");
-    Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
-    Witness c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
+    Segment a = builder.build("a", "zijn hond liep aan zijn hand");
+    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
+    Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
     Poging2 p2 = new Poging2(a, b, c);
 
     Map<String, List<Integer>> zijnPositions = p2.matchingWordPositionsPerWitness("zijn");
@@ -45,9 +45,9 @@ public class Poging2Test {
 
   @Test
   public void testGetOneWordSequences() {
-    Witness a = builder.build("a", "Zijn hond liep aan zijn hand.");
-    Witness b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
-    Witness c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
+    Segment a = builder.build("a", "Zijn hond liep aan zijn hand.");
+    Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
+    Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
     Poging2 p2 = new Poging2(a, b, c);
 
     Map<String, Map<String, List<Integer>>> oneWordSequences = p2.getOneWordSequences();
@@ -131,9 +131,9 @@ public class Poging2Test {
 
   @Test
   public void testGo() {
-    Witness a = builder.build("a", "Zijn hond liep aan zijn hand.");
-    Witness b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
-    Witness c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
+    Segment a = builder.build("a", "Zijn hond liep aan zijn hand.");
+    Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
+    Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
     Poging2 p2 = new Poging2(a, b, c);
     p2.go();
     assertNotNull(p2);

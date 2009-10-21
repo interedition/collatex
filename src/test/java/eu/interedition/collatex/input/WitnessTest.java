@@ -11,7 +11,7 @@ public class WitnessTest {
   public void testNullWitness() {
 
     try {
-      new Witness(null);
+      new Segment(null);
       fail();
     } catch (IllegalArgumentException e) {
       assertEquals(e.getMessage(), "List of words cannot be null.");
@@ -20,7 +20,7 @@ public class WitnessTest {
 
   @Test
   public void testEmptyWitness() {
-    Witness witness = new Witness(new Word[0]);
+    Segment witness = new Segment(new Word[0]);
     assertEquals(witness.getWords().size(), 0);
   }
 

@@ -12,7 +12,7 @@ import com.sd_editions.collatex.permutations.Matches;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class AlignmentView {
@@ -26,7 +26,7 @@ public class AlignmentView {
     Map<Word, Alignment> alignment = determineAlignment();
     StringBuilder html = new StringBuilder();
     for (int i = 0; i < colors.numberOfWitnesses(); i++) {
-      Witness witness = colors.witnesses.get(i);
+      Segment witness = colors.witnesses.get(i);
       html.append(colorWitness(alignment, witness));
     }
     return html.toString();
@@ -56,7 +56,7 @@ public class AlignmentView {
     return wordToAlignment;
   }
 
-  private String colorWitness(Map<Word, Alignment> alignmentMap, Witness base) {
+  private String colorWitness(Map<Word, Alignment> alignmentMap, Segment base) {
     StringBuilder html = new StringBuilder();
     List<String> words = Lists.newArrayList();
     for (Word word : base.getWords()) {

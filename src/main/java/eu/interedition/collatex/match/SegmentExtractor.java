@@ -7,20 +7,20 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class SegmentExtractor {
 
-  private static HashMap<String, Witness> witnessHash = Maps.newHashMap();
+  private static HashMap<String, Segment> witnessHash = Maps.newHashMap();
   private static List<String> possibleWordsInSegments;
   private static List<String> wordsInSegments;
 
-  public static List<WordSegment> extractSegments(Witness... witnesses) {
+  public static List<WordSegment> extractSegments(Segment... witnesses) {
     possibleWordsInSegments = Lists.newArrayList();
     wordsInSegments = Lists.newArrayList();
 
-    for (Witness witness : witnesses) {
+    for (Segment witness : witnesses) {
       Util.p(witness);
       witnessHash.put(witness.id, witness);
     }
@@ -28,7 +28,7 @@ public class SegmentExtractor {
     WordPairCollection wordpairs = new WordPairCollection(witnessHash);
 
     int witness_index = 0;
-    for (Witness witness1 : witnesses) {
+    for (Segment witness1 : witnesses) {
       int witnessSize1 = witness1.size();
       for (int position1 = 1; position1 < witnessSize1; position1++) {
         Word baseWord0 = witness1.getWordOnPosition(position1);
@@ -41,7 +41,7 @@ public class SegmentExtractor {
 
           // Check if this pair appears again in the other witnesses
           for (int i = witness_index + 1; i < witnesses.length; i++) {
-            Witness witness2 = witnesses[i];
+            Segment witness2 = witnesses[i];
             int witnessSize2 = witness2.size();
             for (int position2 = 1; position2 < witnessSize2; position2++) {
               Word word0 = witness2.getWordOnPosition(position2);
@@ -61,7 +61,7 @@ public class SegmentExtractor {
     return wordpairs.getWordSegments(wordsInSegments);
   }
 
-  private static void addPairOccurancesInWitness(WordPairCollection wordpairs, Witness witness, int witnessSize, int position, Word baseWord0, Word baseWord1, String normalized0, String normalized1) {
+  private static void addPairOccurancesInWitness(WordPairCollection wordpairs, Segment witness, int witnessSize, int position, Word baseWord0, Word baseWord1, String normalized0, String normalized1) {
     addWordPair(wordpairs, baseWord0, baseWord1);
     for (int position1 = position + 2; position1 < witnessSize; position1++) {
       if (pairFound(normalized0, normalized1, witness, position1)) {
@@ -84,7 +84,7 @@ public class SegmentExtractor {
     return !(wordsInSegments.contains(wordIdentifier(baseWord0)) || wordsInSegments.contains(wordIdentifier(baseWord1)));
   }
 
-  private static boolean pairFound(String normalized0, String normalized1, Witness witness2, int position2) {
+  private static boolean pairFound(String normalized0, String normalized1, Segment witness2, int position2) {
     return (witness2.getWordOnPosition(position2).normalized.equals(normalized0)) && //
         (witness2.getWordOnPosition(position2 + 1).normalized.equals(normalized1));
   }
