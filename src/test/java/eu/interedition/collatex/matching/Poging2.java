@@ -1,13 +1,20 @@
 package eu.interedition.collatex.matching;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
@@ -34,6 +41,57 @@ public class Poging2 {
 
   void go() {
     sequences = getOneWordSequences();
+    Multimap<WitnessPosition, String> sequencesAtWitnessPosition = Multimaps.newArrayListMultimap();
+    Set<Entry<String, Map<String, List<Integer>>>> entrySet = sequences.entrySet();
+    for (Entry<String, Map<String, List<Integer>>> entry : entrySet) {
+      String sequenceTitle = entry.getKey();
+      Map<String, List<Integer>> positionsPerWitness = entry.getValue();
+      Set<Entry<String, List<Integer>>> entrySet2 = positionsPerWitness.entrySet();
+      for (Entry<String, List<Integer>> positionsPerWitnessEntry : entrySet2) {
+        String witnessId = positionsPerWitnessEntry.getKey();
+        List<Integer> positions = positionsPerWitnessEntry.getValue();
+        for (Integer position : positions) {
+          WitnessPosition witnessPosition = new WitnessPosition(witnessId, position);
+          sequencesAtWitnessPosition.put(witnessPosition, sequenceTitle);
+        }
+      }
+      Util.p(sequenceTitle + " occurs in " + positionsPerWitness.size() + " witnesses.");
+      Util.p(sequencesAtWitnessPosition);
+    }
+
+    Iterator<WitnessPosition> iterator = sequencesAtWitnessPosition.keys().iterator();
+    WitnessPosition dummy = iterator.next();
+    WitnessPosition first = iterator.next();
+    // see if wordsegement at position first is expandable
+    WitnessPosition next = first.nextWitnessPosition();
+    Collection<String> sequencesForFirst = sequencesAtWitnessPosition.get(first);
+    Util.p(first);
+    Util.p(sequencesForFirst);
+    Collection<String> sequencesForNext = sequencesAtWitnessPosition.get(next);
+    Util.p(next);
+    Util.p(sequencesForNext);
+
+    Collection<String> commonSequences = findCommonSequences(sequencesForFirst, sequencesForNext);
+    Util.p(commonSequences);
+  }
+
+  Collection<String> findCommonSequences(Collection<String> sequences0, Collection<String> sequences1) {
+    List<String> commonSequences = Lists.newArrayList();
+    int size0 = sequences0.size();
+    int size1 = sequences1.size();
+    if (size0 < size1) {
+      commonSequences = addToCommonSequences(sequences0, sequences1, commonSequences);
+    } else {
+      commonSequences = addToCommonSequences(sequences1, sequences0, commonSequences);
+    }
+    return commonSequences;
+  }
+
+  private List<String> addToCommonSequences(Collection<String> sequences0, Collection<String> sequences1, List<String> commonSequences) {
+    for (String sequenceTitle : sequences0) {
+      if (sequences1.contains(sequenceTitle)) commonSequences.add(sequenceTitle);
+    }
+    return commonSequences;
   }
 
   Map<String, Map<String, List<Integer>>> getOneWordSequences() {
@@ -61,13 +119,14 @@ public class Poging2 {
   }
 
   public Map<String, List<Integer>> matchingWordPositionsPerWitness(String wordToMatch) {
-    Predicate<Word> matching = matchingPredicate(wordToMatch);
+    Predicate<Word> matchingPredicate = matchingPredicate(wordToMatch);
     Map<String, List<Integer>> map = Maps.newHashMap();
     for (Witness witness : witnesses) {
       String witnessId = witness.id;
-      Iterable<Word> matchingWords = Iterables.filter(witness.getWords(), matching);
-      Iterable<Integer> positions = Iterables.transform(matchingWords, extractPosition);
-      map.put(witnessId, Lists.newArrayList(positions));
+      Iterable<Word> matchingWords = Iterables.filter(witness.getWords(), matchingPredicate);
+      Iterable<Integer> matchingWordPositions = Iterables.transform(matchingWords, extractPosition);
+      List<Integer> positions = Lists.newArrayList(matchingWordPositions);
+      if (!positions.isEmpty()) map.put(witnessId, positions);
     }
     return map;
   }

@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Block.Util;
@@ -33,7 +32,7 @@ public class SegmentMatchingTest {
     System.out.println();
   }
 
-  @Test
+  //  @Test
   public void testExtractSegments1() {
     Witness a = builder.build("a", "zijn hond liep aan zijn hand");
     Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
@@ -50,7 +49,7 @@ public class SegmentMatchingTest {
         "zijn hond", "liep", "aan zijn hand", "op zijn pad"));
   }
 
-  @Test
+  //  @Test
   public void testExtractSegments2() {
     Witness a = builder.build("a", "zijn hond liep aan zijn hand op zijn dag");
     Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand op zijn dag");
@@ -67,7 +66,7 @@ public class SegmentMatchingTest {
         "zijn hond", "liep", "aan zijn hand op zijn dag", "op zijn pad"));
   }
 
-  @Test
+  //  @Test
   public void testExtractSegments3() {
     Witness a = builder.build("a", "zijn hond liep aan zijn hand");
     Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
