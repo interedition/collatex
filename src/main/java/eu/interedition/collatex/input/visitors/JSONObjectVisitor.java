@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
 
@@ -22,14 +22,14 @@ public class JSONObjectVisitor implements IResourceVisitor {
   }
 
   @Override
-  public void visitWitness(Witness witness) {
+  public void visitWitness(Segment witness) {
     _jsonObject = new JSONObject();
     _jsonObject.put("ID", witness.id);
     _words = Lists.newArrayList();
   }
 
   @Override
-  public void postVisitWitness(Witness witness) {
+  public void postVisitWitness(Segment witness) {
     _jsonObject.put("tokens", _words);
     _jsonArray.add(_jsonObject);
   }

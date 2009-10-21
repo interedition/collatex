@@ -11,7 +11,7 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.functions.Matcher;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
 
@@ -19,13 +19,13 @@ public class AlignmentTableCreator {
 
   public static AlignmentTable2 createAlignmentTable(WitnessSet set) {
     AlignmentTable2 table = new AlignmentTable2();
-    for (Witness witness : set.getWitnesses()) {
+    for (Segment witness : set.getWitnesses()) {
       AlignmentTableCreator.addWitness(table, witness);
     }
     return table;
   }
 
-  static void addWitness(AlignmentTable2 table, Witness witness) {
+  static void addWitness(AlignmentTable2 table, Segment witness) {
     if (table.getWitnesses().isEmpty()) {
       for (Word word : witness.getWords()) {
         table.add(new Column(word));
@@ -54,7 +54,7 @@ public class AlignmentTableCreator {
   }
 
   // TODO: addReplacements.. should look like addAdditions method!
-  static void addReplacementsToAlignmentTable(AlignmentTable2 table, Witness witness, Superbase superbase, Alignment compresult) {
+  static void addReplacementsToAlignmentTable(AlignmentTable2 table, Segment witness, Superbase superbase, Alignment compresult) {
     List<Gap> replacements = compresult.getReplacements();
     for (Gap replacement : replacements) {
       // TODO: hou rekening met langere additions!

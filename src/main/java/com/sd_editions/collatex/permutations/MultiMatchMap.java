@@ -10,17 +10,17 @@ import com.google.common.base.Join;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class MultiMatchMap {
   private final LinkedHashMap<String, MultiMatch> mmm;
 
-  public MultiMatchMap(Witness... witnesses) {
+  public MultiMatchMap(Segment... witnesses) {
     this.mmm = Maps.newLinkedHashMap();
     // initialize with the first 2 witnesses
-    Witness witness0 = witnesses[0];
-    Witness witness1 = witnesses[1];
+    Segment witness0 = witnesses[0];
+    Segment witness1 = witnesses[1];
     for (Word word0 : witness0.getWords()) {
       String normalized = word0.normalized;
       if (this.containsKey(normalized)) {

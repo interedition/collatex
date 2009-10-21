@@ -4,10 +4,10 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
-public class SegmentSuperbase extends Witness {
+public class SegmentSuperbase extends Segment {
   private final List<SegmentColumn> _columnForEachWord;
 
   public static SegmentSuperbase create(AlignmentTable3 alignmentTable) {
@@ -23,7 +23,7 @@ public class SegmentSuperbase extends Witness {
     this._columnForEachWord = Lists.newArrayList();
   }
 
-  public void addSegment(Segment segment, SegmentColumn segmentColumn) {
+  public void addSegment(OldSegment segment, SegmentColumn segmentColumn) {
     for (Word word : segment.getWords()) {
       Word newWord = new Word("sb", word.original, getWords().size() + 1);
       getWords().add(newWord);

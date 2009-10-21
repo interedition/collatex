@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class Phrase {
-  private final Witness witness;
+  private final Segment witness;
   private final int startPosition;
   private final int endPosition;
   private final int size;
@@ -20,7 +20,7 @@ public class Phrase {
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public Phrase(Witness _witness, int _size, int _startPosition, int _endPosition, Word _previous, Word _next) {
+  public Phrase(Segment _witness, int _size, int _startPosition, int _endPosition, Word _previous, Word _next) {
     witness = _witness;
     this.size = _size;
     this.next = _next;
@@ -29,7 +29,7 @@ public class Phrase {
     endPosition = _endPosition;
   }
 
-  public Phrase(Witness _witness, Word beginWord, Word endWord) {
+  public Phrase(Segment _witness, Word beginWord, Word endWord) {
     this.witness = _witness;
     this.size = -1; // !!!
     this.next = null; // !!!
@@ -60,7 +60,7 @@ public class Phrase {
     return replacementString;
   }
 
-  public Witness getWitness() {
+  public Segment getWitness() {
     return witness;
   }
 

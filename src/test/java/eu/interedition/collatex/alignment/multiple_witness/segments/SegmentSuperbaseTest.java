@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class SegmentSuperbaseTest {
@@ -18,7 +18,7 @@ public class SegmentSuperbaseTest {
 
   @Test
   public void testCreateSuperBase() {
-    Witness a = builder.build("A", "the first witness");
+    Segment a = builder.build("A", "the first witness");
     AlignmentTable3 alignmentTable = new AlignmentTable3();
     alignmentTable.addWitness(a);
     SegmentSuperbase superbase = SegmentSuperbase.create(alignmentTable);

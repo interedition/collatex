@@ -14,7 +14,7 @@ import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.visualization.Modification;
@@ -27,15 +27,15 @@ public class ColorsView {
 
   private final List<String> messages;
 
-  private final List<Witness> witnesses;
+  private final List<Segment> witnesses;
 
-  public ColorsView(List<String> _messages, List<Witness> _witnesses) {
+  public ColorsView(List<String> _messages, List<Segment> _witnesses) {
     this.witnesses = _witnesses;
     this.colors = new CollateCore(_witnesses); // this is legacy!
     this.messages = _messages;
   }
 
-  public ColorsView(Witness... _witnesses) {
+  public ColorsView(Segment... _witnesses) {
     this.witnesses = Lists.newArrayList(_witnesses);
     this.colors = new CollateCore(_witnesses); // this is legacy!
     this.messages = Lists.newArrayList();
@@ -77,8 +77,8 @@ public class ColorsView {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html.append("Comparing witness " + base + " - witness " + (w) + ":");
         new Matcher();
-        Witness a = witnesses.get(base - 1);
-        Witness b = witnesses.get(w - 1);
+        Segment a = witnesses.get(base - 1);
+        Segment b = witnesses.get(w - 1);
         Alignment align = Matcher.align(a, b);
         Modifications modifications = Visualization.getModifications(align);
         html.append(modificationsView(base, modifications));
@@ -161,7 +161,7 @@ public class ColorsView {
   }
 
   private String additionView(Addition addition, int base) {
-    Witness baseIndex = colors.getWitness(base);
+    Segment baseIndex = colors.getWitness(base);
     StringBuffer html = new StringBuffer("<i>" + addition.getAddedWords() + "</i> added ");
     List<Word> baseWords = baseIndex.getWords();
     int position = addition.getPosition();

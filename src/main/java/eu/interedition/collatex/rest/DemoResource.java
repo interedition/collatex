@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -42,7 +42,7 @@ public class DemoResource extends ServerResource {
       e.printStackTrace();
     }
 
-    List<Witness> witnesses = Lists.newArrayList();
+    List<Segment> witnesses = Lists.newArrayList();
     WitnessBuilder builder = new WitnessBuilder();
     try {
       List<String> sortedKeys = Lists.newArrayList();
@@ -57,7 +57,7 @@ public class DemoResource extends ServerResource {
 
       for (String key : sortedKeys) {
         String text = jsonObject.getString(key);
-        Witness witness = builder.build(key, text);
+        Segment witness = builder.build(key, text);
         witnesses.add(witness);
       }
     } catch (JSONException e) {
@@ -115,7 +115,7 @@ public class DemoResource extends ServerResource {
 
   private String witnessesAsString(WitnessSet set2) {
     StringBuilder builder = new StringBuilder();
-    for (Witness w : set2.getWitnesses()) {
+    for (Segment w : set2.getWitnesses()) {
       builder.append(w.toString() + "<br/>");
     }
     // TODO Auto-generated method stub

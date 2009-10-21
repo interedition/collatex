@@ -5,10 +5,10 @@ import java.io.InputStream;
 
 import org.xml.sax.SAXException;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 
 public abstract class WitnessStreamBuilder extends WitnessBuilder {
 
-  public abstract Witness build(InputStream inputStream) throws SAXException, IOException;
+  public abstract Segment build(InputStream inputStream) throws SAXException, IOException;
 
 }

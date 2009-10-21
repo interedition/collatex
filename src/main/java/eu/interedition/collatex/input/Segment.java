@@ -8,11 +8,11 @@ import eu.interedition.collatex.Util;
 import eu.interedition.collatex.input.visitors.ICollationResource;
 import eu.interedition.collatex.input.visitors.IResourceVisitor;
 
-public class Witness implements ICollationResource {
+public class Segment implements ICollationResource {
   public final String id;
   private final List<Word> words;
 
-  public Witness(Word... _words) {
+  public Segment(Word... _words) {
     if (_words == null) throw new IllegalArgumentException("List of words cannot be null.");
     if (_words.length == 0)
       this.id = Util.generateRandomId();
@@ -21,7 +21,7 @@ public class Witness implements ICollationResource {
     this.words = Lists.newArrayList(_words);
   }
 
-  public Witness(String _id, List<Word> _words) {
+  public Segment(String _id, List<Word> _words) {
     this.id = _id;
     this.words = _words;
   }

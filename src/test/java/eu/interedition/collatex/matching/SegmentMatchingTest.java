@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.match.SegmentExtractor;
 import eu.interedition.collatex.match.WordSegment;
@@ -29,17 +29,17 @@ public class SegmentMatchingTest {
 
   @Test
   public void testExtractSegments2() {
-    Witness a = builder.build("zijn hond liep aan zijn hand");
-    Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
+    Segment a = builder.build("zijn hond liep aan zijn hand");
+    Segment b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     Set<WordSegment> segments = SegmentExtractor.extractSegmentSet(a, b);
     assertTrue("(some) expected segments are missing", segmentSetContains(segments, "zijn hond", "aan zijn hand"));
   }
 
   @Test
   public void testExtractSegments3() {
-    Witness a = builder.build("zijn hond liep aan zijn hand");
-    Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    Witness c = builder.build("met zijn hond aan zijn hand liep hij op zijn pad");
+    Segment a = builder.build("zijn hond liep aan zijn hand");
+    Segment b = builder.build("op zijn pad liep zijn hond aan zijn hand");
+    Segment c = builder.build("met zijn hond aan zijn hand liep hij op zijn pad");
     Set<WordSegment> segments = SegmentExtractor.extractSegmentSet(a, b, c);
     assertFalse(segments.isEmpty());
     assertTrue("(some) expected segments are missing", segmentSetContains(segments, "zijn hond", "aan zijn hand", "op zijn pad"));

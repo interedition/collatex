@@ -7,19 +7,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.alignment.Match;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.WordDistance;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Matches {
-  private final Witness base;
-  private final Witness witness;
+  private final Segment base;
+  private final Segment witness;
   private List<Set<Match>> permutations;
   private final Set<Match> matches;
   private final WordDistance distanceMeasure;
 
-  public Matches(Witness _base, Witness _witness, WordDistance distanceMeasure) {
+  public Matches(Segment _base, Segment _witness, WordDistance distanceMeasure) {
     this.base = _base;
     this.witness = _witness;
     this.distanceMeasure = distanceMeasure;

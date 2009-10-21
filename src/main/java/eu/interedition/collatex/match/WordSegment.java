@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class WordSegment {
@@ -30,7 +30,7 @@ public class WordSegment {
     return title;
   }
 
-  public void grow(HashMap<String, Witness> witnessHash) {
+  public void grow(HashMap<String, Segment> witnessHash) {
     boolean nextWordsMatch = true;
     while (nextWordsMatch) {
       Set<String> nextWordSet = Sets.newHashSet();
@@ -55,9 +55,9 @@ public class WordSegment {
 
   }
 
-  private Word getNextWord(List<Word> wordList, HashMap<String, Witness> witnessHash) {
+  private Word getNextWord(List<Word> wordList, HashMap<String, Segment> witnessHash) {
     Word lastWord = wordList.get(wordList.size() - 1);
-    Witness witness = witnessHash.get(lastWord.getWitnessId());
+    Segment witness = witnessHash.get(lastWord.getWitnessId());
     boolean witnessHasMoreWords = lastWord.position < witness.size();
     Word nextWord = witnessHasMoreWords ? witness.getWordOnPosition(lastWord.position + 1) : null;
     return nextWord;

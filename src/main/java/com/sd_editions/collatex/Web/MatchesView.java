@@ -6,14 +6,14 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class MatchesView {
 
   private final WitnessBuilder builder = new WitnessBuilder();
 
-  public String renderPermutations(Witness witnessA, Witness witnessB) {
+  public String renderPermutations(Segment witnessA, Segment witnessB) {
     //    CollateCore collateCore = new CollateCore(witnessA, witnessB);
     //    List<MatchNonMatch> matchNonMatches = collateCore.doCompareWitnesses(witnessA, witnessB);
     //    collateCore.sortPermutationsByVariation(matchNonMatches);

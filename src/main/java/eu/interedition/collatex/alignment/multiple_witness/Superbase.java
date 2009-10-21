@@ -5,10 +5,10 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.Match;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
-public class Superbase extends Witness {
+public class Superbase extends Segment {
   private final List<Column> columnForEachWord;
 
   public Superbase() {

@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.functions.GapDetection;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 
 public class Alignment {
 
@@ -17,7 +17,7 @@ public class Alignment {
   private final List<Gap> gaps;
 
   // Note: this constructor should take an UnfixedAlignment object as parameter!
-  public Alignment(Set<Match> _matches, Witness a, Witness b) {
+  public Alignment(Set<Match> _matches, Segment a, Segment b) {
     this.matches = _matches;
     this.sequencesA = SequenceDetection.calculateMatchSequences(matches);
     this.sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);

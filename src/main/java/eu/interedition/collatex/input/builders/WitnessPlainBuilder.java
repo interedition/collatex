@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 
 public class WitnessPlainBuilder extends WitnessStreamBuilder {
 
   @Override
-  public Witness build(InputStream inputStream) throws IOException {
+  public Segment build(InputStream inputStream) throws IOException {
     InputStreamReader reader = new InputStreamReader(inputStream);
 
     BufferedReader bufferedReader = new BufferedReader(reader);

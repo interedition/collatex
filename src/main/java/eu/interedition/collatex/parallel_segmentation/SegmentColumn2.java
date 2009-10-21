@@ -14,7 +14,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.alignment.Phrase;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 /**
@@ -25,9 +25,9 @@ import eu.interedition.collatex.input.Word;
 public class SegmentColumn2 {
 
   private final Map<String, Phrase> _phrases;
-  private final List<Witness> _witnesses;
+  private final List<Segment> _witnesses;
 
-  public SegmentColumn2(List<Witness> witnesses) {
+  public SegmentColumn2(List<Segment> witnesses) {
     this._phrases = Maps.newHashMap();
     this._witnesses = witnesses;
   }
@@ -86,7 +86,7 @@ public class SegmentColumn2 {
 
   private Set<String> getEmptyCells() {
     Set<String> sigliInTable = Sets.newLinkedHashSet();
-    for (Witness witness1 : _witnesses) {
+    for (Segment witness1 : _witnesses) {
       sigliInTable.add(witness1.id);
     }
     Set<String> emptySigli = Sets.newLinkedHashSet(sigliInTable);
@@ -110,7 +110,7 @@ public class SegmentColumn2 {
     return b.toString();
   }
 
-  public void addWord(Witness witness2, Word word) {
+  public void addWord(Segment witness2, Word word) {
     Phrase existingPhrase = _phrases.get(witness2.id);
     if (existingPhrase == null) {
       Phrase phrase = new Phrase(witness2, word, word);
