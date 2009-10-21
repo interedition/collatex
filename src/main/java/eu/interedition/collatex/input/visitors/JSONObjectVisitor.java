@@ -2,6 +2,7 @@ package eu.interedition.collatex.input.visitors;
 
 import java.util.List;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import com.google.common.collect.Lists;
@@ -12,22 +13,25 @@ import eu.interedition.collatex.input.Word;
 
 public class JSONObjectVisitor implements IResourceVisitor {
 
-  private final JSONObject _jsonObject;
+  private final JSONArray _jsonArray;
+  private JSONObject _jsonObject;
   private List<JSONObject> _words;
 
   public JSONObjectVisitor() {
+    _jsonArray = new JSONArray();
+  }
+
+  @Override
+  public void visitWitness(Witness witness) {
     _jsonObject = new JSONObject();
+    _jsonObject.put("ID", witness.id);
+    _words = Lists.newArrayList();
   }
 
   @Override
   public void postVisitWitness(Witness witness) {
     _jsonObject.put("tokens", _words);
-  }
-
-  @Override
-  public void visitWitness(Witness witness) {
-    _jsonObject.put("ID", witness.id);
-    _words = Lists.newArrayList();
+    _jsonArray.add(_jsonObject);
   }
 
   @Override
@@ -44,8 +48,7 @@ public class JSONObjectVisitor implements IResourceVisitor {
     _words.add(w1);
   }
 
-  public JSONObject getJSONObject() {
-    return _jsonObject;
+  public JSONArray getJsonArray() {
+    return _jsonArray;
   }
-
 }

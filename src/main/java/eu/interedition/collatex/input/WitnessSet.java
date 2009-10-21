@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.input.builders.WitnessBuilder;
+import eu.interedition.collatex.input.visitors.JSONObjectVisitor;
 
 public class WitnessSet {
   private final List<Witness> _witnesses;
@@ -41,5 +42,12 @@ public class WitnessSet {
 
   public List<Witness> getWitnesses() {
     return _witnesses;
+  }
+
+  public void accept(JSONObjectVisitor visitor) {
+    visitor.visitWitnessSet(this);
+    for (Witness witness : _witnesses) {
+      witness.accept(visitor);
+    }
   }
 }
