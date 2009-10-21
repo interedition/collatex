@@ -19,10 +19,10 @@ import com.sd_editions.collatex.Block.Util;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
-public class Poging2 {
+public class SubsegmentExtractor {
   private final Segment[] witnesses;
   private static Map<String, Segment> witnessHash = Maps.newHashMap();
-  private Map<String, Map<String, List<Integer>>> sequences;
+  private Map<String, Map<String, List<Integer>>> subsegments;
 
   Function<Word, Integer> extractPosition = new Function<Word, Integer>() {
     @Override
@@ -31,7 +31,7 @@ public class Poging2 {
     }
   };
 
-  public Poging2(Segment... _witnesses) {
+  public SubsegmentExtractor(Segment... _witnesses) {
     this.witnesses = _witnesses;
 
     for (Segment witness : witnesses) {
@@ -40,9 +40,9 @@ public class Poging2 {
   }
 
   void go() {
-    sequences = getOneWordSequences();
+    subsegments = getOneWordSubsegments();
     Multimap<WitnessPosition, String> sequencesAtWitnessPosition = Multimaps.newArrayListMultimap();
-    Set<Entry<String, Map<String, List<Integer>>>> entrySet = sequences.entrySet();
+    Set<Entry<String, Map<String, List<Integer>>>> entrySet = subsegments.entrySet();
     for (Entry<String, Map<String, List<Integer>>> entry : entrySet) {
       String sequenceTitle = entry.getKey();
       Map<String, List<Integer>> positionsPerWitness = entry.getValue();
@@ -94,7 +94,7 @@ public class Poging2 {
     return commonSequences;
   }
 
-  Map<String, Map<String, List<Integer>>> getOneWordSequences() {
+  Map<String, Map<String, List<Integer>>> getOneWordSubsegments() {
     Map<String, Map<String, List<Integer>>> oneWordSequences = Maps.newHashMap();
     for (Segment witness : witnesses) {
       //      Util.p(witness);
@@ -129,5 +129,9 @@ public class Poging2 {
       if (!positions.isEmpty()) map.put(witnessId, positions);
     }
     return map;
+  }
+
+  public Map<String, Map<String, List<Integer>>> getSubsegments() {
+    return subsegments;
   }
 }
