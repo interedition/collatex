@@ -33,7 +33,7 @@ public class MatchSequence {
   }
 
   @SuppressWarnings("boxing")
-  public Integer getWitnessPosition() {
+  public Integer getSegmentPosition() {
     return getFirstWitnessWord().position;
   }
 

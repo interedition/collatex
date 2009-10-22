@@ -76,7 +76,7 @@ public class SequenceDetection {
     Comparator<MatchSequence> comparator = new Comparator<MatchSequence>() {
       @SuppressWarnings("boxing")
       public int compare(MatchSequence o1, MatchSequence o2) {
-        return o1.getWitnessPosition() - o2.getWitnessPosition();
+        return o1.getSegmentPosition() - o2.getSegmentPosition();
       }
     };
     List<MatchSequence> matchSequencesForWitness = Lists.newArrayList(matchSequences);

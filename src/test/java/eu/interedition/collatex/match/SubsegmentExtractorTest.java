@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matching;
+package eu.interedition.collatex.match;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -10,10 +10,16 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sd_editions.collatex.Block.Util;
+import com.sd_editions.collatex.match.Subsegment;
+import com.sd_editions.collatex.match.SubsegmentExtractor;
+import com.sd_editions.collatex.match.Subsegments;
+
+import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
-public class Poging2Test {
+public class SubsegmentExtractorTest {
   private WitnessBuilder builder;
 
   @Before
@@ -26,9 +32,9 @@ public class Poging2Test {
     Segment a = builder.build("a", "zijn hond liep aan zijn hand");
     Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
     Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
-    Poging2 p2 = new Poging2(a, b, c);
+    SubsegmentExtractor p2 = new SubsegmentExtractor(a, b, c);
 
-    Map<String, List<Integer>> zijnPositions = p2.matchingWordPositionsPerWitness("zijn");
+    Subsegment zijnPositions = p2.matchingWordPositionsPerWitness("zijn");
     // all 3 witnesses have at least 1 'zijn':
     assertEquals(3, zijnPositions.size());
 
@@ -48,13 +54,13 @@ public class Poging2Test {
     Segment a = builder.build("a", "Zijn hond liep aan zijn hand.");
     Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
     Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
-    Poging2 p2 = new Poging2(a, b, c);
+    SubsegmentExtractor p2 = new SubsegmentExtractor(a, b, c);
 
-    Map<String, Map<String, List<Integer>>> oneWordSequences = p2.getOneWordSequences();
-    Map<String, List<Integer>> hondSequences = oneWordSequences.get("hond");
+    Subsegments oneWordSegments = p2.getOneWordSubsegments();
+    Subsegment hondSequences = oneWordSegments.get("hond");
     assertContainsPositions(hondSequences.get("a"), 2);
     // nr. of unique normalized words in all witnesses combined
-    assertEquals(9, oneWordSequences.size());
+    assertEquals(9, oneWordSegments.size());
 
     // sequences: "zijn", "hond", "liep", "aan", "hand", "op", "pad", "met", "hij"
 
@@ -134,9 +140,24 @@ public class Poging2Test {
     Segment a = builder.build("a", "Zijn hond liep aan zijn hand.");
     Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
     Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
-    Poging2 p2 = new Poging2(a, b, c);
-    p2.go();
-    assertNotNull(p2);
+    SubsegmentExtractor sse = new SubsegmentExtractor(a, b, c);
+    sse.go();
+    assertNotNull(sse);
+    Subsegments subsegments = sse.getSubsegments();
+    assertNotNull(subsegments);
+    Util.p(subsegments);
   }
 
+  @Test
+  public void testGetPhrasesPerSegment() {
+    Segment a = builder.build("a", "Zijn hond liep aan zijn hand.");
+    Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
+    Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
+    SubsegmentExtractor sse = new SubsegmentExtractor(a, b, c);
+    sse.go();
+    Map<String, List<Phrase>> phrasesPerSegment = sse.getPhrasesPerSegment();
+    assertNotNull(phrasesPerSegment);
+    assertEquals(3, phrasesPerSegment.size());
+    Util.p(phrasesPerSegment);
+  }
 }

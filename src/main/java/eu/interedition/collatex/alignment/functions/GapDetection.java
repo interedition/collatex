@@ -106,7 +106,7 @@ public class GapDetection {
     Word nextWord = null;
     List<Phrase> gaps = Lists.newArrayList();
     for (MatchSequence sequence : sequences) {
-      int position = sequence.getWitnessPosition();
+      int position = sequence.getSegmentPosition();
       int indexDif = position - currentIndex;
       Match nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getWitnessWord();

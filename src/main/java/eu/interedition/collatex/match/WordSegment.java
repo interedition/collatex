@@ -42,7 +42,7 @@ public class WordSegment {
       Map<String, Word> nextWords = Maps.newHashMap();
       for (List<Word> wordList : wordsPerWitness.values()) {
         Word nextWord = getNextWord(wordList, witnessHash);
-        if (nextWord == null || this.wordsInSegments.contains(SegmentExtractor.wordIdentifier(nextWord))) {
+        if (nextWord == null || this.wordsInSegments.contains(OldSegmentExtractor.wordIdentifier(nextWord))) {
           nextWordSet.add(null);
         } else {
           nextWords.put(nextWord.getWitnessId(), nextWord);
@@ -53,7 +53,7 @@ public class WordSegment {
       if (nextWordsMatch) {
         for (java.util.Map.Entry<String, List<Word>> entry : wordsPerWitness.entries()) {
           Word nextWord = nextWords.get(entry.getKey());
-          this.wordsInSegments.add(SegmentExtractor.wordIdentifier(nextWord));
+          this.wordsInSegments.add(OldSegmentExtractor.wordIdentifier(nextWord));
           entry.getValue().add(nextWord);
         }
         this.title += " " + nextWordSet.iterator().next();

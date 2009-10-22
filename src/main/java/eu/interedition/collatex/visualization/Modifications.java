@@ -46,7 +46,7 @@ public class Modifications {
     return null;
   }
 
-  public Match getMatchAtWitnessPosition(int witnessPosition) {
+  public Match getMatchAtSegmentPosition(int witnessPosition) {
     for (Match match : matches) {
       if (match.getWitnessWord().position == witnessPosition) return match;
     }

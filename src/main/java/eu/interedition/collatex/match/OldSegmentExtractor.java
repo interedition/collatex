@@ -10,7 +10,7 @@ import com.sd_editions.collatex.Block.Util;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
-public class SegmentExtractor {
+public class OldSegmentExtractor {
 
   private static HashMap<String, Segment> witnessHash = Maps.newHashMap();
   private static List<String> possibleWordsInSegments;

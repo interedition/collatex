@@ -15,7 +15,7 @@ import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
-import eu.interedition.collatex.match.SegmentExtractor;
+import eu.interedition.collatex.match.OldSegmentExtractor;
 import eu.interedition.collatex.match.WordSegment;
 
 public class SegmentMatchingTest {
@@ -37,15 +37,15 @@ public class SegmentMatchingTest {
     Segment a = builder.build("a", "zijn hond liep aan zijn hand");
     Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
 
-    List<WordSegment> segments = SegmentExtractor.extractSegments(a, b);
+    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a, b);
     assert1(segments);
 
-    segments = SegmentExtractor.extractSegments(b, a);
+    segments = OldSegmentExtractor.extractSegments(b, a);
     assert1(segments);
   }
 
   private void assert1(List<WordSegment> segments) {
-    assertTrue("(some) expected segments are missing", segmentListContains(segments, //
+    assertTrue("(some) expected segments are missing", subsegmentListContainsAll(segments, //
         "zijn hond", "liep", "aan zijn hand", "op zijn pad"));
   }
 
@@ -54,15 +54,15 @@ public class SegmentMatchingTest {
     Segment a = builder.build("a", "zijn hond liep aan zijn hand op zijn dag");
     Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand op zijn dag");
 
-    List<WordSegment> segments = SegmentExtractor.extractSegments(a, b);
+    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a, b);
     assert2(segments);
 
-    segments = SegmentExtractor.extractSegments(b, a);
+    segments = OldSegmentExtractor.extractSegments(b, a);
     assert2(segments);
   }
 
   private void assert2(List<WordSegment> segments) {
-    assertTrue("(some) expected segments are missing", segmentListContains(segments, //
+    assertTrue("(some) expected segments are missing", subsegmentListContainsAll(segments, //
         "zijn hond", "liep", "aan zijn hand op zijn dag", "op zijn pad"));
   }
 
@@ -72,25 +72,25 @@ public class SegmentMatchingTest {
     Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
     Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
 
-    List<WordSegment> segments = SegmentExtractor.extractSegments(a, b, c);
+    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a, b, c);
     assert3(segments);
 
-    segments = SegmentExtractor.extractSegments(b, c, a);
+    segments = OldSegmentExtractor.extractSegments(b, c, a);
     assert3(segments);
 
-    segments = SegmentExtractor.extractSegments(c, a, b);
+    segments = OldSegmentExtractor.extractSegments(c, a, b);
     assert3(segments);
 
-    segments = SegmentExtractor.extractSegments(a, c, b);
+    segments = OldSegmentExtractor.extractSegments(a, c, b);
     assert3(segments);
   }
 
   private void assert3(List<WordSegment> segments) {
-    assertTrue("(some) expected segments are missing", segmentListContains(segments, //
+    assertTrue("(some) expected segments are missing", subsegmentListContainsAll(segments, //
         "zijn hond", "liep", "aan zijn hand", "op zijn pad", "met", "hij"));
   }
 
-  private boolean segmentListContains(List<WordSegment> segmentSet, String... segments) {
+  private boolean subsegmentListContainsAll(List<WordSegment> segmentSet, String... segments) {
     Set<String> containedStrings = Sets.newHashSet();
     for (WordSegment wordsegment : segmentSet) {
       containedStrings.add(wordsegment.toString());

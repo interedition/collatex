@@ -34,7 +34,7 @@ public class TranspositionDetection {
   public static List<Tuple2<MatchSequence>> filterAwayRealMatches(List<Tuple2<MatchSequence>> possibleMatches) {
     List<Tuple2<MatchSequence>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence>>() {
       public boolean apply(Tuple2<MatchSequence> tuple) {
-        return tuple.left.code != tuple.right.code;
+        return !tuple.left.code.equals(tuple.right.code);
       }
     }));
     return filteredMatchSequences;
@@ -85,7 +85,7 @@ public class TranspositionDetection {
   public static List<MatchSequence> getMatches(List<Tuple2<MatchSequence>> possibleMatches) {
     List<Tuple2<MatchSequence>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence>>() {
       public boolean apply(Tuple2<MatchSequence> tuple) {
-        return tuple.left.code == tuple.right.code;
+        return tuple.left.code.equals(tuple.right.code);
       }
     }));
     List<MatchSequence> realMatches = Lists.newArrayList();

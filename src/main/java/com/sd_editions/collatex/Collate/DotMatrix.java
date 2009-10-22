@@ -151,7 +151,7 @@ public class DotMatrix {
   private Sequenz rearrangeTransposTupelSeq(Sequenz seq2) {
     ArrayList<Tuple> arrLTransposTup = new ArrayList<Tuple>();
     int count = 0;
-    if (seq2.getSize() % 2 == 1) {
+    if (seq2.getSize() % 2 != 0) {
       for (int firstTup = 0, lastTup = seq2.getSize() - 1; firstTup < (seq2.getSize() - 1) / 2; firstTup++, lastTup--) {
         Tuple nTup = new Tuple(seq2.getSeq().get(firstTup).baseIndex, seq2.getSeq().get(lastTup).witnessIndex);
         arrLTransposTup.add(nTup);

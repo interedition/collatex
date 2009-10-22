@@ -26,7 +26,7 @@ public class WordPairCollectionTest {
   private Segment b;
 
   @Before
-  public void SetUp() {
+  public void setUp() {
     WitnessBuilder builder = new WitnessBuilder();
     a = builder.build("op zijn pad liep zijn hond aan zijn hand op zijn dag");
     b = builder.build("zijn hond liep aan zijn hand op zijn dag");
