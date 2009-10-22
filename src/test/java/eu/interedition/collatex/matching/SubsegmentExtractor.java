@@ -1,10 +1,8 @@
 package eu.interedition.collatex.matching;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import com.google.common.base.Function;
@@ -22,7 +20,8 @@ import eu.interedition.collatex.input.Word;
 public class SubsegmentExtractor {
   private final Segment[] witnesses;
   private static Map<String, Segment> witnessHash = Maps.newHashMap();
-  private Map<String, Map<String, List<Integer>>> subsegments;
+  //  private Map<String, Map<String, List<Integer>>> subsegments;
+  private Subsegments subsegments;
 
   Function<Word, Integer> extractPosition = new Function<Word, Integer>() {
     @Override
@@ -41,13 +40,102 @@ public class SubsegmentExtractor {
 
   void go() {
     subsegments = getOneWordSubsegments();
+
+    Multimap<WitnessPosition, String> sequencesAtWitnessPosition = getSequencesAtWitnessPosition();
+    Util.p("sequencesAtWitnessPosition", sequencesAtWitnessPosition);
+
+    Subsegment firstOpenSubsegment = subsegments.getFirstOpenSubsegment();
+    while (firstOpenSubsegment != null) {
+      Util.p("firstOpenSubsegment", firstOpenSubsegment);
+      subsegments.close(firstOpenSubsegment.getTitle());
+      firstOpenSubsegment = subsegments.getFirstOpenSubsegment();
+    }
+
+    // sequences: "zijn", "hond", "liep", "aan", "hand", "op", "pad", "met", "hij"
+
+    // neem: zijn
+    // zijn is in witness a,b,c
+    // nextwords_for_zijn: hond, hand,pad
+    //  hond in a,b,c => "zijn hond" is een sequence
+    //  hand in a,b,c => "zijn hand" is een sequence
+    //  pad in b,c => "zijn pad" is een sequence
+    // verwijder zijn, hond, hand en pad als sequences
+    // voeg toe: "zijn hond", "zijn hand", "zijn pad"
+
+    // sequences: "zijn hond", "liep", "aan", "zijn hand", "op", "zijn pad", "met", "hij"
+
+    // groei "zijn hond": a:liep,b:aan,c:aan => sequence is final
+    // groei "zijn hand": a:-,b:-,c:liep => final
+    // groei "zijn pad": b:liep,c:- => final
+
+    // sequences: "zijn hond"!, "liep", "aan", "zijn hand"!, "op", "zijn pad"!, "met", "hij"
+
+    // neem "liep"
+    // in witness a,b,c
+    // nextwords": aan,zijn,hij
+    // nextwords.size=(a,b,c).size => liep is final
+
+    // sequences: "zijn hond"!, "liep"!, "aan", "zijn hand"!, "op", "zijn pad"!, "met", "hij"
+
+    // neem "aan"
+    // in witness a,b,c
+    // nextwords: zijn (onderdeel van "zijn hand"
+    // nextwords.size=(a,b,c).size => "aan zijn hand" is nieuwe sequence
+    // verwijder "aan" en "zijn hand"
+    // voeg "aan zijn hand" toe. "zijn hand" was final, dus is "aan zijn hand" dat ook
+
+    // sequences: "zijn hond"!, "liep"!, "aan zijn hand"!, "op", "zijn pad"!, "met", "hij"
+
+    // "op"
+    // in witness b,c
+    // nextwords: zijn (onderdeel van "zijn pad")
+    // nextwords.size=(b,c).size => "op zijn pad" is nieuwe sequence
+    // verwijder "op" en "zijn pad"
+    // voeg "op zijn pad" toe. "zijn pad" was final, dus is "op zijn pad" dat ook
+
+    // sequences: "zijn hond"!, "liep"!, "aan zijn hand"!, "op zijn pad"!, "met", "hij"
+
+    // "met"
+    // in witness c
+    // nextword: zijn (onderdeel van "zijn hond", dat andere witnesses heeft dan met => met is final) 
+
+    // sequences: "zijn hond"!, "liep"!, "aan zijn hand"!, "op zijn pad"!, "met"!, "hij"
+
+    // "hij"
+    // in witness c
+    // nextword: op (onderdeel van "op zijn pad", dat andere witnesses heeft dan met => hij is final)
+
+    // sequences: "zijn hond"!, "liep"!, "aan zijn hand"!, "op zijn pad"!, "met"!, "hij"!
+
+    // geen woorden meer: klaar!
+
+    // sequences: "zijn hond (a1-2,b)"!, "liep"!, "aan zijn hand"!, "op zijn pad"!, "met"!, "hij"!
+
+    //    Iterator<WitnessPosition> iterator = sequencesAtWitnessPosition.keys().iterator();
+    //    WitnessPosition dummy = iterator.next();
+    //    WitnessPosition first = iterator.next();
+    //    // see if wordsegement at position first is expandable
+    //    WitnessPosition next = first.nextWitnessPosition();
+    //    Collection<String> sequencesForFirst = sequencesAtWitnessPosition.get(first);
+    //    Util.p(first);
+    //    Util.p(sequencesForFirst);
+    //    Collection<String> sequencesForNext = sequencesAtWitnessPosition.get(next);
+    //    Util.p(next);
+    //    Util.p(sequencesForNext);
+    //
+    //    Collection<String> commonSequences = findCommonSequences(sequencesForFirst, sequencesForNext);
+    //    Util.p(commonSequences);
+  }
+
+  private Subsegment getFirstOpenSubsegment() {
+    return null;
+  }
+
+  private Multimap<WitnessPosition, String> getSequencesAtWitnessPosition() {
     Multimap<WitnessPosition, String> sequencesAtWitnessPosition = Multimaps.newArrayListMultimap();
-    Set<Entry<String, Map<String, List<Integer>>>> entrySet = subsegments.entrySet();
-    for (Entry<String, Map<String, List<Integer>>> entry : entrySet) {
-      String sequenceTitle = entry.getKey();
-      Map<String, List<Integer>> positionsPerWitness = entry.getValue();
-      Set<Entry<String, List<Integer>>> entrySet2 = positionsPerWitness.entrySet();
-      for (Entry<String, List<Integer>> positionsPerWitnessEntry : entrySet2) {
+    for (Subsegment subsegment : subsegments.all()) {
+      String sequenceTitle = subsegment.getTitle();
+      for (Entry<String, List<Integer>> positionsPerWitnessEntry : subsegment.entrySet()) {
         String witnessId = positionsPerWitnessEntry.getKey();
         List<Integer> positions = positionsPerWitnessEntry.getValue();
         for (Integer position : positions) {
@@ -55,24 +143,10 @@ public class SubsegmentExtractor {
           sequencesAtWitnessPosition.put(witnessPosition, sequenceTitle);
         }
       }
-      Util.p(sequenceTitle + " occurs in " + positionsPerWitness.size() + " witnesses.");
+      Util.p(sequenceTitle + " occurs in " + subsegment.size() + " witnesses.");
       Util.p(sequencesAtWitnessPosition);
     }
-
-    Iterator<WitnessPosition> iterator = sequencesAtWitnessPosition.keys().iterator();
-    WitnessPosition dummy = iterator.next();
-    WitnessPosition first = iterator.next();
-    // see if wordsegement at position first is expandable
-    WitnessPosition next = first.nextWitnessPosition();
-    Collection<String> sequencesForFirst = sequencesAtWitnessPosition.get(first);
-    Util.p(first);
-    Util.p(sequencesForFirst);
-    Collection<String> sequencesForNext = sequencesAtWitnessPosition.get(next);
-    Util.p(next);
-    Util.p(sequencesForNext);
-
-    Collection<String> commonSequences = findCommonSequences(sequencesForFirst, sequencesForNext);
-    Util.p(commonSequences);
+    return sequencesAtWitnessPosition;
   }
 
   Collection<String> findCommonSequences(Collection<String> sequences0, Collection<String> sequences1) {
@@ -94,14 +168,14 @@ public class SubsegmentExtractor {
     return commonSequences;
   }
 
-  Map<String, Map<String, List<Integer>>> getOneWordSubsegments() {
-    Map<String, Map<String, List<Integer>>> oneWordSequences = Maps.newHashMap();
+  Subsegments getOneWordSubsegments() {
+    Subsegments oneWordSequences = new Subsegments();
     for (Segment witness : witnesses) {
       //      Util.p(witness);
       for (Word word : witness.getWords()) {
         final String wordToMatch = word.normalized;
-        if (!oneWordSequences.containsKey(wordToMatch)) {
-          oneWordSequences.put(wordToMatch, matchingWordPositionsPerWitness(wordToMatch));
+        if (!oneWordSequences.containsTitle(wordToMatch)) {
+          oneWordSequences.add(wordToMatch, matchingWordPositionsPerWitness(wordToMatch));
         }
       }
     }
@@ -118,20 +192,21 @@ public class SubsegmentExtractor {
     return matching;
   }
 
-  public Map<String, List<Integer>> matchingWordPositionsPerWitness(String wordToMatch) {
+  public Subsegment matchingWordPositionsPerWitness(String wordToMatch) {
     Predicate<Word> matchingPredicate = matchingPredicate(wordToMatch);
-    Map<String, List<Integer>> map = Maps.newHashMap();
+    //    Map<String, List<Integer>> map = Maps.newHashMap();
+    Subsegment subsegment = new Subsegment(wordToMatch);
     for (Segment witness : witnesses) {
       String witnessId = witness.id;
       Iterable<Word> matchingWords = Iterables.filter(witness.getWords(), matchingPredicate);
       Iterable<Integer> matchingWordPositions = Iterables.transform(matchingWords, extractPosition);
       List<Integer> positions = Lists.newArrayList(matchingWordPositions);
-      if (!positions.isEmpty()) map.put(witnessId, positions);
+      if (!positions.isEmpty()) subsegment.add(witnessId, positions);
     }
-    return map;
+    return subsegment;
   }
 
-  public Map<String, Map<String, List<Integer>>> getSubsegments() {
+  public Subsegments getSubsegments() {
     return subsegments;
   }
 }

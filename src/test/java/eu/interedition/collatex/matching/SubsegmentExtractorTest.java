@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +27,7 @@ public class SubsegmentExtractorTest {
     Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
     SubsegmentExtractor p2 = new SubsegmentExtractor(a, b, c);
 
-    Map<String, List<Integer>> zijnPositions = p2.matchingWordPositionsPerWitness("zijn");
+    Subsegment zijnPositions = p2.matchingWordPositionsPerWitness("zijn");
     // all 3 witnesses have at least 1 'zijn':
     assertEquals(3, zijnPositions.size());
 
@@ -50,8 +49,8 @@ public class SubsegmentExtractorTest {
     Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
     SubsegmentExtractor p2 = new SubsegmentExtractor(a, b, c);
 
-    Map<String, Map<String, List<Integer>>> oneWordSegments = p2.getOneWordSubsegments();
-    Map<String, List<Integer>> hondSequences = oneWordSegments.get("hond");
+    Subsegments oneWordSegments = p2.getOneWordSubsegments();
+    Subsegment hondSequences = oneWordSegments.get("hond");
     assertContainsPositions(hondSequences.get("a"), 2);
     // nr. of unique normalized words in all witnesses combined
     assertEquals(9, oneWordSegments.size());
