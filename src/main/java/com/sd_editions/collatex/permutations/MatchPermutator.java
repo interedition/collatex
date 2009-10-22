@@ -134,18 +134,18 @@ public class MatchPermutator {
   //      }
   //    });
   //    List<Integer> allBasePositions = Lists.newArrayList();
-  //    List<Integer> allWitnessPositions = Lists.newArrayList();
+  //    List<Integer> allSegmentPositions = Lists.newArrayList();
   //    for (MatchGroup mg : _matchgroups) {
   //      for (Match m : mg) {
   //        allBasePositions.add(m.getBaseWord().position);
-  //        allWitnessPositions.add(m.getWitnessWord().position);
+  //        allSegmentPositions.add(m.getWitnessWord().position);
   //      }
   //    }
   //
   //    Set<Integer> uniqueBasePositions = Sets.newHashSet(allBasePositions);
-  //    Set<Integer> uniqueWitnessPositions = Sets.newHashSet(allWitnessPositions);
+  //    Set<Integer> uniqueSegmentPositions = Sets.newHashSet(allSegmentPositions);
   //    boolean baseWordIsUnique = uniqueBasePositions.size() == allBasePositions.size();
-  //    boolean witnessWordIsUnique = uniqueWitnessPositions.size() == allWitnessPositions.size();
+  //    boolean witnessWordIsUnique = uniqueSegmentPositions.size() == allSegmentPositions.size();
   //    boolean result = onlyOneMatchPerGroup && baseWordIsUnique && witnessWordIsUnique;
   //    //    System.out.println("incoming: " + _matchgroups);
   //    //    System.out.println("result: " + result);

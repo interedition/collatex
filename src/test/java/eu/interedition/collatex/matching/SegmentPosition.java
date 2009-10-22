@@ -1,11 +1,11 @@
 package eu.interedition.collatex.matching;
 
-public class WitnessPosition {
+public class SegmentPosition {
 
   public final String witnessId;
   public final Integer position;
 
-  public WitnessPosition(String witnessId1, Integer position1) {
+  public SegmentPosition(String witnessId1, Integer position1) {
     this.witnessId = witnessId1;
     this.position = position1;
   }
@@ -16,15 +16,15 @@ public class WitnessPosition {
   }
 
   @SuppressWarnings("boxing")
-  public WitnessPosition nextWitnessPosition() {
-    return new WitnessPosition(witnessId, position + 1);
+  public SegmentPosition nextSegmentPosition() {
+    return new SegmentPosition(witnessId, position + 1);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof WitnessPosition)) return false;
-    WitnessPosition witnessPosition = (WitnessPosition) obj;
-    return witnessPosition.witnessId.equals(this.witnessId) && witnessPosition.position.equals(this.position);
+    if (!(obj instanceof SegmentPosition)) return false;
+    SegmentPosition segmentPosition = (SegmentPosition) obj;
+    return segmentPosition.witnessId.equals(this.witnessId) && segmentPosition.position.equals(this.position);
   }
 
   @Override

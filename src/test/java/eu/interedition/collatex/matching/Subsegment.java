@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class Subsegment {
@@ -47,5 +48,20 @@ public class Subsegment {
 
   public void close() {
     open = false;
+  }
+
+  public Set<String> getWitnessIds() {
+    return map.keySet();
+  }
+
+  public List<SegmentPosition> getSegmentPositions() {
+    List<SegmentPosition> list = Lists.newArrayList();
+    for (Entry<String, List<Integer>> entry : map.entrySet()) {
+      String witnessId = entry.getKey();
+      for (Integer position : entry.getValue()) {
+        list.add(new SegmentPosition(witnessId, position));
+      }
+    }
+    return list;
   }
 }

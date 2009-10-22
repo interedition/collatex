@@ -3,6 +3,7 @@ package eu.interedition.collatex.matching;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import com.google.common.base.Function;
@@ -41,14 +42,27 @@ public class SubsegmentExtractor {
   void go() {
     subsegments = getOneWordSubsegments();
 
-    Multimap<WitnessPosition, String> sequencesAtWitnessPosition = getSequencesAtWitnessPosition();
-    Util.p("sequencesAtWitnessPosition", sequencesAtWitnessPosition);
+    Multimap<SegmentPosition, String> sequencesAtSegmentPosition = getSequencesAtSegmentPosition();
+    Util.p("sequencesAtSegmentPosition", sequencesAtSegmentPosition);
 
-    Subsegment firstOpenSubsegment = subsegments.getFirstOpenSubsegment();
-    while (firstOpenSubsegment != null) {
-      Util.p("firstOpenSubsegment", firstOpenSubsegment);
-      subsegments.close(firstOpenSubsegment.getTitle());
-      firstOpenSubsegment = subsegments.getFirstOpenSubsegment();
+    Subsegment subsegment = subsegments.getFirstOpenSubsegment();
+    while (subsegment != null) {
+      Util.p("firstOpenSubsegment", subsegment);
+      Set<String> witnessIdsForSubsegment = subsegment.getWitnessIds();
+      Util.p(witnessIdsForSubsegment);
+      for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
+        SegmentPosition next = segmentPosition.nextSegmentPosition();
+        Subsegment nextSubsegment = subsegments.getSubsegmentAtSegmentPosition(next);
+      }
+
+      subsegments.close(subsegment.getTitle());
+      subsegment = subsegments.getFirstOpenSubsegment();
+
+      //      Set<Entry<String, List<Integer>>> entrySet = subsegment.entrySet();
+      //      for (Entry<String, List<Integer>> entry : entrySet) {
+      //        String witnessId = entry.getKey();
+      //        List<Integer> positions = entry.getValue();
+      //      }
     }
 
     // sequences: "zijn", "hond", "liep", "aan", "hand", "op", "pad", "met", "hij"
@@ -111,15 +125,15 @@ public class SubsegmentExtractor {
 
     // sequences: "zijn hond (a1-2,b)"!, "liep"!, "aan zijn hand"!, "op zijn pad"!, "met"!, "hij"!
 
-    //    Iterator<WitnessPosition> iterator = sequencesAtWitnessPosition.keys().iterator();
-    //    WitnessPosition dummy = iterator.next();
-    //    WitnessPosition first = iterator.next();
+    //    Iterator<SegmentPosition> iterator = sequencesAtSegmentPosition.keys().iterator();
+    //    SegmentPosition dummy = iterator.next();
+    //    SegmentPosition first = iterator.next();
     //    // see if wordsegement at position first is expandable
-    //    WitnessPosition next = first.nextWitnessPosition();
-    //    Collection<String> sequencesForFirst = sequencesAtWitnessPosition.get(first);
+    //    SegmentPosition next = first.nextSegmentPosition();
+    //    Collection<String> sequencesForFirst = sequencesAtSegmentPosition.get(first);
     //    Util.p(first);
     //    Util.p(sequencesForFirst);
-    //    Collection<String> sequencesForNext = sequencesAtWitnessPosition.get(next);
+    //    Collection<String> sequencesForNext = sequencesAtSegmentPosition.get(next);
     //    Util.p(next);
     //    Util.p(sequencesForNext);
     //
@@ -131,22 +145,22 @@ public class SubsegmentExtractor {
     return null;
   }
 
-  private Multimap<WitnessPosition, String> getSequencesAtWitnessPosition() {
-    Multimap<WitnessPosition, String> sequencesAtWitnessPosition = Multimaps.newArrayListMultimap();
+  private Multimap<SegmentPosition, String> getSequencesAtSegmentPosition() {
+    Multimap<SegmentPosition, String> sequencesAtSegmentPosition = Multimaps.newArrayListMultimap();
     for (Subsegment subsegment : subsegments.all()) {
       String sequenceTitle = subsegment.getTitle();
       for (Entry<String, List<Integer>> positionsPerWitnessEntry : subsegment.entrySet()) {
         String witnessId = positionsPerWitnessEntry.getKey();
         List<Integer> positions = positionsPerWitnessEntry.getValue();
         for (Integer position : positions) {
-          WitnessPosition witnessPosition = new WitnessPosition(witnessId, position);
-          sequencesAtWitnessPosition.put(witnessPosition, sequenceTitle);
+          SegmentPosition segmentPosition = new SegmentPosition(witnessId, position);
+          sequencesAtSegmentPosition.put(segmentPosition, sequenceTitle);
         }
       }
       Util.p(sequenceTitle + " occurs in " + subsegment.size() + " witnesses.");
-      Util.p(sequencesAtWitnessPosition);
+      Util.p(sequencesAtSegmentPosition);
     }
-    return sequencesAtWitnessPosition;
+    return sequencesAtSegmentPosition;
   }
 
   Collection<String> findCommonSequences(Collection<String> sequences0, Collection<String> sequences1) {

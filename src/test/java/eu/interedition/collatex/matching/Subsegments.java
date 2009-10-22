@@ -11,6 +11,7 @@ import com.google.common.collect.Maps;
 public class Subsegments {
   private final Map<String, Subsegment> subsegments;
   private final Predicate<Subsegment> subsegmentIsOpen;
+  private final Map<SegmentPosition, String> subsegmentsAtSegmentPosition = Maps.newHashMap();
 
   public Subsegments() {
     subsegments = Maps.newHashMap();
@@ -32,6 +33,9 @@ public class Subsegments {
 
   public void add(String title, Subsegment subsegment) {
     subsegments.put(title, subsegment);
+    for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
+      subsegmentsAtSegmentPosition.put(segmentPosition, title);
+    }
   }
 
   public Collection<Subsegment> all() {
@@ -52,5 +56,9 @@ public class Subsegments {
 
   public void close(String title) {
     subsegments.get(title).close();
+  }
+
+  public Subsegment getSubsegmentAtSegmentPosition(SegmentPosition next) {
+    return get(subsegmentsAtSegmentPosition.get(next));
   }
 }

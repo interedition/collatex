@@ -92,7 +92,7 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
 
     } else {
       // now, first try to find a match in the witnessBlock for the baseWord
-      Block savedWitnessPosition = witnessBlock;
+      Block savedSegmentPosition = witnessBlock;
       int savedWitnessIndex = witnessIndex;
       boolean foundMatchInWitness = false;
       while (!foundMatchInWitness && witnessWord.hasNextSibling()) {
@@ -116,8 +116,8 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
       }
       if (!foundMatchInWitness) {
         // reset
-        witnessBlock = savedWitnessPosition;
-        witnessWord = (Word) savedWitnessPosition;
+        witnessBlock = savedSegmentPosition;
+        witnessWord = (Word) savedSegmentPosition;
         witnessIndex = savedWitnessIndex;
       }
     }
