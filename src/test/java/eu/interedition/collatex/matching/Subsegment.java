@@ -7,6 +7,11 @@ import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sd_editions.collatex.Block.Util;
+
+import eu.interedition.collatex.alignment.Phrase;
+import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Word;
 
 public class Subsegment {
   private String title;
@@ -76,6 +81,7 @@ public class Subsegment {
 
   public void concat(Subsegment nextSubsegment) {
     title += " " + nextSubsegment.getTitle();
+    numberOfWords += nextSubsegment.getNumberOfWords();
   }
 
   @Override
@@ -83,4 +89,19 @@ public class Subsegment {
     return getTitle() + " " + map.toString();
   }
 
+  @SuppressWarnings("boxing")
+  public Phrase getPhrase(Segment segment) {
+    Phrase phrase = null;
+    Util.p("segment.id", segment.id);
+    Util.p("map", map);
+    List<Integer> list = map.get(segment.id);
+    if (list != null) {
+      int beginPosition = list.get(0);
+      Word beginWord = segment.getWordOnPosition(beginPosition);
+      int endPosition = beginPosition + numberOfWords - 1;
+      Word endWord = segment.getWordOnPosition(endPosition);
+      phrase = new Phrase(segment, beginWord, endWord);
+    }
+    return phrase;
+  }
 }

@@ -5,10 +5,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sd_editions.collatex.Block.Util;
+
+import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -136,7 +140,21 @@ public class SubsegmentExtractorTest {
     SubsegmentExtractor sse = new SubsegmentExtractor(a, b, c);
     sse.go();
     assertNotNull(sse);
-    sse.getSubsegments();
+    Subsegments subsegments = sse.getSubsegments();
+    assertNotNull(subsegments);
+    Util.p(subsegments);
   }
 
+  @Test
+  public void testGetPhrasesPerSegment() {
+    Segment a = builder.build("a", "Zijn hond liep aan zijn hand.");
+    Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
+    Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
+    SubsegmentExtractor sse = new SubsegmentExtractor(a, b, c);
+    sse.go();
+    Map<String, List<Phrase>> phrasesPerSegment = sse.getPhrasesPerSegment();
+    assertNotNull(phrasesPerSegment);
+    assertEquals(3, phrasesPerSegment.size());
+    Util.p(phrasesPerSegment);
+  }
 }

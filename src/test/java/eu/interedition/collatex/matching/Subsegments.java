@@ -1,13 +1,18 @@
 package eu.interedition.collatex.matching;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.Block.Util;
+
+import eu.interedition.collatex.alignment.Phrase;
+import eu.interedition.collatex.input.Segment;
 
 public class Subsegments {
   private final Map<String, Subsegment> subsegments;
@@ -77,5 +82,19 @@ public class Subsegments {
 
   private void removeSubsegment(String subsegmentTitle) {
   //    subsegments.remove(subsegmentTitle);
+  }
+
+  @Override
+  public String toString() {
+    return subsegments.toString();
+  }
+
+  public List<Phrase> getPhrases(Segment segment) {
+    List<Phrase> phrases = Lists.newArrayList();
+    for (Subsegment subsegment : subsegments.values()) {
+      Phrase phrase = subsegment.getPhrase(segment);//new Phrase(segment, segment.getWordOnPosition(subsegment.getStartPosition(segmentId)), segment.getWordOnPosition(subsegment.getEndPosition(segmentId)));
+      if (phrase != null) phrases.add(phrase);
+    }
+    return phrases;
   }
 }

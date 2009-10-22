@@ -13,9 +13,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Block.Util;
 
+import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
@@ -56,17 +56,35 @@ public class SubsegmentExtractor {
       Set<String> witnessIdsForSubsegment = subsegment.getWitnessIds();
       //      Util.p(witnessIdsForSubsegment);
 
-      Set<String> nextSubsegmentTitleSet = Sets.newHashSet();
+      Map<String, List<SegmentPosition>> nextWordMap = Maps.newHashMap();
       for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
-        SegmentPosition next = segmentPosition.nextSegmentPosition();
-        nextSubsegmentTitleSet.add(subsegments.getSubsegmentTitleAtSegmentPosition(next));
+        SegmentPosition nextSegmentPosition = segmentPosition.nextSegmentPosition();
+        String nextSegmentTitle = subsegments.getSubsegmentTitleAtSegmentPosition(nextSegmentPosition);
+        List<SegmentPosition> list = nextWordMap.get(nextSegmentTitle);
+        if (list == null) list = Lists.newArrayList();
+        list.add(nextSegmentPosition);
+        nextWordMap.put(nextSegmentTitle, list);
       }
-      Util.p("nextSubsegmentTitleSet", nextSubsegmentTitleSet);
-      if (nextSubsegmentTitleSet.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
-        // subsegment and nextSubsegment can be joined
-        Util.remark("join!");
-        subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
-      } else {}
+      Util.p("nextwordmap", nextWordMap);
+
+      Set<Entry<String, List<SegmentPosition>>> entrySet = nextWordMap.entrySet();
+      for (Entry<String, List<SegmentPosition>> entry : entrySet) {
+        String title = entry.getKey();
+        entry.getValue();
+
+      }
+
+      //      Set<String> nextSubsegmentTitleSet = Sets.newHashSet();
+      //      for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
+      //        SegmentPosition next = segmentPosition.nextSegmentPosition();
+      //        nextSubsegmentTitleSet.add(subsegments.getSubsegmentTitleAtSegmentPosition(next));
+      //      }
+      //      Util.p("nextSubsegmentTitleSet", nextSubsegmentTitleSet);
+      //      if (nextSubsegmentTitleSet.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
+      //        // subsegment and nextSubsegment can be joined
+      //        Util.remark("join!");
+      //        subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
+      //      } else {}
 
       subsegments.close(subsegment.getTitle());
       subsegment = subsegments.getFirstOpenSubsegment();
@@ -82,7 +100,7 @@ public class SubsegmentExtractor {
 
     // neem: zijn
     // zijn is in witness a,b,c
-    // nextwords_for_zijn: hond, hand,pad
+    // nextwords_for_zijn: hond, hand, pad
     //  hond in a,b,c => "zijn hond" is een sequence
     //  hand in a,b,c => "zijn hand" is een sequence
     //  pad in b,c => "zijn pad" is een sequence
@@ -232,4 +250,14 @@ public class SubsegmentExtractor {
   public Subsegments getSubsegments() {
     return subsegments;
   }
+
+  public Map<String, List<Phrase>> getPhrasesPerSegment() {
+    Map<String, List<Phrase>> phrasesPerSegment = Maps.newHashMap();
+    for (Segment segment : witnesses) {
+      List<Phrase> phraseList = subsegments.getPhrases(segment);
+      phrasesPerSegment.put(segment.id, phraseList);
+    }
+    return phrasesPerSegment;
+  }
+
 }
