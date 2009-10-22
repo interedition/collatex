@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.input.Segment;
@@ -35,8 +36,10 @@ public class SubsegmentExtractor {
     this.witnesses = _witnesses;
 
     for (Segment witness : witnesses) {
+      Util.p(witness.id, witness);
       witnessHash.put(witness.id, witness);
     }
+    Util.newline();
   }
 
   void go() {
@@ -47,13 +50,23 @@ public class SubsegmentExtractor {
 
     Subsegment subsegment = subsegments.getFirstOpenSubsegment();
     while (subsegment != null) {
-      Util.p("firstOpenSubsegment", subsegment);
+      Util.newline();
+      Util.p("subsegment", subsegment);
+
       Set<String> witnessIdsForSubsegment = subsegment.getWitnessIds();
-      Util.p(witnessIdsForSubsegment);
+      //      Util.p(witnessIdsForSubsegment);
+
+      Set<String> nextSubsegmentTitleSet = Sets.newHashSet();
       for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
         SegmentPosition next = segmentPosition.nextSegmentPosition();
-        Subsegment nextSubsegment = subsegments.getSubsegmentAtSegmentPosition(next);
+        nextSubsegmentTitleSet.add(subsegments.getSubsegmentTitleAtSegmentPosition(next));
       }
+      Util.p("nextSubsegmentTitleSet", nextSubsegmentTitleSet);
+      if (nextSubsegmentTitleSet.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
+        // subsegment and nextSubsegment can be joined
+        Util.remark("join!");
+        subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
+      } else {}
 
       subsegments.close(subsegment.getTitle());
       subsegment = subsegments.getFirstOpenSubsegment();
@@ -141,10 +154,6 @@ public class SubsegmentExtractor {
     //    Util.p(commonSequences);
   }
 
-  private Subsegment getFirstOpenSubsegment() {
-    return null;
-  }
-
   private Multimap<SegmentPosition, String> getSequencesAtSegmentPosition() {
     Multimap<SegmentPosition, String> sequencesAtSegmentPosition = Multimaps.newArrayListMultimap();
     for (Subsegment subsegment : subsegments.all()) {
@@ -157,8 +166,8 @@ public class SubsegmentExtractor {
           sequencesAtSegmentPosition.put(segmentPosition, sequenceTitle);
         }
       }
-      Util.p(sequenceTitle + " occurs in " + subsegment.size() + " witnesses.");
-      Util.p(sequencesAtSegmentPosition);
+      //      Util.p(sequenceTitle + " occurs in " + subsegment.size() + " witnesses.");
+      //      Util.p(sequencesAtSegmentPosition);
     }
     return sequencesAtSegmentPosition;
   }
