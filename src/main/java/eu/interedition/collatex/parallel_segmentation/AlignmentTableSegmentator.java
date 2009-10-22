@@ -32,7 +32,7 @@ public class AlignmentTableSegmentator {
         mergedColumn = new SegmentColumn2(alignmentTable.getWitnesses());
         mergedColumns.add(mergedColumn);
       }
-  
+
       List<Segment> witnesses = alignmentTable.getWitnesses();
       for (Segment witness : witnesses) {
         if (column.containsWitness(witness)) {
@@ -40,9 +40,9 @@ public class AlignmentTableSegmentator {
           mergedColumn.addWord(witness, word);
         }
       }
-  
+
       previousColumn = column;
-  
+
     }
     return mergedColumns;
   }

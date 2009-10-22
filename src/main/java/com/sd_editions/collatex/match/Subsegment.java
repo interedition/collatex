@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matching;
+package com.sd_editions.collatex.match;
 
 import java.util.List;
 import java.util.Map;
@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.input.Segment;
@@ -92,9 +91,7 @@ public class Subsegment {
   @SuppressWarnings("boxing")
   public Phrase getPhrase(Segment segment) {
     Phrase phrase = null;
-    Util.p("segment.id", segment.id);
-    Util.p("map", map);
-    List<Integer> list = map.get(segment.id);
+    List<Integer> list = map.get(segment.getWitnessId());
     if (list != null) {
       int beginPosition = list.get(0);
       Word beginWord = segment.getWordOnPosition(beginPosition);

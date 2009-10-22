@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matching;
+package com.sd_editions.collatex.match;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,8 +20,8 @@ import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
 public class SubsegmentExtractor {
-  private final Segment[] witnesses;
-  private static Map<String, Segment> witnessHash = Maps.newHashMap();
+  private final Segment[] segments;
+  private static Map<String, Segment> segmentHash = Maps.newHashMap();
   //  private Map<String, Map<String, List<Integer>>> subsegments;
   private Subsegments subsegments;
 
@@ -32,17 +32,17 @@ public class SubsegmentExtractor {
     }
   };
 
-  public SubsegmentExtractor(Segment... _witnesses) {
-    this.witnesses = _witnesses;
+  public SubsegmentExtractor(Segment... _segments) {
+    this.segments = _segments;
 
-    for (Segment witness : witnesses) {
-      Util.p(witness.id, witness);
-      witnessHash.put(witness.id, witness);
+    for (Segment segment : segments) {
+      Util.p(segment.getWitnessId(), segment);
+      segmentHash.put(segment.getWitnessId(), segment);
     }
     Util.newline();
   }
 
-  void go() {
+  public void go() {
     subsegments = getOneWordSubsegments();
 
     Multimap<SegmentPosition, String> sequencesAtSegmentPosition = getSequencesAtSegmentPosition();
@@ -53,8 +53,7 @@ public class SubsegmentExtractor {
       Util.newline();
       Util.p("subsegment", subsegment);
 
-      Set<String> witnessIdsForSubsegment = subsegment.getWitnessIds();
-      //      Util.p(witnessIdsForSubsegment);
+      subsegment.getWitnessIds();
 
       Map<String, List<SegmentPosition>> nextWordMap = Maps.newHashMap();
       for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
@@ -69,7 +68,7 @@ public class SubsegmentExtractor {
 
       Set<Entry<String, List<SegmentPosition>>> entrySet = nextWordMap.entrySet();
       for (Entry<String, List<SegmentPosition>> entry : entrySet) {
-        String title = entry.getKey();
+        entry.getKey();
         entry.getValue();
 
       }
@@ -209,11 +208,11 @@ public class SubsegmentExtractor {
     return commonSequences;
   }
 
-  Subsegments getOneWordSubsegments() {
+  public Subsegments getOneWordSubsegments() {
     Subsegments oneWordSequences = new Subsegments();
-    for (Segment witness : witnesses) {
+    for (Segment segment : segments) {
       //      Util.p(witness);
-      for (Word word : witness.getWords()) {
+      for (Word word : segment.getWords()) {
         final String wordToMatch = word.normalized;
         if (!oneWordSequences.containsTitle(wordToMatch)) {
           oneWordSequences.add(wordToMatch, matchingWordPositionsPerWitness(wordToMatch));
@@ -237,9 +236,9 @@ public class SubsegmentExtractor {
     Predicate<Word> matchingPredicate = matchingPredicate(wordToMatch);
     //    Map<String, List<Integer>> map = Maps.newHashMap();
     Subsegment subsegment = new Subsegment(wordToMatch);
-    for (Segment witness : witnesses) {
-      String witnessId = witness.id;
-      Iterable<Word> matchingWords = Iterables.filter(witness.getWords(), matchingPredicate);
+    for (Segment segment : segments) {
+      String witnessId = segment.getWitnessId();
+      Iterable<Word> matchingWords = Iterables.filter(segment.getWords(), matchingPredicate);
       Iterable<Integer> matchingWordPositions = Iterables.transform(matchingWords, extractPosition);
       List<Integer> positions = Lists.newArrayList(matchingWordPositions);
       if (!positions.isEmpty()) subsegment.add(witnessId, positions);
@@ -253,9 +252,9 @@ public class SubsegmentExtractor {
 
   public Map<String, List<Phrase>> getPhrasesPerSegment() {
     Map<String, List<Phrase>> phrasesPerSegment = Maps.newHashMap();
-    for (Segment segment : witnesses) {
+    for (Segment segment : segments) {
       List<Phrase> phraseList = subsegments.getPhrases(segment);
-      phrasesPerSegment.put(segment.id, phraseList);
+      phrasesPerSegment.put(segment.getWitnessId(), phraseList);
     }
     return phrasesPerSegment;
   }

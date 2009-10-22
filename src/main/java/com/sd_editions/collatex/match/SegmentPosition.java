@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matching;
+package com.sd_editions.collatex.match;
 
 public class SegmentPosition {
 

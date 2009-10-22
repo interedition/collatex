@@ -58,4 +58,9 @@ public class Segment implements ICollationResource {
     }
     visitor.postVisitWitness(this);
   }
+
+  public String getWitnessId() {
+    // TODO: use the actual witnessId, this is the segmentId
+    return id;
+  }
 }

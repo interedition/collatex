@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matching;
+package eu.interedition.collatex.match;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -11,6 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
+import com.sd_editions.collatex.match.Subsegment;
+import com.sd_editions.collatex.match.SubsegmentExtractor;
+import com.sd_editions.collatex.match.Subsegments;
 
 import eu.interedition.collatex.alignment.Phrase;
 import eu.interedition.collatex.input.Segment;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matching;
+package com.sd_editions.collatex.match;
 
 import java.util.Collection;
 import java.util.List;
@@ -92,7 +92,7 @@ public class Subsegments {
   public List<Phrase> getPhrases(Segment segment) {
     List<Phrase> phrases = Lists.newArrayList();
     for (Subsegment subsegment : subsegments.values()) {
-      Phrase phrase = subsegment.getPhrase(segment);//new Phrase(segment, segment.getWordOnPosition(subsegment.getStartPosition(segmentId)), segment.getWordOnPosition(subsegment.getEndPosition(segmentId)));
+      Phrase phrase = subsegment.getPhrase(segment);
       if (phrase != null) phrases.add(phrase);
     }
     return phrases;
