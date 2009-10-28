@@ -26,7 +26,7 @@ public class AlignmentView {
     Map<Word, Alignment> alignment = determineAlignment();
     StringBuilder html = new StringBuilder();
     for (int i = 0; i < colors.numberOfWitnesses(); i++) {
-      Segment witness = colors.witnesses.get(i);
+      Segment witness = colors.witnesses.get(i).getFirstSegment();
       html.append(colorWitness(alignment, witness));
     }
     return html.toString();

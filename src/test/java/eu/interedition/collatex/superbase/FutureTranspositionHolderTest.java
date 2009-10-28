@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
-import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -24,8 +24,8 @@ public class FutureTranspositionHolderTest {
   @Test
   @Ignore
   public void testTransposition() {
-    Segment w1 = builder.build("A", "the cat is black");
-    Segment w2 = builder.build("B", "black is the cat");
+    Witness w1 = builder.build("A", "the cat is black");
+    Witness w2 = builder.build("B", "black is the cat");
     WitnessSet set = new WitnessSet(w1, w2);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected;
@@ -38,9 +38,9 @@ public class FutureTranspositionHolderTest {
   @Test
   @Ignore
   public void testAdditionInCombinationWithTransposition() {
-    Segment w1 = builder.build("A", "the cat is very happy");
-    Segment w2 = builder.build("B", "very happy is the cat");
-    Segment w3 = builder.build("C", "very delitied and happy is the cat");
+    Witness w1 = builder.build("A", "the cat is very happy");
+    Witness w2 = builder.build("B", "very happy is the cat");
+    Witness w3 = builder.build("C", "very delitied and happy is the cat");
     WitnessSet set = new WitnessSet(w1, w2, w3);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected;

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -20,18 +20,18 @@ public class AlignmentTable3Test {
 
   @Test
   public void testStringOutputOneWitness() {
-    Segment w1 = builder.build("A", "the black cat");
+    Witness w1 = builder.build("A", "the black cat");
     AlignmentTable3 table = new AlignmentTable3();
-    table.addWitness(w1);
+    table.addWitness(w1.getFirstSegment());
     String expected = "A: the black cat\n";
     assertEquals(expected, table.toString());
   }
 
   @Test
   public void testEverythingMatches() {
-    Segment w1 = builder.build("A", "the black cat");
-    Segment w2 = builder.build("B", "the black cat");
-    Segment w3 = builder.build("C", "the black cat");
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the black cat");
+    Witness w3 = builder.build("C", "the black cat");
     WitnessSet set = new WitnessSet(w1, w2, w3);
     AlignmentTable3 table = AlignmentTable3.create(set);
     String expected = "A: the black cat\n";

@@ -15,6 +15,7 @@ import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex.match.worddistance.WordDistance;
@@ -22,6 +23,10 @@ import eu.interedition.collatex.match.worddistance.WordDistance;
 // TODO: extract matching functionality from this class
 // TODO: rename class to Aligner or something like that
 public class Matcher {
+
+  public static Alignment align(Witness a, Witness b) {
+    return align(a.getFirstSegment(), b.getFirstSegment());
+  }
 
   public static Alignment align(Segment a, Segment b) {
     UnfixedAlignment unfixedAlignment = createFirstUnfixedAlignment(a, b);

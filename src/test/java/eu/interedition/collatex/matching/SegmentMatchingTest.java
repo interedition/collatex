@@ -13,7 +13,7 @@ import org.junit.Before;
 import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.match.OldSegmentExtractor;
 import eu.interedition.collatex.match.WordSegment;
@@ -34,13 +34,13 @@ public class SegmentMatchingTest {
 
   //  @Test
   public void testExtractSegments1() {
-    Segment a = builder.build("a", "zijn hond liep aan zijn hand");
-    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
+    Witness a = builder.build("a", "zijn hond liep aan zijn hand");
+    Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
 
-    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a, b);
+    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a.getFirstSegment(), b.getFirstSegment());
     assert1(segments);
 
-    segments = OldSegmentExtractor.extractSegments(b, a);
+    segments = OldSegmentExtractor.extractSegments(b.getFirstSegment(), a.getFirstSegment());
     assert1(segments);
   }
 
@@ -51,13 +51,13 @@ public class SegmentMatchingTest {
 
   //  @Test
   public void testExtractSegments2() {
-    Segment a = builder.build("a", "zijn hond liep aan zijn hand op zijn dag");
-    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand op zijn dag");
+    Witness a = builder.build("a", "zijn hond liep aan zijn hand op zijn dag");
+    Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand op zijn dag");
 
-    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a, b);
+    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a.getFirstSegment(), b.getFirstSegment());
     assert2(segments);
 
-    segments = OldSegmentExtractor.extractSegments(b, a);
+    segments = OldSegmentExtractor.extractSegments(b.getFirstSegment(), a.getFirstSegment());
     assert2(segments);
   }
 
@@ -68,20 +68,20 @@ public class SegmentMatchingTest {
 
   //  @Test
   public void testExtractSegments3() {
-    Segment a = builder.build("a", "zijn hond liep aan zijn hand");
-    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
-    Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
+    Witness a = builder.build("a", "zijn hond liep aan zijn hand");
+    Witness b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
+    Witness c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
 
-    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a, b, c);
+    List<WordSegment> segments = OldSegmentExtractor.extractSegments(a.getFirstSegment(), b.getFirstSegment(), c.getFirstSegment());
     assert3(segments);
 
-    segments = OldSegmentExtractor.extractSegments(b, c, a);
+    segments = OldSegmentExtractor.extractSegments(b.getFirstSegment(), c.getFirstSegment(), a.getFirstSegment());
     assert3(segments);
 
-    segments = OldSegmentExtractor.extractSegments(c, a, b);
+    segments = OldSegmentExtractor.extractSegments(c.getFirstSegment(), a.getFirstSegment(), b.getFirstSegment());
     assert3(segments);
 
-    segments = OldSegmentExtractor.extractSegments(a, c, b);
+    segments = OldSegmentExtractor.extractSegments(a.getFirstSegment(), c.getFirstSegment(), b.getFirstSegment());
     assert3(segments);
   }
 

@@ -51,7 +51,7 @@ public class Segment implements ICollationResource {
   }
 
   public void accept(IResourceVisitor visitor) {
-    visitor.visitWitness(this);
+    visitor.visitSegment(this);
     List<Word> words2 = getWords();
     for (Word word : words2) {
       visitor.visitWord(word);

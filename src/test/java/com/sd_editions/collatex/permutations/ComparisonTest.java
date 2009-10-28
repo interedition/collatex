@@ -2,7 +2,7 @@ package com.sd_editions.collatex.permutations;
 
 import junit.framework.TestCase;
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.visualization.Modifications;
 
@@ -23,9 +23,9 @@ public class ComparisonTest extends TestCase {
   }
 
   public void testWorCount() {
-    Segment w1 = builder.build("\t\n  a cat");
-    Segment w2 = builder.build("a cat");
-    assertEquals(w1.size(), w2.size());
+    Witness w1 = builder.build("\t\n  a cat");
+    Witness w2 = builder.build("a cat");
+    assertEquals(w1.getFirstSegment().size(), w2.getFirstSegment().size());
 
   }
 

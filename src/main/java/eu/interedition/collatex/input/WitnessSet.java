@@ -9,22 +9,22 @@ import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.input.visitors.JSONObjectVisitor;
 
 public class WitnessSet {
-  private final List<Segment> _witnesses;
+  private final List<Witness> _witnesses;
 
-  public WitnessSet(Segment... witnesses) {
+  public WitnessSet(Witness... witnesses) {
     this(Arrays.asList(witnesses));
   }
 
-  public WitnessSet(List<Segment> witnesses) {
+  public WitnessSet(List<Witness> witnesses) {
     this._witnesses = witnesses;
   }
 
   public static WitnessSet createWitnessSet(String[] witnessStrings) {
     WitnessBuilder builder = new WitnessBuilder();
     int i = 1;
-    List<Segment> witnesses = Lists.newArrayList();
+    List<Witness> witnesses = Lists.newArrayList();
     for (String witnessString : witnessStrings) {
-      Segment witness = builder.build("witness" + i++, witnessString);
+      Witness witness = builder.build("witness" + i++, witnessString);
       witnesses.add(witness);
     }
     WitnessSet set = new WitnessSet(witnesses);
@@ -34,19 +34,19 @@ public class WitnessSet {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    for (Segment witness : _witnesses) {
-      builder.append(witness.id + ": " + witness.toString() + "\n");
+    for (Witness witness : _witnesses) {
+      builder.append(witness.getFirstSegment().id + ": " + witness.toString() + "\n");
     }
     return builder.toString();
   }
 
-  public List<Segment> getWitnesses() {
+  public List<Witness> getWitnesses() {
     return _witnesses;
   }
 
   public void accept(JSONObjectVisitor visitor) {
     visitor.visitWitnessSet(this);
-    for (Segment witness : _witnesses) {
+    for (Witness witness : _witnesses) {
       witness.accept(visitor);
     }
   }
