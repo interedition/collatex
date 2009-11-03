@@ -53,7 +53,7 @@ public class SubsegmentExtractor {
       Util.newline();
       Util.p("subsegment", subsegment);
 
-      subsegment.getWitnessIds();
+      Set<String> witnessIds = subsegment.getWitnessIds();
 
       Map<String, List<SegmentPosition>> nextWordMap = Maps.newHashMap();
       for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
@@ -70,7 +70,6 @@ public class SubsegmentExtractor {
       for (Entry<String, List<SegmentPosition>> entry : entrySet) {
         entry.getKey();
         entry.getValue();
-
       }
 
       //      Set<String> nextSubsegmentTitleSet = Sets.newHashSet();
