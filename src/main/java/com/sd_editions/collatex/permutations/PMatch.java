@@ -4,7 +4,7 @@ import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.input.Word;
 
 public class PMatch {
-  final Match match;
+  final Match<Word> match;
   private boolean fixed;
 
   public PMatch(Match _match) {

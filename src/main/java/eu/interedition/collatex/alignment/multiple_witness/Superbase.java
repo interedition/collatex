@@ -21,7 +21,7 @@ public class Superbase extends Segment {
     columnForEachWord.add(column);
   }
 
-  public Column getColumnFor(Match match) {
+  public Column getColumnFor(Match<Word> match) {
     // Note: this piece of code was meant to handle transposed matches!
     // matchesOrderedForTheWitness and matchesOrderedForTheBase were parameters!
     //    int indexOfMatchInWitness = matchesOrderedForTheWitness.indexOf(match);

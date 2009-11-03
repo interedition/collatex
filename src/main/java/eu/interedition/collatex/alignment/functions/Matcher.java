@@ -24,68 +24,68 @@ import eu.interedition.collatex.match.worddistance.WordDistance;
 // TODO: rename class to Aligner or something like that
 public class Matcher {
 
-  public static Alignment align(Witness a, Witness b) {
+  public static Alignment<Word> align(Witness a, Witness b) {
     return align(a.getFirstSegment(), b.getFirstSegment());
   }
 
-  public static Alignment align(Segment a, Segment b) {
-    UnfixedAlignment unfixedAlignment = createFirstUnfixedAlignment(a, b);
+  public static Alignment<Word> align(Segment a, Segment b) {
+    UnfixedAlignment<Word> unfixedAlignment = createFirstUnfixedAlignment(a, b);
 
     while (unfixedAlignment.hasUnfixedWords()) {
       unfixedAlignment = Matcher.permutate(a, b, unfixedAlignment);
     }
-    Alignment alignment = new Alignment(unfixedAlignment.getFixedMatches(), a, b);
+    Alignment<Word> alignment = new Alignment<Word>(unfixedAlignment.getFixedMatches(), a, b);
     return alignment;
   }
 
-  public static UnfixedAlignment createFirstUnfixedAlignment(Segment a, Segment b) {
-    Set<Match> allMatches = findMatches(a, b, new NormalizedLevenshtein());
+  public static UnfixedAlignment<Word> createFirstUnfixedAlignment(Segment a, Segment b) {
+    Set<Match<Word>> allMatches = findMatches(a, b, new NormalizedLevenshtein());
 
     // Note: this code is not the simplest thing that 
     // could possibly work!
-    Set<Match> exactMatches = Sets.newLinkedHashSet();
-    for (Match match : allMatches) {
-      Iterable<Match> alternatives = Matcher.findAlternatives(allMatches, match);
+    Set<Match<Word>> exactMatches = Sets.newLinkedHashSet();
+    for (Match<Word> match : allMatches) {
+      Iterable<Match<Word>> alternatives = Matcher.findAlternatives(allMatches, match);
       if (!alternatives.iterator().hasNext()) {
         exactMatches.add(match);
       }
     }
 
-    Set<Match> unfixedMatches = Sets.newLinkedHashSet(allMatches);
+    Set<Match<Word>> unfixedMatches = Sets.newLinkedHashSet(allMatches);
     unfixedMatches.removeAll(exactMatches);
 
     UnfixedAlignment unfixedAlignment = new UnfixedAlignment(exactMatches, unfixedMatches);
     return unfixedAlignment;
   }
 
-  private static Set<Match> findMatches(Segment base, Segment witness, WordDistance distanceMeasure) {
-    Set<Match> matchSet = Sets.newLinkedHashSet();
+  private static Set<Match<Word>> findMatches(Segment base, Segment witness, WordDistance distanceMeasure) {
+    Set<Match<Word>> matchSet = Sets.newLinkedHashSet();
     for (Word baseWord : base.getWords()) {
       for (Word witnessWord : witness.getWords()) {
         if (baseWord.normalized.equals(witnessWord.normalized)) {
-          matchSet.add(new Match(baseWord, witnessWord));
+          matchSet.add(new Match<Word>(baseWord, witnessWord));
         } else {
           float editDistance = distanceMeasure.distance(baseWord.normalized, witnessWord.normalized);
-          if (editDistance < 0.5) matchSet.add(new Match(baseWord, witnessWord, editDistance));
+          if (editDistance < 0.5) matchSet.add(new Match<Word>(baseWord, witnessWord, editDistance));
         }
       }
     }
     return matchSet;
   }
 
-  public static UnfixedAlignment permutate(Segment a, Segment b, final UnfixedAlignment alignment) {
-    Collection<Match> unfixedMatches = getMatchesToPermutateWith(alignment);
-    List<UnfixedAlignment> alignments = getAlignmentsForUnfixedMatches(alignment, unfixedMatches);
-    UnfixedAlignment bestAlignment = selectBestPossibleAlignment(a, b, alignments);
+  public static UnfixedAlignment<Word> permutate(Segment a, Segment b, final UnfixedAlignment alignment) {
+    Collection<Match<Word>> unfixedMatches = getMatchesToPermutateWith(alignment);
+    List<UnfixedAlignment<Word>> alignments = getAlignmentsForUnfixedMatches(alignment, unfixedMatches);
+    UnfixedAlignment<Word> bestAlignment = selectBestPossibleAlignment(a, b, alignments);
     return bestAlignment;
   }
 
-  private static Collection<Match> getMatchesToPermutateWith(final UnfixedAlignment alignment) {
+  private static Collection<Match<Word>> getMatchesToPermutateWith(final UnfixedAlignment<Word> alignment) {
     Word nextBase = selectNextUnfixedWordToAlign(alignment);
-    Collection<Match> unfixedMatchesFrom = alignment.getMatchesThatLinkFrom(nextBase);
+    Collection<Match<Word>> unfixedMatchesFrom = alignment.getMatchesThatLinkFrom(nextBase);
     Word nextWitness = unfixedMatchesFrom.iterator().next().getWitnessWord();
-    Collection<Match> unfixedMatchesTo = alignment.getMatchesThatLinkTo(nextWitness);
-    Collection<Match> unfixedMatches;
+    Collection<Match<Word>> unfixedMatchesTo = alignment.getMatchesThatLinkTo(nextWitness);
+    Collection<Match<Word>> unfixedMatches;
     if (unfixedMatchesFrom.size() > unfixedMatchesTo.size()) {
       unfixedMatches = unfixedMatchesFrom;
       //      System.out.println("next word that is going to be matched: (from a) " + nextBase + " at position: " + nextBase.position);
@@ -96,7 +96,7 @@ public class Matcher {
     return unfixedMatches;
   }
 
-  private static Word selectNextUnfixedWordToAlign(final UnfixedAlignment alignment) {
+  private static Word selectNextUnfixedWordToAlign(final UnfixedAlignment<Word> alignment) {
     // Check whether there are unfixed near matches.
     // Align them first!
     // Note: this is probably not generic enough!
@@ -111,25 +111,25 @@ public class Matcher {
   }
 
   // TODO: naming here is not cool!
-  private static List<UnfixedAlignment> getAlignmentsForUnfixedMatches(UnfixedAlignment previousAlignment, Collection<Match> unfixedMatches) {
-    List<UnfixedAlignment> permutationsForMatchGroup = Lists.newArrayList();
-    for (Match possibleMatch : unfixedMatches) {
-      UnfixedAlignment alignment = previousAlignment.fixMatch(possibleMatch);
+  private static List<UnfixedAlignment<Word>> getAlignmentsForUnfixedMatches(UnfixedAlignment<Word> previousAlignment, Collection<Match<Word>> unfixedMatches) {
+    List<UnfixedAlignment<Word>> permutationsForMatchGroup = Lists.newArrayList();
+    for (Match<Word> possibleMatch : unfixedMatches) {
+      UnfixedAlignment<Word> alignment = previousAlignment.fixMatch(possibleMatch);
       alignment = fixTheOnlyOtherPossibleMatch(unfixedMatches, possibleMatch, alignment);
       permutationsForMatchGroup.add(alignment);
     }
     return permutationsForMatchGroup;
   }
 
-  private static UnfixedAlignment fixTheOnlyOtherPossibleMatch(Collection<Match> unfixedMatches, Match possibleMatch, final UnfixedAlignment alignment) {
-    UnfixedAlignment result = alignment;
+  private static UnfixedAlignment<Word> fixTheOnlyOtherPossibleMatch(Collection<Match<Word>> unfixedMatches, Match<Word> possibleMatch, final UnfixedAlignment<Word> alignment) {
+    UnfixedAlignment<Word> result = alignment;
     if (unfixedMatches.size() == 2) {
-      Set<Match> temp = Sets.newLinkedHashSet(unfixedMatches);
+      Set<Match<Word>> temp = Sets.newLinkedHashSet(unfixedMatches);
       temp.remove(possibleMatch);
-      Match matchToSearch = temp.iterator().next();
-      Set<Match> unfixedMatchesInNewAlignment = alignment.getUnfixedMatches();
-      Match matchToFix = null;
-      for (Match matchToCheck : unfixedMatchesInNewAlignment) {
+      Match<Word> matchToSearch = temp.iterator().next();
+      Set<Match<Word>> unfixedMatchesInNewAlignment = alignment.getUnfixedMatches();
+      Match<Word> matchToFix = null;
+      for (Match<Word> matchToCheck : unfixedMatchesInNewAlignment) {
         if (matchToFix == null && (matchToCheck.getBaseWord().equals(matchToSearch.getBaseWord()) || matchToCheck.getWitnessWord().equals(matchToSearch.getWitnessWord()))) {
           matchToFix = matchToCheck;
         }
@@ -143,7 +143,7 @@ public class Matcher {
   }
 
   // TODO: move all the collation creation out of the way!
-  private static UnfixedAlignment selectBestPossibleAlignment(Segment a, Segment b, List<UnfixedAlignment> alignments) {
+  private static UnfixedAlignment<Word> selectBestPossibleAlignment(Segment a, Segment b, List<UnfixedAlignment<Word>> alignments) {
     UnfixedAlignment bestAlignment = null;
     Alignment bestCollation = null;
 
@@ -163,9 +163,9 @@ public class Matcher {
     return bestAlignment;
   }
 
-  private static Iterable<Match> findAlternatives(Iterable<Match> pmatches, final Match pmatch) {
-    Predicate<Match> unfixedAlternativeToGivenPMatch = new Predicate<Match>() {
-      public boolean apply(Match pm) {
+  private static Iterable<Match<Word>> findAlternatives(Iterable<Match<Word>> pmatches, final Match<Word> pmatch) {
+    Predicate<Match<Word>> unfixedAlternativeToGivenPMatch = new Predicate<Match<Word>>() {
+      public boolean apply(Match<Word> pm) {
         return pm != pmatch && (pm.getBaseWord().equals(pmatch.getBaseWord()) || pm.getWitnessWord().equals(pmatch.getWitnessWord()));
       }
     };

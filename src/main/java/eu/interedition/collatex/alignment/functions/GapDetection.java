@@ -9,27 +9,27 @@ import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.Phrase;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
-import eu.interedition.collatex.input.Word;
 
 public class GapDetection {
-  public static List<Gap> getVariantsInMatchSequences(Segment base, Segment witness, List<MatchSequence> sequences) {
+  public static <T extends BaseElement> List<Gap> getVariantsInMatchSequences(Segment base, Segment witness, List<MatchSequence<T>> sequences) {
     List<Gap> variants = Lists.newArrayList();
-    for (MatchSequence sequence : sequences) {
-      List<Match> matches = sequence.getMatches();
+    for (MatchSequence<T> sequence : sequences) {
+      List<Match<T>> matches = sequence.getMatches();
       if (matches.size() > 1) {
-        Iterator<Match> i = matches.iterator();
-        Match previous = i.next();
+        Iterator<Match<T>> i = matches.iterator();
+        Match<T> previous = i.next();
         while (i.hasNext()) {
-          Match next = i.next();
-          Word previousWordBase = previous.getBaseWord();
-          Word nextWordBase = next.getBaseWord();
-          int baseStartPosition = previousWordBase.position;
-          int baseEndPosition = nextWordBase.position;
-          Word previousWordWitness = previous.getWitnessWord();
-          Word nextWordWitness = next.getWitnessWord();
-          int witnessStartPosition = previousWordWitness.position;
-          int witnessEndPosition = nextWordWitness.position;
+          Match<T> next = i.next();
+          T previousWordBase = previous.getBaseWord();
+          T nextWordBase = next.getBaseWord();
+          int baseStartPosition = previousWordBase.getPosition();
+          int baseEndPosition = nextWordBase.getPosition();
+          T previousWordWitness = previous.getWitnessWord();
+          T nextWordWitness = next.getWitnessWord();
+          int witnessStartPosition = previousWordWitness.getPosition();
+          int witnessEndPosition = nextWordWitness.getPosition();
           int gapSizeBase = baseEndPosition - baseStartPosition - 1;
           int gapSizeWitness = witnessEndPosition - witnessStartPosition - 1;
           if (gapSizeBase != 0 || gapSizeWitness != 0) {
@@ -46,9 +46,9 @@ public class GapDetection {
     return variants;
   }
 
-  public static List<Gap> getVariantsInBetweenMatchSequences(Segment base, Segment witness, List<MatchSequence> sequencesBase, List<MatchSequence> sequencesWitness) {
+  public static <T extends BaseElement> List<Gap> getVariantsInBetweenMatchSequences(Segment base, Segment witness, List<MatchSequence<T>> sequencesBase, List<MatchSequence<T>> sequencesWitness) {
     List<Phrase> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
-    List<Phrase> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
+    List<Phrase<T>> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
     List<Match> nextMatchesWitness = getNextMatchesWitness(sequencesWitness);
     List<Gap> variants = Lists.newArrayList();
     for (int i = 0; i < gapsBase.size(); i++) {
@@ -63,7 +63,7 @@ public class GapDetection {
     return variants;
   }
 
-  private static List<Match> getNextMatchesWitness(List<MatchSequence> sequencesWitness) {
+  private static <T extends BaseElement> List<Match> getNextMatchesWitness(List<MatchSequence<T>> sequencesWitness) {
     List<Match> nextMatches = Lists.newArrayList();
     for (MatchSequence sequence : sequencesWitness) {
       Match nextMatch = sequence.getFirstMatch();
@@ -77,19 +77,19 @@ public class GapDetection {
   // TODO: rename gaps to phrases
   // this method is made for the base... 
   @SuppressWarnings("boxing")
-  private static List<Phrase> getGapsFromInBetweenMatchSequencesForBase(Segment witness, List<MatchSequence> sequences) {
+  private static <T extends BaseElement> List<Phrase> getGapsFromInBetweenMatchSequencesForBase(Segment witness, List<MatchSequence<T>> sequences) {
     int currentIndex = 1;
-    Word previousWord = null;
-    Word nextWord = null;
+    T previousWord = null;
+    T nextWord = null;
     List<Phrase> gaps = Lists.newArrayList();
-    for (MatchSequence sequence : sequences) {
+    for (MatchSequence<T> sequence : sequences) {
       int position = sequence.getBasePosition();
       int indexDif = position - currentIndex;
-      Match nextMatch = sequence.getFirstMatch();
+      Match<T> nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getBaseWord();
       gaps.add(new Phrase(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
       previousWord = sequence.getLastMatch().getBaseWord();
-      currentIndex = 1 + previousWord.position;
+      currentIndex = 1 + previousWord.getPosition();
     }
     int IndexDif = witness.size() - currentIndex + 1;
     nextWord = null;
@@ -100,19 +100,19 @@ public class GapDetection {
   // TODO: rename gaps to phrases
   // this method is made for the witness...
   @SuppressWarnings("boxing")
-  private static List<Phrase> getGapsFromInBetweenMatchSequencesForWitness(Segment witness, List<MatchSequence> sequences) {
+  private static <T extends BaseElement> List<Phrase<T>> getGapsFromInBetweenMatchSequencesForWitness(Segment witness, List<MatchSequence<T>> sequences) {
     int currentIndex = 1;
-    Word previousWord = null;
-    Word nextWord = null;
-    List<Phrase> gaps = Lists.newArrayList();
-    for (MatchSequence sequence : sequences) {
+    T previousWord = null;
+    T nextWord = null;
+    List<Phrase<T>> gaps = Lists.newArrayList();
+    for (MatchSequence<T> sequence : sequences) {
       int position = sequence.getSegmentPosition();
       int indexDif = position - currentIndex;
-      Match nextMatch = sequence.getFirstMatch();
+      Match<T> nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getWitnessWord();
       gaps.add(new Phrase(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
       previousWord = sequence.getLastMatch().getWitnessWord();
-      currentIndex = 1 + previousWord.position;
+      currentIndex = 1 + previousWord.getPosition();
     }
     int IndexDif = witness.size() - currentIndex + 1;
     nextWord = null;

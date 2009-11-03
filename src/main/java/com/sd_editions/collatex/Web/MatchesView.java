@@ -7,6 +7,7 @@ import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class MatchesView {
@@ -26,11 +27,11 @@ public class MatchesView {
     return result.toString();
   }
 
-  public String renderPermutation(Alignment matchNonMatch) {
+  public String renderPermutation(Alignment<Word> matchNonMatch) {
     StringBuilder result = new StringBuilder();
 
     result.append("<span class=\"variance\" style=\"display:none\">Permutation: ").append(matchNonMatch.getMatches()).append('\n');
-    List<MatchSequence> sequencesForBase = matchNonMatch.getMatchSequencesOrderedForWitnessA();
+    List<MatchSequence<Word>> sequencesForBase = matchNonMatch.getMatchSequencesOrderedForWitnessA();
     result.append("<ul>");
     for (MatchSequence matchSequence : sequencesForBase) {
       result.append("<li>MatchSequence: ").append(matchSequence);

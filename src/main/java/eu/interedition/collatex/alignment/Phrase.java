@@ -4,23 +4,24 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
-public class Phrase {
+public class Phrase<T extends BaseElement> {
   private final Segment witness;
   private final int startPosition;
   private final int endPosition;
   private final int size;
-  private final Word previous;
-  private final Word next;
+  private final T previous;
+  private final T next;
 
   // TODO: It is pretty obvious: too many parameters here!
   // Note: probably two constructors needed...
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public Phrase(Segment _witness, int _size, int _startPosition, int _endPosition, Word _previous, Word _next) {
+  public Phrase(Segment _witness, int _size, int _startPosition, int _endPosition, T _previous, T _next) {
     witness = _witness;
     this.size = _size;
     this.next = _next;
@@ -85,7 +86,7 @@ public class Phrase {
     return getWords().get(0);
   }
 
-  public Word getNextWord() {
+  public T getNextWord() {
     if (isAtTheEnd()) {
       throw new RuntimeException("There is no next word!");
     }
@@ -96,7 +97,7 @@ public class Phrase {
     return next == null;
   }
 
-  public Word getPreviousWord() {
+  public T getPreviousWord() {
     if (isAtTheFront()) {
       throw new RuntimeException("There is no previous word!");
     }

@@ -4,13 +4,13 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.input.BaseElement;
 
-public class MatchSequence {
-  private final List<Match> sequence;
+public class MatchSequence<T extends BaseElement> {
+  private final List<Match<T>> sequence;
   public final Integer code;
 
-  public MatchSequence(Integer _code, Match... matches) {
+  public MatchSequence(Integer _code, Match<T>... matches) {
     sequence = Lists.newArrayList(matches);
     code = _code;
   }
@@ -20,7 +20,7 @@ public class MatchSequence {
     return sequence.toString();
   }
 
-  public void add(Match match) {
+  public void add(Match<T> match) {
     sequence.add(match);
   }
 
@@ -28,25 +28,25 @@ public class MatchSequence {
     return sequence.isEmpty();
   }
 
-  public Match getFirstMatch() {
+  public Match<T> getFirstMatch() {
     return sequence.get(0);
   }
 
   @SuppressWarnings("boxing")
   public Integer getSegmentPosition() {
-    return getFirstWitnessWord().position;
+    return getFirstWitnessWord().getPosition();
   }
 
   @SuppressWarnings("boxing")
   public Integer getBasePosition() {
-    return getFirstBaseWord().position;
+    return getFirstBaseWord().getPosition();
   }
 
-  private Word getFirstWitnessWord() {
+  private T getFirstWitnessWord() {
     return getFirstMatch().getWitnessWord();
   }
 
-  private Word getFirstBaseWord() {
+  private T getFirstBaseWord() {
     return getFirstMatch().getBaseWord();
   }
 
@@ -54,8 +54,8 @@ public class MatchSequence {
     String result = "";
     String delimiter = "";
     for (int i = 0; i < sequence.size(); i++) {
-      Word baseWord = sequence.get(i).getBaseWord();
-      if (i > 0 && (baseWord.position - sequence.get(i - 1).getBaseWord().position) > 1) {
+      T baseWord = sequence.get(i).getBaseWord();
+      if (i > 0 && (baseWord.getPosition() - sequence.get(i - 1).getBaseWord().getPosition()) > 1) {
         result += delimiter + "...";
       }
       result += delimiter + baseWord.toString();
@@ -64,11 +64,11 @@ public class MatchSequence {
     return result;
   }
 
-  public List<Match> getMatches() {
+  public List<Match<T>> getMatches() {
     return sequence;
   }
 
-  public Match getLastMatch() {
+  public Match<T> getLastMatch() {
     return sequence.get(sequence.size() - 1);
   }
 }

@@ -8,13 +8,14 @@ import com.sd_editions.collatex.match.views.ModificationVisitor;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.input.Word;
 
 public class Modifications {
   private final List<Transposition> transpositions;
   private final List<Modification> modifications;
-  private final Set<Match> matches;
+  private final Set<Match<Word>> matches;
 
-  public Modifications(List<Modification> _modifications, List<Transposition> _transpositions, Set<Match> _matches) {
+  public Modifications(List<Modification> _modifications, List<Transposition> _transpositions, Set<Match<Word>> _matches) {
     this.modifications = _modifications;
     this.transpositions = _transpositions;
     this.matches = _matches;
@@ -41,19 +42,19 @@ public class Modifications {
 
   public Match getMatchAtBasePosition(int basePosition) {
     for (Match match : matches) {
-      if (match.getBaseWord().position == basePosition) return match;
+      if (match.getBaseWord().getPosition() == basePosition) return match;
     }
     return null;
   }
 
   public Match getMatchAtSegmentPosition(int witnessPosition) {
     for (Match match : matches) {
-      if (match.getWitnessWord().position == witnessPosition) return match;
+      if (match.getWitnessWord().getPosition() == witnessPosition) return match;
     }
     return null;
   }
 
-  public Set<Match> getMatches() {
+  public Set<Match<Word>> getMatches() {
     return matches;
   }
 

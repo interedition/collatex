@@ -85,7 +85,7 @@ public class AlignmentTableCreator {
 
   static void addMatchesToAlignmentTable(Superbase superbase, Alignment compresult) {
     Set<Match> matches = compresult.getMatches();
-    for (Match match : matches) {
+    for (Match<Word> match : matches) {
       Column column = superbase.getColumnFor(match);
       Word witnessWord = match.getWitnessWord();
       column.addMatch(witnessWord);

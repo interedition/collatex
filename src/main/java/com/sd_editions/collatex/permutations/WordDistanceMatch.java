@@ -6,9 +6,9 @@ import eu.interedition.collatex.visualization.Modification;
 
 public class WordDistanceMatch extends Modification {
 
-  private final Match match;
+  private final Match<Word> match;
 
-  public WordDistanceMatch(Match _match) {
+  public WordDistanceMatch(Match<Word> _match) {
     this.match = _match;
   }
 

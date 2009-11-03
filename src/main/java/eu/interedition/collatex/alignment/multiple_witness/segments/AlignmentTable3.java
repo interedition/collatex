@@ -76,7 +76,7 @@ public class AlignmentTable3 {
 
   private void addMatchesToAlignmentTable(SegmentSuperbase superbase, Alignment alignment) {
     List<MatchSequence> matchSequencesOrderedForWitnessA = alignment.getMatchSequencesOrderedForWitnessA();
-    for (MatchSequence seq : matchSequencesOrderedForWitnessA) {
+    for (MatchSequence<Word> seq : matchSequencesOrderedForWitnessA) {
       SegmentColumn segmentColumn = superbase.getColumnFor(seq.getFirstMatch().getBaseWord());
       // TODO: directly implement size() on column?
       if (segmentColumn.getSegment().getWords().size() == (seq.getMatches().size())) {

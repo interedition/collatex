@@ -7,17 +7,18 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.functions.GapDetection;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 
-public class Alignment {
+public class Alignment<T extends BaseElement> {
 
-  private final List<MatchSequence> sequencesA;
-  private final List<MatchSequence> sequencesB;
-  private final Set<Match> matches;
+  private final List<MatchSequence<T>> sequencesA;
+  private final List<MatchSequence<T>> sequencesB;
+  private final Set<Match<T>> matches;
   private final List<Gap> gaps;
 
   // Note: this constructor should take an UnfixedAlignment object as parameter!
-  public Alignment(Set<Match> _matches, Segment a, Segment b) {
+  public Alignment(Set<Match<T>> _matches, Segment a, Segment b) {
     this.matches = _matches;
     this.sequencesA = SequenceDetection.calculateMatchSequences(matches);
     this.sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
@@ -28,11 +29,11 @@ public class Alignment {
     gaps.addAll(gaps2);
   }
 
-  public Set<Match> getMatches() {
+  public Set<Match<T>> getMatches() {
     return matches;
   }
 
-  public List<MatchSequence> getMatchSequences() {
+  public List<MatchSequence<T>> getMatchSequences() {
     return sequencesA;
   }
 
@@ -40,11 +41,11 @@ public class Alignment {
     return gaps;
   }
 
-  public List<MatchSequence> getMatchSequencesOrderedForWitnessA() {
+  public List<MatchSequence<T>> getMatchSequencesOrderedForWitnessA() {
     return getMatchSequences();
   }
 
-  public List<MatchSequence> getMatchSequencesOrderedForWitnessB() {
+  public List<MatchSequence<T>> getMatchSequencesOrderedForWitnessB() {
     return sequencesB;
   }
 
@@ -54,7 +55,7 @@ public class Alignment {
 
   public float getWordDistanceSum() {
     float wordDistanceSum = 0f;
-    for (MatchSequence matchSequence : sequencesA)
+    for (MatchSequence<T> matchSequence : sequencesA)
       for (Match match : matchSequence.getMatches())
         wordDistanceSum += match.wordDistance;
     return wordDistanceSum;

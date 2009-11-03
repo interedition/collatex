@@ -21,6 +21,7 @@ import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex.visualization.Modifications;
 import eu.interedition.collatex.visualization.Visualization;
@@ -165,12 +166,12 @@ public class CollateCore {
   }
 
   @Deprecated
-  public List<MatchSequence> getMatchSequences(int i, int j) {
+  public List<MatchSequence<Word>> getMatchSequences(int i, int j) {
     Segment base = getWitness(i).getFirstSegment();
     Segment witness = getWitness(j).getFirstSegment();
     Matches xmatches = new Matches(base, witness, new NormalizedLevenshtein());
-    List<Set<Match>> permutationList = xmatches.permutations();
-    Set<Match> matches = permutationList.get(0);
+    List<Set<Match<Word>>> permutationList = xmatches.permutations();
+    Set<Match<Word>> matches = permutationList.get(0);
     return SequenceDetection.calculateMatchSequences(matches);
   }
 
