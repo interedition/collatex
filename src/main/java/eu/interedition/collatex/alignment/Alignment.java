@@ -9,36 +9,44 @@ import eu.interedition.collatex.alignment.functions.GapDetection;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Word;
 
 public class Alignment<T extends BaseElement> {
 
-  private final List<MatchSequence<T>> sequencesA;
-  private final List<MatchSequence<T>> sequencesB;
-  private final Set<Match<T>> matches;
-  private final List<Gap> gaps;
+  private final List<MatchSequence<T>> _sequencesA;
+  private final List<MatchSequence<T>> _sequencesB;
+  private final Set<Match<T>> _matches;
+  private final List<Gap> _gaps;
 
   // Note: this constructor should take an UnfixedAlignment object as parameter!
-  public Alignment(Set<Match<T>> _matches, Segment a, Segment b) {
-    this.matches = _matches;
-    this.sequencesA = SequenceDetection.calculateMatchSequences(matches);
-    this.sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
+  private Alignment(Set<Match<T>> matches, List<Gap> gaps, List<MatchSequence<T>> sequencesA, List<MatchSequence<T>> sequencesB) {
+    this._matches = matches;
+    this._gaps = gaps;
+    this._sequencesA = sequencesA;
+    this._sequencesB = sequencesB;
+  }
+
+  public static Alignment<Word> create(Set<Match<Word>> matches, Segment a, Segment b) {
+    List<MatchSequence<Word>> sequencesA = SequenceDetection.calculateMatchSequences(matches);
+    List<MatchSequence<Word>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
     List<Gap> gaps1 = GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB);
     List<Gap> gaps2 = GapDetection.getVariantsInMatchSequences(a, b, sequencesA);
-    gaps = Lists.newArrayList();
+    List<Gap> gaps = Lists.newArrayList();
     gaps.addAll(gaps1);
     gaps.addAll(gaps2);
+    return new Alignment<Word>(matches, gaps, sequencesA, sequencesB);
   }
 
   public Set<Match<T>> getMatches() {
-    return matches;
+    return _matches;
   }
 
   public List<MatchSequence<T>> getMatchSequences() {
-    return sequencesA;
+    return _sequencesA;
   }
 
   public List<Gap> getGaps() {
-    return gaps;
+    return _gaps;
   }
 
   public List<MatchSequence<T>> getMatchSequencesOrderedForWitnessA() {
@@ -46,24 +54,24 @@ public class Alignment<T extends BaseElement> {
   }
 
   public List<MatchSequence<T>> getMatchSequencesOrderedForWitnessB() {
-    return sequencesB;
+    return _sequencesB;
   }
 
   public double getVariationMeasure() {
-    return 1000.0 * (sequencesA.size() - 1) + 10.0 * gaps.size() + getWordDistanceSum();
+    return 1000.0 * (_sequencesA.size() - 1) + 10.0 * _gaps.size() + getWordDistanceSum();
   }
 
   public float getWordDistanceSum() {
     float wordDistanceSum = 0f;
-    for (MatchSequence<T> matchSequence : sequencesA)
-      for (Match match : matchSequence.getMatches())
+    for (MatchSequence<T> matchSequence : _sequencesA)
+      for (Match<T> match : matchSequence.getMatches())
         wordDistanceSum += match.wordDistance;
     return wordDistanceSum;
   }
 
   public List<Gap> getAdditions() {
     List<Gap> additions = Lists.newArrayList();
-    for (Gap gap : gaps) {
+    for (Gap gap : _gaps) {
       if (gap.isAddition()) {
         additions.add(gap);
       }
@@ -73,7 +81,7 @@ public class Alignment<T extends BaseElement> {
 
   public List<Gap> getReplacements() {
     List<Gap> replacements = Lists.newArrayList();
-    for (Gap gap : gaps) {
+    for (Gap gap : _gaps) {
       if (gap.isReplacement()) {
         replacements.add(gap);
       }

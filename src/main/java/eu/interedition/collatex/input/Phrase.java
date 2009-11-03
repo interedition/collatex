@@ -1,27 +1,24 @@
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.input;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.input.BaseElement;
-import eu.interedition.collatex.input.Segment;
-import eu.interedition.collatex.input.Word;
 
-public class Phrase<T extends BaseElement> {
+public class Phrase extends BaseElement {
   private final Segment witness;
   private final int startPosition;
   private final int endPosition;
   private final int size;
-  private final T previous;
-  private final T next;
+  private final Word previous;
+  private final Word next;
 
   // TODO: It is pretty obvious: too many parameters here!
   // Note: probably two constructors needed...
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public Phrase(Segment _witness, int _size, int _startPosition, int _endPosition, T _previous, T _next) {
+  public Phrase(Segment _witness, int _size, int _startPosition, int _endPosition, Word _previous, Word _next) {
     witness = _witness;
     this.size = _size;
     this.next = _next;
@@ -86,7 +83,7 @@ public class Phrase<T extends BaseElement> {
     return getWords().get(0);
   }
 
-  public T getNextWord() {
+  public Word getNextWord() {
     if (isAtTheEnd()) {
       throw new RuntimeException("There is no next word!");
     }
@@ -97,7 +94,7 @@ public class Phrase<T extends BaseElement> {
     return next == null;
   }
 
-  public T getPreviousWord() {
+  public Word getPreviousWord() {
     if (isAtTheFront()) {
       throw new RuntimeException("There is no previous word!");
     }
@@ -106,5 +103,15 @@ public class Phrase<T extends BaseElement> {
 
   public boolean isAtTheFront() {
     return previous == null;
+  }
+
+  @Override
+  public String getOriginal() {
+    return toString();
+  }
+
+  @Override
+  public int getPosition() {
+    return startPosition;
   }
 }

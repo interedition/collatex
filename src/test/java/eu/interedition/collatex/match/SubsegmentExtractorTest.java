@@ -15,7 +15,7 @@ import com.sd_editions.collatex.match.Subsegment;
 import com.sd_editions.collatex.match.SubsegmentExtractor;
 import com.sd_editions.collatex.match.Subsegments;
 
-import eu.interedition.collatex.alignment.Phrase;
+import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 

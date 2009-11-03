@@ -34,7 +34,7 @@ public class Matcher {
     while (unfixedAlignment.hasUnfixedWords()) {
       unfixedAlignment = Matcher.permutate(a, b, unfixedAlignment);
     }
-    Alignment<Word> alignment = new Alignment<Word>(unfixedAlignment.getFixedMatches(), a, b);
+    Alignment<Word> alignment = Alignment.create(unfixedAlignment.getFixedMatches(), a, b);
     return alignment;
   }
 
@@ -150,13 +150,13 @@ public class Matcher {
     // TODO: add test for lowest number of matchsequences (transpositions)
     // NOTE: this can be done in a nicer way with the min function!
     for (UnfixedAlignment alignment : alignments) {
-      Alignment collation = new Alignment(alignment.getFixedMatches(), a, b);
+      Alignment collation = Alignment.create(alignment.getFixedMatches(), a, b);
       List<Gap> nonMatches = collation.getGaps();
       List<MatchSequence> matchSequences = collation.getMatchSequences();
       //      System.out.println(alignment.getFixedMatches().toString() + ":" + matchSequences.size() + ":" + nonMatches.size());
       if (bestAlignment == null || bestCollation == null || matchSequences.size() < bestCollation.getMatchSequences().size() || nonMatches.size() < bestCollation.getGaps().size()) {
         bestAlignment = alignment;
-        bestCollation = new Alignment(bestAlignment.getFixedMatches(), a, b);
+        bestCollation = Alignment.create(bestAlignment.getFixedMatches(), a, b);
       }
     }
     if (bestAlignment == null) throw new RuntimeException("Unexpected error!");
