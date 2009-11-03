@@ -10,12 +10,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.input.Word;
 
 @Deprecated
 public class MatchPermutator {
 
   private final Set<Match> possibleMatches;
-  private final Set<Set<Match>> permutations;
+  private final Set<Set<Match<Word>>> permutations;
 
   public MatchPermutator(Set<Match> allPossibleMatches) {
     possibleMatches = allPossibleMatches;
@@ -46,7 +47,7 @@ public class MatchPermutator {
     }
     if (pmatch == null) {
       // no more unfixed matches in the list? we've got a permutation!
-      Set<Match> permutation = Sets.newLinkedHashSet();
+      Set<Match<Word>> permutation = Sets.newLinkedHashSet();
       for (PMatch pm : pmatches) {
         permutation.add(pm.match);
       }
@@ -152,7 +153,7 @@ public class MatchPermutator {
   //    return result;
   //  }
 
-  public List<Set<Match>> permutations() {
+  public List<Set<Match<Word>>> permutations() {
     return Lists.newArrayList(permutations);
   }
 

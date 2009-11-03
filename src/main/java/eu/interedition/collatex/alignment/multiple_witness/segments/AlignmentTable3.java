@@ -8,6 +8,7 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
 
@@ -18,8 +19,8 @@ public class AlignmentTable3 {
 
   public static AlignmentTable3 create(WitnessSet set) {
     AlignmentTable3 table = new AlignmentTable3();
-    for (Segment witness : set.getWitnesses()) {
-      table.addWitness(witness);
+    for (Witness witness : set.getWitnesses()) {
+      table.addWitness(witness.getFirstSegment());
     }
     return table;
   }
@@ -45,7 +46,14 @@ public class AlignmentTable3 {
     this._columns = Lists.newArrayList();
   }
 
+  // NOTE: THIS ONLY WORKS FOR WITNESSES
+  // WITH one SEGMENT!
+  public void addWitness(Witness witness) {
+    addWitness(witness.getFirstSegment());
+  }
+
   // TODO: could make this protected?
+  // TODO: rename to addSegment!
   public void addWitness(Segment witness) {
     if (_witnesses.isEmpty()) {
       List<Word> words = witness.getWords();
@@ -68,7 +76,7 @@ public class AlignmentTable3 {
 
   private void addMatchesToAlignmentTable(SegmentSuperbase superbase, Alignment alignment) {
     List<MatchSequence> matchSequencesOrderedForWitnessA = alignment.getMatchSequencesOrderedForWitnessA();
-    for (MatchSequence seq : matchSequencesOrderedForWitnessA) {
+    for (MatchSequence<Word> seq : matchSequencesOrderedForWitnessA) {
       SegmentColumn segmentColumn = superbase.getColumnFor(seq.getFirstMatch().getBaseWord());
       // TODO: directly implement size() on column?
       if (segmentColumn.getSegment().getWords().size() == (seq.getMatches().size())) {

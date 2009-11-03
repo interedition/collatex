@@ -1,17 +1,17 @@
 package eu.interedition.collatex.alignment;
 
-import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.input.BaseElement;
 
-public class Match implements Comparable<Match> {
-  private final Word word1;
-  private final Word word2;
+public class Match<T extends BaseElement> implements Comparable<Match> {
+  private final T word1;
+  private final T word2;
   public final float wordDistance;
 
-  public Match(Word baseWord, Word witnessWord) {
+  public Match(T baseWord, T witnessWord) {
     this(baseWord, witnessWord, 0);
   }
 
-  public Match(Word baseWord, Word witnessWord, float levDistance) {
+  public Match(T baseWord, T witnessWord, float levDistance) {
     this.word1 = baseWord;
     this.word2 = witnessWord;
     this.wordDistance = levDistance;
@@ -19,14 +19,14 @@ public class Match implements Comparable<Match> {
 
   @Override
   public String toString() {
-    return "(" + word1.position + "->" + word2.position + ")";
+    return "(" + word1.getPosition() + "->" + word2.getPosition() + ")";
   }
 
-  public Word getWitnessWord() {
+  public T getWitnessWord() {
     return word2;
   }
 
-  public Word getBaseWord() {
+  public T getBaseWord() {
     return word1;
   }
 
@@ -45,6 +45,6 @@ public class Match implements Comparable<Match> {
   }
 
   public int compareTo(Match m2) {
-    return getBaseWord().position - m2.getBaseWord().position;
+    return getBaseWord().getPosition() - m2.getBaseWord().getPosition();
   }
 }

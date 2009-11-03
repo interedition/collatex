@@ -11,7 +11,7 @@ public class JsonOutputTest {
   @Test
   public void testJsonObjectVisitor() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment w1 = builder.build("id", "a b c d");
+    Witness w1 = builder.build("id", "a b c d");
     JSONObjectVisitor visitor = new JSONObjectVisitor();
     w1.accept(visitor);
     String expected = "[{\"ID\":\"id\",\"tokens\":[{\"token\":\"a\"},{\"token\":\"b\"},{\"token\":\"c\"},{\"token\":\"d\"}]}]";

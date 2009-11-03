@@ -79,7 +79,11 @@ public class WitnessBuilderTest extends TestCase {
     xmlFileTokenB.close();
   }
 
-  private void compareWitnesses(Segment w1, Segment w2) {
+  private void compareWitnesses(Witness w1, Witness w2) {
+    compareSegments(w1.getFirstSegment(), w2.getFirstSegment());
+  }
+
+  private void compareSegments(Segment w1, Segment w2) {
     List<Word> words1 = w1.getWords();
     List<Word> words2 = w2.getWords();
 
@@ -92,28 +96,28 @@ public class WitnessBuilderTest extends TestCase {
   }
 
   public void testXmlA() throws SAXException, IOException {
-    Segment w1 = witnessBuilder.build(PLAIN_TEXT_A);
-    Segment w2 = null;
+    Witness w1 = witnessBuilder.build(PLAIN_TEXT_A);
+    Witness w2 = null;
     w2 = witnessBuilder.build(xmlSimpleA, ContentType.TEXT_XML);
-    Segment w3 = null;
+    Witness w3 = null;
     w3 = witnessBuilder.build(xmlTokenA, ContentType.TEXT_XML);
     compareWitnesses(w1, w2);
     compareWitnesses(w1, w3);
   }
 
   public void testXmlB() throws SAXException, IOException {
-    Segment w1 = witnessBuilder.build(PLAIN_TEXT_B);
-    Segment w2 = witnessBuilder.build(xmlSimpleB, ContentType.TEXT_XML);
-    Segment w3 = witnessBuilder.build(xmlTokenB, ContentType.TEXT_XML);
+    Witness w1 = witnessBuilder.build(PLAIN_TEXT_B);
+    Witness w2 = witnessBuilder.build(xmlSimpleB, ContentType.TEXT_XML);
+    Witness w3 = witnessBuilder.build(xmlTokenB, ContentType.TEXT_XML);
 
     compareWitnesses(w1, w2);
     compareWitnesses(w1, w3);
   }
 
   public void testXMLFileA() throws SAXException, IOException {
-    Segment w1 = witnessBuilder.build(xmlFileSimpleA, ContentType.TEXT_XML);
-    Segment w2 = witnessBuilder.build(xmlFileTokenA, ContentType.TEXT_XML);
-    Segment w3 = witnessBuilder.build(plainTextFileA, ContentType.TEXT_PLAIN);
+    Witness w1 = witnessBuilder.build(xmlFileSimpleA, ContentType.TEXT_XML);
+    Witness w2 = witnessBuilder.build(xmlFileTokenA, ContentType.TEXT_XML);
+    Witness w3 = witnessBuilder.build(plainTextFileA, ContentType.TEXT_PLAIN);
 
     compareWitnesses(w1, w2);
     compareWitnesses(w1, w3);
@@ -121,9 +125,9 @@ public class WitnessBuilderTest extends TestCase {
   }
 
   public void testXMLFileB() throws SAXException, IOException {
-    Segment w1 = witnessBuilder.build(xmlFileSimpleB, ContentType.TEXT_XML);
-    Segment w2 = witnessBuilder.build(xmlFileTokenB, ContentType.TEXT_XML);
-    Segment w3 = witnessBuilder.build(plainTextFileB, ContentType.TEXT_PLAIN);
+    Witness w1 = witnessBuilder.build(xmlFileSimpleB, ContentType.TEXT_XML);
+    Witness w2 = witnessBuilder.build(xmlFileTokenB, ContentType.TEXT_XML);
+    Witness w3 = witnessBuilder.build(plainTextFileB, ContentType.TEXT_PLAIN);
 
     compareWitnesses(w1, w2);
     compareWitnesses(w1, w3);
@@ -131,7 +135,7 @@ public class WitnessBuilderTest extends TestCase {
   }
 
   public void testEmptyStream() {
-    Segment w = null;
+    Witness w = null;
     try {
       w = witnessBuilder.build(new ByteArrayInputStream(new byte[0]), ContentType.TEXT_XML);
       fail();
@@ -171,8 +175,8 @@ public class WitnessBuilderTest extends TestCase {
 
   public void testEmptyXml() {
     try {
-      Segment w = witnessBuilder.build(emptyXml, ContentType.TEXT_XML);
-      assertEquals(w.getWords().size(), 0);
+      Witness w = witnessBuilder.build(emptyXml, ContentType.TEXT_XML);
+      assertEquals(w.getFirstSegment().getWords().size(), 0);
     } catch (SAXException e) {
       fail();
     } catch (IOException e) {
@@ -181,8 +185,8 @@ public class WitnessBuilderTest extends TestCase {
   }
 
   public void testEmptyWitnessFromString() {
-    Segment witness = witnessBuilder.build("");
-    assertEquals(witness.getWords().size(), 0);
+    Witness witness = witnessBuilder.build("");
+    assertEquals(witness.getFirstSegment().getWords().size(), 0);
   }
 
   public void testValueOfContentType() {

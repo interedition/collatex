@@ -14,10 +14,10 @@ public class AlignmentTable {
   // NOTE: rename to elements? A tree has elements after all!
   public AlignmentTable(Modifications modifications) {
     // NOTE: move this to Modifications?
-    Set<Match> matches = modifications.getMatches();
+    Set<Match<Word>> matches = modifications.getMatches();
     cells = new Element[100]; // TODO: take longest witness?
     // NOTE: move this to ModificationVisitor?
-    for (Match match : matches) {
+    for (Match<Word> match : matches) {
       Word matchedWord = match.getBaseWord();
       cells[matchedWord.position * 2 - 1] = new TextElement(matchedWord);
     }

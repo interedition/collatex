@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.alignment.Phrase;
+import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 
 public class Subsegments {

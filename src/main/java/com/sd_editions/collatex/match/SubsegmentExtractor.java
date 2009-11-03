@@ -15,7 +15,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.sd_editions.collatex.Block.Util;
 
-import eu.interedition.collatex.alignment.Phrase;
+import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 

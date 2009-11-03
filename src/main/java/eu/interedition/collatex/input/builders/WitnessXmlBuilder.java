@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Util;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 
 public class WitnessXmlBuilder extends WitnessStreamBuilder {
@@ -40,7 +41,7 @@ public class WitnessXmlBuilder extends WitnessStreamBuilder {
   }
 
   @Override
-  public Segment build(InputStream inputStream) throws SAXException, IOException {
+  public Witness build(InputStream inputStream) throws SAXException, IOException {
     String id = Util.generateRandomId();
     Document doc = getXmlDocument(inputStream);
 
@@ -58,8 +59,8 @@ public class WitnessXmlBuilder extends WitnessStreamBuilder {
         String value = nodes.item(i).getTextContent();
         builder1.append(value);
       }
-      Segment w = build(builder1.toString());
-      for (Word word : w.getWords()) {
+      Witness w = build(builder1.toString());
+      for (Word word : w.getFirstSegment().getWords()) {
         words.add(new Word(id, word.toString(), counter++));
       }
     } else { // get text from prepared 'w' elements 
@@ -69,7 +70,7 @@ public class WitnessXmlBuilder extends WitnessStreamBuilder {
         words.add(new Word(id, value, counter++));
       }
     }
-    return new Segment(words.toArray(new Word[0]));
+    return new Witness(new Segment(words.toArray(new Word[0])));
   }
 
   private Object evaluate(XPath xpath, Document doc, String exprression) {

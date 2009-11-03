@@ -34,7 +34,7 @@ public class MatchSequenceTest extends TestCase {
     String base = "a b";
     String witness = "a b";
     CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
-    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    List<MatchSequence<Word>> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1), (2->2)]", sequences.get(0).toString());
     assertEquals(1, sequences.size());
   }
@@ -43,7 +43,7 @@ public class MatchSequenceTest extends TestCase {
     String base = "a b";
     String witness = "a c b";
     CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
-    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    List<MatchSequence<Word>> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1), (2->3)]", sequences.get(0).toString());
     assertEquals(1, sequences.size());
   }
@@ -52,7 +52,7 @@ public class MatchSequenceTest extends TestCase {
     String base = "a c b";
     String witness = "a b";
     CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
-    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    List<MatchSequence<Word>> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1), (3->2)]", sequences.get(0).toString());
     assertEquals(1, sequences.size());
   }
@@ -61,7 +61,7 @@ public class MatchSequenceTest extends TestCase {
     String base = "a b c";
     String witness = "a d c";
     CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
-    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    List<MatchSequence<Word>> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1), (3->3)]", sequences.get(0).toString());
     assertEquals(1, sequences.size());
   }
@@ -70,7 +70,7 @@ public class MatchSequenceTest extends TestCase {
     String base = "a b";
     String witness = "b a";
     CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
-    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    List<MatchSequence<Word>> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->2)]", sequences.get(0).toString());
     assertEquals("[(2->1)]", sequences.get(1).toString());
     assertEquals(2, sequences.size());
@@ -81,7 +81,7 @@ public class MatchSequenceTest extends TestCase {
     String base = "The black dog chases a red cat.";
     String witness = "A red cat chases the yellow dog";
     CollateCore colors = new CollateCore(builder.buildWitnesses(new String[] { base, witness }));
-    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    List<MatchSequence<Word>> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->5), (3->7)]", sequences.get(0).toString());
     assertEquals("[(4->4)]", sequences.get(1).toString());
     assertEquals("[(5->1), (6->2), (7->3)]", sequences.get(2).toString());
@@ -90,7 +90,7 @@ public class MatchSequenceTest extends TestCase {
 
   public void testTranspositionExample1() {
     CollateCore colors = new CollateCore(builder.buildWitnesses("a b c d e", "a c d b e"));
-    List<MatchSequence> sequences = colors.getMatchSequences(1, 2);
+    List<MatchSequence<Word>> sequences = colors.getMatchSequences(1, 2);
     assertEquals("[(1->1)]", sequences.get(0).toString());
     assertEquals("[(2->4)]", sequences.get(1).toString());
     assertEquals("[(3->2), (4->3)]", sequences.get(2).toString());
@@ -105,12 +105,12 @@ public class MatchSequenceTest extends TestCase {
     Match a = new Match(new Word(witnessId1, "A", 1), new Word(witnessId2, "A", 3));
     Match b = new Match(new Word(witnessId1, "B", 2), new Word(witnessId2, "B", 4));
     Match c = new Match(new Word(witnessId1, "C", 3), new Word(witnessId2, "C", 5));
-    MatchSequence sequence = new MatchSequence(1, a, b, c);
+    MatchSequence<Word> sequence = new MatchSequence<Word>(1, a, b, c);
     Match d = new Match(new Word(witnessId1, "D", 4), new Word(witnessId2, "D", 1));
     Match e = new Match(new Word(witnessId1, "E", 5), new Word(witnessId2, "E", 2));
-    MatchSequence sequence2 = new MatchSequence(2, d, e);
-    List<MatchSequence> matchSequences = Lists.newArrayList(sequence, sequence2);
-    List<MatchSequence> arrayForWitness = SequenceDetection.sortSequencesForWitness(matchSequences);
+    MatchSequence<Word> sequence2 = new MatchSequence<Word>(2, d, e);
+    List<MatchSequence<Word>> matchSequences = Lists.newArrayList(sequence, sequence2);
+    List<MatchSequence<Word>> arrayForWitness = SequenceDetection.sortSequencesForWitness(matchSequences);
     assertEquals(Lists.newArrayList(sequence2, sequence), arrayForWitness);
   }
 
@@ -183,8 +183,8 @@ public class MatchSequenceTest extends TestCase {
     Segment witness = new Segment(aW, cW, bW);
     Match a = new Match(aB, aW);
     Match b = new Match(bB, bW);
-    MatchSequence sequence = new MatchSequence(1, a, b);
-    List<MatchSequence> sequences = Lists.newArrayList(sequence);
+    MatchSequence<Word> sequence = new MatchSequence<Word>(1, a, b);
+    List<MatchSequence<Word>> sequences = Lists.newArrayList(sequence);
     List<Gap> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
     List<Modification> results = Visualization.analyseVariants(variants);
     List<Modification> modificationsInMatchSequences = results;
@@ -202,8 +202,8 @@ public class MatchSequenceTest extends TestCase {
     Segment witness = new Segment(aW, bW);
     Match a = new Match(aB, aW);
     Match b = new Match(bB, bW);
-    MatchSequence sequence = new MatchSequence(1, a, b);
-    List<MatchSequence> sequences = Lists.newArrayList(sequence);
+    MatchSequence<Word> sequence = new MatchSequence(1, a, b);
+    List<MatchSequence<Word>> sequences = Lists.newArrayList(sequence);
     List<Gap> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
     List<Modification> results = Visualization.analyseVariants(variants);
     List<Modification> modificationsInMatchSequences = results;

@@ -15,7 +15,7 @@ import eu.interedition.collatex.visualization.Modification;
 public class Matches {
   private final Segment base;
   private final Segment witness;
-  private List<Set<Match>> permutations;
+  private List<Set<Match<Word>>> permutations;
   private final Set<Match> matches;
   private final WordDistance distanceMeasure;
 
@@ -41,7 +41,7 @@ public class Matches {
     return matchSet;
   }
 
-  public List<Set<Match>> permutations() {
+  public List<Set<Match<Word>>> permutations() {
     if (permutations == null) permutations = new MatchPermutator(matches).permutations();
     return permutations;
   }

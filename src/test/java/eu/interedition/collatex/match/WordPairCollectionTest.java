@@ -28,8 +28,8 @@ public class WordPairCollectionTest {
   @Before
   public void setUp() {
     WitnessBuilder builder = new WitnessBuilder();
-    a = builder.build("op zijn pad liep zijn hond aan zijn hand op zijn dag");
-    b = builder.build("zijn hond liep aan zijn hand op zijn dag");
+    a = builder.build("op zijn pad liep zijn hond aan zijn hand op zijn dag").getFirstSegment();
+    b = builder.build("zijn hond liep aan zijn hand op zijn dag").getFirstSegment();
     HashMap<String, Segment> witnessHash = Maps.newHashMap();
     for (Segment witness : Lists.newArrayList(a, b)) {
       witnessHash.put(witness.id, witness);

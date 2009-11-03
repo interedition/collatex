@@ -9,24 +9,24 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.input.BaseElement;
 
-public class UnfixedAlignment {
-  private final Set<Match> fixedMatches;
-  private final Set<Match> unfixedMatches;
+public class UnfixedAlignment<T extends BaseElement> {
+  private final Set<Match<T>> fixedMatches;
+  private final Set<Match<T>> unfixedMatches;
 
-  private final Multimap<Word, Match> baseToWitness;
-  private final Multimap<Word, Match> witnessToBase;
-  private final UnfixedAlignment previous;
+  private final Multimap<T, Match<T>> baseToWitness;
+  private final Multimap<T, Match<T>> witnessToBase;
+  private final UnfixedAlignment<T> previous;
 
-  public UnfixedAlignment(Set<Match> _fixedMatches, Set<Match> _unfixedMatches) {
+  public UnfixedAlignment(Set<Match<T>> _fixedMatches, Set<Match<T>> _unfixedMatches) {
     this(_fixedMatches, _unfixedMatches, null);
 
     //    System.out.println(fixedMatches.toString());
     //    System.out.println(unfixedMatches.toString());
   }
 
-  public UnfixedAlignment(Set<Match> _fixedMatches, Set<Match> _unfixedMatches, UnfixedAlignment _previous) {
+  public UnfixedAlignment(Set<Match<T>> _fixedMatches, Set<Match<T>> _unfixedMatches, UnfixedAlignment<T> _previous) {
     this.fixedMatches = _fixedMatches;
     this.unfixedMatches = _unfixedMatches;
     this.baseToWitness = groupMatchesForBase(unfixedMatches);
@@ -34,51 +34,51 @@ public class UnfixedAlignment {
     this.previous = _previous;
   }
 
-  public Set<Match> getFixedMatches() {
+  public Set<Match<T>> getFixedMatches() {
     return fixedMatches;
   }
 
-  public Set<Word> getUnfixedWords() {
+  public Set<T> getUnfixedWords() {
     return baseToWitness.keySet();
   }
 
-  public Collection<Match> getMatchesThatLinkFrom(Word word) {
+  public Collection<Match<T>> getMatchesThatLinkFrom(T word) {
     return baseToWitness.get(word);
   }
 
-  public Collection<Match> getMatchesThatLinkTo(Word word) {
+  public Collection<Match<T>> getMatchesThatLinkTo(T word) {
     return witnessToBase.get(word);
   }
 
-  public UnfixedAlignment fixMatch(Match match) {
-    Set<Match> newFixedMatches = Sets.newLinkedHashSet();
+  public UnfixedAlignment<T> fixMatch(Match<T> match) {
+    Set<Match<T>> newFixedMatches = Sets.newLinkedHashSet();
     newFixedMatches.addAll(fixedMatches);
     newFixedMatches.add(match);
-    Set<Match> newUnfixedMatches = filterAwayNoLongerPossibleMatches(unfixedMatches, match);
-    UnfixedAlignment matches = new UnfixedAlignment(newFixedMatches, newUnfixedMatches, this);
+    Set<Match<T>> newUnfixedMatches = filterAwayNoLongerPossibleMatches(unfixedMatches, match);
+    UnfixedAlignment<T> matches = new UnfixedAlignment<T>(newFixedMatches, newUnfixedMatches, this);
     return matches;
   }
 
   // group matches by common base word or common witness word
-  private Multimap<Word, Match> groupMatchesForBase(Set<Match> _matches) {
-    Multimap<Word, Match> matchGroupsForBase = Multimaps.newLinkedListMultimap();
-    for (Match match : _matches) {
+  private Multimap<T, Match<T>> groupMatchesForBase(Set<Match<T>> _matches) {
+    Multimap<T, Match<T>> matchGroupsForBase = Multimaps.newLinkedListMultimap();
+    for (Match<T> match : _matches) {
       matchGroupsForBase.put(match.getBaseWord(), match);
     }
     return matchGroupsForBase;
   }
 
-  private Multimap<Word, Match> groupMatchesForWitness(Set<Match> _matches) {
-    Multimap<Word, Match> groupMatchesForWitness = Multimaps.newLinkedListMultimap();
-    for (Match match : _matches) {
+  private Multimap<T, Match<T>> groupMatchesForWitness(Set<Match<T>> _matches) {
+    Multimap<T, Match<T>> groupMatchesForWitness = Multimaps.newLinkedListMultimap();
+    for (Match<T> match : _matches) {
       groupMatchesForWitness.put(match.getWitnessWord(), match);
     }
     return groupMatchesForWitness;
   }
 
-  private Set<Match> filterAwayNoLongerPossibleMatches(Set<Match> unfixedMatches2, Match possibleMatch) {
-    Set<Match> results = Sets.newLinkedHashSet();
-    for (Match match : unfixedMatches2) {
+  private Set<Match<T>> filterAwayNoLongerPossibleMatches(Set<Match<T>> unfixedMatches2, Match<T> possibleMatch) {
+    Set<Match<T>> results = Sets.newLinkedHashSet();
+    for (Match<T> match : unfixedMatches2) {
       if (match.getBaseWord().equals(possibleMatch.getBaseWord()) || match.getWitnessWord().equals(possibleMatch.getWitnessWord())) {
         // do nothing... this one should be filtered away
       } else {
@@ -92,9 +92,9 @@ public class UnfixedAlignment {
     return !baseToWitness.keySet().isEmpty();
   }
 
-  public List<Match> getUnfixedNearMatches() {
-    List<Match> nearMatches = Lists.newArrayList();
-    for (Match match : unfixedMatches) {
+  public List<Match<T>> getUnfixedNearMatches() {
+    List<Match<T>> nearMatches = Lists.newArrayList();
+    for (Match<T> match : unfixedMatches) {
       if (match.wordDistance > 0) {
         nearMatches.add(match);
       }
@@ -102,11 +102,11 @@ public class UnfixedAlignment {
     return nearMatches;
   }
 
-  public Set<Match> getUnfixedMatches() {
+  public Set<Match<T>> getUnfixedMatches() {
     return unfixedMatches;
   }
 
-  public UnfixedAlignment getPrevious() {
+  public UnfixedAlignment<T> getPrevious() {
     return previous;
   }
 

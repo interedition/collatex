@@ -1,13 +1,11 @@
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.input;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.input.Segment;
-import eu.interedition.collatex.input.Word;
 
-public class Phrase {
+public class Phrase extends BaseElement {
   private final Segment witness;
   private final int startPosition;
   private final int endPosition;
@@ -105,5 +103,15 @@ public class Phrase {
 
   public boolean isAtTheFront() {
     return previous == null;
+  }
+
+  @Override
+  public String getOriginal() {
+    return toString();
+  }
+
+  @Override
+  public int getPosition() {
+    return startPosition;
   }
 }

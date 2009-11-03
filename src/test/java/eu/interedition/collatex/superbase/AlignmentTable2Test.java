@@ -7,6 +7,7 @@ import org.junit.Test;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -14,7 +15,7 @@ public class AlignmentTable2Test {
   @Test
   public void testCreateSuperBase() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment a = builder.build("A", "the first witness");
+    Witness a = builder.build("A", "the first witness");
     WitnessSet set = new WitnessSet(a);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     Segment superbase = table.createSuperbase();
@@ -24,8 +25,8 @@ public class AlignmentTable2Test {
   @Test
   public void testCreateSuperBaseWithVariation() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment a = builder.build("A", "the first witness");
-    Segment b = builder.build("B", "the second witness");
+    Witness a = builder.build("A", "the first witness");
+    Witness b = builder.build("B", "the second witness");
     WitnessSet set = new WitnessSet(a, b);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     Segment superbase = table.createSuperbase();
@@ -35,7 +36,7 @@ public class AlignmentTable2Test {
   @Test
   public void testStringOutputOneWitness() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment a = builder.build("A", "the black cat");
+    Witness a = builder.build("A", "the black cat");
     WitnessSet set = new WitnessSet(a);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
@@ -45,8 +46,8 @@ public class AlignmentTable2Test {
   @Test
   public void testStringOutputTwoWitnesses() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment a = builder.build("A", "the black cat");
-    Segment b = builder.build("B", "the black cat");
+    Witness a = builder.build("A", "the black cat");
+    Witness b = builder.build("B", "the black cat");
     WitnessSet set = new WitnessSet(a, b);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     // TODO: add match test can be moved to a column test class? 
@@ -65,8 +66,8 @@ public class AlignmentTable2Test {
   @Test
   public void testStringOutputEmptyCells() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment a = builder.build("A", "the black cat");
-    Segment b = builder.build("B", "the");
+    Witness a = builder.build("A", "the black cat");
+    Witness b = builder.build("B", "the");
     WitnessSet set = new WitnessSet(a, b);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     // TODO: add match test can be moved to column class?
@@ -81,8 +82,8 @@ public class AlignmentTable2Test {
   @Test
   public void testTranspositionsAreNotStoredInAlignmentTable() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment a = builder.build("A", "the black and white cat");
-    Segment b = builder.build("B", "the white and black cat");
+    Witness a = builder.build("A", "the black and white cat");
+    Witness b = builder.build("B", "the white and black cat");
     WitnessSet set = new WitnessSet(a, b);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black|and|white|cat\n";

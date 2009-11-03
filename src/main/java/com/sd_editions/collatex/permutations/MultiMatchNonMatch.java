@@ -25,13 +25,13 @@ public class MultiMatchNonMatch {
     this.nonMatches = determineNonMatches();
   }
 
-  private Set<MultiMatch> determineAllCommonMatches(Alignment... matchNonMatches) {
+  private Set<MultiMatch> determineAllCommonMatches(Alignment<Word>... matchNonMatches) {
     // These nonMatches should all have the same base
     Set<MultiMatch> commonMatches = Sets.newHashSet();
     // initialize with the first matchset
-    Function<Match, MultiMatch> match2multimatch = new Function<Match, MultiMatch>() {
+    Function<Match<Word>, MultiMatch> match2multimatch = new Function<Match<Word>, MultiMatch>() {
       @Override
-      public MultiMatch apply(Match match) {
+      public MultiMatch apply(Match<Word> match) {
         return new MultiMatch(match.getBaseWord(), match.getWitnessWord());
       }
     };
@@ -47,13 +47,13 @@ public class MultiMatchNonMatch {
       for (MultiMatch multiMatch : commonMatches) {
         final Word baseWord = multiMatch.getWords().get(0);
 
-        Predicate<Match> sameBaseword = new Predicate<Match>() {
+        Predicate<Match<Word>> sameBaseword = new Predicate<Match<Word>>() {
           @Override
           public boolean apply(Match match) {
             return match.getBaseWord().equals(baseWord);
           }
         };
-        for (Match match : Iterables.filter(matchNonMatches[i].getMatches(), sameBaseword)) {
+        for (Match<Word> match : Iterables.filter(matchNonMatches[i].getMatches(), sameBaseword)) {
           multiMatch.addMatchingWord(match.getWitnessWord());
         }
       }

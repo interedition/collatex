@@ -15,7 +15,7 @@ import com.sd_editions.collatex.match.Subsegment;
 import com.sd_editions.collatex.match.SubsegmentExtractor;
 import com.sd_editions.collatex.match.Subsegments;
 
-import eu.interedition.collatex.alignment.Phrase;
+import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -29,9 +29,9 @@ public class SubsegmentExtractorTest {
 
   @Test
   public void testMatchingWordPositionsPerWitness() {
-    Segment a = builder.build("a", "zijn hond liep aan zijn hand");
-    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand");
-    Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad");
+    Segment a = builder.build("a", "zijn hond liep aan zijn hand").getFirstSegment();
+    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand").getFirstSegment();
+    Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad").getFirstSegment();
     SubsegmentExtractor p2 = new SubsegmentExtractor(a, b, c);
 
     Subsegment zijnPositions = p2.matchingWordPositionsPerWitness("zijn");
@@ -93,9 +93,9 @@ public class SubsegmentExtractorTest {
   }
 
   private SubsegmentExtractor defaultSegmentExtractor() {
-    Segment a = builder.build("a", "Zijn hond liep aan zijn hand.");
-    Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.");
-    Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.");
+    Segment a = builder.build("a", "Zijn hond liep aan zijn hand.").getFirstSegment();
+    Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.").getFirstSegment();
+    Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.").getFirstSegment();
     SubsegmentExtractor sse = new SubsegmentExtractor(a, b, c);
     return sse;
   }

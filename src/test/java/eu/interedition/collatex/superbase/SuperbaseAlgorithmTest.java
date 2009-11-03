@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
-import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -24,9 +24,9 @@ public class SuperbaseAlgorithmTest {
 
   @Test
   public void testEverythingMatches() {
-    Segment w1 = builder.build("A", "the black cat");
-    Segment w2 = builder.build("B", "the black cat");
-    Segment w3 = builder.build("C", "the black cat");
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the black cat");
+    Witness w3 = builder.build("C", "the black cat");
     WitnessSet set = new WitnessSet(w1, w2, w3);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
@@ -37,9 +37,9 @@ public class SuperbaseAlgorithmTest {
 
   @Test
   public void testOmission() {
-    Segment w1 = builder.build("A", "the black cat");
-    Segment w2 = builder.build("B", "the cat");
-    Segment w3 = builder.build("C", "the black cat");
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the cat");
+    Witness w3 = builder.build("C", "the black cat");
     WitnessSet set = new WitnessSet(w1, w2, w3);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
@@ -50,11 +50,11 @@ public class SuperbaseAlgorithmTest {
 
   @Test
   public void testVariant() {
-    Segment w1 = builder.build("A", "the black cat");
-    Segment w2 = builder.build("B", "the white cat");
-    Segment w3 = builder.build("C", "the green cat");
-    Segment w4 = builder.build("D", "the red cat");
-    Segment w5 = builder.build("E", "the yellow cat");
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the white cat");
+    Witness w3 = builder.build("C", "the green cat");
+    Witness w4 = builder.build("D", "the red cat");
+    Witness w5 = builder.build("E", "the yellow cat");
     WitnessSet set = new WitnessSet(w1, w2, w3, w4, w5);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
@@ -67,10 +67,10 @@ public class SuperbaseAlgorithmTest {
 
   @Test
   public void testAddition() {
-    Segment w1 = builder.build("A", "the cat");
-    Segment w2 = builder.build("B", "before the cat");
-    Segment w3 = builder.build("C", "the black cat");
-    Segment w4 = builder.build("D", "the cat walks");
+    Witness w1 = builder.build("A", "the cat");
+    Witness w2 = builder.build("B", "before the cat");
+    Witness w3 = builder.build("C", "the black cat");
+    Witness w4 = builder.build("D", "the cat walks");
     WitnessSet set = new WitnessSet(w1, w2, w3, w4);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A:  |the| |cat| \n";
@@ -87,10 +87,10 @@ public class SuperbaseAlgorithmTest {
 
   @Test
   public void testGenSuperbase() {
-    Segment w1 = builder.build("A", "the cat");
-    Segment w2 = builder.build("B", "before the cat");
-    Segment w3 = builder.build("C", "the black cat");
-    Segment w4 = builder.build("D", "just before midnight the cat walks");
+    Witness w1 = builder.build("A", "the cat");
+    Witness w2 = builder.build("B", "before the cat");
+    Witness w3 = builder.build("C", "the black cat");
+    Witness w4 = builder.build("D", "just before midnight the cat walks");
     WitnessSet set = new WitnessSet(w1, w2, w3, w4);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A:  | | |the| |cat| \n";
@@ -103,10 +103,10 @@ public class SuperbaseAlgorithmTest {
 
   @Test
   public void testVariation() {
-    Segment w1 = builder.build("A", "the black cat");
-    Segment w2 = builder.build("B", "the black and white cat");
-    Segment w3 = builder.build("C", "the black very special cat");
-    Segment w4 = builder.build("D", "the black not very special cat");
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the black and white cat");
+    Witness w3 = builder.build("C", "the black very special cat");
+    Witness w4 = builder.build("D", "the black not very special cat");
     WitnessSet set = new WitnessSet(w1, w2, w3, w4);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black| | | |cat\n";
@@ -119,10 +119,10 @@ public class SuperbaseAlgorithmTest {
 
   @Test
   public void testWitnessReorder() {
-    Segment w1 = builder.build("A", "the black cat");
-    Segment w2 = builder.build("B", "the black and white cat");
-    Segment w3 = builder.build("C", "the black not very special cat");
-    Segment w4 = builder.build("D", "the black very special cat");
+    Witness w1 = builder.build("A", "the black cat");
+    Witness w2 = builder.build("B", "the black and white cat");
+    Witness w3 = builder.build("C", "the black not very special cat");
+    Witness w4 = builder.build("D", "the black very special cat");
     WitnessSet set = new WitnessSet(w1, w2, w3, w4);
     AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     String expected = "A: the|black| | | |cat\n";

@@ -61,8 +61,8 @@ public class IgnoredTest {
           List<String> baseWords = Lists.newArrayList();
           List<String> witnessWords = Lists.newArrayList();
           for (Match match : matches) {
-            baseWords.add(match.getBaseWord().original);
-            witnessWords.add(match.getWitnessWord().original);
+            baseWords.add(match.getBaseWord().getOriginal());
+            witnessWords.add(match.getWitnessWord().getOriginal());
           }
           println("      '" + Join.join(" ", baseWords) + "' -> '" + Join.join(" ", witnessWords) + "'");
         }

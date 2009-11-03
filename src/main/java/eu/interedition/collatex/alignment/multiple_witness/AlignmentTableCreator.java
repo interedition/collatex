@@ -12,6 +12,7 @@ import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
 
@@ -19,12 +20,13 @@ public class AlignmentTableCreator {
 
   public static AlignmentTable2 createAlignmentTable(WitnessSet set) {
     AlignmentTable2 table = new AlignmentTable2();
-    for (Segment witness : set.getWitnesses()) {
-      AlignmentTableCreator.addWitness(table, witness);
+    for (Witness witness : set.getWitnesses()) {
+      AlignmentTableCreator.addWitness(table, witness.getFirstSegment());
     }
     return table;
   }
 
+  // TODO: rename to addSegment!
   static void addWitness(AlignmentTable2 table, Segment witness) {
     if (table.getWitnesses().isEmpty()) {
       for (Word word : witness.getWords()) {
@@ -83,7 +85,7 @@ public class AlignmentTableCreator {
 
   static void addMatchesToAlignmentTable(Superbase superbase, Alignment compresult) {
     Set<Match> matches = compresult.getMatches();
-    for (Match match : matches) {
+    for (Match<Word> match : matches) {
       Column column = superbase.getColumnFor(match);
       Word witnessWord = match.getWitnessWord();
       column.addMatch(witnessWord);

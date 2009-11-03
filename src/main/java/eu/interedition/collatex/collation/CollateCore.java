@@ -20,26 +20,28 @@ import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.functions.Matcher;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex.visualization.Modifications;
 import eu.interedition.collatex.visualization.Visualization;
 
 public class CollateCore {
 
-  public final List<Segment> witnesses;
+  public final List<Witness> witnesses;
 
-  public CollateCore(Segment... _witnesses) {
+  public CollateCore(Witness... _witnesses) {
     this(Lists.newArrayList(_witnesses));
   }
 
-  public CollateCore(List<Segment> _witnesses) {
+  public CollateCore(List<Witness> _witnesses) {
     this.witnesses = _witnesses;
   }
 
   @Deprecated
   public Modifications compareWitness(int i, int j) {
-    Segment base = getWitness(i);
-    Segment witness = getWitness(j);
+    Segment base = getWitness(i).getFirstSegment();
+    Segment witness = getWitness(j).getFirstSegment();
     Alignment collation = compareWitnesses(base, witness);
     Modifications modifications = Visualization.getModifications(collation);
     return modifications;
@@ -152,10 +154,10 @@ public class CollateCore {
   }
 
   public Matches getMatches(int i, int j) {
-    return new Matches(getWitness(i), getWitness(j), new NormalizedLevenshtein());
+    return new Matches(getWitness(i).getFirstSegment(), getWitness(j).getFirstSegment(), new NormalizedLevenshtein());
   }
 
-  public Segment getWitness(int i) {
+  public Witness getWitness(int i) {
     return witnesses.get(i - 1);
   }
 
@@ -164,12 +166,12 @@ public class CollateCore {
   }
 
   @Deprecated
-  public List<MatchSequence> getMatchSequences(int i, int j) {
-    Segment base = getWitness(i);
-    Segment witness = getWitness(j);
+  public List<MatchSequence<Word>> getMatchSequences(int i, int j) {
+    Segment base = getWitness(i).getFirstSegment();
+    Segment witness = getWitness(j).getFirstSegment();
     Matches xmatches = new Matches(base, witness, new NormalizedLevenshtein());
-    List<Set<Match>> permutationList = xmatches.permutations();
-    Set<Match> matches = permutationList.get(0);
+    List<Set<Match<Word>>> permutationList = xmatches.permutations();
+    Set<Match<Word>> matches = permutationList.get(0);
     return SequenceDetection.calculateMatchSequences(matches);
   }
 

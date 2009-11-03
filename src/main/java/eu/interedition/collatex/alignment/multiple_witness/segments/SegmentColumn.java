@@ -47,7 +47,7 @@ public class SegmentColumn {
     // We have to convert the match sequence witness to a segment
     List<Match> matches = seq.getMatches();
     List<Word> witnessWords = Lists.newArrayList();
-    for (Match match : matches) {
+    for (Match<Word> match : matches) {
       witnessWords.add(match.getWitnessWord());
     }
     OldSegment newSegment = new OldSegment(witnessWords);

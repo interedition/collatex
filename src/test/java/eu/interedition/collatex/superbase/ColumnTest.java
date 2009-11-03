@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import eu.interedition.collatex.alignment.multiple_witness.Column;
 import eu.interedition.collatex.alignment.multiple_witness.Superbase;
-import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
@@ -18,33 +18,33 @@ public class ColumnTest {
   @Test(expected = NoSuchElementException.class)
   public void testGetWordNonExistingGivesException() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment witness = builder.build("A", "a test string");
-    Segment witnessB = builder.build("B", "different");
-    Word word = witness.getWordOnPosition(1);
+    Witness witness = builder.build("A", "a test string");
+    Witness witnessB = builder.build("B", "different");
+    Word word = witness.getFirstSegment().getWordOnPosition(1);
     Column column = new Column(word);
-    column.getWord(witnessB);
+    column.getWord(witnessB.getFirstSegment());
   }
 
   @Test
   public void testContainsWitness() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment witness = builder.build("A", "a test string");
-    Segment witnessB = builder.build("B", "different");
-    Word word = witness.getWordOnPosition(1);
+    Witness witness = builder.build("A", "a test string");
+    Witness witnessB = builder.build("B", "different");
+    Word word = witness.getFirstSegment().getWordOnPosition(1);
     Column column = new Column(word);
-    assertTrue(column.containsWitness(witness));
-    assertFalse(column.containsWitness(witnessB));
+    assertTrue(column.containsWitness(witness.getFirstSegment()));
+    assertFalse(column.containsWitness(witnessB.getFirstSegment()));
   }
 
   @Test
   public void testInverseWordMap() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment witness = builder.build("A", "first");
-    Segment witnessB = builder.build("B", "second");
-    Segment witnessC = builder.build("C", "third");
-    Word word = witness.getWordOnPosition(1);
-    Word wordB = witnessB.getWordOnPosition(1);
-    Word wordC = witnessC.getWordOnPosition(1);
+    Witness witness = builder.build("A", "first");
+    Witness witnessB = builder.build("B", "second");
+    Witness witnessC = builder.build("C", "third");
+    Word word = witness.getFirstSegment().getWordOnPosition(1);
+    Word wordB = witnessB.getFirstSegment().getWordOnPosition(1);
+    Word wordC = witnessC.getFirstSegment().getWordOnPosition(1);
     Column column = new Column(word);
     column.addVariant(wordB);
     column.addVariant(wordC);
@@ -56,12 +56,12 @@ public class ColumnTest {
   @Test
   public void testInverseWordMap2() {
     WitnessBuilder builder = new WitnessBuilder();
-    Segment witness = builder.build("A", "first");
-    Segment witnessB = builder.build("B", "match");
-    Segment witnessC = builder.build("C", "match");
-    Word word = witness.getWordOnPosition(1);
-    Word wordB = witnessB.getWordOnPosition(1);
-    Word wordC = witnessC.getWordOnPosition(1);
+    Witness witness = builder.build("A", "first");
+    Witness witnessB = builder.build("B", "match");
+    Witness witnessC = builder.build("C", "match");
+    Word word = witness.getFirstSegment().getWordOnPosition(1);
+    Word wordB = witnessB.getFirstSegment().getWordOnPosition(1);
+    Word wordC = witnessC.getFirstSegment().getWordOnPosition(1);
     Column column = new Column(word);
     column.addVariant(wordB);
     column.addMatch(wordC);

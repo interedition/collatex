@@ -4,7 +4,7 @@ import eu.interedition.collatex.input.visitors.ICollationResource;
 import eu.interedition.collatex.input.visitors.IResourceVisitor;
 import eu.interedition.collatex.tokenization.Token;
 
-public class Word implements ICollationResource {
+public class Word extends BaseElement implements ICollationResource {
   private final String witnessId;
   public final String original;
   public final String normalized;
@@ -52,6 +52,16 @@ public class Word implements ICollationResource {
   @Override
   public void accept(IResourceVisitor visitor) {
     visitor.visitWord(this);
+  }
+
+  @Override
+  public int getPosition() {
+    return position;
+  }
+
+  @Override
+  public String getOriginal() {
+    return original;
   }
 
 }
