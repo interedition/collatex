@@ -104,10 +104,12 @@ public class SubsegmentExtractorTest {
     final UnfixedAlignment<Phrase> unfixedAlignment = sse.getUnfixedAlignment();
     assertNotNull(unfixedAlignment);
     final Set<Match<Phrase>> fixedMatches = unfixedAlignment.getFixedMatches();
-    assertEquals(1, fixedMatches.size());
+    // verwachte fixedMatches: 'zijn hond', 'liep', 'aan zijn hand', 'op zijn pad'
+    assertEquals(4, fixedMatches.size());
     Util.p(fixedMatches);
     final Set<Match<Phrase>> unfixedMatches = unfixedAlignment.getUnfixedMatches();
-    assertEquals(1, unfixedMatches.size());
+    // geen unfixedMatches
+    assertEquals(0, unfixedMatches.size());
     Util.p(unfixedMatches);
   }
 
