@@ -8,7 +8,9 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.alignment.functions.GapDetection;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.input.BaseElement;
+import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.Word;
 
 public class Alignment<T extends BaseElement> {
@@ -35,6 +37,15 @@ public class Alignment<T extends BaseElement> {
     gaps.addAll(gaps1);
     gaps.addAll(gaps2);
     return new Alignment<Word>(matches, gaps, sequencesA, sequencesB);
+  }
+
+  // TODO: gap detection does not work yet!
+  public static Alignment<Phrase> createPhraseAlignment(Set<Match<Phrase>> matches, WitnessSegmentPhrases a, WitnessSegmentPhrases b) {
+    List<MatchSequence<Phrase>> sequencesA = SequenceDetection.calculateMatchSequences(matches);
+    List<MatchSequence<Phrase>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
+    List<Gap> gaps = Lists.newArrayList();
+    Alignment<Phrase> al = new Alignment<Phrase>(matches, gaps, sequencesA, sequencesB);
+    return al;
   }
 
   public Set<Match<T>> getMatches() {

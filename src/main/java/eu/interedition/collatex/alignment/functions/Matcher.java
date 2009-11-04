@@ -31,10 +31,15 @@ public class Matcher {
   public static Alignment<Word> align(Segment a, Segment b) {
     UnfixedAlignment<Word> unfixedAlignment = createFirstUnfixedAlignment(a, b);
 
-    while (unfixedAlignment.hasUnfixedWords()) {
-      unfixedAlignment = Matcher.permutate(a, b, unfixedAlignment);
+    return align(a, b, unfixedAlignment);
+  }
+
+  public static Alignment<Word> align(Segment a, Segment b, UnfixedAlignment<Word> unfixedAlignment) {
+    UnfixedAlignment<Word> temp = unfixedAlignment;
+    while (temp.hasUnfixedWords()) {
+      temp = Matcher.permutate(a, b, temp);
     }
-    Alignment<Word> alignment = Alignment.create(unfixedAlignment.getFixedMatches(), a, b);
+    Alignment<Word> alignment = Alignment.create(temp.getFixedMatches(), a, b);
     return alignment;
   }
 
