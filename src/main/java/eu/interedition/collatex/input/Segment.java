@@ -61,6 +61,7 @@ public class Segment implements ICollationResource {
 
   public String getWitnessId() {
     // TODO: use the actual witnessId, this is the segmentId
+    // Note: the note above is no longer correct!
     return id;
   }
 }
