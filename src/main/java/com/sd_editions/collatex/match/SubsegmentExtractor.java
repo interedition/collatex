@@ -1,5 +1,9 @@
 package com.sd_editions.collatex.match;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.transform;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -8,34 +12,35 @@ import java.util.Map.Entry;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
 import com.sd_editions.collatex.Block.Util;
 
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.Word;
 
 public class SubsegmentExtractor {
   private final Segment[] segments;
   private static Map<String, Segment> segmentHash = Maps.newHashMap();
-  //  private Map<String, Map<String, List<Integer>>> subsegments;
   private Subsegments subsegments;
 
   Function<Word, Integer> extractPosition = new Function<Word, Integer>() {
     @Override
-    public Integer apply(Word word0) {
+    public Integer apply(final Word word0) {
       return Integer.valueOf(word0.position);
     }
   };
 
-  public SubsegmentExtractor(Segment... _segments) {
+  public SubsegmentExtractor(final Segment... _segments) {
     this.segments = _segments;
-
-    for (Segment segment : segments) {
+    for (final Segment segment : segments) {
       Util.p(segment.getWitnessId(), segment);
       segmentHash.put(segment.getWitnessId(), segment);
     }
@@ -45,7 +50,7 @@ public class SubsegmentExtractor {
   public void go() {
     subsegments = getOneWordSubsegments();
 
-    Multimap<SegmentPosition, String> sequencesAtSegmentPosition = getSequencesAtSegmentPosition();
+    final Multimap<SegmentPosition, String> sequencesAtSegmentPosition = getSequencesAtSegmentPosition();
     Util.p("sequencesAtSegmentPosition", sequencesAtSegmentPosition);
 
     Subsegment subsegment = subsegments.getFirstOpenSubsegment();
@@ -53,12 +58,12 @@ public class SubsegmentExtractor {
       Util.newline();
       Util.p("subsegment", subsegment);
 
-      Set<String> witnessIds = subsegment.getWitnessIds();
+      //      final Set<String> witnessIds = subsegment.getWitnessIds();
 
-      Map<String, List<SegmentPosition>> nextWordMap = Maps.newHashMap();
-      for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
-        SegmentPosition nextSegmentPosition = segmentPosition.nextSegmentPosition();
-        String nextSegmentTitle = subsegments.getSubsegmentTitleAtSegmentPosition(nextSegmentPosition);
+      final Map<String, List<SegmentPosition>> nextWordMap = Maps.newHashMap();
+      for (final SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
+        final SegmentPosition nextSegmentPosition = segmentPosition.nextSegmentPosition();
+        final String nextSegmentTitle = subsegments.getSubsegmentTitleAtSegmentPosition(nextSegmentPosition);
         List<SegmentPosition> list = nextWordMap.get(nextSegmentTitle);
         if (list == null) list = Lists.newArrayList();
         list.add(nextSegmentPosition);
@@ -66,32 +71,29 @@ public class SubsegmentExtractor {
       }
       Util.p("nextwordmap", nextWordMap);
 
-      Set<Entry<String, List<SegmentPosition>>> entrySet = nextWordMap.entrySet();
-      for (Entry<String, List<SegmentPosition>> entry : entrySet) {
-        entry.getKey();
-        entry.getValue();
-      }
-
-      //      Set<String> nextSubsegmentTitleSet = Sets.newHashSet();
-      //      for (SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
-      //        SegmentPosition next = segmentPosition.nextSegmentPosition();
-      //        nextSubsegmentTitleSet.add(subsegments.getSubsegmentTitleAtSegmentPosition(next));
+      //      final Set<Entry<String, List<SegmentPosition>>> entrySet = nextWordMap.entrySet();
+      //      for (final Entry<String, List<SegmentPosition>> entry : entrySet) {
+      //        entry.getKey();
+      //        entry.getValue();
       //      }
-      //      Util.p("nextSubsegmentTitleSet", nextSubsegmentTitleSet);
-      //      if (nextSubsegmentTitleSet.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
-      //        // subsegment and nextSubsegment can be joined
-      //        Util.remark("join!");
-      //        subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
-      //      } else {}
+
+      final Set<String> nextSubsegmentTitleSet = Sets.newHashSet();
+      for (final SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
+        final SegmentPosition next = segmentPosition.nextSegmentPosition();
+        nextSubsegmentTitleSet.add(subsegments.getSubsegmentTitleAtSegmentPosition(next));
+      }
+      Util.p("nextSubsegmentTitleSet", nextSubsegmentTitleSet);
+
+      if (subsegment.size() > 1 && nextWordMap.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
+        // subsegment and nextSubsegment can be joined
+        Util.remark("join!");
+        subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
+      } else {
+
+      }
 
       subsegments.close(subsegment.getTitle());
       subsegment = subsegments.getFirstOpenSubsegment();
-
-      //      Set<Entry<String, List<Integer>>> entrySet = subsegment.entrySet();
-      //      for (Entry<String, List<Integer>> entry : entrySet) {
-      //        String witnessId = entry.getKey();
-      //        List<Integer> positions = entry.getValue();
-      //      }
     }
 
     // sequences: "zijn", "hond", "liep", "aan", "hand", "op", "pad", "met", "hij"
@@ -171,14 +173,14 @@ public class SubsegmentExtractor {
   }
 
   private Multimap<SegmentPosition, String> getSequencesAtSegmentPosition() {
-    Multimap<SegmentPosition, String> sequencesAtSegmentPosition = Multimaps.newArrayListMultimap();
-    for (Subsegment subsegment : subsegments.all()) {
-      String sequenceTitle = subsegment.getTitle();
-      for (Entry<String, List<Integer>> positionsPerWitnessEntry : subsegment.entrySet()) {
-        String witnessId = positionsPerWitnessEntry.getKey();
-        List<Integer> positions = positionsPerWitnessEntry.getValue();
-        for (Integer position : positions) {
-          SegmentPosition segmentPosition = new SegmentPosition(witnessId, position);
+    final Multimap<SegmentPosition, String> sequencesAtSegmentPosition = Multimaps.newArrayListMultimap();
+    for (final Subsegment subsegment : subsegments.all()) {
+      final String sequenceTitle = subsegment.getTitle();
+      for (final Entry<String, List<Integer>> positionsPerWitnessEntry : subsegment.entrySet()) {
+        final String witnessId = positionsPerWitnessEntry.getKey();
+        final List<Integer> positions = positionsPerWitnessEntry.getValue();
+        for (final Integer position : positions) {
+          final SegmentPosition segmentPosition = new SegmentPosition(witnessId, position);
           sequencesAtSegmentPosition.put(segmentPosition, sequenceTitle);
         }
       }
@@ -188,10 +190,10 @@ public class SubsegmentExtractor {
     return sequencesAtSegmentPosition;
   }
 
-  Collection<String> findCommonSequences(Collection<String> sequences0, Collection<String> sequences1) {
+  Collection<String> findCommonSequences(final Collection<String> sequences0, final Collection<String> sequences1) {
     List<String> commonSequences = Lists.newArrayList();
-    int size0 = sequences0.size();
-    int size1 = sequences1.size();
+    final int size0 = sequences0.size();
+    final int size1 = sequences1.size();
     if (size0 < size1) {
       commonSequences = addToCommonSequences(sequences0, sequences1, commonSequences);
     } else {
@@ -200,18 +202,18 @@ public class SubsegmentExtractor {
     return commonSequences;
   }
 
-  private List<String> addToCommonSequences(Collection<String> sequences0, Collection<String> sequences1, List<String> commonSequences) {
-    for (String sequenceTitle : sequences0) {
+  private List<String> addToCommonSequences(final Collection<String> sequences0, final Collection<String> sequences1, final List<String> commonSequences) {
+    for (final String sequenceTitle : sequences0) {
       if (sequences1.contains(sequenceTitle)) commonSequences.add(sequenceTitle);
     }
     return commonSequences;
   }
 
   public Subsegments getOneWordSubsegments() {
-    Subsegments oneWordSequences = new Subsegments();
-    for (Segment segment : segments) {
+    final Subsegments oneWordSequences = new Subsegments();
+    for (final Segment segment : segments) {
       //      Util.p(witness);
-      for (Word word : segment.getWords()) {
+      for (final Word word : segment.getWords()) {
         final String wordToMatch = word.normalized;
         if (!oneWordSequences.containsTitle(wordToMatch)) {
           oneWordSequences.add(wordToMatch, matchingWordPositionsPerWitness(wordToMatch));
@@ -222,24 +224,23 @@ public class SubsegmentExtractor {
   }
 
   private Predicate<Word> matchingPredicate(final String wordToMatch) {
-    Predicate<Word> matching = new Predicate<Word>() {
+    final Predicate<Word> matching = new Predicate<Word>() {
       @Override
-      public boolean apply(Word word1) {
+      public boolean apply(final Word word1) {
         return word1.normalized.equals(wordToMatch);
       }
     };
     return matching;
   }
 
-  public Subsegment matchingWordPositionsPerWitness(String wordToMatch) {
-    Predicate<Word> matchingPredicate = matchingPredicate(wordToMatch);
+  public Subsegment matchingWordPositionsPerWitness(final String wordToMatch) {
+    final Predicate<Word> matchingPredicate = matchingPredicate(wordToMatch);
     //    Map<String, List<Integer>> map = Maps.newHashMap();
-    Subsegment subsegment = new Subsegment(wordToMatch);
-    for (Segment segment : segments) {
-      String witnessId = segment.getWitnessId();
-      Iterable<Word> matchingWords = Iterables.filter(segment.getWords(), matchingPredicate);
-      Iterable<Integer> matchingWordPositions = Iterables.transform(matchingWords, extractPosition);
-      List<Integer> positions = Lists.newArrayList(matchingWordPositions);
+    final Subsegment subsegment = new Subsegment(wordToMatch);
+    for (final Segment segment : segments) {
+      final String witnessId = segment.getWitnessId();
+      final Iterable<Integer> matchingWordPositions = transform(filter(segment.getWords(), matchingPredicate), extractPosition);
+      final List<Integer> positions = Lists.newArrayList(matchingWordPositions);
       if (!positions.isEmpty()) subsegment.add(witnessId, positions);
     }
     return subsegment;
@@ -249,13 +250,31 @@ public class SubsegmentExtractor {
     return subsegments;
   }
 
-  public Map<String, List<Phrase>> getPhrasesPerSegment() {
-    Map<String, List<Phrase>> phrasesPerSegment = Maps.newHashMap();
-    for (Segment segment : segments) {
-      List<Phrase> phraseList = subsegments.getPhrases(segment);
-      phrasesPerSegment.put(segment.getWitnessId(), phraseList);
-    }
-    return phrasesPerSegment;
+  //  public Map<String, List<Phrase>> getPhrasesPerSegment() {
+  //    final Map<String, List<Phrase>> phrasesPerSegment = Maps.newHashMap();
+  //    for (final Segment segment : segments) {
+  //      final List<Phrase> phraseList = subsegments.getPhrases(segment);
+  //      phrasesPerSegment.put(segment.getWitnessId(), phraseList);
+  //    }
+  //    return phrasesPerSegment;
+  //  }
+
+  public WitnessSegmentPhrases getWitnessSegmentPhrases(final String witnessId) {
+    subsegments.removeMarkedSubsegments();
+    final Predicate<Segment> relevant = new Predicate<Segment>() {
+      @Override
+      public boolean apply(final Segment s) {
+        return s.getWitnessId().equals(witnessId);
+      }
+    };
+    final Segment witnessSegment = find(Lists.newArrayList(segments), relevant);
+    final List<Phrase> phraseList = subsegments.getPhrases(witnessSegment);
+    return new WitnessSegmentPhrases(witnessId, phraseList);
   }
 
+  public UnfixedAlignment<Phrase> getUnfixedAlignment() {
+    final Set<Match<Phrase>> fixed = Sets.newHashSet();
+    final Set<Match<Phrase>> unfixed = Sets.newHashSet();
+    return new UnfixedAlignment<Phrase>(fixed, unfixed);
+  }
 }

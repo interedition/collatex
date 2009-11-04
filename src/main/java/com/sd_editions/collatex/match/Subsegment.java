@@ -17,8 +17,9 @@ public class Subsegment {
   private boolean open = true;
   private final Map<String, List<Integer>> map = Maps.newHashMap();
   private int numberOfWords = 0;
+  private boolean remove = false;
 
-  public Subsegment(String _title) {
+  public Subsegment(final String _title) {
     this.title = _title;
   }
 
@@ -34,7 +35,7 @@ public class Subsegment {
     return !isOpen();
   }
 
-  public void add(String witnessId, List<Integer> positions) {
+  public void add(final String witnessId, final List<Integer> positions) {
     if (isClosed() || getNumberOfWords() > 1) {
       throw new RuntimeException("You're not allowed to add to a subsegment after it's been joined or closed.");
     }
@@ -55,7 +56,7 @@ public class Subsegment {
     return map.size();
   }
 
-  public List<Integer> get(String witnessId) {
+  public List<Integer> get(final String witnessId) {
     return map.get(witnessId);
   }
 
@@ -68,17 +69,17 @@ public class Subsegment {
   }
 
   public List<SegmentPosition> getSegmentPositions() {
-    List<SegmentPosition> list = Lists.newArrayList();
-    for (Entry<String, List<Integer>> entry : map.entrySet()) {
-      String witnessId = entry.getKey();
-      for (Integer position : entry.getValue()) {
+    final List<SegmentPosition> list = Lists.newArrayList();
+    for (final Entry<String, List<Integer>> entry : map.entrySet()) {
+      final String witnessId = entry.getKey();
+      for (final Integer position : entry.getValue()) {
         list.add(new SegmentPosition(witnessId, position));
       }
     }
     return list;
   }
 
-  public void concat(Subsegment nextSubsegment) {
+  public void concat(final Subsegment nextSubsegment) {
     title += " " + nextSubsegment.getTitle();
     numberOfWords += nextSubsegment.getNumberOfWords();
   }
@@ -89,16 +90,24 @@ public class Subsegment {
   }
 
   @SuppressWarnings("boxing")
-  public Phrase getPhrase(Segment segment) {
+  public Phrase getPhrase(final Segment segment) {
     Phrase phrase = null;
-    List<Integer> list = map.get(segment.getWitnessId());
+    final List<Integer> list = map.get(segment.getWitnessId());
     if (list != null) {
-      int beginPosition = list.get(0);
-      Word beginWord = segment.getWordOnPosition(beginPosition);
-      int endPosition = beginPosition + numberOfWords - 1;
-      Word endWord = segment.getWordOnPosition(endPosition);
+      final int beginPosition = list.get(0);
+      final Word beginWord = segment.getWordOnPosition(beginPosition);
+      final int endPosition = beginPosition + numberOfWords - 1;
+      final Word endWord = segment.getWordOnPosition(endPosition);
       phrase = new Phrase(segment, beginWord, endWord);
     }
     return phrase;
+  }
+
+  public void markForRemoval() {
+    remove = true;
+  }
+
+  public boolean canRemove() {
+    return remove;
   }
 }

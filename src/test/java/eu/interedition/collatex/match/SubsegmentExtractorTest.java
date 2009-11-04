@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +15,11 @@ import com.sd_editions.collatex.match.Subsegment;
 import com.sd_editions.collatex.match.SubsegmentExtractor;
 import com.sd_editions.collatex.match.Subsegments;
 
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
+import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class SubsegmentExtractorTest {
@@ -29,13 +32,9 @@ public class SubsegmentExtractorTest {
 
   @Test
   public void testMatchingWordPositionsPerWitness() {
-    Segment a = builder.build("a", "zijn hond liep aan zijn hand").getFirstSegment();
-    Segment b = builder.build("b", "op zijn pad liep zijn hond aan zijn hand").getFirstSegment();
-    Segment c = builder.build("c", "met zijn hond aan zijn hand liep hij op zijn pad").getFirstSegment();
-    SubsegmentExtractor p2 = new SubsegmentExtractor(a, b, c);
+    final SubsegmentExtractor p2 = defaultSegmentExtractor();
 
-    Subsegment zijnPositions = p2.matchingWordPositionsPerWitness("zijn");
-    // all 3 witnesses have at least 1 'zijn':
+    final Subsegment zijnPositions = p2.matchingWordPositionsPerWitness("zijn");
     assertEquals(3, zijnPositions.size());
 
     assertContainsPositions(zijnPositions.get("a"), 1, 5);
@@ -43,18 +42,18 @@ public class SubsegmentExtractorTest {
     assertContainsPositions(zijnPositions.get("c"), 2, 5, 10);
   }
 
-  private void assertContainsPositions(List<Integer> positionsA, int... positions) {
-    for (int position : positions) {
+  private void assertContainsPositions(final List<Integer> positionsA, final int... positions) {
+    for (final int position : positions) {
       assertTrue("position " + position + " not found", positionsA.contains(Integer.valueOf(position)));
     }
   }
 
   @Test
   public void testGetOneWordSequences() {
-    SubsegmentExtractor p2 = defaultSegmentExtractor();
+    final SubsegmentExtractor p2 = defaultSegmentExtractor();
 
-    Subsegments oneWordSegments = p2.getOneWordSubsegments();
-    Subsegment hondSequences = oneWordSegments.get("hond");
+    final Subsegments oneWordSegments = p2.getOneWordSubsegments();
+    final Subsegment hondSequences = oneWordSegments.get("hond");
     assertContainsPositions(hondSequences.get("a"), 2);
     // nr. of unique normalized words in all witnesses combined
     assertEquals(9, oneWordSegments.size());
@@ -74,29 +73,49 @@ public class SubsegmentExtractorTest {
 
   @Test
   public void testGo() {
-    SubsegmentExtractor sse = defaultSegmentExtractor();
+    final SubsegmentExtractor sse = defaultSegmentExtractor();
     sse.go();
     assertNotNull(sse);
-    Subsegments subsegments = sse.getSubsegments();
+    final Subsegments subsegments = sse.getSubsegments();
     assertNotNull(subsegments);
     Util.p(subsegments);
   }
 
   @Test
   public void testGetPhrasesPerSegment() {
-    SubsegmentExtractor sse = defaultSegmentExtractor();
+    final SubsegmentExtractor sse = defaultSegmentExtractor();
     sse.go();
-    Map<String, List<Phrase>> phrasesPerSegment = sse.getPhrasesPerSegment();
-    assertNotNull(phrasesPerSegment);
-    assertEquals(3, phrasesPerSegment.size());
-    Util.p(phrasesPerSegment);
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("a"), "'Zijn hond','liep','aan zijn hand.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("b"), "'Op zijn pad','liep','zijn hond','aan zijn hand.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("c"), "'Met','zijn hond','aan zijn hand,','liep','hij','op zijn pad.'");
+  }
+
+  private void assertPhrasesFound(final WitnessSegmentPhrases wsp, final String expectedPhrases) {
+    assertNotNull(wsp);
+    final String string = wsp.toString();
+    assertTrue(expectedPhrases + " not found in " + string, string.contains(expectedPhrases));
+    Util.p(wsp);
+  }
+
+  @Test
+  public void testGetUnfixedAlignment() {
+    final SubsegmentExtractor sse = defaultSegmentExtractor();
+    sse.go();
+    final UnfixedAlignment<Phrase> unfixedAlignment = sse.getUnfixedAlignment();
+    assertNotNull(unfixedAlignment);
+    final Set<Match<Phrase>> fixedMatches = unfixedAlignment.getFixedMatches();
+    assertEquals(1, fixedMatches.size());
+    Util.p(fixedMatches);
+    final Set<Match<Phrase>> unfixedMatches = unfixedAlignment.getUnfixedMatches();
+    assertEquals(1, unfixedMatches.size());
+    Util.p(unfixedMatches);
   }
 
   private SubsegmentExtractor defaultSegmentExtractor() {
-    Segment a = builder.build("a", "Zijn hond liep aan zijn hand.").getFirstSegment();
-    Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.").getFirstSegment();
-    Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.").getFirstSegment();
-    SubsegmentExtractor sse = new SubsegmentExtractor(a, b, c);
+    final Segment a = builder.build("a", "Zijn hond liep aan zijn hand.").getFirstSegment();
+    final Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.").getFirstSegment();
+    final Segment c = builder.build("c", "Met zijn hond aan zijn hand, liep hij op zijn pad.").getFirstSegment();
+    final SubsegmentExtractor sse = new SubsegmentExtractor(a, b, c);
     return sse;
   }
 }

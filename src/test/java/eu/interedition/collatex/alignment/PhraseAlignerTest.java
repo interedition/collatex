@@ -26,20 +26,22 @@ public class PhraseAlignerTest {
 
   @Test
   public void testNoPermutationsOnlyExactMatches() {
+
     // THIS IS ALL SETUP!
-    WitnessSegmentPhrases a = SegmentBuilder.build("A", "deze zinnen zijn hetzelfde");
-    WitnessSegmentPhrases b = SegmentBuilder.build("B", "deze zinnen zijn hetzelfde");
-    Phrase pa = a.getPhraseOnPosition(1);
-    Phrase pb = b.getPhraseOnPosition(1);
-    Match<Phrase> match = new Match<Phrase>(pa, pb);
-    Set<Match<Phrase>> exactMatches = Sets.newHashSet(match);
-    Set<Match<Phrase>> nonExactMatches = Sets.emptySortedSet();
-    UnfixedAlignment<Phrase> u = new UnfixedAlignment<Phrase>(exactMatches, nonExactMatches);
+    final WitnessSegmentPhrases a = SegmentBuilder.build("A", "deze zinnen zijn hetzelfde");
+    final WitnessSegmentPhrases b = SegmentBuilder.build("B", "deze zinnen zijn hetzelfde");
+    final Phrase pa = a.getPhraseOnPosition(1);
+    final Phrase pb = b.getPhraseOnPosition(1);
+    final Match<Phrase> match = new Match<Phrase>(pa, pb);
+    final Set<Match<Phrase>> exactMatches = Sets.newHashSet(match);
+    final Set<Match<Phrase>> nonExactMatches = Sets.emptySortedSet();
+    final UnfixedAlignment<Phrase> u = new UnfixedAlignment<Phrase>(exactMatches, nonExactMatches);
+    // TODO: code to make a,b,u
 
     // DO THE ACTUAL ALIGNMENT
-    Alignment<Phrase> alignment = PhraseAligner.align(a, b, u);
-    Set<Match<Phrase>> matches = alignment.getMatches();
-    String expected = "[(1->1)]";
+    final Alignment<Phrase> alignment = PhraseAligner.align(a, b, u);
+    final Set<Match<Phrase>> matches = alignment.getMatches();
+    final String expected = "[(1->1)]";
     Assert.assertEquals(expected, matches.toString());
     Assert.assertTrue(alignment.getGaps().isEmpty());
   }

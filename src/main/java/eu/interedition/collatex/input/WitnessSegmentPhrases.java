@@ -1,21 +1,35 @@
 package eu.interedition.collatex.input;
 
+import java.util.Collection;
 import java.util.List;
 
+import com.google.common.base.Join;
 import com.google.common.collect.Lists;
-
 
 public class WitnessSegmentPhrases {
   private final String _witnessId;
   private final List<Phrase> _phrases;
 
-  public WitnessSegmentPhrases(String witnessId, Phrase phrase) {
+  public WitnessSegmentPhrases(final String witnessId, final Phrase... phrases) {
     _witnessId = witnessId;
-    _phrases = Lists.newArrayList(phrase);
+    _phrases = Lists.newArrayList(phrases);
   }
 
-  public Phrase getPhraseOnPosition(int i) {
+  public WitnessSegmentPhrases(final String witnessId, final Collection<Phrase> phrases) {
+    _witnessId = witnessId;
+    _phrases = Lists.newArrayList(phrases);
+  }
+
+  public Phrase getPhraseOnPosition(final int i) {
     return _phrases.get(i - 1);
   }
 
+  public String getWitnessId() {
+    return _witnessId;
+  }
+
+  @Override
+  public String toString() {
+    return "WitnessSegmentPhrases(" + getWitnessId() + ", '" + Join.join("','", _phrases) + "')";
+  }
 }
