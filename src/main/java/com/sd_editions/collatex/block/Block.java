@@ -31,12 +31,12 @@ public abstract class Block {
     return this.name;
   }
 
-  protected void setName(String name) {
-    this.name = name;
+  protected void setName(final String _name) {
+    this.name = _name;
   }
 
-  protected void setFirstChild(Block firstChild) {
-    this.firstChild = firstChild;
+  protected void setFirstChild(final Block _firstChild) {
+    this.firstChild = _firstChild;
   }
 
   public Block getFirstChild() {
@@ -51,8 +51,8 @@ public abstract class Block {
     this.firstChild = null;
   }
 
-  protected void setLastChild(Block lastChild) {
-    this.lastChild = lastChild;
+  protected void setLastChild(final Block _lastChild) {
+    this.lastChild = _lastChild;
   }
 
   public Block getLastChild() {
@@ -67,8 +67,8 @@ public abstract class Block {
     this.lastChild = null;
   }
 
-  protected void setNextSibling(Block nextSibling) {
-    this.nextSibling = nextSibling;
+  protected void setNextSibling(final Block _nextSibling) {
+    this.nextSibling = _nextSibling;
   }
 
   public Block getNextSibling() {
@@ -83,8 +83,8 @@ public abstract class Block {
     this.nextSibling = null;
   }
 
-  protected void setPreviousSibling(Block previousSibling) {
-    this.previousSibling = previousSibling;
+  protected void setPreviousSibling(final Block _previousSibling) {
+    this.previousSibling = _previousSibling;
   }
 
   public Block getPreviousSibling() {
@@ -99,8 +99,8 @@ public abstract class Block {
     this.previousSibling = null;
   }
 
-  protected void setStartParent(Block startParent) {
-    this.startParent = startParent;
+  protected void setStartParent(final Block _startParent) {
+    this.startParent = _startParent;
   }
 
   public Block getStartParent() {
@@ -115,7 +115,7 @@ public abstract class Block {
     this.startParent = null;
   }
 
-  protected void setEndParent(Block endParent) {
+  protected void setEndParent(final Block endParent) {
     this.endParent = endParent;
   }
 
@@ -131,15 +131,15 @@ public abstract class Block {
     this.endParent = null;
   }
 
-  public void setAttribute(String key, String value) {
+  public void setAttribute(final String key, final String value) {
     this.attributes.put(key, value);
   }
 
-  public String getAttribute(String key) {
+  public String getAttribute(final String key) {
     return this.attributes.get(key);
   }
 
-  public String removeAttribute(String key) {
+  public String removeAttribute(final String key) {
     return this.attributes.remove(key);
   }
 

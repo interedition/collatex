@@ -53,7 +53,9 @@ public class SubsegmentExtractorTest {
     final SubsegmentExtractor p2 = defaultSegmentExtractor();
 
     final Subsegments oneWordSegments = p2.getOneWordSubsegments();
+    Util.p(oneWordSegments);
     final Subsegment hondSequences = oneWordSegments.get("hond");
+    Util.p(hondSequences);
     assertContainsPositions(hondSequences.get("a"), 2);
     // nr. of unique normalized words in all witnesses combined
     assertEquals(9, oneWordSegments.size());

@@ -16,11 +16,11 @@ public class MatchPermutatorTest extends TestCase {
 
   private MatchPermutator permutator;
   private Set<Match> testSet;
-  private Match match_1_2;
-  private Match match_1_3;
-  private Match match_2_1;
-  private Match match_2_3;
-  private Match match_3_4;
+  private Match<Word> match_1_2;
+  private Match<Word> match_1_3;
+  private Match<Word> match_2_1;
+  private Match<Word> match_2_3;
+  private Match<Word> match_3_4;
   private PMatch pmatch_1_2;
   private PMatch pmatch_1_3;
   private PMatch pmatch_2_1;
@@ -33,11 +33,11 @@ public class MatchPermutatorTest extends TestCase {
     testSet = Sets.newLinkedHashSet();
     String witnessId1 = "A";
     String witnessId2 = "B";
-    match_1_2 = new Match(new Word(witnessId1, "een", 1), new Word(witnessId2, "een", 2));
-    match_1_3 = new Match(new Word(witnessId1, "een", 1), new Word(witnessId2, "tween", 3));
-    match_2_1 = new Match(new Word(witnessId1, "twee", 2), new Word(witnessId2, "twee", 1));
-    match_2_3 = new Match(new Word(witnessId1, "twee", 2), new Word(witnessId2, "tween", 3));
-    match_3_4 = new Match(new Word(witnessId1, "drie", 3), new Word(witnessId2, "drie", 4));
+    match_1_2 = new Match<Word>(new Word(witnessId1, "een", 1), new Word(witnessId2, "een", 2));
+    match_1_3 = new Match<Word>(new Word(witnessId1, "een", 1), new Word(witnessId2, "tween", 3));
+    match_2_1 = new Match<Word>(new Word(witnessId1, "twee", 2), new Word(witnessId2, "twee", 1));
+    match_2_3 = new Match<Word>(new Word(witnessId1, "twee", 2), new Word(witnessId2, "tween", 3));
+    match_3_4 = new Match<Word>(new Word(witnessId1, "drie", 3), new Word(witnessId2, "drie", 4));
     pmatch_1_2 = new PMatch(match_1_2);
     pmatch_1_3 = new PMatch(match_1_3);
     pmatch_2_1 = new PMatch(match_2_1);

@@ -21,19 +21,8 @@ import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 
 public class Subsegments {
-  private final Map<String, Subsegment> subsegments;
-  private final Predicate<Subsegment> subsegmentIsOpen;
+  private final Map<String, Subsegment> subsegments = Maps.newHashMap();
   private final Map<SegmentPosition, String> subsegmentTitlesAtSegmentPosition = Maps.newHashMap();
-
-  public Subsegments() {
-    subsegments = Maps.newHashMap();
-    subsegmentIsOpen = new Predicate<Subsegment>() {
-      @Override
-      public boolean apply(final Subsegment subsegment) {
-        return !subsegment.canRemove() && subsegment.isOpen();
-      }
-    };
-  }
 
   public Subsegment get(final String title) {
     return subsegments.get(title);
@@ -58,9 +47,16 @@ public class Subsegments {
     return subsegments.size();
   }
 
+  private static final Predicate<Subsegment> SUBSEGMENT_IS_OPEN = new Predicate<Subsegment>() {
+    @Override
+    public boolean apply(final Subsegment subsegment) {
+      return !subsegment.canRemove() && subsegment.isOpen();
+    }
+  };
+
   public Subsegment getFirstOpenSubsegment() {
     try {
-      return find(all(), subsegmentIsOpen);
+      return find(all(), SUBSEGMENT_IS_OPEN);
     } catch (final NoSuchElementException e) {
       return null;
     }
@@ -75,8 +71,13 @@ public class Subsegments {
     return subsegmentTitlesAtSegmentPosition.get(next);
   }
 
-  public Subsegment join(final String subsegmentTitle0, final String subsegmentTitle1) {
+  public Subsegment join(final String subsegmentTitle0, final String subsegmentTitle1, final List<SegmentPosition> startPositions) {
     final Subsegment subsegment = get(subsegmentTitle0);
+    if (!subsegment.isSingular()) {
+      final Subsegment splitOff = subsegment.splitOff(startPositions);
+      add(splitOff.getTitle(), splitOff);
+    }
+
     final Subsegment nextSubsegment = get(subsegmentTitle1);
     Util.p("subsegmentTitle1", subsegmentTitle1);
     Util.p("subsegments", subsegments);
@@ -126,8 +127,7 @@ public class Subsegments {
   };
 
   public void removeMarkedSubsegments() {
-    final List<String> removableKeys = Lists.newArrayList(transform(filter(subsegments.values(), IS_REMOVABLE), EXTRACT_KEY));
-    for (final String key : removableKeys) {
+    for (final String key : Lists.newArrayList(transform(filter(subsegments.values(), IS_REMOVABLE), EXTRACT_KEY))) {
       subsegments.remove(key);
     }
   }
