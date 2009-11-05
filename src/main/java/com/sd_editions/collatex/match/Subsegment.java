@@ -68,12 +68,13 @@ public class Subsegment {
     return map.keySet();
   }
 
+  @SuppressWarnings("boxing")
   public List<SegmentPosition> getSegmentPositions() {
     final List<SegmentPosition> list = Lists.newArrayList();
     for (final Entry<String, List<Integer>> entry : map.entrySet()) {
       final String witnessId = entry.getKey();
       for (final Integer position : entry.getValue()) {
-        list.add(new SegmentPosition(witnessId, position));
+        list.add(new SegmentPosition(witnessId, position + numberOfWords - 1));
       }
     }
     return list;

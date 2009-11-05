@@ -1,6 +1,7 @@
 package com.sd_editions.collatex.match;
 
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Iterables.transform;
 
 import java.util.Collection;
@@ -12,7 +13,6 @@ import java.util.NoSuchElementException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.Block.Util;
@@ -60,7 +60,7 @@ public class Subsegments {
 
   public Subsegment getFirstOpenSubsegment() {
     try {
-      return Iterables.find(all(), subsegmentIsOpen);
+      return find(all(), subsegmentIsOpen);
     } catch (final NoSuchElementException e) {
       return null;
     }
@@ -75,7 +75,7 @@ public class Subsegments {
     return subsegmentTitlesAtSegmentPosition.get(next);
   }
 
-  public void join(final String subsegmentTitle0, final String subsegmentTitle1) {
+  public Subsegment join(final String subsegmentTitle0, final String subsegmentTitle1) {
     final Subsegment subsegment = get(subsegmentTitle0);
     final Subsegment nextSubsegment = get(subsegmentTitle1);
     Util.p("subsegmentTitle1", subsegmentTitle1);
@@ -84,6 +84,7 @@ public class Subsegments {
     add(subsegment.getTitle(), subsegment);
     markForRemoval(subsegmentTitle0);
     markForRemoval(subsegmentTitle1);
+    return subsegment;
   }
 
   private void markForRemoval(final String subsegmentTitle) {

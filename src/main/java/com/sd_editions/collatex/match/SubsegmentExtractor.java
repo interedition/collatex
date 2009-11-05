@@ -87,13 +87,12 @@ public class SubsegmentExtractor {
       if (subsegment.size() > 1 && nextWordMap.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
         // subsegment and nextSubsegment can be joined
         Util.remark("join!");
-        subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
+        subsegment = subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
+        Util.p(subsegment);
       } else {
-
+        subsegments.close(subsegment.getTitle());
+        subsegment = subsegments.getFirstOpenSubsegment();
       }
-
-      subsegments.close(subsegment.getTitle());
-      subsegment = subsegments.getFirstOpenSubsegment();
     }
 
     // sequences: "zijn", "hond", "liep", "aan", "hand", "op", "pad", "met", "hij"
