@@ -4,26 +4,25 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-
 // Note: this class started life as a duplicate of
 // Phase; it will get a life of its own
 // for instance...
 // it might not need to extend BaseElement?
 // anyway it should take BaseElements in
-public class BaseContainerPart extends BaseElement {
+public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   private final BaseContainer _witness;
   private final int startPosition;
   private final int endPosition;
   private final int size;
-  private final Word previous;
-  private final Word next;
+  private final T previous;
+  private final T next;
 
   // TODO: It is pretty obvious: too many parameters here!
   // Note: probably two constructors needed...
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public BaseContainerPart(final BaseContainer witness, final int _size, final int _startPosition, final int _endPosition, final Word _previous, final Word _next) {
+  public BaseContainerPart(final BaseContainer witness, final int _size, final int _startPosition, final int _endPosition, final T _previous, final T _next) {
     this._witness = witness;
     this.size = _size;
     this.next = _next;
@@ -88,7 +87,7 @@ public class BaseContainerPart extends BaseElement {
     return getWords().get(0);
   }
 
-  public Word getNextWord() {
+  public T getNextWord() {
     if (isAtTheEnd()) {
       throw new RuntimeException("There is no next word!");
     }
@@ -99,7 +98,7 @@ public class BaseContainerPart extends BaseElement {
     return next == null;
   }
 
-  public Word getPreviousWord() {
+  public T getPreviousWord() {
     if (isAtTheFront()) {
       throw new RuntimeException("There is no previous word!");
     }
