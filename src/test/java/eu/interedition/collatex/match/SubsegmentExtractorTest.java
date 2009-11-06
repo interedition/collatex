@@ -74,6 +74,7 @@ public class SubsegmentExtractorTest {
     //    Util.p(newArrayList);
   }
 
+  @Ignore
   @Test
   public void testGo() {
     final SubsegmentExtractor sse = defaultSegmentExtractor();

@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
 // it might not need to extend BaseElement?
 // anyway it should take BaseElements in
 public class BaseContainerPart extends BaseElement {
-  private final Segment witness;
+  private final BaseContainer _witness;
   private final int startPosition;
   private final int endPosition;
   private final int size;
@@ -23,8 +23,8 @@ public class BaseContainerPart extends BaseElement {
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public BaseContainerPart(Segment _witness, int _size, int _startPosition, int _endPosition, Word _previous, Word _next) {
-    witness = _witness;
+  public BaseContainerPart(final BaseContainer witness, final int _size, final int _startPosition, final int _endPosition, final Word _previous, final Word _next) {
+    this._witness = witness;
     this.size = _size;
     this.next = _next;
     this.previous = _previous;
@@ -32,8 +32,8 @@ public class BaseContainerPart extends BaseElement {
     endPosition = _endPosition;
   }
 
-  public BaseContainerPart(Segment _witness, Word beginWord, Word endWord) {
-    this.witness = _witness;
+  public BaseContainerPart(final BaseContainer witness, final Word beginWord, final Word endWord) {
+    this._witness = witness;
     this.size = -1; // !!!
     this.next = null; // !!!
     this.previous = null; // !!!
@@ -48,23 +48,23 @@ public class BaseContainerPart extends BaseElement {
 
   @Override
   public String toString() {
-    List<String> words = Lists.newArrayList();
+    final List<String> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      String word = witness.getWordOnPosition(k).toString();
+      final String word = _witness.getWordOnPosition(k).toString();
       words.add(word);
     }
 
     String replacementString = "";
     String divider = "";
-    for (String replacement : words) {
+    for (final String replacement : words) {
       replacementString += divider + replacement;
       divider = " ";
     }
     return replacementString;
   }
 
-  public Segment getWitness() {
-    return witness;
+  public BaseContainer getWitness() {
+    return _witness;
   }
 
   public int getStartPosition() {
@@ -76,9 +76,9 @@ public class BaseContainerPart extends BaseElement {
   }
 
   public List<Word> getWords() {
-    List<Word> words = Lists.newArrayList();
+    final List<Word> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      Word word = getWitness().getWordOnPosition(k);
+      final Word word = getWitness().getWordOnPosition(k);
       words.add(word);
     }
     return words;
