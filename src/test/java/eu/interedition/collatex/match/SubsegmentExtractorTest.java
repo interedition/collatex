@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
@@ -83,6 +84,7 @@ public class SubsegmentExtractorTest {
     Util.p(subsegments);
   }
 
+  @Ignore
   @Test
   public void testGetPhrasesPerSegment() {
     final SubsegmentExtractor sse = defaultSegmentExtractor();
@@ -99,6 +101,7 @@ public class SubsegmentExtractorTest {
     Util.p(wsp);
   }
 
+  @Ignore
   @Test
   public void testGetUnfixedAlignment() {
     final SubsegmentExtractor sse = defaultSegmentExtractor();

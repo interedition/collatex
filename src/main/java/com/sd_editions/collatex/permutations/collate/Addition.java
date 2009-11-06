@@ -2,16 +2,16 @@ package com.sd_editions.collatex.permutations.collate;
 
 import com.sd_editions.collatex.match.views.ModificationVisitor;
 
-import eu.interedition.collatex.input.Phrase;
+import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Addition extends Modification {
-  private final Phrase phrase;
+  private final BaseContainerPart _part;
   private final int position;
 
-  public Addition(int _position, Phrase _phrase) {
+  public Addition(int _position, BaseContainerPart part) {
     this.position = _position;
-    this.phrase = _phrase;
+    this._part = part;
   }
 
   public int getPosition() {
@@ -19,12 +19,12 @@ public class Addition extends Modification {
   }
 
   public String getAddedWords() {
-    return phrase.toString();
+    return _part.toString();
   }
 
   @Override
   public String toString() {
-    return "addition: " + phrase.toString() + " position: " + position;
+    return "addition: " + _part.toString() + " position: " + position;
   }
 
   @Override

@@ -2,35 +2,35 @@ package com.sd_editions.collatex.permutations.collate;
 
 import com.sd_editions.collatex.match.views.ModificationVisitor;
 
-import eu.interedition.collatex.input.Phrase;
+import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Replacement extends Modification {
-  private final Phrase original;
-  private final Phrase replacement;
+  private final BaseContainerPart _original;
+  private final BaseContainerPart _replacement;
 
-  public Replacement(Phrase _original, Phrase _replacement) {
-    this.original = _original;
-    this.replacement = _replacement;
+  public Replacement(BaseContainerPart original, BaseContainerPart replacement) {
+    this._original = original;
+    this._replacement = replacement;
   }
 
   @Override
   public String toString() {
-    String baseWords = original.toString();
-    String replacementWords = replacement.toString();
-    return "replacement: " + baseWords + " / " + replacementWords + " position: " + original.getStartPosition();
+    String baseWords = _original.toString();
+    String replacementWords = _replacement.toString();
+    return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getStartPosition();
   }
 
   public int getPosition() {
-    return original.getStartPosition();
+    return _original.getStartPosition();
   }
 
   public String getOriginalWords() {
-    return original.toString();
+    return _original.toString();
   }
 
   public String getReplacementWords() {
-    return replacement.toString();
+    return _replacement.toString();
   }
 
   @Override

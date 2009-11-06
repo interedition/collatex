@@ -4,65 +4,69 @@ import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
+import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.visualization.Modification;
 
+// TODO: add generics!
 public class Gap {
-  final Phrase phraseA;
-  final Phrase phraseB;
+  final BaseContainerPart _partA;
+  final BaseContainerPart _partB;
   final Match next;
 
-  public Gap(Phrase _phraseA, Phrase _phraseB, Match _next) {
-    this.phraseA = _phraseA;
-    this.phraseB = _phraseB;
+  public Gap(BaseContainerPart partA, BaseContainerPart partB, Match _next) {
+    this._partA = partA;
+    this._partB = partB;
     this.next = _next;
   }
 
-  public Phrase getPhraseA() {
-    return phraseA;
+  //TODO: rename method to getPartA
+  public BaseContainerPart getPhraseA() {
+    return _partA;
   }
 
-  public Phrase getPhraseB() {
-    return phraseB;
+  //TODO: rename method to getPartB
+  public BaseContainerPart getPhraseB() {
+    return _partB;
   }
 
   public Addition createAddition() {
-    return new Addition(phraseA.getStartPosition(), phraseB);
+    return new Addition(_partA.getStartPosition(), _partB);
   }
 
   public Omission createOmission() {
-    return new Omission(phraseA);
+    return new Omission(_partA);
   }
 
   public Replacement createReplacement() {
-    return new Replacement(phraseA, phraseB);
+    return new Replacement(_partA, _partB);
   }
 
   public boolean isAddition() {
-    return !phraseA.hasGap() && phraseB.hasGap();
+    return !_partA.hasGap() && _partB.hasGap();
   }
 
   public boolean isOmission() {
-    return phraseA.hasGap() && !phraseB.hasGap();
+    return _partA.hasGap() && !_partB.hasGap();
   }
 
   public boolean isReplacement() {
-    return phraseA.hasGap() && phraseB.hasGap();
+    return _partA.hasGap() && _partB.hasGap();
   }
 
   public boolean isValid() {
-    return phraseA.hasGap() || phraseB.hasGap();
+    return _partA.hasGap() || _partB.hasGap();
   }
 
   @Override
   public String toString() {
-    String result = "NonMatch: addition: " + isAddition() + " base: " + phraseA;
-    if (phraseA.isAtTheEnd()) {
+    String result = "NonMatch: addition: " + isAddition() + " base: " + _partA;
+    if (_partA.isAtTheEnd()) {
       result += "; nextWord: none";
     } else {
-      result += "; nextWord: " + phraseA.getNextWord();
+      result += "; nextWord: " + _partA.getNextWord();
     }
-    result += "; witness: " + phraseB;
+    result += "; witness: " + _partB;
     return result;
   }
 
