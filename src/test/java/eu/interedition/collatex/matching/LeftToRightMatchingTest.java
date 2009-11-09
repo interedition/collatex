@@ -6,6 +6,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sd_editions.collatex.match.SubsegmentExtractor;
@@ -101,6 +102,26 @@ public class LeftToRightMatchingTest {
     final Match<Phrase> match = matches.iterator().next();
     Assert.assertEquals(1, match.getBaseWord().getStartPosition());
     Assert.assertEquals(1, match.getWitnessWord().getStartPosition());
+  }
+
+  @Ignore
+  @Test
+  public void testTransposition() {
+    final Segment a = builder.build("a", "the black cat and the white cat").getFirstSegment();
+    final Segment b = builder.build("b", "the white cat and the black cat").getFirstSegment();
+    final SubsegmentExtractor sse = new SubsegmentExtractor(a, b);
+    sse.go();
+    final WitnessSegmentPhrases pa = sse.getWitnessSegmentPhrases("a");
+    final WitnessSegmentPhrases pb = sse.getWitnessSegmentPhrases("b");
+
+    Assert.assertEquals(3, pa.size());
+    Assert.assertEquals(3, pb.size());
+
+    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    Assert.assertEquals(3, matches.size());
+    //    final Match<Phrase> match = matches.iterator().next();
+    //    Assert.assertEquals(1, match.getBaseWord().getStartPosition());
+    //    Assert.assertEquals(1, match.getWitnessWord().getStartPosition());
   }
 
   // TODO: add a transposition test!
