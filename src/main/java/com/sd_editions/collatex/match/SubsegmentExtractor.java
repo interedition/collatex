@@ -176,9 +176,6 @@ public class SubsegmentExtractor {
 
   @SuppressWarnings("boxing")
   private Subsegments expandSubsegmentsUntilAllAreSingular(final Subsegments _subsegments) {
-    //    final Map<SegmentPosition, String> subsegmentTitleAtSegmentPosition = getSequencesAtSegmentPosition(_subsegments);
-    //    Util.p("sequencesAtSegmentPosition", subsegmentTitleAtSegmentPosition);
-
     final Iterable<Subsegment> pluralSubsegments = Lists.newArrayList(filter(_subsegments.all(), NOT_SINGULAR));
     final Map<String, Subsegment> nextWords = Maps.newHashMap();
     for (final Subsegment pluralSubsegment : pluralSubsegments) {
