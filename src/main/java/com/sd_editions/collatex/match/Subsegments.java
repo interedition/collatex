@@ -16,7 +16,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
@@ -69,7 +68,7 @@ public class Subsegments {
   }
 
   public void close(final String title) {
-    Util.p("title to close", title);
+    //    Util.p("title to close", title);
     subsegments.get(title).close();
   }
 
@@ -85,14 +84,14 @@ public class Subsegments {
     //    }
 
     final Subsegment nextSubsegment = get(subsegmentTitle1);
-    Util.p("subsegmentTitle0", subsegmentTitle0);
-    Util.p("subsegmentTitle1", subsegmentTitle1);
-    Util.p("subsegments", subsegments);
+    //    Util.p("subsegmentTitle0", subsegmentTitle0);
+    //    Util.p("subsegmentTitle1", subsegmentTitle1);
+    //    Util.p("subsegments", subsegments);
     subsegment.concat(nextSubsegment);
     add(subsegment.getTitle(), subsegment);
-    //    markForRemoval(subsegmentTitle0);
+    markForRemoval(subsegmentTitle0);
     markForRemoval(subsegmentTitle1);
-    Util.p("subsegment", subsegment);
+    //    Util.p("subsegment", subsegment);
     //    for (final SegmentPosition segmentPosition : startPositions) {
     //      subsegmentTitlesAtSegmentPosition.put(segmentPosition, subsegment.getTitle());
     //    }
@@ -160,6 +159,6 @@ public class Subsegments {
     }
     //    return sequencesAtSegmentPosition;
     //  }
-    Util.p("subsegmentTitlesAtSegmentPosition", subsegmentTitlesAtSegmentPosition);
+    //    Util.p("subsegmentTitlesAtSegmentPosition", subsegmentTitlesAtSegmentPosition);
   }
 }

@@ -39,7 +39,7 @@ public class SubsegmentExtractor {
   public SubsegmentExtractor(final Segment... _segments) {
     this.segments = _segments;
     for (final Segment segment : segments) {
-      Util.p(segment.getWitnessId(), segment);
+      //      Util.p(segment.getWitnessId(), segment);
       segmentHash.put(segment.getWitnessId(), segment);
     }
     Util.newline();
@@ -57,8 +57,8 @@ public class SubsegmentExtractor {
 
     Subsegment subsegment = subsegments.getFirstOpenSubsegment();
     while (subsegment != null) {
-      Util.newline();
-      Util.p("subsegment", subsegment);
+      //      Util.newline();
+      //      Util.p("subsegment", subsegment);
 
       //      final Set<String> witnessIds = subsegment.getWitnessIds();
 
@@ -71,7 +71,7 @@ public class SubsegmentExtractor {
         list.add(nextSegmentPosition);
         nextWordMap.put(nextSegmentTitle, list);
       }
-      Util.p("nextwordmap", nextWordMap);
+      //      Util.p("nextwordmap", nextWordMap);
 
       //      final Set<Entry<String, List<SegmentPosition>>> entrySet = nextWordMap.entrySet();
       //      for (final Entry<String, List<SegmentPosition>> entry : entrySet) {
@@ -84,16 +84,18 @@ public class SubsegmentExtractor {
         final SegmentPosition next = segmentPosition.nextSegmentPosition();
         nextSubsegmentTitleSet.add(subsegments.getSubsegmentTitleAtSegmentPosition(next));
       }
-      Util.p("nextSubsegmentTitleSet", nextSubsegmentTitleSet);
+      //      Util.p("nextSubsegmentTitleSet", nextSubsegmentTitleSet);
 
       if (subsegment.size() > 1 && nextWordMap.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
         // subsegment and nextSubsegment can be joined
-        Util.remark("join!");
+        //        Util.remark("join!");
         subsegment = subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
-        Util.p(subsegment);
+        //        Util.p(subsegment);
       }
       subsegments.close(subsegment.getTitle());
+      subsegments.removeMarkedSubsegments();
       subsegment = subsegments.getFirstOpenSubsegment();
+      //      Util.p("subsegments", subsegments);
     }
 
     // sequences: "zijn", "hond", "liep", "aan", "hand", "op", "pad", "met", "hij"
@@ -198,19 +200,19 @@ public class SubsegmentExtractor {
           originalSubsegmentForNextWord.deleteSegmentPosition(new SegmentPosition(witnessId, position + subsegment.getNumberOfWords()));
         }
       }
-      Util.p("nextWords", nextWords);
+      //      Util.p("nextWords", nextWords);
       final Set<Entry<String, Subsegment>> entrySet = nextWords.entrySet();
       for (final Entry<String, Subsegment> entry : entrySet) {
         final String nextWord = entry.getKey();
         final Subsegment subsegment = entry.getValue();
         subsegment.extend(nextWord);
-        Util.p("subsegment", subsegment);
+        //        Util.p("subsegment", subsegment);
         _subsegments.add(subsegment.getTitle(), subsegment);
       }
       pluralSubsegment.markForRemoval();
       _subsegments.removeMarkedSubsegments();
     }
-    Util.p("_subsegments", _subsegments);
+    //    Util.p("_subsegments", _subsegments);
     _subsegments.reindex();
     return _subsegments;
   }

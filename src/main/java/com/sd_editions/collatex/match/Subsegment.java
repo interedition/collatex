@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
@@ -161,7 +160,7 @@ public class Subsegment {
       startPositionsForPhrase.remove(witnessId);
     }
     if (startPositionsForPhrase.isEmpty()) markForRemoval();
-    Util.p("startPositionsForPhrase", startPositionsForPhrase);
+    //    Util.p("startPositionsForPhrase", startPositionsForPhrase);
   }
 
   private Predicate<String> makePredicate(final Map<String, List<Integer>> _startPositionsForPhrase) {
