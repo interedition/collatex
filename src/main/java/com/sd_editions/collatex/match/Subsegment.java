@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
@@ -49,7 +50,7 @@ public class Subsegment {
     numberOfWords = 1;
   }
 
-  private int getNumberOfWords() {
+  int getNumberOfWords() {
     return numberOfWords;
   }
 
@@ -87,7 +88,7 @@ public class Subsegment {
 
   @Override
   public String toString() {
-    return getTitle() + " " + startPositionsForPhrase.toString();
+    return getTitle() + " (" + numberOfWords + " words) " + startPositionsForPhrase.toString() + (canRemove() ? "!" : "");
   }
 
   @SuppressWarnings("boxing")
@@ -155,11 +156,12 @@ public class Subsegment {
   public void deleteSegmentPosition(final SegmentPosition segmentPosition) {
     startPositionsForPhrase.get(segmentPosition.witnessId).remove(segmentPosition.position);
     final Predicate<String> positionlist_is_empty = makePredicate(startPositionsForPhrase);
-    final Iterable<String> witnesIdsToRemove = filter(startPositionsForPhrase.keySet(), positionlist_is_empty);
+    final List<String> witnesIdsToRemove = Lists.newArrayList(filter(startPositionsForPhrase.keySet(), positionlist_is_empty));
     for (final String witnessId : witnesIdsToRemove) {
       startPositionsForPhrase.remove(witnessId);
     }
     if (startPositionsForPhrase.isEmpty()) markForRemoval();
+    Util.p("startPositionsForPhrase", startPositionsForPhrase);
   }
 
   private Predicate<String> makePredicate(final Map<String, List<Integer>> _startPositionsForPhrase) {

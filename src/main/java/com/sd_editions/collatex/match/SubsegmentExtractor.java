@@ -89,13 +89,11 @@ public class SubsegmentExtractor {
       if (subsegment.size() > 1 && nextWordMap.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
         // subsegment and nextSubsegment can be joined
         Util.remark("join!");
-        final List<SegmentPosition> startPositions = null;
-        subsegment = subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next(), startPositions);
+        subsegment = subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
         Util.p(subsegment);
-      } else {
-        subsegments.close(subsegment.getTitle());
-        subsegment = subsegments.getFirstOpenSubsegment();
       }
+      subsegments.close(subsegment.getTitle());
+      subsegment = subsegments.getFirstOpenSubsegment();
     }
 
     // sequences: "zijn", "hond", "liep", "aan", "hand", "op", "pad", "met", "hij"
@@ -176,8 +174,8 @@ public class SubsegmentExtractor {
 
   @SuppressWarnings("boxing")
   private Subsegments expandSubsegmentsUntilAllAreSingular(final Subsegments _subsegments) {
-    final Map<SegmentPosition, String> sequencesAtSegmentPosition = getSequencesAtSegmentPosition(_subsegments);
-    Util.p("sequencesAtSegmentPosition", sequencesAtSegmentPosition);
+    //    final Map<SegmentPosition, String> subsegmentTitleAtSegmentPosition = getSequencesAtSegmentPosition(_subsegments);
+    //    Util.p("sequencesAtSegmentPosition", subsegmentTitleAtSegmentPosition);
 
     final Iterable<Subsegment> pluralSubsegments = Lists.newArrayList(filter(_subsegments.all(), NOT_SINGULAR));
     final Map<String, Subsegment> nextWords = Maps.newHashMap();
@@ -187,7 +185,7 @@ public class SubsegmentExtractor {
       for (final String witnessId : pluralSubsegment.getWitnessIds()) {
         final List<Integer> positions = pluralSubsegment.get(witnessId);
         for (final Integer position : positions) {
-          final String nextWord = sequencesAtSegmentPosition.get(new SegmentPosition(witnessId, position + 1));
+          final String nextWord = _subsegments.getSubsegmentTitleAtSegmentPosition(new SegmentPosition(witnessId, position + 1));
           Subsegment subsegment = nextWords.get(nextWord);
           if (subsegment == null) subsegment = new Subsegment(subsegmentTitle);
           List<Integer> originalPositions = subsegment.get(witnessId);
@@ -195,8 +193,9 @@ public class SubsegmentExtractor {
           originalPositions.add(position);
           subsegment.add(witnessId, originalPositions);
           nextWords.put(nextWord, subsegment);
+
           final Subsegment originalSubsegmentForNextWord = _subsegments.get(nextWord);
-          originalSubsegmentForNextWord.deleteSegmentPosition(new SegmentPosition(witnessId, position));
+          originalSubsegmentForNextWord.deleteSegmentPosition(new SegmentPosition(witnessId, position + subsegment.getNumberOfWords()));
         }
       }
       Util.p("nextWords", nextWords);
@@ -205,30 +204,15 @@ public class SubsegmentExtractor {
         final String nextWord = entry.getKey();
         final Subsegment subsegment = entry.getValue();
         subsegment.extend(nextWord);
+        Util.p("subsegment", subsegment);
         _subsegments.add(subsegment.getTitle(), subsegment);
       }
       pluralSubsegment.markForRemoval();
       _subsegments.removeMarkedSubsegments();
     }
     Util.p("_subsegments", _subsegments);
+    _subsegments.reindex();
     return _subsegments;
-  }
-
-  private Map<SegmentPosition, String> getSequencesAtSegmentPosition(final Subsegments _subsegments) {
-    final Map<SegmentPosition, String> sequencesAtSegmentPosition = Maps.newHashMap();
-    for (final Subsegment subsegment : _subsegments.all()) {
-      final String sequenceTitle = subsegment.getTitle();
-      for (final Entry<String, List<Integer>> positionsPerWitnessEntry : subsegment.entrySet()) {
-        final String witnessId = positionsPerWitnessEntry.getKey();
-        final List<Integer> positions = positionsPerWitnessEntry.getValue();
-        for (final Integer position : positions) {
-          sequencesAtSegmentPosition.put(new SegmentPosition(witnessId, position), sequenceTitle);
-        }
-      }
-      //      Util.p(sequenceTitle + " occurs in " + subsegment.size() + " witnesses.");
-      //      Util.p(sequencesAtSegmentPosition);
-    }
-    return sequencesAtSegmentPosition;
   }
 
   Collection<String> findCommonSequences(final Collection<String> sequences0, final Collection<String> sequences1) {
@@ -255,10 +239,10 @@ public class SubsegmentExtractor {
     for (final Segment segment : segments) {
       for (final Word word : segment.getWords()) {
         final String wordToMatch = word.normalized;
-        Util.p(wordToMatch);
+        //        Util.p(wordToMatch);
         if (!oneWordSequences.containsTitle(wordToMatch)) {
           oneWordSequences.add(wordToMatch, matchingWordPositionsPerWitness(wordToMatch));
-          Util.p(oneWordSequences);
+          //          Util.p(oneWordSequences);
         }
       }
     }
