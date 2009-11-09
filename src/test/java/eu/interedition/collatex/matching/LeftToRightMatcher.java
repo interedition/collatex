@@ -16,12 +16,15 @@ public class LeftToRightMatcher {
     // take pa as a starting point (depends on the length!)
     for (int i = 1; i <= pa.size(); i++) {
       final Phrase phrase = pa.getPhraseOnPosition(i);
-      final Phrase phrase2 = pb.getPhraseOnPosition(i);
-      final Subsegment subsegment1 = phrase.getSubsegment();
-      final Subsegment subsegment2 = phrase2.getSubsegment();
-      final boolean exactMatch = subsegment1.getTitle().equals(subsegment2.getTitle());
-      if (exactMatch) {
-        matches.add(new Match<Phrase>(phrase, phrase2));
+      for (int j = i; j <= pb.size(); j++) {
+        final Phrase phrase2 = pb.getPhraseOnPosition(j);
+        final Subsegment subsegment1 = phrase.getSubsegment();
+        final Subsegment subsegment2 = phrase2.getSubsegment();
+        final boolean exactMatch = subsegment1.getTitle().equals(subsegment2.getTitle());
+        if (exactMatch) {
+          matches.add(new Match<Phrase>(phrase, phrase2));
+          break;
+        }
       }
     }
     return matches;

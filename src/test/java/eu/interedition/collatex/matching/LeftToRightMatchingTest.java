@@ -39,6 +39,41 @@ public class LeftToRightMatchingTest {
     Assert.assertEquals(1, matches.size());
   }
 
+  @Test
+  public void testAdditionInFront() {
+    final Segment a = builder.build("a", "everything matches").getFirstSegment();
+    final Segment b = builder.build("b", "addition everything matches").getFirstSegment();
+    final SubsegmentExtractor sse = new SubsegmentExtractor(a, b);
+    sse.go();
+    final WitnessSegmentPhrases pa = sse.getWitnessSegmentPhrases("a");
+    final WitnessSegmentPhrases pb = sse.getWitnessSegmentPhrases("b");
+
+    Assert.assertEquals(1, pa.size());
+    Assert.assertEquals(2, pb.size());
+
+    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    Assert.assertEquals(1, matches.size());
+    final Match<Phrase> match = matches.iterator().next();
+    Assert.assertEquals(1, match.getBaseWord().getStartPosition());
+    Assert.assertEquals(2, match.getWitnessWord().getStartPosition());
+  }
+
+  //  @Test
+  //  public void testOmittedInFront() {
+  //    final Segment a = builder.build("a", "omitted everything matches").getFirstSegment();
+  //    final Segment b = builder.build("b", "everything matches").getFirstSegment();
+  //    final SubsegmentExtractor sse = new SubsegmentExtractor(a, b);
+  //    sse.go();
+  //    final WitnessSegmentPhrases pa = sse.getWitnessSegmentPhrases("a");
+  //    final WitnessSegmentPhrases pb = sse.getWitnessSegmentPhrases("b");
+  //
+  //    Assert.assertEquals(2, pa.size());
+  //    Assert.assertEquals(1, pb.size());
+  //
+  //    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+  //    Assert.assertEquals(1, matches.size());
+  //  }
+
   private SubsegmentExtractor defaultSegmentExtractor() {
     final Segment a = builder.build("a", "Zijn hond liep aan zijn hand.").getFirstSegment();
     final Segment b = builder.build("b", "Op zijn pad liep zijn hond, aan zijn hand.").getFirstSegment();
