@@ -10,12 +10,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Map.Entry;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sd_editions.collatex.Block.Util;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
@@ -36,6 +36,11 @@ public class Subsegments {
     subsegments.put(title, subsegment);
     for (final SegmentPosition segmentPosition : subsegment.getSegmentPositions()) {
       subsegmentTitlesAtSegmentPosition.put(segmentPosition, title);
+      SegmentPosition nextSegmentPosition = segmentPosition.nextSegmentPosition();
+      for (int i = 2; i < subsegment.getNumberOfWords(); i++) {
+        subsegmentTitlesAtSegmentPosition.put(nextSegmentPosition, title);
+        nextSegmentPosition = nextSegmentPosition.nextSegmentPosition();
+      }
     }
   }
 
@@ -63,7 +68,7 @@ public class Subsegments {
   }
 
   public void close(final String title) {
-    Util.p("title to close", title);
+    //    Util.p("title to close", title);
     subsegments.get(title).close();
   }
 
@@ -71,20 +76,25 @@ public class Subsegments {
     return subsegmentTitlesAtSegmentPosition.get(next);
   }
 
-  public Subsegment join(final String subsegmentTitle0, final String subsegmentTitle1, final List<SegmentPosition> startPositions) {
+  public Subsegment join(final String subsegmentTitle0, final String subsegmentTitle1/*, final List<SegmentPosition> startPositions*/) {
     final Subsegment subsegment = get(subsegmentTitle0);
-    if (!subsegment.isSingular()) {
-      final Subsegment splitOff = subsegment.splitOff(startPositions);
-      add(splitOff.getTitle(), splitOff);
-    }
+    //    if (!subsegment.isSingular()) {
+    //      final Subsegment splitOff = subsegment.splitOff(startPositions);
+    //      add(splitOff.getTitle(), splitOff);
+    //    }
 
     final Subsegment nextSubsegment = get(subsegmentTitle1);
-    Util.p("subsegmentTitle1", subsegmentTitle1);
-    Util.p("subsegments", subsegments);
+    //    Util.p("subsegmentTitle0", subsegmentTitle0);
+    //    Util.p("subsegmentTitle1", subsegmentTitle1);
+    //    Util.p("subsegments", subsegments);
     subsegment.concat(nextSubsegment);
     add(subsegment.getTitle(), subsegment);
     markForRemoval(subsegmentTitle0);
     markForRemoval(subsegmentTitle1);
+    //    Util.p("subsegment", subsegment);
+    //    for (final SegmentPosition segmentPosition : startPositions) {
+    //      subsegmentTitlesAtSegmentPosition.put(segmentPosition, subsegment.getTitle());
+    //    }
     return subsegment;
   }
 
@@ -130,5 +140,25 @@ public class Subsegments {
     for (final String key : Lists.newArrayList(transform(filter(subsegments.values(), IS_REMOVABLE), EXTRACT_KEY))) {
       subsegments.remove(key);
     }
+  }
+
+  public void reindex() {
+    subsegmentTitlesAtSegmentPosition.clear();
+    //  private Map<SegmentPosition, String> getSequencesAtSegmentPosition(final Subsegments _subsegments) {
+    for (final Subsegment subsegment : all()) {
+      final String sequenceTitle = subsegment.getTitle();
+      for (final Entry<String, List<Integer>> positionsPerWitnessEntry : subsegment.entrySet()) {
+        final String witnessId = positionsPerWitnessEntry.getKey();
+        final List<Integer> positions = positionsPerWitnessEntry.getValue();
+        for (final Integer position : positions) {
+          subsegmentTitlesAtSegmentPosition.put(new SegmentPosition(witnessId, position), sequenceTitle);
+        }
+      }
+      //      Util.p(sequenceTitle + " occurs in " + subsegment.size() + " witnesses.");
+      //      Util.p(sequencesAtSegmentPosition);
+    }
+    //    return sequencesAtSegmentPosition;
+    //  }
+    //    Util.p("subsegmentTitlesAtSegmentPosition", subsegmentTitlesAtSegmentPosition);
   }
 }

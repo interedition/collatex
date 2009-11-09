@@ -74,7 +74,6 @@ public class SubsegmentExtractorTest {
     //    Util.p(newArrayList);
   }
 
-  @Ignore
   @Test
   public void testGo() {
     final SubsegmentExtractor sse = defaultSegmentExtractor();
@@ -85,14 +84,13 @@ public class SubsegmentExtractorTest {
     Util.p(subsegments);
   }
 
-  @Ignore
   @Test
   public void testGetPhrasesPerSegment() {
     final SubsegmentExtractor sse = defaultSegmentExtractor();
     sse.go();
-    assertPhrasesFound(sse.getWitnessSegmentPhrases("a"), "'Zijn hond','liep','aan zijn hand.'");
-    assertPhrasesFound(sse.getWitnessSegmentPhrases("b"), "'Op zijn pad','liep','zijn hond','aan zijn hand.'");
-    assertPhrasesFound(sse.getWitnessSegmentPhrases("c"), "'Met','zijn hond','aan zijn hand,','liep','hij','op zijn pad.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("a"), "'Zijn hond','liep','aan zijn hand.')");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("b"), "'Op zijn pad','liep','zijn hond,','aan zijn hand.')");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("c"), "'Met','zijn hond','aan zijn hand,','liep','hij','op zijn pad.')");
   }
 
   private void assertPhrasesFound(final WitnessSegmentPhrases wsp, final String expectedPhrases) {
