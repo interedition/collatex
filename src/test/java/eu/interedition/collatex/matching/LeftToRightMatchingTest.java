@@ -104,6 +104,25 @@ public class LeftToRightMatchingTest {
     Assert.assertEquals(1, match.getWitnessWord().getStartPosition());
   }
 
+  @Test
+  public void testOmittedInFront() {
+    final Segment a = builder.build("a", "omitted everything matches").getFirstSegment();
+    final Segment b = builder.build("b", "everything matches").getFirstSegment();
+    final SubsegmentExtractor sse = new SubsegmentExtractor(a, b);
+    sse.go();
+    final WitnessSegmentPhrases pa = sse.getWitnessSegmentPhrases("a");
+    final WitnessSegmentPhrases pb = sse.getWitnessSegmentPhrases("b");
+
+    Assert.assertEquals(2, pa.size());
+    Assert.assertEquals(1, pb.size());
+
+    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    Assert.assertEquals(1, matches.size());
+    final Match<Phrase> match = matches.iterator().next();
+    Assert.assertEquals(2, match.getBaseWord().getStartPosition());
+    Assert.assertEquals(1, match.getWitnessWord().getStartPosition());
+  }
+
   @Ignore
   @Test
   public void testTransposition() {
@@ -114,6 +133,7 @@ public class LeftToRightMatchingTest {
     final WitnessSegmentPhrases pa = sse.getWitnessSegmentPhrases("a");
     final WitnessSegmentPhrases pb = sse.getWitnessSegmentPhrases("b");
 
+    System.out.println(pa);
     Assert.assertEquals(3, pa.size());
     Assert.assertEquals(3, pb.size());
 
@@ -123,25 +143,6 @@ public class LeftToRightMatchingTest {
     //    Assert.assertEquals(1, match.getBaseWord().getStartPosition());
     //    Assert.assertEquals(1, match.getWitnessWord().getStartPosition());
   }
-
-  // TODO: add a transposition test!
-  // There I don't want the thing to be smart!
-
-  //  @Test
-  //  public void testOmittedInFront() {
-  //    final Segment a = builder.build("a", "omitted everything matches").getFirstSegment();
-  //    final Segment b = builder.build("b", "everything matches").getFirstSegment();
-  //    final SubsegmentExtractor sse = new SubsegmentExtractor(a, b);
-  //    sse.go();
-  //    final WitnessSegmentPhrases pa = sse.getWitnessSegmentPhrases("a");
-  //    final WitnessSegmentPhrases pb = sse.getWitnessSegmentPhrases("b");
-  //
-  //    Assert.assertEquals(2, pa.size());
-  //    Assert.assertEquals(1, pb.size());
-  //
-  //    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
-  //    Assert.assertEquals(1, matches.size());
-  //  }
 
   private SubsegmentExtractor defaultSegmentExtractor() {
     final Segment a = builder.build("a", "Zijn hond liep aan zijn hand.").getFirstSegment();
