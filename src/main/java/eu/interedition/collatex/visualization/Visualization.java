@@ -13,35 +13,37 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.input.BaseElement;
 
 public class Visualization {
 
-  public static Modifications getModifications(Alignment collation) {
-    List<Transposition> transpositions = Visualization.determineTranspositions(collation.getMatchSequencesOrderedForWitnessA(), collation.getMatchSequencesOrderedForWitnessB());
-    List<Modification> modificationList = Visualization.determineModifications(collation.getMatches(), collation.getGaps());
-    Modifications modifications = new Modifications(modificationList, transpositions, collation.getMatches());
+  public static Modifications getModifications(final Alignment collation) {
+    final List<Transposition> transpositions = Visualization.determineTranspositions(collation.getMatchSequencesOrderedForWitnessA(), collation.getMatchSequencesOrderedForWitnessB());
+    final List<Modification> modificationList = Visualization.determineModifications(collation.getMatches(), collation.getGaps());
+    final Modifications modifications = new Modifications(modificationList, transpositions, collation.getMatches());
     return modifications;
   }
 
-  public static List<Modification> determineModifications(Set<Match> permutation, List<Gap> determineNonMatches) {
-    List<Modification> modifications = Lists.newArrayList();
+  public static List<Modification> determineModifications(final Set<Match> permutation, final List<Gap> determineNonMatches) {
+    final List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(Matches.getWordDistanceMatches(permutation));
     modifications.addAll(Visualization.analyseVariants(determineNonMatches));
     return modifications;
   }
 
-  public static List<Transposition> determineTranspositions(List<MatchSequence> matchSequencesForBase, List<MatchSequence> matchSequencesForWitness) {
-    List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
-    List<Tuple2<MatchSequence>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
-    List<Transposition> transpositions = TranspositionDetection.createTranspositions(possibleTranspositionTuples);
+  // TODO: move this? seems duplicate of Alignment.getTranspositions?
+  public static <T extends BaseElement> List<Transposition> determineTranspositions(final List<MatchSequence<T>> matchSequencesForBase, final List<MatchSequence<T>> matchSequencesForWitness) {
+    final List<Tuple2<MatchSequence<T>>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
+    final List<Tuple2<MatchSequence<T>>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);
+    final List<Transposition> transpositions = TranspositionDetection.createTranspositions(possibleTranspositionTuples);
     return transpositions;
   }
 
   @Deprecated
-  public static List<Modification> analyseVariants(List<Gap> variants) {
-    List<Modification> results = Lists.newArrayList();
-    for (Gap nonMatch : variants) {
-      Modification modification = nonMatch.analyse();
+  public static List<Modification> analyseVariants(final List<Gap> variants) {
+    final List<Modification> results = Lists.newArrayList();
+    for (final Gap nonMatch : variants) {
+      final Modification modification = nonMatch.analyse();
       results.add(modification);
     }
     return results;

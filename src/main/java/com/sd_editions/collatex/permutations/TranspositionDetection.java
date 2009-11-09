@@ -11,6 +11,7 @@ import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 
 public class TranspositionDetection {
@@ -22,18 +23,18 @@ public class TranspositionDetection {
     this.witness2 = _witness2;
   }
 
-  public static List<Tuple2<MatchSequence>> calculateSequenceTuples(final List<MatchSequence> matchSequencesForBase, final List<MatchSequence> matchSequencesForWitness) {
-    final List<Tuple2<MatchSequence>> tuples = Lists.newArrayList();
+  public static <T extends BaseElement> List<Tuple2<MatchSequence<T>>> calculateSequenceTuples(final List<MatchSequence<T>> matchSequencesForBase, final List<MatchSequence<T>> matchSequencesForWitness) {
+    final List<Tuple2<MatchSequence<T>>> tuples = Lists.newArrayList();
     for (int i = 0; i < matchSequencesForBase.size(); i++) {
-      final Tuple2<MatchSequence> tuple = new Tuple2<MatchSequence>(matchSequencesForBase.get(i), matchSequencesForWitness.get(i));
+      final Tuple2<MatchSequence<T>> tuple = new Tuple2<MatchSequence<T>>(matchSequencesForBase.get(i), matchSequencesForWitness.get(i));
       tuples.add(tuple);
     }
     return tuples;
   }
 
-  public static List<Tuple2<MatchSequence>> filterAwayRealMatches(final List<Tuple2<MatchSequence>> possibleMatches) {
-    final List<Tuple2<MatchSequence>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence>>() {
-      public boolean apply(final Tuple2<MatchSequence> tuple) {
+  public static <T extends BaseElement> List<Tuple2<MatchSequence<T>>> filterAwayRealMatches(final List<Tuple2<MatchSequence<T>>> possibleMatches) {
+    final List<Tuple2<MatchSequence<T>>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence<T>>>() {
+      public boolean apply(final Tuple2<MatchSequence<T>> tuple) {
         return !tuple.left.code.equals(tuple.right.code);
       }
     }));
@@ -43,10 +44,10 @@ public class TranspositionDetection {
   /**
    * simpler replacement for {@link #createTranspositions(List)}
    */
-  public static List<Transposition> createTranspositions(final List<Tuple2<MatchSequence>> possibleTranspositionTuples) {
+  public static <T extends BaseElement> List<Transposition> createTranspositions(final List<Tuple2<MatchSequence<T>>> possibleTranspositionTuples) {
     List<Transposition> transpositions;
     transpositions = Lists.newArrayList();
-    for (final Tuple2<MatchSequence> possibleTranspositionTuple : possibleTranspositionTuples) {
+    for (final Tuple2<MatchSequence<T>> possibleTranspositionTuple : possibleTranspositionTuples) {
       transpositions.add(new Transposition(possibleTranspositionTuple.right, possibleTranspositionTuple.left));
     }
     return transpositions;

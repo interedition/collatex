@@ -119,13 +119,13 @@ public class MatchSequenceTest extends TestCase {
     final Match a = new Match(new Word(witnessId1, "A", 1), new Word(witnessId2, "A", 3));
     final Match b = new Match(new Word(witnessId1, "B", 2), new Word(witnessId2, "B", 4));
     final Match c = new Match(new Word(witnessId1, "C", 3), new Word(witnessId2, "C", 5));
-    final MatchSequence sequence = new MatchSequence(1, a, b, c);
+    final MatchSequence<Word> sequence = new MatchSequence<Word>(1, a, b, c);
     final Match d = new Match(new Word(witnessId1, "D", 4), new Word(witnessId2, "D", 1));
     final Match e = new Match(new Word(witnessId1, "E", 5), new Word(witnessId2, "E", 2));
-    final MatchSequence sequence2 = new MatchSequence(2, d, e);
-    final List<MatchSequence> matchSequencesForBase = Lists.newArrayList(sequence, sequence2);
-    final List<MatchSequence> matchSequencesForWitness = Lists.newArrayList(sequence2, sequence);
-    final List<Tuple2<MatchSequence>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
+    final MatchSequence<Word> sequence2 = new MatchSequence<Word>(2, d, e);
+    final List<MatchSequence<Word>> matchSequencesForBase = Lists.newArrayList(sequence, sequence2);
+    final List<MatchSequence<Word>> matchSequencesForWitness = Lists.newArrayList(sequence2, sequence);
+    final List<Tuple2<MatchSequence<Word>>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     final Tuple2<MatchSequence> expected1 = new Tuple2<MatchSequence>(sequence, sequence2);
     final Tuple2<MatchSequence> expected2 = new Tuple2<MatchSequence>(sequence2, sequence);
     assertEquals(expected1, matchSequenceTuples.get(0));
@@ -142,12 +142,12 @@ public class MatchSequenceTest extends TestCase {
     final MatchSequence sequenceA = new MatchSequence(1, a);
     final MatchSequence sequenceB = new MatchSequence(2, b);
     final MatchSequence sequenceC = new MatchSequence(3, c);
-    final Tuple2<MatchSequence> tuple1 = new Tuple2<MatchSequence>(sequenceA, sequenceB);
-    final Tuple2<MatchSequence> tuple2 = new Tuple2<MatchSequence>(sequenceB, sequenceA);
-    final Tuple2<MatchSequence> tuple3 = new Tuple2<MatchSequence>(sequenceC, sequenceC);
-    final List<Tuple2<MatchSequence>> tuples = Lists.newArrayList(tuple1, tuple2, tuple3);
-    final List<Tuple2<MatchSequence>> expected = Lists.newArrayList(tuple1, tuple2);
-    final List<Tuple2<MatchSequence>> actual = TranspositionDetection.filterAwayRealMatches(tuples);
+    final Tuple2<MatchSequence<Word>> tuple1 = new Tuple2<MatchSequence<Word>>(sequenceA, sequenceB);
+    final Tuple2<MatchSequence<Word>> tuple2 = new Tuple2<MatchSequence<Word>>(sequenceB, sequenceA);
+    final Tuple2<MatchSequence<Word>> tuple3 = new Tuple2<MatchSequence<Word>>(sequenceC, sequenceC);
+    final List<Tuple2<MatchSequence<Word>>> tuples = Lists.newArrayList(tuple1, tuple2, tuple3);
+    final List<Tuple2<MatchSequence<Word>>> expected = Lists.newArrayList(tuple1, tuple2);
+    final List<Tuple2<MatchSequence<Word>>> actual = TranspositionDetection.filterAwayRealMatches(tuples);
     assertEquals(expected, actual);
   }
 
