@@ -33,7 +33,7 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
 
   public BaseContainerPart(final BaseContainer witness, final Word beginWord, final Word endWord) {
     this._witness = witness;
-    this.size = -1; // !!!
+    this.size = endWord.position - beginWord.position + 1;
     this.next = null; // !!!
     this.previous = null; // !!!
     this.startPosition = beginWord.position;

@@ -1,13 +1,10 @@
 package com.sd_editions.collatex.permutations;
 
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.sd_editions.collatex.Block.Util;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.MatchSequence;
@@ -57,30 +54,8 @@ public class TranspositionDetection {
    * @deprecated use {@link #createTranspositions(List)} instead
    */
   @Deprecated
-  protected static List<Transposition> calculateTranspositions(final List<Tuple2<MatchSequence>> possibleTranspositionTuples) {
-    // here we go and filter.. so that only transpositions are kept..
-    // later on we filter away duplicates
-    Util.p(possibleTranspositionTuples);
-    final List<Tuple2<MatchSequence>> matchSequencesInTransposition = Lists.newArrayList(Iterables.filter(possibleTranspositionTuples, new Predicate<Tuple2<MatchSequence>>() {
-      public boolean apply(final Tuple2<MatchSequence> tuple) {
-        final Tuple2<MatchSequence> mirror = new Tuple2<MatchSequence>(tuple.right, tuple.left);
-        return possibleTranspositionTuples.contains(mirror);
-      }
-    }));
-    // this is to filter away duplicates... --> wrap them in TranpositionTuples
-    final List<TranspositionTuple> asTranspositionTuples = Lists.newArrayList();
-    for (final Tuple2<MatchSequence> sequence : matchSequencesInTransposition) {
-      asTranspositionTuples.add(new TranspositionTuple(sequence));
-    }
-    final Set<TranspositionTuple> transpositionTuples = Sets.newHashSet(asTranspositionTuples);
-    // Unwrap them and map them to Transpositions..
-    final List<Transposition> modifications = Lists.newArrayList();
-    for (final TranspositionTuple transposition : transpositionTuples) {
-      final MatchSequence base = transposition.getLeftSequence();
-      final MatchSequence witness = transposition.getRightSequence();
-      modifications.add(new Transposition(base, witness));
-    }
-    return modifications;
+  public static <T extends BaseElement> List<Transposition> oldCalculateTranspositions(final List<Tuple2<MatchSequence<T>>> possibleTranspositionTuples) {
+    return null;
   }
 
   public static List<MatchSequence> getMatches(final List<Tuple2<MatchSequence>> possibleMatches) {

@@ -1,22 +1,23 @@
 package com.sd_editions.collatex.permutations;
 
 import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.input.BaseElement;
 
-public class TranspositionTuple {
+public class TranspositionTuple<T extends BaseElement> {
 
-  private final Tuple2<MatchSequence> tuple;
+  private final Tuple2<MatchSequence<T>> tuple;
 
-  public TranspositionTuple(Tuple2<MatchSequence> _tuple) {
+  public TranspositionTuple(final Tuple2<MatchSequence<T>> _tuple) {
     this.tuple = _tuple;
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (!(obj instanceof TranspositionTuple)) {
       return false;
     }
-    TranspositionTuple tuple2 = (TranspositionTuple) obj;
-    boolean result = tuple2.getLeftWordCode().equals(getLeftWordCode()) && tuple2.getRightWordCode().equals(getRightWordCode());
+    final TranspositionTuple tuple2 = (TranspositionTuple) obj;
+    final boolean result = tuple2.getLeftWordCode().equals(getLeftWordCode()) && tuple2.getRightWordCode().equals(getRightWordCode());
     //    System.out.println("comparing: " + this.toString() + " && " + tuple2.toString() + " result: " + result);
     return result;
   }
