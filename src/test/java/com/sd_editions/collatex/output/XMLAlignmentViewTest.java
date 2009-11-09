@@ -12,6 +12,7 @@ import com.sd_editions.collatex.permutations.collate.Addition;
 import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
@@ -43,7 +44,7 @@ public class XMLAlignmentViewTest {
     Segment segment = witness.getFirstSegment();
     Word next = segment.getWordOnPosition(3);
     Word previous = null;
-    Addition addition = new Addition(1, new Phrase(segment, 2, 1, 2, previous, next));
+    Addition addition = new Addition(1, new BaseContainerPart(segment, 2, 1, 2, previous, next));
     XMLAlignmentView alignmentView = setupAlignmentView(addition);
 
     String result = alignmentView.modificationsView(-1);
@@ -58,7 +59,7 @@ public class XMLAlignmentViewTest {
     Segment segment = witness.getFirstSegment();
     Word next = segment.getWordOnPosition(3);
     Word previous = segment.getWordOnPosition(1);
-    Omission omission = new Omission(new Phrase(segment, 1, 2, 2, previous, next));
+    Omission omission = new Omission(new BaseContainerPart(segment, 1, 2, 2, previous, next));
     XMLAlignmentView alignmentView = setupAlignmentView(omission);
 
     String result = alignmentView.modificationsView(-1);

@@ -8,11 +8,11 @@ import eu.interedition.collatex.Util;
 import eu.interedition.collatex.input.visitors.ICollationResource;
 import eu.interedition.collatex.input.visitors.IResourceVisitor;
 
-public class Segment implements ICollationResource {
+public class Segment extends BaseContainer implements ICollationResource {
   public final String id;
   private final List<Word> words;
 
-  public Segment(Word... _words) {
+  public Segment(final Word... _words) {
     if (_words == null) throw new IllegalArgumentException("List of words cannot be null.");
     if (_words.length == 0)
       this.id = Util.generateRandomId();
@@ -21,7 +21,7 @@ public class Segment implements ICollationResource {
     this.words = Lists.newArrayList(_words);
   }
 
-  public Segment(String _id, List<Word> _words) {
+  public Segment(final String _id, final List<Word> _words) {
     this.id = _id;
     this.words = _words;
   }
@@ -30,10 +30,12 @@ public class Segment implements ICollationResource {
     return words;
   }
 
-  public Word getWordOnPosition(int position) {
+  @Override
+  public Word getWordOnPosition(final int position) {
     return words.get(position - 1);
   }
 
+  @Override
   public int size() {
     return words.size();
   }
@@ -43,17 +45,17 @@ public class Segment implements ICollationResource {
   public String toString() {
     String replacementString = "";
     String divider = "";
-    for (Word word : words) {
+    for (final Word word : words) {
       replacementString += divider + word;
       divider = " ";
     }
     return replacementString;
   }
 
-  public void accept(IResourceVisitor visitor) {
+  public void accept(final IResourceVisitor visitor) {
     visitor.visitSegment(this);
-    List<Word> words2 = getWords();
-    for (Word word : words2) {
+    final List<Word> words2 = getWords();
+    for (final Word word : words2) {
       visitor.visitWord(word);
     }
     visitor.postVisitWitness(this);

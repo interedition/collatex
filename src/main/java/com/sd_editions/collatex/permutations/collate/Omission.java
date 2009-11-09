@@ -2,13 +2,14 @@ package com.sd_editions.collatex.permutations.collate;
 
 import com.sd_editions.collatex.match.views.ModificationVisitor;
 
+import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.visualization.Modification;
 
 public class Omission extends Modification {
-  private final Phrase phrase;
+  private final BaseContainerPart phrase;
 
-  public Omission(Phrase _phrase) {
+  public Omission(BaseContainerPart _phrase) {
     this.phrase = _phrase;
   }
 

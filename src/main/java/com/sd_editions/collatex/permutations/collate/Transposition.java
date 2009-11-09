@@ -7,7 +7,7 @@ public class Transposition extends Modification {
   private final MatchSequence base;
   private final MatchSequence witness;
 
-  public Transposition(MatchSequence _base, MatchSequence _witness) {
+  public Transposition(final MatchSequence _base, final MatchSequence _witness) {
     this.base = _base;
     this.witness = _witness;
   }
@@ -23,5 +23,13 @@ public class Transposition extends Modification {
 
   public String getRight() {
     return witness.baseToString();
+  }
+
+  public MatchSequence getBase() {
+    return base;
+  }
+
+  public MatchSequence getWitness() {
+    return witness;
   }
 }
