@@ -1,10 +1,9 @@
 package eu.interedition.collatex.input;
 
+public abstract class BaseContainer<T extends BaseElement> {
 
-// TODO: remove dependency on Word!
-public abstract class BaseContainer {
-
-  public abstract Word getWordOnPosition(final int k);
+  // TODO: rename?
+  public abstract T getWordOnPosition(final int k);
 
   public abstract int size();
 

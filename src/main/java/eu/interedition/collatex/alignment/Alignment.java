@@ -49,7 +49,10 @@ public class Alignment<T extends BaseElement> {
   public static Alignment<Phrase> createPhraseAlignment(final Set<Match<Phrase>> matches, final WitnessSegmentPhrases a, final WitnessSegmentPhrases b) {
     final List<MatchSequence<Phrase>> sequencesA = SequenceDetection.calculateMatchSequences(matches);
     final List<MatchSequence<Phrase>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
+    // TODO: extract convenience method for this!
     final List<Gap> gaps = Lists.newArrayList();
+    //    gaps.addAll(GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB));
+    //    gaps.addAll(GapDetection.getVariantsInMatchSequences(a, b, sequencesA));
     final Alignment<Phrase> al = new Alignment<Phrase>(matches, gaps, sequencesA, sequencesB);
     return al;
   }

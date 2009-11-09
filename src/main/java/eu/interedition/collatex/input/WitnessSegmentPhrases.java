@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
-public class WitnessSegmentPhrases {
+public class WitnessSegmentPhrases extends BaseContainer<Phrase> {
   private final String _witnessId;
   private final List<Phrase> _phrases;
 
@@ -33,7 +33,13 @@ public class WitnessSegmentPhrases {
     return "WitnessSegmentPhrases(" + getWitnessId() + ", '" + Join.join("','", _phrases) + "')";
   }
 
+  @Override
   public int size() {
     return _phrases.size();
+  }
+
+  @Override
+  public Phrase getWordOnPosition(final int k) {
+    return getPhraseOnPosition(k);
   }
 }

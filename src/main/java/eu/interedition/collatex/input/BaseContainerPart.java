@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 // it might not need to extend BaseElement?
 // anyway it should take BaseElements in
 public class BaseContainerPart<T extends BaseElement> extends BaseElement {
-  private final BaseContainer _witness;
+  private final BaseContainer<T> _witness;
   private final int startPosition;
   private final int endPosition;
   private final int size;
@@ -22,7 +22,7 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public BaseContainerPart(final BaseContainer witness, final int _size, final int _startPosition, final int _endPosition, final T _previous, final T _next) {
+  public BaseContainerPart(final BaseContainer<T> witness, final int _size, final int _startPosition, final int _endPosition, final T _previous, final T _next) {
     this._witness = witness;
     this.size = _size;
     this.next = _next;
@@ -31,7 +31,7 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
     endPosition = _endPosition;
   }
 
-  public BaseContainerPart(final BaseContainer witness, final Word beginWord, final Word endWord) {
+  public BaseContainerPart(final BaseContainer<T> witness, final Word beginWord, final Word endWord) {
     this._witness = witness;
     this.size = endWord.position - beginWord.position + 1;
     this.next = null; // !!!
@@ -62,7 +62,7 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
     return replacementString;
   }
 
-  public BaseContainer getWitness() {
+  public BaseContainer<T> getWitness() {
     return _witness;
   }
 
@@ -74,16 +74,16 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
     return endPosition;
   }
 
-  public List<Word> getWords() {
-    final List<Word> words = Lists.newArrayList();
+  public List<T> getWords() {
+    final List<T> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      final Word word = getWitness().getWordOnPosition(k);
+      final T word = getWitness().getWordOnPosition(k);
       words.add(word);
     }
     return words;
   }
 
-  public Word getFirstWord() {
+  public T getFirstWord() {
     return getWords().get(0);
   }
 
