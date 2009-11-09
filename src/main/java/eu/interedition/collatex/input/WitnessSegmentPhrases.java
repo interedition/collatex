@@ -32,4 +32,8 @@ public class WitnessSegmentPhrases {
   public String toString() {
     return "WitnessSegmentPhrases(" + getWitnessId() + ", '" + Join.join("','", _phrases) + "')";
   }
+
+  public int size() {
+    return _phrases.size();
+  }
 }

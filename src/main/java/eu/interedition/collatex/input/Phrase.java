@@ -3,7 +3,7 @@ package eu.interedition.collatex.input;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-
+import com.sd_editions.collatex.match.Subsegment;
 
 public class Phrase extends BaseElement {
   private final Segment witness;
@@ -12,13 +12,14 @@ public class Phrase extends BaseElement {
   private final int size;
   private final Word previous;
   private final Word next;
+  private Subsegment _subSegment;
 
   // TODO: It is pretty obvious: too many parameters here!
   // Note: probably two constructors needed...
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public Phrase(Segment _witness, int _size, int _startPosition, int _endPosition, Word _previous, Word _next) {
+  public Phrase(final Segment _witness, final int _size, final int _startPosition, final int _endPosition, final Word _previous, final Word _next) {
     witness = _witness;
     this.size = _size;
     this.next = _next;
@@ -27,13 +28,14 @@ public class Phrase extends BaseElement {
     endPosition = _endPosition;
   }
 
-  public Phrase(Segment _witness, Word beginWord, Word endWord) {
+  public Phrase(final Segment _witness, final Word beginWord, final Word endWord, final Subsegment subsegment) {
     this.witness = _witness;
     this.size = -1; // !!!
     this.next = null; // !!!
     this.previous = null; // !!!
     this.startPosition = beginWord.position;
     this.endPosition = endWord.position;
+    this._subSegment = subsegment;
   }
 
   //TODO: rename method!
@@ -43,15 +45,15 @@ public class Phrase extends BaseElement {
 
   @Override
   public String toString() {
-    List<String> words = Lists.newArrayList();
+    final List<String> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      String word = witness.getWordOnPosition(k).toString();
+      final String word = witness.getWordOnPosition(k).toString();
       words.add(word);
     }
 
     String replacementString = "";
     String divider = "";
-    for (String replacement : words) {
+    for (final String replacement : words) {
       replacementString += divider + replacement;
       divider = " ";
     }
@@ -71,9 +73,9 @@ public class Phrase extends BaseElement {
   }
 
   public List<Word> getWords() {
-    List<Word> words = Lists.newArrayList();
+    final List<Word> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      Word word = getWitness().getWordOnPosition(k);
+      final Word word = getWitness().getWordOnPosition(k);
       words.add(word);
     }
     return words;
@@ -113,5 +115,9 @@ public class Phrase extends BaseElement {
   @Override
   public int getPosition() {
     return startPosition;
+  }
+
+  public Subsegment getSubsegment() {
+    return _subSegment;
   }
 }

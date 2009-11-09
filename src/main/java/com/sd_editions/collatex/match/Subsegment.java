@@ -99,7 +99,7 @@ public class Subsegment {
       final Word beginWord = segment.getWordOnPosition(beginPosition);
       final int endPosition = beginPosition + numberOfWords - 1;
       final Word endWord = segment.getWordOnPosition(endPosition);
-      phrase = new Phrase(segment, beginWord, endWord);
+      phrase = new Phrase(segment, beginWord, endWord, this);
     }
     return phrase;
   }

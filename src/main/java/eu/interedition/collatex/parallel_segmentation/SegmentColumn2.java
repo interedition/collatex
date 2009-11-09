@@ -27,15 +27,15 @@ public class SegmentColumn2 {
   private final Map<String, Phrase> _phrases;
   private final List<Segment> _witnesses;
 
-  public SegmentColumn2(List<Segment> witnesses) {
+  public SegmentColumn2(final List<Segment> witnesses) {
     this._phrases = Maps.newHashMap();
     this._witnesses = witnesses;
   }
 
   public String toXML() {
     // group together similar phrases
-    Multimap<String, String> renderedPhraseToWitnessID = Multimaps.newArrayListMultimap();
-    for (Entry<String, Phrase> entry : _phrases.entrySet()) {
+    final Multimap<String, String> renderedPhraseToWitnessID = Multimaps.newArrayListMultimap();
+    for (final Entry<String, Phrase> entry : _phrases.entrySet()) {
       renderedPhraseToWitnessID.put(entry.getValue().toString(), entry.getKey());
     }
     // There is no app tag needed!
@@ -44,34 +44,34 @@ public class SegmentColumn2 {
     }
 
     // add the empty sigli to the multimap
-    Set<String> emptySigli = getEmptyCells();
-    for (String sigil : emptySigli) {
+    final Set<String> emptySigli = getEmptyCells();
+    for (final String sigil : emptySigli) {
       renderedPhraseToWitnessID.put("", sigil);
     }
 
-    Map<String, String> renderSigli = renderSigli(renderedPhraseToWitnessID);
+    final Map<String, String> renderSigli = renderSigli(renderedPhraseToWitnessID);
     return renderTheAppTag(renderSigli);
   }
 
-  private Map<String, String> renderSigli(Multimap<String, String> renderedPhraseToWitnessID) {
+  private Map<String, String> renderSigli(final Multimap<String, String> renderedPhraseToWitnessID) {
     // convert the multimap to a normal map  (by rendering the multiple sigli to a single string)
-    Map<String, String> sigliToRenderedPhrase = Maps.newLinkedHashMap();
-    for (String renderedPhrase : renderedPhraseToWitnessID.keySet()) {
-      Collection<String> sigli = renderedPhraseToWitnessID.get(renderedPhrase);
-      String renderedSigli = renderSigli(sigli);
+    final Map<String, String> sigliToRenderedPhrase = Maps.newLinkedHashMap();
+    for (final String renderedPhrase : renderedPhraseToWitnessID.keySet()) {
+      final Collection<String> sigli = renderedPhraseToWitnessID.get(renderedPhrase);
+      final String renderedSigli = renderSigli(sigli);
       sigliToRenderedPhrase.put(renderedSigli, renderedPhrase);
     }
     return sigliToRenderedPhrase;
   }
 
-  private String renderTheAppTag(Map<String, String> sigliPhrase) {
+  private String renderTheAppTag(final Map<String, String> sigliPhrase) {
     // do the actual rendering
-    StringBuilder xml = new StringBuilder("<app>");
-    List<String> keys = Lists.newArrayList(sigliPhrase.keySet());
+    final StringBuilder xml = new StringBuilder("<app>");
+    final List<String> keys = Lists.newArrayList(sigliPhrase.keySet());
     Collections.sort(keys);
-    for (String sigli : keys) {
+    for (final String sigli : keys) {
       xml.append("<rdg wit=\"").append(sigli).append('"');
-      String renderedPhrase = sigliPhrase.get(sigli);
+      final String renderedPhrase = sigliPhrase.get(sigli);
       if (renderedPhrase.isEmpty()) {
         xml.append("/>");
       } else
@@ -85,11 +85,11 @@ public class SegmentColumn2 {
   }
 
   private Set<String> getEmptyCells() {
-    Set<String> sigliInTable = Sets.newLinkedHashSet();
-    for (Segment witness1 : _witnesses) {
+    final Set<String> sigliInTable = Sets.newLinkedHashSet();
+    for (final Segment witness1 : _witnesses) {
       sigliInTable.add(witness1.id);
     }
-    Set<String> emptySigli = Sets.newLinkedHashSet(sigliInTable);
+    final Set<String> emptySigli = Sets.newLinkedHashSet(sigliInTable);
     emptySigli.removeAll(_phrases.keySet());
     return emptySigli;
   }
@@ -98,10 +98,10 @@ public class SegmentColumn2 {
     return _witnesses.size() != _phrases.size();
   }
 
-  private String renderSigli(Collection<String> sigli) {
-    StringBuilder b = new StringBuilder();
+  private String renderSigli(final Collection<String> sigli) {
+    final StringBuilder b = new StringBuilder();
     String delimiter = "";
-    for (String sigil : sigli) {
+    for (final String sigil : sigli) {
       b.append(delimiter);
       b.append("#");
       b.append(sigil);
@@ -110,15 +110,15 @@ public class SegmentColumn2 {
     return b.toString();
   }
 
-  public void addWord(Segment witness2, Word word) {
-    Phrase existingPhrase = _phrases.get(witness2.id);
+  public void addWord(final Segment witness2, final Word word) {
+    final Phrase existingPhrase = _phrases.get(witness2.id);
     if (existingPhrase == null) {
-      Phrase phrase = new Phrase(witness2, word, word);
+      final Phrase phrase = new Phrase(witness2, word, word, null);
       _phrases.put(witness2.id, phrase);
       return;
     }
 
-    Phrase newPhrase = new Phrase(witness2, existingPhrase.getFirstWord(), word);
+    final Phrase newPhrase = new Phrase(witness2, existingPhrase.getFirstWord(), word, null);
     _phrases.put(witness2.id, newPhrase);
   }
 }
