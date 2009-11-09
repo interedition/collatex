@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sd_editions.collatex.Block.Util;
@@ -93,12 +92,36 @@ public class SubsegmentExtractorTest {
     assertPhrasesFound(sse.getWitnessSegmentPhrases("c"), "'Met','zijn hond','aan zijn hand,','liep','hij','op zijn pad.')");
   }
 
+  @Test
   public void testGetPhrasesPerSegment2() {
     final SubsegmentExtractor sse = theSameExtractor();
     sse.go();
-    assertPhrasesFound(sse.getWitnessSegmentPhrases("06-1"), "'The same','clock','as when','for example','Magee','once died.')");
-    assertPhrasesFound(sse.getWitnessSegmentPhrases("06-2"), "'Op zijn pad','liep','zijn hond,','aan zijn hand.')");
-    assertPhrasesFound(sse.getWitnessSegmentPhrases("08-1"), "'Met','zijn hond','aan zijn hand,','liep','hij','op zijn pad.')");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("06-1"), "'The same','clock','as when','for example','Magee','once','died.')");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("06-2"), "'The same','as when','for example','Magee','once','died.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("08-1"), "'The same','as when','for example','McKee','once','died','.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("08-2"), "'The same','as when','among others','Darly','once','died','&amp;','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("09-1"), "'The same','as when','Darly','among others','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("09-2"), "'The same','as when','Darly','among others','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("10-1"), "'The same','as when','Darly','among others','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("10-2"), "'The same','as when','Darly','among others','once','went','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("11-1"), "'The same','as when','among others','Darly','once','went','andleft','him'");
+    //    assertPhrasesFound(sse.getWitnessSegmentPhrases("11-2"), "'The same','as when','among others','Darly','once','died','on him','&amp;','left him.'");
+    //    assertPhrasesFound(sse.getWitnessSegmentPhrases("12-1"), "'The same','as when','among others','Darly','once','died','and','left','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("12-2"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("13-1"), "'The same','as when','among others','Darly','pnce','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("13-2"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("14-1"), "'The same','as when','among others','Darly','pnce','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("14-2"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("15-1"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("15-2"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("16-1"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("16-2"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("17-1"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("17-2"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("19-1"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("19-2"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("BS-1"), "'The same','as when','among others','Darly','once','died','and','left him.'");
+    assertPhrasesFound(sse.getWitnessSegmentPhrases("BS-2"), "'The same','as when','among others','Darly','once','died','and','left him.'");
   }
 
   private void assertPhrasesFound(final WitnessSegmentPhrases wsp, final String expectedPhrases) {
@@ -108,8 +131,7 @@ public class SubsegmentExtractorTest {
     Util.p(wsp);
   }
 
-  @Ignore
-  @Test
+  //  @Test
   public void testGetUnfixedAlignment() {
     final SubsegmentExtractor sse = defaultSegmentExtractor();
     sse.go();
@@ -161,7 +183,7 @@ public class SubsegmentExtractorTest {
     final Segment y = builder.build("BS-1", "The same as when among others Darly once died and left him.").getFirstSegment();
     final Segment z = builder.build("BS-2", "The same as when among others Darly once died and left him.").getFirstSegment();
     final SubsegmentExtractor sse = new SubsegmentExtractor(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z);
+    //    final SubsegmentExtractor sse = new SubsegmentExtractor(a, d);
     return sse;
   }
-
 }

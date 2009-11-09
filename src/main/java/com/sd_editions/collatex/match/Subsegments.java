@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 
 import com.google.common.base.Function;
+import com.google.common.base.Join;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -104,7 +105,13 @@ public class Subsegments {
 
   @Override
   public String toString() {
-    return subsegments.toString();
+    final List<String> titleList = Lists.newArrayList(subsegments.keySet());
+    Collections.sort(titleList);
+    final List<String> items = Lists.newArrayList();
+    for (final String title : titleList) {
+      items.add("'" + title + "'=" + subsegments.get(title).toString());
+    }
+    return Join.join("\n", items);
   }
 
   static final Comparator<Phrase> SORT_ON_STARTPOSITION = new Comparator<Phrase>() {

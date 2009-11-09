@@ -21,7 +21,7 @@ import eu.interedition.collatex.input.Word;
 public class Subsegment {
   private String title;
   private boolean open = true;
-  final Map<String, List<Integer>> startPositionsForPhrase = Maps.newHashMap();
+  final Map<String, List<Integer>> startPositionsForPhrase = Maps.newLinkedHashMap();
   private int numberOfWords = 0;
   private boolean remove = false;
 

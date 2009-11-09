@@ -86,7 +86,15 @@ public class SubsegmentExtractor {
       }
       //      Util.p("nextSubsegmentTitleSet", nextSubsegmentTitleSet);
 
-      if (subsegment.size() > 1 && nextWordMap.size() == 1 && !nextSubsegmentTitleSet.contains(null)) {
+      final int witnessesForThisSubsegment = subsegment.size();
+      final int possibleNextWords = nextWordMap.size();
+      final Subsegment nextSubsegment = subsegments.get(nextWordMap.keySet().iterator().next());
+      final int witnessesForNextSubsegment = (nextSubsegment == null) ? 0 : nextSubsegment.size();
+      final boolean moreThanOneWitnessInSubsegment = witnessesForThisSubsegment > 1;
+      final boolean onlyOnePossibleNextWord = possibleNextWords == 1;
+      final boolean sameWitnessesInSubsegmentAndNextsubsegment = witnessesForNextSubsegment == witnessesForThisSubsegment;
+      final boolean segmentIsNeverLastInAWitness = !nextSubsegmentTitleSet.contains(null);
+      if (moreThanOneWitnessInSubsegment && onlyOnePossibleNextWord && sameWitnessesInSubsegmentAndNextsubsegment && segmentIsNeverLastInAWitness) {
         // subsegment and nextSubsegment can be joined
         //        Util.remark("join!");
         subsegment = subsegments.join(subsegment.getTitle(), nextSubsegmentTitleSet.iterator().next());
@@ -176,15 +184,19 @@ public class SubsegmentExtractor {
 
   @SuppressWarnings("boxing")
   private Subsegments expandSubsegmentsUntilAllAreSingular(final Subsegments _subsegments) {
+    Util.p("_subsegments", _subsegments);
     final Iterable<Subsegment> pluralSubsegments = Lists.newArrayList(filter(_subsegments.all(), NOT_SINGULAR));
     final Map<String, Subsegment> nextWords = Maps.newHashMap();
     for (final Subsegment pluralSubsegment : pluralSubsegments) {
+      Util.p("pluralSubsegment", pluralSubsegment);
       final String subsegmentTitle = pluralSubsegment.getTitle();
 
       for (final String witnessId : pluralSubsegment.getWitnessIds()) {
         final List<Integer> positions = pluralSubsegment.get(witnessId);
         for (final Integer position : positions) {
-          final String nextWord = _subsegments.getSubsegmentTitleAtSegmentPosition(new SegmentPosition(witnessId, position + 1));
+          final SegmentPosition nextPosition = new SegmentPosition(witnessId, position + 1);
+          Util.p("nextPosition", nextPosition);
+          final String nextWord = _subsegments.getSubsegmentTitleAtSegmentPosition(nextPosition);
           Subsegment subsegment = nextWords.get(nextWord);
           if (subsegment == null) subsegment = new Subsegment(subsegmentTitle);
           List<Integer> originalPositions = subsegment.get(witnessId);
@@ -193,16 +205,23 @@ public class SubsegmentExtractor {
           subsegment.add(witnessId, originalPositions);
           nextWords.put(nextWord, subsegment);
 
-          final Subsegment originalSubsegmentForNextWord = _subsegments.get(nextWord);
-          originalSubsegmentForNextWord.deleteSegmentPosition(new SegmentPosition(witnessId, position + subsegment.getNumberOfWords()));
+          Util.p("_subsegments", _subsegments);
+          Util.p("nextWord", nextWord);
+          Util.p("subsegment", subsegment);
+
+          if (nextWord != null) {
+            final Subsegment originalSubsegmentForNextWord = _subsegments.get(nextWord);
+            Util.p("originalSubsegmentForNextWord", originalSubsegmentForNextWord);
+            originalSubsegmentForNextWord.deleteSegmentPosition(new SegmentPosition(witnessId, position + subsegment.getNumberOfWords()));
+          }
         }
       }
-      //      Util.p("nextWords", nextWords);
+      Util.p("nextWords", nextWords);
       final Set<Entry<String, Subsegment>> entrySet = nextWords.entrySet();
       for (final Entry<String, Subsegment> entry : entrySet) {
         final String nextWord = entry.getKey();
         final Subsegment subsegment = entry.getValue();
-        subsegment.extend(nextWord);
+        if (nextWord != null) subsegment.extend(nextWord);
         //        Util.p("subsegment", subsegment);
         _subsegments.add(subsegment.getTitle(), subsegment);
       }
