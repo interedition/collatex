@@ -68,6 +68,7 @@ public class Phrase extends BaseElement {
     return startPosition;
   }
 
+  @Override
   public int getEndPosition() {
     return endPosition;
   }
@@ -113,7 +114,7 @@ public class Phrase extends BaseElement {
   }
 
   @Override
-  public int getPosition() {
+  public int getBeginPosition() {
     return startPosition;
   }
 

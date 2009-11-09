@@ -48,7 +48,7 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   @Override
   public String toString() {
     final List<String> words = Lists.newArrayList();
-    for (int k = getStartPosition(); k <= getEndPosition(); k++) {
+    for (int k = getBeginPosition(); k <= getEndPosition(); k++) {
       final String word = _witness.getWordOnPosition(k).toString();
       words.add(word);
     }
@@ -66,17 +66,19 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
     return _witness;
   }
 
-  public int getStartPosition() {
+  @Override
+  public int getBeginPosition() {
     return startPosition;
   }
 
+  @Override
   public int getEndPosition() {
     return endPosition;
   }
 
   public List<T> getWords() {
     final List<T> words = Lists.newArrayList();
-    for (int k = getStartPosition(); k <= getEndPosition(); k++) {
+    for (int k = getBeginPosition(); k <= getEndPosition(); k++) {
       final T word = getWitness().getWordOnPosition(k);
       words.add(word);
     }
@@ -114,8 +116,4 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
     return toString();
   }
 
-  @Override
-  public int getPosition() {
-    return startPosition;
-  }
 }

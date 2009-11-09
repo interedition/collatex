@@ -10,7 +10,7 @@ public class MatchSequence<T extends BaseElement> {
   private final List<Match<T>> sequence;
   public final Integer code;
 
-  public MatchSequence(Integer _code, Match<T>... matches) {
+  public MatchSequence(final Integer _code, final Match<T>... matches) {
     sequence = Lists.newArrayList(matches);
     code = _code;
   }
@@ -20,7 +20,7 @@ public class MatchSequence<T extends BaseElement> {
     return sequence.toString();
   }
 
-  public void add(Match<T> match) {
+  public void add(final Match<T> match) {
     sequence.add(match);
   }
 
@@ -32,20 +32,24 @@ public class MatchSequence<T extends BaseElement> {
     return sequence.get(0);
   }
 
+  // TODO: rename to getWitnessBeginPosition!
   @SuppressWarnings("boxing")
   public Integer getSegmentPosition() {
-    return getFirstWitnessWord().getPosition();
+    return getFirstWitnessWord().getBeginPosition();
   }
 
+  // TODO: rename to getBaseWitnessBeginPosition!
   @SuppressWarnings("boxing")
   public Integer getBasePosition() {
-    return getFirstBaseWord().getPosition();
+    return getFirstBaseWord().getBeginPosition();
   }
 
+  //TODO: rename Word to Element!
   private T getFirstWitnessWord() {
     return getFirstMatch().getWitnessWord();
   }
 
+  //TODO: rename Word to Element!
   private T getFirstBaseWord() {
     return getFirstMatch().getBaseWord();
   }
@@ -54,8 +58,8 @@ public class MatchSequence<T extends BaseElement> {
     String result = "";
     String delimiter = "";
     for (int i = 0; i < sequence.size(); i++) {
-      T baseWord = sequence.get(i).getBaseWord();
-      if (i > 0 && (baseWord.getPosition() - sequence.get(i - 1).getBaseWord().getPosition()) > 1) {
+      final T baseWord = sequence.get(i).getBaseWord();
+      if (i > 0 && (baseWord.getBeginPosition() - sequence.get(i - 1).getBaseWord().getBeginPosition()) > 1) {
         result += delimiter + "...";
       }
       result += delimiter + baseWord.toString();

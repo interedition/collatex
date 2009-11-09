@@ -13,7 +13,9 @@ import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
 
 public class GapDetection {
-  public static <T extends BaseElement> List<Gap> getVariantsInMatchSequences(final BaseContainer base, final BaseContainer witness, final List<MatchSequence<T>> sequences) {
+  // TODO: rename Word to Element
+  // TODO: rename some gaps to Part
+  public static <T extends BaseElement> List<Gap> getVariantsInMatchSequences(final BaseContainer<T> base, final BaseContainer<T> witness, final List<MatchSequence<T>> sequences) {
     final List<Gap> variants = Lists.newArrayList();
     for (final MatchSequence<T> sequence : sequences) {
       final List<Match<T>> matches = sequence.getMatches();
@@ -24,12 +26,12 @@ public class GapDetection {
           final Match<T> next = i.next();
           final T previousWordBase = previous.getBaseWord();
           final T nextWordBase = next.getBaseWord();
-          final int baseStartPosition = previousWordBase.getPosition();
-          final int baseEndPosition = nextWordBase.getPosition();
+          final int baseStartPosition = previousWordBase.getEndPosition();
+          final int baseEndPosition = nextWordBase.getBeginPosition();
           final T previousWordWitness = previous.getWitnessWord();
           final T nextWordWitness = next.getWitnessWord();
-          final int witnessStartPosition = previousWordWitness.getPosition();
-          final int witnessEndPosition = nextWordWitness.getPosition();
+          final int witnessStartPosition = previousWordWitness.getEndPosition();
+          final int witnessEndPosition = nextWordWitness.getBeginPosition();
           final int gapSizeBase = baseEndPosition - baseStartPosition - 1;
           final int gapSizeWitness = witnessEndPosition - witnessStartPosition - 1;
           if (gapSizeBase != 0 || gapSizeWitness != 0) {
@@ -46,7 +48,9 @@ public class GapDetection {
     return variants;
   }
 
-  public static <T extends BaseElement> List<Gap> getVariantsInBetweenMatchSequences(final BaseContainer base, final BaseContainer witness, final List<MatchSequence<T>> sequencesBase,
+  // TODO: rename some gaps to Part
+  // TODO: rename nonmatch to gap
+  public static <T extends BaseElement> List<Gap> getVariantsInBetweenMatchSequences(final BaseContainer<T> base, final BaseContainer<T> witness, final List<MatchSequence<T>> sequencesBase,
       final List<MatchSequence<T>> sequencesWitness) {
     final List<BaseContainerPart<T>> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
     final List<BaseContainerPart<T>> gapsWitness = getGapsFromInBetweenMatchSequencesForWitness(witness, sequencesWitness);
@@ -75,22 +79,24 @@ public class GapDetection {
     return nextMatches;
   }
 
+  // TODO: rename Word to Element!
   // TODO: rename gaps to parts!
   // this method is made for the base... 
   @SuppressWarnings("boxing")
-  private static <T extends BaseElement> List<BaseContainerPart<T>> getGapsFromInBetweenMatchSequencesForBase(final BaseContainer witness, final List<MatchSequence<T>> sequences) {
+  private static <T extends BaseElement> List<BaseContainerPart<T>> getGapsFromInBetweenMatchSequencesForBase(final BaseContainer<T> witness, final List<MatchSequence<T>> sequences) {
     int currentIndex = 1;
     T previousWord = null;
     T nextWord = null;
     final List<BaseContainerPart<T>> gaps = Lists.newArrayList();
     for (final MatchSequence<T> sequence : sequences) {
+      // TODO: with getBasePosition the begin position is meant!
       final int position = sequence.getBasePosition();
       final int indexDif = position - currentIndex;
       final Match<T> nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getBaseWord();
       gaps.add(new BaseContainerPart<T>(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
       previousWord = sequence.getLastMatch().getBaseWord();
-      currentIndex = 1 + previousWord.getPosition();
+      currentIndex = 1 + previousWord.getEndPosition();
     }
     // TODO: rename IndexDif to indexDif
     final int IndexDif = witness.size() - currentIndex + 1;
@@ -102,19 +108,20 @@ public class GapDetection {
   // TODO: rename gaps to parts
   // this method is made for the witness...
   @SuppressWarnings("boxing")
-  private static <T extends BaseElement> List<BaseContainerPart<T>> getGapsFromInBetweenMatchSequencesForWitness(final BaseContainer witness, final List<MatchSequence<T>> sequences) {
+  private static <T extends BaseElement> List<BaseContainerPart<T>> getGapsFromInBetweenMatchSequencesForWitness(final BaseContainer<T> witness, final List<MatchSequence<T>> sequences) {
     int currentIndex = 1;
     T previousWord = null;
     T nextWord = null;
     final List<BaseContainerPart<T>> gaps = Lists.newArrayList();
     for (final MatchSequence<T> sequence : sequences) {
+      // with getSegmentPosition getWitnessStartPosition is meant!
       final int position = sequence.getSegmentPosition();
       final int indexDif = position - currentIndex;
       final Match<T> nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getWitnessWord();
       gaps.add(new BaseContainerPart<T>(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
       previousWord = sequence.getLastMatch().getWitnessWord();
-      currentIndex = 1 + previousWord.getPosition();
+      currentIndex = 1 + previousWord.getEndPosition();
     }
     final int IndexDif = witness.size() - currentIndex + 1;
     nextWord = null;

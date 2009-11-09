@@ -7,11 +7,11 @@ public class Match<T extends BaseElement> implements Comparable<Match> {
   private final T word2;
   public final float wordDistance;
 
-  public Match(T baseWord, T witnessWord) {
+  public Match(final T baseWord, final T witnessWord) {
     this(baseWord, witnessWord, 0);
   }
 
-  public Match(T baseWord, T witnessWord, float levDistance) {
+  public Match(final T baseWord, final T witnessWord, final float levDistance) {
     this.word1 = baseWord;
     this.word2 = witnessWord;
     this.wordDistance = levDistance;
@@ -19,7 +19,7 @@ public class Match<T extends BaseElement> implements Comparable<Match> {
 
   @Override
   public String toString() {
-    return "(" + word1.getPosition() + "->" + word2.getPosition() + ")";
+    return "(" + word1.getBeginPosition() + "->" + word2.getBeginPosition() + ")";
   }
 
   public T getWitnessWord() {
@@ -31,11 +31,11 @@ public class Match<T extends BaseElement> implements Comparable<Match> {
   }
 
   @Override
-  public boolean equals(Object _other) {
+  public boolean equals(final Object _other) {
     if (!(_other instanceof Match)) {
       return false;
     }
-    Match other = (Match) _other;
+    final Match other = (Match) _other;
     return this.word1.equals(other.word1) && this.word2.equals(other.word2);
   }
 
@@ -44,7 +44,7 @@ public class Match<T extends BaseElement> implements Comparable<Match> {
     return word1.hashCode() + word2.hashCode();
   }
 
-  public int compareTo(Match m2) {
-    return getBaseWord().getPosition() - m2.getBaseWord().getPosition();
+  public int compareTo(final Match m2) {
+    return getBaseWord().getBeginPosition() - m2.getBaseWord().getBeginPosition();
   }
 }

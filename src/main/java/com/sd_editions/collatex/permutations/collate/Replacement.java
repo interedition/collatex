@@ -9,20 +9,20 @@ public class Replacement extends Modification {
   private final BaseContainerPart _original;
   private final BaseContainerPart _replacement;
 
-  public Replacement(BaseContainerPart original, BaseContainerPart replacement) {
+  public Replacement(final BaseContainerPart original, final BaseContainerPart replacement) {
     this._original = original;
     this._replacement = replacement;
   }
 
   @Override
   public String toString() {
-    String baseWords = _original.toString();
-    String replacementWords = _replacement.toString();
-    return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getStartPosition();
+    final String baseWords = _original.toString();
+    final String replacementWords = _replacement.toString();
+    return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getBeginPosition();
   }
 
   public int getPosition() {
-    return _original.getStartPosition();
+    return _original.getBeginPosition();
   }
 
   public String getOriginalWords() {
@@ -34,7 +34,7 @@ public class Replacement extends Modification {
   }
 
   @Override
-  public void accept(ModificationVisitor modificationVisitor) {
+  public void accept(final ModificationVisitor modificationVisitor) {
     modificationVisitor.visitReplacement(this);
   }
 

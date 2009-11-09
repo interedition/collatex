@@ -15,7 +15,7 @@ public class Modifications {
   private final List<Modification> modifications;
   private final Set<Match<Word>> matches;
 
-  public Modifications(List<Modification> _modifications, List<Transposition> _transpositions, Set<Match<Word>> _matches) {
+  public Modifications(final List<Modification> _modifications, final List<Transposition> _transpositions, final Set<Match<Word>> _matches) {
     this.modifications = _modifications;
     this.transpositions = _transpositions;
     this.matches = _matches;
@@ -26,7 +26,7 @@ public class Modifications {
   }
 
   public List<Modification> getModifications() {
-    List<Modification> addedUp = Lists.newArrayList();
+    final List<Modification> addedUp = Lists.newArrayList();
     addedUp.addAll(modifications);
     addedUp.addAll(transpositions);
     return addedUp;
@@ -36,20 +36,21 @@ public class Modifications {
     return getModifications().size();
   }
 
-  public Modification get(int i) {
+  public Modification get(final int i) {
     return getModifications().get(i);
   }
 
-  public Match getMatchAtBasePosition(int basePosition) {
-    for (Match match : matches) {
-      if (match.getBaseWord().getPosition() == basePosition) return match;
+  public Match getMatchAtBasePosition(final int basePosition) {
+    for (final Match match : matches) {
+      if (match.getBaseWord().getBeginPosition() == basePosition) return match;
     }
     return null;
   }
 
-  public Match getMatchAtSegmentPosition(int witnessPosition) {
-    for (Match match : matches) {
-      if (match.getWitnessWord().getPosition() == witnessPosition) return match;
+  // TODO: rename WitnessPosition is meant here!
+  public Match getMatchAtSegmentPosition(final int witnessPosition) {
+    for (final Match match : matches) {
+      if (match.getWitnessWord().getBeginPosition() == witnessPosition) return match;
     }
     return null;
   }
@@ -58,8 +59,8 @@ public class Modifications {
     return matches;
   }
 
-  public void accept(ModificationVisitor modificationVisitor) {
-    for (Modification modification : modifications) {
+  public void accept(final ModificationVisitor modificationVisitor) {
+    for (final Modification modification : modifications) {
       modification.accept(modificationVisitor);
     }
 

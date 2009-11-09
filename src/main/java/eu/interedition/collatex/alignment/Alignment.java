@@ -51,8 +51,8 @@ public class Alignment<T extends BaseElement> {
     final List<MatchSequence<Phrase>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
     // TODO: extract convenience method for this!
     final List<Gap> gaps = Lists.newArrayList();
-    //    gaps.addAll(GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB));
-    //    gaps.addAll(GapDetection.getVariantsInMatchSequences(a, b, sequencesA));
+    gaps.addAll(GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB));
+    gaps.addAll(GapDetection.getVariantsInMatchSequences(a, b, sequencesA));
     final Alignment<Phrase> al = new Alignment<Phrase>(matches, gaps, sequencesA, sequencesB);
     return al;
   }

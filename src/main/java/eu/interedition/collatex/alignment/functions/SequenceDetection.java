@@ -16,19 +16,19 @@ import eu.interedition.collatex.input.BaseElement;
 public class SequenceDetection {
 
   @SuppressWarnings("boxing")
-  public static <T extends BaseElement> List<MatchSequence<T>> calculateMatchSequences(Set<Match<T>> matches) {
+  public static <T extends BaseElement> List<MatchSequence<T>> calculateMatchSequences(final Set<Match<T>> matches) {
     // sort Matches for the base
-    List<Match<T>> matchesSortedForBase = SequenceDetection.sortMatchesForBase(matches);
+    final List<Match<T>> matchesSortedForBase = SequenceDetection.sortMatchesForBase(matches);
     // sort Matches for the witness
-    List<Match<T>> matchesSortedForWitness = SequenceDetection.sortMatchesForWitness(matches);
+    final List<Match<T>> matchesSortedForWitness = SequenceDetection.sortMatchesForWitness(matches);
     // now compare..
-    Map<Match<T>, Match<T>> previousMatchMapBase = SequenceDetection.buildPreviousMatchMap(matchesSortedForBase);
-    Map<Match<T>, Match<T>> previousMatchMapWitness = SequenceDetection.buildPreviousMatchMap(matchesSortedForWitness);
-    List<MatchSequence<T>> sequences = Lists.newArrayList();
+    final Map<Match<T>, Match<T>> previousMatchMapBase = SequenceDetection.buildPreviousMatchMap(matchesSortedForBase);
+    final Map<Match<T>, Match<T>> previousMatchMapWitness = SequenceDetection.buildPreviousMatchMap(matchesSortedForWitness);
+    final List<MatchSequence<T>> sequences = Lists.newArrayList();
     MatchSequence sequence = new MatchSequence(sequences.size());
-    for (Match match : matchesSortedForBase) {
-      Match expected = previousMatchMapBase.get(match);
-      Match actual = previousMatchMapWitness.get(match);
+    for (final Match match : matchesSortedForBase) {
+      final Match expected = previousMatchMapBase.get(match);
+      final Match actual = previousMatchMapWitness.get(match);
       if (expected != actual || expected != null && !expected.equals(actual)) {
         if (!sequence.isEmpty()) sequences.add(sequence);
         sequence = new MatchSequence(sequences.size());
@@ -41,46 +41,46 @@ public class SequenceDetection {
 
   // Note: THE previous METHOD ASSUMED AN ORDER IN THE SET!
   // TODO: add test!
-  private static <T extends BaseElement> List<Match<T>> sortMatchesForBase(Set<Match<T>> matches) {
-    Comparator<Match<T>> comparator = new Comparator<Match<T>>() {
-      public int compare(Match<T> o1, Match<T> o2) {
-        return o1.getBaseWord().getPosition() - o2.getBaseWord().getPosition();
+  private static <T extends BaseElement> List<Match<T>> sortMatchesForBase(final Set<Match<T>> matches) {
+    final Comparator<Match<T>> comparator = new Comparator<Match<T>>() {
+      public int compare(final Match<T> o1, final Match<T> o2) {
+        return o1.getBaseWord().getBeginPosition() - o2.getBaseWord().getBeginPosition();
       }
     };
-    List<Match<T>> matchesSortedForBase = Lists.newArrayList(matches);
+    final List<Match<T>> matchesSortedForBase = Lists.newArrayList(matches);
     Collections.sort(matchesSortedForBase, comparator);
     return matchesSortedForBase;
   }
 
-  private static <T extends BaseElement> List<Match<T>> sortMatchesForWitness(Set<Match<T>> matches) {
-    Comparator<Match> comparator = new Comparator<Match>() {
-      public int compare(Match o1, Match o2) {
-        return o1.getWitnessWord().getPosition() - o2.getWitnessWord().getPosition();
+  private static <T extends BaseElement> List<Match<T>> sortMatchesForWitness(final Set<Match<T>> matches) {
+    final Comparator<Match> comparator = new Comparator<Match>() {
+      public int compare(final Match o1, final Match o2) {
+        return o1.getWitnessWord().getBeginPosition() - o2.getWitnessWord().getBeginPosition();
       }
     };
-    List<Match<T>> matchesForWitness = Lists.newArrayList(matches);
+    final List<Match<T>> matchesForWitness = Lists.newArrayList(matches);
     Collections.sort(matchesForWitness, comparator);
     return matchesForWitness;
   }
 
-  private static <T extends BaseElement> Map<Match<T>, Match<T>> buildPreviousMatchMap(List<Match<T>> matches) {
-    Map<Match<T>, Match<T>> previousMatches = Maps.newHashMap();
+  private static <T extends BaseElement> Map<Match<T>, Match<T>> buildPreviousMatchMap(final List<Match<T>> matches) {
+    final Map<Match<T>, Match<T>> previousMatches = Maps.newHashMap();
     Match previousMatch = null;
-    for (Match match : matches) {
+    for (final Match match : matches) {
       previousMatches.put(match, previousMatch);
       previousMatch = match;
     }
     return previousMatches;
   }
 
-  public static <T extends BaseElement> List<MatchSequence<T>> sortSequencesForWitness(List<MatchSequence<T>> matchSequences) {
-    Comparator<MatchSequence<T>> comparator = new Comparator<MatchSequence<T>>() {
+  public static <T extends BaseElement> List<MatchSequence<T>> sortSequencesForWitness(final List<MatchSequence<T>> matchSequences) {
+    final Comparator<MatchSequence<T>> comparator = new Comparator<MatchSequence<T>>() {
       @SuppressWarnings("boxing")
-      public int compare(MatchSequence<T> o1, MatchSequence<T> o2) {
+      public int compare(final MatchSequence<T> o1, final MatchSequence<T> o2) {
         return o1.getSegmentPosition() - o2.getSegmentPosition();
       }
     };
-    List<MatchSequence<T>> matchSequencesForWitness = Lists.newArrayList(matchSequences);
+    final List<MatchSequence<T>> matchSequencesForWitness = Lists.newArrayList(matchSequences);
     Collections.sort(matchSequencesForWitness, comparator);
     return matchSequencesForWitness;
   }

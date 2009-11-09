@@ -5,7 +5,6 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
 import eu.interedition.collatex.input.BaseContainerPart;
-import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.visualization.Modification;
 
 // TODO: add generics!
@@ -14,7 +13,7 @@ public class Gap {
   final BaseContainerPart _partB;
   final Match next;
 
-  public Gap(BaseContainerPart partA, BaseContainerPart partB, Match _next) {
+  public Gap(final BaseContainerPart partA, final BaseContainerPart partB, final Match _next) {
     this._partA = partA;
     this._partB = partB;
     this.next = _next;
@@ -31,7 +30,7 @@ public class Gap {
   }
 
   public Addition createAddition() {
-    return new Addition(_partA.getStartPosition(), _partB);
+    return new Addition(_partA.getBeginPosition(), _partB);
   }
 
   public Omission createOmission() {

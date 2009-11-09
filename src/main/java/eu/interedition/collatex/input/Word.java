@@ -11,7 +11,7 @@ public class Word extends BaseElement implements ICollationResource {
   public final int position;
 
   // TODO: add punctuation!!
-  public Word(String _witnessId, String _original, int _position) {
+  public Word(final String _witnessId, final String _original, final int _position) {
     if (_original.isEmpty()) throw new IllegalArgumentException("Word cannot be empty!");
     this.witnessId = _witnessId;
     this.original = _original;
@@ -21,7 +21,7 @@ public class Word extends BaseElement implements ICollationResource {
 
   // TODO: notice the duplication here!
   // TODO: store punctuation!
-  public Word(String _witnessId, Token nextToken, int _position) {
+  public Word(final String _witnessId, final Token nextToken, final int _position) {
     this.witnessId = _witnessId;
     this.position = _position;
     this.original = nextToken.getOriginal();
@@ -39,9 +39,9 @@ public class Word extends BaseElement implements ICollationResource {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (!(obj instanceof Word)) return false;
-    Word other = (Word) obj;
+    final Word other = (Word) obj;
     return other.original.equals(this.original) && (other.position == this.position);
   }
 
@@ -50,12 +50,17 @@ public class Word extends BaseElement implements ICollationResource {
   }
 
   @Override
-  public void accept(IResourceVisitor visitor) {
+  public void accept(final IResourceVisitor visitor) {
     visitor.visitWord(this);
   }
 
   @Override
-  public int getPosition() {
+  public int getBeginPosition() {
+    return position;
+  }
+
+  @Override
+  public int getEndPosition() {
     return position;
   }
 
