@@ -12,17 +12,17 @@ import eu.interedition.collatex.input.Word;
 
 public class AlignmentTableSegmentator {
 
-  public static TeiParallelSegmentationTable createTeiParrallelSegmentationTable(AlignmentTable2 alignmentTable) {
+  public static TeiParallelSegmentationTable createTeiParrallelSegmentationTable(final AlignmentTable2 alignmentTable) {
     return new TeiParallelSegmentationTable(AlignmentTableSegmentator.mergeColumns(alignmentTable));
   }
 
   // Note: to merge or not to merge? that is the question
-  static List<SegmentColumn2> mergeColumns(AlignmentTable2 alignmentTable) {
-    List<SegmentColumn2> mergedColumns = Lists.newArrayList();
-    List<Column> columns = alignmentTable.getColumns();
+  static List<SegmentColumn2> mergeColumns(final AlignmentTable2 alignmentTable) {
+    final List<SegmentColumn2> mergedColumns = Lists.newArrayList();
+    final List<Column> columns = alignmentTable.getColumns();
     SegmentColumn2 mergedColumn = null;
     Column previousColumn = null; // Note: in the next step we have to compare two columns with each other
-    for (Column column : columns) {
+    for (final Column column : columns) {
       boolean needNewCell = previousColumn == null || !previousColumn.getColumnState().equals(column.getColumnState()) || !column.getSigli().equals(previousColumn.getSigli());
       if (previousColumn != null && previousColumn.getColumnState() == ColumnState.VARIANT && previousColumn.getSigli().size() > column.getSigli().size()
           && previousColumn.getSigli().containsAll(column.getSigli())) {
@@ -33,10 +33,10 @@ public class AlignmentTableSegmentator {
         mergedColumns.add(mergedColumn);
       }
 
-      List<Segment> witnesses = alignmentTable.getWitnesses();
-      for (Segment witness : witnesses) {
+      final List<Segment> witnesses = alignmentTable.getWitnesses();
+      for (final Segment witness : witnesses) {
         if (column.containsWitness(witness)) {
-          Word word = column.getWord(witness);
+          final Word word = (Word) column.getWord(witness);
           mergedColumn.addWord(witness, word);
         }
       }

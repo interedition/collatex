@@ -23,40 +23,45 @@ import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTab
 public class AlignmentTable2 {
   private final List<Column> columns;
   private final List<Segment> witnesses;
+  private final List<String> _sigli;
+
+  // _sigli is a replacement for witnesses;
+  // witnesses could also become a BaseContainer!
 
   public AlignmentTable2() {
     this.columns = Lists.newArrayList();
     this.witnesses = Lists.newArrayList();
+    this._sigli = Lists.newArrayList();
   }
 
   // Note: should this be public?
-  public void add(Column column) {
+  public void add(final Column column) {
     columns.add(column);
   }
 
-  public void addVariantBefore(Column column, List<Word> witnessWords) {
+  public void addVariantBefore(final Column column, final List<Word> witnessWords) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
       throw new RuntimeException("Unexpected error: Column not found!");
     }
 
-    for (Word word : witnessWords) {
-      Column extraColumn = new Column(word);
+    for (final Word word : witnessWords) {
+      final Column extraColumn = new Column(word);
       columns.add(indexOf, extraColumn);
       indexOf++;
     }
   }
 
-  public void addVariantAtTheEnd(List<Word> witnessWords) {
-    for (Word word : witnessWords) {
-      Column extraColumn = new Column(word);
+  public void addVariantAtTheEnd(final List<Word> witnessWords) {
+    for (final Word word : witnessWords) {
+      final Column extraColumn = new Column(word);
       columns.add(extraColumn);
     }
   }
 
   public Superbase createSuperbase() {
-    Superbase superbase = new Superbase();
-    for (Column column : columns) {
+    final Superbase superbase = new Superbase();
+    for (final Column column : columns) {
       column.addToSuperbase(superbase);
     }
     return superbase;
@@ -73,17 +78,17 @@ public class AlignmentTable2 {
   // TODO: move this to a visitor!
   // TODO: separate in two steps: segmentation and xml rendering
   public String toXML() {
-    TeiParallelSegmentationTable app = AlignmentTableSegmentator.createTeiParrallelSegmentationTable(this);
+    final TeiParallelSegmentationTable app = AlignmentTableSegmentator.createTeiParrallelSegmentationTable(this);
     return app.toXML();
   }
 
   @Override
   public String toString() {
     String collectedStrings = "";
-    for (Segment witness : witnesses) {
+    for (final Segment witness : witnesses) {
       collectedStrings += witness.id + ": ";
       String delim = "";
-      for (Column column : columns) {
+      for (final Column column : columns) {
         collectedStrings += delim + cellToString(witness, column);
         delim = "|";
       }
@@ -92,7 +97,7 @@ public class AlignmentTable2 {
     return collectedStrings;
   }
 
-  private String cellToString(Segment witness, Column column) {
+  private String cellToString(final Segment witness, final Column column) {
     if (!column.containsWitness(witness)) {
       return " ";
     }
@@ -103,7 +108,7 @@ public class AlignmentTable2 {
   // TODO: I dont think one witness is ever
   // TODO: added twice to the table!
   // TODO: rename to add witness?
-  void addWitnessToInternalList(Segment witness) {
+  void addWitnessToInternalList(final Segment witness) {
     // TODO: an ordered set instead of list would be nice here
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
@@ -112,25 +117,26 @@ public class AlignmentTable2 {
 
   // TODO: add visitor who walks over the witnesses
   // Note: this is a visitor who walks over the columns!
-  public void accept(IAlignmentTableVisitor visitor) {
+  public void accept(final IAlignmentTableVisitor visitor) {
     visitor.visitTable(this);
-    for (Column column : columns) {
+    for (final Column column : columns) {
       column.accept(visitor);
     }
     visitor.postVisitTable(this);
   }
 
   // TODO: move this functionality to a visitor!
-  public static String alignmentTableToHTML(AlignmentTable2 alignmentTable) {
-    StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
+  public static String alignmentTableToHTML(final AlignmentTable2 alignmentTable) {
+    final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
 
-    for (Segment witness : alignmentTable.getWitnesses()) {
+    for (final Segment witness : alignmentTable.getWitnesses()) {
       tableHTML.append("<tr>");
       tableHTML.append("<th>Witness ").append(witness.id).append(":</th>");
-      for (Column column : alignmentTable.getColumns()) {
+      for (final Column column : alignmentTable.getColumns()) {
         tableHTML.append("<td>");
         if (column.containsWitness(witness)) {
-          tableHTML.append(column.getWord(witness).normalized); // TODO: add escaping!
+          // TODO: this was normalized!
+          tableHTML.append(column.getWord(witness).getOriginal()); // TODO: add escaping!
         }
         tableHTML.append("</td>");
       }
@@ -139,5 +145,9 @@ public class AlignmentTable2 {
     tableHTML.append("</table>\n</div>\n\n");
     //    return alignmentTable.toString().replaceAll("\n", "<br/>") + "<br/>";
     return tableHTML.toString();
+  }
+
+  public List<String> getSigli() {
+    return _sigli;
   }
 }

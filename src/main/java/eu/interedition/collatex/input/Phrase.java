@@ -121,4 +121,9 @@ public class Phrase extends BaseElement {
   public Subsegment getSubsegment() {
     return _subSegment;
   }
+
+  @Override
+  public String getWitnessId() {
+    return getFirstWord().getWitnessId();
+  }
 }

@@ -116,4 +116,9 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
     return toString();
   }
 
+  @Override
+  public String getWitnessId() {
+    return getFirstWord().getWitnessId();
+  }
+
 }

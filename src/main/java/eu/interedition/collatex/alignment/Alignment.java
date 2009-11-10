@@ -117,7 +117,7 @@ public class Alignment<T extends BaseElement> {
     return createTranspositions;
   }
 
-  public Alignment makeAddDelFromTrans(final Segment a, final Segment b) {
+  public Alignment<T> makeAddDelFromTrans(final Segment a, final Segment b) {
     // remove duplicates from transpositions
     final Stack<Transposition> transToCheck = new Stack<Transposition>();
     final List<Transposition> transpositions = Lists.newArrayList();

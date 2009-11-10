@@ -10,75 +10,77 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
-public class Column {
+public class Column<T extends BaseElement> {
 
-  protected final Map<String, Word> wordsProWitness;
-  private final List<Word> variants; // TODO: rename to unique words!
+  // TODO: rename Word to Element
+  protected final Map<String, T> wordsProWitness;
+  private final List<T> variants; // TODO: rename to unique words!
   private ColumnState state;
 
-  public Column(Word word) {
+  public Column(final T word) {
     wordsProWitness = Maps.newLinkedHashMap();
     variants = Lists.newLinkedList();
     initColumn(word);
   }
 
-  private void initColumn(Word word) {
+  private void initColumn(final T word) {
     wordsProWitness.put(word.getWitnessId(), word);
     variants.add(word);
     state = ColumnState.NEW;
   }
 
-  public void addMatch(Word word) {
+  public void addMatch(final T word) {
     wordsProWitness.put(word.getWitnessId(), word);
     state = state.addMatch();
   }
 
-  public void addVariant(Word word) {
+  public void addVariant(final T word) {
     wordsProWitness.put(word.getWitnessId(), word);
     variants.add(word);
     state = state.addVariant();
   }
 
-  public void toXML(StringBuilder builder) {
+  public void toXML(final StringBuilder builder) {
   // TODO Auto-generated method stub
 
   }
 
   @Override
   public String toString() {
-    Collection<Word> values = wordsProWitness.values();
+    final Collection<T> values = wordsProWitness.values();
     String result = "";
     String delim = "";
-    for (Word word : values) {
-      result += delim + word.original;
+    for (final T word : values) {
+      result += delim + word.getOriginal();
       delim += " ";
     }
     return result;
   }
 
-  public boolean containsWitness(Segment witness) {
+  public boolean containsWitness(final Segment witness) {
     return wordsProWitness.containsKey(witness.id);
   }
 
-  public Word getWord(Segment witness) {
+  public T getWord(final Segment witness) {
     if (!containsWitness(witness)) {
       throw new NoSuchElementException();
     }
-    Word result = wordsProWitness.get(witness.id);
+    final T result = wordsProWitness.get(witness.id);
     return result;
   }
 
-  public Collection<Word> getWords() {
-    Collection<Word> values = wordsProWitness.values();
+  public Collection<T> getWords() {
+    final Collection<T> values = wordsProWitness.values();
     return values;
   }
 
-  public void addToSuperbase(Superbase superbase) {
-    for (Word variant : variants)
-      superbase.addWord(variant, this);
+  public void addToSuperbase(final Superbase superbase) {
+    for (final T variant : variants)
+      superbase.addWord((Word) variant, this);
   }
 
   public ColumnState getColumnState() {
@@ -89,12 +91,12 @@ public class Column {
     return wordsProWitness.keySet();
   }
 
-  public void accept(IAlignmentTableVisitor visitor) {
+  public void accept(final IAlignmentTableVisitor<T> visitor) {
     visitor.visitColumn(this);
-    Set<String> sigli = this.getSigli();
-    for (String sigel : sigli) {
-      Word word = wordsProWitness.get(sigel);
-      visitor.visitWord(sigel, word);
+    final Set<String> sigli = this.getSigli();
+    for (final String sigel : sigli) {
+      final T word = wordsProWitness.get(sigel);
+      visitor.visitElement(sigel, word);
     }
   }
 

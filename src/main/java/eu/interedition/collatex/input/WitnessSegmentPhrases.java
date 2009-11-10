@@ -42,4 +42,8 @@ public class WitnessSegmentPhrases extends BaseContainer<Phrase> {
   public Phrase getWordOnPosition(final int k) {
     return getPhraseOnPosition(k);
   }
+
+  public List<Phrase> getPhrases() {
+    return _phrases;
+  }
 }
