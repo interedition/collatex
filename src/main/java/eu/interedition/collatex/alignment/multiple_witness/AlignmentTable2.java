@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.parallel_segmentation.AlignmentTableSegmentator;
@@ -52,9 +53,9 @@ public class AlignmentTable2 {
     }
   }
 
-  public void addVariantAtTheEnd(final List<Word> witnessWords) {
-    for (final Word word : witnessWords) {
-      final Column extraColumn = new Column(word);
+  public <T extends BaseElement> void addVariantAtTheEnd(final List<T> witnessWords) {
+    for (final T word : witnessWords) {
+      final Column<T> extraColumn = new Column<T>(word);
       columns.add(extraColumn);
     }
   }

@@ -12,7 +12,6 @@ import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
-import eu.interedition.collatex.input.Word;
 
 public class NewAlignmentTableCreator {
 
@@ -43,8 +42,7 @@ public class NewAlignmentTableCreator {
     //    final Alignment better = alignment.makeAddDelFromTrans(null, witness);
     addMatchesToAlignmentTable(superbase, alignment);
     addReplacementsToAlignmentTable(table, seg, superbase, alignment);
-    //    addAdditionsToAlignmentTable(table, superbase, better);
-
+    addAdditionsToAlignmentTable(table, superbase, alignment);
   }
 
   static void addMatchesToAlignmentTable(final NewSuperbase superbase, final Alignment<Phrase> alignment) {
@@ -59,11 +57,11 @@ public class NewAlignmentTableCreator {
     }
   }
 
-  /////////////////////////// TODO 
-  static void addAdditionsToAlignmentTable(final AlignmentTable2 table, final Superbase superbase, final Alignment compresult) {
-    final List<Gap> additions = compresult.getAdditions();
+  // TODO: make Gap generic!
+  static void addAdditionsToAlignmentTable(final AlignmentTable2 table, final NewSuperbase superbase, final Alignment<Phrase> alignment) {
+    final List<Gap> additions = alignment.getAdditions();
     for (final Gap addition : additions) {
-      final List<Word> witnessWords = addition.getPhraseB().getWords();
+      final List<Phrase> witnessWords = addition.getPhraseB().getWords();
       NewAlignmentTableCreator.addVariantAtGap(table, superbase, addition, witnessWords);
     }
   }
@@ -121,13 +119,14 @@ public class NewAlignmentTableCreator {
     //    }
   }
 
-  static void addVariantAtGap(final AlignmentTable2 table, final Superbase superbase, final Gap gap, final List<Word> witnessWords) {
+  static void addVariantAtGap(final AlignmentTable2 table, final NewSuperbase superbase, final Gap gap, final List<Phrase> witnessWords) {
     if (gap.getPhraseA().isAtTheEnd()) {
       table.addVariantAtTheEnd(witnessWords);
     } else {
-      final Match nextMatch = gap.getNextMatch();
-      final Column column = superbase.getColumnFor(nextMatch);
-      table.addVariantBefore(column, witnessWords);
+      throw new RuntimeException("NOT IMPLEMENTED YET!");
+      //      final Match<Phrase> nextMatch = gap.getNextMatch();
+      //      final Column<Phrase> column = superbase.getColumnFor(nextMatch);
+      //      table.addVariantBefore(column, witnessWords);
     }
   }
 
