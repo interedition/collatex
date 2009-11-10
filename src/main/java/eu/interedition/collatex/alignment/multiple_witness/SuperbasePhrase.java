@@ -10,4 +10,9 @@ public class SuperbasePhrase extends Phrase {
     super(position, position, subsegment);
   }
 
+  @Override
+  public String toString() {
+    return "SB: " + getSubsegment().getTitle().toString() + " " + getBeginPosition();
+  }
+
 }

@@ -51,6 +51,9 @@ public class NewAlignmentTableCreator {
 
   static void addMatchesToAlignmentTable(final NewSuperbase superbase, final Alignment<Phrase> alignment) {
     final Set<Match<Phrase>> matches = alignment.getMatches();
+    System.out.println(superbase.toString());
+    System.out.println("!!!Matches!!!" + matches);
+
     for (final Match<Phrase> match : matches) {
       final Column<Phrase> column = superbase.getColumnFor(match);
       final Phrase witnessPhrase = match.getWitnessWord();

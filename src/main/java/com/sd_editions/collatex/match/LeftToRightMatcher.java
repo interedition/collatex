@@ -8,6 +8,8 @@ import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
 
+// TODO: add replacement tests!
+// TODO: add check for alternative matches!
 public class LeftToRightMatcher {
 
   public static Set<Match<Phrase>> match(final WitnessSegmentPhrases pa, final WitnessSegmentPhrases pb) {
@@ -29,7 +31,7 @@ public class LeftToRightMatcher {
     final Set<Match<Phrase>> matches = Sets.newLinkedHashSet();
     for (int i = 1; i <= pa.size(); i++) {
       final Phrase phrase = pa.getPhraseOnPosition(i);
-      for (int j = i; j <= pb.size(); j++) {
+      for (int j = 1; j <= pb.size(); j++) {
         final Phrase phrase2 = pb.getPhraseOnPosition(j);
         final Subsegment subsegment1 = phrase.getSubsegment();
         final Subsegment subsegment2 = phrase2.getSubsegment();

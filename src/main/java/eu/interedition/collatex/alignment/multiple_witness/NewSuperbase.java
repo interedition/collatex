@@ -43,4 +43,18 @@ public class NewSuperbase extends WitnessSegmentPhrases {
     final Column<Phrase> column = _columns.get(position - 1);
     return column;
   }
+
+  @Override
+  public String toString() {
+    String result = "Superbase: (";
+    String delimiter = "";
+    for (final Phrase p : getPhrases()) {
+      result += delimiter + p.getSubsegment().getTitle();
+      delimiter = ", ";
+    }
+
+    result += ")";
+    return result;
+  }
+
 }
