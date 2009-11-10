@@ -45,6 +45,7 @@ public class Word extends BaseElement implements ICollationResource {
     return other.original.equals(this.original) && (other.position == this.position);
   }
 
+  @Override
   public String getWitnessId() {
     return witnessId;
   }
@@ -67,6 +68,11 @@ public class Word extends BaseElement implements ICollationResource {
   @Override
   public String getOriginal() {
     return original;
+  }
+
+  @Override
+  public int length() {
+    return 1;
   }
 
 }

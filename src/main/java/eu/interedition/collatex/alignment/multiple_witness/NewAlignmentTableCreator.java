@@ -81,9 +81,16 @@ public class NewAlignmentTableCreator {
       final Iterator<Phrase> iteratorB = phrasesB.iterator();
       while (iteratorA.hasNext()) {
         final Phrase phraseA = iteratorA.next();
-        final Phrase phraseB = iteratorB.next(); // TODO: dangerous! replacement might be shorter!
-        final Column<Phrase> column = superbase.getColumnFor(phraseA);
-        column.addVariant(phraseB);
+        // TODO: dangerous! replacement might be shorter!
+        // this can happen when there is variation in a column,
+        // then one phrase can replace multiple phrases!
+        // maybe detect the number of columns in the phrases
+        // first? then make a decision?
+        if (iteratorB.hasNext()) {
+          final Phrase phraseB = iteratorB.next();
+          final Column<Phrase> column = superbase.getColumnFor(phraseA);
+          column.addVariant(phraseB);
+        }
       }
       // TODO: you might miss stuff here! replacement might be longer!
     }

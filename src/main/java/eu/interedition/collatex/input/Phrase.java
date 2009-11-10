@@ -31,21 +31,21 @@ public class Phrase extends BaseElement {
   // THIS constructor is pretty close, and actually used!
   public Phrase(final Segment _witness, final Word beginWord, final Word endWord, final Subsegment subsegment) {
     this.witness = _witness;
-    this.size = -1; // !!!
     this.next = null; // !!!
     this.previous = null; // !!!
     this.startPosition = beginWord.position;
     this.endPosition = endWord.position;
     this._subSegment = subsegment;
+    this.size = endWord.position - beginWord.position + 1;
   }
 
   public Phrase(final int _startPosition, final int _endPosition, final Subsegment subsegment) {
     this.startPosition = _startPosition;
     this.endPosition = _endPosition;
     this._subSegment = subsegment;
+    this.size = endPosition - startPosition + 1;
     // ALL THIS STUFF IS NOT NECESSARY!
     this.witness = null; // this is not wanted here!
-    this.size = -1; // !!!
     this.next = null; // !!!
     this.previous = null; // !!!
   }
@@ -137,5 +137,10 @@ public class Phrase extends BaseElement {
   @Override
   public String getWitnessId() {
     return getFirstWord().getWitnessId();
+  }
+
+  @Override
+  public int length() {
+    return size;
   }
 }

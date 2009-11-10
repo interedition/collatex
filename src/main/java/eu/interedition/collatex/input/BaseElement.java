@@ -9,4 +9,6 @@ public abstract class BaseElement {
   public abstract int getEndPosition();
 
   public abstract String getOriginal();
+
+  public abstract int length();
 }
