@@ -100,4 +100,20 @@ public class Column<T extends BaseElement> {
     }
   }
 
+  public List<T> getUniqueElements() {
+    return variants;
+  }
+
+  public boolean containsWitness(final String witnessId) {
+    return wordsProWitness.containsKey(witnessId);
+  }
+
+  public T getWord(final String witnessId) {
+    if (!containsWitness(witnessId)) {
+      throw new NoSuchElementException();
+    }
+    final T result = wordsProWitness.get(witnessId);
+    return result;
+  }
+
 }

@@ -127,16 +127,16 @@ public class AlignmentTable2 {
 
   // TODO: move this functionality to a visitor!
   public static String alignmentTableToHTML(final AlignmentTable2 alignmentTable) {
-    final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
+    final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
 
-    for (final Segment witness : alignmentTable.getWitnesses()) {
+    for (final String witnessId : alignmentTable.getSigli()) {
       tableHTML.append("<tr>");
-      tableHTML.append("<th>Witness ").append(witness.id).append(":</th>");
+      tableHTML.append("<th>Witness ").append(witnessId).append(":</th>");
       for (final Column column : alignmentTable.getColumns()) {
         tableHTML.append("<td>");
-        if (column.containsWitness(witness)) {
+        if (column.containsWitness(witnessId)) {
           // TODO: this was normalized!
-          tableHTML.append(column.getWord(witness).getOriginal()); // TODO: add escaping!
+          tableHTML.append(column.getWord(witnessId).getOriginal()); // TODO: add escaping!
         }
         tableHTML.append("</td>");
       }

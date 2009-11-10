@@ -28,6 +28,7 @@ public class Phrase extends BaseElement {
     endPosition = _endPosition;
   }
 
+  // THIS constructor is pretty close, and actually used!
   public Phrase(final Segment _witness, final Word beginWord, final Word endWord, final Subsegment subsegment) {
     this.witness = _witness;
     this.size = -1; // !!!
@@ -36,6 +37,17 @@ public class Phrase extends BaseElement {
     this.startPosition = beginWord.position;
     this.endPosition = endWord.position;
     this._subSegment = subsegment;
+  }
+
+  public Phrase(final int _startPosition, final int _endPosition, final Subsegment subsegment) {
+    this.startPosition = _startPosition;
+    this.endPosition = _endPosition;
+    this._subSegment = subsegment;
+    // ALL THIS STUFF IS NOT NECESSARY!
+    this.witness = null; // this is not wanted here!
+    this.size = -1; // !!!
+    this.next = null; // !!!
+    this.previous = null; // !!!
   }
 
   //TODO: rename method!

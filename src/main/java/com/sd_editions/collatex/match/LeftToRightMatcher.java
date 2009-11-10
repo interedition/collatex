@@ -1,9 +1,8 @@
-package eu.interedition.collatex.matching;
+package com.sd_editions.collatex.match;
 
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import com.sd_editions.collatex.match.Subsegment;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.input.Phrase;
