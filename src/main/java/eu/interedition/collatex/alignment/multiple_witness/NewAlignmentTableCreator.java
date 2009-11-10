@@ -1,9 +1,11 @@
 package eu.interedition.collatex.alignment.multiple_witness;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.LeftToRightMatcher;
 
 import eu.interedition.collatex.alignment.Alignment;
@@ -66,7 +68,8 @@ public class NewAlignmentTableCreator {
     }
   }
 
-  // TODO: addReplacements.. should look like addAdditions method!
+  // TODO: make Gap generic!
+  // NOTE: addReplacements.. should look like addAdditions method?
   static void addReplacementsToAlignmentTable(final AlignmentTable2 table, final WitnessSegmentPhrases witness, final NewSuperbase superbase, final Alignment<Phrase> alignment) {
     final List<Gap> replacements = alignment.getReplacements();
     for (final Gap replacement : replacements) {
@@ -91,6 +94,11 @@ public class NewAlignmentTableCreator {
         }
       }
       // TODO: you might miss stuff here! replacement might be longer!
+      // still have words in the witness? add new columns after the last one from the base
+      if (iteratorB.hasNext()) {
+        final LinkedList<Phrase> remainingWitnessWords = Lists.newLinkedList(iteratorB);
+        NewAlignmentTableCreator.addVariantAtGap(table, superbase, replacement, remainingWitnessWords);
+      }
     }
 
     //    final List<Gap> replacements = compresult.getReplacements();
@@ -110,11 +118,6 @@ public class NewAlignmentTableCreator {
     //            column.addVariant(wordInWitness);
     //          }
     //        }
-    //      }
-    //      // still have words in the witness? add new columns after the last one from the base
-    //      if (witnessIterator.hasNext()) {
-    //        final LinkedList<Word> remainingWitnessWords = Lists.newLinkedList(witnessIterator);
-    //        NewAlignmentTableCreator.addVariantAtGap(table, superbase, replacement, remainingWitnessWords);
     //      }
     //    }
   }
