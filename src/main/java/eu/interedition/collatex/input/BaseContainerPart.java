@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 // for instance...
 // it might not need to extend BaseElement?
 // anyway it should take BaseElements in
+// TODO: rename Word to Element!
 public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   private final BaseContainer<T> _witness;
   private final int startPosition;
@@ -49,7 +50,7 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   public String toString() {
     final List<String> words = Lists.newArrayList();
     for (int k = getBeginPosition(); k <= getEndPosition(); k++) {
-      final String word = _witness.getWordOnPosition(k).toString();
+      final String word = _witness.getElementOnWordPosition(k).toString();
       words.add(word);
     }
 
@@ -79,7 +80,7 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   public List<T> getWords() {
     final List<T> words = Lists.newArrayList();
     for (int k = getBeginPosition(); k <= getEndPosition(); k++) {
-      final T word = getWitness().getWordOnPosition(k);
+      final T word = getWitness().getElementOnWordPosition(k);
       words.add(word);
     }
     return words;

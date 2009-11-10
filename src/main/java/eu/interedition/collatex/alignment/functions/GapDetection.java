@@ -99,9 +99,9 @@ public class GapDetection {
       currentIndex = 1 + previousWord.getEndPosition();
     }
     // TODO: rename IndexDif to indexDif
-    final int IndexDif = witness.size() - currentIndex + 1;
+    final int IndexDif = witness.wordSize() - currentIndex + 1;
     nextWord = null;
-    gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.size(), previousWord, nextWord));
+    gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.wordSize(), previousWord, nextWord));
     return gaps;
   }
 
@@ -123,9 +123,9 @@ public class GapDetection {
       previousWord = sequence.getLastMatch().getWitnessWord();
       currentIndex = 1 + previousWord.getEndPosition();
     }
-    final int IndexDif = witness.size() - currentIndex + 1;
+    final int IndexDif = witness.wordSize() - currentIndex + 1;
     nextWord = null;
-    gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.size(), previousWord, nextWord));
+    gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.wordSize(), previousWord, nextWord));
     return gaps;
   }
 

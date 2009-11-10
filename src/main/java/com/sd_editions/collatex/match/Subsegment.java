@@ -96,9 +96,9 @@ public class Subsegment {
     final List<Integer> list = startPositionsForPhrase.get(segment.getWitnessId());
     if (list != null) {
       final int beginPosition = list.get(0);
-      final Word beginWord = segment.getWordOnPosition(beginPosition);
+      final Word beginWord = segment.getElementOnWordPosition(beginPosition);
       final int endPosition = beginPosition + numberOfWords - 1;
-      final Word endWord = segment.getWordOnPosition(endPosition);
+      final Word endWord = segment.getElementOnWordPosition(endPosition);
       phrase = new Phrase(segment, beginWord, endWord, this);
     }
     return phrase;

@@ -39,7 +39,11 @@ public class NewSuperbase extends WitnessSegmentPhrases {
   }
 
   public Column<Phrase> getColumnFor(final Match<Phrase> match) {
-    final int position = match.getBaseWord().getStartPosition();
+    return getColumnFor(match.getBaseWord());
+  }
+
+  public Column<Phrase> getColumnFor(final Phrase phraseA) {
+    final int position = phraseA.getStartPosition();
     final Column<Phrase> column = _columns.get(position - 1);
     return column;
   }

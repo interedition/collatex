@@ -31,12 +31,12 @@ public class Segment extends BaseContainer implements ICollationResource {
   }
 
   @Override
-  public Word getWordOnPosition(final int position) {
+  public Word getElementOnWordPosition(final int position) {
     return words.get(position - 1);
   }
 
   @Override
-  public int size() {
+  public int wordSize() {
     return words.size();
   }
 

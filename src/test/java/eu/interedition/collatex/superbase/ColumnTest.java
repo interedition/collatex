@@ -20,7 +20,7 @@ public class ColumnTest {
     final WitnessBuilder builder = new WitnessBuilder();
     final Witness witness = builder.build("A", "a test string");
     final Witness witnessB = builder.build("B", "different");
-    final Word word = witness.getFirstSegment().getWordOnPosition(1);
+    final Word word = witness.getFirstSegment().getElementOnWordPosition(1);
     final Column column = new Column(word);
     column.getWord(witnessB.getFirstSegment());
   }
@@ -30,7 +30,7 @@ public class ColumnTest {
     final WitnessBuilder builder = new WitnessBuilder();
     final Witness witness = builder.build("A", "a test string");
     final Witness witnessB = builder.build("B", "different");
-    final Word word = witness.getFirstSegment().getWordOnPosition(1);
+    final Word word = witness.getFirstSegment().getElementOnWordPosition(1);
     final Column column = new Column(word);
     assertTrue(column.containsWitness(witness.getFirstSegment()));
     assertFalse(column.containsWitness(witnessB.getFirstSegment()));
@@ -42,9 +42,9 @@ public class ColumnTest {
     final Witness witness = builder.build("A", "first");
     final Witness witnessB = builder.build("B", "second");
     final Witness witnessC = builder.build("C", "third");
-    final Word word = witness.getFirstSegment().getWordOnPosition(1);
-    final Word wordB = witnessB.getFirstSegment().getWordOnPosition(1);
-    final Word wordC = witnessC.getFirstSegment().getWordOnPosition(1);
+    final Word word = witness.getFirstSegment().getElementOnWordPosition(1);
+    final Word wordB = witnessB.getFirstSegment().getElementOnWordPosition(1);
+    final Word wordC = witnessC.getFirstSegment().getElementOnWordPosition(1);
     final Column column = new Column(word);
     column.addVariant(wordB);
     column.addVariant(wordC);
@@ -59,9 +59,9 @@ public class ColumnTest {
     final Witness witness = builder.build("A", "first");
     final Witness witnessB = builder.build("B", "match");
     final Witness witnessC = builder.build("C", "match");
-    final Word word = witness.getFirstSegment().getWordOnPosition(1);
-    final Word wordB = witnessB.getFirstSegment().getWordOnPosition(1);
-    final Word wordC = witnessC.getFirstSegment().getWordOnPosition(1);
+    final Word word = witness.getFirstSegment().getElementOnWordPosition(1);
+    final Word wordB = witnessB.getFirstSegment().getElementOnWordPosition(1);
+    final Word wordC = witnessC.getFirstSegment().getElementOnWordPosition(1);
     final Column column = new Column(word);
     column.addVariant(wordB);
     column.addMatch(wordC);

@@ -20,11 +20,11 @@ public class WordSegment {
   private int size;
   public List<String> wordsInSegments;
 
-  public WordSegment(String _title) {
+  public WordSegment(final String _title) {
     this.title = _title;
   }
 
-  public void addWitnessPair(String witnessId, List<Word> words) {
+  public void addWitnessPair(final String witnessId, final List<Word> words) {
     wordsPerWitness.put(witnessId, words);
     this.size = words.size();
   }
@@ -34,14 +34,14 @@ public class WordSegment {
     return title;
   }
 
-  public void grow(HashMap<String, Segment> witnessHash, List<String> _wordsInSegments) {
+  public void grow(final HashMap<String, Segment> witnessHash, final List<String> _wordsInSegments) {
     this.wordsInSegments = _wordsInSegments;
     boolean nextWordsMatch = true;
     while (nextWordsMatch) {
-      Set<String> nextWordSet = Sets.newHashSet();
-      Map<String, Word> nextWords = Maps.newHashMap();
-      for (List<Word> wordList : wordsPerWitness.values()) {
-        Word nextWord = getNextWord(wordList, witnessHash);
+      final Set<String> nextWordSet = Sets.newHashSet();
+      final Map<String, Word> nextWords = Maps.newHashMap();
+      for (final List<Word> wordList : wordsPerWitness.values()) {
+        final Word nextWord = getNextWord(wordList, witnessHash);
         if (nextWord == null || this.wordsInSegments.contains(OldSegmentExtractor.wordIdentifier(nextWord))) {
           nextWordSet.add(null);
         } else {
@@ -51,8 +51,8 @@ public class WordSegment {
       }
       nextWordsMatch = (nextWordSet.size() == 1 && !nextWordSet.contains(null));
       if (nextWordsMatch) {
-        for (java.util.Map.Entry<String, List<Word>> entry : wordsPerWitness.entries()) {
-          Word nextWord = nextWords.get(entry.getKey());
+        for (final java.util.Map.Entry<String, List<Word>> entry : wordsPerWitness.entries()) {
+          final Word nextWord = nextWords.get(entry.getKey());
           this.wordsInSegments.add(OldSegmentExtractor.wordIdentifier(nextWord));
           entry.getValue().add(nextWord);
         }
@@ -63,11 +63,11 @@ public class WordSegment {
 
   }
 
-  private Word getNextWord(List<Word> wordList, HashMap<String, Segment> witnessHash) {
-    Word lastWord = wordList.get(wordList.size() - 1);
-    Segment witness = witnessHash.get(lastWord.getWitnessId());
-    boolean witnessHasMoreWords = lastWord.position < witness.size();
-    Word nextWord = witnessHasMoreWords ? witness.getWordOnPosition(lastWord.position + 1) : null;
+  private Word getNextWord(final List<Word> wordList, final HashMap<String, Segment> witnessHash) {
+    final Word lastWord = wordList.get(wordList.size() - 1);
+    final Segment witness = witnessHash.get(lastWord.getWitnessId());
+    final boolean witnessHasMoreWords = lastWord.position < witness.wordSize();
+    final Word nextWord = witnessHasMoreWords ? witness.getElementOnWordPosition(lastWord.position + 1) : null;
     return nextWord;
   }
 

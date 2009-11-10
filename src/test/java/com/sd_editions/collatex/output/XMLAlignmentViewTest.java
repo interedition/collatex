@@ -42,7 +42,7 @@ public class XMLAlignmentViewTest {
   public void testModificationsView() {
     Witness witness = builder.build("some addition its longer than that");
     Segment segment = witness.getFirstSegment();
-    Word next = segment.getWordOnPosition(3);
+    Word next = segment.getElementOnWordPosition(3);
     Word previous = null;
     Addition addition = new Addition(1, new BaseContainerPart(segment, 2, 1, 2, previous, next));
     XMLAlignmentView alignmentView = setupAlignmentView(addition);
@@ -57,8 +57,8 @@ public class XMLAlignmentViewTest {
   public void testModificationsViewOmissions() {
     Witness witness = builder.build("some deletion has occurred");
     Segment segment = witness.getFirstSegment();
-    Word next = segment.getWordOnPosition(3);
-    Word previous = segment.getWordOnPosition(1);
+    Word next = segment.getElementOnWordPosition(3);
+    Word previous = segment.getElementOnWordPosition(1);
     Omission omission = new Omission(new BaseContainerPart(segment, 1, 2, 2, previous, next));
     XMLAlignmentView alignmentView = setupAlignmentView(omission);
 

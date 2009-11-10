@@ -11,7 +11,7 @@ public class SegmentBuilder {
     final WitnessBuilder builder = new WitnessBuilder();
     final Witness witness = builder.build(witnessId, phrasePlain);
     final Segment segment = witness.getFirstSegment();
-    final Phrase phrase = new Phrase(segment, segment.getWordOnPosition(1), segment.getWordOnPosition(segment.size()), null);
+    final Phrase phrase = new Phrase(segment, segment.getElementOnWordPosition(1), segment.getElementOnWordPosition(segment.wordSize()), null);
     final WitnessSegmentPhrases p = new WitnessSegmentPhrases(witnessId, phrase);
     return p;
   }

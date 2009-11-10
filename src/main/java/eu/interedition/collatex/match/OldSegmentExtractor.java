@@ -16,36 +16,36 @@ public class OldSegmentExtractor {
   private static List<String> possibleWordsInSegments;
   private static List<String> wordsInSegments;
 
-  public static List<WordSegment> extractSegments(Segment... witnesses) {
+  public static List<WordSegment> extractSegments(final Segment... witnesses) {
     possibleWordsInSegments = Lists.newArrayList();
     wordsInSegments = Lists.newArrayList();
 
-    for (Segment witness : witnesses) {
+    for (final Segment witness : witnesses) {
       Util.p(witness);
       witnessHash.put(witness.id, witness);
     }
 
-    WordPairCollection wordpairs = new WordPairCollection(witnessHash);
+    final WordPairCollection wordpairs = new WordPairCollection(witnessHash);
 
     int witness_index = 0;
-    for (Segment witness1 : witnesses) {
-      int witnessSize1 = witness1.size();
+    for (final Segment witness1 : witnesses) {
+      final int witnessSize1 = witness1.wordSize();
       for (int position1 = 1; position1 < witnessSize1; position1++) {
-        Word baseWord0 = witness1.getWordOnPosition(position1);
-        Word baseWord1 = witness1.getWordOnPosition(position1 + 1);
-        String normalized0 = baseWord0.normalized;
-        String normalized1 = baseWord1.normalized;
+        final Word baseWord0 = witness1.getElementOnWordPosition(position1);
+        final Word baseWord1 = witness1.getElementOnWordPosition(position1 + 1);
+        final String normalized0 = baseWord0.normalized;
+        final String normalized1 = baseWord1.normalized;
         if (wordsNotInSegments(baseWord0, baseWord1)) {
           boolean matchingPairFound = false;
           addPairOccurancesInWitness(wordpairs, witness1, witnessSize1, position1, baseWord0, baseWord1, normalized0, normalized1);
 
           // Check if this pair appears again in the other witnesses
           for (int i = witness_index + 1; i < witnesses.length; i++) {
-            Segment witness2 = witnesses[i];
-            int witnessSize2 = witness2.size();
+            final Segment witness2 = witnesses[i];
+            final int witnessSize2 = witness2.wordSize();
             for (int position2 = 1; position2 < witnessSize2; position2++) {
-              Word word0 = witness2.getWordOnPosition(position2);
-              Word word1 = witness2.getWordOnPosition(position2 + 1);
+              final Word word0 = witness2.getElementOnWordPosition(position2);
+              final Word word1 = witness2.getElementOnWordPosition(position2 + 1);
               if (wordsNotInSegments(word0, word1) && pairFound(normalized0, normalized1, witness2, position2)) {
                 matchingPairFound = true;
                 addPairOccurancesInWitness(wordpairs, witness2, witnessSize2, position2, word0, word1, normalized0, normalized1);
@@ -61,12 +61,13 @@ public class OldSegmentExtractor {
     return wordpairs.getWordSegments(wordsInSegments);
   }
 
-  private static void addPairOccurancesInWitness(WordPairCollection wordpairs, Segment witness, int witnessSize, int position, Word baseWord0, Word baseWord1, String normalized0, String normalized1) {
+  private static void addPairOccurancesInWitness(final WordPairCollection wordpairs, final Segment witness, final int witnessSize, final int position, final Word baseWord0, final Word baseWord1,
+      final String normalized0, final String normalized1) {
     addWordPair(wordpairs, baseWord0, baseWord1);
     for (int position1 = position + 2; position1 < witnessSize; position1++) {
       if (pairFound(normalized0, normalized1, witness, position1)) {
-        Word word0 = witness.getWordOnPosition(position1);
-        Word word1 = witness.getWordOnPosition(position1 + 1);
+        final Word word0 = witness.getElementOnWordPosition(position1);
+        final Word word1 = witness.getElementOnWordPosition(position1 + 1);
         if (wordsNotInSegments(word0, word1)) {
           addWordPair(wordpairs, word0, word1);
         }
@@ -74,22 +75,22 @@ public class OldSegmentExtractor {
     }
   }
 
-  private static void addWordPair(WordPairCollection wordpairs, Word baseWord0, Word baseWord1) {
+  private static void addWordPair(final WordPairCollection wordpairs, final Word baseWord0, final Word baseWord1) {
     possibleWordsInSegments.add(wordIdentifier(baseWord0));
     possibleWordsInSegments.add(wordIdentifier(baseWord1));
     wordpairs.addWordPair(baseWord0, baseWord1);
   }
 
-  private static boolean wordsNotInSegments(Word baseWord0, Word baseWord1) {
+  private static boolean wordsNotInSegments(final Word baseWord0, final Word baseWord1) {
     return !(wordsInSegments.contains(wordIdentifier(baseWord0)) || wordsInSegments.contains(wordIdentifier(baseWord1)));
   }
 
-  private static boolean pairFound(String normalized0, String normalized1, Segment witness2, int position2) {
-    return (witness2.getWordOnPosition(position2).normalized.equals(normalized0)) && //
-        (witness2.getWordOnPosition(position2 + 1).normalized.equals(normalized1));
+  private static boolean pairFound(final String normalized0, final String normalized1, final Segment witness2, final int position2) {
+    return (witness2.getElementOnWordPosition(position2).normalized.equals(normalized0)) && //
+        (witness2.getElementOnWordPosition(position2 + 1).normalized.equals(normalized1));
   }
 
-  public static String wordIdentifier(Word word) {
+  public static String wordIdentifier(final Word word) {
     return word.getWitnessId() + "." + word.position;
   }
 

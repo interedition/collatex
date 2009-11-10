@@ -59,7 +59,7 @@ public class Phrase extends BaseElement {
   public String toString() {
     final List<String> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      final String word = witness.getWordOnPosition(k).toString();
+      final String word = witness.getElementOnWordPosition(k).toString();
       words.add(word);
     }
 
@@ -88,7 +88,7 @@ public class Phrase extends BaseElement {
   public List<Word> getWords() {
     final List<Word> words = Lists.newArrayList();
     for (int k = getStartPosition(); k <= getEndPosition(); k++) {
-      final Word word = getWitness().getWordOnPosition(k);
+      final Word word = getWitness().getElementOnWordPosition(k);
       words.add(word);
     }
     return words;

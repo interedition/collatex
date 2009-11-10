@@ -38,11 +38,11 @@ public class PossibleMatchesTest {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
     UnfixedAlignment unfixedAlignment = Matcher.createFirstUnfixedAlignment(a.getFirstSegment(), b.getFirstSegment());
-    Word zijn = a.getFirstSegment().getWordOnPosition(1);
+    Word zijn = a.getFirstSegment().getElementOnWordPosition(1);
     Collection<Match> linked = unfixedAlignment.getMatchesThatLinkFrom(zijn);
     Assert.assertEquals("[(1->2), (1->5), (1->8)]", linked.toString());
 
-    Word zijnB = b.getFirstSegment().getWordOnPosition(2);
+    Word zijnB = b.getFirstSegment().getElementOnWordPosition(2);
     Collection<Match> links = unfixedAlignment.getMatchesThatLinkTo(zijnB);
     Assert.assertEquals("[(1->2), (5->2)]", links.toString());
   }

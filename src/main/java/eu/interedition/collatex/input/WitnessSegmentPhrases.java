@@ -34,13 +34,22 @@ public class WitnessSegmentPhrases extends BaseContainer<Phrase> {
   }
 
   @Override
+  public int wordSize() {
+    return getPhrases().get(getPhrases().size() - 1).getEndPosition();
+  }
+
   public int size() {
     return _phrases.size();
   }
 
   @Override
-  public Phrase getWordOnPosition(final int k) {
-    return getPhraseOnPosition(k);
+  public Phrase getElementOnWordPosition(final int k) {
+    for (final Phrase phrase : getPhrases()) {
+      if (phrase.getBeginPosition() == k) {
+        return phrase;
+      }
+    }
+    throw new RuntimeException("No element found on position: " + k);
   }
 
   public List<Phrase> getPhrases() {
