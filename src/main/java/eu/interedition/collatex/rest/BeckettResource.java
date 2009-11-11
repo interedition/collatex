@@ -35,13 +35,15 @@ public class BeckettResource extends ServerResource {
       final WitnessSegmentPhrases pb = sse.getWitnessSegmentPhrases("06-2");
       final WitnessSegmentPhrases pc = sse.getWitnessSegmentPhrases("08-1");
       final WitnessSegmentPhrases pd = sse.getWitnessSegmentPhrases("08-2");
+      final WitnessSegmentPhrases pe = sse.getWitnessSegmentPhrases("09-1");
 
       System.out.println(pa.toString());
       System.out.println(pb.toString());
       System.out.println(pc.toString());
       System.out.println(pd.toString());
+      System.out.println(pe.toString());
 
-      final AlignmentTable2 alignmentTable = NewAlignmentTableCreator.createNewAlignmentTable(pa, pb, pc, pd);
+      final AlignmentTable2 alignmentTable = NewAlignmentTableCreator.createNewAlignmentTable(pa, pb, pc, pd, pe);
       // HTML
       html = "<html><body> " + AlignmentTable2.alignmentTableToHTML(alignmentTable) + "</body></html>";
     } catch (final Exception e) {

@@ -3,7 +3,6 @@ package eu.interedition.collatex.alignment;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.TranspositionDetection;
@@ -12,7 +11,6 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.functions.GapDetection;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
-import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
@@ -46,6 +44,7 @@ public class Alignment<T extends BaseElement> {
   }
 
   // TODO: gap detection does not work yet!
+  // Note: it works now, remove TODO!
   public static Alignment<Phrase> createPhraseAlignment(final Set<Match<Phrase>> matches, final WitnessSegmentPhrases a, final WitnessSegmentPhrases b) {
     final List<MatchSequence<Phrase>> sequencesA = SequenceDetection.calculateMatchSequences(matches);
     final List<MatchSequence<Phrase>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
@@ -55,6 +54,10 @@ public class Alignment<T extends BaseElement> {
     gaps.addAll(GapDetection.getVariantsInMatchSequences(a, b, sequencesA));
     final Alignment<Phrase> al = new Alignment<Phrase>(matches, gaps, sequencesA, sequencesB);
     return al;
+  }
+
+  public static <T extends BaseElement> Alignment<T> create2(final Set<Match<T>> matches, final List<Gap> gaps, final List<MatchSequence<T>> sequencesA, final List<MatchSequence<T>> sequencesB) {
+    return new Alignment<T>(matches, gaps, sequencesA, sequencesB);
   }
 
   public Set<Match<T>> getMatches() {
@@ -116,63 +119,5 @@ public class Alignment<T extends BaseElement> {
     final List<Transposition> createTranspositions = TranspositionDetection.createTranspositions(filterAwayRealMatches);
     return createTranspositions;
   }
-
-  public Alignment<T> makeAddDelFromTrans(final Segment a, final Segment b) {
-    // remove duplicates from transpositions
-    final Stack<Transposition> transToCheck = new Stack<Transposition>();
-    final List<Transposition> transpositions = Lists.newArrayList();
-    transToCheck.addAll(getTranpositions());
-    while (!transToCheck.isEmpty()) {
-      final Transposition top = transToCheck.pop();
-      transpositions.add(top);
-      for (final Transposition tr : transToCheck) {
-        if (tr.getBase().equals(top.getWitness())) {
-          if (tr.getWitness().equals(top.getBase())) {
-            transToCheck.remove(tr);
-            break;
-          }
-        }
-      }
-    }
-    // remove matches from transpositions
-    final Set<Match<T>> matches = this.getMatches();
-    final List<Gap> gaps = this.getGaps();
-    //    System.out.println(transpositions);
-    for (final Transposition t : transpositions) {
-      final MatchSequence<Word> base = t.getBase();
-      for (final Match<Word> match : base.getMatches()) {
-        //        System.out.println("WHAT? " + match);
-        matches.remove(match);
-      }
-      // make an addition from the matchSequence
-      final Word w = (Word) t.getBase().getFirstMatch().getWitnessWord();
-      final Word o = (Word) t.getBase().getLastMatch().getWitnessWord();
-      //      System.out.println(w);
-      //      System.out.println(o);
-      final BaseContainerPart<Word> partNull = new BaseContainerPart<Word>(null, 0, 0, 0, null, null);
-      final BaseContainerPart<Word> partAdd = new BaseContainerPart<Word>(b, w, o);
-      final Gap addition = new Gap(partNull, partAdd, null);
-      //      System.out.println(partAdd.hasGap());
-      //      System.out.println(addition.isAddition());
-      gaps.add(addition);
-    }
-    final Alignment<T> al = new Alignment<T>(matches, gaps, getMatchSequencesOrderedForWitnessA(), getMatchSequencesOrderedForWitnessB());
-    return al;
-  }
-  //  // I just need it as a list of matches
-  //  List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesOrderedForWitnessA();
-  //  List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesOrderedForWitnessB();
-  //  List<Match> matchesOrderedForTheWitness = Lists.newArrayList();
-  //  for (MatchSequence matchSeq : matchSequencesForWitness) {
-  //    for (Match match : matchSeq.getMatches()) {
-  //      matchesOrderedForTheWitness.add(match);
-  //    }
-  //  }
-  //  List<Match> matchesOrderedForTheBase = Lists.newArrayList();
-  //  for (MatchSequence matchSeq : matchSequencesForBase) {
-  //    for (Match match : matchSeq.getMatches()) {
-  //      matchesOrderedForTheBase.add(match);
-  //    }
-  //  }
 
 }

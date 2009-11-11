@@ -41,7 +41,7 @@ public class AlignmentTableCreator {
     // make the superbase from the alignment table
     final Superbase superbase = table.createSuperbase();
     final Alignment alignment = Matcher.align(superbase, witness);
-    final Alignment better = alignment.makeAddDelFromTrans(null, witness);
+    final Alignment better = NewAlignmentTableCreator.makeAddDelFromTrans(null, witness, alignment);
     addMatchesToAlignmentTable(superbase, better);
     addReplacementsToAlignmentTable(table, witness, superbase, better);
     addAdditionsToAlignmentTable(table, superbase, better);

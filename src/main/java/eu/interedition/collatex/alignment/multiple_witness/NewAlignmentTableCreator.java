@@ -4,16 +4,22 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.LeftToRightMatcher;
+import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.input.BaseContainerPart;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
+import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
+import eu.interedition.collatex.input.Word;
 
 public class NewAlignmentTableCreator {
 
@@ -41,6 +47,9 @@ public class NewAlignmentTableCreator {
     final NewSuperbase superbase = NewSuperbase.create(table);
     final Set<Match<Phrase>> matches = LeftToRightMatcher.match(superbase, seg);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, superbase, seg);
+
+    // handle transpositions here!
+    System.out.println(alignment.getTranpositions());
     //    final Alignment better = alignment.makeAddDelFromTrans(null, witness);
     addMatchesToAlignmentTable(superbase, alignment);
     addReplacementsToAlignmentTable(table, seg, superbase, alignment);
@@ -132,5 +141,72 @@ public class NewAlignmentTableCreator {
       //      table.addVariantBefore(column, witnessWords);
     }
   }
+
+  // TODO: make this method generic or work with Phrase,
+  // TODO; remove dependency on Word
+  // NOTE: the way transpositions are handled here
+  // and the way there are placed in the alignment table
+  // is just one specific case, namely
+  // a b
+  // b a
+  // this becomes |a| b| |, | |b|a|
+  public static <T extends BaseElement> Alignment<T> makeAddDelFromTrans(final Segment a, final Segment b, final Alignment<T> alignment) {
+    // remove duplicates from transpositions
+    final Stack<Transposition> transToCheck = new Stack<Transposition>();
+    final List<Transposition> transpositions = Lists.newArrayList();
+    transToCheck.addAll(alignment.getTranpositions());
+    while (!transToCheck.isEmpty()) {
+      final Transposition top = transToCheck.pop();
+      transpositions.add(top);
+      for (final Transposition tr : transToCheck) {
+        if (tr.getBase().equals(top.getWitness())) {
+          if (tr.getWitness().equals(top.getBase())) {
+            transToCheck.remove(tr);
+            break;
+          }
+        }
+      }
+    }
+    // remove matches from transpositions
+    final Set<Match<T>> matches = alignment.getMatches();
+    final List<Gap> gaps = alignment.getGaps();
+    //    System.out.println(transpositions);
+    for (final Transposition t : transpositions) {
+      final MatchSequence<Word> base = t.getBase();
+      for (final Match<Word> match : base.getMatches()) {
+        //        System.out.println("WHAT? " + match);
+        matches.remove(match);
+      }
+      // make an addition from the matchSequence
+      final Word w = (Word) t.getBase().getFirstMatch().getWitnessWord();
+      final Word o = (Word) t.getBase().getLastMatch().getWitnessWord();
+      //      System.out.println(w);
+      //      System.out.println(o);
+      final BaseContainerPart<Word> partNull = new BaseContainerPart<Word>(null, 0, 0, 0, null, null);
+      final BaseContainerPart<Word> partAdd = new BaseContainerPart<Word>(b, w, o);
+      final Gap addition = new Gap(partNull, partAdd, null);
+      //      System.out.println(partAdd.hasGap());
+      //      System.out.println(addition.isAddition());
+      gaps.add(addition);
+    }
+    final Alignment<T> al = Alignment.create2(matches, gaps, alignment.getMatchSequencesOrderedForWitnessA(), alignment.getMatchSequencesOrderedForWitnessB());
+    return al;
+  }
+
+  //  // I just need it as a list of matches
+  //  List<MatchSequence> matchSequencesForBase = compresult.getMatchSequencesOrderedForWitnessA();
+  //  List<MatchSequence> matchSequencesForWitness = compresult.getMatchSequencesOrderedForWitnessB();
+  //  List<Match> matchesOrderedForTheWitness = Lists.newArrayList();
+  //  for (MatchSequence matchSeq : matchSequencesForWitness) {
+  //    for (Match match : matchSeq.getMatches()) {
+  //      matchesOrderedForTheWitness.add(match);
+  //    }
+  //  }
+  //  List<Match> matchesOrderedForTheBase = Lists.newArrayList();
+  //  for (MatchSequence matchSeq : matchSequencesForBase) {
+  //    for (Match match : matchSeq.getMatches()) {
+  //      matchesOrderedForTheBase.add(match);
+  //    }
+  //  }
 
 }
