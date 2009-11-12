@@ -7,11 +7,9 @@ import com.google.common.collect.Lists;
 // Note: this class started life as a duplicate of
 // Phase; it will get a life of its own
 // for instance...
-// it might not need to extend BaseElement?
 // anyway it should take BaseElements in
 // TODO: rename Word to Element!
-// Do we really want to extend baseelment? DON'T THINK so!
-public class BaseContainerPart<T extends BaseElement> extends BaseElement {
+public class BaseContainerPart<T extends BaseElement> {
   private final BaseContainer<T> _witness;
   private final int startPosition;
   private final int endPosition;
@@ -66,12 +64,10 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
     return _witness;
   }
 
-  @Override
   public int getBeginPosition() {
     return startPosition;
   }
 
-  @Override
   public int getEndPosition() {
     return endPosition;
   }
@@ -89,20 +85,4 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   public T getFirstWord() {
     return getWords().get(0);
   }
-
-  @Override
-  public String getOriginal() {
-    return toString();
-  }
-
-  @Override
-  public String getWitnessId() {
-    return getFirstWord().getWitnessId();
-  }
-
-  @Override
-  public int length() {
-    return size;
-  }
-
 }
