@@ -36,8 +36,8 @@ public class GapDetection {
           final int gapSizeWitness = witnessEndPosition - witnessStartPosition - 1;
           if (gapSizeBase != 0 || gapSizeWitness != 0) {
             //            System.out.println(gapSizeBase + ":" + gapSizeWitness);
-            final BaseContainerPart<T> gapBase = new BaseContainerPart<T>(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1, previousWordBase, nextWordBase);
-            final BaseContainerPart<T> gapWitness = new BaseContainerPart<T>(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1, previousWordWitness, nextWordWitness);
+            final BaseContainerPart<T> gapBase = new BaseContainerPart<T>(base, gapSizeBase, baseStartPosition + 1, baseEndPosition - 1);
+            final BaseContainerPart<T> gapWitness = new BaseContainerPart<T>(witness, gapSizeWitness, witnessStartPosition + 1, witnessEndPosition - 1);
             final Gap nonMatch = new Gap(gapBase, gapWitness, next);
             variants.add(nonMatch);
           }
@@ -94,14 +94,14 @@ public class GapDetection {
       final int indexDif = position - currentIndex;
       final Match<T> nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getBaseWord();
-      gaps.add(new BaseContainerPart<T>(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
+      gaps.add(new BaseContainerPart<T>(witness, indexDif, currentIndex, position - 1));
       previousWord = sequence.getLastMatch().getBaseWord();
       currentIndex = 1 + previousWord.getEndPosition();
     }
     // TODO: rename IndexDif to indexDif
     final int IndexDif = witness.wordSize() - currentIndex + 1;
     nextWord = null;
-    gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.wordSize(), previousWord, nextWord));
+    gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.wordSize()));
     return gaps;
   }
 
@@ -119,13 +119,13 @@ public class GapDetection {
       final int indexDif = position - currentIndex;
       final Match<T> nextMatch = sequence.getFirstMatch();
       nextWord = nextMatch.getWitnessWord();
-      gaps.add(new BaseContainerPart<T>(witness, indexDif, currentIndex, position - 1, previousWord, nextWord));
+      gaps.add(new BaseContainerPart<T>(witness, indexDif, currentIndex, position - 1));
       previousWord = sequence.getLastMatch().getWitnessWord();
       currentIndex = 1 + previousWord.getEndPosition();
     }
     final int IndexDif = witness.wordSize() - currentIndex + 1;
     nextWord = null;
-    gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.wordSize(), previousWord, nextWord));
+    gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.wordSize()));
     return gaps;
   }
 

@@ -198,7 +198,7 @@ public class NewAlignmentTableCreator {
       } else {
         nextBaseWord = null;
       }
-      final BaseContainerPart<T> partNull = new BaseContainerPart<T>(null, 0, 0, 0, null, nextBaseWord);
+      final BaseContainerPart<T> partNull = new BaseContainerPart<T>(null, 0, 0, 0);
       final BaseContainerPart<T> partAdd = new BaseContainerPart<T>(b, w, o);
       final Gap addition = new Gap(partNull, partAdd, nextMatch);
       //      System.out.println(partAdd.hasGap());

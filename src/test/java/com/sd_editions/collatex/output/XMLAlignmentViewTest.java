@@ -44,7 +44,7 @@ public class XMLAlignmentViewTest {
     Segment segment = witness.getFirstSegment();
     Word next = segment.getElementOnWordPosition(3);
     Word previous = null;
-    Addition addition = new Addition(1, new BaseContainerPart(segment, 2, 1, 2, previous, next));
+    Addition addition = new Addition(1, new BaseContainerPart(segment, 2, 1, 2));
     XMLAlignmentView alignmentView = setupAlignmentView(addition);
 
     String result = alignmentView.modificationsView(-1);
@@ -59,7 +59,7 @@ public class XMLAlignmentViewTest {
     Segment segment = witness.getFirstSegment();
     Word next = segment.getElementOnWordPosition(3);
     Word previous = segment.getElementOnWordPosition(1);
-    Omission omission = new Omission(new BaseContainerPart(segment, 1, 2, 2, previous, next));
+    Omission omission = new Omission(new BaseContainerPart(segment, 1, 2, 2));
     XMLAlignmentView alignmentView = setupAlignmentView(omission);
 
     String result = alignmentView.modificationsView(-1);

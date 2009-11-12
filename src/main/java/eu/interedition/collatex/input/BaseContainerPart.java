@@ -22,7 +22,7 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public BaseContainerPart(final BaseContainer<T> witness, final int _size, final int _startPosition, final int _endPosition, final T _previous, final T _next) {
+  public BaseContainerPart(final BaseContainer<T> witness, final int _size, final int _startPosition, final int _endPosition) {
     this._witness = witness;
     this.size = _size;
     startPosition = _startPosition;
