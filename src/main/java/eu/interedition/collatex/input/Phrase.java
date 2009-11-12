@@ -10,8 +10,6 @@ public class Phrase extends BaseElement {
   private final int startPosition;
   private final int endPosition;
   private final int size;
-  private final Word previous;
-  private final Word next;
   private Subsegment _subSegment;
 
   // TODO: It is pretty obvious: too many parameters here!
@@ -19,11 +17,9 @@ public class Phrase extends BaseElement {
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
 
-  public Phrase(final Segment _witness, final int _size, final int _startPosition, final int _endPosition, final Word _previous, final Word _next) {
+  public Phrase(final Segment _witness, final int _size, final int _startPosition, final int _endPosition) {
     witness = _witness;
     this.size = _size;
-    this.next = _next;
-    this.previous = _previous;
     startPosition = _startPosition;
     endPosition = _endPosition;
   }
@@ -31,8 +27,6 @@ public class Phrase extends BaseElement {
   // THIS constructor is pretty close, and actually used!
   public Phrase(final Segment _witness, final Word beginWord, final Word endWord, final Subsegment subsegment) {
     this.witness = _witness;
-    this.next = null; // !!!
-    this.previous = null; // !!!
     this.startPosition = beginWord.position;
     this.endPosition = endWord.position;
     this._subSegment = subsegment;
@@ -44,10 +38,7 @@ public class Phrase extends BaseElement {
     this.endPosition = _endPosition;
     this._subSegment = subsegment;
     this.size = endPosition - startPosition + 1;
-    // ALL THIS STUFF IS NOT NECESSARY!
     this.witness = null; // this is not wanted here!
-    this.next = null; // !!!
-    this.previous = null; // !!!
   }
 
   //TODO: rename method!
@@ -96,28 +87,6 @@ public class Phrase extends BaseElement {
 
   public Word getFirstWord() {
     return getWords().get(0);
-  }
-
-  public Word getNextWord() {
-    if (isAtTheEnd()) {
-      throw new RuntimeException("There is no next word!");
-    }
-    return next;
-  }
-
-  public boolean isAtTheEnd() {
-    return next == null;
-  }
-
-  public Word getPreviousWord() {
-    if (isAtTheFront()) {
-      throw new RuntimeException("There is no previous word!");
-    }
-    return previous;
-  }
-
-  public boolean isAtTheFront() {
-    return previous == null;
   }
 
   @Override
