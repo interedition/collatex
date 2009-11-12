@@ -49,7 +49,7 @@ public class AlignmentTableTranspositionTest {
     final Witness b = builder.build("B", "b a");
     final WitnessSet set = new WitnessSet(a, b);
     final AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
-    final String expected = "A: a|b| \n" + "B:  |b|a\n";
+    final String expected = "A:  |a|b\n" + "B: b|a| \n";
     final String actual = alignmentTable.toString();
     Assert.assertEquals(expected, actual);
   }

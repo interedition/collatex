@@ -174,19 +174,19 @@ public class NewAlignmentTableCreator {
     final List<Gap> gaps = alignment.getGaps();
     //    System.out.println(transpositions);
     for (final Transposition t : transpositions) {
-      final MatchSequence<T> base = t.getBase();
-      for (final Match<T> match : base.getMatches()) {
+      final MatchSequence<T> witness = t.getWitness();
+      for (final Match<T> match : witness.getMatches()) {
         //        System.out.println("WHAT? " + match);
         matches.remove(match);
       }
       // make an addition from the matchSequence
       // NOTE: I need the next match here!
       // NOTE: so the next match should be in the TranspositioN!
-      final T w = (T) t.getBase().getFirstMatch().getWitnessWord();
-      final T o = (T) t.getBase().getLastMatch().getWitnessWord();
+      final T w = (T) t.getWitness().getFirstMatch().getWitnessWord();
+      final T o = (T) t.getWitness().getLastMatch().getWitnessWord();
       //      System.out.println(w);
       //      System.out.println(o);
-      final Match<T> nextMatch = t.getNextMatch();
+      final Match<T> nextMatch = t.getBase().getFirstMatch();
       // TODO: remove nextWord from BaseContainerPart
       // TODO: add next match to addition, transposition, etc
       // TODO: and use that!
