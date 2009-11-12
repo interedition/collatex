@@ -10,19 +10,12 @@ public class Phrase extends BaseElement {
   private final int startPosition;
   private final int endPosition;
   private final int size;
-  private Subsegment _subSegment;
+  private final Subsegment _subSegment;
 
   // TODO: It is pretty obvious: too many parameters here!
   // Note: probably two constructors needed...
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
-
-  public Phrase(final Segment _witness, final int _size, final int _startPosition, final int _endPosition) {
-    witness = _witness;
-    this.size = _size;
-    startPosition = _startPosition;
-    endPosition = _endPosition;
-  }
 
   // THIS constructor is pretty close, and actually used!
   public Phrase(final Segment _witness, final Word beginWord, final Word endWord, final Subsegment subsegment) {
@@ -39,11 +32,6 @@ public class Phrase extends BaseElement {
     this._subSegment = subsegment;
     this.size = endPosition - startPosition + 1;
     this.witness = null; // this is not wanted here!
-  }
-
-  //TODO: rename method!
-  public boolean hasGap() {
-    return size > 0;
   }
 
   @Override
