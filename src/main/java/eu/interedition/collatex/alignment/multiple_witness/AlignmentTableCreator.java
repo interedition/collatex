@@ -93,7 +93,7 @@ public class AlignmentTableCreator {
   }
 
   static void addVariantAtGap(final AlignmentTable2 table, final Superbase superbase, final Gap gap, final List<Word> witnessWords) {
-    if (gap.getPhraseA().isAtTheEnd()) {
+    if (gap.isAtTheEnd()) {
       table.addVariantAtTheEnd(witnessWords);
     } else {
       final Match nextMatch = gap.getNextMatch();

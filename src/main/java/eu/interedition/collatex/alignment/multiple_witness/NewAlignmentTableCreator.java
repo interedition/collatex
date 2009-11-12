@@ -130,7 +130,7 @@ public class NewAlignmentTableCreator {
   }
 
   static void addVariantAtGap(final AlignmentTable2 table, final NewSuperbase superbase, final Gap gap, final List<Phrase> witnessWords) {
-    if (gap.getPhraseA().isAtTheEnd()) {
+    if (gap.isAtTheEnd()) {
       table.addVariantAtTheEnd(witnessWords);
     } else {
       // throw new RuntimeException("NOT IMPLEMENTED YET!");

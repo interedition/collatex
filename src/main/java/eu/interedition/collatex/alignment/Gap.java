@@ -60,10 +60,10 @@ public class Gap {
   @Override
   public String toString() {
     String result = "NonMatch: addition: " + isAddition() + " base: " + _partA;
-    if (_partA.isAtTheEnd()) {
+    if (isAtTheEnd()) {
       result += "; nextWord: none";
     } else {
-      result += "; nextWord: " + _partA.getNextWord();
+      result += "; nextWord: " + getNextMatch().getBaseWord();
     }
     result += "; witness: " + _partB;
     return result;
@@ -88,6 +88,10 @@ public class Gap {
       throw new RuntimeException("There is no next match!");
     }
     return next;
+  }
+
+  public boolean isAtTheEnd() {
+    return next == null;
   }
 
 }

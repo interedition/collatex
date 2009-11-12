@@ -16,8 +16,6 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   private final int startPosition;
   private final int endPosition;
   private final int size;
-  private final T previous;
-  private final T next;
 
   // TODO: It is pretty obvious: too many parameters here!
   // Note: probably two constructors needed...
@@ -27,8 +25,6 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   public BaseContainerPart(final BaseContainer<T> witness, final int _size, final int _startPosition, final int _endPosition, final T _previous, final T _next) {
     this._witness = witness;
     this.size = _size;
-    this.next = _next;
-    this.previous = _previous;
     startPosition = _startPosition;
     endPosition = _endPosition;
   }
@@ -36,8 +32,6 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
   public BaseContainerPart(final BaseContainer<T> witness, final T beginWord, final T endWord) {
     this._witness = witness;
     this.size = endWord.getEndPosition() - beginWord.getBeginPosition() + 1;
-    this.next = null; // !!!
-    this.previous = null; // !!!
     this.startPosition = beginWord.getBeginPosition();
     this.endPosition = endWord.getEndPosition();
   }
@@ -94,28 +88,6 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
 
   public T getFirstWord() {
     return getWords().get(0);
-  }
-
-  public T getNextWord() {
-    if (isAtTheEnd()) {
-      throw new RuntimeException("There is no next word!");
-    }
-    return next;
-  }
-
-  public boolean isAtTheEnd() {
-    return next == null;
-  }
-
-  public T getPreviousWord() {
-    if (isAtTheFront()) {
-      throw new RuntimeException("There is no previous word!");
-    }
-    return previous;
-  }
-
-  public boolean isAtTheFront() {
-    return previous == null;
   }
 
   @Override
