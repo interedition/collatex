@@ -33,22 +33,25 @@ public class BaseContainerPart<T extends BaseElement> extends BaseElement {
     endPosition = _endPosition;
   }
 
-  public BaseContainerPart(final BaseContainer<T> witness, final Word beginWord, final Word endWord) {
+  public BaseContainerPart(final BaseContainer<T> witness, final T beginWord, final T endWord) {
     this._witness = witness;
-    this.size = endWord.position - beginWord.position + 1;
+    this.size = endWord.getEndPosition() - beginWord.getBeginPosition() + 1;
     this.next = null; // !!!
     this.previous = null; // !!!
-    this.startPosition = beginWord.position;
-    this.endPosition = endWord.position;
+    this.startPosition = beginWord.getBeginPosition();
+    this.endPosition = endWord.getEndPosition();
   }
 
-  //TODO: rename method!
+  //TODO: rename method to isEmpty!
   public boolean hasGap() {
     return size > 0;
   }
 
   @Override
   public String toString() {
+    if (!hasGap()) {
+      return "EMPTY!";
+    }
     final List<String> words = Lists.newArrayList();
     for (int k = getBeginPosition(); k <= getEndPosition();) {
       final T word = _witness.getElementOnWordPosition(k);

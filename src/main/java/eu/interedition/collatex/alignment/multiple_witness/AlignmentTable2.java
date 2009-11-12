@@ -7,7 +7,6 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
-import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.parallel_segmentation.AlignmentTableSegmentator;
 import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTable;
 
@@ -40,14 +39,15 @@ public class AlignmentTable2 {
     columns.add(column);
   }
 
-  public void addVariantBefore(final Column column, final List<Word> witnessWords) {
+  // TODO: rename words to Elements!
+  public <T extends BaseElement> void addVariantBefore(final Column<T> column, final List<T> witnessWords) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
       throw new RuntimeException("Unexpected error: Column not found!");
     }
 
-    for (final Word word : witnessWords) {
-      final Column extraColumn = new Column(word);
+    for (final T word : witnessWords) {
+      final Column<T> extraColumn = new Column<T>(word);
       columns.add(indexOf, extraColumn);
       indexOf++;
     }

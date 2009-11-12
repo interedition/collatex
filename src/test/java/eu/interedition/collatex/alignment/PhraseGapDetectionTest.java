@@ -55,7 +55,7 @@ public class PhraseGapDetectionTest {
     final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, pa, pb);
     final Gap gap = alignment.getAdditions().get(0);
-    Assert.assertEquals("NonMatch: addition: true base: ; nextWord: everything matches; witness: addition", gap.toString());
+    Assert.assertEquals("NonMatch: addition: true base: EMPTY!; nextWord: everything matches; witness: addition", gap.toString());
   }
 
   @Test
@@ -73,7 +73,7 @@ public class PhraseGapDetectionTest {
     final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, pa, pb);
     final Gap gap = alignment.getAdditions().get(0);
-    Assert.assertEquals("NonMatch: addition: true base: ; nextWord: matches; witness: addition", gap.toString());
+    Assert.assertEquals("NonMatch: addition: true base: EMPTY!; nextWord: matches; witness: addition", gap.toString());
   }
 
   @Test
@@ -92,7 +92,7 @@ public class PhraseGapDetectionTest {
     final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, pa, pb);
     final Gap gap = alignment.getAdditions().get(0);
-    Assert.assertEquals("NonMatch: addition: true base: ; nextWord: matches; witness: multiple word addition", gap.toString());
+    Assert.assertEquals("NonMatch: addition: true base: EMPTY!; nextWord: matches; witness: multiple word addition", gap.toString());
   }
   //
   //  @Test

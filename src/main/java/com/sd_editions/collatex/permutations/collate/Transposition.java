@@ -1,15 +1,20 @@
 package com.sd_editions.collatex.permutations.collate;
 
+import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.visualization.Modification;
 
+//TODO: make generic!
 public class Transposition extends Modification {
   private final MatchSequence base;
   private final MatchSequence witness;
+  private final Match<BaseElement> _nextMatch;
 
-  public Transposition(final MatchSequence _base, final MatchSequence _witness) {
+  public Transposition(final MatchSequence _base, final MatchSequence _witness, final Match nextMatch) {
     this.base = _base;
     this.witness = _witness;
+    this._nextMatch = nextMatch;
   }
 
   @Override
@@ -31,5 +36,9 @@ public class Transposition extends Modification {
 
   public MatchSequence getWitness() {
     return witness;
+  }
+
+  public Match getNextMatch() {
+    return _nextMatch;
   }
 }

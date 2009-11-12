@@ -1,5 +1,6 @@
 package eu.interedition.collatex.alignment.multiple_witness;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,12 +15,11 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.input.BaseContainer;
 import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
-import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
-import eu.interedition.collatex.input.Word;
 
 public class NewAlignmentTableCreator {
 
@@ -48,12 +48,10 @@ public class NewAlignmentTableCreator {
     final Set<Match<Phrase>> matches = LeftToRightMatcher.match(superbase, seg);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, superbase, seg);
 
-    // handle transpositions here!
-    System.out.println(alignment.getTranpositions());
-    //    final Alignment better = alignment.makeAddDelFromTrans(null, witness);
-    addMatchesToAlignmentTable(superbase, alignment);
-    addReplacementsToAlignmentTable(table, seg, superbase, alignment);
-    addAdditionsToAlignmentTable(table, superbase, alignment);
+    final Alignment<Phrase> better = NewAlignmentTableCreator.makeAddDelFromTrans(null, seg, alignment);
+    addMatchesToAlignmentTable(superbase, better);
+    addReplacementsToAlignmentTable(table, seg, superbase, better);
+    addAdditionsToAlignmentTable(table, superbase, better);
   }
 
   static void addMatchesToAlignmentTable(final NewSuperbase superbase, final Alignment<Phrase> alignment) {
@@ -82,7 +80,7 @@ public class NewAlignmentTableCreator {
   static void addReplacementsToAlignmentTable(final AlignmentTable2 table, final WitnessSegmentPhrases witness, final NewSuperbase superbase, final Alignment<Phrase> alignment) {
     final List<Gap> replacements = alignment.getReplacements();
     for (final Gap replacement : replacements) {
-      System.out.println(replacement.toString());
+      //      System.out.println(replacement.toString());
       final BaseContainerPart<Phrase> partA = replacement.getPhraseA();
       final BaseContainerPart<Phrase> partB = replacement.getPhraseB();
       final List<Phrase> phrasesA = partA.getWords();
@@ -135,10 +133,10 @@ public class NewAlignmentTableCreator {
     if (gap.getPhraseA().isAtTheEnd()) {
       table.addVariantAtTheEnd(witnessWords);
     } else {
-      throw new RuntimeException("NOT IMPLEMENTED YET!");
-      //      final Match<Phrase> nextMatch = gap.getNextMatch();
-      //      final Column<Phrase> column = superbase.getColumnFor(nextMatch);
-      //      table.addVariantBefore(column, witnessWords);
+      // throw new RuntimeException("NOT IMPLEMENTED YET!");
+      final Match<Phrase> nextMatch = gap.getNextMatch();
+      final Column<Phrase> column = superbase.getColumnFor(nextMatch);
+      table.addVariantBefore(column, witnessWords);
     }
   }
 
@@ -150,11 +148,15 @@ public class NewAlignmentTableCreator {
   // a b
   // b a
   // this becomes |a| b| |, | |b|a|
-  public static <T extends BaseElement> Alignment<T> makeAddDelFromTrans(final Segment a, final Segment b, final Alignment<T> alignment) {
+  public static <T extends BaseElement> Alignment<T> makeAddDelFromTrans(final BaseContainer<T> a, final BaseContainer<T> b, final Alignment<T> alignment) {
+    // handle transpositions here!
+    final Collection<Transposition> tranpositions = alignment.getTranpositions();
+    System.out.println(tranpositions);
+    // TODO: DO CHECK HERE!!!!
     // remove duplicates from transpositions
     final Stack<Transposition> transToCheck = new Stack<Transposition>();
     final List<Transposition> transpositions = Lists.newArrayList();
-    transToCheck.addAll(alignment.getTranpositions());
+    transToCheck.addAll(tranpositions);
     while (!transToCheck.isEmpty()) {
       final Transposition top = transToCheck.pop();
       transpositions.add(top);
@@ -172,22 +174,38 @@ public class NewAlignmentTableCreator {
     final List<Gap> gaps = alignment.getGaps();
     //    System.out.println(transpositions);
     for (final Transposition t : transpositions) {
-      final MatchSequence<Word> base = t.getBase();
-      for (final Match<Word> match : base.getMatches()) {
+      final MatchSequence<T> base = t.getBase();
+      for (final Match<T> match : base.getMatches()) {
         //        System.out.println("WHAT? " + match);
         matches.remove(match);
       }
       // make an addition from the matchSequence
-      final Word w = (Word) t.getBase().getFirstMatch().getWitnessWord();
-      final Word o = (Word) t.getBase().getLastMatch().getWitnessWord();
+      // NOTE: I need the next match here!
+      // NOTE: so the next match should be in the TranspositioN!
+      final T w = (T) t.getBase().getFirstMatch().getWitnessWord();
+      final T o = (T) t.getBase().getLastMatch().getWitnessWord();
       //      System.out.println(w);
       //      System.out.println(o);
-      final BaseContainerPart<Word> partNull = new BaseContainerPart<Word>(null, 0, 0, 0, null, null);
-      final BaseContainerPart<Word> partAdd = new BaseContainerPart<Word>(b, w, o);
-      final Gap addition = new Gap(partNull, partAdd, null);
+      final Match<T> nextMatch = t.getNextMatch();
+      // TODO: remove nextWord from BaseContainerPart
+      // TODO: add next match to addition, transposition, etc
+      // TODO: and use that!
+      // TODO: rename word to element!
+      final T nextBaseWord;
+      // TODO: make a method on Transposition called hasNextMatch!
+      if (nextMatch != null) {
+        nextBaseWord = nextMatch.getBaseWord();
+      } else {
+        nextBaseWord = null;
+      }
+      final BaseContainerPart<T> partNull = new BaseContainerPart<T>(null, 0, 0, 0, null, nextBaseWord);
+      final BaseContainerPart<T> partAdd = new BaseContainerPart<T>(b, w, o);
+      final Gap addition = new Gap(partNull, partAdd, nextMatch);
       //      System.out.println(partAdd.hasGap());
       //      System.out.println(addition.isAddition());
       gaps.add(addition);
+      System.out.println("Hey heb addition geadd: " + addition.toString());
+
     }
     final Alignment<T> al = Alignment.create2(matches, gaps, alignment.getMatchSequencesOrderedForWitnessA(), alignment.getMatchSequencesOrderedForWitnessB());
     return al;
