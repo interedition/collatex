@@ -79,11 +79,10 @@ public class NewAlignmentTableCreator {
     }
   }
 
-  // TODO: make Gap generic!
   // NOTE: addReplacements.. should look like addAdditions method?
-  static void addReplacementsToAlignmentTable(final AlignmentTable2 table, final WitnessSegmentPhrases witness, final NewSuperbase superbase, final Alignment<Phrase> alignment) {
-    final List<Gap> replacements = alignment.getReplacements();
-    for (final Gap replacement : replacements) {
+  static void addReplacementsToAlignmentTable(final AlignmentTable2<Phrase> table, final WitnessSegmentPhrases witness, final NewSuperbase superbase, final Alignment<Phrase> alignment) {
+    final List<Gap<Phrase>> replacements = alignment.getReplacements();
+    for (final Gap<Phrase> replacement : replacements) {
       //      System.out.println(replacement.toString());
       final BaseContainerPart<Phrase> partA = replacement.getPhraseA();
       final BaseContainerPart<Phrase> partB = replacement.getPhraseB();
@@ -133,7 +132,7 @@ public class NewAlignmentTableCreator {
     //    }
   }
 
-  static void addVariantAtGap(final AlignmentTable2 table, final NewSuperbase superbase, final Gap gap, final List<Phrase> witnessWords) {
+  static void addVariantAtGap(final AlignmentTable2<Phrase> table, final NewSuperbase superbase, final Gap<Phrase> gap, final List<Phrase> witnessWords) {
     if (gap.isAtTheEnd()) {
       table.addVariantAtTheEnd(witnessWords);
     } else {
@@ -175,7 +174,7 @@ public class NewAlignmentTableCreator {
     }
     // remove matches from transpositions
     final Set<Match<T>> matches = alignment.getMatches();
-    final List<Gap> gaps = alignment.getGaps();
+    final List<Gap<T>> gaps = alignment.getGaps();
     //    System.out.println(transpositions);
     for (final Transposition t : transpositions) {
       final MatchSequence<T> witness = t.getWitness();

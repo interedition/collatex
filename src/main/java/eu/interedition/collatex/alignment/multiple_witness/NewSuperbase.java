@@ -17,7 +17,7 @@ public class NewSuperbase extends WitnessSegmentPhrases {
     _columns = Lists.newArrayList();
   }
 
-  public static NewSuperbase create(final AlignmentTable2 table) {
+  public static NewSuperbase create(final AlignmentTable2<Phrase> table) {
     final NewSuperbase newS = new NewSuperbase();
     for (final Column<Phrase> column : table.getColumns()) {
       final List<Phrase> unique = column.getUniqueElements();

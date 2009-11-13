@@ -42,7 +42,7 @@ public class IntegrationTest {
     System.out.println(match);
     // Alignment
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(match, pa, pb);
-    final List<Gap> gaps = alignment.getGaps();
+    final List<Gap<Phrase>> gaps = alignment.getGaps();
     //    System.out.println(gaps.toString());
     Assert.assertEquals(1, gaps.size());
   }

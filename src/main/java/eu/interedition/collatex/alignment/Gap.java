@@ -5,27 +5,27 @@ import com.sd_editions.collatex.permutations.collate.Omission;
 import com.sd_editions.collatex.permutations.collate.Replacement;
 
 import eu.interedition.collatex.input.BaseContainerPart;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.visualization.Modification;
 
-// TODO: add generics!
-public class Gap {
-  final BaseContainerPart _partA;
-  final BaseContainerPart _partB;
-  final Match next;
+public class Gap<T extends BaseElement> {
+  final BaseContainerPart<T> _partA;
+  final BaseContainerPart<T> _partB;
+  final Match<T> next;
 
-  public Gap(final BaseContainerPart partA, final BaseContainerPart partB, final Match _next) {
+  public Gap(final BaseContainerPart<T> partA, final BaseContainerPart<T> partB, final Match<T> _next) {
     this._partA = partA;
     this._partB = partB;
     this.next = _next;
   }
 
   //TODO: rename method to getPartA
-  public BaseContainerPart getPhraseA() {
+  public BaseContainerPart<T> getPhraseA() {
     return _partA;
   }
 
   //TODO: rename method to getPartB
-  public BaseContainerPart getPhraseB() {
+  public BaseContainerPart<T> getPhraseB() {
     return _partB;
   }
 
@@ -83,7 +83,7 @@ public class Gap {
   }
 
   // Note: this the next match after the gap for the second witness!
-  public Match getNextMatch() {
+  public Match<T> getNextMatch() {
     if (next == null) {
       throw new RuntimeException("There is no next match!");
     }

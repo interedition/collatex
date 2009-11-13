@@ -1,22 +1,22 @@
 package com.sd_editions.collatex.permutations;
 
 import eu.interedition.collatex.alignment.Match;
-import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.visualization.Modification;
 
-public class WordDistanceMatch extends Modification {
+public class WordDistanceMatch<T extends BaseElement> extends Modification {
 
-  private final Match<Word> match;
+  private final Match<T> match;
 
-  public WordDistanceMatch(Match<Word> _match) {
+  public WordDistanceMatch(final Match<T> _match) {
     this.match = _match;
   }
 
-  public Word base() {
+  public T base() {
     return match.getBaseWord();
   }
 
-  public Word witness() {
+  public T witness() {
     return match.getWitnessWord();
   }
 

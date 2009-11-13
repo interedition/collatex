@@ -22,10 +22,10 @@ public class Alignment<T extends BaseElement> {
   private final List<MatchSequence<T>> _sequencesA;
   private final List<MatchSequence<T>> _sequencesB;
   private final Set<Match<T>> _matches;
-  private final List<Gap> _gaps;
+  private final List<Gap<T>> _gaps;
 
   // Note: this constructor should take an UnfixedAlignment object as parameter!
-  private Alignment(final Set<Match<T>> matches, final List<Gap> gaps, final List<MatchSequence<T>> sequencesA, final List<MatchSequence<T>> sequencesB) {
+  private Alignment(final Set<Match<T>> matches, final List<Gap<T>> gaps, final List<MatchSequence<T>> sequencesA, final List<MatchSequence<T>> sequencesB) {
     this._matches = matches;
     this._gaps = gaps;
     this._sequencesA = sequencesA;
@@ -35,9 +35,9 @@ public class Alignment<T extends BaseElement> {
   public static Alignment<Word> create(final Set<Match<Word>> matches, final Segment a, final Segment b) {
     final List<MatchSequence<Word>> sequencesA = SequenceDetection.calculateMatchSequences(matches);
     final List<MatchSequence<Word>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
-    final List<Gap> gaps1 = GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB);
-    final List<Gap> gaps2 = GapDetection.getVariantsInMatchSequences(a, b, sequencesA);
-    final List<Gap> gaps = Lists.newArrayList();
+    final List<Gap<Word>> gaps1 = GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB);
+    final List<Gap<Word>> gaps2 = GapDetection.getVariantsInMatchSequences(a, b, sequencesA);
+    final List<Gap<Word>> gaps = Lists.newArrayList();
     gaps.addAll(gaps1);
     gaps.addAll(gaps2);
     return new Alignment<Word>(matches, gaps, sequencesA, sequencesB);
@@ -49,14 +49,14 @@ public class Alignment<T extends BaseElement> {
     final List<MatchSequence<Phrase>> sequencesA = SequenceDetection.calculateMatchSequences(matches);
     final List<MatchSequence<Phrase>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
     // TODO: extract convenience method for this!
-    final List<Gap> gaps = Lists.newArrayList();
+    final List<Gap<Phrase>> gaps = Lists.newArrayList();
     gaps.addAll(GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB));
     gaps.addAll(GapDetection.getVariantsInMatchSequences(a, b, sequencesA));
     final Alignment<Phrase> al = new Alignment<Phrase>(matches, gaps, sequencesA, sequencesB);
     return al;
   }
 
-  public static <T extends BaseElement> Alignment<T> create2(final Set<Match<T>> matches, final List<Gap> gaps, final List<MatchSequence<T>> sequencesA, final List<MatchSequence<T>> sequencesB) {
+  public static <T extends BaseElement> Alignment<T> create2(final Set<Match<T>> matches, final List<Gap<T>> gaps, final List<MatchSequence<T>> sequencesA, final List<MatchSequence<T>> sequencesB) {
     return new Alignment<T>(matches, gaps, sequencesA, sequencesB);
   }
 
@@ -68,7 +68,7 @@ public class Alignment<T extends BaseElement> {
     return _sequencesA;
   }
 
-  public List<Gap> getGaps() {
+  public List<Gap<T>> getGaps() {
     return _gaps;
   }
 
@@ -102,9 +102,9 @@ public class Alignment<T extends BaseElement> {
     return additions;
   }
 
-  public List<Gap> getReplacements() {
-    final List<Gap> replacements = Lists.newArrayList();
-    for (final Gap gap : _gaps) {
+  public List<Gap<T>> getReplacements() {
+    final List<Gap<T>> replacements = Lists.newArrayList();
+    for (final Gap<T> gap : _gaps) {
       if (gap.isReplacement()) {
         replacements.add(gap);
       }

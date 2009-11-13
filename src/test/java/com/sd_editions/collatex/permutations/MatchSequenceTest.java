@@ -185,7 +185,7 @@ public class MatchSequenceTest extends TestCase {
     final Match b = new Match(bB, bW);
     final MatchSequence<Word> sequence = new MatchSequence<Word>(1, a, b);
     final List<MatchSequence<Word>> sequences = Lists.newArrayList(sequence);
-    final List<Gap> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
+    final List<Gap<Word>> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
     final List<Modification> results = Visualization.analyseVariants(variants);
     final List<Modification> modificationsInMatchSequences = results;
     assertEquals(1, modificationsInMatchSequences.size());
@@ -204,7 +204,7 @@ public class MatchSequenceTest extends TestCase {
     final Match b = new Match(bB, bW);
     final MatchSequence<Word> sequence = new MatchSequence(1, a, b);
     final List<MatchSequence<Word>> sequences = Lists.newArrayList(sequence);
-    final List<Gap> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
+    final List<Gap<Word>> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
     final List<Modification> results = Visualization.analyseVariants(variants);
     final List<Modification> modificationsInMatchSequences = results;
     assertEquals(0, modificationsInMatchSequences.size());

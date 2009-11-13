@@ -20,9 +20,8 @@ import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTab
 // superbase. So that every witness is compared against
 // the super base which is constructed after each compare
 
-// TODO: make generic!
-public class AlignmentTable2 {
-  private final List<Column> columns;
+public class AlignmentTable2<T extends BaseElement> {
+  private final List<Column<T>> columns;
   private final List<Segment> witnesses; // TODO: remove!
   private final List<String> _sigli;
 
@@ -36,12 +35,12 @@ public class AlignmentTable2 {
   }
 
   // Note: should this be public?
-  public void add(final Column column) {
+  public void add(final Column<T> column) {
     columns.add(column);
   }
 
   // TODO: rename words to Elements!
-  public <T extends BaseElement> void addVariantBefore(final Column<T> column, final List<T> witnessWords) {
+  public void addVariantBefore(final Column<T> column, final List<T> witnessWords) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
       throw new RuntimeException("Unexpected error: Column not found!");
@@ -54,7 +53,7 @@ public class AlignmentTable2 {
     }
   }
 
-  public <T extends BaseElement> void addVariantAtTheEnd(final List<T> witnessWords) {
+  public void addVariantAtTheEnd(final List<T> witnessWords) {
     for (final T word : witnessWords) {
       final Column<T> extraColumn = new Column<T>(word);
       columns.add(extraColumn);
@@ -63,13 +62,13 @@ public class AlignmentTable2 {
 
   public Superbase createSuperbase() {
     final Superbase superbase = new Superbase();
-    for (final Column column : columns) {
+    for (final Column<T> column : columns) {
       column.addToSuperbase(superbase);
     }
     return superbase;
   }
 
-  public List<Column> getColumns() {
+  public List<Column<T>> getColumns() {
     return columns;
   }
 
@@ -91,7 +90,7 @@ public class AlignmentTable2 {
     for (final Segment witness : witnesses) {
       collectedStrings += witness.id + ": ";
       String delim = "";
-      for (final Column column : columns) {
+      for (final Column<T> column : columns) {
         collectedStrings += delim + cellToString(witness, column);
         delim = "|";
       }
@@ -100,7 +99,7 @@ public class AlignmentTable2 {
     return collectedStrings;
   }
 
-  private String cellToString(final Segment witness, final Column column) {
+  private String cellToString(final Segment witness, final Column<T> column) {
     if (!column.containsWitness(witness)) {
       return " ";
     }
@@ -108,7 +107,7 @@ public class AlignmentTable2 {
   }
 
   // TODO: is this check still necessary?
-  // TODO: I dont think one witness is ever
+  // TODO: I don't think one witness is ever
   // TODO: added twice to the table!
   // TODO: rename to add witness?
   void addWitnessToInternalList(final Segment witness) {
@@ -121,22 +120,22 @@ public class AlignmentTable2 {
 
   // TODO: add visitor who walks over the witnesses
   // Note: this is a visitor who walks over the columns!
-  public void accept(final IAlignmentTableVisitor visitor) {
+  public void accept(final IAlignmentTableVisitor<T> visitor) {
     visitor.visitTable(this);
-    for (final Column column : columns) {
+    for (final Column<T> column : columns) {
       column.accept(visitor);
     }
     visitor.postVisitTable(this);
   }
 
   // TODO: move this functionality to a visitor!
-  public static String alignmentTableToHTML(final AlignmentTable2 alignmentTable) {
+  public static <T extends BaseElement> String alignmentTableToHTML(final AlignmentTable2<T> alignmentTable) {
     final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
 
     for (final String witnessId : alignmentTable.getSigli()) {
       tableHTML.append("<tr>");
       tableHTML.append("<th>Witness ").append(witnessId).append(":</th>");
-      for (final Column column : alignmentTable.getColumns()) {
+      for (final Column<T> column : alignmentTable.getColumns()) {
         tableHTML.append("<td>");
         if (column.containsWitness(witnessId)) {
           // TODO: this was normalized!

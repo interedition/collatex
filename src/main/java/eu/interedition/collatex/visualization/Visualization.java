@@ -24,7 +24,7 @@ public class Visualization {
     return modifications;
   }
 
-  public static List<Modification> determineModifications(final Set<Match> permutation, final List<Gap> determineNonMatches) {
+  public static <T extends BaseElement> List<Modification> determineModifications(final Set<Match<T>> permutation, final List<Gap<T>> determineNonMatches) {
     final List<Modification> modifications = Lists.newArrayList();
     modifications.addAll(Matches.getWordDistanceMatches(permutation));
     modifications.addAll(Visualization.analyseVariants(determineNonMatches));
@@ -40,9 +40,9 @@ public class Visualization {
   }
 
   @Deprecated
-  public static List<Modification> analyseVariants(final List<Gap> variants) {
+  public static <T extends BaseElement> List<Modification> analyseVariants(final List<Gap<T>> variants) {
     final List<Modification> results = Lists.newArrayList();
-    for (final Gap nonMatch : variants) {
+    for (final Gap<T> nonMatch : variants) {
       final Modification modification = nonMatch.analyse();
       results.add(modification);
     }
