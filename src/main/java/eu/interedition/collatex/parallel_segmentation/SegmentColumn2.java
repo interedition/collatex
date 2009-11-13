@@ -99,9 +99,11 @@ public class SegmentColumn2 {
   }
 
   private String renderSigli(final Collection<String> sigli) {
+    final List<String> l = Lists.newArrayList(sigli);
+    Collections.sort(l);
     final StringBuilder b = new StringBuilder();
     String delimiter = "";
-    for (final String sigil : sigli) {
+    for (final String sigil : l) {
       b.append(delimiter);
       b.append("#");
       b.append(sigil);
