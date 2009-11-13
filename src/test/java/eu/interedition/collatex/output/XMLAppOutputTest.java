@@ -20,12 +20,12 @@ public class XMLAppOutputTest {
     builder = new WitnessBuilder();
   }
 
-  private String collateWitnessStrings(String a, String b, String c) {
-    Witness w1 = builder.build("A", a);
-    Witness w2 = builder.build("B", b);
-    Witness w3 = builder.build("C", c);
-    WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
+  private String collateWitnessStrings(final String a, final String b, final String c) {
+    final Witness w1 = builder.build("A", a);
+    final Witness w2 = builder.build("B", b);
+    final Witness w3 = builder.build("C", c);
+    final WitnessSet set = new WitnessSet(w1, w2, w3);
+    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
     return table.toXML();
   }
 
@@ -34,8 +34,8 @@ public class XMLAppOutputTest {
    */
   @Test
   public void testSimpleSubstitutionOutput() {
-    String xml = collateWitnessStrings("the black cat and the black mat", "the black dog and the black mat", "the black dog and the black mat");
-    Assert.assertEquals("<collation>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B #C\">dog</rdg></app> and the black mat</collation>", xml);
+    final String xml = collateWitnessStrings("the black cat and the black mat", "the black dog and the black mat", "the black dog and the black mat");
+    Assert.assertEquals("<collation><seg>the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B #C\">dog</rdg></app> and the black mat</seg></collation>", xml);
   }
 
   /**
@@ -43,50 +43,51 @@ public class XMLAppOutputTest {
    */
   @Test
   public void testSimpleAddDelOutput() {
-    String xml = collateWitnessStrings("the black cat on the white table", "the black saw the black cat on the table", "the black saw the black cat on the table");
+    final String xml = collateWitnessStrings("the black cat on the white table", "the black saw the black cat on the table", "the black saw the black cat on the table");
     Assert.assertEquals(
-        "<collation>the black <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B #C\"/></app> table</collation>", xml);
+        "<collation><seg>the black <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B #C\"/></app> table</seg></collation>",
+        xml);
   }
 
   @Test
   public void testMultiSubstitutionOutput() {
-    String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat", "the big white dog and the black mat");
-    Assert.assertEquals("<collation>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B #C\">big white dog</rdg></app> and the black mat</collation>", xml);
+    final String xml = collateWitnessStrings("the black cat and the black mat", "the big white dog and the black mat", "the big white dog and the black mat");
+    Assert.assertEquals("<collation><seg>the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B #C\">big white dog</rdg></app> and the black mat</seg></collation>", xml);
   }
 
   // Additional unit tests (not present in ticket #6)
   @Test
   public void testAllWitnessesEqual() {
-    Witness w1 = builder.build("the black cat");
-    Witness w2 = builder.build("the black cat");
-    Witness w3 = builder.build("the black cat");
-    WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "<collation>the black cat</collation>";
+    final Witness w1 = builder.build("the black cat");
+    final Witness w2 = builder.build("the black cat");
+    final Witness w3 = builder.build("the black cat");
+    final WitnessSet set = new WitnessSet(w1, w2, w3);
+    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
+    final String expected = "<collation><seg>the black cat</seg></collation>";
     Assert.assertEquals(expected, table.toXML());
   }
 
   // Note: There are some problems with whitespace here!
   @Test
   public void testAWordMissingAtTheEnd() {
-    Witness w1 = builder.build("A", "the black cat");
-    Witness w2 = builder.build("B", "the black cat");
-    Witness w3 = builder.build("C", "the black");
-    WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "<collation>the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app></collation>";
+    final Witness w1 = builder.build("A", "the black cat");
+    final Witness w2 = builder.build("B", "the black cat");
+    final Witness w3 = builder.build("C", "the black");
+    final WitnessSet set = new WitnessSet(w1, w2, w3);
+    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
+    final String expected = "<collation><seg>the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app></seg></collation>";
     Assert.assertEquals(expected, table.toXML());
   }
 
   // Note: There might be some problems with whitespace here!
   @Test
   public void testCrossVariation() {
-    Witness w1 = builder.build("A", "the black cat");
-    Witness w2 = builder.build("B", "the white and black cat");
-    Witness w3 = builder.build("C", "the white cat");
-    WitnessSet set = new WitnessSet(w1, w2, w3);
-    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "<collation>the <app><rdg wit='#A'/><rdg wit='#B #C'>white</rdg></app> <app><rdg wit='#A #C'/><rdg wit='#B'>and</rdg></app> <app><rdg wit='#A #B'>black</rdg><rdg wit='#C'/></app> cat</collation>"
+    final Witness w1 = builder.build("A", "the black cat");
+    final Witness w2 = builder.build("B", "the white and black cat");
+    final Witness w3 = builder.build("C", "the white cat");
+    final WitnessSet set = new WitnessSet(w1, w2, w3);
+    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
+    final String expected = "<collation><seg>the <app><rdg wit='#A'/><rdg wit='#B #C'>white</rdg></app> <app><rdg wit='#A #C'/><rdg wit='#B'>and</rdg></app> <app><rdg wit='#A #B'>black</rdg><rdg wit='#C'/></app> cat</seg></collation>"
         .replaceAll("\\'", "\\\"");
     Assert.assertEquals(expected, table.toXML());
   }
@@ -94,11 +95,11 @@ public class XMLAppOutputTest {
   // Note: There might be some problems with whitespace here!
   @Test
   public void testAddition() {
-    Witness w1 = builder.build("A", "the black cat");
-    Witness w2 = builder.build("B", "the white and black cat");
-    WitnessSet set = new WitnessSet(w1, w2);
-    AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "<collation>the <app><rdg wit=\"#A\"/><rdg wit=\"#B\">white and</rdg></app> black cat</collation>";
+    final Witness w1 = builder.build("A", "the black cat");
+    final Witness w2 = builder.build("B", "the white and black cat");
+    final WitnessSet set = new WitnessSet(w1, w2);
+    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
+    final String expected = "<collation><seg>the <app><rdg wit=\"#A\"/><rdg wit=\"#B\">white and</rdg></app> black cat</seg></collation>";
     Assert.assertEquals(expected, table.toXML());
   }
 

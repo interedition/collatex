@@ -20,9 +20,10 @@ import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTab
 // superbase. So that every witness is compared against
 // the super base which is constructed after each compare
 
+// TODO: make generic!
 public class AlignmentTable2 {
   private final List<Column> columns;
-  private final List<Segment> witnesses;
+  private final List<Segment> witnesses; // TODO: remove!
   private final List<String> _sigli;
 
   // _sigli is a replacement for witnesses;
@@ -78,6 +79,7 @@ public class AlignmentTable2 {
 
   // TODO: move this to a visitor!
   // TODO: separate in two steps: segmentation and xml rendering
+  // TODO: this uses the OLD CODE!
   public String toXML() {
     final TeiParallelSegmentationTable app = AlignmentTableSegmentator.createTeiParrallelSegmentationTable(this);
     return app.toXML();
@@ -114,6 +116,7 @@ public class AlignmentTable2 {
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
     }
+    _sigli.add(witness.id);
   }
 
   // TODO: add visitor who walks over the witnesses

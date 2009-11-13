@@ -32,7 +32,9 @@ public class AlignmentTableSegmentator {
         needNewCell = false;
       }
       if (needNewCell) {
-        mergedColumn = new SegmentColumn2(alignmentTable.getWitnesses());
+        final List<String> sigli = alignmentTable.getSigli();
+        System.out.println("!!!" + sigli);
+        mergedColumn = new SegmentColumn2(sigli);
         mergedColumns.add(mergedColumn);
       }
 

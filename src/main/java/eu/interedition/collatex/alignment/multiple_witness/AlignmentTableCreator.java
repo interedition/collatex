@@ -33,6 +33,7 @@ public class AlignmentTableCreator {
         table.add(new Column(word));
       }
       table.getWitnesses().add(witness);
+      table.getSigli().add(witness.id);
       return;
     }
 

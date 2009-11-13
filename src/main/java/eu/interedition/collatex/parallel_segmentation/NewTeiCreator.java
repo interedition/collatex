@@ -15,7 +15,7 @@ public class NewTeiCreator {
     final List<SegmentColumn2> segcol = Lists.newArrayList();
     for (final Column column : columns) {
 
-      final SegmentColumn2 newColumn = new SegmentColumn2(table.getWitnesses());
+      final SegmentColumn2 newColumn = new SegmentColumn2(table.getSigli());
       final Set<String> sigli = column.getSigli();
       for (final String sigil : sigli) {
         final Phrase phrase = (Phrase) column.getWord(sigil);

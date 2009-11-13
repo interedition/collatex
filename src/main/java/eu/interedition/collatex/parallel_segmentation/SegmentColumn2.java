@@ -25,11 +25,11 @@ import eu.interedition.collatex.input.Word;
 public class SegmentColumn2 {
 
   private final Map<String, Phrase> _phrases;
-  private final List<Segment> _witnesses;
+  private final List<String> _sigliInTable;
 
-  public SegmentColumn2(final List<Segment> witnesses) {
+  public SegmentColumn2(final List<String> sigliInTable) {
     this._phrases = Maps.newHashMap();
-    this._witnesses = witnesses;
+    this._sigliInTable = sigliInTable;
   }
 
   public String toXML() {
@@ -38,6 +38,7 @@ public class SegmentColumn2 {
     for (final Entry<String, Phrase> entry : _phrases.entrySet()) {
       renderedPhraseToWitnessID.put(entry.getValue().toString(), entry.getKey());
     }
+    System.out.println(renderedPhraseToWitnessID.keySet());
     // There is no app tag needed!
     if (renderedPhraseToWitnessID.keySet().size() == 1 && !hasEmptyCells()) {
       return renderedPhraseToWitnessID.keys().iterator().next();
@@ -85,17 +86,18 @@ public class SegmentColumn2 {
   }
 
   private Set<String> getEmptyCells() {
-    final Set<String> sigliInTable = Sets.newLinkedHashSet();
-    for (final Segment witness1 : _witnesses) {
-      sigliInTable.add(witness1.id);
-    }
-    final Set<String> emptySigli = Sets.newLinkedHashSet(sigliInTable);
+    //    final Set<String> sigliInTable = Sets.newLinkedHashSet();
+    //    for (final Segment witness1 : _witnesses) {
+    //      sigliInTable.add(witness1.id);
+    //    }
+    final Set<String> emptySigli = Sets.newLinkedHashSet(_sigliInTable);
     emptySigli.removeAll(_phrases.keySet());
     return emptySigli;
   }
 
   private boolean hasEmptyCells() {
-    return _witnesses.size() != _phrases.size();
+    System.out.println(_sigliInTable.size() + ":" + _phrases.size());
+    return _sigliInTable.size() != _phrases.size();
   }
 
   private String renderSigli(final Collection<String> sigli) {
