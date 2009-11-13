@@ -23,12 +23,16 @@ import eu.interedition.collatex.input.WitnessSegmentPhrases;
 
 public class NewAlignmentTableCreator {
 
-  public static AlignmentTable2 createNewAlignmentTable(final WitnessSegmentPhrases... set) {
+  public static AlignmentTable2 createNewAlignmentTable(final List<WitnessSegmentPhrases> set) {
     final AlignmentTable2 table = new AlignmentTable2();
     for (final WitnessSegmentPhrases seg : set) {
       NewAlignmentTableCreator.addSegmentPhrases(table, seg);
     }
     return table;
+  }
+
+  public static AlignmentTable2 createNewAlignmentTable(final WitnessSegmentPhrases... set) {
+    return createNewAlignmentTable(Lists.newArrayList(set));
   }
 
   private static void addSegmentPhrases(final AlignmentTable2 table, final WitnessSegmentPhrases seg) {

@@ -321,4 +321,12 @@ public class SubsegmentExtractor {
     final Set<Match<Phrase>> unfixed = Sets.newHashSet();
     return new UnfixedAlignment<Phrase>(fixed, unfixed);
   }
+
+  public List<String> getSigli() {
+    final List<String> sigli = Lists.newArrayList();
+    for (final Segment segment : segments) {
+      sigli.add(segment.id);
+    }
+    return sigli;
+  }
 }

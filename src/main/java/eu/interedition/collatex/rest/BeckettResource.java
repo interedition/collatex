@@ -1,6 +1,7 @@
 package eu.interedition.collatex.rest;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -10,6 +11,7 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
+import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.SubsegmentExtractor;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
@@ -31,25 +33,16 @@ public class BeckettResource extends ServerResource {
     try {
       final SubsegmentExtractor sse = theSameExtractor();
       sse.go();
-      final WitnessSegmentPhrases pa = sse.getWitnessSegmentPhrases("06-1");
-      final WitnessSegmentPhrases pb = sse.getWitnessSegmentPhrases("06-2");
-      final WitnessSegmentPhrases pc = sse.getWitnessSegmentPhrases("08-1");
-      final WitnessSegmentPhrases pd = sse.getWitnessSegmentPhrases("08-2");
-      final WitnessSegmentPhrases pe = sse.getWitnessSegmentPhrases("09-1");
-      final WitnessSegmentPhrases pf = sse.getWitnessSegmentPhrases("09-2");
-      final WitnessSegmentPhrases pg = sse.getWitnessSegmentPhrases("10-1");
-      final WitnessSegmentPhrases ph = sse.getWitnessSegmentPhrases("10-2");
+      // TODO: 11-2 en 12-1 subsegmenten gaan nog fout!
+      final List<String> sigli = sse.getSigli();
+      sigli.remove("11-2");
+      sigli.remove("12-1");
+      final List<WitnessSegmentPhrases> set = Lists.newLinkedList();
+      for (final String sigil : sigli) {
+        set.add(sse.getWitnessSegmentPhrases(sigil));
+      }
 
-      System.out.println(pa.toString());
-      System.out.println(pb.toString());
-      System.out.println(pc.toString());
-      System.out.println(pd.toString());
-      System.out.println(pe.toString());
-      System.out.println(pf.toString());
-      System.out.println(pg.toString());
-      System.out.println(ph.toString());
-
-      final AlignmentTable2 alignmentTable = NewAlignmentTableCreator.createNewAlignmentTable(pa, pb, pc, pd, pe, pf, pg, ph);
+      final AlignmentTable2 alignmentTable = NewAlignmentTableCreator.createNewAlignmentTable(set);
       // HTML
       html = "<html><body> " + AlignmentTable2.alignmentTableToHTML(alignmentTable) + "</body></html>";
     } catch (final Exception e) {
