@@ -34,11 +34,12 @@ public class BeckettResource extends ServerResource {
       final SubsegmentExtractor sse = theSameExtractor();
       sse.go();
       // TODO: 11-2 en 12-1 subsegmenten gaan nog fout!
+      //      sigli.remove("11-2");
+      //      sigli.remove("12-1");
       final List<String> sigli = sse.getSigli();
-      sigli.remove("11-2");
-      sigli.remove("12-1");
+      final List<String> shownSigli = sigli.subList(0, 8);
       final List<WitnessSegmentPhrases> set = Lists.newLinkedList();
-      for (final String sigil : sigli) {
+      for (final String sigil : shownSigli) {
         set.add(sse.getWitnessSegmentPhrases(sigil));
       }
 
