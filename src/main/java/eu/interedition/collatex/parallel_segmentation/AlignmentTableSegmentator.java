@@ -10,6 +10,9 @@ import eu.interedition.collatex.alignment.multiple_witness.ColumnState;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 
+// NOTE: this class should become obsolete if the 
+// complete alignment pipeline works with segment phrases instead
+// of words
 public class AlignmentTableSegmentator {
 
   public static TeiParallelSegmentationTable createTeiParrallelSegmentationTable(final AlignmentTable2 alignmentTable) {

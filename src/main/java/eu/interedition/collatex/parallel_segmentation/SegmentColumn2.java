@@ -110,6 +110,7 @@ public class SegmentColumn2 {
     return b.toString();
   }
 
+  // NOTE: This is old code, should not be needed 
   public void addWord(final Segment witness2, final Word word) {
     final Phrase existingPhrase = _phrases.get(witness2.id);
     if (existingPhrase == null) {
@@ -120,5 +121,9 @@ public class SegmentColumn2 {
 
     final Phrase newPhrase = new Phrase(witness2, existingPhrase.getFirstWord(), word, null);
     _phrases.put(witness2.id, newPhrase);
+  }
+
+  public void addPhrase(final String witnessid, final Phrase phrase) {
+    _phrases.put(witnessid, phrase);
   }
 }
