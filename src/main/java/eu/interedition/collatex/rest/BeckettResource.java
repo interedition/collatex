@@ -38,8 +38,12 @@ public class BeckettResource extends ServerResource {
       // TODO: 11-2 en 12-1 subsegmenten gaan nog fout!
       //      sigli.remove("11-2");
       //      sigli.remove("12-1");
+
       final List<String> sigli = sse.getSigli();
-      final List<String> shownSigli = sigli.subList(0, 8);
+      final List<String> shownSigli = sigli.subList(0, 26);
+      shownSigli.remove("11-1"); // andleft is missing!
+      shownSigli.remove("11-2"); // died is weggevallen
+      shownSigli.remove("12-1"); // him goes wrong; died is weg and left 2x
       final List<WitnessSegmentPhrases> set = Lists.newLinkedList();
       for (final String sigil : shownSigli) {
         set.add(sse.getWitnessSegmentPhrases(sigil));
