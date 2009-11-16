@@ -10,7 +10,7 @@ import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.functions.Matcher;
+import eu.interedition.collatex.alignment.functions.Aligner;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.collation.CollateCore;
@@ -77,10 +77,10 @@ public class ColorsView {
     for (int base = 1; base < numberOfWitnesses; base++) {
       for (int w = base + 1; w <= numberOfWitnesses; w++) {
         html.append("Comparing witness " + base + " - witness " + (w) + ":");
-        new Matcher();
+        new Aligner();
         Witness a = witnesses.get(base - 1);
         Witness b = witnesses.get(w - 1);
-        Alignment align = Matcher.align(a.getFirstSegment(), b.getFirstSegment());
+        Alignment align = Aligner.align(a.getFirstSegment(), b.getFirstSegment());
         Modifications modifications = Visualization.getModifications(align);
         html.append(modificationsView(base, modifications));
         html.append("<br/>");

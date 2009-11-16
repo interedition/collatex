@@ -17,7 +17,7 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.alignment.functions.Matcher;
+import eu.interedition.collatex.alignment.functions.Aligner;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
@@ -56,7 +56,7 @@ public class CollateCore {
   }
 
   public Alignment doCompareWitnesses(Segment base, Segment witness) {
-    Alignment alignment = Matcher.align(base, witness);
+    Alignment alignment = Aligner.align(base, witness);
     return alignment;
     //    Matches matches = new Matches(base, witness, new NormalizedLevenshtein());
     //    List<Set<Match>> permutationList = matches.permutations();

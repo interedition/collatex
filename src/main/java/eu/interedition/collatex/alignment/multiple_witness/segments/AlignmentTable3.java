@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.MatchSequence;
-import eu.interedition.collatex.alignment.functions.Matcher;
+import eu.interedition.collatex.alignment.functions.Aligner;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
@@ -65,7 +65,7 @@ public class AlignmentTable3 {
 
     // make the superbase from the alignment table
     SegmentSuperbase superbase = SegmentSuperbase.create(this);
-    Alignment alignment = Matcher.align(superbase, witness);
+    Alignment alignment = Aligner.align(superbase, witness);
 
     addMatchesToAlignmentTable(superbase, alignment);
     _witnesses.add(witness);
