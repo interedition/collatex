@@ -9,6 +9,7 @@ import com.sd_editions.collatex.match.Subsegment;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.UnfixedAlignment;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
@@ -39,20 +40,14 @@ public class Matcher {
   // TODO: make this code return an UnfixedAlignment object
   // TODO: make this code similar to match(Segment, Segment)
   public static UnfixedAlignment<Phrase> match(final WitnessSegmentPhrases pa, final WitnessSegmentPhrases pb) {
-    if (pa.size() > pb.size()) {
-      final Set<Match<Phrase>> matches_wrong = Matcher.match2(pb, pa);
-      final Set<Match<Phrase>> matches_right = Sets.newLinkedHashSet();
-      for (final Match<Phrase> match : matches_wrong) {
-        matches_right.add(new Match<Phrase>(match.getWitnessWord(), match.getBaseWord()));
-      }
-      final Set<Match<Phrase>> unfixedMatches = Sets.newLinkedHashSet();
-      final UnfixedAlignment<Phrase> result = new UnfixedAlignment<Phrase>(matches_right, unfixedMatches);
-      return result;
-    }
-    final Set<Match<Phrase>> fixedMatches = Matcher.match2(pa, pb);
-    final Set<Match<Phrase>> unfixedMatches = Sets.newLinkedHashSet();
-    final UnfixedAlignment<Phrase> result = new UnfixedAlignment<Phrase>(fixedMatches, unfixedMatches);
-    return result;
+    final Set<Match<Phrase>> allMatches = Matcher.match2(pa, pb);
+    final UnfixedAlignment<Phrase> unfixedAlignment = separateAllMatchesIntoFixedAndUnfixedMatches(allMatches);
+    return unfixedAlignment;
+
+    //    final Set<Match<Phrase>> fixedMatches = 
+    //    final Set<Match<Phrase>> unfixedMatches = Sets.newLinkedHashSet();
+    //    final UnfixedAlignment<Phrase> result = new UnfixedAlignment<Phrase>(fixedMatches, unfixedMatches);
+    //    return result;
   }
 
   // NOTE: this code is specific for Segments/Words!
@@ -71,27 +66,27 @@ public class Matcher {
     return matchSet;
   }
 
-  private static UnfixedAlignment<Word> separateAllMatchesIntoFixedAndUnfixedMatches(final Set<Match<Word>> allMatches) {
+  private static <T extends BaseElement> UnfixedAlignment<T> separateAllMatchesIntoFixedAndUnfixedMatches(final Set<Match<T>> allMatches) {
     // Note: this code is not the simplest thing that 
     // could possibly work!
-    final Set<Match<Word>> exactMatches = Sets.newLinkedHashSet();
-    for (final Match<Word> match : allMatches) {
-      final Iterable<Match<Word>> alternatives = findAlternatives(allMatches, match);
+    final Set<Match<T>> exactMatches = Sets.newLinkedHashSet();
+    for (final Match<T> match : allMatches) {
+      final Iterable<Match<T>> alternatives = findAlternatives(allMatches, match);
       if (!alternatives.iterator().hasNext()) {
         exactMatches.add(match);
       }
     }
 
-    final Set<Match<Word>> unfixedMatches = Sets.newLinkedHashSet(allMatches);
+    final Set<Match<T>> unfixedMatches = Sets.newLinkedHashSet(allMatches);
     unfixedMatches.removeAll(exactMatches);
 
-    final UnfixedAlignment<Word> unfixedAlignment = new UnfixedAlignment<Word>(exactMatches, unfixedMatches);
+    final UnfixedAlignment<T> unfixedAlignment = new UnfixedAlignment<T>(exactMatches, unfixedMatches);
     return unfixedAlignment;
   }
 
-  static Iterable<Match<Word>> findAlternatives(final Iterable<Match<Word>> pmatches, final Match<Word> pmatch) {
-    final Predicate<Match<Word>> unfixedAlternativeToGivenPMatch = new Predicate<Match<Word>>() {
-      public boolean apply(final Match<Word> pm) {
+  static <T extends BaseElement> Iterable<Match<T>> findAlternatives(final Iterable<Match<T>> pmatches, final Match<T> pmatch) {
+    final Predicate<Match<T>> unfixedAlternativeToGivenPMatch = new Predicate<Match<T>>() {
+      public boolean apply(final Match<T> pm) {
         return pm != pmatch && (pm.getBaseWord().equals(pmatch.getBaseWord()) || pm.getWitnessWord().equals(pmatch.getWitnessWord()));
       }
     };
@@ -115,7 +110,6 @@ public class Matcher {
           //          System.out.println(phrase);
           //          System.out.println(phrase2);
           matches.add(new Match<Phrase>(phrase, phrase2));
-          break;
         } else {
           //          System.out.println(phrase);
           //          System.out.println(phrase2);

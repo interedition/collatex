@@ -10,6 +10,7 @@ import com.sd_editions.collatex.permutations.Tuple2;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.functions.GapDetection;
+import eu.interedition.collatex.alignment.functions.NewAligner;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
@@ -45,10 +46,15 @@ public class Alignment<T extends BaseElement> {
 
   // TODO: make alternative matches work!
   public static Alignment<Phrase> createPhraseAlignment(final UnfixedAlignment<Phrase> matches, final WitnessSegmentPhrases a, final WitnessSegmentPhrases b) {
-    if (matches.hasUnfixedWords()) {
-      throw new RuntimeException("There are alternatives here! NOT YET IMPLEMENTED!");
+    final UnfixedAlignment<Phrase> fixed = NewAligner.permutate(matches, a, b);
+    if (fixed.hasUnfixedWords()) {
+      throw new RuntimeException("There are alternatives here! NOT YET IMPLEMENTED! " + matches.getUnfixedWords());
     }
 
+    return theRealCreation(fixed, a, b);
+  }
+
+  private static Alignment<Phrase> theRealCreation(final UnfixedAlignment<Phrase> matches, final WitnessSegmentPhrases a, final WitnessSegmentPhrases b) {
     final List<MatchSequence<Phrase>> sequencesA = SequenceDetection.calculateMatchSequences(matches.getFixedMatches());
     final List<MatchSequence<Phrase>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
     // TODO: extract convenience method for this!

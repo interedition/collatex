@@ -44,6 +44,10 @@ public class UnfixedAlignment<T extends BaseElement> {
     return baseToWitness.keySet();
   }
 
+  public Set<T> getUnfixedElementsInWitness() {
+    return witnessToBase.keySet();
+  }
+
   public Collection<Match<T>> getMatchesThatLinkFrom(final T word) {
     return baseToWitness.get(word);
   }

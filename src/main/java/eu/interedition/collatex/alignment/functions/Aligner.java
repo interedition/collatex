@@ -12,6 +12,7 @@ import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.UnfixedAlignment;
+import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
@@ -76,25 +77,25 @@ public class Aligner {
   }
 
   // TODO: naming here is not cool!
-  private static List<UnfixedAlignment<Word>> getAlignmentsForUnfixedMatches(final UnfixedAlignment<Word> previousAlignment, final Collection<Match<Word>> unfixedMatches) {
-    final List<UnfixedAlignment<Word>> permutationsForMatchGroup = Lists.newArrayList();
-    for (final Match<Word> possibleMatch : unfixedMatches) {
-      UnfixedAlignment<Word> alignment = previousAlignment.fixMatch(possibleMatch);
+  static <T extends BaseElement> List<UnfixedAlignment<T>> getAlignmentsForUnfixedMatches(final UnfixedAlignment<T> previousAlignment, final Collection<Match<T>> unfixedMatches) {
+    final List<UnfixedAlignment<T>> permutationsForMatchGroup = Lists.newArrayList();
+    for (final Match<T> possibleMatch : unfixedMatches) {
+      UnfixedAlignment<T> alignment = previousAlignment.fixMatch(possibleMatch);
       alignment = fixTheOnlyOtherPossibleMatch(unfixedMatches, possibleMatch, alignment);
       permutationsForMatchGroup.add(alignment);
     }
     return permutationsForMatchGroup;
   }
 
-  private static UnfixedAlignment<Word> fixTheOnlyOtherPossibleMatch(final Collection<Match<Word>> unfixedMatches, final Match<Word> possibleMatch, final UnfixedAlignment<Word> alignment) {
-    UnfixedAlignment<Word> result = alignment;
+  private static <T extends BaseElement> UnfixedAlignment<T> fixTheOnlyOtherPossibleMatch(final Collection<Match<T>> unfixedMatches, final Match<T> possibleMatch, final UnfixedAlignment<T> alignment) {
+    UnfixedAlignment<T> result = alignment;
     if (unfixedMatches.size() == 2) {
-      final Set<Match<Word>> temp = Sets.newLinkedHashSet(unfixedMatches);
+      final Set<Match<T>> temp = Sets.newLinkedHashSet(unfixedMatches);
       temp.remove(possibleMatch);
-      final Match<Word> matchToSearch = temp.iterator().next();
-      final Set<Match<Word>> unfixedMatchesInNewAlignment = alignment.getUnfixedMatches();
-      Match<Word> matchToFix = null;
-      for (final Match<Word> matchToCheck : unfixedMatchesInNewAlignment) {
+      final Match<T> matchToSearch = temp.iterator().next();
+      final Set<Match<T>> unfixedMatchesInNewAlignment = alignment.getUnfixedMatches();
+      Match<T> matchToFix = null;
+      for (final Match<T> matchToCheck : unfixedMatchesInNewAlignment) {
         if (matchToFix == null && (matchToCheck.getBaseWord().equals(matchToSearch.getBaseWord()) || matchToCheck.getWitnessWord().equals(matchToSearch.getWitnessWord()))) {
           matchToFix = matchToCheck;
         }
@@ -107,6 +108,8 @@ public class Aligner {
     return result;
   }
 
+  // TODO: naming of the variables here is not cool!
+  // TODO: rename UnfixedAlignment to Matches!
   // TODO: move all the collation creation out of the way!
   private static UnfixedAlignment<Word> selectBestPossibleAlignment(final Segment a, final Segment b, final List<UnfixedAlignment<Word>> alignments) {
     UnfixedAlignment bestAlignment = null;
