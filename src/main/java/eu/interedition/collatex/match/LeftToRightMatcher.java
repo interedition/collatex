@@ -1,8 +1,9 @@
-package com.sd_editions.collatex.match;
+package eu.interedition.collatex.match;
 
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+import com.sd_editions.collatex.match.Subsegment;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.input.Phrase;
@@ -10,6 +11,8 @@ import eu.interedition.collatex.input.WitnessSegmentPhrases;
 
 // TODO: add replacement tests!
 // TODO: add check for alternative matches!
+// Note: this class can be made obsolete by
+// Note: making the Matcher class more generic!
 public class LeftToRightMatcher {
 
   public static Set<Match<Phrase>> match(final WitnessSegmentPhrases pa, final WitnessSegmentPhrases pb) {

@@ -8,7 +8,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sd_editions.collatex.match.LeftToRightMatcher;
 import com.sd_editions.collatex.match.SubsegmentExtractor;
 
 import eu.interedition.collatex.alignment.Alignment;

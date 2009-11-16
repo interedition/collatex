@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.match.LeftToRightMatcher;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.Alignment;
@@ -20,6 +19,7 @@ import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
+import eu.interedition.collatex.match.LeftToRightMatcher;
 
 public class NewAlignmentTableCreator {
 

@@ -23,9 +23,30 @@ import eu.interedition.collatex.match.worddistance.WordDistance;
 public class Matcher {
 
   // NOTE: maybe rename UnfixedAlignment back to Matches?
-  public static UnfixedAlignment<Word> createFirstUnfixedAlignment(final Segment a, final Segment b) {
+  public static UnfixedAlignment<Word> match(final Segment a, final Segment b) {
     final Set<Match<Word>> allMatches = findMatches(a, b, new NormalizedLevenshtein());
 
+    final UnfixedAlignment<Word> unfixedAlignment = separateAllMatchesIntoFixedAndUnfixedMatches(allMatches);
+    return unfixedAlignment;
+  }
+
+  // NOTE: this code is specific for Segments/Words!
+  static Set<Match<Word>> findMatches(final Segment base, final Segment witness, final WordDistance distanceMeasure) {
+    final Set<Match<Word>> matchSet = Sets.newLinkedHashSet();
+    for (final Word baseWord : base.getWords()) {
+      for (final Word witnessWord : witness.getWords()) {
+        if (baseWord.normalized.equals(witnessWord.normalized)) {
+          matchSet.add(new Match<Word>(baseWord, witnessWord));
+        } else {
+          final float editDistance = distanceMeasure.distance(baseWord.normalized, witnessWord.normalized);
+          if (editDistance < 0.5) matchSet.add(new Match<Word>(baseWord, witnessWord, editDistance));
+        }
+      }
+    }
+    return matchSet;
+  }
+
+  private static UnfixedAlignment<Word> separateAllMatchesIntoFixedAndUnfixedMatches(final Set<Match<Word>> allMatches) {
     // Note: this code is not the simplest thing that 
     // could possibly work!
     final Set<Match<Word>> exactMatches = Sets.newLinkedHashSet();
@@ -41,21 +62,6 @@ public class Matcher {
 
     final UnfixedAlignment<Word> unfixedAlignment = new UnfixedAlignment<Word>(exactMatches, unfixedMatches);
     return unfixedAlignment;
-  }
-
-  static Set<Match<Word>> findMatches(final Segment base, final Segment witness, final WordDistance distanceMeasure) {
-    final Set<Match<Word>> matchSet = Sets.newLinkedHashSet();
-    for (final Word baseWord : base.getWords()) {
-      for (final Word witnessWord : witness.getWords()) {
-        if (baseWord.normalized.equals(witnessWord.normalized)) {
-          matchSet.add(new Match<Word>(baseWord, witnessWord));
-        } else {
-          final float editDistance = distanceMeasure.distance(baseWord.normalized, witnessWord.normalized);
-          if (editDistance < 0.5) matchSet.add(new Match<Word>(baseWord, witnessWord, editDistance));
-        }
-      }
-    }
-    return matchSet;
   }
 
   static Iterable<Match<Word>> findAlternatives(final Iterable<Match<Word>> pmatches, final Match<Word> pmatch) {

@@ -27,7 +27,7 @@ public class PossibleMatchesTest {
   public void testExactMatchesAreFixed() {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    UnfixedAlignment unfixedAlignment = Matcher.createFirstUnfixedAlignment(a.getFirstSegment(), b.getFirstSegment());
+    UnfixedAlignment unfixedAlignment = Matcher.match(a.getFirstSegment(), b.getFirstSegment());
     Set<Match> exactMatches = unfixedAlignment.getFixedMatches();
     String expected = "[(3->4), (4->7)]";
     Assert.assertEquals(expected, exactMatches.toString());
@@ -37,7 +37,7 @@ public class PossibleMatchesTest {
   public void testPossibleMatchesAsAMap() {
     Witness a = builder.build("zijn hond liep aan zijn hand");
     Witness b = builder.build("op zijn pad liep zijn hond aan zijn hand");
-    UnfixedAlignment unfixedAlignment = Matcher.createFirstUnfixedAlignment(a.getFirstSegment(), b.getFirstSegment());
+    UnfixedAlignment unfixedAlignment = Matcher.match(a.getFirstSegment(), b.getFirstSegment());
     Word zijn = a.getFirstSegment().getElementOnWordPosition(1);
     Collection<Match> linked = unfixedAlignment.getMatchesThatLinkFrom(zijn);
     Assert.assertEquals("[(1->2), (1->5), (1->8)]", linked.toString());

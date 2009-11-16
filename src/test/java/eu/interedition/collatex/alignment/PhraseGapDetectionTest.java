@@ -7,13 +7,13 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sd_editions.collatex.match.LeftToRightMatcher;
 import com.sd_editions.collatex.match.SubsegmentExtractor;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
+import eu.interedition.collatex.match.LeftToRightMatcher;
 
 public class PhraseGapDetectionTest {
   private WitnessBuilder builder;

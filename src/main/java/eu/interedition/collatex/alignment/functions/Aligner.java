@@ -24,7 +24,7 @@ public class Aligner {
   }
 
   public static Alignment<Word> align(final Segment a, final Segment b) {
-    final UnfixedAlignment<Word> unfixedAlignment = Matcher.createFirstUnfixedAlignment(a, b);
+    final UnfixedAlignment<Word> unfixedAlignment = Matcher.match(a, b);
 
     return align(a, b, unfixedAlignment);
   }
