@@ -8,12 +8,12 @@ import eu.interedition.collatex.input.WitnessSegmentPhrases;
 public class PhraseAligner {
 
   // TODO: warning duplicate with Matcher.align!
-  public static Alignment<Phrase> align(WitnessSegmentPhrases a, WitnessSegmentPhrases b, UnfixedAlignment<Phrase> u) {
-    UnfixedAlignment<Phrase> temp = u;
+  public static Alignment<Phrase> align(final WitnessSegmentPhrases a, final WitnessSegmentPhrases b, final UnfixedAlignment<Phrase> u) {
+    final UnfixedAlignment<Phrase> temp = u;
     //    while (temp.hasUnfixedWords()) {
     //      temp = Matcher.permutate(a, b, temp);
     //    }
-    Alignment<Phrase> alignment = Alignment.createPhraseAlignment(temp.getFixedMatches(), a, b);
+    final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(temp, a, b);
     return alignment;
   }
 }

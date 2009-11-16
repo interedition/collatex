@@ -38,17 +38,21 @@ public class Matcher {
   // NOTE: this code is specific for Phrase matching.
   // TODO: make this code return an UnfixedAlignment object
   // TODO: make this code similar to match(Segment, Segment)
-  public static Set<Match<Phrase>> match(final WitnessSegmentPhrases pa, final WitnessSegmentPhrases pb) {
+  public static UnfixedAlignment<Phrase> match(final WitnessSegmentPhrases pa, final WitnessSegmentPhrases pb) {
     if (pa.size() > pb.size()) {
       final Set<Match<Phrase>> matches_wrong = Matcher.match2(pb, pa);
       final Set<Match<Phrase>> matches_right = Sets.newLinkedHashSet();
       for (final Match<Phrase> match : matches_wrong) {
         matches_right.add(new Match<Phrase>(match.getWitnessWord(), match.getBaseWord()));
       }
-      return matches_right;
+      final Set<Match<Phrase>> unfixedMatches = Sets.newLinkedHashSet();
+      final UnfixedAlignment<Phrase> result = new UnfixedAlignment<Phrase>(matches_right, unfixedMatches);
+      return result;
     }
-    return Matcher.match2(pa, pb);
-
+    final Set<Match<Phrase>> fixedMatches = Matcher.match2(pa, pb);
+    final Set<Match<Phrase>> unfixedMatches = Sets.newLinkedHashSet();
+    final UnfixedAlignment<Phrase> result = new UnfixedAlignment<Phrase>(fixedMatches, unfixedMatches);
+    return result;
   }
 
   // NOTE: this code is specific for Segments/Words!

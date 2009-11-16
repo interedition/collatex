@@ -1,7 +1,5 @@
 package eu.interedition.collatex.alignment;
 
-import java.util.Set;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -35,7 +33,7 @@ public class PhraseGapDetectionTest {
     Assert.assertEquals(1, pa.size());
     Assert.assertEquals(1, pb.size());
 
-    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
+    final UnfixedAlignment<Phrase> matches = Matcher.match(pa, pb);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, pa, pb);
     Assert.assertEquals(0, alignment.getGaps().size());
   }
@@ -52,7 +50,7 @@ public class PhraseGapDetectionTest {
     Assert.assertEquals(1, pa.size());
     Assert.assertEquals(2, pb.size());
 
-    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
+    final UnfixedAlignment<Phrase> matches = Matcher.match(pa, pb);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, pa, pb);
     final Gap gap = alignment.getAdditions().get(0);
     Assert.assertEquals("NonMatch: addition: true base: EMPTY!; nextWord: everything matches; witness: addition", gap.toString());
@@ -70,7 +68,7 @@ public class PhraseGapDetectionTest {
     Assert.assertEquals(2, pa.size());
     Assert.assertEquals(3, pb.size());
 
-    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
+    final UnfixedAlignment<Phrase> matches = Matcher.match(pa, pb);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, pa, pb);
     final Gap gap = alignment.getAdditions().get(0);
     Assert.assertEquals("NonMatch: addition: true base: EMPTY!; nextWord: matches; witness: addition", gap.toString());
@@ -89,7 +87,7 @@ public class PhraseGapDetectionTest {
     Assert.assertEquals(5, pb.size());
     // TODO: this is wrong! SHOULD BE 3!
 
-    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
+    final UnfixedAlignment<Phrase> matches = Matcher.match(pa, pb);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, pa, pb);
     final Gap gap = alignment.getAdditions().get(0);
     Assert.assertEquals("NonMatch: addition: true base: EMPTY!; nextWord: matches; witness: multiple word addition", gap.toString());

@@ -43,16 +43,19 @@ public class Alignment<T extends BaseElement> {
     return new Alignment<Word>(matches, gaps, sequencesA, sequencesB);
   }
 
-  // TODO: gap detection does not work yet!
-  // Note: it works now, remove TODO!
-  public static Alignment<Phrase> createPhraseAlignment(final Set<Match<Phrase>> matches, final WitnessSegmentPhrases a, final WitnessSegmentPhrases b) {
-    final List<MatchSequence<Phrase>> sequencesA = SequenceDetection.calculateMatchSequences(matches);
+  // TODO: make alternative matches work!
+  public static Alignment<Phrase> createPhraseAlignment(final UnfixedAlignment<Phrase> matches, final WitnessSegmentPhrases a, final WitnessSegmentPhrases b) {
+    if (matches.hasUnfixedWords()) {
+      throw new RuntimeException("There are alternatives here! NOT YET IMPLEMENTED!");
+    }
+
+    final List<MatchSequence<Phrase>> sequencesA = SequenceDetection.calculateMatchSequences(matches.getFixedMatches());
     final List<MatchSequence<Phrase>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
     // TODO: extract convenience method for this!
     final List<Gap<Phrase>> gaps = Lists.newArrayList();
     gaps.addAll(GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB));
     gaps.addAll(GapDetection.getVariantsInMatchSequences(a, b, sequencesA));
-    final Alignment<Phrase> al = new Alignment<Phrase>(matches, gaps, sequencesA, sequencesB);
+    final Alignment<Phrase> al = new Alignment<Phrase>(matches.getFixedMatches(), gaps, sequencesA, sequencesB);
     return al;
   }
 

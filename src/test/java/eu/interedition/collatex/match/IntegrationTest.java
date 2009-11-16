@@ -1,7 +1,6 @@
 package eu.interedition.collatex.match;
 
 import java.util.List;
-import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -12,7 +11,7 @@ import com.sd_editions.collatex.match.SubsegmentExtractor;
 
 import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
-import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
@@ -36,7 +35,7 @@ public class IntegrationTest {
     System.out.println(pa.toString());
     System.out.println(pb.toString());
     // Matching
-    final Set<Match<Phrase>> match = Matcher.match(pa, pb);
+    final UnfixedAlignment<Phrase> match = Matcher.match(pa, pb);
     Assert.assertEquals(6, match.size());
     System.out.println(match);
     // Alignment

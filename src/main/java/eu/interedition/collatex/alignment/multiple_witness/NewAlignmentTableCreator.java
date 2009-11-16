@@ -14,6 +14,7 @@ import eu.interedition.collatex.alignment.Alignment;
 import eu.interedition.collatex.alignment.Gap;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.alignment.UnfixedAlignment;
 import eu.interedition.collatex.input.BaseContainer;
 import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
@@ -49,7 +50,7 @@ public class NewAlignmentTableCreator {
 
     // make the superbase from the alignment table
     final NewSuperbase superbase = NewSuperbase.create(table);
-    final Set<Match<Phrase>> matches = Matcher.match(superbase, seg);
+    final UnfixedAlignment<Phrase> matches = Matcher.match(superbase, seg);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, superbase, seg);
 
     final Alignment<Phrase> better = NewAlignmentTableCreator.makeAddDelFromTrans(null, seg, alignment);
