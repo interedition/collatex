@@ -36,7 +36,7 @@ public class IntegrationTest {
     System.out.println(pa.toString());
     System.out.println(pb.toString());
     // Matching
-    final Set<Match<Phrase>> match = LeftToRightMatcher.match(pa, pb);
+    final Set<Match<Phrase>> match = Matcher.match(pa, pb);
     Assert.assertEquals(6, match.size());
     System.out.println(match);
     // Alignment

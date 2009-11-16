@@ -16,7 +16,7 @@ import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
-import eu.interedition.collatex.match.LeftToRightMatcher;
+import eu.interedition.collatex.match.Matcher;
 
 public class LeftToRightMatchingTest {
   private WitnessBuilder builder;
@@ -38,7 +38,7 @@ public class LeftToRightMatchingTest {
     Assert.assertEquals(1, pa.size());
     Assert.assertEquals(1, pb.size());
 
-    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
     Assert.assertEquals(1, matches.size());
   }
 
@@ -54,7 +54,7 @@ public class LeftToRightMatchingTest {
     Assert.assertEquals(1, pa.size());
     Assert.assertEquals(2, pb.size());
 
-    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
     Assert.assertEquals(1, matches.size());
     final Match<Phrase> match = matches.iterator().next();
     Assert.assertEquals(1, match.getBaseWord().getStartPosition());
@@ -73,7 +73,7 @@ public class LeftToRightMatchingTest {
     Assert.assertEquals(2, pa.size());
     Assert.assertEquals(3, pb.size());
 
-    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
     Assert.assertEquals(2, matches.size());
 
     final Iterator<Match<Phrase>> i = matches.iterator();
@@ -98,7 +98,7 @@ public class LeftToRightMatchingTest {
     Assert.assertEquals(1, pa.size());
     Assert.assertEquals(2, pb.size());
 
-    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
     Assert.assertEquals(1, matches.size());
     final Match<Phrase> match = matches.iterator().next();
     Assert.assertEquals(1, match.getBaseWord().getStartPosition());
@@ -117,7 +117,7 @@ public class LeftToRightMatchingTest {
     Assert.assertEquals(2, pa.size());
     Assert.assertEquals(1, pb.size());
 
-    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
     Assert.assertEquals(1, matches.size());
     final Match<Phrase> match = matches.iterator().next();
     Assert.assertEquals(2, match.getBaseWord().getStartPosition());
@@ -138,7 +138,7 @@ public class LeftToRightMatchingTest {
     Assert.assertEquals(3, pa.size());
     Assert.assertEquals(3, pb.size());
 
-    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(pa, pb);
+    final Set<Match<Phrase>> matches = Matcher.match(pa, pb);
     Assert.assertEquals(3, matches.size());
     //    final Match<Phrase> match = matches.iterator().next();
     //    Assert.assertEquals(1, match.getBaseWord().getStartPosition());

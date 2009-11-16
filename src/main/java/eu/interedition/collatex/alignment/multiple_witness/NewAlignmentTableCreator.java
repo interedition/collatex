@@ -19,7 +19,7 @@ import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
-import eu.interedition.collatex.match.LeftToRightMatcher;
+import eu.interedition.collatex.match.Matcher;
 
 public class NewAlignmentTableCreator {
 
@@ -49,7 +49,7 @@ public class NewAlignmentTableCreator {
 
     // make the superbase from the alignment table
     final NewSuperbase superbase = NewSuperbase.create(table);
-    final Set<Match<Phrase>> matches = LeftToRightMatcher.match(superbase, seg);
+    final Set<Match<Phrase>> matches = Matcher.match(superbase, seg);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, superbase, seg);
 
     final Alignment<Phrase> better = NewAlignmentTableCreator.makeAddDelFromTrans(null, seg, alignment);
