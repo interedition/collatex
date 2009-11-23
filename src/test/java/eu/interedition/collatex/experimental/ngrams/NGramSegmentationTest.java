@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.input.Phrase;
@@ -32,11 +31,13 @@ public class NGramSegmentationTest {
     Assert.assertEquals("when clock", bigram2.getOriginal());
   }
 
-  @Ignore
   @Test
   public void testBeckett2() {
     final Witness a = builder.build("A", "as when clock");
-    //   final Witness b = builder.build("B", "as when");
-
+    final Witness b = builder.build("B", "as when");
+    final List<Subsegment2> subsegments = BiGrams.getOverlappingBiGrams(a, b);
+    Assert.assertEquals(1, subsegments.size());
+    final Subsegment2 segment1 = subsegments.get(0);
+    Assert.assertEquals("as when", segment1.getNormalized());
   }
 }
