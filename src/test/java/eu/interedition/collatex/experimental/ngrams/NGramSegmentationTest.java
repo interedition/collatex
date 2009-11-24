@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class NGramSegmentationTest {
@@ -31,6 +32,7 @@ public class NGramSegmentationTest {
     Assert.assertEquals("when clock", bigram2.getOriginal());
   }
 
+  // TODO: clock should get its own subsegment! (not overlapping)
   @Test
   public void testBeckett2() {
     final Witness a = builder.build("A", "as when clock");
@@ -39,5 +41,15 @@ public class NGramSegmentationTest {
     Assert.assertEquals(1, subsegments.size());
     final Subsegment2 segment1 = subsegments.get(0);
     Assert.assertEquals("as when", segment1.getNormalized());
+  }
+
+  @Test
+  public void testBeckett3() {
+    final Witness a = builder.build("A", "as when clock");
+    final Witness b = builder.build("B", "as when");
+    final WitnessSegmentPhrases wsp1 = BiGrams.getWSP("A", a, b);
+    final WitnessSegmentPhrases wsp2 = BiGrams.getWSP("B", a, b);
+    Assert.assertEquals("|as when|", wsp2.toSpecialString());
+    // TODO: add test for wsp1!
   }
 }

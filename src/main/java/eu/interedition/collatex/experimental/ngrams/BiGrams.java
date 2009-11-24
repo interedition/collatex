@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.Word;
 
 public class BiGrams {
@@ -37,7 +38,9 @@ public class BiGrams {
     union.retainAll(biGramMapped2.keySet());
     final List<Subsegment2> subsegments = Lists.newArrayList();
     for (final String normalized : union) {
-      final Subsegment2 subsegment = new Subsegment2(normalized);
+      final Phrase phrase1 = biGramMapped1.get(normalized);
+      final Phrase phrase2 = biGramMapped2.get(normalized);
+      final Subsegment2 subsegment = new Subsegment2(normalized, phrase1, phrase2);
       subsegments.add(subsegment);
     }
     return subsegments;
@@ -50,5 +53,24 @@ public class BiGrams {
       normalized.put(ngram.getOriginal(), ngram);
     }
     return normalized;
+  }
+
+  public static WitnessSegmentPhrases getWSP(final String sigil, final Witness a, final Witness b) {
+    final List<Subsegment2> overlappingBiGrams = getOverlappingBiGrams(a, b);
+    final List<Phrase> phrases = Lists.newArrayList();
+    // TODO: add gap detection!
+    // first get suite phrases!
+    // sort them (based on start position)
+    // then add gaps were needed!
+    for (final Subsegment2 s : overlappingBiGrams) {
+      // TODO: in the future we will also have to pay attention to the order!
+      if (s.contains(sigil)) {
+        final Phrase phrase = s.getPhraseFor(sigil);
+        phrases.add(phrase);
+      }
+    }
+    final WitnessSegmentPhrases ph = new WitnessSegmentPhrases(sigil, phrases);
+
+    return ph;
   }
 }

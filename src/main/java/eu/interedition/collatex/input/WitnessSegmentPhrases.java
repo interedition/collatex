@@ -55,4 +55,15 @@ public class WitnessSegmentPhrases extends BaseContainer<Phrase> {
   public List<Phrase> getPhrases() {
     return _phrases;
   }
+
+  public String toSpecialString() {
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append("|");
+    for (final Phrase phrase : _phrases) {
+      // TODO: could become get normalized1
+      buffer.append(phrase.getOriginal());
+      buffer.append("|");
+    }
+    return buffer.toString();
+  }
 }
