@@ -55,6 +55,7 @@ public class BiGrams {
     return normalized;
   }
 
+  // TODO: REMOVE THIS!; CHANGED MY MIND!
   public static WitnessSegmentPhrases getWSP(final String sigil, final Witness a, final Witness b) {
     final List<Subsegment2> overlappingBiGrams = getOverlappingBiGrams(a, b);
     final List<Phrase> phrases = Lists.newArrayList();
@@ -73,4 +74,48 @@ public class BiGrams {
 
     return ph;
   }
+
+  public static List<Phrase> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
+    final List<Subsegment2> overlappingBiGrams = getOverlappingBiGrams(a, b);
+    // hmm hier heb ik weer de bigrams nodig van Witness A; dat wordt dan wel dubbel berekend.. zucht
+    final List<Phrase> biGramsForWitnessA = calculate(a);
+    final List<Phrase> uniqueBiGramsForWitnessA = Lists.newArrayList();
+    uniqueBiGramsForWitnessA.addAll(biGramsForWitnessA);
+
+    for (final Subsegment2 overlappingBiGram : overlappingBiGrams) {
+      final Phrase overlappingPhraseInWitnessA = overlappingBiGram.getPhraseFor(a.getFirstSegment().getWitnessId());
+      // TODO: this is here because Phrase has no equals!
+      // TODO: should be toTest.getNormalized!;
+      // TODO: this is inefficient!
+      for (final Phrase toTest : biGramsForWitnessA) {
+        if (toTest.getOriginal().equals(overlappingPhraseInWitnessA.getOriginal())) {
+          uniqueBiGramsForWitnessA.remove(toTest);
+        }
+      }
+    }
+    return uniqueBiGramsForWitnessA;
+  }
+
+  // TODO: method who are doing almost the same thing! That should not be necessary!
+  public static List<Phrase> getUniqueBiGramsForWitnessB(final Witness a, final Witness b) {
+    final List<Subsegment2> overlappingBiGrams = getOverlappingBiGrams(a, b);
+    // hmm hier heb ik weer de bigrams nodig van Witness B; dat wordt dan wel dubbel berekend.. zucht
+    final List<Phrase> biGramsForWitnessB = calculate(b);
+    final List<Phrase> uniqueBiGramsForWitnessB = Lists.newArrayList();
+    uniqueBiGramsForWitnessB.addAll(biGramsForWitnessB);
+
+    for (final Subsegment2 overlappingBiGram : overlappingBiGrams) {
+      final Phrase overlappingPhraseInWitnessB = overlappingBiGram.getPhraseFor(b.getFirstSegment().getWitnessId());
+      // TODO: this is here because Phrase has no equals!
+      // TODO: should be toTest.getNormalized!;
+      // TODO: this is inefficient!
+      for (final Phrase toTest : biGramsForWitnessB) {
+        if (toTest.getOriginal().equals(overlappingPhraseInWitnessB.getOriginal())) {
+          uniqueBiGramsForWitnessB.remove(toTest);
+        }
+      }
+    }
+    return uniqueBiGramsForWitnessB;
+  }
+
 }

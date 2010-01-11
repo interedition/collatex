@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.input.Phrase;
+import eu.interedition.collatex.input.Word;
 
 public class Subsegment2 {
 
@@ -34,6 +35,11 @@ public class Subsegment2 {
       throw new RuntimeException("This subsegment does not contain a phrase for " + sigil);
     }
     return _sigilToPhrase.get(sigil);
+  }
+
+  public Word getFirstWordFor(final String sigil) {
+    final Phrase phrase = getPhraseFor(sigil);
+    return phrase.getFirstWord();
   }
 
 }
