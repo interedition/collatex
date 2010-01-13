@@ -100,4 +100,8 @@ public class Phrase extends BaseElement {
   public int length() {
     return size;
   }
+
+  public Word getLastWord() {
+    return getWords().get(length() - 1);
+  }
 }

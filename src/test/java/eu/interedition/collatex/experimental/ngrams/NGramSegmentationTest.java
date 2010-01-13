@@ -74,6 +74,20 @@ public class NGramSegmentationTest {
 
   // TODO: next step would be to make trigrams from bigrams were possible for each witness!
 
+  @Test
+  public void testBeckett2b() {
+    final Witness a = builder.build("A", "# as when clock #");
+    final Witness b = builder.build("B", "# as when #");
+    final List<Phrase> pieces = BiGrams.getLongestUniquePiecesForWitnessA(a, b);
+    Assert.assertEquals(1, pieces.size());
+    final Phrase piece = pieces.get(0);
+    Assert.assertEquals("when clock #", piece.getOriginal());
+    final List<Phrase> pieces2 = BiGrams.getLongestUniquePiecesForWitnessB(a, b);
+    Assert.assertEquals(1, pieces2.size());
+    final Phrase piece2 = pieces2.get(0);
+    Assert.assertEquals("when #", piece2.getOriginal());
+  }
+
   // Not sure where this test leads to
   @Ignore
   @Test

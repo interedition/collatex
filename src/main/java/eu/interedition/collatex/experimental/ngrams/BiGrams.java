@@ -118,4 +118,24 @@ public class BiGrams {
     return uniqueBiGramsForWitnessB;
   }
 
+  // TODO: this method is not finished!
+  // TODO: does not work right for multiple groups of bigrams
+  public static List<Phrase> getLongestUniquePiecesForWitnessA(final Witness a, final Witness b) {
+    final List<Phrase> uniqueBiGramsForWitnessA = getUniqueBiGramsForWitnessA(a, b);
+    final List<Phrase> newBiGrams = Lists.newArrayList();
+    final Phrase currentBiGram = uniqueBiGramsForWitnessA.remove(0); // TODO: this can be dangerous; if there are no unique bigrams!
+    for (final Phrase nextBiGram : uniqueBiGramsForWitnessA) {
+      System.out.println(currentBiGram.getBeginPosition() + ":" + nextBiGram.getBeginPosition());
+      final Phrase newBigram = new Phrase(currentBiGram.getWitness(), currentBiGram.getFirstWord(), nextBiGram.getLastWord(), null);
+      newBiGrams.add(newBigram);
+    }
+    return newBiGrams;
+  }
+
+  // TODO: this method is not finished!
+  public static List<Phrase> getLongestUniquePiecesForWitnessB(final Witness a, final Witness b) {
+    final List<Phrase> uniqueBiGramsForWitnessB = getUniqueBiGramsForWitnessB(a, b);
+    return uniqueBiGramsForWitnessB;
+  }
+
 }
