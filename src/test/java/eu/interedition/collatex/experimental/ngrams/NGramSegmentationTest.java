@@ -62,16 +62,16 @@ public class NGramSegmentationTest {
     final Witness b = builder.build("B", "# as when #");
     final List<Subsegment2> subsegments = BiGrams.getOverlappingBiGrams(a, b);
     Assert.assertEquals(2, subsegments.size());
-    final List<Phrase> uniqueSubsegmentsOne = BiGrams.getUniqueBiGramsForWitnessA(a, b);
-    Assert.assertEquals(2, uniqueSubsegmentsOne.size());
-    final Phrase segment1 = uniqueSubsegmentsOne.get(0);
-    final Phrase segment2 = uniqueSubsegmentsOne.get(1);
-    Assert.assertEquals("when clock", segment1.getOriginal());
-    Assert.assertEquals("clock #", segment2.getOriginal());
-    final List<Phrase> uniqueSubsegmentsTwo = BiGrams.getUniqueBiGramsForWitnessB(a, b);
-    Assert.assertEquals(1, uniqueSubsegmentsTwo.size());
-    final Phrase segment3 = uniqueSubsegmentsTwo.get(0);
-    Assert.assertEquals("when #", segment3.getOriginal());
+    //    final List<Phrase> uniqueSubsegmentsOne = BiGrams.getUniqueBiGramsForWitnessA(a, b);
+    //    Assert.assertEquals(2, uniqueSubsegmentsOne.size());
+    //    final Phrase segment1 = uniqueSubsegmentsOne.get(0);
+    //    final Phrase segment2 = uniqueSubsegmentsOne.get(1);
+    //    Assert.assertEquals("when clock", segment1.getOriginal());
+    //    Assert.assertEquals("clock #", segment2.getOriginal());
+    //    final List<Phrase> uniqueSubsegmentsTwo = BiGrams.getUniqueBiGramsForWitnessB(a, b);
+    //    Assert.assertEquals(1, uniqueSubsegmentsTwo.size());
+    //    final Phrase segment3 = uniqueSubsegmentsTwo.get(0);
+    //    Assert.assertEquals("when #", segment3.getOriginal());
   }
 
   // TODO: next step would be to make trigrams from bigrams were possible for each witness!

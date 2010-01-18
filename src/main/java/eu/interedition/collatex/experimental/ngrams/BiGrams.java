@@ -58,8 +58,20 @@ public class BiGrams {
     return normalized;
   }
 
-  public static List<Phrase> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
-    throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
+  public static List<Subsegment2> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
+    final List<Subsegment2> biGrams1 = calculate(a);
+    final List<Subsegment2> biGrams2 = calculate(b);
+    final Map<String, Subsegment2> biGramMapped1 = normalize(biGrams1);
+    final Map<String, Subsegment2> biGramMapped2 = normalize(biGrams2);
+    final List<String> uniqueBigramsForWitnessANormalized = Lists.newArrayList(biGramMapped1.keySet());
+    uniqueBigramsForWitnessANormalized.removeAll(biGramMapped2.keySet());
+    System.out.println(uniqueBigramsForWitnessANormalized);
+    final List<Subsegment2> subsegments = Lists.newArrayList();
+    for (final String normalized : uniqueBigramsForWitnessANormalized) {
+      final Subsegment2 phrase1 = biGramMapped1.get(normalized);
+      subsegments.add(phrase1);
+    }
+    return subsegments;
     //    final List<Subsegment2> overlappingBiGrams = getOverlappingBiGrams(a, b);
     //    // hmm hier heb ik weer de bigrams nodig van Witness A; dat wordt dan wel dubbel berekend.. zucht
     //    final List<Phrase> biGramsForWitnessA = calculate(a);
@@ -107,15 +119,17 @@ public class BiGrams {
   // TODO: this method is not finished!
   // TODO: does not work right for multiple groups of bigrams
   public static List<Phrase> getLongestUniquePiecesForWitnessA(final Witness a, final Witness b) {
-    final List<Phrase> uniqueBiGramsForWitnessA = getUniqueBiGramsForWitnessA(a, b);
-    final List<Phrase> newBiGrams = Lists.newArrayList();
-    final Phrase currentBiGram = uniqueBiGramsForWitnessA.remove(0); // TODO: this can be dangerous; if there are no unique bigrams!
-    for (final Phrase nextBiGram : uniqueBiGramsForWitnessA) {
-      System.out.println(currentBiGram.getBeginPosition() + ":" + nextBiGram.getBeginPosition());
-      final Phrase newBigram = new Phrase(currentBiGram.getWitness(), currentBiGram.getFirstWord(), nextBiGram.getLastWord(), null);
-      newBiGrams.add(newBigram);
-    }
-    return newBiGrams;
+    throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
+
+    //    final List<Phrase> uniqueBiGramsForWitnessA = getUniqueBiGramsForWitnessA(a, b);
+    //    final List<Phrase> newBiGrams = Lists.newArrayList();
+    //    final Phrase currentBiGram = uniqueBiGramsForWitnessA.remove(0); // TODO: this can be dangerous; if there are no unique bigrams!
+    //    for (final Phrase nextBiGram : uniqueBiGramsForWitnessA) {
+    //      System.out.println(currentBiGram.getBeginPosition() + ":" + nextBiGram.getBeginPosition());
+    //      final Phrase newBigram = new Phrase(currentBiGram.getWitness(), currentBiGram.getFirstWord(), nextBiGram.getLastWord(), null);
+    //      newBiGrams.add(newBigram);
+    //    }
+    //    return newBiGrams;
   }
 
   // TODO: this method is not finished!
