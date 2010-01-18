@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class NGramBasedAlgorithmTest {
@@ -36,4 +37,16 @@ public class NGramBasedAlgorithmTest {
     Assert.assertEquals("cat #", ngrams.get(5).getNormalized());
   }
 
+  @Test
+  public void testOverlappingNGrams2() {
+    // "The black cat", "The black and white cat"
+    final WitnessBuilder builder = new WitnessBuilder();
+    final Witness a = builder.build("A", "The black cat");
+    final Witness b = builder.build("B", "The black and white cat");
+    final List<Subsegment2> overlappingBiGrams = BiGrams.getOverlappingBiGrams(a, b);
+    Assert.assertEquals(3, overlappingBiGrams.size());
+    Assert.assertEquals("# the A: 0 B: 0", overlappingBiGrams.get(0).toString());
+    Assert.assertEquals("the black A: 1 B: 1", overlappingBiGrams.get(1).toString());
+    Assert.assertEquals("cat # A: 3 B: 5", overlappingBiGrams.get(2).toString());
+  }
 }

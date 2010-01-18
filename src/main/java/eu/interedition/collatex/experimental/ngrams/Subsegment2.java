@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Word;
 
 public class Subsegment2 {
@@ -14,19 +13,18 @@ public class Subsegment2 {
   //also be a list; but would be slower!
   private final Map<String, WordsTuple> _sigilToPhrase;
 
-  public Subsegment2(final String normalized, final Phrase... a) {
-    this._normalized = normalized;
-    this._sigilToPhrase = Maps.newLinkedHashMap();
-    //    for (final Phrase p : a) {
-    //      _sigilToPhrase.put(p.getWitnessId(), p);
-    //    }
-  }
-
   public Subsegment2(final String normalized, final WordsTuple tuple) {
     this._normalized = normalized;
     this._sigilToPhrase = Maps.newLinkedHashMap();
     final String witnessId = tuple.getFirstWord().getWitnessId();
     _sigilToPhrase.put(witnessId, tuple);
+  }
+
+  public Subsegment2(final String normalized, final WordsTuple wordsA, final WordsTuple wordsB) {
+    this._normalized = normalized;
+    this._sigilToPhrase = Maps.newLinkedHashMap();
+    _sigilToPhrase.put(wordsA.getFirstWord().getWitnessId(), wordsA);
+    _sigilToPhrase.put(wordsB.getFirstWord().getWitnessId(), wordsB);
   }
 
   public String getNormalized() {
@@ -49,4 +47,17 @@ public class Subsegment2 {
     return phrase.getFirstWord();
   }
 
+  @Override
+  public String toString() {
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append(_normalized);
+    for (final String sigil : _sigilToPhrase.keySet()) {
+      final WordsTuple wordsTuple = _sigilToPhrase.get(sigil);
+      buffer.append(" ");
+      buffer.append(wordsTuple.getFirstWord().getWitnessId());
+      buffer.append(": ");
+      buffer.append(wordsTuple.getFirstWord().getBeginPosition());
+    }
+    return buffer.toString();
+  }
 }

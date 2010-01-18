@@ -2,6 +2,7 @@ package eu.interedition.collatex.experimental.ngrams;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -30,28 +31,29 @@ public class BiGrams {
   }
 
   public static List<Subsegment2> getOverlappingBiGrams(final Witness a, final Witness b) {
-    throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
-    //    final List<Phrase> biGrams1 = calculate(a);
-    //    final List<Phrase> biGrams2 = calculate(b);
-    //    final Map<String, Phrase> biGramMapped1 = normalize(biGrams1);
-    //    final Map<String, Phrase> biGramMapped2 = normalize(biGrams2);
-    //    final Set<String> union = biGramMapped1.keySet();
-    //    union.retainAll(biGramMapped2.keySet());
-    //    final List<Subsegment2> subsegments = Lists.newArrayList();
-    //    for (final String normalized : union) {
-    //      final Phrase phrase1 = biGramMapped1.get(normalized);
-    //      final Phrase phrase2 = biGramMapped2.get(normalized);
-    //      final Subsegment2 subsegment = new Subsegment2(normalized, phrase1, phrase2);
-    //      subsegments.add(subsegment);
-    //    }
-    //    return subsegments;
+    final List<Subsegment2> biGrams1 = calculate(a);
+    final List<Subsegment2> biGrams2 = calculate(b);
+    final Map<String, Subsegment2> biGramMapped1 = normalize(biGrams1);
+    final Map<String, Subsegment2> biGramMapped2 = normalize(biGrams2);
+    final Set<String> union = biGramMapped1.keySet();
+    union.retainAll(biGramMapped2.keySet());
+    //    System.out.println("union: " + union);
+    final List<Subsegment2> subsegments = Lists.newArrayList();
+    for (final String normalized : union) {
+      final Subsegment2 phrase1 = biGramMapped1.get(normalized);
+      final Subsegment2 phrase2 = biGramMapped2.get(normalized);
+      final WordsTuple wordsA = phrase1.getPhraseFor(a.getFirstSegment().getWitnessId());
+      final WordsTuple wordsB = phrase2.getPhraseFor(b.getFirstSegment().getWitnessId());
+      final Subsegment2 subsegment = new Subsegment2(normalized, wordsA, wordsB);
+      subsegments.add(subsegment);
+    }
+    return subsegments;
   }
 
-  private static Map<String, Phrase> normalize(final List<Phrase> ngrams) {
-    final Map<String, Phrase> normalized = Maps.newLinkedHashMap();
-    for (final Phrase ngram : ngrams) {
-      // TODO: should be get normalized!
-      normalized.put(ngram.getOriginal(), ngram);
+  private static Map<String, Subsegment2> normalize(final List<Subsegment2> ngrams) {
+    final Map<String, Subsegment2> normalized = Maps.newLinkedHashMap();
+    for (final Subsegment2 ngram : ngrams) {
+      normalized.put(ngram.getNormalized(), ngram);
     }
     return normalized;
   }
