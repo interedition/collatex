@@ -7,7 +7,7 @@ import eu.interedition.collatex.tokenization.Token;
 public class Word extends BaseElement implements ICollationResource {
   private final String witnessId;
   public final String original;
-  public final String normalized;
+  public final String _normalized;
   public final int position;
 
   // TODO: add punctuation!!
@@ -15,7 +15,7 @@ public class Word extends BaseElement implements ICollationResource {
     if (_original.isEmpty()) throw new IllegalArgumentException("Word cannot be empty!");
     this.witnessId = _witnessId;
     this.original = _original;
-    this.normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
+    this._normalized = original.toLowerCase().replaceAll("[`~'!@#$%^&*():;,\\.]", "");
     this.position = _position;
   }
 
@@ -25,7 +25,11 @@ public class Word extends BaseElement implements ICollationResource {
     this.witnessId = _witnessId;
     this.position = _position;
     this.original = nextToken.getOriginal();
-    this.normalized = nextToken.getText();
+    this._normalized = nextToken.getText();
+  }
+
+  public String getNormalized() {
+    return _normalized;
   }
 
   @Override

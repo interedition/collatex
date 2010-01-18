@@ -104,4 +104,9 @@ public class Phrase extends BaseElement {
   public Word getLastWord() {
     return getWords().get(length() - 1);
   }
+
+  public String getNormalized() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

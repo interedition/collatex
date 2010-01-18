@@ -31,10 +31,10 @@ public class Matches {
     final Set<Match> matchSet = Sets.newLinkedHashSet();
     for (final Word baseWord : base.getWords()) {
       for (final Word witnessWord : witness.getWords()) {
-        if (baseWord.normalized.equals(witnessWord.normalized)) {
+        if (baseWord._normalized.equals(witnessWord._normalized)) {
           matchSet.add(new Match(baseWord, witnessWord));
         } else {
-          final float editDistance = distanceMeasure.distance(baseWord.normalized, witnessWord.normalized);
+          final float editDistance = distanceMeasure.distance(baseWord._normalized, witnessWord._normalized);
           if (editDistance < 0.5) matchSet.add(new Match(baseWord, witnessWord, editDistance));
         }
       }

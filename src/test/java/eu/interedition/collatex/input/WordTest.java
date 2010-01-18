@@ -7,12 +7,12 @@ public class WordTest extends TestCase {
 
   public void testNormalize1() {
     Word word = new Word(witnessId, "Hello,", 1);
-    assertEquals("hello", word.normalized);
+    assertEquals("hello", word._normalized);
   }
 
   public void testNormalize2() {
     Word word = new Word(witnessId, "ειπων", 2);
-    assertEquals("ειπων", word.normalized);
+    assertEquals("ειπων", word._normalized);
   }
 
   public void testEmpty() {

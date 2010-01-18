@@ -33,8 +33,8 @@ public class OldSegmentExtractor {
       for (int position1 = 1; position1 < witnessSize1; position1++) {
         final Word baseWord0 = witness1.getElementOnWordPosition(position1);
         final Word baseWord1 = witness1.getElementOnWordPosition(position1 + 1);
-        final String normalized0 = baseWord0.normalized;
-        final String normalized1 = baseWord1.normalized;
+        final String normalized0 = baseWord0._normalized;
+        final String normalized1 = baseWord1._normalized;
         if (wordsNotInSegments(baseWord0, baseWord1)) {
           boolean matchingPairFound = false;
           addPairOccurancesInWitness(wordpairs, witness1, witnessSize1, position1, baseWord0, baseWord1, normalized0, normalized1);
@@ -86,8 +86,8 @@ public class OldSegmentExtractor {
   }
 
   private static boolean pairFound(final String normalized0, final String normalized1, final Segment witness2, final int position2) {
-    return (witness2.getElementOnWordPosition(position2).normalized.equals(normalized0)) && //
-        (witness2.getElementOnWordPosition(position2 + 1).normalized.equals(normalized1));
+    return (witness2.getElementOnWordPosition(position2)._normalized.equals(normalized0)) && //
+        (witness2.getElementOnWordPosition(position2 + 1)._normalized.equals(normalized1));
   }
 
   public static String wordIdentifier(final Word word) {

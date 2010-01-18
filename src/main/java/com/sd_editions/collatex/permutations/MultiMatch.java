@@ -13,14 +13,14 @@ public class MultiMatch {
 
   public MultiMatch(Word... witnessWords) {
     this.similarWordsPerWitness = Multimaps.newArrayListMultimap();
-    this.name = witnessWords[0].normalized;
+    this.name = witnessWords[0]._normalized;
     for (Word word : witnessWords) {
       addMatchingWord(word);
     }
   }
 
   public void addMatchingWord(Word word) {
-    if (word.normalized.equals(this.name)) {
+    if (word._normalized.equals(this.name)) {
       similarWordsPerWitness.get(word.getWitnessId()).add(word);
     }
   }

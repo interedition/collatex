@@ -46,7 +46,7 @@ public class WordSegment {
           nextWordSet.add(null);
         } else {
           nextWords.put(nextWord.getWitnessId(), nextWord);
-          nextWordSet.add(nextWord.normalized);
+          nextWordSet.add(nextWord._normalized);
         }
       }
       nextWordsMatch = (nextWordSet.size() == 1 && !nextWordSet.contains(null));

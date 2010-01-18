@@ -256,7 +256,7 @@ public class SubsegmentExtractor {
     final Subsegments oneWordSequences = new Subsegments();
     for (final Segment segment : segments) {
       for (final Word word : segment.getWords()) {
-        final String wordToMatch = word.normalized;
+        final String wordToMatch = word._normalized;
         //        Util.p(wordToMatch);
         if (!oneWordSequences.containsTitle(wordToMatch)) {
           oneWordSequences.add(wordToMatch, matchingWordPositionsPerWitness(wordToMatch));
@@ -271,7 +271,7 @@ public class SubsegmentExtractor {
     final Predicate<Word> matching = new Predicate<Word>() {
       @Override
       public boolean apply(final Word word1) {
-        return word1.normalized.equals(wordToMatch);
+        return word1._normalized.equals(wordToMatch);
       }
     };
     return matching;

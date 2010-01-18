@@ -22,12 +22,12 @@ public class MultiMatchMap {
     Segment witness0 = witnesses[0];
     Segment witness1 = witnesses[1];
     for (Word word0 : witness0.getWords()) {
-      String normalized = word0.normalized;
+      String normalized = word0._normalized;
       if (this.containsKey(normalized)) {
         this.get(normalized).addMatchingWord(word0);
       }
       for (Word word1 : witness1.getWords()) {
-        if (normalized.equals(word1.normalized)) {
+        if (normalized.equals(word1._normalized)) {
           MultiMatch mm;
           if (this.containsKey(normalized)) {
             mm = this.get(normalized);
@@ -46,7 +46,7 @@ public class MultiMatchMap {
       for (String normalized : keySet) {
         boolean normalizedHasMatchInThisWitness = false;
         for (Word witnessword : witness1.getWords()) {
-          if (normalized.equals(witnessword.normalized)) {
+          if (normalized.equals(witnessword._normalized)) {
             MultiMatch mm = this.get(normalized);
             mm.addMatchingWord(witnessword);
             this.put(normalized, mm);

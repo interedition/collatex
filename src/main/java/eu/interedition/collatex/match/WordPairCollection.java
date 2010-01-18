@@ -28,7 +28,7 @@ public class WordPairCollection {
     //
     //    wordsInSegments.add(wordIdentifier(word0));
     //    wordsInSegments.add(wordIdentifier(word1));
-    final String wordPairKey = word0.normalized + " " + word1.normalized;
+    final String wordPairKey = word0._normalized + " " + word1._normalized;
     Map<String, List<List<Word>>> listMap = wordPairs.get(wordPairKey);
     if (listMap == null) {
       listMap = Maps.newHashMap();
@@ -57,7 +57,7 @@ public class WordPairCollection {
         for (final List<Word> pair : pairList) {
           final Word nextWord = getNextWord(pair);
           if (nextWord != null) {
-            final String normalized = nextWord.normalized;
+            final String normalized = nextWord._normalized;
             Map<String, List<Word>> map = nextWords.get(normalized);
             if (map == null) map = Maps.newHashMap();
             pair.add(nextWord);

@@ -12,14 +12,21 @@ public class Subsegment2 {
   private final String _normalized;
   //Note: it does not have to be a map; could
   //also be a list; but would be slower!
-  private final Map<String, Phrase> _sigilToPhrase;
+  private final Map<String, WordsTuple> _sigilToPhrase;
 
   public Subsegment2(final String normalized, final Phrase... a) {
     this._normalized = normalized;
     this._sigilToPhrase = Maps.newLinkedHashMap();
-    for (final Phrase p : a) {
-      _sigilToPhrase.put(p.getWitnessId(), p);
-    }
+    //    for (final Phrase p : a) {
+    //      _sigilToPhrase.put(p.getWitnessId(), p);
+    //    }
+  }
+
+  public Subsegment2(final String normalized, final WordsTuple tuple) {
+    this._normalized = normalized;
+    this._sigilToPhrase = Maps.newLinkedHashMap();
+    final String witnessId = tuple.getFirstWord().getWitnessId();
+    _sigilToPhrase.put(witnessId, tuple);
   }
 
   public String getNormalized() {
@@ -30,7 +37,7 @@ public class Subsegment2 {
     return _sigilToPhrase.containsKey(sigil);
   }
 
-  public Phrase getPhraseFor(final String sigil) {
+  public WordsTuple getPhraseFor(final String sigil) {
     if (!contains(sigil)) {
       throw new RuntimeException("This subsegment does not contain a phrase for " + sigil);
     }
@@ -38,7 +45,7 @@ public class Subsegment2 {
   }
 
   public Word getFirstWordFor(final String sigil) {
-    final Phrase phrase = getPhraseFor(sigil);
+    final WordsTuple phrase = getPhraseFor(sigil);
     return phrase.getFirstWord();
   }
 
