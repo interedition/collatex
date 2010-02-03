@@ -93,27 +93,22 @@ public class BiGrams {
   }
 
   // TODO: method who are doing almost the same thing! That should not be necessary!
-  public static List<Phrase> getUniqueBiGramsForWitnessB(final Witness a, final Witness b) {
-    final List<Subsegment2> overlappingBiGrams = getOverlappingBiGrams(a, b);
-    throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
-
-    // hmm hier heb ik weer de bigrams nodig van Witness B; dat wordt dan wel dubbel berekend.. zucht
-    //    final List<Phrase> biGramsForWitnessB = calculate(b);
-    //    final List<Phrase> uniqueBiGramsForWitnessB = Lists.newArrayList();
-    //    uniqueBiGramsForWitnessB.addAll(biGramsForWitnessB);
-    //
-    //    for (final Subsegment2 overlappingBiGram : overlappingBiGrams) {
-    //      final Phrase overlappingPhraseInWitnessB = overlappingBiGram.getPhraseFor(b.getFirstSegment().getWitnessId());
-    //      // TODO: this is here because Phrase has no equals!
-    //      // TODO: should be toTest.getNormalized!;
-    //      // TODO: this is inefficient!
-    //      for (final Phrase toTest : biGramsForWitnessB) {
-    //        if (toTest.getOriginal().equals(overlappingPhraseInWitnessB.getOriginal())) {
-    //          uniqueBiGramsForWitnessB.remove(toTest);
-    //        }
-    //      }
-    //    }
-    //    return uniqueBiGramsForWitnessB;
+  public static List<Subsegment2> getUniqueBiGramsForWitnessB(final Witness a, final Witness b) {
+    final List<Subsegment2> biGrams1 = calculate(a);
+    final List<Subsegment2> biGrams2 = calculate(b);
+    final Map<String, Subsegment2> biGramMapped1 = normalize(biGrams1);
+    final Map<String, Subsegment2> biGramMapped2 = normalize(biGrams2);
+    // Until here is the exact same stuff as the other method!
+    final List<String> result = Lists.newArrayList(biGramMapped2.keySet());
+    result.removeAll(biGramMapped1.keySet());
+    System.out.println(result);
+    // The next part is also the same! (only the map were it comes from is different!
+    final List<Subsegment2> subsegments = Lists.newArrayList();
+    for (final String normalized : result) {
+      final Subsegment2 phrase1 = biGramMapped2.get(normalized);
+      subsegments.add(phrase1);
+    }
+    return subsegments;
   }
 
   // TODO: this method is not finished!
@@ -134,8 +129,9 @@ public class BiGrams {
 
   // TODO: this method is not finished!
   public static List<Phrase> getLongestUniquePiecesForWitnessB(final Witness a, final Witness b) {
-    final List<Phrase> uniqueBiGramsForWitnessB = getUniqueBiGramsForWitnessB(a, b);
-    return uniqueBiGramsForWitnessB;
+    throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
+    //    final List<Phrase> uniqueBiGramsForWitnessB = getUniqueBiGramsForWitnessB(a, b);
+    //    return uniqueBiGramsForWitnessB;
   }
 
 }
