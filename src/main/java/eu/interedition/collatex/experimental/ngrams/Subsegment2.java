@@ -4,27 +4,28 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex.experimental.ngrams.data.BiGram;
+import eu.interedition.collatex.experimental.ngrams.data.Token;
 
 public class Subsegment2 {
 
   private final String _normalized;
   //Note: it does not have to be a map; could
   //also be a list; but would be slower!
-  private final Map<String, WordsTuple> _sigilToPhrase;
+  private final Map<String, BiGram> _sigilToPhrase;
 
-  public Subsegment2(final String normalized, final WordsTuple tuple) {
+  public Subsegment2(final String normalized, final BiGram tuple) {
     this._normalized = normalized;
     this._sigilToPhrase = Maps.newLinkedHashMap();
-    final String witnessId = tuple.getFirstWord().getWitnessId();
+    final String witnessId = tuple.getFirstToken().getSigil();
     _sigilToPhrase.put(witnessId, tuple);
   }
 
-  public Subsegment2(final String normalized, final WordsTuple wordsA, final WordsTuple wordsB) {
+  public Subsegment2(final String normalized, final BiGram wordsA, final BiGram wordsB) {
     this._normalized = normalized;
     this._sigilToPhrase = Maps.newLinkedHashMap();
-    _sigilToPhrase.put(wordsA.getFirstWord().getWitnessId(), wordsA);
-    _sigilToPhrase.put(wordsB.getFirstWord().getWitnessId(), wordsB);
+    _sigilToPhrase.put(wordsA.getFirstToken().getSigil(), wordsA);
+    _sigilToPhrase.put(wordsB.getFirstToken().getSigil(), wordsB);
   }
 
   public String getNormalized() {
@@ -35,16 +36,16 @@ public class Subsegment2 {
     return _sigilToPhrase.containsKey(sigil);
   }
 
-  public WordsTuple getPhraseFor(final String sigil) {
+  public BiGram getPhraseFor(final String sigil) {
     if (!contains(sigil)) {
       throw new RuntimeException("This subsegment does not contain a phrase for " + sigil);
     }
     return _sigilToPhrase.get(sigil);
   }
 
-  public Word getFirstWordFor(final String sigil) {
-    final WordsTuple phrase = getPhraseFor(sigil);
-    return phrase.getFirstWord();
+  public Token getFirstWordFor(final String sigil) {
+    final BiGram phrase = getPhraseFor(sigil);
+    return phrase.getFirstToken();
   }
 
   @Override
@@ -52,11 +53,11 @@ public class Subsegment2 {
     final StringBuffer buffer = new StringBuffer();
     buffer.append(_normalized);
     for (final String sigil : _sigilToPhrase.keySet()) {
-      final WordsTuple wordsTuple = _sigilToPhrase.get(sigil);
+      final BiGram wordsTuple = _sigilToPhrase.get(sigil);
       buffer.append(" ");
-      buffer.append(wordsTuple.getFirstWord().getWitnessId());
+      buffer.append(wordsTuple.getFirstToken().getSigil());
       buffer.append(": ");
-      buffer.append(wordsTuple.getFirstWord().getBeginPosition());
+      buffer.append(wordsTuple.getFirstToken().getPosition());
     }
     return buffer.toString();
   }
