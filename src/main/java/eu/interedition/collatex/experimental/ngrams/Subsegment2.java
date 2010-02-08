@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.experimental.ngrams.data.BiGram;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
 
 public class Subsegment2 {

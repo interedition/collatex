@@ -1,4 +1,6 @@
-package eu.interedition.collatex.experimental.ngrams.data;
+package eu.interedition.collatex.experimental.ngrams;
+
+import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 
 public class BiGram {
   // NOTE: BiGram could become an extend version of NormalizedToken!

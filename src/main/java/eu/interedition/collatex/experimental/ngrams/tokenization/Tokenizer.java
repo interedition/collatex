@@ -27,7 +27,7 @@ public class Tokenizer {
   public Token nextToken() {
     // TODO: I need an array iterator with generic support!
     final String content = (String) arrayIterator.next();
-    final Token token = new Token(witness2.getSigil(), content, counter++);
+    final Token token = new Token(witness2.getSigil(), content, ++counter);
     return token;
   }
 }

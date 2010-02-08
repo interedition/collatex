@@ -1,13 +1,9 @@
 package eu.interedition.collatex.experimental.ngrams;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.experimental.ngrams.data.BiGram;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
 import eu.interedition.collatex.experimental.ngrams.data.SpecialToken;
@@ -33,29 +29,8 @@ public class BiGrams {
   }
 
   public static List<Subsegment2> getOverlappingBiGrams(final Witness a, final Witness b) {
-    final List<BiGram> biGrams1 = calculate(a);
-    final List<BiGram> biGrams2 = calculate(b);
-    final Map<String, BiGram> biGramMapped1 = normalize(biGrams1);
-    final Map<String, BiGram> biGramMapped2 = normalize(biGrams2);
-    final Set<String> union = biGramMapped1.keySet();
-    union.retainAll(biGramMapped2.keySet());
-    //    System.out.println("union: " + union);
-    final List<Subsegment2> subsegments = Lists.newArrayList();
-    for (final String normalized : union) {
-      final BiGram wordsA = biGramMapped1.get(normalized);
-      final BiGram wordsB = biGramMapped2.get(normalized);
-      final Subsegment2 subsegment = new Subsegment2(normalized, wordsA, wordsB);
-      subsegments.add(subsegment);
-    }
-    return subsegments;
-  }
-
-  private static Map<String, BiGram> normalize(final List<BiGram> ngrams) {
-    final Map<String, BiGram> normalized = Maps.newLinkedHashMap();
-    for (final BiGram ngram : ngrams) {
-      normalized.put(ngram.getNormalized(), ngram);
-    }
-    return normalized;
+    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
+    return group.getOverlap();
   }
 
   public static List<Subsegment2> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
