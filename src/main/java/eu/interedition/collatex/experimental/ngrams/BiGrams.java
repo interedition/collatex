@@ -33,6 +33,8 @@ public class BiGrams {
     return group.getOverlap();
   }
 
+  // TODO: move this to the BiGramIndexGroup!
+  // TODO: maybe this method should return a BiGramIndex!
   public static List<Subsegment2> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
     throw new RuntimeException("Not yet implemented!");
     //    final List<Subsegment2> biGrams1 = calculate(a);
