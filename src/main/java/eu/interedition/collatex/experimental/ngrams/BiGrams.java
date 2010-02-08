@@ -13,6 +13,7 @@ import eu.interedition.collatex.input.Phrase;
 
 public class BiGrams {
 
+  // TODO: shouldn't this return value become an instance of bigramindex?
   public static List<BiGram> calculate(final Witness a) {
     final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
     final List<NormalizedToken> tokens = aa.getTokens();
