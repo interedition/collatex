@@ -41,7 +41,7 @@ public class BiGrams {
     return group.getUniqueBiGramsForWitnessA();
   }
 
-  public static List<Subsegment2> getUniqueBiGramsForWitnessB(final Witness a, final Witness b) {
+  public static List<BiGram> getUniqueBiGramsForWitnessB(final Witness a, final Witness b) {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
     return group.getUniqueBiGramsForWitnessB();
   }
