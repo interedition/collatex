@@ -38,4 +38,18 @@ public class BiGramIndexGroup {
     }
     return subsegments;
   }
+
+  // TODO: this should return a BiGramIndex instead!
+  public List<Subsegment2> getUniqueBiGramsForWitnessA() {
+    final List<String> uniqueBigramsForWitnessANormalized = Lists.newArrayList(indexA.keys());
+    uniqueBigramsForWitnessANormalized.removeAll(indexB.keys());
+    // System.out.println(uniqueBigramsForWitnessANormalized);
+    final List<Subsegment2> subsegments = Lists.newArrayList();
+    for (final String key : uniqueBigramsForWitnessANormalized) {
+      final BiGram phrase1 = indexA.get(key);
+      final Subsegment2 subsegment = new Subsegment2(key, phrase1);
+      subsegments.add(subsegment);
+    }
+    return subsegments;
+  }
 }

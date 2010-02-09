@@ -48,18 +48,18 @@ public class NGramBasedAlgorithmTest {
     Assert.assertEquals("cat # A: 3 B: 5", overlappingBiGrams.get(2).toString());
   }
 
+  @Test
+  public void testUniqueNGrams3() {
+    // "The black cat", "The black and white cat"
+    final Witness a = new Witness("A", "The black cat");
+    final Witness b = new Witness("B", "The black and white cat");
+    final List<Subsegment2> uniqueBiGrams = BiGrams.getUniqueBiGramsForWitnessA(a, b);
+    Assert.assertEquals(1, uniqueBiGrams.size());
+    Assert.assertEquals("black cat A: 2", uniqueBiGrams.get(0).toString());
+  }
+  // TODO: getUniqueBiGrams should give back an BiGramIndex
   //
-  //  @Test
-  //  public void testUniqueNGrams3() {
-  //    // "The black cat", "The black and white cat"
-  //    final WitnessBuilder builder = new WitnessBuilder();
-  //    final Witness a = builder.build("A", "The black cat");
-  //    final Witness b = builder.build("B", "The black and white cat");
-  //    final List<Subsegment2> uniqueBiGrams = BiGrams.getUniqueBiGramsForWitnessA(a, b);
-  //    Assert.assertEquals(1, uniqueBiGrams.size());
-  //    Assert.assertEquals("black cat A: 2", uniqueBiGrams.get(0).toString());
-  //  }
-  //
+
   //  @Test
   //  public void testUniqueNGrams3b() {
   //    // "The black cat", "The black and white cat"

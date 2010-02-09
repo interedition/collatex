@@ -37,38 +37,9 @@ public class BiGrams {
   // TODO: move this to the BiGramIndexGroup!
   // TODO: maybe this method should return a BiGramIndex!
   public static List<Subsegment2> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
-    throw new RuntimeException("Not yet implemented!");
-    //    final List<Subsegment2> biGrams1 = calculate(a);
-    //    final List<Subsegment2> biGrams2 = calculate(b);
-    //    final Map<String, Subsegment2> biGramMapped1 = normalize(biGrams1);
-    //    final Map<String, Subsegment2> biGramMapped2 = normalize(biGrams2);
-    //    final List<String> uniqueBigramsForWitnessANormalized = Lists.newArrayList(biGramMapped1.keySet());
-    //    uniqueBigramsForWitnessANormalized.removeAll(biGramMapped2.keySet());
-    //    System.out.println(uniqueBigramsForWitnessANormalized);
-    //    final List<Subsegment2> subsegments = Lists.newArrayList();
-    //    for (final String normalized : uniqueBigramsForWitnessANormalized) {
-    //      final Subsegment2 phrase1 = biGramMapped1.get(normalized);
-    //      subsegments.add(phrase1);
-    //    }
-    //    return subsegments;
-    //    final List<Subsegment2> overlappingBiGrams = getOverlappingBiGrams(a, b);
-    //    // hmm hier heb ik weer de bigrams nodig van Witness A; dat wordt dan wel dubbel berekend.. zucht
-    //    final List<Phrase> biGramsForWitnessA = calculate(a);
-    //    final List<Phrase> uniqueBiGramsForWitnessA = Lists.newArrayList();
-    //    uniqueBiGramsForWitnessA.addAll(biGramsForWitnessA);
-    //
-    //    for (final Subsegment2 overlappingBiGram : overlappingBiGrams) {
-    //      final Phrase overlappingPhraseInWitnessA = overlappingBiGram.getPhraseFor(a.getFirstSegment().getWitnessId());
-    //      // TODO: this is here because Phrase has no equals!
-    //      // TODO: should be toTest.getNormalized!;
-    //      // TODO: this is inefficient!
-    //      for (final Phrase toTest : biGramsForWitnessA) {
-    //        if (toTest.getOriginal().equals(overlappingPhraseInWitnessA.getOriginal())) {
-    //          uniqueBiGramsForWitnessA.remove(toTest);
-    //        }
-    //      }
-    //    }
-    //    return uniqueBiGramsForWitnessA;
+    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
+    return group.getUniqueBiGramsForWitnessA();
+
   }
 
   // TODO: method who are doing almost the same thing! That should not be necessary!
