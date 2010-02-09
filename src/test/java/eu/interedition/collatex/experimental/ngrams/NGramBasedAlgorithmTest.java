@@ -73,4 +73,13 @@ public class NGramBasedAlgorithmTest {
     Assert.assertEquals("white cat", uniqueBiGrams.get(2).getNormalized());
   }
 
+  @Test
+  public void testUniqueNGrams3c() {
+    // "The black cat", "The black and white cat"
+    final Witness a = new Witness("A", "The black cat");
+    final Witness b = new Witness("B", "The black and white cat");
+    final List<NGram> uniqueNGrams = BiGrams.getUniqueNGramsForWitnessB(a, b);
+    Assert.assertEquals(1, uniqueNGrams.size());
+    Assert.assertEquals("black and white cat", uniqueNGrams.get(0).getNormalized());
+  }
 }

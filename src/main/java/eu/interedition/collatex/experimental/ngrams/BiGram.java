@@ -21,4 +21,8 @@ public class BiGram {
 
   }
 
+  public NormalizedToken getLastToken() {
+    return _next;
+  }
+
 }

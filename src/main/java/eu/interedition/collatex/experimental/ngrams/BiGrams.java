@@ -51,15 +51,6 @@ public class BiGrams {
   public static List<Phrase> getLongestUniquePiecesForWitnessA(final Witness a, final Witness b) {
     throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
 
-    //    final List<Phrase> uniqueBiGramsForWitnessA = getUniqueBiGramsForWitnessA(a, b);
-    //    final List<Phrase> newBiGrams = Lists.newArrayList();
-    //    final Phrase currentBiGram = uniqueBiGramsForWitnessA.remove(0); // TODO: this can be dangerous; if there are no unique bigrams!
-    //    for (final Phrase nextBiGram : uniqueBiGramsForWitnessA) {
-    //      System.out.println(currentBiGram.getBeginPosition() + ":" + nextBiGram.getBeginPosition());
-    //      final Phrase newBigram = new Phrase(currentBiGram.getWitness(), currentBiGram.getFirstWord(), nextBiGram.getLastWord(), null);
-    //      newBiGrams.add(newBigram);
-    //    }
-    //    return newBiGrams;
   }
 
   // TODO: this method is not finished!
@@ -67,6 +58,11 @@ public class BiGrams {
     throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
     //    final List<Phrase> uniqueBiGramsForWitnessB = getUniqueBiGramsForWitnessB(a, b);
     //    return uniqueBiGramsForWitnessB;
+  }
+
+  public static List<NGram> getUniqueNGramsForWitnessB(final Witness a, final Witness b) {
+    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
+    return group.getUniqueNGramsForWitnessB();
   }
 
 }

@@ -67,4 +67,17 @@ public class BiGramIndexGroup {
     }
     return subsegments;
   }
+
+  public List<NGram> getUniqueNGramsForWitnessB() {
+    final List<BiGram> uniqueBiGramsForWitnessA = getUniqueBiGramsForWitnessB();
+    final List<NGram> newNGrams = Lists.newArrayList();
+    final NGram currentNGram = NGram.create(uniqueBiGramsForWitnessA.remove(0)); // TODO: this can be dangerous; if there are no unique bigrams!
+    for (final BiGram nextBiGram : uniqueBiGramsForWitnessA) {
+      //System.out.println(currentBiGram.getBeginPosition() + ":" + nextBiGram.getBeginPosition());
+      currentNGram.add(nextBiGram);
+      //   final Phrase newBigram = new Phrase(currentBiGram.getWitness(), currentBiGram.getFirstWord(), nextBiGram.getLastWord(), null);
+      // newBiGrams.add(newBigram);
+    }
+    return Lists.newArrayList(currentNGram);
+  }
 }
