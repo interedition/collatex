@@ -52,4 +52,20 @@ public class BiGramIndexGroup {
     }
     return subsegments;
   }
+
+  // TODO: methods that are doing almost the same thing! That should not be necessary!
+  //    // Until here is the exact same stuff as the other method!
+  public List<Subsegment2> getUniqueBiGramsForWitnessB() {
+    final List<String> result = Lists.newArrayList(indexB.keys());
+    result.removeAll(indexA.keys());
+    System.out.println(result);
+    // The next part is also the same! (only the map were it comes from is different!
+    final List<Subsegment2> subsegments = Lists.newArrayList();
+    for (final String key : result) {
+      final BiGram phrase1 = indexB.get(key);
+      final Subsegment2 subsegment = new Subsegment2(key, phrase1);
+      subsegments.add(subsegment);
+    }
+    return subsegments;
+  }
 }
