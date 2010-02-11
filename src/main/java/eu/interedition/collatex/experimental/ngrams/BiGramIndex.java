@@ -40,9 +40,8 @@ public class BiGramIndex implements Iterable<BiGram> {
   // TODO: make this method private
   public static List<BiGram> calculate(final Witness a) {
     final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
-    final List<NormalizedToken> tokens = aa.getTokens();
-    final List<NormalizedToken> tokensTodo = Lists.newArrayList(tokens);
-    tokensTodo.add(new SpecialToken(a.getSigil(), "#", tokens.size() + 1));
+    final List<NormalizedToken> tokensTodo = Lists.newArrayList(aa);
+    tokensTodo.add(new SpecialToken(a.getSigil(), "#", aa.size() + 1));
     NormalizedToken previous = new SpecialToken(a.getSigil(), "#", 0);
     final List<BiGram> bigrams = Lists.newArrayList();
     for (final NormalizedToken next : tokensTodo) {
