@@ -14,7 +14,7 @@ public class NGramBasedAlgorithmTest {
   public void testNgrams1() {
     // "The black cat", "The black and white cat"
     final Witness a = new Witness("A", "The black cat");
-    final List<BiGram> ngrams = BiGrams.calculate(a);
+    final List<BiGram> ngrams = BiGramIndex.calculate(a);
     Assert.assertEquals(4, ngrams.size());
     Assert.assertEquals("# the", ngrams.get(0).getNormalized());
     Assert.assertEquals("the black", ngrams.get(1).getNormalized());
@@ -26,7 +26,7 @@ public class NGramBasedAlgorithmTest {
   public void testNgrams1b() {
     // "The black cat", "The black and white cat"
     final Witness b = new Witness("B", "The black and white cat");
-    final List<BiGram> ngrams = BiGrams.calculate(b);
+    final List<BiGram> ngrams = BiGramIndex.calculate(b);
     Assert.assertEquals(6, ngrams.size());
     Assert.assertEquals("# the", ngrams.get(0).getNormalized());
     Assert.assertEquals("the black", ngrams.get(1).getNormalized());
