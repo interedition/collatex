@@ -12,6 +12,13 @@ public class NormalizedToken extends Token {
     return normalized;
   }
 
+  public static NormalizedToken normalize(final Token token) {
+    final String content = token.getContent();
+    final String normalized = content.toLowerCase(); // TODO: this is far too simple!
+    final NormalizedToken normalizedT = create(token, normalized);
+    return normalizedT;
+  }
+
   public static NormalizedToken create(final Token token, final String normalized) {
     return new NormalizedToken(token.getSigil(), token.getContent(), token.getPosition(), normalized);
   }

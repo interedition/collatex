@@ -31,9 +31,7 @@ public class NormalizedWitnessBuilder {
   private static List<NormalizedToken> normalize(final List<Token> tokens) {
     final List<NormalizedToken> normalizeds = Lists.newArrayList();
     for (final Token token : tokens) {
-      final String content = token.getContent();
-      final String normalized = content.toLowerCase(); // TODO: this is far too simple!
-      final NormalizedToken normalizedT = NormalizedToken.create(token, normalized);
+      final NormalizedToken normalizedT = NormalizedToken.normalize(token);
       normalizeds.add(normalizedT);
     }
     return normalizeds;

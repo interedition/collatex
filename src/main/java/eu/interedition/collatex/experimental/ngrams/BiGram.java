@@ -1,6 +1,7 @@
 package eu.interedition.collatex.experimental.ngrams;
 
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
+import eu.interedition.collatex.experimental.ngrams.data.Token;
 
 public class BiGram {
   // NOTE: BiGram could become an extend version of NormalizedToken!
@@ -25,4 +26,11 @@ public class BiGram {
     return _next;
   }
 
+  public static BiGram create(final Token token, final Token token2) {
+    return new BiGram(NormalizedToken.normalize(token), NormalizedToken.normalize(token2));
+  }
+
+  public boolean contains(final Token token) {
+    return getFirstToken().equals(token) || getLastToken().equals(token);
+  }
 }

@@ -4,12 +4,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
 import eu.interedition.collatex.experimental.ngrams.data.SpecialToken;
+import eu.interedition.collatex.experimental.ngrams.data.Token;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitnessBuilder;
 
@@ -68,4 +71,19 @@ public class BiGramIndex {
     return normalize.get(key);
   }
 
+  // NOTE: this method is only used in tests! Make it less visible?
+  public BiGramIndex removeBiGramsWithToken(final Token token) {
+    final List<BiGram> result = Lists.newArrayList(Iterables.filter(biGrams1, new Predicate<BiGram>() {
+      @Override
+      public boolean apply(final BiGram bigram) {
+        return !bigram.contains(token);
+      }
+    }));
+    return new BiGramIndex(result);
+
+  }
+
+  public int size() {
+    return biGrams1.size();
+  }
 }

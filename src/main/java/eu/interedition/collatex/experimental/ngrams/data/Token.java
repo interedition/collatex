@@ -26,4 +26,19 @@ public class Token {
     return position;
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if (!(obj instanceof Token)) {
+      return false;
+    }
+    final Token token = (Token) obj;
+    final boolean result = sigil.equals(token.sigil) && content.equals(token.content) && position == token.position;
+    return result;
+  }
+
+  @Override
+  public int hashCode() {
+    return content.hashCode();
+  }
+
 }
