@@ -15,6 +15,9 @@ public class NGramIndexTest {
     final BiGramIndex index = BiGramIndex.create(a);
     final List<NGram> ngrams = NGramIndex.concatenateBiGramToNGram(index);
     Assert.assertEquals(1, ngrams.size());
+    // Note: next assert checks that the original index
+    // Note: is not affected!
+    Assert.assertEquals(5, index.size());
   }
 
   //  @Test

@@ -8,8 +8,7 @@ public class NGramIndex {
 
   //TODO: make return type a NGramIndex
   static List<NGram> concatenateBiGramToNGram(final BiGramIndex biGramIndex) {
-    // TODO: not making a copy here might be dangerous!
-    final List<BiGram> biGrams = biGramIndex.getBiGrams();
+    final List<BiGram> biGrams = Lists.newArrayList(biGramIndex);
     final List<NGram> newNGrams;
     final NGram currentNGram = NGram.create(biGrams.remove(0)); // TODO: this can be dangerous; if there are no unique bigrams!
     for (final BiGram nextBiGram : biGrams) {
