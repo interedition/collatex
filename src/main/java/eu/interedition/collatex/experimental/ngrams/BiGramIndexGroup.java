@@ -70,28 +70,12 @@ public class BiGramIndexGroup {
 
   public List<NGram> getUniqueNGramsForWitnessB() {
     final List<BiGram> biGramIndex = getUniqueBiGramsForWitnessB();
-    return concatenateBiGramToNGram(biGramIndex);
-  }
-
-  //TODO: make parameter a BiGramIndex class
-  //TODO: make a class NGramIndex
-  //TODO: move this method to that class
-  private List<NGram> concatenateBiGramToNGram(final List<BiGram> biGramIndex) {
-    final List<NGram> newNGrams;
-    final NGram currentNGram = NGram.create(biGramIndex.remove(0)); // TODO: this can be dangerous; if there are no unique bigrams!
-    for (final BiGram nextBiGram : biGramIndex) {
-      //System.out.println(currentBiGram.getBeginPosition() + ":" + nextBiGram.getBeginPosition());
-      currentNGram.add(nextBiGram);
-      //   final Phrase newBigram = new Phrase(currentBiGram.getWitness(), currentBiGram.getFirstWord(), nextBiGram.getLastWord(), null);
-      // newBiGrams.add(newBigram);
-    }
-    newNGrams = Lists.newArrayList(currentNGram);
-    return newNGrams;
+    return NGramIndex.concatenateBiGramToNGram(biGramIndex);
   }
 
   public Alignment align() {
     final List<BiGram> bigrams = getOverlappingBiGramsForWitnessA();
-    final List<NGram> ngrams = concatenateBiGramToNGram(bigrams);
+    final List<NGram> ngrams = NGramIndex.concatenateBiGramToNGram(bigrams);
     return new Alignment(ngrams);
   }
 
