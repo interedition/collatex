@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
-// TODO: note this is not really an index! this is a combination of one!
+// TODO: note this is not really an index! this is a combination of two!
 public class BiGramIndexGroup {
 
   private final BiGramIndex indexA;
@@ -73,6 +73,9 @@ public class BiGramIndexGroup {
     return concatenateBiGramToNGram(biGramIndex);
   }
 
+  //TODO: make parameter a BiGramIndex class
+  //TODO: make a class NGramIndex
+  //TODO: move this method to that class
   private List<NGram> concatenateBiGramToNGram(final List<BiGram> biGramIndex) {
     final List<NGram> newNGrams;
     final NGram currentNGram = NGram.create(biGramIndex.remove(0)); // TODO: this can be dangerous; if there are no unique bigrams!
@@ -87,15 +90,20 @@ public class BiGramIndexGroup {
   }
 
   public Alignment align() {
+    final List<BiGram> bigrams = getOverlappingBiGramsForWitnessA();
+    final List<NGram> ngrams = concatenateBiGramToNGram(bigrams);
+    return new Alignment(ngrams);
+  }
+
+  public List<BiGram> getOverlappingBiGramsForWitnessA() {
     final Set<String> union = indexA.keys();
     union.retainAll(indexB.keys());
     //    System.out.println("union: " + union);
-    final List<BiGram> subsegments = Lists.newArrayList();
+    final List<BiGram> bigrams = Lists.newArrayList();
     for (final String key : union) {
       final BiGram biGramA = indexA.get(key);
-      subsegments.add(biGramA);
+      bigrams.add(biGramA);
     }
-    final List<NGram> concatenateBiGramToNGram = concatenateBiGramToNGram(subsegments);
-    return new Alignment(concatenateBiGramToNGram);
+    return bigrams;
   }
 }

@@ -48,6 +48,19 @@ public class NGramBasedAlgorithmTest {
     Assert.assertEquals("cat # A: 3 B: 5", overlappingBiGrams.get(2).toString());
   }
 
+  // TODO: getUniqueBiGrams should give back an BiGramIndex
+  @Test
+  public void testOverlappingNGrams2b() {
+    // "The black cat", "The black and white cat"
+    final Witness a = new Witness("A", "The black cat");
+    final Witness b = new Witness("B", "The black and white cat");
+    final List<BiGram> overlappingBiGrams = BiGrams.getOverlappingBiGramsForWitnessA(a, b);
+    Assert.assertEquals(3, overlappingBiGrams.size());
+    Assert.assertEquals("# the", overlappingBiGrams.get(0).getNormalized());
+    Assert.assertEquals("the black", overlappingBiGrams.get(1).getNormalized());
+    Assert.assertEquals("cat #", overlappingBiGrams.get(2).getNormalized());
+  }
+
   @Test
   public void testUniqueNGrams3() {
     // "The black cat", "The black and white cat"
@@ -57,9 +70,6 @@ public class NGramBasedAlgorithmTest {
     Assert.assertEquals(1, uniqueBiGrams.size());
     Assert.assertEquals("black cat A: 2", uniqueBiGrams.get(0).toString());
   }
-
-  // TODO: getUniqueBiGrams should give back an BiGramIndex
-  //
 
   @Test
   public void testUniqueNGrams3b() {

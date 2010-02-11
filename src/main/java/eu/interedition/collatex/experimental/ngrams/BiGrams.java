@@ -34,6 +34,11 @@ public class BiGrams {
     return group.getOverlap();
   }
 
+  public static List<BiGram> getOverlappingBiGramsForWitnessA(final Witness a, final Witness b) {
+    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
+    return group.getOverlappingBiGramsForWitnessA();
+  }
+
   // TODO: move this to the BiGramIndexGroup!
   // TODO: maybe this method should return a BiGramIndex!
   public static List<Subsegment2> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
