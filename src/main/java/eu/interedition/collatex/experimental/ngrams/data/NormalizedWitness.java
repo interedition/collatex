@@ -11,6 +11,7 @@ public class NormalizedWitness {
     this.tokens = tokens;
   }
 
+  // Note: not pleased with this method!
   public List<NormalizedToken> getTokens() {
     return tokens;
   }

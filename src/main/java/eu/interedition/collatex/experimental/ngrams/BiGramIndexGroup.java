@@ -69,13 +69,13 @@ public class BiGramIndexGroup {
   }
 
   public List<NGram> getUniqueNGramsForWitnessB() {
-    final List<BiGram> biGramIndex = getUniqueBiGramsForWitnessB();
+    final BiGramIndex biGramIndex = new BiGramIndex(getUniqueBiGramsForWitnessB());
     return NGramIndex.concatenateBiGramToNGram(biGramIndex);
   }
 
   public Alignment align() {
-    final List<BiGram> bigrams = getOverlappingBiGramsForWitnessA();
-    final List<NGram> ngrams = NGramIndex.concatenateBiGramToNGram(bigrams);
+    final BiGramIndex biGramIndex = new BiGramIndex(getOverlappingBiGramsForWitnessA());
+    final List<NGram> ngrams = NGramIndex.concatenateBiGramToNGram(biGramIndex);
     return new Alignment(ngrams);
   }
 

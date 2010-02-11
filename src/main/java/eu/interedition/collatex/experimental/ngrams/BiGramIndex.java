@@ -86,4 +86,9 @@ public class BiGramIndex {
   public int size() {
     return biGrams1.size();
   }
+
+  //NOTE: I am not pleased with this method... I wish other classes could iterate over this class!
+  public List<BiGram> getBiGrams() {
+    return biGrams1;
+  }
 }
