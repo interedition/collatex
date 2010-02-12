@@ -2,7 +2,6 @@ package eu.interedition.collatex.experimental.ngrams;
 
 import java.util.List;
 
-
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.input.Phrase;
 
@@ -18,16 +17,10 @@ public class BiGrams {
     return group.getOverlappingBiGramsForWitnessA();
   }
 
-  // TODO: move this to the BiGramIndexGroup!
   // TODO: maybe this method should return a BiGramIndex!
   public static List<Subsegment2> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
     return group.getUniqueBiGramsForWitnessA();
-  }
-
-  public static List<BiGram> getUniqueBiGramsForWitnessB(final Witness a, final Witness b) {
-    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
-    return group.getUniqueBiGramsForWitnessB();
   }
 
   // TODO: this method is not finished!
@@ -42,11 +35,6 @@ public class BiGrams {
     throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
     //    final List<Phrase> uniqueBiGramsForWitnessB = getUniqueBiGramsForWitnessB(a, b);
     //    return uniqueBiGramsForWitnessB;
-  }
-
-  public static List<NGram> getUniqueNGramsForWitnessB(final Witness a, final Witness b) {
-    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
-    return group.getUniqueNGramsForWitnessB();
   }
 
 }

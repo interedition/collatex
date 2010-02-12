@@ -6,19 +6,21 @@ import com.google.common.collect.Lists;
 
 public class NGramIndex {
 
+  //TODO: rename to create?
   //TODO: make return type a NGramIndex
   static List<NGram> concatenateBiGramToNGram(final BiGramIndex biGramIndex) {
     final List<BiGram> biGrams = Lists.newArrayList(biGramIndex);
-    final List<NGram> newNGrams;
-    final NGram currentNGram = NGram.create(biGrams.remove(0)); // TODO: this can be dangerous; if there are no unique bigrams!
+    final List<NGram> newNGrams = Lists.newArrayList();
+    NGram currentNGram = NGram.create(biGrams.remove(0)); // TODO: this can be dangerous; if there are no unique bigrams!
+    newNGrams.add(currentNGram);
     for (final BiGram nextBiGram : biGrams) {
-      //System.out.println(currentBiGram.getBeginPosition() + ":" + nextBiGram.getBeginPosition());
-      currentNGram.add(nextBiGram);
-      //   final Phrase newBigram = new Phrase(currentBiGram.getWitness(), currentBiGram.getFirstWord(), nextBiGram.getLastWord(), null);
-      // newBiGrams.add(newBigram);
+      if (nextBiGram.getFirstToken().getPosition() - currentNGram.getLastToken().getPosition() > 1) {
+        currentNGram = NGram.create(nextBiGram);
+        newNGrams.add(currentNGram);
+      } else {
+        currentNGram.add(nextBiGram);
+      }
     }
-    newNGrams = Lists.newArrayList(currentNGram);
     return newNGrams;
   }
-
 }

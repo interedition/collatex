@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
+import eu.interedition.collatex.experimental.ngrams.data.Token;
 
 public class NGram {
   private final List<NormalizedToken> tokens;
@@ -31,6 +32,10 @@ public class NGram {
     }
     return replacementString;
 
+  }
+
+  public Token getLastToken() {
+    return tokens.get(tokens.size() - 1);
   }
 
 }

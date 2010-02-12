@@ -5,6 +5,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.interedition.collatex.experimental.ngrams.data.Token;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
 public class NGramIndexTest {
@@ -20,10 +21,13 @@ public class NGramIndexTest {
     Assert.assertEquals(5, index.size());
   }
 
-  //  @Test
-  //  public void testNGramIndex() {
-  //    final Witness a = new Witness("A", "a b c d GAP e f g");
-  //    final BiGramIndex biGramI = BiGramIndex.create(a);
-  //    biGramI.removeBiGramsWithToken(new Token("A", "GAP", 5));
-  //  }
+  @Test
+  public void testNGramIndex2() {
+    final Witness a = new Witness("A", "a b c d GAP e f g");
+    final BiGramIndex biGramI = BiGramIndex.create(a);
+    final BiGramIndex indexWithGap = biGramI.removeBiGramsWithToken(new Token("A", "GAP", 5));
+    final List<NGram> ngrams = NGramIndex.concatenateBiGramToNGram(indexWithGap);
+    Assert.assertEquals(2, ngrams.size());
+
+  }
 }

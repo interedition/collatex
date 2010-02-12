@@ -76,7 +76,8 @@ public class NGramBasedAlgorithmTest {
     // "The black cat", "The black and white cat"
     final Witness a = new Witness("A", "The black cat");
     final Witness b = new Witness("B", "The black and white cat");
-    final List<BiGram> uniqueBiGrams = BiGrams.getUniqueBiGramsForWitnessB(a, b);
+    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
+    final List<BiGram> uniqueBiGrams = group.getUniqueBiGramsForWitnessB();
     Assert.assertEquals(3, uniqueBiGrams.size());
     Assert.assertEquals("black and", uniqueBiGrams.get(0).getNormalized());
     Assert.assertEquals("and white", uniqueBiGrams.get(1).getNormalized());
@@ -88,7 +89,8 @@ public class NGramBasedAlgorithmTest {
     // "The black cat", "The black and white cat"
     final Witness a = new Witness("A", "The black cat");
     final Witness b = new Witness("B", "The black and white cat");
-    final List<NGram> uniqueNGrams = BiGrams.getUniqueNGramsForWitnessB(a, b);
+    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
+    final List<NGram> uniqueNGrams = group.getUniqueNGramsForWitnessB();
     Assert.assertEquals(1, uniqueNGrams.size());
     Assert.assertEquals("black and white cat", uniqueNGrams.get(0).getNormalized());
   }
