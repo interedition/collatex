@@ -1,5 +1,6 @@
 package eu.interedition.collatex.experimental.ngrams;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +17,7 @@ import eu.interedition.collatex.experimental.ngrams.data.Token;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitnessBuilder;
 
-public class BiGramIndex {
+public class BiGramIndex implements Iterable<BiGram> {
 
   private final List<BiGram> biGrams1;
 
@@ -88,7 +89,18 @@ public class BiGramIndex {
   }
 
   //NOTE: I am not pleased with this method... I wish other classes could iterate over this class!
+  //TODO: remove!
   public List<BiGram> getBiGrams() {
     return biGrams1;
+  }
+
+  public BiGram get(final int i) {
+    return biGrams1.get(i);
+  }
+
+  // TODO: make iterator read only!
+  @Override
+  public Iterator<BiGram> iterator() {
+    return biGrams1.iterator();
   }
 }

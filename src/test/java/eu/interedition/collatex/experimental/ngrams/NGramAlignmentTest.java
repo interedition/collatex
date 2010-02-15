@@ -23,6 +23,21 @@ public class NGramAlignmentTest {
     Assert.assertEquals("# cat #", matches.get(0).getNormalized());
   }
 
+  @Test
+  public void testAlignment2() {
+    final Witness a = new Witness("A", "The black cat");
+    final Witness b = new Witness("B", "The black and white cat");
+    final WitnessSet set = new WitnessSet(a, b);
+    final BiGramIndex index = set.getUniqueBiGramIndexForWitnessA();
+    // Note: this also test elsewhere! (BiGramGroupTest)
+    Assert.assertEquals(1, index.size());
+    final Alignment alignment = set.align();
+    final List<NGram> matches = alignment.getMatches();
+    Assert.assertEquals(2, matches.size());
+    Assert.assertEquals("the black", matches.get(0).getNormalized());
+    Assert.assertEquals("cat", matches.get(1).getNormalized());
+  }
+
   //  public void testAlignmentVariant() throws FileNotFoundException, IOException, BlockStructureCascadeException {
   //    final Table table = alignmentTable("cat", "mat");
   //    assertEquals("variant-align: cat / mat", table.get(1, 2).toString());

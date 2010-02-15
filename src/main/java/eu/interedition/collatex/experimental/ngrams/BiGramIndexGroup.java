@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
 // TODO: note this is not really an index! this is a combination of two!
+// TODO: this class is gonna be very similar to WitnessSet!
 public class BiGramIndexGroup {
 
   private final BiGramIndex indexA;
@@ -39,18 +40,16 @@ public class BiGramIndexGroup {
     return subsegments;
   }
 
-  // TODO: this should return a BiGramIndex instead!
-  public List<Subsegment2> getUniqueBiGramsForWitnessA() {
+  public BiGramIndex getUniqueBiGramsForWitnessA() {
     final List<String> uniqueBigramsForWitnessANormalized = Lists.newArrayList(indexA.keys());
     uniqueBigramsForWitnessANormalized.removeAll(indexB.keys());
     // System.out.println(uniqueBigramsForWitnessANormalized);
-    final List<Subsegment2> subsegments = Lists.newArrayList();
+    final List<BiGram> bigrams = Lists.newArrayList();
     for (final String key : uniqueBigramsForWitnessANormalized) {
-      final BiGram phrase1 = indexA.get(key);
-      final Subsegment2 subsegment = new Subsegment2(key, phrase1);
-      subsegments.add(subsegment);
+      final BiGram bigram = indexA.get(key);
+      bigrams.add(bigram);
     }
-    return subsegments;
+    return new BiGramIndex(bigrams);
   }
 
   // TODO: methods that are doing almost the same thing! That should not be necessary!
@@ -90,4 +89,5 @@ public class BiGramIndexGroup {
     }
     return bigrams;
   }
+
 }

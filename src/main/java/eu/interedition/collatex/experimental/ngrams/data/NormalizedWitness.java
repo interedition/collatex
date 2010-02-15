@@ -11,12 +11,21 @@ public class NormalizedWitness {
     this.tokens = tokens;
   }
 
-  // Note: not pleased with this method!
+  // Note: not pleased with this method! implement Iterable!
   public List<NormalizedToken> getTokens() {
     return tokens;
   }
 
   public String getSigil() {
     return sigil;
+  }
+
+  //Note: not pleased with this method! reduce visibility?
+  public List<NormalizedToken> getTokens(final int startPosition, final int endPosition) {
+    return tokens.subList(startPosition - 1, endPosition);
+  }
+
+  public int size() {
+    return tokens.size();
   }
 }
