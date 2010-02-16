@@ -1,5 +1,6 @@
 package eu.interedition.collatex.experimental.ngrams;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -10,8 +11,11 @@ public class NGramIndex {
   static List<NGram> concatenateBiGramToNGram(final BiGramIndex biGramIndex) {
     // TODO: not making a copy here might be dangerous!
     final List<BiGram> biGrams = biGramIndex.getBiGrams();
+    if (biGrams.isEmpty()) {
+      return Collections.emptyList();
+    }
     final List<NGram> newNGrams;
-    final NGram currentNGram = NGram.create(biGrams.remove(0)); // TODO: this can be dangerous; if there are no unique bigrams!
+    final NGram currentNGram = NGram.create(biGrams.remove(0));
     for (final BiGram nextBiGram : biGrams) {
       //System.out.println(currentBiGram.getBeginPosition() + ":" + nextBiGram.getBeginPosition());
       currentNGram.add(nextBiGram);

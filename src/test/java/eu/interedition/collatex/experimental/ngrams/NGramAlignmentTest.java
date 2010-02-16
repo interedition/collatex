@@ -11,16 +11,15 @@ import eu.interedition.collatex.experimental.ngrams.data.Witness;
 public class NGramAlignmentTest {
 
   //Copied from TextAlignmentTest
-  // TODO: remove # .. # !
   @Test
   public void testAlignment() {
     final Witness a = new Witness("A", "cat");
     final Witness b = new Witness("B", "cat");
-    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
-    final Alignment alignment = group.align();
+    final WitnessSet set = new WitnessSet(a, b);
+    final Alignment alignment = set.align();
     final List<NGram> matches = alignment.getMatches();
     Assert.assertEquals(1, matches.size());
-    Assert.assertEquals("# cat #", matches.get(0).getNormalized());
+    Assert.assertEquals("cat", matches.get(0).getNormalized());
   }
 
   @Test

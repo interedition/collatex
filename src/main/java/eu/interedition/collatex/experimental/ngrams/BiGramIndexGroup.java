@@ -68,12 +68,7 @@ public class BiGramIndexGroup {
     return subsegments;
   }
 
-  public Alignment align() {
-    final BiGramIndex biGramIndex = new BiGramIndex(getOverlappingBiGramsForWitnessA());
-    final List<NGram> ngrams = NGramIndex.concatenateBiGramToNGram(biGramIndex);
-    return new Alignment(ngrams);
-  }
-
+  // TODO: no longer used? remove!
   public List<BiGram> getOverlappingBiGramsForWitnessA() {
     final Set<String> union = indexA.keys();
     union.retainAll(indexB.keys());
@@ -86,6 +81,7 @@ public class BiGramIndexGroup {
     return bigrams;
   }
 
+  // TODO: no longer used? remove!
   public List<Subsegment2> getOverlap() {
     final Set<String> union = indexA.keys();
     union.retainAll(indexB.keys());

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitnessBuilder;
@@ -26,7 +27,19 @@ public class WitnessSet {
 
     final List<NGram> bigrams = getUniqueBiGramIndexForWitnessA();
     final List<NGram> matches = calculateMatches(aa, bigrams);
-    return new Alignment(matches);
+    final List<Gap> gaps = calculateGaps();
+    return new Alignment(matches, gaps);
+  }
+
+  private List<Gap> calculateGaps() {
+    // TODO: rename method!
+    final List<NGram> ngramsA = getUniqueBiGramIndexForWitnessA();
+    final List<NGram> ngramsB = getUniqueBiGramIndexForWitnessB();
+    final List<Gap> gaps = Lists.newArrayList();
+    for (int i = 0; i < ngramsA.size(); i++) {
+      gaps.add(new Gap(ngramsA.get(i), ngramsB.get(i)));
+    }
+    return gaps;
   }
 
   private List<NGram> calculateMatches(final NormalizedWitness aa, final List<NGram> bigrams) {
@@ -47,9 +60,16 @@ public class WitnessSet {
     return matches;
   }
 
+  // TODO: inline!
   public List<NGram> getUniqueBiGramIndexForWitnessA() {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
     return group.getUniqueNGramsForWitnessA();
+  }
+
+  // TODO: inline!
+  public List<NGram> getUniqueBiGramIndexForWitnessB() {
+    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
+    return group.getUniqueNGramsForWitnessB();
   }
 
 }

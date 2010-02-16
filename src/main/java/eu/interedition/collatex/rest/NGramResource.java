@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.experimental.ngrams.Alignment;
 import eu.interedition.collatex.experimental.ngrams.NGram;
 import eu.interedition.collatex.experimental.ngrams.WitnessSet;
+import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
 public class NGramResource extends ServerResource {
@@ -42,6 +43,12 @@ public class NGramResource extends ServerResource {
     html += "matches: ";
     for (final NGram nGram : matches) {
       html += " " + nGram.getNormalized() + ";";
+    }
+    final List<Gap> gaps = align.getGaps();
+    html += "</br>";
+    html += "gaps: ";
+    for (final Gap gap : gaps) {
+      html += " " + gap.toString() + ";";
     }
     final Representation representation = new StringRepresentation(html, MediaType.TEXT_HTML);
     return representation;
