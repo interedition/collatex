@@ -26,21 +26,19 @@ public class BiGramIndexGroup {
     return group;
   }
 
-  public List<Subsegment2> getOverlap() {
-    final Set<String> union = indexA.keys();
-    union.retainAll(indexB.keys());
-    //    System.out.println("union: " + union);
-    final List<Subsegment2> subsegments = Lists.newArrayList();
-    for (final String key : union) {
-      final BiGram biGramA = indexA.get(key);
-      final BiGram biGramB = indexB.get(key);
-      final Subsegment2 subsegment = new Subsegment2(key, biGramA, biGramB);
-      subsegments.add(subsegment);
-    }
-    return subsegments;
+  // TODO: make it return a NGramIndex!
+  public List<NGram> getUniqueNGramsForWitnessA() {
+    final BiGramIndex bigrams = getUniqueBigramsForWitnessA();
+    return NGramIndex.concatenateBiGramToNGram(bigrams);
   }
 
-  public BiGramIndex getUniqueBiGramsForWitnessA() {
+  // TODO: make it return a NGramIndex!
+  public List<NGram> getUniqueNGramsForWitnessB() {
+    final BiGramIndex biGramIndex = new BiGramIndex(getUniqueBiGramsForWitnessB());
+    return NGramIndex.concatenateBiGramToNGram(biGramIndex);
+  }
+
+  private BiGramIndex getUniqueBigramsForWitnessA() {
     final List<String> uniqueBigramsForWitnessANormalized = Lists.newArrayList(indexA.keys());
     uniqueBigramsForWitnessANormalized.removeAll(indexB.keys());
     // System.out.println(uniqueBigramsForWitnessANormalized);
@@ -49,11 +47,14 @@ public class BiGramIndexGroup {
       final BiGram bigram = indexA.get(key);
       bigrams.add(bigram);
     }
-    return new BiGramIndex(bigrams);
+    final BiGramIndex index = new BiGramIndex(bigrams);
+    return index;
   }
 
   // TODO: methods that are doing almost the same thing! That should not be necessary!
   //    // Until here is the exact same stuff as the other method!
+  // TODO: make private!
+  // TODO: make return type a BiGramIndex!
   public List<BiGram> getUniqueBiGramsForWitnessB() {
     final List<String> result = Lists.newArrayList(indexB.keys());
     result.removeAll(indexA.keys());
@@ -65,11 +66,6 @@ public class BiGramIndexGroup {
       subsegments.add(phrase1);
     }
     return subsegments;
-  }
-
-  public List<NGram> getUniqueNGramsForWitnessB() {
-    final BiGramIndex biGramIndex = new BiGramIndex(getUniqueBiGramsForWitnessB());
-    return NGramIndex.concatenateBiGramToNGram(biGramIndex);
   }
 
   public Alignment align() {
@@ -88,6 +84,20 @@ public class BiGramIndexGroup {
       bigrams.add(biGramA);
     }
     return bigrams;
+  }
+
+  public List<Subsegment2> getOverlap() {
+    final Set<String> union = indexA.keys();
+    union.retainAll(indexB.keys());
+    //    System.out.println("union: " + union);
+    final List<Subsegment2> subsegments = Lists.newArrayList();
+    for (final String key : union) {
+      final BiGram biGramA = indexA.get(key);
+      final BiGram biGramB = indexB.get(key);
+      final Subsegment2 subsegment = new Subsegment2(key, biGramA, biGramB);
+      subsegments.add(subsegment);
+    }
+    return subsegments;
   }
 
 }

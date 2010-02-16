@@ -41,4 +41,12 @@ public class NGram {
 
   }
 
+  public NormalizedToken getFirstToken() {
+    return tokens.get(0);
+  }
+
+  public NormalizedToken getLastToken() {
+    return tokens.get(tokens.size() - 1);
+  }
+
 }

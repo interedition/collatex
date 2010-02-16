@@ -24,11 +24,15 @@ public class WitnessSet {
     final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
     //final NormalizedWitness bb = NormalizedWitnessBuilder.create(b);
 
-    int startPosition = 1;
+    final List<NGram> bigrams = getUniqueBiGramIndexForWitnessA();
+    final List<NGram> matches = calculateMatches(aa, bigrams);
+    return new Alignment(matches);
+  }
 
-    final BiGramIndex bigrams = getUniqueBiGramIndexForWitnessA();
+  private List<NGram> calculateMatches(final NormalizedWitness aa, final List<NGram> bigrams) {
+    int startPosition = 1;
     final List<NGram> matches = Lists.newArrayList();
-    for (final BiGram bigram : bigrams) {
+    for (final NGram bigram : bigrams) {
       final int endPosition = bigram.getFirstToken().getPosition();
       System.out.println(startPosition);
       System.out.println(endPosition);
@@ -40,12 +44,12 @@ public class WitnessSet {
     final NGram ngram = NGram.create(aa, startPosition, aa.size());
     matches.add(ngram);
     System.out.println(ngram.getNormalized());
-    return new Alignment(matches);
+    return matches;
   }
 
-  public BiGramIndex getUniqueBiGramIndexForWitnessA() {
+  public List<NGram> getUniqueBiGramIndexForWitnessA() {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
-    return group.getUniqueBiGramsForWitnessA();
+    return group.getUniqueNGramsForWitnessA();
   }
 
 }

@@ -18,9 +18,9 @@ public class BiGrams {
   }
 
   // TODO: move this to the BiGramIndexGroup!
-  public static BiGramIndex getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
+  public static List<NGram> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
-    return group.getUniqueBiGramsForWitnessA();
+    return group.getUniqueNGramsForWitnessA();
   }
 
   public static List<BiGram> getUniqueBiGramsForWitnessB(final Witness a, final Witness b) {

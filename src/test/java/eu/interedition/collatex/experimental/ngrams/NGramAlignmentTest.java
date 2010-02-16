@@ -28,7 +28,7 @@ public class NGramAlignmentTest {
     final Witness a = new Witness("A", "The black cat");
     final Witness b = new Witness("B", "The black and white cat");
     final WitnessSet set = new WitnessSet(a, b);
-    final BiGramIndex index = set.getUniqueBiGramIndexForWitnessA();
+    final List<NGram> index = set.getUniqueBiGramIndexForWitnessA();
     // Note: this also test elsewhere! (BiGramGroupTest)
     Assert.assertEquals(1, index.size());
     final Alignment alignment = set.align();
