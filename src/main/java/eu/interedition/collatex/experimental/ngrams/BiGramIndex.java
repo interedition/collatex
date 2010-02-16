@@ -80,15 +80,23 @@ public class BiGramIndex implements Iterable<BiGram> {
       }
     }));
     return new BiGramIndex(result);
-
   }
 
   public int size() {
     return biGrams1.size();
   }
 
-  // TODO: check whether the remove on iterator throws an
-  // exception!
+  //NOTE: I am not pleased with this method... I wish other classes could iterate over this class!
+  //TODO: remove!
+  public List<BiGram> getBiGrams() {
+    return biGrams1;
+  }
+
+  public BiGram get(final int i) {
+    return biGrams1.get(i);
+  }
+
+  // TODO: make iterator read only!
   @Override
   public Iterator<BiGram> iterator() {
     return biGrams1.iterator();

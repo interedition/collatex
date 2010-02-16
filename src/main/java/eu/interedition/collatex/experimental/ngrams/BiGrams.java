@@ -17,10 +17,10 @@ public class BiGrams {
     return group.getOverlappingBiGramsForWitnessA();
   }
 
-  // TODO: maybe this method should return a BiGramIndex!
-  public static List<Subsegment2> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
+  // TODO: move this to the BiGramIndexGroup!
+  public static List<NGram> getUniqueBiGramsForWitnessA(final Witness a, final Witness b) {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
-    return group.getUniqueBiGramsForWitnessA();
+    return group.getUniqueNGramsForWitnessA();
   }
 
   // TODO: this method is not finished!
