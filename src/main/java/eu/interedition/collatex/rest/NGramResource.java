@@ -14,8 +14,8 @@ import org.restlet.resource.ServerResource;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.experimental.ngrams.Alignment;
-import eu.interedition.collatex.experimental.ngrams.BiGramIndexGroup;
 import eu.interedition.collatex.experimental.ngrams.NGram;
+import eu.interedition.collatex.experimental.ngrams.WitnessSet;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
 public class NGramResource extends ServerResource {
@@ -35,8 +35,8 @@ public class NGramResource extends ServerResource {
 
     final Witness a = new Witness("A", firstUseCase[0]);
     final Witness b = new Witness("B", firstUseCase[1]);
-    final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
-    final Alignment align = group.align();
+    final WitnessSet set = new WitnessSet(a, b);
+    final Alignment align = set.align();
     final List<NGram> matches = align.getMatches();
     html += "</br>";
     html += "matches: ";
