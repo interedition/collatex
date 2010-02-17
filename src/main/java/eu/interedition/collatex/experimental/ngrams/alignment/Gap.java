@@ -13,7 +13,14 @@ public class Gap {
 
   @Override
   public String toString() {
+    if (isAddition()) {
+      return "\"" + gapB.getNormalized() + "\" added";
+    }
     return "A: " + gapA.getNormalized() + " -> B: " + gapB.getNormalized();
+  }
+
+  public boolean isAddition() {
+    return gapA.isEmpty() && !gapB.isEmpty();
   }
 
   public NGram getNGramA() {

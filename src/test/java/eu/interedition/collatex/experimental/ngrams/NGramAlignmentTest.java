@@ -49,6 +49,7 @@ public class NGramAlignmentTest {
     final Gap gap = gaps.get(0);
     Assert.assertTrue("NGram A is not empty!", gap.getNGramA().isEmpty());
     Assert.assertEquals("and white", gap.getNGramB().getNormalized());
+    Assert.assertTrue(gap.isAddition());
   }
 
   //  public void testAlignmentVariant() throws FileNotFoundException, IOException, BlockStructureCascadeException {
