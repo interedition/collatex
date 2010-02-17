@@ -31,27 +31,43 @@ public class NGramResource extends ServerResource {
     final List<String[]> useCases = useCases();
     final String[] firstUseCase = useCases.get(0);
     String html = "";
-    html += "A: " + firstUseCase[0] + "</BR>";
-    html += "B: " + firstUseCase[1] + "</BR>";
+    for (int i = 0; i < firstUseCase.length; i++) {
+      for (int j = i + 1; j < firstUseCase.length; j++) {
+        final String plainWitnessA = firstUseCase[i];
+        final String plainWitnessB = firstUseCase[j];
+        html = displayAWitnessPair(html, plainWitnessA, plainWitnessB);
+      }
+    }
+    //    final String plainWitnessA = firstUseCase[0];
+    //    final String plainWitnessB = firstUseCase[1];
+    //    html = displayAWitnessPair(html, plainWitnessA, plainWitnessB);
+    final Representation representation = new StringRepresentation(html, MediaType.TEXT_HTML);
+    return representation;
+  }
 
-    final Witness a = new Witness("A", firstUseCase[0]);
-    final Witness b = new Witness("B", firstUseCase[1]);
+  private String displayAWitnessPair(String html, final String plainWitnessA, final String plainWitnessB) {
+    html += "A: " + plainWitnessA + "</BR>";
+    html += "B: " + plainWitnessB + "</BR>";
+    final Witness a = new Witness("A", plainWitnessA);
+    final Witness b = new Witness("B", plainWitnessB);
     final WitnessSet set = new WitnessSet(a, b);
     final Alignment align = set.align();
     final List<NGram> matches = align.getMatches();
     html += "</br>";
     html += "matches: ";
+    String splitter = "";
     for (final NGram nGram : matches) {
-      html += " " + nGram.getNormalized() + ";";
+      html += splitter + "\"" + nGram.getNormalized() + "\"";
+      splitter = ", ";
     }
     final List<Gap> gaps = align.getGaps();
-    html += "</br>";
-    html += "gaps: ";
+    html += "</br></br>";
+    html += "gaps: </BR>";
     for (final Gap gap : gaps) {
-      html += " " + gap.toString() + ";";
+      html += " " + gap.toString() + "</BR>";
     }
-    final Representation representation = new StringRepresentation(html, MediaType.TEXT_HTML);
-    return representation;
+    html += "</br></br>";
+    return html;
   }
 
   // NOTE: copied from UseCasePage!
