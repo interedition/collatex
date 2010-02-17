@@ -37,7 +37,7 @@ public class WitnessSet {
     final List<NGram> ngramsB = getUniqueBiGramIndexForWitnessB();
     final List<Gap> gaps = Lists.newArrayList();
     for (int i = 0; i < ngramsA.size(); i++) {
-      gaps.add(new Gap(ngramsA.get(i), ngramsB.get(i)));
+      gaps.add(new Gap(ngramsA.get(i).trim(), ngramsB.get(i).trim()));
     }
     return gaps;
   }

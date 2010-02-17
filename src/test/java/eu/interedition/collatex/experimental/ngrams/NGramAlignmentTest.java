@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
 public class NGramAlignmentTest {
@@ -23,7 +24,7 @@ public class NGramAlignmentTest {
   }
 
   @Test
-  public void testAlignment2() {
+  public void testAlignment2Matches() {
     final Witness a = new Witness("A", "The black cat");
     final Witness b = new Witness("B", "The black and white cat");
     final WitnessSet set = new WitnessSet(a, b);
@@ -35,6 +36,19 @@ public class NGramAlignmentTest {
     Assert.assertEquals(2, matches.size());
     Assert.assertEquals("the black", matches.get(0).getNormalized());
     Assert.assertEquals("cat", matches.get(1).getNormalized());
+  }
+
+  @Test
+  public void testAlignment2Gaps() {
+    final Witness a = new Witness("A", "The black cat");
+    final Witness b = new Witness("B", "The black and white cat");
+    final WitnessSet set = new WitnessSet(a, b);
+    final Alignment alignment = set.align();
+    final List<Gap> gaps = alignment.getGaps();
+    Assert.assertEquals(1, gaps.size());
+    final Gap gap = gaps.get(0);
+    Assert.assertTrue("NGram A is not empty!", gap.getNGramA().isEmpty());
+    Assert.assertEquals("and white", gap.getNGramB().getNormalized());
   }
 
   //  public void testAlignmentVariant() throws FileNotFoundException, IOException, BlockStructureCascadeException {

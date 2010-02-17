@@ -49,4 +49,13 @@ public class NGram {
     return tokens.get(tokens.size() - 1);
   }
 
+  public boolean isEmpty() {
+    return tokens.isEmpty();
+  }
+
+  public NGram trim() {
+    final List<NormalizedToken> subList = tokens.subList(1, tokens.size() - 1);
+    return new NGram(subList);
+  }
+
 }

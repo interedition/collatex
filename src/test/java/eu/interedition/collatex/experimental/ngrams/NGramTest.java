@@ -13,6 +13,9 @@ import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitne
 
 public class NGramTest {
 
+  // TODO: why is this called NGramTest: NGram isn't even used!
+  // probably because of the NormalizedWitness.getTokens(1,2) which is used
+  // for the creation of NGrams
   @Test
   public void testNGram() {
     final Witness a = new Witness("A", "The black and white cat");
@@ -25,4 +28,16 @@ public class NGramTest {
     Assert.assertEquals(token, tokens.get(0));
     Assert.assertEquals(token2, tokens.get(1));
   }
+
+  @Test
+  public void testNGram2Trim() {
+    final Witness a = new Witness("A", "The black and white cat");
+    final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
+    final List<NormalizedToken> tokens = aa.getTokens();
+    final NGram ngram = new NGram(tokens);
+    final NGram result = ngram.trim();
+    Assert.assertEquals("black and white", result.getNormalized());
+    // TODO: maybe assert size()?
+  }
+
 }
