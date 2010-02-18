@@ -29,7 +29,7 @@ public class NGramResource extends ServerResource {
   @Override
   public Representation get(final Variant variant) throws ResourceException {
     final List<String[]> useCases = useCases();
-    final String[] firstUseCase = useCases.get(0);
+    final String[] firstUseCase = useCases.get(1);
     String html = "";
     for (int i = 0; i < firstUseCase.length; i++) {
       for (int j = i + 1; j < firstUseCase.length; j++) {

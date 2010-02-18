@@ -1,7 +1,11 @@
 package eu.interedition.collatex.experimental.ngrams.data;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class NormalizedToken extends Token {
   private final String normalized;
+  private final static Pattern PUNCT = Pattern.compile("\\p{Punct}");
 
   public NormalizedToken(final String sigil, final String content, final int position, final String normalized) {
     super(sigil, content, position);
@@ -14,7 +18,12 @@ public class NormalizedToken extends Token {
 
   public static NormalizedToken normalize(final Token token) {
     final String content = token.getContent();
-    final String normalized = content.toLowerCase(); // TODO: this is far too simple!
+    String normalized = content.toLowerCase();
+    final Matcher matcher = PUNCT.matcher(normalized);
+    final boolean find = matcher.find();
+    if (find) {
+      normalized = matcher.replaceAll("");
+    }
     final NormalizedToken normalizedT = create(token, normalized);
     return normalizedT;
   }

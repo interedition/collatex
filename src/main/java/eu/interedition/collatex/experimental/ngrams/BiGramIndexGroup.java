@@ -38,10 +38,12 @@ public class BiGramIndexGroup {
     return NGramIndex.concatenateBiGramToNGram(biGramIndex);
   }
 
-  private BiGramIndex getUniqueBigramsForWitnessA() {
+  // TODO: This method is only public for test reasons!
+  // TODO: move test to another package and make this method protected instead!
+  public BiGramIndex getUniqueBigramsForWitnessA() {
     final List<String> uniqueBigramsForWitnessANormalized = Lists.newArrayList(indexA.keys());
     uniqueBigramsForWitnessANormalized.removeAll(indexB.keys());
-    // System.out.println(uniqueBigramsForWitnessANormalized);
+    System.out.println(uniqueBigramsForWitnessANormalized);
     final List<BiGram> bigrams = Lists.newArrayList();
     for (final String key : uniqueBigramsForWitnessANormalized) {
       final BiGram bigram = indexA.get(key);
