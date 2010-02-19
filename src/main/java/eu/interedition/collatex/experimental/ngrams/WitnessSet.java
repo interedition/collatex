@@ -47,17 +47,25 @@ public class WitnessSet {
     final List<NGram> matches = Lists.newArrayList();
     for (final NGram bigram : bigrams) {
       final int endPosition = bigram.getFirstToken().getPosition();
-      System.out.println(startPosition);
-      System.out.println(endPosition);
       final NGram ngram = NGram.create(aa, startPosition, endPosition);
-      System.out.println(ngram.getNormalized());
       matches.add(ngram);
       startPosition = bigram.getLastToken().getPosition();
     }
     final NGram ngram = NGram.create(aa, startPosition, aa.size());
     matches.add(ngram);
-    System.out.println(ngram.getNormalized());
-    return matches;
+    final List<NGram> nonEmptyMatches = filterEmptyBeginAndEndMatches(matches);
+    return nonEmptyMatches;
+  }
+
+  private List<NGram> filterEmptyBeginAndEndMatches(final List<NGram> matches) {
+    // filter away empty begin and end matches
+    final List<NGram> nonEmptyMatches = Lists.newArrayList();
+    for (final NGram match : matches) {
+      if (!match.isEmpty()) {
+        nonEmptyMatches.add(match);
+      }
+    }
+    return nonEmptyMatches;
   }
 
   // TODO: inline!

@@ -6,9 +6,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import eu.interedition.collatex.experimental.ngrams.Alignment;
 import eu.interedition.collatex.experimental.ngrams.BiGramIndex;
 import eu.interedition.collatex.experimental.ngrams.BiGramIndexGroup;
 import eu.interedition.collatex.experimental.ngrams.NGram;
+import eu.interedition.collatex.experimental.ngrams.WitnessSet;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
 public class NGramTranspositionTest {
@@ -37,5 +39,17 @@ public class NGramTranspositionTest {
     Assert.assertEquals("# the", uniqueNGramsForWitnessA.get(0).getNormalized());
     Assert.assertEquals("dog chases a", uniqueNGramsForWitnessA.get(1).getNormalized());
     Assert.assertEquals("cat #", uniqueNGramsForWitnessA.get(2).getNormalized());
+  }
+
+  // TODO: finish the remarked tests!
+  @Test
+  public void testTransposition2() {
+    final Witness a = new Witness("A", "The black dog chases a red cat.");
+    final Witness b = new Witness("B", "A red cat chases the black dog.");
+    final WitnessSet set = new WitnessSet(a, b);
+    final Alignment align = set.align();
+    final List<NGram> matches = align.getMatches();
+    //Assert.assertEquals(3, matches.size());
+    Assert.assertEquals("the black dog", matches.get(0).getNormalized());
   }
 }
