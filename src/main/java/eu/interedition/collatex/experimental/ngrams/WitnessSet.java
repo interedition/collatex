@@ -39,7 +39,32 @@ public class WitnessSet {
     for (int i = 0; i < ngramsA.size(); i++) {
       gaps.add(new Gap(ngramsA.get(i).trim(), ngramsB.get(i).trim()));
     }
-    return gaps;
+    // Note; the second filter has the same effect!
+    // filterAwayEmptyBeginAndEndGaps(gaps);
+    final List<Gap> filteredGaps = filterUnigrramReplacements(gaps);
+
+    return filteredGaps;
+  }
+
+  private List<Gap> filterUnigrramReplacements(final List<Gap> gaps) {
+    // filter away unigram replacements that are really matches!
+    final List<Gap> filteredGaps = Lists.newArrayList();
+    for (final Gap gap : gaps) {
+      if (!gap.getNGramA().getNormalized().equals(gap.getNGramB().getNormalized())) {
+        filteredGaps.add(gap);
+      }
+    }
+    return filteredGaps;
+  }
+
+  private void filterAwayEmptyBeginAndEndGaps(final List<Gap> gaps) {
+    // filter away empty begin and end gaps
+    final List<Gap> nonEmptyGaps = Lists.newArrayList();
+    for (final Gap gap : gaps) {
+      if (!gap.isEmpty()) {
+        nonEmptyGaps.add(gap);
+      }
+    }
   }
 
   private List<NGram> calculateMatches(final NormalizedWitness aa, final List<NGram> bigrams) {

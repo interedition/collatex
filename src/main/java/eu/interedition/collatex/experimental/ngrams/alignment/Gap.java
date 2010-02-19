@@ -30,4 +30,8 @@ public class Gap {
   public NGram getNGramB() {
     return gapB;
   }
+
+  public boolean isEmpty() {
+    return gapA.isEmpty() && gapB.isEmpty();
+  }
 }
