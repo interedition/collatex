@@ -55,6 +55,9 @@ public class WitnessSet {
       final NGram matchNGram = NGram.create(aa, startPosition, endPosition);
       matches.add(matchNGram);
       startPosition = gapNGram.getLastToken().getPosition();
+      if (gap.getNGramA().trim().getNormalized().equals(gap.getNGramB().trim().getNormalized())) {
+        matches.add(gapNGram.trim());
+      }
     }
     final NGram ngram = NGram.create(aa, startPosition, aa.size());
     matches.add(ngram);

@@ -42,7 +42,6 @@ public class NGramTranspositionTest {
     Assert.assertEquals("cat #", uniqueNGramsForWitnessA.get(2).getNormalized());
   }
 
-  // TODO: finish the remarked tests!
   @Test
   public void testTransposition2Matches() {
     final Witness a = new Witness("A", "The black dog chases a red cat.");
@@ -50,9 +49,10 @@ public class NGramTranspositionTest {
     final WitnessSet set = new WitnessSet(a, b);
     final Alignment align = set.align();
     final List<NGram> matches = align.getMatches();
-    //Assert.assertEquals(3, matches.size());
+    Assert.assertEquals(3, matches.size());
     Assert.assertEquals("the black dog", matches.get(0).getNormalized());
-    // TODO: add tests here!
+    Assert.assertEquals("chases", matches.get(1).getNormalized());
+    Assert.assertEquals("a red cat", matches.get(2).getNormalized());
   }
 
   @Test
