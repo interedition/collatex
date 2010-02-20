@@ -19,10 +19,6 @@ public class Gap {
     return "A: " + gapA.getNormalized() + " -> B: " + gapB.getNormalized();
   }
 
-  public boolean isAddition() {
-    return gapA.isEmpty() && !gapB.isEmpty();
-  }
-
   public NGram getNGramA() {
     return gapA;
   }
@@ -33,5 +29,13 @@ public class Gap {
 
   public boolean isEmpty() {
     return gapA.isEmpty() && gapB.isEmpty();
+  }
+
+  public boolean isReplacement() {
+    return !gapA.isEmpty() && !gapB.isEmpty();
+  }
+
+  public boolean isAddition() {
+    return gapA.isEmpty() && !gapB.isEmpty();
   }
 }

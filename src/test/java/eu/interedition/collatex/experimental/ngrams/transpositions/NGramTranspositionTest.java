@@ -52,6 +52,7 @@ public class NGramTranspositionTest {
     final List<NGram> matches = align.getMatches();
     //Assert.assertEquals(3, matches.size());
     Assert.assertEquals("the black dog", matches.get(0).getNormalized());
+    // TODO: add tests here!
   }
 
   @Test

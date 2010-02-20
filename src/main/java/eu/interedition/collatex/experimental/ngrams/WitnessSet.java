@@ -24,11 +24,42 @@ public class WitnessSet {
   public Alignment align() {
     final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
     //final NormalizedWitness bb = NormalizedWitnessBuilder.create(b);
-
-    final List<NGram> bigrams = getUniqueBiGramIndexForWitnessA();
-    final List<NGram> matches = calculateMatches(aa, bigrams);
     final List<Gap> gaps = calculateGaps();
-    return new Alignment(matches, gaps);
+    final List<NGram> matches = calculateMatchesBasedOnGaps(gaps, aa);
+    //    final List<NGram> bigrams = getUniqueBiGramIndexForWitnessA();
+    //    final List<NGram> matches = calculateMatches(aa, bigrams);
+    final List<Gap> trimmedGaps = trimGaps(gaps);
+    final List<Gap> filteredGaps = filterUnigrramReplacements(trimmedGaps);
+    return new Alignment(matches, filteredGaps);
+  }
+
+  private List<Gap> trimGaps(final List<Gap> gaps) {
+    final List<Gap> trimmedGaps = Lists.newArrayList();
+    for (final Gap gap : gaps) {
+      final Gap trimmedGap = new Gap(gap.getNGramA().trim(), gap.getNGramB().trim());
+      trimmedGaps.add(trimmedGap);
+    }
+    final List<Gap> filteredGaps = filterAwayEmptyBeginAndEndGaps(trimmedGaps);
+    // Note; the second filter has the same effect!
+    // final List<Gap> filteredGaps = filterUnigrramReplacements(gaps);
+    return filteredGaps;
+  }
+
+  private List<NGram> calculateMatchesBasedOnGaps(final List<Gap> gaps, final NormalizedWitness aa) {
+    int startPosition = 1;
+    final List<NGram> matches = Lists.newArrayList();
+    for (final Gap gap : gaps) {
+      final NGram gapNGram = gap.getNGramA();
+      //System.out.println("NGRAm voor de gap: " + gapNGram.getNormalized());
+      final int endPosition = gapNGram.getFirstToken().getPosition();
+      final NGram matchNGram = NGram.create(aa, startPosition, endPosition);
+      matches.add(matchNGram);
+      startPosition = gapNGram.getLastToken().getPosition();
+    }
+    final NGram ngram = NGram.create(aa, startPosition, aa.size());
+    matches.add(ngram);
+    final List<NGram> filteredMatches = filterEmptyBeginAndEndMatches(matches);
+    return filteredMatches;
   }
 
   private List<Gap> calculateGaps() {
@@ -37,13 +68,10 @@ public class WitnessSet {
     final List<NGram> ngramsB = getUniqueBiGramIndexForWitnessB();
     final List<Gap> gaps = Lists.newArrayList();
     for (int i = 0; i < ngramsA.size(); i++) {
-      gaps.add(new Gap(ngramsA.get(i).trim(), ngramsB.get(i).trim()));
+      gaps.add(new Gap(ngramsA.get(i)/*.trim()*/, ngramsB.get(i)/*.trim()*/));
     }
-    // Note; the second filter has the same effect!
-    // filterAwayEmptyBeginAndEndGaps(gaps);
-    final List<Gap> filteredGaps = filterUnigrramReplacements(gaps);
 
-    return filteredGaps;
+    return gaps/*filteredGaps*/;
   }
 
   private List<Gap> filterUnigrramReplacements(final List<Gap> gaps) {
@@ -57,7 +85,7 @@ public class WitnessSet {
     return filteredGaps;
   }
 
-  private void filterAwayEmptyBeginAndEndGaps(final List<Gap> gaps) {
+  private List<Gap> filterAwayEmptyBeginAndEndGaps(final List<Gap> gaps) {
     // filter away empty begin and end gaps
     final List<Gap> nonEmptyGaps = Lists.newArrayList();
     for (final Gap gap : gaps) {
@@ -65,21 +93,7 @@ public class WitnessSet {
         nonEmptyGaps.add(gap);
       }
     }
-  }
-
-  private List<NGram> calculateMatches(final NormalizedWitness aa, final List<NGram> bigrams) {
-    int startPosition = 1;
-    final List<NGram> matches = Lists.newArrayList();
-    for (final NGram bigram : bigrams) {
-      final int endPosition = bigram.getFirstToken().getPosition();
-      final NGram ngram = NGram.create(aa, startPosition, endPosition);
-      matches.add(ngram);
-      startPosition = bigram.getLastToken().getPosition();
-    }
-    final NGram ngram = NGram.create(aa, startPosition, aa.size());
-    matches.add(ngram);
-    final List<NGram> nonEmptyMatches = filterEmptyBeginAndEndMatches(matches);
-    return nonEmptyMatches;
+    return nonEmptyGaps;
   }
 
   private List<NGram> filterEmptyBeginAndEndMatches(final List<NGram> matches) {
