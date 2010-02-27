@@ -3,6 +3,7 @@ package eu.interedition.collatex.experimental.ngrams;
 import java.util.List;
 
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
+import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
 public class Alignment {
 
@@ -22,4 +23,8 @@ public class Alignment {
     return gaps;
   }
 
+  public static Alignment create(final Witness a, final Witness b) {
+    final WitnessSet set = new WitnessSet(a, b);
+    return set.align();
+  }
 }

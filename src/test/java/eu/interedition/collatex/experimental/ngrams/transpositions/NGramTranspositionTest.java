@@ -10,7 +10,6 @@ import eu.interedition.collatex.experimental.ngrams.Alignment;
 import eu.interedition.collatex.experimental.ngrams.BiGramIndex;
 import eu.interedition.collatex.experimental.ngrams.BiGramIndexGroup;
 import eu.interedition.collatex.experimental.ngrams.NGram;
-import eu.interedition.collatex.experimental.ngrams.WitnessSet;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
@@ -46,8 +45,7 @@ public class NGramTranspositionTest {
   public void testTransposition2Matches() {
     final Witness a = new Witness("A", "The black dog chases a red cat.");
     final Witness b = new Witness("B", "A red cat chases the black dog.");
-    final WitnessSet set = new WitnessSet(a, b);
-    final Alignment align = set.align();
+    final Alignment align = Alignment.create(a, b);
     final List<NGram> matches = align.getMatches();
     Assert.assertEquals(3, matches.size());
     Assert.assertEquals("the black dog", matches.get(0).getNormalized());
@@ -59,8 +57,7 @@ public class NGramTranspositionTest {
   public void testTransposition3Gaps() {
     final Witness a = new Witness("A", "The black dog chases a red cat.");
     final Witness b = new Witness("B", "A red cat chases the black dog.");
-    final WitnessSet set = new WitnessSet(a, b);
-    final Alignment align = set.align();
+    final Alignment align = Alignment.create(a, b);
     final List<Gap> gaps = align.getGaps();
     Assert.assertTrue(gaps.toString(), gaps.isEmpty());
   }

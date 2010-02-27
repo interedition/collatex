@@ -21,7 +21,7 @@ public class WitnessSet {
 
   // TODO: maybe the alignment should know the witness set instead (top/down etc)
   // TODO: incomplete method!
-  public Alignment align() {
+  protected Alignment align() {
     final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
     //final NormalizedWitness bb = NormalizedWitnessBuilder.create(b);
     final List<Gap> gaps = calculateGaps();

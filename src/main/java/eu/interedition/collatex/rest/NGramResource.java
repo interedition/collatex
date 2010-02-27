@@ -15,7 +15,6 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.experimental.ngrams.Alignment;
 import eu.interedition.collatex.experimental.ngrams.NGram;
-import eu.interedition.collatex.experimental.ngrams.WitnessSet;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
@@ -29,7 +28,7 @@ public class NGramResource extends ServerResource {
   @Override
   public Representation get(final Variant variant) throws ResourceException {
     final List<String[]> useCases = useCases();
-    final String[] firstUseCase = useCases.get(1);
+    final String[] firstUseCase = useCases.get(3);
     String html = "";
     for (int i = 0; i < firstUseCase.length; i++) {
       for (int j = i + 1; j < firstUseCase.length; j++) {
@@ -50,8 +49,7 @@ public class NGramResource extends ServerResource {
     html += "B: " + plainWitnessB + "</BR>";
     final Witness a = new Witness("A", plainWitnessA);
     final Witness b = new Witness("B", plainWitnessB);
-    final WitnessSet set = new WitnessSet(a, b);
-    final Alignment align = set.align();
+    final Alignment align = Alignment.create(a, b);
     final List<NGram> matches = align.getMatches();
     html += "</br>";
     html += "matches: ";
