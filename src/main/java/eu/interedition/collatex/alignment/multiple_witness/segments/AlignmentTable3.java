@@ -17,9 +17,9 @@ public class AlignmentTable3 {
   private final List<Segment> _witnesses;
   private final List<SegmentColumn> _columns;
 
-  public static AlignmentTable3 create(WitnessSet set) {
-    AlignmentTable3 table = new AlignmentTable3();
-    for (Witness witness : set.getWitnesses()) {
+  public static AlignmentTable3 create(final WitnessSet set) {
+    final AlignmentTable3 table = new AlignmentTable3();
+    for (final Witness witness : set.getWitnesses()) {
       table.addWitness(witness.getFirstSegment());
     }
     return table;
@@ -28,10 +28,10 @@ public class AlignmentTable3 {
   @Override
   public String toString() {
     String collectedStrings = "";
-    for (Segment witness : _witnesses) {
+    for (final Segment witness : _witnesses) {
       collectedStrings += witness.id + ": ";
       String delim = "";
-      for (SegmentColumn column : _columns) {
+      for (final SegmentColumn column : _columns) {
         collectedStrings += delim + cellToString(witness, column);
         delim = "|";
       }
@@ -48,24 +48,25 @@ public class AlignmentTable3 {
 
   // NOTE: THIS ONLY WORKS FOR WITNESSES
   // WITH one SEGMENT!
-  public void addWitness(Witness witness) {
+  public void addWitness(final Witness witness) {
     addWitness(witness.getFirstSegment());
   }
 
   // TODO: could make this protected?
   // TODO: rename to addSegment!
-  public void addWitness(Segment witness) {
+  public void addWitness(final Segment witness) {
     if (_witnesses.isEmpty()) {
-      List<Word> words = witness.getWords();
-      OldSegment segment = new OldSegment(words);
+      final List<Word> words = witness.getWords();
+      final OldSegment segment = new OldSegment(words);
       addColumn(new SegmentColumn(segment));
       _witnesses.add(witness);
       return;
     }
 
+    // TODO: remove call to Aligner!
     // make the superbase from the alignment table
-    SegmentSuperbase superbase = SegmentSuperbase.create(this);
-    Alignment alignment = Aligner.align(superbase, witness);
+    final SegmentSuperbase superbase = SegmentSuperbase.create(this);
+    final Alignment alignment = Aligner.align(superbase, witness);
 
     addMatchesToAlignmentTable(superbase, alignment);
     _witnesses.add(witness);
@@ -74,10 +75,10 @@ public class AlignmentTable3 {
 
   }
 
-  private void addMatchesToAlignmentTable(SegmentSuperbase superbase, Alignment alignment) {
-    List<MatchSequence> matchSequencesOrderedForWitnessA = alignment.getMatchSequencesOrderedForWitnessA();
-    for (MatchSequence<Word> seq : matchSequencesOrderedForWitnessA) {
-      SegmentColumn segmentColumn = superbase.getColumnFor(seq.getFirstMatch().getBaseWord());
+  private void addMatchesToAlignmentTable(final SegmentSuperbase superbase, final Alignment alignment) {
+    final List<MatchSequence> matchSequencesOrderedForWitnessA = alignment.getMatchSequencesOrderedForWitnessA();
+    for (final MatchSequence<Word> seq : matchSequencesOrderedForWitnessA) {
+      final SegmentColumn segmentColumn = superbase.getColumnFor(seq.getFirstMatch().getBaseWord());
       // TODO: directly implement size() on column?
       if (segmentColumn.getSegment().getWords().size() == (seq.getMatches().size())) {
         // we have complete alignment; remember there could be added words!
@@ -103,21 +104,21 @@ public class AlignmentTable3 {
   }
 
   // TODO: add stuff!
-  private String cellToString(Segment witness, SegmentColumn column) {
+  private String cellToString(final Segment witness, final SegmentColumn column) {
     return column.toString();
   }
 
-  private void addColumn(SegmentColumn segmentColumn) {
+  private void addColumn(final SegmentColumn segmentColumn) {
     _columns.add(segmentColumn);
   }
 
-  public static String alignmentTableToHTML(AlignmentTable3 alignmentTable) {
-    StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
+  public static String alignmentTableToHTML(final AlignmentTable3 alignmentTable) {
+    final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table class=\"alignment\">\n");
 
-    for (Segment witness : alignmentTable.getWitnesses()) {
+    for (final Segment witness : alignmentTable.getWitnesses()) {
       tableHTML.append("<tr>");
       tableHTML.append("<th>Witness ").append(witness.id).append(":</th>");
-      for (SegmentColumn column : alignmentTable.getColumns()) {
+      for (final SegmentColumn column : alignmentTable.getColumns()) {
         tableHTML.append("<td>");
         if (column.containsWitness(witness)) {
           tableHTML.append(column.getSegment(witness)); // TODO: add escaping!

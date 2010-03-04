@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
+import eu.interedition.collatex.experimental.ngrams.alignment.InternalUncompleteGap;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitnessBuilder;
@@ -24,31 +25,52 @@ public class WitnessSet {
   protected Alignment align() {
     final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
     //final NormalizedWitness bb = NormalizedWitnessBuilder.create(b);
-    final List<Gap> gaps = calculateGaps();
-    final List<NGram> matches = calculateMatchesBasedOnGaps(gaps, aa);
+    final List<InternalUncompleteGap> unprocessedGaps = calculateGaps();
+    final List<NGram> matches = calculateMatchesBasedOnGaps(unprocessedGaps, aa);
+    final List<Gap> gaps = mapToGaps(unprocessedGaps, matches);
     //    final List<NGram> bigrams = getUniqueBiGramIndexForWitnessA();
     //    final List<NGram> matches = calculateMatches(aa, bigrams);
-    final List<Gap> trimmedGaps = trimGaps(gaps);
-    final List<Gap> filteredGaps = filterUnigrramReplacements(trimmedGaps);
-    return new Alignment(matches, filteredGaps);
+    //final List<InternalUncompleteGap> trimmedGaps = trimGaps(gaps);
+    //final List<InternalUncompleteGap> filteredGaps = filterUnigrramReplacements(trimmedGaps);
+    return new Alignment(matches, gaps);
   }
 
-  private List<Gap> trimGaps(final List<Gap> gaps) {
-    final List<Gap> trimmedGaps = Lists.newArrayList();
-    for (final Gap gap : gaps) {
-      final Gap trimmedGap = new Gap(gap.getNGramA().trim(), gap.getNGramB().trim());
+  // TODO: maybe more tests should be added for nextMatch!
+  private List<Gap> mapToGaps(final List<InternalUncompleteGap> unprocessedGaps, final List<NGram> matches) {
+    final List<Gap> gaps = Lists.newArrayList();
+    for (final InternalUncompleteGap iGap : unprocessedGaps) {
+      final NGram nGramA = iGap.getNGramA();
+      final NGram nGramB = iGap.getNGramB();
+      // find match
+      final int position = nGramA.getLastToken().getPosition();
+      NGram nextMatch = null;
+      for (final NGram match : matches) {
+        if (match.getFirstToken().getPosition() == position) {
+          nextMatch = match;
+        }
+      }
+      final Gap gap = new Gap(nGramA.trim(), nGramB.trim(), nextMatch);
+      gaps.add(gap);
+    }
+    return filterUnigrramReplacements(gaps);
+  }
+
+  private List<InternalUncompleteGap> trimGaps(final List<InternalUncompleteGap> gaps) {
+    final List<InternalUncompleteGap> trimmedGaps = Lists.newArrayList();
+    for (final InternalUncompleteGap gap : gaps) {
+      final InternalUncompleteGap trimmedGap = new InternalUncompleteGap(gap.getNGramA().trim(), gap.getNGramB().trim());
       trimmedGaps.add(trimmedGap);
     }
-    final List<Gap> filteredGaps = filterAwayEmptyBeginAndEndGaps(trimmedGaps);
+    final List<InternalUncompleteGap> filteredGaps = filterAwayEmptyBeginAndEndGaps(trimmedGaps);
     // Note; the second filter has the same effect!
     // final List<Gap> filteredGaps = filterUnigrramReplacements(gaps);
     return filteredGaps;
   }
 
-  private List<NGram> calculateMatchesBasedOnGaps(final List<Gap> gaps, final NormalizedWitness aa) {
+  private List<NGram> calculateMatchesBasedOnGaps(final List<InternalUncompleteGap> gaps, final NormalizedWitness aa) {
     int startPosition = 1;
     final List<NGram> matches = Lists.newArrayList();
-    for (final Gap gap : gaps) {
+    for (final InternalUncompleteGap gap : gaps) {
       final NGram gapNGram = gap.getNGramA();
       //System.out.println("NGRAm voor de gap: " + gapNGram.getNormalized());
       final int endPosition = gapNGram.getFirstToken().getPosition();
@@ -65,13 +87,13 @@ public class WitnessSet {
     return filteredMatches;
   }
 
-  private List<Gap> calculateGaps() {
+  private List<InternalUncompleteGap> calculateGaps() {
     // TODO: rename method!
     final List<NGram> ngramsA = getUniqueBiGramIndexForWitnessA();
     final List<NGram> ngramsB = getUniqueBiGramIndexForWitnessB();
-    final List<Gap> gaps = Lists.newArrayList();
+    final List<InternalUncompleteGap> gaps = Lists.newArrayList();
     for (int i = 0; i < ngramsA.size(); i++) {
-      gaps.add(new Gap(ngramsA.get(i)/*.trim()*/, ngramsB.get(i)/*.trim()*/));
+      gaps.add(new InternalUncompleteGap(ngramsA.get(i)/*.trim()*/, ngramsB.get(i)/*.trim()*/));
     }
 
     return gaps/*filteredGaps*/;
@@ -88,10 +110,10 @@ public class WitnessSet {
     return filteredGaps;
   }
 
-  private List<Gap> filterAwayEmptyBeginAndEndGaps(final List<Gap> gaps) {
+  private List<InternalUncompleteGap> filterAwayEmptyBeginAndEndGaps(final List<InternalUncompleteGap> gaps) {
     // filter away empty begin and end gaps
-    final List<Gap> nonEmptyGaps = Lists.newArrayList();
-    for (final Gap gap : gaps) {
+    final List<InternalUncompleteGap> nonEmptyGaps = Lists.newArrayList();
+    for (final InternalUncompleteGap gap : gaps) {
       if (!gap.isEmpty()) {
         nonEmptyGaps.add(gap);
       }

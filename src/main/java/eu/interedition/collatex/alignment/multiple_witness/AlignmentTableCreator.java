@@ -39,6 +39,7 @@ public class AlignmentTableCreator {
 
     table.addWitnessToInternalList(witness);
 
+    // TODO: remove call to Aligner!
     // make the superbase from the alignment table
     final Superbase superbase = table.createSuperbase();
     final Alignment alignment = Aligner.align(superbase, witness);

@@ -41,10 +41,15 @@ public class NGram {
 
   }
 
+  // TODO: add test for defensive behavior!
   public NormalizedToken getFirstToken() {
+    if (isEmpty()) {
+      throw new RuntimeException("This ngram is empty!");
+    }
     return tokens.get(0);
   }
 
+  //TODO: make defensive and add test!
   public NormalizedToken getLastToken() {
     return tokens.get(tokens.size() - 1);
   }

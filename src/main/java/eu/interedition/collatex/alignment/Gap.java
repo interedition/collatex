@@ -1,9 +1,8 @@
 package eu.interedition.collatex.alignment;
 
-import com.sd_editions.collatex.permutations.collate.Addition;
-import com.sd_editions.collatex.permutations.collate.Omission;
-import com.sd_editions.collatex.permutations.collate.Replacement;
-
+import eu.interedition.collatex.experimental.ngrams.alignment.Addition;
+import eu.interedition.collatex.experimental.ngrams.alignment.Omission;
+import eu.interedition.collatex.experimental.ngrams.alignment.Replacement;
 import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.visualization.Modification;
@@ -30,15 +29,18 @@ public class Gap<T extends BaseElement> {
   }
 
   public Addition createAddition() {
-    return new Addition(_partA.getBeginPosition(), _partB);
+    throw new UnsupportedOperationException("Not implemented on this class! See the new Gap class!");
+    //return new Addition(_partA.getBeginPosition(), _partB);
   }
 
   public Omission createOmission() {
-    return new Omission(_partA);
+    throw new UnsupportedOperationException("Not implemented on this class! See the new Gap class!");
+    // return new Omission(_partA);
   }
 
   public Replacement createReplacement() {
-    return new Replacement(_partA, _partB);
+    throw new UnsupportedOperationException("Not implemented on this class! See the new Gap class!");
+    // return new Replacement(_partA, _partB);
   }
 
   public boolean isAddition() {

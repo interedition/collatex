@@ -3,11 +3,11 @@ package com.sd_editions.collatex.output;
 import java.util.List;
 
 import com.sd_editions.collatex.permutations.WordDistanceMatch;
-import com.sd_editions.collatex.permutations.collate.Addition;
-import com.sd_editions.collatex.permutations.collate.Omission;
-import com.sd_editions.collatex.permutations.collate.Replacement;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.experimental.ngrams.alignment.Addition;
+import eu.interedition.collatex.experimental.ngrams.alignment.Omission;
+import eu.interedition.collatex.experimental.ngrams.alignment.Replacement;
 import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Modifications;
 

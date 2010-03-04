@@ -18,12 +18,14 @@ import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.Matcher;
 
+//TODO: I want this one gone!
 public class Aligner {
 
   public static Alignment<Word> align(final Witness a, final Witness b) {
     return align(a.getFirstSegment(), b.getFirstSegment());
   }
 
+  // TODO: remove method!
   public static Alignment<Word> align(final Segment a, final Segment b) {
     final UnfixedAlignment<Word> unfixedAlignment = Matcher.match(a, b);
 

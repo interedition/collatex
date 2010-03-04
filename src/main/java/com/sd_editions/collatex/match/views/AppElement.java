@@ -1,18 +1,20 @@
 package com.sd_editions.collatex.match.views;
 
+import eu.interedition.collatex.experimental.ngrams.NGram;
+
 public class AppElement extends Element {
   // TODO: rename!
-  private final String addedWords;
-  private final String reading;
+  private final NGram addedWords;
+  private final NGram reading;
 
-  public AppElement(String addedWords) {
-    this.addedWords = addedWords;
+  public AppElement(final NGram addedWords2) {
+    this.addedWords = addedWords2;
     this.reading = null;
   }
 
-  public AppElement(String lemma, String reading) {
-    addedWords = lemma;
-    this.reading = reading;
+  public AppElement(final NGram lemma, final NGram reading2) {
+    this.addedWords = lemma;
+    this.reading = reading2;
   }
 
   // TODO: use StringBuilder!
@@ -20,10 +22,13 @@ public class AppElement extends Element {
   public String toXML() {
     String result = "<app>";
     if (reading == null) {
-      result += addedWords;
+      //TODO: should not be getNormalized!
+      result += addedWords.getNormalized();
     } else {
-      result += "<lemma>" + addedWords + "</lemma>";
-      result += "<reading>" + reading + "</reading>";
+      //TODO: should not be getNormalized!
+      result += "<lemma>" + addedWords.getNormalized() + "</lemma>";
+      //TODO: should not be getNormalized!
+      result += "<reading>" + reading.getNormalized() + "</reading>";
     }
     result += "</app>";
     return result;

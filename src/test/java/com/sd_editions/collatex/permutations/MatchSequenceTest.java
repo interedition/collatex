@@ -16,7 +16,6 @@ import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.visualization.Modification;
-import eu.interedition.collatex.visualization.Modifications;
 import eu.interedition.collatex.visualization.Visualization;
 
 public class MatchSequenceTest extends TestCase {
@@ -170,28 +169,6 @@ public class MatchSequenceTest extends TestCase {
     assertEquals(expected, actual);
   }
 
-  // a b
-  // a c b
-  @SuppressWarnings("boxing")
-  public void testModificationsInMatchSequences() {
-    final Word aB = new Word(witnessId1, "A", 1);
-    final Word bB = new Word(witnessId1, "B", 2);
-    final Word aW = new Word(witnessId2, "A", 1);
-    final Word cW = new Word(witnessId2, "C", 2);
-    final Word bW = new Word(witnessId2, "B", 3);
-    final Segment base = new Segment(aB, bB);
-    final Segment witness = new Segment(aW, cW, bW);
-    final Match a = new Match(aB, aW);
-    final Match b = new Match(bB, bW);
-    final MatchSequence<Word> sequence = new MatchSequence<Word>(1, a, b);
-    final List<MatchSequence<Word>> sequences = Lists.newArrayList(sequence);
-    final List<Gap<Word>> variants = GapDetection.getVariantsInMatchSequences(base, witness, sequences);
-    final List<Modification> results = Visualization.analyseVariants(variants);
-    final List<Modification> modificationsInMatchSequences = results;
-    assertEquals(1, modificationsInMatchSequences.size());
-    assertEquals("addition: C position: 2", modificationsInMatchSequences.get(0).toString());
-  }
-
   @SuppressWarnings("boxing")
   public void testNoModificationsInMatchSequences() {
     final Word aB = new Word(witnessId1, "A", 1);
@@ -208,22 +185,6 @@ public class MatchSequenceTest extends TestCase {
     final List<Modification> results = Visualization.analyseVariants(variants);
     final List<Modification> modificationsInMatchSequences = results;
     assertEquals(0, modificationsInMatchSequences.size());
-  }
-
-  public void testModificationsInBetweenMatchSequences() {
-    final CollateCore colors = new CollateCore(builder.buildWitnesses("a b y c z d", "a x b c n d"));
-    final Modifications compareWitness = colors.compareWitness(1, 2);
-    assertEquals(3, compareWitness.size());
-    assertEquals("addition: x position: 2", compareWitness.get(0).toString());
-    assertEquals("omission: y position: 3", compareWitness.get(1).toString());
-    assertEquals("replacement: z / n position: 5", compareWitness.get(2).toString());
-  }
-
-  public void testModificationAtTheEnd() {
-    final CollateCore colors = new CollateCore(builder.buildWitnesses("a b", "a c"));
-    final Modifications compareWitness = colors.compareWitness(1, 2);
-    assertEquals(1, compareWitness.size());
-    assertEquals("replacement: b / c position: 2", compareWitness.get(0).toString());
   }
 
   // TODO: test gaps of more than 1 word?

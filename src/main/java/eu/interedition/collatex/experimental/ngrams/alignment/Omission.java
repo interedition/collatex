@@ -1,29 +1,30 @@
-package com.sd_editions.collatex.permutations.collate;
+package eu.interedition.collatex.experimental.ngrams.alignment;
 
 import com.sd_editions.collatex.match.views.ModificationVisitor;
 
-import eu.interedition.collatex.input.BaseContainerPart;
+import eu.interedition.collatex.experimental.ngrams.NGram;
 import eu.interedition.collatex.visualization.Modification;
 
 // TODO: rename phrase to part!
 public class Omission extends Modification {
-  private final BaseContainerPart phrase;
+  private final NGram phrase;
 
-  public Omission(final BaseContainerPart _phrase) {
+  public Omission(final NGram _phrase) {
     this.phrase = _phrase;
   }
 
-  public String getOmittedWords() {
-    return phrase.toString();
+  public NGram getOmittedWords() {
+    return phrase;
   }
 
   public int getPosition() {
-    return phrase.getBeginPosition();
+    return phrase.getFirstToken().getPosition();
   }
 
+  //TODO: should not be getNormalized!
   @Override
   public String toString() {
-    return "omission: " + phrase.toString() + " position: " + phrase.getBeginPosition();
+    return "omission: " + phrase.getNormalized() + " position: " + phrase.getFirstToken().getPosition();
   }
 
   @Override

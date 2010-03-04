@@ -10,6 +10,8 @@ import com.sd_editions.collatex.permutations.collate.Transposition;
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.input.Word;
 
+//TODO: remove this class!
+//TODO: Alignment class in experimental package is its replacement!
 public class Modifications {
   private final List<Transposition> transpositions;
   private final List<Modification> modifications;
