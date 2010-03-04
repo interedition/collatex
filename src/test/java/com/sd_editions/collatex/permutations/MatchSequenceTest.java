@@ -12,10 +12,10 @@ import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.alignment.functions.GapDetection;
 import eu.interedition.collatex.alignment.functions.SequenceDetection;
 import eu.interedition.collatex.collation.CollateCore;
+import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
-import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Visualization;
 
 public class MatchSequenceTest extends TestCase {

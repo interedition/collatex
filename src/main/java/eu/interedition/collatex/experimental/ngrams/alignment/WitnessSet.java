@@ -1,11 +1,11 @@
-package eu.interedition.collatex.experimental.ngrams;
+package eu.interedition.collatex.experimental.ngrams.alignment;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
-import eu.interedition.collatex.experimental.ngrams.alignment.InternalUncompleteGap;
+import eu.interedition.collatex.experimental.ngrams.BiGramIndexGroup;
+import eu.interedition.collatex.experimental.ngrams.NGram;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitnessBuilder;

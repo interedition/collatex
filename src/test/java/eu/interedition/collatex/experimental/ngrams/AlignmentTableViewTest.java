@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.experimental.ngrams.table.AlignmentTable;
 

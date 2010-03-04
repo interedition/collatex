@@ -1,7 +1,6 @@
 package eu.interedition.collatex.experimental.ngrams.alignment;
 
 import eu.interedition.collatex.experimental.ngrams.NGram;
-import eu.interedition.collatex.visualization.Modification;
 
 public class Gap {
   private final NGram gapA;

@@ -7,11 +7,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.WordDistance;
-import eu.interedition.collatex.visualization.Modification;
 
 public class Matches {
   private final Segment base;

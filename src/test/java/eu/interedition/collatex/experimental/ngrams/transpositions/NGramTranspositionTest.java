@@ -6,10 +6,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import eu.interedition.collatex.experimental.ngrams.Alignment;
 import eu.interedition.collatex.experimental.ngrams.BiGramIndex;
 import eu.interedition.collatex.experimental.ngrams.BiGramIndexGroup;
 import eu.interedition.collatex.experimental.ngrams.NGram;
+import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 

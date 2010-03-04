@@ -13,8 +13,8 @@ import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.experimental.ngrams.Alignment;
 import eu.interedition.collatex.experimental.ngrams.NGram;
+import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 

@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.sd_editions.collatex.match.views.AppElement;
 import com.sd_editions.collatex.match.views.Element;
-import com.sd_editions.collatex.match.views.ModificationVisitor;
 import com.sd_editions.collatex.match.views.TextElement;
 
-import eu.interedition.collatex.experimental.ngrams.Alignment;
 import eu.interedition.collatex.experimental.ngrams.NGram;
+import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
+import eu.interedition.collatex.experimental.ngrams.alignment.ModificationVisitor;
 import eu.interedition.collatex.visualization.Modifications;
 
 public class AlignmentTable {

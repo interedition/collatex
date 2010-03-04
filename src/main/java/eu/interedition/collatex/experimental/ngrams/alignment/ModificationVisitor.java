@@ -1,10 +1,9 @@
-package com.sd_editions.collatex.match.views;
+package eu.interedition.collatex.experimental.ngrams.alignment;
 
+
+import com.sd_editions.collatex.match.views.AppElement;
 
 import eu.interedition.collatex.experimental.ngrams.NGram;
-import eu.interedition.collatex.experimental.ngrams.alignment.Addition;
-import eu.interedition.collatex.experimental.ngrams.alignment.Omission;
-import eu.interedition.collatex.experimental.ngrams.alignment.Replacement;
 import eu.interedition.collatex.experimental.ngrams.table.AlignmentTable;
 
 public class ModificationVisitor {

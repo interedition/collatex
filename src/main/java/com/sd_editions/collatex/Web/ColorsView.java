@@ -12,13 +12,13 @@ import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.experimental.ngrams.alignment.Addition;
+import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.experimental.ngrams.alignment.Omission;
 import eu.interedition.collatex.experimental.ngrams.alignment.Replacement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.Word;
-import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Modifications;
 import eu.interedition.collatex.visualization.Visualization;
 

@@ -7,8 +7,8 @@ import org.junit.BeforeClass;
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
+import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
-import eu.interedition.collatex.visualization.Modification;
 import eu.interedition.collatex.visualization.Modifications;
 
 public class XMLAlignmentViewTest {

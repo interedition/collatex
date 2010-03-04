@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.sd_editions.collatex.match.views.ModificationVisitor;
 import com.sd_editions.collatex.permutations.collate.Transposition;
 
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
+import eu.interedition.collatex.experimental.ngrams.alignment.ModificationVisitor;
 import eu.interedition.collatex.input.Word;
 
 //TODO: remove this class!

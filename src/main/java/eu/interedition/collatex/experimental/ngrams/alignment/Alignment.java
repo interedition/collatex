@@ -1,12 +1,10 @@
-package eu.interedition.collatex.experimental.ngrams;
+package eu.interedition.collatex.experimental.ngrams.alignment;
 
 import java.util.List;
 
-import com.sd_editions.collatex.match.views.ModificationVisitor;
 
-import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
+import eu.interedition.collatex.experimental.ngrams.NGram;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
-import eu.interedition.collatex.visualization.Modification;
 
 public class Alignment {
 

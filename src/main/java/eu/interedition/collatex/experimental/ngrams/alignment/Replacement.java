@@ -1,9 +1,7 @@
 package eu.interedition.collatex.experimental.ngrams.alignment;
 
-import com.sd_editions.collatex.match.views.ModificationVisitor;
 
 import eu.interedition.collatex.experimental.ngrams.NGram;
-import eu.interedition.collatex.visualization.Modification;
 
 public class Replacement extends Modification {
   private final NGram _original;

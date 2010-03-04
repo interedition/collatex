@@ -1,11 +1,11 @@
 package eu.interedition.collatex.alignment;
 
 import eu.interedition.collatex.experimental.ngrams.alignment.Addition;
+import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.experimental.ngrams.alignment.Omission;
 import eu.interedition.collatex.experimental.ngrams.alignment.Replacement;
 import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
-import eu.interedition.collatex.visualization.Modification;
 
 public class Gap<T extends BaseElement> {
   final BaseContainerPart<T> _partA;

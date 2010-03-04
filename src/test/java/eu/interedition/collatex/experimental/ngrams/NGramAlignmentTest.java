@@ -7,7 +7,9 @@ import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
+import eu.interedition.collatex.experimental.ngrams.alignment.WitnessSet;
 import eu.interedition.collatex.experimental.ngrams.data.Witness;
 
 public class NGramAlignmentTest {

@@ -1,8 +1,8 @@
 package com.sd_editions.collatex.permutations;
 
 import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.input.BaseElement;
-import eu.interedition.collatex.visualization.Modification;
 
 public class WordDistanceMatch<T extends BaseElement> extends Modification {
 

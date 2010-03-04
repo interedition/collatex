@@ -2,8 +2,8 @@ package com.sd_editions.collatex.permutations.collate;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.MatchSequence;
+import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.input.BaseElement;
-import eu.interedition.collatex.visualization.Modification;
 
 //TODO: make generic!
 public class Transposition extends Modification {
