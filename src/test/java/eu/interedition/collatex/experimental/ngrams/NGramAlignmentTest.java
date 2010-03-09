@@ -10,15 +10,16 @@ import org.junit.Test;
 import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.alignment.WitnessSet;
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
+import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramAlignmentTest {
 
   //Copied from TextAlignmentTest
   @Test
   public void testAlignment() {
-    final Witness a = new Witness("A", "cat");
-    final Witness b = new Witness("B", "cat");
+    final IWitness a = WitnessF.create("A", "cat");
+    final IWitness b = WitnessF.create("B", "cat");
     final Alignment alignment = Alignment.create(a, b);
     final List<NGram> matches = alignment.getMatches();
     Assert.assertEquals(1, matches.size());
@@ -27,8 +28,8 @@ public class NGramAlignmentTest {
 
   @Test
   public void testAlignment2Matches() {
-    final Witness a = new Witness("A", "The black cat");
-    final Witness b = new Witness("B", "The black and white cat");
+    final IWitness a = WitnessF.create("A", "The black cat");
+    final IWitness b = WitnessF.create("B", "The black and white cat");
     final WitnessSet set = new WitnessSet(a, b);
     final List<NGram> index = set.getUniqueBiGramIndexForWitnessA();
     // Note: this also test elsewhere! (BiGramGroupTest)
@@ -42,8 +43,8 @@ public class NGramAlignmentTest {
 
   @Test
   public void testAlignment2Gaps() {
-    final Witness a = new Witness("A", "The black cat");
-    final Witness b = new Witness("B", "The black and white cat");
+    final IWitness a = WitnessF.create("A", "The black cat");
+    final IWitness b = WitnessF.create("B", "The black and white cat");
     final Alignment alignment = Alignment.create(a, b);
     final List<Gap> gaps = alignment.getGaps();
     Assert.assertEquals(1, gaps.size());
@@ -56,8 +57,8 @@ public class NGramAlignmentTest {
   // Note: taken from TextAlignmentTest!
   @Test
   public void testAddition_AtTheStart() {
-    final Witness a = new Witness("A", "to be");
-    final Witness b = new Witness("B", "not to be");
+    final IWitness a = WitnessF.create("A", "to be");
+    final IWitness b = WitnessF.create("B", "not to be");
     final Alignment alignment = Alignment.create(a, b);
     final List<NGram> matches = alignment.getMatches();
     Assert.assertEquals(1, matches.size());
@@ -73,8 +74,8 @@ public class NGramAlignmentTest {
   @Ignore
   @Test
   public void testRepetitionTheBlack() {
-    final Witness a = new Witness("A", "the black cat on the table");
-    final Witness b = new Witness("B", "the black saw on the black cat on the table");
+    final IWitness a = WitnessF.create("A", "the black cat on the table");
+    final IWitness b = WitnessF.create("B", "the black saw on the black cat on the table");
     final Alignment align = Alignment.create(a, b);
     final List<Gap> gaps = align.getGaps();
     Assert.assertEquals(1, gaps.size());

@@ -7,19 +7,19 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
+import eu.interedition.collatex.interfaces.IWitness;
 
 public class NormalizedWitnessBuilder {
 
-  public static NormalizedWitness create(final Witness witness) {
-    final List<Token> tokens = tokenize(witness);
+  public static IWitness create(final String sigil, final String words) {
+    final List<Token> tokens = tokenize(sigil, words);
     final List<NormalizedToken> normalizeds = normalize(tokens);
-    final NormalizedWitness result = new NormalizedWitness(witness.getSigil(), normalizeds);
+    final NormalizedWitness result = new NormalizedWitness(sigil, normalizeds);
     return result;
   }
 
-  private static List<Token> tokenize(final Witness witness) {
-    final Tokenizer tokenizer = new Tokenizer(witness);
+  private static List<Token> tokenize(final String sigil, final String words) {
+    final Tokenizer tokenizer = new Tokenizer(sigil, words);
     final List<Token> tokens = Lists.newArrayList();
     while (tokenizer.hasNext()) {
       final Token next = tokenizer.nextToken();

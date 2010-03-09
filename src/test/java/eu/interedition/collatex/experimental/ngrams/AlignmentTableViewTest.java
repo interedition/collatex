@@ -5,8 +5,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.experimental.ngrams.table.AlignmentTable;
+import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.WitnessF;
 
 public class AlignmentTableViewTest {
   @Test
@@ -48,8 +49,8 @@ public class AlignmentTableViewTest {
     //WitnessBuilder builder = new WitnessBuilder();
     //CollateCore core = new CollateCore(builder.build(w1), builder.build(w2));
     //Modifications modifications = core.compareWitness(1, 2);
-    final Witness a = new Witness("A", w1);
-    final Witness b = new Witness("B", w2);
+    final IWitness a = WitnessF.create("A", w1);
+    final IWitness b = WitnessF.create("B", w2);
     final Alignment alignment = Alignment.create(a, b);
     final AlignmentTable table = new AlignmentTable(alignment);
     final String xml = table.toXML();

@@ -16,7 +16,8 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.experimental.ngrams.NGram;
 import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
+import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramResource extends ServerResource {
   private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
@@ -47,8 +48,8 @@ public class NGramResource extends ServerResource {
   private String displayAWitnessPair(String html, final String plainWitnessA, final String plainWitnessB) {
     html += "A: " + plainWitnessA + "</BR>";
     html += "B: " + plainWitnessB + "</BR>";
-    final Witness a = new Witness("A", plainWitnessA);
-    final Witness b = new Witness("B", plainWitnessB);
+    final IWitness a = WitnessF.create("A", plainWitnessA);
+    final IWitness b = WitnessF.create("B", plainWitnessB);
     final Alignment align = Alignment.create(a, b);
     final List<NGram> matches = align.getMatches();
     html += "</br>";

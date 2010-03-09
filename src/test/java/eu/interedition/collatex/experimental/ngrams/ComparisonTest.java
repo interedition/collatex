@@ -9,7 +9,8 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
 import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
+import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.WitnessF;
 
 // TODO: rename to alignment test part 2 and move!  
 public class ComparisonTest extends TestCase {
@@ -148,8 +149,8 @@ public class ComparisonTest extends TestCase {
   //  }
 
   private List<Modification> getModifications(final String base, final String witness) {
-    final Witness a = new Witness("A", base);
-    final Witness b = new Witness("B", witness);
+    final IWitness a = WitnessF.create("A", base);
+    final IWitness b = WitnessF.create("B", witness);
     final Alignment al = Alignment.create(a, b);
     return convertAlignmentToModifications(al);
   }
@@ -167,8 +168,8 @@ public class ComparisonTest extends TestCase {
   // a c b
   @SuppressWarnings("boxing")
   public void testModificationsInMatchSequences() {
-    final Witness a = new Witness("A", "a b");
-    final Witness b = new Witness("B", "a c b");
+    final IWitness a = WitnessF.create("A", "a b");
+    final IWitness b = WitnessF.create("B", "a c b");
     final Alignment alignment = Alignment.create(a, b);
     final List<Modification> results = convertAlignmentToModifications(alignment);
     assertEquals(1, results.size());
@@ -178,8 +179,8 @@ public class ComparisonTest extends TestCase {
   //NOTE: the old algorithm so 3 modifications
   //NOTE: the new one only sees one!
   public void testModificationsInBetweenMatchSequences() {
-    final Witness a = new Witness("A", "a b y c z d");
-    final Witness b = new Witness("B", "a x b c n d");
+    final IWitness a = WitnessF.create("A", "a b y c z d");
+    final IWitness b = WitnessF.create("B", "a x b c n d");
     final Alignment alignment = Alignment.create(a, b);
     final List<Modification> results = convertAlignmentToModifications(alignment);
     assertEquals(1, results.size());
@@ -192,8 +193,8 @@ public class ComparisonTest extends TestCase {
   }
 
   public void testModificationAtTheEnd() {
-    final Witness a = new Witness("A", "a b");
-    final Witness b = new Witness("B", "a c");
+    final IWitness a = WitnessF.create("A", "a b");
+    final IWitness b = WitnessF.create("B", "a c");
     final Alignment alignment = Alignment.create(a, b);
     final List<Modification> results = convertAlignmentToModifications(alignment);
     assertEquals(1, results.size());

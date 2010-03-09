@@ -11,14 +11,15 @@ import eu.interedition.collatex.experimental.ngrams.BiGramIndexGroup;
 import eu.interedition.collatex.experimental.ngrams.NGram;
 import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
+import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramTranspositionTest {
 
   @Test
   public void testTransposition1() {
-    final Witness a = new Witness("A", "The black dog chases a red cat.");
-    final Witness b = new Witness("B", "A red cat chases the black dog.");
+    final IWitness a = WitnessF.create("A", "The black dog chases a red cat.");
+    final IWitness b = WitnessF.create("B", "A red cat chases the black dog.");
     final BiGramIndex index = BiGramIndex.create(a);
     Assert.assertEquals(8, index.size());
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
@@ -43,8 +44,8 @@ public class NGramTranspositionTest {
 
   @Test
   public void testTransposition2Matches() {
-    final Witness a = new Witness("A", "The black dog chases a red cat.");
-    final Witness b = new Witness("B", "A red cat chases the black dog.");
+    final IWitness a = WitnessF.create("A", "The black dog chases a red cat.");
+    final IWitness b = WitnessF.create("B", "A red cat chases the black dog.");
     final Alignment align = Alignment.create(a, b);
     final List<NGram> matches = align.getMatches();
     Assert.assertEquals(3, matches.size());
@@ -55,8 +56,8 @@ public class NGramTranspositionTest {
 
   @Test
   public void testTransposition3Gaps() {
-    final Witness a = new Witness("A", "The black dog chases a red cat.");
-    final Witness b = new Witness("B", "A red cat chases the black dog.");
+    final IWitness a = WitnessF.create("A", "The black dog chases a red cat.");
+    final IWitness b = WitnessF.create("B", "A red cat chases the black dog.");
     final Alignment align = Alignment.create(a, b);
     final List<Gap> gaps = align.getGaps();
     Assert.assertTrue(gaps.toString(), gaps.isEmpty());

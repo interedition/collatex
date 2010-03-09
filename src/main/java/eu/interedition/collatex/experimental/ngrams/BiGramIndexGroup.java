@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
+import eu.interedition.collatex.interfaces.IWitness;
 
 // TODO: note this is not really an index! this is a combination of two!
 // TODO: this class is gonna be very similar to WitnessSet!
@@ -19,7 +19,7 @@ public class BiGramIndexGroup {
     this.indexB = indexB;
   }
 
-  public static BiGramIndexGroup create(final Witness a, final Witness b) {
+  public static BiGramIndexGroup create(final IWitness a, final IWitness b) {
     final BiGramIndex indexA = BiGramIndex.create(a);
     final BiGramIndex indexB = BiGramIndex.create(b);
     final BiGramIndexGroup group = new BiGramIndexGroup(indexA, indexB);

@@ -6,16 +6,14 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.experimental.ngrams.BiGramIndexGroup;
 import eu.interedition.collatex.experimental.ngrams.NGram;
-import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
-import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitnessBuilder;
+import eu.interedition.collatex.interfaces.IWitness;
 
 public class WitnessSet {
 
-  private final Witness a;
-  private final Witness b;
+  private final IWitness a;
+  private final IWitness b;
 
-  public WitnessSet(final Witness a, final Witness b) {
+  public WitnessSet(final IWitness a, final IWitness b) {
     this.a = a;
     this.b = b;
   }
@@ -23,10 +21,8 @@ public class WitnessSet {
   // TODO: maybe the alignment should know the witness set instead (top/down etc)
   // TODO: incomplete method!
   protected Alignment align() {
-    final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
-    //final NormalizedWitness bb = NormalizedWitnessBuilder.create(b);
     final List<InternalUncompleteGap> unprocessedGaps = calculateGaps();
-    final List<NGram> matches = calculateMatchesBasedOnGaps(unprocessedGaps, aa);
+    final List<NGram> matches = calculateMatchesBasedOnGaps(unprocessedGaps, a);
     final List<Gap> gaps = mapToGaps(unprocessedGaps, matches);
     //    final List<NGram> bigrams = getUniqueBiGramIndexForWitnessA();
     //    final List<NGram> matches = calculateMatches(aa, bigrams);
@@ -67,7 +63,7 @@ public class WitnessSet {
     return filteredGaps;
   }
 
-  private List<NGram> calculateMatchesBasedOnGaps(final List<InternalUncompleteGap> gaps, final NormalizedWitness aa) {
+  private List<NGram> calculateMatchesBasedOnGaps(final List<InternalUncompleteGap> gaps, final IWitness aa) {
     int startPosition = 1;
     final List<NGram> matches = Lists.newArrayList();
     for (final InternalUncompleteGap gap : gaps) {

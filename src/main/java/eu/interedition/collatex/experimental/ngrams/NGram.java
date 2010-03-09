@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
-import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
+import eu.interedition.collatex.interfaces.IWitness;
 
 public class NGram {
   private final List<NormalizedToken> tokens;
@@ -20,7 +20,7 @@ public class NGram {
     return new NGram(tokens);
   }
 
-  public static NGram create(final NormalizedWitness aa, final int startPosition, final int endPosition) {
+  public static NGram create(final IWitness aa, final int startPosition, final int endPosition) {
     final List<NormalizedToken> tokens2 = aa.getTokens(startPosition, endPosition);
     return new NGram(tokens2);
   }

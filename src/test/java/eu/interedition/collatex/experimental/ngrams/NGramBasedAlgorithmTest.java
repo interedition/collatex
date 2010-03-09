@@ -6,14 +6,15 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
+import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramBasedAlgorithmTest {
 
   @Test
   public void testNgrams1() {
     // "The black cat", "The black and white cat"
-    final Witness a = new Witness("A", "The black cat");
+    final IWitness a = WitnessF.create("A", "The black cat");
     final List<BiGram> ngrams = BiGramIndex.calculate(a);
     Assert.assertEquals(4, ngrams.size());
     Assert.assertEquals("# the", ngrams.get(0).getNormalized());
@@ -25,7 +26,7 @@ public class NGramBasedAlgorithmTest {
   @Test
   public void testNgrams1b() {
     // "The black cat", "The black and white cat"
-    final Witness b = new Witness("B", "The black and white cat");
+    final IWitness b = WitnessF.create("B", "The black and white cat");
     final List<BiGram> ngrams = BiGramIndex.calculate(b);
     Assert.assertEquals(6, ngrams.size());
     Assert.assertEquals("# the", ngrams.get(0).getNormalized());
@@ -39,8 +40,8 @@ public class NGramBasedAlgorithmTest {
   @Test
   public void testOverlappingNGrams2() {
     // "The black cat", "The black and white cat"
-    final Witness a = new Witness("A", "The black cat");
-    final Witness b = new Witness("B", "The black and white cat");
+    final IWitness a = WitnessF.create("A", "The black cat");
+    final IWitness b = WitnessF.create("B", "The black and white cat");
     final List<Subsegment2> overlappingBiGrams = BiGrams.getOverlappingBiGrams(a, b);
     Assert.assertEquals(3, overlappingBiGrams.size());
     Assert.assertEquals("# the A: 0 B: 0", overlappingBiGrams.get(0).toString());
@@ -52,8 +53,8 @@ public class NGramBasedAlgorithmTest {
   @Test
   public void testOverlappingNGrams2b() {
     // "The black cat", "The black and white cat"
-    final Witness a = new Witness("A", "The black cat");
-    final Witness b = new Witness("B", "The black and white cat");
+    final IWitness a = WitnessF.create("A", "The black cat");
+    final IWitness b = WitnessF.create("B", "The black and white cat");
     final List<BiGram> overlappingBiGrams = BiGrams.getOverlappingBiGramsForWitnessA(a, b);
     Assert.assertEquals(3, overlappingBiGrams.size());
     Assert.assertEquals("# the", overlappingBiGrams.get(0).getNormalized());
@@ -64,8 +65,8 @@ public class NGramBasedAlgorithmTest {
   @Test
   public void testUniqueNGrams3() {
     // "The black cat", "The black and white cat"
-    final Witness a = new Witness("A", "The black cat");
-    final Witness b = new Witness("B", "The black and white cat");
+    final IWitness a = WitnessF.create("A", "The black cat");
+    final IWitness b = WitnessF.create("B", "The black and white cat");
     final List<NGram> uniqueNGrams = BiGrams.getUniqueBiGramsForWitnessA(a, b);
     Assert.assertEquals(1, uniqueNGrams.size());
     Assert.assertEquals("black cat", uniqueNGrams.get(0).getNormalized());
@@ -74,8 +75,8 @@ public class NGramBasedAlgorithmTest {
   @Test
   public void testUniqueNGrams3b() {
     // "The black cat", "The black and white cat"
-    final Witness a = new Witness("A", "The black cat");
-    final Witness b = new Witness("B", "The black and white cat");
+    final IWitness a = WitnessF.create("A", "The black cat");
+    final IWitness b = WitnessF.create("B", "The black and white cat");
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
     final List<BiGram> uniqueBiGrams = group.getUniqueBiGramsForWitnessB();
     Assert.assertEquals(3, uniqueBiGrams.size());
@@ -87,8 +88,8 @@ public class NGramBasedAlgorithmTest {
   @Test
   public void testUniqueNGrams3c() {
     // "The black cat", "The black and white cat"
-    final Witness a = new Witness("A", "The black cat");
-    final Witness b = new Witness("B", "The black and white cat");
+    final IWitness a = WitnessF.create("A", "The black cat");
+    final IWitness b = WitnessF.create("B", "The black and white cat");
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
     final List<NGram> uniqueNGrams = group.getUniqueNGramsForWitnessB();
     Assert.assertEquals(1, uniqueNGrams.size());

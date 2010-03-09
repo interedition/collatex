@@ -6,10 +6,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
-import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
-import eu.interedition.collatex.experimental.ngrams.data.Witness;
 import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitnessBuilder;
+import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramTest {
 
@@ -18,8 +18,7 @@ public class NGramTest {
   // for the creation of NGrams
   @Test
   public void testNGram() {
-    final Witness a = new Witness("A", "The black and white cat");
-    final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
+    final IWitness aa = NormalizedWitnessBuilder.create("A", "The black and white cat");
     final List<NormalizedToken> tokens = aa.getTokens(1, 2);
     final Token token = new Token("A", "The", 1);
     final Token token2 = new Token("A", "black", 2);
@@ -31,9 +30,8 @@ public class NGramTest {
 
   @Test
   public void testNGram2Trim() {
-    final Witness a = new Witness("A", "The black and white cat");
-    final NormalizedWitness aa = NormalizedWitnessBuilder.create(a);
-    final List<NormalizedToken> tokens = aa.getTokens();
+    final IWitness a = WitnessF.create("A", "The black and white cat");
+    final List<NormalizedToken> tokens = a.getTokens();
     final NGram ngram = new NGram(tokens);
     final NGram result = ngram.trim();
     Assert.assertEquals("black and white", result.getNormalized());
