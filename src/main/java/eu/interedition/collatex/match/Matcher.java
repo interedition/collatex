@@ -9,13 +9,13 @@ import com.sd_editions.collatex.match.Subsegment;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.UnfixedAlignment;
+import eu.interedition.collatex.general.RealMatcher;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
-import eu.interedition.collatex.match.worddistance.WordDistance;
 
 ////////////////////////////////////////
 // 1. Tokenization
@@ -30,7 +30,7 @@ public class Matcher {
 
   // NOTE: maybe rename UnfixedAlignment back to Matches?
   public static UnfixedAlignment<Word> match(final Segment a, final Segment b) {
-    final Set<Match<Word>> allMatches = findMatches(a, b, new NormalizedLevenshtein());
+    final Set<Match<Word>> allMatches = RealMatcher.findMatches(a, b, new NormalizedLevenshtein());
 
     final UnfixedAlignment<Word> unfixedAlignment = separateAllMatchesIntoFixedAndUnfixedMatches(allMatches);
     return unfixedAlignment;
@@ -48,22 +48,6 @@ public class Matcher {
     //    final Set<Match<Phrase>> unfixedMatches = Sets.newLinkedHashSet();
     //    final UnfixedAlignment<Phrase> result = new UnfixedAlignment<Phrase>(fixedMatches, unfixedMatches);
     //    return result;
-  }
-
-  // NOTE: this code is specific for Segments/Words!
-  static Set<Match<Word>> findMatches(final Segment base, final Segment witness, final WordDistance distanceMeasure) {
-    final Set<Match<Word>> matchSet = Sets.newLinkedHashSet();
-    for (final Word baseWord : base.getWords()) {
-      for (final Word witnessWord : witness.getWords()) {
-        if (baseWord._normalized.equals(witnessWord._normalized)) {
-          matchSet.add(new Match<Word>(baseWord, witnessWord));
-        } else {
-          final float editDistance = distanceMeasure.distance(baseWord._normalized, witnessWord._normalized);
-          if (editDistance < 0.5) matchSet.add(new Match<Word>(baseWord, witnessWord, editDistance));
-        }
-      }
-    }
-    return matchSet;
   }
 
   private static <T extends BaseElement> UnfixedAlignment<T> separateAllMatchesIntoFixedAndUnfixedMatches(final Set<Match<T>> allMatches) {

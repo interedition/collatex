@@ -1,4 +1,4 @@
-package eu.interedition.collatex.experimental.ngrams.tokenization;
+package eu.interedition.collatex.general;
 
 import java.util.List;
 
@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedWitness;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
+import eu.interedition.collatex.experimental.ngrams.tokenization.Tokenizer;
 import eu.interedition.collatex.interfaces.IWitness;
 
 public class NormalizedWitnessBuilder {

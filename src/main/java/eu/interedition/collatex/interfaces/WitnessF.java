@@ -1,6 +1,6 @@
 package eu.interedition.collatex.interfaces;
 
-import eu.interedition.collatex.experimental.ngrams.tokenization.NormalizedWitnessBuilder;
+import eu.interedition.collatex.general.NormalizedWitnessBuilder;
 
 public class WitnessF {
   public static IWitness create(final String sigil, final String words) {
