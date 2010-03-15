@@ -20,6 +20,9 @@ public class SequenceDetection {
 
   //NOTE: we might want to extract the two tokens lists into a 
   // token container or something!
+  //WARNING: Only looking at the next match for witness A is not
+  //good enough, since transpositions can change order of the
+  //matches in witness B!
   private static List<IMatch> chainMatches(final IAlignment alignment) {
     final List<IMatch> unchainedMatches = alignment.getMatches();
     final List<IMatch> chainedMatches = Lists.newArrayList();

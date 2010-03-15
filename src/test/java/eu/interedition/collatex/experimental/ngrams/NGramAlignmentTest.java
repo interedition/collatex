@@ -14,19 +14,6 @@ import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramAlignmentTest {
 
-  @Test
-  public void testAlignment2Gaps() {
-    final IWitness a = WitnessF.create("A", "The black cat");
-    final IWitness b = WitnessF.create("B", "The black and white cat");
-    final Alignment alignment = Alignment.create(a, b);
-    final List<Gap> gaps = alignment.getGaps();
-    Assert.assertEquals(1, gaps.size());
-    final Gap gap = gaps.get(0);
-    Assert.assertTrue("NGram A is not empty!", gap.getNGramA().isEmpty());
-    Assert.assertEquals("and white", gap.getNGramB().getNormalized());
-    Assert.assertTrue(gap.isAddition());
-  }
-
   // Note: taken from TextAlignmentTest!
   @Test
   public void testAddition_AtTheStart() {

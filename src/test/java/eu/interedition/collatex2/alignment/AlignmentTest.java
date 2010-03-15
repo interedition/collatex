@@ -57,4 +57,17 @@ public class AlignmentTest {
     Assert.assertEquals("cat", matches.get(1).getNormalized());
   }
 
+  @Test
+  public void testAlignment2Gaps() {
+    final IWitness a = factory.createWitness("A", "The black cat");
+    final IWitness b = factory.createWitness("B", "The black and white cat");
+    final IAlignment alignment = factory.createAlignment(a, b);
+    final List<IGap> gaps = alignment.getGaps();
+    Assert.assertEquals(1, gaps.size());
+    final IGap gap = gaps.get(0);
+    Assert.assertTrue(gap.isAddition());
+    Assert.assertTrue("NGram A is not empty!", gap.getNGramA().isEmpty());
+    Assert.assertEquals("and white", gap.getNGramB().getNormalized());
+  }
+
 }

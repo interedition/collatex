@@ -4,4 +4,10 @@ public interface IGap {
 
   boolean isEmpty();
 
+  boolean isAddition();
+
+  INGram getNGramA();
+
+  INGram getNGramB();
+
 }
