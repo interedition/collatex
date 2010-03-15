@@ -1,5 +1,7 @@
 package eu.interedition.collatex2.implementation.alignment;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -12,12 +14,8 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class GapDetection {
 
   public static List<IGap> detectGap(final List<IMatch> matches, final IWitness witnessA, final IWitness witnessB) {
-    final List<INGram> matchingNgramsForA = Lists.newArrayList();
-    final List<INGram> matchingNgramsForB = Lists.newArrayList();
-    for (final IMatch m : matches) {
-      matchingNgramsForA.add(m.getNGramA());
-      matchingNgramsForB.add(m.getNGramB());
-    }
+    final List<INGram> matchingNgramsForA = calculateMatchingNGramsForA(matches);
+    final List<INGram> matchingNgramsForB = calculateMatchingNGramsForB(matches);
     final List<INGram> gapNGramsForA = calculateGapNGramsFor(matchingNgramsForA, witnessA);
     final List<INGram> gapNGramsForB = calculateGapNGramsFor(matchingNgramsForB, witnessB);
     final List<IGap> gaps = Lists.newArrayList();
@@ -26,12 +24,31 @@ public class GapDetection {
       final INGram gapB = gapNGramsForB.get(i);
       final IGap gap = new Gap(gapA, gapB, null);
       //      final Match<T> nextMatch = nextMatchesWitness.get(i);
-      // TODO: move this decision further on the processing chain when sequence detection is added!
-      //   if (!gap.isEmpty()) {
       gaps.add(gap);
-      // }
     }
     return gaps;
+  }
+
+  private static List<INGram> calculateMatchingNGramsForA(final List<IMatch> matches) {
+    final List<INGram> matchingNgramsForA = Lists.newArrayList();
+    for (final IMatch m : matches) {
+      matchingNgramsForA.add(m.getNGramA());
+    }
+    return matchingNgramsForA;
+  }
+
+  private static List<INGram> calculateMatchingNGramsForB(final List<IMatch> matches) {
+    final List<INGram> matchingNgramsForB = Lists.newArrayList();
+    for (final IMatch m : matches) {
+      matchingNgramsForB.add(m.getNGramB());
+    }
+    final Comparator<INGram> comparator = new Comparator<INGram>() {
+      public int compare(final INGram o1, final INGram o2) {
+        return o1.getBeginPosition() - o2.getBeginPosition();
+      }
+    };
+    Collections.sort(matchingNgramsForB, comparator);
+    return matchingNgramsForB;
   }
 
   private static List<INGram> calculateGapNGramsFor(final List<INGram> matchingNgrams, final IWitness witness) {
