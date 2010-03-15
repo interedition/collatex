@@ -1,8 +1,12 @@
 package eu.interedition.collatex2.implementation.alignment;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.indexing.NGram;
 import eu.interedition.collatex2.implementation.matching.Match;
@@ -20,27 +24,62 @@ public class SequenceDetection {
 
   //NOTE: we might want to extract the two tokens lists into a 
   // token container or something!
-  //WARNING: Only looking at the next match for witness A is not
+  //WARNING: Only looking at the previous match for witness A is not
   //good enough, since transpositions can change order of the
   //matches in witness B!
   private static List<IMatch> chainMatches(final IAlignment alignment) {
+    // input/output
     final List<IMatch> unchainedMatches = alignment.getMatches();
     final List<IMatch> chainedMatches = Lists.newArrayList();
+    // calculate previous matches map for A and B
+    // TODO: add maps for previous gaps for A and B
+    final List<IMatch> matchesSortedForA = unchainedMatches;
+    final List<IMatch> matchesSortedForB = SequenceDetection.sortMatchesForB(matchesSortedForA);
+    // now build the actual map!
+    final Map<IMatch, IMatch> previousMatchMapA = SequenceDetection.buildPreviousMatchMap(matchesSortedForA);
+    final Map<IMatch, IMatch> previousMatchMapB = SequenceDetection.buildPreviousMatchMap(matchesSortedForB);
+    // make buffer
     List<INormalizedToken> tokensA = Lists.newArrayList();
     List<INormalizedToken> tokensB = Lists.newArrayList();
+    // chain the matches
     for (int index = 0; index < unchainedMatches.size(); index++) {
       final IMatch match = unchainedMatches.get(index);
-      tokensA.add(match.getNGramA().getFirstToken());
-      tokensB.add(match.getNGramB().getFirstToken());
-      final IGap nextGap = alignment.getGaps().get(index + 1);
-      if (!nextGap.isEmpty()) {
+      // determine whether matches should be chained
+      final IGap previousGap = alignment.getGaps().get(index);
+      final IMatch previousMatchA = previousMatchMapA.get(match);
+      final IMatch previousMatchB = previousMatchMapB.get(match);
+      if (!previousGap.isEmpty() || previousMatchA != previousMatchB) {
         createChainedMatchAndAddToList(chainedMatches, tokensA, tokensB);
         tokensA = Lists.newArrayList();
         tokensB = Lists.newArrayList();
       }
+      // fill buffer
+      tokensA.add(match.getNGramA().getFirstToken());
+      tokensB.add(match.getNGramB().getFirstToken());
     }
     createChainedMatchAndAddToList(chainedMatches, tokensA, tokensB);
     return chainedMatches;
+  }
+
+  private static Map<IMatch, IMatch> buildPreviousMatchMap(final List<IMatch> matches) {
+    final Map<IMatch, IMatch> previousMatches = Maps.newHashMap();
+    IMatch previousMatch = null;
+    for (final IMatch match : matches) {
+      previousMatches.put(match, previousMatch);
+      previousMatch = match;
+    }
+    return previousMatches;
+  }
+
+  private static List<IMatch> sortMatchesForB(final List<IMatch> matches) {
+    final Comparator<IMatch> comparator = new Comparator<IMatch>() {
+      public int compare(final IMatch o1, final IMatch o2) {
+        return o1.getNGramB().getBeginPosition() - o2.getNGramB().getBeginPosition();
+      }
+    };
+    final List<IMatch> matchesForB = Lists.newArrayList(matches);
+    Collections.sort(matchesForB, comparator);
+    return matchesForB;
   }
 
   private static void createChainedMatchAndAddToList(final List<IMatch> chainedMatches, final List<INormalizedToken> tokensA, final List<INormalizedToken> tokensB) {

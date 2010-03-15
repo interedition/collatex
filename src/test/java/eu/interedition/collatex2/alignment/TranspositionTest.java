@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.Factory;
@@ -22,7 +21,6 @@ public class TranspositionTest {
     factory = new Factory();
   }
 
-  @Ignore
   @Test
   public void testTransposition1Matches() {
     final IWitness a = factory.createWitness("A", "The black dog chases a red cat.");
