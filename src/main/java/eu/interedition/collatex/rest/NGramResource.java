@@ -13,12 +13,14 @@ import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.experimental.ngrams.NGram;
-import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
-import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
-import eu.interedition.collatex.interfaces.IWitness;
-import eu.interedition.collatex.interfaces.WitnessF;
+import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.interfaces.IAlignment;
+import eu.interedition.collatex2.interfaces.IGap;
+import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.IWitness;
 
+//TODO: move this class to collatex2 package!
+//TODO: rename!
 public class NGramResource extends ServerResource {
   private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
 
@@ -26,10 +28,11 @@ public class NGramResource extends ServerResource {
     getVariants().put(Method.GET, Arrays.asList(TYPES));
   }
 
+  //Note: usecase 0 works
   @Override
   public Representation get(final Variant variant) throws ResourceException {
     final List<String[]> useCases = useCases();
-    final String[] firstUseCase = useCases.get(3);
+    final String[] firstUseCase = useCases.get(0);
     String html = "";
     for (int i = 0; i < firstUseCase.length; i++) {
       for (int j = i + 1; j < firstUseCase.length; j++) {
@@ -48,21 +51,22 @@ public class NGramResource extends ServerResource {
   private String displayAWitnessPair(String html, final String plainWitnessA, final String plainWitnessB) {
     html += "A: " + plainWitnessA + "</BR>";
     html += "B: " + plainWitnessB + "</BR>";
-    final IWitness a = WitnessF.create("A", plainWitnessA);
-    final IWitness b = WitnessF.create("B", plainWitnessB);
-    final Alignment align = Alignment.create(a, b);
-    final List<NGram> matches = align.getMatches();
+    final Factory factory = new Factory();
+    final IWitness a = factory.createWitness("A", plainWitnessA);
+    final IWitness b = factory.createWitness("B", plainWitnessB);
+    final IAlignment align = factory.createAlignment(a, b);
+    final List<IMatch> matches = align.getMatches();
     html += "</br>";
     html += "matches: ";
     String splitter = "";
-    for (final NGram nGram : matches) {
-      html += splitter + "\"" + nGram.getNormalized() + "\"";
+    for (final IMatch match : matches) {
+      html += splitter + "\"" + match.getNormalized() + "\"";
       splitter = ", ";
     }
-    final List<Gap> gaps = align.getGaps();
+    final List<IGap> gaps = align.getGaps();
     html += "</br></br>";
     html += "gaps: </BR>";
-    for (final Gap gap : gaps) {
+    for (final IGap gap : gaps) {
       html += " " + gap.toString() + "</BR>";
     }
     html += "</br></br>";
