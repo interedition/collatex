@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.Factory;
@@ -47,7 +46,6 @@ public class AlignmentTest {
     Assert.assertEquals("cat", matches.get(0).getNormalized());
   }
 
-  @Ignore
   @Test
   public void testAlignment2Matches() {
     final IWitness a = factory.createWitness("A", "The black cat");

@@ -28,4 +28,9 @@ public class Match implements IMatch {
   public INGram getNGramB() {
     return b;
   }
+
+  @Override
+  public String toString() {
+    return getNGramA() + "->" + getNGramB();
+  }
 }
