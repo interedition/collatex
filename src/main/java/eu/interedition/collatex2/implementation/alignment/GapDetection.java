@@ -27,9 +27,9 @@ public class GapDetection {
       final IGap gap = new Gap(gapA, gapB, null);
       //      final Match<T> nextMatch = nextMatchesWitness.get(i);
       // TODO: move this decision further on the processing chain when sequence detection is added!
-      if (!gap.isEmpty()) {
-        gaps.add(gap);
-      }
+      //   if (!gap.isEmpty()) {
+      gaps.add(gap);
+      // }
     }
     return gaps;
   }

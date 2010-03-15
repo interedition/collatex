@@ -5,6 +5,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.Factory;
@@ -34,4 +35,28 @@ public class AlignmentTest {
     Assert.assertEquals(1, gaps.size());
     Assert.assertEquals("\"c\" added", gaps.get(0).toString());
   }
+
+  //Copied from TextAlignmentTest
+  @Test
+  public void testAlignment() {
+    final IWitness a = factory.createWitness("A", "cat");
+    final IWitness b = factory.createWitness("B", "cat");
+    final IAlignment alignment = factory.createAlignment(a, b);
+    final List<IMatch> matches = alignment.getMatches();
+    Assert.assertEquals(1, matches.size());
+    Assert.assertEquals("cat", matches.get(0).getNormalized());
+  }
+
+  @Ignore
+  @Test
+  public void testAlignment2Matches() {
+    final IWitness a = factory.createWitness("A", "The black cat");
+    final IWitness b = factory.createWitness("B", "The black and white cat");
+    final IAlignment alignment = factory.createAlignment(a, b);
+    final List<IMatch> matches = alignment.getMatches();
+    Assert.assertEquals(2, matches.size());
+    Assert.assertEquals("the black", matches.get(0).getNormalized());
+    Assert.assertEquals("cat", matches.get(1).getNormalized());
+  }
+
 }

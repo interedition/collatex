@@ -9,37 +9,10 @@ import org.junit.Test;
 
 import eu.interedition.collatex.experimental.ngrams.alignment.Alignment;
 import eu.interedition.collatex.experimental.ngrams.alignment.Gap;
-import eu.interedition.collatex.experimental.ngrams.alignment.WitnessSet;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramAlignmentTest {
-
-  //Copied from TextAlignmentTest
-  @Test
-  public void testAlignment() {
-    final IWitness a = WitnessF.create("A", "cat");
-    final IWitness b = WitnessF.create("B", "cat");
-    final Alignment alignment = Alignment.create(a, b);
-    final List<NGram> matches = alignment.getMatches();
-    Assert.assertEquals(1, matches.size());
-    Assert.assertEquals("cat", matches.get(0).getNormalized());
-  }
-
-  @Test
-  public void testAlignment2Matches() {
-    final IWitness a = WitnessF.create("A", "The black cat");
-    final IWitness b = WitnessF.create("B", "The black and white cat");
-    final WitnessSet set = new WitnessSet(a, b);
-    final List<NGram> index = set.getUniqueBiGramIndexForWitnessA();
-    // Note: this also test elsewhere! (BiGramGroupTest)
-    Assert.assertEquals(1, index.size());
-    final Alignment alignment = Alignment.create(a, b);
-    final List<NGram> matches = alignment.getMatches();
-    Assert.assertEquals(2, matches.size());
-    Assert.assertEquals("the black", matches.get(0).getNormalized());
-    Assert.assertEquals("cat", matches.get(1).getNormalized());
-  }
 
   @Test
   public void testAlignment2Gaps() {
