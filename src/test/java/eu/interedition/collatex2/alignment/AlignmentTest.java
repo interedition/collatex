@@ -70,4 +70,21 @@ public class AlignmentTest {
     Assert.assertEquals("and white", gap.getNGramB().getNormalized());
   }
 
+  // Note: taken from TextAlignmentTest!
+  @Test
+  public void testAddition_AtTheStart() {
+    final IWitness a = factory.createWitness("A", "to be");
+    final IWitness b = factory.createWitness("B", "not to be");
+    final IAlignment alignment = factory.createAlignment(a, b);
+    final List<IMatch> matches = alignment.getMatches();
+    Assert.assertEquals(1, matches.size());
+    Assert.assertEquals("to be", matches.get(0).getNormalized());
+    final List<IGap> gaps = alignment.getGaps();
+    Assert.assertEquals(1, gaps.size());
+    final IGap gap = gaps.get(0);
+    Assert.assertTrue(gap.isAddition());
+    Assert.assertTrue("NGram A is not empty!", gap.getNGramA().isEmpty());
+    Assert.assertEquals("not", gap.getNGramB().getNormalized());
+  }
+
 }

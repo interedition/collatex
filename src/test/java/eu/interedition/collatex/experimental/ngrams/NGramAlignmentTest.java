@@ -14,22 +14,6 @@ import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramAlignmentTest {
 
-  // Note: taken from TextAlignmentTest!
-  @Test
-  public void testAddition_AtTheStart() {
-    final IWitness a = WitnessF.create("A", "to be");
-    final IWitness b = WitnessF.create("B", "not to be");
-    final Alignment alignment = Alignment.create(a, b);
-    final List<NGram> matches = alignment.getMatches();
-    Assert.assertEquals(1, matches.size());
-    Assert.assertEquals("to be", matches.get(0).getNormalized());
-    final List<Gap> gaps = alignment.getGaps();
-    Assert.assertEquals(1, gaps.size());
-    Assert.assertTrue(gaps.get(0).isAddition());
-    // TODO: add more tests!
-    // TODO: if matches become an ngram index the tests could be simpler!
-  }
-
   // TODO: this test should be fixed by enhancing the code to handle this case!
   @Ignore
   @Test
