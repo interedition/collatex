@@ -2,6 +2,8 @@ package eu.interedition.collatex2.interfaces;
 
 public interface INormalizedToken {
 
-	String getNormalized();
+  String getNormalized();
+
+  int getPosition();
 
 }

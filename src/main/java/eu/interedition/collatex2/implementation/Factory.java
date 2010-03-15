@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.alignment.Alignment;
+import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.indexing.NGram;
 import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.matching.RealMatcher;
@@ -20,28 +21,26 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class Factory {
 
-	public IWitness createWitness(String sigil, String words) {
-		return NormalizedWitnessBuilder.create(sigil, words);
-	}
+  public IWitness createWitness(final String sigil, final String words) {
+    return NormalizedWitnessBuilder.create(sigil, words);
+  }
 
-	public IAlignment createAlignment(IWitness a, IWitness b) {
-		WordDistance distanceMeasure = new NormalizedLevenshtein();
-		Set<IMatch> matches = RealMatcher.findMatches(a, b, distanceMeasure);
-		List<IMatch> matchesAsList = Lists.newArrayList(matches);
-		List<IGap> gaps = Lists.newArrayList();
-		return new Alignment(matchesAsList, gaps);
-	}
+  public IAlignment createAlignment(final IWitness a, final IWitness b) {
+    final WordDistance distanceMeasure = new NormalizedLevenshtein();
+    final Set<IMatch> matches = RealMatcher.findMatches(a, b, distanceMeasure);
+    final List<IMatch> matchesAsList = Lists.newArrayList(matches);
+    final List<IGap> gaps = GapDetection.detectGap(matchesAsList, a, b);
+    return new Alignment(matchesAsList, gaps);
+  }
 
-	public static IMatch createMatch(INormalizedToken baseWord,
-			INormalizedToken witnessWord) {
-		NGram a = NGram.create(baseWord);
-		NGram b = NGram.create(baseWord);
-		return new Match(a, b);
-	}
+  public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord) {
+    final NGram a = NGram.create(baseWord);
+    final NGram b = NGram.create(witnessWord);
+    return new Match(a, b);
+  }
 
-	public static IMatch createMatch(INormalizedToken baseWord,
-			INormalizedToken witnessWord, float editDistance) {
-	throw new RuntimeException("Near matches are not yet supported!");
-	}
+  public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
+    throw new RuntimeException("Near matches are not yet supported!");
+  }
 
 }

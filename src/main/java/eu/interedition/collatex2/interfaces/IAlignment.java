@@ -4,6 +4,8 @@ import java.util.List;
 
 public interface IAlignment {
 
-	List<IMatch> getMatches();
+  List<IMatch> getMatches();
+
+  List<IGap> getGaps();
 
 }

@@ -3,6 +3,8 @@ package eu.interedition.collatex2.implementation.input;
 import java.util.Iterator;
 import java.util.List;
 
+import eu.interedition.collatex2.implementation.indexing.NGram;
+import eu.interedition.collatex2.interfaces.INGram;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -30,9 +32,8 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
     return tokens.iterator();
   }
 
-  //Note: not pleased with this method! reduce visibility?
-  public List<INormalizedToken> getTokens(final int startPosition, final int endPosition) {
-    return tokens.subList(startPosition - 1, endPosition);
+  public INGram createNGram(final int startPosition, final int endPosition) {
+    return new NGram(tokens.subList(startPosition - 1, endPosition));
   }
 
   public int size() {
