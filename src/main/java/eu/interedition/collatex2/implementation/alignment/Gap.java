@@ -20,6 +20,7 @@ public class Gap implements IGap {
     this.nextMatchA = nextMatchA;
   }
 
+  //TODO: change to string of Gap
   @Override
   public String toString() {
     if (isAddition()) {

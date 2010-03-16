@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.Factory;
@@ -55,14 +54,15 @@ public class TranspositionTest {
     Assert.assertEquals("b", matches.get(2).getNormalized());
   }
 
-  @Ignore
   @Test
   public void testTransposition2Gaps() {
     final IWitness a = factory.createWitness("A", "d a b");
     final IWitness b = factory.createWitness("B", "a c b d");
     final IAlignment align = factory.createAlignment(a, b);
     final List<IGap> gaps = align.getGaps();
-    // TODO: change to string of Gap
-    Assert.assertTrue(gaps.toString(), gaps.isEmpty());
+    Assert.assertEquals(1, gaps.size());
+    final IGap gap = gaps.get(0);
+    Assert.assertTrue(gap.isAddition());
+    Assert.assertEquals("c", gap.getPhraseB().getNormalized());
   }
 }
