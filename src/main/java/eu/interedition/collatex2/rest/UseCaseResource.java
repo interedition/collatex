@@ -19,8 +19,6 @@ import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: move this class to collatex2 package!
-//TODO: rename!
 public class UseCaseResource extends ServerResource {
   private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
 
