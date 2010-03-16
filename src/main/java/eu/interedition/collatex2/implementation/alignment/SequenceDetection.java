@@ -8,7 +8,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.implementation.indexing.NGram;
+import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
@@ -84,8 +84,8 @@ public class SequenceDetection {
 
   private static void createChainedMatchAndAddToList(final List<IMatch> chainedMatches, final List<INormalizedToken> tokensA, final List<INormalizedToken> tokensB) {
     if (!tokensA.isEmpty()) {
-      final NGram phraseA = new NGram(tokensA);
-      final NGram phraseB = new NGram(tokensB);
+      final Phrase phraseA = new Phrase(tokensA);
+      final Phrase phraseB = new Phrase(tokensB);
       chainedMatches.add(new Match(phraseA, phraseB));
     }
   }

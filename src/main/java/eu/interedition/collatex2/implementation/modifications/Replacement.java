@@ -1,13 +1,13 @@
 package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IModification;
-import eu.interedition.collatex2.interfaces.INGram;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Replacement implements IModification {
-  private final INGram _original;
-  private final INGram _replacement;
+  private final IPhrase _original;
+  private final IPhrase _replacement;
 
-  public Replacement(final INGram original, final INGram replacement) {
+  public Replacement(final IPhrase original, final IPhrase replacement) {
     this._original = original;
     this._replacement = replacement;
   }
@@ -25,11 +25,11 @@ public class Replacement implements IModification {
     return _original.getFirstToken().getPosition();
   }
 
-  public INGram getOriginalWords() {
+  public IPhrase getOriginalWords() {
     return _original;
   }
 
-  public INGram getReplacementWords() {
+  public IPhrase getReplacementWords() {
     return _replacement;
   }
 

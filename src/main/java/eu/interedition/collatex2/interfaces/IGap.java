@@ -6,8 +6,8 @@ public interface IGap {
 
   boolean isAddition();
 
-  INGram getNGramA();
+  IPhrase getPhraseA();
 
-  INGram getNGramB();
+  IPhrase getPhraseB();
 
 }

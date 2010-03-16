@@ -1,7 +1,7 @@
 package eu.interedition.collatex2.interfaces;
 
 
-public interface INGram {
+public interface IPhrase {
 
   String getNormalized();
 

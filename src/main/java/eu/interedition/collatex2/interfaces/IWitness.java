@@ -7,7 +7,7 @@ public interface IWitness {
   // Note: not pleased with this method! implement Iterable!
   List<INormalizedToken> getTokens();
 
-  INGram createNGram(final int startPosition, final int endPosition);
+  IPhrase createPhrase(final int startPosition, final int endPosition);
 
   int size();
 

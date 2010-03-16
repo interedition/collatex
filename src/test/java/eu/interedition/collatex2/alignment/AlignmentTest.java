@@ -66,8 +66,8 @@ public class AlignmentTest {
     Assert.assertEquals(1, gaps.size());
     final IGap gap = gaps.get(0);
     Assert.assertTrue(gap.isAddition());
-    Assert.assertTrue("NGram A is not empty!", gap.getNGramA().isEmpty());
-    Assert.assertEquals("and white", gap.getNGramB().getNormalized());
+    Assert.assertTrue("Phrase A is not empty!", gap.getPhraseA().isEmpty());
+    Assert.assertEquals("and white", gap.getPhraseB().getNormalized());
   }
 
   // Note: taken from TextAlignmentTest!
@@ -83,8 +83,8 @@ public class AlignmentTest {
     Assert.assertEquals(1, gaps.size());
     final IGap gap = gaps.get(0);
     Assert.assertTrue(gap.isAddition());
-    Assert.assertTrue("NGram A is not empty!", gap.getNGramA().isEmpty());
-    Assert.assertEquals("not", gap.getNGramB().getNormalized());
+    Assert.assertTrue("Phrase A is not empty!", gap.getPhraseA().isEmpty());
+    Assert.assertEquals("not", gap.getPhraseB().getNormalized());
   }
 
 }

@@ -8,20 +8,20 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
-import eu.interedition.collatex2.interfaces.INGram;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class GapDetection {
 
   public static List<IGap> detectGap(final List<IMatch> matches, final IWitness witnessA, final IWitness witnessB) {
-    final List<INGram> matchingNgramsForA = calculateMatchingNGramsForA(matches);
-    final List<INGram> matchingNgramsForB = calculateMatchingNGramsForB(matches);
-    final List<INGram> gapNGramsForA = calculateGapNGramsFor(matchingNgramsForA, witnessA);
-    final List<INGram> gapNGramsForB = calculateGapNGramsFor(matchingNgramsForB, witnessB);
+    final List<IPhrase> matchingPhrasesForA = calculateMatchingPhrasesForA(matches);
+    final List<IPhrase> matchingPhrasesForB = calculateMatchingPhrasesForB(matches);
+    final List<IPhrase> gapPhrasesForA = calculateGapPhrasesFor(matchingPhrasesForA, witnessA);
+    final List<IPhrase> gapPhrasesForB = calculateGapPhrasesFor(matchingPhrasesForB, witnessB);
     final List<IGap> gaps = Lists.newArrayList();
-    for (int i = 0; i < gapNGramsForA.size(); i++) {
-      final INGram gapA = gapNGramsForA.get(i);
-      final INGram gapB = gapNGramsForB.get(i);
+    for (int i = 0; i < gapPhrasesForA.size(); i++) {
+      final IPhrase gapA = gapPhrasesForA.get(i);
+      final IPhrase gapB = gapPhrasesForB.get(i);
       final IGap gap = new Gap(gapA, gapB, null);
       //      final Match<T> nextMatch = nextMatchesWitness.get(i);
       gaps.add(gap);
@@ -29,21 +29,21 @@ public class GapDetection {
     return gaps;
   }
 
-  private static List<INGram> calculateMatchingNGramsForA(final List<IMatch> matches) {
-    final List<INGram> matchingNgramsForA = Lists.newArrayList();
+  private static List<IPhrase> calculateMatchingPhrasesForA(final List<IMatch> matches) {
+    final List<IPhrase> matchingNgramsForA = Lists.newArrayList();
     for (final IMatch m : matches) {
       matchingNgramsForA.add(m.getNGramA());
     }
     return matchingNgramsForA;
   }
 
-  private static List<INGram> calculateMatchingNGramsForB(final List<IMatch> matches) {
-    final List<INGram> matchingNgramsForB = Lists.newArrayList();
+  private static List<IPhrase> calculateMatchingPhrasesForB(final List<IMatch> matches) {
+    final List<IPhrase> matchingNgramsForB = Lists.newArrayList();
     for (final IMatch m : matches) {
       matchingNgramsForB.add(m.getNGramB());
     }
-    final Comparator<INGram> comparator = new Comparator<INGram>() {
-      public int compare(final INGram o1, final INGram o2) {
+    final Comparator<IPhrase> comparator = new Comparator<IPhrase>() {
+      public int compare(final IPhrase o1, final IPhrase o2) {
         return o1.getBeginPosition() - o2.getBeginPosition();
       }
     };
@@ -51,17 +51,17 @@ public class GapDetection {
     return matchingNgramsForB;
   }
 
-  private static List<INGram> calculateGapNGramsFor(final List<INGram> matchingNgrams, final IWitness witness) {
+  private static List<IPhrase> calculateGapPhrasesFor(final List<IPhrase> matchingNgrams, final IWitness witness) {
     int currentIndex = 1;
-    INGram previous = null;
-    final List<INGram> gaps = Lists.newArrayList();
-    for (final INGram current : matchingNgrams) {
+    IPhrase previous = null;
+    final List<IPhrase> gaps = Lists.newArrayList();
+    for (final IPhrase current : matchingNgrams) {
       final int position = current.getBeginPosition();
-      gaps.add(witness.createNGram(currentIndex, position - 1));
+      gaps.add(witness.createPhrase(currentIndex, position - 1));
       previous = current;
       currentIndex = 1 + previous.getEndPosition();
     }
-    gaps.add(witness.createNGram(currentIndex, witness.size()));
+    gaps.add(witness.createPhrase(currentIndex, witness.size()));
     return gaps;
   }
 }

@@ -1,28 +1,28 @@
-package eu.interedition.collatex2.implementation.indexing;
+package eu.interedition.collatex2.implementation.input;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.interfaces.INGram;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class NGram implements INGram {
+public class Phrase implements IPhrase {
   private final List<INormalizedToken> tokens;
 
-  public NGram(final List<INormalizedToken> tokens) {
+  public Phrase(final List<INormalizedToken> tokens) {
     this.tokens = tokens;
   }
 
   //  // TODO: rename parameter "remove" to bigram
-  //  public static NGram create(final BiGram remove) {
+  //  public static Phrase create(final BiGram remove) {
   //    final List<NormalizedToken> tokens = Lists.newArrayList(remove.getFirstToken(), remove.getLastToken());
-  //    return new NGram(tokens);
+  //    return new Phrase(tokens);
   //  }
 
-  //  public static NGram create(final IWitness aa, final int startPosition, final int endPosition) {
+  //  public static Phrase create(final IWitness aa, final int startPosition, final int endPosition) {
   //    final List<NormalizedToken> tokens2 = aa.getTokens(startPosition, endPosition);
-  //    return new NGram(tokens2);
+  //    return new Phrase(tokens2);
   //  }
 
   //  // Note: not too pleased with this method! Not immutable!
@@ -58,13 +58,13 @@ public class NGram implements INGram {
     return tokens.isEmpty();
   }
 
-  public NGram trim() {
+  public Phrase trim() {
     final List<INormalizedToken> subList = tokens.subList(1, tokens.size() - 1);
-    return new NGram(subList);
+    return new Phrase(subList);
   }
 
-  public static NGram create(final INormalizedToken token) {
-    return new NGram(Lists.newArrayList(token));
+  public static Phrase create(final INormalizedToken token) {
+    return new Phrase(Lists.newArrayList(token));
   }
 
   @Override

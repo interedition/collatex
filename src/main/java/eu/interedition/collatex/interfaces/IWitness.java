@@ -16,7 +16,7 @@ public interface IWitness extends Iterable<NormalizedToken> {
   Iterator<NormalizedToken> iterator();
 
   //Note: not pleased with this method! reduce visibility?
-  //Note: shouldn't this return a NGram?
+  //Note: shouldn't this return a Phrase?
   List<NormalizedToken> getTokens(final int startPosition, final int endPosition);
 
   public abstract int size();

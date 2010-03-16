@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
-import eu.interedition.collatex2.implementation.indexing.NGram;
+import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.matching.RealMatcher;
 import eu.interedition.collatex2.implementation.matching.worddistance.NormalizedLevenshtein;
@@ -36,8 +36,8 @@ public class Factory {
   }
 
   public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord) {
-    final NGram a = NGram.create(baseWord);
-    final NGram b = NGram.create(witnessWord);
+    final Phrase a = Phrase.create(baseWord);
+    final Phrase b = Phrase.create(witnessWord);
     return new Match(a, b);
   }
 

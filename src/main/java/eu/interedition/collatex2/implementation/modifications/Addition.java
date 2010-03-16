@@ -1,13 +1,13 @@
 package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IModification;
-import eu.interedition.collatex2.interfaces.INGram;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Addition implements IModification {
-  private final INGram addition;
-  private final INGram nextMatchA;
+  private final IPhrase addition;
+  private final IPhrase nextMatchA;
 
-  public Addition(final INGram nextMatchA, final INGram addition) {
+  public Addition(final IPhrase nextMatchA, final IPhrase addition) {
     this.nextMatchA = nextMatchA;
     this.addition = addition;
   }
@@ -19,7 +19,7 @@ public class Addition implements IModification {
     return nextMatchA.getFirstToken().getPosition();
   }
 
-  public INGram getAddedWords() {
+  public IPhrase getAddedWords() {
     return addition;
   }
 

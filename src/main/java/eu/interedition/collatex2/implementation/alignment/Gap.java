@@ -5,16 +5,16 @@ import eu.interedition.collatex2.implementation.modifications.Omission;
 import eu.interedition.collatex2.implementation.modifications.Replacement;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IModification;
-import eu.interedition.collatex2.interfaces.INGram;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Gap implements IGap {
-  private final INGram gapA;
-  private final INGram gapB;
-  private final INGram nextMatchA;
+  private final IPhrase gapA;
+  private final IPhrase gapB;
+  private final IPhrase nextMatchA;
 
   //TODO: decouple gaps and modifications... 
   //TODO: Modifications should know about gaps not the other way around!
-  public Gap(final INGram gapA, final INGram gapB, final INGram nextMatchA) {
+  public Gap(final IPhrase gapA, final IPhrase gapB, final IPhrase nextMatchA) {
     this.gapA = gapA;
     this.gapB = gapB;
     this.nextMatchA = nextMatchA;
@@ -28,11 +28,11 @@ public class Gap implements IGap {
     return "A: " + gapA.getNormalized() + " -> B: " + gapB.getNormalized();
   }
 
-  public INGram getNGramA() {
+  public IPhrase getPhraseA() {
     return gapA;
   }
 
-  public INGram getNGramB() {
+  public IPhrase getPhraseB() {
     return gapB;
   }
 

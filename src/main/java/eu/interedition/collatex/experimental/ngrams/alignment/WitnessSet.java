@@ -24,8 +24,8 @@ public class WitnessSet {
     final List<InternalUncompleteGap> unprocessedGaps = calculateGaps();
     final List<NGram> matches = calculateMatchesBasedOnGaps(unprocessedGaps, a);
     final List<Gap> gaps = mapToGaps(unprocessedGaps, matches);
-    //    final List<NGram> bigrams = getUniqueBiGramIndexForWitnessA();
-    //    final List<NGram> matches = calculateMatches(aa, bigrams);
+    //    final List<Phrase> bigrams = getUniqueBiGramIndexForWitnessA();
+    //    final List<Phrase> matches = calculateMatches(aa, bigrams);
     //final List<InternalUncompleteGap> trimmedGaps = trimGaps(gaps);
     //final List<InternalUncompleteGap> filteredGaps = filterUnigrramReplacements(trimmedGaps);
     return new Alignment(matches, gaps);

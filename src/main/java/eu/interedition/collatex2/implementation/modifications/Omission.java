@@ -1,16 +1,16 @@
 package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IModification;
-import eu.interedition.collatex2.interfaces.INGram;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Omission implements IModification {
-  private final INGram phrase;
+  private final IPhrase phrase;
 
-  public Omission(final INGram _phrase) {
+  public Omission(final IPhrase _phrase) {
     this.phrase = _phrase;
   }
 
-  public INGram getOmittedWords() {
+  public IPhrase getOmittedWords() {
     return phrase;
   }
 

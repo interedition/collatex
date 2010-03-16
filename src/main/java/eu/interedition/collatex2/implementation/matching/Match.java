@@ -1,15 +1,15 @@
 package eu.interedition.collatex2.implementation.matching;
 
-import eu.interedition.collatex2.implementation.indexing.NGram;
+import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.IMatch;
-import eu.interedition.collatex2.interfaces.INGram;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Match implements IMatch {
 
-  private final NGram a;
-  private final NGram b;
+  private final Phrase a;
+  private final Phrase b;
 
-  public Match(final NGram a, final NGram b) {
+  public Match(final Phrase a, final Phrase b) {
     this.a = a;
     this.b = b;
   }
@@ -20,12 +20,12 @@ public class Match implements IMatch {
   }
 
   @Override
-  public INGram getNGramA() {
+  public IPhrase getNGramA() {
     return a;
   }
 
   @Override
-  public INGram getNGramB() {
+  public IPhrase getNGramB() {
     return b;
   }
 
