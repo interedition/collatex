@@ -20,14 +20,13 @@ public class SequenceDetection {
     return new Alignment(chainedMatches, filteredGaps);
   }
 
-  //NOTE: we might want to extract the two tokens lists into a 
+  // NOTE: we might want to extract the two tokens lists into a 
   // token container or something!
   private static List<IMatch> chainMatches(final IAlignment alignment) {
     // input/output
     final List<IMatch> unchainedMatches = alignment.getMatches();
     final List<IMatch> chainedMatches = Lists.newArrayList();
     // calculate previous matches map for A and B
-    // TODO: add maps for previous gaps for A and B
     final List<IMatch> matchesSortedForA = unchainedMatches;
     final List<IMatch> matchesSortedForB = alignment.getMatchesSortedForB();
     // now build the actual map!
