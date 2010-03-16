@@ -43,18 +43,26 @@ public class TranspositionTest {
     Assert.assertTrue(gaps.toString(), gaps.isEmpty());
   }
 
-  @Ignore
   @Test
-  public void testTrans2() {
+  public void testTransposition2Matches() {
     final IWitness a = factory.createWitness("A", "d a b");
     final IWitness b = factory.createWitness("B", "a c b d");
-    final IAlignment align = factory.createAlignment(b, a);
+    final IAlignment align = factory.createAlignment(a, b);
     final List<IMatch> matches = align.getMatches();
-    System.out.println(matches.toString());
     Assert.assertEquals(3, matches.size());
+    Assert.assertEquals("d", matches.get(0).getNormalized());
+    Assert.assertEquals("a", matches.get(1).getNormalized());
+    Assert.assertEquals("b", matches.get(2).getNormalized());
+  }
+
+  @Ignore
+  @Test
+  public void testTransposition2Gaps() {
+    final IWitness a = factory.createWitness("A", "d a b");
+    final IWitness b = factory.createWitness("B", "a c b d");
+    final IAlignment align = factory.createAlignment(a, b);
     final List<IGap> gaps = align.getGaps();
     // TODO: change to string of Gap
     Assert.assertTrue(gaps.toString(), gaps.isEmpty());
-
   }
 }

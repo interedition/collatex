@@ -22,9 +22,6 @@ public class SequenceDetection {
 
   //NOTE: we might want to extract the two tokens lists into a 
   // token container or something!
-  //WARNING: Only looking at the previous match for witness A is not
-  //good enough, since transpositions can change order of the
-  //matches in witness B!
   private static List<IMatch> chainMatches(final IAlignment alignment) {
     // input/output
     final List<IMatch> unchainedMatches = alignment.getMatches();
@@ -34,6 +31,7 @@ public class SequenceDetection {
     final List<IMatch> matchesSortedForA = unchainedMatches;
     final List<IMatch> matchesSortedForB = alignment.getMatchesSortedForB();
     // now build the actual map!
+    final Map<IMatch, IGap> previousGapMapB = SequenceDetection.buildPreviousGapMap(matchesSortedForB, alignment.getGaps());
     final Map<IMatch, IMatch> previousMatchMapA = SequenceDetection.buildPreviousMatchMap(matchesSortedForA);
     final Map<IMatch, IMatch> previousMatchMapB = SequenceDetection.buildPreviousMatchMap(matchesSortedForB);
     // make buffer
@@ -43,10 +41,11 @@ public class SequenceDetection {
     for (int index = 0; index < unchainedMatches.size(); index++) {
       final IMatch match = unchainedMatches.get(index);
       // determine whether matches should be chained
-      final IGap previousGap = alignment.getGaps().get(index);
+      final IGap previousGapA = alignment.getGaps().get(index);
+      final IGap previousGapB = previousGapMapB.get(match);
       final IMatch previousMatchA = previousMatchMapA.get(match);
       final IMatch previousMatchB = previousMatchMapB.get(match);
-      if (!previousGap.isEmpty() || previousMatchA != previousMatchB) {
+      if (!previousGapA.isEmpty() || !previousGapB.isEmpty() || previousMatchA != previousMatchB) {
         createChainedMatchAndAddToList(chainedMatches, tokensA, tokensB);
         tokensA = Lists.newArrayList();
         tokensB = Lists.newArrayList();
@@ -57,6 +56,16 @@ public class SequenceDetection {
     }
     createChainedMatchAndAddToList(chainedMatches, tokensA, tokensB);
     return chainedMatches;
+  }
+
+  private static Map<IMatch, IGap> buildPreviousGapMap(final List<IMatch> matches, final List<IGap> gaps) {
+    final Map<IMatch, IGap> previousGaps = Maps.newHashMap();
+    for (int index = 0; index < matches.size(); index++) {
+      final IGap previousGap = gaps.get(index);
+      final IMatch match = matches.get(index);
+      previousGaps.put(match, previousGap);
+    }
+    return previousGaps;
   }
 
   private static Map<IMatch, IMatch> buildPreviousMatchMap(final List<IMatch> matches) {
