@@ -4,8 +4,8 @@ public interface IMatch {
 
   String getNormalized();
 
-  IPhrase getNGramA();
+  IPhrase getPhraseA();
 
-  IPhrase getNGramB();
+  IPhrase getPhraseB();
 
 }

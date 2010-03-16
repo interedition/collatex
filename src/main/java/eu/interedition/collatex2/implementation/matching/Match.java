@@ -20,17 +20,17 @@ public class Match implements IMatch {
   }
 
   @Override
-  public IPhrase getNGramA() {
+  public IPhrase getPhraseA() {
     return a;
   }
 
   @Override
-  public IPhrase getNGramB() {
+  public IPhrase getPhraseB() {
     return b;
   }
 
   @Override
   public String toString() {
-    return getNGramA() + "->" + getNGramB();
+    return getPhraseA() + "->" + getPhraseB();
   }
 }

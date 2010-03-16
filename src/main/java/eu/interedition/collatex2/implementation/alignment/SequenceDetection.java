@@ -54,8 +54,8 @@ public class SequenceDetection {
         tokensB = Lists.newArrayList();
       }
       // fill buffer
-      tokensA.add(match.getNGramA().getFirstToken());
-      tokensB.add(match.getNGramB().getFirstToken());
+      tokensA.add(match.getPhraseA().getFirstToken());
+      tokensB.add(match.getPhraseB().getFirstToken());
     }
     createChainedMatchAndAddToList(chainedMatches, tokensA, tokensB);
     return chainedMatches;
@@ -74,7 +74,7 @@ public class SequenceDetection {
   private static List<IMatch> sortMatchesForB(final List<IMatch> matches) {
     final Comparator<IMatch> comparator = new Comparator<IMatch>() {
       public int compare(final IMatch o1, final IMatch o2) {
-        return o1.getNGramB().getBeginPosition() - o2.getNGramB().getBeginPosition();
+        return o1.getPhraseB().getBeginPosition() - o2.getPhraseB().getBeginPosition();
       }
     };
     final List<IMatch> matchesForB = Lists.newArrayList(matches);
