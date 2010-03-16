@@ -29,7 +29,11 @@ public class UseCaseResource extends ServerResource {
 
   @Override
   protected void doInit() throws ResourceException {
-    i = Integer.parseInt((String) getRequest().getAttributes().get("i"));
+    try {
+      i = Integer.parseInt((String) getRequest().getAttributes().get("i"));
+    } catch (final NumberFormatException e) {
+      i = 0;
+    }
   }
 
   //Note: usecase 0 works
