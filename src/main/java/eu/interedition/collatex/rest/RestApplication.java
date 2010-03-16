@@ -6,16 +6,6 @@ import org.restlet.routing.Router;
 
 public class RestApplication extends Application {
 
-  //    private final Database database;
-
-  public RestApplication() {
-  //      database = Database.getInstance();
-  }
-
-  //    public Database getDatabase() {
-  //      return database;
-  //    }
-
   @Override
   public synchronized Restlet createRoot() {
     final Router router = new Router(getContext());
@@ -25,10 +15,6 @@ public class RestApplication extends Application {
     router.attach("/jsoninput", ParserResource.class);
     router.attach("/demo", DemoResource.class);
     router.attach("/beckett", BeckettResource.class);
-    router.attach("/ngram", NGramResource.class);
-    //      router.attachDefault(ServiceResource.class);
-    //      router.attach("/authors", AuthorsResource.class);
-    //      router.attach("/author/{name}", AuthorResource.class);
     return router;
   }
 

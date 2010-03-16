@@ -1,4 +1,4 @@
-package eu.interedition.collatex.rest;
+package eu.interedition.collatex2.rest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +21,10 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 //TODO: move this class to collatex2 package!
 //TODO: rename!
-public class NGramResource extends ServerResource {
+public class UseCaseResource extends ServerResource {
   private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
 
-  public NGramResource() {
+  public UseCaseResource() {
     getVariants().put(Method.GET, Arrays.asList(TYPES));
   }
 
