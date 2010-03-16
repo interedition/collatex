@@ -47,14 +47,14 @@ public class UseCaseResource extends ServerResource {
   }
 
   private String displayAWitnessPair(String html, final String plainWitnessA, final String plainWitnessB) {
-    html += "A: " + plainWitnessA + "</BR>";
-    html += "B: " + plainWitnessB + "</BR>";
+    html += "A: " + plainWitnessA + "<br/>";
+    html += "B: " + plainWitnessB + "<br/>";
     final Factory factory = new Factory();
     final IWitness a = factory.createWitness("A", plainWitnessA);
     final IWitness b = factory.createWitness("B", plainWitnessB);
     final IAlignment align = factory.createAlignment(a, b);
     final List<IMatch> matches = align.getMatches();
-    html += "</br>";
+    html += "<br/>";
     html += "matches: ";
     String splitter = "";
     for (final IMatch match : matches) {
@@ -62,12 +62,12 @@ public class UseCaseResource extends ServerResource {
       splitter = ", ";
     }
     final List<IGap> gaps = align.getGaps();
-    html += "</br></br>";
-    html += "gaps: </BR>";
+    html += "<br/><br/>";
+    html += "gaps: <br/>";
     for (final IGap gap : gaps) {
-      html += " " + gap.toString() + "</BR>";
+      html += " " + gap.toString() + "<br/>";
     }
-    html += "</br></br>";
+    html += "<br/><br/>";
     return html;
   }
 

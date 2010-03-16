@@ -113,7 +113,7 @@ public class UseCaseView {
   //          if (word != null) htmlWords.add(new WordColorTuple(word, "color" + colorMatrix.getCell(row, col)).toHtml());
   //        }
   //        html += Join.join(" ", htmlWords);
-  //        html += "</br></li>";
+  //        html += "<br/></li>";
   //      }
   //      html += "<pre>" + colorMatrix.toString() + "</pre>";
   //      html += "</ol></li>";

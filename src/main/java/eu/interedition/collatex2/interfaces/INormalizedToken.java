@@ -6,4 +6,6 @@ public interface INormalizedToken {
 
   int getPosition();
 
+  String getSigil();
+
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.Factory;
@@ -43,7 +42,6 @@ public class TranspositionTest {
     Assert.assertTrue(gaps.toString(), gaps.isEmpty());
   }
 
-  @Ignore
   @Test
   public void testTrans2() {
     final IWitness a = factory.createWitness("A", "d a b");
