@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.interfaces;
 
-
 public interface IPhrase {
 
   String getNormalized();
@@ -12,5 +11,7 @@ public interface IPhrase {
   boolean isEmpty();
 
   INormalizedToken getFirstToken();
+
+  String getSigil();
 
 }

@@ -20,13 +20,12 @@ public class Gap implements IGap {
     this.nextMatchA = nextMatchA;
   }
 
-  //TODO: change to string of Gap
   @Override
   public String toString() {
     if (isAddition()) {
       return "\"" + gapB.getNormalized() + "\" added";
     }
-    return "A: " + gapA.getNormalized() + " -> B: " + gapB.getNormalized();
+    return gapA.getSigil() + ": " + gapA.getNormalized() + " -> " + gapB.getSigil() + ": " + gapB.getNormalized();
   }
 
   public IPhrase getPhraseA() {

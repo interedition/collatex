@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Phrase implements IPhrase {
   private final List<INormalizedToken> tokens;
@@ -83,6 +83,11 @@ public class Phrase implements IPhrase {
       return "<empty>";
     }
     return getNormalized() + ":" + getBeginPosition() + ":" + getEndPosition();
+  }
+
+  @Override
+  public String getSigil() {
+    return getFirstToken().getSigil();
   }
 
 }
