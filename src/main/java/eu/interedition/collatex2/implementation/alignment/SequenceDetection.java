@@ -1,7 +1,5 @@
 package eu.interedition.collatex2.implementation.alignment;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +32,7 @@ public class SequenceDetection {
     // calculate previous matches map for A and B
     // TODO: add maps for previous gaps for A and B
     final List<IMatch> matchesSortedForA = unchainedMatches;
-    final List<IMatch> matchesSortedForB = SequenceDetection.sortMatchesForB(matchesSortedForA);
+    final List<IMatch> matchesSortedForB = alignment.getMatchesSortedForB();
     // now build the actual map!
     final Map<IMatch, IMatch> previousMatchMapA = SequenceDetection.buildPreviousMatchMap(matchesSortedForA);
     final Map<IMatch, IMatch> previousMatchMapB = SequenceDetection.buildPreviousMatchMap(matchesSortedForB);
@@ -69,17 +67,6 @@ public class SequenceDetection {
       previousMatch = match;
     }
     return previousMatches;
-  }
-
-  private static List<IMatch> sortMatchesForB(final List<IMatch> matches) {
-    final Comparator<IMatch> comparator = new Comparator<IMatch>() {
-      public int compare(final IMatch o1, final IMatch o2) {
-        return o1.getPhraseB().getBeginPosition() - o2.getPhraseB().getBeginPosition();
-      }
-    };
-    final List<IMatch> matchesForB = Lists.newArrayList(matches);
-    Collections.sort(matchesForB, comparator);
-    return matchesForB;
   }
 
   private static void createChainedMatchAndAddToList(final List<IMatch> chainedMatches, final List<INormalizedToken> tokensA, final List<INormalizedToken> tokensB) {

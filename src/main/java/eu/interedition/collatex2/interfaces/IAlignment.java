@@ -6,6 +6,8 @@ public interface IAlignment {
 
   List<IMatch> getMatches();
 
+  List<IMatch> getMatchesSortedForB();
+
   List<IGap> getGaps();
 
 }
