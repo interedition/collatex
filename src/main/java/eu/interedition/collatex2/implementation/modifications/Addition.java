@@ -1,9 +1,9 @@
 package eu.interedition.collatex2.implementation.modifications;
 
-import eu.interedition.collatex2.interfaces.IModification;
+import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
-public class Addition implements IModification {
+public class Addition implements IAddition {
   private final IPhrase addition;
   private final IPhrase nextMatchA;
 

@@ -21,16 +21,26 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class UseCaseResource extends ServerResource {
   private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
+  private int i;
 
   public UseCaseResource() {
     getVariants().put(Method.GET, Arrays.asList(TYPES));
+  }
+
+  @Override
+  protected void doInit() throws ResourceException {
+    try {
+      i = Integer.parseInt((String) getRequest().getAttributes().get("i"));
+    } catch (final NumberFormatException e) {
+      i = 0;
+    }
   }
 
   //Note: usecase 0 works
   @Override
   public Representation get(final Variant variant) throws ResourceException {
     final List<String[]> useCases = useCases();
-    final String[] firstUseCase = useCases.get(0);
+    final String[] firstUseCase = useCases.get(i);
     String html = "";
     for (int i = 0; i < firstUseCase.length; i++) {
       for (int j = i + 1; j < firstUseCase.length; j++) {

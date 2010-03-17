@@ -10,4 +10,8 @@ public interface IAlignment {
 
   List<IGap> getGaps();
 
+  List<ITransposition> getTranspositions();
+
+  List<IAddition> getAdditions();
+
 }
