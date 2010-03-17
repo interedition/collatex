@@ -11,4 +11,6 @@ public interface IWitness {
 
   int size();
 
+  String getSigil();
+
 }
