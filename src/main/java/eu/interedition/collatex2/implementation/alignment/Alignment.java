@@ -1,19 +1,25 @@
 package eu.interedition.collatex2.implementation.alignment;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.implementation.modifications.Transposition;
+import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.ITransposition;
 
 public class Alignment implements IAlignment {
-
   private final List<IMatch> matches;
   private final List<IGap> gaps;
 
@@ -57,6 +63,23 @@ public class Alignment implements IAlignment {
     return transpositions;
   }
 
+  private static final Predicate<IGap> ADDITION_PREDICATE = new Predicate<IGap>() {
+    @Override
+    public boolean apply(final IGap gap) {
+      return gap.isAddition();
+    }
+  };
+  private static final Function<IGap, IAddition> GAP_TO_ADDITION = new Function<IGap, IAddition>() {
+    @Override
+    public IAddition apply(final IGap gap) {
+      return new Addition(gap.getPhraseA(), gap.getPhraseB());
+    }
+  };
+
+  @Override
+  public List<IAddition> getAdditions() {
+    return Lists.newArrayList(transform(filter(getGaps(), ADDITION_PREDICATE), GAP_TO_ADDITION));
+  }
   //		  public static Alignment create(final IWitness a, final IWitness b) {
   //		    final WitnessSet set = new WitnessSet(a, b);
   //		    return set.align();

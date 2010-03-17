@@ -12,4 +12,6 @@ public interface IAlignment {
 
   List<ITransposition> getTranspositions();
 
+  List<IAddition> getAdditions();
+
 }
