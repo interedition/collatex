@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.ITransposition;
 
 public class Alignment implements IAlignment {
 
@@ -37,6 +38,11 @@ public class Alignment implements IAlignment {
     final List<IMatch> matchesForB = Lists.newArrayList(matches);
     Collections.sort(matchesForB, comparator);
     return matchesForB;
+  }
+
+  @Override
+  public List<ITransposition> getTranspositions() {
+    return TranspositionDetection.getTranspositions(this);
   }
 
   //		  public static Alignment create(final IWitness a, final IWitness b) {

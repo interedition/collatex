@@ -9,11 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.Factory;
-import eu.interedition.collatex2.implementation.alignment.TranspositionDetection;
-import eu.interedition.collatex2.implementation.modifications.Transposition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class TranspositionTest {
@@ -46,20 +45,71 @@ public class TranspositionTest {
   }
 
   @Test
+  public void testTransposition2Matches() {
+    final IWitness a = factory.createWitness("A", "d a b");
+    final IWitness b = factory.createWitness("B", "a c b d");
+    final IAlignment align = factory.createAlignment(a, b);
+    final List<IMatch> matches = align.getMatches();
+    assertEquals(3, matches.size());
+    assertEquals("d", matches.get(0).getNormalized());
+    assertEquals("a", matches.get(1).getNormalized());
+    assertEquals("b", matches.get(2).getNormalized());
+  }
+
+  @Test
+  public void testTransposition2Gaps() {
+    final IWitness a = factory.createWitness("A", "d a b");
+    final IWitness b = factory.createWitness("B", "a c b d");
+    final IAlignment align = factory.createAlignment(a, b);
+    final List<IGap> gaps = align.getGaps();
+    assertEquals(1, gaps.size());
+    final IGap gap = gaps.get(0);
+    assertTrue(gap.isAddition());
+    assertEquals("c", gap.getPhraseB().getNormalized());
+  }
+
+  @Test
+  public void testTransposition1() {
+    final IWitness a = factory.createWitness("A", "d a b");
+    final IWitness b = factory.createWitness("B", "a b d");
+    final IAlignment align = factory.createAlignment(a, b);
+    final List<ITransposition> transpositions = align.getTranspositions();
+    assertEquals(2, transpositions.size());
+    assertEquals("d", transpositions.get(0).getMatchA().getNormalized());
+    assertEquals("a b", transpositions.get(0).getMatchB().getNormalized());
+    assertEquals("d", transpositions.get(1).getMatchB().getNormalized());
+    assertEquals("a b", transpositions.get(1).getMatchA().getNormalized());
+  }
+
+  @Test
   public void testTransposition2() {
     final IWitness a = factory.createWitness("A", "d a b");
     final IWitness b = factory.createWitness("B", "a c b d");
-    final IAlignment align = factory.createAlignment(b, a);
-    final List<IMatch> matches = align.getMatches();
-    System.out.println(matches.toString());
-    assertEquals(3, matches.size());
-    final List<IGap> gaps = align.getGaps();
-    assertEquals(1, gaps.size());
-    final TranspositionDetection td = new TranspositionDetection(align);
-    final List<Transposition> transpositions = td.getTranspositions();
-    assertEquals(1, transpositions.size());
-    assertEquals("d", transpositions.get(0).getNormalized());
-    // TODO: change to string of Gap
-    //    assertTrue(gaps.toString(), gaps.isEmpty());
+    final IAlignment align = factory.createAlignment(a, b);
+    final List<ITransposition> transpositions = align.getTranspositions();
+    assertEquals(3, transpositions.size());
+    assertEquals("d", transpositions.get(0).getMatchA().getNormalized());
+    assertEquals("a", transpositions.get(0).getMatchB().getNormalized());
+    assertEquals("a", transpositions.get(1).getMatchA().getNormalized());
+    assertEquals("b", transpositions.get(1).getMatchB().getNormalized());
+    assertEquals("b", transpositions.get(2).getMatchA().getNormalized());
+    assertEquals("d", transpositions.get(2).getMatchB().getNormalized());
+  }
+
+  @Test
+  public void testTransposition3() {
+    final IWitness a = factory.createWitness("1", "a b x c d e");
+    final IWitness b = factory.createWitness("2", "c e y a d b");
+    final IAlignment align = factory.createAlignment(a, b);
+    final List<ITransposition> transpositions = align.getTranspositions();
+    assertEquals(4, transpositions.size());
+    assertEquals("a", transpositions.get(0).getMatchA().getNormalized());
+    assertEquals("c", transpositions.get(0).getMatchB().getNormalized());
+    assertEquals("b", transpositions.get(1).getMatchA().getNormalized());
+    assertEquals("e", transpositions.get(1).getMatchB().getNormalized());
+    assertEquals("c", transpositions.get(2).getMatchA().getNormalized());
+    assertEquals("a", transpositions.get(2).getMatchB().getNormalized());
+    assertEquals("e", transpositions.get(3).getMatchA().getNormalized());
+    assertEquals("b", transpositions.get(3).getMatchB().getNormalized());
   }
 }

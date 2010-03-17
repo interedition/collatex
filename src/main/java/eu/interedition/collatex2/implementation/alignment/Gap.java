@@ -25,7 +25,7 @@ public class Gap implements IGap {
     if (isAddition()) {
       return "\"" + gapB.getNormalized() + "\" added";
     }
-    return gapA.getSigil()+": " + gapA.getNormalized() + " -> "+gapB.getSigil()+": " + gapB.getNormalized();
+    return gapA.getSigil() + ": " + gapA.getNormalized() + " -> " + gapB.getSigil() + ": " + gapB.getNormalized();
   }
 
   public IPhrase getPhraseA() {
