@@ -11,7 +11,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.implementation.modifications.Transposition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
@@ -72,7 +71,7 @@ public class Alignment implements IAlignment {
   private static final Function<IGap, IAddition> GAP_TO_ADDITION = new Function<IGap, IAddition>() {
     @Override
     public IAddition apply(final IGap gap) {
-      return new Addition(gap.getPhraseA(), gap.getPhraseB());
+      return (IAddition) gap.getModification();
     }
   };
 

@@ -10,4 +10,6 @@ public interface IGap {
 
   IPhrase getPhraseB();
 
+  IModification getModification();
+
 }
