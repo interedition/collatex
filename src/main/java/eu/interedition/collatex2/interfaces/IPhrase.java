@@ -1,5 +1,7 @@
 package eu.interedition.collatex2.interfaces;
 
+import java.util.List;
+
 public interface IPhrase {
 
   String getNormalized();
@@ -13,5 +15,7 @@ public interface IPhrase {
   INormalizedToken getFirstToken();
 
   String getSigil();
+
+  List<INormalizedToken> getTokens();
 
 }
