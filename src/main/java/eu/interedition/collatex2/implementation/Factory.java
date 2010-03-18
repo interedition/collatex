@@ -9,6 +9,7 @@ import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
+import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.matching.RealMatcher;
@@ -21,6 +22,7 @@ import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class Factory {
 
@@ -45,6 +47,11 @@ public class Factory {
 
   public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
+  }
+
+  public static IWitnessIndex createWitnessIndex(final IWitness witness) {
+    final WitnessIndex witnessIndex = new WitnessIndex(witness);
+    return witnessIndex;
   }
 
   public IAlignmentTable createNewAlignmentTable(final List<IWitness> set) {
