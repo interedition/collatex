@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.implementation.alignmenttable;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import com.google.common.collect.Maps;
 
@@ -22,6 +23,9 @@ public class Column3 implements IColumn {
 
   @Override
   public INormalizedToken getToken(final String sigil) {
+    if (!containsWitness(sigil)) {
+      throw new NoSuchElementException("Witness " + sigil + " is not present in this column");
+    }
     return sigliToTokens.get(sigil);
   }
 

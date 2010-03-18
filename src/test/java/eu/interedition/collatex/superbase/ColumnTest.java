@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.NoSuchElementException;
-
 import org.junit.Test;
 
 import eu.interedition.collatex.alignment.multiple_witness.Column;
@@ -15,16 +13,6 @@ import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class ColumnTest {
-  @Test(expected = NoSuchElementException.class)
-  public void testGetWordNonExistingGivesException() {
-    final WitnessBuilder builder = new WitnessBuilder();
-    final Witness witness = builder.build("A", "a test string");
-    final Witness witnessB = builder.build("B", "different");
-    final Word word = witness.getFirstSegment().getElementOnWordPosition(1);
-    final Column column = new Column(word);
-    column.getWord(witnessB.getFirstSegment());
-  }
-
   @Test
   public void testContainsWitness() {
     final WitnessBuilder builder = new WitnessBuilder();
