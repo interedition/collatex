@@ -2,6 +2,8 @@ package eu.interedition.collatex2.alignmenttable;
 
 import java.util.NoSuchElementException;
 
+import junit.framework.Assert;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,22 +27,20 @@ public class ColumnTest {
   @Test(expected = NoSuchElementException.class)
   public void testGetWordNonExistingGivesException() {
     final IWitness witness = factory.createWitness("A", "a test string");
-    //    final Witness witnessB = builder.build("B", "different");
     final INormalizedToken word = witness.getTokens().get(0);
     final IColumn column = new Column3(word);
     column.getToken("B");
   }
 
-  //  @Test
-  //  public void testContainsWitness() {
-  //    final WitnessBuilder builder = new WitnessBuilder();
-  //    final Witness witness = builder.build("A", "a test string");
-  //    final Witness witnessB = builder.build("B", "different");
-  //    final Word word = witness.getFirstSegment().getElementOnWordPosition(1);
-  //    final Column column = new Column(word);
-  //    assertTrue(column.containsWitness(witness.getFirstSegment()));
-  //    assertFalse(column.containsWitness(witnessB.getFirstSegment()));
-  //  }
+  @Test
+  public void testContainsWitness() {
+    final IWitness witness = factory.createWitness("A", "a test string");
+    final INormalizedToken word = witness.getTokens().get(0);
+    final IColumn column = new Column3(word);
+    Assert.assertTrue(column.containsWitness("A"));
+    Assert.assertFalse(column.containsWitness("B"));
+  }
+
   //
   //  @Test
   //  public void testInverseWordMap() {

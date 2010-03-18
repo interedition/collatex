@@ -1,8 +1,6 @@
 package eu.interedition.collatex.superbase;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -13,16 +11,6 @@ import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class ColumnTest {
-  @Test
-  public void testContainsWitness() {
-    final WitnessBuilder builder = new WitnessBuilder();
-    final Witness witness = builder.build("A", "a test string");
-    final Witness witnessB = builder.build("B", "different");
-    final Word word = witness.getFirstSegment().getElementOnWordPosition(1);
-    final Column column = new Column(word);
-    assertTrue(column.containsWitness(witness.getFirstSegment()));
-    assertFalse(column.containsWitness(witnessB.getFirstSegment()));
-  }
 
   @Test
   public void testInverseWordMap() {
