@@ -98,4 +98,9 @@ public class WitnessIndex implements IWitnessIndex {
   public int size() {
     return phraseBag.size();
   }
+
+  @Override
+  public Collection<IPhrase> getPhrases() {
+    return phraseBag;
+  }
 }
