@@ -56,29 +56,30 @@ public class UseCaseResource extends ServerResource {
     return representation;
   }
 
-  private String displayAWitnessPair(String html, final String plainWitnessA, final String plainWitnessB) {
-    html += "A: " + plainWitnessA + "<br/>";
-    html += "B: " + plainWitnessB + "<br/>";
+  private String displayAWitnessPair(final String html, final String plainWitnessA, final String plainWitnessB) {
     final Factory factory = new Factory();
     final IWitness a = factory.createWitness("A", plainWitnessA);
     final IWitness b = factory.createWitness("B", plainWitnessB);
     final IAlignment align = factory.createAlignment(a, b);
     final List<IMatch> matches = align.getMatches();
-    html += "<br/>";
-    html += "matches: ";
+    final StringBuilder stringBuilder = new StringBuilder(html).//
+        append("A: ").append(plainWitnessA).append("<br/>").//
+        append("B: ").append(plainWitnessB).append("<br/>").//;
+        append("<br/>").//
+        append("matches: ");
     String splitter = "";
     for (final IMatch match : matches) {
-      html += splitter + "\"" + match.getNormalized() + "\"";
+      stringBuilder.append(splitter).append("\"").append(match.getNormalized()).append("\"");
       splitter = ", ";
     }
     final List<IGap> gaps = align.getGaps();
-    html += "<br/><br/>";
-    html += "gaps: <br/>";
+    stringBuilder.append("<br/><br/>").//
+        append("gaps: <br/>");
     for (final IGap gap : gaps) {
-      html += " " + gap.toString() + "<br/>";
+      stringBuilder.append(" ").append(gap.toString()).append("<br/>");
     }
-    html += "<br/><br/>";
-    return html;
+    stringBuilder.append("<br/><br/>");
+    return stringBuilder.toString();
   }
 
   // NOTE: copied from UseCasePage!

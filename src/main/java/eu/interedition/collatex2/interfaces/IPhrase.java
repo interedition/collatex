@@ -18,4 +18,6 @@ public interface IPhrase {
 
   List<INormalizedToken> getTokens();
 
+  int size();
+
 }

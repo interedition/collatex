@@ -5,7 +5,6 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mortbay.log.Log;
 
@@ -36,18 +35,32 @@ public class IndexingTest {
     assertTrue(index.contains("tobe #"));
   }
 
-  @Ignore
+  //  @Ignore
   @Test
   public void test2() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     Log.info("witness = [the big black cat and the big black rat]");
     final IWitnessIndex index = Factory.createWitnessIndex(a);
-    assertEquals(5, index.size());
     assertTrue(index.contains("# the big black"));
     assertTrue(index.contains("the big black cat"));
+    assertTrue(index.contains("cat"));
     assertTrue(index.contains("and"));
     assertTrue(index.contains("and the big black"));
     assertTrue(index.contains("the big black rat"));
+    assertTrue(index.contains("rat"));
+    assertEquals(7, index.size());
   }
 
+  //  @Test
+  //  public void test3() {
+  //    final IWitness a = factory.createWitness("A", "X C A B Y C A Z A B W");
+  //    Log.info("witness = [X C A B Y C A Z A B W]");
+  //    final IWitnessIndex index = Factory.createWitnessIndex(a);
+  //    assertTrue(index.contains("# the big black"));
+  //    assertTrue(index.contains("the big black cat"));
+  //    assertTrue(index.contains("and"));
+  //    assertTrue(index.contains("and the big black"));
+  //    assertTrue(index.contains("the big black rat"));
+  //    assertEquals(5, index.size());
+  //  }
 }

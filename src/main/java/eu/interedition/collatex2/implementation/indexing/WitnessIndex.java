@@ -32,46 +32,52 @@ public class WitnessIndex implements IWitnessIndex {
     }
     do {
       final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
-      Log.info("keys = " + phraseMap.keySet());
+      //      Log.info("keys = " + phraseMap.keySet());
       for (final String phraseId : phraseMap.keySet()) {
         final Collection<IPhrase> phrases = phraseMap.get(phraseId);
-        Log.info("phrases = " + phrases.toString());
+        //        Log.info("phrases = " + phrases.toString());
         if (phrases.size() > 1) {
-          for (final IPhrase phrase : phrases) {
-            final int beforePosition = phrase.getBeginPosition() - 1;
-            final int afterPosition = phrase.getEndPosition();
-
-            final INormalizedToken beforeToken = (beforePosition > 0) ? tokens.get(beforePosition - 1) : new NullToken(phrase.getBeginPosition(), phrase.getSigil());
-            final INormalizedToken afterToken = (afterPosition < tokens.size()) ? tokens.get(afterPosition) : new NullToken(phrase.getEndPosition(), phrase.getSigil());
-
-            final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
-            leftExpandedTokenList.addAll(phrase.getTokens());
-            final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
-
-            final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phrase.getTokens());
-            rightExpandedTokenList.add(afterToken);
-            final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
-
-            final String leftPhraseId = leftExpandedPhrase.getNormalized();
-            //            if (!newPhraseMap.containsEntry(leftPhraseId, leftExpandedPhrase)) {
-            newPhraseMap.put(leftPhraseId, leftExpandedPhrase);
-            //            }
-            final String rightPhraseId = rightExpandedPhrase.getNormalized();
-            //            if (!newPhraseMap.containsEntry(rightPhraseId, rightExpandedPhrase)) {
-            newPhraseMap.put(rightPhraseId, rightExpandedPhrase);
-            //            }
-          }
+          addExpandedPhrases(newPhraseMap, phrases, tokens/*, phraseMap*/);
         } else {
-          newPhraseMap.put(phraseId, phrases.iterator().next());
+          final IPhrase phrase = phrases.iterator().next();
+          if (phrase.size() == 1) {
+            newPhraseMap.put(phraseId, phrase);
+          }
         }
-        Log.info("newPhraseMap = " + newPhraseMap.toString());
+        //        Log.info("newPhraseMap = " + newPhraseMap.toString());
+        //        Log.info("");
       }
       phraseMap = newPhraseMap;
-      Log.info("phraseMap.entries().size() = " + String.valueOf(phraseMap.entries().size()));
-      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
+      //      Log.info("phraseMap.entries().size() = " + String.valueOf(phraseMap.entries().size()));
+      //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
+      //      Log.info("");
     } while (phraseMap.entries().size() > phraseMap.keySet().size());
 
     phraseBag.addAll(phraseMap.values());
+  }
+
+  private void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens) {
+    for (final IPhrase phrase : phrases) {
+      final int beforePosition = phrase.getBeginPosition() - 1;
+      final int afterPosition = phrase.getEndPosition();
+
+      final INormalizedToken beforeToken = (beforePosition > 0) ? tokens.get(beforePosition - 1) : new NullToken(phrase.getBeginPosition(), phrase.getSigil());
+      final INormalizedToken afterToken = (afterPosition < tokens.size()) ? tokens.get(afterPosition) : new NullToken(phrase.getEndPosition(), phrase.getSigil());
+
+      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
+      leftExpandedTokenList.addAll(phrase.getTokens());
+      final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
+
+      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phrase.getTokens());
+      rightExpandedTokenList.add(afterToken);
+      final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
+
+      final String leftPhraseId = leftExpandedPhrase.getNormalized();
+      newPhraseMap.put(leftPhraseId, leftExpandedPhrase);
+
+      final String rightPhraseId = rightExpandedPhrase.getNormalized();
+      newPhraseMap.put(rightPhraseId, rightExpandedPhrase);
+    }
   }
 
   private static final Function<IPhrase, String> PHRASE_TO_NORMALIZED = new Function<IPhrase, String>() {

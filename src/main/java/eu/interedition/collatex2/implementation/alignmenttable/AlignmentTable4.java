@@ -32,17 +32,17 @@ public class AlignmentTable4 implements IAlignmentTable {
 
   @Override
   public String toString() {
-    String collectedStrings = "";
+    final StringBuilder stringBuilder = new StringBuilder();
     for (final String sigil : getSigli()) {
-      collectedStrings += sigil + ": ";
+      stringBuilder.append(sigil).append(": ");
       String delim = "";
       for (final IColumn column : getColumns()) {
-        collectedStrings += delim + cellToString(sigil, column);
+        stringBuilder.append(delim).append(cellToString(sigil, column));
         delim = "|";
       }
-      collectedStrings += "\n";
+      stringBuilder.append("\n");
     }
-    return collectedStrings;
+    return stringBuilder.toString();
   }
 
   private String cellToString(final String sigil, final IColumn column) {

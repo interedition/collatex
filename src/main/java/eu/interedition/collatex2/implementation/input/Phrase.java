@@ -2,8 +2,6 @@ package eu.interedition.collatex2.implementation.input;
 
 import java.util.List;
 
-import org.mortbay.log.Log;
-
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -33,13 +31,13 @@ public class Phrase implements IPhrase {
   //  }
 
   public String getNormalized() {
-    String replacementString = "";
+    final StringBuilder normalized = new StringBuilder();
     String divider = "";
     for (final INormalizedToken token : tokens) {
-      replacementString += divider + token.getNormalized();
+      normalized.append(divider).append(token.getNormalized());
       divider = " ";
     }
-    return replacementString;
+    return normalized.toString();
 
   }
 
@@ -98,12 +96,20 @@ public class Phrase implements IPhrase {
   }
 
   @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
   public boolean equals(final Object obj) {
-    Log.info("Phrase.equals() called");
     if (!(obj instanceof Phrase)) {
       return false;
     }
-    //    return tokens.equals(((Phrase) obj).getTokens());
-    return toString().equals(((Phrase) obj).toString());
+    return tokens.equals(((Phrase) obj).getTokens());
+  }
+
+  @Override
+  public int size() {
+    return tokens.size();
   }
 }
