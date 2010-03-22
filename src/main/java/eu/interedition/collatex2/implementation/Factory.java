@@ -1,9 +1,11 @@
 package eu.interedition.collatex2.implementation;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.GapDetection;
@@ -63,6 +65,14 @@ public class Factory {
     IAlignmentTable table;
     table = AlignmentTableCreator3.createAlignmentTable(set);
     return table;
+  }
+
+  public static Map<String, IWitnessIndex> createWitnessIndexMap(final IWitness... witnesses) {
+    final Map<String, IWitnessIndex> map = Maps.newHashMap();
+    for (final IWitness witness : witnesses) {
+      map.put(witness.getSigil(), createWitnessIndex(witness));
+    }
+    return map;
   }
 
 }
