@@ -8,11 +8,13 @@ public interface IColumn {
 
   INormalizedToken getToken(String sigil);
 
+  List<INormalizedToken> getVariants();
+
   void addVariant(INormalizedToken token);
+
+  void addMatch(INormalizedToken token);
 
   //TODO: remove this dependency
   void addToSuperbase(ISuperbase superbase);
-
-  List<INormalizedToken> getVariants();
 
 }

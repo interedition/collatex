@@ -39,7 +39,7 @@ public class ColumnTest {
   }
 
   @Test
-  public void testContainsWitness() {
+  public void testFirstToken() {
     final IWitness witness = factory.createWitness("A", "a test string");
     final INormalizedToken word = witness.getTokens().get(0);
     final IColumn column = new Column3(word);
@@ -47,10 +47,8 @@ public class ColumnTest {
     Assert.assertFalse(column.containsWitness("B"));
   }
 
-  //TODO: Rename test?`
-  //TODO: This test tests addVariant 
   @Test
-  public void testInverseWordMap() {
+  public void testAddVariant() {
     final IWitness witness = factory.createWitness("A", "first");
     final IWitness witnessB = factory.createWitness("B", "second");
     final IWitness witnessC = factory.createWitness("C", "third");
@@ -65,25 +63,30 @@ public class ColumnTest {
     Assert.assertEquals("first", variants.get(0).getNormalized());
     Assert.assertEquals("second", variants.get(1).getNormalized());
     Assert.assertEquals("third", variants.get(2).getNormalized());
+    Assert.assertTrue(column.containsWitness("A"));
+    Assert.assertTrue(column.containsWitness("B"));
+    Assert.assertTrue(column.containsWitness("C"));
   }
 
-  //
-  //  @Test
-  //  public void testInverseWordMap2() {
-  //    final WitnessBuilder builder = new WitnessBuilder();
-  //    final Witness witness = builder.build("A", "first");
-  //    final Witness witnessB = builder.build("B", "match");
-  //    final Witness witnessC = builder.build("C", "match");
-  //    final Word word = witness.getFirstSegment().getElementOnWordPosition(1);
-  //    final Word wordB = witnessB.getFirstSegment().getElementOnWordPosition(1);
-  //    final Word wordC = witnessC.getFirstSegment().getElementOnWordPosition(1);
-  //    final Column column = new Column(word);
-  //    column.addVariant(wordB);
-  //    column.addMatch(wordC);
-  //    final Superbase superbase = new Superbase();
-  //    column.addToSuperbase(superbase);
-  //    assertEquals("first match", superbase.toString());
-  //  }
+  @Test
+  public void testAddMatch() {
+    final IWitness witness = factory.createWitness("A", "first");
+    final IWitness witnessB = factory.createWitness("B", "match");
+    final IWitness witnessC = factory.createWitness("C", "match");
+    final INormalizedToken word = witness.getTokens().get(0);
+    final INormalizedToken wordB = witnessB.getTokens().get(0);
+    final INormalizedToken wordC = witnessC.getTokens().get(0);
+    final IColumn column = new Column3(word);
+    column.addVariant(wordB);
+    column.addMatch(wordC);
+    final List<INormalizedToken> variants = column.getVariants();
+    Assert.assertEquals(2, variants.size());
+    Assert.assertEquals("first", variants.get(0).getNormalized());
+    Assert.assertEquals("match", variants.get(1).getNormalized());
+    Assert.assertTrue(column.containsWitness("A"));
+    Assert.assertTrue(column.containsWitness("B"));
+    Assert.assertTrue(column.containsWitness("C"));
+  }
 
   @Ignore
   @Test
@@ -102,4 +105,20 @@ public class ColumnTest {
     Assert.assertEquals("first second third", superbase.toString());
   }
 
+  @Ignore
+  @Test
+  public void testSuperbase2() {
+    final IWitness witness = factory.createWitness("A", "first");
+    final IWitness witnessB = factory.createWitness("B", "match");
+    final IWitness witnessC = factory.createWitness("C", "match");
+    final INormalizedToken word = witness.getTokens().get(0);
+    final INormalizedToken wordB = witnessB.getTokens().get(0);
+    final INormalizedToken wordC = witnessC.getTokens().get(0);
+    final IColumn column = new Column3(word);
+    column.addVariant(wordB);
+    column.addMatch(wordC);
+    final ISuperbase superbase = new Superbase4();
+    column.addToSuperbase(superbase);
+    Assert.assertEquals("first match", superbase.toString());
+  }
 }

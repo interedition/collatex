@@ -40,6 +40,22 @@ public class Column3 implements IColumn {
     return sigliToTokens.get(sigil);
   }
 
+  @Override
+  public List<INormalizedToken> getVariants() {
+    return variants;
+  }
+
+  @Override
+  public void addVariant(final INormalizedToken token) {
+    sigliToTokens.put(token.getSigil(), token);
+    variants.add(token);
+  }
+
+  @Override
+  public void addMatch(final INormalizedToken token) {
+    sigliToTokens.put(token.getSigil(), token);
+  }
+
   //TODO: is this method actually used?
   //Using getters would remove knowledge of superbase
   //Using a visitor would be even better!
@@ -47,16 +63,6 @@ public class Column3 implements IColumn {
   public void addToSuperbase(final ISuperbase superbase) {
     for (final INormalizedToken variant : variants)
       superbase.addToken(variant, this);
-  }
-
-  @Override
-  public void addVariant(final INormalizedToken token) {
-    variants.add(token);
-  }
-
-  @Override
-  public List<INormalizedToken> getVariants() {
-    return variants;
   }
 
 }
