@@ -3,8 +3,10 @@ package eu.interedition.collatex2.implementation.input;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.interedition.collatex2.interfaces.IPhrase;
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
@@ -14,6 +16,11 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   public NormalizedWitness(final String sigil, final List<INormalizedToken> tokens) {
     this.sigil = sigil;
     this.tokens = tokens;
+  }
+
+  public NormalizedWitness(final String sigil) {
+    this.sigil = sigil;
+    this.tokens = Lists.newArrayList();
   }
 
   // Note: not pleased with this method! implement Iterable!

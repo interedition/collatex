@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -14,6 +13,7 @@ import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
+//TODO: Rename to AlignmentTableTest!
 //Note: this test are very similar to the alignment table 2 tests!
 //Note: since the superbase algorithm class becomes more like a container, and does not contain any 
 //Note: responsibility the tests should just move to there!
@@ -35,7 +35,6 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
-  @Ignore
   @Test
   public void testEverythingMatches() {
     final IWitness w1 = factory.createWitness("A", "the black cat");

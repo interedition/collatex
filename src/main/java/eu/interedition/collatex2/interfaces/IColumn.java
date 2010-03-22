@@ -14,7 +14,4 @@ public interface IColumn {
 
   void addMatch(INormalizedToken token);
 
-  //TODO: remove this dependency
-  void addToSuperbase(ISuperbase superbase);
-
 }

@@ -3,7 +3,6 @@ package eu.interedition.collatex2.alignmenttable;
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.Factory;
@@ -32,7 +31,6 @@ public class SuperbaseTest {
   //    assertEquals("the first witness", superbase.toString());
   //  }
 
-  @Ignore
   @Test
   public void testSuperbase1() {
     final IWitness witness = factory.createWitness("A", "first");
@@ -45,11 +43,10 @@ public class SuperbaseTest {
     column.addVariant(wordB);
     column.addVariant(wordC);
     final ISuperbase superbase = new Superbase4();
-    column.addToSuperbase(superbase);
-    Assert.assertEquals("first second third", superbase.toString());
+    superbase.addColumn(column);
+    Assert.assertEquals("Superbase: (first, second, third)", superbase.toString());
   }
 
-  @Ignore
   @Test
   public void testSuperbase2() {
     final IWitness witness = factory.createWitness("A", "first");
@@ -62,8 +59,8 @@ public class SuperbaseTest {
     column.addVariant(wordB);
     column.addMatch(wordC);
     final ISuperbase superbase = new Superbase4();
-    column.addToSuperbase(superbase);
-    Assert.assertEquals("first match", superbase.toString());
+    superbase.addColumn(column);
+    Assert.assertEquals("Superbase: (first, match)", superbase.toString());
   }
 
 }

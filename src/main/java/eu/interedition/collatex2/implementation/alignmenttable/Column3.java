@@ -9,7 +9,6 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.ISuperbase;
 
 //TODO: add ColumnState
 public class Column3 implements IColumn {
@@ -54,15 +53,6 @@ public class Column3 implements IColumn {
   @Override
   public void addMatch(final INormalizedToken token) {
     sigliToTokens.put(token.getSigil(), token);
-  }
-
-  //TODO: is this method actually used?
-  //Using getters would remove knowledge of superbase
-  //Using a visitor would be even better!
-  @Override
-  public void addToSuperbase(final ISuperbase superbase) {
-    for (final INormalizedToken variant : variants)
-      superbase.addToken(variant, this);
   }
 
 }
