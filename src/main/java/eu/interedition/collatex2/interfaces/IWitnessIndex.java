@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public interface IWitnessIndex {
 
-  boolean contains(String string);
+  boolean contains(String normalized);
 
   int size();
 
