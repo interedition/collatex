@@ -1,16 +1,25 @@
 package eu.interedition.collatex2.implementation;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
+import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.matching.Match;
@@ -67,12 +76,121 @@ public class Factory {
     return table;
   }
 
+  private static final Predicate<IPhrase> TWO_OR_MORE_WORDS = new Predicate<IPhrase>() {
+    @Override
+    public boolean apply(final IPhrase phrase) {
+      return phrase.size() > 1;
+    }
+  };
+
   public static Map<String, IWitnessIndex> createWitnessIndexMap(final IWitness... witnesses) {
     final Map<String, IWitnessIndex> map = Maps.newHashMap();
+    final Set<String> tokensWithMultiples = getTokensWithMultiples(witnesses);
+
     for (final IWitness witness : witnesses) {
-      map.put(witness.getSigil(), createWitnessIndex(witness));
+      final Multiset<IPhrase> phraseBag = Multisets.newHashMultiset();
+      Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
+      final List<INormalizedToken> tokens = witness.getTokens();
+      for (final INormalizedToken token : tokens) {
+        phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
+      }
+      do {
+        final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
+        for (final String phraseId : phraseMap.keySet()) {
+          final Collection<IPhrase> phrases = phraseMap.get(phraseId);
+          if (tokensWithMultiples.contains(phraseId)) {
+            addExpandedPhrases(newPhraseMap, phrases, tokens, tokensWithMultiples/*, phraseMap*/);
+          } else {
+            final IPhrase phrase = phrases.iterator().next();
+            if (phrase.size() == 1) {
+              newPhraseMap.put(phraseId, phrase);
+            }
+          }
+        }
+        phraseMap = newPhraseMap;
+      } while (phraseMap.entries().size() > phraseMap.keySet().size());
+      phraseBag.addAll(phraseMap.values());
+      map.put(witness.getSigil(), new WitnessIndex(phraseBag));
     }
+
     return map;
+  }
+
+  private static void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens, final Set<String> tokensWithMultiples) {
+    for (final IPhrase phrase : phrases) {
+      final int beforePosition = phrase.getBeginPosition() - 1;
+      final int afterPosition = phrase.getEndPosition();
+
+      final INormalizedToken beforeToken = (beforePosition > 0) ? tokens.get(beforePosition - 1) : new NullToken(phrase.getBeginPosition(), phrase.getSigil());
+      final INormalizedToken afterToken = (afterPosition < tokens.size()) ? tokens.get(afterPosition) : new NullToken(phrase.getEndPosition(), phrase.getSigil());
+
+      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
+      leftExpandedTokenList.addAll(phrase.getTokens());
+      final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
+
+      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phrase.getTokens());
+      rightExpandedTokenList.add(afterToken);
+      final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
+
+      final String leftPhraseId = leftExpandedPhrase.getNormalized();
+      newPhraseMap.put(leftPhraseId, leftExpandedPhrase);
+
+      final String rightPhraseId = rightExpandedPhrase.getNormalized();
+      newPhraseMap.put(rightPhraseId, rightExpandedPhrase);
+    }
+  }
+
+  //  public static Map<String, IWitnessIndex> createWitnessIndexMap(final IWitness... witnesses) {
+  //    final Map<String, IWitnessIndex> map = Maps.newHashMap();
+  //    final List<String> uniquePhrases = Lists.newArrayList();
+  //    for (final IWitness witness : witnesses) {
+  //      final IWitnessIndex index = createWitnessIndex(witness);
+  //      map.put(witness.getSigil(), index);
+  //      uniquePhrases.addAll(Lists.newArrayList(transform(filter(index.getPhrases(), TWO_OR_MORE_WORDS), WitnessIndex.PHRASE_TO_NORMALIZED)));
+  //    }
+  //    final Set<Entry<String, IWitnessIndex>> entrySet = map.entrySet();
+  //    for (final Entry<String, IWitnessIndex> entry : entrySet) {
+  //      final String sigil = entry.getKey();
+  //      final IWitnessIndex index = entry.getValue();
+  //      index.use(uniquePhrases);
+  //    }
+  //    return map;
+  //  }
+
+  protected static Set<String> getTokensWithMultiples(final IWitness... witnesses) {
+    final Set<String> stringSet = Sets.newHashSet();
+    for (final IWitness witness : witnesses) {
+      final Multiset<String> tokenSet = Multisets.newHashMultiset();
+      final List<INormalizedToken> tokens = witness.getTokens();
+      for (final INormalizedToken token : tokens) {
+        tokenSet.add(token.getNormalized());
+      }
+      final Set<String> elementSet = tokenSet.elementSet();
+      for (final String tokenString : elementSet) {
+        if (tokenSet.count(tokenString) > 1) {
+          stringSet.add(tokenString);
+        }
+      }
+    }
+    return stringSet;
+  }
+
+  protected static Set<String> getPhrasesWithMultiples(final IWitness... witnesses) {
+    final Set<String> stringSet = Sets.newHashSet();
+    for (final IWitness witness : witnesses) {
+      final Multiset<String> tokenSet = Multisets.newHashMultiset();
+      final List<INormalizedToken> tokens = witness.getTokens();
+      for (final INormalizedToken token : tokens) {
+        tokenSet.add(token.getNormalized());
+      }
+      final Set<String> elementSet = tokenSet.elementSet();
+      for (final String tokenString : elementSet) {
+        if (tokenSet.count(tokenString) > 1) {
+          stringSet.add(tokenString);
+        }
+      }
+    }
+    return stringSet;
   }
 
 }

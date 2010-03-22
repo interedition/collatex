@@ -52,8 +52,11 @@ public class WitnessIndex implements IWitnessIndex {
       //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
       //      Log.info("");
     } while (phraseMap.entries().size() > phraseMap.keySet().size());
-
     phraseBag.addAll(phraseMap.values());
+  }
+
+  public WitnessIndex(final Multiset<IPhrase> _phraseBag) {
+    this.phraseBag = _phraseBag;
   }
 
   private void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens) {
@@ -80,7 +83,7 @@ public class WitnessIndex implements IWitnessIndex {
     }
   }
 
-  private static final Function<IPhrase, String> PHRASE_TO_NORMALIZED = new Function<IPhrase, String>() {
+  public static final Function<IPhrase, String> PHRASE_TO_NORMALIZED = new Function<IPhrase, String>() {
     @Override
     public String apply(final IPhrase phrase) {
       return phrase.getNormalized();
@@ -103,4 +106,30 @@ public class WitnessIndex implements IWitnessIndex {
   public Collection<IPhrase> getPhrases() {
     return phraseBag;
   }
+
+  //  @Override
+  //  public void use(final List<String> uniquePhrases) {
+  //    Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
+  //    for (final IPhrase phrase : getPhrases()) {
+  //      phraseMap.put(phrase.getNormalized(), phrase);
+  //    }
+  //    do {
+  //      final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
+  //      for (final String phraseId : phraseMap.keySet()) {
+  //        final Collection<IPhrase> phrases = phraseMap.get(phraseId);
+  //        if (phrases.size() > 1) {
+  //          addExpandedPhrases(newPhraseMap, phrases, tokens/*, phraseMap*/);
+  //        } else {
+  //          final IPhrase phrase = phrases.iterator().next();
+  //          if (phrase.size() == 1) {
+  //            newPhraseMap.put(phraseId, phrase);
+  //          }
+  //        }
+  //      }
+  //      phraseMap = newPhraseMap;
+  //    } while (phraseMap.entries().size() > phraseMap.keySet().size());
+  //
+  //    phraseBag.addAll(phraseMap.values());
+  //
+  //  }
 }

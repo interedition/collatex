@@ -1,0 +1,40 @@
+<html>
+	<body>
+		<div id="alignment-table">
+			<h4>Alignment Table:</h4>
+			<table border="1" class="alignment">
+				<tr>
+					<th>Witness 06-1:</th>
+					<td>The same</td>
+					<td>clock</td>
+					<td>as when</td>
+					<td>for example</td>
+					<td>Magee</td>
+					<td>once</td>
+					<td>died.</td>
+				</tr>
+				<tr>
+					<th>Witness 06-2:</th>
+					<td>The same</td>
+					<td></td>
+					<td>as when</td>
+					<td>for example</td>
+					<td>Magee</td>
+					<td>once</td>
+					<td>died.</td>
+				</tr>
+				<tr>
+					<th>Witness 08-1:</th>
+					<td>The same</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+
+	</body>
+</html>

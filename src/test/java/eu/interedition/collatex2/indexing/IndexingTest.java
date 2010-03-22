@@ -7,6 +7,7 @@ import static junit.framework.Assert.assertTrue;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mortbay.log.Log;
 
@@ -54,6 +55,37 @@ public class IndexingTest {
   }
 
   @Test
+  public void test1a() {
+    final IWitness a = factory.createWitness("A", "tobe or not tobe");
+    final IWitnessIndex index = Factory.createWitnessIndexMap(a).get("A");
+    assertEquals(6, index.size());
+    assertContains(index, "# tobe");
+    assertContains(index, "tobe or");
+    assertContains(index, "or");
+    assertDoesNotContain(index, "or not");
+    assertContains(index, "not");
+    assertDoesNotContain(index, "or tobe");
+    assertContains(index, "not tobe");
+    assertContains(index, "tobe #");
+  }
+
+  @Ignore
+  @Test
+  public void test2a() {
+    final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
+    final IWitnessIndex index = Factory.createWitnessIndexMap(a).get("A");
+    assertContains(index, "# the big black");
+    assertContains(index, "the big black cat");
+    assertContains(index, "cat");
+    assertContains(index, "and");
+    assertContains(index, "and the big black");
+    assertContains(index, "the big black rat");
+    assertContains(index, "rat");
+    assertEquals(7, index.size());
+  }
+
+  @Ignore
+  @Test
   public void testTwoWitnesses() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness b = factory.createWitness("B", "and the big black cat ate the big rat");
@@ -63,7 +95,7 @@ public class IndexingTest {
     final IWitnessIndex indexA = indexMap.get(a.getSigil());
     final IWitnessIndex indexB = indexMap.get(b.getSigil());
     assertContains(indexA, "# the big black");
-    assertContains(indexA, "# the big black");
+    assertContains(indexB, "# the big black");
     assertContains(indexA, "the big black cat");
     assertContains(indexB, "the big black cat");
     assertContains(indexA, "cat");
