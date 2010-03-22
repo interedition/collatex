@@ -1,17 +1,16 @@
 package eu.interedition.collatex2.implementation.matching;
 
-import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Match implements IMatch {
 
-  private final Phrase a;
-  private final Phrase b;
+  private final IPhrase a;
+  private final IPhrase b;
 
-  public Match(final Phrase a, final Phrase b) {
-    this.a = a;
-    this.b = b;
+  public Match(final IPhrase basePhrase, final IPhrase witnessPhrase) {
+    this.a = basePhrase;
+    this.b = witnessPhrase;
   }
 
   @Override

@@ -8,14 +8,16 @@ import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.matching.worddistance.WordDistance;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class RealMatcher {
 
   // NOTE; this code works directly on IWitness
-	// There should be an indexing phase and then this should
-	// work on indexes!
-	public static Set<IMatch> findMatches(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
+  // There should be an indexing phase and then this should
+  // work on indexes!
+  public static Set<IMatch> findMatches(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
     final Set<IMatch> matchSet = Sets.newLinkedHashSet();
     for (final INormalizedToken baseWord : base.getTokens()) {
       for (final INormalizedToken witnessWord : witness.getTokens()) {
@@ -27,6 +29,24 @@ public class RealMatcher {
         }
       }
     }
+    return matchSet;
+  }
+
+  public static Set<IMatch> findMatchesWithIndex(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
+    final Set<IMatch> matchSet = Sets.newLinkedHashSet();
+    final IWitnessIndex baseIndex = Factory.createWitnessIndex(base);
+    final IWitnessIndex witnessIndex = Factory.createWitnessIndex(witness);
+    for (final IPhrase basePhrase : baseIndex.getPhrases()) {
+      for (final IPhrase witnessPhrase : witnessIndex.getPhrases()) {
+        if (basePhrase.getNormalized().equals(witnessPhrase.getNormalized())) {
+          matchSet.add(new Match(basePhrase, witnessPhrase));
+        } else {
+          final float editDistance = distanceMeasure.distance(basePhrase.getNormalized(), witnessPhrase.getNormalized());
+          if (editDistance < 0.5) matchSet.add(Factory.createMatch(basePhrase, witnessPhrase, editDistance));
+        }
+      }
+    }
+    // en nu opschonen
     return matchSet;
   }
 }

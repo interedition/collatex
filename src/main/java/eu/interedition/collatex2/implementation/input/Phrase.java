@@ -31,13 +31,13 @@ public class Phrase implements IPhrase {
   //  }
 
   public String getNormalized() {
-    String replacementString = "";
+    final StringBuilder normalized = new StringBuilder();
     String divider = "";
     for (final INormalizedToken token : tokens) {
-      replacementString += divider + token.getNormalized();
+      normalized.append(divider).append(token.getNormalized());
       divider = " ";
     }
-    return replacementString;
+    return normalized.toString();
 
   }
 
@@ -90,4 +90,26 @@ public class Phrase implements IPhrase {
     return getFirstToken().getSigil();
   }
 
+  @Override
+  public List<INormalizedToken> getTokens() {
+    return tokens;
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (!(obj instanceof Phrase)) {
+      return false;
+    }
+    return tokens.equals(((Phrase) obj).getTokens());
+  }
+
+  @Override
+  public int size() {
+    return tokens.size();
+  }
 }
