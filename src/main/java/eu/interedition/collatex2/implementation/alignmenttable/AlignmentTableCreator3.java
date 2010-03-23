@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.implementation.alignmenttable;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -46,6 +45,13 @@ public class AlignmentTableCreator3 {
     addReplacementsToAlignmentTable(superbase, alignment);
   }
 
+  static void addMatchesToAlignmentTable(final ISuperbase superbase, final IAlignment alignment) {
+    final List<IMatch> matches = alignment.getMatches();
+    for (final IMatch match : matches) {
+      addMatchToAlignmentTable(superbase, match);
+    }
+  }
+
   private static void addReplacementsToAlignmentTable(final ISuperbase superbase, final IAlignment alignment) {
     final List<IReplacement> replacements = alignment.getReplacements();
     for (final IReplacement replacement : replacements) {
@@ -53,15 +59,29 @@ public class AlignmentTableCreator3 {
     }
   }
 
+  private static void addMatchToAlignmentTable(final ISuperbase superbase, final IMatch match) {
+    final List<IColumn> columns = determineColumns(match.getPhraseA(), superbase);
+    placeMatchPhraseInColumns(match.getPhraseB(), columns);
+  }
+
   //NOTE: for now we assume that phraseA and PhraseB have the same length!
   private static void addReplacement(final IReplacement replacement, final ISuperbase superbase) {
     final List<IColumn> columns = determineColumns(replacement.getOriginalWords(), superbase);
-    placePhraseInColumns(replacement.getReplacementWords(), columns);
+    placeVariantPhraseInColumns(replacement.getReplacementWords(), columns);
+  }
+
+  private static List<IColumn> determineColumns(final IPhrase phraseA, final ISuperbase superbase) {
+    final List<IColumn> columns = Lists.newArrayList();
+    for (final INormalizedToken tokenA : phraseA.getTokens()) {
+      final IColumn column = superbase.getColumnFor(tokenA);
+      columns.add(column);
+    }
+    return columns;
   }
 
   //NOTE: for now we assume that phraseA is longer than phraseB!
   //NOTE: this method is only for variants!
-  private static void placePhraseInColumns(final IPhrase phraseB, final List<IColumn> columns) {
+  private static void placeVariantPhraseInColumns(final IPhrase phraseB, final List<IColumn> columns) {
     if (phraseB.size() > columns.size()) {
       // System.out.println(columns.size());
       // System.out.println(phraseB.size());
@@ -75,34 +95,20 @@ public class AlignmentTableCreator3 {
     }
   }
 
-  private static List<IColumn> determineColumns(final IPhrase phraseA, final ISuperbase superbase) {
-    System.out.println(phraseA);
-    final List<IColumn> columns = Lists.newArrayList();
-    for (final INormalizedToken tokenA : phraseA.getTokens()) {
-      final IColumn column = superbase.getColumnFor(tokenA);
-      columns.add(column);
+  //NOTE: for now we assume that phraseA is longer than phraseB!
+  //NOTE: this method is only for matches!
+  private static void placeMatchPhraseInColumns(final IPhrase phraseB, final List<IColumn> columns) {
+    if (phraseB.size() > columns.size()) {
+      // System.out.println(columns.size());
+      // System.out.println(phraseB.size());
+      throw new RuntimeException("The phrase to be placed in the table is longer than columns!");
     }
-    return columns;
-  }
-
-  static void addMatchesToAlignmentTable(final ISuperbase superbase, final IAlignment alignment) {
-    final List<IMatch> matches = alignment.getMatches();
-    //    System.out.println(superbase.toString());
-    //    System.out.println("!!!Matches!!!" + matches);
-
-    // TODO: first extract a List of Columns!
-    // TODO: Use the determine columns method!
-    // TODO: extract handle match method!
-    for (final IMatch match : matches) {
-      final IPhrase phraseA = match.getPhraseA();
-      final IPhrase phraseB = match.getPhraseB();
-      final Iterator<INormalizedToken> iterator = phraseB.getTokens().iterator();
-      for (final INormalizedToken tokenA : phraseA.getTokens()) {
-        final INormalizedToken tokenB = iterator.next();
-        //the next lines are the essence!
-        final IColumn column = superbase.getColumnFor(tokenA);
-        column.addMatch(tokenB);
-      }
+    final List<INormalizedToken> tokens = phraseB.getTokens();
+    for (int i = 0; i < phraseB.size(); i++) {
+      final IColumn column = columns.get(i);
+      final INormalizedToken token = tokens.get(i);
+      column.addMatch(token);
     }
   }
+
 }
