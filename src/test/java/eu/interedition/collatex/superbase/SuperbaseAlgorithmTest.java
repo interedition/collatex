@@ -23,19 +23,6 @@ public class SuperbaseAlgorithmTest {
   }
 
   @Test
-  public void testOmission() {
-    final Witness w1 = builder.build("A", "the black cat");
-    final Witness w2 = builder.build("B", "the cat");
-    final Witness w3 = builder.build("C", "the black cat");
-    final WitnessSet set = new WitnessSet(w1, w2, w3);
-    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "A: the|black|cat\n";
-    expected += "B: the| |cat\n";
-    expected += "C: the|black|cat\n";
-    assertEquals(expected, table.toString());
-  }
-
-  @Test
   public void testAddition() {
     final Witness w1 = builder.build("A", "the cat");
     final Witness w2 = builder.build("B", "before the cat");

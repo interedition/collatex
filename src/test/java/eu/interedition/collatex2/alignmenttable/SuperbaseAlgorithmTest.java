@@ -66,6 +66,19 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
+  @Test
+  public void testOmission() {
+    final IWitness w1 = factory.createWitness("A", "the black cat");
+    final IWitness w2 = factory.createWitness("B", "the cat");
+    final IWitness w3 = factory.createWitness("C", "the black cat");
+    final List<IWitness> set = Lists.newArrayList(w1, w2, w3);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A: the|black|cat\n";
+    expected += "B: the| |cat\n";
+    expected += "C: the|black|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
   //  private static WitnessBuilder builder;
   //
   //  @BeforeClass
@@ -73,18 +86,6 @@ public class SuperbaseAlgorithmTest {
   //    builder = new WitnessBuilder();
   //  }
   //
-  //  @Test
-  //  public void testOmission() {
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the cat");
-  //    Witness w3 = builder.build("C", "the black cat");
-  //    WitnessSet magic = new WitnessSet(w1, w2, w3);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A: the|black|cat\n";
-  //    expected += "B: the| |cat\n";
-  //    expected += "C: the|black|cat\n";
-  //    assertEquals(expected, table.toString());
-  //  }
   //
   //  @Test
   //  public void testAddition() {
