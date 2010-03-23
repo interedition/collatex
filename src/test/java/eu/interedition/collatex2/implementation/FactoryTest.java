@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -30,13 +31,14 @@ public class FactoryTest {
     }
   }
 
-  //@Test
+  @Ignore
+  @Test
   public void testGetPhrasesWithMultiples() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness b = factory.createWitness("B", "the big black rat and the small white rat");
     final Set<String> tokensWithMultiples = Factory.getPhrasesWithMultiples(a, b);
     final String[] expectedPhrases = { "the big black", "rat" };
-    assertEquals(expectedPhrases.length, tokensWithMultiples.size());
+    assertEquals(tokensWithMultiples.toString(), expectedPhrases.length, tokensWithMultiples.size());
     for (final String expected : expectedPhrases) {
       assertContains(tokensWithMultiples, expected);
     }
@@ -44,7 +46,6 @@ public class FactoryTest {
 
   private void assertContains(final Set<String> stringSet, final String string) {
     assertTrue(string + " not found in " + stringSet, stringSet.contains(string));
-
   }
 
 }
