@@ -30,7 +30,7 @@ public class SuperbaseTest {
   public void testCreateSuperBase() {
     final IWitness a = factory.createWitness("A", "the first witness");
     final List<IWitness> set = Lists.newArrayList(a);
-    final IAlignmentTable alignmentTable = factory.createNewAlignmentTable(set);
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
     final ISuperbase superbase = Superbase4.create(alignmentTable);
     assertEquals("Superbase: (the, first, witness)", superbase.toString());
   }
@@ -41,7 +41,7 @@ public class SuperbaseTest {
     final IWitness b = factory.createWitness("B", "the second witness");
     //final WitnessSet set = new WitnessSet(a, b);
     final List<IWitness> set = Lists.newArrayList(a, b);
-    final IAlignmentTable table = factory.createNewAlignmentTable(set);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
     final ISuperbase superbase = Superbase4.create(table);
     assertEquals("Superbase: (the, first, second, witness)", superbase.toString());
   }
