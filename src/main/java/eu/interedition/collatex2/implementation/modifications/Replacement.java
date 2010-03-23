@@ -1,9 +1,9 @@
 package eu.interedition.collatex2.implementation.modifications;
 
-import eu.interedition.collatex2.interfaces.IModification;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IReplacement;
 
-public class Replacement implements IModification {
+public class Replacement implements IReplacement {
   private final IPhrase _original;
   private final IPhrase _replacement;
 

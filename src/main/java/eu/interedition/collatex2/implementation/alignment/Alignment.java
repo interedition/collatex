@@ -16,6 +16,7 @@ import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.ITransposition;
 
 public class Alignment implements IAlignment {
@@ -68,6 +69,16 @@ public class Alignment implements IAlignment {
       return gap.isAddition();
     }
   };
+
+  private static final Predicate<IGap> REPLACEMENT_PREDICATE = new Predicate<IGap>() {
+    @Override
+    public boolean apply(final IGap gap) {
+      return gap.isReplacement();
+    }
+  };
+
+  //TODO: remove gap.getModification!
+  //Modification should know about Gap, not the other way around!
   private static final Function<IGap, IAddition> GAP_TO_ADDITION = new Function<IGap, IAddition>() {
     @Override
     public IAddition apply(final IGap gap) {
@@ -75,14 +86,29 @@ public class Alignment implements IAlignment {
     }
   };
 
+  //TODO: remove gap.getModification!
+  //Modification should know about Gap, not the other way around!
+  private static final Function<IGap, IReplacement> GAP_TO_REPLACEMENT = new Function<IGap, IReplacement>() {
+    @Override
+    public IReplacement apply(final IGap gap) {
+      return (IReplacement) gap.getModification();
+    }
+  };
+
   @Override
   public List<IAddition> getAdditions() {
     return Lists.newArrayList(transform(filter(getGaps(), ADDITION_PREDICATE), GAP_TO_ADDITION));
   }
-  //		  public static Alignment create(final IWitness a, final IWitness b) {
-  //		    final WitnessSet set = new WitnessSet(a, b);
-  //		    return set.align();
-  //		  }
+
+  @Override
+  public List<IReplacement> getReplacements() {
+    return Lists.newArrayList(transform(filter(getGaps(), REPLACEMENT_PREDICATE), GAP_TO_REPLACEMENT));
+  }
+
+  //      public static Alignment create(final IWitness a, final IWitness b) {
+  //        final WitnessSet set = new WitnessSet(a, b);
+  //        return set.align();
+  //      }
 
   //	  public void accept(final ModificationVisitor modificationVisitor) {
   //		    for (final Gap gap : gaps) {

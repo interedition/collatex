@@ -1,8 +1,8 @@
 package eu.interedition.collatex2.alignmenttable;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.Assert;
+import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,7 +32,18 @@ public class SuperbaseTest {
     final List<IWitness> set = Lists.newArrayList(a);
     final IAlignmentTable alignmentTable = factory.createNewAlignmentTable(set);
     final ISuperbase superbase = Superbase4.create(alignmentTable);
-    Assert.assertEquals("Superbase: (the, first, witness)", superbase.toString());
+    assertEquals("Superbase: (the, first, witness)", superbase.toString());
+  }
+
+  @Test
+  public void testCreateSuperBaseWithVariation() {
+    final IWitness a = factory.createWitness("A", "the first witness");
+    final IWitness b = factory.createWitness("B", "the second witness");
+    //final WitnessSet set = new WitnessSet(a, b);
+    final List<IWitness> set = Lists.newArrayList(a, b);
+    final IAlignmentTable table = factory.createNewAlignmentTable(set);
+    final ISuperbase superbase = Superbase4.create(table);
+    assertEquals("Superbase: (the, first, second, witness)", superbase.toString());
   }
 
   @Test
@@ -48,7 +59,7 @@ public class SuperbaseTest {
     column.addVariant(wordC);
     final ISuperbase superbase = new Superbase4();
     superbase.addColumn(column);
-    Assert.assertEquals("Superbase: (first, second, third)", superbase.toString());
+    assertEquals("Superbase: (first, second, third)", superbase.toString());
   }
 
   @Test
@@ -64,7 +75,7 @@ public class SuperbaseTest {
     column.addMatch(wordC);
     final ISuperbase superbase = new Superbase4();
     superbase.addColumn(column);
-    Assert.assertEquals("Superbase: (first, match)", superbase.toString());
+    assertEquals("Superbase: (first, match)", superbase.toString());
   }
 
 }
