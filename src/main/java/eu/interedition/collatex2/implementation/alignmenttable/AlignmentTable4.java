@@ -52,4 +52,25 @@ public class AlignmentTable4 implements IAlignmentTable {
     return column.getToken(sigil).getNormalized().toString();
   }
 
+  public static String alignmentTableToHTML(final IAlignmentTable alignmentTable) {
+    final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
+
+    for (final String witnessId : alignmentTable.getSigli()) {
+      tableHTML.append("<tr>");
+      tableHTML.append("<th>Witness ").append(witnessId).append(":</th>");
+      for (final IColumn column : alignmentTable.getColumns()) {
+        tableHTML.append("<td>");
+        if (column.containsWitness(witnessId)) {
+          // TODO: this was normalized!
+          tableHTML.append(column.getToken(witnessId).getContent()); // TODO: add escaping!
+        }
+        tableHTML.append("</td>");
+      }
+      tableHTML.append("</tr>\n");
+    }
+    tableHTML.append("</table>\n</div>\n\n");
+    //    return alignmentTable.toString().replaceAll("\n", "<br/>") + "<br/>";
+    return tableHTML.toString();
+  }
+
 }

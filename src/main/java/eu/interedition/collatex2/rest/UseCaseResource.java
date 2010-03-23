@@ -42,9 +42,9 @@ public class UseCaseResource extends ServerResource {
     final List<String[]> useCases = useCases();
     final String[] firstUseCase = useCases.get(i);
     String html = "";
-    for (int i = 0; i < firstUseCase.length; i++) {
-      for (int j = i + 1; j < firstUseCase.length; j++) {
-        final String plainWitnessA = firstUseCase[i];
+    for (int i1 = 0; i1 < firstUseCase.length; i1++) {
+      for (int j = i1 + 1; j < firstUseCase.length; j++) {
+        final String plainWitnessA = firstUseCase[i1];
         final String plainWitnessB = firstUseCase[j];
         html = displayAWitnessPair(html, plainWitnessA, plainWitnessB);
       }

@@ -20,16 +20,16 @@ import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
-import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
-import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessSet;
-import eu.interedition.collatex.input.builders.WitnessBuilder;
+import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
+import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DarwinResource extends ServerResource {
   private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
   private String readFileToString;
-  private final WitnessSet set;
+  private final List<IWitness> witnesses = Lists.newArrayList();
 
   @SuppressWarnings("unchecked")
   public DarwinResource() {
@@ -41,8 +41,7 @@ public class DarwinResource extends ServerResource {
       e.printStackTrace();
     }
 
-    List<Witness> witnesses = Lists.newArrayList();
-    final WitnessBuilder builder = new WitnessBuilder();
+    final Factory factory = new Factory();
     try {
       final List<String> sortedKeys = Lists.newArrayList();
       final JSONObject jsonObject = new JSONObject(readFileToString);
@@ -56,85 +55,29 @@ public class DarwinResource extends ServerResource {
 
       for (final String key : sortedKeys) {
         final String text = jsonObject.getString(key);
-        final Witness witness = builder.build(key, text);
+        final IWitness witness = factory.createWitness(key, text);
         witnesses.add(witness);
       }
     } catch (final JSONException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-
-    // limit the number of witnesses by cutting something of the list (just a temp measure!)
-
-    witnesses = witnesses.subList(0, 2);
-
-    set = new WitnessSet(witnesses);
   }
 
   @Override
   public Representation get(final Variant variant) throws ResourceException {
-    //    Representation representation = new StringRepresentation(readFileToString);
-    final AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
-    // HTML
-    final String html = "<html><body> " + witnessesAsString(set) + AlignmentTable2.alignmentTableToHTML(alignmentTable) + "</body></html>";
+    final IAlignmentTable alignmentTable = AlignmentTableCreator3.createAlignmentTable(witnesses);
+    final String html = "<html><body> " + witnessesAsString(witnesses) + AlignmentTable4.alignmentTableToHTML(alignmentTable) + "</body></html>";
     final Representation representation = new StringRepresentation(html, MediaType.TEXT_HTML);
-    // TEI
-    //    String xml = alignmentTable.toXML();
-    //    //    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
-    //    //    alignmentTable.accept(visitor);
-    //    //    JSONObject jsonObject = visitor.getJSONObject();
-    //    //    Representation representation = new JsonLibRepresentation(jsonObject);
-    //    Representation representation = new StringRepresentation(xml, MediaType.APPLICATION_XML);
-    // Representation representation = null;
-
-    // JSON
-    //    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
-    //    alignmentTable.accept(visitor);
-    //    net.sf.json.JSONObject jsonObject = visitor.getJSONObject();
-    //    Representation representation = new JsonLibRepresentation(jsonObject);
     return representation;
   }
 
-  //    try {
-  //      JSONArray witnessArray = jsonRepresentation.getJsonArray();
-  //      for (int w = 0; w < witnessArray.length(); w++) {
-  //        JSONObject jsonObject = witnessArray.getJSONObject(w);
-  //        Witness createWitness = createWitness(jsonObject);
-  //        witnesses.add(createWitness);
-  //      }
-  //      WitnessSet set = new WitnessSet(witnesses);
-  //      return set;
-  //      //    } catch (IOException e) {
-  //      //      e.printStackTrace();
-  //      //      throw new RuntimeException(e);
-  //    } catch (JSONException e) {
-  //      e.printStackTrace();
-  //      throw new RuntimeException(e);
-  //    }
-
-  private String witnessesAsString(final WitnessSet set2) {
+  private String witnessesAsString(final List<IWitness> witnessList) {
     final StringBuilder builder = new StringBuilder();
-    for (final Witness w : set2.getWitnesses()) {
+    for (final IWitness w : witnessList) {
       builder.append(w.toString() + "<br/>");
     }
-    // TODO Auto-generated method stub
     return builder.toString();
   }
-
-  //    public Witness createWitness(JSONObject object) throws JSONException {
-  //      String id = object.getString("id");
-  //      JSONArray jsonArray = object.getJSONArray("tokens");
-  //      List<Word> words = Lists.newArrayList();
-  //      int position = 1;
-  //      for (int i = 0; i < jsonArray.length(); i++) {
-  //        JSONObject jsonObject = jsonArray.getJSONObject(i);
-  //        String token = jsonObject.getString("token");
-  //        Word word = new Word(id, token, position);
-  //        position++;
-  //        words.add(word);
-  //      }
-  //      Witness witness = new Witness(id, words);
-  //      return witness;
-  //    }
 
 }

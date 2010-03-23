@@ -11,6 +11,7 @@ public class RestApplication extends Application {
     final Router router = new Router(getContext());
     router.attach("/usecases", UseCaseResource.class);
     router.attach("/usecases/{i}", UseCaseResource.class);
+    router.attach("/darwin", DarwinResource.class);
     return router;
   }
 
