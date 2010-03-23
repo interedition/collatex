@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -16,15 +17,15 @@ import eu.interedition.collatex2.interfaces.ISuperbase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableCreator3 {
-  public static IAlignmentTable createAlignmentTable(final List<IWitness> set) {
+  public static IAlignmentTable createAlignmentTable(final List<IWitness> set, final ICallback callback) {
     final IAlignmentTable table = new AlignmentTable4();
     for (final IWitness witness : set) {
-      AlignmentTableCreator3.addWitness(table, witness);
+      AlignmentTableCreator3.addWitness(table, witness, callback);
     }
     return table;
   }
 
-  private static void addWitness(final IAlignmentTable table, final IWitness witness) {
+  private static void addWitness(final IAlignmentTable table, final IWitness witness, final ICallback callback) {
     if (table.getSigli().isEmpty()) {
       for (final INormalizedToken token : witness.getTokens()) {
         table.add(new Column3(token));
@@ -37,10 +38,10 @@ public class AlignmentTableCreator3 {
     table.getSigli().add(witness.getSigil());
 
     // make the superbase from the alignment table
-    // TODO: figure out first the columns affected?
     final ISuperbase superbase = Superbase4.create(table);
     final Factory factory = new Factory();
     final IAlignment alignment = factory.createAlignment(superbase, witness);
+    callback.alignment(alignment);
     addMatchesToAlignmentTable(superbase, alignment);
     addReplacementsToAlignmentTable(superbase, alignment);
   }

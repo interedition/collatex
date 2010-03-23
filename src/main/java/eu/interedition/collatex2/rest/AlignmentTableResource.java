@@ -31,7 +31,7 @@ public class AlignmentTableResource extends ServerResource {
     final IWitness w2 = factory.createWitness("B", "the white cat");
     final IWitness w3 = factory.createWitness("C", "the red cat");
     final List<IWitness> set = Lists.newArrayList(w1, w2, w3);
-    final IAlignmentTable alignmentTable = factory.createNewAlignmentTable(set);
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
 
     return new StringRepresentation("We are done");
   }

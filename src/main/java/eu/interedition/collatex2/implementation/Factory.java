@@ -18,6 +18,7 @@ import eu.interedition.collatex2.implementation.matching.worddistance.WordDistan
 import eu.interedition.collatex2.implementation.tokenization.NormalizedWitnessBuilder;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -59,10 +60,17 @@ public class Factory {
     return witnessIndex;
   }
 
-  public IAlignmentTable createNewAlignmentTable(final List<IWitness> set) {
-    IAlignmentTable table;
-    table = AlignmentTableCreator3.createAlignmentTable(set);
-    return table;
+  private static ICallback NULLCALLBACK = new ICallback() {
+    @Override
+    public void alignment(final IAlignment alignment) {}
+  };
+
+  public IAlignmentTable createAlignmentTable(final List<IWitness> set) {
+    return createAlignmentTable(set, NULLCALLBACK);
+  }
+
+  public IAlignmentTable createAlignmentTable(final List<IWitness> set, final ICallback callback) {
+    return AlignmentTableCreator3.createAlignmentTable(set, callback);
   }
 
 }

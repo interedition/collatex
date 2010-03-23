@@ -30,7 +30,7 @@ public class SuperbaseAlgorithmTest {
     final IWitness w1 = factory.createWitness("A", "the black cat");
     //final WitnessSet set = new WitnessSet(w1);
     final List<IWitness> set = Lists.newArrayList(w1);
-    final IAlignmentTable table = factory.createNewAlignmentTable(set);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
     final String expected = "A: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
@@ -42,7 +42,7 @@ public class SuperbaseAlgorithmTest {
     final IWitness w3 = factory.createWitness("C", "the black cat");
     //final WitnessSet set = new WitnessSet(w1, w2, w3);
     final List<IWitness> set = Lists.newArrayList(w1, w2, w3);
-    final IAlignmentTable table = factory.createNewAlignmentTable(set);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
     expected += "B: the|black|cat\n";
     expected += "C: the|black|cat\n";
@@ -57,7 +57,7 @@ public class SuperbaseAlgorithmTest {
     final IWitness w4 = factory.createWitness("D", "the red cat");
     final IWitness w5 = factory.createWitness("E", "the yellow cat");
     final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4, w5);
-    final IAlignmentTable table = factory.createNewAlignmentTable(set);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
     String expected = "A: the|black|cat\n";
     expected += "B: the|white|cat\n";
     expected += "C: the|green|cat\n";
