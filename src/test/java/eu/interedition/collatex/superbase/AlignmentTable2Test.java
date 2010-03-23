@@ -6,33 +6,11 @@ import org.junit.Test;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
-import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class AlignmentTable2Test {
-  @Test
-  public void testCreateSuperBase() {
-    final WitnessBuilder builder = new WitnessBuilder();
-    final Witness a = builder.build("A", "the first witness");
-    final WitnessSet set = new WitnessSet(a);
-    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    final Segment superbase = table.createSuperbase();
-    assertEquals("the first witness", superbase.toString());
-  }
-
-  @Test
-  public void testCreateSuperBaseWithVariation() {
-    final WitnessBuilder builder = new WitnessBuilder();
-    final Witness a = builder.build("A", "the first witness");
-    final Witness b = builder.build("B", "the second witness");
-    final WitnessSet set = new WitnessSet(a, b);
-    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    final Segment superbase = table.createSuperbase();
-    assertEquals("the first second witness", superbase.toString());
-  }
-
   @Test
   public void testStringOutputOneWitness() {
     final WitnessBuilder builder = new WitnessBuilder();

@@ -14,4 +14,6 @@ public interface IAlignment {
 
   List<IAddition> getAdditions();
 
+  List<IReplacement> getReplacements();
+
 }

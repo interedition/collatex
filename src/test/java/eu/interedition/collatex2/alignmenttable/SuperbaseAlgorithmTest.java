@@ -49,6 +49,23 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
+  @Test
+  public void testVariant() {
+    final IWitness w1 = factory.createWitness("A", "the black cat");
+    final IWitness w2 = factory.createWitness("B", "the white cat");
+    final IWitness w3 = factory.createWitness("C", "the green cat");
+    final IWitness w4 = factory.createWitness("D", "the red cat");
+    final IWitness w5 = factory.createWitness("E", "the yellow cat");
+    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4, w5);
+    final IAlignmentTable table = factory.createNewAlignmentTable(set);
+    String expected = "A: the|black|cat\n";
+    expected += "B: the|white|cat\n";
+    expected += "C: the|green|cat\n";
+    expected += "D: the|red|cat\n";
+    expected += "E: the|yellow|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
   //  private static WitnessBuilder builder;
   //
   //  @BeforeClass
