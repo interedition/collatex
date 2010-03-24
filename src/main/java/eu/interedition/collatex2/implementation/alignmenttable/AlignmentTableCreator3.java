@@ -69,6 +69,8 @@ public class AlignmentTableCreator3 {
     placeVariantPhraseInColumns(replacement.getReplacementWords(), columns);
   }
 
+  //TODO: Could make an object out of List<IColumn> and method
+  //TODO: this functionality over there
   //NOTE: for now we assume that phraseA is longer than phraseB!
   //NOTE: this method is only for variants!
   private static void placeVariantPhraseInColumns(final IPhrase phraseB, final List<IColumn> columns) {
@@ -85,6 +87,8 @@ public class AlignmentTableCreator3 {
     }
   }
 
+  //TODO: Could make an object out of List<IColumn> and method
+  //TODO: this functionality over there
   //NOTE: for now we assume that phraseA is longer than phraseB!
   //NOTE: this method is only for matches!
   private static void placeMatchPhraseInColumns(final IPhrase phraseB, final List<IColumn> columns) {
