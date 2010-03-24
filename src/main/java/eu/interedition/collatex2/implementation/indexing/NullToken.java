@@ -25,4 +25,9 @@ public class NullToken implements INormalizedToken {
   public String getSigil() {
     return sigil;
   }
+
+  @Override
+  public String getContent() {
+    return "";
+  }
 }

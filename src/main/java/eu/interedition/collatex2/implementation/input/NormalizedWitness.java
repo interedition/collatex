@@ -1,5 +1,6 @@
 package eu.interedition.collatex2.implementation.input;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,7 +40,10 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   }
 
   public IPhrase createPhrase(final int startPosition, final int endPosition) {
-    return new Phrase(tokens.subList(startPosition - 1, endPosition));
+    // TODO: this problemCase shouldn't occur
+    final boolean problemCase = (startPosition - 1 > endPosition);
+    final List<INormalizedToken> subList = problemCase ? new ArrayList<INormalizedToken>() : tokens.subList(startPosition - 1, endPosition);
+    return new Phrase(subList);
   }
 
   public int size() {

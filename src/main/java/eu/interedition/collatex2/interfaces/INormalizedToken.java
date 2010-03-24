@@ -8,4 +8,6 @@ public interface INormalizedToken {
 
   String getSigil();
 
+  String getContent();
+
 }

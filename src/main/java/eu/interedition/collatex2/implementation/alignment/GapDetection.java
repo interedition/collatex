@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IGap;
@@ -12,6 +15,8 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class GapDetection {
+
+  static Log LOG = LogFactory.getLog(GapDetection.class);
 
   public static List<IGap> detectGap(final List<IMatch> matches, final IWitness witnessA, final IWitness witnessB) {
     final List<IPhrase> matchingPhrasesForA = calculateMatchingPhrasesForA(matches);
@@ -52,6 +57,7 @@ public class GapDetection {
   }
 
   private static List<IPhrase> calculateGapPhrasesFor(final List<IPhrase> matchingNgrams, final IWitness witness) {
+    LOG.info(witness);
     int currentIndex = 1;
     IPhrase previous = null;
     final List<IPhrase> gaps = Lists.newArrayList();
