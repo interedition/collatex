@@ -6,10 +6,9 @@ import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.ISuperbase;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -59,50 +58,14 @@ public class AlignmentTableCreator3 {
   }
 
   private static void addMatchToAlignmentTable(final ISuperbase superbase, final IMatch match) {
-    final List<IColumn> columns = superbase.getColumnsFor(match.getPhraseA());
-    placeMatchPhraseInColumns(match.getPhraseB(), columns);
+    final IColumns columns = superbase.getColumnsFor(match.getPhraseA());
+    columns.addMatchPhrase(match.getPhraseB());
   }
 
   //NOTE: for now we assume that phraseA and PhraseB have the same length!
   private static void addReplacement(final IReplacement replacement, final ISuperbase superbase) {
-    final List<IColumn> columns = superbase.getColumnsFor(replacement.getOriginalWords());
-    placeVariantPhraseInColumns(replacement.getReplacementWords(), columns);
-  }
-
-  //TODO: Could make an object out of List<IColumn> and method
-  //TODO: this functionality over there
-  //NOTE: for now we assume that phraseA is longer than phraseB!
-  //NOTE: this method is only for variants!
-  private static void placeVariantPhraseInColumns(final IPhrase phraseB, final List<IColumn> columns) {
-    if (phraseB.size() > columns.size()) {
-      // System.out.println(columns.size());
-      // System.out.println(phraseB.size());
-      throw new RuntimeException("The phrase to be placed in the table is longer than columns!");
-    }
-    final List<INormalizedToken> tokens = phraseB.getTokens();
-    for (int i = 0; i < phraseB.size(); i++) {
-      final IColumn column = columns.get(i);
-      final INormalizedToken token = tokens.get(i);
-      column.addVariant(token);
-    }
-  }
-
-  //TODO: Could make an object out of List<IColumn> and method
-  //TODO: this functionality over there
-  //NOTE: for now we assume that phraseA is longer than phraseB!
-  //NOTE: this method is only for matches!
-  private static void placeMatchPhraseInColumns(final IPhrase phraseB, final List<IColumn> columns) {
-    if (phraseB.size() > columns.size()) {
-      // System.out.println(columns.size());
-      // System.out.println(phraseB.size());
-      throw new RuntimeException("The phrase to be placed in the table is longer than columns!");
-    }
-    final List<INormalizedToken> tokens = phraseB.getTokens();
-    for (int i = 0; i < phraseB.size(); i++) {
-      final IColumn column = columns.get(i);
-      final INormalizedToken token = tokens.get(i);
-      column.addMatch(token);
-    }
+    final IColumns columns = superbase.getColumnsFor(replacement.getOriginalWords());
+    columns.addVariantPhrase(replacement.getReplacementWords());
   }
 
 }

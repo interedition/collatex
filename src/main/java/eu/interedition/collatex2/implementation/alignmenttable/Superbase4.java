@@ -8,6 +8,7 @@ import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.input.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ISuperbase;
@@ -52,13 +53,13 @@ public class Superbase4 extends NormalizedWitness implements ISuperbase {
     return column;
   }
 
-  public List<IColumn> getColumnsFor(final IPhrase phraseA) {
+  public IColumns getColumnsFor(final IPhrase phraseA) {
     final List<IColumn> columns = Lists.newArrayList();
     for (final INormalizedToken tokenA : phraseA.getTokens()) {
       final IColumn column = getColumnFor(tokenA);
       columns.add(column);
     }
-    return columns;
+    return new Columns(columns);
   }
 
   @Override
