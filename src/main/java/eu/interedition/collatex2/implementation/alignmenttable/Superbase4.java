@@ -9,6 +9,7 @@ import eu.interedition.collatex2.implementation.input.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ISuperbase;
 
 public class Superbase4 extends NormalizedWitness implements ISuperbase {
@@ -51,6 +52,15 @@ public class Superbase4 extends NormalizedWitness implements ISuperbase {
     return column;
   }
 
+  public List<IColumn> getColumnsFor(final IPhrase phraseA) {
+    final List<IColumn> columns = Lists.newArrayList();
+    for (final INormalizedToken tokenA : phraseA.getTokens()) {
+      final IColumn column = getColumnFor(tokenA);
+      columns.add(column);
+    }
+    return columns;
+  }
+
   @Override
   public String toString() {
     String result = "Superbase: (";
@@ -63,4 +73,5 @@ public class Superbase4 extends NormalizedWitness implements ISuperbase {
     result += ")";
     return result;
   }
+
 }

@@ -2,8 +2,6 @@ package eu.interedition.collatex2.implementation.alignmenttable;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -61,23 +59,14 @@ public class AlignmentTableCreator3 {
   }
 
   private static void addMatchToAlignmentTable(final ISuperbase superbase, final IMatch match) {
-    final List<IColumn> columns = determineColumns(match.getPhraseA(), superbase);
+    final List<IColumn> columns = superbase.getColumnsFor(match.getPhraseA());
     placeMatchPhraseInColumns(match.getPhraseB(), columns);
   }
 
   //NOTE: for now we assume that phraseA and PhraseB have the same length!
   private static void addReplacement(final IReplacement replacement, final ISuperbase superbase) {
-    final List<IColumn> columns = determineColumns(replacement.getOriginalWords(), superbase);
+    final List<IColumn> columns = superbase.getColumnsFor(replacement.getOriginalWords());
     placeVariantPhraseInColumns(replacement.getReplacementWords(), columns);
-  }
-
-  private static List<IColumn> determineColumns(final IPhrase phraseA, final ISuperbase superbase) {
-    final List<IColumn> columns = Lists.newArrayList();
-    for (final INormalizedToken tokenA : phraseA.getTokens()) {
-      final IColumn column = superbase.getColumnFor(tokenA);
-      columns.add(column);
-    }
-    return columns;
   }
 
   //NOTE: for now we assume that phraseA is longer than phraseB!
