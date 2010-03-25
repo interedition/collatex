@@ -44,8 +44,9 @@ public class RealMatcher {
         if (basePhrase.getNormalized().equals(witnessPhrase.getNormalized())) {
           matchSet.add(new Match(basePhrase, witnessPhrase));
         } else {
-          final float editDistance = distanceMeasure.distance(basePhrase.getNormalized(), witnessPhrase.getNormalized());
-          if (editDistance < 0.5) matchSet.add(Factory.createMatch(basePhrase, witnessPhrase, editDistance));
+          // skip the near matches for now
+          //          final float editDistance = distanceMeasure.distance(baseWord.getNormalized(), witnessWord.getNormalized());
+          //          if (editDistance < 0.5) matchSet.add(Factory.createMatch(baseWord, witnessWord, editDistance));
         }
       }
     }
