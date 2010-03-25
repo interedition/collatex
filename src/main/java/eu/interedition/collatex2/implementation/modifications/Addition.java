@@ -1,22 +1,23 @@
 package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IAddition;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Addition implements IAddition {
   private final IPhrase addition;
-  private final IPhrase nextMatchA;
+  private final INormalizedToken nextMatchTokenA;
 
-  public Addition(final IPhrase nextMatchA, final IPhrase addition) {
-    this.nextMatchA = nextMatchA;
+  public Addition(final INormalizedToken nextMatchTokenA, final IPhrase addition) {
+    this.nextMatchTokenA = nextMatchTokenA;
     this.addition = addition;
   }
 
   public int getPosition() {
-    if (nextMatchA == null || nextMatchA.isEmpty()) {
+    if (nextMatchTokenA == null) {
       throw new RuntimeException("There is no next match!");
     }
-    return nextMatchA.getFirstToken().getPosition();
+    return nextMatchTokenA.getPosition();
   }
 
   public IPhrase getAddedWords() {
@@ -28,7 +29,7 @@ public class Addition implements IAddition {
     // TODO: should not be get Normalized?
     String result = "addition: " + addition.getNormalized();
     // TODO: I would like to have only 
-    if (nextMatchA == null || nextMatchA.isEmpty()) {
+    if (nextMatchTokenA == null) {
       result += " position: at the end";
     } else {
       result += " position: " + getPosition();
