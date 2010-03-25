@@ -3,12 +3,15 @@ package eu.interedition.collatex2.implementation.alignmenttable;
 import java.util.List;
 
 import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.ISuperbase;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -39,6 +42,7 @@ public class AlignmentTableCreator3 {
     callback.alignment(alignment);
     addMatchesToAlignmentTable(superbase, alignment);
     addReplacementsToAlignmentTable(superbase, alignment);
+    addAdditionsToAlignmentTable(table, superbase, alignment);
   }
 
   static void addMatchesToAlignmentTable(final ISuperbase superbase, final IAlignment alignment) {
@@ -66,4 +70,21 @@ public class AlignmentTableCreator3 {
     columns.addVariantPhrase(replacement.getReplacementWords());
   }
 
+  static void addAdditionsToAlignmentTable(final IAlignmentTable table, final ISuperbase superbase, final IAlignment alignment) {
+    final List<IAddition> additions = alignment.getAdditions();
+    for (final IAddition addition : additions) {
+      final IPhrase witnessPhrase = addition.getAddedWords();
+      AlignmentTableCreator3.addVariantAtGap(table, superbase, addition, witnessPhrase);
+    }
+  }
+
+  private static void addVariantAtGap(final IAlignmentTable table, final ISuperbase superbase, final IAddition addition, final IPhrase witnessPhrase) {
+    if (addition.isAtTheEnd()) {
+      table.addVariantAtTheEnd(witnessPhrase);
+    } else {
+      final INormalizedToken nextMatchToken = addition.getNextMatchToken();
+      final IColumn column = superbase.getColumnFor(nextMatchToken);
+      table.addVariantBefore(column, witnessPhrase);
+    }
+  }
 }

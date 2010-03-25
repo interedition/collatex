@@ -5,19 +5,20 @@ import eu.interedition.collatex2.implementation.modifications.Omission;
 import eu.interedition.collatex2.implementation.modifications.Replacement;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IModification;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Gap implements IGap {
   private final IPhrase gapA;
   private final IPhrase gapB;
-  private final IPhrase nextMatchA;
+  private final INormalizedToken nextMatchTokenA;
 
   //TODO: decouple gaps and modifications... 
   //TODO: Modifications should know about gaps not the other way around!
-  public Gap(final IPhrase gapA, final IPhrase gapB, final IPhrase nextMatchA) {
+  public Gap(final IPhrase gapA, final IPhrase gapB, final INormalizedToken nextMatchToken) {
     this.gapA = gapA;
     this.gapB = gapB;
-    this.nextMatchA = nextMatchA;
+    this.nextMatchTokenA = nextMatchToken;
   }
 
   @Override
@@ -73,10 +74,8 @@ public class Gap implements IGap {
     return new Omission(gapA);
   }
 
-  // TODO: 0 -> this is not right!
-  // TODO: this todo can be removed right?
   private IModification createAddition() {
-    return new Addition(nextMatchA, gapB);
+    return new Addition(nextMatchTokenA, gapB);
   }
 
 }
