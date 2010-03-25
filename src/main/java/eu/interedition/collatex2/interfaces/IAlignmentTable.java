@@ -10,4 +10,8 @@ public interface IAlignmentTable {
 
   void add(IColumn column);
 
+  void addVariantAtTheEnd(IPhrase witnessPhrase);
+
+  void addVariantBefore(IColumn column, IPhrase witnessPhrase);
+
 }

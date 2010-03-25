@@ -14,10 +14,7 @@ public class Addition implements IAddition {
   }
 
   public int getPosition() {
-    if (nextMatchTokenA == null) {
-      throw new RuntimeException("There is no next match!");
-    }
-    return nextMatchTokenA.getPosition();
+    return getNextMatchToken().getPosition();
   }
 
   public IPhrase getAddedWords() {
@@ -29,12 +26,25 @@ public class Addition implements IAddition {
     // TODO: should not be get Normalized?
     String result = "addition: " + addition.getNormalized();
     // TODO: I would like to have only 
-    if (nextMatchTokenA == null) {
+    if (isAtTheEnd()) {
       result += " position: at the end";
     } else {
       result += " position: " + getPosition();
     }
     return result;
+  }
+
+  @Override
+  public boolean isAtTheEnd() {
+    return nextMatchTokenA == null;
+  }
+
+  @Override
+  public INormalizedToken getNextMatchToken() {
+    if (isAtTheEnd()) {
+      throw new RuntimeException("There is no next match!");
+    }
+    return nextMatchTokenA;
   }
 
   //  @Override
