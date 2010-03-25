@@ -4,6 +4,7 @@ import static com.google.common.collect.Iterables.transform;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.mortbay.log.Log;
@@ -13,7 +14,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -22,8 +22,13 @@ import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class WitnessIndex implements IWitnessIndex {
-  Multiset<IPhrase> phraseBag = Multisets.newHashMultiset();
+  Multiset<IPhrase> phraseBag;// = Multisets.newTreeMultiset();
 
+  public WitnessIndex(final Multiset<IPhrase> _phraseBag) {
+    this.phraseBag = _phraseBag;
+  }
+
+  @Deprecated
   public WitnessIndex(final IWitness witness) {
     Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
     final List<INormalizedToken> tokens = witness.getTokens();
@@ -52,11 +57,9 @@ public class WitnessIndex implements IWitnessIndex {
       //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
       //      Log.info("");
     } while (phraseMap.entries().size() > phraseMap.keySet().size());
-    phraseBag.addAll(phraseMap.values());
-  }
-
-  public WitnessIndex(final Multiset<IPhrase> _phraseBag) {
-    this.phraseBag = _phraseBag;
+    final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
+    Collections.sort(values, Phrase.PHRASECOMPARATOR);
+    phraseBag.addAll(values);
   }
 
   private void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens) {

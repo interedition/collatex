@@ -23,9 +23,11 @@ public class Alignment implements IAlignment {
   private final List<IMatch> matches;
   private final List<IGap> gaps;
 
-  public Alignment(final List<IMatch> matches, final List<IGap> gaps) {
-    this.matches = matches;
-    this.gaps = gaps;
+  public Alignment(final List<IMatch> matches1, final List<IGap> gaps1) {
+    // matches1 should be sorted om phraseA.getBeginPosition() 
+
+    this.matches = matches1;
+    this.gaps = gaps1;
   }
 
   public List<IMatch> getMatches() {

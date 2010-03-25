@@ -2,6 +2,7 @@ package eu.interedition.collatex2.implementation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class Factory {
 
   public IAlignment createAlignment(final IWitness a, final IWitness b) {
     final WordDistance distanceMeasure = new NormalizedLevenshtein();
-    final Set<IMatch> matches = RealMatcher.findMatches(a, b, distanceMeasure);
+    final Set<IMatch> matches = RealMatcher.findMatchesWithIndex(a, b, distanceMeasure);
     final List<IMatch> matchesAsList = Lists.newArrayList(matches);
     final List<IGap> gaps = GapDetection.detectGap(matchesAsList, a, b);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matchesAsList, gaps));
@@ -66,6 +67,8 @@ public class Factory {
     throw new RuntimeException("Near matches are not yet supported!");
   }
 
+  @Deprecated
+  // Use createWitnessIndexMap
   public static IWitnessIndex createWitnessIndex(final IWitness witness) {
     final WitnessIndex witnessIndex = new WitnessIndex(witness);
     return witnessIndex;
@@ -96,8 +99,8 @@ public class Factory {
     final Set<String> tokensWithMultiples = getTokensWithMultiples(witnesses);
 
     for (final IWitness witness : witnesses) {
-      final Multiset<IPhrase> phraseBag = Multisets.newHashMultiset();
-      Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
+      final Multiset<IPhrase> phraseBag = Multisets.newTreeMultiset();
+      Multimap<String, IPhrase> phraseMap = Multimaps.newTreeMultimap();
       final List<INormalizedToken> tokens = witness.getTokens();
       for (final INormalizedToken token : tokens) {
         phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
@@ -116,12 +119,18 @@ public class Factory {
           }
         }
         phraseMap = newPhraseMap;
-      } while (phraseMap.entries().size() > phraseMap.keySet().size());
-      phraseBag.addAll(phraseMap.values());
+      } while (hasMultiples(phraseMap));
+      final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
+      Collections.sort(values, Phrase.PHRASECOMPARATOR);
+      phraseBag.addAll(values);
       map.put(witness.getSigil(), new WitnessIndex(phraseBag));
     }
 
     return map;
+  }
+
+  private static boolean hasMultiples(final Multimap<String, IPhrase> phraseMap) {
+    return phraseMap.entries().size() > phraseMap.keySet().size();
   }
 
   private static void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens, final Set<String> tokensWithMultiples) {

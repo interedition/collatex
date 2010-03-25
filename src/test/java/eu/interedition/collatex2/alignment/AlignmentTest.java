@@ -5,8 +5,14 @@ import static junit.framework.Assert.assertTrue;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.base.Function;
+import com.google.common.base.Join;
+import com.google.common.collect.Iterables;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IAddition;
@@ -17,6 +23,7 @@ import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTest {
+  private static final Log LOG = LogFactory.getLog(AlignmentTest.class);
   private Factory factory;
 
   @Before
@@ -214,6 +221,12 @@ public class AlignmentTest {
     final IWitness b = factory.createWitness("2", "c e y a d b");
     final IAlignment align = factory.createAlignment(a, b);
     final List<ITransposition> transpositions = align.getTranspositions();
+    LOG.info("transpositions=[" + Join.join(", ", Iterables.transform(transpositions, new Function<ITransposition, String>() {
+      @Override
+      public String apply(final ITransposition from) {
+        return from.getMatchA().getNormalized() + "=>" + from.getMatchB().getNormalized();
+      }
+    })) + "]");
     assertEquals(4, transpositions.size());
     assertEquals("a", transpositions.get(0).getMatchA().getNormalized());
     assertEquals("c", transpositions.get(0).getMatchB().getNormalized());
@@ -224,5 +237,4 @@ public class AlignmentTest {
     assertEquals("e", transpositions.get(3).getMatchA().getNormalized());
     assertEquals("b", transpositions.get(3).getMatchB().getNormalized());
   }
-
 }

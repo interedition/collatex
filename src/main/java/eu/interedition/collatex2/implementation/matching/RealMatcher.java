@@ -1,5 +1,6 @@
 package eu.interedition.collatex2.implementation.matching;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -35,8 +36,9 @@ public class RealMatcher {
 
   public static Set<IMatch> findMatchesWithIndex(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
     final Set<IMatch> matchSet = Sets.newLinkedHashSet();
-    final IWitnessIndex baseIndex = Factory.createWitnessIndex(base);
-    final IWitnessIndex witnessIndex = Factory.createWitnessIndex(witness);
+    final Map<String, IWitnessIndex> witnessIndexMap = Factory.createWitnessIndexMap(base, witness);
+    final IWitnessIndex baseIndex = witnessIndexMap.get(base.getSigil());
+    final IWitnessIndex witnessIndex = witnessIndexMap.get(witness.getSigil());
     for (final IPhrase basePhrase : baseIndex.getPhrases()) {
       for (final IPhrase witnessPhrase : witnessIndex.getPhrases()) {
         if (basePhrase.getNormalized().equals(witnessPhrase.getNormalized())) {
