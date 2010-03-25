@@ -6,6 +6,8 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class AlignmentTable4 implements IAlignmentTable {
   private final List<String> sigli;
@@ -73,4 +75,25 @@ public class AlignmentTable4 implements IAlignmentTable {
     return tableHTML.toString();
   }
 
+  @Override
+  public void addVariantAtTheEnd(final IPhrase witnessPhrase) {
+    for (final INormalizedToken token : witnessPhrase.getTokens()) {
+      final IColumn extraColumn = new Column3(token);
+      columns.add(extraColumn);
+    }
+  }
+
+  @Override
+  public void addVariantBefore(final IColumn column, final IPhrase witnessPhrase) {
+    int indexOf = columns.indexOf(column);
+    if (indexOf == -1) {
+      throw new RuntimeException("Unexpected error: Column not found!");
+    }
+
+    for (final INormalizedToken token : witnessPhrase.getTokens()) {
+      final IColumn extraColumn = new Column3(token);
+      columns.add(indexOf, extraColumn);
+      indexOf++;
+    }
+  }
 }

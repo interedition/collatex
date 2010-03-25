@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -23,12 +24,13 @@ public class GapDetection {
     final List<IPhrase> matchingPhrasesForB = calculateMatchingPhrasesForB(matches);
     final List<IPhrase> gapPhrasesForA = calculateGapPhrasesFor(matchingPhrasesForA, witnessA);
     final List<IPhrase> gapPhrasesForB = calculateGapPhrasesFor(matchingPhrasesForB, witnessB);
+    final List<INormalizedToken> nextMatchTokens = getNextMatchToken(matchingPhrasesForA);
     final List<IGap> gaps = Lists.newArrayList();
     for (int i = 0; i < gapPhrasesForA.size(); i++) {
       final IPhrase gapA = gapPhrasesForA.get(i);
       final IPhrase gapB = gapPhrasesForB.get(i);
-      final IGap gap = new Gap(gapA, gapB, null);
-      //      final Match<T> nextMatch = nextMatchesWitness.get(i);
+      final INormalizedToken nextMatchToken = nextMatchTokens.get(i);
+      final IGap gap = new Gap(gapA, gapB, nextMatchToken);
       gaps.add(gap);
     }
     return gaps;
@@ -70,4 +72,17 @@ public class GapDetection {
     gaps.add(witness.createPhrase(currentIndex, witness.size()));
     return gaps;
   }
+
+  //TODO: add test!
+  private static List<INormalizedToken> getNextMatchToken(final List<IPhrase> matchPhrases) {
+    final List<INormalizedToken> nextMatches = Lists.newArrayList();
+    for (final IPhrase phrase : matchPhrases) {
+      final INormalizedToken nextMatchToken = phrase.getFirstToken();
+      nextMatches.add(nextMatchToken);
+    }
+    // Note: the last gap does not have a next match!
+    nextMatches.add(null);
+    return nextMatches;
+  }
+
 }
