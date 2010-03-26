@@ -2,7 +2,7 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
-public interface IPhrase {
+public interface IPhrase extends Comparable<IPhrase> {
 
   String getNormalized();
 

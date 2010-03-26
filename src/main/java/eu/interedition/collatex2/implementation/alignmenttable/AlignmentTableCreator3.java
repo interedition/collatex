@@ -17,25 +17,24 @@ import eu.interedition.collatex2.interfaces.ISuperbase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableCreator3 {
-  public static IAlignmentTable createAlignmentTable(final List<IWitness> set, final ICallback callback) {
+  public static IAlignmentTable createAlignmentTable(final List<IWitness> witnessList, final ICallback callback) {
+    Factory.createWitnessIndexMap(witnessList);
     final IAlignmentTable table = new AlignmentTable4();
-    for (final IWitness witness : set) {
+    for (final IWitness witness : witnessList) {
       AlignmentTableCreator3.addWitness(table, witness, callback);
     }
     return table;
   }
 
   private static void addWitness(final IAlignmentTable table, final IWitness witness, final ICallback callback) {
-    if (table.getSigli().isEmpty()) {
+    final boolean tableIsEmpty = table.getSigli().isEmpty();
+    table.getSigli().add(witness.getSigil());
+    if (tableIsEmpty) {
       for (final INormalizedToken token : witness.getTokens()) {
         table.add(new Column3(token));
       }
-      table.getSigli().add(witness.getSigil());
       return;
     }
-
-    // hey! that is duplicated!
-    table.getSigli().add(witness.getSigil());
 
     // make the superbase from the alignment table
     final ISuperbase superbase = Superbase4.create(table);
