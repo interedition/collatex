@@ -6,4 +6,12 @@ public interface IColumns {
 
   void addVariantPhrase(IPhrase phrase);
 
+  int getBeginPosition();
+
+  int getEndPosition();
+
+  IColumn getFirstColumn();
+
+  boolean isEmpty();
+
 }

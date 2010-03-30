@@ -3,22 +3,23 @@ package eu.interedition.collatex2.implementation.alignment;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.implementation.modifications.Omission;
 import eu.interedition.collatex2.implementation.modifications.Replacement;
+import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IModification;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Gap implements IGap {
-  private final IPhrase gapA;
+  private final IColumns gapA;
   private final IPhrase gapB;
-  private final INormalizedToken nextMatchTokenA;
+  private final IColumn nextColumn;
 
   //TODO: decouple gaps and modifications... 
   //TODO: Modifications should know about gaps not the other way around!
-  public Gap(final IPhrase gapA, final IPhrase gapB, final INormalizedToken nextMatchToken) {
+  public Gap(final IColumns gapA, final IPhrase gapB, final IColumn nextColumn) {
     this.gapA = gapA;
     this.gapB = gapB;
-    this.nextMatchTokenA = nextMatchToken;
+    this.nextColumn = nextColumn;
   }
 
   @Override
@@ -26,10 +27,10 @@ public class Gap implements IGap {
     if (isAddition()) {
       return "\"" + gapB.getNormalized() + "\" added";
     }
-    return gapA.getSigil() + ": " + gapA.getNormalized() + " -> " + gapB.getSigil() + ": " + gapB.getNormalized();
+    return /*gapA.getSigil() + ": " +gapA.getNormalized() */gapA.toString() + " -> " + gapB.getSigil() + ": " + gapB.getNormalized();
   }
 
-  public IPhrase getPhraseA() {
+  public IColumns getColumnsA() {
     return gapA;
   }
 
@@ -75,7 +76,7 @@ public class Gap implements IGap {
   }
 
   private IModification createAddition() {
-    return new Addition(nextMatchTokenA, gapB);
+    return new Addition(nextColumn, gapB);
   }
 
 }

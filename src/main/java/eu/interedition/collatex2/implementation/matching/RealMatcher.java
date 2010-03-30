@@ -7,9 +7,9 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.matching.worddistance.WordDistance;
-import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IPhraseMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
@@ -18,8 +18,8 @@ public class RealMatcher {
   // NOTE; this code works directly on IWitness
   // There should be an indexing phase and then this should
   // work on indexes!
-  public static Set<IMatch> findMatches(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
-    final Set<IMatch> matchSet = Sets.newLinkedHashSet();
+  public static Set<IPhraseMatch> findMatches(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
+    final Set<IPhraseMatch> matchSet = Sets.newLinkedHashSet();
     for (final INormalizedToken baseWord : base.getTokens()) {
       for (final INormalizedToken witnessWord : witness.getTokens()) {
         if (baseWord.getNormalized().equals(witnessWord.getNormalized())) {
@@ -34,15 +34,15 @@ public class RealMatcher {
     return matchSet;
   }
 
-  public static Set<IMatch> findMatchesWithIndex(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
-    final Set<IMatch> matchSet = Sets.newLinkedHashSet();
+  public static Set<IPhraseMatch> findMatchesWithIndex(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
+    final Set<IPhraseMatch> matchSet = Sets.newLinkedHashSet();
     final Map<String, IWitnessIndex> witnessIndexMap = Factory.createWitnessIndexMap(base, witness);
     final IWitnessIndex baseIndex = witnessIndexMap.get(base.getSigil());
     final IWitnessIndex witnessIndex = witnessIndexMap.get(witness.getSigil());
     for (final IPhrase basePhrase : baseIndex.getPhrases()) {
       for (final IPhrase witnessPhrase : witnessIndex.getPhrases()) {
         if (basePhrase.getNormalized().equals(witnessPhrase.getNormalized())) {
-          matchSet.add(new Match(basePhrase, witnessPhrase));
+          matchSet.add(new PhraseMatch(basePhrase, witnessPhrase));
         } else {
           // skip the near matches for now
           //          final float editDistance = distanceMeasure.distance(baseWord.getNormalized(), witnessWord.getNormalized());

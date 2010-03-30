@@ -14,4 +14,8 @@ public interface IColumn {
 
   void addMatch(INormalizedToken token);
 
+  int getPosition();
+
+  void setPosition(int position);
+
 }

@@ -1,27 +1,27 @@
 package eu.interedition.collatex2.implementation.modifications;
 
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IModification;
-import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Omission implements IModification {
-  private final IPhrase phrase;
+  private final IColumns columns;
 
-  public Omission(final IPhrase _phrase) {
-    this.phrase = _phrase;
+  public Omission(final IColumns gapA) {
+    this.columns = gapA;
   }
 
-  public IPhrase getOmittedWords() {
-    return phrase;
+  public IColumns getOmittedWords() {
+    return columns;
   }
 
   public int getPosition() {
-    return phrase.getFirstToken().getPosition();
+    return columns.getFirstColumn().getPosition();
   }
 
   //TODO: should not be getNormalized!
   @Override
   public String toString() {
-    return "omission: " + phrase.getNormalized() + " position: " + phrase.getFirstToken().getPosition();
+    return "omission: " + columns.toString() + " position: " + getPosition();
   }
 
   //  @Override

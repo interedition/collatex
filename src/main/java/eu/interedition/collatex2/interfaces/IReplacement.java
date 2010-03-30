@@ -2,8 +2,8 @@ package eu.interedition.collatex2.interfaces;
 
 public interface IReplacement extends IModification {
 
-  IPhrase getOriginalWords();
+  IColumns getOriginalColumns();
 
-  IPhrase getReplacementWords();
+  IPhrase getReplacementPhrase();
 
 }

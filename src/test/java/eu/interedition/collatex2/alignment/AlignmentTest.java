@@ -76,7 +76,7 @@ public class AlignmentTest {
     assertEquals(1, gaps.size());
     final IGap gap = gaps.get(0);
     assertTrue(gap.isAddition());
-    assertTrue("Phrase A is not empty!", gap.getPhraseA().isEmpty());
+    assertTrue("Phrase A is not empty!", gap.getColumnsA().isEmpty());
     assertEquals("and white", gap.getPhraseB().getNormalized());
   }
 
@@ -93,12 +93,12 @@ public class AlignmentTest {
     assertEquals(1, gaps.size());
     final IGap gap = gaps.get(0);
     assertTrue(gap.isAddition());
-    assertTrue("Phrase A is not empty!", gap.getPhraseA().isEmpty());
+    assertTrue("Phrase A is not empty!", gap.getColumnsA().isEmpty());
     assertEquals("not", gap.getPhraseB().getNormalized());
     final List<IAddition> additions = alignment.getAdditions();
     assertEquals(1, additions.size());
     final IAddition addition = additions.get(0);
-    assertEquals("not", addition.getAddedWords().getNormalized());
+    assertEquals("not", addition.getAddedPhrase().getNormalized());
   }
 
   @Test
@@ -113,12 +113,12 @@ public class AlignmentTest {
     assertEquals(1, gaps.size());
     final IGap gap = gaps.get(0);
     assertTrue(gap.isAddition());
-    assertTrue("Phrase A is not empty!", gap.getPhraseA().isEmpty());
+    assertTrue("Phrase A is not empty!", gap.getColumnsA().isEmpty());
     assertEquals("or not", gap.getPhraseB().getNormalized());
     final List<IAddition> additions = alignment.getAdditions();
     assertEquals(1, additions.size());
     final IAddition addition = additions.get(0);
-    assertEquals("or not", addition.getAddedWords().getNormalized());
+    assertEquals("or not", addition.getAddedPhrase().getNormalized());
   }
 
   @Test
@@ -134,12 +134,12 @@ public class AlignmentTest {
     assertEquals(1, gaps.size());
     final IGap gap = gaps.get(0);
     assertTrue(gap.isAddition());
-    assertTrue("Phrase A is not empty!", gap.getPhraseA().isEmpty());
+    assertTrue("Phrase A is not empty!", gap.getColumnsA().isEmpty());
     assertEquals("think therefore", gap.getPhraseB().getNormalized());
     final List<IAddition> additions = alignment.getAdditions();
     assertEquals(1, additions.size());
     final IAddition addition = additions.get(0);
-    assertEquals("think therefore", addition.getAddedWords().getNormalized());
+    assertEquals("think therefore", addition.getAddedPhrase().getNormalized());
   }
 
   @Test

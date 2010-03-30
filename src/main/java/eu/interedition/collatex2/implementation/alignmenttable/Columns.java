@@ -47,4 +47,34 @@ public class Columns implements IColumns {
     }
   }
 
+  @Override
+  public int getBeginPosition() {
+    return getFirstColumn().getPosition();
+  }
+
+  @Override
+  public int getEndPosition() {
+    return getLastColumn().getPosition();
+  }
+
+  @Override
+  public IColumn getFirstColumn() {
+    if (isEmpty()) {
+      throw new RuntimeException("Columns are empty!");
+    }
+    return columns.get(0);
+  }
+
+  public IColumn getLastColumn() {
+    if (isEmpty()) {
+      throw new RuntimeException("Columns are empty!");
+    }
+    return columns.get(columns.size() - 1);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return columns.isEmpty();
+  }
+
 }

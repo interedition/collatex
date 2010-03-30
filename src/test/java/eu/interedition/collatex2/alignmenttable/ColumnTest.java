@@ -30,7 +30,7 @@ public class ColumnTest {
   public void testGetWordNonExistingGivesException() {
     final IWitness witness = factory.createWitness("A", "a test string");
     final INormalizedToken word = witness.getTokens().get(0);
-    final IColumn column = new Column3(word);
+    final IColumn column = new Column3(word, 1);
     column.getToken("B");
   }
 
@@ -38,7 +38,7 @@ public class ColumnTest {
   public void testFirstToken() {
     final IWitness witness = factory.createWitness("A", "a test string");
     final INormalizedToken word = witness.getTokens().get(0);
-    final IColumn column = new Column3(word);
+    final IColumn column = new Column3(word, 1);
     Assert.assertTrue(column.containsWitness("A"));
     Assert.assertFalse(column.containsWitness("B"));
   }
@@ -51,7 +51,7 @@ public class ColumnTest {
     final INormalizedToken word = witness.getTokens().get(0);
     final INormalizedToken wordB = witnessB.getTokens().get(0);
     final INormalizedToken wordC = witnessC.getTokens().get(0);
-    final IColumn column = new Column3(word);
+    final IColumn column = new Column3(word, 1);
     column.addVariant(wordB);
     column.addVariant(wordC);
     final List<INormalizedToken> variants = column.getVariants();
@@ -72,7 +72,7 @@ public class ColumnTest {
     final INormalizedToken word = witness.getTokens().get(0);
     final INormalizedToken wordB = witnessB.getTokens().get(0);
     final INormalizedToken wordC = witnessC.getTokens().get(0);
-    final IColumn column = new Column3(word);
+    final IColumn column = new Column3(word, 1);
     column.addVariant(wordB);
     column.addMatch(wordC);
     final List<INormalizedToken> variants = column.getVariants();

@@ -1,23 +1,23 @@
 package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IAddition;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Addition implements IAddition {
   private final IPhrase addition;
-  private final INormalizedToken nextMatchTokenA;
+  private final IColumn nextColumn;
 
-  public Addition(final INormalizedToken nextMatchTokenA, final IPhrase addition) {
-    this.nextMatchTokenA = nextMatchTokenA;
+  public Addition(final IColumn nextColumn, final IPhrase addition) {
+    this.nextColumn = nextColumn;
     this.addition = addition;
   }
 
   public int getPosition() {
-    return getNextMatchToken().getPosition();
+    return getNextColumn().getPosition();
   }
 
-  public IPhrase getAddedWords() {
+  public IPhrase getAddedPhrase() {
     return addition;
   }
 
@@ -36,15 +36,15 @@ public class Addition implements IAddition {
 
   @Override
   public boolean isAtTheEnd() {
-    return nextMatchTokenA == null;
+    return nextColumn == null;
   }
 
   @Override
-  public INormalizedToken getNextMatchToken() {
+  public IColumn getNextColumn() {
     if (isAtTheEnd()) {
       throw new RuntimeException("There is no next match!");
     }
-    return nextMatchTokenA;
+    return nextColumn;
   }
 
   //  @Override

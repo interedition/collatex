@@ -6,9 +6,12 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.interfaces.IAlignment;
+import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -34,7 +37,7 @@ public class SequenceDetection {
     final Map<IMatch, IMatch> previousMatchMapA = SequenceDetection.buildPreviousMatchMap(matchesSortedForA);
     final Map<IMatch, IMatch> previousMatchMapB = SequenceDetection.buildPreviousMatchMap(matchesSortedForB);
     // make buffer
-    List<INormalizedToken> tokensA = Lists.newArrayList();
+    List<IColumn> columnsA = Lists.newArrayList();
     List<INormalizedToken> tokensB = Lists.newArrayList();
     // chain the matches
     for (int index = 0; index < unchainedMatches.size(); index++) {
@@ -45,15 +48,15 @@ public class SequenceDetection {
       final IMatch previousMatchA = previousMatchMapA.get(match);
       final IMatch previousMatchB = previousMatchMapB.get(match);
       if (!previousGapA.isEmpty() || !previousGapB.isEmpty() || previousMatchA != previousMatchB) {
-        createChainedMatchAndAddToList(chainedMatches, tokensA, tokensB);
-        tokensA = Lists.newArrayList();
+        createChainedMatchAndAddToList(chainedMatches, columnsA, tokensB);
+        columnsA = Lists.newArrayList();
         tokensB = Lists.newArrayList();
       }
       // fill buffer
-      tokensA.add(match.getPhraseA().getFirstToken());
+      columnsA.add(match.getColumnsA().getFirstColumn());
       tokensB.add(match.getPhraseB().getFirstToken());
     }
-    createChainedMatchAndAddToList(chainedMatches, tokensA, tokensB);
+    createChainedMatchAndAddToList(chainedMatches, columnsA, tokensB);
     return chainedMatches;
   }
 
@@ -77,11 +80,11 @@ public class SequenceDetection {
     return previousMatches;
   }
 
-  private static void createChainedMatchAndAddToList(final List<IMatch> chainedMatches, final List<INormalizedToken> tokensA, final List<INormalizedToken> tokensB) {
-    if (!tokensA.isEmpty()) {
-      final Phrase phraseA = new Phrase(tokensA);
-      final Phrase phraseB = new Phrase(tokensB);
-      chainedMatches.add(new Match(phraseA, phraseB));
+  private static void createChainedMatchAndAddToList(final List<IMatch> chainedMatches, final List<IColumn> columnsA, final List<INormalizedToken> tokensB) {
+    if (!columnsA.isEmpty()) {
+      final IColumns columns = new Columns(columnsA);
+      final Phrase phrase = new Phrase(tokensB);
+      chainedMatches.add(new Match(columns, phrase));
     }
   }
 

@@ -16,7 +16,7 @@ import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.matching.RealMatcher;
 import eu.interedition.collatex2.implementation.matching.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex2.implementation.matching.worddistance.WordDistance;
-import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.IPhraseMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class RealMatcherTest {
@@ -26,21 +26,21 @@ public class RealMatcherTest {
     final IWitness a = factory.createWitness("A", "The black cat");
     final IWitness b = factory.createWitness("B", "The black and white cat");
     final WordDistance distanceMeasure = new NormalizedLevenshtein();
-    final Set<IMatch> matches = RealMatcher.findMatchesWithIndex(a, b, distanceMeasure);
+    final Set<IPhraseMatch> matches = RealMatcher.findMatchesWithIndex(a, b, distanceMeasure);
     assertContains(matches, "the");
     assertContains(matches, "black");
     assertContains(matches, "cat");
     assertEquals(3, matches.size());
   }
 
-  final Function<IMatch, String> function = new Function<IMatch, String>() {
+  final Function<IPhraseMatch, String> function = new Function<IPhraseMatch, String>() {
     @Override
-    public String apply(final IMatch match) {
+    public String apply(final IPhraseMatch match) {
       return match.getNormalized();
     }
   };
 
-  private void assertContains(final Set<IMatch> matches, final String string) {
+  private void assertContains(final Set<IPhraseMatch> matches, final String string) {
     final Iterable<String> normalizedMatches = Iterables.transform(matches, function);
     assertTrue(string + " not found in matches: " + Join.join(",", normalizedMatches), Lists.newArrayList(normalizedMatches).contains(string));
   }
