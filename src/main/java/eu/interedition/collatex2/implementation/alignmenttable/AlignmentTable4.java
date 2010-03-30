@@ -89,8 +89,8 @@ public class AlignmentTable4 implements IAlignmentTable {
     int startPosition = column.getPosition();
     for (int i = startPosition; i <= columns.size(); i++) {
       final IColumn mcolumn = columns.get(i - 1);
-      final int position = column.getPosition();
-      mcolumn.setPosition(position + 1);
+      final int position = mcolumn.getPosition();
+      mcolumn.setPosition(position + witnessPhrase.size());
     }
     for (final INormalizedToken token : witnessPhrase.getTokens()) {
       final IColumn extraColumn = new Column3(token, startPosition);

@@ -97,7 +97,7 @@ public class Factory {
     return witnessIndex;
   }
 
-  private static ICallback NULLCALLBACK = new ICallback() {
+  public static ICallback NULLCALLBACK = new ICallback() {
     @Override
     public void alignment(final IAlignment alignment) {}
   };

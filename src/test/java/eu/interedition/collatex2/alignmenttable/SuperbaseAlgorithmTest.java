@@ -4,13 +4,20 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.ICallback;
+import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 //TODO: Rename to AlignmentTableTest!
@@ -91,7 +98,6 @@ public class SuperbaseAlgorithmTest {
     expected += "B: before|the| |cat| \n";
     expected += "C:  |the|black|cat| \n";
     expected += "D:  |the| |cat|walks\n";
-
     assertEquals(expected, table.toString());
   }
 
@@ -112,6 +118,40 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
+  @Test
+  public void testAddVariantBeforeColumnAndPositions() {
+    final IAlignmentTable table = new AlignmentTable4();
+    final IWitness witness = factory.createWitness("A", "two before two after");
+    final IWitness temp = factory.createWitness("B", "in between");
+    final IPhrase tobeadded = temp.createPhrase(1, 2);
+    final ICallback callback = Factory.NULLCALLBACK;
+    AlignmentTableCreator3.addWitness(table, witness, callback);
+    final IColumn column = table.getColumns().get(2);
+    table.addVariantBefore(column, tobeadded);
+    final List<IColumn> columns = table.getColumns();
+    Assert.assertEquals(1, columns.get(0).getPosition());
+    Assert.assertEquals(2, columns.get(1).getPosition());
+    Assert.assertEquals(3, columns.get(2).getPosition());
+    Assert.assertEquals(4, columns.get(3).getPosition());
+    Assert.assertEquals(5, columns.get(4).getPosition());
+    Assert.assertEquals(6, columns.get(5).getPosition());
+  }
+
+  @Test
+  public void testVariation() {
+    final IWitness w1 = factory.createWitness("A", "the black cat");
+    final IWitness w2 = factory.createWitness("B", "the black and white cat");
+    final IWitness w3 = factory.createWitness("C", "the black very special cat");
+    final IWitness w4 = factory.createWitness("D", "the black not very special cat");
+    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A: the|black| | | |cat\n";
+    expected += "B: the|black| |and|white|cat\n";
+    expected += "C: the|black| |very|special|cat\n";
+    expected += "D: the|black|not|very|special|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
   //  private static WitnessBuilder builder;
   //
   //  @BeforeClass
@@ -125,21 +165,6 @@ public class SuperbaseAlgorithmTest {
   //  // TODO: fix the gap bug for the last gap
   //
   //
-  //  @Test
-  //  public void testVariation() {
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the black and white cat");
-  //    Witness w3 = builder.build("C", "the black very special cat");
-  //    Witness w4 = builder.build("D", "the black not very special cat");
-  //    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A: the|black| | | |cat\n";
-  //    expected += "B: the|black| |and|white|cat\n";
-  //    expected += "C: the|black| |very|special|cat\n";
-  //    expected += "D: the|black|not|very|special|cat\n";
-  //
-  //    assertEquals(expected, table.toString());
-  //  }
   //
   //  @Test
   //  public void testWitnessReorder() {
