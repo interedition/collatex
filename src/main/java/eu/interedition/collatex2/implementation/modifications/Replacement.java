@@ -1,35 +1,35 @@
 package eu.interedition.collatex2.implementation.modifications;
 
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
 
 public class Replacement implements IReplacement {
-  private final IPhrase _original;
+  private final IColumns _original;
   private final IPhrase _replacement;
 
-  public Replacement(final IPhrase original, final IPhrase replacement) {
-    this._original = original;
+  public Replacement(final IColumns gapA, final IPhrase replacement) {
+    this._original = gapA;
     this._replacement = replacement;
   }
 
   @Override
   public String toString() {
-    // TODO: Not getNormalized!
-    final String baseWords = _original.getNormalized();
+    final String baseWords = _original.toString();
     // TODO: Not getNormalized!
     final String replacementWords = _replacement.getNormalized();
-    return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getFirstToken().getPosition();
+    return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getFirstColumn().getPosition();
   }
 
   public int getPosition() {
-    return _original.getFirstToken().getPosition();
+    return _original.getFirstColumn().getPosition();
   }
 
-  public IPhrase getOriginalWords() {
+  public IColumns getOriginalColumns() {
     return _original;
   }
 
-  public IPhrase getReplacementWords() {
+  public IPhrase getReplacementPhrase() {
     return _replacement;
   }
 

@@ -54,7 +54,7 @@ public class SuperbaseTest {
     final INormalizedToken word = witness.getTokens().get(0);
     final INormalizedToken wordB = witnessB.getTokens().get(0);
     final INormalizedToken wordC = witnessC.getTokens().get(0);
-    final IColumn column = new Column3(word);
+    final IColumn column = new Column3(word, 1);
     column.addVariant(wordB);
     column.addVariant(wordC);
     final ISuperbase superbase = new Superbase4();
@@ -70,7 +70,7 @@ public class SuperbaseTest {
     final INormalizedToken word = witness.getTokens().get(0);
     final INormalizedToken wordB = witnessB.getTokens().get(0);
     final INormalizedToken wordC = witnessC.getTokens().get(0);
-    final IColumn column = new Column3(word);
+    final IColumn column = new Column3(word, 1);
     column.addVariant(wordB);
     column.addMatch(wordC);
     final ISuperbase superbase = new Superbase4();

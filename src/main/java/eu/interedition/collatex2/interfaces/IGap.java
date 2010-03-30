@@ -8,7 +8,7 @@ public interface IGap {
 
   boolean isReplacement();
 
-  IPhrase getPhraseA();
+  IColumns getColumnsA();
 
   IPhrase getPhraseB();
 

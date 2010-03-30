@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
@@ -78,22 +79,34 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public void addVariantAtTheEnd(final IPhrase witnessPhrase) {
     for (final INormalizedToken token : witnessPhrase.getTokens()) {
-      final IColumn extraColumn = new Column3(token);
+      final IColumn extraColumn = new Column3(token, size() + 1);
       columns.add(extraColumn);
     }
   }
 
   @Override
   public void addVariantBefore(final IColumn column, final IPhrase witnessPhrase) {
-    int indexOf = columns.indexOf(column);
-    if (indexOf == -1) {
-      throw new RuntimeException("Unexpected error: Column not found!");
+    int startPosition = column.getPosition();
+    for (int i = startPosition; i <= columns.size(); i++) {
+      final IColumn mcolumn = columns.get(i - 1);
+      final int position = column.getPosition();
+      mcolumn.setPosition(position + 1);
     }
-
     for (final INormalizedToken token : witnessPhrase.getTokens()) {
-      final IColumn extraColumn = new Column3(token);
-      columns.add(indexOf, extraColumn);
-      indexOf++;
+      final IColumn extraColumn = new Column3(token, startPosition);
+      columns.add(startPosition - 1, extraColumn);
+      startPosition++;
     }
+  }
+
+  @Override
+  public IColumns createColumns(final int startPosition, final int endPosition) {
+    final List<IColumn> subList = columns.subList(startPosition - 1, endPosition);
+    return new Columns(subList);
+  }
+
+  @Override
+  public int size() {
+    return getColumns().size();
   }
 }

@@ -4,7 +4,7 @@ public interface IMatch {
 
   String getNormalized();
 
-  IPhrase getPhraseA();
+  IColumns getColumnsA();
 
   IPhrase getPhraseB();
 

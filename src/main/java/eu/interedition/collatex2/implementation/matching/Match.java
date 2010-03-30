@@ -1,25 +1,26 @@
 package eu.interedition.collatex2.implementation.matching;
 
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Match implements IMatch {
 
-  private final IPhrase a;
+  private final IColumns a;
   private final IPhrase b;
 
-  public Match(final IPhrase basePhrase, final IPhrase witnessPhrase) {
-    this.a = basePhrase;
+  public Match(final IColumns columnsA, final IPhrase witnessPhrase) {
+    this.a = columnsA;
     this.b = witnessPhrase;
   }
 
   @Override
   public String getNormalized() {
-    return a.getNormalized();
+    return b.getNormalized();
   }
 
   @Override
-  public IPhrase getPhraseA() {
+  public IColumns getColumnsA() {
     return a;
   }
 
@@ -30,6 +31,6 @@ public class Match implements IMatch {
 
   @Override
   public String toString() {
-    return getPhraseA() + "->" + getPhraseB();
+    return getColumnsA() + "->" + getPhraseB();
   }
 }

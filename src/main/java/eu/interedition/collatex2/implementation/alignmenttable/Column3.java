@@ -14,8 +14,10 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 public class Column3 implements IColumn {
   private final Map<String, INormalizedToken> sigliToTokens;
   private final List<INormalizedToken> variants;
+  private int _position;
 
-  public Column3(final INormalizedToken token) {
+  public Column3(final INormalizedToken token, final int position) {
+    _position = position;
     this.sigliToTokens = Maps.newHashMap();
     this.variants = Lists.newArrayList();
     init(token);
@@ -55,4 +57,13 @@ public class Column3 implements IColumn {
     sigliToTokens.put(token.getSigil(), token);
   }
 
+  @Override
+  public int getPosition() {
+    return _position;
+  }
+
+  @Override
+  public void setPosition(final int position) {
+    _position = position;
+  }
 }

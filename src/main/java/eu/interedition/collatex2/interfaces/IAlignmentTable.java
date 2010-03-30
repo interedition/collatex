@@ -14,4 +14,9 @@ public interface IAlignmentTable {
 
   void addVariantBefore(IColumn column, IPhrase witnessPhrase);
 
+  //TODO: Maybe rename to getCells?
+  IColumns createColumns(int currentIndex, int i);
+
+  int size();
+
 }
