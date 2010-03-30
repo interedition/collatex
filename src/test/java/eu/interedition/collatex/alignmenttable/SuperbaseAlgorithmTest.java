@@ -1,4 +1,4 @@
-package eu.interedition.collatex.superbase;
+package eu.interedition.collatex.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,22 +25,6 @@ public class SuperbaseAlgorithmTest {
   // TODO: make the tostring on the alignmenttable
   // TODO: work with multiple spaces for an empty cell
   // TODO: fix the gap bug for the last gap
-
-  @Test
-  public void testGenSuperbase() {
-    final Witness w1 = builder.build("A", "the cat");
-    final Witness w2 = builder.build("B", "before the cat");
-    final Witness w3 = builder.build("C", "the black cat");
-    final Witness w4 = builder.build("D", "just before midnight the cat walks");
-    final WitnessSet set = new WitnessSet(w1, w2, w3, w4);
-    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "A:  | | |the| |cat| \n";
-    expected += "B:  |before| |the| |cat| \n";
-    expected += "C:  | | |the|black|cat| \n";
-    expected += "D: just|before|midnight|the| |cat|walks\n";
-
-    assertEquals(expected, table.toString());
-  }
 
   @Test
   public void testVariation() {

@@ -95,6 +95,23 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
+  //TODO: rename test!
+  @Test
+  public void testGenSuperbase() {
+    final IWitness w1 = factory.createWitness("A", "the cat");
+    final IWitness w2 = factory.createWitness("B", "before the cat");
+    final IWitness w3 = factory.createWitness("C", "the black cat");
+    final IWitness w4 = factory.createWitness("D", "just before midnight the cat walks");
+    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A:  | | |the| |cat| \n";
+    expected += "B:  |before| |the| |cat| \n";
+    expected += "C:  | | |the|black|cat| \n";
+    expected += "D: just|before|midnight|the| |cat|walks\n";
+
+    assertEquals(expected, table.toString());
+  }
+
   //  private static WitnessBuilder builder;
   //
   //  @BeforeClass
@@ -107,21 +124,6 @@ public class SuperbaseAlgorithmTest {
   //  // TODO: work with multiple spaces for an empty cell
   //  // TODO: fix the gap bug for the last gap
   //
-  //  @Test
-  //  public void testGenSuperbase() {
-  //    Witness w1 = builder.build("A", "the cat");
-  //    Witness w2 = builder.build("B", "before the cat");
-  //    Witness w3 = builder.build("C", "the black cat");
-  //    Witness w4 = builder.build("D", "just before midnight the cat walks");
-  //    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A:  | | |the| |cat| \n";
-  //    expected += "B:  |before| |the| |cat| \n";
-  //    expected += "C:  | | |the|black|cat| \n";
-  //    expected += "D: just|before|midnight|the| |cat|walks\n";
-  //
-  //    assertEquals(expected, table.toString());
-  //  }
   //
   //  @Test
   //  public void testVariation() {
