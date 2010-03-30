@@ -60,6 +60,7 @@ public class Factory {
   }
 
   public IAlignment createAlignment(final IAlignmentTable table, final IWitness b) {
+    //TODO: START replace with witnessindexuse
     // make the superbase from the alignment table
     final ISuperbase superbase = Superbase4.create(table);
     final WordDistance distanceMeasure = new NormalizedLevenshtein();
@@ -71,6 +72,8 @@ public class Factory {
       final IPhrase phraseB = phraseMatch.getPhraseB();
       matches.add(new Match(columns, phraseB));
     }
+    //TODO: END replace with witnessindexuse
+
     final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;

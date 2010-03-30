@@ -38,7 +38,7 @@ public class UseCaseResource extends ServerResource {
 
   //Note: usecase 0 works
   @Override
-  public Representation get(final Variant variant) throws ResourceException {
+  public Representation get(@SuppressWarnings("unused") final Variant variant) throws ResourceException {
     final List<String[]> useCases = useCases();
     final String[] firstUseCase = useCases.get(i);
     String html = "";

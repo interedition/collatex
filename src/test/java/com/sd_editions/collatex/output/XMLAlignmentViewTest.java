@@ -2,7 +2,10 @@ package com.sd_editions.collatex.output;
 
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.permutations.collate.Transposition;
@@ -58,4 +61,10 @@ public class XMLAlignmentViewTest {
   //    final String expected = "<modifications><omission position=\"2\">deletion</omission></modifications>";
   //    assertEquals(expected, result);
   //  }
+
+  @Test
+  // dummy test for mvn's benefit, doesn't like testfiles without tests
+  public void test() {
+    Assert.assertTrue(true);
+  }
 }
