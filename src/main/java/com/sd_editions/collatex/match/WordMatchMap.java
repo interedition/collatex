@@ -133,7 +133,7 @@ public class WordMatchMap {
   //          // give the matching words in other rows the same color
   //          String word = witnessWordsMatrix[witnessId][wordId];
   //          WordMatches wordMatches = wordMatchMap.get(word);
-  //          // TODO: do something with the permutations in wordMatches
+  //          // TODO do something with the permutations in wordMatches
   //          // If this is the best place to deal with it..
   //          colorId++;
   //        }

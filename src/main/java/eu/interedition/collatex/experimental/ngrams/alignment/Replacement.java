@@ -14,9 +14,9 @@ public class Replacement extends Modification {
 
   @Override
   public String toString() {
-    // TODO: Not getNormalized!
+    // TODO Not getNormalized!
     final String baseWords = _original.getNormalized();
-    // TODO: Not getNormalized!
+    // TODO Not getNormalized!
     final String replacementWords = _replacement.getNormalized();
     return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getFirstToken().getPosition();
   }

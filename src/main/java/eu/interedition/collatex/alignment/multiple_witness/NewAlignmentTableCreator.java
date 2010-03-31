@@ -71,7 +71,7 @@ public class NewAlignmentTableCreator {
     }
   }
 
-  // TODO: make Gap generic!
+  // TODO make Gap generic!
   static void addAdditionsToAlignmentTable(final AlignmentTable2 table, final NewSuperbase superbase, final Alignment<Phrase> alignment) {
     final List<Gap> additions = alignment.getAdditions();
     for (final Gap addition : additions) {
@@ -93,7 +93,7 @@ public class NewAlignmentTableCreator {
       final Iterator<Phrase> iteratorB = phrasesB.iterator();
       while (iteratorA.hasNext()) {
         final Phrase phraseA = iteratorA.next();
-        // TODO: dangerous! replacement might be shorter!
+        // TODO dangerous! replacement might be shorter!
         // this can happen when there is variation in a column,
         // then one phrase can replace multiple phrases!
         // maybe detect the number of columns in the phrases
@@ -104,7 +104,7 @@ public class NewAlignmentTableCreator {
           column.addVariant(phraseB);
         }
       }
-      // TODO: you might miss stuff here! replacement might be longer!
+      // TODO you might miss stuff here! replacement might be longer!
       // still have words in the witness? add new columns after the last one from the base
       if (iteratorB.hasNext()) {
         final LinkedList<Phrase> remainingWitnessWords = Lists.newLinkedList(iteratorB);
@@ -114,7 +114,7 @@ public class NewAlignmentTableCreator {
 
     //    final List<Gap> replacements = compresult.getReplacements();
     //    for (final Gap replacement : replacements) {
-    //      // TODO: hou rekening met langere additions!
+    //      // TODO hou rekening met langere additions!
     //
     //      final Iterator<Word> baseIterator = replacement.getPhraseA().getWords().iterator();
     //      final Iterator<Word> witnessIterator = replacement.getPhraseB().getWords().iterator();
@@ -144,8 +144,8 @@ public class NewAlignmentTableCreator {
     }
   }
 
-  // TODO: make this method generic or work with Phrase,
-  // TODO; remove dependency on Word
+  // TODO make this method generic or work with Phrase,
+  // TODO remove dependency on Word
   // NOTE: the way transpositions are handled here
   // and the way there are placed in the alignment table
   // is just one specific case, namely
@@ -156,7 +156,7 @@ public class NewAlignmentTableCreator {
     // handle transpositions here!
     final Collection<Transposition> tranpositions = alignment.getTranpositions();
     System.out.println(tranpositions);
-    // TODO: DO CHECK HERE!!!!
+    // TODO DO CHECK HERE!!!!
     // remove duplicates from transpositions
     final Stack<Transposition> transToCheck = new Stack<Transposition>();
     final List<Transposition> transpositions = Lists.newArrayList();
@@ -191,12 +191,12 @@ public class NewAlignmentTableCreator {
       //      System.out.println(w);
       //      System.out.println(o);
       final Match<T> nextMatch = t.getBase().getFirstMatch();
-      // TODO: remove nextWord from BaseContainerPart
-      // TODO: add next match to addition, transposition, etc
-      // TODO: and use that!
-      // TODO: rename word to element!
+      // TODO remove nextWord from BaseContainerPart
+      // TODO add next match to addition, transposition, etc
+      // TODO and use that!
+      // TODO rename word to element!
       final T nextBaseWord;
-      // TODO: make a method on Transposition called hasNextMatch!
+      // TODO make a method on Transposition called hasNextMatch!
       if (nextMatch != null) {
         nextBaseWord = nextMatch.getBaseWord();
       } else {

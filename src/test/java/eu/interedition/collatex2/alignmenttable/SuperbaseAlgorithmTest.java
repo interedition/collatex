@@ -4,16 +4,23 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.ICallback;
+import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: Rename to AlignmentTableTest!
+//TODO Rename to AlignmentTableTest!
 //Note: this test are very similar to the alignment table 2 tests!
 //Note: since the superbase algorithm class becomes more like a container, and does not contain any 
 //Note: responsibility the tests should just move to there!
@@ -91,7 +98,57 @@ public class SuperbaseAlgorithmTest {
     expected += "B: before|the| |cat| \n";
     expected += "C:  |the|black|cat| \n";
     expected += "D:  |the| |cat|walks\n";
+    assertEquals(expected, table.toString());
+  }
 
+  //TODO: rename test!
+  @Test
+  public void testGenSuperbase() {
+    final IWitness w1 = factory.createWitness("A", "the cat");
+    final IWitness w2 = factory.createWitness("B", "before the cat");
+    final IWitness w3 = factory.createWitness("C", "the black cat");
+    final IWitness w4 = factory.createWitness("D", "just before midnight the cat walks");
+    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A:  | | |the| |cat| \n";
+    expected += "B:  |before| |the| |cat| \n";
+    expected += "C:  | | |the|black|cat| \n";
+    expected += "D: just|before|midnight|the| |cat|walks\n";
+
+    assertEquals(expected, table.toString());
+  }
+
+  @Test
+  public void testAddVariantBeforeColumnAndPositions() {
+    final IAlignmentTable table = new AlignmentTable4();
+    final IWitness witness = factory.createWitness("A", "two before two after");
+    final IWitness temp = factory.createWitness("B", "in between");
+    final IPhrase tobeadded = temp.createPhrase(1, 2);
+    final ICallback callback = Factory.NULLCALLBACK;
+    AlignmentTableCreator3.addWitness(table, witness, callback);
+    final IColumn column = table.getColumns().get(2);
+    table.addVariantBefore(column, tobeadded);
+    final List<IColumn> columns = table.getColumns();
+    Assert.assertEquals(1, columns.get(0).getPosition());
+    Assert.assertEquals(2, columns.get(1).getPosition());
+    Assert.assertEquals(3, columns.get(2).getPosition());
+    Assert.assertEquals(4, columns.get(3).getPosition());
+    Assert.assertEquals(5, columns.get(4).getPosition());
+    Assert.assertEquals(6, columns.get(5).getPosition());
+  }
+
+  @Test
+  public void testVariation() {
+    final IWitness w1 = factory.createWitness("A", "the black cat");
+    final IWitness w2 = factory.createWitness("B", "the black and white cat");
+    final IWitness w3 = factory.createWitness("C", "the black very special cat");
+    final IWitness w4 = factory.createWitness("D", "the black not very special cat");
+    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A: the|black| | | |cat\n";
+    expected += "B: the|black| |and|white|cat\n";
+    expected += "C: the|black| |very|special|cat\n";
+    expected += "D: the|black|not|very|special|cat\n";
     assertEquals(expected, table.toString());
   }
 
@@ -103,41 +160,11 @@ public class SuperbaseAlgorithmTest {
   //  }
   //
   //
-  //  // TODO: make the tostring on the alignmenttable
-  //  // TODO: work with multiple spaces for an empty cell
-  //  // TODO: fix the gap bug for the last gap
+  //  // TODO make the tostring on the alignmenttable
+  //  // TODO work with multiple spaces for an empty cell
+  //  // TODO fix the gap bug for the last gap
   //
-  //  @Test
-  //  public void testGenSuperbase() {
-  //    Witness w1 = builder.build("A", "the cat");
-  //    Witness w2 = builder.build("B", "before the cat");
-  //    Witness w3 = builder.build("C", "the black cat");
-  //    Witness w4 = builder.build("D", "just before midnight the cat walks");
-  //    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A:  | | |the| |cat| \n";
-  //    expected += "B:  |before| |the| |cat| \n";
-  //    expected += "C:  | | |the|black|cat| \n";
-  //    expected += "D: just|before|midnight|the| |cat|walks\n";
   //
-  //    assertEquals(expected, table.toString());
-  //  }
-  //
-  //  @Test
-  //  public void testVariation() {
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the black and white cat");
-  //    Witness w3 = builder.build("C", "the black very special cat");
-  //    Witness w4 = builder.build("D", "the black not very special cat");
-  //    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A: the|black| | | |cat\n";
-  //    expected += "B: the|black| |and|white|cat\n";
-  //    expected += "C: the|black| |very|special|cat\n";
-  //    expected += "D: the|black|not|very|special|cat\n";
-  //
-  //    assertEquals(expected, table.toString());
-  //  }
   //
   //  @Test
   //  public void testWitnessReorder() {
@@ -177,8 +204,8 @@ public class SuperbaseAlgorithmTest {
   //    AlignmentTable2 table = new AlignmentTable2();
   //    table.addWitness(w1);
   //    table.addWitness(w2);
-  //    // TODO: add match test can be moved to a column test class? 
-  //    //    // TODO: word contains id also, which refers to Witness
+  //    // TODO add match test can be moved to a column test class? 
+  //    //    // TODO word contains id also, which refers to Witness
   //    //    Column c1 = table.getColumns().get(0);
   //    //    Column c2 = table.getColumns().get(1);
   //    //    Column c3 = table.getColumns().get(2);
@@ -198,9 +225,9 @@ public class SuperbaseAlgorithmTest {
   //    AlignmentTable2 table = new AlignmentTable2();
   //    table.addWitness(w1);
   //    table.addWitness(w2);
-  //    // TODO: add match test can be moved to column class?
+  //    // TODO add match test can be moved to column class?
   //    //    Column column = table.getColumns().get(0);
-  //    // TODO: word contains id also, which refers to Witness
+  //    // TODO word contains id also, which refers to Witness
   //    //table.addMatch(w2, w2.getWordOnPosition(1), column);
   //    String expected = "A: the|black|cat\n";
   //    expected += "B: the| | \n";

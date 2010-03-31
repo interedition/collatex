@@ -12,7 +12,7 @@ public interface IWitness extends Iterable<NormalizedToken> {
 
   String getSigil();
 
-  // TODO: check whether iterator.remove() throws exception!
+  // TODO check whether iterator.remove() throws exception!
   Iterator<NormalizedToken> iterator();
 
   //Note: not pleased with this method! reduce visibility?

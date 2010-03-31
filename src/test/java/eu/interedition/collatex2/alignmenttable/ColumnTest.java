@@ -14,7 +14,7 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: Add tests for the state of the Column
+//TODO Add tests for the state of the Column
 //NOTE: this is an implementation test!
 //NOTE: constructors are called directly!
 //NOTE: Not only read only methods are called!

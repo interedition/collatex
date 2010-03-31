@@ -40,7 +40,7 @@ public class SequenceDetection {
   }
 
   // Note: THE previous METHOD ASSUMED AN ORDER IN THE SET!
-  // TODO: add test!
+  // TODO add test!
   private static <T extends BaseElement> List<Match<T>> sortMatchesForBase(final Set<Match<T>> matches) {
     final Comparator<Match<T>> comparator = new Comparator<Match<T>>() {
       public int compare(final Match<T> o1, final Match<T> o2) {

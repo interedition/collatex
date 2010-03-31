@@ -23,13 +23,13 @@ public class NGramSegmentationTest {
     //    Assert.assertEquals(2, bigrams.size());
     //    final Phrase bigram1 = bigrams.get(0);
     //    final Phrase bigram2 = bigrams.get(1);
-    // TODO: should be bigram1.getNormalized()
+    // TODO should be bigram1.getNormalized()
     //    Assert.assertEquals("as when", bigram1.getOriginal());
     //    Assert.assertEquals("when clock", bigram2.getOriginal());
     // THIS should become 4 bigrams; # as, as when, when clock, clock #
   }
 
-  // TODO: clock should get its own subsegment! (not overlapping)
+  // TODO clock should get its own subsegment! (not overlapping)
   //  @Ignore
   //  @Test
   //  public void testBeckett2() {
@@ -47,7 +47,7 @@ public class NGramSegmentationTest {
   // hummm omissions are a form of additions ... so ...
   // so thinking about the replacements first..
 
-  // TODO: add extra asserts
+  // TODO add extra asserts
   // NOTE: # as, as when
   // NOTE: when clock, clock #
   //   public void testBeckett2a() {
@@ -66,7 +66,7 @@ public class NGramSegmentationTest {
   //    //    final Phrase segment3 = uniqueSubsegmentsTwo.get(0);
   //    //    Assert.assertEquals("when #", segment3.getOriginal());
   //  }
-  // TODO: next step would be to make trigrams from bigrams were possible for each witness!
+  // TODO next step would be to make trigrams from bigrams were possible for each witness!
   //  @Test
   //  @Ignore
   //  public void testBeckett2b() {
@@ -81,7 +81,7 @@ public class NGramSegmentationTest {
   //    final Phrase piece2 = pieces2.get(0);
   //    Assert.assertEquals("when #", piece2.getOriginal());
   //  }
-  // TODO: nu is het een kwestie van de groepen met elkaar vergelijken
+  // TODO nu is het een kwestie van de groepen met elkaar vergelijken
   // ok nu moet er een nieuwe vorm van gap detection komen
   // die dus gaps oplevert
   // interesting
@@ -94,6 +94,6 @@ public class NGramSegmentationTest {
     //    final WitnessSegmentPhrases wsp1 = BiGrams.getWSP("A", a, b);
     //    final WitnessSegmentPhrases wsp2 = BiGrams.getWSP("B", a, b);
     //    Assert.assertEquals("|as when|", wsp2.toSpecialString());
-    // TODO: add test for wsp1!
+    // TODO add test for wsp1!
   }
 }

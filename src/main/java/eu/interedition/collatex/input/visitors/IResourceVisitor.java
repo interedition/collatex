@@ -12,8 +12,8 @@ public interface IResourceVisitor {
 
   public void visitWord(Word word);
 
-  // TODO: rename!
-  // TODO: visitWitness
+  // TODO rename!
+  // TODO visitWitness
   public void postVisitWitness(Segment witness);
 
 }

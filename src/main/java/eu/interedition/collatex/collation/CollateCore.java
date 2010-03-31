@@ -79,7 +79,7 @@ public class CollateCore {
     //    return matchNonMatchList.get(0);
   }
 
-  // TODO: remove!
+  // TODO remove!
   public List<List<Alignment>> getAllMatchNonMatchPermutations() {
     throw new UnsupportedOperationException();
     //    List<List<MatchNonMatch>> matchNonMatchPermutationsForAllWitnessPairs = Lists.newArrayList();

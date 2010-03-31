@@ -12,7 +12,7 @@ public interface IGap {
 
   IPhrase getPhraseB();
 
-  //TODO: remove this method!
+  //TODO remove this method!
   //Modification should know about Gap, not the other way around!
   IModification getModification();
 

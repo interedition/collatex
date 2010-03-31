@@ -16,7 +16,7 @@ public class Replacement implements IReplacement {
   @Override
   public String toString() {
     final String baseWords = _original.toString();
-    // TODO: Not getNormalized!
+    // TODO Not getNormalized!
     final String replacementWords = _replacement.getNormalized();
     return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getFirstColumn().getPosition();
   }

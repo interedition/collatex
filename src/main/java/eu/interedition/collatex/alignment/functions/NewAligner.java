@@ -45,12 +45,12 @@ public class NewAligner {
     return result;
   }
 
-  // TODO: naming here is not cool!
+  // TODO naming here is not cool!
   private static UnfixedAlignment<Phrase> selectBestPossibleAlignment(final WitnessSegmentPhrases a, final WitnessSegmentPhrases b, final List<UnfixedAlignment<Phrase>> alignments) {
     UnfixedAlignment<Phrase> bestAlignment = null;
     Alignment<Phrase> bestCollation = null;
 
-    // TODO: add test for lowest number of matchsequences (transpositions)
+    // TODO add test for lowest number of matchsequences (transpositions)
     // NOTE: this can be done in a nicer way with the min function!
     for (final UnfixedAlignment<Phrase> alignment : alignments) {
       final Alignment<Phrase> collation = Alignment.createPhraseAlignment(alignment, a, b);

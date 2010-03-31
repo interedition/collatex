@@ -1,4 +1,4 @@
-package eu.interedition.collatex.superbase;
+package eu.interedition.collatex.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,41 +22,9 @@ public class SuperbaseAlgorithmTest {
     builder = new WitnessBuilder();
   }
 
-  // TODO: make the tostring on the alignmenttable
-  // TODO: work with multiple spaces for an empty cell
-  // TODO: fix the gap bug for the last gap
-
-  @Test
-  public void testGenSuperbase() {
-    final Witness w1 = builder.build("A", "the cat");
-    final Witness w2 = builder.build("B", "before the cat");
-    final Witness w3 = builder.build("C", "the black cat");
-    final Witness w4 = builder.build("D", "just before midnight the cat walks");
-    final WitnessSet set = new WitnessSet(w1, w2, w3, w4);
-    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "A:  | | |the| |cat| \n";
-    expected += "B:  |before| |the| |cat| \n";
-    expected += "C:  | | |the|black|cat| \n";
-    expected += "D: just|before|midnight|the| |cat|walks\n";
-
-    assertEquals(expected, table.toString());
-  }
-
-  @Test
-  public void testVariation() {
-    final Witness w1 = builder.build("A", "the black cat");
-    final Witness w2 = builder.build("B", "the black and white cat");
-    final Witness w3 = builder.build("C", "the black very special cat");
-    final Witness w4 = builder.build("D", "the black not very special cat");
-    final WitnessSet set = new WitnessSet(w1, w2, w3, w4);
-    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "A: the|black| | | |cat\n";
-    expected += "B: the|black| |and|white|cat\n";
-    expected += "C: the|black| |very|special|cat\n";
-    expected += "D: the|black|not|very|special|cat\n";
-
-    assertEquals(expected, table.toString());
-  }
+  // TODO make the tostring on the alignmenttable
+  // TODO work with multiple spaces for an empty cell
+  // TODO fix the gap bug for the last gap
 
   @Test
   public void testWitnessReorder() {
@@ -74,7 +42,7 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
-  // TODO: add this for replacements in comb. with transposit.
+  // TODO add this for replacements in comb. with transposit.
   //  // Note: this is with an unequal transposition sequence size!
   //  @Test
   //  public void testAdditionInCombinationWithTransposition() {
@@ -91,11 +59,11 @@ public class SuperbaseAlgorithmTest {
   //    assertEquals(expected, table.toString());
   //  }
 
-  // TODO: test a variant with multiple words
-  // TODO: hint: more words than the original string it replaces
+  // TODO test a variant with multiple words
+  // TODO hint: more words than the original string it replaces
 
-  // TODO: test a variant where one words turns out
-  // todo: to be a match later
+  // TODO test a variant where one words turns out
+  // TODO to be a match later
   // this is an addition.. not the easiest test
   //  @Test
   //  public void testTwoWitnesses() {

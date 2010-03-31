@@ -46,7 +46,7 @@ public class JSONObjectTableVisitor implements IAlignmentTableVisitor<Word> {
     jsonObject.put("columns", _columns);
   }
 
-  // TODO: extract jsonvisitorinterface!
+  // TODO extract jsonvisitorinterface!
   public JSONObject getJSONObject() {
     return jsonObject;
   }

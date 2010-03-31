@@ -148,7 +148,7 @@ public class ColorsView {
 
   private String replacementView(Replacement replacement) {
     int position = replacement.getPosition();
-    return "<i>" + replacement.getOriginalWords() + "</i> replaced by <i>" + replacement.getReplacementWords() + "</i> at position " + position; // TODO: TEMP!
+    return "<i>" + replacement.getOriginalWords() + "</i> replaced by <i>" + replacement.getReplacementWords() + "</i> at position " + position; // TODO TEMP!
   }
 
   private String transpositionView(Transposition transposition) {

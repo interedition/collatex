@@ -44,7 +44,7 @@ public class Alignment<T extends BaseElement> {
     return new Alignment<Word>(matches, gaps, sequencesA, sequencesB);
   }
 
-  // TODO: make alternative matches work!
+  // TODO make alternative matches work!
   public static Alignment<Phrase> createPhraseAlignment(final UnfixedAlignment<Phrase> matches, final WitnessSegmentPhrases a, final WitnessSegmentPhrases b) {
     final UnfixedAlignment<Phrase> fixed = NewAligner.permutate(matches, a, b);
     if (fixed.hasUnfixedWords()) {
@@ -57,7 +57,7 @@ public class Alignment<T extends BaseElement> {
   private static Alignment<Phrase> theRealCreation(final UnfixedAlignment<Phrase> matches, final WitnessSegmentPhrases a, final WitnessSegmentPhrases b) {
     final List<MatchSequence<Phrase>> sequencesA = SequenceDetection.calculateMatchSequences(matches.getFixedMatches());
     final List<MatchSequence<Phrase>> sequencesB = SequenceDetection.sortSequencesForWitness(sequencesA);
-    // TODO: extract convenience method for this!
+    // TODO extract convenience method for this!
     final List<Gap<Phrase>> gaps = Lists.newArrayList();
     gaps.addAll(GapDetection.getVariantsInBetweenMatchSequences(a, b, sequencesA, sequencesB));
     gaps.addAll(GapDetection.getVariantsInMatchSequences(a, b, sequencesA));
@@ -121,7 +121,7 @@ public class Alignment<T extends BaseElement> {
     return replacements;
   }
 
-  // TODO: rename; add s
+  // TODO rename; add s
   public Collection<Transposition> getTranpositions() {
     final List<Tuple2<MatchSequence<T>>> calculateSequenceTuples = TranspositionDetection.calculateSequenceTuples(getMatchSequencesOrderedForWitnessA(), getMatchSequencesOrderedForWitnessB());
     final List<Tuple2<MatchSequence<T>>> filterAwayRealMatches = TranspositionDetection.filterAwayRealMatches(calculateSequenceTuples);

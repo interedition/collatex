@@ -52,7 +52,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     if (!column.containsWitness(sigil)) {
       return " ";
     }
-    //TODO: should not be getnormalized!
+    //TODO should not be getnormalized!
     return column.getToken(sigil).getNormalized().toString();
   }
 
@@ -65,8 +65,8 @@ public class AlignmentTable4 implements IAlignmentTable {
       for (final IColumn column : alignmentTable.getColumns()) {
         tableHTML.append("<td>");
         if (column.containsWitness(witnessId)) {
-          // TODO: this was normalized!
-          tableHTML.append(column.getToken(witnessId).getContent()); // TODO: add escaping!
+          // TODO this was normalized!
+          tableHTML.append(column.getToken(witnessId).getContent()); // TODO add escaping!
         }
         tableHTML.append("</td>");
       }
@@ -90,8 +90,8 @@ public class AlignmentTable4 implements IAlignmentTable {
     int startPosition = column.getPosition();
     for (int i = startPosition; i <= columns.size(); i++) {
       final IColumn mcolumn = columns.get(i - 1);
-      final int position = column.getPosition();
-      mcolumn.setPosition(position + 1);
+      final int position = mcolumn.getPosition();
+      mcolumn.setPosition(position + witnessPhrase.size());
     }
     for (final INormalizedToken token : witnessPhrase.getTokens()) {
       final IColumn extraColumn = new Column3(token, startPosition);

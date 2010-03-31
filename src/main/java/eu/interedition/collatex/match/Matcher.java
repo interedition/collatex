@@ -25,8 +25,8 @@ import eu.interedition.collatex.match.worddistance.NormalizedLevenshtein;
 // This class does the Matching!
 //
 public class Matcher {
-  //TODO: TESTING: add replacement tests!
-  //TODO: TESTING: add check for alternative matches!
+  //TODO TESTING: add replacement tests!
+  //TODO TESTING: add check for alternative matches!
 
   // NOTE: maybe rename UnfixedAlignment back to Matches?
   public static UnfixedAlignment<Word> match(final Segment a, final Segment b) {
@@ -37,8 +37,8 @@ public class Matcher {
   }
 
   // NOTE: this code is specific for Phrase matching.
-  // TODO: make this code return an UnfixedAlignment object
-  // TODO: make this code similar to match(Segment, Segment)
+  // TODO make this code return an UnfixedAlignment object
+  // TODO make this code similar to match(Segment, Segment)
   public static UnfixedAlignment<Phrase> match(final WitnessSegmentPhrases pa, final WitnessSegmentPhrases pb) {
     final Set<Match<Phrase>> allMatches = Matcher.match2(pa, pb);
     final UnfixedAlignment<Phrase> unfixedAlignment = separateAllMatchesIntoFixedAndUnfixedMatches(allMatches);
@@ -78,7 +78,7 @@ public class Matcher {
   }
 
   //NOTE: THIS METHOD IS SPECIFIC FOR PHRASE MATCHING!
-  // TODO: should look more like findMatches!
+  // TODO should look more like findMatches!
   static Set<Match<Phrase>> match2(final WitnessSegmentPhrases pa, final WitnessSegmentPhrases pb) {
     // take pa as a starting point (depends on the length!)
 

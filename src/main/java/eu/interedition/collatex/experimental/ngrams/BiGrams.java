@@ -18,20 +18,20 @@ public class BiGrams {
     return group.getOverlappingBiGramsForWitnessA();
   }
 
-  // TODO: move this to the BiGramIndexGroup!
+  // TODO move this to the BiGramIndexGroup!
   public static List<NGram> getUniqueBiGramsForWitnessA(final IWitness a, final IWitness b) {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
     return group.getUniqueNGramsForWitnessA();
   }
 
-  // TODO: this method is not finished!
-  // TODO: does not work right for multiple groups of bigrams
+  // TODO this method is not finished!
+  // TODO does not work right for multiple groups of bigrams
   public static List<Phrase> getLongestUniquePiecesForWitnessA(final WitnessF a, final WitnessF b) {
     throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
 
   }
 
-  // TODO: this method is not finished!
+  // TODO this method is not finished!
   public static List<Phrase> getLongestUniquePiecesForWitnessB(final WitnessF a, final WitnessF b) {
     throw new UnsupportedOperationException("NOT YET IMPLEMENTED!");
     //    final List<Phrase> uniqueBiGramsForWitnessB = getUniqueBiGramsForWitnessB(a, b);

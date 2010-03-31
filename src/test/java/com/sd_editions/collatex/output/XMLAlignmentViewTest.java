@@ -31,7 +31,7 @@ public class XMLAlignmentViewTest {
     return alignmentView;
   }
 
-  // TODO: REWRITE!
+  // TODO REWRITE!
   //  @Test
   //  public void testModificationsView() {
   //    Witness witness = builder.build("some addition its longer than that");
@@ -47,7 +47,7 @@ public class XMLAlignmentViewTest {
   //
   //  }
 
-  //TODO: REWRITE!
+  //TODO REWRITE!
   //  @Test
   //  public void testModificationsViewOmissions() {
   //    final Witness witness = builder.build("some deletion has occurred");

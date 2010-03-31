@@ -29,7 +29,7 @@ public class SegmentationResource extends ServerResource {
     String[] witnessStrings = getQuery().getValuesArray("witness");
     WitnessSet set = WitnessSet.createWitnessSet(witnessStrings);
     AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
-    // TODO: make a visitor out of this! (this is actually tei parallel segmentation)
+    // TODO make a visitor out of this! (this is actually tei parallel segmentation)
     String xml = alignmentTable.toXML();
     //    JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();
     //    alignmentTable.accept(visitor);

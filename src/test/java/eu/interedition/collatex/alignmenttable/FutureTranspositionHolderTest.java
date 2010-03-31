@@ -1,4 +1,4 @@
-package eu.interedition.collatex.superbase;
+package eu.interedition.collatex.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
 

@@ -12,7 +12,7 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.input.BaseElement;
 
-//TODO: rename to Matches!
+//TODO rename to Matches!
 public class UnfixedAlignment<T extends BaseElement> {
   private final Set<Match<T>> fixedMatches;
   private final Set<Match<T>> unfixedMatches;

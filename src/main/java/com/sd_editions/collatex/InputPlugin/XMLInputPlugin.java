@@ -97,8 +97,8 @@ public class XMLInputPlugin implements IntInputPlugin {
     @Override
     @SuppressWarnings("unused")
     public InputSource getExternalSubset(String name, String baseURI) throws SAXException, IOException {
-      String entities = "<!ENTITY Base ' '>"; // TODO: replace base with?
-      entities += "<!ENTITY paraph ' '>"; // TODO: replace paraph with?
+      String entities = "<!ENTITY Base ' '>"; // TODO replace base with?
+      entities += "<!ENTITY paraph ' '>"; // TODO replace paraph with?
       entities += "<!ENTITY virgule '/'>";
       return new InputSource(new StringReader(entities));
     }

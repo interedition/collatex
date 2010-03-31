@@ -36,7 +36,7 @@ public class PhraseAlignerTest {
     final Set<Match<Phrase>> exactMatches = Sets.newHashSet(match);
     final Set<Match<Phrase>> nonExactMatches = Sets.emptySortedSet();
     final UnfixedAlignment<Phrase> u = new UnfixedAlignment<Phrase>(exactMatches, nonExactMatches);
-    // TODO: code to make a,b,u
+    // TODO code to make a,b,u
 
     // DO THE ACTUAL ALIGNMENT
     final Alignment<Phrase> alignment = PhraseAligner.align(a, b, u);

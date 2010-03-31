@@ -1,18 +1,14 @@
 package eu.interedition.collatex2.implementation.matching;
 
-import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.matching.worddistance.WordDistance;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IPhraseMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class RealMatcher {
 
@@ -32,26 +28,6 @@ public class RealMatcher {
         }
       }
     }
-    return matchSet;
-  }
-
-  public static Set<IPhraseMatch> findMatchesWithIndex(final IWitness base, final IWitness witness, final WordDistance distanceMeasure) {
-    final Set<IPhraseMatch> matchSet = Sets.newLinkedHashSet();
-    final Map<String, IWitnessIndex> witnessIndexMap = Factory.createWitnessIndexMap(Lists.newArrayList(base, witness));
-    final IWitnessIndex baseIndex = witnessIndexMap.get(base.getSigil());
-    final IWitnessIndex witnessIndex = witnessIndexMap.get(witness.getSigil());
-    for (final IPhrase basePhrase : baseIndex.getPhrases()) {
-      for (final IPhrase witnessPhrase : witnessIndex.getPhrases()) {
-        if (basePhrase.getNormalized().equals(witnessPhrase.getNormalized())) {
-          matchSet.add(new PhraseMatch(basePhrase, witnessPhrase));
-        } else {
-          // skip the near matches for now
-          //          final float editDistance = distanceMeasure.distance(baseWord.getNormalized(), witnessWord.getNormalized());
-          //          if (editDistance < 0.5) matchSet.add(Factory.createMatch(baseWord, witnessWord, editDistance));
-        }
-      }
-    }
-    // en nu opschonen
     return matchSet;
   }
 }

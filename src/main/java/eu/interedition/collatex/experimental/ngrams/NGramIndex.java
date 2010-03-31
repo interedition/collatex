@@ -7,8 +7,8 @@ import com.google.common.collect.Lists;
 
 public class NGramIndex {
 
-  //TODO: rename to create?
-  //TODO: make return type a NGramIndex
+  //TODO rename to create?
+  //TODO make return type a NGramIndex
   static List<NGram> concatenateBiGramToNGram(final BiGramIndex biGramIndex) {
     final List<BiGram> biGrams = Lists.newArrayList(biGramIndex);
     if (biGrams.isEmpty()) {

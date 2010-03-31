@@ -10,7 +10,7 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-//TODO: add ColumnState
+//TODO add ColumnState
 public class Column3 implements IColumn {
   private final Map<String, INormalizedToken> sigliToTokens;
   private final List<INormalizedToken> variants;

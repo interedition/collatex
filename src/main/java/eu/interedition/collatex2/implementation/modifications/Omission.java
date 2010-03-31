@@ -18,7 +18,7 @@ public class Omission implements IModification {
     return columns.getFirstColumn().getPosition();
   }
 
-  //TODO: should not be getNormalized!
+  //TODO should not be getNormalized!
   @Override
   public String toString() {
     return "omission: " + columns.toString() + " position: " + getPosition();

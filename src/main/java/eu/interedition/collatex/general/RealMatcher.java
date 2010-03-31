@@ -12,7 +12,7 @@ import eu.interedition.collatex.match.worddistance.WordDistance;
 public class RealMatcher {
 
   // NOTE: this code is specific for Segments/Words!
-  // TODO: generalize to IWitness etc
+  // TODO generalize to IWitness etc
   public static Set<Match<Word>> findMatches(final Segment base, final Segment witness, final WordDistance distanceMeasure) {
     final Set<Match<Word>> matchSet = Sets.newLinkedHashSet();
     for (final Word baseWord : base.getWords()) {

@@ -25,9 +25,9 @@ public class Addition extends Modification {
 
   @Override
   public String toString() {
-    // TODO: should not be get Normalized?
+    // TODO should not be get Normalized?
     String result = "addition: " + addition.getNormalized();
-    // TODO: I would like to have only 
+    // TODO I would like to have only 
     if (nextMatchA == null || nextMatchA.isEmpty()) {
       result += " position: at the end";
     } else {

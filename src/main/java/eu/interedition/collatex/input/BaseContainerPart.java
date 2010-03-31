@@ -8,14 +8,14 @@ import com.google.common.collect.Lists;
 // Phase; it will get a life of its own
 // for instance...
 // anyway it should take BaseElements in
-// TODO: rename Word to Element!
+// TODO rename Word to Element!
 public class BaseContainerPart<T extends BaseElement> {
   private final BaseContainer<T> _witness;
   private final int startPosition;
   private final int endPosition;
   private final int size;
 
-  // TODO: It is pretty obvious: too many parameters here!
+  // TODO It is pretty obvious: too many parameters here!
   // Note: probably two constructors needed...
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given
@@ -34,7 +34,7 @@ public class BaseContainerPart<T extends BaseElement> {
     this.endPosition = endWord.getEndPosition();
   }
 
-  //TODO: rename method to isEmpty!
+  //TODO rename method to isEmpty!
   public boolean hasGap() {
     return size > 0;
   }

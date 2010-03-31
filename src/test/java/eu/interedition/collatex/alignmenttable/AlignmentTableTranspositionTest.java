@@ -54,7 +54,7 @@ public class AlignmentTableTranspositionTest {
     Assert.assertEquals(expected, actual);
   }
 
-  //TODO: make test work to see what happens if a does not stand at the end!
+  //TODO make test work to see what happens if a does not stand at the end!
   @Ignore
   @Test
   public void testDoubleTransposition3() {
@@ -67,7 +67,7 @@ public class AlignmentTableTranspositionTest {
     Assert.assertEquals(expected, actual);
   }
 
-  // TODO: change expectations and make this work!
+  // TODO change expectations and make this work!
   @Ignore
   @Test
   public void testTranspositionsAreNotStoredInAlignmentTable() {

@@ -59,7 +59,7 @@ public class TranspositionTest extends TestCase {
   // 6 3 7 1
   // 3 2 4 1
 
-  // TODO: re-enable later!
+  // TODO re-enable later!
   //  public void testComplex() {
   //    String base = "The black dog chases a red cat.";
   //    String witness = "A red cat chases the yellow dog";

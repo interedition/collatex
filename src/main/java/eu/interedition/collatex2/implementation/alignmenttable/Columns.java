@@ -35,6 +35,7 @@ public class Columns implements IColumns {
   //NOTE: this method is only for variants!
   public void addVariantPhrase(final IPhrase phraseB) {
     if (phraseB.size() > columns.size()) {
+      System.out.println("!!" + columns.toString() + ":" + phraseB.toString());
       // System.out.println(columns.size());
       // System.out.println(phraseB.size());
       throw new RuntimeException("The phrase to be placed in the table is longer than columns!");
@@ -75,6 +76,14 @@ public class Columns implements IColumns {
   @Override
   public boolean isEmpty() {
     return columns.isEmpty();
+  }
+
+  @Override
+  public String toString() {
+    if (isEmpty()) {
+      return "Columns: EMPTY";
+    }
+    return "Columns: " + getBeginPosition() + "-" + getEndPosition();
   }
 
 }

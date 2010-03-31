@@ -11,8 +11,8 @@ import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.experimental.ngrams.alignment.ModificationVisitor;
 import eu.interedition.collatex.input.Word;
 
-//TODO: remove this class!
-//TODO: Alignment class in experimental package is its replacement!
+//TODO remove this class!
+//TODO Alignment class in experimental package is its replacement!
 public class Modifications {
   private final List<Transposition> transpositions;
   private final List<Modification> modifications;
@@ -50,7 +50,7 @@ public class Modifications {
     return null;
   }
 
-  // TODO: rename WitnessPosition is meant here!
+  // TODO rename WitnessPosition is meant here!
   public Match getMatchAtSegmentPosition(final int witnessPosition) {
     for (final Match match : matches) {
       if (match.getWitnessWord().getBeginPosition() == witnessPosition) return match;

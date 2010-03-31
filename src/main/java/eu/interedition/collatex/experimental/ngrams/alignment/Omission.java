@@ -3,7 +3,7 @@ package eu.interedition.collatex.experimental.ngrams.alignment;
 
 import eu.interedition.collatex.experimental.ngrams.NGram;
 
-// TODO: rename phrase to part!
+// TODO rename phrase to part!
 public class Omission extends Modification {
   private final NGram phrase;
 
@@ -19,7 +19,7 @@ public class Omission extends Modification {
     return phrase.getFirstToken().getPosition();
   }
 
-  //TODO: should not be getNormalized!
+  //TODO should not be getNormalized!
   @Override
   public String toString() {
     return "omission: " + phrase.getNormalized() + " position: " + phrase.getFirstToken().getPosition();

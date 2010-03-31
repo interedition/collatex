@@ -14,7 +14,7 @@ import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.match.Matcher;
 
-// TODO: rename to unfixed alignment test!
+// TODO rename to unfixed alignment test!
 public class PossibleMatchesTest {
   private WitnessBuilder builder;
 

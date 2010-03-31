@@ -59,8 +59,37 @@ public class Factory {
     return alignment;
   }
 
+  public IAlignment createAlignment0(final IAlignmentTable table, final IWitness b) {
+    final WordDistance distanceMeasure = new NormalizedLevenshtein();
+    final Set<IPhraseMatch> phraseMatches = findPhraseMatches(table, b, distanceMeasure);
+    final List<IMatch> matches = Lists.newArrayList();
+    final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
+    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
+    return alignment;
+  }
+
+  private Set<IPhraseMatch> findPhraseMatches(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
+    final Set<IPhraseMatch> matchSet = Sets.newLinkedHashSet();
+    //    final Map<String, IWitnessIndex> witnessIndexMap = Factory.createWitnessIndexMap(Lists.newArrayList(base, witness));
+    //    final IWitnessIndex baseIndex = witnessIndexMap.get(table.getSigil());
+    //    final IWitnessIndex witnessIndex = witnessIndexMap.get(witness.getSigil());
+    //    for (final IPhrase basePhrase : baseIndex.getPhrases()) {
+    //      for (final IPhrase witnessPhrase : witnessIndex.getPhrases()) {
+    //        if (basePhrase.getNormalized().equals(witnessPhrase.getNormalized())) {
+    //          matchSet.add(new PhraseMatch(basePhrase, witnessPhrase));
+    //        } else {
+    //          // skip the near matches for now
+    //          //          final float editDistance = distanceMeasure.distance(baseWord.getNormalized(), witnessWord.getNormalized());
+    //          //          if (editDistance < 0.5) matchSet.add(Factory.createMatch(baseWord, witnessWord, editDistance));
+    //        }
+    //      }
+    //    }
+    //    // en nu opschonen
+    return matchSet;
+  }
+
   public IAlignment createAlignment(final IAlignmentTable table, final IWitness b) {
-    //TODO: START replace with witnessindexuse
+    //TODO START replace with witnessindexuse
     // make the superbase from the alignment table
     final ISuperbase superbase = Superbase4.create(table);
     final WordDistance distanceMeasure = new NormalizedLevenshtein();
@@ -72,7 +101,7 @@ public class Factory {
       final IPhrase phraseB = phraseMatch.getPhraseB();
       matches.add(new Match(columns, phraseB));
     }
-    //TODO: END replace with witnessindexuse
+    //TODO END replace with witnessindexuse
 
     final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
@@ -100,7 +129,7 @@ public class Factory {
     return witnessIndex;
   }
 
-  private static ICallback NULLCALLBACK = new ICallback() {
+  public static ICallback NULLCALLBACK = new ICallback() {
     @Override
     public void alignment(final IAlignment alignment) {}
   };

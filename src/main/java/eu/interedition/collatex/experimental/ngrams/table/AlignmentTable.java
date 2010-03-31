@@ -18,11 +18,11 @@ public class AlignmentTable {
   // NOTE: rename to tree? XML is a tree after all!
   // NOTE: rename to elements? A tree has elements after all!
   public AlignmentTable(final Modifications modifications) {
-    cells = new Element[100]; // TODO: take longest witness?
+    cells = new Element[100]; // TODO take longest witness?
 
     // NOTE: move this to Modifications?
     //    final Set<Match<Word>> matches = modifications.getMatches();
-    //    cells = new Element[100]; // TODO: take longest witness?
+    //    cells = new Element[100]; // TODO take longest witness?
     //    // NOTE: move this to ModificationVisitor?
     //    for (final Match<Word> match : matches) {
     //      final Word matchedWord = match.getBaseWord();
@@ -35,7 +35,7 @@ public class AlignmentTable {
 
   public AlignmentTable(final Alignment alignment) {
     final List<NGram> matches = alignment.getMatches();
-    cells = new Element[100]; // TODO: take longest witness?
+    cells = new Element[100]; // TODO take longest witness?
     // Note: move this to ModificationVisitor?
     for (final NGram match : matches) {
       cells[match.getFirstToken().getPosition() * 2 - 1] = new TextElement(match);
@@ -45,8 +45,8 @@ public class AlignmentTable {
     alignment.accept(modificationVisitor);
   }
 
-  // TODO: use a StringBuilder or Buffer instead of +=
-  // TODO: should we store the whitespace in a Word?
+  // TODO use a StringBuilder or Buffer instead of +=
+  // TODO should we store the whitespace in a Word?
   public String toXML() {
     String result = "<xml>";
     String whitespace = "";

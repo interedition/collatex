@@ -79,7 +79,7 @@ public class Alignment implements IAlignment {
     }
   };
 
-  //TODO: remove gap.getModification!
+  //TODO remove gap.getModification!
   //Modification should know about Gap, not the other way around!
   private static final Function<IGap, IAddition> GAP_TO_ADDITION = new Function<IGap, IAddition>() {
     @Override
@@ -88,7 +88,7 @@ public class Alignment implements IAlignment {
     }
   };
 
-  //TODO: remove gap.getModification!
+  //TODO remove gap.getModification!
   //Modification should know about Gap, not the other way around!
   private static final Function<IGap, IReplacement> GAP_TO_REPLACEMENT = new Function<IGap, IReplacement>() {
     @Override

@@ -24,7 +24,7 @@ public class NGramTranspositionTest {
     // Bigrams test
     final BiGramIndex uindex = group.getUniqueBigramsForWitnessA();
     //Assert.assertEquals(4, index.size());
-    // TODO: I can also make a method that gives back the bigramindex
+    // TODO I can also make a method that gives back the bigramindex
     // in normalized form as a list of strings
     // NOTE: maybe that method is already there! It is called keys!
     Assert.assertEquals("# the", uindex.get(0).getNormalized());

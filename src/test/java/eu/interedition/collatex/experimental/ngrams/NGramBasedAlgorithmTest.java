@@ -49,7 +49,7 @@ public class NGramBasedAlgorithmTest {
     Assert.assertEquals("cat # A: 3 B: 5", overlappingBiGrams.get(2).toString());
   }
 
-  // TODO: getUniqueBiGrams should give back an BiGramIndex
+  // TODO getUniqueBiGrams should give back an BiGramIndex
   @Test
   public void testOverlappingNGrams2b() {
     // "The black cat", "The black and white cat"

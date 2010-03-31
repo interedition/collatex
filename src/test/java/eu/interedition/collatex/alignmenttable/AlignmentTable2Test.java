@@ -1,4 +1,4 @@
-package eu.interedition.collatex.superbase;
+package eu.interedition.collatex.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,8 +28,8 @@ public class AlignmentTable2Test {
     final Witness b = builder.build("B", "the black cat");
     final WitnessSet set = new WitnessSet(a, b);
     final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    // TODO: add match test can be moved to a column test class? 
-    //    // TODO: word contains id also, which refers to Witness
+    // TODO add match test can be moved to a column test class? 
+    //    // TODO word contains id also, which refers to Witness
     //    Column c1 = table.getColumns().get(0);
     //    Column c2 = table.getColumns().get(1);
     //    Column c3 = table.getColumns().get(2);
@@ -48,9 +48,9 @@ public class AlignmentTable2Test {
     final Witness b = builder.build("B", "the");
     final WitnessSet set = new WitnessSet(a, b);
     final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    // TODO: add match test can be moved to column class?
+    // TODO add match test can be moved to column class?
     //    Column column = table.getColumns().get(0);
-    // TODO: word contains id also, which refers to Witness
+    // TODO word contains id also, which refers to Witness
     //table.addMatch(w2, w2.getWordOnPosition(1), column);
     String expected = "A: the|black|cat\n";
     expected += "B: the| | \n";

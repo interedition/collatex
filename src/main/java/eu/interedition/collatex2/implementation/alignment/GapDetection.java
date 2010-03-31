@@ -90,7 +90,7 @@ public class GapDetection {
     return gaps;
   }
 
-  //TODO: add test!
+  //TODO add test!
   private static List<IColumn> getNextColumns(final List<IColumns> matchPhrases) {
     final List<IColumn> nextMatches = Lists.newArrayList();
     for (final IColumns phrase : matchPhrases) {

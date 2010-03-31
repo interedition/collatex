@@ -27,7 +27,7 @@ public class BiGramIndexTest {
     Assert.assertEquals(3, result.size());
   }
 
-  //  TODO: we might want to change this behavior!
+  //  TODO we might want to change this behavior!
   @Test
   public void testIterable() {
     final IWitness a = WitnessF.create("A", "a b c d");

@@ -26,7 +26,7 @@ public class AlignmentTableCreator {
     return table;
   }
 
-  // TODO: rename to addSegment!
+  // TODO rename to addSegment!
   static void addWitness(final AlignmentTable2 table, final Segment witness) {
     if (table.getWitnesses().isEmpty()) {
       for (final Word word : witness.getWords()) {
@@ -39,7 +39,7 @@ public class AlignmentTableCreator {
 
     table.addWitnessToInternalList(witness);
 
-    // TODO: remove call to Aligner!
+    // TODO remove call to Aligner!
     // make the superbase from the alignment table
     final Superbase superbase = table.createSuperbase();
     final Alignment alignment = Aligner.align(superbase, witness);
@@ -57,11 +57,11 @@ public class AlignmentTableCreator {
     }
   }
 
-  // TODO: addReplacements.. should look like addAdditions method!
+  // TODO addReplacements.. should look like addAdditions method!
   static void addReplacementsToAlignmentTable(final AlignmentTable2 table, final Segment witness, final Superbase superbase, final Alignment compresult) {
     final List<Gap> replacements = compresult.getReplacements();
     for (final Gap replacement : replacements) {
-      // TODO: hou rekening met langere additions!
+      // TODO hou rekening met langere additions!
 
       final Iterator<Word> baseIterator = replacement.getPhraseA().getWords().iterator();
       final Iterator<Word> witnessIterator = replacement.getPhraseB().getWords().iterator();

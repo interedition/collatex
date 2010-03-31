@@ -40,7 +40,7 @@ public class Superbase4 extends NormalizedWitness implements ISuperbase {
   public void addToken(final INormalizedToken token, final IColumn column) {
     //NOTE: here we make a new NormalizedToken ... to set the position,  and sigil.
     final int position = size() + 1;
-    //TODO: We really need a token.getContent!
+    //TODO We really need a token.getContent!
     final INormalizedToken faked = new NormalizedToken("superbase", "FAKED", position, token.getNormalized());
     getTokens().add(faked);
     _columns.add(column);
