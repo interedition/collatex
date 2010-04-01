@@ -56,8 +56,91 @@ public class FactoryTest {
     assertTrue(string + " not found in " + stringSet, stringSet.contains(string));
   }
 
+  @Ignore
   @Test
-  public void testGetMatchesUsingWitnessIndex1() {
+  public void testEverythingIsUnique() {
+    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
+    final IWitness witnessB = factory.createWitness("B", "everything is unique");
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
+    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
+    assertEquals(1, matches.size());
+    final IMatch match = matches.get(0);
+    assertEquals("everything is unique", match.getNormalized());
+    final IColumns columnsA = match.getColumnsA();
+    assertEquals(1, columnsA.getBeginPosition());
+    assertEquals(3, columnsA.getEndPosition());
+  }
+
+  @Ignore
+  @Test
+  public void testEverythingIsUniqueTwoWitnesses() {
+    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
+    final IWitness witnessB = factory.createWitness("B", "this one very different");
+    final IWitness witnessC = factory.createWitness("C", "everything is different");
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA, witnessB), Factory.NULLCALLBACK);
+    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessC, new NormalizedLevenshtein());
+    assertEquals(3, matches.size());
+    final IMatch match = matches.get(0);
+    assertEquals("everything", match.getNormalized());
+    final IColumns columnsA = match.getColumnsA();
+    assertEquals(1, columnsA.getBeginPosition());
+    assertEquals(1, columnsA.getEndPosition());
+    final IMatch match2 = matches.get(1);
+    assertEquals("is", match2.getNormalized());
+    final IColumns columnsB = match2.getColumnsA();
+    assertEquals(2, columnsB.getBeginPosition());
+    assertEquals(2, columnsB.getEndPosition());
+    final IMatch match3 = matches.get(2);
+    assertEquals("different", match3.getNormalized());
+    final IColumns columnsC = match3.getColumnsA();
+    assertEquals(4, columnsC.getBeginPosition());
+    assertEquals(4, columnsC.getEndPosition());
+  }
+
+  @Ignore
+  @Test
+  public void testOverlappingMatches() {
+    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
+    final IWitness witnessB = factory.createWitness("B", "this one is different");
+    final IWitness witnessC = factory.createWitness("C", "everything is different");
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA, witnessB), Factory.NULLCALLBACK);
+    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessC, new NormalizedLevenshtein());
+    assertEquals(2, matches.size());
+    final IMatch match = matches.get(0);
+    assertEquals("everything", match.getNormalized());
+    final IColumns columnsA = match.getColumnsA();
+    assertEquals(1, columnsA.getBeginPosition());
+    assertEquals(1, columnsA.getEndPosition());
+    final IMatch match2 = matches.get(1);
+    assertEquals("is", match2.getNormalized());
+    final IColumns columnsB = match2.getColumnsA();
+    assertEquals(3, columnsB.getBeginPosition());
+    assertEquals(3, columnsB.getEndPosition());
+    final IMatch match3 = matches.get(2);
+    assertEquals("different", match3.getNormalized());
+    final IColumns columnsC = match3.getColumnsA();
+    assertEquals(4, columnsC.getBeginPosition());
+    assertEquals(4, columnsC.getEndPosition());
+  }
+
+  @Ignore
+  @Test
+  public void testGetMatchesUsingWitnessIndex() {
+    final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
+    final IWitness witnessB = factory.createWitness("B", "the big black");
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
+    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
+    assertEquals(1, matches.size());
+    final IMatch match = matches.get(0);
+    assertEquals("the big black", match.getNormalized());
+    final IColumns columnsA = match.getColumnsA();
+    assertEquals(1, columnsA.getBeginPosition());
+    assertEquals(3, columnsA.getEndPosition());
+  }
+
+  @Ignore
+  @Test
+  public void testGetMatchesUsingWitnessIndexWithOverlapping() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "the big black cat");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);

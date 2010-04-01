@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.Factory;
@@ -17,6 +18,8 @@ public class WitnessIndexTest {
     factory = new Factory();
   }
 
+  // Note: there are more combinations valid!
+  @Ignore
   @Test
   public void test() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
