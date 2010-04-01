@@ -20,4 +20,6 @@ public interface IPhrase extends Comparable<IPhrase> {
 
   int size();
 
+  IPhrase createSubPhrase(int startIndex, int endIndex);
+
 }

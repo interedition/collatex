@@ -3,6 +3,7 @@ package eu.interedition.collatex2.implementation.alignmenttable;
 import java.util.List;
 
 import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -39,7 +40,7 @@ public class AlignmentTableCreator3 {
     final IAlignment alignment = factory.createAlignment(table, witness);
     callback.alignment(alignment);
     addMatchesToAlignmentTable(alignment);
-    addReplacementsToAlignmentTable(alignment);
+    addReplacementsToAlignmentTable(table, alignment);
     addAdditionsToAlignmentTable(table, alignment);
   }
 
@@ -50,10 +51,10 @@ public class AlignmentTableCreator3 {
     }
   }
 
-  private static void addReplacementsToAlignmentTable(final IAlignment alignment) {
+  private static void addReplacementsToAlignmentTable(final IAlignmentTable table, final IAlignment alignment) {
     final List<IReplacement> replacements = alignment.getReplacements();
     for (final IReplacement replacement : replacements) {
-      addReplacement(replacement);
+      addReplacement(table, replacement);
     }
   }
 
@@ -62,10 +63,21 @@ public class AlignmentTableCreator3 {
     columns.addMatchPhrase(match.getPhraseB());
   }
 
-  //NOTE: for now we assume that phraseA and PhraseB have the same length!
-  private static void addReplacement(final IReplacement replacement) {
+  private static void addReplacement(final IAlignmentTable table, final IReplacement replacement) {
     final IColumns columns = replacement.getOriginalColumns();
-    columns.addVariantPhrase(replacement.getReplacementPhrase());
+    final IPhrase replacementPhrase = replacement.getReplacementPhrase();
+    if (replacementPhrase.size() > columns.size()) {
+      final IColumn nextColumn = replacement.getNextColumn();
+      final IPhrase additionalPhrase = replacementPhrase.createSubPhrase(columns.size() + 1, replacementPhrase.size());
+      //System.out.println("this should be additional: " + additionalPhrase);
+      final IPhrase smallerPhrase = replacementPhrase.createSubPhrase(1, columns.size());
+      //System.out.println("this should be the replacement: " + smallerPhrase);
+      final IAddition addition = new Addition(nextColumn, additionalPhrase);
+      columns.addVariantPhrase(smallerPhrase);
+      addVariantAtGap(table, addition, additionalPhrase);
+    } else {
+      columns.addVariantPhrase(replacementPhrase);
+    }
   }
 
   static void addAdditionsToAlignmentTable(final IAlignmentTable table, final IAlignment alignment) {
@@ -76,6 +88,7 @@ public class AlignmentTableCreator3 {
     }
   }
 
+  //TODO: the number of parameters here is strange!
   private static void addVariantAtGap(final IAlignmentTable table, final IAddition addition, final IPhrase witnessPhrase) {
     if (addition.isAtTheEnd()) {
       table.addVariantAtTheEnd(witnessPhrase);

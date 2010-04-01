@@ -14,4 +14,6 @@ public interface IColumns {
 
   boolean isEmpty();
 
+  int size();
+
 }

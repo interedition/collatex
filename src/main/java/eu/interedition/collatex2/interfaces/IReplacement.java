@@ -6,4 +6,6 @@ public interface IReplacement extends IModification {
 
   IPhrase getReplacementPhrase();
 
+  IColumn getNextColumn();
+
 }

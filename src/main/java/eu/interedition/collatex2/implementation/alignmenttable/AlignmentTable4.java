@@ -102,7 +102,8 @@ public class AlignmentTable4 implements IAlignmentTable {
 
   @Override
   public IColumns createColumns(final int startPosition, final int endPosition) {
-    final List<IColumn> subList = columns.subList(startPosition - 1, endPosition);
+    // NOTE: We make a new List here to prevent ConcurrentModificationExceptions!
+    final List<IColumn> subList = Lists.newArrayList(columns.subList(startPosition - 1, endPosition));
     return new Columns(subList);
   }
 
