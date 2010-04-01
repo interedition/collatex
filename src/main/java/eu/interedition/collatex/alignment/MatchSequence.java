@@ -32,24 +32,24 @@ public class MatchSequence<T extends BaseElement> {
     return sequence.get(0);
   }
 
-  // TODO: rename to getWitnessBeginPosition!
+  // TODO rename to getWitnessBeginPosition!
   @SuppressWarnings("boxing")
   public Integer getSegmentPosition() {
     return getFirstWitnessWord().getBeginPosition();
   }
 
-  // TODO: rename to getBaseWitnessBeginPosition!
+  // TODO rename to getBaseWitnessBeginPosition!
   @SuppressWarnings("boxing")
   public Integer getBasePosition() {
     return getFirstBaseWord().getBeginPosition();
   }
 
-  //TODO: rename Word to Element!
+  //TODO rename Word to Element!
   private T getFirstWitnessWord() {
     return getFirstMatch().getWitnessWord();
   }
 
-  //TODO: rename Word to Element!
+  //TODO rename Word to Element!
   private T getFirstBaseWord() {
     return getFirstMatch().getBaseWord();
   }

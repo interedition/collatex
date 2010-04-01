@@ -85,7 +85,7 @@ public class PhraseGapDetectionTest {
 
     Assert.assertEquals(2, pa.size());
     Assert.assertEquals(5, pb.size());
-    // TODO: this is wrong! SHOULD BE 3!
+    // TODO this is wrong! SHOULD BE 3!
 
     final UnfixedAlignment<Phrase> matches = Matcher.match(pa, pb);
     final Alignment<Phrase> alignment = Alignment.createPhraseAlignment(matches, pa, pb);

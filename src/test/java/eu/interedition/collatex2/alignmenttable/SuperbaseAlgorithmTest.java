@@ -20,7 +20,7 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: Rename to AlignmentTableTest!
+//TODO Rename to AlignmentTableTest!
 //Note: this test are very similar to the alignment table 2 tests!
 //Note: since the superbase algorithm class becomes more like a container, and does not contain any 
 //Note: responsibility the tests should just move to there!
@@ -175,9 +175,9 @@ public class SuperbaseAlgorithmTest {
   //  }
   //
   //
-  //  // TODO: make the tostring on the alignmenttable
-  //  // TODO: work with multiple spaces for an empty cell
-  //  // TODO: fix the gap bug for the last gap
+  //  // TODO make the tostring on the alignmenttable
+  //  // TODO work with multiple spaces for an empty cell
+  //  // TODO fix the gap bug for the last gap
   //
   //
   //
@@ -191,8 +191,8 @@ public class SuperbaseAlgorithmTest {
   //    AlignmentTable2 table = new AlignmentTable2();
   //    table.addWitness(w1);
   //    table.addWitness(w2);
-  //    // TODO: add match test can be moved to a column test class? 
-  //    //    // TODO: word contains id also, which refers to Witness
+  //    // TODO add match test can be moved to a column test class? 
+  //    //    // TODO word contains id also, which refers to Witness
   //    //    Column c1 = table.getColumns().get(0);
   //    //    Column c2 = table.getColumns().get(1);
   //    //    Column c3 = table.getColumns().get(2);
@@ -212,9 +212,9 @@ public class SuperbaseAlgorithmTest {
   //    AlignmentTable2 table = new AlignmentTable2();
   //    table.addWitness(w1);
   //    table.addWitness(w2);
-  //    // TODO: add match test can be moved to column class?
+  //    // TODO add match test can be moved to column class?
   //    //    Column column = table.getColumns().get(0);
-  //    // TODO: word contains id also, which refers to Witness
+  //    // TODO word contains id also, which refers to Witness
   //    //table.addMatch(w2, w2.getWordOnPosition(1), column);
   //    String expected = "A: the|black|cat\n";
   //    expected += "B: the| | \n";

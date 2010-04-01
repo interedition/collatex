@@ -51,7 +51,8 @@ public class AlignmentTable4 implements IAlignmentTable {
   private String cellToString(final String sigil, final IColumn column) {
     if (!column.containsWitness(sigil)) {
       return " ";
-    }//TODO: should not be getnormalized!
+    }
+    //TODO should not be getnormalized!
     return column.getToken(sigil).getNormalized().toString();
   }
 
@@ -59,13 +60,13 @@ public class AlignmentTable4 implements IAlignmentTable {
     final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
 
     for (final String witnessId : alignmentTable.getSigli()) {
-      tableHTML.append("<tr>");
-      tableHTML.append("<th>Witness ").append(witnessId).append(":</th>");
+      tableHTML.append("<tr>").//
+          append("<th>Witness ").append(witnessId).append(":</th>");
       for (final IColumn column : alignmentTable.getColumns()) {
         tableHTML.append("<td>");
         if (column.containsWitness(witnessId)) {
-          // TODO: this was normalized!
-          tableHTML.append(column.getToken(witnessId).getContent()); // TODO: add escaping!
+          // TODO this was normalized!
+          tableHTML.append(column.getToken(witnessId).getContent()); // TODO add escaping!
         }
         tableHTML.append("</td>");
       }

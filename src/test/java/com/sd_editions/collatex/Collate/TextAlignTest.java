@@ -13,14 +13,14 @@ public class TextAlignTest extends TestCase {
     try {
       arrL = ta.getContentofBlock(ta.getTxtOrigBase());
     } catch (Exception e) {
-      // TODO: handle exception
+      // TODO handle exception
     }
     ta.setBase(arrL);
     ta.base2Slot();
     try {
       arrL = ta.getContentofBlock(ta.getTxtOrigWit(1));
     } catch (Exception e) {
-      // TODO: handle exception
+      // TODO handle exception
       System.out.println(e);
     }
     ta.setWit(arrL);

@@ -18,12 +18,12 @@ public class Gap<T extends BaseElement> {
     this.next = _next;
   }
 
-  //TODO: rename method to getPartA
+  //TODO rename method to getPartA
   public BaseContainerPart<T> getPhraseA() {
     return _partA;
   }
 
-  //TODO: rename method to getPartB
+  //TODO rename method to getPartB
   public BaseContainerPart<T> getPhraseB() {
     return _partB;
   }

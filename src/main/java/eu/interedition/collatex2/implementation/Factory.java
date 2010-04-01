@@ -22,6 +22,7 @@ import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.implementation.alignmenttable.Superbase4;
+import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.Phrase;
@@ -50,7 +51,7 @@ public class Factory {
     return NormalizedWitnessBuilder.create(sigil, words);
   }
 
-  //NOTE: this method creates an alignmenttable, add the first witness,
+  // NOTE: this method creates an alignmenttable, adds the first witness,
   // then calls the other createAlignmentMethod
   public IAlignment createAlignment(final IWitness a, final IWitness b) {
     final IAlignmentTable table = new AlignmentTable4();
@@ -71,6 +72,7 @@ public class Factory {
       final IPhrase phraseB = phraseMatch.getPhraseB();
       matches.add(new Match(columns, phraseB));
     }
+
     final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;
@@ -90,13 +92,6 @@ public class Factory {
     throw new RuntimeException("Near matches are not yet supported!");
   }
 
-  @Deprecated
-  // Use createWitnessIndexMap
-  public static IWitnessIndex createWitnessIndex(final IWitness witness) {
-    final WitnessIndex witnessIndex = new WitnessIndex(witness);
-    return witnessIndex;
-  }
-
   public static ICallback NULLCALLBACK = new ICallback() {
     @Override
     public void alignment(final IAlignment alignment) {}
@@ -110,14 +105,120 @@ public class Factory {
     return AlignmentTableCreator3.createAlignmentTable(set, callback);
   }
 
-  private static final Predicate<IPhrase> TWO_OR_MORE_WORDS = new Predicate<IPhrase>() {
-    @Override
-    public boolean apply(final IPhrase phrase) {
-      return phrase.size() > 1;
-    }
-  };
+  public IAlignment createAlignment0(final IAlignmentTable table, final IWitness witness) {
+    final List<IMatch> matches = getMatchesUsingWitnessIndex(table, witness, new NormalizedLevenshtein());
+    final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
+    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
+    return alignment;
+  }
 
-  public static Map<String, IWitnessIndex> createWitnessIndexMap(final IWitness... witnesses) {
+  protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
+    return findMatches(new AlignmentTableIndex(table), new WitnessIndex(witness));
+  }
+
+  private static List<IMatch> findMatches(final AlignmentTableIndex tableIndex, final IWitnessIndex witnessIndex) {
+    final List<IMatch> matches = Lists.newArrayList();
+    final Collection<IPhrase> phrases = witnessIndex.getPhrases();
+    for (final IPhrase phrase : phrases) {
+      if (tableIndex.containsNormalizedPhrase(phrase.getNormalized())) {
+        final IColumns matchingColumns = tableIndex.getColumns(phrase.getNormalized());
+        matches.add(new Match(matchingColumns, phrase));
+      }
+    }
+    return joinOverlappingMatches(matches);
+  }
+
+  protected static List<IMatch> joinOverlappingMatches(final List<IMatch> matches) {
+    final List<IMatch> newMatches = matches;
+    // TODO implement
+    return newMatches;
+  }
+
+  /* use or throw away everything after this */
+
+  //  public IAlignment createAlignment0(final IAlignmentTable table, final IWitness b) {
+  //    final WordDistance distanceMeasure = new NormalizedLevenshtein();
+  //
+  //    // tokenid = normalized name
+  //
+  //    final Multimap<String, IColumn> columnsForTokenId = Multimaps.newArrayListMultimap();
+  //    for (final IColumn column : table.getColumns()) {
+  //      for (final INormalizedToken normalizedToken : column.getVariants()) {
+  //        columnsForTokenId.put(normalizedToken.getNormalized(), column);
+  //      }
+  //    }
+  //
+  //    final List<String> tokensFoundInMultipleColums = Lists.newArrayList();
+  //    for (final String tokenId : columnsForTokenId.keySet()) {
+  //      if (columnsForTokenId.get(tokenId).size() > 1) {
+  //        tokensFoundInMultipleColums.add(tokenId);
+  //      }
+  //    }
+  //
+  //    for (final String tokenId : tokensFoundInMultipleColums) {
+  //
+  //    }
+  //
+  //    for (final INormalizedToken normalizedToken : b.getTokens()) {
+  //      final String normalized = normalizedToken.getNormalized();
+  //      final Collection<IColumn> columns = columnsForTokenId.get(normalized);
+  //
+  //    }
+  //
+  //    // van de table: verzamel die normalizedtokens die in meerdere columns voorkomen
+  //    // van de witness: kijk of er normalizedtokens voorkomen die nog niet dubbel voorkomen in de table, maar wel in de witness
+  //
+  //    // bereken unieke phrases van de table => komen maar in 1 set columns voor
+  //    // bereken unieke phrases van de witness => komen maar i keer voor in de witness
+  //
+  //    // per normalized token, in welke phrases komen ze voor?
+  //    // per phrase: in welke columns komen ze voor?
+  //
+  //    // table.calculateUniquePhrases
+  //    
+  //    // 2: loop de tokens van de witness af
+  //    //   is het token uniek in witness en table? -> vraag de column aan de alignmenttable, voeg column toe
+  //    //   is het token niet uniek in witness of table? -> breid de phrase uit tot het uniek is.
+  //    
+  //
+  //    final Set<IPhraseMatch> phraseMatches = findPhraseMatches(table, b, distanceMeasure);
+  //
+  //    // we hebben een alignmentable, kent alleen columns
+  //    // we moeten daar uitzoeken welke tokens dubbel voorkomen
+  //    // : loop 
+  //
+  //    final List<IMatch> matches = Lists.newArrayList();
+  //
+  //    final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
+  //    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
+  //    return alignment;
+  //  }
+  private Set<IPhraseMatch> findPhraseMatches(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
+    final Set<IPhraseMatch> matchSet = Sets.newLinkedHashSet();
+    //    final Map<String, IWitnessIndex> witnessIndexMap = Factory.createWitnessIndexMap(Lists.newArrayList(base, witness));
+    //    final IWitnessIndex baseIndex = witnessIndexMap.get(table.getSigil());
+    //    final IWitnessIndex witnessIndex = witnessIndexMap.get(witness.getSigil());
+    //    for (final IPhrase basePhrase : baseIndex.getPhrases()) {
+    //      for (final IPhrase witnessPhrase : witnessIndex.getPhrases()) {
+    //        if (basePhrase.getNormalized().equals(witnessPhrase.getNormalized())) {
+    //          matchSet.add(new PhraseMatch(basePhrase, witnessPhrase));
+    //        } else {
+    //          // skip the near matches for now
+    //          //          final float editDistance = distanceMeasure.distance(baseWord.getNormalized(), witnessWord.getNormalized());
+    //          //          if (editDistance < 0.5) matchSet.add(Factory.createMatch(baseWord, witnessWord, editDistance));
+    //        }
+    //      }
+    //    }
+    //    // en nu opschonen
+    return matchSet;
+  }
+
+  public static IWitnessIndex createWitnessIndex(final IWitness witness) {
+    final WitnessIndex witnessIndex = new WitnessIndex(witness);
+    return witnessIndex;
+  }
+
+  public static Map<String, IWitnessIndex> createWitnessIndexMap(final Collection<IWitness> witnesses) {
     final Map<String, IWitnessIndex> map = Maps.newHashMap();
     final Set<String> tokensWithMultiples = getTokensWithMultiples(witnesses);
 
@@ -151,6 +252,13 @@ public class Factory {
 
     return map;
   }
+
+  private static final Predicate<IPhrase> TWO_OR_MORE_WORDS = new Predicate<IPhrase>() {
+    @Override
+    public boolean apply(final IPhrase phrase) {
+      return phrase.size() > 1;
+    }
+  };
 
   private static boolean hasMultiples(final Multimap<String, IPhrase> phraseMap) {
     return phraseMap.entries().size() > phraseMap.keySet().size();
@@ -197,7 +305,7 @@ public class Factory {
   //    return map;
   //  }
 
-  protected static Set<String> getTokensWithMultiples(final IWitness... witnesses) {
+  protected static Set<String> getTokensWithMultiples(final Collection<IWitness> witnesses) {
     final Set<String> stringSet = Sets.newHashSet();
     for (final IWitness witness : witnesses) {
       final Multiset<String> tokenSet = Multisets.newHashMultiset();

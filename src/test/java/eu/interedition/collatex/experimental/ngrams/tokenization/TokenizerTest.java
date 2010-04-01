@@ -5,7 +5,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 public class TokenizerTest {
-  //TODO: do some with preceding whitespace!
+  //TODO do some with preceding whitespace!
   // test content
   @Test
   public void testTokenizer1() {

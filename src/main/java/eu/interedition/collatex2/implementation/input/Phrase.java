@@ -21,7 +21,7 @@ public class Phrase implements IPhrase {
     this.tokens = tokens1;
   }
 
-  //  // TODO: rename parameter "remove" to bigram
+  //  // TODO rename parameter "remove" to bigram
   //  public static Phrase create(final BiGram remove) {
   //    final List<NormalizedToken> tokens = Lists.newArrayList(remove.getFirstToken(), remove.getLastToken());
   //    return new Phrase(tokens);
@@ -48,7 +48,7 @@ public class Phrase implements IPhrase {
 
   }
 
-  // TODO: add test for defensive behavior!
+  // TODO add test for defensive behavior!
   public INormalizedToken getFirstToken() {
     if (isEmpty()) {
       throw new RuntimeException("This ngram is empty!");
@@ -56,7 +56,7 @@ public class Phrase implements IPhrase {
     return tokens.get(0);
   }
 
-  //TODO: make defensive and add test!
+  //TODO make defensive and add test!
   public INormalizedToken getLastToken() {
     return tokens.get(tokens.size() - 1);
   }

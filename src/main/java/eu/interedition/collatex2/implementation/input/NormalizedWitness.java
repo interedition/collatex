@@ -33,14 +33,14 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
     return sigil;
   }
 
-  // TODO: check whether iterator.remove() throws exception!
+  // TODO check whether iterator.remove() throws exception!
   @Override
   public Iterator<INormalizedToken> iterator() {
     return tokens.iterator();
   }
 
   public IPhrase createPhrase(final int startPosition, final int endPosition) {
-    // TODO: this problemCase shouldn't occur
+    // TODO this problemCase shouldn't occur
     final boolean problemCase = (startPosition - 1 > endPosition);
     final List<INormalizedToken> subList = problemCase ? new ArrayList<INormalizedToken>() : tokens.subList(startPosition - 1, endPosition);
     return new Phrase(subList);

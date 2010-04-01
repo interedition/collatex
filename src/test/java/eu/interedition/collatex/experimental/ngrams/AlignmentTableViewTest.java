@@ -43,7 +43,7 @@ public class AlignmentTableViewTest {
   }
 
   public String getGoing(final String w1, final String w2) {
-    // TODO: make a constructor for Witness, Witness
+    // TODO make a constructor for Witness, Witness
     //    Witness base = new Witness(w1);
     //    Witness witness = new Witness(w2);
     //WitnessBuilder builder = new WitnessBuilder();

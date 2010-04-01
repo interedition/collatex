@@ -5,12 +5,14 @@
 	<artifactId>CollateX</artifactId>
 	<name>CollateX</name>
 	<version>1.1-SNAPSHOT</version>
-	<url>http://www.sourceforge.net/projects/collatex</url>
+	<url>http://www.sourceforge.net/projects/collatex
+	</url>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<outputDirectory>target/classes</outputDirectory>
-		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<testOutputDirectory>target/test-classes
+		</testOutputDirectory>
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>
@@ -21,10 +23,18 @@
 		</resources>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptor>assembly.xml</descriptor>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -33,12 +43,6 @@
 				<configuration>
 					<mainClass>com.sd_editions.collatex.InputPlugin.SimpleInputPlugin
 					</mainClass>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptor>assembly.xml</descriptor>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -98,11 +102,11 @@
 			<artifactId>google-collect</artifactId>
 			<version>snapshot-20080321</version>
 		</dependency>
-    <dependency>
-      <groupId>com.google.collections</groupId>
-      <artifactId>google-collections</artifactId>
-      <version>1.0</version>
-    </dependency>
+		<dependency>
+			<groupId>com.google.collections</groupId>
+			<artifactId>google-collections</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

@@ -23,7 +23,7 @@ public class BiGramIndex implements Iterable<BiGram> {
     this.biGrams1 = biGrams1;
   }
 
-  // TODO: remove!
+  // TODO remove!
   public Map normalize() {
     final Map<String, BiGram> biGramMapped1 = normalize(biGrams1);
     return biGramMapped1;
@@ -34,8 +34,8 @@ public class BiGramIndex implements Iterable<BiGram> {
     return new BiGramIndex(biGrams1);
   }
 
-  // TODO: replace calls to this method with calls to create!
-  // TODO: make this method private
+  // TODO replace calls to this method with calls to create!
+  // TODO make this method private
   public static List<BiGram> calculate(final IWitness w) {
     final List<NormalizedToken> tokensTodo = Lists.newArrayList(w);
     tokensTodo.add(new SpecialToken(w.getSigil(), "#", w.size() + 1));
@@ -49,7 +49,7 @@ public class BiGramIndex implements Iterable<BiGram> {
     return bigrams;
   }
 
-  // TODO: integrate the two static functions into one!
+  // TODO integrate the two static functions into one!
   private static Map<String, BiGram> normalize(final List<BiGram> ngrams) {
     final Map<String, BiGram> normalized = Maps.newLinkedHashMap();
     for (final BiGram ngram : ngrams) {
@@ -84,7 +84,7 @@ public class BiGramIndex implements Iterable<BiGram> {
   }
 
   //NOTE: I am not pleased with this method... I wish other classes could iterate over this class!
-  //TODO: remove!
+  //TODO remove!
   public List<BiGram> getBiGrams() {
     return biGrams1;
   }
@@ -93,7 +93,7 @@ public class BiGramIndex implements Iterable<BiGram> {
     return biGrams1.get(i);
   }
 
-  // TODO: make iterator read only!
+  // TODO make iterator read only!
   @Override
   public Iterator<BiGram> iterator() {
     return biGrams1.iterator();

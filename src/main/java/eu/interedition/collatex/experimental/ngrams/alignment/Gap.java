@@ -66,7 +66,7 @@ public class Gap {
     return new Omission(gapA);
   }
 
-  // TODO: 0 -> this is not right!
+  // TODO 0 -> this is not right!
   private Modification createAddition() {
     return new Addition(nextMatchA, gapB);
   }

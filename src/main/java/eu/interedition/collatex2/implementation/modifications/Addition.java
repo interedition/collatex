@@ -23,9 +23,9 @@ public class Addition implements IAddition {
 
   @Override
   public String toString() {
-    // TODO: should not be get Normalized?
+    // TODO should not be get Normalized?
     String result = "addition: " + addition.getNormalized();
-    // TODO: I would like to have only 
+    // TODO I would like to have only 
     if (isAtTheEnd()) {
       result += " position: at the end";
     } else {

@@ -35,7 +35,7 @@ public class BeckettResource extends ServerResource {
     try {
       final SubsegmentExtractor sse = theSameExtractor();
       sse.go();
-      // TODO: 11-2 en 12-1 subsegmenten gaan nog fout!
+      // TODO 11-2 en 12-1 subsegmenten gaan nog fout!
       //      sigli.remove("11-2");
       //      sigli.remove("12-1");
 

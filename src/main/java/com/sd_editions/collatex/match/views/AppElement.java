@@ -3,7 +3,7 @@ package com.sd_editions.collatex.match.views;
 import eu.interedition.collatex.experimental.ngrams.NGram;
 
 public class AppElement extends Element {
-  // TODO: rename!
+  // TODO rename!
   private final NGram addedWords;
   private final NGram reading;
 
@@ -17,17 +17,17 @@ public class AppElement extends Element {
     this.reading = reading2;
   }
 
-  // TODO: use StringBuilder!
+  // TODO use StringBuilder!
   @Override
   public String toXML() {
     String result = "<app>";
     if (reading == null) {
-      //TODO: should not be getNormalized!
+      //TODO should not be getNormalized!
       result += addedWords.getNormalized();
     } else {
-      //TODO: should not be getNormalized!
+      //TODO should not be getNormalized!
       result += "<lemma>" + addedWords.getNormalized() + "</lemma>";
-      //TODO: should not be getNormalized!
+      //TODO should not be getNormalized!
       result += "<reading>" + reading.getNormalized() + "</reading>";
     }
     result += "</app>";

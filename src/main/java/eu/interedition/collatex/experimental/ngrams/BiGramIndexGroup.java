@@ -7,8 +7,8 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.interfaces.IWitness;
 
-// TODO: note this is not really an index! this is a combination of two!
-// TODO: this class is gonna be very similar to WitnessSet!
+// TODO note this is not really an index! this is a combination of two!
+// TODO this class is gonna be very similar to WitnessSet!
 public class BiGramIndexGroup {
 
   private final BiGramIndex indexA;
@@ -26,20 +26,20 @@ public class BiGramIndexGroup {
     return group;
   }
 
-  // TODO: make it return a NGramIndex!
+  // TODO make it return a NGramIndex!
   public List<NGram> getUniqueNGramsForWitnessA() {
     final BiGramIndex bigrams = getUniqueBigramsForWitnessA();
     return NGramIndex.concatenateBiGramToNGram(bigrams);
   }
 
-  // TODO: make it return a NGramIndex!
+  // TODO make it return a NGramIndex!
   public List<NGram> getUniqueNGramsForWitnessB() {
     final BiGramIndex biGramIndex = new BiGramIndex(getUniqueBiGramsForWitnessB());
     return NGramIndex.concatenateBiGramToNGram(biGramIndex);
   }
 
-  // TODO: This method is only public for test reasons!
-  // TODO: move test to another package and make this method protected instead!
+  // TODO This method is only public for test reasons!
+  // TODO move test to another package and make this method protected instead!
   public BiGramIndex getUniqueBigramsForWitnessA() {
     final List<String> uniqueBigramsForWitnessANormalized = Lists.newArrayList(indexA.keys());
     uniqueBigramsForWitnessANormalized.removeAll(indexB.keys());
@@ -53,10 +53,10 @@ public class BiGramIndexGroup {
     return index;
   }
 
-  // TODO: methods that are doing almost the same thing! That should not be necessary!
+  // TODO methods that are doing almost the same thing! That should not be necessary!
   //    // Until here is the exact same stuff as the other method!
-  // TODO: make private!
-  // TODO: make return type a BiGramIndex!
+  // TODO make private!
+  // TODO make return type a BiGramIndex!
   public List<BiGram> getUniqueBiGramsForWitnessB() {
     final List<String> result = Lists.newArrayList(indexB.keys());
     result.removeAll(indexA.keys());
@@ -70,7 +70,7 @@ public class BiGramIndexGroup {
     return subsegments;
   }
 
-  // TODO: no longer used? remove!
+  // TODO no longer used? remove!
   public List<BiGram> getOverlappingBiGramsForWitnessA() {
     final Set<String> union = indexA.keys();
     union.retainAll(indexB.keys());
@@ -83,7 +83,7 @@ public class BiGramIndexGroup {
     return bigrams;
   }
 
-  // TODO: no longer used? remove!
+  // TODO no longer used? remove!
   public List<Subsegment2> getOverlap() {
     final Set<String> union = indexA.keys();
     union.retainAll(indexB.keys());

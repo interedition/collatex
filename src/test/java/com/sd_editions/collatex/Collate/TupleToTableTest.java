@@ -52,7 +52,7 @@ public class TupleToTableTest extends TestCase {
     assertEquals("addition: calico", table.get(1, 3).toString());
     assertEquals("identical: cat", table.get(1, 4).toString());
 
-    //    assertEquals("addition: many", table.get(2, 1).toString()); TODO: fix it so this works!
+    //    assertEquals("addition: many", table.get(2, 1).toString()); TODO fix it so this works!
     assertEquals("identical: a", table.get(2, 2).toString());
     assertEquals("addition: black", table.get(2, 3).toString());
     assertEquals("identical: cat", table.get(2, 4).toString());

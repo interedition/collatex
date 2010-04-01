@@ -11,5 +11,5 @@ public interface IAlignment {
 
   List<IGap> getGaps();
 
-  // TODO: add getMatches and IMatch class!
+  // TODO add getMatches and IMatch class!
 }

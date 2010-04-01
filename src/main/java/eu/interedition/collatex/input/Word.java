@@ -10,7 +10,7 @@ public class Word extends BaseElement implements ICollationResource {
   public final String _normalized;
   public final int position;
 
-  // TODO: add punctuation!!
+  // TODO add punctuation!!
   public Word(final String _witnessId, final String _original, final int _position) {
     if (_original.isEmpty()) throw new IllegalArgumentException("Word cannot be empty!");
     this.witnessId = _witnessId;
@@ -19,8 +19,8 @@ public class Word extends BaseElement implements ICollationResource {
     this.position = _position;
   }
 
-  // TODO: notice the duplication here!
-  // TODO: store punctuation!
+  // TODO notice the duplication here!
+  // TODO store punctuation!
   public Word(final String _witnessId, final Token nextToken, final int _position) {
     this.witnessId = _witnessId;
     this.position = _position;

@@ -12,7 +12,7 @@ import eu.interedition.collatex.alignment.functions.Aligner;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
-// TODO: rename to Alignment Test!
+// TODO rename to Alignment Test!
 public class MatchingTest {
 
   private WitnessBuilder builder;
@@ -23,7 +23,7 @@ public class MatchingTest {
   }
 
   @Test
-  // TODO: assert near matches separate?
+  // TODO assert near matches separate?
   public void testNearMatch() {
     Witness a = builder.build("a near match");
     Witness b = builder.build("a nar match");

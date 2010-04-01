@@ -15,11 +15,11 @@ public class SuperbaseAlgorithmTest {
     builder = new WitnessBuilder();
   }
 
-  // TODO: make the tostring on the alignmenttable
-  // TODO: work with multiple spaces for an empty cell
-  // TODO: fix the gap bug for the last gap
+  // TODO make the tostring on the alignmenttable
+  // TODO work with multiple spaces for an empty cell
+  // TODO fix the gap bug for the last gap
 
-  // TODO: add this for replacements in comb. with transposit.
+  // TODO add this for replacements in comb. with transposit.
   //  // Note: this is with an unequal transposition sequence size!
   //  @Test
   //  public void testAdditionInCombinationWithTransposition() {
@@ -36,11 +36,11 @@ public class SuperbaseAlgorithmTest {
   //    assertEquals(expected, table.toString());
   //  }
 
-  // TODO: test a variant with multiple words
-  // TODO: hint: more words than the original string it replaces
+  // TODO test a variant with multiple words
+  // TODO hint: more words than the original string it replaces
 
-  // TODO: test a variant where one words turns out
-  // todo: to be a match later
+  // TODO test a variant where one words turns out
+  // TODO to be a match later
   // this is an addition.. not the easiest test
   //  @Test
   //  public void testTwoWitnesses() {

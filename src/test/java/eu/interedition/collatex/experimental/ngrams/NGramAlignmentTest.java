@@ -14,7 +14,7 @@ import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramAlignmentTest {
 
-  // TODO: this test should be fixed by enhancing the code to handle this case!
+  // TODO this test should be fixed by enhancing the code to handle this case!
   @Ignore
   @Test
   public void testRepetitionTheBlack() {

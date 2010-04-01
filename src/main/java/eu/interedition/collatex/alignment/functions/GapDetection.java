@@ -13,8 +13,8 @@ import eu.interedition.collatex.input.BaseContainerPart;
 import eu.interedition.collatex.input.BaseElement;
 
 public class GapDetection {
-  // TODO: rename Word to Element
-  // TODO: rename some gaps to Part
+  // TODO rename Word to Element
+  // TODO rename some gaps to Part
   public static <T extends BaseElement> List<Gap<T>> getVariantsInMatchSequences(final BaseContainer<T> base, final BaseContainer<T> witness, final List<MatchSequence<T>> sequences) {
     final List<Gap<T>> variants = Lists.newArrayList();
     for (final MatchSequence<T> sequence : sequences) {
@@ -48,8 +48,8 @@ public class GapDetection {
     return variants;
   }
 
-  // TODO: rename some gaps to Part
-  // TODO: rename nonmatch to gap
+  // TODO rename some gaps to Part
+  // TODO rename nonmatch to gap
   public static <T extends BaseElement> List<Gap<T>> getVariantsInBetweenMatchSequences(final BaseContainer<T> base, final BaseContainer<T> witness, final List<MatchSequence<T>> sequencesBase,
       final List<MatchSequence<T>> sequencesWitness) {
     final List<BaseContainerPart<T>> gapsBase = getGapsFromInBetweenMatchSequencesForBase(base, sequencesBase);
@@ -79,8 +79,8 @@ public class GapDetection {
     return nextMatches;
   }
 
-  // TODO: rename Word to Element!
-  // TODO: rename gaps to parts!
+  // TODO rename Word to Element!
+  // TODO rename gaps to parts!
   // this method is made for the base... 
   @SuppressWarnings("boxing")
   private static <T extends BaseElement> List<BaseContainerPart<T>> getGapsFromInBetweenMatchSequencesForBase(final BaseContainer<T> witness, final List<MatchSequence<T>> sequences) {
@@ -88,20 +88,20 @@ public class GapDetection {
     T previousWord = null;
     final List<BaseContainerPart<T>> gaps = Lists.newArrayList();
     for (final MatchSequence<T> sequence : sequences) {
-      // TODO: with getBasePosition the begin position is meant!
+      // TODO with getBasePosition the begin position is meant!
       final int position = sequence.getBasePosition();
       final int indexDif = position - currentIndex;
       gaps.add(new BaseContainerPart<T>(witness, indexDif, currentIndex, position - 1));
       previousWord = sequence.getLastMatch().getBaseWord();
       currentIndex = 1 + previousWord.getEndPosition();
     }
-    // TODO: rename IndexDif to indexDif
+    // TODO rename IndexDif to indexDif
     final int IndexDif = witness.wordSize() - currentIndex + 1;
     gaps.add(new BaseContainerPart<T>(witness, IndexDif, currentIndex, witness.wordSize()));
     return gaps;
   }
 
-  // TODO: rename gaps to parts
+  // TODO rename gaps to parts
   // this method is made for the witness...
   @SuppressWarnings("boxing")
   private static <T extends BaseElement> List<BaseContainerPart<T>> getGapsFromInBetweenMatchSequencesForWitness(final BaseContainer<T> witness, final List<MatchSequence<T>> sequences) {

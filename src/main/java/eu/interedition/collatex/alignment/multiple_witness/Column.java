@@ -16,9 +16,9 @@ import eu.interedition.collatex.input.Word;
 
 public class Column<T extends BaseElement> {
 
-  // TODO: rename Word to Element
+  // TODO rename Word to Element
   protected final Map<String, T> wordsProWitness;
-  private final List<T> variants; // TODO: rename to unique words!
+  private final List<T> variants; // TODO rename to unique words!
   private ColumnState state;
 
   public Column(final T word) {

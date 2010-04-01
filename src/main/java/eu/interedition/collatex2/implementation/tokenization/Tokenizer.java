@@ -14,7 +14,7 @@ public class Tokenizer {
 
   public Tokenizer(final String sigil, final String words) {
     this.sigil = sigil;
-    final String[] tokens = words.split(" "); // TODO: more chars!
+    final String[] tokens = words.split(" "); // TODO more chars!
     arrayIterator = new ArrayIterator(tokens);
     counter = 0;
   }
@@ -24,7 +24,7 @@ public class Tokenizer {
   }
 
   public Token nextToken() {
-    // TODO: I need an array iterator with generic support!
+    // TODO I need an array iterator with generic support!
     final String content = (String) arrayIterator.next();
     final Token token = new Token(sigil, content, ++counter);
     return token;

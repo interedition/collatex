@@ -45,7 +45,7 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
       baseIndex++;
       w.accept(this);
     }
-    // TODO: move to next line etc...
+    // TODO move to next line etc...
   }
 
   public boolean lookForBetterMatch(Word baseWord, Word witnessWord) {

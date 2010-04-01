@@ -26,7 +26,7 @@ public class RealMatcherTest {
     final IWitness a = factory.createWitness("A", "The black cat");
     final IWitness b = factory.createWitness("B", "The black and white cat");
     final WordDistance distanceMeasure = new NormalizedLevenshtein();
-    final Set<IPhraseMatch> matches = RealMatcher.findMatchesWithIndex(a, b, distanceMeasure);
+    final Set<IPhraseMatch> matches = RealMatcher.findMatches(a, b, distanceMeasure);
     assertContains(matches, "the");
     assertContains(matches, "black");
     assertContains(matches, "cat");

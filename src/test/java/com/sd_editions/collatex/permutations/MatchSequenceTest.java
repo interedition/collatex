@@ -187,6 +187,6 @@ public class MatchSequenceTest extends TestCase {
     assertEquals(0, modificationsInMatchSequences.size());
   }
 
-  // TODO: test gaps of more than 1 word?
+  // TODO test gaps of more than 1 word?
 
 }

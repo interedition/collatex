@@ -16,7 +16,7 @@ public class Util {
     BlockStructure result = null;
     try {
       result = new StringInputPlugin(string).readFile();
-      // TODO: work away those exceptions.. they are not relevant for Strings
+      // TODO work away those exceptions.. they are not relevant for Strings
     } catch (final FileNotFoundException e) {
       throw new RuntimeException(e);
     } catch (final IOException e) {

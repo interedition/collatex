@@ -32,7 +32,7 @@ public class Visualization {
     return modifications;
   }
 
-  // TODO: move this? seems duplicate of Alignment.getTranspositions?
+  // TODO move this? seems duplicate of Alignment.getTranspositions?
   public static <T extends BaseElement> List<Transposition> determineTranspositions(final List<MatchSequence<T>> matchSequencesForBase, final List<MatchSequence<T>> matchSequencesForWitness) {
     final List<Tuple2<MatchSequence<T>>> matchSequenceTuples = TranspositionDetection.calculateSequenceTuples(matchSequencesForBase, matchSequencesForWitness);
     final List<Tuple2<MatchSequence<T>>> possibleTranspositionTuples = TranspositionDetection.filterAwayRealMatches(matchSequenceTuples);

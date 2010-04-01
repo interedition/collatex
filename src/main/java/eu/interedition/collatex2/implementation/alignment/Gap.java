@@ -14,8 +14,8 @@ public class Gap implements IGap {
   private final IPhrase gapB;
   private final IColumn nextColumn;
 
-  //TODO: decouple gaps and modifications... 
-  //TODO: Modifications should know about gaps not the other way around!
+  //TODO decouple gaps and modifications... 
+  //TODO Modifications should know about gaps not the other way around!
   public Gap(final IColumns gapA, final IPhrase gapB, final IColumn nextColumn) {
     this.gapA = gapA;
     this.gapB = gapB;

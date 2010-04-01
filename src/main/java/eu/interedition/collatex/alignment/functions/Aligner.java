@@ -18,14 +18,14 @@ import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.match.Matcher;
 
-//TODO: I want this one gone!
+//TODO I want this one gone!
 public class Aligner {
 
   public static Alignment<Word> align(final Witness a, final Witness b) {
     return align(a.getFirstSegment(), b.getFirstSegment());
   }
 
-  // TODO: remove method!
+  // TODO remove method!
   public static Alignment<Word> align(final Segment a, final Segment b) {
     final UnfixedAlignment<Word> unfixedAlignment = Matcher.match(a, b);
 
@@ -78,7 +78,7 @@ public class Aligner {
     return nextBase;
   }
 
-  // TODO: naming here is not cool!
+  // TODO naming here is not cool!
   static <T extends BaseElement> List<UnfixedAlignment<T>> getAlignmentsForUnfixedMatches(final UnfixedAlignment<T> previousAlignment, final Collection<Match<T>> unfixedMatches) {
     final List<UnfixedAlignment<T>> permutationsForMatchGroup = Lists.newArrayList();
     for (final Match<T> possibleMatch : unfixedMatches) {
@@ -110,14 +110,14 @@ public class Aligner {
     return result;
   }
 
-  // TODO: naming of the variables here is not cool!
-  // TODO: rename UnfixedAlignment to Matches!
-  // TODO: move all the collation creation out of the way!
+  // TODO naming of the variables here is not cool!
+  // TODO rename UnfixedAlignment to Matches!
+  // TODO move all the collation creation out of the way!
   private static UnfixedAlignment<Word> selectBestPossibleAlignment(final Segment a, final Segment b, final List<UnfixedAlignment<Word>> alignments) {
     UnfixedAlignment bestAlignment = null;
     Alignment bestCollation = null;
 
-    // TODO: add test for lowest number of matchsequences (transpositions)
+    // TODO add test for lowest number of matchsequences (transpositions)
     // NOTE: this can be done in a nicer way with the min function!
     for (final UnfixedAlignment alignment : alignments) {
       final Alignment collation = Alignment.create(alignment.getFixedMatches(), a, b);

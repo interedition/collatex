@@ -22,7 +22,7 @@ import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTab
 
 public class AlignmentTable2<T extends BaseElement> {
   private final List<Column<T>> columns;
-  private final List<Segment> witnesses; // TODO: remove!
+  private final List<Segment> witnesses; // TODO remove!
   private final List<String> _sigli;
 
   // _sigli is a replacement for witnesses;
@@ -39,7 +39,7 @@ public class AlignmentTable2<T extends BaseElement> {
     columns.add(column);
   }
 
-  // TODO: rename words to Elements!
+  // TODO rename words to Elements!
   public void addVariantBefore(final Column<T> column, final List<T> witnessWords) {
     int indexOf = columns.indexOf(column);
     if (indexOf == -1) {
@@ -76,9 +76,9 @@ public class AlignmentTable2<T extends BaseElement> {
     return witnesses;
   }
 
-  // TODO: move this to a visitor!
-  // TODO: separate in two steps: segmentation and xml rendering
-  // TODO: this uses the OLD CODE!
+  // TODO move this to a visitor!
+  // TODO separate in two steps: segmentation and xml rendering
+  // TODO this uses the OLD CODE!
   public String toXML() {
     final TeiParallelSegmentationTable app = AlignmentTableSegmentator.createTeiParrallelSegmentationTable(this);
     return app.toXML();
@@ -106,19 +106,19 @@ public class AlignmentTable2<T extends BaseElement> {
     return column.getWord(witness).toString();
   }
 
-  // TODO: is this check still necessary?
-  // TODO: I don't think one witness is ever
-  // TODO: added twice to the table!
-  // TODO: rename to add witness?
+  // TODO is this check still necessary?
+  // TODO I don't think one witness is ever
+  // TODO added twice to the table!
+  // TODO rename to add witness?
   void addWitnessToInternalList(final Segment witness) {
-    // TODO: an ordered set instead of list would be nice here
+    // TODO an ordered set instead of list would be nice here
     if (!witnesses.contains(witness)) {
       witnesses.add(witness);
     }
     _sigli.add(witness.id);
   }
 
-  // TODO: add visitor who walks over the witnesses
+  // TODO add visitor who walks over the witnesses
   // Note: this is a visitor who walks over the columns!
   public void accept(final IAlignmentTableVisitor<T> visitor) {
     visitor.visitTable(this);
@@ -128,7 +128,7 @@ public class AlignmentTable2<T extends BaseElement> {
     visitor.postVisitTable(this);
   }
 
-  // TODO: move this functionality to a visitor!
+  // TODO move this functionality to a visitor!
   public static <T extends BaseElement> String alignmentTableToHTML(final AlignmentTable2<T> alignmentTable) {
     final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
 
@@ -138,8 +138,8 @@ public class AlignmentTable2<T extends BaseElement> {
       for (final Column<T> column : alignmentTable.getColumns()) {
         tableHTML.append("<td>");
         if (column.containsWitness(witnessId)) {
-          // TODO: this was normalized!
-          tableHTML.append(column.getWord(witnessId).getOriginal()); // TODO: add escaping!
+          // TODO this was normalized!
+          tableHTML.append(column.getWord(witnessId).getOriginal()); // TODO add escaping!
         }
         tableHTML.append("</td>");
       }

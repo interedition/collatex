@@ -5,7 +5,7 @@ import eu.interedition.collatex.alignment.MatchSequence;
 import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.input.BaseElement;
 
-//TODO: make generic!
+//TODO make generic!
 public class Transposition extends Modification {
   private final MatchSequence base;
   private final MatchSequence witness;

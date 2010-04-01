@@ -14,7 +14,7 @@ public class NGram {
     this.tokens = tokens;
   }
 
-  // TODO: rename parameter "remove" to bigram
+  // TODO rename parameter "remove" to bigram
   public static NGram create(final BiGram remove) {
     final List<NormalizedToken> tokens = Lists.newArrayList(remove.getFirstToken(), remove.getLastToken());
     return new NGram(tokens);
@@ -41,7 +41,7 @@ public class NGram {
 
   }
 
-  // TODO: add test for defensive behavior!
+  // TODO add test for defensive behavior!
   public NormalizedToken getFirstToken() {
     if (isEmpty()) {
       throw new RuntimeException("This ngram is empty!");
@@ -49,7 +49,7 @@ public class NGram {
     return tokens.get(0);
   }
 
-  //TODO: make defensive and add test!
+  //TODO make defensive and add test!
   public NormalizedToken getLastToken() {
     return tokens.get(tokens.size() - 1);
   }

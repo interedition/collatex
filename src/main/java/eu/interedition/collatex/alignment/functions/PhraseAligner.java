@@ -7,7 +7,7 @@ import eu.interedition.collatex.input.WitnessSegmentPhrases;
 
 public class PhraseAligner {
 
-  // TODO: warning duplicate with Matcher.align!
+  // TODO warning duplicate with Matcher.align!
   public static Alignment<Phrase> align(final WitnessSegmentPhrases a, final WitnessSegmentPhrases b, final UnfixedAlignment<Phrase> u) {
     final UnfixedAlignment<Phrase> temp = u;
     //    while (temp.hasUnfixedWords()) {

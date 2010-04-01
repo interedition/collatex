@@ -29,7 +29,7 @@ public class NormalizedWitness implements Iterable<NormalizedToken>, IWitness {
     return sigil;
   }
 
-  // TODO: check whether iterator.remove() throws exception!
+  // TODO check whether iterator.remove() throws exception!
   /* (non-Javadoc)
    * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#iterator()
    */

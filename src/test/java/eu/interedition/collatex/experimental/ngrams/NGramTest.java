@@ -13,7 +13,7 @@ import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramTest {
 
-  // TODO: why is this called NGramTest: NGram isn't even used!
+  // TODO why is this called NGramTest: NGram isn't even used!
   // probably because of the NormalizedWitness.getTokens(1,2) which is used
   // for the creation of NGrams
   @Test
@@ -35,7 +35,7 @@ public class NGramTest {
     final NGram ngram = new NGram(tokens);
     final NGram result = ngram.trim();
     Assert.assertEquals("black and white", result.getNormalized());
-    // TODO: maybe assert size()?
+    // TODO maybe assert size()?
   }
 
 }

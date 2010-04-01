@@ -12,7 +12,7 @@ public class Phrase extends BaseElement {
   private final int size;
   private final Subsegment _subSegment;
 
-  // TODO: It is pretty obvious: too many parameters here!
+  // TODO It is pretty obvious: too many parameters here!
   // Note: probably two constructors needed...
   // Note: one where the phrase resembles the words between two other words of the witness
   // Note: one where the start and end words of the phrase are given

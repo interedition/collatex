@@ -18,8 +18,8 @@ public class WitnessSet {
     this.b = b;
   }
 
-  // TODO: maybe the alignment should know the witness set instead (top/down etc)
-  // TODO: incomplete method!
+  // TODO maybe the alignment should know the witness set instead (top/down etc)
+  // TODO incomplete method!
   protected Alignment align() {
     final List<InternalUncompleteGap> unprocessedGaps = calculateGaps();
     final List<NGram> matches = calculateMatchesBasedOnGaps(unprocessedGaps, a);
@@ -31,7 +31,7 @@ public class WitnessSet {
     return new Alignment(matches, gaps);
   }
 
-  // TODO: maybe more tests should be added for nextMatch!
+  // TODO maybe more tests should be added for nextMatch!
   private List<Gap> mapToGaps(final List<InternalUncompleteGap> unprocessedGaps, final List<NGram> matches) {
     final List<Gap> gaps = Lists.newArrayList();
     for (final InternalUncompleteGap iGap : unprocessedGaps) {
@@ -84,7 +84,7 @@ public class WitnessSet {
   }
 
   private List<InternalUncompleteGap> calculateGaps() {
-    // TODO: rename method!
+    // TODO rename method!
     final List<NGram> ngramsA = getUniqueBiGramIndexForWitnessA();
     final List<NGram> ngramsB = getUniqueBiGramIndexForWitnessB();
     final List<InternalUncompleteGap> gaps = Lists.newArrayList();
@@ -128,13 +128,13 @@ public class WitnessSet {
     return nonEmptyMatches;
   }
 
-  // TODO: inline!
+  // TODO inline!
   public List<NGram> getUniqueBiGramIndexForWitnessA() {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
     return group.getUniqueNGramsForWitnessA();
   }
 
-  // TODO: inline!
+  // TODO inline!
   public List<NGram> getUniqueBiGramIndexForWitnessB() {
     final BiGramIndexGroup group = BiGramIndexGroup.create(a, b);
     return group.getUniqueNGramsForWitnessB();

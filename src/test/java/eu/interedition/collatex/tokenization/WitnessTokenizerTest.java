@@ -46,7 +46,7 @@ public class WitnessTokenizerTest {
 
   @Test
   // Note: add Don't you think? What to do with '?
-  // TODO: rename original to something else?
+  // TODO rename original to something else?
   public void testPunctuation() {
     WitnessTokenizer tokenizer = new WitnessTokenizer("Punctuation. is, important!", true);
     Token nextToken = tokenizer.nextToken();

@@ -60,7 +60,7 @@ public class WitnessSegmentPhrases extends BaseContainer<Phrase> {
     final StringBuffer buffer = new StringBuffer();
     buffer.append("|");
     for (final Phrase phrase : _phrases) {
-      // TODO: could become get normalized1
+      // TODO could become get normalized1
       buffer.append(phrase.getOriginal());
       buffer.append("|");
     }

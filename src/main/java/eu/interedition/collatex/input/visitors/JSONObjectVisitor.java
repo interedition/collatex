@@ -46,7 +46,7 @@ public class JSONObjectVisitor implements IResourceVisitor {
 
   }
 
-  // TODO: add punctuation!
+  // TODO add punctuation!
   @Override
   public void visitWord(Word word) {
     JSONObject w1 = new JSONObject();

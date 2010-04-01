@@ -12,7 +12,7 @@ import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.WitnessF;
 
-// TODO: rename to alignment test part 2 and move!  
+// TODO rename to alignment test part 2 and move!  
 public class ComparisonTest extends TestCase {
 
   public void testAddition_InTheMiddle() {

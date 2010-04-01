@@ -12,7 +12,7 @@ public class TextElement extends Element {
 
   @Override
   public String toXML() {
-    // TODO: should not be normalized!
+    // TODO should not be normalized!
     return baseWord.getNormalized();
   }
 

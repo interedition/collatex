@@ -121,17 +121,17 @@ public class TextAlign {
       try {
         bs = plugin.readFile();
       } catch (Exception e) {
-        // TODO: handle exception
+        // TODO handle exception
       }
     } else {
       try {
         bs = simplePlugin.readFile();
       } catch (FileNotFoundException e) {
-        // TODO: handle exception
+        // TODO handle exception
       } catch (IOException e) {
-        // TODO: handle exception
+        // TODO handle exception
       } catch (BlockStructureCascadeException e) {
-        // TODO: handle exception
+        // TODO handle exception
       }
     }
     return bs;
@@ -173,7 +173,7 @@ public class TextAlign {
         j += 2;
       }
     } catch (Exception e) {
-      // TODO: handle exception
+      // TODO handle exception
       // System.out.println("Fehler in" + e);
     }
   }
@@ -186,7 +186,7 @@ public class TextAlign {
         j += 2;
       }
     } catch (Exception e) {
-      // TODO: handle exception
+      // TODO handle exception
       // System.out.println("Fehler in" + e);
     }
   }
