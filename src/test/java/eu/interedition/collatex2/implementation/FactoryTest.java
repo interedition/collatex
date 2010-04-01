@@ -3,6 +3,7 @@ package eu.interedition.collatex2.implementation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -11,6 +12,11 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
+import eu.interedition.collatex2.implementation.matching.worddistance.NormalizedLevenshtein;
+import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IColumns;
+import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class FactoryTest {
@@ -50,4 +56,17 @@ public class FactoryTest {
     assertTrue(string + " not found in " + stringSet, stringSet.contains(string));
   }
 
+  @Test
+  public void testGetMatchesUsingWitnessIndex1() {
+    final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
+    final IWitness witnessB = factory.createWitness("B", "the big black cat");
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
+    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
+    assertEquals(1, matches.size());
+    final IMatch match = matches.get(0);
+    assertEquals("the big black cat", match.getNormalized());
+    final IColumns columnsA = match.getColumnsA();
+    assertEquals(1, columnsA.getBeginPosition());
+    assertEquals(4, columnsA.getEndPosition());
+  }
 }
