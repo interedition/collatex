@@ -184,19 +184,6 @@ public class SuperbaseAlgorithmTest {
 
   //
   //  @Test
-  //  public void testCreateSuperBaseWithVariation() {
-  //    WitnessBuilder builder = new WitnessBuilder();
-  //    Witness a = builder.build("A", "the first witness");
-  //    Witness b = builder.build("B", "the second witness");
-  //    AlignmentTable2 alignmentTable = new AlignmentTable2();
-  //    alignmentTable.addWitness(a);
-  //    alignmentTable.addWitness(b);
-  //    Witness superbase = alignmentTable.createSuperbase();
-  //    assertEquals("the first second witness", superbase.toString());
-  //  }
-  //
-  //
-  //  @Test
   //  public void testStringOutputTwoWitnesses() {
   //    WitnessBuilder builder = new WitnessBuilder();
   //    Witness w1 = builder.build("A", "the black cat");
