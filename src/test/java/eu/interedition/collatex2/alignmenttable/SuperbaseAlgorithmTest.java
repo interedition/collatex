@@ -152,6 +152,21 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
+  @Test
+  public void testWitnessReorder() {
+    final IWitness w1 = factory.createWitness("A", "the black cat");
+    final IWitness w2 = factory.createWitness("B", "the black and white cat");
+    final IWitness w3 = factory.createWitness("C", "the black not very special cat");
+    final IWitness w4 = factory.createWitness("D", "the black very special cat");
+    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A: the|black| | | |cat\n";
+    expected += "B: the|black|and|white| |cat\n";
+    expected += "C: the|black|not|very|special|cat\n";
+    expected += "D: the|black| |very|special|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
   //  private static WitnessBuilder builder;
   //
   //  @BeforeClass
@@ -166,21 +181,6 @@ public class SuperbaseAlgorithmTest {
   //
   //
   //
-  //  @Test
-  //  public void testWitnessReorder() {
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the black and white cat");
-  //    Witness w3 = builder.build("C", "the black not very special cat");
-  //    Witness w4 = builder.build("D", "the black very special cat");
-  //    WitnessSet magic = new WitnessSet(w1, w2, w3, w4);
-  //    AlignmentTable2 table = magic.createAlignmentTable();
-  //    String expected = "A: the|black| | | |cat\n";
-  //    expected += "B: the|black|and|white| |cat\n";
-  //    expected += "C: the|black|not|very|special|cat\n";
-  //    expected += "D: the|black| |very|special|cat\n";
-  //
-  //    assertEquals(expected, table.toString());
-  //  }
 
   //
   //  @Test

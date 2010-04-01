@@ -1,14 +1,7 @@
 package eu.interedition.collatex.alignmenttable;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.BeforeClass;
-import org.junit.Test;
 
-import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
-import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
-import eu.interedition.collatex.input.Witness;
-import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 // Note: this test are very similar to the alignment table 2 tests!
@@ -25,22 +18,6 @@ public class SuperbaseAlgorithmTest {
   // TODO: make the tostring on the alignmenttable
   // TODO: work with multiple spaces for an empty cell
   // TODO: fix the gap bug for the last gap
-
-  @Test
-  public void testWitnessReorder() {
-    final Witness w1 = builder.build("A", "the black cat");
-    final Witness w2 = builder.build("B", "the black and white cat");
-    final Witness w3 = builder.build("C", "the black not very special cat");
-    final Witness w4 = builder.build("D", "the black very special cat");
-    final WitnessSet set = new WitnessSet(w1, w2, w3, w4);
-    final AlignmentTable2 table = AlignmentTableCreator.createAlignmentTable(set);
-    String expected = "A: the|black| | | |cat\n";
-    expected += "B: the|black|and|white| |cat\n";
-    expected += "C: the|black|not|very|special|cat\n";
-    expected += "D: the|black| |very|special|cat\n";
-
-    assertEquals(expected, table.toString());
-  }
 
   // TODO: add this for replacements in comb. with transposit.
   //  // Note: this is with an unequal transposition sequence size!

@@ -133,4 +133,9 @@ public class Phrase implements IPhrase {
     final int sizeDelta = getTokens().size() - other.getTokens().size();
     return sizeDelta;
   }
+
+  @Override
+  public IPhrase createSubPhrase(final int startIndex, final int endIndex) {
+    return new Phrase(tokens.subList(startIndex - 1, endIndex));
+  }
 }

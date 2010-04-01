@@ -68,7 +68,7 @@ public class Gap implements IGap {
   }
 
   private IModification createReplacement() {
-    return new Replacement(gapA, gapB);
+    return new Replacement(gapA, gapB, nextColumn);
   }
 
   private IModification createOmission() {
