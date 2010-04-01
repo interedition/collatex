@@ -34,6 +34,7 @@ import eu.interedition.collatex2.implementation.tokenization.NormalizedWitnessBu
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -50,7 +51,7 @@ public class Factory {
     return NormalizedWitnessBuilder.create(sigil, words);
   }
 
-  //NOTE: this method creates an alignmenttable, add the first witness,
+  // NOTE: this method creates an alignmenttable, adds the first witness,
   // then calls the other createAlignmentMethod
   public IAlignment createAlignment(final IWitness a, final IWitness b) {
     final IAlignmentTable table = new AlignmentTable4();
@@ -61,8 +62,52 @@ public class Factory {
 
   public IAlignment createAlignment0(final IAlignmentTable table, final IWitness b) {
     final WordDistance distanceMeasure = new NormalizedLevenshtein();
+
+    // tokenid = normalized name
+
+    final Multimap<String, IColumn> columnsForTokenId = Multimaps.newArrayListMultimap();
+    for (final IColumn column : table.getColumns()) {
+      for (final INormalizedToken normalizedToken : column.getVariants()) {
+        columnsForTokenId.put(normalizedToken.getNormalized(), column);
+      }
+    }
+
+    final List<String> tokensFoundInMultipleColums = Lists.newArrayList();
+    for (final String tokenId : columnsForTokenId.keySet()) {
+      if (columnsForTokenId.get(tokenId).size() > 1) {
+        tokensFoundInMultipleColums.add(tokenId);
+      }
+    }
+
+    for (final String tokenId : tokensFoundInMultipleColums) {
+
+    }
+
+    for (final INormalizedToken normalizedToken : b.getTokens()) {
+      final String normalized = normalizedToken.getNormalized();
+      final Collection<IColumn> columns = columnsForTokenId.get(normalized);
+
+    }
+
+    // van de table: verzamel die normalizedtokens die in meerdere columns voorkomen
+    // van de witness: kijk of er normalizedtokens voorkomen die nog niet dubbel voorkomen in de table, maar wel in de witness
+
+    // bereken unieke phrases van de table => komen maar in 1 set columns voor
+    // bereken unieke phrases van de witness => komen maar i keer voor in de witness
+
+    // per normalized token, in welke phrases komen ze voor?
+    // per phrase: in welke columns komen ze voor?
+
+    // table.calculateUniquePhrases
+
     final Set<IPhraseMatch> phraseMatches = findPhraseMatches(table, b, distanceMeasure);
+
+    // we hebben een alignmentable, kent alleen columns
+    // we moeten daar uitzoeken welke tokens dubbel voorkomen
+    // : loop 
+
     final List<IMatch> matches = Lists.newArrayList();
+
     final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;
