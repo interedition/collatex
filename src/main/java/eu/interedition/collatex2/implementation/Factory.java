@@ -22,6 +22,7 @@ import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.implementation.alignmenttable.Superbase4;
+import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.Phrase;
@@ -111,19 +112,29 @@ public class Factory {
     return alignment;
   }
 
-  protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness b, final WordDistance distanceMeasure) {
-    //    // make the superbase from the alignment table
-    //    final ISuperbase superbase = Superbase4.create(table);
-    //    final Set<IPhraseMatch> phraseMatches = RealMatcher.findMatches(superbase, b, distanceMeasure);
-    //    // now convert phrase matches to column matches
-    final List<IMatch> matches = Lists.newArrayList();
-    //    for (final IPhraseMatch phraseMatch : phraseMatches) {
-    //      final IColumns columns = superbase.getColumnsFor(phraseMatch.getPhraseA());
-    //      final IPhrase phraseB = phraseMatch.getPhraseB();
-    //      matches.add(new Match(columns, phraseB));
-    //    }
-    return matches;
+  protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
+    return findMatches(new AlignmentTableIndex(table), new WitnessIndex(witness));
   }
+
+  private static List<IMatch> findMatches(final AlignmentTableIndex tableIndex, final IWitnessIndex witnessIndex) {
+    final List<IMatch> matches = Lists.newArrayList();
+    final Collection<IPhrase> phrases = witnessIndex.getPhrases();
+    for (final IPhrase phrase : phrases) {
+      if (tableIndex.containsNormalizedPhrase(phrase.getNormalized())) {
+        final IColumns matchingColumns = tableIndex.getColumns(phrase.getNormalized());
+        matches.add(new Match(matchingColumns, phrase));
+      }
+    }
+    return joinOverlappingMatches(matches);
+  }
+
+  protected static List<IMatch> joinOverlappingMatches(final List<IMatch> matches) {
+    final List<IMatch> newMatches = matches;
+    // TODO implement
+    return newMatches;
+  }
+
+  /* use or throw away everything after this */
 
   //  public IAlignment createAlignment0(final IAlignmentTable table, final IWitness b) {
   //    final WordDistance distanceMeasure = new NormalizedLevenshtein();
@@ -182,7 +193,6 @@ public class Factory {
   //    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
   //    return alignment;
   //  }
-
   private Set<IPhraseMatch> findPhraseMatches(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
     final Set<IPhraseMatch> matchSet = Sets.newLinkedHashSet();
     //    final Map<String, IWitnessIndex> witnessIndexMap = Factory.createWitnessIndexMap(Lists.newArrayList(base, witness));

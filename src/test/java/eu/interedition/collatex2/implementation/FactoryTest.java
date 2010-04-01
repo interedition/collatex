@@ -69,4 +69,13 @@ public class FactoryTest {
     assertEquals(1, columnsA.getBeginPosition());
     assertEquals(4, columnsA.getEndPosition());
   }
+
+  @Ignore
+  @Test
+  public void testJoinOverlappingMatches() {
+    // TODO make this testcase
+    final List<IMatch> matches = Lists.newArrayList();
+    final List<IMatch> joined = Factory.joinOverlappingMatches(matches);
+    assertEquals(1, joined.size());
+  }
 }

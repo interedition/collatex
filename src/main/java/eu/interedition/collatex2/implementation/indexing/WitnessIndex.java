@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -22,7 +23,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class WitnessIndex implements IWitnessIndex {
-  Multiset<IPhrase> phraseBag;// = Multisets.newTreeMultiset();
+  Multiset<IPhrase> phraseBag = Multisets.newTreeMultiset();
 
   public WitnessIndex(final Multiset<IPhrase> _phraseBag) {
     this.phraseBag = _phraseBag;
