@@ -28,7 +28,6 @@ public class WitnessIndex implements IWitnessIndex {
     this.phraseBag = _phraseBag;
   }
 
-  @Deprecated
   public WitnessIndex(final IWitness witness) {
     Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
     final List<INormalizedToken> tokens = witness.getTokens();

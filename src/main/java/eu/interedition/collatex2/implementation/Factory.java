@@ -59,6 +59,72 @@ public class Factory {
     return alignment;
   }
 
+  public IAlignment createAlignment(final IAlignmentTable table, final IWitness b) {
+    // make the superbase from the alignment table
+    final ISuperbase superbase = Superbase4.create(table);
+    final WordDistance distanceMeasure = new NormalizedLevenshtein();
+    final Set<IPhraseMatch> phraseMatches = RealMatcher.findMatches(superbase, b, distanceMeasure);
+    // now convert phrase matches to column matches
+    final List<IMatch> matches = Lists.newArrayList();
+    for (final IPhraseMatch phraseMatch : phraseMatches) {
+      final IColumns columns = superbase.getColumnsFor(phraseMatch.getPhraseA());
+      final IPhrase phraseB = phraseMatch.getPhraseB();
+      matches.add(new Match(columns, phraseB));
+    }
+
+    final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
+    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
+    return alignment;
+  }
+
+  public static IPhraseMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord) {
+    final Phrase a = Phrase.create(baseWord);
+    final Phrase b = Phrase.create(witnessWord);
+    return new PhraseMatch(a, b);
+  }
+
+  public static IPhraseMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
+    throw new RuntimeException("Near matches are not yet supported!");
+  }
+
+  public static IPhraseMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
+    throw new RuntimeException("Near matches are not yet supported!");
+  }
+
+  public static ICallback NULLCALLBACK = new ICallback() {
+    @Override
+    public void alignment(final IAlignment alignment) {}
+  };
+
+  public IAlignmentTable createAlignmentTable(final List<IWitness> set) {
+    return createAlignmentTable(set, NULLCALLBACK);
+  }
+
+  public IAlignmentTable createAlignmentTable(final List<IWitness> set, final ICallback callback) {
+    return AlignmentTableCreator3.createAlignmentTable(set, callback);
+  }
+
+  public IAlignment createAlignment0(final IAlignmentTable table, final IWitness witness) {
+    final List<IMatch> matches = getMatchesUsingWitnessIndex(table, witness, new NormalizedLevenshtein());
+    final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
+    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
+    return alignment;
+  }
+
+  protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness b, final WordDistance distanceMeasure) {
+    //    // make the superbase from the alignment table
+    //    final ISuperbase superbase = Superbase4.create(table);
+    //    final Set<IPhraseMatch> phraseMatches = RealMatcher.findMatches(superbase, b, distanceMeasure);
+    //    // now convert phrase matches to column matches
+    final List<IMatch> matches = Lists.newArrayList();
+    //    for (final IPhraseMatch phraseMatch : phraseMatches) {
+    //      final IColumns columns = superbase.getColumnsFor(phraseMatch.getPhraseA());
+    //      final IPhrase phraseB = phraseMatch.getPhraseB();
+    //      matches.add(new Match(columns, phraseB));
+    //    }
+    return matches;
+  }
+
   //  public IAlignment createAlignment0(final IAlignmentTable table, final IWitness b) {
   //    final WordDistance distanceMeasure = new NormalizedLevenshtein();
   //
@@ -137,66 +203,10 @@ public class Factory {
     return matchSet;
   }
 
-  public IAlignment createAlignment(final IAlignmentTable table, final IWitness b) {
-    //TODO START replace with witnessindexuse
-    // make the superbase from the alignment table
-    final ISuperbase superbase = Superbase4.create(table);
-    final WordDistance distanceMeasure = new NormalizedLevenshtein();
-    final Set<IPhraseMatch> phraseMatches = RealMatcher.findMatches(superbase, b, distanceMeasure);
-    // now convert phrase matches to column matches
-    final List<IMatch> matches = Lists.newArrayList();
-    for (final IPhraseMatch phraseMatch : phraseMatches) {
-      final IColumns columns = superbase.getColumnsFor(phraseMatch.getPhraseA());
-      final IPhrase phraseB = phraseMatch.getPhraseB();
-      matches.add(new Match(columns, phraseB));
-    }
-    //TODO END replace with witnessindexuse
-
-    final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
-    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
-    return alignment;
-  }
-
-  public static IPhraseMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord) {
-    final Phrase a = Phrase.create(baseWord);
-    final Phrase b = Phrase.create(witnessWord);
-    return new PhraseMatch(a, b);
-  }
-
-  public static IPhraseMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
-    throw new RuntimeException("Near matches are not yet supported!");
-  }
-
-  public static IPhraseMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
-    throw new RuntimeException("Near matches are not yet supported!");
-  }
-
-  @Deprecated
-  // Use createWitnessIndexMap
   public static IWitnessIndex createWitnessIndex(final IWitness witness) {
     final WitnessIndex witnessIndex = new WitnessIndex(witness);
     return witnessIndex;
   }
-
-  public static ICallback NULLCALLBACK = new ICallback() {
-    @Override
-    public void alignment(final IAlignment alignment) {}
-  };
-
-  public IAlignmentTable createAlignmentTable(final List<IWitness> set) {
-    return createAlignmentTable(set, NULLCALLBACK);
-  }
-
-  public IAlignmentTable createAlignmentTable(final List<IWitness> set, final ICallback callback) {
-    return AlignmentTableCreator3.createAlignmentTable(set, callback);
-  }
-
-  private static final Predicate<IPhrase> TWO_OR_MORE_WORDS = new Predicate<IPhrase>() {
-    @Override
-    public boolean apply(final IPhrase phrase) {
-      return phrase.size() > 1;
-    }
-  };
 
   public static Map<String, IWitnessIndex> createWitnessIndexMap(final Collection<IWitness> witnesses) {
     final Map<String, IWitnessIndex> map = Maps.newHashMap();
@@ -232,6 +242,13 @@ public class Factory {
 
     return map;
   }
+
+  private static final Predicate<IPhrase> TWO_OR_MORE_WORDS = new Predicate<IPhrase>() {
+    @Override
+    public boolean apply(final IPhrase phrase) {
+      return phrase.size() > 1;
+    }
+  };
 
   private static boolean hasMultiples(final Multimap<String, IPhrase> phraseMap) {
     return phraseMap.entries().size() > phraseMap.keySet().size();
@@ -331,24 +348,4 @@ public class Factory {
     return stringSet;
   }
 
-  public IAlignment createAlignment0(final IAlignmentTable table, final IWitness witness) {
-    final List<IMatch> matches = getMatchesUsingWitnessIndex(table, witness, new NormalizedLevenshtein());
-    final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
-    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
-    return alignment;
-  }
-
-  protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness b, final WordDistance distanceMeasure) {
-    // make the superbase from the alignment table
-    final ISuperbase superbase = Superbase4.create(table);
-    final Set<IPhraseMatch> phraseMatches = RealMatcher.findMatches(superbase, b, distanceMeasure);
-    // now convert phrase matches to column matches
-    final List<IMatch> matches = Lists.newArrayList();
-    for (final IPhraseMatch phraseMatch : phraseMatches) {
-      final IColumns columns = superbase.getColumnsFor(phraseMatch.getPhraseA());
-      final IPhrase phraseB = phraseMatch.getPhraseB();
-      matches.add(new Match(columns, phraseB));
-    }
-    return matches;
-  }
 }
