@@ -23,9 +23,12 @@ public class WitnessIndexTest {
     final WitnessIndex index = new WitnessIndex(witnessA);
     assertTrue(index.contains("# the big black"));
     assertTrue(index.contains("the big black cat"));
+    assertTrue(index.contains("cat"));
     assertTrue(index.contains("and"));
     assertTrue(index.contains("and the big black"));
     assertTrue(index.contains("the big black rat"));
+    assertTrue(index.contains("rat"));
+    // Note: there are more combinations valid!
     assertEquals(5, index.size());
   }
 

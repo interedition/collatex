@@ -36,9 +36,12 @@ public class AlignmentTableIndexTest {
     final AlignmentTableIndex index = new AlignmentTableIndex(table);
     assertTrue(index.containsNormalizedPhrase("# the big black"));
     assertTrue(index.containsNormalizedPhrase("the big black cat"));
+    assertTrue(index.containsNormalizedPhrase("cat"));
     assertTrue(index.containsNormalizedPhrase("and"));
     assertTrue(index.containsNormalizedPhrase("and the big black"));
     assertTrue(index.containsNormalizedPhrase("the big black rat"));
+    assertTrue(index.containsNormalizedPhrase("rat"));
+    //Note: there are more valid combinations!
     assertEquals(5, index.size());
   }
 }
