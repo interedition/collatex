@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.Gap;
@@ -116,50 +114,86 @@ public class AlignmentTableCreator3 {
   public static IAlignment makeAddDelFromTrans(final IAlignment alignment) {
     // handle transpositions here!
     final List<ITransposition> transpositions = alignment.getTranspositions();
-    // System.out.println(transpositions);
-    // TODO DO CHECK HERE!!!!
-    // TODO: extract method!
-    // remove mirrored transpositions (a->b, b->a) from transpositions
+    final List<IMatch> matches = removeMatchesFromTranpositions(alignment, transpositions);
     final Stack<ITransposition> transToCheck = new Stack<ITransposition>();
-    final List<ITransposition> ntranspositions = Lists.newArrayList();
+    final List<IGap> gaps = alignment.getGaps();
     transToCheck.addAll(transpositions);
     Collections.reverse(transToCheck);
     while (!transToCheck.isEmpty()) {
       final ITransposition top = transToCheck.pop();
-      // System.out.println("Keeping: transposition " + top.toString());
-      ntranspositions.add(top);
-      for (final ITransposition tr : transToCheck) {
-        if (tr.getMatchA().getNormalized().equals(top.getMatchB().getNormalized())) {
-          if (tr.getMatchB().getNormalized().equals(top.getMatchA().getNormalized())) {
-            // System.out.println("Removing: transposition " + tr.toString());
-            transToCheck.remove(tr);
-            break;
-          }
-        }
+      final ITransposition mirrored = findMirroredTransposition(transToCheck, top);
+      //Note: this only calculates the distance between the columns.
+      //Note: it does not take into account a possible distance in the prases!
+      if (mirrored != null && distanceBetweenTranspositions(top, mirrored) == 0) {
+        // System.out.println("Keeping: transposition " + top.toString());
+        // System.out.println("Removing: transposition " + mirrored.toString());
+        // remove mirrored transpositions (a->b, b->a) from transpositions
+        transToCheck.remove(mirrored);
+        final IGap addition = makeAdditionOutOfTransposition(top);
+        gaps.add(addition);
+        matches.add(top.getMatchA());
+      } else {
+        final IGap replacement = makeReplacementOutOfTransposition(top);
+        gaps.add(replacement);
       }
     }
+
+    final IAlignment al = new Alignment(matches, gaps);
+    return al;
+  }
+
+  private static IGap makeReplacementOutOfTransposition(final ITransposition top) {
+    final IColumns columns = top.getMatchA().getColumnsA();
+    final IPhrase phrase = top.getMatchB().getPhraseB();
+    final IColumn nextColumn = null; // TODO: this is wrong... very wrong!
+    final IGap gap = new Gap(columns, phrase, nextColumn);
+    return gap;
+  }
+
+  private static int distanceBetweenTranspositions(final ITransposition top, final ITransposition mirrored) {
+    final int beginPosition = mirrored.getMatchA().getColumnsA().getBeginPosition();
+    final int endPosition = top.getMatchA().getColumnsA().getEndPosition();
+    //System.out.println(beginPosition + ":" + endPosition);
+    final int distance = beginPosition - (endPosition + 1);
+    // System.out.println(distance);
+    return distance;
+  }
+
+  private static List<IMatch> removeMatchesFromTranpositions(final IAlignment alignment, final List<ITransposition> ntranspositions) {
     // remove matches from transpositions
     final List<IMatch> matches = alignment.getMatches();
-    final List<IGap> gaps = alignment.getGaps();
-    //    System.out.println(transpositions);
     for (final ITransposition t : ntranspositions) {
       final IMatch witness = t.getMatchB();
       //Note: this is not nice; this removes from the original list!
       matches.remove(witness);
-      // make an addition from the match
-      final IColumns columns = new Columns();
-      final IPhrase phrase = witness.getPhraseB();
-      // NOTE: I need the next column here!
-      // NOTE: so the next column should be in the transposition!
-      // TODO add next column to addition, transposition, etc
-      // TODO and use that!
-      final IColumn nextColumn = t.getMatchA().getColumnsA().getFirstColumn();
-      final IGap addition = new Gap(columns, phrase, nextColumn);
-      //Note: this is not nice; this adds to the original list!
-      gaps.add(addition);
-      //System.out.println("Hey heb addition geadd: " + addition.toString());
     }
-    final IAlignment al = new Alignment(matches, gaps);
-    return al;
+    return matches;
   }
+
+  private static IGap makeAdditionOutOfTransposition(final ITransposition t) {
+    // make an addition from the match
+    final IMatch witness = t.getMatchB();
+    final IColumns columns = new Columns();
+    final IPhrase phrase = witness.getPhraseB();
+    // NOTE: I need the next column here!
+    // NOTE: so the next column should be in the transposition!
+    // TODO add next column to addition, transposition, etc
+    // TODO and use that!
+    final IColumn nextColumn = t.getMatchA().getColumnsA().getFirstColumn();
+    final IGap addition = new Gap(columns, phrase, nextColumn);
+    //Note: this is not nice; this adds to the original list!
+    return addition;
+  }
+
+  private static ITransposition findMirroredTransposition(final Stack<ITransposition> transToCheck, final ITransposition original) {
+    for (final ITransposition transposition : transToCheck) {
+      if (transposition.getMatchA().getNormalized().equals(original.getMatchB().getNormalized())) {
+        if (transposition.getMatchB().getNormalized().equals(original.getMatchA().getNormalized())) {
+          return transposition;
+        }
+      }
+    }
+    return null;
+  }
+
 }
