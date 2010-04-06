@@ -1,5 +1,7 @@
 package eu.interedition.collatex2.alignmenttable;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import junit.framework.Assert;
@@ -51,6 +53,30 @@ public class AlignmentTableTranspositionTest {
     final String expected = "A:  |a|b\n" + "B: b|a| \n";
     final String actual = alignmentTable.toString();
     Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testDoubleTransposition3() {
+    final IWitness a = factory.createWitness("A", "a b c");
+    final IWitness b = factory.createWitness("B", "b a c");
+    final List<IWitness> set = Lists.newArrayList(a, b);
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
+    final String expected = "A:  |a|b|c\n" + "B: b|a| |c\n";
+    final String actual = alignmentTable.toString();
+    Assert.assertEquals(expected, actual);
+  }
+
+  // TODO change expectations and make this work!
+  // TODO: rename: mirrored transpositions with match in between!
+  @Test
+  public void testTranspositionsAreStoredInAlignmentTable() {
+    final IWitness a = factory.createWitness("A", "the black and white cat");
+    final IWitness b = factory.createWitness("B", "the white and black cat");
+    final List<IWitness> set = Lists.newArrayList(a, b);
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
+    String expected = "A: the|black|and|white|cat\n";
+    expected += "B: the|white|and|black|cat\n";
+    assertEquals(expected, alignmentTable.toString());
   }
 
 }
