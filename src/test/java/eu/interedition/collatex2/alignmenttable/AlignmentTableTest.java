@@ -20,11 +20,7 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO Rename to AlignmentTableTest!
-//Note: this test are very similar to the alignment table 2 tests!
-//Note: since the superbase algorithm class becomes more like a container, and does not contain any 
-//Note: responsibility the tests should just move to there!
-public class SuperbaseAlgorithmTest {
+public class AlignmentTableTest {
   private static Factory factory;
 
   @BeforeClass
@@ -167,60 +163,40 @@ public class SuperbaseAlgorithmTest {
     assertEquals(expected, table.toString());
   }
 
-  //  private static WitnessBuilder builder;
-  //
-  //  @BeforeClass
-  //  public static void setUp() {
-  //    builder = new WitnessBuilder();
-  //  }
-  //
-  //
-  //  // TODO make the tostring on the alignmenttable
-  //  // TODO work with multiple spaces for an empty cell
-  //  // TODO fix the gap bug for the last gap
-  //
-  //
-  //
+  //Note: tests toString method
+  @Test
+  public void testStringOutputOneWitness() {
+    final IWitness a = factory.createWitness("A", "the black cat");
+    final List<IWitness> set = Lists.newArrayList(a);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final String expected = "A: the|black|cat\n";
+    assertEquals(expected, table.toString());
+  }
 
-  //
-  //  @Test
-  //  public void testStringOutputTwoWitnesses() {
-  //    WitnessBuilder builder = new WitnessBuilder();
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the black cat");
-  //    AlignmentTable2 table = new AlignmentTable2();
-  //    table.addWitness(w1);
-  //    table.addWitness(w2);
-  //    // TODO add match test can be moved to a column test class? 
-  //    //    // TODO word contains id also, which refers to Witness
-  //    //    Column c1 = table.getColumns().get(0);
-  //    //    Column c2 = table.getColumns().get(1);
-  //    //    Column c3 = table.getColumns().get(2);
-  //    //    table.addMatch(w2, w2.getWordOnPosition(1), c1);
-  //    //    table.addMatch(w2, w2.getWordOnPosition(2), c2);
-  //    //    table.addMatch(w2, w2.getWordOnPosition(3), c3);
-  //    String expected = "A: the|black|cat\n";
-  //    expected += "B: the|black|cat\n";
-  //    assertEquals(expected, table.toString());
-  //  }
-  //
-  //  @Test
-  //  public void testStringOutputEmptyCells() {
-  //    WitnessBuilder builder = new WitnessBuilder();
-  //    Witness w1 = builder.build("A", "the black cat");
-  //    Witness w2 = builder.build("B", "the");
-  //    AlignmentTable2 table = new AlignmentTable2();
-  //    table.addWitness(w1);
-  //    table.addWitness(w2);
-  //    // TODO add match test can be moved to column class?
-  //    //    Column column = table.getColumns().get(0);
-  //    // TODO word contains id also, which refers to Witness
-  //    //table.addMatch(w2, w2.getWordOnPosition(1), column);
-  //    String expected = "A: the|black|cat\n";
-  //    expected += "B: the| | \n";
-  //    assertEquals(expected, table.toString());
-  //  }
-  //
+  //Note: tests toString method
+  @Test
+  public void testStringOutputTwoWitnesses() {
+    final IWitness a = factory.createWitness("A", "the black cat");
+    final IWitness b = factory.createWitness("B", "the black cat");
+    final List<IWitness> set = Lists.newArrayList(a, b);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A: the|black|cat\n";
+    expected += "B: the|black|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
+  //Note: tests toString method
+  @Test
+  public void testStringOutputEmptyCells() {
+    final IWitness a = factory.createWitness("A", "the black cat");
+    final IWitness b = factory.createWitness("B", "the");
+    final List<IWitness> set = Lists.newArrayList(a, b);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A: the|black|cat\n";
+    expected += "B: the| | \n";
+    assertEquals(expected, table.toString());
+  }
+
   //  @Test
   //  public void testTranspositionsAreNotStoredInAlignmentTable() {
   //    WitnessBuilder builder = new WitnessBuilder();

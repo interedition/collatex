@@ -7,13 +7,10 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import eu.interedition.collatex.alignment.Alignment;
-import eu.interedition.collatex.alignment.functions.Aligner;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
-import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class AlignmentTableTranspositionTest {
@@ -23,35 +20,6 @@ public class AlignmentTableTranspositionTest {
   @Before
   public void setup() {
     builder = new WitnessBuilder();
-  }
-
-  @Test
-  public void testNoTransposition() {
-    final Witness a = builder.build("no transposition");
-    final Witness b = builder.build("no transposition");
-    final Alignment<Word> al = Aligner.align(a, b);
-    Assert.assertTrue(al.getTranpositions().isEmpty());
-  }
-
-  @Test
-  public void testDoubleTransposition() {
-    final Witness a = builder.build("a b");
-    final Witness b = builder.build("b a");
-    final Alignment<Word> al = Aligner.align(a, b);
-    Assert.assertEquals(2, al.getTranpositions().size());
-    // 1: a -> b
-    // 2: b -> a
-  }
-
-  @Test
-  public void testDoubleTransposition2() {
-    final Witness a = builder.build("A", "a b");
-    final Witness b = builder.build("B", "b a");
-    final WitnessSet set = new WitnessSet(a, b);
-    final AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
-    final String expected = "A:  |a|b\n" + "B: b|a| \n";
-    final String actual = alignmentTable.toString();
-    Assert.assertEquals(expected, actual);
   }
 
   //TODO make test work to see what happens if a does not stand at the end!

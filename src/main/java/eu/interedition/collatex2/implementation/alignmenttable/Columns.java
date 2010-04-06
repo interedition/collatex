@@ -2,6 +2,8 @@ package eu.interedition.collatex2.implementation.alignmenttable;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -13,6 +15,10 @@ public class Columns implements IColumns {
 
   public Columns(final List<IColumn> columns) {
     this.columns = columns;
+  }
+
+  public Columns() {
+    this.columns = Lists.newArrayList();
   }
 
   //NOTE: for now we assume that phraseA is longer than phraseB!
