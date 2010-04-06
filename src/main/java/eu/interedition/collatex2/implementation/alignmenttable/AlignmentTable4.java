@@ -4,11 +4,14 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.implementation.modifications.Addition;
+import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IReplacement;
 
 public class AlignmentTable4 implements IAlignmentTable {
   private final List<String> sigli;
@@ -77,15 +80,13 @@ public class AlignmentTable4 implements IAlignmentTable {
     return tableHTML.toString();
   }
 
-  @Override
-  public void addVariantAtTheEnd(final IPhrase witnessPhrase) {
+  private void addVariantAtTheEnd(final IPhrase witnessPhrase) {
     for (final INormalizedToken token : witnessPhrase.getTokens()) {
       final IColumn extraColumn = new Column3(token, size() + 1);
       columns.add(extraColumn);
     }
   }
 
-  @Override
   public void addVariantBefore(final IColumn column, final IPhrase witnessPhrase) {
     int startPosition = column.getPosition();
     for (int i = startPosition; i <= columns.size(); i++) {
@@ -110,5 +111,32 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public int size() {
     return getColumns().size();
+  }
+
+  public void addReplacement(final IReplacement replacement) {
+    final IColumns originalColumns = replacement.getOriginalColumns();
+    final IPhrase replacementPhrase = replacement.getReplacementPhrase();
+    if (replacementPhrase.size() > originalColumns.size()) {
+      final IColumn nextColumn = replacement.getNextColumn();
+      final IPhrase additionalPhrase = replacementPhrase.createSubPhrase(originalColumns.size() + 1, replacementPhrase.size());
+      //System.out.println("this should be additional: " + additionalPhrase);
+      final IPhrase smallerPhrase = replacementPhrase.createSubPhrase(1, originalColumns.size());
+      //System.out.println("this should be the replacement: " + smallerPhrase);
+      final IAddition addition = new Addition(nextColumn, additionalPhrase);
+      originalColumns.addVariantPhrase(smallerPhrase);
+      addAddition(addition);
+    } else {
+      originalColumns.addVariantPhrase(replacementPhrase);
+    }
+  }
+
+  public void addAddition(final IAddition addition) {
+    final IPhrase witnessPhrase = addition.getAddedPhrase();
+    if (addition.isAtTheEnd()) {
+      addVariantAtTheEnd(witnessPhrase);
+    } else {
+      final IColumn column = addition.getNextColumn();
+      addVariantBefore(column, witnessPhrase);
+    }
   }
 }

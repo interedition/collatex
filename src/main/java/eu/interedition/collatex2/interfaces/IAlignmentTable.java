@@ -10,13 +10,13 @@ public interface IAlignmentTable {
 
   void add(IColumn column);
 
-  void addVariantAtTheEnd(IPhrase witnessPhrase);
-
-  void addVariantBefore(IColumn column, IPhrase witnessPhrase);
-
-  //TODO Maybe rename to getCells?
+  //TODO: Maybe rename to getCells?
   IColumns createColumns(int currentIndex, int i);
 
   int size();
+
+  void addReplacement(IReplacement replacement);
+
+  void addAddition(IAddition addition);
 
 }

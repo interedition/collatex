@@ -114,9 +114,10 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
+  //TODO: rewrite test to use addAddition
   @Test
   public void testAddVariantBeforeColumnAndPositions() {
-    final IAlignmentTable table = new AlignmentTable4();
+    final AlignmentTable4 table = new AlignmentTable4();
     final IWitness witness = factory.createWitness("A", "two before two after");
     final IWitness temp = factory.createWitness("B", "in between");
     final IPhrase tobeadded = temp.createPhrase(1, 2);
