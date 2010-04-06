@@ -23,4 +23,8 @@ public class Transposition implements ITransposition {
     return matchB;
   }
 
+  @Override
+  public String toString() {
+    return getMatchA().getNormalized() + " -> " + getMatchB().getNormalized();
+  }
 }

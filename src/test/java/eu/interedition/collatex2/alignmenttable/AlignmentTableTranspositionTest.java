@@ -1,12 +1,17 @@
 package eu.interedition.collatex2.alignmenttable;
 
+import java.util.List;
+
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IAlignment;
+import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableTranspositionTest {
@@ -35,6 +40,17 @@ public class AlignmentTableTranspositionTest {
     Assert.assertEquals(2, al.getTranspositions().size());
     // 1: a -> b
     // 2: b -> a
+  }
+
+  @Test
+  public void testDoubleTransposition2() {
+    final IWitness a = factory.createWitness("A", "a b");
+    final IWitness b = factory.createWitness("B", "b a");
+    final List<IWitness> set = Lists.newArrayList(a, b);
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
+    final String expected = "A:  |a|b\n" + "B: b|a| \n";
+    final String actual = alignmentTable.toString();
+    Assert.assertEquals(expected, actual);
   }
 
 }

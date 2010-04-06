@@ -1,8 +1,14 @@
 package eu.interedition.collatex2.implementation.alignmenttable;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
+
+import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.alignment.Alignment;
+import eu.interedition.collatex2.implementation.alignment.Gap;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
@@ -10,10 +16,12 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
+import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
+import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableCreator3 {
@@ -39,9 +47,10 @@ public class AlignmentTableCreator3 {
     final Factory factory = new Factory();
     final IAlignment alignment = factory.createAlignment(table, witness);
     callback.alignment(alignment);
-    addMatchesToAlignmentTable(alignment);
-    addReplacementsToAlignmentTable(table, alignment);
-    addAdditionsToAlignmentTable(table, alignment);
+    final IAlignment alignment2 = makeAddDelFromTrans(alignment);
+    addMatchesToAlignmentTable(alignment2);
+    addReplacementsToAlignmentTable(table, alignment2);
+    addAdditionsToAlignmentTable(table, alignment2);
   }
 
   static void addMatchesToAlignmentTable(final IAlignment alignment) {
@@ -96,5 +105,61 @@ public class AlignmentTableCreator3 {
       final IColumn column = addition.getNextColumn();
       table.addVariantBefore(column, witnessPhrase);
     }
+  }
+
+  // NOTE: the way transpositions are handled here
+  // and the way there are placed in the alignment table
+  // is just one specific case, namely
+  // a b
+  // b a
+  // this becomes |a| b| |, | |b|a|
+  public static IAlignment makeAddDelFromTrans(final IAlignment alignment) {
+    // handle transpositions here!
+    final List<ITransposition> transpositions = alignment.getTranspositions();
+    // System.out.println(transpositions);
+    // TODO DO CHECK HERE!!!!
+    // TODO: extract method!
+    // remove mirrored transpositions (a->b, b->a) from transpositions
+    final Stack<ITransposition> transToCheck = new Stack<ITransposition>();
+    final List<ITransposition> ntranspositions = Lists.newArrayList();
+    transToCheck.addAll(transpositions);
+    Collections.reverse(transToCheck);
+    while (!transToCheck.isEmpty()) {
+      final ITransposition top = transToCheck.pop();
+      // System.out.println("Keeping: transposition " + top.toString());
+      ntranspositions.add(top);
+      for (final ITransposition tr : transToCheck) {
+        if (tr.getMatchA().getNormalized().equals(top.getMatchB().getNormalized())) {
+          if (tr.getMatchB().getNormalized().equals(top.getMatchA().getNormalized())) {
+            // System.out.println("Removing: transposition " + tr.toString());
+            transToCheck.remove(tr);
+            break;
+          }
+        }
+      }
+    }
+    // remove matches from transpositions
+    final List<IMatch> matches = alignment.getMatches();
+    final List<IGap> gaps = alignment.getGaps();
+    //    System.out.println(transpositions);
+    for (final ITransposition t : ntranspositions) {
+      final IMatch witness = t.getMatchB();
+      //Note: this is not nice; this removes from the original list!
+      matches.remove(witness);
+      // make an addition from the match
+      final IColumns columns = new Columns();
+      final IPhrase phrase = witness.getPhraseB();
+      // NOTE: I need the next column here!
+      // NOTE: so the next column should be in the transposition!
+      // TODO add next column to addition, transposition, etc
+      // TODO and use that!
+      final IColumn nextColumn = t.getMatchA().getColumnsA().getFirstColumn();
+      final IGap addition = new Gap(columns, phrase, nextColumn);
+      //Note: this is not nice; this adds to the original list!
+      gaps.add(addition);
+      //System.out.println("Hey heb addition geadd: " + addition.toString());
+    }
+    final IAlignment al = new Alignment(matches, gaps);
+    return al;
   }
 }

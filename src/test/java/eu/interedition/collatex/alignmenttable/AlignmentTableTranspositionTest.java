@@ -22,17 +22,6 @@ public class AlignmentTableTranspositionTest {
     builder = new WitnessBuilder();
   }
 
-  @Test
-  public void testDoubleTransposition2() {
-    final Witness a = builder.build("A", "a b");
-    final Witness b = builder.build("B", "b a");
-    final WitnessSet set = new WitnessSet(a, b);
-    final AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
-    final String expected = "A:  |a|b\n" + "B: b|a| \n";
-    final String actual = alignmentTable.toString();
-    Assert.assertEquals(expected, actual);
-  }
-
   //TODO make test work to see what happens if a does not stand at the end!
   @Ignore
   @Test
