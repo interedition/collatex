@@ -1,7 +1,6 @@
 package eu.interedition.collatex.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -20,19 +19,6 @@ public class AlignmentTableTranspositionTest {
   @Before
   public void setup() {
     builder = new WitnessBuilder();
-  }
-
-  //TODO make test work to see what happens if a does not stand at the end!
-  @Ignore
-  @Test
-  public void testDoubleTransposition3() {
-    final Witness a = builder.build("A", "a b c");
-    final Witness b = builder.build("B", "b a c");
-    final WitnessSet set = new WitnessSet(a, b);
-    final AlignmentTable2 alignmentTable = AlignmentTableCreator.createAlignmentTable(set);
-    final String expected = "A: a|b| |c\n" + "B:  |b|a |c\n";
-    final String actual = alignmentTable.toString();
-    Assert.assertEquals(expected, actual);
   }
 
   // TODO change expectations and make this work!

@@ -53,4 +53,15 @@ public class AlignmentTableTranspositionTest {
     Assert.assertEquals(expected, actual);
   }
 
+  @Test
+  public void testDoubleTransposition3() {
+    final IWitness a = factory.createWitness("A", "a b c");
+    final IWitness b = factory.createWitness("B", "b a c");
+    final List<IWitness> set = Lists.newArrayList(a, b);
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
+    final String expected = "A:  |a|b|c\n" + "B: b|a| |c\n";
+    final String actual = alignmentTable.toString();
+    Assert.assertEquals(expected, actual);
+  }
+
 }
