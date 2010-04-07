@@ -13,16 +13,6 @@ public class AlignmentTableTranspositionTest {
     builder = new WitnessBuilder();
   }
 
-  // THIS SHOULD NOT REALLY MATTER BECAUSE OF THE SEQUENCE DETECTION!
-  //  @Test
-  //  public void testMultipleTransposition() {
-  //    final Witness a = builder.build("a b c");
-  //    final Witness b = builder.build("b c a");
-  //    final Alignment<Word> al = Matcher.align(a, b);
-  //    Assert.assertTrue(al.getTranpositions().isEmpty());
-  //
-  //  }
-
   // HERE THERE IS NO TRANSPOSITION!
   //  @Test
   //  public void testGarbage() {
