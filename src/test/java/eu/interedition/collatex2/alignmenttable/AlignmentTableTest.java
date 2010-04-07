@@ -198,17 +198,4 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //  @Test
-  //  public void testTranspositionsAreNotStoredInAlignmentTable() {
-  //    WitnessBuilder builder = new WitnessBuilder();
-  //    Witness w1 = builder.build("A", "the black and white cat");
-  //    Witness w2 = builder.build("B", "the white and black cat");
-  //    AlignmentTable2 table = new AlignmentTable2();
-  //    table.addWitness(w1);
-  //    table.addWitness(w2);
-  //    String expected = "A: the|black|and|white|cat\n";
-  //    expected += "B: the|black|and|white|cat\n";
-  //    assertEquals(expected, table.toString());
-  //  }
-
 }
