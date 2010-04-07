@@ -36,6 +36,15 @@ public class AlignmentTableTranspositionTest {
 
   //Note: this is more of an alignment test.. no table is involved here! 
   @Test
+  public void testNoTransposition2() {
+    final IWitness a = factory.createWitness("A", "a b");
+    final IWitness b = factory.createWitness("B", "c a");
+    final IAlignment al = factory.createAlignment(a, b);
+    Assert.assertTrue(al.getTranspositions().isEmpty());
+  }
+
+  //Note: this is more of an alignment test.. no table is involved here! 
+  @Test
   public void testDoubleTransposition() {
     final IWitness a = factory.createWitness("A", "a b");
     final IWitness b = factory.createWitness("B", "b a");
