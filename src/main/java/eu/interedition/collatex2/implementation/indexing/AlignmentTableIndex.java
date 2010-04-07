@@ -2,7 +2,6 @@ package eu.interedition.collatex2.implementation.indexing;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -53,36 +52,36 @@ public class AlignmentTableIndex {
   }
 
   public AlignmentTableIndex(final IAlignmentTable table, final int dummy) {
-    Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
-    final List<INormalizedToken> tokens = witness.getTokens();
-    for (final INormalizedToken token : tokens) {
-      phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
-    }
-    do {
-      final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
-      //      Log.info("keys = " + phraseMap.keySet());
-      for (final String phraseId : phraseMap.keySet()) {
-        final Collection<IPhrase> phrases = phraseMap.get(phraseId);
-        //        Log.info("phrases = " + phrases.toString());
-        if (phrases.size() > 1) {
-          addExpandedPhrases(newPhraseMap, phrases, tokens/*, phraseMap*/);
-        } else {
-          final IPhrase phrase = phrases.iterator().next();
-          //          if (phrase.size() == 1) {
-          newPhraseMap.put(phraseId, phrase);
-          //          }
-        }
-        //        Log.info("newPhraseMap = " + newPhraseMap.toString());
-        //        Log.info("");
-      }
-      phraseMap = newPhraseMap;
-      //      Log.info("phraseMap.entries().size() = " + String.valueOf(phraseMap.entries().size()));
-      //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
-      //      Log.info("");
-    } while (phraseMap.entries().size() > phraseMap.keySet().size());
-    final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
-    Collections.sort(values, Phrase.PHRASECOMPARATOR);
-    phraseBag.addAll(values);
+  //    Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
+  //    final List<INormalizedToken> tokens = witness.getTokens();
+  //    for (final INormalizedToken token : tokens) {
+  //      phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
+  //    }
+  //    do {
+  //      final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
+  //      //      Log.info("keys = " + phraseMap.keySet());
+  //      for (final String phraseId : phraseMap.keySet()) {
+  //        final Collection<IPhrase> phrases = phraseMap.get(phraseId);
+  //        //        Log.info("phrases = " + phrases.toString());
+  //        if (phrases.size() > 1) {
+  //          addExpandedPhrases(newPhraseMap, phrases, tokens/*, phraseMap*/);
+  //        } else {
+  //          final IPhrase phrase = phrases.iterator().next();
+  //          //          if (phrase.size() == 1) {
+  //          newPhraseMap.put(phraseId, phrase);
+  //          //          }
+  //        }
+  //        //        Log.info("newPhraseMap = " + newPhraseMap.toString());
+  //        //        Log.info("");
+  //      }
+  //      phraseMap = newPhraseMap;
+  //      //      Log.info("phraseMap.entries().size() = " + String.valueOf(phraseMap.entries().size()));
+  //      //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
+  //      //      Log.info("");
+  //    } while (phraseMap.entries().size() > phraseMap.keySet().size());
+  //    final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
+  //    Collections.sort(values, Phrase.PHRASECOMPARATOR);
+  //    phraseBag.addAll(values);
   }
 
   private void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens) {
