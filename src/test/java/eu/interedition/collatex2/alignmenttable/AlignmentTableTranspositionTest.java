@@ -7,6 +7,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -87,6 +88,24 @@ public class AlignmentTableTranspositionTest {
     String expected;
     expected = "A: the|cat|is|black| \n";
     expected += "B: black| |is|the|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
+  //TODO: because of the repetition this test can not yet work!
+  //TODO: first the witness indexing has to work!
+  @Test
+  @Ignore
+  public void testAdditionInCombinationWithTransposition() {
+    final IWitness a = factory.createWitness("A", "the cat is very happy");
+    final IWitness b = factory.createWitness("B", "very happy is the cat");
+    final IWitness c = factory.createWitness("C", "very delitied and happy is the cat");
+    final List<IWitness> set = Lists.newArrayList(a, b, c);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected;
+    expected = "A: the| | |cat|is|very|happy\n";
+    expected += "B: very| | |happy|is|the|cat\n";
+    expected += "C: very|delitied|and|happy|is|the|cat\n";
+
     assertEquals(expected, table.toString());
   }
 
