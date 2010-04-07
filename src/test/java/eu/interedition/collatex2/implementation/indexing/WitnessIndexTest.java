@@ -21,6 +21,9 @@ public class WitnessIndexTest {
   public void test() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final WitnessIndex index = new WitnessIndex(witnessA);
+    // The index should contain all unique n-grams with 
+    //   0 or more tokens         occurring multiple times in the witness, and
+    //   exactly 1 token (or '#') occurring only once      in the witness
     assertTrue(index.contains("# the"));
     assertTrue(index.contains("# the big"));
     assertTrue(index.contains("# the big black"));

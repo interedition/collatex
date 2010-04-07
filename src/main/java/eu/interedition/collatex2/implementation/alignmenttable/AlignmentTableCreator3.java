@@ -7,7 +7,6 @@ import java.util.Stack;
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.Gap;
-import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -61,7 +60,7 @@ public class AlignmentTableCreator3 {
   private static void addReplacementsToAlignmentTable(final IAlignmentTable table, final IAlignment alignment) {
     final List<IReplacement> replacements = alignment.getReplacements();
     for (final IReplacement replacement : replacements) {
-      addReplacement(table, replacement);
+      table.addReplacement(replacement);
     }
   }
 
@@ -70,38 +69,10 @@ public class AlignmentTableCreator3 {
     columns.addMatchPhrase(match.getPhraseB());
   }
 
-  private static void addReplacement(final IAlignmentTable table, final IReplacement replacement) {
-    final IColumns columns = replacement.getOriginalColumns();
-    final IPhrase replacementPhrase = replacement.getReplacementPhrase();
-    if (replacementPhrase.size() > columns.size()) {
-      final IColumn nextColumn = replacement.getNextColumn();
-      final IPhrase additionalPhrase = replacementPhrase.createSubPhrase(columns.size() + 1, replacementPhrase.size());
-      //System.out.println("this should be additional: " + additionalPhrase);
-      final IPhrase smallerPhrase = replacementPhrase.createSubPhrase(1, columns.size());
-      //System.out.println("this should be the replacement: " + smallerPhrase);
-      final IAddition addition = new Addition(nextColumn, additionalPhrase);
-      columns.addVariantPhrase(smallerPhrase);
-      addVariantAtGap(table, addition, additionalPhrase);
-    } else {
-      columns.addVariantPhrase(replacementPhrase);
-    }
-  }
-
   static void addAdditionsToAlignmentTable(final IAlignmentTable table, final IAlignment alignment) {
     final List<IAddition> additions = alignment.getAdditions();
     for (final IAddition addition : additions) {
-      final IPhrase witnessPhrase = addition.getAddedPhrase();
-      AlignmentTableCreator3.addVariantAtGap(table, addition, witnessPhrase);
-    }
-  }
-
-  //TODO: the number of parameters here is strange!
-  private static void addVariantAtGap(final IAlignmentTable table, final IAddition addition, final IPhrase witnessPhrase) {
-    if (addition.isAtTheEnd()) {
-      table.addVariantAtTheEnd(witnessPhrase);
-    } else {
-      final IColumn column = addition.getNextColumn();
-      table.addVariantBefore(column, witnessPhrase);
+      table.addAddition(addition);
     }
   }
 

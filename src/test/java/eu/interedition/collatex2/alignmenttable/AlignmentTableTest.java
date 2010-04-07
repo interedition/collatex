@@ -114,9 +114,10 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
+  //TODO: rewrite test to use addAddition
   @Test
   public void testAddVariantBeforeColumnAndPositions() {
-    final IAlignmentTable table = new AlignmentTable4();
+    final AlignmentTable4 table = new AlignmentTable4();
     final IWitness witness = factory.createWitness("A", "two before two after");
     final IWitness temp = factory.createWitness("B", "in between");
     final IPhrase tobeadded = temp.createPhrase(1, 2);
@@ -196,18 +197,5 @@ public class AlignmentTableTest {
     expected += "B: the| | \n";
     assertEquals(expected, table.toString());
   }
-
-  //  @Test
-  //  public void testTranspositionsAreNotStoredInAlignmentTable() {
-  //    WitnessBuilder builder = new WitnessBuilder();
-  //    Witness w1 = builder.build("A", "the black and white cat");
-  //    Witness w2 = builder.build("B", "the white and black cat");
-  //    AlignmentTable2 table = new AlignmentTable2();
-  //    table.addWitness(w1);
-  //    table.addWitness(w2);
-  //    String expected = "A: the|black|and|white|cat\n";
-  //    expected += "B: the|black|and|white|cat\n";
-  //    assertEquals(expected, table.toString());
-  //  }
 
 }
