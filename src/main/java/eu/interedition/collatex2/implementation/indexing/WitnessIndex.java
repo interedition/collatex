@@ -45,9 +45,9 @@ public class WitnessIndex implements IWitnessIndex {
           addExpandedPhrases(newPhraseMap, phrases, tokens/*, phraseMap*/);
         } else {
           final IPhrase phrase = phrases.iterator().next();
-          if (phrase.size() == 1) {
-            newPhraseMap.put(phraseId, phrase);
-          }
+          //          if (phrase.size() == 1) {
+          newPhraseMap.put(phraseId, phrase);
+          //          }
         }
         //        Log.info("newPhraseMap = " + newPhraseMap.toString());
         //        Log.info("");

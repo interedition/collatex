@@ -34,14 +34,21 @@ public class AlignmentTableIndexTest {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CALLBACK);
     final AlignmentTableIndex index = new AlignmentTableIndex(table);
+    assertTrue(index.containsNormalizedPhrase("# the"));
+    assertTrue(index.containsNormalizedPhrase("# the big"));
     assertTrue(index.containsNormalizedPhrase("# the big black"));
     assertTrue(index.containsNormalizedPhrase("the big black cat"));
+    assertTrue(index.containsNormalizedPhrase("big black cat"));
+    assertTrue(index.containsNormalizedPhrase("black cat"));
     assertTrue(index.containsNormalizedPhrase("cat"));
     assertTrue(index.containsNormalizedPhrase("and"));
+    assertTrue(index.containsNormalizedPhrase("and the"));
+    assertTrue(index.containsNormalizedPhrase("and the big"));
     assertTrue(index.containsNormalizedPhrase("and the big black"));
     assertTrue(index.containsNormalizedPhrase("the big black rat"));
+    assertTrue(index.containsNormalizedPhrase("big black rat"));
+    assertTrue(index.containsNormalizedPhrase("black rat"));
     assertTrue(index.containsNormalizedPhrase("rat"));
-    //Note: there are more valid combinations!
-    assertEquals(5, index.size());
+    assertEquals(15, index.size());
   }
 }

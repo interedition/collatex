@@ -21,15 +21,22 @@ public class WitnessIndexTest {
   public void test() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final WitnessIndex index = new WitnessIndex(witnessA);
+    assertTrue(index.contains("# the"));
+    assertTrue(index.contains("# the big"));
     assertTrue(index.contains("# the big black"));
     assertTrue(index.contains("the big black cat"));
+    assertTrue(index.contains("big black cat"));
+    assertTrue(index.contains("black cat"));
     assertTrue(index.contains("cat"));
     assertTrue(index.contains("and"));
+    assertTrue(index.contains("and the"));
+    assertTrue(index.contains("and the big"));
     assertTrue(index.contains("and the big black"));
     assertTrue(index.contains("the big black rat"));
+    assertTrue(index.contains("big black rat"));
+    assertTrue(index.contains("black rat"));
     assertTrue(index.contains("rat"));
-    // Note: there are more combinations valid!
-    assertEquals(5, index.size());
+    assertEquals(15, index.size());
   }
 
 }
