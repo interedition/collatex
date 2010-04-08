@@ -119,4 +119,9 @@ public class Columns implements IColumns {
     return sizeDelta;
   }
 
+  @Override
+  public List<IColumn> getColumns() {
+    return columns;
+  }
+
 }

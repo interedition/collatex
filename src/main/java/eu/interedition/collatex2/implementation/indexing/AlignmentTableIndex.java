@@ -3,9 +3,12 @@ package eu.interedition.collatex2.implementation.indexing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.base.Join;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
@@ -17,6 +20,7 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class AlignmentTableIndex {
   Multimap<String, IColumn> columnsForNormalizedPhrase = Multimaps.newArrayListMultimap();
+  private ColumnCells value;
 
   public AlignmentTableIndex(final IAlignmentTable table) {
     final List<IColumn> tableColumns = table.getColumns();
@@ -54,30 +58,42 @@ public class AlignmentTableIndex {
     //    } else {
     //
     //      // try 2
-    Multimap<String, List<ColumnCell>> phraseColumnsMap = Multimaps.newHashMultimap();
+    Multimap<String, List<ColumnCells>> phraseColumnsMap = Multimaps.newHashMultimap();
     for (final IColumn tableColumn : tableColumns) {
+      final Map<String, ColumnCells> cellsForTokenMap = Maps.newHashMap();
       for (final INormalizedToken normalizedToken : tableColumn.getVariants()) {
-        phraseColumnsMap.put(normalizedToken.getNormalized(), Lists.newArrayList(new ColumnCell(tableColumn, normalizedToken.getSigil())));
+        final String tokenName = normalizedToken.getNormalized();
+        ColumnCells columnCells;
+        if (cellsForTokenMap.containsKey(tokenName)) {
+          columnCells = cellsForTokenMap.get(tokenName);
+        } else {
+          columnCells = new ColumnCells(tableColumn);
+          cellsForTokenMap.put(tokenName, columnCells);
+        }
+        columnCells.addSigil(normalizedToken.getSigil());
+      }
+      for (final Entry<String, ColumnCells> entry : cellsForTokenMap.entrySet()) {
+        final String tokenName = entry.getKey();
+        phraseColumnsMap.put(tokenName, Lists.newArrayList(entry.getValue()));
       }
     }
 
     do {
-      final Multimap<String, List<ColumnCell>> newPhraseColumnsMap = Multimaps.newHashMultimap();
+      final Multimap<String, List<ColumnCells>> newPhraseColumnsMap = Multimaps.newHashMultimap();
       for (final String phraseId : phraseColumnsMap.keySet()) {
-        final Collection<List<ColumnCell>> phraseColumnsCollection = phraseColumnsMap.get(phraseId);
+        final Collection<List<ColumnCells>> phraseColumnsCollection = phraseColumnsMap.get(phraseId);
         if (phraseColumnsCollection.size() == 1) {
-          final List<ColumnCell> phraseColumns = phraseColumnsCollection.iterator().next();
+          final List<ColumnCells> phraseColumns = phraseColumnsCollection.iterator().next();
           newPhraseColumnsMap.put(phraseId, phraseColumns);
         } else {
-          addExpandedPhrases(newPhraseColumnsMap, phraseColumnsCollection, tableColumns, phraseId /*, phraseMap*/);
+          addExpandedPhrases(newPhraseColumnsMap, phraseColumnsCollection, tableColumns, phraseId);
         }
       }
       phraseColumnsMap = newPhraseColumnsMap;
     } while (phraseColumnsMap.entries().size() > phraseColumnsMap.keySet().size());
 
-    for (final Entry<String, List<ColumnCell>> entry : phraseColumnsMap.entries()) {
-      final List<ColumnCell> value = entry.getValue();
-      for (final ColumnCell columnCell : value) {
+    for (final Entry<String, List<ColumnCells>> entry : phraseColumnsMap.entries()) {
+      for (final ColumnCells columnCell : entry.getValue()) {
         columnsForNormalizedPhrase.put(entry.getKey(), columnCell.getColumn());
       }
     }
@@ -85,9 +101,9 @@ public class AlignmentTableIndex {
 
   //  }
 
-  private void addExpandedPhrases(final Multimap<String, List<ColumnCell>> newPhraseColumnsMap, final Collection<List<ColumnCell>> phraseColumnsCollection, final List<IColumn> tableColumns,
+  private void addExpandedPhrases(final Multimap<String, List<ColumnCells>> newPhraseColumnsMap, final Collection<List<ColumnCells>> phraseColumnsCollection, final List<IColumn> tableColumns,
       final String phraseId) {
-    for (final List<ColumnCell> phraseColumns : phraseColumnsCollection) {
+    for (final List<ColumnCells> phraseColumns : phraseColumnsCollection) {
 
       final int phraseColumnsBeginPosition = phraseColumns.get(0).getColumn().getPosition();
       final int phraseColumnsEndPosition = phraseColumns.get(phraseColumns.size() - 1).getColumn().getPosition();
@@ -101,18 +117,30 @@ public class AlignmentTableIndex {
 
       final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
       //      leftExpandedTokenList.addAll(phraseColumns.getTokens());
-      //      final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
-      //
+      final List<ColumnCells> leftExpandedPhrase = phraseAsListOfColumnCells(leftExpandedTokenList);
+
       //      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phraseColumns.getTokens());
       //      rightExpandedTokenList.add(afterToken);
-      //      final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
-      //
-      //      final String leftPhraseId = leftExpandedPhrase.getNormalized();
-      //      newPhraseMap.put(leftPhraseId, leftExpandedPhrase);
-      //
-      //      final String rightPhraseId = rightExpandedPhrase.getNormalized();
-      //      newPhraseMap.put(rightPhraseId, rightExpandedPhrase);
+      //      final List<ColumnCells> rightExpandedPhrase = phraseAsListOfColumnCells(rightExpandedTokenList);
+
+      final String leftPhraseId = getPhraseId(leftExpandedPhrase);
+      newPhraseColumnsMap.put(leftPhraseId, leftExpandedPhrase);
+
+      //      final String rightPhraseId = getPhraseId(rightExpandedPhrase);
+      //      newPhraseColumnsMap.put(rightPhraseId, rightExpandedPhrase);
     }
+  }
+
+  private String getPhraseId(final List<ColumnCells> columnCellsList) {
+    final List<String> tokenList = Lists.newArrayList();
+    for (final ColumnCells columnCells : columnCellsList) {
+      tokenList.add(columnCells.getNormalized());
+    }
+    return Join.join(" ", tokenList);
+  }
+
+  private List<ColumnCells> phraseAsListOfColumnCells(final ArrayList<INormalizedToken> tokenList) {
+    return null;
   }
 
   public boolean containsNormalizedPhrase(final String normalized) {
@@ -127,21 +155,29 @@ public class AlignmentTableIndex {
     return columnsForNormalizedPhrase.keySet().size();
   }
 
-  private static class ColumnCell {
-    private final String sigil;
+  private static class ColumnCells {
+    private final List<String> sigli;
     private final IColumn column;
 
-    public ColumnCell(final IColumn column1, final String sigil1) {
+    public ColumnCells(final IColumn column1) {
       this.column = column1;
-      this.sigil = sigil1;
+      this.sigli = Lists.newArrayList();
+    }
+
+    public String getNormalized() {
+      return column.getToken(sigli.get(0)).getNormalized();
     }
 
     public IColumn getColumn() {
       return column;
     }
 
-    public String getSigil() {
-      return sigil;
+    public void addSigil(final String sigil) {
+      sigli.add(sigil);
+    }
+
+    public List<String> getSigli() {
+      return sigli;
     }
   }
 
