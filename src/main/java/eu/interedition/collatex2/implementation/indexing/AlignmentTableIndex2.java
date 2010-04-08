@@ -25,11 +25,13 @@ public class AlignmentTableIndex2 implements IAligmentTableIndex {
 
   public static IAligmentTableIndex create(final IAlignmentTable table) {
     final AlignmentTableIndex2 index = new AlignmentTableIndex2();
-
-    // bepaal eerst welke tokens dubbel voorkomen in de kolommen
     final List<String> findRepeatingTokens = findRepeatingTokens(table);
-
     final String row = "A";
+    findUniquePhrasesForRow(table, index, findRepeatingTokens, row);
+    return index;
+  }
+
+  private static void findUniquePhrasesForRow(final IAlignmentTable table, final AlignmentTableIndex2 index, final List<String> findRepeatingTokens, final String row) {
     // filteren would be nicer.. maar we doen het maar even alles in een!
     for (final IColumn column : table.getColumns()) {
       if (column.containsWitness(row)) {
@@ -50,7 +52,6 @@ public class AlignmentTableIndex2 implements IAligmentTableIndex {
         System.out.println("Column " + column.getPosition() + " is empty!");
       }
     }
-    return index;
   }
 
   //TODO: add support for empty cells!
