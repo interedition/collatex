@@ -2,8 +2,8 @@ package eu.interedition.collatex.experimental.ngrams.alignment;
 
 import java.util.List;
 
-import eu.interedition.collatex.experimental.interfaces.IWitness;
 import eu.interedition.collatex.experimental.ngrams.NGram;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class Alignment {
 

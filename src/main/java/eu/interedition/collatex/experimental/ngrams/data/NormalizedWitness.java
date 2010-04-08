@@ -3,13 +3,16 @@ package eu.interedition.collatex.experimental.ngrams.data;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.interedition.collatex.experimental.interfaces.IWitness;
+import eu.interedition.collatex2.implementation.input.Phrase;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IWitness;
 
-public class NormalizedWitness implements Iterable<NormalizedToken>, IWitness {
+public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   private final String sigil;
-  private final List<NormalizedToken> tokens;
+  private final List<INormalizedToken> tokens;
 
-  public NormalizedWitness(final String sigil, final List<NormalizedToken> tokens) {
+  public NormalizedWitness(final String sigil, final List<INormalizedToken> tokens) {
     this.sigil = sigil;
     this.tokens = tokens;
   }
@@ -18,7 +21,7 @@ public class NormalizedWitness implements Iterable<NormalizedToken>, IWitness {
   /* (non-Javadoc)
    * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#getTokens()
    */
-  public List<NormalizedToken> getTokens() {
+  public List<INormalizedToken> getTokens() {
     return tokens;
   }
 
@@ -34,22 +37,19 @@ public class NormalizedWitness implements Iterable<NormalizedToken>, IWitness {
    * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#iterator()
    */
   @Override
-  public Iterator<NormalizedToken> iterator() {
+  public Iterator<INormalizedToken> iterator() {
     return tokens.iterator();
   }
 
-  //Note: not pleased with this method! reduce visibility?
   /* (non-Javadoc)
-   * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#getTokens(int, int)
-   */
-  public List<NormalizedToken> getTokens(final int startPosition, final int endPosition) {
-    return tokens.subList(startPosition - 1, endPosition);
-  }
-
-  /* (non-Javadoc)
-   * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#size()
-   */
+  * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#size()
+  */
   public int size() {
     return tokens.size();
+  }
+
+  @Override
+  public IPhrase createPhrase(final int startPosition, final int endPosition) {
+    return new Phrase(tokens.subList(startPosition - 1, endPosition));
   }
 }

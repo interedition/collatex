@@ -10,10 +10,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.experimental.interfaces.IWitness;
-import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 import eu.interedition.collatex.experimental.ngrams.data.SpecialToken;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class BiGramIndex implements Iterable<BiGram> {
 
@@ -37,11 +37,11 @@ public class BiGramIndex implements Iterable<BiGram> {
   // TODO replace calls to this method with calls to create!
   // TODO make this method private
   public static List<BiGram> calculate(final IWitness w) {
-    final List<NormalizedToken> tokensTodo = Lists.newArrayList(w);
+    final List<INormalizedToken> tokensTodo = Lists.newArrayList(w.getTokens());
     tokensTodo.add(new SpecialToken(w.getSigil(), "#", w.size() + 1));
-    NormalizedToken previous = new SpecialToken(w.getSigil(), "#", 0);
+    INormalizedToken previous = new SpecialToken(w.getSigil(), "#", 0);
     final List<BiGram> bigrams = Lists.newArrayList();
-    for (final NormalizedToken next : tokensTodo) {
+    for (final INormalizedToken next : tokensTodo) {
       final BiGram tuple = new BiGram(previous, next);
       bigrams.add(tuple);
       previous = next;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex.general;
+package eu.interedition.collatex.match;
 
 import java.util.Set;
 
