@@ -123,10 +123,9 @@ public class FactoryTest {
   }
 
   @Test
-  @Ignore
   public void testGetMatchesUsingWitnessIndex() {
-    final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
-    final IWitness witnessB = factory.createWitness("B", "the big black");
+    final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");
+    final IWitness witnessB = factory.createWitness("B", "The big black");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
     final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();

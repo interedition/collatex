@@ -8,6 +8,12 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class NullColumn implements IColumn {
 
+  private final int position;
+
+  public NullColumn(final int position) {
+    this.position = position;
+  }
+
   @Override
   public void addMatch(final INormalizedToken token) {}
 
@@ -21,7 +27,7 @@ public class NullColumn implements IColumn {
 
   @Override
   public int getPosition() {
-    return 0;
+    return position;
   }
 
   @Override
@@ -40,6 +46,12 @@ public class NullColumn implements IColumn {
   @Override
   public ColumnState getState() {
     return null;
+  }
+
+  @Override
+  public int compareTo(final IColumn o) {
+    // TODO Auto-generated method stub
+    return 0;
   }
 
 }

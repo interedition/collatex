@@ -1,7 +1,9 @@
 package eu.interedition.collatex2.implementation.indexing;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -52,48 +54,56 @@ public class AlignmentTableIndex {
     //    } else {
     //
     //      // try 2
-    Multimap<String, IColumn> columnsMap = Multimaps.newHashMultimap();
+    Multimap<String, List<ColumnCell>> phraseColumnsMap = Multimaps.newHashMultimap();
     for (final IColumn tableColumn : tableColumns) {
       for (final INormalizedToken normalizedToken : tableColumn.getVariants()) {
-        columnsMap.put(normalizedToken.getNormalized(), tableColumn);
+        phraseColumnsMap.put(normalizedToken.getNormalized(), Lists.newArrayList(new ColumnCell(tableColumn, normalizedToken.getSigil())));
       }
     }
+
     do {
-      final Multimap<String, IColumn> newPhraseMap = Multimaps.newHashMultimap();
-      for (final String phraseId : columnsMap.keySet()) {
-        final Collection<IColumn> phraseColumns = columnsMap.get(phraseId);
-        if (phraseColumns.size() > 1) {
-          addExpandedPhrases(newPhraseMap, phraseColumns, tableColumns, phraseId /*, phraseMap*/);
+      final Multimap<String, List<ColumnCell>> newPhraseColumnsMap = Multimaps.newHashMultimap();
+      for (final String phraseId : phraseColumnsMap.keySet()) {
+        final Collection<List<ColumnCell>> phraseColumnsCollection = phraseColumnsMap.get(phraseId);
+        if (phraseColumnsCollection.size() == 1) {
+          final List<ColumnCell> phraseColumns = phraseColumnsCollection.iterator().next();
+          newPhraseColumnsMap.put(phraseId, phraseColumns);
         } else {
-          final IColumn phrase = phraseColumns.iterator().next();
-          newPhraseMap.put(phraseId, phrase);
+          addExpandedPhrases(newPhraseColumnsMap, phraseColumnsCollection, tableColumns, phraseId /*, phraseMap*/);
         }
       }
-      columnsMap = newPhraseMap;
-    } while (columnsMap.entries().size() > columnsMap.keySet().size());
+      phraseColumnsMap = newPhraseColumnsMap;
+    } while (phraseColumnsMap.entries().size() > phraseColumnsMap.keySet().size());
 
-    for (final java.util.Map.Entry<String, IColumn> entry : columnsMap.entries()) {
-      columnsForNormalizedPhrase.put(entry.getKey(), entry.getValue());
+    for (final Entry<String, List<ColumnCell>> entry : phraseColumnsMap.entries()) {
+      final List<ColumnCell> value = entry.getValue();
+      for (final ColumnCell columnCell : value) {
+        columnsForNormalizedPhrase.put(entry.getKey(), columnCell.getColumn());
+      }
     }
   }
 
   //  }
 
-  private void addExpandedPhrases(final Multimap<String, IColumn> newPhraseMap, final Collection<IColumn> phrases, final List<IColumn> tableColumns, final String phraseId) {
-    for (final IColumn phraseColumn : phrases) {
-      // column heeft witnesses, welke witnesses zijn relevant?
+  private void addExpandedPhrases(final Multimap<String, List<ColumnCell>> newPhraseColumnsMap, final Collection<List<ColumnCell>> phraseColumnsCollection, final List<IColumn> tableColumns,
+      final String phraseId) {
+    for (final List<ColumnCell> phraseColumns : phraseColumnsCollection) {
 
-      //      final int beforePosition = phraseColumn.getBeginPosition() - 1;
-      //      final int afterPosition = phraseColumn.getEndPosition();
-      //
-      //      final INormalizedToken beforeToken = (beforePosition > 0) ? tableColumns.get(beforePosition - 1) : new NullToken(phraseColumn.getBeginPosition(), phraseColumn.getSigil());
-      //      final INormalizedToken afterToken = (afterPosition < tableColumns.size()) ? tableColumns.get(afterPosition) : new NullToken(phraseColumn.getEndPosition(), phraseColumn.getSigil());
-      //
-      //      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
-      //      leftExpandedTokenList.addAll(phraseColumn.getTokens());
+      final int phraseColumnsBeginPosition = phraseColumns.get(0).getColumn().getPosition();
+      final int phraseColumnsEndPosition = phraseColumns.get(phraseColumns.size() - 1).getColumn().getPosition();
+      final int beforePosition = phraseColumnsBeginPosition - 1;
+      final int afterPosition = phraseColumnsEndPosition + 1;
+
+      final IColumn beforeColumn = (beforePosition > 0) ? tableColumns.get(beforePosition - 1) : new NullColumn(phraseColumnsBeginPosition);
+      final INormalizedToken beforeToken = beforeColumn.getVariants().get(0);
+      final IColumn afterColumn = (afterPosition < tableColumns.size()) ? tableColumns.get(afterPosition) : new NullColumn(phraseColumnsEndPosition);
+      final INormalizedToken afterToken = afterColumn.getVariants().get(0);
+
+      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
+      //      leftExpandedTokenList.addAll(phraseColumns.getTokens());
       //      final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
       //
-      //      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phraseColumn.getTokens());
+      //      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phraseColumns.getTokens());
       //      rightExpandedTokenList.add(afterToken);
       //      final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
       //
@@ -115,6 +125,24 @@ public class AlignmentTableIndex {
 
   public int size() {
     return columnsForNormalizedPhrase.keySet().size();
+  }
+
+  private static class ColumnCell {
+    private final String sigil;
+    private final IColumn column;
+
+    public ColumnCell(final IColumn column1, final String sigil1) {
+      this.column = column1;
+      this.sigil = sigil1;
+    }
+
+    public IColumn getColumn() {
+      return column;
+    }
+
+    public String getSigil() {
+      return sigil;
+    }
   }
 
 }

@@ -3,7 +3,9 @@ package eu.interedition.collatex2.implementation.alignmenttable;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Map.Entry;
 
+import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -74,5 +76,26 @@ public class Column3 implements IColumn {
   @Override
   public ColumnState getState() {
     return state;
+  }
+
+  @Override
+  public int compareTo(final IColumn other) {
+    return (getPosition() - other.getPosition());
+  }
+
+  @Override
+  public String toString() {
+    final List<String> list = Lists.newArrayList();
+    for (final Entry<String, INormalizedToken> entry : sigliToTokens.entrySet()) {
+      list.add(//
+          new StringBuilder(entry.getKey()).//
+              append(":").//
+              append(entry.getValue().getPosition()).//
+              append("->").//
+              append(entry.getValue().getContent()).//
+              toString()//
+          );
+    }
+    return Join.join(",", list);
   }
 }
