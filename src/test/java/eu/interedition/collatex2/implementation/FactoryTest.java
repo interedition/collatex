@@ -98,7 +98,6 @@ public class FactoryTest {
     assertEquals(4, columnsC.getEndPosition());
   }
 
-  @Ignore
   @Test
   public void testOverlappingMatches() {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
@@ -106,7 +105,7 @@ public class FactoryTest {
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA, witnessB), Factory.NULLCALLBACK);
     final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessC, new NormalizedLevenshtein());
-    assertEquals(2, matches.size());
+    assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
     final IColumns columnsA = match.getColumnsA();
