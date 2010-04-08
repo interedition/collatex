@@ -2,7 +2,7 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
-public interface IColumns extends Comparable<IColumns> {
+public interface IColumns {
 
   void addMatchPhrase(IPhrase phrase);
 

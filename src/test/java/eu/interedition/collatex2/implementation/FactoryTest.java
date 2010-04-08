@@ -122,6 +122,7 @@ public class FactoryTest {
     assertEquals(4, columnsC.getEndPosition());
   }
 
+  @Ignore
   @Test
   public void testGetMatchesUsingWitnessIndex() {
     final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");
@@ -137,13 +138,15 @@ public class FactoryTest {
     assertEquals(3, columnsA.getEndPosition());
   }
 
-  @Test
   @Ignore
+  @Test
   public void testGetMatchesUsingWitnessIndexWithOverlapping() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "the big black cat");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
-    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
+    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final List<IMatch> matches = alignment.getMatches();
+    //    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("the big black cat", match.getNormalized());

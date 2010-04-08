@@ -1,6 +1,9 @@
 package eu.interedition.collatex2.implementation.indexing;
 
+import java.util.Collection;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -13,7 +16,7 @@ public class ColumnPhrase {
   private List<String> sigli;
   String name;
 
-  public ColumnPhrase(final String _name, final IColumns _columns, final List<String> _sigli) {
+  public ColumnPhrase(final String _name, final IColumns _columns, final Collection<String> _sigli) {
     this.setColumns(_columns);
     this.setSigli(_sigli);
     this.name = _name;
@@ -47,8 +50,8 @@ public class ColumnPhrase {
     return name;
   }
 
-  public void setSigli(final List<String> sigli1) {
-    this.sigli = sigli1;
+  public void setSigli(final Collection<String> sigli1) {
+    this.sigli = Lists.newArrayList(sigli1);
   }
 
   public List<String> getSigli() {
