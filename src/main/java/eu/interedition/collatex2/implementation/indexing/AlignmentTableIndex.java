@@ -22,9 +22,9 @@ public class AlignmentTableIndex {
   public AlignmentTableIndex(final IAlignmentTable table) {
     final List<IColumn> tableColumns = table.getColumns();
 
-    Multimap<String, ColumnPhrase> columnPhraseMap = seed(tableColumns);
-    columnPhraseMap = grow(tableColumns, columnPhraseMap);
-    harvest(columnPhraseMap);
+    final Multimap<String, ColumnPhrase> seedlings = seed(tableColumns);
+    final Multimap<String, ColumnPhrase> crop = grow(seedlings, tableColumns);
+    harvest(crop);
   }
 
   public boolean containsNormalizedPhrase(final String normalized) {
@@ -59,7 +59,7 @@ public class AlignmentTableIndex {
     return columnPhraseMap;
   }
 
-  private Multimap<String, ColumnPhrase> grow(final List<IColumn> tableColumns, final Multimap<String, ColumnPhrase> _columnPhraseMap) {
+  private Multimap<String, ColumnPhrase> grow(final Multimap<String, ColumnPhrase> _columnPhraseMap, final List<IColumn> tableColumns) {
     Multimap<String, ColumnPhrase> columnPhraseMap = _columnPhraseMap;
     do {
       final Multimap<String, ColumnPhrase> newColumnPhraseMap = Multimaps.newHashMultimap();
@@ -75,12 +75,6 @@ public class AlignmentTableIndex {
       columnPhraseMap = newColumnPhraseMap;
     } while (columnPhraseMap.entries().size() > columnPhraseMap.keySet().size());
     return columnPhraseMap;
-  }
-
-  private void harvest(final Multimap<String, ColumnPhrase> columnPhraseMap) {
-    for (final Entry<String, ColumnPhrase> entry : columnPhraseMap.entries()) {
-      columnsForNormalizedPhrase.put(entry.getKey(), entry.getValue().getColumns());
-    }
   }
 
   private void addExpandedPhrases(final Multimap<String, ColumnPhrase> newPhraseColumnsMap, final Collection<ColumnPhrase> phraseColumnsCollection, final List<IColumn> tableColumns,
@@ -111,6 +105,12 @@ public class AlignmentTableIndex {
   //      //      final String rightPhraseId = getPhraseId(rightExpandedPhrase);
   //      //      newPhraseColumnsMap.put(rightPhraseId, rightExpandedPhrase);
   //    }
+  }
+
+  private void harvest(final Multimap<String, ColumnPhrase> columnPhraseMap) {
+    for (final Entry<String, ColumnPhrase> entry : columnPhraseMap.entries()) {
+      columnsForNormalizedPhrase.put(entry.getKey(), entry.getValue().getColumns());
+    }
   }
 
 }
