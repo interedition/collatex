@@ -1,4 +1,4 @@
-package eu.interedition.collatex.alignment.multiple_witness;
+package eu.interedition.collatex2.interfaces;
 
 public enum ColumnState {
   NEW, MATCH, VARIANT;

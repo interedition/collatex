@@ -13,6 +13,7 @@ import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTa
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex2.interfaces.ColumnState;
 
 public class Column<T extends BaseElement> {
 
