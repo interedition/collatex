@@ -6,9 +6,9 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.Column;
-import eu.interedition.collatex.alignment.multiple_witness.ColumnState;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
+import eu.interedition.collatex2.interfaces.ColumnState;
 
 // NOTE: this class should become obsolete if the 
 // complete alignment pipeline works with segment phrases instead

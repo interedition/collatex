@@ -2,9 +2,9 @@ package eu.interedition.collatex.experimental.ngrams;
 
 import java.util.List;
 
+import eu.interedition.collatex.experimental.interfaces.IWitness;
+import eu.interedition.collatex.experimental.interfaces.WitnessF;
 import eu.interedition.collatex.input.Phrase;
-import eu.interedition.collatex.interfaces.IWitness;
-import eu.interedition.collatex.interfaces.WitnessF;
 
 public class BiGrams {
 

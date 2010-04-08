@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.experimental.interfaces.IWitness;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
-import eu.interedition.collatex.interfaces.IWitness;
 
 public class NGram {
   private final List<NormalizedToken> tokens;

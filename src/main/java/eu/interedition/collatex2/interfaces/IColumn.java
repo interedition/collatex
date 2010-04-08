@@ -18,4 +18,6 @@ public interface IColumn {
 
   void setPosition(int position);
 
+  ColumnState getState();
+
 }

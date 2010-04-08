@@ -6,8 +6,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import eu.interedition.collatex.interfaces.IWitness;
-import eu.interedition.collatex.interfaces.WitnessF;
+import eu.interedition.collatex.experimental.interfaces.IWitness;
+import eu.interedition.collatex.experimental.interfaces.WitnessF;
 
 public class NGramBasedAlgorithmTest {
 

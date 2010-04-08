@@ -7,14 +7,15 @@ import java.util.NoSuchElementException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-//TODO add ColumnState
 public class Column3 implements IColumn {
   private final Map<String, INormalizedToken> sigliToTokens;
   private final List<INormalizedToken> variants;
   private int _position;
+  private ColumnState state;
 
   public Column3(final INormalizedToken token, final int position) {
     _position = position;
@@ -26,6 +27,7 @@ public class Column3 implements IColumn {
   private void init(final INormalizedToken token) {
     sigliToTokens.put(token.getSigil(), token);
     variants.add(token);
+    state = ColumnState.NEW;
   }
 
   @Override
@@ -50,11 +52,13 @@ public class Column3 implements IColumn {
   public void addVariant(final INormalizedToken token) {
     sigliToTokens.put(token.getSigil(), token);
     variants.add(token);
+    state = state.addVariant();
   }
 
   @Override
   public void addMatch(final INormalizedToken token) {
     sigliToTokens.put(token.getSigil(), token);
+    state = state.addMatch();
   }
 
   @Override
@@ -65,5 +69,10 @@ public class Column3 implements IColumn {
   @Override
   public void setPosition(final int position) {
     _position = position;
+  }
+
+  @Override
+  public ColumnState getState() {
+    return state;
   }
 }

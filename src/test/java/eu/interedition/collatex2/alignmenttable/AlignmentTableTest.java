@@ -82,6 +82,18 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
+  //TODO: rename test!
+  @Test
+  public void testTwoWitnesses() {
+    final IWitness w1 = factory.createWitness("A", "the black cat");
+    final IWitness w2 = factory.createWitness("B", "the white and black cat");
+    final List<IWitness> set = Lists.newArrayList(w1, w2);
+    final IAlignmentTable table = factory.createAlignmentTable(set);
+    String expected = "A: the| | |black|cat\n";
+    expected += "B: the|white|and|black|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
   @Test
   public void testAddition() {
     final IWitness w1 = factory.createWitness("A", "the cat");

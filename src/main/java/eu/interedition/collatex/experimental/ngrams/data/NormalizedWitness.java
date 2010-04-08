@@ -3,7 +3,7 @@ package eu.interedition.collatex.experimental.ngrams.data;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.experimental.interfaces.IWitness;
 
 public class NormalizedWitness implements Iterable<NormalizedToken>, IWitness {
   private final String sigil;
