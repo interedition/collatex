@@ -15,7 +15,6 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO Add tests for the state of the Column
 //NOTE: this is an implementation test!
 //NOTE: constructors are called directly!
 //NOTE: Not only read only methods are called!
@@ -67,9 +66,22 @@ public class ColumnTest {
     Assert.assertEquals(ColumnState.VARIANT, column.getState());
   }
 
-  //TODO:rename to add mixed
   @Test
   public void testAddMatch() {
+    final IWitness a = factory.createWitness("A", "match");
+    final IWitness b = factory.createWitness("B", "match");
+    final INormalizedToken wordA = a.getTokens().get(0);
+    final INormalizedToken wordB = b.getTokens().get(0);
+    final IColumn column = new Column3(wordA, 1);
+    column.addMatch(wordB);
+    final List<INormalizedToken> variants = column.getVariants();
+    Assert.assertEquals(1, variants.size());
+    Assert.assertEquals(ColumnState.MATCH, column.getState());
+  }
+
+  //TODO change and add expectations !
+  @Test
+  public void testAddMixed() {
     final IWitness witness = factory.createWitness("A", "first");
     final IWitness witnessB = factory.createWitness("B", "match");
     final IWitness witnessC = factory.createWitness("C", "match");

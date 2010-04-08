@@ -11,7 +11,6 @@ import eu.interedition.collatex.alignment.multiple_witness.ColumnState;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-//TODO add ColumnState
 public class Column3 implements IColumn {
   private final Map<String, INormalizedToken> sigliToTokens;
   private final List<INormalizedToken> variants;
@@ -59,6 +58,7 @@ public class Column3 implements IColumn {
   @Override
   public void addMatch(final INormalizedToken token) {
     sigliToTokens.put(token.getSigil(), token);
+    state = state.addMatch();
   }
 
   @Override
@@ -73,6 +73,6 @@ public class Column3 implements IColumn {
 
   @Override
   public ColumnState getState() {
-    return state;// 
+    return state;
   }
 }
