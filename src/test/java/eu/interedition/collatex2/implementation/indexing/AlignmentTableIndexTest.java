@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -29,6 +30,7 @@ public class AlignmentTableIndexTest {
     factory = new Factory();
   }
 
+  @Ignore
   @Test
   public void test1() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");

@@ -55,7 +55,7 @@ public class AlignmentTableIndex {
 
   Multiset<IColumns> phraseBag = Multisets.newTreeMultiset();
 
-  public AlignmentTableIndex(final IAlignmentTable table, final int dezemoethetworden) {
+  public AlignmentTableIndex(final IAlignmentTable table, final int dummy) {
     Multimap<String, IColumns> columnsMap = Multimaps.newHashMultimap();
     final List<IColumn> tableColumns = table.getColumns();
     for (final IColumn tableColumn : tableColumns) {
@@ -70,7 +70,7 @@ public class AlignmentTableIndex {
         final Collection<IColumns> phraseColumns = columnsMap.get(phraseId);
         //        Log.info("phrases = " + phrases.toString());
         if (phraseColumns.size() > 1) {
-          addExpandedPhrases(newPhraseMap, phraseColumns, tableColumns/*, phraseMap*/);
+          addExpandedPhrases(newPhraseMap, phraseColumns, tableColumns, phraseId /*, phraseMap*/);
         } else {
           final IColumns phrase = phraseColumns.iterator().next();
           //          if (phrase.size() == 1) {
@@ -90,11 +90,10 @@ public class AlignmentTableIndex {
     phraseBag.addAll(values);
   }
 
-  private void addExpandedPhrases(final Multimap<String, IColumns> newPhraseMap, final Collection<IColumns> phrases, final List<IColumn> tableColumns) {
+  private void addExpandedPhrases(final Multimap<String, IColumns> newPhraseMap, final Collection<IColumns> phrases, final List<IColumn> tableColumns, final String phraseId) {
     for (final IColumns phraseColumn : phrases) {
       // column heeft witnesses, welke witnesses zijn relevant?
-      //      phrase
-      //
+
       //      final int beforePosition = phraseColumn.getBeginPosition() - 1;
       //      final int afterPosition = phraseColumn.getEndPosition();
       //
