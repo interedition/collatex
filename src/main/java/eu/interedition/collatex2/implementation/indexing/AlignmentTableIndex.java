@@ -17,14 +17,14 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class AlignmentTableIndex {
-  Map<String, IColumns> columnsForNormalizedPhrase = Maps.newHashMap();
+  Map<String, IColumns> columnsForNormalizedPhrase;
 
   public AlignmentTableIndex(final IAlignmentTable table) {
     final List<IColumn> tableColumns = table.getColumns();
 
     final Multimap<String, ColumnPhrase> seedlings = seed(tableColumns);
-    final Multimap<String, ColumnPhrase> crop = grow(seedlings, tableColumns);
-    harvest(crop);
+    final Map<String, ColumnPhrase> crop = grow(seedlings, tableColumns);
+    columnsForNormalizedPhrase = harvest(crop);
   }
 
   public boolean containsNormalizedPhrase(final String normalized) {
@@ -59,8 +59,9 @@ public class AlignmentTableIndex {
     return columnPhraseMap;
   }
 
-  private Multimap<String, ColumnPhrase> grow(final Multimap<String, ColumnPhrase> _columnPhraseMap, final List<IColumn> tableColumns) {
-    Multimap<String, ColumnPhrase> columnPhraseMap = _columnPhraseMap;
+  private Map<String, ColumnPhrase> grow(final Multimap<String, ColumnPhrase> seed, final List<IColumn> tableColumns) {
+    Multimap<String, ColumnPhrase> columnPhraseMap = seed;
+
     do {
       final Multimap<String, ColumnPhrase> newColumnPhraseMap = Multimaps.newHashMultimap();
       for (final String phraseId : columnPhraseMap.keySet()) {
@@ -74,7 +75,13 @@ public class AlignmentTableIndex {
       }
       columnPhraseMap = newColumnPhraseMap;
     } while (columnPhraseMap.entries().size() > columnPhraseMap.keySet().size());
-    return columnPhraseMap;
+
+    final Map<String, ColumnPhrase> crop = Maps.newHashMap();
+    for (final Entry<String, ColumnPhrase> entry : columnPhraseMap.entries()) {
+      crop.put(entry.getKey(), entry.getValue());
+    }
+
+    return crop;
   }
 
   private void addExpandedPhrases(final Multimap<String, ColumnPhrase> newPhraseColumnsMap, final Collection<ColumnPhrase> phraseColumnsCollection, final List<IColumn> tableColumns,
@@ -107,10 +114,12 @@ public class AlignmentTableIndex {
   //    }
   }
 
-  private void harvest(final Multimap<String, ColumnPhrase> columnPhraseMap) {
-    for (final Entry<String, ColumnPhrase> entry : columnPhraseMap.entries()) {
-      columnsForNormalizedPhrase.put(entry.getKey(), entry.getValue().getColumns());
+  private Map<String, IColumns> harvest(final Map<String, ColumnPhrase> crop) {
+    final Map<String, IColumns> harvestMap = Maps.newHashMap();
+    for (final Entry<String, ColumnPhrase> entry : crop.entrySet()) {
+      harvestMap.put(entry.getKey(), entry.getValue().getColumns());
     }
+    return harvestMap;
   }
 
 }

@@ -6,11 +6,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mortbay.log.Log;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
@@ -32,7 +35,7 @@ public class WitnessIndex implements IWitnessIndex {
   public WitnessIndex(final IWitness witness) {
     final List<INormalizedToken> tokens = witness.getTokens();
     final Multimap<String, IPhrase> seedlings = seed(tokens);
-    final Multimap<String, IPhrase> crop = grow(seedlings, tokens);
+    final Map<String, IPhrase> crop = grow(seedlings, tokens);
     phraseBag.addAll(harvest(crop));
   }
 
@@ -68,8 +71,9 @@ public class WitnessIndex implements IWitnessIndex {
     return phraseMap;
   }
 
-  private Multimap<String, IPhrase> grow(final Multimap<String, IPhrase> _phraseMap, final List<INormalizedToken> tokens) {
-    Multimap<String, IPhrase> phraseMap = _phraseMap;
+  private Map<String, IPhrase> grow(final Multimap<String, IPhrase> seed, final List<INormalizedToken> tokens) {
+    Multimap<String, IPhrase> phraseMap = seed;
+
     do {
       final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
       //      Log.info("keys = " + phraseMap.keySet());
@@ -92,7 +96,13 @@ public class WitnessIndex implements IWitnessIndex {
       //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
       //      Log.info("");
     } while (phraseMap.entries().size() > phraseMap.keySet().size());
-    return phraseMap;
+
+    final Map<String, IPhrase> crop = Maps.newHashMap();
+    for (final Entry<String, IPhrase> entry : phraseMap.entries()) {
+      crop.put(entry.getKey(), entry.getValue());
+    }
+
+    return crop;
   }
 
   private void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens) {
@@ -119,7 +129,7 @@ public class WitnessIndex implements IWitnessIndex {
     }
   }
 
-  private List<IPhrase> harvest(final Multimap<String, IPhrase> phraseMap) {
+  private List<IPhrase> harvest(final Map<String, IPhrase> phraseMap) {
     final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
     Collections.sort(values, Phrase.PHRASECOMPARATOR);
     return values;
