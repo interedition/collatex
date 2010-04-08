@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.experimental.ngrams.data.Token;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class Subsegment2 {
 
@@ -42,7 +42,7 @@ public class Subsegment2 {
     return _sigilToPhrase.get(sigil);
   }
 
-  public Token getFirstWordFor(final String sigil) {
+  public INormalizedToken getFirstWordFor(final String sigil) {
     final BiGram phrase = getPhraseFor(sigil);
     return phrase.getFirstToken();
   }

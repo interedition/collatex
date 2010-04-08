@@ -5,11 +5,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.interedition.collatex.experimental.interfaces.IWitness;
 import eu.interedition.collatex.experimental.interfaces.WitnessF;
-import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
 import eu.interedition.collatex.general.NormalizedWitnessBuilder;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NGramTest {
 
@@ -19,7 +19,7 @@ public class NGramTest {
   @Test
   public void testNGram() {
     final IWitness aa = NormalizedWitnessBuilder.create("A", "The black and white cat");
-    final List<NormalizedToken> tokens = aa.getTokens(1, 2);
+    final List<INormalizedToken> tokens = aa.createPhrase(1, 2).getTokens();
     final Token token = new Token("A", "The", 1);
     final Token token2 = new Token("A", "black", 2);
 
@@ -31,7 +31,7 @@ public class NGramTest {
   @Test
   public void testNGram2Trim() {
     final IWitness a = WitnessF.create("A", "The black and white cat");
-    final List<NormalizedToken> tokens = a.getTokens();
+    final List<INormalizedToken> tokens = a.getTokens();
     final NGram ngram = new NGram(tokens);
     final NGram result = ngram.trim();
     Assert.assertEquals("black and white", result.getNormalized());

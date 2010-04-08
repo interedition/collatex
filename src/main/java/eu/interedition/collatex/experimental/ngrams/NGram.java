@@ -4,24 +4,24 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.experimental.interfaces.IWitness;
-import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NGram {
-  private final List<NormalizedToken> tokens;
+  private final List<INormalizedToken> tokens;
 
-  public NGram(final List<NormalizedToken> tokens) {
+  public NGram(final List<INormalizedToken> tokens) {
     this.tokens = tokens;
   }
 
   // TODO rename parameter "remove" to bigram
   public static NGram create(final BiGram remove) {
-    final List<NormalizedToken> tokens = Lists.newArrayList(remove.getFirstToken(), remove.getLastToken());
+    final List<INormalizedToken> tokens = Lists.newArrayList(remove.getFirstToken(), remove.getLastToken());
     return new NGram(tokens);
   }
 
   public static NGram create(final IWitness aa, final int startPosition, final int endPosition) {
-    final List<NormalizedToken> tokens2 = aa.getTokens(startPosition, endPosition);
+    final List<INormalizedToken> tokens2 = aa.createPhrase(startPosition, endPosition).getTokens();
     return new NGram(tokens2);
   }
 
@@ -33,7 +33,7 @@ public class NGram {
   public String getNormalized() {
     String replacementString = "";
     String divider = "";
-    for (final NormalizedToken token : tokens) {
+    for (final INormalizedToken token : tokens) {
       replacementString += divider + token.getNormalized();
       divider = " ";
     }
@@ -42,7 +42,7 @@ public class NGram {
   }
 
   // TODO add test for defensive behavior!
-  public NormalizedToken getFirstToken() {
+  public INormalizedToken getFirstToken() {
     if (isEmpty()) {
       throw new RuntimeException("This ngram is empty!");
     }
@@ -50,7 +50,7 @@ public class NGram {
   }
 
   //TODO make defensive and add test!
-  public NormalizedToken getLastToken() {
+  public INormalizedToken getLastToken() {
     return tokens.get(tokens.size() - 1);
   }
 
@@ -59,7 +59,7 @@ public class NGram {
   }
 
   public NGram trim() {
-    final List<NormalizedToken> subList = tokens.subList(1, tokens.size() - 1);
+    final List<INormalizedToken> subList = tokens.subList(1, tokens.size() - 1);
     return new NGram(subList);
   }
 

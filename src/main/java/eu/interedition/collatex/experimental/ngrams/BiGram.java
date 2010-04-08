@@ -2,13 +2,14 @@ package eu.interedition.collatex.experimental.ngrams;
 
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class BiGram {
   // NOTE: BiGram could become an extend version of NormalizedToken!
-  private final NormalizedToken _previous;
-  private final NormalizedToken _next;
+  private final INormalizedToken _previous;
+  private final INormalizedToken _next;
 
-  public BiGram(final NormalizedToken previous, final NormalizedToken next) {
+  public BiGram(final INormalizedToken previous, final INormalizedToken next) {
     this._previous = previous;
     this._next = next;
   }
@@ -17,12 +18,12 @@ public class BiGram {
     return _previous.getNormalized() + " " + _next.getNormalized();
   }
 
-  public NormalizedToken getFirstToken() {
+  public INormalizedToken getFirstToken() {
     return _previous;
 
   }
 
-  public NormalizedToken getLastToken() {
+  public INormalizedToken getLastToken() {
     return _next;
   }
 

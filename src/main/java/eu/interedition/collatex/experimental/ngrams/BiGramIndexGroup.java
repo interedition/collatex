@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.experimental.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 // TODO note this is not really an index! this is a combination of two!
 // TODO this class is gonna be very similar to WitnessSet!

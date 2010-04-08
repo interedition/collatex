@@ -5,9 +5,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.interedition.collatex.experimental.interfaces.IWitness;
 import eu.interedition.collatex.experimental.interfaces.WitnessF;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NGramIndexTest {
 

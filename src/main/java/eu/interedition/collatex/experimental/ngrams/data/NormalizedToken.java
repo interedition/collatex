@@ -3,7 +3,9 @@ package eu.interedition.collatex.experimental.ngrams.data;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NormalizedToken extends Token {
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+
+public class NormalizedToken extends Token implements INormalizedToken {
   private final String normalized;
   private final static Pattern PUNCT = Pattern.compile("\\p{Punct}");
 
@@ -16,7 +18,7 @@ public class NormalizedToken extends Token {
     return normalized;
   }
 
-  public static NormalizedToken normalize(final Token token) {
+  public static INormalizedToken normalize(final Token token) {
     final String content = token.getContent();
     String normalized = content.toLowerCase();
     final Matcher matcher = PUNCT.matcher(normalized);
