@@ -16,6 +16,7 @@ public class Column3 implements IColumn {
   private final Map<String, INormalizedToken> sigliToTokens;
   private final List<INormalizedToken> variants;
   private int _position;
+  private ColumnState state;
 
   public Column3(final INormalizedToken token, final int position) {
     _position = position;
@@ -27,6 +28,7 @@ public class Column3 implements IColumn {
   private void init(final INormalizedToken token) {
     sigliToTokens.put(token.getSigil(), token);
     variants.add(token);
+    state = ColumnState.NEW;
   }
 
   @Override
@@ -51,6 +53,7 @@ public class Column3 implements IColumn {
   public void addVariant(final INormalizedToken token) {
     sigliToTokens.put(token.getSigil(), token);
     variants.add(token);
+    state = state.addVariant();
   }
 
   @Override
@@ -70,6 +73,6 @@ public class Column3 implements IColumn {
 
   @Override
   public ColumnState getState() {
-    return ColumnState.NEW;
+    return state;// 
   }
 }

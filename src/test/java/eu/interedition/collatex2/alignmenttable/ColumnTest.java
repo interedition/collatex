@@ -64,8 +64,10 @@ public class ColumnTest {
     Assert.assertTrue(column.containsWitness("A"));
     Assert.assertTrue(column.containsWitness("B"));
     Assert.assertTrue(column.containsWitness("C"));
+    Assert.assertEquals(ColumnState.VARIANT, column.getState());
   }
 
+  //TODO:rename to add mixed
   @Test
   public void testAddMatch() {
     final IWitness witness = factory.createWitness("A", "first");
