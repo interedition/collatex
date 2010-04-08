@@ -5,11 +5,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.interedition.collatex.experimental.interfaces.IWitness;
+import eu.interedition.collatex.experimental.interfaces.WitnessF;
 import eu.interedition.collatex.experimental.ngrams.data.NormalizedToken;
 import eu.interedition.collatex.experimental.ngrams.data.Token;
 import eu.interedition.collatex.general.NormalizedWitnessBuilder;
-import eu.interedition.collatex.interfaces.IWitness;
-import eu.interedition.collatex.interfaces.WitnessF;
 
 public class NGramTest {
 

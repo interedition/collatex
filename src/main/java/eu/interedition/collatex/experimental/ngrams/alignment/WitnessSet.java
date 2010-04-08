@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.experimental.interfaces.IWitness;
 import eu.interedition.collatex.experimental.ngrams.BiGramIndexGroup;
 import eu.interedition.collatex.experimental.ngrams.NGram;
-import eu.interedition.collatex.interfaces.IWitness;
 
 public class WitnessSet {
 
