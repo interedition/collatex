@@ -1,14 +1,11 @@
 package eu.interedition.collatex2.implementation.indexing;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -20,78 +17,70 @@ public class AlignmentTableIndex {
   Multimap<String, IColumn> columnsForNormalizedPhrase = Multimaps.newArrayListMultimap();
 
   public AlignmentTableIndex(final IAlignmentTable table) {
-    final Multimap<String, IColumn> columnsForToken = Multimaps.newArrayListMultimap();
     final List<IColumn> tableColumns = table.getColumns();
-    for (final IColumn column : tableColumns) {
-      for (final INormalizedToken normalizedToken : column.getVariants()) {
-        columnsForToken.put(normalizedToken.getNormalized(), column);
-      }
-    }
-    for (final String tokenName : columnsForToken.keySet()) {
-      final Collection<IColumn> columns = columnsForToken.get(tokenName);
-      if (columns.size() > 1) {
-        for (final IColumn column : columns) {
-          final int position = column.getPosition();
-          final IColumn beforeColumn;
-          if (position == 0) {
-            beforeColumn = new NullColumn();
-          } else {
-            beforeColumn = tableColumns.get(position - 1);
-          }
-          for (final INormalizedToken normalizedToken : column.getVariants()) {
-            if (normalizedToken.equals(tokenName)) {
 
-            }
-          }
-        }
-      } else {
-        columnsForNormalizedPhrase.put(tokenName, columns.iterator().next());
-      }
-
-    }
-
+    //    if (false) {
+    //      // try 1
+    //      final Multimap<String, IColumn> columnsForToken = Multimaps.newArrayListMultimap();
+    //      for (final IColumn column : tableColumns) {
+    //        for (final INormalizedToken normalizedToken : column.getVariants()) {
+    //          columnsForToken.put(normalizedToken.getNormalized(), column);
+    //        }
+    //      }
+    //      for (final String tokenName : columnsForToken.keySet()) {
+    //        final Collection<IColumn> columns = columnsForToken.get(tokenName);
+    //        if (columns.size() > 1) {
+    //          for (final IColumn column : columns) {
+    //            final int position = column.getPosition();
+    //            final IColumn beforeColumn;
+    //            if (position == 0) {
+    //              beforeColumn = new NullColumn();
+    //            } else {
+    //              beforeColumn = tableColumns.get(position - 1);
+    //            }
+    //            for (final INormalizedToken normalizedToken : column.getVariants()) {
+    //              if (normalizedToken.equals(tokenName)) {
+    //                // what?
+    //              }
+    //            }
+    //          }
+    //        } else {
+    //          columnsForNormalizedPhrase.put(tokenName, columns.iterator().next());
+    //        }
     //
-  }
-
-  Multiset<IColumns> phraseBag = Multisets.newTreeMultiset();
-
-  public AlignmentTableIndex(final IAlignmentTable table, final int dummy) {
-    Multimap<String, IColumns> columnsMap = Multimaps.newHashMultimap();
-    final List<IColumn> tableColumns = table.getColumns();
+    //      }
+    //    } else {
+    //
+    //      // try 2
+    Multimap<String, IColumn> columnsMap = Multimaps.newHashMultimap();
     for (final IColumn tableColumn : tableColumns) {
       for (final INormalizedToken normalizedToken : tableColumn.getVariants()) {
-        columnsMap.put(normalizedToken.getNormalized(), new Columns(Lists.newArrayList(tableColumn)));
+        columnsMap.put(normalizedToken.getNormalized(), tableColumn);
       }
     }
     do {
-      final Multimap<String, IColumns> newPhraseMap = Multimaps.newHashMultimap();
-      //      Log.info("keys = " + phraseMap.keySet());
+      final Multimap<String, IColumn> newPhraseMap = Multimaps.newHashMultimap();
       for (final String phraseId : columnsMap.keySet()) {
-        final Collection<IColumns> phraseColumns = columnsMap.get(phraseId);
-        //        Log.info("phrases = " + phrases.toString());
+        final Collection<IColumn> phraseColumns = columnsMap.get(phraseId);
         if (phraseColumns.size() > 1) {
           addExpandedPhrases(newPhraseMap, phraseColumns, tableColumns, phraseId /*, phraseMap*/);
         } else {
-          final IColumns phrase = phraseColumns.iterator().next();
-          //          if (phrase.size() == 1) {
+          final IColumn phrase = phraseColumns.iterator().next();
           newPhraseMap.put(phraseId, phrase);
-          //          }
         }
-        //        Log.info("newPhraseMap = " + newPhraseMap.toString());
-        //        Log.info("");
       }
       columnsMap = newPhraseMap;
-      //      Log.info("phraseMap.entries().size() = " + String.valueOf(phraseMap.entries().size()));
-      //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
-      //      Log.info("");
     } while (columnsMap.entries().size() > columnsMap.keySet().size());
-    final List<IColumns> values = Lists.newArrayList(columnsMap.values());
-    Collections.sort(values, Columns.COLUMNSCOMPARATOR);
-    phraseBag.addAll(values);
+
+    for (final java.util.Map.Entry<String, IColumn> entry : columnsMap.entries()) {
+      columnsForNormalizedPhrase.put(entry.getKey(), entry.getValue());
+    }
   }
 
-  private void addExpandedPhrases(final Multimap<String, IColumns> newPhraseMap, final Collection<IColumns> phrases, final List<IColumn> tableColumns, final String phraseId) {
-    for (final IColumns phraseColumn : phrases) {
+  //  }
+
+  private void addExpandedPhrases(final Multimap<String, IColumn> newPhraseMap, final Collection<IColumn> phrases, final List<IColumn> tableColumns, final String phraseId) {
+    for (final IColumn phraseColumn : phrases) {
       // column heeft witnesses, welke witnesses zijn relevant?
 
       //      final int beforePosition = phraseColumn.getBeginPosition() - 1;
