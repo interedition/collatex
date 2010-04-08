@@ -9,7 +9,6 @@ import com.sd_editions.collatex.match.Subsegment;
 
 import eu.interedition.collatex.alignment.Match;
 import eu.interedition.collatex.alignment.UnfixedAlignment;
-import eu.interedition.collatex.general.RealMatcher;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
