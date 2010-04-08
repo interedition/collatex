@@ -1,7 +1,7 @@
 package eu.interedition.collatex2.interfaces;
 
 
-public interface IAligmentTableIndex {
+public interface IAlignmentTableIndex {
 
   public abstract boolean containsNormalizedPhrase(final String normalized);
 

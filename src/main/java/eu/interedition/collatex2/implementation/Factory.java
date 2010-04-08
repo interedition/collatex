@@ -32,7 +32,7 @@ import eu.interedition.collatex2.implementation.matching.RealMatcher;
 import eu.interedition.collatex2.implementation.matching.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex2.implementation.matching.worddistance.WordDistance;
 import eu.interedition.collatex2.implementation.tokenization.NormalizedWitnessBuilder;
-import eu.interedition.collatex2.interfaces.IAligmentTableIndex;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
@@ -117,7 +117,7 @@ public class Factory {
     return findMatches(new AlignmentTableIndex(table), new WitnessIndex(witness));
   }
 
-  private static List<IMatch> findMatches(final IAligmentTableIndex tableIndex, final IWitnessIndex witnessIndex) {
+  private static List<IMatch> findMatches(final IAlignmentTableIndex tableIndex, final IWitnessIndex witnessIndex) {
     final List<IMatch> matches = Lists.newArrayList();
     final Collection<IPhrase> phrases = witnessIndex.getPhrases();
     for (final IPhrase phrase : phrases) {

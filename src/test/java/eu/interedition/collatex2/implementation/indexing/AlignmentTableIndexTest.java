@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
-import eu.interedition.collatex2.interfaces.IAligmentTableIndex;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
@@ -36,7 +36,7 @@ public class AlignmentTableIndexTest {
   public void test1() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CALLBACK);
-    final IAligmentTableIndex index = new AlignmentTableIndex(table);
+    final IAlignmentTableIndex index = new AlignmentTableIndex(table);
     assertTrue(index.containsNormalizedPhrase("cat"));
     assertTrue(index.containsNormalizedPhrase("and"));
     assertTrue(index.containsNormalizedPhrase("rat"));

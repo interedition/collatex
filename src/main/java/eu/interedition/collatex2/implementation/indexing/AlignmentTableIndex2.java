@@ -10,20 +10,20 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.interfaces.IAligmentTableIndex;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class AlignmentTableIndex2 implements IAligmentTableIndex {
+public class AlignmentTableIndex2 implements IAlignmentTableIndex {
   private final Map<String, IColumns> normalizedToColumns;
 
   private AlignmentTableIndex2() {
     this.normalizedToColumns = Maps.newHashMap();
   }
 
-  public static IAligmentTableIndex create(final IAlignmentTable table) {
+  public static IAlignmentTableIndex create(final IAlignmentTable table) {
     final AlignmentTableIndex2 index = new AlignmentTableIndex2();
     final List<String> findRepeatingTokens = findRepeatingTokens(table);
     final String row = "A";
