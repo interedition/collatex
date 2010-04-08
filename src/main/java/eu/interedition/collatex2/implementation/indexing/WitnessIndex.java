@@ -76,25 +76,16 @@ public class WitnessIndex implements IWitnessIndex {
 
     do {
       final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
-      //      Log.info("keys = " + phraseMap.keySet());
       for (final String phraseId : phraseMap.keySet()) {
         final Collection<IPhrase> phrases = phraseMap.get(phraseId);
-        //        Log.info("phrases = " + phrases.toString());
-        if (phrases.size() > 1) {
-          addExpandedPhrases(newPhraseMap, phrases, tokens/*, phraseMap*/);
-        } else {
+        if (phrases.size() == 1) {
           final IPhrase phrase = phrases.iterator().next();
-          //          if (phrase.size() == 1) {
           newPhraseMap.put(phraseId, phrase);
-          //          }
+        } else {
+          addExpandedPhrases(newPhraseMap, phrases, tokens);
         }
-        //        Log.info("newPhraseMap = " + newPhraseMap.toString());
-        //        Log.info("");
       }
       phraseMap = newPhraseMap;
-      //      Log.info("phraseMap.entries().size() = " + String.valueOf(phraseMap.entries().size()));
-      //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
-      //      Log.info("");
     } while (phraseMap.entries().size() > phraseMap.keySet().size());
 
     final Map<String, IPhrase> crop = Maps.newHashMap();

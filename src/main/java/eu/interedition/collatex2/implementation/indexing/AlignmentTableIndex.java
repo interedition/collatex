@@ -41,7 +41,7 @@ public class AlignmentTableIndex {
 
   private Multimap<String, ColumnPhrase> seed(final List<IColumn> tableColumns) {
     final Multimap<String, ColumnPhrase> columnPhraseMap = Multimaps.newHashMultimap();
-    // seed the columnphrasemap with the individual tokens
+
     for (final IColumn tableColumn : tableColumns) {
       final Multimap<String, String> sigliForTokenMap = Multimaps.newHashMultimap();
       for (final INormalizedToken normalizedToken : tableColumn.getVariants()) {
@@ -49,11 +49,11 @@ public class AlignmentTableIndex {
         sigliForTokenMap.put(tokenName, normalizedToken.getSigil());
       }
 
-      for (final String token : sigliForTokenMap.keySet()) {
+      for (final String tokenName : sigliForTokenMap.keySet()) {
         final Columns _columns = new Columns(Lists.newArrayList(tableColumn));
-        final Collection<String> _sigli = sigliForTokenMap.get(token);
-        final ColumnPhrase columnPhrase = new ColumnPhrase(token, _columns, _sigli);
-        columnPhraseMap.put(token, columnPhrase);
+        final Collection<String> _sigli = sigliForTokenMap.get(tokenName);
+        final ColumnPhrase columnPhrase = new ColumnPhrase(tokenName, _columns, _sigli);
+        columnPhraseMap.put(tokenName, columnPhrase);
       }
     }
     return columnPhraseMap;
