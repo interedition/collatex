@@ -10,11 +10,10 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Columns implements IColumns {
-
   private final List<IColumn> columns;
 
-  public Columns(final List<IColumn> columns) {
-    this.columns = columns;
+  public Columns(final List<IColumn> columns1) {
+    this.columns = columns1;
   }
 
   public Columns() {
@@ -95,6 +94,11 @@ public class Columns implements IColumns {
   @Override
   public int size() {
     return columns.size();
+  }
+
+  @Override
+  public List<IColumn> getColumns() {
+    return columns;
   }
 
 }

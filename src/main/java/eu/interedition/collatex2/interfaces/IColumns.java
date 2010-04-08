@@ -1,5 +1,7 @@
 package eu.interedition.collatex2.interfaces;
 
+import java.util.List;
+
 public interface IColumns {
 
   void addMatchPhrase(IPhrase phrase);
@@ -15,5 +17,7 @@ public interface IColumns {
   boolean isEmpty();
 
   int size();
+
+  List<IColumn> getColumns();
 
 }

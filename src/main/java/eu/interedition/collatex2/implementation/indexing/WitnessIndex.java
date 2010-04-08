@@ -6,11 +6,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mortbay.log.Log;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
@@ -30,60 +33,10 @@ public class WitnessIndex implements IWitnessIndex {
   }
 
   public WitnessIndex(final IWitness witness) {
-    Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
     final List<INormalizedToken> tokens = witness.getTokens();
-    for (final INormalizedToken token : tokens) {
-      phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
-    }
-    do {
-      final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
-      //      Log.info("keys = " + phraseMap.keySet());
-      for (final String phraseId : phraseMap.keySet()) {
-        final Collection<IPhrase> phrases = phraseMap.get(phraseId);
-        //        Log.info("phrases = " + phrases.toString());
-        if (phrases.size() > 1) {
-          addExpandedPhrases(newPhraseMap, phrases, tokens/*, phraseMap*/);
-        } else {
-          final IPhrase phrase = phrases.iterator().next();
-          if (phrase.size() == 1) {
-            newPhraseMap.put(phraseId, phrase);
-          }
-        }
-        //        Log.info("newPhraseMap = " + newPhraseMap.toString());
-        //        Log.info("");
-      }
-      phraseMap = newPhraseMap;
-      //      Log.info("phraseMap.entries().size() = " + String.valueOf(phraseMap.entries().size()));
-      //      Log.info("phraseMap.keySet().size() = " + String.valueOf(phraseMap.keySet().size()));
-      //      Log.info("");
-    } while (phraseMap.entries().size() > phraseMap.keySet().size());
-    final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
-    Collections.sort(values, Phrase.PHRASECOMPARATOR);
-    phraseBag.addAll(values);
-  }
-
-  private void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens) {
-    for (final IPhrase phrase : phrases) {
-      final int beforePosition = phrase.getBeginPosition() - 1;
-      final int afterPosition = phrase.getEndPosition();
-
-      final INormalizedToken beforeToken = (beforePosition > 0) ? tokens.get(beforePosition - 1) : new NullToken(phrase.getBeginPosition(), phrase.getSigil());
-      final INormalizedToken afterToken = (afterPosition < tokens.size()) ? tokens.get(afterPosition) : new NullToken(phrase.getEndPosition(), phrase.getSigil());
-
-      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
-      leftExpandedTokenList.addAll(phrase.getTokens());
-      final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
-
-      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phrase.getTokens());
-      rightExpandedTokenList.add(afterToken);
-      final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
-
-      final String leftPhraseId = leftExpandedPhrase.getNormalized();
-      newPhraseMap.put(leftPhraseId, leftExpandedPhrase);
-
-      final String rightPhraseId = rightExpandedPhrase.getNormalized();
-      newPhraseMap.put(rightPhraseId, rightExpandedPhrase);
-    }
+    final Multimap<String, IPhrase> seedlings = seed(tokens);
+    final Map<String, IPhrase> crop = grow(seedlings, tokens);
+    phraseBag.addAll(harvest(crop));
   }
 
   public static final Function<IPhrase, String> PHRASE_TO_NORMALIZED = new Function<IPhrase, String>() {
@@ -110,29 +63,67 @@ public class WitnessIndex implements IWitnessIndex {
     return phraseBag;
   }
 
-  //  @Override
-  //  public void use(final List<String> uniquePhrases) {
-  //    Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
-  //    for (final IPhrase phrase : getPhrases()) {
-  //      phraseMap.put(phrase.getNormalized(), phrase);
-  //    }
-  //    do {
-  //      final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
-  //      for (final String phraseId : phraseMap.keySet()) {
-  //        final Collection<IPhrase> phrases = phraseMap.get(phraseId);
-  //        if (phrases.size() > 1) {
-  //          addExpandedPhrases(newPhraseMap, phrases, tokens/*, phraseMap*/);
-  //        } else {
-  //          final IPhrase phrase = phrases.iterator().next();
-  //          if (phrase.size() == 1) {
-  //            newPhraseMap.put(phraseId, phrase);
-  //          }
-  //        }
-  //      }
-  //      phraseMap = newPhraseMap;
-  //    } while (phraseMap.entries().size() > phraseMap.keySet().size());
-  //
-  //    phraseBag.addAll(phraseMap.values());
-  //
-  //  }
+  private Multimap<String, IPhrase> seed(final List<INormalizedToken> tokens) {
+    final Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
+    for (final INormalizedToken token : tokens) {
+      phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
+    }
+    return phraseMap;
+  }
+
+  private Map<String, IPhrase> grow(final Multimap<String, IPhrase> seed, final List<INormalizedToken> tokens) {
+    Multimap<String, IPhrase> phraseMap = seed;
+
+    do {
+      final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
+      for (final String phraseId : phraseMap.keySet()) {
+        final Collection<IPhrase> phrases = phraseMap.get(phraseId);
+        if (phrases.size() == 1) {
+          final IPhrase phrase = phrases.iterator().next();
+          newPhraseMap.put(phraseId, phrase);
+        } else {
+          addExpandedPhrases(newPhraseMap, phrases, tokens);
+        }
+      }
+      phraseMap = newPhraseMap;
+    } while (phraseMap.entries().size() > phraseMap.keySet().size());
+
+    final Map<String, IPhrase> crop = Maps.newHashMap();
+    for (final Entry<String, IPhrase> entry : phraseMap.entries()) {
+      crop.put(entry.getKey(), entry.getValue());
+    }
+
+    return crop;
+  }
+
+  private void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens) {
+    for (final IPhrase phrase : phrases) {
+      final int beforePosition = phrase.getBeginPosition() - 1;
+      final int afterPosition = phrase.getEndPosition();
+
+      final INormalizedToken beforeToken = (beforePosition > 0) ? tokens.get(beforePosition - 1) : new NullToken(phrase.getBeginPosition(), phrase.getSigil());
+      final INormalizedToken afterToken = (afterPosition < tokens.size()) ? tokens.get(afterPosition) : new NullToken(phrase.getEndPosition(), phrase.getSigil());
+
+      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
+      leftExpandedTokenList.addAll(phrase.getTokens());
+      final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
+
+      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phrase.getTokens());
+      rightExpandedTokenList.add(afterToken);
+      final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
+
+      final String leftPhraseId = leftExpandedPhrase.getNormalized();
+      newPhraseMap.put(leftPhraseId, leftExpandedPhrase);
+
+      final String rightPhraseId = rightExpandedPhrase.getNormalized();
+      newPhraseMap.put(rightPhraseId, rightExpandedPhrase);
+    }
+  }
+
+  private List<IPhrase> harvest(final Map<String, IPhrase> phraseMap) {
+    final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
+    Collections.sort(values, Phrase.PHRASECOMPARATOR);
+    return values;
+  }
+
 }

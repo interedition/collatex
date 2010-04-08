@@ -105,7 +105,7 @@ public class Factory {
     return AlignmentTableCreator3.createAlignmentTable(set, callback);
   }
 
-  public IAlignment createAlignment0(final IAlignmentTable table, final IWitness witness) {
+  public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
     final List<IMatch> matches = getMatchesUsingWitnessIndex(table, witness, new NormalizedLevenshtein());
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));

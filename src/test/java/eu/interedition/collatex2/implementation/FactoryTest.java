@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.implementation.matching.worddistance.NormalizedLevenshtein;
+import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -56,13 +57,13 @@ public class FactoryTest {
     assertTrue(string + " not found in " + stringSet, stringSet.contains(string));
   }
 
-  @Ignore
   @Test
   public void testEverythingIsUnique() {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = factory.createWitness("B", "everything is unique");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
-    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
+    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final List<IMatch> matches = alignment.getMatches();
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything is unique", match.getNormalized());
@@ -71,7 +72,6 @@ public class FactoryTest {
     assertEquals(3, columnsA.getEndPosition());
   }
 
-  @Ignore
   @Test
   public void testEverythingIsUniqueTwoWitnesses() {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
@@ -97,7 +97,6 @@ public class FactoryTest {
     assertEquals(4, columnsC.getEndPosition());
   }
 
-  @Ignore
   @Test
   public void testOverlappingMatches() {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
@@ -105,7 +104,7 @@ public class FactoryTest {
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA, witnessB), Factory.NULLCALLBACK);
     final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessC, new NormalizedLevenshtein());
-    assertEquals(2, matches.size());
+    assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
     final IColumns columnsA = match.getColumnsA();
@@ -126,10 +125,11 @@ public class FactoryTest {
   @Ignore
   @Test
   public void testGetMatchesUsingWitnessIndex() {
-    final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
-    final IWitness witnessB = factory.createWitness("B", "the big black");
+    final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");
+    final IWitness witnessB = factory.createWitness("B", "The big black");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
-    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
+    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final List<IMatch> matches = alignment.getMatches();
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("the big black", match.getNormalized());
@@ -144,7 +144,9 @@ public class FactoryTest {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "the big black cat");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
-    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
+    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final List<IMatch> matches = alignment.getMatches();
+    //    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("the big black cat", match.getNormalized());
