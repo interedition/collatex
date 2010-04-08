@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex.alignment.multiple_witness.ColumnState;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
@@ -65,5 +66,10 @@ public class Column3 implements IColumn {
   @Override
   public void setPosition(final int position) {
     _position = position;
+  }
+
+  @Override
+  public ColumnState getState() {
+    return ColumnState.NEW;
   }
 }

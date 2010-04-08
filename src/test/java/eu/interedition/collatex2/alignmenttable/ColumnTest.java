@@ -8,6 +8,7 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import eu.interedition.collatex.alignment.multiple_witness.ColumnState;
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.alignmenttable.Column3;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -41,6 +42,7 @@ public class ColumnTest {
     final IColumn column = new Column3(word, 1);
     Assert.assertTrue(column.containsWitness("A"));
     Assert.assertFalse(column.containsWitness("B"));
+    Assert.assertEquals(ColumnState.NEW, column.getState());
   }
 
   @Test
