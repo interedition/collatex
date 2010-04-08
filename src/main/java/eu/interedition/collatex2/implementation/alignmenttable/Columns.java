@@ -1,5 +1,6 @@
 package eu.interedition.collatex2.implementation.alignmenttable;
 
+import java.util.Comparator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -10,6 +11,13 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Columns implements IColumns {
+
+  public static final Comparator<IColumns> COLUMNSCOMPARATOR = new Comparator<IColumns>() {
+    @Override
+    public int compare(final IColumns c1, final IColumns c2) {
+      return c1.compareTo(c2);
+    }
+  };
 
   private final List<IColumn> columns;
 
@@ -95,6 +103,20 @@ public class Columns implements IColumns {
   @Override
   public int size() {
     return columns.size();
+  }
+
+  @Override
+  public int compareTo(final IColumns other) {
+    final int beginDelta = getBeginPosition() - other.getBeginPosition();
+    if (beginDelta != 0) {
+      return beginDelta;
+    }
+    final int endDelta = getEndPosition() - other.getEndPosition();
+    if (endDelta != 0) {
+      return endDelta;
+    }
+    final int sizeDelta = size() - other.size();
+    return sizeDelta;
   }
 
 }

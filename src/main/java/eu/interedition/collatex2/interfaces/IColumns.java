@@ -1,6 +1,6 @@
 package eu.interedition.collatex2.interfaces;
 
-public interface IColumns {
+public interface IColumns extends Comparable<IColumns> {
 
   void addMatchPhrase(IPhrase phrase);
 

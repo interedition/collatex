@@ -30,10 +30,14 @@ public class AlignmentTableIndexTest {
   }
 
   @Test
-  public void test() {
+  public void test1() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CALLBACK);
     final AlignmentTableIndex index = new AlignmentTableIndex(table);
+    assertTrue(index.containsNormalizedPhrase("cat"));
+    assertTrue(index.containsNormalizedPhrase("and"));
+    assertTrue(index.containsNormalizedPhrase("rat"));
+    assertEquals(15, index.size());
     assertTrue(index.containsNormalizedPhrase("# the"));
     assertTrue(index.containsNormalizedPhrase("# the big"));
     assertTrue(index.containsNormalizedPhrase("# the big black"));
