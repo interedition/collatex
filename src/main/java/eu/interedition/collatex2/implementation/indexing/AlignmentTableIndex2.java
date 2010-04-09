@@ -56,8 +56,7 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
   }
 
   //TODO: add support for empty cells!
-  private static ColumnPhrase findUniqueColumnPhraseToTheLeft(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column,
-      final INormalizedToken token) {
+  private static ColumnPhrase findUniqueColumnPhraseToTheLeft(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column, final INormalizedToken token) {
     // combine to the left
     final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), new Columns(Lists.newArrayList(column)), Lists.newArrayList(row));
     boolean found = false; // not nice!
@@ -76,8 +75,7 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
   }
 
   //TODO: add support for empty cells!
-  private static ColumnPhrase findUniqueColumnPhraseToTheRight(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column,
-      final INormalizedToken token) {
+  private static ColumnPhrase findUniqueColumnPhraseToTheRight(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column, final INormalizedToken token) {
     final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), new Columns(Lists.newArrayList(column)), Lists.newArrayList(row));
     boolean found = false; // not nice!
     for (int i = column.getPosition() + 1; !found && i < table.size() + 1; i++) {
@@ -98,6 +96,7 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
     normalizedToColumns.put(phrase.getNormalized(), phrase.getColumns());
   }
 
+  //TODO: move to IAlignmentTable?
   private static List<String> findRepeatingTokens(final IAlignmentTable table) {
     //transform
     Multimap<String, IColumn> yes;
@@ -126,10 +125,13 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
     return normalizedToColumns.containsKey(normalized);
   }
 
+  //TODO: add test!
   @Override
   public IColumns getColumns(final String normalized) {
-    // TODO Auto-generated method stub
-    return null;
+    if (!containsNormalizedPhrase(normalized)) {
+      throw new RuntimeException("No such element " + normalized + " in AlignmentTableIndex!");
+    }
+    return normalizedToColumns.get(normalized);
   }
 
   @Override
