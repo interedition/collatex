@@ -10,8 +10,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -65,13 +65,11 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
       final IColumn leftColumn = table.getColumns().get(i - 1);
       final boolean empty = !leftColumn.containsWitness(row);
       found = !empty && !findRepeatingTokens.contains(leftColumn.getToken(row).getNormalized());
-      if (found) {
-        buffer.add(0, leftColumn);
-        normalized = leftColumn.getToken(row).getNormalized() + " " + normalized;
-        break;
-      }
       buffer.add(0, leftColumn);
       normalized = leftColumn.getToken(row).getNormalized() + " " + normalized;
+      if (found) {
+        break;
+      }
     }
     if (found) {
       index.put(normalized, new Columns(buffer));
@@ -91,13 +89,11 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
       final IColumn rightColumn = table.getColumns().get(i - 1);
       final boolean empty = !rightColumn.containsWitness(row);
       found = !empty && !findRepeatingTokens.contains(rightColumn.getToken(row).getNormalized());
-      if (found) {
-        buffer.add(rightColumn);
-        normalized += " " + rightColumn.getToken(row).getNormalized();
-        break;
-      }
       buffer.add(rightColumn);
       normalized += " " + rightColumn.getToken(row).getNormalized();
+      if (found) {
+        break;
+      }
     }
     if (found) {
       index.put(normalized, new Columns(buffer));
