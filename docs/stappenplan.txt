@@ -1,3 +1,14 @@
+TODO
+
+X - Verplaats de code voor de bepaling van herhalende tokens van AlignmentTableIndex en WitnessIndex classes naar respectievelijk AlignmentTable en Witness class 
+  - Voor het matchen van de twee indexen eerst herhalende tokens bepalen in de AlignmentTable en witness, daar een gecombineerde Set van maken
+X - Ondersteuning voor meerdere witnesses inbouwen in de AlignmentTableIndex
+  - Hou bij het bepalen van de unieke ColumnPhrases links en rechts van een herhalend Token rekening met empty cells 
+  - Na het matchen van de twee indexen moeten overlappende matches worden weg gefilterd
+
+
+ALGORITHM
+
 Input een lijst van IWitness
 
 Via ATC addWitness

@@ -52,4 +52,10 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   public IPhrase createPhrase(final int startPosition, final int endPosition) {
     return new Phrase(tokens.subList(startPosition - 1, endPosition));
   }
+
+  @Override
+  public List<String> findRepeatingTokens() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

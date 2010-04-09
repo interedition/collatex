@@ -1,12 +1,15 @@
 package eu.interedition.collatex2.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -208,6 +211,41 @@ public class AlignmentTableTest {
     String expected = "A: the|black|cat\n";
     expected += "B: the| | \n";
     assertEquals(expected, table.toString());
+  }
+
+  @Test
+  public void testRepeatingTokensWithOneWitness() {
+    final IWitness witness = factory.createWitness("a", "a c a t g c a");
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(Lists.newArrayList(witness));
+    final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
+    assertEquals(2, repeatingTokens.size());
+    assertTrue(repeatingTokens.contains("a"));
+    assertTrue(repeatingTokens.contains("c"));
+    assertFalse(repeatingTokens.contains("t"));
+    assertFalse(repeatingTokens.contains("g"));
+  }
+
+  @Ignore
+  @Test
+  public void testRepeatingTokensWithMultipleWitnesses() {
+    final IWitness witnessA = factory.createWitness("a", "a c a t g c a");
+    final IWitness witnessB = factory.createWitness("b", "a c a t t c a");
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(Lists.newArrayList(witnessA, witnessB));
+    final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
+    assertEquals(2, repeatingTokens.size());
+    assertTrue(repeatingTokens.contains("a"));
+    assertTrue(repeatingTokens.contains("c"));
+    assertTrue(repeatingTokens.contains("t"));
+    assertFalse(repeatingTokens.contains("g"));
+  }
+
+  @Test
+  public void testRepeatingTokensWithMultipleWitnesses2() {
+    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
+    final IWitness witnessB = factory.createWitness("B", "this one very different");
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(Lists.newArrayList(witnessA, witnessB));
+    final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
+    assertEquals(0, repeatingTokens.size());
   }
 
 }

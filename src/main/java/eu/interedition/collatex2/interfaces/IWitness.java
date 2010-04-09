@@ -13,4 +13,6 @@ public interface IWitness {
 
   String getSigil();
 
+  List<String> findRepeatingTokens();
+
 }

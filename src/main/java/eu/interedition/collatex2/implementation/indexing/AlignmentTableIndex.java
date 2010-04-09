@@ -1,135 +1,114 @@
 package eu.interedition.collatex2.implementation.indexing;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class AlignmentTableIndex implements IAlignmentTableIndex {
-  Map<String, IColumns> columnsForNormalizedPhrase;
+  private final Map<String, IColumns> normalizedToColumns;
 
-  public AlignmentTableIndex(final IAlignmentTable table) {
-    final List<IColumn> tableColumns = table.getColumns();
-
-    final Multimap<String, ColumnPhrase> seedlings = seed(tableColumns);
-    final Map<String, ColumnPhrase> crop = grow(seedlings, tableColumns);
-    columnsForNormalizedPhrase = harvest(crop);
+  private AlignmentTableIndex() {
+    this.normalizedToColumns = Maps.newHashMap();
   }
 
-  /* (non-Javadoc)
-   * @see eu.interedition.collatex2.implementation.indexing.IAligmentTableIndex#containsNormalizedPhrase(java.lang.String)
-   */
-  public boolean containsNormalizedPhrase(final String normalized) {
-    return columnsForNormalizedPhrase.containsKey(normalized);
-  }
-
-  /* (non-Javadoc)
-   * @see eu.interedition.collatex2.implementation.indexing.IAligmentTableIndex#getColumns(java.lang.String)
-   */
-  public IColumns getColumns(final String normalized) {
-    return columnsForNormalizedPhrase.get(normalized);
-  }
-
-  /* (non-Javadoc)
-   * @see eu.interedition.collatex2.implementation.indexing.IAligmentTableIndex#size()
-   */
-  public int size() {
-    return columnsForNormalizedPhrase.keySet().size();
-  }
-
-  private Multimap<String, ColumnPhrase> seed(final List<IColumn> tableColumns) {
-    final Multimap<String, ColumnPhrase> columnPhraseMap = Multimaps.newHashMultimap();
-
-    for (final IColumn tableColumn : tableColumns) {
-      final Multimap<String, String> sigliForTokenMap = Multimaps.newHashMultimap();
-      for (final INormalizedToken normalizedToken : tableColumn.getVariants()) {
-        final String tokenName = normalizedToken.getNormalized();
-        sigliForTokenMap.put(tokenName, normalizedToken.getSigil());
-      }
-
-      for (final String tokenName : sigliForTokenMap.keySet()) {
-        final Columns _columns = new Columns(Lists.newArrayList(tableColumn));
-        final Collection<String> _sigli = sigliForTokenMap.get(tokenName);
-        final ColumnPhrase columnPhrase = new ColumnPhrase(tokenName, _columns, _sigli);
-        columnPhraseMap.put(tokenName, columnPhrase);
-      }
+  public static IAlignmentTableIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
+    final AlignmentTableIndex index = new AlignmentTableIndex();
+    for (final String sigil : table.getSigli()) {
+      findUniquePhrasesForRow(table, index, repeatingTokens, sigil);
     }
-    return columnPhraseMap;
+    return index;
   }
 
-  private Map<String, ColumnPhrase> grow(final Multimap<String, ColumnPhrase> seed, final List<IColumn> tableColumns) {
-    Multimap<String, ColumnPhrase> columnPhraseMap = seed;
-
-    do {
-      final Multimap<String, ColumnPhrase> newColumnPhraseMap = Multimaps.newHashMultimap();
-      for (final String phraseId : columnPhraseMap.keySet()) {
-        final Collection<ColumnPhrase> columnPhraseCollection = columnPhraseMap.get(phraseId);
-        if (columnPhraseCollection.size() == 1) {
-          final ColumnPhrase phraseColumns = columnPhraseCollection.iterator().next();
-          newColumnPhraseMap.put(phraseId, phraseColumns);
+  private static void findUniquePhrasesForRow(final IAlignmentTable table, final AlignmentTableIndex index, final List<String> findRepeatingTokens, final String row) {
+    // filteren would be nicer.. maar we doen het maar even alles in een!
+    for (final IColumn column : table.getColumns()) {
+      if (column.containsWitness(row)) {
+        final INormalizedToken token = column.getToken(row);
+        // kijken of ie unique is
+        final boolean unique = !findRepeatingTokens.contains(token.getNormalized());
+        if (unique) {
+          final IColumns columns = new Columns(Lists.newArrayList(column));
+          final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), columns, Lists.newArrayList(row));
+          index.add(phrase);
         } else {
-          addExpandedPhrases(newColumnPhraseMap, columnPhraseCollection, tableColumns, phraseId);
+          //System.out.println("We have to combine stuff here!");
+          final ColumnPhrase leftPhrase = findUniqueColumnPhraseToTheLeft(table, findRepeatingTokens, row, column, token);
+          final ColumnPhrase rightPhrase = findUniqueColumnPhraseToTheRight(table, findRepeatingTokens, row, column, token);
+          index.add(leftPhrase);
+          index.add(rightPhrase);
         }
+      } else {
+        System.out.println("Column " + column.getPosition() + " is empty!");
       }
-      columnPhraseMap = newColumnPhraseMap;
-    } while (columnPhraseMap.entries().size() > columnPhraseMap.keySet().size());
-
-    final Map<String, ColumnPhrase> crop = Maps.newHashMap();
-    for (final Entry<String, ColumnPhrase> entry : columnPhraseMap.entries()) {
-      crop.put(entry.getKey(), entry.getValue());
     }
-
-    return crop;
   }
 
-  private void addExpandedPhrases(final Multimap<String, ColumnPhrase> newPhraseColumnsMap, final Collection<ColumnPhrase> phraseColumnsCollection, final List<IColumn> tableColumns,
-      final String phraseId) {
-  //    for (final ColumnPhrase phraseColumns : phraseColumnsCollection) {
-  //
-  //      final int phraseColumnsBeginPosition = phraseColumns.get(0).getColumn().getPosition();
-  //      final int phraseColumnsEndPosition = phraseColumns.get(phraseColumns.size() - 1).getColumn().getPosition();
-  //      final int beforePosition = phraseColumnsBeginPosition - 1;
-  //      final int afterPosition = phraseColumnsEndPosition + 1;
-  //
-  //      final IColumn beforeColumn = (beforePosition > 0) ? tableColumns.get(beforePosition - 1) : new NullColumn(phraseColumnsBeginPosition);
-  //      final INormalizedToken beforeToken = beforeColumn.getVariants().get(0);
-  //      final IColumn afterColumn = (afterPosition < tableColumns.size()) ? tableColumns.get(afterPosition) : new NullColumn(phraseColumnsEndPosition);
-  //      final INormalizedToken afterToken = afterColumn.getVariants().get(0);
-  //
-  //      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
-  //      //      leftExpandedTokenList.addAll(phraseColumns.getTokens());
-  //      final ColumnPhrase leftExpandedPhrase = phraseAsListOfColumnPhrase(leftExpandedTokenList);
-  //
-  //      //      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phraseColumns.getTokens());
-  //      //      rightExpandedTokenList.add(afterToken);
-  //      //      final ColumnPhrase rightExpandedPhrase = phraseAsListOfColumnPhrase(rightExpandedTokenList);
-  //
-  //      final String leftPhraseId = leftExpandedPhrase.getNormalized();
-  //      newPhraseColumnsMap.put(leftPhraseId, leftExpandedPhrase);
-  //
-  //      //      final String rightPhraseId = getPhraseId(rightExpandedPhrase);
-  //      //      newPhraseColumnsMap.put(rightPhraseId, rightExpandedPhrase);
-  //    }
+  //TODO: add support for empty cells!
+  private static ColumnPhrase findUniqueColumnPhraseToTheLeft(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column, final INormalizedToken token) {
+    // combine to the left
+    final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), new Columns(Lists.newArrayList(column)), Lists.newArrayList(row));
+    boolean found = false; // not nice!
+    for (int i = column.getPosition() - 1; !found && i > 0; i--) {
+      final IColumn leftColumn = table.getColumns().get(i - 1);
+      final boolean empty = !leftColumn.containsWitness(row);
+      //TODO: next statement is not allowed if empty column!
+      final String normalizedNeighbour = leftColumn.getToken(row).getNormalized();
+      found = !empty && !findRepeatingTokens.contains(normalizedNeighbour);
+      phrase.addColumnToLeft(leftColumn);
+    }
+    if (!found) {
+      phrase.addColumnToLeft(new NullColumn(1));
+    }
+    return phrase;
   }
 
-  private Map<String, IColumns> harvest(final Map<String, ColumnPhrase> crop) {
-    final Map<String, IColumns> harvestMap = Maps.newHashMap();
-    for (final Entry<String, ColumnPhrase> entry : crop.entrySet()) {
-      harvestMap.put(entry.getKey(), entry.getValue().getColumns());
+  //TODO: add support for empty cells!
+  private static ColumnPhrase findUniqueColumnPhraseToTheRight(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column, final INormalizedToken token) {
+    final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), new Columns(Lists.newArrayList(column)), Lists.newArrayList(row));
+    boolean found = false; // not nice!
+    for (int i = column.getPosition() + 1; !found && i < table.size() + 1; i++) {
+      final IColumn rightColumn = table.getColumns().get(i - 1);
+      final boolean empty = !rightColumn.containsWitness(row);
+      //TODO: next statement is not allowed if empty column!
+      final String normalizedNeighbour = rightColumn.getToken(row).getNormalized();
+      found = !empty && !findRepeatingTokens.contains(normalizedNeighbour);
+      phrase.addColumnToRight(rightColumn);
     }
-    return harvestMap;
+    if (!found) {
+      phrase.addColumnToRight(new NullColumn(table.size()));
+    }
+    return phrase;
+  }
+
+  private void add(final ColumnPhrase phrase) {
+    normalizedToColumns.put(phrase.getNormalized(), phrase.getColumns());
+  }
+
+  @Override
+  public boolean containsNormalizedPhrase(final String normalized) {
+    return normalizedToColumns.containsKey(normalized);
+  }
+
+  @Override
+  public IColumns getColumns(final String normalized) {
+    if (!containsNormalizedPhrase(normalized)) {
+      throw new RuntimeException("No such element " + normalized + " in AlignmentTableIndex!");
+    }
+    return normalizedToColumns.get(normalized);
+  }
+
+  @Override
+  public int size() {
+    return normalizedToColumns.size();
   }
 
 }

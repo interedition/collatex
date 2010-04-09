@@ -1,8 +1,11 @@
 package eu.interedition.collatex2.implementation.alignmenttable;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
@@ -139,4 +142,27 @@ public class AlignmentTable4 implements IAlignmentTable {
       addVariantBefore(column, witnessPhrase);
     }
   }
+
+  @Override
+  public List<String> findRepeatingTokens() {
+    //transform
+    final Multimap<String, IColumn> columnsForTokenMap = Multimaps.newArrayListMultimap();
+    for (final IColumn column : getColumns()) {
+      final List<INormalizedToken> variants = column.getVariants();
+      for (final INormalizedToken token : variants) {
+        columnsForTokenMap.put(token.getNormalized(), column);
+      }
+    }
+    //predicate
+    final List<String> repeatingNormalizedTokens = Lists.newArrayList();
+    for (final String tokenName : columnsForTokenMap.keySet()) {
+      final Collection<IColumn> columnCollection = columnsForTokenMap.get(tokenName);
+      if (columnCollection.size() > 1) {
+        //System.out.println("Repeating token: " + key + " in columns " + xcolumns.toString());
+        repeatingNormalizedTokens.add(tokenName);
+      }
+    }
+    return repeatingNormalizedTokens;
+  }
+
 }

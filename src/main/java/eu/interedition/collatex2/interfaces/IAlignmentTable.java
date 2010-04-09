@@ -19,4 +19,6 @@ public interface IAlignmentTable {
 
   void addAddition(IAddition addition);
 
+  List<String> findRepeatingTokens();
+
 }

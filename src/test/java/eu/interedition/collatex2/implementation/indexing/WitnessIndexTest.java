@@ -20,7 +20,7 @@ public class WitnessIndexTest {
   @Test
   public void test() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
-    final WitnessIndex index = new WitnessIndex(witnessA);
+    final WitnessIndex index = new WitnessIndex(witnessA, witnessA.findRepeatingTokens());
     // The index should contain all unique n-grams with 
     //   0 or more tokens         occurring multiple times in the witness, and
     //   exactly 1 token (or '#') occurring only once      in the witness
