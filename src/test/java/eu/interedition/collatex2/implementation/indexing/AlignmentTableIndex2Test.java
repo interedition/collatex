@@ -10,9 +10,9 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -38,9 +38,9 @@ public class AlignmentTableIndex2Test {
     assertTrue(index.containsNormalizedPhrase("cat"));
     assertTrue(index.containsNormalizedPhrase("and"));
     assertTrue(index.containsNormalizedPhrase("rat"));
-    assertTrue(index.containsNormalizedPhrase("# the"));
-    assertTrue(index.containsNormalizedPhrase("# the big"));
-    assertTrue(index.containsNormalizedPhrase("# the big black"));
+    assertTrue(index.containsNormalizedPhrase("+ the"));
+    assertTrue(index.containsNormalizedPhrase("+ the big"));
+    assertTrue(index.containsNormalizedPhrase("+ the big black"));
     assertTrue(index.containsNormalizedPhrase("the big black cat"));
     assertTrue(index.containsNormalizedPhrase("big black cat"));
     assertTrue(index.containsNormalizedPhrase("black cat"));
