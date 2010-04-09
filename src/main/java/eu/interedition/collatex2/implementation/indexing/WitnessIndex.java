@@ -32,7 +32,7 @@ public class WitnessIndex implements IWitnessIndex {
     this.phraseBag = _phraseBag;
   }
 
-  public WitnessIndex(final IWitness witness) {
+  public WitnessIndex(final IWitness witness, final Collection<String> repeatingTokens) {
     final List<INormalizedToken> tokens = witness.getTokens();
     final Multimap<String, IPhrase> seedlings = seed(tokens);
     final Map<String, IPhrase> crop = grow(seedlings, tokens);

@@ -32,9 +32,9 @@ import eu.interedition.collatex2.implementation.matching.RealMatcher;
 import eu.interedition.collatex2.implementation.matching.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex2.implementation.matching.worddistance.WordDistance;
 import eu.interedition.collatex2.implementation.tokenization.NormalizedWitnessBuilder;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
@@ -48,6 +48,8 @@ import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class Factory {
 
+  //  private static final Log LOG = LogFactory.getLog(Factory.class);
+
   public IWitness createWitness(final String sigil, final String words) {
     return NormalizedWitnessBuilder.create(sigil, words);
   }
@@ -57,11 +59,11 @@ public class Factory {
   public IAlignment createAlignment(final IWitness a, final IWitness b) {
     final IAlignmentTable table = new AlignmentTable4();
     AlignmentTableCreator3.addWitness(table, a, NULLCALLBACK);
-    final IAlignment alignment = createAlignment(table, b);
+    final IAlignment alignment = createAlignmentUsingSuperbase(table, b);
     return alignment;
   }
 
-  public IAlignment createAlignment(final IAlignmentTable table, final IWitness b) {
+  public IAlignment createAlignmentUsingSuperbase(final IAlignmentTable table, final IWitness b) {
     // make the superbase from the alignment table
     final ISuperbase superbase = Superbase4.create(table);
     final WordDistance distanceMeasure = new NormalizedLevenshtein();
@@ -114,7 +116,10 @@ public class Factory {
   }
 
   protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
-    return findMatches(new AlignmentTableIndex(table), new WitnessIndex(witness));
+    final Set<String> repeatingTokens = Sets.newHashSet();
+    repeatingTokens.addAll(table.findRepeatingTokens());
+    repeatingTokens.addAll(witness.findRepeatingTokens());
+    return findMatches(AlignmentTableIndex.create(table, Lists.newArrayList(repeatingTokens)), new WitnessIndex(witness, repeatingTokens));
   }
 
   private static List<IMatch> findMatches(final IAlignmentTableIndex tableIndex, final IWitnessIndex witnessIndex) {
@@ -215,8 +220,7 @@ public class Factory {
   }
 
   public static IWitnessIndex createWitnessIndex(final IWitness witness) {
-    final WitnessIndex witnessIndex = new WitnessIndex(witness);
-    return witnessIndex;
+    return new WitnessIndex(witness, witness.findRepeatingTokens());
   }
 
   public static Map<String, IWitnessIndex> createWitnessIndexMap(final Collection<IWitness> witnesses) {

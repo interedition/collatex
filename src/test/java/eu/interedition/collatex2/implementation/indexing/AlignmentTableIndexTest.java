@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -31,19 +30,17 @@ public class AlignmentTableIndexTest {
     factory = new Factory();
   }
 
-  @Ignore
   @Test
   public void test1() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CALLBACK);
-    final IAlignmentTableIndex index = new AlignmentTableIndex(table);
+    final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
     assertTrue(index.containsNormalizedPhrase("cat"));
     assertTrue(index.containsNormalizedPhrase("and"));
     assertTrue(index.containsNormalizedPhrase("rat"));
-    assertEquals(15, index.size());
-    assertTrue(index.containsNormalizedPhrase("# the"));
-    assertTrue(index.containsNormalizedPhrase("# the big"));
-    assertTrue(index.containsNormalizedPhrase("# the big black"));
+    assertTrue(index.containsNormalizedPhrase("+ the"));
+    assertTrue(index.containsNormalizedPhrase("+ the big"));
+    assertTrue(index.containsNormalizedPhrase("+ the big black"));
     assertTrue(index.containsNormalizedPhrase("the big black cat"));
     assertTrue(index.containsNormalizedPhrase("big black cat"));
     assertTrue(index.containsNormalizedPhrase("black cat"));
