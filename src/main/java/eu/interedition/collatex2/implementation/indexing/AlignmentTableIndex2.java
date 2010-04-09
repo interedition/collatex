@@ -71,12 +71,11 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
         break;
       }
     }
-    if (found) {
-      index.put(normalized, new Columns(buffer));
-    } else {
+    if (!found) {
       buffer.add(0, new NullColumn(1));
-      index.put("# " + normalized, new Columns(buffer));
+      normalized = "# " + normalized;
     }
+    index.put(normalized, new Columns(buffer));
   }
 
   //TODO: add support for empty cells!
@@ -95,12 +94,11 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
         break;
       }
     }
-    if (found) {
-      index.put(normalized, new Columns(buffer));
-    } else {
+    if (!found) {
       buffer.add(new NullColumn(table.size()));
-      index.put(normalized + "# ", new Columns(buffer));
+      normalized += " #";
     }
+    index.put(normalized, new Columns(buffer));
   }
 
   private void put(final String normalized, final IColumns columns) {
