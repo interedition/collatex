@@ -40,14 +40,14 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
         final boolean unique = !findRepeatingTokens.contains(token.getNormalized());
         if (unique) {
           final IColumns columns = new Columns(Lists.newArrayList(column));
-          index.put(token.getNormalized(), columns);
+          final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), columns, Lists.newArrayList(row));
+          index.add(phrase);
         } else {
           //System.out.println("We have to combine stuff here!");
 
           findUniqueTokenToTheLeft(table, index, findRepeatingTokens, row, column, token);
           findUniqueTokenToTheRight(table, index, findRepeatingTokens, row, column, token);
         }
-
       } else {
         System.out.println("Column " + column.getPosition() + " is empty!");
       }
@@ -95,12 +95,6 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
 
   private void add(final ColumnPhrase phrase) {
     normalizedToColumns.put(phrase.getNormalized(), phrase.getColumns());
-  }
-
-  //TODO: remove!
-  private void put(final String normalized, final IColumns columns) {
-    // System.out.println("adding " + normalized);
-    normalizedToColumns.put(normalized, columns);
   }
 
   private static List<String> findRepeatingTokens(final IAlignmentTable table) {
