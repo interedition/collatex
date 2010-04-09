@@ -39,12 +39,9 @@ public class AlignmentTableIndexTest {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CALLBACK);
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
-    assertTrue(index.containsNormalizedPhrase("cat"));
-    assertTrue(index.containsNormalizedPhrase("and"));
-    assertTrue(index.containsNormalizedPhrase("rat"));
-    assertTrue(index.containsNormalizedPhrase("+ the"));
-    assertTrue(index.containsNormalizedPhrase("+ the big"));
-    assertTrue(index.containsNormalizedPhrase("+ the big black"));
+    assertTrue(index.containsNormalizedPhrase("# the"));
+    assertTrue(index.containsNormalizedPhrase("# the big"));
+    assertTrue(index.containsNormalizedPhrase("# the big black"));
     assertTrue(index.containsNormalizedPhrase("the big black cat"));
     assertTrue(index.containsNormalizedPhrase("big black cat"));
     assertTrue(index.containsNormalizedPhrase("black cat"));

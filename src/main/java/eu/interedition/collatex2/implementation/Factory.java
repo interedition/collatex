@@ -2,16 +2,15 @@ package eu.interedition.collatex2.implementation;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
@@ -48,7 +47,7 @@ import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class Factory {
 
-  //  private static final Log LOG = LogFactory.getLog(Factory.class);
+  private static final Log LOG = LogFactory.getLog(Factory.class);
 
   public IWitness createWitness(final String sigil, final String words) {
     return NormalizedWitnessBuilder.create(sigil, words);
@@ -110,6 +109,7 @@ public class Factory {
 
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
     final List<IMatch> matches = getMatchesUsingWitnessIndex(table, witness, new NormalizedLevenshtein());
+    LOG.info(matches);
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;
@@ -140,8 +140,11 @@ public class Factory {
   }
 
   protected static List<IMatch> joinOverlappingMatches(final List<IMatch> matches) {
-    final List<IMatch> newMatches = matches;
-    // TODO implement
+    final List<IMatch> newMatches = Lists.newArrayList();
+    for (final IMatch match : matches) {
+      //      match.removeNullObject();
+      newMatches.add(match);
+    }
     return newMatches;
   }
 
@@ -228,40 +231,40 @@ public class Factory {
     return new WitnessIndex(witness, witness.findRepeatingTokens());
   }
 
-  public static Map<String, IWitnessIndex> createWitnessIndexMap(final Collection<IWitness> witnesses) {
-    final Map<String, IWitnessIndex> map = Maps.newHashMap();
-    final Set<String> tokensWithMultiples = getTokensWithMultiples(witnesses);
-
-    for (final IWitness witness : witnesses) {
-      final Multiset<IPhrase> phraseBag = Multisets.newTreeMultiset();
-      Multimap<String, IPhrase> phraseMap = Multimaps.newTreeMultimap();
-      final List<INormalizedToken> tokens = witness.getTokens();
-      for (final INormalizedToken token : tokens) {
-        phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
-      }
-      do {
-        final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
-        for (final String phraseId : phraseMap.keySet()) {
-          final Collection<IPhrase> phrases = phraseMap.get(phraseId);
-          if (tokensWithMultiples.contains(phraseId)) {
-            addExpandedPhrases(newPhraseMap, phrases, tokens, tokensWithMultiples/*, phraseMap*/);
-          } else {
-            final IPhrase phrase = phrases.iterator().next();
-            if (phrase.size() == 1) {
-              newPhraseMap.put(phraseId, phrase);
-            }
-          }
-        }
-        phraseMap = newPhraseMap;
-      } while (hasMultiples(phraseMap));
-      final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
-      Collections.sort(values, Phrase.PHRASECOMPARATOR);
-      phraseBag.addAll(values);
-      map.put(witness.getSigil(), new WitnessIndex(phraseBag));
-    }
-
-    return map;
-  }
+  //  public static Map<String, IWitnessIndex> createWitnessIndexMap(final Collection<IWitness> witnesses) {
+  //    final Map<String, IWitnessIndex> map = Maps.newHashMap();
+  //    final Set<String> tokensWithMultiples = getTokensWithMultiples(witnesses);
+  //
+  //    for (final IWitness witness : witnesses) {
+  //      final Multiset<IPhrase> phraseBag = Multisets.newTreeMultiset();
+  //      Multimap<String, IPhrase> phraseMap = Multimaps.newTreeMultimap();
+  //      final List<INormalizedToken> tokens = witness.getTokens();
+  //      for (final INormalizedToken token : tokens) {
+  //        phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
+  //      }
+  //      do {
+  //        final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
+  //        for (final String phraseId : phraseMap.keySet()) {
+  //          final Collection<IPhrase> phrases = phraseMap.get(phraseId);
+  //          if (tokensWithMultiples.contains(phraseId)) {
+  //            addExpandedPhrases(newPhraseMap, phrases, tokens, tokensWithMultiples/*, phraseMap*/);
+  //          } else {
+  //            final IPhrase phrase = phrases.iterator().next();
+  //            if (phrase.size() == 1) {
+  //              newPhraseMap.put(phraseId, phrase);
+  //            }
+  //          }
+  //        }
+  //        phraseMap = newPhraseMap;
+  //      } while (hasMultiples(phraseMap));
+  //      final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
+  //      Collections.sort(values, Phrase.PHRASECOMPARATOR);
+  //      phraseBag.addAll(values);
+  //      map.put(witness.getSigil(), new WitnessIndex(phraseBag));
+  //    }
+  //
+  //    return map;
+  //  }
 
   private static final Predicate<IPhrase> TWO_OR_MORE_WORDS = new Predicate<IPhrase>() {
     @Override

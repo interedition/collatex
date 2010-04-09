@@ -23,7 +23,6 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableCreator3 {
   public static IAlignmentTable createAlignmentTable(final List<IWitness> witnessList, final ICallback callback) {
-    Factory.createWitnessIndexMap(witnessList);
     final IAlignmentTable table = new AlignmentTable4();
     for (final IWitness witness : witnessList) {
       AlignmentTableCreator3.addWitness(table, witness, callback);

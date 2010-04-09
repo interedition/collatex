@@ -9,13 +9,14 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Phrase implements IPhrase {
+  private final List<INormalizedToken> tokens;
+
   public static final Comparator<IPhrase> PHRASECOMPARATOR = new Comparator<IPhrase>() {
     @Override
     public int compare(final IPhrase p1, final IPhrase p2) {
       return p1.compareTo(p2);
     }
   };
-  private final List<INormalizedToken> tokens;
 
   public Phrase(final List<INormalizedToken> tokens1) {
     this.tokens = tokens1;
@@ -137,5 +138,15 @@ public class Phrase implements IPhrase {
   @Override
   public IPhrase createSubPhrase(final int startIndex, final int endIndex) {
     return new Phrase(tokens.subList(startIndex - 1, endIndex));
+  }
+
+  @Override
+  public void addColumnToRight(final INormalizedToken token) {
+    tokens.add(token);
+  }
+
+  @Override
+  public void addTokenToLeft(final INormalizedToken token) {
+    tokens.add(0, token);
   }
 }
