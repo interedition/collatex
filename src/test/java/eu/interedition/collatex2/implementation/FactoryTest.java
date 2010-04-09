@@ -137,7 +137,7 @@ public class FactoryTest {
     assertEquals(3, columnsA.getEndPosition());
   }
 
-  @Ignore
+  //Note: internally this gives # the big black and the big black cat as matches
   @Test
   public void testGetMatchesUsingWitnessIndexWithOverlapping() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
