@@ -4,15 +4,12 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mortbay.log.Log;
 
 import com.google.common.base.Join;
-import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -29,7 +26,7 @@ public class IndexingTest {
   @Test
   public void test1() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final IWitnessIndex index = Factory.createWitnessIndexMap(Lists.newArrayList(a)).get(a.getSigil());
+    final IWitnessIndex index = Factory.createWitnessIndex(a);
     assertEquals(6, index.size());
     assertContains(index, "# tobe");
     assertContains(index, "tobe or");
@@ -46,7 +43,7 @@ public class IndexingTest {
   public void test2() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     Log.info("witness = [the big black cat and the big black rat]");
-    final IWitnessIndex index = Factory.createWitnessIndexMap(Lists.newArrayList(a)).get(a.getSigil());
+    final IWitnessIndex index = Factory.createWitnessIndex(a);
     assertContains(index, "# the big black");
     assertContains(index, "the big black cat");
     assertContains(index, "cat");
@@ -60,7 +57,7 @@ public class IndexingTest {
   @Test
   public void test1a() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final IWitnessIndex index = Factory.createWitnessIndexMap(Lists.newArrayList(a)).get("A");
+    final IWitnessIndex index = Factory.createWitnessIndex(a);
     assertEquals(6, index.size());
     assertContains(index, "# tobe");
     assertContains(index, "tobe or");
@@ -76,7 +73,7 @@ public class IndexingTest {
   @Test
   public void test2a() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
-    final IWitnessIndex index = Factory.createWitnessIndexMap(Lists.newArrayList(a)).get("A");
+    final IWitnessIndex index = Factory.createWitnessIndex(a);
     assertContains(index, "# the big black");
     assertContains(index, "the big black cat");
     assertContains(index, "cat");
@@ -94,9 +91,8 @@ public class IndexingTest {
     final IWitness b = factory.createWitness("B", "and the big black cat ate the big rat");
     Log.info("witness a = [the big black cat and the big black rat]");
     Log.info("witness b = [and the big black cat ate the big rat]");
-    final Map<String, IWitnessIndex> indexMap = Factory.createWitnessIndexMap(Lists.newArrayList(a, b));
-    final IWitnessIndex indexA = indexMap.get(a.getSigil());
-    final IWitnessIndex indexB = indexMap.get(b.getSigil());
+    final IWitnessIndex indexA = Factory.createWitnessIndex(a);
+    final IWitnessIndex indexB = Factory.createWitnessIndex(b);
     assertContains(indexA, "# the big black");
     assertContains(indexB, "# the big black");
     assertContains(indexA, "the big black cat");

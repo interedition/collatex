@@ -22,4 +22,8 @@ public interface IPhrase extends Comparable<IPhrase> {
 
   IPhrase createSubPhrase(int startIndex, int endIndex);
 
+  void addTokenToLeft(INormalizedToken leftToken);
+
+  void addColumnToRight(INormalizedToken rightToken);
+
 }

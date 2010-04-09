@@ -24,7 +24,7 @@ public class ColumnPhrase {
 
   public void addColumnToLeft(final IColumn column) {
     if (column instanceof NullColumn) {
-      name = new StringBuilder("+ ").append(name).toString();
+      name = new StringBuilder("# ").append(name).toString();
     } else {
       final List<IColumn> columnList = getColumns().getColumns();
       columnList.add(0, column);
@@ -36,7 +36,7 @@ public class ColumnPhrase {
 
   public void addColumnToRight(final IColumn column) {
     if (column instanceof NullColumn) {
-      name = new StringBuilder(name).append(" +").toString();
+      name = new StringBuilder(name).append(" #").toString();
     } else {
       final List<IColumn> columnList = getColumns().getColumns();
       columnList.add(column);

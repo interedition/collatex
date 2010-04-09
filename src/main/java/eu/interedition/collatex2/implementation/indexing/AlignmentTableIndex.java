@@ -23,12 +23,12 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
   public static IAlignmentTableIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
     final AlignmentTableIndex index = new AlignmentTableIndex();
     for (final String sigil : table.getSigli()) {
-      findUniquePhrasesForRow(table, index, repeatingTokens, sigil);
+      findUniquePhrasesForRow(sigil, table, index, repeatingTokens);
     }
     return index;
   }
 
-  private static void findUniquePhrasesForRow(final IAlignmentTable table, final AlignmentTableIndex index, final List<String> findRepeatingTokens, final String row) {
+  private static void findUniquePhrasesForRow(final String row, final IAlignmentTable table, final AlignmentTableIndex index, final List<String> findRepeatingTokens) {
     // filteren would be nicer.. maar we doen het maar even alles in een!
     for (final IColumn column : table.getColumns()) {
       if (column.containsWitness(row)) {
