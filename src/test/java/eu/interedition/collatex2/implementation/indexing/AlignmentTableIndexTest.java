@@ -11,9 +11,9 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IWitness;
 
