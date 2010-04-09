@@ -35,7 +35,7 @@ public class WitnessIndex implements IWitnessIndex {
   public WitnessIndex(final IWitness witness, final Collection<String> repeatingTokens) {
     final List<INormalizedToken> tokens = witness.getTokens();
     final Multimap<String, IPhrase> seedlings = seed(tokens);
-    final Map<String, IPhrase> crop = grow(seedlings, tokens);
+    final Map<String, IPhrase> crop = grow(seedlings, tokens, repeatingTokens);
     phraseBag.addAll(harvest(crop));
   }
 
@@ -71,14 +71,14 @@ public class WitnessIndex implements IWitnessIndex {
     return phraseMap;
   }
 
-  private Map<String, IPhrase> grow(final Multimap<String, IPhrase> seed, final List<INormalizedToken> tokens) {
+  private Map<String, IPhrase> grow(final Multimap<String, IPhrase> seed, final List<INormalizedToken> tokens, final Collection<String> repeatingTokens) {
     Multimap<String, IPhrase> phraseMap = seed;
 
     do {
       final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
       for (final String phraseId : phraseMap.keySet()) {
         final Collection<IPhrase> phrases = phraseMap.get(phraseId);
-        if (phrases.size() == 1) {
+        if (phrases.size() == 1 && !repeatingTokens.contains(phraseId)) {
           final IPhrase phrase = phrases.iterator().next();
           newPhraseMap.put(phraseId, phrase);
         } else {

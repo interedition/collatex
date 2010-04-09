@@ -98,7 +98,6 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     return normalizedToColumns.containsKey(normalized);
   }
 
-  //TODO: add test!
   @Override
   public IColumns getColumns(final String normalized) {
     if (!containsNormalizedPhrase(normalized)) {

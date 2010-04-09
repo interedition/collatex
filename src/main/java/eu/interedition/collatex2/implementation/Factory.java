@@ -116,10 +116,15 @@ public class Factory {
   }
 
   protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
+    final List<String> repeatingTokens = combineRepeatingTokens(table, witness);
+    return findMatches(AlignmentTableIndex.create(table, repeatingTokens), new WitnessIndex(witness, repeatingTokens));
+  }
+
+  private static List<String> combineRepeatingTokens(final IAlignmentTable table, final IWitness witness) {
     final Set<String> repeatingTokens = Sets.newHashSet();
     repeatingTokens.addAll(table.findRepeatingTokens());
     repeatingTokens.addAll(witness.findRepeatingTokens());
-    return findMatches(AlignmentTableIndex.create(table, Lists.newArrayList(repeatingTokens)), new WitnessIndex(witness, repeatingTokens));
+    return Lists.newArrayList(repeatingTokens);
   }
 
   private static List<IMatch> findMatches(final IAlignmentTableIndex tableIndex, final IWitnessIndex witnessIndex) {
