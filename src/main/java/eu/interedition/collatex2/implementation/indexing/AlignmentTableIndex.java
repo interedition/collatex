@@ -11,12 +11,13 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class AlignmentTableIndex {
+public class AlignmentTableIndex implements IAlignmentTableIndex {
   Map<String, IColumns> columnsForNormalizedPhrase;
 
   public AlignmentTableIndex(final IAlignmentTable table) {
@@ -27,14 +28,23 @@ public class AlignmentTableIndex {
     columnsForNormalizedPhrase = harvest(crop);
   }
 
+  /* (non-Javadoc)
+   * @see eu.interedition.collatex2.implementation.indexing.IAligmentTableIndex#containsNormalizedPhrase(java.lang.String)
+   */
   public boolean containsNormalizedPhrase(final String normalized) {
     return columnsForNormalizedPhrase.containsKey(normalized);
   }
 
+  /* (non-Javadoc)
+   * @see eu.interedition.collatex2.implementation.indexing.IAligmentTableIndex#getColumns(java.lang.String)
+   */
   public IColumns getColumns(final String normalized) {
     return columnsForNormalizedPhrase.get(normalized);
   }
 
+  /* (non-Javadoc)
+   * @see eu.interedition.collatex2.implementation.indexing.IAligmentTableIndex#size()
+   */
   public int size() {
     return columnsForNormalizedPhrase.keySet().size();
   }
