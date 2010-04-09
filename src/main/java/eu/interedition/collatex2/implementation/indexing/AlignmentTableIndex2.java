@@ -61,15 +61,12 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
     String normalized = token.getNormalized();
     final List<IColumn> buffer = Lists.newArrayList();
     boolean found = false; // not nice!
-    for (int i = column.getPosition() - 1; i > 0; i--) {
+    for (int i = column.getPosition() - 1; !found && i > 0; i--) {
       final IColumn leftColumn = table.getColumns().get(i - 1);
       final boolean empty = !leftColumn.containsWitness(row);
       found = !empty && !findRepeatingTokens.contains(leftColumn.getToken(row).getNormalized());
       buffer.add(0, leftColumn);
       normalized = leftColumn.getToken(row).getNormalized() + " " + normalized;
-      if (found) {
-        break;
-      }
     }
     if (!found) {
       buffer.add(0, new NullColumn(1));
@@ -84,15 +81,12 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
     String normalized = token.getNormalized();
     final List<IColumn> buffer = Lists.newArrayList();
     boolean found = false; // not nice!
-    for (int i = column.getPosition() + 1; i < table.size() + 1; i++) {
+    for (int i = column.getPosition() + 1; !found && i < table.size() + 1; i++) {
       final IColumn rightColumn = table.getColumns().get(i - 1);
       final boolean empty = !rightColumn.containsWitness(row);
       found = !empty && !findRepeatingTokens.contains(rightColumn.getToken(row).getNormalized());
       buffer.add(rightColumn);
       normalized += " " + rightColumn.getToken(row).getNormalized();
-      if (found) {
-        break;
-      }
     }
     if (!found) {
       buffer.add(new NullColumn(table.size()));
