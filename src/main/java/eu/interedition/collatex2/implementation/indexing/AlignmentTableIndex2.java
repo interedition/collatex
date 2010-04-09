@@ -44,9 +44,10 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
           index.add(phrase);
         } else {
           //System.out.println("We have to combine stuff here!");
-
-          findUniqueTokenToTheLeft(table, index, findRepeatingTokens, row, column, token);
-          findUniqueTokenToTheRight(table, index, findRepeatingTokens, row, column, token);
+          final ColumnPhrase leftPhrase = findUniqueColumnPhraseToTheLeft(table, findRepeatingTokens, row, column, token);
+          final ColumnPhrase rightPhrase = findUniqueColumnPhraseToTheRight(table, findRepeatingTokens, row, column, token);
+          index.add(leftPhrase);
+          index.add(rightPhrase);
         }
       } else {
         System.out.println("Column " + column.getPosition() + " is empty!");
@@ -55,7 +56,7 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
   }
 
   //TODO: add support for empty cells!
-  private static void findUniqueTokenToTheLeft(final IAlignmentTable table, final AlignmentTableIndex2 index, final List<String> findRepeatingTokens, final String row, final IColumn column,
+  private static ColumnPhrase findUniqueColumnPhraseToTheLeft(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column,
       final INormalizedToken token) {
     // combine to the left
     final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), new Columns(Lists.newArrayList(column)), Lists.newArrayList(row));
@@ -71,11 +72,11 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
     if (!found) {
       phrase.addColumnToLeft(new NullColumn(1));
     }
-    index.add(phrase);
+    return phrase;
   }
 
   //TODO: add support for empty cells!
-  private static void findUniqueTokenToTheRight(final IAlignmentTable table, final AlignmentTableIndex2 index, final List<String> findRepeatingTokens, final String row, final IColumn column,
+  private static ColumnPhrase findUniqueColumnPhraseToTheRight(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column,
       final INormalizedToken token) {
     final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), new Columns(Lists.newArrayList(column)), Lists.newArrayList(row));
     boolean found = false; // not nice!
@@ -90,7 +91,7 @@ public class AlignmentTableIndex2 implements IAlignmentTableIndex {
     if (!found) {
       phrase.addColumnToRight(new NullColumn(table.size()));
     }
-    index.add(phrase);
+    return phrase;
   }
 
   private void add(final ColumnPhrase phrase) {
