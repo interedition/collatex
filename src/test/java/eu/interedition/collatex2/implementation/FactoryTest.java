@@ -122,7 +122,6 @@ public class FactoryTest {
     assertEquals(4, columnsC.getEndPosition());
   }
 
-  @Ignore
   @Test
   public void testGetMatchesUsingWitnessIndex() {
     final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");

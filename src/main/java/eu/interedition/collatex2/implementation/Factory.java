@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
@@ -20,14 +21,13 @@ import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
-import eu.interedition.collatex2.implementation.alignmenttable.Superbase4;
 import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
+import eu.interedition.collatex2.implementation.indexing.NullColumn;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.matching.PhraseMatch;
-import eu.interedition.collatex2.implementation.matching.RealMatcher;
 import eu.interedition.collatex2.implementation.matching.worddistance.NormalizedLevenshtein;
 import eu.interedition.collatex2.implementation.matching.worddistance.WordDistance;
 import eu.interedition.collatex2.implementation.tokenization.NormalizedWitnessBuilder;
@@ -35,13 +35,13 @@ import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.ICallback;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IPhraseMatch;
-import eu.interedition.collatex2.interfaces.ISuperbase;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
@@ -58,27 +58,27 @@ public class Factory {
   public IAlignment createAlignment(final IWitness a, final IWitness b) {
     final IAlignmentTable table = new AlignmentTable4();
     AlignmentTableCreator3.addWitness(table, a, NULLCALLBACK);
-    final IAlignment alignment = createAlignmentUsingSuperbase(table, b);
+    final IAlignment alignment = createAlignmentUsingIndex(table, b);
     return alignment;
   }
 
-  public IAlignment createAlignmentUsingSuperbase(final IAlignmentTable table, final IWitness b) {
-    // make the superbase from the alignment table
-    final ISuperbase superbase = Superbase4.create(table);
-    final WordDistance distanceMeasure = new NormalizedLevenshtein();
-    final Set<IPhraseMatch> phraseMatches = RealMatcher.findMatches(superbase, b, distanceMeasure);
-    // now convert phrase matches to column matches
-    final List<IMatch> matches = Lists.newArrayList();
-    for (final IPhraseMatch phraseMatch : phraseMatches) {
-      final IColumns columns = superbase.getColumnsFor(phraseMatch.getPhraseA());
-      final IPhrase phraseB = phraseMatch.getPhraseB();
-      matches.add(new Match(columns, phraseB));
-    }
-
-    final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
-    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
-    return alignment;
-  }
+  //  public IAlignment createAlignmentUsingSuperbase(final IAlignmentTable table, final IWitness b) {
+  //    // make the superbase from the alignment table
+  //    final ISuperbase superbase = Superbase4.create(table);
+  //    final WordDistance distanceMeasure = new NormalizedLevenshtein();
+  //    final Set<IPhraseMatch> phraseMatches = RealMatcher.findMatches(superbase, b, distanceMeasure);
+  //    // now convert phrase matches to column matches
+  //    final List<IMatch> matches = Lists.newArrayList();
+  //    for (final IPhraseMatch phraseMatch : phraseMatches) {
+  //      final IColumns columns = superbase.getColumnsFor(phraseMatch.getPhraseA());
+  //      final IPhrase phraseB = phraseMatch.getPhraseB();
+  //      matches.add(new Match(columns, phraseB));
+  //    }
+  //
+  //    final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
+  //    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
+  //    return alignment;
+  //  }
 
   public static IPhraseMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord) {
     final Phrase a = Phrase.create(baseWord);
@@ -136,15 +136,40 @@ public class Factory {
         matches.add(new Match(matchingColumns, phrase));
       }
     }
+    LOG.info("unfiltered matches: " + matches);
     return joinOverlappingMatches(matches);
   }
 
+  @SuppressWarnings("boxing")
   protected static List<IMatch> joinOverlappingMatches(final List<IMatch> matches) {
-    final List<IMatch> newMatches = Lists.newArrayList();
+    //group matches with same startposition together
+    final Multimap<Integer, IMatch> group = Multimaps.newArrayListMultimap();
     for (final IMatch match : matches) {
-      //      match.removeNullObject();
-      newMatches.add(match);
+      group.put(match.getColumnsA().getBeginPosition(), match);
     }
+    final List<IMatch> newMatches = Lists.newArrayList();
+    for (final Integer key : group.keySet()) {
+      final Collection<IMatch> collection = group.get(key);
+      IMatch longestMatch = null;
+      for (final IMatch match : collection) {
+        if (longestMatch == null || match.getColumnsA().size() > longestMatch.getColumnsA().size()) {
+          longestMatch = match;
+        }
+      }
+      // NOTE: Simple NullColumn removal implementation
+      final IColumn firstColumn = longestMatch.getColumnsA().getColumns().get(0);
+      if (firstColumn instanceof NullColumn) {
+        LOG.info("filtered matches: NullColumn");
+        longestMatch.getColumnsA().getColumns().remove(0);
+      }
+      final INormalizedToken token = longestMatch.getPhraseB().getTokens().get(0);
+      if (token instanceof NullToken) {
+        LOG.info("filtered matches: NullToken");
+        longestMatch.getPhraseB().getTokens().remove(0);
+      }
+      newMatches.add(longestMatch);
+    }
+    LOG.info("filtered matches: " + newMatches);
     return newMatches;
   }
 

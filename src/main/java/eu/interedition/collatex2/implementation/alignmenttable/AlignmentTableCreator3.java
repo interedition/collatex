@@ -41,7 +41,7 @@ public class AlignmentTableCreator3 {
     }
 
     final Factory factory = new Factory();
-    final IAlignment alignment = factory.createAlignmentUsingSuperbase(table, witness);
+    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witness);
     callback.alignment(alignment);
     final IAlignment alignment2 = makeAddDelFromTrans(alignment);
     addMatchesToAlignmentTable(alignment2);
