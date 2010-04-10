@@ -4,10 +4,8 @@ public interface IMatch {
 
   String getNormalized();
 
-  //TODO: rename to getColumns!
-  IColumns getColumnsA();
+  IColumns getColumns();
 
-  //TODO: rename to getPhrase!
-  IPhrase getPhraseB();
+  IPhrase getPhrase();
 
 }

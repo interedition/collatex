@@ -20,17 +20,17 @@ public class Match implements IMatch {
   }
 
   @Override
-  public IColumns getColumnsA() {
+  public IColumns getColumns() {
     return a;
   }
 
   @Override
-  public IPhrase getPhraseB() {
+  public IPhrase getPhrase() {
     return b;
   }
 
   @Override
   public String toString() {
-    return getColumnsA() + "->" + getPhraseB();
+    return getColumns() + "->" + getPhrase();
   }
 }

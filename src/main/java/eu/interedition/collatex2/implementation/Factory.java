@@ -163,8 +163,8 @@ public class Factory {
     final Map<Integer, INormalizedToken> tokenMap = Maps.newHashMap();
     for (final IMatch match : matches) {
       //TODO: rename match.getColumnsA to match.getColumns
-      final IColumns columns = match.getColumnsA();
-      final IPhrase phrase = match.getPhraseB();
+      final IColumns columns = match.getColumns();
+      final IPhrase phrase = match.getPhrase();
       final Iterator<INormalizedToken> tokens = phrase.getTokens().iterator();
       for (final IColumn column : columns.getColumns()) {
         if (!(column instanceof NullColumn)) {
@@ -197,14 +197,14 @@ public class Factory {
     //group matches with same begin position together
     final Multimap<Integer, IMatch> group = Multimaps.newArrayListMultimap();
     for (final IMatch match : matches) {
-      group.put(match.getColumnsA().getBeginPosition(), match);
+      group.put(match.getColumns().getBeginPosition(), match);
     }
     final List<IMatch> newMatches = Lists.newArrayList();
     for (final Integer key : group.keySet()) {
       final Collection<IMatch> collection = group.get(key);
       IMatch longestMatch = null;
       for (final IMatch match : collection) {
-        if (longestMatch == null || match.getColumnsA().size() > longestMatch.getColumnsA().size()) {
+        if (longestMatch == null || match.getColumns().size() > longestMatch.getColumns().size()) {
           longestMatch = match;
         }
       }
@@ -212,15 +212,15 @@ public class Factory {
         throw new RuntimeException("Unexpected runtime error!");
       }
       // NOTE: Simple NullColumn/NullToken removal implementation
-      final IColumn firstColumn = longestMatch.getColumnsA().getColumns().get(0);
+      final IColumn firstColumn = longestMatch.getColumns().getColumns().get(0);
       if (firstColumn instanceof NullColumn) {
         LOG.info("filtered matches: NullColumn");
-        longestMatch.getColumnsA().getColumns().remove(0);
+        longestMatch.getColumns().getColumns().remove(0);
       }
-      final INormalizedToken token = longestMatch.getPhraseB().getTokens().get(0);
+      final INormalizedToken token = longestMatch.getPhrase().getTokens().get(0);
       if (token instanceof NullToken) {
         LOG.info("filtered matches: NullToken");
-        longestMatch.getPhraseB().getTokens().remove(0);
+        longestMatch.getPhrase().getTokens().remove(0);
       }
       newMatches.add(longestMatch);
     }
@@ -232,14 +232,14 @@ public class Factory {
     //group matches with same end position together
     final Multimap<Integer, IMatch> group = Multimaps.newArrayListMultimap();
     for (final IMatch match : matches) {
-      group.put(match.getColumnsA().getEndPosition(), match);
+      group.put(match.getColumns().getEndPosition(), match);
     }
     final List<IMatch> newMatches = Lists.newArrayList();
     for (final Integer key : group.keySet()) {
       final Collection<IMatch> collection = group.get(key);
       IMatch longestMatch = null;
       for (final IMatch match : collection) {
-        if (longestMatch == null || match.getColumnsA().size() > longestMatch.getColumnsA().size()) {
+        if (longestMatch == null || match.getColumns().size() > longestMatch.getColumns().size()) {
           longestMatch = match;
         }
       }
@@ -247,17 +247,17 @@ public class Factory {
         throw new RuntimeException("Unexpected runtime error!");
       }
       // NOTE: Simple NullColumn/NullToken removal implementation
-      final int size = longestMatch.getColumnsA().getColumns().size();
-      final IColumn lastColumn = longestMatch.getColumnsA().getColumns().get(size - 1);
+      final int size = longestMatch.getColumns().getColumns().size();
+      final IColumn lastColumn = longestMatch.getColumns().getColumns().get(size - 1);
       if (lastColumn instanceof NullColumn) {
         LOG.info("filtered matches: NullColumn");
-        longestMatch.getColumnsA().getColumns().remove(size - 1);
+        longestMatch.getColumns().getColumns().remove(size - 1);
       }
-      final int tsize = longestMatch.getPhraseB().getTokens().size();
-      final INormalizedToken token = longestMatch.getPhraseB().getTokens().get(tsize - 1);
+      final int tsize = longestMatch.getPhrase().getTokens().size();
+      final INormalizedToken token = longestMatch.getPhrase().getTokens().get(tsize - 1);
       if (token instanceof NullToken) {
         LOG.info("filtered matches: NullToken");
-        longestMatch.getPhraseB().getTokens().remove(tsize - 1);
+        longestMatch.getPhrase().getTokens().remove(tsize - 1);
       }
       newMatches.add(longestMatch);
     }

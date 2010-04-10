@@ -64,8 +64,8 @@ public class AlignmentTableCreator3 {
   }
 
   private static void addMatchToAlignmentTable(final IMatch match) {
-    final IColumns columns = match.getColumnsA();
-    columns.addMatchPhrase(match.getPhraseB());
+    final IColumns columns = match.getColumns();
+    columns.addMatchPhrase(match.getPhrase());
   }
 
   static void addAdditionsToAlignmentTable(final IAlignmentTable table, final IAlignment alignment) {
@@ -113,16 +113,16 @@ public class AlignmentTableCreator3 {
   }
 
   private static IGap makeReplacementOutOfTransposition(final ITransposition top) {
-    final IColumns columns = top.getMatchA().getColumnsA();
-    final IPhrase phrase = top.getMatchB().getPhraseB();
+    final IColumns columns = top.getMatchA().getColumns();
+    final IPhrase phrase = top.getMatchB().getPhrase();
     final IColumn nextColumn = null; // TODO: this is wrong... very wrong!
     final IGap gap = new Gap(columns, phrase, nextColumn);
     return gap;
   }
 
   private static int distanceBetweenTranspositions(final ITransposition top, final ITransposition mirrored) {
-    final int beginPosition = mirrored.getMatchA().getColumnsA().getBeginPosition();
-    final int endPosition = top.getMatchA().getColumnsA().getEndPosition();
+    final int beginPosition = mirrored.getMatchA().getColumns().getBeginPosition();
+    final int endPosition = top.getMatchA().getColumns().getEndPosition();
     //System.out.println(beginPosition + ":" + endPosition);
     final int distance = beginPosition - (endPosition + 1);
     // System.out.println(distance);
@@ -144,12 +144,12 @@ public class AlignmentTableCreator3 {
     // make an addition from the match
     final IMatch witness = t.getMatchB();
     final IColumns columns = new Columns();
-    final IPhrase phrase = witness.getPhraseB();
+    final IPhrase phrase = witness.getPhrase();
     // NOTE: I need the next column here!
     // NOTE: so the next column should be in the transposition!
     // TODO add next column to addition, transposition, etc
     // TODO and use that!
-    final IColumn nextColumn = t.getMatchA().getColumnsA().getFirstColumn();
+    final IColumn nextColumn = t.getMatchA().getColumns().getFirstColumn();
     final IGap addition = new Gap(columns, phrase, nextColumn);
     //Note: this is not nice; this adds to the original list!
     return addition;

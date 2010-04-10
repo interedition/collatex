@@ -40,7 +40,7 @@ public class Alignment implements IAlignment {
 
   final Comparator<IMatch> SORT_MATCHES_ON_POSITION_B = new Comparator<IMatch>() {
     public int compare(final IMatch o1, final IMatch o2) {
-      return o1.getPhraseB().getBeginPosition() - o2.getPhraseB().getBeginPosition();
+      return o1.getPhrase().getBeginPosition() - o2.getPhrase().getBeginPosition();
     }
   };
 

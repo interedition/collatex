@@ -53,8 +53,8 @@ public class SequenceDetection {
         tokensB = Lists.newArrayList();
       }
       // fill buffer
-      columnsA.addAll(match.getColumnsA().getColumns());
-      tokensB.addAll(match.getPhraseB().getTokens());
+      columnsA.addAll(match.getColumns().getColumns());
+      tokensB.addAll(match.getPhrase().getTokens());
     }
     createChainedMatchAndAddToList(chainedMatches, columnsA, tokensB);
     return chainedMatches;

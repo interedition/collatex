@@ -41,7 +41,7 @@ public class GapDetection {
   private static List<IColumns> calculateMatchingColumnsForA(final List<IMatch> matches) {
     final List<IColumns> matchingNgramsForA = Lists.newArrayList();
     for (final IMatch m : matches) {
-      matchingNgramsForA.add(m.getColumnsA());
+      matchingNgramsForA.add(m.getColumns());
     }
     return matchingNgramsForA;
   }
@@ -49,7 +49,7 @@ public class GapDetection {
   private static List<IPhrase> calculateMatchingPhrasesForB(final List<IMatch> matches) {
     final List<IPhrase> matchingNgramsForB = Lists.newArrayList();
     for (final IMatch m : matches) {
-      matchingNgramsForB.add(m.getPhraseB());
+      matchingNgramsForB.add(m.getPhrase());
     }
     final Comparator<IPhrase> comparator = new Comparator<IPhrase>() {
       public int compare(final IPhrase o1, final IPhrase o2) {

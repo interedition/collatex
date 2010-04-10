@@ -67,7 +67,7 @@ public class FactoryTest {
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything is unique", match.getNormalized());
-    final IColumns columnsA = match.getColumnsA();
+    final IColumns columnsA = match.getColumns();
     assertEquals(1, columnsA.getBeginPosition());
     assertEquals(3, columnsA.getEndPosition());
   }
@@ -82,17 +82,17 @@ public class FactoryTest {
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
-    final IColumns columnsA = match.getColumnsA();
+    final IColumns columnsA = match.getColumns();
     assertEquals(1, columnsA.getBeginPosition());
     assertEquals(1, columnsA.getEndPosition());
     final IMatch match2 = matches.get(1);
     assertEquals("is", match2.getNormalized());
-    final IColumns columnsB = match2.getColumnsA();
+    final IColumns columnsB = match2.getColumns();
     assertEquals(2, columnsB.getBeginPosition());
     assertEquals(2, columnsB.getEndPosition());
     final IMatch match3 = matches.get(2);
     assertEquals("different", match3.getNormalized());
-    final IColumns columnsC = match3.getColumnsA();
+    final IColumns columnsC = match3.getColumns();
     assertEquals(4, columnsC.getBeginPosition());
     assertEquals(4, columnsC.getEndPosition());
   }
@@ -107,17 +107,17 @@ public class FactoryTest {
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
-    final IColumns columnsA = match.getColumnsA();
+    final IColumns columnsA = match.getColumns();
     assertEquals(1, columnsA.getBeginPosition());
     assertEquals(1, columnsA.getEndPosition());
     final IMatch match2 = matches.get(1);
     assertEquals("is", match2.getNormalized());
-    final IColumns columnsB = match2.getColumnsA();
+    final IColumns columnsB = match2.getColumns();
     assertEquals(3, columnsB.getBeginPosition());
     assertEquals(3, columnsB.getEndPosition());
     final IMatch match3 = matches.get(2);
     assertEquals("different", match3.getNormalized());
-    final IColumns columnsC = match3.getColumnsA();
+    final IColumns columnsC = match3.getColumns();
     assertEquals(4, columnsC.getBeginPosition());
     assertEquals(4, columnsC.getEndPosition());
   }
@@ -132,7 +132,7 @@ public class FactoryTest {
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("the big black", match.getNormalized());
-    final IColumns columnsA = match.getColumnsA();
+    final IColumns columnsA = match.getColumns();
     assertEquals(1, columnsA.getBeginPosition());
     assertEquals(3, columnsA.getEndPosition());
   }
@@ -149,7 +149,7 @@ public class FactoryTest {
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("the big black cat", match.getNormalized());
-    final IColumns columnsA = match.getColumnsA();
+    final IColumns columnsA = match.getColumns();
     assertEquals(1, columnsA.getBeginPosition());
     assertEquals(4, columnsA.getEndPosition());
   }
