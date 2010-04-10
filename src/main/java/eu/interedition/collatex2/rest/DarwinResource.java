@@ -27,7 +27,8 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
-import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
+import eu.interedition.collatex2.implementation.parallel_segmentation.AlignmentTableSegmentator;
+import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationTable;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
@@ -96,9 +97,10 @@ public class DarwinResource extends ServerResource {
   @Override
   public Representation get(final Variant variant) throws ResourceException {
     final IAlignmentTable alignmentTable = new Factory().createAlignmentTable(witnesses, LOG_ALIGNMENT);
+    final ParallelSegmentationTable table = AlignmentTableSegmentator.createParrallelSegmentationTable(alignmentTable);
     final StringBuilder stringBuilder = new StringBuilder("<html><body> ").//
+        append(ParallelSegmentationTable.tableToHTML(table)).//
         append(witnessesAsString(witnesses)).//
-        append(AlignmentTable4.alignmentTableToHTML(alignmentTable)).//
         append("</body></html>");
     final Representation representation = new StringRepresentation(stringBuilder.toString(), MediaType.TEXT_HTML);
     return representation;

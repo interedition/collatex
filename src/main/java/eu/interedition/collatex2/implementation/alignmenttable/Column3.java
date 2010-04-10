@@ -98,4 +98,9 @@ public class Column3 implements IColumn {
     }
     return Join.join(",", list);
   }
+
+  @Override
+  public List<String> getSigli() {
+    return Lists.newArrayList(sigliToTokens.keySet());
+  }
 }

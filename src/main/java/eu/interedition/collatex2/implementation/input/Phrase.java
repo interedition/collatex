@@ -49,6 +49,18 @@ public class Phrase implements IPhrase {
 
   }
 
+  //TODO: add escaping!
+  @Override
+  public String getContent() {
+    final StringBuilder content = new StringBuilder();
+    String divider = "";
+    for (final INormalizedToken token : tokens) {
+      content.append(divider).append(token.getContent());
+      divider = " ";
+    }
+    return content.toString();
+  }
+
   // TODO add test for defensive behavior!
   public INormalizedToken getFirstToken() {
     if (isEmpty()) {
@@ -149,4 +161,5 @@ public class Phrase implements IPhrase {
   public void addTokenToLeft(final INormalizedToken token) {
     tokens.add(0, token);
   }
+
 }

@@ -54,4 +54,10 @@ public class NullColumn implements IColumn {
     return 0;
   }
 
+  @Override
+  public List<String> getSigli() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

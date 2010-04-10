@@ -6,6 +6,8 @@ public interface IPhrase extends Comparable<IPhrase> {
 
   String getNormalized();
 
+  String getContent();
+
   int getBeginPosition();
 
   int getEndPosition();
