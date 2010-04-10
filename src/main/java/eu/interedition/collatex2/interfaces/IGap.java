@@ -10,11 +10,9 @@ public interface IGap {
 
   boolean isReplacement();
 
-  //TODO: rename this method! (remove A)
-  IColumns getColumnsA();
+  IColumns getColumns();
 
-  //TODO: rename this method! (remove B)
-  IPhrase getPhraseB();
+  IPhrase getPhrase();
 
   //TODO remove this method!
   //Modification should know about Gap, not the other way around!

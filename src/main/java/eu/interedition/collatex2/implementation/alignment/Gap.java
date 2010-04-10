@@ -33,11 +33,11 @@ public class Gap implements IGap {
     return gapA.toString() + " -> " + gapB.getSigil() + ": " + gapB.getNormalized();
   }
 
-  public IColumns getColumnsA() {
+  public IColumns getColumns() {
     return gapA;
   }
 
-  public IPhrase getPhraseB() {
+  public IPhrase getPhrase() {
     return gapB;
   }
 
