@@ -52,7 +52,7 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     }
   }
 
-  //TODO: add support for empty cells!
+  //TODO: add test support of empty cells!
   private static ColumnPhrase findUniqueColumnPhraseToTheLeft(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column, final INormalizedToken token) {
     // combine to the left
     final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), new Columns(Lists.newArrayList(column)), Lists.newArrayList(row));
@@ -60,10 +60,11 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     for (int i = column.getPosition() - 1; !found && i > 0; i--) {
       final IColumn leftColumn = table.getColumns().get(i - 1);
       final boolean empty = !leftColumn.containsWitness(row);
-      //TODO: next statement is not allowed if empty column!
-      final String normalizedNeighbour = leftColumn.getToken(row).getNormalized();
-      found = !empty && !findRepeatingTokens.contains(normalizedNeighbour);
-      phrase.addColumnToLeft(leftColumn);
+      if (!empty) {
+        final String normalizedNeighbour = leftColumn.getToken(row).getNormalized();
+        found = !empty && !findRepeatingTokens.contains(normalizedNeighbour);
+        phrase.addColumnToLeft(leftColumn);
+      }
     }
     if (!found) {
       phrase.addColumnToLeft(new NullColumn(1));
@@ -71,17 +72,18 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     return phrase;
   }
 
-  //TODO: add support for empty cells!
+  //TODO: add test for support of empty cells!
   private static ColumnPhrase findUniqueColumnPhraseToTheRight(final IAlignmentTable table, final List<String> findRepeatingTokens, final String row, final IColumn column, final INormalizedToken token) {
     final ColumnPhrase phrase = new ColumnPhrase(token.getNormalized(), new Columns(Lists.newArrayList(column)), Lists.newArrayList(row));
     boolean found = false; // not nice!
     for (int i = column.getPosition() + 1; !found && i < table.size() + 1; i++) {
       final IColumn rightColumn = table.getColumns().get(i - 1);
       final boolean empty = !rightColumn.containsWitness(row);
-      //TODO: next statement is not allowed if empty column!
-      final String normalizedNeighbour = rightColumn.getToken(row).getNormalized();
-      found = !empty && !findRepeatingTokens.contains(normalizedNeighbour);
-      phrase.addColumnToRight(rightColumn);
+      if (!empty) {
+        final String normalizedNeighbour = rightColumn.getToken(row).getNormalized();
+        found = !empty && !findRepeatingTokens.contains(normalizedNeighbour);
+        phrase.addColumnToRight(rightColumn);
+      }
     }
     if (!found) {
       phrase.addColumnToRight(new NullColumn(table.size()));
