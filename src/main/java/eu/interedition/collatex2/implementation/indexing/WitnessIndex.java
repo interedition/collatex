@@ -84,10 +84,10 @@ public class WitnessIndex implements IWitnessIndex {
       final INormalizedToken rightToken = tokens.get(i - 1);
       final String normalizedNeighbour = rightToken.getNormalized();
       found = !repeatingTokens.contains(normalizedNeighbour);
-      phrase.addColumnToRight(rightToken);
+      phrase.addTokenToRight(rightToken);
     }
     if (!found) {
-      phrase.addColumnToRight(new NullToken(tokens.size(), token.getSigil()));
+      phrase.addTokenToRight(new NullToken(tokens.size(), token.getSigil()));
     }
     return phrase;
   }

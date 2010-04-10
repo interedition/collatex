@@ -18,6 +18,7 @@ public interface IColumns {
 
   int size();
 
+  //Note: exposes internal list; implement Collection instead?
   List<IColumn> getColumns();
 
 }

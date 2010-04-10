@@ -141,7 +141,7 @@ public class Phrase implements IPhrase {
   }
 
   @Override
-  public void addColumnToRight(final INormalizedToken token) {
+  public void addTokenToRight(final INormalizedToken token) {
     tokens.add(token);
   }
 

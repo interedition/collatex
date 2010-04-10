@@ -24,6 +24,6 @@ public interface IPhrase extends Comparable<IPhrase> {
 
   void addTokenToLeft(INormalizedToken leftToken);
 
-  void addColumnToRight(INormalizedToken rightToken);
+  void addTokenToRight(INormalizedToken rightToken);
 
 }

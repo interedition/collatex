@@ -10,8 +10,7 @@ public interface IAlignmentTable {
 
   void add(IColumn column);
 
-  //TODO: Maybe rename to getCells?
-  IColumns createColumns(int currentIndex, int i);
+  IColumns createColumns(int startIndex, int endIndex);
 
   int size();
 
