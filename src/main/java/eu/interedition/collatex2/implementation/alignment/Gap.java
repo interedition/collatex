@@ -27,7 +27,10 @@ public class Gap implements IGap {
     if (isAddition()) {
       return "\"" + gapB.getNormalized() + "\" added";
     }
-    return /*gapA.getSigil() + ": " +gapA.getNormalized() */gapA.toString() + " -> " + gapB.getSigil() + ": " + gapB.getNormalized();
+    if (isOmission()) {
+      return gapA.toString() + " omitted";
+    }
+    return gapA.toString() + " -> " + gapB.getSigil() + ": " + gapB.getNormalized();
   }
 
   public IColumns getColumnsA() {
@@ -50,7 +53,7 @@ public class Gap implements IGap {
     return gapA.isEmpty() && !gapB.isEmpty();
   }
 
-  private boolean isOmission() {
+  public boolean isOmission() {
     return !gapA.isEmpty() && gapB.isEmpty();
   }
 

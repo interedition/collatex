@@ -6,10 +6,14 @@ public interface IGap {
 
   boolean isAddition();
 
+  boolean isOmission();
+
   boolean isReplacement();
 
+  //TODO: rename this method! (remove A)
   IColumns getColumnsA();
 
+  //TODO: rename this method! (remove B)
   IPhrase getPhraseB();
 
   //TODO remove this method!
