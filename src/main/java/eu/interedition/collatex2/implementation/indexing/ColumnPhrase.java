@@ -23,24 +23,24 @@ public class ColumnPhrase {
   }
 
   public void addColumnToLeft(final IColumn column) {
+    final List<IColumn> columnList = getColumns().getColumns();
+    columnList.add(0, column);
+    setColumns(new Columns(columnList));
     if (column instanceof NullColumn) {
       name = new StringBuilder("# ").append(name).toString();
     } else {
-      final List<IColumn> columnList = getColumns().getColumns();
-      columnList.add(0, column);
-      setColumns(new Columns(columnList));
       final String normalized = column.getToken(getSigli().get(0)).getNormalized();
       name = new StringBuilder(normalized).append(" ").append(name).toString();
     }
   }
 
   public void addColumnToRight(final IColumn column) {
+    final List<IColumn> columnList = getColumns().getColumns();
+    columnList.add(column);
+    setColumns(new Columns(columnList));
     if (column instanceof NullColumn) {
       name = new StringBuilder(name).append(" #").toString();
     } else {
-      final List<IColumn> columnList = getColumns().getColumns();
-      columnList.add(column);
-      setColumns(new Columns(columnList));
       final String normalized = column.getToken(getSigli().get(0)).getNormalized();
       name = new StringBuilder(name).append(" ").append(normalized).toString();
     }

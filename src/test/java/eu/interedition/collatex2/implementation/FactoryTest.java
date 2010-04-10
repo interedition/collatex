@@ -154,6 +154,23 @@ public class FactoryTest {
     assertEquals(4, columnsA.getEndPosition());
   }
 
+  //TODO: make convenience method for creation of AlignmentTable on Factory!
+
+  @Test
+  public void testOverlappingMatches2() {
+    final IWitness witnessA = factory.createWitness("A", "the black cat and the black mat");
+    final IWitness witnessB = factory.createWitness("B", "the black dog and the black mat");
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
+    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final List<IMatch> matches = alignment.getMatches();
+    assertEquals(2, matches.size());
+    final IMatch match = matches.get(0);
+    assertEquals("the black", match.getNormalized());
+    //    final IColumns columnsA = match.getColumnsA();
+    //    assertEquals(1, columnsA.getBeginPosition());
+    //    assertEquals(4, columnsA.getEndPosition());
+  }
+
   @Ignore
   @Test
   public void testJoinOverlappingMatches() {

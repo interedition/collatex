@@ -2,7 +2,10 @@ package eu.interedition.collatex2.implementation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -10,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
@@ -21,6 +25,7 @@ import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
+import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.indexing.NullColumn;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
@@ -115,11 +120,13 @@ public class Factory {
     return alignment;
   }
 
+  //TODO: move to another class!
   protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
     final List<String> repeatingTokens = combineRepeatingTokens(table, witness);
     return findMatches(AlignmentTableIndex.create(table, repeatingTokens), new WitnessIndex(witness, repeatingTokens));
   }
 
+  //TODO: move to another class!
   private static List<String> combineRepeatingTokens(final IAlignmentTable table, final IWitness witness) {
     final Set<String> repeatingTokens = Sets.newHashSet();
     repeatingTokens.addAll(table.findRepeatingTokens());
@@ -127,6 +134,7 @@ public class Factory {
     return Lists.newArrayList(repeatingTokens);
   }
 
+  //TODO: move to another class!
   private static List<IMatch> findMatches(final IAlignmentTableIndex tableIndex, final IWitnessIndex witnessIndex) {
     final List<IMatch> matches = Lists.newArrayList();
     final Collection<IPhrase> phrases = witnessIndex.getPhrases();
@@ -141,11 +149,49 @@ public class Factory {
   }
 
   protected static List<IMatch> joinOverlappingMatches(final List<IMatch> matches) {
-    final List<IMatch> newMatches = filterMatchesBasedOnEndPosition(filterMatchesBasedOnBeginPosition(matches));
+    //final List<IMatch> newMatches = filterMatchesBasedOnEndPosition(filterMatchesBasedOnBeginPosition(matches));
+    final List<IMatch> newMatches = filterMatchesBasedOnPositionMatches(matches);
     LOG.info("filtered matches: " + newMatches);
     return newMatches;
   }
 
+  //TODO: make IColumns Iterable!
+  //TODO: check whether there is a wrong second token placed on the same position!
+  @SuppressWarnings("boxing")
+  private static List<IMatch> filterMatchesBasedOnPositionMatches(final List<IMatch> matches) {
+    final Map<Integer, IColumn> columnsMap = Maps.newHashMap();
+    final Map<Integer, INormalizedToken> tokenMap = Maps.newHashMap();
+    for (final IMatch match : matches) {
+      //TODO: rename match.getColumnsA to match.getColumns
+      final IColumns columns = match.getColumnsA();
+      final IPhrase phrase = match.getPhraseB();
+      final Iterator<INormalizedToken> tokens = phrase.getTokens().iterator();
+      for (final IColumn column : columns.getColumns()) {
+        if (!(column instanceof NullColumn)) {
+          final int position = column.getPosition();
+          columnsMap.put(position, column);
+          tokenMap.put(position, tokens.next());
+        } else {
+          tokens.next();
+        }
+      }
+    }
+    final List<IMatch> newMatches = Lists.newArrayList();
+    final List<Integer> positions = Lists.newArrayList(columnsMap.keySet());
+    Collections.sort(positions);
+    for (final Integer position : positions) {
+      final IColumn column = columnsMap.get(position);
+      final INormalizedToken token = tokenMap.get(position);
+      //TODO: hide this in constructors!
+      final IColumns columns = new Columns(Lists.newArrayList(column));
+      final IPhrase phrase = new Phrase(Lists.newArrayList(token));
+      final IMatch newMatch = new Match(columns, phrase);
+      newMatches.add(newMatch);
+    }
+    return newMatches;
+  }
+
+  //TODO:remove!
   @SuppressWarnings("boxing")
   private static List<IMatch> filterMatchesBasedOnBeginPosition(final List<IMatch> matches) {
     //group matches with same begin position together
