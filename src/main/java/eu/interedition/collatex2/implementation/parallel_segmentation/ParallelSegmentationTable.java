@@ -32,7 +32,7 @@ public class ParallelSegmentationTable {
     for (final String witnessId : table.getSigli()) {
       tableHTML.append("<tr>").append("<th>Witness ").append(witnessId).append(":</th>");
       for (final SegmentColumn column : table.getColumns()) {
-        tableHTML.append("<td>");
+        tableHTML.append("<td nowrap>");
         if (column.containsWitness(witnessId)) {
           tableHTML.append(column.getPhrase(witnessId).getContent()); // TODO add escaping!
         }
@@ -40,8 +40,7 @@ public class ParallelSegmentationTable {
       }
       tableHTML.append("</tr>\n");
     }
-    tableHTML.append("</table>\n</div>\n\n");
-    //    return alignmentTable.toString().replaceAll("\n", "<br/>") + "<br/>";
+    tableHTML.append("</table>\n</div><br/><br/>");
     return tableHTML.toString();
   }
 
