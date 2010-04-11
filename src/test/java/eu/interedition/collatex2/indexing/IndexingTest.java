@@ -23,21 +23,6 @@ public class IndexingTest {
     factory = new Factory();
   }
 
-  @Test
-  public void test1() {
-    final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final IWitnessIndex index = Factory.createWitnessIndex(a);
-    assertEquals(6, index.size());
-    assertContains(index, "# tobe");
-    assertContains(index, "tobe or");
-    assertContains(index, "or");
-    assertDoesNotContain(index, "or not");
-    assertContains(index, "not");
-    assertDoesNotContain(index, "or tobe");
-    assertContains(index, "not tobe");
-    assertContains(index, "tobe #");
-  }
-
   @Ignore
   @Test
   public void test2() {

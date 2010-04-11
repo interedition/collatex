@@ -1,6 +1,6 @@
 package eu.interedition.collatex2.implementation.indexing;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
@@ -62,4 +62,20 @@ public class WitnessIndexTest {
     assertTrue(index.contains("black #"));
     assertEquals(6, index.size());
   }
+
+  @Test
+  public void test1() {
+    final IWitness a = factory.createWitness("A", "tobe or not tobe");
+    final IWitnessIndex index = Factory.createWitnessIndex(a);
+    assertEquals(6, index.size());
+    assertTrue(index.contains("# tobe"));
+    assertTrue(index.contains("tobe or"));
+    assertTrue(index.contains("or"));
+    assertTrue(!index.contains("or not"));
+    assertTrue(index.contains("not"));
+    assertTrue(!index.contains("or tobe"));
+    assertTrue(index.contains("not tobe"));
+    assertTrue(index.contains("tobe #"));
+  }
+
 }
