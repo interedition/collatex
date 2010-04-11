@@ -17,7 +17,7 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
   private final Map<String, IColumns> normalizedToColumns;
 
   private AlignmentTableIndex() {
-    this.normalizedToColumns = Maps.newHashMap();
+    this.normalizedToColumns = Maps.newLinkedHashMap();
   }
 
   public static IAlignmentTableIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
@@ -111,6 +111,20 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
   @Override
   public int size() {
     return normalizedToColumns.size();
+  }
+
+  //TODO: remove "Superbase: " part!
+  @Override
+  public String toString() {
+    String result = "Superbase: (";
+    String delimiter = "";
+    for (final String normalizedPhrase : normalizedToColumns.keySet()) {
+      result += delimiter + normalizedPhrase;
+      delimiter = ", ";
+    }
+
+    result += ")";
+    return result;
   }
 
 }
