@@ -15,7 +15,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
@@ -187,79 +186,6 @@ public class Factory {
       final IPhrase phrase = new Phrase(Lists.newArrayList(token));
       final IMatch newMatch = new Match(columns, phrase);
       newMatches.add(newMatch);
-    }
-    return newMatches;
-  }
-
-  //TODO:remove!
-  @SuppressWarnings("boxing")
-  private static List<IMatch> filterMatchesBasedOnBeginPosition(final List<IMatch> matches) {
-    //group matches with same begin position together
-    final Multimap<Integer, IMatch> group = Multimaps.newArrayListMultimap();
-    for (final IMatch match : matches) {
-      group.put(match.getColumns().getBeginPosition(), match);
-    }
-    final List<IMatch> newMatches = Lists.newArrayList();
-    for (final Integer key : group.keySet()) {
-      final Collection<IMatch> collection = group.get(key);
-      IMatch longestMatch = null;
-      for (final IMatch match : collection) {
-        if (longestMatch == null || match.getColumns().size() > longestMatch.getColumns().size()) {
-          longestMatch = match;
-        }
-      }
-      if (longestMatch == null) {
-        throw new RuntimeException("Unexpected runtime error!");
-      }
-      // NOTE: Simple NullColumn/NullToken removal implementation
-      final IColumn firstColumn = longestMatch.getColumns().getColumns().get(0);
-      if (firstColumn instanceof NullColumn) {
-        LOG.info("filtered matches: NullColumn");
-        longestMatch.getColumns().getColumns().remove(0);
-      }
-      final INormalizedToken token = longestMatch.getPhrase().getTokens().get(0);
-      if (token instanceof NullToken) {
-        LOG.info("filtered matches: NullToken");
-        longestMatch.getPhrase().getTokens().remove(0);
-      }
-      newMatches.add(longestMatch);
-    }
-    return newMatches;
-  }
-
-  @SuppressWarnings("boxing")
-  private static List<IMatch> filterMatchesBasedOnEndPosition(final List<IMatch> matches) {
-    //group matches with same end position together
-    final Multimap<Integer, IMatch> group = Multimaps.newArrayListMultimap();
-    for (final IMatch match : matches) {
-      group.put(match.getColumns().getEndPosition(), match);
-    }
-    final List<IMatch> newMatches = Lists.newArrayList();
-    for (final Integer key : group.keySet()) {
-      final Collection<IMatch> collection = group.get(key);
-      IMatch longestMatch = null;
-      for (final IMatch match : collection) {
-        if (longestMatch == null || match.getColumns().size() > longestMatch.getColumns().size()) {
-          longestMatch = match;
-        }
-      }
-      if (longestMatch == null) {
-        throw new RuntimeException("Unexpected runtime error!");
-      }
-      // NOTE: Simple NullColumn/NullToken removal implementation
-      final int size = longestMatch.getColumns().getColumns().size();
-      final IColumn lastColumn = longestMatch.getColumns().getColumns().get(size - 1);
-      if (lastColumn instanceof NullColumn) {
-        LOG.info("filtered matches: NullColumn");
-        longestMatch.getColumns().getColumns().remove(size - 1);
-      }
-      final int tsize = longestMatch.getPhrase().getTokens().size();
-      final INormalizedToken token = longestMatch.getPhrase().getTokens().get(tsize - 1);
-      if (token instanceof NullToken) {
-        LOG.info("filtered matches: NullToken");
-        longestMatch.getPhrase().getTokens().remove(tsize - 1);
-      }
-      newMatches.add(longestMatch);
     }
     return newMatches;
   }
