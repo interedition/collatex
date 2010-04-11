@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.matching;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -8,6 +9,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.base.Function;
+import com.google.common.base.Join;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
@@ -149,6 +153,30 @@ public class IndexMatcherTest {
     final List<IMatch> matches = Lists.newArrayList();
     final List<IMatch> joined = IndexMatcher.joinOverlappingMatches(matches);
     assertEquals(1, joined.size());
+  }
+
+  @Test
+  public void testMatchesWithIndex() {
+    final IWitness a = factory.createWitness("A", "The black cat");
+    final IWitness b = factory.createWitness("B", "The black and white cat");
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(a), Factory.NULLCALLBACK);
+    final IAlignment alignment = factory.createAlignmentUsingIndex(table, b);
+    final List<IMatch> matches = alignment.getMatches();
+    assertContains(matches, "the black");
+    assertContains(matches, "cat");
+    assertEquals(2, matches.size());
+  }
+
+  final Function<IMatch, String> function = new Function<IMatch, String>() {
+    @Override
+    public String apply(final IMatch match) {
+      return match.getNormalized();
+    }
+  };
+
+  private void assertContains(final List<IMatch> matches, final String string) {
+    final Iterable<String> normalizedMatches = Iterables.transform(matches, function);
+    assertTrue(string + " not found in matches: " + Join.join(",", normalizedMatches), Lists.newArrayList(normalizedMatches).contains(string));
   }
 
 }
