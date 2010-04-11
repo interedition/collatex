@@ -112,9 +112,8 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //TODO: rename test!
   @Test
-  public void testGenSuperbase() {
+  public void testAddition2() {
     final IWitness w1 = factory.createWitness("A", "the cat");
     final IWitness w2 = factory.createWitness("B", "before the cat");
     final IWitness w3 = factory.createWitness("C", "the black cat");

@@ -41,24 +41,6 @@ public class Factory {
     return alignment;
   }
 
-  //  public IAlignment createAlignmentUsingSuperbase(final IAlignmentTable table, final IWitness b) {
-  //    // make the superbase from the alignment table
-  //    final ISuperbase superbase = Superbase4.create(table);
-  //    final WordDistance distanceMeasure = new NormalizedLevenshtein();
-  //    final Set<IPhraseMatch> phraseMatches = RealMatcher.findMatches(superbase, b, distanceMeasure);
-  //    // now convert phrase matches to column matches
-  //    final List<IMatch> matches = Lists.newArrayList();
-  //    for (final IPhraseMatch phraseMatch : phraseMatches) {
-  //      final IColumns columns = superbase.getColumnsFor(phraseMatch.getPhraseA());
-  //      final IPhrase phraseB = phraseMatch.getPhraseB();
-  //      matches.add(new Match(columns, phraseB));
-  //    }
-  //
-  //    final List<IGap> gaps = GapDetection.detectGap(matches, table, b);
-  //    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
-  //    return alignment;
-  //  }
-
   public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
   }

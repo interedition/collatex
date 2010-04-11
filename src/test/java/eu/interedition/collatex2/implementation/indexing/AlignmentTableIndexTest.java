@@ -63,49 +63,45 @@ public class AlignmentTableIndexTest {
     assertEquals(4, columns.getEndPosition());
   }
 
-  //TODO: rename test!
   @Test
-  public void testCreateSuperBase() {
+  public void testCreateAlignmentTableIndex() {
     final IWitness a = factory.createWitness("A", "the first witness");
     final List<IWitness> list = Lists.newArrayList(a);
     final IAlignmentTable table = factory.createAlignmentTable(list);
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
-    assertEquals("Superbase: (the, first, witness)", index.toString());
+    assertEquals("AlignmentTableIndex: (the, first, witness)", index.toString());
   }
 
-  //TODO: rename test!
   @Test
-  public void testCreateSuperBaseWithVariation() {
+  public void testCreateAlignmentTableIndexWithVariation() {
     final IWitness a = factory.createWitness("A", "the first witness");
     final IWitness b = factory.createWitness("B", "the second witness");
     final List<IWitness> list = Lists.newArrayList(a, b);
     final IAlignmentTable table = factory.createAlignmentTable(list);
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
-    assertEquals("Superbase: (the, first, witness, second)", index.toString());
+    assertEquals("AlignmentTableIndex: (the, first, witness, second)", index.toString());
   }
 
-  //TODO: rename test!
   @Test
-  public void testSuperbase1() {
+  public void testAlignmentTableIndex() {
     final IWitness a = factory.createWitness("A", "first");
     final IWitness b = factory.createWitness("B", "second");
     final IWitness c = factory.createWitness("C", "third");
     final List<IWitness> list = Lists.newArrayList(a, b, c);
     final IAlignmentTable table = factory.createAlignmentTable(list);
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
-    assertEquals("Superbase: (first, second, third)", index.toString());
+    assertEquals("AlignmentTableIndex: (first, second, third)", index.toString());
   }
 
-  //TODO: rename test!
   @Test
-  public void testSuperbase2() {
+  public void testAlignmentTableIndex2() {
     final IWitness a = factory.createWitness("A", "first");
     final IWitness b = factory.createWitness("B", "match");
     final IWitness c = factory.createWitness("C", "match");
     final List<IWitness> list = Lists.newArrayList(a, b, c);
     final IAlignmentTable table = factory.createAlignmentTable(list);
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
-    assertEquals("Superbase: (first, match)", index.toString());
+    assertEquals("AlignmentTableIndex: (first, match)", index.toString());
   }
 
 }

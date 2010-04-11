@@ -113,10 +113,9 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     return normalizedToColumns.size();
   }
 
-  //TODO: remove "Superbase: " part!
   @Override
   public String toString() {
-    String result = "Superbase: (";
+    String result = "AlignmentTableIndex: (";
     String delimiter = "";
     for (final String normalizedPhrase : normalizedToColumns.keySet()) {
       result += delimiter + normalizedPhrase;
