@@ -1,17 +1,9 @@
 package eu.interedition.collatex2.implementation;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
@@ -21,22 +13,14 @@ import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
-import eu.interedition.collatex2.implementation.indexing.NullColumn;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.matching.Match;
+import eu.interedition.collatex2.implementation.matching.IndexMatcher;
 import eu.interedition.collatex2.implementation.matching.PhraseMatch;
-import eu.interedition.collatex2.implementation.matching.worddistance.NormalizedLevenshtein;
-import eu.interedition.collatex2.implementation.matching.worddistance.WordDistance;
 import eu.interedition.collatex2.implementation.tokenization.NormalizedWitnessBuilder;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.ICallback;
-import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -46,8 +30,6 @@ import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class Factory {
-
-  private static final Log LOG = LogFactory.getLog(Factory.class);
 
   public IWitness createWitness(final String sigil, final String words) {
     return NormalizedWitnessBuilder.create(sigil, words);
@@ -108,87 +90,17 @@ public class Factory {
   }
 
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
-    final List<IMatch> matches = getMatchesUsingWitnessIndex(table, witness, new NormalizedLevenshtein());
-    LOG.info(matches);
+    final List<IMatch> matches = IndexMatcher.getMatchesUsingWitnessIndex(table, witness);
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;
-  }
-
-  //TODO: move to another class!
-  protected static List<IMatch> getMatchesUsingWitnessIndex(final IAlignmentTable table, final IWitness witness, final WordDistance distanceMeasure) {
-    final List<String> repeatingTokens = combineRepeatingTokens(table, witness);
-    return findMatches(AlignmentTableIndex.create(table, repeatingTokens), new WitnessIndex(witness, repeatingTokens));
-  }
-
-  //TODO: move to another class!
-  private static List<String> combineRepeatingTokens(final IAlignmentTable table, final IWitness witness) {
-    final Set<String> repeatingTokens = Sets.newHashSet();
-    repeatingTokens.addAll(table.findRepeatingTokens());
-    repeatingTokens.addAll(witness.findRepeatingTokens());
-    return Lists.newArrayList(repeatingTokens);
-  }
-
-  //TODO: move to another class!
-  private static List<IMatch> findMatches(final IAlignmentTableIndex tableIndex, final IWitnessIndex witnessIndex) {
-    final List<IMatch> matches = Lists.newArrayList();
-    final Collection<IPhrase> phrases = witnessIndex.getPhrases();
-    for (final IPhrase phrase : phrases) {
-      if (tableIndex.containsNormalizedPhrase(phrase.getNormalized())) {
-        final IColumns matchingColumns = tableIndex.getColumns(phrase.getNormalized());
-        matches.add(new Match(matchingColumns, phrase));
-      }
-    }
-    LOG.info("unfiltered matches: " + matches);
-    return joinOverlappingMatches(matches);
-  }
-
-  protected static List<IMatch> joinOverlappingMatches(final List<IMatch> matches) {
-    final List<IMatch> newMatches = filterMatchesBasedOnPositionMatches(matches);
-    LOG.info("filtered matches: " + newMatches);
-    return newMatches;
-  }
-
-  //TODO: make IColumns Iterable!
-  //TODO: check whether there is a wrong second token placed on the same position!
-  @SuppressWarnings("boxing")
-  private static List<IMatch> filterMatchesBasedOnPositionMatches(final List<IMatch> matches) {
-    final Map<Integer, IColumn> columnsMap = Maps.newHashMap();
-    final Map<Integer, INormalizedToken> tokenMap = Maps.newHashMap();
-    for (final IMatch match : matches) {
-      //TODO: rename match.getColumnsA to match.getColumns
-      final IColumns columns = match.getColumns();
-      final IPhrase phrase = match.getPhrase();
-      final Iterator<INormalizedToken> tokens = phrase.getTokens().iterator();
-      for (final IColumn column : columns.getColumns()) {
-        if (!(column instanceof NullColumn)) {
-          final int position = column.getPosition();
-          columnsMap.put(position, column);
-          tokenMap.put(position, tokens.next());
-        } else {
-          tokens.next();
-        }
-      }
-    }
-    final List<IMatch> newMatches = Lists.newArrayList();
-    final List<Integer> positions = Lists.newArrayList(columnsMap.keySet());
-    Collections.sort(positions);
-    for (final Integer position : positions) {
-      final IColumn column = columnsMap.get(position);
-      final INormalizedToken token = tokenMap.get(position);
-      //TODO: hide this in constructors!
-      final IColumns columns = new Columns(Lists.newArrayList(column));
-      final IPhrase phrase = new Phrase(Lists.newArrayList(token));
-      final IMatch newMatch = new Match(columns, phrase);
-      newMatches.add(newMatch);
-    }
-    return newMatches;
   }
 
   public static IWitnessIndex createWitnessIndex(final IWitness witness) {
     return new WitnessIndex(witness, witness.findRepeatingTokens());
   }
 
+  //TODO: remove? seems only used in tests!
   protected static Set<String> getTokensWithMultiples(final Collection<IWitness> witnesses) {
     final Set<String> stringSet = Sets.newHashSet();
     for (final IWitness witness : witnesses) {
@@ -207,6 +119,7 @@ public class Factory {
     return stringSet;
   }
 
+  //TODO: remove? seems only used in tests!
   protected static Set<String> getPhrasesWithMultiples(final IWitness... witnesses) {
     final Set<String> stringSet = Sets.newHashSet();
     for (final IWitness witness : witnesses) {
