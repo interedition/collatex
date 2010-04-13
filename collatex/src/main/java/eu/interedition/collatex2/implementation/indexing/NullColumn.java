@@ -3,6 +3,7 @@ package eu.interedition.collatex2.implementation.indexing;
 import java.util.List;
 
 import eu.interedition.collatex2.interfaces.ColumnState;
+import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
@@ -58,6 +59,12 @@ public class NullColumn implements IColumn {
   public List<String> getSigli() {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public void accept(final IAlignmentTableVisitor visitor) {
+  // TODO Auto-generated method stub
+
   }
 
 }

@@ -1,4 +1,4 @@
-package eu.interedition.collatex.rest;
+package eu.interedition.collatex2.rest.output;
 
 import java.io.IOException;
 import java.io.Writer;

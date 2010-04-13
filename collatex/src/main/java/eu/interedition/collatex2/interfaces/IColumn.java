@@ -22,4 +22,6 @@ public interface IColumn extends Comparable<IColumn> {
 
   List<String> getSigli();
 
+  void accept(IAlignmentTableVisitor visitor);
+
 }

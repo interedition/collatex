@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.interfaces.ColumnState;
+import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
@@ -103,4 +104,14 @@ public class Column3 implements IColumn {
   public List<String> getSigli() {
     return Lists.newArrayList(sigliToTokens.keySet());
   }
+
+  public void accept(final IAlignmentTableVisitor visitor) {
+    visitor.visitColumn(this);
+    final List<String> sigli = this.getSigli();
+    for (final String sigel : sigli) {
+      final INormalizedToken token = getToken(sigel);
+      visitor.visitToken(sigel, token);
+    }
+  }
+
 }

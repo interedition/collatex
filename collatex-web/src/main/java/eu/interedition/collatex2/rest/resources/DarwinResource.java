@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.rest;
+package eu.interedition.collatex2.rest.resources;
 
 import static com.google.common.collect.Iterables.transform;
 
@@ -47,6 +47,26 @@ public class DarwinResource extends ServerResource {
   public DarwinResource() {
     getVariants().put(Method.GET, Arrays.asList(TYPES));
 
+  }
+
+  @Override
+  protected void doInit() throws ResourceException {}
+
+  private static final ICallback LOG_ALIGNMENT = new ICallback() {
+    @Override
+    public void alignment(final IAlignment alignment) {
+      LOG.info(alignment.getMatches().size());
+    }
+  };
+  private int i;
+
+  @Override
+  public Representation get(final Variant variant) throws ResourceException {
+    i = 0;
+    try {
+      i = Integer.parseInt((String) getRequest().getAttributes().get("i"));
+    } catch (final NumberFormatException e) {}
+
     final File file = new File("docs/darwin/Ch1-" + fileNums[i] + ".json");
     try {
       readFileToString = FileUtils.readFileToString(file);
@@ -76,27 +96,7 @@ public class DarwinResource extends ServerResource {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-  }
-
-  @Override
-  protected void doInit() throws ResourceException {
-    i = 0;
-    try {
-      i = Integer.parseInt((String) getRequest().getAttributes().get("i"));
-    } catch (final NumberFormatException e) {}
-  }
-
-  private static final ICallback LOG_ALIGNMENT = new ICallback() {
-    @Override
-    public void alignment(final IAlignment alignment) {
-      LOG.info(alignment.getMatches().size());
-    }
-  };
-  private int i;
-
-  @Override
-  public Representation get(final Variant variant) throws ResourceException {
-    final IAlignmentTable alignmentTable = new Factory().createAlignmentTable(witnesses, LOG_ALIGNMENT);
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(witnesses, LOG_ALIGNMENT);
     final ParallelSegmentationTable table = AlignmentTableSegmentator.createParrallelSegmentationTable(alignmentTable);
     final StringBuilder stringBuilder = new StringBuilder("<html><body> ").//
         append(ParallelSegmentationTable.tableToHTML(table)).//

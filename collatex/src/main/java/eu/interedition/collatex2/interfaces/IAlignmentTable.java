@@ -20,4 +20,6 @@ public interface IAlignmentTable {
 
   List<String> findRepeatingTokens();
 
+  void accept(IAlignmentTableVisitor visitor);
+
 }
