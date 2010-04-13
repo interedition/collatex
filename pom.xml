@@ -11,6 +11,7 @@
 		<module>collatex</module>
 		<module>collatex-legacy</module>
 		<module>collatex-web</module>
+		<module>collatex-spring</module>
 	</modules>
 	<build>
 		<plugins>
@@ -64,7 +65,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>1.5.11</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<!-- 
 		<dependency>
@@ -101,6 +102,11 @@
 				<groupId>eu.interedition.collatex</groupId>
 				<artifactId>collatex</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.wicket</groupId>
@@ -179,4 +185,7 @@
 	<scm>
 		<url>scm:bazaar:lp:collatex</url>
 	</scm>
+	<properties>
+		<slf4j.version>1.5.11</slf4j.version>
+	</properties>
 </project>
