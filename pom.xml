@@ -124,14 +124,14 @@
 				<version>2.9.1</version>
 			</dependency>
 			<dependency>
-				<groupId>org.restlet</groupId>
+				<groupId>org.restlet.jse</groupId>
 				<artifactId>org.restlet</artifactId>
-				<version>2.0-M3</version>
+				<version>${restlet.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.restlet</groupId>
+				<groupId>org.restlet.jse</groupId>
 				<artifactId>org.restlet.ext.json</artifactId>
-				<version>2.0-M3</version>
+				<version>${restlet.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sf.json-lib</groupId>
@@ -187,5 +187,6 @@
 	</scm>
 	<properties>
 		<slf4j.version>1.5.11</slf4j.version>
+		<restlet.version>2.0-RC2</restlet.version>
 	</properties>
 </project>

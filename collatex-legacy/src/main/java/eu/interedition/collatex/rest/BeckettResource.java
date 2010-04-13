@@ -1,10 +1,8 @@
 package eu.interedition.collatex.rest;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
@@ -23,10 +21,9 @@ import eu.interedition.collatex.parallel_segmentation.NewTeiCreator;
 import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTable;
 
 public class BeckettResource extends ServerResource {
-  private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
-
   public BeckettResource() {
-    getVariants().put(Method.GET, Arrays.asList(TYPES));
+    getVariants().add(new Variant(MediaType.TEXT_HTML));
+    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
   }
 
   @Override

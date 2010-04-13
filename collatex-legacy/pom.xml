@@ -32,11 +32,11 @@
 			<artifactId>jetty</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.restlet</groupId>
+			<groupId>org.restlet.jse</groupId>
 			<artifactId>org.restlet</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.restlet</groupId>
+			<groupId>org.restlet.jse</groupId>
 			<artifactId>org.restlet.ext.json</artifactId>
 		</dependency>
 	</dependencies>

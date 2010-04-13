@@ -27,13 +27,13 @@ import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 
 public class DemoResource extends ServerResource {
-  private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
   private String readFileToString;
   private final WitnessSet set;
 
   @SuppressWarnings("unchecked")
   public DemoResource() {
-    getVariants().put(Method.GET, Arrays.asList(TYPES));
+    getVariants().add(new Variant(MediaType.TEXT_HTML));
+    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
     File file = new File("docs/demodirk/json_input.txt");
     try {
       readFileToString = FileUtils.readFileToString(file);

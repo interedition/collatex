@@ -1,12 +1,10 @@
 package eu.interedition.collatex2.rest.resources;
 
-import java.util.Arrays;
 import java.util.List;
 
 import net.sf.json.JSONObject;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
@@ -22,10 +20,9 @@ import eu.interedition.collatex2.rest.output.JsonLibRepresentation;
 
 public class AlignmentResource extends ServerResource {
 
-  private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
-
   public AlignmentResource() {
-    getVariants().put(Method.GET, Arrays.asList(TYPES));
+    getVariants().add(new Variant(MediaType.TEXT_HTML));
+    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
   }
 
   @Override

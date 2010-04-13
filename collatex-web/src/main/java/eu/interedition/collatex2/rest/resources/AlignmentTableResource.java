@@ -1,10 +1,8 @@
 package eu.interedition.collatex2.rest.resources;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
@@ -18,10 +16,10 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableResource extends ServerResource {
-  private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
 
   public AlignmentTableResource() {
-    getVariants().put(Method.GET, Arrays.asList(TYPES));
+    getVariants().add(new Variant(MediaType.TEXT_HTML));
+    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
   }
 
   @Override
@@ -32,7 +30,7 @@ public class AlignmentTableResource extends ServerResource {
     final IWitness w3 = factory.createWitness("C", "the red cat");
     final List<IWitness> set = Lists.newArrayList(w1, w2, w3);
     final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
-    //TODO: not finished!
+    // TODO: not finished!
     return new StringRepresentation("We are done");
   }
 }

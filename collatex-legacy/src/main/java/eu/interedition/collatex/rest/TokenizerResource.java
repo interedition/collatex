@@ -1,11 +1,8 @@
 package eu.interedition.collatex.rest;
 
-import java.util.Arrays;
-
 import net.sf.json.JSONArray;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
@@ -17,10 +14,9 @@ import eu.interedition.collatex2.rest.output.JsonLibRepresentation;
 
 public class TokenizerResource extends ServerResource {
 
-  private static final MediaType[] TYPES = { MediaType.TEXT_HTML, MediaType.TEXT_PLAIN };
-
   public TokenizerResource() {
-    getVariants().put(Method.GET, Arrays.asList(TYPES));
+    getVariants().add(new Variant(MediaType.TEXT_HTML));
+    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
   }
 
   @Override
