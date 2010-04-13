@@ -13,6 +13,7 @@ import org.restlet.resource.ServerResource;
 
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.input.visitors.JSONObjectVisitor;
+import eu.interedition.collatex2.rest.output.JsonLibRepresentation;
 
 public class TokenizerResource extends ServerResource {
 

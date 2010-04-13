@@ -10,6 +10,7 @@ import com.google.common.collect.Multimaps;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -88,6 +89,15 @@ public class AlignmentTable4 implements IAlignmentTable {
       final IColumn extraColumn = new Column3(token, size() + 1);
       columns.add(extraColumn);
     }
+  }
+
+  // Note: this is a visitor who walks over the columns!
+  public void accept(final IAlignmentTableVisitor visitor) {
+    visitor.visitTable(this);
+    for (final IColumn column : columns) {
+      column.accept(visitor);
+    }
+    visitor.postVisitTable(this);
   }
 
   public void addVariantBefore(final IColumn column, final IPhrase witnessPhrase) {

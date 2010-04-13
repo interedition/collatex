@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.rest;
+package eu.interedition.collatex2.rest.resources;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,7 @@ public class AlignmentTableResource extends ServerResource {
     final IWitness w3 = factory.createWitness("C", "the red cat");
     final List<IWitness> set = Lists.newArrayList(w1, w2, w3);
     final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
-
+    //TODO: not finished!
     return new StringRepresentation("We are done");
   }
 }

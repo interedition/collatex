@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.rest;
+package eu.interedition.collatex2.rest.resources;
 
 import java.util.Arrays;
 import java.util.List;

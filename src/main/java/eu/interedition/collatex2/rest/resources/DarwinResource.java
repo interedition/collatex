@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.rest;
+package eu.interedition.collatex2.rest.resources;
 
 import static com.google.common.collect.Iterables.transform;
 

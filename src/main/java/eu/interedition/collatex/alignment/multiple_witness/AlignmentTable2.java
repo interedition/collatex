@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.parallel_segmentation.AlignmentTableSegmentator;
@@ -116,16 +115,6 @@ public class AlignmentTable2<T extends BaseElement> {
       witnesses.add(witness);
     }
     _sigli.add(witness.id);
-  }
-
-  // TODO add visitor who walks over the witnesses
-  // Note: this is a visitor who walks over the columns!
-  public void accept(final IAlignmentTableVisitor<T> visitor) {
-    visitor.visitTable(this);
-    for (final Column<T> column : columns) {
-      column.accept(visitor);
-    }
-    visitor.postVisitTable(this);
   }
 
   // TODO move this functionality to a visitor!

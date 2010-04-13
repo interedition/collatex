@@ -9,7 +9,6 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.alignment.multiple_witness.visitors.IAlignmentTableVisitor;
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Word;
@@ -90,15 +89,6 @@ public class Column<T extends BaseElement> {
 
   public Set<String> getSigli() {
     return wordsProWitness.keySet();
-  }
-
-  public void accept(final IAlignmentTableVisitor<T> visitor) {
-    visitor.visitColumn(this);
-    final Set<String> sigli = this.getSigli();
-    for (final String sigel : sigli) {
-      final T word = wordsProWitness.get(sigel);
-      visitor.visitElement(sigel, word);
-    }
   }
 
   public List<T> getUniqueElements() {
