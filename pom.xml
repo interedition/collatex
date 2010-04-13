@@ -9,6 +9,7 @@
 	<url>http://www.sourceforge.net/projects/collatex</url>
 	<modules>
 		<module>collatex</module>
+		<module>collatex-legacy</module>
 		<module>collatex-web</module>
 	</modules>
 	<build>
