@@ -127,6 +127,12 @@
 				<groupId>org.restlet.jse</groupId>
 				<artifactId>org.restlet</artifactId>
 				<version>${restlet.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.osgi</groupId>
+						<artifactId>org.osgi.core</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.restlet.jse</groupId>
