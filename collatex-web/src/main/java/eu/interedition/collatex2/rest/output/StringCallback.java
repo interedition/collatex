@@ -18,6 +18,32 @@ public class StringCallback implements ICallback {
 
 	@Override
 	public void alignment(final IAlignment alignment) {
+		displayMatches(alignment);
+		final List<IGap> gaps = alignment.getGaps();
+		buffer.append(BR + BR).//
+				append("gaps: ").//
+				append(BR);
+		for (final IGap gap : gaps) {
+			buffer.append(" ").append(gap.toString()).append(BR);
+		}
+		buffer.append(BR + BR);
+		displayTranspositions(alignment);
+		buffer.append(BR + BR);
+	}
+
+	private void displayTranspositions(final IAlignment alignment) {
+		final List<ITransposition> transpositions = alignment
+				.getTranspositions();
+				buffer.append("transpositions: " + BR);
+		if (transpositions.isEmpty()) {
+			buffer.append("none" + BR);
+		}
+		for (final ITransposition transposition : transpositions) {
+			buffer.append(" ").append(transposition.toString()).append(BR);
+		}
+	}
+
+	private void displayMatches(final IAlignment alignment) {
 		buffer.append("matches: " + BR + " - ");
 		String splitter = "";
 		final List<IMatch> matches = alignment.getMatches();
@@ -26,25 +52,6 @@ public class StringCallback implements ICallback {
 					.append("\"");
 			splitter = BR + " - ";
 		}
-		final List<IGap> gaps = alignment.getGaps();
-		buffer.append(BR + BR).//
-				append("gaps: ").//
-				append(BR);
-		for (final IGap gap : gaps) {
-			buffer.append(" ").append(gap.toString()).append(BR);
-		}
-		final List<ITransposition> transpositions = alignment
-				.getTranspositions();
-		buffer.append(BR + BR).//
-				append("transpositions: " + BR);
-		if (transpositions.isEmpty()) {
-			buffer.append("none" + BR);
-		}
-		for (final ITransposition transposition : transpositions) {
-			buffer.append(" ").append(transposition.toString()).append(BR);
-		}
-
-		buffer.append(BR + BR);
 	}
 
 	public String getResult() {
