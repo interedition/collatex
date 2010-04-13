@@ -14,11 +14,22 @@ import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
+/**
+ * Testing the dependence of the algorithm on the order of witnesses.
+ * 
+ * <p>
+ * See Matthew Spencer and Christopher J. Howe
+ * "Collating Texts Using Progressive Multiple Alignment".
+ * </p>
+ * 
+ * @author Gregor Middell
+ * 
+ */
 public class SpencerHoweTest {
   private static Logger logger = LoggerFactory.getLogger(SpencerHoweTest.class);
-  
+
   private Factory factory = new Factory();
-    
+
   @Test
   @Ignore
   public void testEverythingMatches() {
@@ -28,7 +39,7 @@ public class SpencerHoweTest {
     final List<IWitness> set = Lists.newArrayList(w1, w2, w3);
     final IAlignmentTable table = factory.createAlignmentTable(set);
     logger.debug(table.toString());
-    String expected =  "V: a|b|-|c|-|d|e|f\n";
+    String expected = "V: a|b|-|c|-|d|e|f\n";
     expected += "W: -|-|x|y|z|d|e|-\n";
     expected += "X: a|b|x|y|z|-|-|-\n";
     Assert.assertEquals(expected, table.toString());
