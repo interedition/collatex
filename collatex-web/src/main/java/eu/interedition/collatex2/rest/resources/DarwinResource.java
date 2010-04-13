@@ -32,6 +32,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.rest.output.StringCallback;
 
 public class DarwinResource extends ServerResource {
   int[] fileNums = { 100, 110, 120, 200, 210, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100,
@@ -93,10 +94,12 @@ public class DarwinResource extends ServerResource {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    final IAlignmentTable alignmentTable = factory.createAlignmentTable(witnesses, LOG_ALIGNMENT);
+    StringCallback alignmentLog = new StringCallback();
+    final IAlignmentTable alignmentTable = factory.createAlignmentTable(witnesses, alignmentLog);
     final ParallelSegmentationTable table = AlignmentTableSegmentator.createParrallelSegmentationTable(alignmentTable);
     final StringBuilder stringBuilder = new StringBuilder("<html><body> ").//
         append(ParallelSegmentationTable.tableToHTML(table)).//
+        append(alignmentLog.getResult()).
         append(witnessesAsString(witnesses)).//
         append("</body></html>");
     final Representation representation = new StringRepresentation(stringBuilder.toString(), MediaType.TEXT_HTML);
