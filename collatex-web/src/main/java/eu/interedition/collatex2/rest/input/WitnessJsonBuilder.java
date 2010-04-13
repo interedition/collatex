@@ -8,14 +8,16 @@ import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.input.NormalizedWitness;
 import eu.interedition.collatex2.implementation.input.Token;
+import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class WitnessJsonBuilder {
-
+  private static ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
+  
   public static List<IWitness> createList(final JSONArray witnessArray) throws JSONException {
     final List<IWitness> witnesses = Lists.newArrayList();
     for (int w = 0; w < witnessArray.length(); w++) {
@@ -35,7 +37,7 @@ public class WitnessJsonBuilder {
       final JSONObject jsonObject = jsonArray.getJSONObject(i);
       final String tokenString = jsonObject.getString("token");
       final Token token = new Token(sigil, tokenString, position);
-      final INormalizedToken normalizedToken = NormalizedToken.normalize(token);
+      final INormalizedToken normalizedToken = tokenNormalizer.apply(token);
       position++;
       normalizedTokens.add(normalizedToken);
     }

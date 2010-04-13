@@ -1,6 +1,8 @@
 package eu.interedition.collatex2.implementation.input;
 
-public class Token {
+import eu.interedition.collatex2.interfaces.IToken;
+
+public class Token implements IToken {
   private final String sigil;
   private final String content;
   private final int position;

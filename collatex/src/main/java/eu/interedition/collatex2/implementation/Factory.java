@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
@@ -14,8 +16,10 @@ import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
+import eu.interedition.collatex2.implementation.input.NormalizedWitness;
 import eu.interedition.collatex2.implementation.matching.IndexMatcher;
-import eu.interedition.collatex2.implementation.tokenization.NormalizedWitnessBuilder;
+import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
+import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
@@ -23,13 +27,27 @@ import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IToken;
+import eu.interedition.collatex2.interfaces.ITokenNormalizer;
+import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class Factory {
-
+  private ITokenizer tokenizer = new WhitespaceTokenizer();
+  private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
+  
+  public void setTokenizer(ITokenizer tokenizer) {
+    this.tokenizer = tokenizer;
+  }
+  
+  public void setTokenNormalizer(ITokenNormalizer tokenNormalizer) {
+    this.tokenNormalizer = tokenNormalizer;
+  }
+  
   public IWitness createWitness(final String sigil, final String words) {
-    return NormalizedWitnessBuilder.create(sigil, words);
+    final Iterable<IToken> tokens = tokenizer.tokenize(sigil, words);
+    return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
   }
 
   // NOTE: this method creates an alignmenttable, adds the first witness,

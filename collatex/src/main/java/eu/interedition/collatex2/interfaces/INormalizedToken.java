@@ -1,13 +1,5 @@
 package eu.interedition.collatex2.interfaces;
 
-public interface INormalizedToken {
-
+public interface INormalizedToken extends IToken {
   String getNormalized();
-
-  int getPosition();
-
-  String getSigil();
-
-  String getContent();
-
 }
