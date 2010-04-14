@@ -12,7 +12,6 @@ import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
-import eu.interedition.collatex.experimental.ngrams.alignment.Omission;
 import eu.interedition.collatex.experimental.ngrams.alignment.Replacement;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
@@ -126,8 +125,8 @@ public class ColorsView {
           html.append("<li>" + wordDistanceMatch((WordDistanceMatch) modification) + "</li>");
 //        } else if (modification instanceof Addition) {
 //          html.append("<li>" + additionView((Addition) modification, base) + "</li>");
-        } else if (modification instanceof Omission) {
-          html.append("<li>" + removalView((Omission) modification) + "</li>");
+//        } else if (modification instanceof Omission) {
+//          html.append("<li>" + removalView((Omission) modification) + "</li>");
         } else if (modification instanceof Transposition) {
           html.append("<li>" + transpositionView((Transposition) modification) + "</li>");
         } else if (modification instanceof Replacement) {
@@ -153,9 +152,5 @@ public class ColorsView {
     return "<i>" + transposition.getLeft() + "</i> transposed with <i>" + transposition.getRight() + "</i>";
   }
 
-  private String removalView(Omission removal) {
-    int position = removal.getPosition();
-    return "<i>" + removal.getOmittedWords() + "</i> at position " + (position) + " removed ";
-  }
 
 }
