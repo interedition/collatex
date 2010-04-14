@@ -9,6 +9,7 @@ import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.IOmission;
 import eu.interedition.collatex2.interfaces.ITransposition;
 
 public class HumanReadableAlignmentCallback implements ICallback {
@@ -25,6 +26,7 @@ public class HumanReadableAlignmentCallback implements ICallback {
   public void alignment(final IAlignment alignment) {
     displayMatches(alignment);
     displayAdditions(alignment, table);
+    displayOmissions(alignment);
     final List<IGap> gaps = alignment.getGaps();
     buffer.append("gaps: ").append(BR);
     for (final IGap gap : gaps) {
@@ -33,6 +35,17 @@ public class HumanReadableAlignmentCallback implements ICallback {
     buffer.append(BR + BR);
     displayTranspositions(alignment);
     buffer.append(BR + BR);
+  }
+
+  private void displayOmissions(IAlignment alignment) {
+    List<IOmission> omissions = alignment.getOmissions();
+    if (!omissions.isEmpty()) {
+      buffer.append("Omissions: ").append(BR);
+      for (IOmission omission : omissions) {
+        buffer.append(omissionView(omission));
+      }
+      buffer.append(BR + BR);   
+    }
   }
 
   private void displayAdditions(IAlignment alignment, IAlignmentTable table) {
@@ -62,6 +75,12 @@ public class HumanReadableAlignmentCallback implements ICallback {
     }
     return html.toString();
   }
+  
+  private String omissionView(IOmission removal) {
+    int position = removal.getPosition();
+    return "<i>" + removal.getOmittedColumns() + "</i> at position " + (position) + " removed ";
+  }
+
 
   private void displayTranspositions(final IAlignment alignment) {
     final List<ITransposition> transpositions = alignment.getTranspositions();
