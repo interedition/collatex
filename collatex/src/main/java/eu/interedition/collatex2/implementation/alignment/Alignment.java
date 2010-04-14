@@ -45,7 +45,7 @@ public class Alignment implements IAlignment {
     }
   };
 
-  public List<IMatch> getMatchesSortedForB() {
+  public List<IMatch> getMatchesSortedForWitness() {
     final List<IMatch> matchesForB = Lists.newArrayList(matches);
     Collections.sort(matchesForB, SORT_MATCHES_ON_POSITION_B);
     return matchesForB;
@@ -54,7 +54,7 @@ public class Alignment implements IAlignment {
   @Override
   public List<ITransposition> getTranspositions() {
     final List<IMatch> matchesA = getMatches();
-    final List<IMatch> matchesB = getMatchesSortedForB();
+    final List<IMatch> matchesB = getMatchesSortedForWitness();
     final List<ITransposition> transpositions = Lists.newArrayList();
     for (int i = 0; i < matchesA.size(); i++) {
       final IMatch matchA = matchesA.get(i);
