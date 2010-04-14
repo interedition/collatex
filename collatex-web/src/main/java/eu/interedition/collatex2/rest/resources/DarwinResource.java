@@ -18,7 +18,6 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
 
 import com.google.common.base.Function;
 import com.google.common.base.Join;
@@ -26,7 +25,6 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
-import eu.interedition.collatex2.implementation.parallel_segmentation.AlignmentTableSegmentator;
 import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationTable;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -35,20 +33,16 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.rest.output.HumanReadableAlignmentCallback;
 
-public class DarwinResource extends ServerResource {
+public class DarwinResource extends AbstractHtmlTextResource {
   int[] fileNums = { 100, 110, 120, 200, 210, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100,
       3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300, 4400, 4500, 4550, 4600 };
   protected static final Log LOG = LogFactory.getLog(DarwinResource.class);
   private String readFileToString;
   private final List<IWitness> witnesses = Lists.newArrayList();
 
-  public DarwinResource() {
-    getVariants().add(new Variant(MediaType.TEXT_HTML));
-    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
-  }
-
   @Override
-  protected void doInit() throws ResourceException {}
+  protected void doInit() throws ResourceException {
+  }
 
   private static final ICallback LOG_ALIGNMENT = new ICallback() {
     @Override
@@ -63,7 +57,8 @@ public class DarwinResource extends ServerResource {
     i = 0;
     try {
       i = Integer.parseInt((String) getRequest().getAttributes().get("i"));
-    } catch (final NumberFormatException e) {}
+    } catch (final NumberFormatException e) {
+    }
 
     final File file = new File("docs/darwin/Ch1-" + fileNums[i] + ".json");
     try {
@@ -87,22 +82,21 @@ public class DarwinResource extends ServerResource {
       for (final String key : sortedKeys) {
         final String text = jsonObject.getString(key);
         final IWitness witness = factory.createWitness(key, text.replaceAll("  +", " ").trim());
-        //        LOG.info(witness.getSigil());
+        // LOG.info(witness.getSigil());
         witnesses.add(witness);
       }
     } catch (final JSONException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
+
     final IAlignmentTable alignmentTable = new AlignmentTable4();
     HumanReadableAlignmentCallback alignmentLog = new HumanReadableAlignmentCallback(alignmentTable);
     factory.addWitnesses(witnesses, alignmentTable, alignmentLog);
-    final ParallelSegmentationTable table = AlignmentTableSegmentator.createParrallelSegmentationTable(alignmentTable);
+    final ParallelSegmentationTable table = Factory.createParrallelSegmentationTable(alignmentTable);
     final StringBuilder stringBuilder = new StringBuilder("<html><body> ").//
-        append(ParallelSegmentationTable.tableToHTML(table)).//
-        append(alignmentLog.getResult()).
-        append(witnessesAsString(witnesses)).//
+        append(renderParallelSegmentationTable(table)).//
+        append(alignmentLog.getResult()).append(witnessesAsString(witnesses)).//
         append("</body></html>");
     final Representation representation = new StringRepresentation(stringBuilder.toString(), MediaType.TEXT_HTML);
     return representation;

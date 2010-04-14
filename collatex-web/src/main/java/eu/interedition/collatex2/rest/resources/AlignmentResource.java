@@ -4,11 +4,9 @@ import java.util.List;
 
 import net.sf.json.JSONObject;
 
-import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
@@ -18,12 +16,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.rest.output.JSONObjectTableVisitor;
 import eu.interedition.collatex2.rest.output.JsonLibRepresentation;
 
-public class AlignmentResource extends ServerResource {
-
-  public AlignmentResource() {
-    getVariants().add(new Variant(MediaType.TEXT_HTML));
-    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
-  }
+public class AlignmentResource extends AbstractHtmlTextResource {
 
   @Override
   public Representation get(final Variant variant) throws ResourceException {

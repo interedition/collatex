@@ -15,12 +15,7 @@ import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class AlignmentTableResource extends ServerResource {
-
-  public AlignmentTableResource() {
-    getVariants().add(new Variant(MediaType.TEXT_HTML));
-    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
-  }
+public class AlignmentTableResource extends AbstractHtmlTextResource {
 
   @Override
   public Representation get(final Variant variant) throws ResourceException {

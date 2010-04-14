@@ -17,13 +17,8 @@ import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class UseCaseResource extends ServerResource {
+public class UseCaseResource extends AbstractHtmlTextResource {
   private int i;
-
-  public UseCaseResource() {
-    getVariants().add(new Variant(MediaType.TEXT_HTML));
-    getVariants().add(new Variant(MediaType.TEXT_PLAIN));
-  }
 
   @Override
   protected void doInit() throws ResourceException {
@@ -34,7 +29,7 @@ public class UseCaseResource extends ServerResource {
     }
   }
 
-  //Note: usecase 0 works
+  // Note: usecase 0 works
   @Override
   public Representation get(@SuppressWarnings("unused") final Variant variant) throws ResourceException {
     final List<String[]> useCases = useCases();
@@ -47,9 +42,9 @@ public class UseCaseResource extends ServerResource {
         html = displayAWitnessPair(html, plainWitnessA, plainWitnessB);
       }
     }
-    //    final String plainWitnessA = firstUseCase[0];
-    //    final String plainWitnessB = firstUseCase[1];
-    //    html = displayAWitnessPair(html, plainWitnessA, plainWitnessB);
+    // final String plainWitnessA = firstUseCase[0];
+    // final String plainWitnessB = firstUseCase[1];
+    // html = displayAWitnessPair(html, plainWitnessA, plainWitnessB);
     final Representation representation = new StringRepresentation(html, MediaType.TEXT_HTML);
     return representation;
   }
@@ -62,7 +57,7 @@ public class UseCaseResource extends ServerResource {
     final List<IMatch> matches = align.getMatches();
     final StringBuilder stringBuilder = new StringBuilder(html).//
         append("A: ").append(plainWitnessA).append("<br/>").//
-        append("B: ").append(plainWitnessB).append("<br/>").//;
+        append("B: ").append(plainWitnessB).append("<br/>").// ;
         append("<br/>").//
         append("matches: ");
     String splitter = "";
