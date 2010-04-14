@@ -15,7 +15,7 @@ import eu.interedition.collatex2.interfaces.ColumnState;
 // of words
 public class AlignmentTableSegmentator {
 
-  public static TeiParallelSegmentationTable createTeiParrallelSegmentationTable(final AlignmentTable2 alignmentTable) {
+  public static TeiParallelSegmentationTable createTeiParallelSegmentationTable(final AlignmentTable2 alignmentTable) {
     return new TeiParallelSegmentationTable(AlignmentTableSegmentator.mergeColumns(alignmentTable));
   }
 

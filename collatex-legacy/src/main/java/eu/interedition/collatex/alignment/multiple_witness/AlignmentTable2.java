@@ -79,7 +79,7 @@ public class AlignmentTable2<T extends BaseElement> {
   // TODO separate in two steps: segmentation and xml rendering
   // TODO this uses the OLD CODE!
   public String toXML() {
-    final TeiParallelSegmentationTable app = AlignmentTableSegmentator.createTeiParrallelSegmentationTable(this);
+    final TeiParallelSegmentationTable app = AlignmentTableSegmentator.createTeiParallelSegmentationTable(this);
     return app.toXML();
   }
 
