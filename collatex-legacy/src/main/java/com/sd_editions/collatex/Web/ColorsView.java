@@ -12,7 +12,6 @@ import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.collation.CollateCore;
 import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
-import eu.interedition.collatex.experimental.ngrams.alignment.Replacement;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
 import eu.interedition.collatex.visualization.Modifications;
@@ -129,9 +128,9 @@ public class ColorsView {
 //          html.append("<li>" + removalView((Omission) modification) + "</li>");
         } else if (modification instanceof Transposition) {
           html.append("<li>" + transpositionView((Transposition) modification) + "</li>");
-        } else if (modification instanceof Replacement) {
-          html.append("<li>" + replacementView((Replacement) modification) + "</li>");
-        }
+//        } else if (modification instanceof Replacement) {
+//          html.append("<li>" + replacementView((Replacement) modification) + "</li>");
+       }
       }
     }
     html.append("</ul>");
@@ -140,11 +139,6 @@ public class ColorsView {
 
   private String wordDistanceMatch(WordDistanceMatch modification) {
     return "<i>" + modification.base() + "</i> matches with <i>" + modification.witness() + "</i>";
-  }
-
-  private String replacementView(Replacement replacement) {
-    int position = replacement.getPosition();
-    return "<i>" + replacement.getOriginalWords() + "</i> replaced by <i>" + replacement.getReplacementWords() + "</i> at position " + position; // TODO TEMP!
   }
 
   private String transpositionView(Transposition transposition) {
