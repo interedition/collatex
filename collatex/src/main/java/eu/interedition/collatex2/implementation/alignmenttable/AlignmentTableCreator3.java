@@ -24,10 +24,14 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class AlignmentTableCreator3 {
   public static IAlignmentTable createAlignmentTable(final List<IWitness> witnessList, final ICallback callback) {
     final IAlignmentTable table = new AlignmentTable4();
+    addWitnesses(witnessList, table, callback);
+    return table;
+  }
+
+  public static void addWitnesses(final List<IWitness> witnessList, final IAlignmentTable table, final ICallback callback) {
     for (final IWitness witness : witnessList) {
       AlignmentTableCreator3.addWitness(table, witness, callback);
     }
-    return table;
   }
 
   public static void addWitness(final IAlignmentTable table, final IWitness witness, final ICallback callback) {

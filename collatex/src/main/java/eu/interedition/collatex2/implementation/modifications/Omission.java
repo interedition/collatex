@@ -1,16 +1,16 @@
 package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IColumns;
-import eu.interedition.collatex2.interfaces.IModification;
+import eu.interedition.collatex2.interfaces.IOmission;
 
-public class Omission implements IModification {
+public class Omission implements IOmission {
   private final IColumns columns;
 
   public Omission(final IColumns gapA) {
     this.columns = gapA;
   }
 
-  public IColumns getOmittedWords() {
+  public IColumns getOmittedColumns() {
     return columns;
   }
 

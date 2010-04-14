@@ -35,6 +35,11 @@ public class Addition implements IAddition {
   }
 
   @Override
+  public boolean isAtTheBeginning() {
+    return addition.getBeginPosition() == 1;
+  }
+
+  @Override
   public boolean isAtTheEnd() {
     return nextColumn == null;
   }
@@ -46,6 +51,7 @@ public class Addition implements IAddition {
     }
     return nextColumn;
   }
+
 
   //  @Override
   //  public void accept(final ModificationVisitor modificationVisitor) {

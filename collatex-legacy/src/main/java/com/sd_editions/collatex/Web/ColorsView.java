@@ -11,14 +11,9 @@ import eu.interedition.collatex.alignment.functions.Aligner;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTable2;
 import eu.interedition.collatex.alignment.multiple_witness.AlignmentTableCreator;
 import eu.interedition.collatex.collation.CollateCore;
-import eu.interedition.collatex.experimental.ngrams.alignment.Addition;
 import eu.interedition.collatex.experimental.ngrams.alignment.Modification;
-import eu.interedition.collatex.experimental.ngrams.alignment.Omission;
-import eu.interedition.collatex.experimental.ngrams.alignment.Replacement;
-import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.WitnessSet;
-import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.visualization.Modifications;
 import eu.interedition.collatex.visualization.Visualization;
 
@@ -127,15 +122,15 @@ public class ColorsView {
       for (Modification modification : modificationsL) {
         if (modification instanceof WordDistanceMatch) {
           html.append("<li>" + wordDistanceMatch((WordDistanceMatch) modification) + "</li>");
-        } else if (modification instanceof Addition) {
-          html.append("<li>" + additionView((Addition) modification, base) + "</li>");
-        } else if (modification instanceof Omission) {
-          html.append("<li>" + removalView((Omission) modification) + "</li>");
+//        } else if (modification instanceof Addition) {
+//          html.append("<li>" + additionView((Addition) modification, base) + "</li>");
+//        } else if (modification instanceof Omission) {
+//          html.append("<li>" + removalView((Omission) modification) + "</li>");
         } else if (modification instanceof Transposition) {
           html.append("<li>" + transpositionView((Transposition) modification) + "</li>");
-        } else if (modification instanceof Replacement) {
-          html.append("<li>" + replacementView((Replacement) modification) + "</li>");
-        }
+//        } else if (modification instanceof Replacement) {
+//          html.append("<li>" + replacementView((Replacement) modification) + "</li>");
+       }
       }
     }
     html.append("</ul>");
@@ -146,33 +141,10 @@ public class ColorsView {
     return "<i>" + modification.base() + "</i> matches with <i>" + modification.witness() + "</i>";
   }
 
-  private String replacementView(Replacement replacement) {
-    int position = replacement.getPosition();
-    return "<i>" + replacement.getOriginalWords() + "</i> replaced by <i>" + replacement.getReplacementWords() + "</i> at position " + position; // TODO TEMP!
-  }
-
   private String transpositionView(Transposition transposition) {
     //    return "<i>" + "</i> transposed from position " + transposition. + " to " + y;
     return "<i>" + transposition.getLeft() + "</i> transposed with <i>" + transposition.getRight() + "</i>";
   }
 
-  private String removalView(Omission removal) {
-    int position = removal.getPosition();
-    return "<i>" + removal.getOmittedWords() + "</i> at position " + (position) + " removed ";
-  }
 
-  private String additionView(Addition addition, int base) {
-    Segment baseIndex = colors.getWitness(base).getFirstSegment();
-    StringBuffer html = new StringBuffer("<i>" + addition.getAddedWords() + "</i> added ");
-    List<Word> baseWords = baseIndex.getWords();
-    int position = addition.getPosition();
-    if (position == 1) {
-      html.append("before <i>" + baseWords.get(0) + "</i>");
-    } else if (position > baseWords.size()) {
-      html.append(" after <i>" + baseWords.get(baseWords.size() - 1) + "</i>");
-    } else {
-      html.append("between <i>" + baseWords.get(position - 2) + "</i> and <i>" + baseWords.get(position - 1) + "</i>");
-    }
-    return html.toString();
-  }
 }

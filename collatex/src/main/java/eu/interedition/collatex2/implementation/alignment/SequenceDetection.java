@@ -31,7 +31,7 @@ public class SequenceDetection {
     final List<IMatch> chainedMatches = Lists.newArrayList();
     // calculate previous matches map for A and B
     final List<IMatch> matchesSortedForA = unchainedMatches;
-    final List<IMatch> matchesSortedForB = alignment.getMatchesSortedForB();
+    final List<IMatch> matchesSortedForB = alignment.getMatchesSortedForWitness();
     // now build the actual map!
     final Map<IMatch, IGap> previousGapMapB = SequenceDetection.buildPreviousGapMap(matchesSortedForB, alignment.getGaps());
     final Map<IMatch, IMatch> previousMatchMapA = SequenceDetection.buildPreviousMatchMap(matchesSortedForA);

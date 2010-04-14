@@ -91,6 +91,10 @@ public class Factory {
     return new WitnessIndex(witness, witness.findRepeatingTokens());
   }
 
+  public void addWitnesses(List<IWitness> witnesses, IAlignmentTable table, ICallback callback) {
+    AlignmentTableCreator3.addWitnesses(witnesses, table, callback);
+  }
+
   //TODO: remove? seems only used in tests!
   protected static Set<String> getTokensWithMultiples(final Collection<IWitness> witnesses) {
     final Set<String> stringSet = Sets.newHashSet();
