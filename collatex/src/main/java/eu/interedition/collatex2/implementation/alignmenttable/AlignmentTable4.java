@@ -11,11 +11,13 @@ import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
+import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
+import eu.interedition.collatex2.interfaces.IRow;
 
 public class AlignmentTable4 implements IAlignmentTable {
   private final List<String> sigli;
@@ -173,6 +175,17 @@ public class AlignmentTable4 implements IAlignmentTable {
       }
     }
     return repeatingNormalizedTokens;
+  }
+
+  //TODO: what about empty cells?
+  @Override
+  public IRow getRow(String sigil) {
+    List<ICell> cells = Lists.newArrayList();
+    for (IColumn column : columns) {
+      ICell cell = new Cell(column, sigil);
+      cells.add(cell);
+    }
+    return new Row(cells);
   }
 
 }
