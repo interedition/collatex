@@ -22,8 +22,8 @@ import org.w3c.dom.Element;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
-import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationTable;
-import eu.interedition.collatex2.implementation.parallel_segmentation.SegmentColumn;
+import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationApparatus;
+import eu.interedition.collatex2.implementation.parallel_segmentation.ApparatusEntry;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -41,39 +41,46 @@ public class ApiController {
     final IWitness witness1 = collateXEngine.createWitness("A", WITNESS_1);
     final IWitness witness2 = collateXEngine.createWitness("B", WITNESS_2);
     final IAlignmentTable alignmentTable = collateXEngine.createAlignmentTable(Lists.newArrayList(witness1, witness2));
-    ParallelSegmentationTable table = Factory.createParrallelSegmentationTable(alignmentTable);
+    return new ModelAndView(new ApparatusXmlView(collateXEngine.createApparatus(alignmentTable)));
+  }
+
+  private static class ApparatusXmlView extends AbstractView {
+
+    private ParallelSegmentationApparatus apparatus;
     
-    final Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    Element root = xml.createElementNS(TEI_NS, "text");
-    xml.appendChild(root);
-
-    for (SegmentColumn segment : table.getColumns()) {
-      Element app = xml.createElementNS(TEI_NS, "app");
-      for (String sigle : table.getSigli()) {
-        Element rdg = xml.createElementNS(TEI_NS, "rdg");
-        rdg.setAttribute("wit", sigle);
-        app.appendChild(rdg);
-
-        if (segment.containsWitness(sigle)) {
-          rdg.setTextContent(segment.getPhrase(sigle).getContent());
-        }
-      }
-      root.appendChild(app);
+    private ApparatusXmlView(ParallelSegmentationApparatus apparatus) {
+      this.apparatus = apparatus;
     }
-    
-    return new ModelAndView(new AbstractView() {
-      
-      @Override
-      protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        response.setContentType("application/xml");
-        response.setCharacterEncoding("UTF-8");
-        
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        TransformerUtils.enableIndenting(transformer);
-        PrintWriter out = response.getWriter();
-        transformer.transform(new DOMSource(xml), new StreamResult(out));
-        out.flush();
+
+    @Override
+    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+      final Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      Element root = xml.createElementNS(TEI_NS, "text");
+      xml.appendChild(root);
+
+      for (ApparatusEntry segment : apparatus.getEntries()) {
+        Element app = xml.createElementNS(TEI_NS, "app");
+        for (String sigle : apparatus.getSigli()) {
+          Element rdg = xml.createElementNS(TEI_NS, "rdg");
+          rdg.setAttribute("wit", sigle);
+          app.appendChild(rdg);
+
+          if (segment.containsWitness(sigle)) {
+            rdg.setTextContent(segment.getPhrase(sigle).getContent());
+          }
+        }
+        root.appendChild(app);
       }
-    });
+
+      response.setContentType("application/xml");
+      response.setCharacterEncoding("UTF-8");
+
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      TransformerUtils.enableIndenting(transformer);
+      PrintWriter out = response.getWriter();
+      transformer.transform(new DOMSource(xml), new StreamResult(out));
+      out.flush();
+    }
+
   }
 }

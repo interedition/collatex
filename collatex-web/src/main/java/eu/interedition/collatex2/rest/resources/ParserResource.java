@@ -13,7 +13,7 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import eu.interedition.collatex2.implementation.Factory;
-import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationTable;
+import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.rest.input.WitnessJsonBuilder;
@@ -49,9 +49,8 @@ public class ParserResource extends ServerResource {
     	final net.sf.json.JSONObject jsonObject = visitor.getJSONObject();
     	representation = new JsonLibRepresentation(jsonObject);
     } else if( format.equals( "html" )) {
-        final ParallelSegmentationTable table = Factory.createParrallelSegmentationTable(alignmentTable);
         final StringBuilder stringBuilder = new StringBuilder("<html><body> ").//
-            append(AbstractHtmlTextResource.renderParallelSegmentationTable(table)).//
+            append(AbstractHtmlTextResource.renderApparatusAsHtml(factory.createApparatus(alignmentTable))).//
             append("</body></html>");
         representation = new StringRepresentation(stringBuilder.toString(), MediaType.TEXT_HTML);
     }

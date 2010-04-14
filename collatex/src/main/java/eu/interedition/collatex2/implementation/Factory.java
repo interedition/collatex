@@ -18,7 +18,7 @@ import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCre
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.NormalizedWitness;
 import eu.interedition.collatex2.implementation.matching.IndexMatcher;
-import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationTable;
+import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.IAlignment;
@@ -96,8 +96,8 @@ public class Factory {
     AlignmentTableCreator3.addWitnesses(witnesses, table, callback);
   }
 
-  public static ParallelSegmentationTable createParrallelSegmentationTable(final IAlignmentTable alignmentTable) {
-    return ParallelSegmentationTable.build(alignmentTable);
+  public ParallelSegmentationApparatus createApparatus(final IAlignmentTable alignmentTable) {
+    return ParallelSegmentationApparatus.build(alignmentTable);
   }
 
   //TODO: remove? seems only used in tests!

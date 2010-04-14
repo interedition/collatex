@@ -25,7 +25,6 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
-import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationTable;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
@@ -93,9 +92,8 @@ public class DarwinResource extends AbstractHtmlTextResource {
     final IAlignmentTable alignmentTable = new AlignmentTable4();
     HumanReadableAlignmentCallback alignmentLog = new HumanReadableAlignmentCallback(alignmentTable);
     factory.addWitnesses(witnesses, alignmentTable, alignmentLog);
-    final ParallelSegmentationTable table = Factory.createParrallelSegmentationTable(alignmentTable);
     final StringBuilder stringBuilder = new StringBuilder("<html><body> ").//
-        append(renderParallelSegmentationTable(table)).//
+        append(renderApparatusAsHtml(factory.createApparatus(alignmentTable))).//
         append(alignmentLog.getResult()).append(witnessesAsString(witnesses)).//
         append("</body></html>");
     final Representation representation = new StringRepresentation(stringBuilder.toString(), MediaType.TEXT_HTML);

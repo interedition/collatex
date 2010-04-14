@@ -3,7 +3,7 @@
 <urlrewrite default-match-type="wildcard">
 	<rule>
 		<from>/</from>
-		<to type="redirect">doc</to>
+		<to type="redirect">api/collate</to>
 	</rule>
 	<rule>
 		<from>/css/**</from>

@@ -10,12 +10,12 @@ import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
-public class SegmentColumn {
+public class ApparatusEntry {
 
   private final List<String> sigli;
   private final Multimap<String, INormalizedToken> sigilToTokens;
 
-  public SegmentColumn(final List<String> sigli) {
+  public ApparatusEntry(final List<String> sigli) {
     this.sigli = sigli;
     this.sigilToTokens = Multimaps.newLinkedHashMultimap();
   }
