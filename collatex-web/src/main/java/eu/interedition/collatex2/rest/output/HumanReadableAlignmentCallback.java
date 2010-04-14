@@ -7,9 +7,9 @@ import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IOmission;
+import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.ITransposition;
 
 public class HumanReadableAlignmentCallback implements ICallback {
@@ -27,14 +27,8 @@ public class HumanReadableAlignmentCallback implements ICallback {
     displayMatches(alignment);
     displayAdditions(alignment, table);
     displayOmissions(alignment);
-    final List<IGap> gaps = alignment.getGaps();
-    buffer.append("gaps: ").append(BR);
-    for (final IGap gap : gaps) {
-      buffer.append(" ").append(gap.toString()).append(BR);
-    }
-    buffer.append(BR + BR);
+    displayReplacements(alignment);
     displayTranspositions(alignment);
-    buffer.append(BR + BR);
   }
 
   private void displayOmissions(IAlignment alignment) {
@@ -44,7 +38,7 @@ public class HumanReadableAlignmentCallback implements ICallback {
       for (IOmission omission : omissions) {
         buffer.append(omissionView(omission));
       }
-      buffer.append(BR + BR);   
+      buffer.append(BR + BR);
     }
   }
 
@@ -54,6 +48,17 @@ public class HumanReadableAlignmentCallback implements ICallback {
       buffer.append("Additions: ").append(BR);
       for (IAddition addition : additions) {
         buffer.append(additionView(addition, table));
+      }
+      buffer.append(BR + BR);
+    }
+  }
+
+  private void displayReplacements(IAlignment alignment) {
+    final List<IReplacement> replacements = alignment.getReplacements();
+    if (!replacements.isEmpty()) {
+      buffer.append("Replacements: ").append(BR);
+      for (IReplacement replacement : replacements) {
+        buffer.append(replacementView(replacement));
       }
       buffer.append(BR + BR);
     }
@@ -75,21 +80,25 @@ public class HumanReadableAlignmentCallback implements ICallback {
     }
     return html.toString();
   }
-  
+
   private String omissionView(IOmission removal) {
     int position = removal.getPosition();
-    return "<i>" + removal.getOmittedColumns() + "</i> at position " + (position) + " removed ";
+    return "<i>" + removal.getOmittedColumns() + "</i> at position " + (position) + " removed "+BR;
   }
 
+  private String replacementView(IReplacement replacement) {
+    int position = replacement.getPosition();
+    return "<i>" + replacement.getOriginalColumns() + "</i> replaced by <i>" + replacement.getReplacementPhrase() + "</i> at position " + position+BR; // TODO
+  }
 
   private void displayTranspositions(final IAlignment alignment) {
     final List<ITransposition> transpositions = alignment.getTranspositions();
-    buffer.append("transpositions: ").append(BR);
-    if (transpositions.isEmpty()) {
-      buffer.append("none").append(BR);
-    }
-    for (final ITransposition transposition : transpositions) {
-      buffer.append(" ").append(transposition.toString()).append(BR);
+    if (!transpositions.isEmpty()) {
+      buffer.append("transpositions: ").append(BR);
+      for (final ITransposition transposition : transpositions) {
+        buffer.append(" ").append(transposition.toString()).append(BR);
+      }
+      buffer.append(BR + BR);
     }
   }
 
