@@ -13,7 +13,7 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import eu.interedition.collatex2.implementation.Factory;
-import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationApparatus;
+import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.rest.input.WitnessJsonBuilder;

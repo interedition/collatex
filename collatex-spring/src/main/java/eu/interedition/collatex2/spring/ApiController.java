@@ -22,8 +22,8 @@ import org.w3c.dom.Element;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.Factory;
-import eu.interedition.collatex2.implementation.parallel_segmentation.ParallelSegmentationApparatus;
-import eu.interedition.collatex2.implementation.parallel_segmentation.ApparatusEntry;
+import eu.interedition.collatex2.implementation.apparatus.ApparatusEntry;
+import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 

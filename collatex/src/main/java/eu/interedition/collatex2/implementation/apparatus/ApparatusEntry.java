@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.parallel_segmentation;
+package eu.interedition.collatex2.implementation.apparatus;
 
 import java.util.List;
 
