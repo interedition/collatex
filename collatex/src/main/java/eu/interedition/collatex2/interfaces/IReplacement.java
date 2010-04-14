@@ -8,4 +8,6 @@ public interface IReplacement extends IModification {
 
   IColumn getNextColumn();
 
+  int getPosition();
+
 }
