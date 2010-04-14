@@ -6,6 +6,7 @@ public interface IAlignment {
 
   List<IMatch> getMatches();
 
+  //TODO: rename to getMatchesSortedForWitness()!
   List<IMatch> getMatchesSortedForB();
 
   List<IGap> getGaps();
@@ -15,5 +16,7 @@ public interface IAlignment {
   List<IAddition> getAdditions();
 
   List<IReplacement> getReplacements();
+
+  List<IOmission> getOmissions();
 
 }
