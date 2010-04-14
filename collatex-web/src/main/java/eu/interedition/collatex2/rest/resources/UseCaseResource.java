@@ -7,11 +7,11 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -53,7 +53,7 @@ public class UseCaseResource extends AbstractHtmlTextResource {
     final CollateXEngine factory = new CollateXEngine();
     final IWitness a = factory.createWitness("A", plainWitnessA);
     final IWitness b = factory.createWitness("B", plainWitnessB);
-    final IAlignment align = factory.createAlignment(a, b);
+    final IAlignment align = PairwiseAlignmentHelper.align(factory, a, b);
     final List<IMatch> matches = align.getMatches();
     final StringBuilder stringBuilder = new StringBuilder(html).//
         append("A: ").append(plainWitnessA).append("<br/>").//

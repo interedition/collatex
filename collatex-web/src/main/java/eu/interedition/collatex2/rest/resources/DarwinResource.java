@@ -24,10 +24,7 @@ import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
-import eu.interedition.collatex2.interfaces.IAlignment;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.ICallback;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.rest.output.HumanReadableAlignmentCallback;
@@ -38,17 +35,14 @@ public class DarwinResource extends AbstractHtmlTextResource {
   protected static final Log LOG = LogFactory.getLog(DarwinResource.class);
   private String readFileToString;
   private final List<IWitness> witnesses = Lists.newArrayList();
+  private CollateXEngine engine = new CollateXEngine();
+  private IAligner aligner;
 
   @Override
   protected void doInit() throws ResourceException {
+    aligner = engine.createAligner();
   }
 
-  private static final ICallback LOG_ALIGNMENT = new ICallback() {
-    @Override
-    public void alignment(final IAlignment alignment) {
-      LOG.info(alignment.getMatches().size());
-    }
-  };
   private int i;
 
   @Override
@@ -59,6 +53,9 @@ public class DarwinResource extends AbstractHtmlTextResource {
     } catch (final NumberFormatException e) {
     }
 
+    HumanReadableAlignmentCallback alignmentLog = new HumanReadableAlignmentCallback(aligner.getResult());
+    aligner.setCallback(alignmentLog);
+
     final File file = new File("docs/darwin/Ch1-" + fileNums[i] + ".json");
     try {
       readFileToString = FileUtils.readFileToString(file);
@@ -66,7 +63,6 @@ public class DarwinResource extends AbstractHtmlTextResource {
       e.printStackTrace();
     }
 
-    final CollateXEngine factory = new CollateXEngine();
     try {
       final List<String> sortedKeys = Lists.newArrayList();
       final JSONObject jsonObject = new JSONObject(readFileToString);
@@ -80,20 +76,17 @@ public class DarwinResource extends AbstractHtmlTextResource {
 
       for (final String key : sortedKeys) {
         final String text = jsonObject.getString(key);
-        final IWitness witness = factory.createWitness(key, text.replaceAll("  +", " ").trim());
+        final IWitness witness = engine.createWitness(key, text.replaceAll("  +", " ").trim());
         // LOG.info(witness.getSigil());
-        witnesses.add(witness);
+        aligner.add(witness);
       }
     } catch (final JSONException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
-    final IAlignmentTable alignmentTable = new AlignmentTable4();
-    HumanReadableAlignmentCallback alignmentLog = new HumanReadableAlignmentCallback(alignmentTable);
-    factory.addWitnesses(witnesses, alignmentTable, alignmentLog);
     final StringBuilder stringBuilder = new StringBuilder("<html><body> ").//
-        append(renderApparatusAsHtml(factory.createApparatus(alignmentTable))).//
+        append(renderApparatusAsHtml(engine.createApparatus(aligner.getResult()))).//
         append(alignmentLog.getResult()).append(witnessesAsString(witnesses)).//
         append("</body></html>");
     final Representation representation = new StringRepresentation(stringBuilder.toString(), MediaType.TEXT_HTML);

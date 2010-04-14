@@ -21,9 +21,9 @@ import eu.interedition.collatex2.implementation.input.NormalizedWitness;
 import eu.interedition.collatex2.implementation.matching.IndexMatcher;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -46,18 +46,25 @@ public class CollateXEngine {
     this.tokenNormalizer = tokenNormalizer;
   }
   
+  public IAlignmentTable align(IWitness... witnesses) {
+    return createAligner().add(witnesses).getResult();
+  }
+  
   public IWitness createWitness(final String sigil, final String words) {
     final Iterable<IToken> tokens = tokenizer.tokenize(sigil, words);
     return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
   }
 
-  // NOTE: this method creates an alignmenttable, adds the first witness,
-  // then calls the other createAlignmentMethod
-  public IAlignment createAlignment(final IWitness a, final IWitness b) {
-    final IAlignmentTable table = new AlignmentTable4();
-    AlignmentTableCreator3.addWitness(table, a, NULLCALLBACK);
-    final IAlignment alignment = createAlignmentUsingIndex(table, b);
-    return alignment;
+  public IAligner createAligner() {
+    return new AlignmentTableCreator3(this);
+  }
+
+  public ParallelSegmentationApparatus createApparatus(final IAlignmentTable alignmentTable) {
+    return ParallelSegmentationApparatus.build(alignmentTable);
+  }
+
+  public IAlignmentTable createAlignmentTable() {
+    return new AlignmentTable4();
   }
 
   public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
@@ -66,19 +73,6 @@ public class CollateXEngine {
 
   public static IMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
-  }
-
-  public static ICallback NULLCALLBACK = new ICallback() {
-    @Override
-    public void alignment(final IAlignment alignment) {}
-  };
-
-  public IAlignmentTable createAlignmentTable(final List<IWitness> set) {
-    return createAlignmentTable(set, NULLCALLBACK);
-  }
-
-  public IAlignmentTable createAlignmentTable(final List<IWitness> set, final ICallback callback) {
-    return AlignmentTableCreator3.createAlignmentTable(set, callback);
   }
 
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
@@ -90,14 +84,6 @@ public class CollateXEngine {
 
   public static IWitnessIndex createWitnessIndex(final IWitness witness) {
     return new WitnessIndex(witness, witness.findRepeatingTokens());
-  }
-
-  public void addWitnesses(List<IWitness> witnesses, IAlignmentTable table, ICallback callback) {
-    AlignmentTableCreator3.addWitnesses(witnesses, table, callback);
-  }
-
-  public ParallelSegmentationApparatus createApparatus(final IAlignmentTable alignmentTable) {
-    return ParallelSegmentationApparatus.build(alignmentTable);
   }
 
   //TODO: remove? seems only used in tests!

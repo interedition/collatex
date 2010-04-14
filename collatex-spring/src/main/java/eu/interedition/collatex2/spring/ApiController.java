@@ -19,12 +19,9 @@ import org.springframework.web.servlet.view.AbstractView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.apparatus.ApparatusEntry;
 import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 @Controller
@@ -40,8 +37,7 @@ public class ApiController {
   public ModelAndView collate() throws Exception {
     final IWitness witness1 = collateXEngine.createWitness("A", WITNESS_1);
     final IWitness witness2 = collateXEngine.createWitness("B", WITNESS_2);
-    final IAlignmentTable alignmentTable = collateXEngine.createAlignmentTable(Lists.newArrayList(witness1, witness2));
-    return new ModelAndView(new ApparatusXmlView(collateXEngine.createApparatus(alignmentTable)));
+    return new ModelAndView(new ApparatusXmlView(collateXEngine.createApparatus(collateXEngine.align(witness1, witness2))));
   }
 
   private static class ApparatusXmlView extends AbstractView {

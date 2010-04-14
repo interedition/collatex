@@ -13,7 +13,6 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.rest.input.WitnessJsonBuilder;
@@ -21,6 +20,7 @@ import eu.interedition.collatex2.rest.output.JSONObjectTableVisitor;
 import eu.interedition.collatex2.rest.output.JsonLibRepresentation;
 
 public class ParserResource extends ServerResource {
+  private CollateXEngine factory = new CollateXEngine();
 
   @Post
   public Representation acceptItem(final Representation entity) {
@@ -40,8 +40,7 @@ public class ParserResource extends ServerResource {
       throw new RuntimeException(e);
     }
 
-    final CollateXEngine factory = new CollateXEngine();
-    final IAlignmentTable alignmentTable = factory.createAlignmentTable(list);
+    final IAlignmentTable alignmentTable = factory.align(list.toArray(new IWitness[list.size()]));
     Representation representation = null;
     if( format.equals( "json")) {
     	final JSONObjectTableVisitor visitor = new JSONObjectTableVisitor();

@@ -12,43 +12,35 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
-import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableTest {
-  private static CollateXEngine factory;
+  private static CollateXEngine engine;
 
   @BeforeClass
   public static void setUp() {
-    factory = new CollateXEngine();
+    engine = new CollateXEngine();
   }
 
   @Test
   public void testFirstWitness() {
-    final IWitness w1 = factory.createWitness("A", "the black cat");
-    //final WitnessSet set = new WitnessSet(w1);
-    final List<IWitness> set = Lists.newArrayList(w1);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IAlignmentTable table = engine.createAligner().add(w1).getResult();
     final String expected = "A: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
 
   @Test
   public void testEverythingMatches() {
-    final IWitness w1 = factory.createWitness("A", "the black cat");
-    final IWitness w2 = factory.createWitness("B", "the black cat");
-    final IWitness w3 = factory.createWitness("C", "the black cat");
-    //final WitnessSet set = new WitnessSet(w1, w2, w3);
-    final List<IWitness> set = Lists.newArrayList(w1, w2, w3);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the black cat");
+    final IWitness w3 = engine.createWitness("C", "the black cat");
+    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3).getResult();
     String expected = "A: the|black|cat\n";
     expected += "B: the|black|cat\n";
     expected += "C: the|black|cat\n";
@@ -57,13 +49,12 @@ public class AlignmentTableTest {
 
   @Test
   public void testVariant() {
-    final IWitness w1 = factory.createWitness("A", "the black cat");
-    final IWitness w2 = factory.createWitness("B", "the white cat");
-    final IWitness w3 = factory.createWitness("C", "the green cat");
-    final IWitness w4 = factory.createWitness("D", "the red cat");
-    final IWitness w5 = factory.createWitness("E", "the yellow cat");
-    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4, w5);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the white cat");
+    final IWitness w3 = engine.createWitness("C", "the green cat");
+    final IWitness w4 = engine.createWitness("D", "the red cat");
+    final IWitness w5 = engine.createWitness("E", "the yellow cat");
+    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3, w4, w5).getResult();
     String expected = "A: the|black|cat\n";
     expected += "B: the|white|cat\n";
     expected += "C: the|green|cat\n";
@@ -74,11 +65,10 @@ public class AlignmentTableTest {
 
   @Test
   public void testOmission() {
-    final IWitness w1 = factory.createWitness("A", "the black cat");
-    final IWitness w2 = factory.createWitness("B", "the cat");
-    final IWitness w3 = factory.createWitness("C", "the black cat");
-    final List<IWitness> set = Lists.newArrayList(w1, w2, w3);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the cat");
+    final IWitness w3 = engine.createWitness("C", "the black cat");
+    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3).getResult();
     String expected = "A: the|black|cat\n";
     expected += "B: the| |cat\n";
     expected += "C: the|black|cat\n";
@@ -88,10 +78,9 @@ public class AlignmentTableTest {
   //TODO: rename test!
   @Test
   public void testTwoWitnesses() {
-    final IWitness w1 = factory.createWitness("A", "the black cat");
-    final IWitness w2 = factory.createWitness("B", "the white and black cat");
-    final List<IWitness> set = Lists.newArrayList(w1, w2);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the white and black cat");
+    final IAlignmentTable table = engine.align(w1, w2);
     String expected = "A: the| | |black|cat\n";
     expected += "B: the|white|and|black|cat\n";
     assertEquals(expected, table.toString());
@@ -99,12 +88,11 @@ public class AlignmentTableTest {
 
   @Test
   public void testAddition() {
-    final IWitness w1 = factory.createWitness("A", "the cat");
-    final IWitness w2 = factory.createWitness("B", "before the cat");
-    final IWitness w3 = factory.createWitness("C", "the black cat");
-    final IWitness w4 = factory.createWitness("D", "the cat walks");
-    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the cat");
+    final IWitness w2 = engine.createWitness("B", "before the cat");
+    final IWitness w3 = engine.createWitness("C", "the black cat");
+    final IWitness w4 = engine.createWitness("D", "the cat walks");
+    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3, w4).getResult();
     String expected = "A:  |the| |cat| \n";
     expected += "B: before|the| |cat| \n";
     expected += "C:  |the|black|cat| \n";
@@ -114,12 +102,11 @@ public class AlignmentTableTest {
 
   @Test
   public void testAddition2() {
-    final IWitness w1 = factory.createWitness("A", "the cat");
-    final IWitness w2 = factory.createWitness("B", "before the cat");
-    final IWitness w3 = factory.createWitness("C", "the black cat");
-    final IWitness w4 = factory.createWitness("D", "just before midnight the cat walks");
-    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the cat");
+    final IWitness w2 = engine.createWitness("B", "before the cat");
+    final IWitness w3 = engine.createWitness("C", "the black cat");
+    final IWitness w4 = engine.createWitness("D", "just before midnight the cat walks");
+    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3, w4).getResult();
     String expected = "A:  | | |the| |cat| \n";
     expected += "B:  |before| |the| |cat| \n";
     expected += "C:  | | |the|black|cat| \n";
@@ -131,14 +118,14 @@ public class AlignmentTableTest {
   //TODO: rewrite test to use addAddition
   @Test
   public void testAddVariantBeforeColumnAndPositions() {
-    final AlignmentTable4 table = new AlignmentTable4();
-    final IWitness witness = factory.createWitness("A", "two before two after");
-    final IWitness temp = factory.createWitness("B", "in between");
+    final IWitness witness = engine.createWitness("A", "two before two after");
+    IAlignmentTable table = engine.createAligner().add(witness).getResult();
+    
+    final IWitness temp = engine.createWitness("B", "in between");
     final IPhrase tobeadded = temp.createPhrase(1, 2);
-    final ICallback callback = CollateXEngine.NULLCALLBACK;
-    AlignmentTableCreator3.addWitness(table, witness, callback);
     final IColumn column = table.getColumns().get(2);
-    table.addVariantBefore(column, tobeadded);
+    ((AlignmentTable4)table).addVariantBefore(column, tobeadded);
+    
     final List<IColumn> columns = table.getColumns();
     Assert.assertEquals(1, columns.get(0).getPosition());
     Assert.assertEquals(2, columns.get(1).getPosition());
@@ -150,12 +137,11 @@ public class AlignmentTableTest {
 
   @Test
   public void testVariation() {
-    final IWitness w1 = factory.createWitness("A", "the black cat");
-    final IWitness w2 = factory.createWitness("B", "the black and white cat");
-    final IWitness w3 = factory.createWitness("C", "the black very special cat");
-    final IWitness w4 = factory.createWitness("D", "the black not very special cat");
-    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the black and white cat");
+    final IWitness w3 = engine.createWitness("C", "the black very special cat");
+    final IWitness w4 = engine.createWitness("D", "the black not very special cat");
+    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3, w4).getResult();
     String expected = "A: the|black| | | |cat\n";
     expected += "B: the|black| |and|white|cat\n";
     expected += "C: the|black| |very|special|cat\n";
@@ -165,12 +151,11 @@ public class AlignmentTableTest {
 
   @Test
   public void testWitnessReorder() {
-    final IWitness w1 = factory.createWitness("A", "the black cat");
-    final IWitness w2 = factory.createWitness("B", "the black and white cat");
-    final IWitness w3 = factory.createWitness("C", "the black not very special cat");
-    final IWitness w4 = factory.createWitness("D", "the black very special cat");
-    final List<IWitness> set = Lists.newArrayList(w1, w2, w3, w4);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the black and white cat");
+    final IWitness w3 = engine.createWitness("C", "the black not very special cat");
+    final IWitness w4 = engine.createWitness("D", "the black very special cat");
+    final IAlignmentTable table = engine.align(w1, w2, w3, w4);
     String expected = "A: the|black| | | |cat\n";
     expected += "B: the|black|and|white| |cat\n";
     expected += "C: the|black|not|very|special|cat\n";
@@ -181,9 +166,8 @@ public class AlignmentTableTest {
   //Note: tests toString method
   @Test
   public void testStringOutputOneWitness() {
-    final IWitness a = factory.createWitness("A", "the black cat");
-    final List<IWitness> set = Lists.newArrayList(a);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "the black cat");
+    final IAlignmentTable table = engine.align(a);
     final String expected = "A: the|black|cat\n";
     assertEquals(expected, table.toString());
   }
@@ -191,10 +175,9 @@ public class AlignmentTableTest {
   //Note: tests toString method
   @Test
   public void testStringOutputTwoWitnesses() {
-    final IWitness a = factory.createWitness("A", "the black cat");
-    final IWitness b = factory.createWitness("B", "the black cat");
-    final List<IWitness> set = Lists.newArrayList(a, b);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "the black cat");
+    final IWitness b = engine.createWitness("B", "the black cat");
+    final IAlignmentTable table = engine.align(a, b);
     String expected = "A: the|black|cat\n";
     expected += "B: the|black|cat\n";
     assertEquals(expected, table.toString());
@@ -203,10 +186,9 @@ public class AlignmentTableTest {
   //Note: tests toString method
   @Test
   public void testStringOutputEmptyCells() {
-    final IWitness a = factory.createWitness("A", "the black cat");
-    final IWitness b = factory.createWitness("B", "the");
-    final List<IWitness> set = Lists.newArrayList(a, b);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "the black cat");
+    final IWitness b = engine.createWitness("B", "the");
+    final IAlignmentTable table = engine.align(a, b);
     String expected = "A: the|black|cat\n";
     expected += "B: the| | \n";
     assertEquals(expected, table.toString());
@@ -214,8 +196,8 @@ public class AlignmentTableTest {
 
   @Test
   public void testRepeatingTokensWithOneWitness() {
-    final IWitness witness = factory.createWitness("a", "a c a t g c a");
-    final IAlignmentTable alignmentTable = factory.createAlignmentTable(Lists.newArrayList(witness));
+    final IWitness witness = engine.createWitness("a", "a c a t g c a");
+    final IAlignmentTable alignmentTable = engine.align(witness);
     final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
     assertEquals(2, repeatingTokens.size());
     assertTrue(repeatingTokens.contains("a"));
@@ -227,9 +209,9 @@ public class AlignmentTableTest {
   @Ignore
   @Test
   public void testRepeatingTokensWithMultipleWitnesses() {
-    final IWitness witnessA = factory.createWitness("a", "a c a t g c a");
-    final IWitness witnessB = factory.createWitness("b", "a c a t t c a");
-    final IAlignmentTable alignmentTable = factory.createAlignmentTable(Lists.newArrayList(witnessA, witnessB));
+    final IWitness witnessA = engine.createWitness("a", "a c a t g c a");
+    final IWitness witnessB = engine.createWitness("b", "a c a t t c a");
+    final IAlignmentTable alignmentTable = engine.align(witnessA, witnessB);
     final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
     assertEquals(2, repeatingTokens.size());
     assertTrue(repeatingTokens.contains("a"));
@@ -240,9 +222,9 @@ public class AlignmentTableTest {
 
   @Test
   public void testRepeatingTokensWithMultipleWitnesses2() {
-    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
-    final IWitness witnessB = factory.createWitness("B", "this one very different");
-    final IAlignmentTable alignmentTable = factory.createAlignmentTable(Lists.newArrayList(witnessA, witnessB));
+    final IWitness witnessA = engine.createWitness("A", "everything is unique should be no problem");
+    final IWitness witnessB = engine.createWitness("B", "this one very different");
+    final IAlignmentTable alignmentTable = engine.align(witnessA, witnessB);
     final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
     assertEquals(0, repeatingTokens.size());
   }

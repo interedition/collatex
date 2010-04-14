@@ -7,10 +7,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
@@ -18,12 +16,6 @@ import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableIndex0Test {
-  private static final ICallback CALLBACK = new ICallback() {
-    @Override
-    public void alignment(final IAlignment alignment) {
-      System.out.println(alignment.getMatches());
-    }
-  };
   private CollateXEngine factory;
 
   @Before
@@ -31,11 +23,22 @@ public class AlignmentTableIndex0Test {
     factory = new CollateXEngine();
   }
 
+  private IAligner createAligner() {
+    IAligner aligner = factory.createAligner();
+    aligner.setCallback(new ICallback() {
+      @Override
+      public void alignment(final IAlignment alignment) {
+        System.out.println(alignment.getMatches());
+      }
+    });
+    return aligner;
+  }
+
   @Ignore
   @Test
   public void test1() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
-    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CALLBACK);
+    final IAlignmentTable table = createAligner().add(witnessA).getResult();
     final IAlignmentTableIndex index = new AlignmentTableIndex0(table);
     assertTrue(index.containsNormalizedPhrase("cat"));
     assertTrue(index.containsNormalizedPhrase("and"));

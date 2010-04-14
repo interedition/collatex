@@ -1,54 +1,50 @@
 package eu.interedition.collatex2.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableTranspositionTest {
-  private static CollateXEngine factory;
+  private static CollateXEngine engine;
 
   @BeforeClass
   public static void setup() {
-    factory = new CollateXEngine();
+    engine = new CollateXEngine();
   }
 
   //Note: this is more of an alignment test.. no table is involved here! 
   @Test
   public void testNoTransposition() {
-    final IWitness a = factory.createWitness("A", "no transposition");
-    final IWitness b = factory.createWitness("B", "no transposition");
-    final IAlignment al = factory.createAlignment(a, b);
+    final IWitness a = engine.createWitness("A", "no transposition");
+    final IWitness b = engine.createWitness("B", "no transposition");
+    final IAlignment al = PairwiseAlignmentHelper.align(engine, a, b);
     Assert.assertTrue(al.getTranspositions().isEmpty());
   }
 
   //Note: this is more of an alignment test.. no table is involved here! 
   @Test
   public void testNoTransposition2() {
-    final IWitness a = factory.createWitness("A", "a b");
-    final IWitness b = factory.createWitness("B", "c a");
-    final IAlignment al = factory.createAlignment(a, b);
+    final IWitness a = engine.createWitness("A", "a b");
+    final IWitness b = engine.createWitness("B", "c a");
+    final IAlignment al = PairwiseAlignmentHelper.align(engine, a, b);
     Assert.assertTrue(al.getTranspositions().isEmpty());
   }
 
   //Note: this is more of an alignment test.. no table is involved here! 
   @Test
   public void testDoubleTransposition() {
-    final IWitness a = factory.createWitness("A", "a b");
-    final IWitness b = factory.createWitness("B", "b a");
-    final IAlignment al = factory.createAlignment(a, b);
+    final IWitness a = engine.createWitness("A", "a b");
+    final IWitness b = engine.createWitness("B", "b a");
+    final IAlignment al = PairwiseAlignmentHelper.align(engine, a, b);
     Assert.assertEquals(2, al.getTranspositions().size());
     // 1: a -> b
     // 2: b -> a
@@ -57,9 +53,9 @@ public class AlignmentTableTranspositionTest {
   //Note: this is more of an alignment test.. no table is involved here! 
   @Test
   public void testMultipleTransposition() {
-    final IWitness a = factory.createWitness("A", "a b c");
-    final IWitness b = factory.createWitness("B", "b c a");
-    final IAlignment al = factory.createAlignment(a, b);
+    final IWitness a = engine.createWitness("A", "a b c");
+    final IWitness b = engine.createWitness("B", "b c a");
+    final IAlignment al = PairwiseAlignmentHelper.align(engine, a, b);
     Assert.assertEquals(2, al.getTranspositions().size());
     // 1: a -> b c
     // 2: b c -> a
@@ -67,10 +63,9 @@ public class AlignmentTableTranspositionTest {
 
   @Test
   public void testDoubleTransposition2() {
-    final IWitness a = factory.createWitness("A", "a b");
-    final IWitness b = factory.createWitness("B", "b a");
-    final List<IWitness> set = Lists.newArrayList(a, b);
-    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "a b");
+    final IWitness b = engine.createWitness("B", "b a");
+    final IAlignmentTable alignmentTable = engine.align(a, b);
     final String expected = "A:  |a|b\n" + "B: b|a| \n";
     final String actual = alignmentTable.toString();
     Assert.assertEquals(expected, actual);
@@ -78,10 +73,9 @@ public class AlignmentTableTranspositionTest {
 
   @Test
   public void testDoubleTransposition3() {
-    final IWitness a = factory.createWitness("A", "a b c");
-    final IWitness b = factory.createWitness("B", "b a c");
-    final List<IWitness> set = Lists.newArrayList(a, b);
-    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "a b c");
+    final IWitness b = engine.createWitness("B", "b a c");
+    final IAlignmentTable alignmentTable = engine.align(a, b);
     final String expected = "A:  |a|b|c\n" + "B: b|a| |c\n";
     final String actual = alignmentTable.toString();
     Assert.assertEquals(expected, actual);
@@ -90,10 +84,9 @@ public class AlignmentTableTranspositionTest {
   // TODO: rename test: mirrored transpositions with match in between!
   @Test
   public void testTranspositionsAreStoredInAlignmentTable() {
-    final IWitness a = factory.createWitness("A", "the black and white cat");
-    final IWitness b = factory.createWitness("B", "the white and black cat");
-    final List<IWitness> set = Lists.newArrayList(a, b);
-    final IAlignmentTable alignmentTable = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "the black and white cat");
+    final IWitness b = engine.createWitness("B", "the white and black cat");
+    final IAlignmentTable alignmentTable = engine.align(a, b);
     String expected = "A: the|black|and|white|cat\n";
     expected += "B: the|white|and|black|cat\n";
     assertEquals(expected, alignmentTable.toString());
@@ -101,10 +94,9 @@ public class AlignmentTableTranspositionTest {
 
   @Test
   public void testTransposition() {
-    final IWitness a = factory.createWitness("A", "the cat is black");
-    final IWitness b = factory.createWitness("B", "black is the cat");
-    final List<IWitness> set = Lists.newArrayList(a, b);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "the cat is black");
+    final IWitness b = engine.createWitness("B", "black is the cat");
+    final IAlignmentTable table = engine.align(a, b);
     String expected;
     expected = "A: the|cat|is|black| \n";
     expected += "B: black| |is|the|cat\n";
@@ -116,11 +108,10 @@ public class AlignmentTableTranspositionTest {
   @Test
   @Ignore
   public void testAdditionInCombinationWithTransposition() {
-    final IWitness a = factory.createWitness("A", "the cat is very happy");
-    final IWitness b = factory.createWitness("B", "very happy is the cat");
-    final IWitness c = factory.createWitness("C", "very delitied and happy is the cat");
-    final List<IWitness> set = Lists.newArrayList(a, b, c);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "the cat is very happy");
+    final IWitness b = engine.createWitness("B", "very happy is the cat");
+    final IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
+    final IAlignmentTable table = engine.align(a, b, c);
     String expected;
     expected = "A: the| | |cat|is|very|happy\n";
     expected += "B: very| | |happy|is|the|cat\n";
@@ -133,11 +124,10 @@ public class AlignmentTableTranspositionTest {
   @Test
   @Ignore
   public void testAdditionInCombinationWithTransposition2() {
-    final IWitness a = factory.createWitness("A", "the cat is black");
-    final IWitness b = factory.createWitness("B", "black is the cat");
-    final IWitness c = factory.createWitness("C", "black and white is the cat");
-    final List<IWitness> set = Lists.newArrayList(a, b, c);
-    final IAlignmentTable table = factory.createAlignmentTable(set);
+    final IWitness a = engine.createWitness("A", "the cat is black");
+    final IWitness b = engine.createWitness("B", "black is the cat");
+    final IWitness c = engine.createWitness("C", "black and white is the cat");
+    final IAlignmentTable table = engine.align(a, b, c);
     String expected;
     expected = "A: the|cat| |is|black| |\n";
     expected += "B: black| | |is||the|cat\n";

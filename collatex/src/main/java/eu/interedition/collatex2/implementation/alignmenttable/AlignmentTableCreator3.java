@@ -8,6 +8,7 @@ import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.Gap;
 import eu.interedition.collatex2.interfaces.IAddition;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
@@ -21,39 +22,53 @@ import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class AlignmentTableCreator3 {
-  public static IAlignmentTable createAlignmentTable(final List<IWitness> witnessList, final ICallback callback) {
-    final IAlignmentTable table = new AlignmentTable4();
-    addWitnesses(witnessList, table, callback);
-    return table;
-  }
+public class AlignmentTableCreator3 implements IAligner {
 
-  public static void addWitnesses(final List<IWitness> witnessList, final IAlignmentTable table, final ICallback callback) {
-    for (final IWitness witness : witnessList) {
-      AlignmentTableCreator3.addWitness(table, witness, callback);
+  private final CollateXEngine engine;
+  private IAlignmentTable alignmentTable;
+  private ICallback callback = new ICallback() {
+    @Override
+    public void alignment(final IAlignment alignment) {
     }
+  };
+
+  public AlignmentTableCreator3(CollateXEngine engine) {
+    this.engine = engine;
+    alignmentTable = engine.createAlignmentTable();
   }
 
-  public static void addWitness(final IAlignmentTable table, final IWitness witness, final ICallback callback) {
-    final boolean tableIsEmpty = table.getSigli().isEmpty();
-    table.getSigli().add(witness.getSigil());
-    if (tableIsEmpty) {
-      for (final INormalizedToken token : witness.getTokens()) {
-        table.add(new Column3(token, table.size() + 1));
+  public void setCallback(ICallback callback) {
+    this.callback = callback;
+  }
+
+  @Override
+  public IAligner add(IWitness... witnesses) {
+    for (IWitness witness : witnesses) {
+      final boolean tableIsEmpty = alignmentTable.getSigli().isEmpty();
+      alignmentTable.getSigli().add(witness.getSigil());
+      if (tableIsEmpty) {
+        for (final INormalizedToken token : witness.getTokens()) {
+          alignmentTable.add(new Column3(token, alignmentTable.size() + 1));
+        }
+        continue;
       }
-      return;
-    }
 
-    final CollateXEngine factory = new CollateXEngine();
-    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witness);
-    callback.alignment(alignment);
-    final IAlignment alignment2 = makeAddDelFromTrans(alignment);
-    addMatchesToAlignmentTable(alignment2);
-    addReplacementsToAlignmentTable(table, alignment2);
-    addAdditionsToAlignmentTable(table, alignment2);
+      final IAlignment alignment = engine.createAlignmentUsingIndex(alignmentTable, witness);
+      callback.alignment(alignment);
+      final IAlignment alignment2 = makeAddDelFromTrans(alignment);
+      addMatchesToAlignmentTable(alignment2);
+      addReplacementsToAlignmentTable(alignmentTable, alignment2);
+      addAdditionsToAlignmentTable(alignmentTable, alignment2);      
+    }
+    return this;
   }
 
-  static void addMatchesToAlignmentTable(final IAlignment alignment) {
+  @Override
+  public IAlignmentTable getResult() {
+    return alignmentTable;
+  }
+
+  private static void addMatchesToAlignmentTable(final IAlignment alignment) {
     final List<IMatch> matches = alignment.getMatches();
     for (final IMatch match : matches) {
       addMatchToAlignmentTable(match);
@@ -72,7 +87,7 @@ public class AlignmentTableCreator3 {
     columns.addMatchPhrase(match.getPhrase());
   }
 
-  static void addAdditionsToAlignmentTable(final IAlignmentTable table, final IAlignment alignment) {
+  private static void addAdditionsToAlignmentTable(final IAlignmentTable table, final IAlignment alignment) {
     final List<IAddition> additions = alignment.getAdditions();
     for (final IAddition addition : additions) {
       table.addAddition(addition);
@@ -96,8 +111,8 @@ public class AlignmentTableCreator3 {
     while (!transToCheck.isEmpty()) {
       final ITransposition top = transToCheck.pop();
       final ITransposition mirrored = findMirroredTransposition(transToCheck, top);
-      //Note: this only calculates the distance between the columns.
-      //Note: it does not take into account a possible distance in the prases!
+      // Note: this only calculates the distance between the columns.
+      // Note: it does not take into account a possible distance in the prases!
       if (mirrored != null && distanceBetweenTranspositions(top, mirrored) == 0) {
         // System.out.println("Keeping: transposition " + top.toString());
         // System.out.println("Removing: transposition " + mirrored.toString());
@@ -127,7 +142,7 @@ public class AlignmentTableCreator3 {
   private static int distanceBetweenTranspositions(final ITransposition top, final ITransposition mirrored) {
     final int beginPosition = mirrored.getMatchA().getColumns().getBeginPosition();
     final int endPosition = top.getMatchA().getColumns().getEndPosition();
-    //System.out.println(beginPosition + ":" + endPosition);
+    // System.out.println(beginPosition + ":" + endPosition);
     final int distance = beginPosition - (endPosition + 1);
     // System.out.println(distance);
     return distance;
@@ -138,7 +153,7 @@ public class AlignmentTableCreator3 {
     final List<IMatch> matches = alignment.getMatches();
     for (final ITransposition t : ntranspositions) {
       final IMatch witness = t.getMatchB();
-      //Note: this is not nice; this removes from the original list!
+      // Note: this is not nice; this removes from the original list!
       matches.remove(witness);
     }
     return matches;
@@ -155,7 +170,7 @@ public class AlignmentTableCreator3 {
     // TODO and use that!
     final IColumn nextColumn = t.getMatchA().getColumns().getFirstColumn();
     final IGap addition = new Gap(columns, phrase, nextColumn);
-    //Note: this is not nice; this adds to the original list!
+    // Note: this is not nice; this adds to the original list!
     return addition;
   }
 
@@ -169,5 +184,4 @@ public class AlignmentTableCreator3 {
     }
     return null;
   }
-
 }
