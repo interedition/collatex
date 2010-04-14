@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.apparatus;
+package eu.interedition.collatex2.output;
 
 import java.util.List;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.input;
+package eu.interedition.collatex2.input;
 
 import java.util.ArrayList;
 import java.util.Collection;

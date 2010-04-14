@@ -7,8 +7,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.matching.Match;
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;

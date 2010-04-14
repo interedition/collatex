@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.apparatus;
+package eu.interedition.collatex2.output;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
-import eu.interedition.collatex2.implementation.input.Phrase;
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 

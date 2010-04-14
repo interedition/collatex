@@ -15,12 +15,11 @@ import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
-import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
-import eu.interedition.collatex2.implementation.input.NormalizedWitness;
 import eu.interedition.collatex2.implementation.matching.IndexMatcher;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
+import eu.interedition.collatex2.input.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -33,6 +32,7 @@ import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 
 public class CollateXEngine {
   private ITokenizer tokenizer = new WhitespaceTokenizer();
