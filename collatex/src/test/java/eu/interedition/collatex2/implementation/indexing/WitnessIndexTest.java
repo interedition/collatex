@@ -10,17 +10,17 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class WitnessIndexTest {
   private static final Logger LOG = LoggerFactory.getLogger(WitnessIndexTest.class);
-  private Factory factory;
+  private CollateXEngine factory;
 
   @Before
   public void setup() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   @Test
@@ -66,7 +66,7 @@ public class WitnessIndexTest {
   @Test
   public void test1() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final IWitnessIndex index = Factory.createWitnessIndex(a);
+    final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
     assertEquals(6, index.size());
     assertTrue(index.contains("# tobe"));
     assertTrue(index.contains("tobe or"));

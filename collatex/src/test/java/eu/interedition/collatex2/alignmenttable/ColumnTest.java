@@ -8,7 +8,7 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignmenttable.Column3;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -19,11 +19,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 //NOTE: constructors are called directly!
 //NOTE: Not only read only methods are called!
 public class ColumnTest {
-  private static Factory factory;
+  private static CollateXEngine factory;
 
   @BeforeClass
   public static void setup() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   @Test(expected = NoSuchElementException.class)

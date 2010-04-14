@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -29,11 +29,11 @@ public class AlignmentTableIndexTest {
       LOG.info(alignment.getMatches().toString());
     }
   };
-  private Factory factory;
+  private CollateXEngine factory;
 
   @Before
   public void setup() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   @Test

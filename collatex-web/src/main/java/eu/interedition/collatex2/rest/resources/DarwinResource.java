@@ -23,7 +23,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -66,7 +66,7 @@ public class DarwinResource extends AbstractHtmlTextResource {
       e.printStackTrace();
     }
 
-    final Factory factory = new Factory();
+    final CollateXEngine factory = new CollateXEngine();
     try {
       final List<String> sortedKeys = Lists.newArrayList();
       final JSONObject jsonObject = new JSONObject(readFileToString);

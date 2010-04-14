@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -24,11 +24,11 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableTest {
-  private static Factory factory;
+  private static CollateXEngine factory;
 
   @BeforeClass
   public static void setUp() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   @Test
@@ -135,7 +135,7 @@ public class AlignmentTableTest {
     final IWitness witness = factory.createWitness("A", "two before two after");
     final IWitness temp = factory.createWitness("B", "in between");
     final IPhrase tobeadded = temp.createPhrase(1, 2);
-    final ICallback callback = Factory.NULLCALLBACK;
+    final ICallback callback = CollateXEngine.NULLCALLBACK;
     AlignmentTableCreator3.addWitness(table, witness, callback);
     final IColumn column = table.getColumns().get(2);
     table.addVariantBefore(column, tobeadded);

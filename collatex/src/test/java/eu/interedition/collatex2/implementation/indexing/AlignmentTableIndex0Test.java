@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -24,11 +24,11 @@ public class AlignmentTableIndex0Test {
       System.out.println(alignment.getMatches());
     }
   };
-  private Factory factory;
+  private CollateXEngine factory;
 
   @Before
   public void setup() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   @Ignore

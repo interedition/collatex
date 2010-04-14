@@ -12,7 +12,7 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -40,7 +40,7 @@ public class ParserResource extends ServerResource {
       throw new RuntimeException(e);
     }
 
-    final Factory factory = new Factory();
+    final CollateXEngine factory = new CollateXEngine();
     final IAlignmentTable alignmentTable = factory.createAlignmentTable(list);
     Representation representation = null;
     if( format.equals( "json")) {

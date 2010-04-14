@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -28,7 +28,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class SpencerHoweTest {
   private static Logger logger = LoggerFactory.getLogger(SpencerHoweTest.class);
 
-  private Factory factory = new Factory();
+  private CollateXEngine factory = new CollateXEngine();
 
   @Test
   @Ignore

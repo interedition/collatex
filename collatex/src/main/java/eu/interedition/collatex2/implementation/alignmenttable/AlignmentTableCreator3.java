@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.Gap;
 import eu.interedition.collatex2.interfaces.IAddition;
@@ -44,7 +44,7 @@ public class AlignmentTableCreator3 {
       return;
     }
 
-    final Factory factory = new Factory();
+    final CollateXEngine factory = new CollateXEngine();
     final IAlignment alignment = factory.createAlignmentUsingIndex(table, witness);
     callback.alignment(alignment);
     final IAlignment alignment2 = makeAddDelFromTrans(alignment);

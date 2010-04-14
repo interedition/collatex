@@ -14,7 +14,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Join;
 import com.google.common.collect.Iterables;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
@@ -24,11 +24,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTest {
   private static final Logger LOG = LoggerFactory.getLogger(AlignmentTest.class);
-  private Factory factory;
+  private CollateXEngine factory;
 
   @Before
   public void setup() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   @Test

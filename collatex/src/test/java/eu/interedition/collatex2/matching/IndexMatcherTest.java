@@ -14,7 +14,7 @@ import com.google.common.base.Join;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.implementation.matching.IndexMatcher;
 import eu.interedition.collatex2.interfaces.IAlignment;
@@ -24,18 +24,18 @@ import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class IndexMatcherTest {
-  private static Factory factory;
+  private static CollateXEngine factory;
 
   @BeforeClass
   public static void setup() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   @Test
   public void testEverythingIsUnique() {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = factory.createWitness("B", "everything is unique");
-    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CollateXEngine.NULLCALLBACK);
     final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
     assertEquals(1, matches.size());
@@ -51,7 +51,7 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = factory.createWitness("B", "this one very different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
-    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA, witnessB), Factory.NULLCALLBACK);
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA, witnessB), CollateXEngine.NULLCALLBACK);
     final List<IMatch> matches = IndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
@@ -76,7 +76,7 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = factory.createWitness("B", "this one is different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
-    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA, witnessB), Factory.NULLCALLBACK);
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA, witnessB), CollateXEngine.NULLCALLBACK);
     final List<IMatch> matches = IndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
@@ -100,7 +100,7 @@ public class IndexMatcherTest {
   public void testGetMatchesUsingWitnessIndex() {
     final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "The big black");
-    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CollateXEngine.NULLCALLBACK);
     final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
     assertEquals(1, matches.size());
@@ -116,7 +116,7 @@ public class IndexMatcherTest {
   public void testGetMatchesUsingWitnessIndexWithOverlapping() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "the big black cat");
-    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CollateXEngine.NULLCALLBACK);
     final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
     //    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
@@ -134,7 +134,7 @@ public class IndexMatcherTest {
   public void testOverlappingMatches2() {
     final IWitness witnessA = factory.createWitness("A", "the black cat and the black mat");
     final IWitness witnessB = factory.createWitness("B", "the black dog and the black mat");
-    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), Factory.NULLCALLBACK);
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(witnessA), CollateXEngine.NULLCALLBACK);
     final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
     assertEquals(2, matches.size());
@@ -159,7 +159,7 @@ public class IndexMatcherTest {
   public void testMatchesWithIndex() {
     final IWitness a = factory.createWitness("A", "The black cat");
     final IWitness b = factory.createWitness("B", "The black and white cat");
-    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(a), Factory.NULLCALLBACK);
+    final IAlignmentTable table = AlignmentTableCreator3.createAlignmentTable(Lists.newArrayList(a), CollateXEngine.NULLCALLBACK);
     final IAlignment alignment = factory.createAlignmentUsingIndex(table, b);
     final List<IMatch> matches = alignment.getMatches();
     assertContains(matches, "the black");

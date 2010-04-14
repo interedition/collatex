@@ -11,7 +11,7 @@ import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -50,7 +50,7 @@ public class UseCaseResource extends AbstractHtmlTextResource {
   }
 
   private String displayAWitnessPair(final String html, final String plainWitnessA, final String plainWitnessB) {
-    final Factory factory = new Factory();
+    final CollateXEngine factory = new CollateXEngine();
     final IWitness a = factory.createWitness("A", plainWitnessA);
     final IWitness b = factory.createWitness("B", plainWitnessB);
     final IAlignment align = factory.createAlignment(a, b);

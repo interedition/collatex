@@ -8,13 +8,13 @@ import java.util.List;
 
 import org.junit.Test;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NormalizedWitnessTest {
   @Test
   public void test() {
-    final IWitness witness = new Factory().createWitness("a", "a b a d b f a");
+    final IWitness witness = new CollateXEngine().createWitness("a", "a b a d b f a");
     final List<String> repeatingTokens = witness.findRepeatingTokens();
     assertEquals(2, repeatingTokens.size());
     assertTrue(repeatingTokens.contains("a"));

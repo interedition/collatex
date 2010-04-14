@@ -34,7 +34,7 @@ import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class Factory {
+public class CollateXEngine {
   private ITokenizer tokenizer = new WhitespaceTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
   

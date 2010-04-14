@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.apparatus.ApparatusEntry;
 import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -34,7 +34,7 @@ public class ApiController {
   private static final String WITNESS_1 = "a b c d e f g h";
   private static final String WITNESS_2 = "d e f g x y z";
 
-  private Factory collateXEngine = new Factory();
+  private CollateXEngine collateXEngine = new CollateXEngine();
 
   @RequestMapping("collate")
   public ModelAndView collate() throws Exception {

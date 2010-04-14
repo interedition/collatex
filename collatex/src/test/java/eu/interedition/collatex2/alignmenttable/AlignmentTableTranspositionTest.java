@@ -12,17 +12,17 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableTranspositionTest {
-  private static Factory factory;
+  private static CollateXEngine factory;
 
   @BeforeClass
   public static void setup() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   //Note: this is more of an alignment test.. no table is involved here! 

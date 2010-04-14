@@ -11,7 +11,7 @@ import org.restlet.resource.ServerResource;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -19,7 +19,7 @@ public class AlignmentTableResource extends AbstractHtmlTextResource {
 
   @Override
   public Representation get(final Variant variant) throws ResourceException {
-    final Factory factory = new Factory();
+    final CollateXEngine factory = new CollateXEngine();
     final IWitness w1 = factory.createWitness("A", "the black cat");
     final IWitness w2 = factory.createWitness("B", "the white cat");
     final IWitness w3 = factory.createWitness("C", "the red cat");

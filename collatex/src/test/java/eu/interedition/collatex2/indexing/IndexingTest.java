@@ -12,17 +12,17 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Join;
 
-import eu.interedition.collatex2.implementation.Factory;
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class IndexingTest {
-  private Factory factory;
+  private CollateXEngine factory;
   private Logger log = LoggerFactory.getLogger(IndexingTest.class);
   
   @Before
   public void setup() {
-    factory = new Factory();
+    factory = new CollateXEngine();
   }
 
   @Ignore
@@ -30,7 +30,7 @@ public class IndexingTest {
   public void test2() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     log.info("witness = [the big black cat and the big black rat]");
-    final IWitnessIndex index = Factory.createWitnessIndex(a);
+    final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
     assertContains(index, "# the big black");
     assertContains(index, "the big black cat");
     assertContains(index, "cat");
@@ -44,7 +44,7 @@ public class IndexingTest {
   @Test
   public void test1a() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final IWitnessIndex index = Factory.createWitnessIndex(a);
+    final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
     assertEquals(6, index.size());
     assertContains(index, "# tobe");
     assertContains(index, "tobe or");
@@ -60,7 +60,7 @@ public class IndexingTest {
   @Test
   public void test2a() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
-    final IWitnessIndex index = Factory.createWitnessIndex(a);
+    final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
     assertContains(index, "# the big black");
     assertContains(index, "the big black cat");
     assertContains(index, "cat");
@@ -78,8 +78,8 @@ public class IndexingTest {
     final IWitness b = factory.createWitness("B", "and the big black cat ate the big rat");
     log.info("witness a = [the big black cat and the big black rat]");
     log.info("witness b = [and the big black cat ate the big rat]");
-    final IWitnessIndex indexA = Factory.createWitnessIndex(a);
-    final IWitnessIndex indexB = Factory.createWitnessIndex(b);
+    final IWitnessIndex indexA = CollateXEngine.createWitnessIndex(a);
+    final IWitnessIndex indexB = CollateXEngine.createWitnessIndex(b);
     assertContains(indexA, "# the big black");
     assertContains(indexB, "# the big black");
     assertContains(indexA, "the big black cat");
