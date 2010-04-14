@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.alignmenttable;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -16,6 +17,7 @@ public class TranspositionAlignmentTest {
     Assert.assertEquals("A:  | |y| \n" + "B: x| |y|z\n" + "C:  |z|y| \n", engine.align(a, b, c).toString());
   }
 
+  @Ignore
   @Test
   public void transposeInTwoPairs() {
     CollateXEngine engine = new CollateXEngine();
