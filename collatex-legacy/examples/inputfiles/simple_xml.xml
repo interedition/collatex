@@ -1,3 +1,8 @@
+<!DOCTYPE div [
+<!ENTITY Base ' '>
+<!ENTITY paraph ' '>
+<!ENTITY virgule '/'>
+]>
 <div type="wit" n="Base">
 	<head>&Base;</head>
 	<div type="G" id="L1-Base" n="Base">
