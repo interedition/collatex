@@ -102,7 +102,7 @@ public class Phrase implements IPhrase {
     if (isEmpty()) {
       return "<empty>";
     }
-    return getNormalized() + ":" + getBeginPosition() + ":" + getEndPosition();
+    return getContent(); /*getNormalized() + ":" + getBeginPosition() + ":" + getEndPosition();*/
   }
 
   @Override

@@ -85,11 +85,20 @@ public class Columns implements IColumns {
 
   @Override
   public String toString() {
-    if (isEmpty()) {
-      return "Columns: EMPTY";
+    StringBuffer buffer = new StringBuffer();
+    String splitter="";
+    for (IColumn column : columns) {
+      buffer.append(splitter);
+      buffer.append(column.toString());
+      splitter = " ";
     }
-    return "Columns: " + getBeginPosition() + "-" + getEndPosition();
+    return buffer.toString();
   }
+//    if (isEmpty()) {
+//      return "Columns: EMPTY";
+//    }
+//    return "Columns: " + getBeginPosition() + "-" + getEndPosition();
+//  }
 
   @Override
   public int size() {
