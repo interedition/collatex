@@ -4,8 +4,8 @@ import org.restlet.data.MediaType;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ServerResource;
 
-import eu.interedition.collatex2.implementation.apparatus.ApparatusEntry;
-import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
+import eu.interedition.collatex2.output.ApparatusEntry;
+import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 
 public abstract class AbstractHtmlTextResource extends ServerResource {
 

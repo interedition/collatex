@@ -8,9 +8,9 @@ import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.input.NormalizedWitness;
-import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
+import eu.interedition.collatex2.input.NormalizedWitness;
+import eu.interedition.collatex2.input.Token;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.IWitness;

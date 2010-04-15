@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -15,8 +16,10 @@ import org.junit.Test;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableTest {
@@ -75,7 +78,7 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //TODO: rename test!
+  // TODO: rename test!
   @Test
   public void testTwoWitnesses() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -115,17 +118,17 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //TODO: rewrite test to use addAddition
+  // TODO: rewrite test to use addAddition
   @Test
   public void testAddVariantBeforeColumnAndPositions() {
     final IWitness witness = engine.createWitness("A", "two before two after");
     IAlignmentTable table = engine.createAligner().add(witness).getResult();
-    
+
     final IWitness temp = engine.createWitness("B", "in between");
     final IPhrase tobeadded = temp.createPhrase(1, 2);
     final IColumn column = table.getColumns().get(2);
-    ((AlignmentTable4)table).addVariantBefore(column, tobeadded);
-    
+    ((AlignmentTable4) table).addVariantBefore(column, tobeadded);
+
     final List<IColumn> columns = table.getColumns();
     Assert.assertEquals(1, columns.get(0).getPosition());
     Assert.assertEquals(2, columns.get(1).getPosition());
@@ -163,7 +166,7 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //Note: tests toString method
+  // Note: tests toString method
   @Test
   public void testStringOutputOneWitness() {
     final IWitness a = engine.createWitness("A", "the black cat");
@@ -172,7 +175,7 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //Note: tests toString method
+  // Note: tests toString method
   @Test
   public void testStringOutputTwoWitnesses() {
     final IWitness a = engine.createWitness("A", "the black cat");
@@ -183,7 +186,7 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //Note: tests toString method
+  // Note: tests toString method
   @Test
   public void testStringOutputEmptyCells() {
     final IWitness a = engine.createWitness("A", "the black cat");
@@ -229,4 +232,23 @@ public class AlignmentTableTest {
     assertEquals(0, repeatingTokens.size());
   }
 
+  @Test
+  public void testGetRow() {
+    final IWitness w1 = engine.createWitness("A", "the black and white cat");
+    final IWitness w2 = engine.createWitness("B", "the red cat");
+    IAlignmentTable table = engine.align(w1, w2);
+    IRow rowA = table.getRow("A");
+    Iterator<ICell> iteratorA = rowA.iterator();
+    assertEquals("the", iteratorA.next().getToken().getNormalized());
+    assertEquals(2, iteratorA.next().getPosition());
+    assertTrue(!iteratorA.next().isEmpty());
+    IRow rowB = table.getRow("B");
+    Iterator<ICell> iteratorB = rowB.iterator();
+    assertEquals("the", iteratorB.next().getToken().getNormalized());
+    assertEquals("red", iteratorB.next().getToken().getNormalized());
+    assertTrue(iteratorB.next().isEmpty());
+    assertTrue(iteratorB.next().isEmpty());
+    assertEquals("cat", iteratorB.next().getToken().getNormalized());
+    assertTrue(!iteratorB.hasNext());
+  }
 }

@@ -20,9 +20,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.apparatus.ApparatusEntry;
-import eu.interedition.collatex2.implementation.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.output.ApparatusEntry;
+import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 
 @Controller
 @RequestMapping("/api/**")

@@ -18,7 +18,7 @@ import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.indexing.NullColumn;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
-import eu.interedition.collatex2.implementation.input.Phrase;
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;

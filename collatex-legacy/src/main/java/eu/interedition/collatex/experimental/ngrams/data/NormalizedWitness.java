@@ -3,7 +3,7 @@ package eu.interedition.collatex.experimental.ngrams.data;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.interedition.collatex2.implementation.input.Phrase;
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
