@@ -14,10 +14,6 @@ public interface IGap {
 
   IPhrase getPhrase();
 
-  //TODO remove this method!
-  //Modification should know about Gap, not the other way around!
-  IModification getModification();
-
   IColumn getNextColumn();
 
 }

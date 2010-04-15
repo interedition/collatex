@@ -1,12 +1,8 @@
 package eu.interedition.collatex2.implementation.alignment;
 
-import eu.interedition.collatex2.implementation.modifications.Addition;
-import eu.interedition.collatex2.implementation.modifications.Omission;
-import eu.interedition.collatex2.implementation.modifications.Replacement;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
-import eu.interedition.collatex2.interfaces.IModification;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Gap implements IGap {
@@ -14,8 +10,6 @@ public class Gap implements IGap {
   private final IPhrase phrase;
   private final IColumn nextColumn;
 
-  //TODO decouple gaps and modifications... 
-  //TODO Modifications should know about gaps not the other way around!
   public Gap(final IColumns columns, final IPhrase phrase, final IColumn nextColumn) {
     this.columns = columns;
     this.phrase = phrase;
@@ -60,19 +54,5 @@ public class Gap implements IGap {
   @Override
   public IColumn getNextColumn() {
     return nextColumn;
-  }
-
-  //TODO: remove method!
-  public IModification getModification() {
-    if (isAddition()) {
-      return Addition.create(this);
-    }
-    if (isOmission()) {
-      return Omission.create(this);
-    }
-    if (isReplacement()) {
-      return Replacement.create(this);
-    }
-    throw new RuntimeException("Not a modification!");
   }
 }
