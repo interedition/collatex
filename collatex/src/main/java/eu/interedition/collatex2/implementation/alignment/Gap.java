@@ -68,19 +68,11 @@ public class Gap implements IGap {
       return Addition.create(this);
     }
     if (isOmission()) {
-      return createOmission(this);
+      return Omission.create(this);
     }
     if (isReplacement()) {
-      return createReplacement(this);
+      return Replacement.create(this);
     }
     throw new RuntimeException("Not a modification!");
-  }
-  
-  private static IModification createOmission(IGap gap) {
-    return new Omission(gap.getColumns());
-  }
-
-  private static IModification createReplacement(IGap gap) {
-    return new Replacement(gap.getColumns(), gap.getPhrase(), gap.getNextColumn());
   }
 }

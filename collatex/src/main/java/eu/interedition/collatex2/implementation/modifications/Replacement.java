@@ -2,6 +2,7 @@ package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
+import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
 
@@ -10,7 +11,7 @@ public class Replacement implements IReplacement {
   private final IPhrase _replacement;
   private final IColumn _nextColumn;
 
-  public Replacement(final IColumns gapA, final IPhrase replacement, final IColumn nextColumn) {
+  private Replacement(final IColumns gapA, final IPhrase replacement, final IColumn nextColumn) {
     _original = gapA;
     _replacement = replacement;
     _nextColumn = nextColumn;
@@ -40,6 +41,10 @@ public class Replacement implements IReplacement {
   @Override
   public IColumn getNextColumn() {
     return _nextColumn;
+  }
+
+  public static IReplacement create(IGap gap) {
+    return new Replacement(gap.getColumns(), gap.getPhrase(), gap.getNextColumn());
   }
 
   //  @Override
