@@ -7,8 +7,16 @@
 	<context:component-scan base-package="eu.interedition.collatex2.spring" />
 	<mvc:annotation-driven />
 
-	<mvc:view-controller path="doc"/>
-	
+	<mvc:view-controller path="doc" />
+
+	<bean id="handlerAdapter" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<array>
+				<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+			</array>
+		</property>
+	</bean>
+
 	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver" />
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">

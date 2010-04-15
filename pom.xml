@@ -51,14 +51,14 @@
 	</build>
 	<repositories>
 		<repository>
-			<id>central</id>
-			<name>central repository</name>
-			<url>http://repo1.maven.org/maven2</url>
+			<id>maven.restlet.org</id>
+			<name>Public online Restlet repository</name>
+			<url>http://maven.restlet.org/</url>
 		</repository>
 		<repository>
-			<id>maven-restlet</id>
-			<name>Public online Restlet repository</name>
-			<url>http://maven.restlet.org</url>
+			<id>maven.collatex.sourceforge.net</id>
+			<name>CollateX Maven repository</name>
+			<url>http://collatex.sourceforge.net/maven-repository/</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -139,12 +139,6 @@
 				<artifactId>org.restlet.ext.json</artifactId>
 				<version>${restlet.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>net.sf.json-lib</groupId>
-				<artifactId>json-lib</artifactId>
-				<version>2.3</version>
-				<classifier>jdk15</classifier>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<reporting>
@@ -188,6 +182,18 @@
 			<name>Gregor Middell</name>
 		</developer>
 	</developers>
+	<distributionManagement>
+		<repository>
+			<id>maven.collatex.sourceforge.net</id>
+			<name>CollateX Maven Repository</name>
+			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/maven-repository</url>
+		</repository>
+		<site>
+			<id>site.collatex.sourceforge.net</id>
+			<name>CollateX Maven Site</name>
+			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/site</url>
+		</site>
+	</distributionManagement>
 	<scm>
 		<url>scm:bazaar:lp:collatex</url>
 	</scm>
