@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.spring;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 
+import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 
@@ -23,7 +25,8 @@ public class ApiController {
 
   @RequestMapping("collate")
   public ModelMap collate(@RequestBody final ApiInput input) throws Exception {
-    return new ModelMap("input", postProcess(input));
+    List<ApiWitness> witnesses = postProcess(input).getWitnesses();
+    return new ModelMap("alignment", new CollateXEngine().align(witnesses.toArray(new ApiWitness[witnesses.size()])));
   }
 
   private ApiInput postProcess(ApiInput input) throws ApiException {
