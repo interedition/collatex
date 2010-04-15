@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.restlet.data.CharacterSet;
 import org.restlet.data.Form;
+import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
@@ -28,6 +30,7 @@ public class ParserResource extends ServerResource {
     final Form form = new Form(entity);
     final String firstValue = form.getFirstValue("request");
     final String format = form.getFirstValue("format", "json");
+    final CharacterSet charset = entity.getCharacterSet();
 
     JsonRepresentation jsonRepresentation;
     jsonRepresentation = new JsonRepresentation(firstValue);
@@ -51,7 +54,7 @@ public class ParserResource extends ServerResource {
         final StringBuilder stringBuilder = new StringBuilder("<html><body> ").//
             append(AbstractHtmlTextResource.renderApparatusAsHtml(factory.createApparatus(alignmentTable))).//
             append("</body></html>");
-        representation = new StringRepresentation(stringBuilder.toString(), MediaType.TEXT_HTML);
+        representation = new StringRepresentation(stringBuilder.toString(), MediaType.TEXT_HTML, Language.ALL, charset);
     }
 
     return representation;
