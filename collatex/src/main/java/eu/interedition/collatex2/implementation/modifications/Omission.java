@@ -1,12 +1,13 @@
 package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IColumns;
+import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IOmission;
 
 public class Omission implements IOmission {
   private final IColumns columns;
 
-  public Omission(final IColumns gapA) {
+  private Omission(final IColumns gapA) {
     this.columns = gapA;
   }
 
@@ -22,6 +23,10 @@ public class Omission implements IOmission {
   @Override
   public String toString() {
     return "omission: " + columns.toString() + " position: " + getPosition();
+  }
+
+  public static IOmission create(IGap gap) {
+    return new Omission(gap.getColumns());
   }
 
   //  @Override

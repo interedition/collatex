@@ -11,6 +11,9 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.implementation.modifications.Addition;
+import eu.interedition.collatex2.implementation.modifications.Omission;
+import eu.interedition.collatex2.implementation.modifications.Replacement;
 import eu.interedition.collatex2.implementation.modifications.Transposition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
@@ -24,9 +27,8 @@ public class Alignment implements IAlignment {
   private final List<IMatch> matches;
   private final List<IGap> gaps;
 
+  // matches1 should be sorted on phraseA.getBeginPosition() 
   public Alignment(final List<IMatch> matches1, final List<IGap> gaps1) {
-    // matches1 should be sorted om phraseA.getBeginPosition() 
-
     this.matches = matches1;
     this.gaps = gaps1;
   }
@@ -87,30 +89,24 @@ public class Alignment implements IAlignment {
     }
   };
 
-  //TODO remove gap.getModification!
-  //Modification should know about Gap, not the other way around!
   private static final Function<IGap, IAddition> GAP_TO_ADDITION = new Function<IGap, IAddition>() {
     @Override
     public IAddition apply(final IGap gap) {
-      return (IAddition) gap.getModification();
+      return Addition.create(gap);
     }
   };
 
-  //TODO remove gap.getModification!
-  //Modification should know about Gap, not the other way around!
   private static final Function<IGap, IOmission> GAP_TO_OMISSION = new Function<IGap, IOmission>() {
     @Override
     public IOmission apply(final IGap gap) {
-      return (IOmission) gap.getModification();
+      return Omission.create(gap);
     }
   };
 
-  //TODO remove gap.getModification!
-  //Modification should know about Gap, not the other way around!
   private static final Function<IGap, IReplacement> GAP_TO_REPLACEMENT = new Function<IGap, IReplacement>() {
     @Override
     public IReplacement apply(final IGap gap) {
-      return (IReplacement) gap.getModification();
+      return Replacement.create(gap);
     }
   };
 

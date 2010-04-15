@@ -1,85 +1,58 @@
 package eu.interedition.collatex2.implementation.alignment;
 
-import eu.interedition.collatex2.implementation.modifications.Addition;
-import eu.interedition.collatex2.implementation.modifications.Omission;
-import eu.interedition.collatex2.implementation.modifications.Replacement;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
-import eu.interedition.collatex2.interfaces.IModification;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Gap implements IGap {
-  private final IColumns gapA;
-  private final IPhrase gapB;
+  private final IColumns columns;
+  private final IPhrase phrase;
   private final IColumn nextColumn;
 
-  //TODO decouple gaps and modifications... 
-  //TODO Modifications should know about gaps not the other way around!
-  public Gap(final IColumns gapA, final IPhrase gapB, final IColumn nextColumn) {
-    this.gapA = gapA;
-    this.gapB = gapB;
+  public Gap(final IColumns columns, final IPhrase phrase, final IColumn nextColumn) {
+    this.columns = columns;
+    this.phrase = phrase;
     this.nextColumn = nextColumn;
   }
 
   @Override
   public String toString() {
     if (isAddition()) {
-      return "\"" + gapB.getNormalized() + "\" added";
+      return "\"" + phrase.getNormalized() + "\" added";
     }
     if (isOmission()) {
-      return gapA.toString() + " omitted";
+      return columns.toString() + " omitted";
     }
-    return gapA.toString() + " -> " + gapB.getSigil() + ": " + gapB.getNormalized();
+    return columns.toString() + " -> " + phrase.getSigil() + ": " + phrase.getNormalized();
   }
 
   public IColumns getColumns() {
-    return gapA;
+    return columns;
   }
 
   public IPhrase getPhrase() {
-    return gapB;
+    return phrase;
   }
 
   public boolean isEmpty() {
-    return gapA.isEmpty() && gapB.isEmpty();
+    return columns.isEmpty() && phrase.isEmpty();
   }
 
   public boolean isReplacement() {
-    return !gapA.isEmpty() && !gapB.isEmpty();
+    return !columns.isEmpty() && !phrase.isEmpty();
   }
 
   public boolean isAddition() {
-    return gapA.isEmpty() && !gapB.isEmpty();
+    return columns.isEmpty() && !phrase.isEmpty();
   }
 
   public boolean isOmission() {
-    return !gapA.isEmpty() && gapB.isEmpty();
+    return !columns.isEmpty() && phrase.isEmpty();
   }
 
-  public IModification getModification() {
-    if (isAddition()) {
-      return createAddition();
-    }
-    if (isOmission()) {
-      return createOmission();
-    }
-    if (isReplacement()) {
-      return createReplacement();
-    }
-    throw new RuntimeException("Not a modification!");
+  @Override
+  public IColumn getNextColumn() {
+    return nextColumn;
   }
-
-  private IModification createReplacement() {
-    return new Replacement(gapA, gapB, nextColumn);
-  }
-
-  private IModification createOmission() {
-    return new Omission(gapA);
-  }
-
-  private IModification createAddition() {
-    return new Addition(nextColumn, gapB);
-  }
-
 }

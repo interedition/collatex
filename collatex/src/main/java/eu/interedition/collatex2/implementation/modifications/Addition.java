@@ -2,13 +2,14 @@ package eu.interedition.collatex2.implementation.modifications;
 
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Addition implements IAddition {
   private final IPhrase addition;
   private final IColumn nextColumn;
 
-  public Addition(final IColumn nextColumn, final IPhrase addition) {
+  private Addition(final IColumn nextColumn, final IPhrase addition) {
     this.nextColumn = nextColumn;
     this.addition = addition;
   }
@@ -50,6 +51,10 @@ public class Addition implements IAddition {
       throw new RuntimeException("There is no next match!");
     }
     return nextColumn;
+  }
+
+  public static IAddition create(IGap gap) {
+    return new Addition(gap.getNextColumn(), gap.getPhrase());
   }
 
 

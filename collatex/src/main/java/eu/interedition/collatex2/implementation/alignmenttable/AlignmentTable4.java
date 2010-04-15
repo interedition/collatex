@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
+import eu.interedition.collatex2.implementation.alignment.Gap;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -93,7 +94,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     }
   }
 
-  // Note: this is a visitor who walks over the columns!
+  // Note: this is a visitor that walks over the columns!
   public void accept(final IAlignmentTableVisitor visitor) {
     visitor.visitTable(this);
     for (final IColumn column : columns) {
@@ -132,12 +133,12 @@ public class AlignmentTable4 implements IAlignmentTable {
     final IColumns originalColumns = replacement.getOriginalColumns();
     final IPhrase replacementPhrase = replacement.getReplacementPhrase();
     if (replacementPhrase.size() > originalColumns.size()) {
+      Columns columns = new Columns();
       final IColumn nextColumn = replacement.getNextColumn();
       final IPhrase additionalPhrase = replacementPhrase.createSubPhrase(originalColumns.size() + 1, replacementPhrase.size());
-      //System.out.println("this should be additional: " + additionalPhrase);
+      Gap gap = new Gap(columns, additionalPhrase, nextColumn);
+      final IAddition addition = Addition.create(gap);
       final IPhrase smallerPhrase = replacementPhrase.createSubPhrase(1, originalColumns.size());
-      //System.out.println("this should be the replacement: " + smallerPhrase);
-      final IAddition addition = new Addition(nextColumn, additionalPhrase);
       originalColumns.addVariantPhrase(smallerPhrase);
       addAddition(addition);
     } else {
@@ -177,7 +178,6 @@ public class AlignmentTable4 implements IAlignmentTable {
     return repeatingNormalizedTokens;
   }
 
-  //TODO: what about empty cells?
   @Override
   public IRow getRow(String sigil) {
     List<ICell> cells = Lists.newArrayList();
@@ -185,7 +185,15 @@ public class AlignmentTable4 implements IAlignmentTable {
       ICell cell = new Cell(column, sigil);
       cells.add(cell);
     }
-    return new Row(cells);
+    return new Row(sigil, cells);
   }
 
+  @Override
+  public List<IRow> getRows() {
+    List<IRow> rows = Lists.newArrayList();
+    for (String sigil: sigli) {
+      rows.add(getRow(sigil));
+    }
+    return rows;
+  }
 }
