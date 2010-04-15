@@ -94,7 +94,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     }
   }
 
-  // Note: this is a visitor who walks over the columns!
+  // Note: this is a visitor that walks over the columns!
   public void accept(final IAlignmentTableVisitor visitor) {
     visitor.visitTable(this);
     for (final IColumn column : columns) {
@@ -178,7 +178,6 @@ public class AlignmentTable4 implements IAlignmentTable {
     return repeatingNormalizedTokens;
   }
 
-  //TODO: what about empty cells?
   @Override
   public IRow getRow(String sigil) {
     List<ICell> cells = Lists.newArrayList();
@@ -186,7 +185,15 @@ public class AlignmentTable4 implements IAlignmentTable {
       ICell cell = new Cell(column, sigil);
       cells.add(cell);
     }
-    return new Row(cells);
+    return new Row(sigil, cells);
   }
 
+  @Override
+  public List<IRow> getRows() {
+    List<IRow> rows = Lists.newArrayList();
+    for (String sigil: sigli) {
+      rows.add(getRow(sigil));
+    }
+    return rows;
+  }
 }

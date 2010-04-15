@@ -251,4 +251,19 @@ public class AlignmentTableTest {
     assertEquals("cat", iteratorB.next().getToken().getNormalized());
     assertTrue(!iteratorB.hasNext());
   }
+  
+  @Test
+  public void testGetRows() {
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "and white cat");
+    final IWitness w3 = engine.createWitness("C", "the red cat");
+    IAlignmentTable table = engine.align(w1, w2, w3);
+    List<IRow> rows = table.getRows();
+    assertEquals(3, rows.size());
+    Iterator<IRow> iterator = rows.iterator();
+    assertEquals("A", iterator.next().getSigil());
+    assertEquals("B", iterator.next().getSigil());
+    assertEquals("C", iterator.next().getSigil());
+  }
+
 }

@@ -23,5 +23,7 @@ public interface IAlignmentTable {
   void accept(IAlignmentTableVisitor visitor);
 
   IRow getRow(String sigil);
+  
+  List<IRow> getRows();
 
 }
