@@ -18,4 +18,6 @@ public interface IGap {
   //Modification should know about Gap, not the other way around!
   IModification getModification();
 
+  IColumn getNextColumn();
+
 }

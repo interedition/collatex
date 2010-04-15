@@ -57,6 +57,12 @@ public class Gap implements IGap {
     return !gapA.isEmpty() && gapB.isEmpty();
   }
 
+  @Override
+  public IColumn getNextColumn() {
+    return nextColumn;
+  }
+
+  //TODO: remove method!
   public IModification getModification() {
     if (isAddition()) {
       return createAddition();
@@ -65,13 +71,13 @@ public class Gap implements IGap {
       return createOmission();
     }
     if (isReplacement()) {
-      return createReplacement();
+      return createReplacement(this);
     }
     throw new RuntimeException("Not a modification!");
   }
 
-  private IModification createReplacement() {
-    return new Replacement(gapA, gapB, nextColumn);
+  private IModification createReplacement(IGap gap) {
+    return new Replacement(gap.getColumns(), gap.getPhrase(), gap.getNextColumn());
   }
 
   private IModification createOmission() {
@@ -81,5 +87,6 @@ public class Gap implements IGap {
   private IModification createAddition() {
     return new Addition(nextColumn, gapB);
   }
+
 
 }
