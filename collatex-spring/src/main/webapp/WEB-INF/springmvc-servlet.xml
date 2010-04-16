@@ -7,8 +7,6 @@
 	<context:component-scan base-package="eu.interedition.collatex2.spring" />
 	<mvc:annotation-driven />
 
-	<mvc:view-controller path="doc" />
-
 	<bean id="handlerAdapter" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="messageConverters">
 			<array>
@@ -36,13 +34,6 @@
 					<property name="prefix" value="" />
 					<property name="suffix" value=".ftl" />
 
-				</bean>
-			</list>
-		</property>
-		<property name="defaultViews">
-			<list>
-				<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
-					<property name="objectMapper" ref="apiObjectMapper" />
 				</bean>
 			</list>
 		</property>
