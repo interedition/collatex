@@ -69,7 +69,9 @@ public class ExamplesController implements InitializingBean {
         NodeList witnessNodes = ((Element) exampleNode).getElementsByTagName("witness");
         IWitness[] witnesses = new IWitness[witnessNodes.getLength()];
         for (int wc = 0; wc < witnessNodes.getLength(); wc++) {
-          witnesses[wc] = engine.createWitness(String.valueOf(wc), witnessNodes.item(wc).getTextContent());
+          Element witnessElement = (Element) witnessNodes.item(wc);
+          String id = witnessElement.hasAttribute("id") ? witnessElement.getAttribute("id") : String.valueOf(wc);
+          witnesses[wc] = engine.createWitness(id, witnessElement.getTextContent());
         }
         examples.add(witnesses);
       }
