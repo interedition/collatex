@@ -67,4 +67,12 @@
 	<properties>
 		<spring.version>3.0.2.RELEASE</spring.version>
 	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
