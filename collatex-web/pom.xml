@@ -6,9 +6,9 @@
 		<artifactId>project</artifactId>
 		<version>1.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>collatex-spring</artifactId>
+	<artifactId>collatex-web</artifactId>
 	<packaging>war</packaging>
-	<name>CollateX :: Spring-based web components</name>
+	<name>CollateX :: Web application</name>
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -42,11 +42,6 @@
 					<artifactId>commons-logging</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-oxm</artifactId>
-			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
