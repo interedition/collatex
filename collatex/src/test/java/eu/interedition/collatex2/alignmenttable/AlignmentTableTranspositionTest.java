@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -103,10 +102,7 @@ public class AlignmentTableTranspositionTest {
     assertEquals(expected, table.toString());
   }
 
-  //TODO: because of the repetition this test can not yet work!
-  //TODO: first the witness indexing has to work!
   @Test
-  @Ignore
   public void testAdditionInCombinationWithTransposition() {
     final IWitness a = engine.createWitness("A", "the cat is very happy");
     final IWitness b = engine.createWitness("B", "very happy is the cat");
@@ -119,18 +115,15 @@ public class AlignmentTableTranspositionTest {
     assertEquals(expected, table.toString());
   }
 
-  //TODO: because of the repetition this test can not yet work!
-  //TODO: first the witness indexing has to work!
   @Test
-  @Ignore
   public void testAdditionInCombinationWithTransposition2() {
     final IWitness a = engine.createWitness("A", "the cat is black");
     final IWitness b = engine.createWitness("B", "black is the cat");
     final IWitness c = engine.createWitness("C", "black and white is the cat");
     final IAlignmentTable table = engine.align(a, b, c);
     String expected;
-    expected = "A: the|cat| |is|black| |\n";
-    expected += "B: black| | |is||the|cat\n";
+    expected = "A: the|cat| |is|black| \n";
+    expected += "B: black| | |is|the|cat\n";
     expected += "C: black|and|white|is|the|cat\n";
     assertEquals(expected, table.toString());
   }

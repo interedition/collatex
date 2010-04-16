@@ -1,10 +1,12 @@
 package eu.interedition.collatex2.output;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -34,5 +36,15 @@ public class ApparatusEntry {
 
   public List<String> getSigli() {
     return sigli;
+  }
+
+  public Set<String> getEmptyCells() {
+    final Set<String> emptySigli = Sets.newLinkedHashSet(sigli);
+    emptySigli.removeAll(sigilToTokens.keySet());
+    return emptySigli;
+  }
+
+  public boolean hasEmptyCells() {
+    return sigli.size() != sigilToTokens.keySet().size();
   }
 }

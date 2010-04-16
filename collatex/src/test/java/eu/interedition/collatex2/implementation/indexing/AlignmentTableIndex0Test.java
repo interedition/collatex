@@ -18,7 +18,7 @@ import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableIndex0Test {
-  private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex0Test.class);
+  static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex0Test.class);
   private CollateXEngine factory;
 
   @Before

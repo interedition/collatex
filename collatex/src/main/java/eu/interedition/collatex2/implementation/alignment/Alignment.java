@@ -27,10 +27,10 @@ public class Alignment implements IAlignment {
   private final List<IMatch> matches;
   private final List<IGap> gaps;
 
-  // matches1 should be sorted on phraseA.getBeginPosition() 
-  public Alignment(final List<IMatch> matches1, final List<IGap> gaps1) {
-    this.matches = matches1;
-    this.gaps = gaps1;
+  // Warning: matches should be sorted on Columns.getBeginPosition()! 
+  public Alignment(final List<IMatch> matches, final List<IGap> gaps) {
+    this.matches = matches;
+    this.gaps = gaps;
   }
 
   public List<IMatch> getMatches() {
@@ -41,16 +41,16 @@ public class Alignment implements IAlignment {
     return gaps;
   }
 
-  final Comparator<IMatch> SORT_MATCHES_ON_POSITION_B = new Comparator<IMatch>() {
+  final Comparator<IMatch> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<IMatch>() {
     public int compare(final IMatch o1, final IMatch o2) {
       return o1.getPhrase().getBeginPosition() - o2.getPhrase().getBeginPosition();
     }
   };
 
   public List<IMatch> getMatchesSortedForWitness() {
-    final List<IMatch> matchesForB = Lists.newArrayList(matches);
-    Collections.sort(matchesForB, SORT_MATCHES_ON_POSITION_B);
-    return matchesForB;
+    final List<IMatch> matchesForWitness = Lists.newArrayList(matches);
+    Collections.sort(matchesForWitness, SORT_MATCHES_ON_POSITION_WITNESS);
+    return matchesForWitness;
   }
 
   @Override
