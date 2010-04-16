@@ -17,9 +17,8 @@ import eu.interedition.collatex.alignment.multiple_witness.NewAlignmentTableCrea
 import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.WitnessSegmentPhrases;
 import eu.interedition.collatex.input.builders.WitnessBuilder;
-import eu.interedition.collatex.parallel_segmentation.NewTeiCreator;
-import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTable;
 
+//TODO: Port over to the new API!!
 public class BeckettResource extends ServerResource {
   public BeckettResource() {
     getVariants().add(new Variant(MediaType.TEXT_HTML));
@@ -48,14 +47,14 @@ public class BeckettResource extends ServerResource {
 
       final AlignmentTable2 alignmentTable = NewAlignmentTableCreator.createNewAlignmentTable(set);
       final String[] output = getQuery().getValuesArray("output");
-      if (output.length > 0 && output[0].equals("xml")) {
-        final TeiParallelSegmentationTable createTEI = NewTeiCreator.createTEI(alignmentTable);
-        final String xml = createTEI.toXML();
-        representation = new StringRepresentation(xml, MediaType.APPLICATION_XML);
-      } else {
+//      if (output.length > 0 && output[0].equals("xml")) {
+//        final TeiParallelSegmentationTable createTEI = NewTeiCreator.createTEI(alignmentTable);
+//        final String xml = createTEI.toXML();
+//        representation = new StringRepresentation(xml, MediaType.APPLICATION_XML);
+//      } else {
         final String html = "<html><body> " + AlignmentTable2.alignmentTableToHTML(alignmentTable) + "</body></html>";
         representation = new StringRepresentation(html, MediaType.TEXT_HTML);
-      }
+//      }
     } catch (final Exception e) {
       System.out.println(e);
       throw new RuntimeException(e);

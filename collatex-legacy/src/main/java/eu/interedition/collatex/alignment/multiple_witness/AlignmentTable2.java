@@ -6,8 +6,6 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.input.BaseElement;
 import eu.interedition.collatex.input.Segment;
-import eu.interedition.collatex.parallel_segmentation.AlignmentTableSegmentator;
-import eu.interedition.collatex.parallel_segmentation.TeiParallelSegmentationTable;
 
 // Note: for the TEI XML output it is easier to
 // have a Column be a list<phrase>
@@ -75,14 +73,6 @@ public class AlignmentTable2<T extends BaseElement> {
     return witnesses;
   }
 
-  // TODO move this to a visitor!
-  // TODO separate in two steps: segmentation and xml rendering
-  // TODO this uses the OLD CODE!
-  public String toXML() {
-    final TeiParallelSegmentationTable app = AlignmentTableSegmentator.createTeiParallelSegmentationTable(this);
-    return app.toXML();
-  }
-
   @Override
   public String toString() {
     String collectedStrings = "";
@@ -141,5 +131,9 @@ public class AlignmentTable2<T extends BaseElement> {
 
   public List<String> getSigli() {
     return _sigli;
+  }
+
+  public String toXML() {
+    throw new RuntimeException("PORT OVER TO THE NEW API!");
   }
 }
