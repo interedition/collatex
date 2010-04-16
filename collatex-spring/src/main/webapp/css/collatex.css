@@ -1,0 +1,28 @@
+@CHARSET "UTF-8";
+html {
+	font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: grey;
+	font-size: 1.5em;
+}
+
+table {
+	margin: 1em;
+}
+
+tr {
+	border: 0;
+}
+
+th, td {
+	border: 1px solid grey;
+	padding: 0.5em;
+}
+
+#mainmenu {
+	color: grey;
+	text-align: right;
+	font-size: smaller;
+}

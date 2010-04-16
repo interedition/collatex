@@ -10,8 +10,8 @@
 	<modules>
 		<module>collatex</module>
 		<module>collatex-legacy</module>
-		<module>collatex-web</module>
 		<module>collatex-spring</module>
+		<module>collatex-nodeps</module>
 	</modules>
 	<build>
 		<plugins>

@@ -12,6 +12,12 @@
 	<link rel="stylesheet" type="text/css" href="${ctx}/css/collatex.css" />
 </head>
 <body>
+	<div id="mainmenu">
+		<a href="${ctx}/examples/usecases" title="Use Cases">Use cases</a> |
+		<a href="${ctx}/examples/darwin" title="Darwin">Darwin</a> |
+		<a href="${ctx}/api/collate" title="REST service">REST service</a>
+	</div>
+	
 	[#nested]
 </body>
 </html>

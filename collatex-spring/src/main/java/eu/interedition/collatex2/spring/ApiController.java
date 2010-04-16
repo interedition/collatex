@@ -26,7 +26,7 @@ import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 @RequestMapping("/api/**")
 public class ApiController implements InitializingBean {
   private ITokenNormalizer defaultNormalizer = new DefaultTokenNormalizer();
-  
+
   @Autowired
   private ApiObjectMapper objectMapper;
 
@@ -37,10 +37,15 @@ public class ApiController implements InitializingBean {
     jsonView = new MappingJacksonJsonView();
     jsonView.setObjectMapper(objectMapper);
   }
-  
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept-Header=application/json" }, method = RequestMethod.POST)
   public ModelAndView collateToJson(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(jsonView, "alignment", collate(input));
+  }
+
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
+    return new ModelAndView("api/alignment", "alignment", collate(input));
   }
 
   @RequestMapping(value = "collate")
