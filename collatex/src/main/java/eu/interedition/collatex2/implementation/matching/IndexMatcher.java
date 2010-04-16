@@ -53,13 +53,13 @@ public class IndexMatcher {
         matches.add(new Match(matchingColumns, phrase));
       }
     }
-    IndexMatcher.LOG.info("unfiltered matches: " + matches);
+    IndexMatcher.LOG.debug("unfiltered matches: " + matches);
     return IndexMatcher.joinOverlappingMatches(matches);
   }
 
   public static List<IMatch> joinOverlappingMatches(final List<IMatch> matches) {
     final List<IMatch> newMatches = IndexMatcher.filterMatchesBasedOnPositionMatches(matches);
-    IndexMatcher.LOG.info("filtered matches: " + newMatches);
+    IndexMatcher.LOG.debug("filtered matches: " + newMatches);
     return newMatches;
   }
 

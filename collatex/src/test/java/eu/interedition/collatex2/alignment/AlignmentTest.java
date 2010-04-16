@@ -222,7 +222,7 @@ public class AlignmentTest {
     final IWitness b = factory.createWitness("2", "c e y a d b");
     final IAlignment align = PairwiseAlignmentHelper.align(factory, a, b);
     final List<ITransposition> transpositions = align.getTranspositions();
-    LOG.info("transpositions=[" + Join.join(", ", Iterables.transform(transpositions, new Function<ITransposition, String>() {
+    LOG.debug("transpositions=[" + Join.join(", ", Iterables.transform(transpositions, new Function<ITransposition, String>() {
       @Override
       public String apply(final ITransposition from) {
         return from.getMatchA().getNormalized() + "=>" + from.getMatchB().getNormalized();

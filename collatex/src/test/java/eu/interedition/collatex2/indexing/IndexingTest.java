@@ -29,7 +29,7 @@ public class IndexingTest {
   @Test
   public void test2() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
-    log.info("witness = [the big black cat and the big black rat]");
+    log.debug("witness = [the big black cat and the big black rat]");
     final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
     assertContains(index, "# the big black");
     assertContains(index, "the big black cat");
@@ -76,8 +76,8 @@ public class IndexingTest {
   public void testTwoWitnesses() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness b = factory.createWitness("B", "and the big black cat ate the big rat");
-    log.info("witness a = [the big black cat and the big black rat]");
-    log.info("witness b = [and the big black cat ate the big rat]");
+    log.debug("witness a = [the big black cat and the big black rat]");
+    log.debug("witness b = [and the big black cat ate the big rat]");
     final IWitnessIndex indexA = CollateXEngine.createWitnessIndex(a);
     final IWitnessIndex indexB = CollateXEngine.createWitnessIndex(b);
     assertContains(indexA, "# the big black");

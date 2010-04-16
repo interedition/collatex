@@ -47,7 +47,7 @@ public class WitnessIndex implements IWitnessIndex {
     final Set<Integer> positionsInPhrases = Sets.newHashSet();
 
     for (final INormalizedToken token : tokens) {
-      LOG.info(token.getContent());
+      LOG.debug(token.getContent());
       if (!positionsInPhrases.contains(token.getPosition()) && repeatingTokens.contains(token.getNormalized())) {
         phraseCollection.add(findUniquePhraseToTheLeft(token, repeatingTokens, tokens));
         phraseCollection.add(findUniquePhraseToTheRight(token, repeatingTokens, tokens));
@@ -57,7 +57,7 @@ public class WitnessIndex implements IWitnessIndex {
         positionsInPhrases.add(token.getPosition());
       }
     }
-    LOG.info(phraseCollection.toString());
+    LOG.debug(phraseCollection.toString());
     return phraseCollection;
   }
 
@@ -100,7 +100,7 @@ public class WitnessIndex implements IWitnessIndex {
     INormalizedToken leftMostToken = token;
     do {
       final int leftPosition = leftMostToken.getPosition() - 1;
-      LOG.info(Integer.toString(leftPosition));
+      LOG.debug(Integer.toString(leftPosition));
       final INormalizedToken leftToken;
       if (leftPosition > 0) {
         leftToken = tokens.get(leftPosition - 1);
@@ -110,7 +110,7 @@ public class WitnessIndex implements IWitnessIndex {
       }
       tokenlist.add(0, leftToken);
       leftMostToken = leftToken;
-      LOG.info(leftMostToken.getNormalized());
+      LOG.debug(leftMostToken.getNormalized());
     } while (repeatingTokens.contains(leftMostToken.getNormalized()));
 
     return new Phrase(tokenlist);
@@ -123,7 +123,7 @@ public class WitnessIndex implements IWitnessIndex {
     INormalizedToken rightMostToken = token;
     do {
       final int rightPosition = rightMostToken.getPosition() + 1;
-      LOG.info(Integer.toString(rightPosition));
+      LOG.debug(Integer.toString(rightPosition));
       final INormalizedToken rightToken = (rightPosition < tokens.size()) ? tokens.get(rightPosition) : new NullToken(rightMostToken.getPosition(), token.getSigil());
       tokenlist.add(rightToken);
       //      tokenPositionsInPhrase.add(rightPosition - 1);
@@ -154,7 +154,7 @@ public class WitnessIndex implements IWitnessIndex {
   @Override
   public boolean contains(final String normalizedPhrase) {
     final List<String> phrasesInIndex = Lists.newArrayList(transform(phraseCollection, PHRASE_TO_NORMALIZED));
-    LOG.info(phrasesInIndex.toString());
+    LOG.debug(phrasesInIndex.toString());
     return phrasesInIndex.contains(normalizedPhrase);
   }
 
