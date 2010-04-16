@@ -14,9 +14,12 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
-  private final String sigil;
-  private final List<INormalizedToken> tokens;
+  private String sigil;
+  private List<INormalizedToken> tokens;
 
+  public NormalizedWitness() {    
+  }
+  
   public NormalizedWitness(final String sigil, final List<INormalizedToken> tokens) {
     this.sigil = sigil;
     this.tokens = tokens;
@@ -32,10 +35,18 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
     return tokens;
   }
 
+  public void setTokens(List<INormalizedToken> tokens) {
+    this.tokens = tokens;
+  }
+  
   public String getSigil() {
     return sigil;
   }
 
+  public void setSigil(String sigil) {
+    this.sigil = sigil;
+  }
+  
   // TODO check whether iterator.remove() throws exception!
   @Override
   public Iterator<INormalizedToken> iterator() {

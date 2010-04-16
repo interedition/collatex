@@ -51,7 +51,7 @@ public class WitnessIndex0 implements IWitnessIndex {
   @Override
   public boolean contains(final String normalizedPhrase) {
     final List<String> phrasesInIndex = Lists.newArrayList(transform(phraseBag.elementSet(), PHRASE_TO_NORMALIZED));
-    log.info(phrasesInIndex.toString());
+    log.debug(phrasesInIndex.toString());
     return phrasesInIndex.contains(normalizedPhrase);
   }
 

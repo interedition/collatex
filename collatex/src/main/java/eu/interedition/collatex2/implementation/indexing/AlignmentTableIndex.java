@@ -3,6 +3,9 @@ package eu.interedition.collatex2.implementation.indexing;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -14,6 +17,8 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class AlignmentTableIndex implements IAlignmentTableIndex {
+  private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
+  
   private final Map<String, IColumns> normalizedToColumns;
 
   private AlignmentTableIndex() {
@@ -47,7 +52,7 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
           index.add(rightPhrase);
         }
       } else {
-        System.out.println("Column " + column.getPosition() + " is empty!");
+        logger.debug("Column " + column.getPosition() + " is empty!");
       }
     }
   }

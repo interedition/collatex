@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAligner;
@@ -16,6 +18,7 @@ import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableIndex0Test {
+  static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex0Test.class);
   private CollateXEngine factory;
 
   @Before
@@ -28,7 +31,7 @@ public class AlignmentTableIndex0Test {
     aligner.setCallback(new ICallback() {
       @Override
       public void alignment(final IAlignment alignment) {
-        System.out.println(alignment.getMatches());
+        logger.debug(alignment.getMatches().toString());
       }
     });
     return aligner;

@@ -31,7 +31,7 @@ public class AlignmentTableIndexTest {
     aligner.setCallback(new ICallback() {
       @Override
       public void alignment(final IAlignment alignment) {
-        System.out.println(alignment.getMatches());
+        LOG.debug(alignment.getMatches().toString());
       }
     });
     return aligner;

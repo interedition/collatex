@@ -1,82 +1,82 @@
 package eu.interedition.collatex2.spring;
 
-import java.io.PrintWriter;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.xml.TransformerUtils;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.AbstractView;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.output.ApparatusEntry;
-import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
+import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
+import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 
 @Controller
 @RequestMapping("/api/**")
-public class ApiController {
-  private static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
-  private static final String WITNESS_1 = "a b c d e f g h";
-  private static final String WITNESS_2 = "d e f g x y z";
+public class ApiController implements InitializingBean {
+  private ITokenNormalizer defaultNormalizer = new DefaultTokenNormalizer();
+  
+  @Autowired
+  private ApiObjectMapper objectMapper;
 
-  private CollateXEngine collateXEngine = new CollateXEngine();
+  private MappingJacksonJsonView jsonView;
 
-  @RequestMapping("collate")
-  public ModelAndView collate() throws Exception {
-    final IWitness witness1 = collateXEngine.createWitness("A", WITNESS_1);
-    final IWitness witness2 = collateXEngine.createWitness("B", WITNESS_2);
-    return new ModelAndView(new ApparatusXmlView(collateXEngine.createApparatus(collateXEngine.align(witness1, witness2))));
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    jsonView = new MappingJacksonJsonView();
+    jsonView.setObjectMapper(objectMapper);
+  }
+  
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  public ModelAndView collateToJson(@RequestBody final ApiInput input) throws Exception {
+    return new ModelAndView(jsonView, "alignment", collate(input));
   }
 
-  private static class ApparatusXmlView extends AbstractView {
+  @RequestMapping(value = "collate")
+  public void documentation() {
+  }
 
-    private ParallelSegmentationApparatus apparatus;
-    
-    private ApparatusXmlView(ParallelSegmentationApparatus apparatus) {
-      this.apparatus = apparatus;
-    }
-
-    @Override
-    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-      final Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-      Element root = xml.createElementNS(TEI_NS, "text");
-      xml.appendChild(root);
-
-      for (ApparatusEntry segment : apparatus.getEntries()) {
-        Element app = xml.createElementNS(TEI_NS, "app");
-        for (String sigle : apparatus.getSigli()) {
-          Element rdg = xml.createElementNS(TEI_NS, "rdg");
-          rdg.setAttribute("wit", sigle);
-          app.appendChild(rdg);
-
-          if (segment.containsWitness(sigle)) {
-            rdg.setTextContent(segment.getPhrase(sigle).getContent());
-          }
-        }
-        root.appendChild(app);
+  private IAlignmentTable collate(ApiInput input) throws ApiException {
+    Set<String> sigle = new HashSet<String>();
+    for (ApiWitness witness : input.getWitnesses()) {
+      String sigil = witness.getSigil();
+      if (sigil == null) {
+        throw new ApiException("Witness without id/sigil given");
       }
+      if (sigle.contains(sigil)) {
+        throw new ApiException("Duplicate id/sigil: " + sigil);
+      }
+      sigle.add(sigil);
 
-      response.setContentType("application/xml");
-      response.setCharacterEncoding("UTF-8");
-
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      TransformerUtils.enableIndenting(transformer);
-      PrintWriter out = response.getWriter();
-      transformer.transform(new DOMSource(xml), new StreamResult(out));
-      out.flush();
+      int tokenPosition = 0;
+      for (ApiToken token : witness.getApiTokens()) {
+        if (token.getContent() == null || token.getContent().trim().length() == 0) {
+          throw new ApiException("Empty token in " + sigil);
+        }
+        token.setSigil(sigil);
+        token.setPosition(++tokenPosition);
+        if (token.getNormalized() == null || token.getNormalized().trim().length() == 0) {
+          token.setNormalized(defaultNormalizer.apply(token).getNormalized());
+        }
+      }
     }
+    final List<ApiWitness> witnesses = input.getWitnesses();
+    return new CollateXEngine().align(witnesses.toArray(new ApiWitness[witnesses.size()]));
+  }
 
+  @ExceptionHandler(ApiException.class)
+  public ModelAndView apiError(HttpServletResponse response, ApiException exception) {
+    return new ModelAndView(new MappingJacksonJsonView(), new ModelMap("error", exception.getMessage()));
   }
 }

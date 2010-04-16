@@ -2,8 +2,14 @@ package eu.interedition.collatex2.rest;
 
 import org.restlet.Component;
 import org.restlet.data.Protocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 
 public class RestServer {
+  private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
+  
   public static void main(final String[] args) {
     try {
       int serverPort = 8182;
@@ -15,7 +21,7 @@ public class RestServer {
           e.printStackTrace();
         }
       }
-      System.out.println(String.format("Running CollateX server on port %d", serverPort));
+      logger.info(String.format("Running CollateX server on port %d", serverPort));
       final Component component = new Component();
       component.getServers().add(Protocol.HTTP, serverPort);
       component.getDefaultHost().attach(new RestApplication());

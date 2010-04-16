@@ -61,7 +61,7 @@ public class GapDetection {
   }
 
   private static List<IColumns> calculateGapColumnsForA(final List<IColumns> matchingNgrams, final IAlignmentTable table) {
-    LOG.info(table.toString());
+    LOG.debug(table.toString());
     int currentIndex = 1;
     IColumns previous = null;
     final List<IColumns> gaps = Lists.newArrayList();
@@ -76,7 +76,7 @@ public class GapDetection {
   }
 
   private static List<IPhrase> calculateGapPhrasesFor(final List<IPhrase> matchingNgrams, final IWitness witness) {
-    LOG.info(witness.toString());
+    LOG.debug(witness.toString());
     int currentIndex = 1;
     IPhrase previous = null;
     final List<IPhrase> gaps = Lists.newArrayList();

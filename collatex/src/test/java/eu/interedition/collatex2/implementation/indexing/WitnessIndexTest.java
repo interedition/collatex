@@ -52,7 +52,7 @@ public class WitnessIndexTest {
   public void test2() {
     final IWitness witnessA = factory.createWitness("A", "the big black");
     final IWitnessIndex index = new WitnessIndex(witnessA, Lists.newArrayList("the", "big", "black"));
-    LOG.info(index.getPhrases().toString());
+    LOG.debug(index.getPhrases().toString());
     assertEquals(6, index.size());
     assertTrue(index.contains("# the"));
     assertTrue(index.contains("# the big"));
