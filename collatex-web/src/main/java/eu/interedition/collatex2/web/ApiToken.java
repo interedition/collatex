@@ -14,24 +14,33 @@ import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import eu.interedition.collatex2.input.NormalizedToken;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 @JsonSerialize(using = ApiToken.Serializer.class)
 @JsonIgnoreProperties( { "position", "sigil" })
 public class ApiToken extends NormalizedToken {
   private Map<String, Object> metadata;
 
-  @Override
-  @JsonProperty("token")
-  public String getContent() {
-    return super.getContent();
+  public ApiToken() {
+    super();
+  }
+  
+  public ApiToken(INormalizedToken other) {
+    super(other);
   }
 
   @Override
-  @JsonProperty("token")
+  @JsonProperty("t")
   public void setContent(String content) {
     super.setContent(content);
   }
 
+  @Override
+  @JsonProperty("n")
+  public void setNormalized(String normalized) {
+    super.setNormalized(normalized);
+  }
+  
   @JsonAnySetter
   public void metadata(String key, Object value) {
     if (metadata == null) {
@@ -45,8 +54,8 @@ public class ApiToken extends NormalizedToken {
     @Override
     public void serialize(ApiToken value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
       jgen.writeStartObject();
-      jgen.writeStringField("token", value.getContent());
-      jgen.writeStringField("normalized", value.getNormalized());
+      jgen.writeStringField("t", value.getContent());
+      jgen.writeStringField("n", value.getNormalized());
       if (value.metadata != null) {
         for (String key : value.metadata.keySet()) {
           Object md = value.metadata.get(key);

@@ -30,10 +30,17 @@ import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
+import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
+import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
 
@@ -43,6 +50,7 @@ public class ApiController implements InitializingBean {
   protected static final String COLLATEX_NS = "http://interedition.eu/collatex/ns/1.0";
   protected static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
+  private ITokenizer defaultTokenizer = new WhitespaceTokenizer();
   private ITokenNormalizer defaultNormalizer = new DefaultTokenNormalizer();
 
   @Autowired
@@ -85,6 +93,11 @@ public class ApiController implements InitializingBean {
       }
       sigle.add(sigil);
 
+      if ((witness.getTokens() == null) && (witness.getContent() != null)) {
+        Iterable<INormalizedToken> tokens = Iterables.transform(defaultTokenizer.tokenize(sigil, witness.getContent()), defaultNormalizer);
+        witness.setTokens(Lists.newArrayList(Iterables.transform(tokens, TO_API_TOKEN)));
+      }
+
       int tokenPosition = 0;
       for (ApiToken token : witness.getApiTokens()) {
         if (token.getContent() == null || token.getContent().trim().length() == 0) {
@@ -106,15 +119,23 @@ public class ApiController implements InitializingBean {
     return new ModelAndView(new MappingJacksonJsonView(), new ModelMap("error", exception.getMessage()));
   }
 
+  private static final Function<INormalizedToken, ? extends INormalizedToken> TO_API_TOKEN = new Function<INormalizedToken, ApiToken>() {
+
+    @Override
+    public ApiToken apply(INormalizedToken from) {
+      return new ApiToken(from);
+    }
+  };
+
   private MappingJacksonJsonView jsonView;
 
   private AbstractView teiView = new AbstractView() {
-    
+
     @Override
     protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
       IAlignmentTable alignmentTable = (IAlignmentTable) model.get("alignment");
       Assert.notNull(alignmentTable);
-      
+
       Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
       Element root = xml.createElementNS(COLLATEX_NS, "collatex:apparatus");
       xml.appendChild(root);
@@ -131,5 +152,5 @@ public class ApiController implements InitializingBean {
       transformer.transform(new DOMSource(xml), new StreamResult(out));
       out.flush();
     }
-  }; 
+  };
 }

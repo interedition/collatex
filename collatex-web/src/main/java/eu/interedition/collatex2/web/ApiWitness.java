@@ -10,6 +10,7 @@ import eu.interedition.collatex2.input.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class ApiWitness extends NormalizedWitness {
+  private String content;
 
   public ApiWitness() {
     super();
@@ -25,6 +26,14 @@ public class ApiWitness extends NormalizedWitness {
   @JsonProperty("id")
   public void setSigil(String sigil) {
     super.setSigil(sigil);
+  }
+
+  public String getContent() {
+    return content;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
   }
 
   @Override

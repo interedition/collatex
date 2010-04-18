@@ -9,10 +9,16 @@ public class NormalizedToken extends Token implements INormalizedToken {
     super();
   }
 
+  public NormalizedToken(INormalizedToken other) {
+    super(other);
+    this.normalized = other.getNormalized();
+  }
+
   public NormalizedToken(final String sigil, final String content, final int position, final String normalized) {
     super(sigil, content, position);
     this.normalized = normalized;
   }
+
 
   public String getNormalized() {
     return normalized;

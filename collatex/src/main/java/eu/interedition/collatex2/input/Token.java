@@ -13,6 +13,10 @@ public class Token implements IToken {
   public Token() {
   }
 
+  public Token(IToken other) {
+    this(other.getSigil(), other.getContent(), other.getPosition());
+  }
+
   public Token(final String sigil, final String content, final int position) {
     this.sigil = sigil;
     this.content = content;
