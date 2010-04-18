@@ -11,11 +11,11 @@ import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class GraphTest {
-  private static CollateXEngine collatex;
+  private static CollateXEngine engine;
   
   @BeforeClass
   public static void setup() {
-    collatex = new CollateXEngine();
+    engine = new CollateXEngine();
   }
   
   //TODO: we should add an end node to the graph!
@@ -31,7 +31,7 @@ public class GraphTest {
   //TODO: we should add an end node to the graph!
   @Test
   public void testOneWitness() {
-    IWitness a = collatex.createWitness("A", "only one witness");
+    IWitness a = engine.createWitness("A", "only one witness");
     IAlignmentGraph graph = AlignmentGraph.create(a);
     final List<IAlignmentNode> nodes = graph.getNodes();
     Assert.assertEquals(4, nodes.size());
@@ -45,9 +45,9 @@ public class GraphTest {
     Assert.assertEquals("witness", thirdNode.getNormalized());
     List<IAlignmentArc> arcs = graph.getArcs();
     Assert.assertEquals(3, arcs.size());
-    Assert.assertEquals(a, arcs.get(0).getWitness());
-    Assert.assertEquals(a, arcs.get(1).getWitness());
-    Assert.assertEquals(a, arcs.get(2).getWitness());
+    Assert.assertEquals(a, arcs.get(0).getWitnesses().get(0));
+    Assert.assertEquals(a, arcs.get(1).getWitnesses().get(0));
+    Assert.assertEquals(a, arcs.get(2).getWitnesses().get(0));
     Assert.assertEquals(startNode, arcs.get(0).getBeginNode());
     Assert.assertEquals(firstNode, arcs.get(0).getEndNode());
     Assert.assertEquals(firstNode, arcs.get(1).getBeginNode());
@@ -55,4 +55,22 @@ public class GraphTest {
     Assert.assertEquals(secondNode, arcs.get(2).getBeginNode());
     Assert.assertEquals(thirdNode, arcs.get(2).getEndNode());
   }
+  
+  @Test
+  public void testTwoWitnesses() {
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the black cat");
+    AlignmentGraph graph = AlignmentGraph.create(w1);
+    graph.addWitness(w2);
+    final List<IAlignmentNode> nodes = graph.getNodes();
+    Assert.assertEquals(4, nodes.size());
+    List<IAlignmentArc> arcs = graph.getArcs();
+    Assert.assertEquals(3, arcs.size());
+    Assert.assertEquals("# -> the: A, B", arcs.get(0).toString());
+    Assert.assertEquals("the -> black: A, B", arcs.get(1).toString());
+    Assert.assertEquals("black -> cat: A, B", arcs.get(2).toString());
+     
+    }
+
+
 }

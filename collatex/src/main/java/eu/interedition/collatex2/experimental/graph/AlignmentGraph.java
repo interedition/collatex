@@ -1,8 +1,10 @@
 package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -18,7 +20,7 @@ public class AlignmentGraph implements IAlignmentGraph {
     return graph;
   }
 
-  public static IAlignmentGraph create(IWitness a) {
+  public static AlignmentGraph create(IWitness a) {
     AlignmentGraph graph = create();
     List<IAlignmentNode> newNodes = Lists.newArrayList();
     for (INormalizedToken token : a.getTokens()) {
@@ -69,5 +71,42 @@ public class AlignmentGraph implements IAlignmentGraph {
   @Override
   public List<String> findRepeatingTokens() {
     return Lists.newArrayList();
+  }
+
+  //NOTE: tokenA is the token from the Witness
+  public void addWitness(IWitness witness) {
+    AlignmentGraphWitnessMatcher matcher = new AlignmentGraphWitnessMatcher(this);
+    List<ITokenMatch> matches = matcher.getMatches(witness);
+    makeArcsForMatches(witness, matches, matcher.getGraphIndex());   
+  }
+
+  private void makeArcsForMatches(IWitness witness, List<ITokenMatch> matches, IAlignmentGraphIndex graphIndex2) {
+    Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
+    witnessTokenToMatch = Maps.newLinkedHashMap();
+    for (ITokenMatch match : matches) {
+      INormalizedToken tokenA = match.getTokenA();
+      witnessTokenToMatch.put(tokenA, match);
+    }
+    IAlignmentNode begin = this.getStartNode();
+    for (INormalizedToken token : witness.getTokens()) {
+      if (!witnessTokenToMatch.containsKey(token)) {
+        throw new RuntimeException("Token "+token+ " is not a match!");
+      }
+      //NOTE: it is a match!
+      ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
+      IAlignmentNode end = graphIndex2.getAlignmentNode(tokenMatch.getTokenB());
+      IAlignmentArc existingArc = find(begin, end);
+      existingArc.getWitnesses().add(witness);
+      begin = end;
+    }
+  }
+
+  private IAlignmentArc find(IAlignmentNode begin, IAlignmentNode end) {
+    for (IAlignmentArc arc: arcs) {
+      if (arc.getBeginNode().equals(begin)&&arc.getEndNode().equals(end)) {
+        return arc;
+      }
+    }
+    throw new RuntimeException("Arc "+begin+ " "+end+" not found!");
   }
 }

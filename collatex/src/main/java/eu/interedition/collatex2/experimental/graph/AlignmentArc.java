@@ -1,21 +1,25 @@
 package eu.interedition.collatex2.experimental.graph;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentArc implements IAlignmentArc {
 
   private final IAlignmentNode start;
   private final IAlignmentNode end;
-  private final IWitness witness;
+  private final List<IWitness> witnesses;
 
   public AlignmentArc(IAlignmentNode start, IAlignmentNode end, IWitness witness) {
     this.start = start;
     this.end = end;
-    this.witness = witness;
+    this.witnesses = Lists.newArrayList(witness);
   }
 
-  public IWitness getWitness() {
-    return witness;
+  public List<IWitness> getWitnesses() {
+    return witnesses;
   }
 
   @Override
@@ -26,6 +30,17 @@ public class AlignmentArc implements IAlignmentArc {
   @Override
   public IAlignmentNode getEndNode() {
     return end;
+  }
+  
+  @Override
+  public String toString() {
+    String splitter="";
+    String to = getBeginNode().getNormalized()+" -> "+getEndNode().getNormalized()+": ";
+    for (IWitness witness: witnesses) {
+      to += splitter+witness.getSigil();
+      splitter=", ";
+    }
+    return to;
   }
 
 }

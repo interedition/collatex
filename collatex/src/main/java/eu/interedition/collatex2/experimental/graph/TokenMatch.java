@@ -17,4 +17,14 @@ public class TokenMatch implements ITokenMatch {
     return witnessToken.getNormalized() + ": "+witnessToken.getPosition()+" -> "+matchingToken.getPosition();
   }
 
+  @Override
+  public INormalizedToken getTokenA() {
+    return witnessToken;
+  }
+
+  @Override
+  public INormalizedToken getTokenB() {
+    return matchingToken;
+  }
+
 }

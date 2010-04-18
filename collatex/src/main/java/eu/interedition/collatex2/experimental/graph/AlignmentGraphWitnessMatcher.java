@@ -18,6 +18,7 @@ public class AlignmentGraphWitnessMatcher {
   //TODO: do inversion of control for creation of indexes!!
   //TODO: take care of repeating tokens (same as IndexMatcher)!
   private final IAlignmentGraph graph;
+  private IAlignmentGraphIndex graphIndex;
 
   //TODO: extract IMatcher interface?
   public AlignmentGraphWitnessMatcher(IAlignmentGraph graph) {
@@ -28,7 +29,7 @@ public class AlignmentGraphWitnessMatcher {
     final List<ITokenMatch> matches = Lists.newArrayList();
     List<String> repeatingTokens = Lists.newArrayList();
     IWitnessIndex witnessIndex = new WitnessIndex(witness, repeatingTokens);
-    IAlignmentGraphIndex graphIndex = AlignmentGraphIndex.create(graph, repeatingTokens);
+    graphIndex = AlignmentGraphIndex.create(graph, repeatingTokens);
     final Collection<IPhrase> phrases = witnessIndex.getPhrases();
     for (final IPhrase phrase : phrases) {
       if (graphIndex.containsNormalizedPhrase(phrase.getNormalized())) {
@@ -42,6 +43,10 @@ public class AlignmentGraphWitnessMatcher {
       }
     }
     return matches;
+  }
+  
+  public IAlignmentGraphIndex getGraphIndex() {
+    return graphIndex;
   }
   
 
