@@ -10,7 +10,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class AlignmentGraph implements IAlignmentGraph {
   private final List<IAlignmentNode> nodes;
   private final IAlignmentNode startNode;
-//  private final List<IAlignmentArc> arcs;
+  private final List<IAlignmentArc> arcs;
 
   public static AlignmentGraph create() {
     final AlignmentGraph graph = new AlignmentGraph();
@@ -19,11 +19,22 @@ public class AlignmentGraph implements IAlignmentGraph {
   
   public static IAlignmentGraph create(IWitness a) {
     AlignmentGraph graph = create();
+    List<IAlignmentNode> newNodes = Lists.newArrayList();
     for (INormalizedToken token : a.getTokens()) {
-      graph.add(new AlignmentNode(token.getNormalized()));
+      //TODO: maybe make this graph.addNewNode(token)?
+      //TODO: use it in constructor too!
+      final AlignmentNode newNode = new AlignmentNode(token.getNormalized());
+      newNodes.add(newNode);
+      graph.add(newNode);
+    }
+    IAlignmentNode previous = graph.getStartNode();
+    for (IAlignmentNode node : newNodes) {
+      graph.addNewArc(previous, node, a);
+      previous = node;
     }
     return graph;
   }
+
 
   @Override
   public List<IAlignmentNode> getNodes() {
@@ -35,14 +46,14 @@ public class AlignmentGraph implements IAlignmentGraph {
     return startNode;
   }
 
-//  @Override
-//  public List<IAlignmentArc> getArcs() {
-//    return arcs;
-//  }
+  @Override
+  public List<IAlignmentArc> getArcs() {
+    return arcs;
+  }
 
   private AlignmentGraph() {
     this.nodes = Lists.newArrayList();
-//    this.arcs = Lists.newArrayList();
+    this.arcs = Lists.newArrayList();
     final IAlignmentNode startNode = new AlignmentNode("#");
     add(startNode);
     this.startNode = startNode;
@@ -52,5 +63,8 @@ public class AlignmentGraph implements IAlignmentGraph {
     nodes.add(alignmentNode);
   }
 
-
+  private void addNewArc(IAlignmentNode start, IAlignmentNode end, IWitness witness) {
+    IAlignmentArc arc = new AlignmentArc(start, end, witness);
+    arcs.add(arc);
+  }
 }
