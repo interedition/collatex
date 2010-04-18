@@ -55,7 +55,7 @@ public class AlignmentGraph implements IAlignmentGraph {
   }
 
   private IAlignmentNode addNewNode(INormalizedToken token) {
-    final AlignmentNode newNode = new AlignmentNode(token.getNormalized());
+    final AlignmentNode newNode = new AlignmentNode(token);
     nodes.add(newNode);
     return newNode;
   }
@@ -63,5 +63,11 @@ public class AlignmentGraph implements IAlignmentGraph {
   private void addNewArc(IAlignmentNode start, IAlignmentNode end, IWitness witness) {
     IAlignmentArc arc = new AlignmentArc(start, end, witness);
     arcs.add(arc);
+  }
+
+  // TODO Auto-generated method stub
+  @Override
+  public List<String> findRepeatingTokens() {
+    return Lists.newArrayList();
   }
 }

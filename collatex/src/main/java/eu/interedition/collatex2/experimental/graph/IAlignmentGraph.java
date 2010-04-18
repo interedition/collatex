@@ -10,4 +10,7 @@ public interface IAlignmentGraph {
 
   List<IAlignmentArc> getArcs();
 
+  //TODO: implement!
+  List<String>  findRepeatingTokens();
+
 }
