@@ -6,4 +6,8 @@ public interface IAlignmentGraph {
 
   List<IAlignmentNode> getNodes();
 
+  IAlignmentNode getStartNode();
+
+  //List<IAlignmentArc> getArcs();
+
 }
