@@ -74,6 +74,13 @@ public class VariantGraph implements IVariantGraph {
   }
 
   //NOTE: tokenA is the token from the Witness
+  //For every token in the witness we have to map a VariantNode
+  //for matches such a node should already exist
+  //however for additions and replacements this will not be the case
+  //then we need to add the arcs
+  //in some cases the arcs may already exist
+  //if they already exist we need to add the witness to the
+  //existing arc!
   public void addWitness(IWitness witness) {
     VariantGraphWitnessMatcher matcher = new VariantGraphWitnessMatcher(this);
     List<ITokenMatch> matches = matcher.getMatches(witness);
