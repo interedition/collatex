@@ -27,6 +27,8 @@ public class TeiParallelSegmentationApparatusBuilder {
 
   public static void build(ParallelSegmentationApparatus apparatus, Node parent) {
     Document doc = (parent.getNodeType() == Node.DOCUMENT_NODE ? (Document) parent : parent.getOwnerDocument());
+    // FIXME: this should be dealt with on the tokenizer level!
+    final String separator = " ";
     for (final ApparatusEntry entry : apparatus.getEntries()) {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
@@ -63,6 +65,11 @@ public class TeiParallelSegmentationApparatusBuilder {
           }
         }
       }
+      parent.appendChild(doc.createTextNode(separator));
+    }
+    // FIXME: whitespace handling in the tokenizer!
+    if (!apparatus.getEntries().isEmpty()) {
+      parent.removeChild(parent.getLastChild());
     }
   }
 
