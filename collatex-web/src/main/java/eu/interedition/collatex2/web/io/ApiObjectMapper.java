@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.web;
+package eu.interedition.collatex2.web.io;
 
 import java.io.IOException;
 
