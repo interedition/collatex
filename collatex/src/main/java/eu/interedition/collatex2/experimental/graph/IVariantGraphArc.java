@@ -4,11 +4,11 @@ import java.util.List;
 
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public interface IAlignmentArc {
+public interface IVariantGraphArc {
 
-  IAlignmentNode getBeginNode();
+  IVariantGraphNode getBeginNode();
 
-  IAlignmentNode getEndNode();
+  IVariantGraphNode getEndNode();
 
   List<IWitness> getWitnesses();
 

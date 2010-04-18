@@ -6,13 +6,13 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class AlignmentArc implements IAlignmentArc {
+public class VariantGraphArc implements IVariantGraphArc {
 
-  private final IAlignmentNode start;
-  private final IAlignmentNode end;
+  private final IVariantGraphNode start;
+  private final IVariantGraphNode end;
   private final List<IWitness> witnesses;
 
-  public AlignmentArc(IAlignmentNode start, IAlignmentNode end, IWitness witness) {
+  public VariantGraphArc(IVariantGraphNode start, IVariantGraphNode end, IWitness witness) {
     this.start = start;
     this.end = end;
     this.witnesses = Lists.newArrayList(witness);
@@ -23,12 +23,12 @@ public class AlignmentArc implements IAlignmentArc {
   }
 
   @Override
-  public IAlignmentNode getBeginNode() {
+  public IVariantGraphNode getBeginNode() {
     return start;
   }
 
   @Override
-  public IAlignmentNode getEndNode() {
+  public IVariantGraphNode getEndNode() {
     return end;
   }
   

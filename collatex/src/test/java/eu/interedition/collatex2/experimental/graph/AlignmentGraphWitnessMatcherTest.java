@@ -23,8 +23,8 @@ public class AlignmentGraphWitnessMatcherTest {
   public void testEverythingIsUnique() {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = factory.createWitness("B", "everything is unique");
-    IAlignmentGraph graph = AlignmentGraph.create(witnessA);
-    AlignmentGraphWitnessMatcher matcher = new AlignmentGraphWitnessMatcher(graph);
+    IVariantGraph graph = VariantGraph.create(witnessA);
+    VariantGraphWitnessMatcher matcher = new VariantGraphWitnessMatcher(graph);
     List<ITokenMatch> matches2 = matcher.getMatches(witnessB);
     assertEquals(3, matches2.size());
     assertEquals("everything: 1 -> 1", matches2.get(0).toString());

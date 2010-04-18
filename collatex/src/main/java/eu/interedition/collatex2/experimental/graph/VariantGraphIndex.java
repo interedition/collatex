@@ -11,15 +11,15 @@ import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class AlignmentGraphIndex implements IAlignmentGraphIndex {
+public class VariantGraphIndex implements IVariantGraphIndex {
 
   private Multimap<String, INormalizedToken> normalizedToTokens;
-  private LinkedHashMap<INormalizedToken, IAlignmentNode> tokenToNode;
+  private LinkedHashMap<INormalizedToken, IVariantGraphNode> tokenToNode;
 
-  public static IAlignmentGraphIndex create(IAlignmentGraph graph, List<String> findRepeatingTokens) {
-    final AlignmentGraphIndex index = new AlignmentGraphIndex();
+  public static IVariantGraphIndex create(IVariantGraph graph, List<String> findRepeatingTokens) {
+    final VariantGraphIndex index = new VariantGraphIndex();
     //TODO: change this for three or more witnesses!
-    for (IAlignmentNode node : graph.getNodes().subList(1, graph.getNodes().size())) {
+    for (IVariantGraphNode node : graph.getNodes().subList(1, graph.getNodes().size())) {
       makeTokenUniqueIfNeeded(index, findRepeatingTokens, node);
     }
     //    for (final String sigil : table.getSigli()) {
@@ -34,7 +34,7 @@ public class AlignmentGraphIndex implements IAlignmentGraphIndex {
   }
 
   @Override
-  public IAlignmentNode getAlignmentNode(INormalizedToken token) {
+  public IVariantGraphNode getAlignmentNode(INormalizedToken token) {
     return tokenToNode.get(token);
   }
 
@@ -43,7 +43,7 @@ public class AlignmentGraphIndex implements IAlignmentGraphIndex {
     return normalizedToTokens.get(normalized);
   }
 
-  private AlignmentGraphIndex() {
+  private VariantGraphIndex() {
     normalizedToTokens = Multimaps.newArrayListMultimap();
     tokenToNode = Maps.newLinkedHashMap();
   }
@@ -61,13 +61,13 @@ public class AlignmentGraphIndex implements IAlignmentGraphIndex {
 
   
 
-  private static void makeTokenUniqueIfNeeded(final AlignmentGraphIndex index, final List<String> findRepeatingTokens,
-      final IAlignmentNode node) {
+  private static void makeTokenUniqueIfNeeded(final VariantGraphIndex index, final List<String> findRepeatingTokens,
+      final IVariantGraphNode node) {
     INormalizedToken token = node.getToken();
     // kijken of ie unique is
     final boolean unique = !findRepeatingTokens.contains(token.getNormalized());
     if (unique) {
-      List<IAlignmentNode> nodes = Lists.newArrayList(node);
+      List<IVariantGraphNode> nodes = Lists.newArrayList(node);
       index.add(nodes);
     } 
 //    else {
@@ -79,14 +79,14 @@ public class AlignmentGraphIndex implements IAlignmentGraphIndex {
 //    }
   }
 
-  private void add(List<IAlignmentNode> nodes) {
+  private void add(List<IVariantGraphNode> nodes) {
     String normalized = "";
     String splitter = "";
-    for (IAlignmentNode node : nodes) {
+    for (IVariantGraphNode node : nodes) {
       normalized += splitter+node.getNormalized();
       splitter = " ";
     }
-    for (IAlignmentNode node : nodes) {
+    for (IVariantGraphNode node : nodes) {
       normalizedToTokens.put(normalized, node.getToken());
       tokenToNode.put(node.getToken(), node);
     }

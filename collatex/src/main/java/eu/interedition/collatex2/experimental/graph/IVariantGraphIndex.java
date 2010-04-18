@@ -4,12 +4,12 @@ import java.util.Collection;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public interface IAlignmentGraphIndex {
+public interface IVariantGraphIndex {
 
   boolean containsNormalizedPhrase(String normalized);
 
   Collection<INormalizedToken> getTokens(String normalized);
 
-  IAlignmentNode getAlignmentNode(INormalizedToken token);
+  IVariantGraphNode getAlignmentNode(INormalizedToken token);
   
 }

@@ -14,14 +14,14 @@ import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 //NOTE: this could become a generic TokenMatcher with a little
 //more extraction
-public class AlignmentGraphWitnessMatcher {
+public class VariantGraphWitnessMatcher {
   //TODO: do inversion of control for creation of indexes!!
   //TODO: take care of repeating tokens (same as IndexMatcher)!
-  private final IAlignmentGraph graph;
-  private IAlignmentGraphIndex graphIndex;
+  private final IVariantGraph graph;
+  private IVariantGraphIndex graphIndex;
 
   //TODO: extract IMatcher interface?
-  public AlignmentGraphWitnessMatcher(IAlignmentGraph graph) {
+  public VariantGraphWitnessMatcher(IVariantGraph graph) {
     this.graph = graph;
   }
   
@@ -29,7 +29,7 @@ public class AlignmentGraphWitnessMatcher {
     final List<ITokenMatch> matches = Lists.newArrayList();
     List<String> repeatingTokens = Lists.newArrayList();
     IWitnessIndex witnessIndex = new WitnessIndex(witness, repeatingTokens);
-    graphIndex = AlignmentGraphIndex.create(graph, repeatingTokens);
+    graphIndex = VariantGraphIndex.create(graph, repeatingTokens);
     final Collection<IPhrase> phrases = witnessIndex.getPhrases();
     for (final IPhrase phrase : phrases) {
       if (graphIndex.containsNormalizedPhrase(phrase.getNormalized())) {
@@ -45,7 +45,7 @@ public class AlignmentGraphWitnessMatcher {
     return matches;
   }
   
-  public IAlignmentGraphIndex getGraphIndex() {
+  public IVariantGraphIndex getGraphIndex() {
     return graphIndex;
   }
   

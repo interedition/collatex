@@ -19,8 +19,8 @@ public class AlignmentGraphIndexTest {
   @Test
   public void testCreateAlignmentTableIndex() {
     final IWitness a = factory.createWitness("A", "the first witness");
-    final IAlignmentGraph graph = factory.graph(a);
-    final IAlignmentGraphIndex index = AlignmentGraphIndex.create(graph, graph.findRepeatingTokens());
+    final IVariantGraph graph = factory.graph(a);
+    final IVariantGraphIndex index = VariantGraphIndex.create(graph, graph.findRepeatingTokens());
     assertEquals("AlignmentGraphIndex: (the, first, witness)", index.toString());
   }
 

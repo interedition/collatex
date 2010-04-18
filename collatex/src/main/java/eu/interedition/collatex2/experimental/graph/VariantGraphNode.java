@@ -2,10 +2,10 @@ package eu.interedition.collatex2.experimental.graph;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class AlignmentNode implements IAlignmentNode {
+public class VariantGraphNode implements IVariantGraphNode {
   private final INormalizedToken token;
 
-  public AlignmentNode(INormalizedToken token) {
+  public VariantGraphNode(INormalizedToken token) {
     this.token = token;
   }
 

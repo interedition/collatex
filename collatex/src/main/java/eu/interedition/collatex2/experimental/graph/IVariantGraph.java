@@ -2,13 +2,13 @@ package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
 
-public interface IAlignmentGraph {
+public interface IVariantGraph {
 
-  List<IAlignmentNode> getNodes();
+  List<IVariantGraphNode> getNodes();
 
-  IAlignmentNode getStartNode();
+  IVariantGraphNode getStartNode();
 
-  List<IAlignmentArc> getArcs();
+  List<IVariantGraphArc> getArcs();
 
   //TODO: implement!
   List<String>  findRepeatingTokens();
