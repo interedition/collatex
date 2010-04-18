@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.input.Segment;
@@ -16,7 +16,7 @@ import eu.interedition.collatex.input.Word;
 public class WordSegment {
 
   public String title;
-  private final Multimap<String, List<Word>> wordsPerWitness = Multimaps.newArrayListMultimap();
+  private final Multimap<String, List<Word>> wordsPerWitness = ArrayListMultimap.create();
   private int size;
   public List<String> wordsInSegments;
 

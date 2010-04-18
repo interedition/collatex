@@ -10,7 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Function;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -175,7 +175,7 @@ public class IndexMatcherTest {
 
   private void assertContains(final List<IMatch> matches, final String string) {
     final Iterable<String> normalizedMatches = Iterables.transform(matches, function);
-    assertTrue(string + " not found in matches: " + Join.join(",", normalizedMatches), Lists.newArrayList(normalizedMatches).contains(string));
+    assertTrue(string + " not found in matches: " + Joiner.on(",").join(normalizedMatches), Lists.newArrayList(normalizedMatches).contains(string));
   }
 
 }

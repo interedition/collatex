@@ -3,9 +3,9 @@ package eu.interedition.collatex2.output;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.input.Phrase;
@@ -19,7 +19,7 @@ public class ApparatusEntry {
 
   public ApparatusEntry(final List<String> sigli) {
     this.sigli = sigli;
-    this.sigilToTokens = Multimaps.newLinkedHashMultimap();
+    this.sigilToTokens = LinkedHashMultimap.create();
   }
 
   public void addToken(final String sigil, final INormalizedToken token) {

@@ -2,8 +2,8 @@ package com.sd_editions.collatex.permutations;
 
 import java.util.List;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex.input.Word;
 
@@ -12,7 +12,7 @@ public class MultiMatch {
   private final Multimap<String, Word> similarWordsPerWitness;
 
   public MultiMatch(Word... witnessWords) {
-    this.similarWordsPerWitness = Multimaps.newArrayListMultimap();
+    this.similarWordsPerWitness = ArrayListMultimap.create();
     this.name = witnessWords[0]._normalized;
     for (Word word : witnessWords) {
       addMatchingWord(word);

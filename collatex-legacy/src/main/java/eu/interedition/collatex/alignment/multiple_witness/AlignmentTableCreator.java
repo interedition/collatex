@@ -79,7 +79,7 @@ public class AlignmentTableCreator {
       }
       // still have words in the witness? add new columns after the last one from the base
       if (witnessIterator.hasNext()) {
-        final LinkedList<Word> remainingWitnessWords = Lists.newLinkedList(witnessIterator);
+        final List<Word> remainingWitnessWords = Lists.newArrayList(witnessIterator);
         AlignmentTableCreator.addVariantAtGap(table, superbase, replacement, remainingWitnessWords);
       }
     }

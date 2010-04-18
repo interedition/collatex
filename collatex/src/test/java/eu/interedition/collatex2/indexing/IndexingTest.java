@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -107,7 +107,7 @@ public class IndexingTest {
   //  }
 
   private void assertContains(final IWitnessIndex index, final String phrase) {
-    assertTrue("phrase '" + phrase + "' not found in index [" + Join.join(", ", index.getPhrases()) + "]", index.contains(phrase));
+    assertTrue("phrase '" + phrase + "' not found in index [" + Joiner.on(", ").join(index.getPhrases()) + "]", index.contains(phrase));
   }
 
   private void assertDoesNotContain(final IWitnessIndex index, final String phrase) {

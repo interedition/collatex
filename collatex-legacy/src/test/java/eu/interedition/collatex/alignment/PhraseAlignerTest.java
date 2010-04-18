@@ -34,7 +34,7 @@ public class PhraseAlignerTest {
     final Phrase pb = b.getPhraseOnPosition(1);
     final Match<Phrase> match = new Match<Phrase>(pa, pb);
     final Set<Match<Phrase>> exactMatches = Sets.newHashSet(match);
-    final Set<Match<Phrase>> nonExactMatches = Sets.emptySortedSet();
+    final Set<Match<Phrase>> nonExactMatches = Sets.newTreeSet();
     final UnfixedAlignment<Phrase> u = new UnfixedAlignment<Phrase>(exactMatches, nonExactMatches);
     // TODO code to make a,b,u
 

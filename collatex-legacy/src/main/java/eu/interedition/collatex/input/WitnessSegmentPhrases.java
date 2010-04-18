@@ -3,7 +3,7 @@ package eu.interedition.collatex.input;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 public class WitnessSegmentPhrases extends BaseContainer<Phrase> {
@@ -30,7 +30,7 @@ public class WitnessSegmentPhrases extends BaseContainer<Phrase> {
 
   @Override
   public String toString() {
-    return "WitnessSegmentPhrases(" + getWitnessId() + ", '" + Join.join("','", _phrases) + "')";
+    return "WitnessSegmentPhrases(" + getWitnessId() + ", '" + Joiner.on("','").join(_phrases) + "')";
   }
 
   @Override

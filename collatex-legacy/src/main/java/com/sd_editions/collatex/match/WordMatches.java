@@ -3,17 +3,16 @@ package com.sd_editions.collatex.match;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-import com.google.common.collect.SortedArraySet;
 import com.google.common.collect.TreeMultimap;
 
 public class WordMatches {
   private final String word;
-  private final SortedArraySet<WordCoordinate> exactMatches = Sets.newSortedArraySet();
-  private final SortedArraySet<WordCoordinate> levMatches = Sets.newSortedArraySet();
+  private final SortedSet<WordCoordinate> exactMatches = Sets.newTreeSet();
+  private final SortedSet<WordCoordinate> levMatches = Sets.newTreeSet();
 
   public WordMatches(String newWord) {
     this.word = newWord;
@@ -31,11 +30,11 @@ public class WordMatches {
     levMatches.add(matchCoordinate);
   }
 
-  public SortedArraySet<WordCoordinate> getExactMatches() {
+  public SortedSet<WordCoordinate> getExactMatches() {
     return exactMatches;
   }
 
-  public SortedArraySet<WordCoordinate> getLevMatches() {
+  public SortedSet<WordCoordinate> getLevMatches() {
     return levMatches;
   }
 
@@ -47,7 +46,7 @@ public class WordMatches {
 
   @SuppressWarnings("boxing")
   public List<WordMatches> getPermutations() {
-    TreeMultimap<Integer, Integer> matchesPerWitness = Multimaps.newTreeMultimap();
+    TreeMultimap<Integer, Integer> matchesPerWitness = TreeMultimap.create();
     for (WordCoordinate wordCoordinate : getAllMatches()) {
       matchesPerWitness.put(wordCoordinate.witnessNumber, wordCoordinate.positionInWitness);
     }
@@ -74,7 +73,7 @@ public class WordMatches {
       final Set<Integer> positionInWitnessSet = matchesPerWitness.get(witnessId);
       if (positionInWitnessSet.size() > 1) {
         for (Integer position : positionInWitnessSet) {
-          TreeMultimap<Integer, Integer> newMatchesPerWitness = Multimaps.newTreeMultimap();
+          TreeMultimap<Integer, Integer> newMatchesPerWitness = TreeMultimap.create();
           newMatchesPerWitness.putAll(matchesPerWitness);
           newMatchesPerWitness.removeAll(witnessId);
           newMatchesPerWitness.put(witnessId, position);

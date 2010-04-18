@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -61,7 +61,7 @@ public class MultiMatchMap {
   }
 
   public String getNormalizedMatchSentence() {
-    return Join.join(" ", mmm.keySet());
+    return Joiner.on(" ").join(mmm.keySet());
   }
 
   /* Delegated methods after here */

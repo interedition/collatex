@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import org.apache.commons.lang.WordUtils;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.sd_editions.collatex.InputPlugin.StringInputPlugin;
 
 public class Util {
@@ -52,7 +52,7 @@ public class Util {
   }
 
   public static void p(final Collection<?> c) {
-    pp(c, "[" + Join.join(",", c) + "]");
+    pp(c, "[" + Joiner.on(",").join(c) + "]");
   }
 
   public static void p(final String label, final Object o) {

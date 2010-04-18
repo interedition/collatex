@@ -2,7 +2,6 @@ package eu.interedition.collatex.alignment.multiple_witness;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -107,7 +106,7 @@ public class NewAlignmentTableCreator {
       // TODO you might miss stuff here! replacement might be longer!
       // still have words in the witness? add new columns after the last one from the base
       if (iteratorB.hasNext()) {
-        final LinkedList<Phrase> remainingWitnessWords = Lists.newLinkedList(iteratorB);
+        final List<Phrase> remainingWitnessWords = Lists.newArrayList(iteratorB);
         NewAlignmentTableCreator.addVariantAtGap(table, superbase, replacement, remainingWitnessWords);
       }
     }

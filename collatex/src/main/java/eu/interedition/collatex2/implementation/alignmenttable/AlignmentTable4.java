@@ -3,9 +3,9 @@ package eu.interedition.collatex2.implementation.alignmenttable;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.implementation.alignment.Gap;
 import eu.interedition.collatex2.implementation.modifications.Addition;
@@ -159,7 +159,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public List<String> findRepeatingTokens() {
     //transform
-    final Multimap<String, IColumn> columnsForTokenMap = Multimaps.newArrayListMultimap();
+    final Multimap<String, IColumn> columnsForTokenMap = ArrayListMultimap.create();
     for (final IColumn column : getColumns()) {
       final List<INormalizedToken> variants = column.getVariants();
       for (final INormalizedToken token : variants) {

@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.alignment.Alignment;
@@ -64,7 +64,7 @@ public class IgnoredTest {
             baseWords.add(match.getBaseWord().getOriginal());
             witnessWords.add(match.getWitnessWord().getOriginal());
           }
-          println("      '" + Join.join(" ", baseWords) + "' -> '" + Join.join(" ", witnessWords) + "'");
+          println("      '" + Joiner.on(" ").join(baseWords) + "' -> '" + Joiner.on(" ").join(witnessWords) + "'");
         }
       }
     }

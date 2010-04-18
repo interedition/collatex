@@ -13,12 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
+import com.google.common.collect.TreeMultiset;
 
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -28,7 +28,7 @@ import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class WitnessIndex0 implements IWitnessIndex {
   private Logger log = LoggerFactory.getLogger(WitnessIndex0.class); 
-  Multiset<IPhrase> phraseBag = Multisets.newTreeMultiset();
+  Multiset<IPhrase> phraseBag = TreeMultiset.create();
   
   public WitnessIndex0(final Multiset<IPhrase> _phraseBag) {
     this.phraseBag = _phraseBag;
@@ -66,7 +66,7 @@ public class WitnessIndex0 implements IWitnessIndex {
   }
 
   private Multimap<String, IPhrase> seed(final List<INormalizedToken> tokens) {
-    final Multimap<String, IPhrase> phraseMap = Multimaps.newHashMultimap();
+    final Multimap<String, IPhrase> phraseMap = HashMultimap.create();
     for (final INormalizedToken token : tokens) {
       phraseMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
     }
@@ -77,7 +77,7 @@ public class WitnessIndex0 implements IWitnessIndex {
     Multimap<String, IPhrase> phraseMap = seed;
 
     do {
-      final Multimap<String, IPhrase> newPhraseMap = Multimaps.newHashMultimap();
+      final Multimap<String, IPhrase> newPhraseMap = HashMultimap.create();
       for (final String phraseId : phraseMap.keySet()) {
         final Collection<IPhrase> phrases = phraseMap.get(phraseId);
         if (phrases.size() == 1 && !repeatingTokens.contains(phraseId)) {

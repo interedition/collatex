@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.alignment.Alignment;
@@ -90,7 +90,7 @@ public class CollateXEngine {
   protected static Set<String> getTokensWithMultiples(final Collection<IWitness> witnesses) {
     final Set<String> stringSet = Sets.newHashSet();
     for (final IWitness witness : witnesses) {
-      final Multiset<String> tokenSet = Multisets.newHashMultiset();
+      final Multiset<String> tokenSet = HashMultiset.create();
       final List<INormalizedToken> tokens = witness.getTokens();
       for (final INormalizedToken token : tokens) {
         tokenSet.add(token.getNormalized());
@@ -109,7 +109,7 @@ public class CollateXEngine {
   protected static Set<String> getPhrasesWithMultiples(final IWitness... witnesses) {
     final Set<String> stringSet = Sets.newHashSet();
     for (final IWitness witness : witnesses) {
-      final Multiset<String> tokenSet = Multisets.newHashMultiset();
+      final Multiset<String> tokenSet = HashMultiset.create();
       final List<INormalizedToken> tokens = witness.getTokens();
       for (final INormalizedToken token : tokens) {
         tokenSet.add(token.getNormalized());

@@ -3,7 +3,7 @@ package com.sd_editions.collatex.permutations;
 import java.util.List;
 
 import com.google.common.base.Function;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
 import eu.interedition.collatex.input.Word;
@@ -36,7 +36,7 @@ public class PMMatch {
       }
     };
     // words.collect{|w| w.position}
-    return "[" + Join.join("->", Iterables.transform(getWords(), extractPosition)) + "]" + (this.isFixed() ? " (fixed)" : " (potential)");
+    return "[" + Joiner.on("->").join(Iterables.transform(getWords(), extractPosition)) + "]" + (this.isFixed() ? " (fixed)" : " (potential)");
   }
 
   public List<Word> getWords() {

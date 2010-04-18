@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sd_editions.collatex.match.WordColorTuple;
@@ -67,7 +67,7 @@ public class AlignmentView {
         words.add(word.original);
       }
     }
-    html.append(Join.join(" ", words));
+    html.append(Joiner.on(" ").join(words));
     html.append("<br/>");
 
     return html.toString();

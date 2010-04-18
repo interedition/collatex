@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.collect.SortedArraySet;
 import com.sd_editions.collatex.Block.Block;
 import com.sd_editions.collatex.Block.BlockStructure;
 import com.sd_editions.collatex.Block.BlockStructureListIterator;
@@ -80,7 +80,7 @@ public class WordMatchMap {
     return Lists.newArrayList(wordMatchMap.keySet());
   }
 
-  public SortedArraySet<WordCoordinate> getExactMatches(String word) {
+  public SortedSet<WordCoordinate> getExactMatches(String word) {
     final WordMatches wordMatches = wordMatchMap.get(word);
     if (wordMatches == null) return null;
     return wordMatchMap.get(word).getExactMatches();
@@ -102,7 +102,7 @@ public class WordMatchMap {
     return positionArray;
   }
 
-  public SortedArraySet<WordCoordinate> getLevMatches(String word) {
+  public SortedSet<WordCoordinate> getLevMatches(String word) {
     final WordMatches wordMatches = wordMatchMap.get(word);
     if (wordMatches == null) return null;
     return wordMatches.getLevMatches();

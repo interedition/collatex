@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -66,7 +66,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
 
   @Override
   public List<String> findRepeatingTokens() {
-    final Multimap<String, INormalizedToken> normalizedTokenMap = Multimaps.newArrayListMultimap();
+    final Multimap<String, INormalizedToken> normalizedTokenMap = ArrayListMultimap.create();
     for (final INormalizedToken token : getTokens()) {
       normalizedTokenMap.put(token.getNormalized(), token);
     }

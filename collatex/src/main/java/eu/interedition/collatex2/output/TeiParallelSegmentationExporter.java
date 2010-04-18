@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 /**
  * Apparatus element serializing to the output format specified in ticket #6.
@@ -41,7 +41,7 @@ public class TeiParallelSegmentationExporter {
 
   private String convertEntry(ApparatusEntry entry) {
     // group together similar phrases
-    final Multimap<String, String> contentToSigel = Multimaps.newArrayListMultimap();
+    final Multimap<String, String> contentToSigel = ArrayListMultimap.create();
     List<String> sigli = entry.getSigli();
     for (String sigel : sigli) {
       contentToSigel.put(entry.getPhrase(sigel).getContent(), sigel);

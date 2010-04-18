@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -99,7 +99,7 @@ public class Column3 implements IColumn {
              
           );
     }
-    return Join.join(",", list);
+    return Joiner.on(",").join(list);
   }
 
   @Override

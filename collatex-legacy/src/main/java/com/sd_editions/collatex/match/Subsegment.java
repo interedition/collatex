@@ -9,10 +9,10 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex.input.Phrase;
 import eu.interedition.collatex.input.Segment;
@@ -127,7 +127,7 @@ public class Subsegment {
   public Subsegment splitOff(final List<SegmentPosition> startPositions) {
     final Subsegment splitOff = new Subsegment(getTitle());
     final List<SegmentPosition> segmentPositions = getSegmentPositions();
-    final Multimap<String, Integer> witnessPositions = Multimaps.newArrayListMultimap();
+    final Multimap<String, Integer> witnessPositions = ArrayListMultimap.create();
     for (final SegmentPosition segmentPosition : segmentPositions) {
       if (!startPositions.contains(segmentPosition)) {
         final String witnessId = segmentPosition.witnessId;

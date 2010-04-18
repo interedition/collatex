@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.input.BaseElement;
@@ -67,7 +67,7 @@ public class UnfixedAlignment<T extends BaseElement> {
 
   // group matches by common base word or common witness word
   private Multimap<T, Match<T>> groupMatchesForBase(final Set<Match<T>> _matches) {
-    final Multimap<T, Match<T>> matchGroupsForBase = Multimaps.newLinkedListMultimap();
+    final Multimap<T, Match<T>> matchGroupsForBase = LinkedListMultimap.create();
     for (final Match<T> match : _matches) {
       matchGroupsForBase.put(match.getBaseWord(), match);
     }
@@ -75,7 +75,7 @@ public class UnfixedAlignment<T extends BaseElement> {
   }
 
   private Multimap<T, Match<T>> groupMatchesForWitness(final Set<Match<T>> _matches) {
-    final Multimap<T, Match<T>> groupMatchesForWitness = Multimaps.newLinkedListMultimap();
+    final Multimap<T, Match<T>> groupMatchesForWitness = LinkedListMultimap.create();
     for (final Match<T> match : _matches) {
       groupMatchesForWitness.put(match.getWitnessWord(), match);
     }

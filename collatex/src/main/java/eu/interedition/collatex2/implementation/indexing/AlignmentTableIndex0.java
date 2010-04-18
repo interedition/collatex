@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -50,10 +50,10 @@ public class AlignmentTableIndex0 implements IAlignmentTableIndex {
   }
 
   private Multimap<String, ColumnPhrase> seed(final List<IColumn> tableColumns) {
-    final Multimap<String, ColumnPhrase> columnPhraseMap = Multimaps.newHashMultimap();
+    final Multimap<String, ColumnPhrase> columnPhraseMap = HashMultimap.create();
 
     for (final IColumn tableColumn : tableColumns) {
-      final Multimap<String, String> sigliForTokenMap = Multimaps.newHashMultimap();
+      final Multimap<String, String> sigliForTokenMap = HashMultimap.create();
       for (final INormalizedToken normalizedToken : tableColumn.getVariants()) {
         final String tokenName = normalizedToken.getNormalized();
         sigliForTokenMap.put(tokenName, normalizedToken.getSigil());
@@ -73,7 +73,7 @@ public class AlignmentTableIndex0 implements IAlignmentTableIndex {
     Multimap<String, ColumnPhrase> columnPhraseMap = seed;
 
     do {
-      final Multimap<String, ColumnPhrase> newColumnPhraseMap = Multimaps.newHashMultimap();
+      final Multimap<String, ColumnPhrase> newColumnPhraseMap = HashMultimap.create();
       for (final String phraseId : columnPhraseMap.keySet()) {
         final Collection<ColumnPhrase> columnPhraseCollection = columnPhraseMap.get(phraseId);
         if (columnPhraseCollection.size() == 1) {
