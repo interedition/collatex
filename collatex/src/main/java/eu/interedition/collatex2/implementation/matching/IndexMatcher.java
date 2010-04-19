@@ -64,23 +64,54 @@ public class IndexMatcher {
   }
 
   //TODO: make IColumns Iterable!
-  //TODO: check whether there is a wrong second token placed on the same position!
+  //NOTE: There is a potential situation here where 1 column matches with multiple phrases
+  //NOTE: The other phrases are seen as additions, which causes too many empty columns
+  //NOTE: --> not the optimal alignment
   @SuppressWarnings("boxing")
   public static List<IMatch> filterMatchesBasedOnPositionMatches(final List<IMatch> matches) {
+    final Map<INormalizedToken, IColumn> tokenToColumn = Maps.newLinkedHashMap();
     final Map<Integer, IColumn> columnsMap = Maps.newHashMap();
     final Map<Integer, INormalizedToken> tokenMap = Maps.newHashMap();
     for (final IMatch match : matches) {
-      //TODO: rename match.getColumnsA to match.getColumns
+      // check whether this match has an alternative that is equal in weight
+      // if so, then skip the alternative!
+      // NOTE: multiple columns match with the same token!
+      // step 1. Gather data
+      List<ColumnToken> things = Lists.newArrayList();
       final IColumns columns = match.getColumns();
       final IPhrase phrase = match.getPhrase();
       final Iterator<INormalizedToken> tokens = phrase.getTokens().iterator();
       for (final IColumn column : columns.getColumns()) {
+        final INormalizedToken token = tokens.next();
+        // skip NullColumn and NullToken
         if (!(column instanceof NullColumn)) {
+          things.add(new ColumnToken(column, token));
+        }
+      }
+      // step 2. Look for alternative
+      boolean foundAlternative = false;
+      for (ColumnToken thing : things) {
+        // check for alternative here!
+        final IColumn column = thing.column;
+        final INormalizedToken token = thing.token;
+        if (tokenToColumn.containsKey(token)) {
+          IColumn existingColumn = tokenToColumn.get(token);
+          if (existingColumn != column) {
+            foundAlternative = true;
+          }  
+        }
+      }
+      // step 3. Decide what to do
+      if (foundAlternative) {
+        IndexMatcher.LOG.debug("Phrase '"+phrase+"' is an alternative! skipping...");
+      } else {
+        for (ColumnToken thing : things) {
+          final IColumn column = thing.column;
           final int position = column.getPosition();
+          final INormalizedToken token = thing.token;
+          tokenToColumn.put(token, column);
           columnsMap.put(position, column);
-          tokenMap.put(position, tokens.next());
-        } else {
-          tokens.next();
+          tokenMap.put(position, token);
         }
       }
     }
@@ -98,5 +129,4 @@ public class IndexMatcher {
     }
     return newMatches;
   }
-
 }
