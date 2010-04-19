@@ -8,16 +8,6 @@
 	</parent>
 	<artifactId>collatex</artifactId>
 	<name>CollateX :: Java library</name>
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**/*.html</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -30,4 +20,11 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<distributionManagement>
+		<site>
+			<id>site.collatex.sourceforge.net</id>
+			<name>CollateX Maven Site</name>
+			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/</url>
+		</site>
+	</distributionManagement>
 </project>

@@ -87,7 +87,7 @@
 		{"t":"A","n":"a"},                
 		{"t":"nice","n":"nice"},                
 		{"t":"black","n":"black"},                
-		{"t":"cat","n":"cat"},                
+		{"t":"cat.","n":"cat"},                
 		null,                
 		null,                
 		null]},        
@@ -95,10 +95,10 @@
 		{"t":"A","n":"a"},                
 		{"t":"white","n":"white"},                
 		null,                
-		{"t":"kitten.","n":"cat"},                
-                {"t":"a","n":"a"},
+		{"t":"kitten","n":"cat"},                
 		{"t":"in","n":"in"},
-                {"t":"basket","n":"basket"}]}
+                {"t":"a","n":"a"},
+                {"t":"basket.","n":"basket"}]}
         ]
 }</pre>
 	
@@ -109,11 +109,11 @@
         <rdg wit="#A">nice black</rdg>
         <rdg wit="#B">white</rdg>
     </app> <app>
-        <rdg wit="#A">cat</rdg>
-        <rdg wit="#B">kitten.</rdg>
+        <rdg wit="#A">cat.</rdg>
+        <rdg wit="#B">kitten</rdg>
     </app> <app>
         <rdg wit="#A"/>
-        <rdg wit="#B">in a basket</rdg>
+        <rdg wit="#B">in a basket.</rdg>
     </app>
 </collatex:apparatus>]]></pre>
 [/@c.page]
