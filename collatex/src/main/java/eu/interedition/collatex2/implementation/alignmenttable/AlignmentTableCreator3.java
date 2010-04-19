@@ -55,7 +55,7 @@ public class AlignmentTableCreator3 implements IAligner {
 
       final IAlignment alignment = engine.createAlignmentUsingIndex(alignmentTable, witness);
       callback.alignment(alignment);
-      final IAlignment alignment2 = makeAddDelFromTrans(alignment);
+      final IAlignment alignment2 = makeAddDelFromTrans(alignmentTable, alignment);
       addMatchesToAlignmentTable(alignment2);
       addReplacementsToAlignmentTable(alignmentTable, alignment2);
       addAdditionsToAlignmentTable(alignmentTable, alignment2);      
@@ -100,7 +100,7 @@ public class AlignmentTableCreator3 implements IAligner {
   // a b
   // b a
   // this becomes |a| b| |, | |b|a|
-  public static IAlignment makeAddDelFromTrans(final IAlignment alignment) {
+  public static IAlignment makeAddDelFromTrans(IAlignmentTable table, final IAlignment alignment) {
     // handle transpositions here!
     final List<ITransposition> transpositions = alignment.getTranspositions();
     final List<IMatch> matches = removeMatchesFromTranpositions(alignment, transpositions);
@@ -112,7 +112,7 @@ public class AlignmentTableCreator3 implements IAligner {
       final ITransposition top = transToCheck.pop();
       final ITransposition mirrored = findMirroredTransposition(transToCheck, top);
       // Note: this only calculates the distance between the columns.
-      // Note: it does not take into account a possible distance in the prases!
+      // Note: it does not take into account a possible distance in the phrases!
       if (mirrored != null && distanceBetweenTranspositions(top, mirrored) == 0) {
         // System.out.println("Keeping: transposition " + top.toString());
         // System.out.println("Removing: transposition " + mirrored.toString());
@@ -122,7 +122,7 @@ public class AlignmentTableCreator3 implements IAligner {
         gaps.add(addition);
         matches.add(top.getMatchA());
       } else {
-        final IGap replacement = makeReplacementOutOfTransposition(top);
+        final IGap replacement = makeReplacementOutOfTransposition(top, table);
         gaps.add(replacement);
       }
     }
@@ -131,10 +131,16 @@ public class AlignmentTableCreator3 implements IAligner {
     return al;
   }
 
-  private static IGap makeReplacementOutOfTransposition(final ITransposition top) {
+  private static IGap makeReplacementOutOfTransposition(final ITransposition top, IAlignmentTable table) {
     final IColumns columns = top.getMatchA().getColumns();
     final IPhrase phrase = top.getMatchB().getPhrase();
-    final IColumn nextColumn = null; // TODO: this is wrong... very wrong!
+    final IColumn lastColumn = columns.getLastColumn();
+    final IColumn nextColumn;
+    if (lastColumn.getPosition() == table.size()){
+      nextColumn = null;
+    } else {
+      nextColumn = table.getColumns().get(lastColumn.getPosition());
+    }
     final IGap gap = new Gap(columns, phrase, nextColumn);
     return gap;
   }
