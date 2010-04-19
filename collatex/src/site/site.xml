@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CollateX" xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+	<bannerRight>
+		<name>Left Banner</name>
+		<src>images/collatex_logo_small.png</src>
+		<alt>CollateX</alt>
+		<href>http://collatex.sourceforge.net/</href>
+	</bannerRight>
+
+	<body>
+		<links>
+			<item name="Huygens Instituut" href="http://www.huygensinstituut.knaw.nl/" />
+			<item name="Universität Würzburg" href="http://www.uni-wuerzburg.de/" />
+			<item name="Oxford University" href="http://www.ox.ac.uk/" />
+		</links>
+
+		<menu name="CollateX">
+			<item href="download.html" name="Download" />
+			<item href="contribute.html" name="Contribute" />
+		</menu>
+		<menu ref="reports" />
+	</body>
+
+	<poweredBy />
+</project>

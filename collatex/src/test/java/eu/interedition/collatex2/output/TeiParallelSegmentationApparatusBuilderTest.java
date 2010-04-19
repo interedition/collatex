@@ -45,7 +45,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testSimpleSubstitutionOutput() throws Exception {
     assertApparatusEquals(//
-        "the black<app><rdg wit=\"#W1\">cat</rdg><rdg wit=\"#W2 #W3\">dog</rdg></app>and the black mat",//
+        "the black <app><rdg wit=\"#W1\">cat</rdg><rdg wit=\"#W2 #W3\">dog</rdg></app> and the black mat",//
         "the black cat and the black mat",//
         "the black dog and the black mat",//
         "the black dog and the black mat");
@@ -59,7 +59,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testSimpleAddDelOutput() throws Exception {
     assertApparatusEquals(//
-        "<app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">the black saw</rdg></app>the black cat on the<app><rdg wit=\"#W1\">white</rdg><rdg wit=\"#W2 #W3\"/></app>table",//
+        "<app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">the black saw</rdg></app> the black cat on the <app><rdg wit=\"#W1\">white</rdg><rdg wit=\"#W2 #W3\"/></app> table",//
         "the black cat on the white table",//
         "the black saw the black cat on the table",//
         "the black saw the black cat on the table");
@@ -68,7 +68,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testMultiSubstitutionOutput() throws Exception {
     assertApparatusEquals(//
-        "the<app><rdg wit=\"#W1\">black cat</rdg><rdg wit=\"#W2 #W3\">big white dog</rdg></app>and the black mat",//
+        "the <app><rdg wit=\"#W1\">black cat</rdg><rdg wit=\"#W2 #W3\">big white dog</rdg></app> and the black mat",//
         "the black cat and the black mat",//
         "the big white dog and the black mat",//
         "the big white dog and the black mat");
@@ -87,7 +87,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testAWordMissingAtTheEnd() throws Exception {
     assertApparatusEquals(//
-        "the black<app><rdg wit=\"#W1 #W2\">cat</rdg><rdg wit=\"#W3\"/></app>",//
+        "the black <app><rdg wit=\"#W1 #W2\">cat</rdg><rdg wit=\"#W3\"/></app>",//
         "the black cat",//
         "the black cat",//
         "the black");
@@ -97,7 +97,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testCrossVariation() throws Exception {
     assertApparatusEquals(//
-        "the<app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">white</rdg></app><app><rdg wit=\"#W1 #W3\"/><rdg wit=\"#W2\">and</rdg></app><app><rdg wit=\"#W1 #W2\">black</rdg><rdg wit=\"#W3\"/></app>cat",//
+        "the <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">white</rdg></app> <app><rdg wit=\"#W1 #W3\"/><rdg wit=\"#W2\">and</rdg></app> <app><rdg wit=\"#W1 #W2\">black</rdg><rdg wit=\"#W3\"/></app> cat",//
         "the black cat",//
         "the white and black cat",//
         "the white cat");
@@ -107,7 +107,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testAddition() throws Exception {
     assertApparatusEquals(//
-        "the<app><rdg wit=\"#W1\"/><rdg wit=\"#W2\">white and</rdg></app>black cat",//
+        "the <app><rdg wit=\"#W1\"/><rdg wit=\"#W2\">white and</rdg></app> black cat",//
         "the black cat",//
         "the white and black cat");
   }

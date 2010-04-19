@@ -6,61 +6,18 @@
 	<packaging>pom</packaging>
 	<name>CollateX :: Project</name>
 	<version>1.1-SNAPSHOT</version>
-	<url>http://www.sourceforge.net/projects/collatex</url>
+	<description>CollateX is a Java library for collating textual sources, for example, to produce an apparatus.</description>
+	<url>http://collatex.sourceforge.net/</url>
+	<organization>
+		<name>COST Action “Interedition”</name>
+		<url>http://www.interedition.eu/</url>
+	</organization>
 	<modules>
 		<module>collatex</module>
 		<module>collatex-nodeps</module>
 		<module>collatex-web</module>
 		<module>collatex-legacy</module>
-	</modules>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptor>assembly.xml</descriptor>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<repositories>
-		<repository>
-			<id>maven.restlet.org</id>
-			<name>Public online Restlet repository</name>
-			<url>http://maven.restlet.org/</url>
-		</repository>
-		<repository>
-			<id>maven.collatex.sourceforge.net</id>
-			<name>CollateX Maven repository</name>
-			<url>http://collatex.sourceforge.net/maven-repository/</url>
-		</repository>
-	</repositories>
+	</modules>	
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -72,10 +29,6 @@
 			<artifactId>google-collections</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<!--
-			<dependency> <groupId>commons-io</groupId> <artifactId>commons-io</artifactId> <version>1.4</version> </dependency> <dependency> <groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId> <version>2.5</version> </dependency>
-		-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -141,17 +94,102 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<repositories>
+		<repository>
+			<id>maven.restlet.org</id>
+			<name>Public online Restlet repository</name>
+			<url>http://maven.restlet.org/</url>
+		</repository>
+		<repository>
+			<id>maven.collatex.sourceforge.net</id>
+			<name>CollateX Maven repository</name>
+			<url>http://collatex.sourceforge.net/maven-repository/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>bin</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-site-plugin</artifactId>
+				<configuration>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<reporting>
 		<plugins>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>dependencies</report>
+							<report>project-team</report>
+							<report>issue-tracking</report>
+							<report>license</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+
+			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
+					<encoding>UTF-8</encoding>
+					<doctitle>CollateX</doctitle>
+					<docencoding>UTF-8</docencoding>
 					<links>
 						<link>http://java.sun.com/j2se/1.6.0/docs/api</link>
 					</links>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<configuration>
+					<linkJavadoc>true</linkJavadoc>
+					<docTitle>CollateX</docTitle>
+					<outputEncoding>UTF-8</outputEncoding>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -159,27 +197,42 @@
 	<developers>
 		<developer>
 			<name>Ronald Haentjens Dekker</name>
+			<organization>Huygens Instituut</organization>
 			<roles>
 				<role>Project lead</role>
 			</roles>
 		</developer>
 		<developer>
-			<name>Marcin Mielnicki</name>
-		</developer>
-		<developer>
 			<name>Tara Andrews</name>
+			<organization>Oxford University</organization>
 		</developer>
 		<developer>
 			<name>Bram Buitendijk</name>
-		</developer>
-		<developer>
-			<name>Thorsten Vitt</name>
+			<organization>Huygens Instituut</organization>
 		</developer>
 		<developer>
 			<name>Zeth Green</name>
+			<organization>University of Birmingham</organization>
 		</developer>
 		<developer>
 			<name>Gregor Middell</name>
+			<organization>Universität Würzburg</organization>
+		</developer>
+		<developer>
+			<name>Marcin Mielnicki</name>
+			<organization>Poznan Supercomputing &amp; Networking Center</organization>
+		</developer>
+		<developer>
+			<name>Tomasz Parkola</name>
+			<organization>Poznan Supercomputing &amp; Networking Center</organization>
+		</developer>
+		<developer>
+			<name>Thorsten Vitt</name>
+			<organization>Universität Würzburg</organization>
+		</developer>
+		<developer>
+			<name>Joris van Zundert</name>
+			<organization>Huygens Instituut</organization>
 		</developer>
 	</developers>
 	<distributionManagement>
@@ -188,15 +241,18 @@
 			<name>CollateX Maven Repository</name>
 			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/maven-repository</url>
 		</repository>
-		<site>
-			<id>site.collatex.sourceforge.net</id>
-			<name>CollateX Maven Site</name>
-			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/site</url>
-		</site>
 	</distributionManagement>
-	<scm>
-		<url>scm:bazaar:lp:collatex</url>
-	</scm>
+	<issueManagement>
+		<system>sourceforge.net</system>
+		<url>http://sourceforge.net/tracker/?group_id=199278</url>
+	</issueManagement>
+	<licenses>
+		<license>
+			<name>GNU General Public License</name>
+			<url>http://www.gnu.org/licenses/gpl.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 	<properties>
 		<slf4j.version>1.5.11</slf4j.version>
 		<restlet.version>2.0-RC2</restlet.version>
