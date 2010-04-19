@@ -21,6 +21,9 @@ th, td {
 	padding: 0.5em;
 }
 
+pre {
+	background: #eee;
+}
 #mainmenu {
 	color: grey;
 	text-align: right;

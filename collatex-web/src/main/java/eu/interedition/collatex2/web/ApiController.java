@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.codehaus.jackson.JsonParseException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -114,8 +115,8 @@ public class ApiController implements InitializingBean {
     return new CollateXEngine().align(witnesses.toArray(new ApiWitness[witnesses.size()]));
   }
 
-  @ExceptionHandler(ApiException.class)
-  public ModelAndView apiError(HttpServletResponse response, ApiException exception) {
+  @ExceptionHandler({ApiException.class, JsonParseException.class })
+  public ModelAndView apiError(HttpServletResponse response, Exception exception) {
     return new ModelAndView(new MappingJacksonJsonView(), new ModelMap("error", exception.getMessage()));
   }
 
