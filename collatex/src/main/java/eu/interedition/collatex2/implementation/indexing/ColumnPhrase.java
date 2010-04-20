@@ -6,8 +6,11 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class ColumnPhrase {
   // IColumns columns is a consecutive list of IColumn-s
@@ -22,6 +25,16 @@ public class ColumnPhrase {
     this.name = _name;
   }
 
+  public IPhrase getPhrase() {
+    List<INormalizedToken> tokens = Lists.newArrayList(); //TODO: do the capacity thing!
+    final String sigil = getSigli().get(0);
+    for (IColumn column : columns.getColumns()) {
+      tokens.add(column.getToken(sigil));
+    }
+    return new Phrase(tokens);
+  }
+  
+  
   public void addColumnToLeft(final IColumn column) {
     final List<IColumn> columnList = getColumns().getColumns();
     columnList.add(0, column);
