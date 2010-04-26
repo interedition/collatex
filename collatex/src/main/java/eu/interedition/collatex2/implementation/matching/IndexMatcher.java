@@ -5,57 +5,30 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
-import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
-import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class IndexMatcher {
-  public static final Logger    LOG = LoggerFactory.getLogger(IndexMatcher.class);
-  private final IAlignmentTable table;
-  private final IWitness        witness;
-  private IAlignmentTableIndex  alignmentTableIndex;
-
-  public IndexMatcher(IAlignmentTable table, IWitness witness) {
-    this.table = table;
-    this.witness = witness;
-  }
-
-  public List<ITokenMatch> getMatches() {
-    final List<String> repeatingTokens = IndexMatcher.combineRepeatingTokens(table, witness);
-    alignmentTableIndex = AlignmentTableIndex.create(table, repeatingTokens);
-    return IndexMatcher.findMatches(alignmentTableIndex, new WitnessIndex(witness, repeatingTokens));
-  }
-
-  public static List<String> combineRepeatingTokens(final IAlignmentTable table, final IWitness witness) {
-    final Set<String> repeatingTokens = Sets.newHashSet();
-    repeatingTokens.addAll(table.findRepeatingTokens());
-    repeatingTokens.addAll(witness.findRepeatingTokens());
-    return Lists.newArrayList(repeatingTokens);
-  }
+  public static final Logger LOG = LoggerFactory.getLogger(IndexMatcher.class);
 
   public static List<ITokenMatch> findMatches(final IWitnessIndex tableIndex, final IWitnessIndex witnessIndex) {
     final List<PhraseMatch> matches = Lists.newArrayList();
     final Collection<IPhrase> phrases = witnessIndex.getPhrases();
     for (final IPhrase phrase : phrases) {
-//      IndexMatcher.LOG.debug("Looking for phrase: " + phrase.getNormalized());
+      // IndexMatcher.LOG.debug("Looking for phrase: " +
+      // phrase.getNormalized());
       if (tableIndex.contains(phrase.getNormalized())) {
-//        IndexMatcher.LOG.debug("FOUND!");
+        // IndexMatcher.LOG.debug("FOUND!");
         final IPhrase tablePhrase = tableIndex.getPhrase(phrase.getNormalized());
         matches.add(new PhraseMatch(tablePhrase, phrase));
       }
@@ -99,7 +72,8 @@ public class IndexMatcher {
         final INormalizedToken column = pair.tableToken;
         final INormalizedToken token = pair.witnessToken;
         final int position = token.getPosition();
-//        System.out.println(column.getContent() + ":" + column.getSigil() + ":" + position);
+        // System.out.println(column.getContent() + ":" + column.getSigil() +
+        // ":" + position);
         tableTokenMap.put(position, column);
         witnessTokenMap.put(position, token);
       }
@@ -114,10 +88,6 @@ public class IndexMatcher {
       newMatches.add(newMatch);
     }
     return newMatches;
-  }
-
-  public IAlignmentTableIndex getAlignmentTableIndex() {
-    return alignmentTableIndex;
   }
 
   // check whether this match has an alternative that is equal in weight
@@ -163,7 +133,7 @@ public class IndexMatcher {
     }
     return filteredMatches;
   }
-  
+
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!
   // NOTE: multiple witness tokens match with the same table column!
@@ -207,5 +177,4 @@ public class IndexMatcher {
     }
     return filteredMatches;
   }
-
 }

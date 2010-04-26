@@ -19,7 +19,7 @@ import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
-import eu.interedition.collatex2.implementation.matching.IndexMatcher;
+import eu.interedition.collatex2.implementation.matching.AlignmentTableIndexMatcher;
 import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
@@ -44,21 +44,21 @@ import eu.interedition.collatex2.interfaces.IWitnessIndex;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 
 public class CollateXEngine {
-  private ITokenizer tokenizer = new WhitespaceTokenizer();
+  private ITokenizer       tokenizer       = new WhitespaceTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
-  
+
   public void setTokenizer(ITokenizer tokenizer) {
     this.tokenizer = tokenizer;
   }
-  
+
   public void setTokenNormalizer(ITokenNormalizer tokenNormalizer) {
     this.tokenNormalizer = tokenNormalizer;
   }
-  
+
   public IAlignmentTable align(IWitness... witnesses) {
     return createAligner().add(witnesses).getResult();
   }
-  
+
   public IWitness createWitness(final String sigil, final String words) {
     final Iterable<IToken> tokens = tokenizer.tokenize(sigil, words);
     return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
@@ -84,26 +84,24 @@ public class CollateXEngine {
     throw new RuntimeException("Near matches are not yet supported!");
   }
 
-  //NOTE; here we have to convert ITokenMatch to IMatch !
-  //NOTE: extract the table and the witness just.. give it just indexes!
-  //NOTE: but then we would have to leave the repeating tokens functionality somewhere!
-  //NOTE: make index matcher non static
-  
-  //TODO: rename this method!
+  // NOTE; here we have to convert ITokenMatch to IMatch !
+  // NOTE: extract the table and the witness just.. give it just indexes!
+  // NOTE: but then we would have to leave the repeating tokens functionality
+  // somewhere!
+  // NOTE: make index matcher non static
+
+  // TODO: rename this method!
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
-    IndexMatcher matcher = new IndexMatcher(table, witness);
+    AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table, witness);
     List<ITokenMatch> tokenMatches = matcher.getMatches();
-    System.out.println("###"+tokenMatches);
     IAlignmentTableIndex alignmentTableIndex = matcher.getAlignmentTableIndex();
-    
     final List<IMatch> matches = convertTokenMatchesToColumnMatches(tokenMatches, alignmentTableIndex);
-    System.out.println("##$##"+matches);
- //   throw new RuntimeException("STOP");
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;
-}
-    private List<IMatch> convertTokenMatchesToColumnMatches(List<ITokenMatch> tokenMatches, IAlignmentTableIndex alignmentTableIndex) {
+  }
+
+  private List<IMatch> convertTokenMatchesToColumnMatches(List<ITokenMatch> tokenMatches, IAlignmentTableIndex alignmentTableIndex) {
     List<IMatch> columnMatches = Lists.newArrayList();
     for (ITokenMatch tokenMatch : tokenMatches) {
       INormalizedToken tableToken = tokenMatch.getTableToken();
@@ -113,8 +111,8 @@ public class CollateXEngine {
       IMatch columnMatch = new Match(columns, witnessPhrase);
       columnMatches.add(columnMatch);
     }
-    //Sort the ColumnMatches here
-    //otherwise the gapdetection goes ballistic!
+    // Sort the ColumnMatches here
+    // otherwise the gapdetection goes ballistic!
     Collections.sort(columnMatches, new Comparator<IMatch>() {
       @Override
       public int compare(IMatch o1, IMatch o2) {
@@ -128,7 +126,7 @@ public class CollateXEngine {
     return new WitnessIndex(witness, witness.findRepeatingTokens());
   }
 
-  //TODO: remove? seems only used in tests!
+  // TODO: remove? seems only used in tests!
   protected static Set<String> getTokensWithMultiples(final Collection<IWitness> witnesses) {
     final Set<String> stringSet = Sets.newHashSet();
     for (final IWitness witness : witnesses) {
@@ -147,7 +145,7 @@ public class CollateXEngine {
     return stringSet;
   }
 
-  //TODO: remove? seems only used in tests!
+  // TODO: remove? seems only used in tests!
   protected static Set<String> getPhrasesWithMultiples(final IWitness... witnesses) {
     final Set<String> stringSet = Sets.newHashSet();
     for (final IWitness witness : witnesses) {
@@ -164,7 +162,8 @@ public class CollateXEngine {
         }
       }
       if (duplicationFound) {
-        // als er een dubbele gevonden is, kijk dan of deze uitgebreid kan worden naar rechts
+        // als er een dubbele gevonden is, kijk dan of deze uitgebreid kan
+        // worden naar rechts
         for (int i = 0; i < tokens.size() - 1; i++) {
           final String currentNormalized = tokens.get(i).getNormalized();
           final String nextNormalized = tokens.get(i + 1).getNormalized();
