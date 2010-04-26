@@ -35,12 +35,12 @@ public class TokenMatch implements ITokenMatch {
 
   @Override
   public INormalizedToken getTokenA() {
-    return tableToken;
+    return token;
   }
 
   @Override
   public INormalizedToken getTokenB() {
-    return token;
+    return tableToken;
   }
 
   @Override

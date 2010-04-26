@@ -9,7 +9,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class VariantGraphIndex implements IVariantGraphIndex {
 
@@ -102,6 +104,36 @@ public class VariantGraphIndex implements IVariantGraphIndex {
     }
     result += ")";
     return result;
+  }
+
+  //TODO: remove duplication!
+  @Override
+  public boolean contains(String normalized) {
+    return containsNormalizedPhrase(normalized);
+  }
+
+  //TODO: this is workaround! store real phrases instead of token!
+  @Override
+  public IPhrase getPhrase(String normalized) {
+    if(!contains(normalized)) {
+      throw new RuntimeException("Item does not exist!");
+    }
+    Collection<INormalizedToken> tokens = normalizedToTokens.get(normalized);
+    return new Phrase(Lists.newArrayList(tokens));
+  }
+
+  @Override
+  public Collection<IPhrase> getPhrases() {
+    List<IPhrase> phrases = Lists.newArrayList();
+    for (String key : normalizedToTokens.keySet()) {
+      phrases.add(getPhrase(key));
+    }
+    return phrases;
+  }
+
+  @Override
+  public int size() {
+    return normalizedToTokens.size();
   }
 
 }

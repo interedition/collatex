@@ -25,7 +25,7 @@ public class AlignmentGraphWitnessMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = factory.createWitness("B", "everything is unique");
     IVariantGraph graph = VariantGraph.create(witnessA);
-    VariantGraphWitnessMatcher matcher = new VariantGraphWitnessMatcher(graph);
+    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
     List<ITokenMatch> matches2 = matcher.getMatches(witnessB);
     assertEquals(3, matches2.size());
     assertEquals("everything: 1 -> 1", matches2.get(0).toString());

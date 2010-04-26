@@ -83,7 +83,7 @@ public class VariantGraph implements IVariantGraph {
   //if they already exist we need to add the witness to the
   //existing arc!
   public void addWitness(IWitness witness) {
-    VariantGraphWitnessMatcher matcher = new VariantGraphWitnessMatcher(this);
+    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(this);
     List<ITokenMatch> matches = matcher.getMatches(witness);
     makeArcsForMatches(witness, matches, matcher.getGraphIndex());   
   }
