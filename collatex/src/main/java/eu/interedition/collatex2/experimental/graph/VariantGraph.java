@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraph implements IVariantGraph {

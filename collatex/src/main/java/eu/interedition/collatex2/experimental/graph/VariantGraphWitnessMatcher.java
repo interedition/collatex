@@ -7,8 +7,10 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
+import eu.interedition.collatex2.implementation.matching.TokenMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 

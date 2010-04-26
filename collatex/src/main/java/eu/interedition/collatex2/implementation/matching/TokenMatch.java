@@ -1,10 +1,11 @@
 package eu.interedition.collatex2.implementation.matching;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 
 public class TokenMatch implements ITokenMatch {
-
+  //TODO: remove duplication here! I look witnessToken and matchingToken the best!
   private final INormalizedToken tableToken;
   private final INormalizedToken token;
 
@@ -28,10 +29,22 @@ public class TokenMatch implements ITokenMatch {
     return token;
   }
   
-  @Override
-  public String toString() {
-    return token.getContent()+" -> "+tableToken.getContent();
+  private IToken getMatchingToken() {
+    return tableToken;
   }
 
+  @Override
+  public INormalizedToken getTokenA() {
+    return tableToken;
+  }
 
+  @Override
+  public INormalizedToken getTokenB() {
+    return token;
+  }
+
+  @Override
+  public String toString() {
+    return getNormalized() + ": "+getWitnessToken().getPosition()+" -> "+getMatchingToken().getPosition();
+  }
 }
