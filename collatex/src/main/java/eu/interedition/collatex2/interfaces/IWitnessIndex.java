@@ -10,4 +10,6 @@ public interface IWitnessIndex {
 
   Collection<IPhrase> getPhrases();
 
+  IPhrase getPhrase(String normalized);
+
 }

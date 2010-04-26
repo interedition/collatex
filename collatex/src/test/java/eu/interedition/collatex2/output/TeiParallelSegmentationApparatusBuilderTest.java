@@ -59,7 +59,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testSimpleAddDelOutput() throws Exception {
     assertApparatusEquals(//
-        "<app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">the black saw</rdg></app> the black cat on the <app><rdg wit=\"#W1\">white</rdg><rdg wit=\"#W2 #W3\"/></app> table",//
+        "the black <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">saw the black</rdg></app> cat on the <app><rdg wit=\"#W1\">white</rdg><rdg wit=\"#W2 #W3\"/></app> table",//
         "the black cat on the white table",//
         "the black saw the black cat on the table",//
         "the black saw the black cat on the table");

@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Function;
@@ -21,8 +20,15 @@ import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
+//TODO: import IAlignment should be removed
+//The IndexMatcher should give back the token matches
+//In the near future IAlignment will just be a few on two rows of the alignment table
+//The IndexMatcher will be the class that matches a witness against the table or the graph
+// and returns TokenMatches
 public class IndexMatcherTest {
   private static CollateXEngine factory;
 
@@ -51,23 +57,21 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one very different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = IndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
+    IndexMatcher indexMatcher = new IndexMatcher(table, witnessC);
+    List<ITokenMatch> matches = indexMatcher.getMatches();
     assertEquals(3, matches.size());
-    final IMatch match = matches.get(0);
+    final ITokenMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
-    final IColumns columnsA = match.getColumns();
-    assertEquals(1, columnsA.getBeginPosition());
-    assertEquals(1, columnsA.getEndPosition());
-    final IMatch match2 = matches.get(1);
+    final INormalizedToken columnsA = match.getTableToken();
+    assertEquals(1, columnsA.getPosition());
+    final ITokenMatch match2 = matches.get(1);
     assertEquals("is", match2.getNormalized());
-    final IColumns columnsB = match2.getColumns();
-    assertEquals(2, columnsB.getBeginPosition());
-    assertEquals(2, columnsB.getEndPosition());
-    final IMatch match3 = matches.get(2);
+    final INormalizedToken columnsB = match2.getTableToken();
+    assertEquals(2, columnsB.getPosition());
+    final ITokenMatch match3 = matches.get(2);
     assertEquals("different", match3.getNormalized());
-    final IColumns columnsC = match3.getColumns();
-    assertEquals(4, columnsC.getBeginPosition());
-    assertEquals(4, columnsC.getEndPosition());
+    final INormalizedToken columnsC = match3.getTableToken();
+    assertEquals(4, columnsC.getPosition());
   }
 
   @Test
@@ -76,23 +80,21 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one is different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = IndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
+    IndexMatcher indexMatcher = new IndexMatcher(table, witnessC);
+    final List<ITokenMatch> matches = indexMatcher.getMatches();
     assertEquals(3, matches.size());
-    final IMatch match = matches.get(0);
+    final ITokenMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
-    final IColumns columnsA = match.getColumns();
-    assertEquals(1, columnsA.getBeginPosition());
-    assertEquals(1, columnsA.getEndPosition());
-    final IMatch match2 = matches.get(1);
+    final INormalizedToken columnsA = match.getTableToken();
+    assertEquals(1, columnsA.getPosition());
+    final ITokenMatch match2 = matches.get(1);
     assertEquals("is", match2.getNormalized());
-    final IColumns columnsB = match2.getColumns();
-    assertEquals(3, columnsB.getBeginPosition());
-    assertEquals(3, columnsB.getEndPosition());
-    final IMatch match3 = matches.get(2);
+    final INormalizedToken columnsB = match2.getTableToken();
+    assertEquals(3, columnsB.getPosition());
+    final ITokenMatch match3 = matches.get(2);
     assertEquals("different", match3.getNormalized());
-    final IColumns columnsC = match3.getColumns();
-    assertEquals(4, columnsC.getBeginPosition());
-    assertEquals(4, columnsC.getEndPosition());
+    final INormalizedToken columnsC = match3.getTableToken();
+    assertEquals(4, columnsC.getPosition());
   }
 
   @Test
@@ -139,19 +141,9 @@ public class IndexMatcherTest {
     assertEquals(2, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("the black", match.getNormalized());
-    //    final IColumns columnsA = match.getColumnsA();
-    //    assertEquals(1, columnsA.getBeginPosition());
-    //    assertEquals(4, columnsA.getEndPosition());
-  }
-
-  //NOTE: joining is already tested in other tests!
-  @Ignore
-  @Test
-  public void testJoinOverlappingMatches() {
-    // TODO make this testcase
-    final List<IMatch> matches = Lists.newArrayList();
-    final List<IMatch> joined = IndexMatcher.joinOverlappingMatches(matches);
-    assertEquals(1, joined.size());
+    final IColumns columns = match.getColumns();
+    assertEquals(1, columns.getBeginPosition());
+    assertEquals(2, columns.getEndPosition());
   }
 
   @Test
@@ -164,6 +156,34 @@ public class IndexMatcherTest {
     assertContains(matches, "the black");
     assertContains(matches, "cat");
     assertEquals(2, matches.size());
+  }
+  
+  @Test
+  public void testTwoEqualPossibilities1() {
+    // test a -> a a
+    final IWitness a = factory.createWitness("A", "a");
+    final IWitness b = factory.createWitness("B", "a a");
+    final IAlignmentTable table = factory.align(a);
+    IndexMatcher matcher = new IndexMatcher(table, b);
+    List<ITokenMatch> matches = matcher.getMatches();
+    assertEquals(1, matches.size());
+    ITokenMatch match = matches.get(0);
+    assertEquals(1, match.getTableToken().getPosition());
+    assertEquals(1, match.getWitnessToken().getPosition());
+  }
+
+  @Test
+  public void testTwoEqualPossibilities2() {
+    // test a a -> a
+    final IWitness a = factory.createWitness("A", "a a");
+    final IWitness b = factory.createWitness("B", "a");
+    final IAlignmentTable table = factory.align(a);
+    IndexMatcher matcher = new IndexMatcher(table, b);
+    List<ITokenMatch> matches = matcher.getMatches();
+    assertEquals(1, matches.size());
+    ITokenMatch match = matches.get(0);
+    assertEquals(1, match.getTableToken().getPosition());
+    assertEquals(1, match.getWitnessToken().getPosition());
   }
 
   final Function<IMatch, String> function = new Function<IMatch, String>() {

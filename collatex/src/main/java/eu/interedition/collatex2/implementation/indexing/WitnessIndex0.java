@@ -128,4 +128,10 @@ public class WitnessIndex0 implements IWitnessIndex {
     return values;
   }
 
+  @Override
+  public IPhrase getPhrase(String normalized) {
+    throw new RuntimeException("WHO USES THIS?");
+    //return null;
+  }
+
 }

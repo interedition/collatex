@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.implementation.indexing;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +18,8 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class AlignmentTableIndex implements IAlignmentTableIndex, IWitnessIndex {
+public class AlignmentTableIndex implements IAlignmentTableIndex {
   private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
   
   //TODO: after all of this.. rename IWitnessIndex to ITokenIndex or something!
@@ -27,9 +27,11 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, IWitnessIndex 
   //The Columns can be retrieved by using columnphrase.getColumns
   //TODO: rename field!
   private final Map<String, ColumnPhrase> normalizedToColumns;
+  private final Map<INormalizedToken, IColumn> tokenToColumn;
 
   private AlignmentTableIndex() {
     this.normalizedToColumns = Maps.newLinkedHashMap();
+    this.tokenToColumn = Maps.newLinkedHashMap();
   }
 
   public static IAlignmentTableIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
@@ -58,9 +60,9 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, IWitnessIndex 
           index.add(leftPhrase);
           index.add(rightPhrase);
         }
-      } else {
+      } /*else {
         logger.debug("Column " + column.getPosition() + " is empty!");
-      }
+      }*/
     }
   }
 
@@ -105,19 +107,24 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, IWitnessIndex 
 
   private void add(final ColumnPhrase phrase) {
     normalizedToColumns.put(phrase.getNormalized(), phrase);
+    IPhrase thephrase = phrase.getPhrase();
+    Iterator<IColumn> columns = phrase.getColumns().getColumns().iterator();
+    for (INormalizedToken token : thephrase.getTokens()) {
+      IColumn column = columns.next();
+      tokenToColumn.put(token, column);
+    }
   }
 
-  @Override
+//TODO: remove! NOT USED ANYMORE!
   public boolean containsNormalizedPhrase(final String normalized) {
     return normalizedToColumns.containsKey(normalized);
   }
 
-  @Override
-  public IColumns getColumns(final String normalized) {
-    if (!containsNormalizedPhrase(normalized)) {
-      throw new RuntimeException("No such element " + normalized + " in AlignmentTableIndex!");
+  public IColumn getColumn(INormalizedToken token) {
+    if (!tokenToColumn.containsKey(token)) {
+      throw new RuntimeException("Token "+token.getNormalized() + " not included in index!");
     }
-    return normalizedToColumns.get(normalized).getColumns();
+    return tokenToColumn.get(token);
   }
 
   @Override
@@ -141,6 +148,7 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, IWitnessIndex 
   //NOTE: From this point on the IWitnessIndex methods start!
   @Override
   public boolean contains(String normalized) {
+    System.out.println(normalizedToColumns.keySet());
     return normalizedToColumns.containsKey(normalized);
   }
 
@@ -153,6 +161,12 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, IWitnessIndex 
      results.add(columnPhrase.getPhrase());
     }
     return results;
+  }
+
+  @Override
+  public IPhrase getPhrase(String normalized) {
+    ColumnPhrase columnPhrase = normalizedToColumns.get(normalized);
+    return columnPhrase.getPhrase();
   }
 
 }

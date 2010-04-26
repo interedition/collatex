@@ -16,6 +16,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class AlignmentTableIndex0 implements IAlignmentTableIndex {
   Map<String, IColumns> columnsForNormalizedPhrase;
@@ -130,6 +131,30 @@ public class AlignmentTableIndex0 implements IAlignmentTableIndex {
       harvestMap.put(entry.getKey(), entry.getValue().getColumns());
     }
     return harvestMap;
+  }
+
+  @Override
+  public boolean contains(String normalized) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public IPhrase getPhrase(String normalized) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Collection<IPhrase> getPhrases() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public IColumn getColumn(INormalizedToken token) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

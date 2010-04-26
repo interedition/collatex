@@ -110,7 +110,7 @@ public class WitnessIndex implements IWitnessIndex {
       }
       tokenlist.add(0, leftToken);
       leftMostToken = leftToken;
-      LOG.debug(leftMostToken.getNormalized());
+  //    LOG.debug(leftMostToken.getNormalized());
     } while (repeatingTokens.contains(leftMostToken.getNormalized()));
 
     return new Phrase(tokenlist);
@@ -123,7 +123,7 @@ public class WitnessIndex implements IWitnessIndex {
     INormalizedToken rightMostToken = token;
     do {
       final int rightPosition = rightMostToken.getPosition() + 1;
-      LOG.debug(Integer.toString(rightPosition));
+   //   LOG.debug(Integer.toString(rightPosition));
       final INormalizedToken rightToken = (rightPosition < tokens.size()) ? tokens.get(rightPosition) : new NullToken(rightMostToken.getPosition(), token.getSigil());
       tokenlist.add(rightToken);
       //      tokenPositionsInPhrase.add(rightPosition - 1);
@@ -166,6 +166,16 @@ public class WitnessIndex implements IWitnessIndex {
   @Override
   public Collection<IPhrase> getPhrases() {
     return phraseCollection;
+  }
+
+  @Override
+  public IPhrase getPhrase(String normalized) {
+    for (IPhrase phrase : phraseCollection) {
+      if (phrase.getNormalized().equals(normalized)) {
+        return phrase;
+      }
+    }
+    throw new RuntimeException("Phrase NOT found!");
   }
 
 }
