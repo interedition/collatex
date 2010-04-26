@@ -1,8 +1,6 @@
 package eu.interedition.collatex2.implementation;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -17,26 +15,19 @@ import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.matching.AlignmentTableIndexMatcher;
-import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.input.NormalizedWitness;
-import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
-import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IToken;
-import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -84,42 +75,13 @@ public class CollateXEngine {
     throw new RuntimeException("Near matches are not yet supported!");
   }
 
-  // NOTE; here we have to convert ITokenMatch to IMatch !
-  // NOTE: extract the table and the witness just.. give it just indexes!
-  // NOTE: but then we would have to leave the repeating tokens functionality
-  // somewhere!
-  // NOTE: make index matcher non static
-
   // TODO: rename this method!
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
     AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table, witness);
-    List<ITokenMatch> tokenMatches = matcher.getMatches();
-    IAlignmentTableIndex alignmentTableIndex = matcher.getAlignmentTableIndex();
-    final List<IMatch> matches = convertTokenMatchesToColumnMatches(tokenMatches, alignmentTableIndex);
+    final List<IMatch> matches = matcher.getColumnMatches();
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;
-  }
-
-  private List<IMatch> convertTokenMatchesToColumnMatches(List<ITokenMatch> tokenMatches, IAlignmentTableIndex alignmentTableIndex) {
-    List<IMatch> columnMatches = Lists.newArrayList();
-    for (ITokenMatch tokenMatch : tokenMatches) {
-      INormalizedToken tableToken = tokenMatch.getTableToken();
-      IColumn column = alignmentTableIndex.getColumn(tableToken);
-      IPhrase witnessPhrase = new Phrase(Lists.newArrayList(tokenMatch.getWitnessToken()));
-      IColumns columns = new Columns(Lists.newArrayList(column));
-      IMatch columnMatch = new Match(columns, witnessPhrase);
-      columnMatches.add(columnMatch);
-    }
-    // Sort the ColumnMatches here
-    // otherwise the gapdetection goes ballistic!
-    Collections.sort(columnMatches, new Comparator<IMatch>() {
-      @Override
-      public int compare(IMatch o1, IMatch o2) {
-        return o1.getColumns().getBeginPosition() - o2.getColumns().getBeginPosition();
-      }
-    });
-    return columnMatches;
   }
 
   public static IWitnessIndex createWitnessIndex(final IWitness witness) {
