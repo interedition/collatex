@@ -74,18 +74,18 @@ public class VariantGraph implements IVariantGraph {
     return Lists.newArrayList();
   }
 
-  //NOTE: tokenA is the token from the Witness
-  //For every token in the witness we have to map a VariantNode
-  //for matches such a node should already exist
-  //however for additions and replacements this will not be the case
-  //then we need to add the arcs
-  //in some cases the arcs may already exist
-  //if they already exist we need to add the witness to the
-  //existing arc!
+  // NOTE: tokenA is the token from the Witness
+  // For every token in the witness we have to map a VariantNode
+  // for matches such a node should already exist
+  // however for additions and replacements this will not be the case
+  // then we need to add the arcs
+  // in some cases the arcs may already exist
+  // if they already exist we need to add the witness to the
+  // existing arc!
   public void addWitness(IWitness witness) {
     VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(this);
     List<ITokenMatch> matches = matcher.getMatches(witness);
-    makeArcsForMatches(witness, matches, matcher.getGraphIndex());   
+    makeArcsForMatches(witness, matches, matcher.getGraphIndex());
   }
 
   private void makeArcsForMatches(IWitness witness, List<ITokenMatch> matches, IVariantGraphIndex graphIndex2) {
@@ -98,23 +98,40 @@ public class VariantGraph implements IVariantGraph {
     IVariantGraphNode begin = this.getStartNode();
     for (INormalizedToken token : witness.getTokens()) {
       if (!witnessTokenToMatch.containsKey(token)) {
-        throw new RuntimeException("Token "+token+ " is not a match!");
+        // NOTE: here we determine that the token is an addition/replacement!
+        IVariantGraphNode end = this.addNewNode(token);
+        this.addNewArc(begin, end, witness);
+        begin = end;
+      } else {
+        // NOTE: it is a match!
+        ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
+        IVariantGraphNode end = graphIndex2.getAlignmentNode(tokenMatch.getTokenB());
+        if (this.arcExist(begin, end)) {
+          IVariantGraphArc existingArc = find(begin, end);
+          existingArc.getWitnesses().add(witness);
+        } else {
+          this.addNewArc(begin, end, witness);
+        }
+        begin = end;
       }
-      //NOTE: it is a match!
-      ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
-      IVariantGraphNode end = graphIndex2.getAlignmentNode(tokenMatch.getTokenB());
-      IVariantGraphArc existingArc = find(begin, end);
-      existingArc.getWitnesses().add(witness);
-      begin = end;
     }
   }
 
+  private boolean arcExist(IVariantGraphNode begin, IVariantGraphNode end) {
+    for (IVariantGraphArc arc : arcs) {
+      if (arc.getBeginNode().equals(begin) && arc.getEndNode().equals(end)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private IVariantGraphArc find(IVariantGraphNode begin, IVariantGraphNode end) {
-    for (IVariantGraphArc arc: arcs) {
-      if (arc.getBeginNode().equals(begin)&&arc.getEndNode().equals(end)) {
+    for (IVariantGraphArc arc : arcs) {
+      if (arc.getBeginNode().equals(begin) && arc.getEndNode().equals(end)) {
         return arc;
       }
     }
-    throw new RuntimeException("Arc "+begin+ " "+end+" not found!");
+    throw new RuntimeException("Arc '" + begin.getNormalized() + "' -> '" + end.getNormalized() + "' not found!");
   }
 }

@@ -77,9 +77,8 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  // TODO: rename test!
   @Test
-  public void testTwoWitnesses() {
+  public void testAddition1() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the white and black cat");
     final IAlignmentTable table = engine.align(w1, w2);
@@ -89,7 +88,7 @@ public class AlignmentTableTest {
   }
 
   @Test
-  public void testAddition() {
+  public void testAddition2() {
     final IWitness w1 = engine.createWitness("A", "the cat");
     final IWitness w2 = engine.createWitness("B", "before the cat");
     final IWitness w3 = engine.createWitness("C", "the black cat");
@@ -103,7 +102,7 @@ public class AlignmentTableTest {
   }
 
   @Test
-  public void testAddition2() {
+  public void testAddition3() {
     final IWitness w1 = engine.createWitness("A", "the cat");
     final IWitness w2 = engine.createWitness("B", "before the cat");
     final IWitness w3 = engine.createWitness("C", "the black cat");
