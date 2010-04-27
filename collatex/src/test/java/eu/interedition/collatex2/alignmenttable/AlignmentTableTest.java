@@ -49,6 +49,7 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
+  //NOTE: implemented on VariantGraphAlignmentTest!
   @Test
   public void testVariant() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -77,6 +78,7 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
+  //NOTE: implemented on VariantGraph
   @Test
   public void testAddition1() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
