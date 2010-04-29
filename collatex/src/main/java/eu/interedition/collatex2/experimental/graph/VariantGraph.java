@@ -15,6 +15,7 @@ public class VariantGraph implements IVariantGraph {
   private final List<IVariantGraphNode> nodes;
   private final IVariantGraphNode       startNode;
   private final List<IVariantGraphArc>  arcs;
+  private final List<IWitness> witnesses; 
 
   public static VariantGraph create() {
     final VariantGraph graph = new VariantGraph();
@@ -23,6 +24,7 @@ public class VariantGraph implements IVariantGraph {
 
   public static VariantGraph create(IWitness a) {
     VariantGraph graph = create();
+    graph.getWitnesses().add(a);
     List<IVariantGraphNode> newNodes = Lists.newArrayList();
     for (INormalizedToken token : a.getTokens()) {
       newNodes.add(graph.addNewNode(token));
@@ -54,6 +56,7 @@ public class VariantGraph implements IVariantGraph {
   private VariantGraph() {
     this.nodes = Lists.newArrayList();
     this.arcs = Lists.newArrayList();
+    this.witnesses = Lists.newArrayList();
     this.startNode = addNewNode(new NullToken(1, null));
   }
 
@@ -83,6 +86,7 @@ public class VariantGraph implements IVariantGraph {
   // if they already exist we need to add the witness to the
   // existing arc!
   public void addWitness(IWitness witness) {
+    witnesses.add(witness);
     VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(this);
     List<ITokenMatch> matches = matcher.getMatches(witness);
     makeArcsForMatches(witness, matches, matcher.getGraphIndex());
@@ -133,5 +137,30 @@ public class VariantGraph implements IVariantGraph {
       }
     }
     throw new RuntimeException("Arc '" + begin.getNormalized() + "' -> '" + end.getNormalized() + "' not found!");
+  }
+
+  @Override
+  public List<IWitness> getWitnesses() {
+    return witnesses;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return witnesses.isEmpty();
+  }
+
+  @Override
+  public IVariantGraphArc findArc(IVariantGraphNode begin, IWitness witness) {
+    for (IVariantGraphArc arc : arcs) {
+      if (arc.getBeginNode().equals(begin) && arc.getWitnesses().contains(witness)) {
+        return arc;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public boolean hasArc(IVariantGraphNode beginNode, IWitness witness) {
+    return findArc(beginNode, witness) != null;
   }
 }
