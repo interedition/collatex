@@ -26,4 +26,6 @@ public interface IAlignmentTable {
   
   List<IRow> getRows();
 
+  boolean isEmpty();
+
 }

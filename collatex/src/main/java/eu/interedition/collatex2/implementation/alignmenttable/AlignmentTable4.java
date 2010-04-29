@@ -196,4 +196,9 @@ public class AlignmentTable4 implements IAlignmentTable {
     }
     return rows;
   }
+
+  @Override
+  public boolean isEmpty() {
+    return size()==0;
+  }
 }

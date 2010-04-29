@@ -22,12 +22,15 @@ public class AlignmentTableCreator {
     if (graph.isEmpty()) {
       return table;
     }
-    IWitness first = graph.getWitnesses().get(0);
-    table.getSigli().add(first.getSigil());
-    List<IVariantGraphNode> path = graph.getPath(first);
-    //now use the path to fill the row ... 
-    for (IVariantGraphNode node : path) {
-      table.add(new Column3(node.getToken(), -1));
+    for (IWitness witness : graph.getWitnesses()) {
+      if (table.isEmpty()) {
+        table.getSigli().add(witness.getSigil());
+        List<IVariantGraphNode> path = graph.getPath(witness);
+        //now use the path to fill the row ... 
+        for (IVariantGraphNode node : path) {
+          table.add(new Column3(node.getToken(), -1));
+        }
+      }
     }
     return table;
   }
