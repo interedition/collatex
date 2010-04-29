@@ -163,4 +163,17 @@ public class VariantGraph implements IVariantGraph {
   public boolean hasArc(IVariantGraphNode beginNode, IWitness witness) {
     return findArc(beginNode, witness) != null;
   }
+  
+  public List<IVariantGraphNode> getPath(IWitness witness) {
+    IVariantGraphNode beginNode = getStartNode();
+    List<IVariantGraphNode> path = Lists.newArrayList();
+    while (hasArc(beginNode, witness)) {
+      IVariantGraphArc arc = findArc(beginNode, witness);
+      IVariantGraphNode endNode = arc.getEndNode();
+      path.add(endNode);
+      beginNode = endNode;
+    }
+    return path;
+  }
+
 }

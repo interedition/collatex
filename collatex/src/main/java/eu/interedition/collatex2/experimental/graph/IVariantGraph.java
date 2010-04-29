@@ -29,4 +29,6 @@ public interface IVariantGraph {
   //TODO: add test!
   boolean hasArc(IVariantGraphNode beginNode, IWitness first);
 
+  //TODO: add test!
+  List<IVariantGraphNode> getPath(IWitness witness);
 }
