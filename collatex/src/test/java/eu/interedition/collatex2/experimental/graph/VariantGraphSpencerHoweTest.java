@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -60,7 +59,7 @@ public void testFirstWitness() {
 
 
   //maybe move test later
-  @Ignore
+//  @Ignore
   @Test
   public void testSimpleVariantGraphToAlignmentTable() {
     IWitness w1 = engine.createWitness("A", "everything matches");
@@ -72,7 +71,7 @@ public void testFirstWitness() {
     graph.addWitness(w3);
     AlignmentTableCreator creator = new AlignmentTableCreator(graph);
     IAlignmentTable table = creator.getAlignmentTable();
-    assertEquals(0, table.getRows().size());
+    assertEquals(3, table.getRows().size());
   }
 
 }
