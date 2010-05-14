@@ -17,20 +17,13 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
+import eu.interedition.collatex2.interfaces.IRow;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTable4 extends BaseAlignmentTable implements IAlignmentTable {
   @Override
   public void add(final IColumn column) {
     columns.add(column);
-  }
-
-  @Override
-  public List<String> getSigli() {
-    return sigli;
-  }
-
-  public List<IColumn> getColumns() {
-    return columns;
   }
 
   @Override
@@ -114,11 +107,6 @@ public class AlignmentTable4 extends BaseAlignmentTable implements IAlignmentTab
     return new Columns(subList);
   }
 
-  @Override
-  public int size() {
-    return getColumns().size();
-  }
-
   public void addReplacement(final IReplacement replacement) {
     final IColumns originalColumns = replacement.getOriginalColumns();
     final IPhrase replacementPhrase = replacement.getReplacementPhrase();
@@ -169,7 +157,7 @@ public class AlignmentTable4 extends BaseAlignmentTable implements IAlignmentTab
   }
 
   @Override
-  public boolean isEmpty() {
-    return size()==0;
+  public IRow getRow(IWitness witness) {
+    return getRow(witness.getSigil());
   }
 }
