@@ -10,9 +10,6 @@ public interface IVariantGraph {
 
   IVariantGraphNode getStartNode();
 
-  //NOTE: could move getArcs to the begin node of the arc!
-  List<IVariantGraphArc> getArcs();
-
   //NOTE: could extract Indexable interface!
   //TODO: implement!
   List<String>  findRepeatingTokens();
@@ -24,11 +21,8 @@ public interface IVariantGraph {
   boolean isEmpty();
 
   //TODO: add test!
-  IVariantGraphArc findArc(IVariantGraphNode begin, IWitness witness);
-
-  //TODO: add test!
-  boolean hasArc(IVariantGraphNode beginNode, IWitness first);
-
-  //TODO: add test!
   List<IVariantGraphNode> getPath(IWitness witness);
+
+  //NOTE: This method is only here for testing purposes!
+  List<IVariantGraphArc> getArcs();
 }

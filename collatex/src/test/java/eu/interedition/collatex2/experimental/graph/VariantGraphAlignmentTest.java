@@ -83,8 +83,8 @@ public class VariantGraphAlignmentTest {
     assertEquals(6, arcs.size());
     assertEquals("# -> the: A, B", arcs.get(0).toString());
     assertEquals("the -> black: A", arcs.get(1).toString());
-    assertEquals("black -> cat: A, B", arcs.get(2).toString());
-    assertEquals("the -> white: B", arcs.get(3).toString());
+    assertEquals("the -> white: B", arcs.get(2).toString());
+    assertEquals("black -> cat: A, B", arcs.get(3).toString());
     assertEquals("white -> and: B", arcs.get(4).toString());
     assertEquals("and -> black: B", arcs.get(5).toString());
   }
@@ -107,14 +107,14 @@ public class VariantGraphAlignmentTest {
     assertEquals(11, arcs.size());
     assertEquals("# -> the: A, B, C, D, E", arcs.get(0).toString());
     assertEquals("the -> black: A", arcs.get(1).toString());
-    assertEquals("black -> cat: A", arcs.get(2).toString());
-    assertEquals("the -> white: B", arcs.get(3).toString());
-    assertEquals("white -> cat: B", arcs.get(4).toString());
-    assertEquals("the -> green: C", arcs.get(5).toString());
-    assertEquals("green -> cat: C", arcs.get(6).toString());
-    assertEquals("the -> red: D", arcs.get(7).toString());
-    assertEquals("red -> cat: D", arcs.get(8).toString());
-    assertEquals("the -> yellow: E", arcs.get(9).toString());
+    assertEquals("the -> white: B", arcs.get(2).toString());
+    assertEquals("the -> green: C", arcs.get(3).toString());
+    assertEquals("the -> red: D", arcs.get(4).toString());
+    assertEquals("the -> yellow: E", arcs.get(5).toString());
+    assertEquals("black -> cat: A", arcs.get(6).toString());
+    assertEquals("white -> cat: B", arcs.get(7).toString());
+    assertEquals("green -> cat: C", arcs.get(8).toString());
+    assertEquals("red -> cat: D", arcs.get(9).toString());
     assertEquals("yellow -> cat: E", arcs.get(10).toString());
   }
 
