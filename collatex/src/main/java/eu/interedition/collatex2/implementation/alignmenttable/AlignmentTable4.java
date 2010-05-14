@@ -12,23 +12,13 @@ import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
-import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
-import eu.interedition.collatex2.interfaces.IRow;
 
-public class AlignmentTable4 implements IAlignmentTable {
-  private final List<String> sigli;
-  private final List<IColumn> columns;
-
-  public AlignmentTable4() {
-    this.sigli = Lists.newArrayList();
-    this.columns = Lists.newArrayList();
-  }
-
+public class AlignmentTable4 extends BaseAlignmentTable implements IAlignmentTable {
   @Override
   public void add(final IColumn column) {
     columns.add(column);
@@ -176,25 +166,6 @@ public class AlignmentTable4 implements IAlignmentTable {
       }
     }
     return repeatingNormalizedTokens;
-  }
-
-  @Override
-  public IRow getRow(String sigil) {
-    List<ICell> cells = Lists.newArrayList();
-    for (IColumn column : columns) {
-      ICell cell = new Cell(column, sigil);
-      cells.add(cell);
-    }
-    return new Row(sigil, cells);
-  }
-
-  @Override
-  public List<IRow> getRows() {
-    List<IRow> rows = Lists.newArrayList();
-    for (String sigil: sigli) {
-      rows.add(getRow(sigil));
-    }
-    return rows;
   }
 
   @Override
