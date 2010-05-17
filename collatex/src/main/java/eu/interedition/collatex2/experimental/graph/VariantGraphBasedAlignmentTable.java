@@ -72,13 +72,33 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
     if (isEmpty()) {
       String sigil = witness.getSigil();
       getSigli().add(sigil);
-      List<IVariantGraphNode> path = graph.getPath(witness);
-      // now use the path to fill the row ...
-      for (IVariantGraphNode node : path) {
-        addNewColumn(node.getToken());
+      List<IVariantGraphArc> arcs = graph.getArcsForWitness(witness);
+      for (IVariantGraphArc arc: arcs) {
+        INormalizedToken token = arc.getToken(witness);
+        addNewColumn(token);
       }
     } else {
-      throw new RuntimeException("NOT YET IMPLEMENTED!");
+      // NOTE: duplicated with above!
+      getSigli().add(witness.getSigil());
+      List<IVariantGraphArc> arcs = graph.getArcsForWitness(witness);
+      // search the right column for each of the tokens of the next witness
+      for (IVariantGraphArc arc: arcs) {
+        INormalizedToken normalized = arc.getEndNode().getToken();
+        boolean found = false;
+        for (IColumn column : columns) {
+          if (column.getVariants().contains(normalized)) {
+            System.out.println("!!"+arc.getToken(witness));
+            column.addMatch(arc.getToken(witness));
+            
+//            System.out.println("MATCHED: "+node.getToken().getContent());
+//            System.out.println(column.getSigli());
+            found = true; // TODO: ugly!
+          }
+        }
+        if (!found) {
+          throw new RuntimeException("NOT YET IMPLEMENTED!");
+        }
+      }
     }
   }
 

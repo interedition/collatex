@@ -32,8 +32,8 @@ public class VariantGraphNode implements IVariantGraphNode {
   }
 
   @Override
-  public void addNewArc(IVariantGraphNode end, IWitness witness) {
-    IVariantGraphArc arc = new VariantGraphArc(this, end, witness);
+  public void addNewArc(IVariantGraphNode end, IWitness witness, INormalizedToken token) {
+    IVariantGraphArc arc = new VariantGraphArc(this, end, witness, token);
     arcs.add(arc);
   }
 

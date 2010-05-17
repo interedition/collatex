@@ -45,9 +45,9 @@ public class VariantGraphAlignmentTest {
     assertEquals("witness", thirdNode.getNormalized());
     List<IVariantGraphArc> arcs = graph.getArcs();
     assertEquals(3, arcs.size());
-    assertEquals(a, arcs.get(0).getWitnesses().get(0));
-    assertEquals(a, arcs.get(1).getWitnesses().get(0));
-    assertEquals(a, arcs.get(2).getWitnesses().get(0));
+    assert(arcs.get(0).getWitnesses().contains(a));
+    assert(arcs.get(1).getWitnesses().contains(a));
+    assert(arcs.get(2).getWitnesses().contains(a));
     assertEquals(startNode, arcs.get(0).getBeginNode());
     assertEquals(firstNode, arcs.get(0).getEndNode());
     assertEquals(firstNode, arcs.get(1).getBeginNode());

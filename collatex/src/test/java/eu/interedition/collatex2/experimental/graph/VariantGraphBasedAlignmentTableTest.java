@@ -51,21 +51,21 @@ public class VariantGraphBasedAlignmentTableTest {
     assertEquals(1, table.getRows().size());
   }
 
-  // //maybe move test later
-  // // @Ignore
-  // @Test
-  // public void testSimpleVariantGraphToAlignmentTable() {
-  // IWitness w1 = engine.createWitness("A", "everything matches");
-  // IWitness w2 = engine.createWitness("B", "everything matches");
-  // IWitness w3 = engine.createWitness("C", "everything matches");
-  // VariantGraph graph = VariantGraph.create();
-  // graph.addWitness(w1);
-  // graph.addWitness(w2);
-  // graph.addWitness(w3);
-  // AlignmentTableCreator creator = new AlignmentTableCreator(graph);
-  // IAlignmentTable table = creator.getAlignmentTable();
-  // assertEquals(3, table.getRows().size());
-  // }
+   @Test
+   public void testMultipleEqualWitnesses() {
+     IWitness a = engine.createWitness("A", "everything matches");
+     IWitness b = engine.createWitness("B", "everything matches");
+     IWitness c = engine.createWitness("C", "everything matches");
+     VariantGraph graph = VariantGraph.create();
+     graph.addWitness(a);
+     graph.addWitness(b);
+     graph.addWitness(c);
+     IAlignmentTable table = new VariantGraphBasedAlignmentTable(graph);
+     assertEquals("A: |everything|matches|", rowToString(table.getRow(a)));
+     assertEquals("B: |everything|matches|", rowToString(table.getRow(b)));
+     assertEquals("C: |everything|matches|", rowToString(table.getRow(c)));
+     assertEquals(3, table.getRows().size());
+   }
 
   // Note: this only tests the Graph, not the table!
   @Test

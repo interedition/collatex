@@ -13,7 +13,7 @@ public interface IVariantGraphNode {
   
   List<IVariantGraphArc> getArcs();
 
-  void addNewArc(IVariantGraphNode node, IWitness a);
+  void addNewArc(IVariantGraphNode node, IWitness witness, INormalizedToken token);
 
   boolean arcExist(IVariantGraphNode end);
 

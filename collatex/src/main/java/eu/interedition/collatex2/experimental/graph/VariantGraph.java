@@ -30,7 +30,7 @@ public class VariantGraph implements IVariantGraph {
     }
     IVariantGraphNode previous = graph.getStartNode();
     for (IVariantGraphNode node : newNodes) {
-      previous.addNewArc(node, a);
+      previous.addNewArc(node, a, node.getToken());
       previous = node;
     }
     return graph;
@@ -92,7 +92,7 @@ public class VariantGraph implements IVariantGraph {
       if (!witnessTokenToMatch.containsKey(token)) {
         // NOTE: here we determine that the token is an addition/replacement!
         IVariantGraphNode end = this.addNewNode(token);
-        begin.addNewArc(end, witness);
+        begin.addNewArc(end, witness, token);
         begin = end;
       } else {
         // NOTE: it is a match!
@@ -100,9 +100,9 @@ public class VariantGraph implements IVariantGraph {
         IVariantGraphNode end = graphIndex2.getAlignmentNode(tokenMatch.getTokenB());
         if (begin.arcExist(end)) {
           IVariantGraphArc existingArc = begin.find(end);
-          existingArc.getWitnesses().add(witness);
+          existingArc.addToken(witness, token);
         } else {
-          begin.addNewArc(end, witness);
+          begin.addNewArc(end, witness, token);
         }
         begin = end;
       }
@@ -139,5 +139,16 @@ public class VariantGraph implements IVariantGraph {
       allArcs.addAll(node.getArcs());
     }
     return allArcs;
+  }
+
+  public List<IVariantGraphArc> getArcsForWitness(IWitness witness) {
+    IVariantGraphNode node = getStartNode();
+    List<IVariantGraphArc> arcs = Lists.newArrayList();
+    while (node.hasArc(witness)) {
+      final IVariantGraphArc arc = node.findArc(witness);
+      arcs.add(arc);
+      node = arc.getEndNode();
+    }
+    return arcs;
   }
 }
