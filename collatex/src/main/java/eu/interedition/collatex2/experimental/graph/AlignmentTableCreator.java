@@ -8,6 +8,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IWitness;
 
+//TODO: DELETE THIS CLASS!
 public class AlignmentTableCreator {
 
   private final IVariantGraph graph;

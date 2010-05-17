@@ -20,6 +20,7 @@ public interface IVariantGraph {
   //TODO: add test!
   boolean isEmpty();
 
+  //TODO: delete method? add arcs based method to interface
   //TODO: add test!
   List<IVariantGraphNode> getPath(IWitness witness);
 

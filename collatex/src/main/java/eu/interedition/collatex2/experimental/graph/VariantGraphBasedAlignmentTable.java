@@ -87,11 +87,7 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
         boolean found = false;
         for (IColumn column : columns) {
           if (column.getVariants().contains(normalized)) {
-            System.out.println("!!"+arc.getToken(witness));
             column.addMatch(arc.getToken(witness));
-            
-//            System.out.println("MATCHED: "+node.getToken().getContent());
-//            System.out.println(column.getSigli());
             found = true; // TODO: ugly!
           }
         }
