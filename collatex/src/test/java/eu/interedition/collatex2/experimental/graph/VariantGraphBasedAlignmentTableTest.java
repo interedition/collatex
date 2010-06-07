@@ -34,6 +34,7 @@ public class VariantGraphBasedAlignmentTableTest {
     return resultRow.toString();
   }
 
+  //OVERGEZET
   @Test
   public void testEmptyGraph() {
     VariantGraph graph = VariantGraph.create();
@@ -41,6 +42,7 @@ public class VariantGraphBasedAlignmentTableTest {
     assertEquals(0, table.getRows().size());
   }
 
+  //OVERGEZET
   @Test
   public void testFirstWitness() {
     IWitness a = engine.createWitness("A", "the first witness");
@@ -51,6 +53,7 @@ public class VariantGraphBasedAlignmentTableTest {
     assertEquals(1, table.getRows().size());
   }
 
+  //OVERGEZET
    @Test
    public void testMultipleEqualWitnesses() {
      IWitness a = engine.createWitness("A", "everything matches");

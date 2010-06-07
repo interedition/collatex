@@ -2,8 +2,11 @@ package eu.interedition.collatex2.experimental.graph;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
+
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.BaseAlignmentTable;
 import eu.interedition.collatex2.implementation.alignmenttable.Column3;
@@ -19,10 +22,13 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
-  private final VariantGraph graph;
+  private final VariantGraph                                 graph;
+  private final Map<CollateXVertex, Column3>                 vertexToColumn;
+  private DirectedAcyclicGraph<CollateXVertex, CollateXEdge> dag;
 
   public DirectedAcyclicGraphBasedAlignmentTable(VariantGraph graph) {
     this.graph = graph;
+    vertexToColumn = Maps.newHashMap();
   }
 
   @Override
@@ -61,8 +67,8 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
     return null;
   }
 
-  //for now I am going to do things lazy..
-  //we will see where the actual init goes..
+  // for now I am going to do things lazy..
+  // we will see where the actual init goes..
   public IRow getRow(IWitness witness) {
     if (!this.getSigli().contains(witness.getSigil())) {
       lazyConstructColumns(witness);
@@ -76,46 +82,61 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
     if (isEmpty()) {
       String sigil = witness.getSigil();
       getSigli().add(sigil);
+
       // build new DAG here!
       DAGBuilder builder = new DAGBuilder();
-      DirectedAcyclicGraph<CollateXVertex, CollateXEdge> dag = builder.buildDAG(graph);
-      
+      dag = builder.buildDAG(graph);
+
       // nu moeten we het langste pad algoritme gaan gebruiken
-      // for now we just walk over all the edges and make no selection
+      // for now we just walk over all the vertices and make no selection
       // we need to start at the first vertex..
       // we use an iterator for that.
-      
       Iterator<CollateXVertex> iterator = dag.iterator();
       CollateXVertex startNode = iterator.next();
       // hier langste pad zoeken
       while (iterator.hasNext()) {
         CollateXVertex vertex = iterator.next();
         INormalizedToken token = vertex.getToken(witness);
-        addNewColumn(token);
+        Column3 newColumn = addNewColumn(token);
+        vertexToColumn.put(vertex, newColumn);
       }
-      
-//      Set<CollateXEdge> outgoingEdgesOf = dag.outgoingEdgesOf(startNode);
-//      // fill it with first witness!
-//      List<IVariantGraphArc> arcs = graph.getArcsForWitness(witness);
-//      for (IVariantGraphArc arc: arcs) {
-//        INormalizedToken token = arc.getToken(witness);
-//        addNewColumn(token);
-//      }    } 
-      
-      
-//      List<IVariantGraphArc> arcs = graph.getArcsForWitness(witness);
-//      for (IVariantGraphArc arc: arcs) {
-//        INormalizedToken token = arc.getToken(witness);
-//        addNewColumn(token);
-//      }   
-      } 
+    } else {
+      // duplicated with above!
+      String sigil = witness.getSigil();
+      getSigli().add(sigil);
+
+      Iterator<CollateXVertex> iterator = dag.iterator();
+      CollateXVertex startNode = iterator.next();
+      // hier pad voor witness zoeken of vertices filteren
+      while (iterator.hasNext()) {
+        CollateXVertex vertex = iterator.next();
+        // TODO:THE FOLLOWING STATEMENT IS NOT ALWAYS POSSIBLE!
+        Column3 column3 = vertexToColumn.get(vertex);
+        INormalizedToken token = vertex.getToken(witness);
+        column3.addMatch(token);
+      }
+    }
+
+    // Set<CollateXEdge> outgoingEdgesOf = dag.outgoingEdgesOf(startNode);
+    // // fill it with first witness!
+    // List<IVariantGraphArc> arcs = graph.getArcsForWitness(witness);
+    // for (IVariantGraphArc arc: arcs) {
+    // INormalizedToken token = arc.getToken(witness);
+    // addNewColumn(token);
+    // } }
+
+    // List<IVariantGraphArc> arcs = graph.getArcsForWitness(witness);
+    // for (IVariantGraphArc arc: arcs) {
+    // INormalizedToken token = arc.getToken(witness);
+    // addNewColumn(token);
+    // }
+
   }
-  
-  private void addNewColumn(INormalizedToken token) {
-    columns.add(new Column3(token, -1));
+
+  private Column3 addNewColumn(INormalizedToken token) {
+    final Column3 column = new Column3(token, -1);
+    columns.add(column);
+    return column;
   }
-
-
-
 
 }
