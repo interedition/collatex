@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.experimental.table;
 
 import java.util.List;
 import java.util.Map;
@@ -7,6 +7,9 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.experimental.graph.IVariantGraphArc;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphNode;
+import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 

@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.experimental.table;
 
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +8,7 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.alignmenttable.BaseAlignmentTable;
 import eu.interedition.collatex2.implementation.alignmenttable.Column3;
 import eu.interedition.collatex2.interfaces.IAddition;
@@ -76,7 +77,6 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
     return super.getRow(witness.getSigil());
   }
 
-  // TODO: create a DAG here from the VariantGraph
   // NOTE: Ignore possible cycles in VariantGraph for now!
   private void lazyConstructColumns(IWitness witness) {
     if (isEmpty()) {

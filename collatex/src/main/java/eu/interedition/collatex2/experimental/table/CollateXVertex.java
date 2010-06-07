@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.experimental.table;
 
 import java.util.Map;
 

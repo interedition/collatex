@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.experimental.table;
 
 import java.util.Iterator;
 
@@ -8,6 +8,10 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.table.CollateXEdge;
+import eu.interedition.collatex2.experimental.table.CollateXVertex;
+import eu.interedition.collatex2.experimental.table.DAGBuilder;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 

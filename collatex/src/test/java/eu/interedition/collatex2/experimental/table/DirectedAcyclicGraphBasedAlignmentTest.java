@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.experimental.table;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -6,6 +6,9 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import eu.interedition.collatex2.experimental.graph.IVariantGraphArc;
+import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.table.DirectedAcyclicGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICell;
