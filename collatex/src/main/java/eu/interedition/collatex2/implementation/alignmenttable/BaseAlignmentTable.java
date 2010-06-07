@@ -20,7 +20,7 @@ public class BaseAlignmentTable {
     this.columns = Lists.newArrayList();
   }
   
-  public List<IRow> getRows() {
+  public final List<IRow> getRows() {
     List<IRow> rows = Lists.newArrayList();
     for (String sigil: sigli) {
       rows.add(getRow(sigil));
@@ -28,7 +28,8 @@ public class BaseAlignmentTable {
     return rows;
   }
 
-  public IRow getRow(String sigil) {
+  //TODO: REMOVE!
+  public final IRow getRow(String sigil) {
     List<ICell> cells = Lists.newArrayList();
     for (IColumn column : columns) {
       ICell cell = new Cell(column, sigil);
@@ -37,19 +38,19 @@ public class BaseAlignmentTable {
     return new Row(sigil, cells);
   }
 
-  public boolean isEmpty() {
+  public final boolean isEmpty() {
     return size()==0;
   }
 
-  public int size() {
+  public final int size() {
     return getColumns().size();
   }
 
-  public List<IColumn> getColumns() {
+  public final List<IColumn> getColumns() {
     return columns;
   }
 
-  public List<String> getSigli() {
+  public final List<String> getSigli() {
     return sigli;
   }
 
