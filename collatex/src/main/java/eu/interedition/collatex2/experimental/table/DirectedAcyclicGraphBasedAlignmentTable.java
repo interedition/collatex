@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
-
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.VariantGraph;
@@ -25,7 +23,7 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
 
   private final VariantGraph                                 graph;
   private final Map<CollateXVertex, Column3>                 vertexToColumn;
-  private DirectedAcyclicGraph<CollateXVertex, CollateXEdge> dag;
+  private DAVariantGraph dag;
 
   public DirectedAcyclicGraphBasedAlignmentTable(VariantGraph graph) {
     this.graph = graph;

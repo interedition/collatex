@@ -3,8 +3,6 @@ package eu.interedition.collatex2.experimental.table;
 import java.util.List;
 import java.util.Map;
 
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
-
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraphArc;
@@ -15,8 +13,8 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DAGBuilder {
 
-  public DirectedAcyclicGraph<CollateXVertex, CollateXEdge> buildDAG(VariantGraph graph) {
-    DirectedAcyclicGraph<CollateXVertex, CollateXEdge> dag = new DirectedAcyclicGraph<CollateXVertex, CollateXEdge>(CollateXEdge.class);
+  public DAVariantGraph buildDAG(VariantGraph graph) {
+    DAVariantGraph dag = new DAVariantGraph(CollateXEdge.class);
     List<IVariantGraphNode> nodes = graph.getNodes();
     Map<IVariantGraphNode, CollateXVertex> map = Maps.newLinkedHashMap();
     // convert nodes to vertices here
