@@ -1,6 +1,9 @@
 package eu.interedition.collatex2.experimental.table;
 
+import org.jgrapht.graph.DefaultWeightedEdge;
 
-public class CollateXEdge {
+
+@SuppressWarnings("serial")
+public class CollateXEdge extends DefaultWeightedEdge {
 
 }

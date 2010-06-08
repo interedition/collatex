@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraphArc;
 import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -20,8 +19,6 @@ public class DAVariantGraphTest {
     engine = new CollateXEngine();
   }
 
-  // TODO!!
-  // Note: this only tests the Graph, not the table!
   @Test
   public void testLongestPath() {
     IWitness w1 = engine.createWitness("A", "a");
@@ -32,11 +29,15 @@ public class DAVariantGraphTest {
     graph.addWitness(w2);
     graph.addWitness(w3);
     assertEquals(3, graph.getNodes().size());
-    final List<IVariantGraphArc> arcs = graph.getArcs();
-    assertEquals(3, arcs.size());
-    assertEquals("# -> a: A, C", arcs.get(0).toString());
-    assertEquals("# -> b: B", arcs.get(1).toString());
-    assertEquals("a -> b: C", arcs.get(2).toString());
+    DAGBuilder builder = new DAGBuilder();
+    DAVariantGraph avg = builder.buildDAG(graph);
+    List<CollateXVertex> longestPath = avg.getLongestPath();
+//    for (CollateXVertex v: longestPath) {
+//      System.out.println(v.getNormalized());
+//    }
+    assertEquals("a", longestPath.get(0).getNormalized());
+    assertEquals("b", longestPath.get(1).getNormalized());
+    assertEquals(2, longestPath.size());
   }
 
 }
