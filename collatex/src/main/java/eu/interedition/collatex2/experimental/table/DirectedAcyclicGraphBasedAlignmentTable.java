@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.experimental.table;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -8,13 +7,11 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.alignmenttable.BaseAlignmentTable;
-import eu.interedition.collatex2.implementation.alignmenttable.Column3;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -22,7 +19,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
   private final VariantGraph                                 graph;
-  private final Map<CollateXVertex, Column3>                 vertexToColumn;
+  private final Map<CollateXVertex, IColumn>                 vertexToColumn;
   private DAVariantGraph dag;
 
   public DirectedAcyclicGraphBasedAlignmentTable(VariantGraph graph) {
@@ -85,27 +82,22 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
       DAGBuilder builder = new DAGBuilder();
       dag = builder.buildDAG(graph);
 
-      // nu moeten we het langste pad algoritme gaan gebruiken
-      // for now we just walk over all the vertices and make no selection
-      // we need to start at the first vertex..
-      // we use an iterator for that.
-      Iterator<CollateXVertex> iterator = dag.iterator();
-      CollateXVertex startNode = iterator.next();
-      // hier langste pad zoeken
-      while (iterator.hasNext()) {
-        CollateXVertex vertex = iterator.next();
-        INormalizedToken token = vertex.getToken(witness);
-        Column3 newColumn = addNewColumn(token);
+      // NOTE: we build a column for each vertex in the longest path
+      List<CollateXVertex> longestPath = dag.getLongestPath();
+      for (CollateXVertex vertex : longestPath) {
+        IColumn newColumn = addNewColumn(vertex);
         vertexToColumn.put(vertex, newColumn);
       }
-    } else {
+    } 
+    else {
       // duplicated with above!
       String sigil = witness.getSigil();
       getSigli().add(sigil);
-
-      Iterator<CollateXVertex> iterator = dag.iterator();
+  }
+    /*
+       Iterator<CollateXVertex> iterator = dag.iterator();
       CollateXVertex startNode = iterator.next();
-      // hier pad voor witness zoeken of vertices filteren
+      // TODO: hier pad voor witness zoeken of vertices filteren
       while (iterator.hasNext()) {
         CollateXVertex vertex = iterator.next();
         // TODO:THE FOLLOWING STATEMENT IS NOT ALWAYS POSSIBLE!
@@ -113,8 +105,9 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
         INormalizedToken token = vertex.getToken(witness);
         column3.addMatch(token);
       }
+      
     }
-
+*/
     // Set<CollateXEdge> outgoingEdgesOf = dag.outgoingEdgesOf(startNode);
     // // fill it with first witness!
     // List<IVariantGraphArc> arcs = graph.getArcsForWitness(witness);
@@ -131,8 +124,8 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
 
   }
 
-  private Column3 addNewColumn(INormalizedToken token) {
-    final Column3 column = new Column3(token, -1);
+  private IColumn addNewColumn(CollateXVertex vertex) {
+    final IColumn column = new AVGColumn(vertex);
     columns.add(column);
     return column;
   }

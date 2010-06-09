@@ -1,14 +1,10 @@
 package eu.interedition.collatex2.experimental.table;
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraphArc;
 import eu.interedition.collatex2.experimental.graph.VariantGraph;
-import eu.interedition.collatex2.experimental.table.DirectedAcyclicGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICell;
@@ -24,14 +20,17 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       engine = new CollateXEngine();
     }
 
-    //TODO: add support for empty rows!
     private String rowToString(IRow row) {
       StringBuffer resultRow = new StringBuffer();
       resultRow.append(row.getSigil());
       resultRow.append(": ");
       for (ICell cell : row) {
         resultRow.append("|");
-        resultRow.append(cell.getToken().getContent());
+        if (cell.isEmpty()) {
+          resultRow.append(" ");
+        } else { 
+          resultRow.append(cell.getToken().getContent());
+        }  
       }
       resultRow.append("|");
       return resultRow.toString();
@@ -70,8 +69,6 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       assertEquals(3, table.getRows().size());
     }
 
-    // TODO!!
-    // Note: this only tests the Graph, not the table!
     @Test
     public void testSimpleSpencerHowe() {
       IWitness w1 = engine.createWitness("A", "a");
@@ -81,12 +78,11 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       graph.addWitness(w1);
       graph.addWitness(w2);
       graph.addWitness(w3);
-      assertEquals(3, graph.getNodes().size());
-      final List<IVariantGraphArc> arcs = graph.getArcs();
-      assertEquals(3, arcs.size());
-      assertEquals("# -> a: A, C", arcs.get(0).toString());
-      assertEquals("# -> b: B", arcs.get(1).toString());
-      assertEquals("a -> b: C", arcs.get(2).toString());
+      IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
+      assertEquals("A: |a| |", rowToString(table.getRow(w1)));
+      assertEquals("B: | |b|", rowToString(table.getRow(w2)));
+      assertEquals("C: |a|b|", rowToString(table.getRow(w3)));
+      assertEquals(3, table.getRows().size());
     }
 
 }

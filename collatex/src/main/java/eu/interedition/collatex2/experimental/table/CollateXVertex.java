@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.experimental.table;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
 
@@ -18,7 +19,7 @@ public class CollateXVertex {
 
   public INormalizedToken getToken(IWitness witness) {
     if (!tokenMap.containsKey(witness)) {
-      throw new RuntimeException("WITNESS "+witness.getSigil()+" NOT FOUND IN THIS ARC!");
+      throw new RuntimeException("TOKEN FOR WITNESS "+witness.getSigil()+" NOT FOUND IN VERTEX "+getNormalized()+"!");
     }
     return tokenMap.get(witness);
   }
@@ -29,5 +30,29 @@ public class CollateXVertex {
 
   public String getNormalized() {
     return normalized;
+  }
+
+  //TODO: change String parameter into IWitness
+  public boolean containsWitness(String sigil) {
+    return (internalGetWitnessForSigil(sigil)!=null);
+  }
+
+  //TODO: change String parameter into IWitness
+  public IWitness getWitnessForSigil(String sigil) {
+    IWitness internalGetWitnessForSigil = internalGetWitnessForSigil(sigil);
+    if (internalGetWitnessForSigil == null) {
+      throw new RuntimeException("Witness with "+sigil+" not found in this vertex!");
+    }
+    return internalGetWitnessForSigil;
+  }
+
+  private IWitness internalGetWitnessForSigil(String sigil) {
+    Set<IWitness> set = tokenMap.keySet();
+    for (IWitness w : set) {
+      if (w.getSigil().equals(sigil)) {
+        return w;
+      }
+    }
+    return null;
   }
 }
