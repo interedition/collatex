@@ -31,7 +31,7 @@ public class SpencerHoweTest {
 
   @Test
   @Ignore
-  public void testEverythingMatches() {
+  public void testATSpencerHowe() {
     final IWitness w1 = engine.createWitness("V", "a b c d e f ");
     final IWitness w2 = engine.createWitness("W", "x y z d e");
     final IWitness w3 = engine.createWitness("X", "a b x y z");
@@ -40,12 +40,9 @@ public class SpencerHoweTest {
     graph.addWitness(w2);
     graph.addWitness(w3);
     IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
-    assertEquals("V: |a|b| |c| |d|e|f|", table.getRow(w1).rowToString());
+    assertEquals("V: |a|b|c| | |d|e|f|", table.getRow(w1).rowToString());
     assertEquals("W: | | |x|y|z|d|e| |", table.getRow(w2).rowToString());
     assertEquals("X: |a|b|x|y|z| | | |", table.getRow(w3).rowToString());
     assertEquals(3, table.getRows().size());
-//    final IAlignmentTable table = engine.align(w1, w2, w3);
-//    logger.debug(table.toString());
-   // Assert.assertEquals(expected, table.toString());
   }
 }
