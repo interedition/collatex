@@ -30,7 +30,7 @@ public class VariantGraph implements IVariantGraph {
     }
     IVariantGraphNode previous = graph.getStartNode();
     for (IVariantGraphNode node : newNodes) {
-      previous.addNewArc(node, a, node.getToken());
+      previous.addNewEdge(node, a, node.getToken());
       previous = node;
     }
     return graph;
@@ -92,17 +92,17 @@ public class VariantGraph implements IVariantGraph {
       if (!witnessTokenToMatch.containsKey(token)) {
         // NOTE: here we determine that the token is an addition/replacement!
         IVariantGraphNode end = this.addNewNode(token);
-        begin.addNewArc(end, witness, token);
+        begin.addNewEdge(end, witness, token);
         begin = end;
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
         IVariantGraphNode end = graphIndex2.getAlignmentNode(tokenMatch.getTokenB());
-        if (begin.arcExist(end)) {
-          IVariantGraphArc existingArc = begin.find(end);
+        if (begin.hasEdge(end)) {
+          IVariantGraphEdge existingArc = begin.findEdge(end);
           existingArc.addToken(witness, token);
         } else {
-          begin.addNewArc(end, witness, token);
+          begin.addNewEdge(end, witness, token);
         }
         begin = end;
       }
@@ -122,8 +122,8 @@ public class VariantGraph implements IVariantGraph {
   public List<IVariantGraphNode> getPath(IWitness witness) {
     IVariantGraphNode beginNode = getStartNode();
     List<IVariantGraphNode> path = Lists.newArrayList();
-    while (beginNode.hasArc(witness)) {
-      IVariantGraphArc arc = beginNode.findArc(witness);
+    while (beginNode.hasEdge(witness)) {
+      IVariantGraphEdge arc = beginNode.findEdge(witness);
       IVariantGraphNode endNode = arc.getEndNode();
       path.add(endNode);
       beginNode = endNode;
@@ -133,19 +133,19 @@ public class VariantGraph implements IVariantGraph {
 
   // NOTE: only for testing purposes!
   @Override
-  public List<IVariantGraphArc> getArcs() {
-    List<IVariantGraphArc> allArcs = Lists.newArrayList();
+  public List<IVariantGraphEdge> getEdges() {
+    List<IVariantGraphEdge> allArcs = Lists.newArrayList();
     for (IVariantGraphNode node : nodes) {
-      allArcs.addAll(node.getArcs());
+      allArcs.addAll(node.getEdges());
     }
     return allArcs;
   }
 
-  public List<IVariantGraphArc> getArcsForWitness(IWitness witness) {
+  public List<IVariantGraphEdge> getArcsForWitness(IWitness witness) {
     IVariantGraphNode node = getStartNode();
-    List<IVariantGraphArc> arcs = Lists.newArrayList();
-    while (node.hasArc(witness)) {
-      final IVariantGraphArc arc = node.findArc(witness);
+    List<IVariantGraphEdge> arcs = Lists.newArrayList();
+    while (node.hasEdge(witness)) {
+      final IVariantGraphEdge arc = node.findEdge(witness);
       arcs.add(arc);
       node = arc.getEndNode();
     }

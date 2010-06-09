@@ -25,5 +25,5 @@ public interface IVariantGraph {
   List<IVariantGraphNode> getPath(IWitness witness);
 
   //NOTE: This method is only here for testing purposes!
-  List<IVariantGraphArc> getArcs();
+  List<IVariantGraphEdge> getEdges();
 }

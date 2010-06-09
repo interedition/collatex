@@ -9,12 +9,12 @@ import eu.interedition.collatex2.experimental.table.CollateXVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphArc extends CollateXVertex implements IVariantGraphArc {
+public class VariantGraphEdge extends CollateXVertex implements IVariantGraphEdge {
   private final IVariantGraphNode start;
   private final IVariantGraphNode end;
   private final Set<IWitness>     witnesses;
 
-  public VariantGraphArc(IVariantGraphNode start, IVariantGraphNode end, IWitness witness, INormalizedToken token) {
+  public VariantGraphEdge(IVariantGraphNode start, IVariantGraphNode end, IWitness witness, INormalizedToken token) {
     super("DOESNOTMATTER");
     this.start = start;
     this.end = end;

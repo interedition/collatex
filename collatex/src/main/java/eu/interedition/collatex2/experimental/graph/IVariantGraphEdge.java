@@ -5,7 +5,7 @@ import java.util.Set;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public interface IVariantGraphArc {
+public interface IVariantGraphEdge {
 
   IVariantGraphNode getBeginNode();
 

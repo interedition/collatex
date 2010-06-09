@@ -11,20 +11,18 @@ public interface IVariantGraphNode {
 
   INormalizedToken getToken();
   
-  List<IVariantGraphArc> getArcs();
+  List<IVariantGraphEdge> getEdges();
 
-  void addNewArc(IVariantGraphNode node, IWitness witness, INormalizedToken token);
+  void addNewEdge(IVariantGraphNode node, IWitness witness, INormalizedToken token);
 
-  boolean arcExist(IVariantGraphNode end);
-
-  IVariantGraphArc find(IVariantGraphNode end);
+  IVariantGraphEdge findEdge(IVariantGraphNode end);
   
   //TODO: add test!
-  IVariantGraphArc findArc(IWitness witness);
+  IVariantGraphEdge findEdge(IWitness witness);
 
   //TODO: add test!
-  boolean hasArc(IWitness witness);
+  boolean hasEdge(IWitness witness);
 
-
+  boolean hasEdge(IVariantGraphNode end);
 
 }

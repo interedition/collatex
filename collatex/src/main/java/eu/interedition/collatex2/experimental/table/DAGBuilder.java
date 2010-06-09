@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraphArc;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphNode;
 import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -25,8 +25,8 @@ public class DAGBuilder {
     }
     // convert arcs to edges
     for (IVariantGraphNode node : nodes) {
-      List<IVariantGraphArc> arcs = node.getArcs();
-      for (IVariantGraphArc arc : arcs) {
+      List<IVariantGraphEdge> arcs = node.getEdges();
+      for (IVariantGraphEdge arc : arcs) {
         IVariantGraphNode endNode = arc.getEndNode();
         CollateXVertex source = map.get(node);
         CollateXVertex dest = map.get(endNode);

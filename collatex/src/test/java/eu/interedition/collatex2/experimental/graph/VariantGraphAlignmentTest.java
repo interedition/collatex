@@ -25,7 +25,7 @@ public class VariantGraphAlignmentTest {
     assertEquals(1, graph.getNodes().size());
     IVariantGraphNode startNode = graph.getStartNode();
     assertEquals("#", startNode.getNormalized());
-    assertEquals(0, graph.getArcs().size());
+    assertEquals(0, graph.getEdges().size());
   }
 
   // TODO: we should add an end node to the graph!
@@ -43,7 +43,7 @@ public class VariantGraphAlignmentTest {
     assertEquals("only", firstNode.getNormalized());
     assertEquals("one", secondNode.getNormalized());
     assertEquals("witness", thirdNode.getNormalized());
-    List<IVariantGraphArc> arcs = graph.getArcs();
+    List<IVariantGraphEdge> arcs = graph.getEdges();
     assertEquals(3, arcs.size());
     assert(arcs.get(0).getWitnesses().contains(a));
     assert(arcs.get(1).getWitnesses().contains(a));
@@ -64,7 +64,7 @@ public class VariantGraphAlignmentTest {
     graph.addWitness(w2);
     final List<IVariantGraphNode> nodes = graph.getNodes();
     assertEquals(4, nodes.size());
-    List<IVariantGraphArc> arcs = graph.getArcs();
+    List<IVariantGraphEdge> arcs = graph.getEdges();
     assertEquals(3, arcs.size());
     assertEquals("# -> the: A, B", arcs.get(0).toString());
     assertEquals("the -> black: A, B", arcs.get(1).toString());
@@ -79,7 +79,7 @@ public class VariantGraphAlignmentTest {
     graph.addWitness(w2);
     final List<IVariantGraphNode> nodes = graph.getNodes();
     assertEquals(6, nodes.size());
-    List<IVariantGraphArc> arcs = graph.getArcs();
+    List<IVariantGraphEdge> arcs = graph.getEdges();
     assertEquals(6, arcs.size());
     assertEquals("# -> the: A, B", arcs.get(0).toString());
     assertEquals("the -> black: A", arcs.get(1).toString());
@@ -103,7 +103,7 @@ public class VariantGraphAlignmentTest {
     graph.addWitness(w5);
     final List<IVariantGraphNode> nodes = graph.getNodes();
     assertEquals(8, nodes.size());
-    List<IVariantGraphArc> arcs = graph.getArcs();
+    List<IVariantGraphEdge> arcs = graph.getEdges();
     assertEquals(11, arcs.size());
     assertEquals("# -> the: A, B, C, D, E", arcs.get(0).toString());
     assertEquals("the -> black: A", arcs.get(1).toString());

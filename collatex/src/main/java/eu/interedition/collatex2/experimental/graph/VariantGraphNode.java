@@ -9,7 +9,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphNode implements IVariantGraphNode {
   private final INormalizedToken token;
-  private final List<IVariantGraphArc>  arcs;
+  private final List<IVariantGraphEdge>  arcs;
 
   public VariantGraphNode(INormalizedToken token) {
     this.token = token;
@@ -27,19 +27,19 @@ public class VariantGraphNode implements IVariantGraphNode {
   }
 
   @Override
-  public List<IVariantGraphArc> getArcs() {
+  public List<IVariantGraphEdge> getEdges() {
     return arcs;
   }
 
   @Override
-  public void addNewArc(IVariantGraphNode end, IWitness witness, INormalizedToken token) {
-    IVariantGraphArc arc = new VariantGraphArc(this, end, witness, token);
+  public void addNewEdge(IVariantGraphNode end, IWitness witness, INormalizedToken token) {
+    IVariantGraphEdge arc = new VariantGraphEdge(this, end, witness, token);
     arcs.add(arc);
   }
 
   @Override
-  public boolean arcExist(IVariantGraphNode end) {
-    for (IVariantGraphArc arc : arcs) {
+  public boolean hasEdge(IVariantGraphNode end) {
+    for (IVariantGraphEdge arc : arcs) {
       if (arc.getBeginNode().equals(this) && arc.getEndNode().equals(end)) {
         return true;
       }
@@ -48,8 +48,8 @@ public class VariantGraphNode implements IVariantGraphNode {
   }
 
   @Override
-  public IVariantGraphArc find(IVariantGraphNode end) {
-    for (IVariantGraphArc arc : arcs) {
+  public IVariantGraphEdge findEdge(IVariantGraphNode end) {
+    for (IVariantGraphEdge arc : arcs) {
       if (arc.getBeginNode().equals(this) && arc.getEndNode().equals(end)) {
         return arc;
       }
@@ -58,8 +58,8 @@ public class VariantGraphNode implements IVariantGraphNode {
   }
 
   @Override
-  public IVariantGraphArc findArc(IWitness witness) {
-    for (IVariantGraphArc arc : arcs) {
+  public IVariantGraphEdge findEdge(IWitness witness) {
+    for (IVariantGraphEdge arc : arcs) {
       if (arc.getBeginNode().equals(this) && arc.getWitnesses().contains(witness)) {
         return arc;
       }
@@ -68,8 +68,8 @@ public class VariantGraphNode implements IVariantGraphNode {
   }
 
   @Override
-  public boolean hasArc(IWitness witness) {
-    return findArc(witness) != null;
+  public boolean hasEdge(IWitness witness) {
+    return findEdge(witness) != null;
   }
   
 
