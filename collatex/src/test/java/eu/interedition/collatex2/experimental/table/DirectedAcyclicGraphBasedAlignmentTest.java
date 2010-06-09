@@ -66,5 +66,28 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       assertEquals("C: |a|b|", table.getRow(w3).rowToString());
       assertEquals(3, table.getRows().size());
     }
+    
+    @Test
+    public void testVariant() {
+      final IWitness w1 = engine.createWitness("A", "the black cat");
+      final IWitness w2 = engine.createWitness("B", "the white cat");
+      final IWitness w3 = engine.createWitness("C", "the green cat");
+      final IWitness w4 = engine.createWitness("D", "the red cat");
+      final IWitness w5 = engine.createWitness("E", "the yellow cat");
+      VariantGraph graph = VariantGraph.create();
+      graph.addWitness(w1);
+      graph.addWitness(w2);
+      graph.addWitness(w3);
+      graph.addWitness(w4);
+      graph.addWitness(w5);
+      IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
+      assertEquals("A: |the|black|cat|", table.getRow(w1).rowToString());
+      assertEquals("B: |the|white|cat|", table.getRow(w2).rowToString());
+      assertEquals("C: |the|green|cat|", table.getRow(w3).rowToString());
+      assertEquals("D: |the|red|cat|", table.getRow(w4).rowToString());
+      assertEquals("E: |the|yellow|cat|", table.getRow(w5).rowToString());
+      assertEquals(5, table.getRows().size());
+    }
+
 
 }

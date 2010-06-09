@@ -2,6 +2,8 @@ package eu.interedition.collatex2.experimental.table;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -9,10 +11,13 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AVGColumn implements IColumn {
-  private final CollateXVertex vertex;
-
-  public AVGColumn(CollateXVertex vertex) {
-    this.vertex = vertex;
+  private final List<CollateXVertex> vertices;
+  private final int position;
+  
+  public AVGColumn(CollateXVertex vertex, int position) {
+    this.vertices = Lists.newArrayList();
+    this.position = position;
+    addVertex(vertex);
   }
   
   @Override
@@ -32,12 +37,24 @@ public class AVGColumn implements IColumn {
 
   @Override
   public boolean containsWitness(String sigil) {
-    return vertex.containsWitness(sigil);
+    CollateXVertex findVertexForWitness = findVertexForWitness(sigil);
+    return findVertexForWitness != null;
+  }
+
+  // should maybe be a map?
+  private CollateXVertex findVertexForWitness(String sigil) {
+    CollateXVertex found = null;
+    for (CollateXVertex vertex : vertices) {
+      if (found == null && vertex.containsWitness(sigil)) {
+        found = vertex;
+      }
+    }
+    return found;
   }
 
   @Override
   public int getPosition() {
-    throw new UnsupportedOperationException();
+    return position;
   }
 
   @Override
@@ -52,6 +69,10 @@ public class AVGColumn implements IColumn {
 
   @Override
   public INormalizedToken getToken(String sigil) {
+    CollateXVertex vertex = findVertexForWitness(sigil);
+    if (vertex == null) {
+      throw new RuntimeException("WITNESS "+sigil+" not found in this column!");
+    }
     IWitness witness = vertex.getWitnessForSigil(sigil);
     return vertex.getToken(witness);
   }
@@ -71,4 +92,8 @@ public class AVGColumn implements IColumn {
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public void addVertex(CollateXVertex vertex) {
+    vertices.add(vertex);
+  }
 }

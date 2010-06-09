@@ -29,6 +29,7 @@ public class AlignmentTableTest {
     engine = new CollateXEngine();
   }
 
+  //NOTE: MOVED THIS ONE TO DAGT TEST
   @Test
   public void testFirstWitness() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -37,6 +38,7 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
+  //NOTE: MOVED THIS ONE TO DAGT TEST
   @Test
   public void testEverythingMatches() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -49,7 +51,7 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //NOTE: implemented on VariantGraphAlignmentTest!
+  //NOTE: Moved this one to DAGT test
   @Test
   public void testVariant() {
     final IWitness w1 = engine.createWitness("A", "the black cat");

@@ -2,6 +2,8 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
+import eu.interedition.collatex2.experimental.table.CollateXVertex;
+
 public interface IColumn extends Comparable<IColumn> {
 
   boolean containsWitness(String sigil);
@@ -23,5 +25,8 @@ public interface IColumn extends Comparable<IColumn> {
   List<String> getSigli();
 
   void accept(IAlignmentTableVisitor visitor);
+
+  //TODO: remove add methods from interface!
+  void addVertex(CollateXVertex vertex);
 
 }

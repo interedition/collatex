@@ -2,6 +2,7 @@ package eu.interedition.collatex2.implementation.indexing;
 
 import java.util.List;
 
+import eu.interedition.collatex2.experimental.table.CollateXVertex;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -70,6 +71,11 @@ public class NullColumn implements IColumn {
   @Override
   public String toString() {
     return "";
+  }
+
+  @Override
+  public void addVertex(CollateXVertex vertex) {
+    throw new UnsupportedOperationException();
   }
 
 }

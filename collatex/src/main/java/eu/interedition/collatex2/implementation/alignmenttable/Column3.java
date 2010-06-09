@@ -8,6 +8,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.experimental.table.CollateXVertex;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -114,6 +115,11 @@ public class Column3 implements IColumn {
       final INormalizedToken token = getToken(sigel);
       visitor.visitToken(sigel, token);
     }
+  }
+
+  @Override
+  public void addVertex(CollateXVertex vertex) {
+    throw new UnsupportedOperationException();
   }
 
 }
