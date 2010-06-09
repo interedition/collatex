@@ -1,11 +1,14 @@
 package eu.interedition.collatex2.alignmenttable;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.table.DirectedAcyclicGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -32,11 +35,17 @@ public class SpencerHoweTest {
     final IWitness w1 = engine.createWitness("V", "a b c d e f ");
     final IWitness w2 = engine.createWitness("W", "x y z d e");
     final IWitness w3 = engine.createWitness("X", "a b x y z");
-    final IAlignmentTable table = engine.align(w1, w2, w3);
-    logger.debug(table.toString());
-    String expected = "V: a|b|-|c|-|d|e|f\n";
-    expected += "W: -|-|x|y|z|d|e|-\n";
-    expected += "X: a|b|x|y|z|-|-|-\n";
-    Assert.assertEquals(expected, table.toString());
+    VariantGraph graph = VariantGraph.create();
+    graph.addWitness(w1);
+    graph.addWitness(w2);
+    graph.addWitness(w3);
+    IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
+    assertEquals("V: |a|b| |c| |d|e|f|", table.getRow(w1).rowToString());
+    assertEquals("W: | | |x|y|z|d|e| |", table.getRow(w2).rowToString());
+    assertEquals("X: |a|b|x|y|z| | | |", table.getRow(w3).rowToString());
+    assertEquals(3, table.getRows().size());
+//    final IAlignmentTable table = engine.align(w1, w2, w3);
+//    logger.debug(table.toString());
+   // Assert.assertEquals(expected, table.toString());
   }
 }

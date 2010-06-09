@@ -24,4 +24,22 @@ public class Row implements IRow {
   public String getSigil() {
     return sigil;
   }
+  
+  @Override
+  public String rowToString() {
+    StringBuffer resultRow = new StringBuffer();
+    resultRow.append(getSigil());
+    resultRow.append(": ");
+    for (ICell cell : this) {
+      resultRow.append("|");
+      if (cell.isEmpty()) {
+        resultRow.append(" ");
+      } else { 
+        resultRow.append(cell.getToken().getContent());
+      }  
+    }
+    resultRow.append("|");
+    return resultRow.toString();
+  }
+
 }

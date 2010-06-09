@@ -7,8 +7,6 @@ import org.junit.Test;
 import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.ICell;
-import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 
@@ -18,22 +16,6 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
     @BeforeClass
     public static void setup() {
       engine = new CollateXEngine();
-    }
-
-    private String rowToString(IRow row) {
-      StringBuffer resultRow = new StringBuffer();
-      resultRow.append(row.getSigil());
-      resultRow.append(": ");
-      for (ICell cell : row) {
-        resultRow.append("|");
-        if (cell.isEmpty()) {
-          resultRow.append(" ");
-        } else { 
-          resultRow.append(cell.getToken().getContent());
-        }  
-      }
-      resultRow.append("|");
-      return resultRow.toString();
     }
 
     @Test
@@ -49,7 +31,7 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       VariantGraph graph = VariantGraph.create();
       graph.addWitness(a);
       IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
-      assertEquals("A: |the|first|witness|", rowToString(table.getRow(a)));
+      assertEquals("A: |the|first|witness|", table.getRow(a).rowToString());
       assertEquals(1, table.getRows().size());
     }
     
@@ -63,9 +45,9 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       graph.addWitness(b);
       graph.addWitness(c);
       IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
-      assertEquals("A: |everything|matches|", rowToString(table.getRow(a)));
-      assertEquals("B: |everything|matches|", rowToString(table.getRow(b)));
-      assertEquals("C: |everything|matches|", rowToString(table.getRow(c)));
+      assertEquals("A: |everything|matches|", table.getRow(a).rowToString());
+      assertEquals("B: |everything|matches|", table.getRow(b).rowToString());
+      assertEquals("C: |everything|matches|", table.getRow(c).rowToString());
       assertEquals(3, table.getRows().size());
     }
 
@@ -79,9 +61,9 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       graph.addWitness(w2);
       graph.addWitness(w3);
       IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
-      assertEquals("A: |a| |", rowToString(table.getRow(w1)));
-      assertEquals("B: | |b|", rowToString(table.getRow(w2)));
-      assertEquals("C: |a|b|", rowToString(table.getRow(w3)));
+      assertEquals("A: |a| |", table.getRow(w1).rowToString());
+      assertEquals("B: | |b|", table.getRow(w2).rowToString());
+      assertEquals("C: |a|b|", table.getRow(w3).rowToString());
       assertEquals(3, table.getRows().size());
     }
 
