@@ -16,12 +16,12 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 public class VariantGraphIndex implements IVariantGraphIndex {
 
   private Multimap<String, INormalizedToken> normalizedToTokens;
-  private LinkedHashMap<INormalizedToken, IVariantGraphNode> tokenToNode;
+  private LinkedHashMap<INormalizedToken, IVariantGraphVertex> tokenToNode;
 
   public static IVariantGraphIndex create(IVariantGraph graph, List<String> findRepeatingTokens) {
     final VariantGraphIndex index = new VariantGraphIndex();
     //TODO: change this for three or more witnesses!
-    for (IVariantGraphNode node : graph.getNodes().subList(1, graph.getNodes().size())) {
+    for (IVariantGraphVertex node : graph.getVertices().subList(1, graph.getVertices().size())) {
       makeTokenUniqueIfNeeded(index, findRepeatingTokens, node);
     }
     //    for (final String sigil : table.getSigli()) {
@@ -36,7 +36,7 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   }
 
   @Override
-  public IVariantGraphNode getAlignmentNode(INormalizedToken token) {
+  public IVariantGraphVertex getAlignmentNode(INormalizedToken token) {
     return tokenToNode.get(token);
   }
 
@@ -64,12 +64,12 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   
 
   private static void makeTokenUniqueIfNeeded(final VariantGraphIndex index, final List<String> findRepeatingTokens,
-      final IVariantGraphNode node) {
+      final IVariantGraphVertex node) {
     INormalizedToken token = node.getToken();
     // kijken of ie unique is
     final boolean unique = !findRepeatingTokens.contains(token.getNormalized());
     if (unique) {
-      List<IVariantGraphNode> nodes = Lists.newArrayList(node);
+      List<IVariantGraphVertex> nodes = Lists.newArrayList(node);
       index.add(nodes);
     } 
 //    else {
@@ -81,14 +81,14 @@ public class VariantGraphIndex implements IVariantGraphIndex {
 //    }
   }
 
-  private void add(List<IVariantGraphNode> nodes) {
+  private void add(List<IVariantGraphVertex> nodes) {
     String normalized = "";
     String splitter = "";
-    for (IVariantGraphNode node : nodes) {
+    for (IVariantGraphVertex node : nodes) {
       normalized += splitter+node.getNormalized();
       splitter = " ";
     }
-    for (IVariantGraphNode node : nodes) {
+    for (IVariantGraphVertex node : nodes) {
       normalizedToTokens.put(normalized, node.getToken());
       tokenToNode.put(node.getToken(), node);
     }

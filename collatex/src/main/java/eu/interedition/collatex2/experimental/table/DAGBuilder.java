@@ -6,7 +6,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
-import eu.interedition.collatex2.experimental.graph.IVariantGraphNode;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -15,19 +15,19 @@ public class DAGBuilder {
 
   public DAVariantGraph buildDAG(VariantGraph graph) {
     DAVariantGraph dag = new DAVariantGraph(CollateXEdge.class);
-    List<IVariantGraphNode> nodes = graph.getNodes();
-    Map<IVariantGraphNode, CollateXVertex> map = Maps.newLinkedHashMap();
+    List<IVariantGraphVertex> nodes = graph.getVertices();
+    Map<IVariantGraphVertex, CollateXVertex> map = Maps.newLinkedHashMap();
     // convert nodes to vertices here
-    for (IVariantGraphNode node : nodes) {
+    for (IVariantGraphVertex node : nodes) {
       CollateXVertex vertex = new CollateXVertex(node.getNormalized());
       dag.addVertex(vertex);
       map.put(node, vertex);
     }
     // convert arcs to edges
-    for (IVariantGraphNode node : nodes) {
+    for (IVariantGraphVertex node : nodes) {
       List<IVariantGraphEdge> arcs = node.getEdges();
       for (IVariantGraphEdge arc : arcs) {
-        IVariantGraphNode endNode = arc.getEndNode();
+        IVariantGraphVertex endNode = arc.getEndVertex();
         CollateXVertex source = map.get(node);
         CollateXVertex dest = map.get(endNode);
         CollateXEdge edge = new CollateXEdge();

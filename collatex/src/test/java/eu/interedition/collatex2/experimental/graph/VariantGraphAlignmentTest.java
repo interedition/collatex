@@ -22,8 +22,8 @@ public class VariantGraphAlignmentTest {
   @Test
   public void testEmptyGraph() {
     IVariantGraph graph = VariantGraph.create();
-    assertEquals(1, graph.getNodes().size());
-    IVariantGraphNode startNode = graph.getStartNode();
+    assertEquals(1, graph.getVertices().size());
+    IVariantGraphVertex startNode = graph.getStartVertex();
     assertEquals("#", startNode.getNormalized());
     assertEquals(0, graph.getEdges().size());
   }
@@ -33,12 +33,12 @@ public class VariantGraphAlignmentTest {
   public void testOneWitness() {
     IWitness a = engine.createWitness("A", "only one witness");
     IVariantGraph graph = VariantGraph.create(a);
-    final List<IVariantGraphNode> nodes = graph.getNodes();
+    final List<IVariantGraphVertex> nodes = graph.getVertices();
     assertEquals(4, nodes.size());
-    final IVariantGraphNode startNode = nodes.get(0);
-    final IVariantGraphNode firstNode = nodes.get(1);
-    final IVariantGraphNode secondNode = nodes.get(2);
-    final IVariantGraphNode thirdNode = nodes.get(3);
+    final IVariantGraphVertex startNode = nodes.get(0);
+    final IVariantGraphVertex firstNode = nodes.get(1);
+    final IVariantGraphVertex secondNode = nodes.get(2);
+    final IVariantGraphVertex thirdNode = nodes.get(3);
     assertEquals("#", startNode.getNormalized());
     assertEquals("only", firstNode.getNormalized());
     assertEquals("one", secondNode.getNormalized());
@@ -48,12 +48,12 @@ public class VariantGraphAlignmentTest {
     assert(arcs.get(0).getWitnesses().contains(a));
     assert(arcs.get(1).getWitnesses().contains(a));
     assert(arcs.get(2).getWitnesses().contains(a));
-    assertEquals(startNode, arcs.get(0).getBeginNode());
-    assertEquals(firstNode, arcs.get(0).getEndNode());
-    assertEquals(firstNode, arcs.get(1).getBeginNode());
-    assertEquals(secondNode, arcs.get(1).getEndNode());
-    assertEquals(secondNode, arcs.get(2).getBeginNode());
-    assertEquals(thirdNode, arcs.get(2).getEndNode());
+    assertEquals(startNode, arcs.get(0).getBeginVertex());
+    assertEquals(firstNode, arcs.get(0).getEndVertex());
+    assertEquals(firstNode, arcs.get(1).getBeginVertex());
+    assertEquals(secondNode, arcs.get(1).getEndVertex());
+    assertEquals(secondNode, arcs.get(2).getBeginVertex());
+    assertEquals(thirdNode, arcs.get(2).getEndVertex());
   }
 
   @Test
@@ -62,7 +62,7 @@ public class VariantGraphAlignmentTest {
     final IWitness w2 = engine.createWitness("B", "the black cat");
     VariantGraph graph = VariantGraph.create(w1);
     graph.addWitness(w2);
-    final List<IVariantGraphNode> nodes = graph.getNodes();
+    final List<IVariantGraphVertex> nodes = graph.getVertices();
     assertEquals(4, nodes.size());
     List<IVariantGraphEdge> arcs = graph.getEdges();
     assertEquals(3, arcs.size());
@@ -77,7 +77,7 @@ public class VariantGraphAlignmentTest {
     final IWitness w2 = engine.createWitness("B", "the white and black cat");
     VariantGraph graph = VariantGraph.create(w1);
     graph.addWitness(w2);
-    final List<IVariantGraphNode> nodes = graph.getNodes();
+    final List<IVariantGraphVertex> nodes = graph.getVertices();
     assertEquals(6, nodes.size());
     List<IVariantGraphEdge> arcs = graph.getEdges();
     assertEquals(6, arcs.size());
@@ -101,7 +101,7 @@ public class VariantGraphAlignmentTest {
     graph.addWitness(w3);
     graph.addWitness(w4);
     graph.addWitness(w5);
-    final List<IVariantGraphNode> nodes = graph.getNodes();
+    final List<IVariantGraphVertex> nodes = graph.getVertices();
     assertEquals(8, nodes.size());
     List<IVariantGraphEdge> arcs = graph.getEdges();
     assertEquals(11, arcs.size());

@@ -5,7 +5,7 @@ import java.util.List;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public interface IVariantGraphNode {
+public interface IVariantGraphVertex {
 
   String getNormalized();
 
@@ -13,9 +13,9 @@ public interface IVariantGraphNode {
   
   List<IVariantGraphEdge> getEdges();
 
-  void addNewEdge(IVariantGraphNode node, IWitness witness, INormalizedToken token);
+  void addNewEdge(IVariantGraphVertex node, IWitness witness, INormalizedToken token);
 
-  IVariantGraphEdge findEdge(IVariantGraphNode end);
+  IVariantGraphEdge findEdge(IVariantGraphVertex end);
   
   //TODO: add test!
   IVariantGraphEdge findEdge(IWitness witness);
@@ -23,6 +23,6 @@ public interface IVariantGraphNode {
   //TODO: add test!
   boolean hasEdge(IWitness witness);
 
-  boolean hasEdge(IVariantGraphNode end);
+  boolean hasEdge(IVariantGraphVertex end);
 
 }

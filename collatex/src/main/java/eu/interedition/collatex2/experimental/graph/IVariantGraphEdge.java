@@ -7,9 +7,9 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public interface IVariantGraphEdge {
 
-  IVariantGraphNode getBeginNode();
+  IVariantGraphVertex getBeginVertex();
 
-  IVariantGraphNode getEndNode();
+  IVariantGraphVertex getEndVertex();
 
   //NOTE: unmodifiable set
   Set<IWitness> getWitnesses();

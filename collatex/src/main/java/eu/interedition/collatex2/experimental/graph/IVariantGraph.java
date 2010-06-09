@@ -6,9 +6,12 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public interface IVariantGraph {
 
-  List<IVariantGraphNode> getNodes();
+  List<IVariantGraphVertex> getVertices();
 
-  IVariantGraphNode getStartNode();
+  //NOTE: This method is only here for testing purposes!
+  List<IVariantGraphEdge> getEdges();
+
+  IVariantGraphVertex getStartVertex();
 
   //NOTE: could extract Indexable interface!
   //TODO: implement!
@@ -22,8 +25,6 @@ public interface IVariantGraph {
 
   //TODO: delete method? add arcs based method to interface
   //TODO: add test!
-  List<IVariantGraphNode> getPath(IWitness witness);
+  List<IVariantGraphVertex> getPath(IWitness witness);
 
-  //NOTE: This method is only here for testing purposes!
-  List<IVariantGraphEdge> getEdges();
 }

@@ -28,7 +28,7 @@ public class DAVariantGraphTest {
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
-    assertEquals(3, graph.getNodes().size());
+    assertEquals(3, graph.getVertices().size());
     DAGBuilder builder = new DAGBuilder();
     DAVariantGraph avg = builder.buildDAG(graph);
     List<CollateXVertex> longestPath = avg.getLongestPath();

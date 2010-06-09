@@ -11,6 +11,6 @@ public interface IVariantGraphIndex extends IWitnessIndex {
 
   Collection<INormalizedToken> getTokens(String normalized);
 
-  IVariantGraphNode getAlignmentNode(INormalizedToken token);
+  IVariantGraphVertex getAlignmentNode(INormalizedToken token);
   
 }

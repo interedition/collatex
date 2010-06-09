@@ -7,11 +7,11 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphNode implements IVariantGraphNode {
+public class VariantGraphVertex implements IVariantGraphVertex {
   private final INormalizedToken token;
   private final List<IVariantGraphEdge>  arcs;
 
-  public VariantGraphNode(INormalizedToken token) {
+  public VariantGraphVertex(INormalizedToken token) {
     this.token = token;
     this.arcs = Lists.newArrayList();
   }
@@ -32,15 +32,15 @@ public class VariantGraphNode implements IVariantGraphNode {
   }
 
   @Override
-  public void addNewEdge(IVariantGraphNode end, IWitness witness, INormalizedToken token) {
+  public void addNewEdge(IVariantGraphVertex end, IWitness witness, INormalizedToken token) {
     IVariantGraphEdge arc = new VariantGraphEdge(this, end, witness, token);
     arcs.add(arc);
   }
 
   @Override
-  public boolean hasEdge(IVariantGraphNode end) {
+  public boolean hasEdge(IVariantGraphVertex end) {
     for (IVariantGraphEdge arc : arcs) {
-      if (arc.getBeginNode().equals(this) && arc.getEndNode().equals(end)) {
+      if (arc.getBeginVertex().equals(this) && arc.getEndVertex().equals(end)) {
         return true;
       }
     }
@@ -48,9 +48,9 @@ public class VariantGraphNode implements IVariantGraphNode {
   }
 
   @Override
-  public IVariantGraphEdge findEdge(IVariantGraphNode end) {
+  public IVariantGraphEdge findEdge(IVariantGraphVertex end) {
     for (IVariantGraphEdge arc : arcs) {
-      if (arc.getBeginNode().equals(this) && arc.getEndNode().equals(end)) {
+      if (arc.getBeginVertex().equals(this) && arc.getEndVertex().equals(end)) {
         return arc;
       }
     }
@@ -60,7 +60,7 @@ public class VariantGraphNode implements IVariantGraphNode {
   @Override
   public IVariantGraphEdge findEdge(IWitness witness) {
     for (IVariantGraphEdge arc : arcs) {
-      if (arc.getBeginNode().equals(this) && arc.getWitnesses().contains(witness)) {
+      if (arc.getBeginVertex().equals(this) && arc.getWitnesses().contains(witness)) {
         return arc;
       }
     }

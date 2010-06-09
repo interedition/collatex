@@ -28,7 +28,7 @@ public class VariantGraphSpencerHoweTest {
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
-    assertEquals(3, graph.getNodes().size());
+    assertEquals(3, graph.getVertices().size());
     final List<IVariantGraphEdge> arcs = graph.getEdges();
     assertEquals(3, arcs.size());
     assertEquals("# -> a: A, C", arcs.get(0).toString());

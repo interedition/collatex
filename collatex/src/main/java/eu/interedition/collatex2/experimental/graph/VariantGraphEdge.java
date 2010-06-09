@@ -10,11 +10,11 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphEdge extends CollateXVertex implements IVariantGraphEdge {
-  private final IVariantGraphNode start;
-  private final IVariantGraphNode end;
+  private final IVariantGraphVertex start;
+  private final IVariantGraphVertex end;
   private final Set<IWitness>     witnesses;
 
-  public VariantGraphEdge(IVariantGraphNode start, IVariantGraphNode end, IWitness witness, INormalizedToken token) {
+  public VariantGraphEdge(IVariantGraphVertex start, IVariantGraphVertex end, IWitness witness, INormalizedToken token) {
     super("DOESNOTMATTER");
     this.start = start;
     this.end = end;
@@ -27,19 +27,19 @@ public class VariantGraphEdge extends CollateXVertex implements IVariantGraphEdg
   }
 
   @Override
-  public IVariantGraphNode getBeginNode() {
+  public IVariantGraphVertex getBeginVertex() {
     return start;
   }
 
   @Override
-  public IVariantGraphNode getEndNode() {
+  public IVariantGraphVertex getEndVertex() {
     return end;
   }
 
   @Override
   public String toString() {
     String splitter = "";
-    String to = getBeginNode().getNormalized() + " -> " + getEndNode().getNormalized() + ": ";
+    String to = getBeginVertex().getNormalized() + " -> " + getEndVertex().getNormalized() + ": ";
     for (IWitness witness : witnesses) {
       to += splitter + witness.getSigil();
       splitter = ", ";
