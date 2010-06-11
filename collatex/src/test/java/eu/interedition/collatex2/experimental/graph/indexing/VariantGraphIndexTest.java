@@ -1,14 +1,17 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.experimental.graph.indexing;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import eu.interedition.collatex2.experimental.graph.IVariantGraph;
+import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
+import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndex;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class AlignmentGraphIndexTest {
+public class VariantGraphIndexTest {
   private static CollateXEngine factory;
 
   @BeforeClass

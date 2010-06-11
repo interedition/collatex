@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.experimental.graph.indexing;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,11 +7,14 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import eu.interedition.collatex2.experimental.graph.IVariantGraph;
+import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class AlignmentGraphWitnessMatcherTest {
+public class VariantGraphIndexMatcherTest {
   private static CollateXEngine factory;
 
   @BeforeClass

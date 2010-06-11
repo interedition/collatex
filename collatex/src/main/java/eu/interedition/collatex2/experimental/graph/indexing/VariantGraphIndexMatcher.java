@@ -1,9 +1,10 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.experimental.graph.indexing;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.matching.IndexMatcher;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
