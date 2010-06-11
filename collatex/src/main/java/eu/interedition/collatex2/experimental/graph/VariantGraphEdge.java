@@ -5,21 +5,18 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.experimental.table.CollateXVertex;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphEdge extends CollateXVertex implements IVariantGraphEdge {
+public class VariantGraphEdge implements IVariantGraphEdge {
   private final IVariantGraphVertex start;
   private final IVariantGraphVertex end;
   private final Set<IWitness>     witnesses;
 
-  public VariantGraphEdge(IVariantGraphVertex start, IVariantGraphVertex end, IWitness witness, INormalizedToken token) {
-    super("DOESNOTMATTER");
+  public VariantGraphEdge(IVariantGraphVertex start, IVariantGraphVertex end, IWitness witness) {
     this.start = start;
     this.end = end;
     this.witnesses = Sets.newLinkedHashSet();
-    addToken(witness, token);
+    addWitness(witness);
   }
 
   public Set<IWitness> getWitnesses() {
@@ -47,9 +44,7 @@ public class VariantGraphEdge extends CollateXVertex implements IVariantGraphEdg
     return to;
   }
 
-  @Override
-  public void addToken(IWitness witness, INormalizedToken token) {
-    witnesses.add(witness); // NOTE: THIS IS DUPLICATION!
-    super.addToken(witness, token);
+  public void addWitness(IWitness witness) {
+    witnesses.add(witness);
   }
 }

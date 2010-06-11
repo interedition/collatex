@@ -12,8 +12,8 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraph implements IVariantGraph {
-  private final List<IVariantGraphVertex> nodes;
-  private final IVariantGraphVertex       startNode;
+  private final List<IVariantGraphVertex> vertices;
+  private final IVariantGraphVertex       startVertex;
   private final List<IWitness>          witnesses;
 
   public static VariantGraph create() {
@@ -24,39 +24,42 @@ public class VariantGraph implements IVariantGraph {
   public static VariantGraph create(IWitness a) {
     VariantGraph graph = create();
     graph.getWitnesses().add(a);
-    List<IVariantGraphVertex> newNodes = Lists.newArrayList();
+    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
     for (INormalizedToken token : a.getTokens()) {
-      newNodes.add(graph.addNewNode(token));
+      newVertices.add(graph.addNewVertex(token, a));
     }
     IVariantGraphVertex previous = graph.getStartVertex();
-    for (IVariantGraphVertex node : newNodes) {
-      previous.addNewEdge(node, a, node.getToken());
-      previous = node;
+    for (IVariantGraphVertex vertex : newVertices) {
+      previous.addNewEdge(vertex, a);
+      previous = vertex;
     }
     return graph;
   }
 
   @Override
   public List<IVariantGraphVertex> getVertices() {
-    return nodes;
+    return vertices;
   }
 
   @Override
   public IVariantGraphVertex getStartVertex() {
-    return startNode;
+    return startVertex;
   }
 
   // TODO: why does NullToken need a sigil as parameter?
   private VariantGraph() {
-    this.nodes = Lists.newArrayList();
+    this.vertices = Lists.newArrayList();
     this.witnesses = Lists.newArrayList();
-    this.startNode = addNewNode(new NullToken(1, null));
+    this.startVertex = addNewVertex(new NullToken(1, null), null);
   }
 
-  private IVariantGraphVertex addNewNode(INormalizedToken token) {
-    final VariantGraphVertex newNode = new VariantGraphVertex(token);
-    nodes.add(newNode);
-    return newNode;
+  private IVariantGraphVertex addNewVertex(INormalizedToken token, IWitness w) {
+    final VariantGraphVertex vertex = new VariantGraphVertex(token);
+    vertices.add(vertex);
+    if (w!=null) {
+      vertex.addToken(w, token);
+    }
+    return vertex;
   }
 
   // TODO Auto-generated method stub
@@ -77,10 +80,11 @@ public class VariantGraph implements IVariantGraph {
     witnesses.add(witness);
     VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(this);
     List<ITokenMatch> matches = matcher.getMatches(witness);
-    makeArcsForMatches(witness, matches, matcher.getGraphIndex());
+    makeEdgesForMatches(witness, matches, matcher.getGraphIndex());
   }
 
-  private void makeArcsForMatches(IWitness witness, List<ITokenMatch> matches, IVariantGraphIndex graphIndex2) {
+  //TODO: move building of graph to subclass?
+  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, IVariantGraphIndex graphIndex2) {
     Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
     witnessTokenToMatch = Maps.newLinkedHashMap();
     for (ITokenMatch match : matches) {
@@ -91,18 +95,20 @@ public class VariantGraph implements IVariantGraph {
     for (INormalizedToken token : witness.getTokens()) {
       if (!witnessTokenToMatch.containsKey(token)) {
         // NOTE: here we determine that the token is an addition/replacement!
-        IVariantGraphVertex end = this.addNewNode(token);
-        begin.addNewEdge(end, witness, token);
+        IVariantGraphVertex end = this.addNewVertex(token, witness);
+        begin.addNewEdge(end, witness);
         begin = end;
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
-        IVariantGraphVertex end = graphIndex2.getAlignmentNode(tokenMatch.getTokenB());
+        IVariantGraphVertex end = graphIndex2.getVertex(tokenMatch.getTokenB());
         if (begin.hasEdge(end)) {
-          IVariantGraphEdge existingArc = begin.findEdge(end);
-          existingArc.addToken(witness, token);
+          IVariantGraphEdge existingEdge = begin.findEdge(end);
+          existingEdge.addWitness(witness);
+          end.addToken(witness, token);
         } else {
-          begin.addNewEdge(end, witness, token);
+          begin.addNewEdge(end, witness);
+          end.addToken(witness, token);
         }
         begin = end;
       }
@@ -135,7 +141,7 @@ public class VariantGraph implements IVariantGraph {
   @Override
   public List<IVariantGraphEdge> getEdges() {
     List<IVariantGraphEdge> allArcs = Lists.newArrayList();
-    for (IVariantGraphVertex node : nodes) {
+    for (IVariantGraphVertex node : vertices) {
       allArcs.addAll(node.getEdges());
     }
     return allArcs;

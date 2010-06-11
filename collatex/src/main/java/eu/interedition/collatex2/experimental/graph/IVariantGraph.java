@@ -15,7 +15,7 @@ public interface IVariantGraph {
 
   //NOTE: could extract Indexable interface!
   //TODO: implement!
-  List<String>  findRepeatingTokens();
+  List<String> findRepeatingTokens();
 
   //TODO: add test!
   List<IWitness> getWitnesses();
@@ -23,7 +23,7 @@ public interface IVariantGraph {
   //TODO: add test!
   boolean isEmpty();
 
-  //TODO: delete method? add arcs based method to interface
+  //TODO: delete method? add edges based method to interface
   //TODO: add test!
   List<IVariantGraphVertex> getPath(IWitness witness);
 

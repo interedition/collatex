@@ -62,13 +62,13 @@ public class VariantGraphAlignmentTest {
     final IWitness w2 = engine.createWitness("B", "the black cat");
     VariantGraph graph = VariantGraph.create(w1);
     graph.addWitness(w2);
-    final List<IVariantGraphVertex> nodes = graph.getVertices();
-    assertEquals(4, nodes.size());
-    List<IVariantGraphEdge> arcs = graph.getEdges();
-    assertEquals(3, arcs.size());
-    assertEquals("# -> the: A, B", arcs.get(0).toString());
-    assertEquals("the -> black: A, B", arcs.get(1).toString());
-    assertEquals("black -> cat: A, B", arcs.get(2).toString());
+    final List<IVariantGraphVertex> vertices = graph.getVertices();
+    assertEquals(4, vertices.size());
+    List<IVariantGraphEdge> edges = graph.getEdges();
+    assertEquals(3, edges.size());
+    assertEquals("# -> the: A, B", edges.get(0).toString());
+    assertEquals("the -> black: A, B", edges.get(1).toString());
+    assertEquals("black -> cat: A, B", edges.get(2).toString());
   }
 
   @Test

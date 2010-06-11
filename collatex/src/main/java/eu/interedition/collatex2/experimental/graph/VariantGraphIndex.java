@@ -12,17 +12,18 @@ import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphIndex implements IVariantGraphIndex {
 
   private Multimap<String, INormalizedToken> normalizedToTokens;
-  private LinkedHashMap<INormalizedToken, IVariantGraphVertex> tokenToNode;
+  private LinkedHashMap<INormalizedToken, IVariantGraphVertex> tokenToVertex;
 
   public static IVariantGraphIndex create(IVariantGraph graph, List<String> findRepeatingTokens) {
     final VariantGraphIndex index = new VariantGraphIndex();
     //TODO: change this for three or more witnesses!
-    for (IVariantGraphVertex node : graph.getVertices().subList(1, graph.getVertices().size())) {
-      makeTokenUniqueIfNeeded(index, findRepeatingTokens, node);
+    for (IVariantGraphVertex vertex : graph.getVertices().subList(1, graph.getVertices().size())) {
+      makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
     }
     //    for (final String sigil : table.getSigli()) {
 //      findUniquePhrasesForRow(sigil, table, index, repeatingTokens);
@@ -36,18 +37,13 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   }
 
   @Override
-  public IVariantGraphVertex getAlignmentNode(INormalizedToken token) {
-    return tokenToNode.get(token);
-  }
-
-  @Override
-  public Collection<INormalizedToken> getTokens(String normalized) {
-    return normalizedToTokens.get(normalized);
+  public IVariantGraphVertex getVertex(INormalizedToken token) {
+    return tokenToVertex.get(token);
   }
 
   private VariantGraphIndex() {
     normalizedToTokens = ArrayListMultimap.create();
-    tokenToNode = Maps.newLinkedHashMap();
+    tokenToVertex = Maps.newLinkedHashMap();
   }
 
 //  private static void findUniquePhrasesForRow(final String row, final IAlignmentTable table, final AlignmentTableIndex index, final List<String> findRepeatingTokens) {
@@ -64,13 +60,13 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   
 
   private static void makeTokenUniqueIfNeeded(final VariantGraphIndex index, final List<String> findRepeatingTokens,
-      final IVariantGraphVertex node) {
-    INormalizedToken token = node.getToken();
+      final IVariantGraphVertex vertex) {
+    String normalized = vertex.getNormalized();
     // kijken of ie unique is
-    final boolean unique = !findRepeatingTokens.contains(token.getNormalized());
+    final boolean unique = !findRepeatingTokens.contains(normalized);
     if (unique) {
-      List<IVariantGraphVertex> nodes = Lists.newArrayList(node);
-      index.add(nodes);
+      List<IVariantGraphVertex> vertices = Lists.newArrayList(vertex);
+      index.add(vertices);
     } 
 //    else {
 //      //System.out.println("We have to combine stuff here!");
@@ -81,16 +77,21 @@ public class VariantGraphIndex implements IVariantGraphIndex {
 //    }
   }
 
-  private void add(List<IVariantGraphVertex> nodes) {
+  private void add(List<IVariantGraphVertex> vertices) {
     String normalized = "";
     String splitter = "";
-    for (IVariantGraphVertex node : nodes) {
-      normalized += splitter+node.getNormalized();
+    for (IVariantGraphVertex vertex : vertices) {
+      normalized += splitter+vertex.getNormalized();
       splitter = " ";
     }
-    for (IVariantGraphVertex node : nodes) {
-      normalizedToTokens.put(normalized, node.getToken());
-      tokenToNode.put(node.getToken(), node);
+    for (IVariantGraphVertex vertex : vertices) {
+      if (vertex.getWitnesses().isEmpty()) {
+        throw new RuntimeException("STOP! Witness set is not supposed to be empty! Vertex: "+vertex.getNormalized());
+      }
+      //Note: this code assumes witnesses = an ordered set
+      IWitness firstWitness = vertex.getWitnesses().iterator().next();
+      normalizedToTokens.put(normalized, vertex.getToken(firstWitness));
+      tokenToVertex.put(vertex.getToken(firstWitness), vertex);
     }
   }
 
@@ -135,5 +136,4 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   public int size() {
     return normalizedToTokens.size();
   }
-
 }

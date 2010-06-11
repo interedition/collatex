@@ -55,4 +55,8 @@ public class CollateXVertex {
     }
     return null;
   }
+  
+  public Set<IWitness> getWitnesses() {
+    return tokenMap.keySet();
+  }
 }

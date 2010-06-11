@@ -27,14 +27,14 @@ public class DAGBuilder {
     for (IVariantGraphVertex node : nodes) {
       List<IVariantGraphEdge> arcs = node.getEdges();
       for (IVariantGraphEdge arc : arcs) {
-        IVariantGraphVertex endNode = arc.getEndVertex();
+        IVariantGraphVertex endVertex = arc.getEndVertex();
         CollateXVertex source = map.get(node);
-        CollateXVertex dest = map.get(endNode);
+        CollateXVertex dest = map.get(endVertex);
         CollateXEdge edge = new CollateXEdge();
         dag.addEdge(source, dest, edge);
         // convert tokens for each witness
         for (IWitness witness: arc.getWitnesses()) {
-          INormalizedToken token = arc.getToken(witness);
+          INormalizedToken token = endVertex.getToken(witness);
           dest.addToken(witness, token);
         }
       }

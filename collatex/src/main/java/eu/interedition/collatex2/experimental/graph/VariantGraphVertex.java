@@ -4,16 +4,18 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.experimental.table.CollateXVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphVertex implements IVariantGraphVertex {
+public class VariantGraphVertex extends CollateXVertex implements IVariantGraphVertex {
   private final INormalizedToken token;
-  private final List<IVariantGraphEdge>  arcs;
+  private final List<IVariantGraphEdge>  edges;
 
   public VariantGraphVertex(INormalizedToken token) {
+    super(token.getNormalized());
     this.token = token;
-    this.arcs = Lists.newArrayList();
+    this.edges = Lists.newArrayList();
   }
 
   @Override
@@ -22,24 +24,19 @@ public class VariantGraphVertex implements IVariantGraphVertex {
   }
 
   @Override
-  public INormalizedToken getToken() {
-    return token;
-  }
-
-  @Override
   public List<IVariantGraphEdge> getEdges() {
-    return arcs;
+    return edges;
   }
 
   @Override
-  public void addNewEdge(IVariantGraphVertex end, IWitness witness, INormalizedToken token) {
-    IVariantGraphEdge arc = new VariantGraphEdge(this, end, witness, token);
-    arcs.add(arc);
+  public void addNewEdge(IVariantGraphVertex end, IWitness witness) {
+    IVariantGraphEdge edge = new VariantGraphEdge(this, end, witness);
+    edges.add(edge);
   }
 
   @Override
   public boolean hasEdge(IVariantGraphVertex end) {
-    for (IVariantGraphEdge arc : arcs) {
+    for (IVariantGraphEdge arc : edges) {
       if (arc.getBeginVertex().equals(this) && arc.getEndVertex().equals(end)) {
         return true;
       }
@@ -49,7 +46,7 @@ public class VariantGraphVertex implements IVariantGraphVertex {
 
   @Override
   public IVariantGraphEdge findEdge(IVariantGraphVertex end) {
-    for (IVariantGraphEdge arc : arcs) {
+    for (IVariantGraphEdge arc : edges) {
       if (arc.getBeginVertex().equals(this) && arc.getEndVertex().equals(end)) {
         return arc;
       }
@@ -59,7 +56,7 @@ public class VariantGraphVertex implements IVariantGraphVertex {
 
   @Override
   public IVariantGraphEdge findEdge(IWitness witness) {
-    for (IVariantGraphEdge arc : arcs) {
+    for (IVariantGraphEdge arc : edges) {
       if (arc.getBeginVertex().equals(this) && arc.getWitnesses().contains(witness)) {
         return arc;
       }
@@ -71,7 +68,4 @@ public class VariantGraphVertex implements IVariantGraphVertex {
   public boolean hasEdge(IWitness witness) {
     return findEdge(witness) != null;
   }
-  
-
-
 }
