@@ -32,8 +32,12 @@ public class DAGBuilder {
         CollateXVertex dest = map.get(endVertex);
         CollateXEdge edge = new CollateXEdge();
         dag.addEdge(source, dest, edge);
+        // convert witnesses on VariantGraph edge to DAG edge
+        for (IWitness w: vGEdge.getWitnesses()) {
+          edge.addWitness(w);
+        }
+        // convert tokens for each witness
         if (endVertex != graph.getEndVertex()) {
-          // convert tokens for each witness
           for (IWitness witness: vGEdge.getWitnesses()) {
             INormalizedToken token = endVertex.getToken(witness);
             dest.addToken(witness, token);

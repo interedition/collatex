@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.experimental.table;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -39,15 +40,20 @@ public class DAGBuilderTest {
       Assert.assertEquals("first", first.getNormalized());
       Assert.assertEquals("witness", witness.getNormalized());
       Assert.assertEquals("#", end.getNormalized());       
+      // tokens on vertices
+      Assert.assertEquals("the", the.getToken(a).getContent());
+      Assert.assertEquals("first", first.getToken(a).getContent());
+      Assert.assertEquals("witness", witness.getToken(a).getContent());
       // edges
       Assert.assertTrue(dag.containsEdge(start, the));
       Assert.assertTrue(dag.containsEdge(the, first));
       Assert.assertTrue(dag.containsEdge(first, witness));
       Assert.assertTrue(dag.containsEdge(witness, end));
-      // tokens
-      Assert.assertEquals("the", the.getToken(a).getContent());
-      Assert.assertEquals("first", first.getToken(a).getContent());
-      Assert.assertEquals("witness", witness.getToken(a).getContent());
+      // witnesses on edges
+      Set<CollateXEdge> edgeSet = dag.edgeSet();
+      for (CollateXEdge edge : edgeSet) {
+        Assert.assertTrue("Witness "+a.getSigil()+" not present in set!", edge.containsWitness(a));
+      }
   }
 
 }

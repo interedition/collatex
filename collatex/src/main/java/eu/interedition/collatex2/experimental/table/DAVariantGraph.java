@@ -56,19 +56,23 @@ public class DAVariantGraph extends DirectedAcyclicGraph<CollateXVertex, Collate
 
   List<CollateXVertex> getPathFor(IWitness witness) {
     List<CollateXVertex> path = Lists.newArrayList();
-    CollateXVertex startVertex = iterator().next();
+    CollateXVertex startVertex = getStartVertex();
     CollateXVertex currentVertex = startVertex;
     while (outDegreeOf(currentVertex) > 0) {
       Set<CollateXEdge> outgoingEdges = outgoingEdgesOf(currentVertex);
+      boolean found = false;
       for (CollateXEdge edge : outgoingEdges) {
-        //TODO: looking at the vertex here is wrong!
-        CollateXVertex edgeTarget = getEdgeTarget(edge);
-        if (edgeTarget.containsWitness(witness.getSigil())) {
+        if (!found&&edge.containsWitness(witness)) {
+          found = true;
+          CollateXVertex edgeTarget = getEdgeTarget(edge);
           if (!edgeTarget.getNormalized().equals("#")) {
             path.add(edgeTarget);
           }
+          currentVertex = edgeTarget;
         }
-        currentVertex = edgeTarget;
+      }
+      if (!found) {
+        throw new RuntimeException("No valid path found for "+witness.getSigil());
       }
     }
     return path;
