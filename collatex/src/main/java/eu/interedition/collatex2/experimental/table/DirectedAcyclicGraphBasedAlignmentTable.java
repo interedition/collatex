@@ -97,12 +97,12 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
     // NOTE: now assign columns to each vertex that is
     // not on the longest path or that is not yet assigned
     IColumn lastColumn = null;
-    System.out.println(path.size());
+//    System.out.println(path.size());
+//    for (CollateXVertex vertex : path) {
+//      System.out.println(vertex.getNormalized());
+//    }
     for (CollateXVertex vertex : path) {
-      System.out.println(vertex.getNormalized());
-    }
-    for (CollateXVertex vertex : path) {
-       System.out.println("Looking for: "+vertex.getNormalized());
+//       System.out.println("Looking for: "+vertex.getNormalized());
       if (vertexToColumn.containsKey(vertex)) {
         // skip... vertex is already placed
         lastColumn = vertexToColumn.get(vertex);
