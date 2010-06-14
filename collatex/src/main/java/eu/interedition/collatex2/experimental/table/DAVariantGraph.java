@@ -2,11 +2,14 @@ package eu.interedition.collatex2.experimental.table;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.jgrapht.alg.BellmanFordShortestPath;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.Lists;
+
+import eu.interedition.collatex2.interfaces.IWitness;
 
 @SuppressWarnings("serial")
 public class DAVariantGraph extends DirectedAcyclicGraph<CollateXVertex, CollateXEdge> {
@@ -49,5 +52,25 @@ public class DAVariantGraph extends DirectedAcyclicGraph<CollateXVertex, Collate
 
   private CollateXVertex getStartVertex() {
     return iterator().next();
+  }
+
+  List<CollateXVertex> getPathFor(IWitness witness) {
+    List<CollateXVertex> path = Lists.newArrayList();
+    CollateXVertex startVertex = iterator().next();
+    CollateXVertex currentVertex = startVertex;
+    while (outDegreeOf(currentVertex) > 0) {
+      Set<CollateXEdge> outgoingEdges = outgoingEdgesOf(currentVertex);
+      for (CollateXEdge edge : outgoingEdges) {
+        //TODO: looking at the vertex here is wrong!
+        CollateXVertex edgeTarget = getEdgeTarget(edge);
+        if (edgeTarget.containsWitness(witness.getSigil())) {
+          if (!edgeTarget.getNormalized().equals("#")) {
+            path.add(edgeTarget);
+          }
+        }
+        currentVertex = edgeTarget;
+      }
+    }
+    return path;
   }
 }

@@ -2,9 +2,7 @@ package eu.interedition.collatex2.experimental.table;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.VariantGraph;
@@ -95,12 +93,16 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
     getSigli().add(sigil);
 
     // Note: search the path through the graph for this witness
-    List<CollateXVertex> path = getPathFor(witness);
+    List<CollateXVertex> path = dag.getPathFor(witness);
     // NOTE: now assign columns to each vertex that is
     // not on the longest path or that is not yet assigned
     IColumn lastColumn = null;
+    System.out.println(path.size());
     for (CollateXVertex vertex : path) {
-      // System.out.println("Looking for: "+vertex.getNormalized());
+      System.out.println(vertex.getNormalized());
+    }
+    for (CollateXVertex vertex : path) {
+       System.out.println("Looking for: "+vertex.getNormalized());
       if (vertexToColumn.containsKey(vertex)) {
         // skip... vertex is already placed
         lastColumn = vertexToColumn.get(vertex);
@@ -150,26 +152,6 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
     // addNewColumn(token);
     // }
 
-  }
-
-  // TODO: move to DAVG
-  private List<CollateXVertex> getPathFor(IWitness witness) {
-    List<CollateXVertex> path = Lists.newArrayList();
-    CollateXVertex startVertex = dag.iterator().next();
-    CollateXVertex currentVertex = startVertex;
-    while (dag.outDegreeOf(currentVertex) > 0) {
-      Set<CollateXEdge> outgoingEdges = dag.outgoingEdgesOf(currentVertex);
-      for (CollateXEdge edge : outgoingEdges) {
-        CollateXVertex edgeTarget = dag.getEdgeTarget(edge);
-        if (edgeTarget.containsWitness(witness.getSigil())) {
-          if (!edgeTarget.getNormalized().equals("#")) {
-            path.add(edgeTarget);
-          }
-        }
-        currentVertex = edgeTarget;
-      }
-    }
-    return path;
   }
 
   private IColumn addNewColumn(CollateXVertex vertex) {
