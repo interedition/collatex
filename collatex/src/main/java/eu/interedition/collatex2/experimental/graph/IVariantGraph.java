@@ -13,6 +13,8 @@ public interface IVariantGraph {
 
   IVariantGraphVertex getStartVertex();
 
+  IVariantGraphVertex getEndVertex();
+
   //NOTE: could extract Indexable interface!
   //TODO: implement!
   List<String> findRepeatingTokens();

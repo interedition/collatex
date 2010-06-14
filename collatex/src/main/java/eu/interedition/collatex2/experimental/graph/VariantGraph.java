@@ -15,8 +15,9 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraph implements IVariantGraph {
   private final List<IVariantGraphVertex> vertices;
-  private final IVariantGraphVertex       startVertex;
   private final List<IWitness>          witnesses;
+  private final IVariantGraphVertex       startVertex;
+  private final IVariantGraphVertex endVertex;
 
   public static VariantGraph create() {
     final VariantGraph graph = new VariantGraph();
@@ -35,12 +36,17 @@ public class VariantGraph implements IVariantGraph {
       previous.addNewEdge(vertex, a);
       previous = vertex;
     }
+    previous.addNewEdge(graph.getEndVertex(), a);
     return graph;
   }
 
   @Override
   public List<IVariantGraphVertex> getVertices() {
-    return vertices;
+    List<IVariantGraphVertex> allVertices = Lists.newArrayList();
+    allVertices.add(getStartVertex());
+    allVertices.addAll(vertices);
+    allVertices.add(getEndVertex());
+    return allVertices;
   }
 
   @Override
@@ -48,11 +54,17 @@ public class VariantGraph implements IVariantGraph {
     return startVertex;
   }
 
+  @Override
+  public IVariantGraphVertex getEndVertex() {
+    return endVertex;
+  }
+
   // TODO: why does NullToken need a sigil as parameter?
   private VariantGraph() {
     this.vertices = Lists.newArrayList();
     this.witnesses = Lists.newArrayList();
-    this.startVertex = addNewVertex(new NullToken(1, null), null);
+    this.startVertex = new VariantGraphVertex(new NullToken(1, null)); 
+    this.endVertex = new VariantGraphVertex(new NullToken(1, null));
   }
 
   private IVariantGraphVertex addNewVertex(INormalizedToken token, IWitness w) {
@@ -115,6 +127,14 @@ public class VariantGraph implements IVariantGraph {
         begin = end;
       }
     }
+    // adds edge from last vertex to end vertex
+    IVariantGraphVertex end = getEndVertex();
+    if (begin.hasEdge(end)) {
+      IVariantGraphEdge existingEdge = begin.findEdge(end);
+      existingEdge.addWitness(witness);
+    } else {
+      begin.addNewEdge(end, witness);
+    }
   }
 
   @Override
@@ -143,7 +163,7 @@ public class VariantGraph implements IVariantGraph {
   @Override
   public List<IVariantGraphEdge> getEdges() {
     List<IVariantGraphEdge> allArcs = Lists.newArrayList();
-    for (IVariantGraphVertex node : vertices) {
+    for (IVariantGraphVertex node : getVertices()) {
       allArcs.addAll(node.getEdges());
     }
     return allArcs;

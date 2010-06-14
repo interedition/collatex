@@ -28,12 +28,14 @@ public class VariantGraphSpencerHoweTest {
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
-    assertEquals(3, graph.getVertices().size());
-    final List<IVariantGraphEdge> arcs = graph.getEdges();
-    assertEquals(3, arcs.size());
-    assertEquals("# -> a: A, C", arcs.get(0).toString());
-    assertEquals("# -> b: B", arcs.get(1).toString());
-    assertEquals("a -> b: C", arcs.get(2).toString());
+    assertEquals(4, graph.getVertices().size());
+    final List<IVariantGraphEdge> edges = graph.getEdges();
+    assertEquals(5, edges.size());
+    assertEquals("# -> a: A, C", edges.get(0).toString());
+    assertEquals("# -> b: B", edges.get(1).toString());
+    assertEquals("a -> #: A", edges.get(2).toString());
+    assertEquals("a -> b: C", edges.get(3).toString());
+    assertEquals("b -> #: B, C", edges.get(4).toString());
   }
   
 

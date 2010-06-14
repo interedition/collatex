@@ -15,27 +15,29 @@ public class DAGBuilder {
 
   public DAVariantGraph buildDAG(VariantGraph graph) {
     DAVariantGraph dag = new DAVariantGraph(CollateXEdge.class);
-    List<IVariantGraphVertex> nodes = graph.getVertices();
+    List<IVariantGraphVertex> vertices = graph.getVertices();
     Map<IVariantGraphVertex, CollateXVertex> map = Maps.newLinkedHashMap();
-    // convert nodes to vertices here
-    for (IVariantGraphVertex node : nodes) {
-      CollateXVertex vertex = new CollateXVertex(node.getNormalized());
+    // convert VariantGraph vertices to DAG vertices 
+    for (IVariantGraphVertex vGVertex : vertices) {
+      CollateXVertex vertex = new CollateXVertex(vGVertex.getNormalized());
       dag.addVertex(vertex);
-      map.put(node, vertex);
+      map.put(vGVertex, vertex);
     }
-    // convert arcs to edges
-    for (IVariantGraphVertex node : nodes) {
-      List<IVariantGraphEdge> arcs = node.getEdges();
-      for (IVariantGraphEdge arc : arcs) {
-        IVariantGraphVertex endVertex = arc.getEndVertex();
-        CollateXVertex source = map.get(node);
+    // convert VariantGraph edges to DAG edges
+    for (IVariantGraphVertex vertex : vertices) {
+      List<IVariantGraphEdge> vGEdges = vertex.getEdges();
+      for (IVariantGraphEdge vGEdge : vGEdges) {
+        IVariantGraphVertex endVertex = vGEdge.getEndVertex();
+        CollateXVertex source = map.get(vertex);
         CollateXVertex dest = map.get(endVertex);
         CollateXEdge edge = new CollateXEdge();
         dag.addEdge(source, dest, edge);
-        // convert tokens for each witness
-        for (IWitness witness: arc.getWitnesses()) {
-          INormalizedToken token = endVertex.getToken(witness);
-          dest.addToken(witness, token);
+        if (endVertex != graph.getEndVertex()) {
+          // convert tokens for each witness
+          for (IWitness witness: vGEdge.getWitnesses()) {
+            INormalizedToken token = endVertex.getToken(witness);
+            dest.addToken(witness, token);
+          }
         }
       }
     }

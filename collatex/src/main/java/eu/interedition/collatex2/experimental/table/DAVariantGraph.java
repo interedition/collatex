@@ -16,27 +16,14 @@ public class DAVariantGraph extends DirectedAcyclicGraph<CollateXVertex, Collate
   }
 
   public List<CollateXVertex> getLongestPath() {
-    // TODO: this is not right place for this code
-    // TODO: move this code to the variant graph
-    // NOTE: Generate end vertex
-    final CollateXVertex endVertex = new CollateXVertex("#");
-    this.addVertex(endVertex);
-    // NOTE: connect all the end vertices of each witness to the end vertex of the graph
-    Iterator<CollateXVertex> s = iterator();
-    while (s.hasNext()) {
-      CollateXVertex v = s.next();
-      if (v != endVertex && outDegreeOf(v) == 0) {
-        CollateXEdge e = new CollateXEdge();
-        this.addEdge(v, endVertex, e);
-      }
-    }
     // NOTE: Weights are set to negative value to
     // generate the longest path instead of the shortest path
     for (CollateXEdge edge : edgeSet()) {
       setEdgeWeight(edge, -1);
     }
     // NOTE: gets the start vertex of the graph
-    CollateXVertex startVertex = iterator().next();
+    CollateXVertex startVertex = getStartVertex();
+    CollateXVertex endVertex = getEndVertex();
     // Note: calculates the longest path
     List<CollateXEdge> findPathBetween = BellmanFordShortestPath.findPathBetween(this, startVertex, endVertex);
     // Note: gets the end vertices associated with the edges of the path
@@ -48,5 +35,19 @@ public class DAVariantGraph extends DirectedAcyclicGraph<CollateXVertex, Collate
       }
     }
     return vertices;
+  }
+
+  //NOTE: not the nicest code in the world
+  private CollateXVertex getEndVertex() {
+    Iterator<CollateXVertex> i = iterator();
+    CollateXVertex end = null;
+    while(i.hasNext()) {
+      end = i.next();
+    }
+    return end;
+  }
+
+  private CollateXVertex getStartVertex() {
+    return iterator().next();
   }
 }

@@ -34,12 +34,13 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
     // Note: we build the new DAG here (based on the variant graph)
     DAGBuilder builder = new DAGBuilder();
     dag = builder.buildDAG(graph);
-
-    // NOTE: we build a column for each vertex in the longest path
-    List<CollateXVertex> longestPath = dag.getLongestPath();
-    for (CollateXVertex vertex : longestPath) {
-      IColumn newColumn = addNewColumn(vertex);
-      vertexToColumn.put(vertex, newColumn);
+    if (!dag.edgeSet().isEmpty()) {
+      // NOTE: we build a column for each vertex in the longest path
+      List<CollateXVertex> longestPath = dag.getLongestPath();
+      for (CollateXVertex vertex : longestPath) {
+        IColumn newColumn = addNewColumn(vertex);
+        vertexToColumn.put(vertex, newColumn);
+      }
     }
   }
 

@@ -24,7 +24,8 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   public static IVariantGraphIndex create(IVariantGraph graph, List<String> findRepeatingTokens) {
     final VariantGraphIndex index = new VariantGraphIndex();
     //TODO: change this for three or more witnesses!
-    for (IVariantGraphVertex vertex : graph.getVertices().subList(1, graph.getVertices().size())) {
+    //Note: this code skips begin and end vertices!
+    for (IVariantGraphVertex vertex : graph.getVertices().subList(1, graph.getVertices().size()-1)) {
       makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
     }
     //    for (final String sigil : table.getSigli()) {
