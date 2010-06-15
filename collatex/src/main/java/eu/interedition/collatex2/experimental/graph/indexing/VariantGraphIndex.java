@@ -35,11 +35,6 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   }
 
   @Override
-  public boolean containsNormalizedPhrase(String normalized) {
-    return normalizedToTokens.containsKey(normalized);
-  }
-
-  @Override
   public IVariantGraphVertex getVertex(INormalizedToken token) {
     return tokenToVertex.get(token);
   }
@@ -110,10 +105,9 @@ public class VariantGraphIndex implements IVariantGraphIndex {
     return result;
   }
 
-  //TODO: remove duplication!
   @Override
   public boolean contains(String normalized) {
-    return containsNormalizedPhrase(normalized);
+    return normalizedToTokens.containsKey(normalized);
   }
 
   //TODO: this is workaround! store real phrases instead of token!
