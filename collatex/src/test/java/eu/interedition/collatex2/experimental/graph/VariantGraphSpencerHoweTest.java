@@ -24,7 +24,7 @@ public class VariantGraphSpencerHoweTest {
     IWitness w1 = engine.createWitness("A", "a");
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
-    VariantGraph graph = VariantGraph.create();
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create();
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);

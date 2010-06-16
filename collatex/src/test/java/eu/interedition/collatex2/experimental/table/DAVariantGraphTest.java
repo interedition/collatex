@@ -7,7 +7,8 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.graph.IModifiableVariantGraph;
+import eu.interedition.collatex2.experimental.graph.ModifiableVariantGraph;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -24,7 +25,7 @@ public class DAVariantGraphTest {
     IWitness w1 = engine.createWitness("A", "a");
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
-    VariantGraph graph = VariantGraph.create();
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create();
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
@@ -45,7 +46,7 @@ public class DAVariantGraphTest {
     final IWitness w1 = engine.createWitness("V", "a b c d e f ");
     final IWitness w2 = engine.createWitness("W", "x y z d e");
     final IWitness w3 = engine.createWitness("X", "a b x y z");
-    VariantGraph graph = VariantGraph.create();
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create();
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);

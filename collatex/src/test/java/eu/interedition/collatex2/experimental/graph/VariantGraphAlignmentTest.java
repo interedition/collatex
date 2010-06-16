@@ -20,7 +20,7 @@ public class VariantGraphAlignmentTest {
 
   @Test
   public void testEmptyGraph() {
-    IVariantGraph graph = VariantGraph.create();
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create();
     assertEquals(2, graph.getVertices().size());
     IVariantGraphVertex startVertex = graph.getStartVertex();
     assertEquals("#", startVertex.getNormalized());
@@ -31,8 +31,8 @@ public class VariantGraphAlignmentTest {
 
   @Test
   public void testOneWitness() {
-    IWitness a = engine.createWitness("A", "only one witness");
-    IVariantGraph graph = VariantGraph.create(a);
+    IWitness a = engine.createWitness("A", "only one witness");   
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create(a);
     final List<IVariantGraphVertex> vertices = graph.getVertices();
     assertEquals(5, vertices.size());
     final IVariantGraphVertex startNode = vertices.get(0);
@@ -69,7 +69,7 @@ public class VariantGraphAlignmentTest {
   public void testTwoWitnesses() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the black cat");
-    VariantGraph graph = VariantGraph.create(w1);
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create(w1);
     graph.addWitness(w2);
     final List<IVariantGraphVertex> vertices = graph.getVertices();
     assertEquals(5, vertices.size());
@@ -85,7 +85,7 @@ public class VariantGraphAlignmentTest {
   public void testAddition1() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the white and black cat");
-    VariantGraph graph = VariantGraph.create(w1);
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create(w1);
     graph.addWitness(w2);
     final List<IVariantGraphVertex> vertices = graph.getVertices();
     assertEquals(7, vertices.size());
@@ -107,7 +107,7 @@ public class VariantGraphAlignmentTest {
     final IWitness w3 = engine.createWitness("C", "the green cat");
     final IWitness w4 = engine.createWitness("D", "the red cat");
     final IWitness w5 = engine.createWitness("E", "the yellow cat");
-    VariantGraph graph = VariantGraph.create(w1);
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
     graph.addWitness(w4);

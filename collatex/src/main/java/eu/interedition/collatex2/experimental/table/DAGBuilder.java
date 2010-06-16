@@ -5,15 +5,15 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
-import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DAGBuilder {
 
-  public DAVariantGraph buildDAG(VariantGraph graph) {
+  public DAVariantGraph buildDAG(IVariantGraph graph) {
     DAVariantGraph dag = new DAVariantGraph(CollateXEdge.class);
     List<IVariantGraphVertex> vertices = graph.getVertices();
     Map<IVariantGraphVertex, CollateXVertex> map = Maps.newLinkedHashMap();

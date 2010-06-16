@@ -8,7 +8,8 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.graph.IModifiableVariantGraph;
+import eu.interedition.collatex2.experimental.graph.ModifiableVariantGraph;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -23,7 +24,7 @@ public class DAGBuilderTest {
   @Test
   public void testSimpleVariantGraphToDAG() {
       IWitness a = engine.createWitness("A", "the first witness");
-      VariantGraph graph = VariantGraph.create();
+      IModifiableVariantGraph graph = ModifiableVariantGraph.create();
       graph.addWitness(a);
       DAGBuilder builder = new DAGBuilder();
       DAVariantGraph dag = builder.buildDAG(graph);

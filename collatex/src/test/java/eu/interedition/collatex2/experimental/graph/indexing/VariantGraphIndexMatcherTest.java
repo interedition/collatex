@@ -7,9 +7,8 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.VariantGraph;
-import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
+import eu.interedition.collatex2.experimental.graph.IModifiableVariantGraph;
+import eu.interedition.collatex2.experimental.graph.ModifiableVariantGraph;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -27,7 +26,7 @@ public class VariantGraphIndexMatcherTest {
   public void testEverythingIsUnique() {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = factory.createWitness("B", "everything is unique");
-    IVariantGraph graph = VariantGraph.create(witnessA);
+    IModifiableVariantGraph graph = ModifiableVariantGraph.create(witnessA);
     VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
     List<ITokenMatch> matches2 = matcher.getMatches(witnessB);
     assertEquals(3, matches2.size());

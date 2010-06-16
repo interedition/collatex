@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.implementation.alignmenttable.BaseAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -18,11 +18,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
-  private final VariantGraph                 graph;
+  private final IVariantGraph                 graph;
   private final Map<CollateXVertex, IColumn> vertexToColumn;
   private DAVariantGraph                     dag;
 
-  public DirectedAcyclicGraphBasedAlignmentTable(VariantGraph graph) {
+  public DirectedAcyclicGraphBasedAlignmentTable(IVariantGraph graph) {
     this.graph = graph;
     vertexToColumn = Maps.newHashMap();
     init();

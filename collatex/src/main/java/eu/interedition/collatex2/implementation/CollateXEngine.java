@@ -10,8 +10,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.experimental.graph.VariantGraph;
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
+import eu.interedition.collatex2.experimental.graph.ModifiableVariantGraph;
 import eu.interedition.collatex2.implementation.alignment.Alignment;
 import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
@@ -147,7 +147,7 @@ public class CollateXEngine {
   }
 
   public IVariantGraph graph(IWitness a) {
-    return VariantGraph.create(a);
+    return ModifiableVariantGraph.create(a);
   }
 
 }
