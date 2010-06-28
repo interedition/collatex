@@ -20,7 +20,7 @@ public class VariantGraphAlignmentTest {
 
   @Test
   public void testEmptyGraph() {
-    IModifiableVariantGraph graph = ModifiableVariantGraph.create();
+    IVariantGraph graph = VariantGraph.create();
     assertEquals(2, graph.getVertices().size());
     IVariantGraphVertex startVertex = graph.getStartVertex();
     assertEquals("#", startVertex.getNormalized());
@@ -32,7 +32,7 @@ public class VariantGraphAlignmentTest {
   @Test
   public void testOneWitness() {
     IWitness a = engine.createWitness("A", "only one witness");   
-    IModifiableVariantGraph graph = ModifiableVariantGraph.create(a);
+    IVariantGraph graph = VariantGraph.create(a);
     final List<IVariantGraphVertex> vertices = graph.getVertices();
     assertEquals(5, vertices.size());
     final IVariantGraphVertex startNode = vertices.get(0);
@@ -69,7 +69,7 @@ public class VariantGraphAlignmentTest {
   public void testTwoWitnesses() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the black cat");
-    IModifiableVariantGraph graph = ModifiableVariantGraph.create(w1);
+    IVariantGraph graph = VariantGraph.create(w1);
     graph.addWitness(w2);
     final List<IVariantGraphVertex> vertices = graph.getVertices();
     assertEquals(5, vertices.size());
@@ -85,7 +85,7 @@ public class VariantGraphAlignmentTest {
   public void testAddition1() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the white and black cat");
-    IModifiableVariantGraph graph = ModifiableVariantGraph.create(w1);
+    IVariantGraph graph = VariantGraph.create(w1);
     graph.addWitness(w2);
     final List<IVariantGraphVertex> vertices = graph.getVertices();
     assertEquals(7, vertices.size());
@@ -93,9 +93,9 @@ public class VariantGraphAlignmentTest {
     assertEquals(7, edges.size());
     assertEquals("# -> the: A, B", edges.get(0).toString());
     assertEquals("the -> black: A", edges.get(1).toString());
-    assertEquals("the -> white: B", edges.get(2).toString());
-    assertEquals("black -> cat: A, B", edges.get(3).toString());
-    assertEquals("cat -> #: A, B", edges.get(4).toString());
+    assertEquals("black -> cat: A, B", edges.get(2).toString());
+    assertEquals("cat -> #: A, B", edges.get(3).toString());
+    assertEquals("the -> white: B", edges.get(4).toString());
     assertEquals("white -> and: B", edges.get(5).toString());
     assertEquals("and -> black: B", edges.get(6).toString());
   }
@@ -107,7 +107,7 @@ public class VariantGraphAlignmentTest {
     final IWitness w3 = engine.createWitness("C", "the green cat");
     final IWitness w4 = engine.createWitness("D", "the red cat");
     final IWitness w5 = engine.createWitness("E", "the yellow cat");
-    IModifiableVariantGraph graph = ModifiableVariantGraph.create(w1);
+    IVariantGraph graph = VariantGraph.create(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
     graph.addWitness(w4);
@@ -118,15 +118,15 @@ public class VariantGraphAlignmentTest {
     assertEquals(12, edges.size());
     assertEquals("# -> the: A, B, C, D, E", edges.get(0).toString());
     assertEquals("the -> black: A", edges.get(1).toString());
-    assertEquals("the -> white: B", edges.get(2).toString());
-    assertEquals("the -> green: C", edges.get(3).toString());
-    assertEquals("the -> red: D", edges.get(4).toString());
-    assertEquals("the -> yellow: E", edges.get(5).toString());
-    assertEquals("black -> cat: A", edges.get(6).toString());
-    assertEquals("cat -> #: A, B, C, D, E", edges.get(7).toString());
-    assertEquals("white -> cat: B", edges.get(8).toString());
-    assertEquals("green -> cat: C", edges.get(9).toString());
-    assertEquals("red -> cat: D", edges.get(10).toString());
+    assertEquals("black -> cat: A", edges.get(2).toString());
+    assertEquals("cat -> #: A, B, C, D, E", edges.get(3).toString());
+    assertEquals("the -> white: B", edges.get(4).toString());
+    assertEquals("white -> cat: B", edges.get(5).toString());
+    assertEquals("the -> green: C", edges.get(6).toString());
+    assertEquals("green -> cat: C", edges.get(7).toString());
+    assertEquals("the -> red: D", edges.get(8).toString());
+    assertEquals("red -> cat: D", edges.get(9).toString());
+    assertEquals("the -> yellow: E", edges.get(10).toString());
     assertEquals("yellow -> cat: E", edges.get(11).toString());
   }
 

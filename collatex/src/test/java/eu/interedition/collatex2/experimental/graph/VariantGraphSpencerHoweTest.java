@@ -24,7 +24,7 @@ public class VariantGraphSpencerHoweTest {
     IWitness w1 = engine.createWitness("A", "a");
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
-    IModifiableVariantGraph graph = ModifiableVariantGraph.create();
+    IVariantGraph graph = VariantGraph.create();
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
@@ -32,10 +32,10 @@ public class VariantGraphSpencerHoweTest {
     final List<IVariantGraphEdge> edges = graph.getEdges();
     assertEquals(5, edges.size());
     assertEquals("# -> a: A, C", edges.get(0).toString());
-    assertEquals("# -> b: B", edges.get(1).toString());
-    assertEquals("a -> #: A", edges.get(2).toString());
-    assertEquals("a -> b: C", edges.get(3).toString());
-    assertEquals("b -> #: B, C", edges.get(4).toString());
+    assertEquals("a -> #: A", edges.get(1).toString());
+    assertEquals("# -> b: B", edges.get(2).toString());
+    assertEquals("b -> #: B, C", edges.get(3).toString());
+    assertEquals("a -> b: C", edges.get(4).toString());
   }
   
 

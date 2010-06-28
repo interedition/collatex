@@ -2,9 +2,11 @@ package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
 
+import org.jgrapht.Graph;
+
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public interface IVariantGraph {
+public interface IVariantGraph extends Graph<IVariantGraphVertex, IVariantGraphEdge> {
 
   List<IVariantGraphVertex> getVertices();
 
@@ -28,5 +30,7 @@ public interface IVariantGraph {
   //TODO: delete method? add edges based method to interface
   //TODO: add test!
   List<IVariantGraphVertex> getPath(IWitness witness);
+
+  void addWitness(IWitness a);
 
 }

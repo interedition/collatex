@@ -2,6 +2,7 @@ package eu.interedition.collatex2.experimental.table;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
 
@@ -25,12 +26,14 @@ public class DAGBuilder {
     }
     // convert VariantGraph edges to DAG edges
     for (IVariantGraphVertex vertex : vertices) {
-      List<IVariantGraphEdge> vGEdges = vertex.getEdges();
+      Set<IVariantGraphEdge> vGEdges = graph.edgesOf(vertex);
       for (IVariantGraphEdge vGEdge : vGEdges) {
         IVariantGraphVertex endVertex = vGEdge.getEndVertex();
         CollateXVertex source = map.get(vertex);
         CollateXVertex dest = map.get(endVertex);
         CollateXEdge edge = new CollateXEdge();
+        System.out.println(source.getNormalized());
+        System.out.println(dest.getNormalized());
         dag.addEdge(source, dest, edge);
         // convert witnesses on VariantGraph edge to DAG edge
         for (IWitness w: vGEdge.getWitnesses()) {
