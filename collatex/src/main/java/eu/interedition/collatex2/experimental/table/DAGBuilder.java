@@ -25,26 +25,23 @@ public class DAGBuilder {
       map.put(vGVertex, vertex);
     }
     // convert VariantGraph edges to DAG edges
-    for (IVariantGraphVertex vertex : vertices) {
-      Set<IVariantGraphEdge> vGEdges = graph.edgesOf(vertex);
-      for (IVariantGraphEdge vGEdge : vGEdges) {
-        IVariantGraphVertex endVertex = vGEdge.getEndVertex();
-        CollateXVertex source = map.get(vertex);
-        CollateXVertex dest = map.get(endVertex);
-        CollateXEdge edge = new CollateXEdge();
-        System.out.println(source.getNormalized());
-        System.out.println(dest.getNormalized());
-        dag.addEdge(source, dest, edge);
-        // convert witnesses on VariantGraph edge to DAG edge
-        for (IWitness w: vGEdge.getWitnesses()) {
-          edge.addWitness(w);
-        }
-        // convert tokens for each witness
-        if (endVertex != graph.getEndVertex()) {
-          for (IWitness witness: vGEdge.getWitnesses()) {
-            INormalizedToken token = endVertex.getToken(witness);
-            dest.addToken(witness, token);
-          }
+    Set<IVariantGraphEdge> edges = graph.edgeSet();
+    for (IVariantGraphEdge vGEdge : edges) {
+      IVariantGraphVertex beginVertex = vGEdge.getBeginVertex();
+      IVariantGraphVertex endVertex = vGEdge.getEndVertex();
+      CollateXVertex source = map.get(beginVertex);
+      CollateXVertex dest = map.get(endVertex);
+      CollateXEdge edge = new CollateXEdge();
+      dag.addEdge(source, dest, edge);
+      // convert witnesses on VariantGraph edge to DAG edge
+      for (IWitness w: vGEdge.getWitnesses()) {
+        edge.addWitness(w);
+      }
+      // convert tokens for each witness
+      if (endVertex != graph.getEndVertex()) {
+        for (IWitness witness: vGEdge.getWitnesses()) {
+          INormalizedToken token = endVertex.getToken(witness);
+          dest.addToken(witness, token);
         }
       }
     }
