@@ -13,7 +13,7 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraph extends BaseGraph implements IVariantGraph {
+public class VariantGraph extends BaseDirectedGraph implements IVariantGraph {
   private final IVariantGraphVertex startVertex;
   private final IVariantGraphVertex endVertex;
   private final List<IWitness> witnesses;

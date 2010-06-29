@@ -2,11 +2,11 @@ package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
 
-import org.jgrapht.Graph;
+import org.jgrapht.DirectedGraph;
 
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public interface IVariantGraph extends Graph<IVariantGraphVertex, IVariantGraphEdge> {
+public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge> {
 
   List<IVariantGraphVertex> getVertices();
 

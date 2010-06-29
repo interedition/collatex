@@ -3,16 +3,16 @@ package eu.interedition.collatex2.experimental.graph;
 import java.util.Collection;
 import java.util.Set;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
-import org.jgrapht.Graph;
 
 import com.google.common.collect.Sets;
 
-public class BaseGraph implements Graph<IVariantGraphVertex, IVariantGraphEdge> {
+public class BaseDirectedGraph implements DirectedGraph<IVariantGraphVertex, IVariantGraphEdge> {
   private final Set<IVariantGraphEdge>  edges;
   private final Set<IVariantGraphVertex> vertices;
 
-  public BaseGraph() {
+  public BaseDirectedGraph() {
     this.edges = Sets.newLinkedHashSet();
     this.vertices = Sets.newLinkedHashSet();
   }
@@ -27,7 +27,6 @@ public class BaseGraph implements Graph<IVariantGraphVertex, IVariantGraphEdge> 
     return edges.add(e);
   }
 
-  //TODO: create vertex with normalized form on VariantGraphClass
   @Override
   public boolean addVertex(IVariantGraphVertex vertex) {
     return vertices.add(vertex);
@@ -58,17 +57,9 @@ public class BaseGraph implements Graph<IVariantGraphVertex, IVariantGraphEdge> 
     return edges;
   }
 
-  //TODO: not a nice implementation; see remark!
-  //TODO: use outgoingEdges method instead!
   @Override
   public Set<IVariantGraphEdge> edgesOf(IVariantGraphVertex vertex) {
-    Set<IVariantGraphEdge> results = Sets.newLinkedHashSet();
-    for (IVariantGraphEdge edge : edges) {
-      if (edge.getBeginVertex().equals(vertex) /*|| edge.getEndVertex().equals(vertex)*/) {
-        results.add(edge);
-      }
-    }
-    return results;
+    throw new UnsupportedOperationException("NOT IMPLEMENTED YET!");
   }
 
   @Override
@@ -141,4 +132,29 @@ public class BaseGraph implements Graph<IVariantGraphVertex, IVariantGraphEdge> 
     return vertices;
   }
 
+  @Override
+  public int inDegreeOf(IVariantGraphVertex vertex) {
+    return incomingEdgesOf(vertex).size();
+  }
+
+  @Override
+  public Set<IVariantGraphEdge> incomingEdgesOf(IVariantGraphVertex vertex) {
+    throw new RuntimeException("NOT IMPLEMENTED!");
+  }
+
+  @Override
+  public int outDegreeOf(IVariantGraphVertex vertex) {
+    return outgoingEdgesOf(vertex).size();
+  }
+
+  @Override
+  public Set<IVariantGraphEdge> outgoingEdgesOf(IVariantGraphVertex vertex) {
+    Set<IVariantGraphEdge> results = Sets.newLinkedHashSet();
+    for (IVariantGraphEdge edge : edges) {
+      if (edge.getBeginVertex().equals(vertex)) {
+        results.add(edge);
+      }
+    }
+    return results;
+  }
 }
