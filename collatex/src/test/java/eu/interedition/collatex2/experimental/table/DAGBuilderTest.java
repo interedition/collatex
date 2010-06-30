@@ -6,6 +6,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
@@ -56,5 +57,17 @@ public class DAGBuilderTest {
         Assert.assertTrue("Witness "+a.getSigil()+" not present in set!", edge.containsWitness(a));
       }
   }
-
+  
+  @Ignore
+  @Test
+  public void testSimpleTranspositionAB() {
+    IWitness a = engine.createWitness("A", "a b");
+    IWitness b = engine.createWitness("B", "b a");
+    IVariantGraph graph = VariantGraph.create();
+    graph.addWitness(a);
+    graph.addWitness(b);
+    DAGBuilder builder = new DAGBuilder();
+    DAVariantGraph dag = builder.buildDAG(graph);
+    System.out.println(dag.vertexSet().size());
+  }
 }

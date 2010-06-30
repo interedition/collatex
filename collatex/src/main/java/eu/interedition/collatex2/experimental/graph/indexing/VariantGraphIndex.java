@@ -3,11 +3,13 @@ package eu.interedition.collatex2.experimental.graph.indexing;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
@@ -25,9 +27,16 @@ public class VariantGraphIndex implements IVariantGraphIndex {
     final VariantGraphIndex index = new VariantGraphIndex();
     //TODO: change this for three or more witnesses!
     //Note: this code skips begin and end vertices!
-    for (IVariantGraphVertex vertex : graph.getVertices().subList(1, graph.getVertices().size()-1)) {
+    //TODO: make immutable set!
+    Set<IVariantGraphVertex> vertexSet = Sets.newLinkedHashSet(graph.vertexSet());
+    vertexSet.remove(graph.getStartVertex());
+    vertexSet.remove(graph.getEndVertex());
+    for (IVariantGraphVertex vertex : vertexSet) {
       makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
     }
+//    for (IVariantGraphVertex vertex : graph.getVertices().subList(1, graph.getVertices().size()-1)) {
+//      makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
+//    }
     //    for (final String sigil : table.getSigli()) {
 //      findUniquePhrasesForRow(sigil, table, index, repeatingTokens);
 //    }

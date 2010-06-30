@@ -2,7 +2,9 @@ package eu.interedition.collatex2.experimental.graph;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,7 +23,7 @@ public class VariantGraphAlignmentTest {
   @Test
   public void testEmptyGraph() {
     IVariantGraph graph = VariantGraph.create();
-    assertEquals(2, graph.getVertices().size());
+    assertEquals(2, graph.vertexSet().size());
     IVariantGraphVertex startVertex = graph.getStartVertex();
     assertEquals("#", startVertex.getNormalized());
     IVariantGraphVertex endVertex = graph.getEndVertex();
@@ -33,13 +35,14 @@ public class VariantGraphAlignmentTest {
   public void testOneWitness() {
     IWitness a = engine.createWitness("A", "only one witness");   
     IVariantGraph graph = VariantGraph.create(a);
-    final List<IVariantGraphVertex> vertices = graph.getVertices();
+    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(5, vertices.size());
-    final IVariantGraphVertex startNode = vertices.get(0);
-    final IVariantGraphVertex firstNode = vertices.get(1);
-    final IVariantGraphVertex secondNode = vertices.get(2);
-    final IVariantGraphVertex thirdNode = vertices.get(3);
-    final IVariantGraphVertex endVertex = vertices.get(4);
+    Iterator<IVariantGraphVertex> vertexI = vertices.iterator();
+    final IVariantGraphVertex startNode = vertexI.next();
+    final IVariantGraphVertex firstNode = vertexI.next();
+    final IVariantGraphVertex secondNode = vertexI.next();
+    final IVariantGraphVertex thirdNode = vertexI.next();
+    final IVariantGraphVertex endVertex = vertexI.next();
     assertEquals("#", startNode.getNormalized());
     assertEquals("only", firstNode.getNormalized());
     assertEquals("one", secondNode.getNormalized());
@@ -71,7 +74,7 @@ public class VariantGraphAlignmentTest {
     final IWitness w2 = engine.createWitness("B", "the black cat");
     IVariantGraph graph = VariantGraph.create(w1);
     graph.addWitness(w2);
-    final List<IVariantGraphVertex> vertices = graph.getVertices();
+    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(5, vertices.size());
     List<IVariantGraphEdge> edges = graph.getEdges();
     assertEquals(4, edges.size());
@@ -87,7 +90,7 @@ public class VariantGraphAlignmentTest {
     final IWitness w2 = engine.createWitness("B", "the white and black cat");
     IVariantGraph graph = VariantGraph.create(w1);
     graph.addWitness(w2);
-    final List<IVariantGraphVertex> vertices = graph.getVertices();
+    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(7, vertices.size());
     List<IVariantGraphEdge> edges = graph.getEdges();
     assertEquals(7, edges.size());
@@ -112,7 +115,7 @@ public class VariantGraphAlignmentTest {
     graph.addWitness(w3);
     graph.addWitness(w4);
     graph.addWitness(w5);
-    final List<IVariantGraphVertex> vertices = graph.getVertices();
+    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(9, vertices.size());
     List<IVariantGraphEdge> edges = graph.getEdges();
     assertEquals(12, edges.size());

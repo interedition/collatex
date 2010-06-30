@@ -8,7 +8,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge> {
 
-  List<IVariantGraphVertex> getVertices();
+//  List<IVariantGraphVertex> getVertices();
 
   //NOTE: This method is only here for testing purposes!
   List<IVariantGraphEdge> getEdges();

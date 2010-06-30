@@ -2,9 +2,11 @@ package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
 import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
@@ -34,6 +36,7 @@ public class VariantGraph extends BaseDirectedGraph implements IVariantGraph {
   // read
   @Override
   public List<IVariantGraphEdge> getEdges() {
+    System.out.println("Method getEdges called!");
     return Lists.newArrayList(edgeSet());
   }
 
@@ -88,16 +91,16 @@ public class VariantGraph extends BaseDirectedGraph implements IVariantGraph {
 
   
 
-  //read
   @Override
-  public List<IVariantGraphVertex> getVertices() {
-    List<IVariantGraphVertex> allVertices = Lists.newArrayList();
+  public Set<IVariantGraphVertex> vertexSet() {
+    System.out.println("Method vertexSet called!");
+    Set<IVariantGraphVertex> allVertices = Sets.newLinkedHashSet();
     allVertices.add(getStartVertex());
-    allVertices.addAll(vertexSet());
+    allVertices.addAll(super.vertexSet());
     allVertices.add(getEndVertex());
     return allVertices;
   }
-
+  
   //read
   @Override
   public List<IWitness> getWitnesses() {

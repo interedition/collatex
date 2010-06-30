@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.experimental.table;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,8 +14,14 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class DAGBuilder {
 
   public DAVariantGraph buildDAG(IVariantGraph graph) {
+    System.out.println("Building DAG!");
+    //detect cycles
+//    CycleDetector<IVariantGraphVertex, IVariantGraphEdge> detector = new CycleDetector<IVariantGraphVertex, IVariantGraphEdge>(graph);
+//    Set<IVariantGraphVertex> findCycles = detector.findCycles();
+//    System.out.println(findCycles);
+    // bla
     DAVariantGraph dag = new DAVariantGraph(CollateXEdge.class);
-    List<IVariantGraphVertex> vertices = graph.getVertices();
+    Set<IVariantGraphVertex> vertices = graph.vertexSet();
     Map<IVariantGraphVertex, CollateXVertex> map = Maps.newLinkedHashMap();
     // convert VariantGraph vertices to DAG vertices 
     for (IVariantGraphVertex vGVertex : vertices) {
