@@ -36,7 +36,6 @@ public class VariantGraph extends BaseDirectedGraph implements IVariantGraph {
   // read
   @Override
   public List<IVariantGraphEdge> getEdges() {
-    System.out.println("Method getEdges called!");
     return Lists.newArrayList(edgeSet());
   }
 
@@ -93,7 +92,6 @@ public class VariantGraph extends BaseDirectedGraph implements IVariantGraph {
 
   @Override
   public Set<IVariantGraphVertex> vertexSet() {
-    System.out.println("Method vertexSet called!");
     Set<IVariantGraphVertex> allVertices = Sets.newLinkedHashSet();
     allVertices.add(getStartVertex());
     allVertices.addAll(super.vertexSet());

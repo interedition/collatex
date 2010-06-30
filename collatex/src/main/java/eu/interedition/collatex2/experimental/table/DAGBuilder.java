@@ -3,6 +3,8 @@ package eu.interedition.collatex2.experimental.table;
 import java.util.Map;
 import java.util.Set;
 
+import org.jgrapht.alg.CycleDetector;
+
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
@@ -16,9 +18,11 @@ public class DAGBuilder {
   public DAVariantGraph buildDAG(IVariantGraph graph) {
     System.out.println("Building DAG!");
     //detect cycles
-//    CycleDetector<IVariantGraphVertex, IVariantGraphEdge> detector = new CycleDetector<IVariantGraphVertex, IVariantGraphEdge>(graph);
-//    Set<IVariantGraphVertex> findCycles = detector.findCycles();
-//    System.out.println(findCycles);
+    CycleDetector<IVariantGraphVertex, IVariantGraphEdge> detector = new CycleDetector<IVariantGraphVertex, IVariantGraphEdge>(graph);
+    Set<IVariantGraphVertex> findCycles = detector.findCycles();
+    for (IVariantGraphVertex vertex : findCycles) {
+      System.out.println(vertex.getNormalized());
+    }
     // bla
     DAVariantGraph dag = new DAVariantGraph(CollateXEdge.class);
     Set<IVariantGraphVertex> vertices = graph.vertexSet();

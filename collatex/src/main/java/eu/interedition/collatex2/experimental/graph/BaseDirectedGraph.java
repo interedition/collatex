@@ -54,7 +54,6 @@ public class BaseDirectedGraph implements DirectedGraph<IVariantGraphVertex, IVa
 
   @Override
   public Set<IVariantGraphEdge> edgeSet() {
-    System.out.println("Method edgeSet called!");
     return edges;
   }
 
@@ -130,9 +129,8 @@ public class BaseDirectedGraph implements DirectedGraph<IVariantGraphVertex, IVa
 
   @Override
   public Set<IVariantGraphVertex> vertexSet() {
-    System.out.println("Method vertexSet called!");
     return vertices;
-  }
+  } 
 
   @Override
   public int inDegreeOf(IVariantGraphVertex vertex) {
@@ -141,7 +139,13 @@ public class BaseDirectedGraph implements DirectedGraph<IVariantGraphVertex, IVa
 
   @Override
   public Set<IVariantGraphEdge> incomingEdgesOf(IVariantGraphVertex vertex) {
-    throw new RuntimeException("NOT IMPLEMENTED!");
+    Set<IVariantGraphEdge> results = Sets.newLinkedHashSet();
+    for (IVariantGraphEdge edge : edges) {
+      if (edge.getEndVertex().equals(vertex)) {
+        results.add(edge);
+      }
+    }
+    return results;
   }
 
   @Override
