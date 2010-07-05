@@ -91,6 +91,42 @@ public class VariantGraph2AlignmentTest {
     }
 
 
+    @Test
+    public void testAddition1() {
+      final IWitness w1 = engine.createWitness("A", "the black cat");
+      final IWitness w2 = engine.createWitness("B", "the white and black cat");
+      IVariantGraph graph = VariantGraph2.create(w1);
+      graph.addWitness(w2);
+      final Set<IVariantGraphVertex> vertices = graph.vertexSet();
+      assertEquals(7, vertices.size());
+      Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+      final IVariantGraphVertex startVertex = vertexI.next();
+      final IVariantGraphVertex theVertex = vertexI.next();
+      final IVariantGraphVertex whiteVertex = vertexI.next();
+      final IVariantGraphVertex andVertex = vertexI.next();
+      final IVariantGraphVertex blackVertex = vertexI.next();
+      final IVariantGraphVertex catVertex = vertexI.next();
+      final IVariantGraphVertex endVertex = vertexI.next();
+      assertEquals("#", startVertex.getNormalized());
+      assertEquals("the", theVertex.getNormalized());
+      assertEquals("white", whiteVertex.getNormalized());
+      assertEquals("and", andVertex.getNormalized());
+      assertEquals("black", blackVertex.getNormalized());
+      assertEquals("cat", catVertex.getNormalized());
+      assertEquals("#", endVertex.getNormalized());
+      Set<IVariantGraphEdge> edges = graph.edgeSet();
+      assertEquals(7, edges.size());
+      assertEquals("# -> the: A, B", graph.getEdge(startVertex, theVertex).toString());
+      assertEquals("the -> black: A", graph.getEdge(theVertex, blackVertex).toString());
+      assertEquals("black -> cat: A, B", graph.getEdge(blackVertex, catVertex).toString());
+      assertEquals("cat -> #: A, B", graph.getEdge(catVertex, endVertex).toString());
+      assertEquals("the -> white: B", graph.getEdge(theVertex, whiteVertex).toString());
+      assertEquals("white -> and: B", graph.getEdge(whiteVertex, andVertex).toString());
+      assertEquals("and -> black: B", graph.getEdge(andVertex, blackVertex).toString());
+    }
+
+    // <!-- TODO -->
+    
     @Ignore
     @Test
     public void testSimpleTranspositionAB() {

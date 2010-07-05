@@ -21,25 +21,6 @@ public class VariantGraphAlignmentTest {
 
 
   @Test
-  public void testAddition1() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IWitness w2 = engine.createWitness("B", "the white and black cat");
-    IVariantGraph graph = VariantGraph.create(w1);
-    graph.addWitness(w2);
-    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
-    assertEquals(7, vertices.size());
-    List<IVariantGraphEdge> edges = graph.getEdges();
-    assertEquals(7, edges.size());
-    assertEquals("# -> the: A, B", edges.get(0).toString());
-    assertEquals("the -> black: A", edges.get(1).toString());
-    assertEquals("black -> cat: A, B", edges.get(2).toString());
-    assertEquals("cat -> #: A, B", edges.get(3).toString());
-    assertEquals("the -> white: B", edges.get(4).toString());
-    assertEquals("white -> and: B", edges.get(5).toString());
-    assertEquals("and -> black: B", edges.get(6).toString());
-  }
-
-  @Test
   public void testVariant() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the white cat");
