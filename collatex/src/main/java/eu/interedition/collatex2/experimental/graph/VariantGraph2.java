@@ -11,6 +11,7 @@ import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.experimental.graph.VariantGraphVertex;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 // This class implements the IVariantGraph interface.
@@ -76,8 +77,47 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return witnesses.isEmpty();
   }
 
-  public static IVariantGraph create() {
+  public static VariantGraph2 create() {
     return new VariantGraph2();
   }
+
+  //TODO: should the first witness really be a special case like this?
+  public static IVariantGraph create(IWitness a) {
+    VariantGraph2 graph = create();
+    //TODO: this is not very nice!
+    //TODO: make getWitnesses read only!
+    graph.getWitnesses().add(a);
+    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
+    for (INormalizedToken token : a.getTokens()) {
+      newVertices.add(graph.addNewVertex(token, a));
+    }
+    IVariantGraphVertex previous = graph.getStartVertex();
+    for (IVariantGraphVertex vertex : newVertices) {
+      graph.addNewEdge(previous, vertex, a);
+      previous = vertex;
+    }
+    graph.addNewEdge(previous, graph.getEndVertex(), a);
+    return graph;
+  }
+  
+  //write
+  private IVariantGraphVertex addNewVertex(INormalizedToken token, IWitness w) {
+    final VariantGraphVertex vertex = new VariantGraphVertex(token);
+    addVertex(vertex);
+    //TODO: is this if still necessary?
+    if (w!=null) {
+      vertex.addToken(w, token);
+    }
+    return vertex;
+  }
+  
+  //write
+  private void addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
+    IVariantGraphEdge e = new VariantGraphEdge(begin, end, witness);
+    addEdge(begin, end, e);
+  }
+  
+
+
 
 }

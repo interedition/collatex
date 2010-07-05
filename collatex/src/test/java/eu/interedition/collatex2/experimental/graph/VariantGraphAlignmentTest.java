@@ -2,7 +2,6 @@ package eu.interedition.collatex2.experimental.graph;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -20,39 +19,6 @@ public class VariantGraphAlignmentTest {
     engine = new CollateXEngine();
   }
 
-  @Test
-  public void testOneWitness() {
-    IWitness a = engine.createWitness("A", "only one witness");   
-    IVariantGraph graph = VariantGraph.create(a);
-    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
-    assertEquals(5, vertices.size());
-    Iterator<IVariantGraphVertex> vertexI = vertices.iterator();
-    final IVariantGraphVertex startNode = vertexI.next();
-    final IVariantGraphVertex firstNode = vertexI.next();
-    final IVariantGraphVertex secondNode = vertexI.next();
-    final IVariantGraphVertex thirdNode = vertexI.next();
-    final IVariantGraphVertex endVertex = vertexI.next();
-    assertEquals("#", startNode.getNormalized());
-    assertEquals("only", firstNode.getNormalized());
-    assertEquals("one", secondNode.getNormalized());
-    assertEquals("witness", thirdNode.getNormalized());
-    assertEquals("#", endVertex.getNormalized());
-    List<IVariantGraphEdge> edges = graph.getEdges();
-    assertEquals(4, edges.size());
-    assert(edges.get(0).getWitnesses().contains(a));
-    assert(edges.get(1).getWitnesses().contains(a));
-    assert(edges.get(2).getWitnesses().contains(a));
-    assert(edges.get(3).getWitnesses().contains(a));
-    assertEquals(startNode, edges.get(0).getBeginVertex());
-    assertEquals(firstNode, edges.get(0).getEndVertex());
-    assertEquals(firstNode, edges.get(1).getBeginVertex());
-    assertEquals(secondNode, edges.get(1).getEndVertex());
-    assertEquals(secondNode, edges.get(2).getBeginVertex());
-    assertEquals(thirdNode, edges.get(2).getEndVertex());
-    assertEquals(thirdNode, edges.get(3).getBeginVertex());
-    assertEquals(endVertex, edges.get(3).getEndVertex());
-  }
-  
   /* The unit test below depend on the correct functioning
    * of the GraphIndexMatcher
    */

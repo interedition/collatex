@@ -1,10 +1,10 @@
 package eu.interedition.collatex2.experimental.graph;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
-
-import junit.framework.Assert;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -31,8 +31,40 @@ public class VariantGraph2AlignmentTest {
       assertEquals("#", endVertex.getNormalized());
       assertEquals(0, graph.edgeSet().size());
       assertEquals(0, graph.getWitnesses().size());
-      assertEquals(Boolean.TRUE, graph.isEmpty());
+      assertTrue(graph.isEmpty());
     }
+    
+    @Test
+    public void testOneWitness() {
+      IWitness a = engine.createWitness("A", "only one witness");   
+      IVariantGraph graph = VariantGraph2.create(a);
+      final Set<IVariantGraphVertex> vertices = graph.vertexSet();
+      assertEquals(5, vertices.size());
+      Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+      final IVariantGraphVertex startVertex = vertexI.next();
+      final IVariantGraphVertex firstVertex = vertexI.next();
+      final IVariantGraphVertex secondVertex = vertexI.next();
+      final IVariantGraphVertex thirdVertex = vertexI.next();
+      final IVariantGraphVertex endVertex = vertexI.next();
+      assertEquals("#", startVertex.getNormalized());
+      assertEquals("only", firstVertex.getNormalized());
+      assertEquals("one", secondVertex.getNormalized());
+      assertEquals("witness", thirdVertex.getNormalized());
+      assertEquals("#", endVertex.getNormalized());
+      Set<IVariantGraphEdge> edges = graph.edgeSet();
+      assertEquals(4, edges.size());
+      Iterator<IVariantGraphEdge> edgeI = edges.iterator();
+      assertTrue(edgeI.next().getWitnesses().contains(a));
+      assertTrue(edgeI.next().getWitnesses().contains(a));
+      assertTrue(edgeI.next().getWitnesses().contains(a));
+      assertTrue(edgeI.next().getWitnesses().contains(a));
+      assertTrue(graph.containsEdge(startVertex, firstVertex));
+      assertTrue(graph.containsEdge(firstVertex, secondVertex));
+      assertTrue(graph.containsEdge(secondVertex, thirdVertex));
+      assertTrue(graph.containsEdge(thirdVertex, endVertex));
+    }
+    
+
 
     @Ignore
     @Test
@@ -43,9 +75,9 @@ public class VariantGraph2AlignmentTest {
       graph.addWitness(a);
       graph.addWitness(b);
       Iterator<IVariantGraphVertex> iterator = graph.iterator();
-      Assert.assertEquals("a", iterator.next().getNormalized());
-      Assert.assertEquals("b", iterator.next().getNormalized());
-      Assert.assertEquals("a", iterator.next().getNormalized());
+      assertEquals("a", iterator.next().getNormalized());
+      assertEquals("b", iterator.next().getNormalized());
+      assertEquals("a", iterator.next().getNormalized());
       System.out.println(graph.vertexSet().size());
     }
 
