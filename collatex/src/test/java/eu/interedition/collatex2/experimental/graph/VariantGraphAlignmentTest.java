@@ -21,17 +21,6 @@ public class VariantGraphAlignmentTest {
   }
 
   @Test
-  public void testEmptyGraph() {
-    IVariantGraph graph = VariantGraph.create();
-    assertEquals(2, graph.vertexSet().size());
-    IVariantGraphVertex startVertex = graph.getStartVertex();
-    assertEquals("#", startVertex.getNormalized());
-    IVariantGraphVertex endVertex = graph.getEndVertex();
-    assertEquals("#", endVertex.getNormalized());
-    assertEquals(0, graph.getEdges().size());
-  }
-
-  @Test
   public void testOneWitness() {
     IWitness a = engine.createWitness("A", "only one witness");   
     IVariantGraph graph = VariantGraph.create(a);

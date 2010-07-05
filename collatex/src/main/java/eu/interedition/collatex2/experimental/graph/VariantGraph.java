@@ -1,5 +1,6 @@
 package eu.interedition.collatex2.experimental.graph;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -218,6 +219,11 @@ public class VariantGraph extends BaseDirectedGraph implements IVariantGraph {
   
   public boolean hasEdge(IVariantGraphVertex source, IWitness witness) {
     return findEdge(source, witness) != null;
+  }
+
+  @Override
+  public Iterator<IVariantGraphVertex> iterator() {
+    throw new RuntimeException("NOT IMPLEMENTED!");
   }
 
 
