@@ -19,25 +19,6 @@ public class VariantGraphAlignmentTest {
     engine = new CollateXEngine();
   }
 
-  /* The unit test below depend on the correct functioning
-   * of the GraphIndexMatcher
-   */
-
-  @Test
-  public void testTwoWitnesses() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IWitness w2 = engine.createWitness("B", "the black cat");
-    IVariantGraph graph = VariantGraph.create(w1);
-    graph.addWitness(w2);
-    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
-    assertEquals(5, vertices.size());
-    List<IVariantGraphEdge> edges = graph.getEdges();
-    assertEquals(4, edges.size());
-    assertEquals("# -> the: A, B", edges.get(0).toString());
-    assertEquals("the -> black: A, B", edges.get(1).toString());
-    assertEquals("black -> cat: A, B", edges.get(2).toString());
-    assertEquals("cat -> #: A, B", edges.get(3).toString());
-  }
 
   @Test
   public void testAddition1() {

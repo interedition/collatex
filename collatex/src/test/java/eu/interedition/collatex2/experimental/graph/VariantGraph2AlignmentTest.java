@@ -64,6 +64,31 @@ public class VariantGraph2AlignmentTest {
       assertTrue(graph.containsEdge(thirdVertex, endVertex));
     }
     
+    /* The unit test below depend on the correct functioning
+     * of the GraphIndexMatcher
+     */
+
+    @Test
+    public void testTwoWitnesses() {
+      final IWitness w1 = engine.createWitness("A", "the black cat");
+      final IWitness w2 = engine.createWitness("B", "the black cat");
+      IVariantGraph graph = VariantGraph2.create(w1);
+      graph.addWitness(w2);
+      final Set<IVariantGraphVertex> vertices = graph.vertexSet();
+      assertEquals(5, vertices.size());
+      Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+      final IVariantGraphVertex startVertex = vertexI.next();
+      final IVariantGraphVertex theVertex = vertexI.next();
+      final IVariantGraphVertex blackVertex = vertexI.next();
+      final IVariantGraphVertex catVertex = vertexI.next();
+      final IVariantGraphVertex endVertex = vertexI.next();
+      Set<IVariantGraphEdge> edges = graph.edgeSet();
+      assertEquals(4, edges.size());
+      assertEquals("# -> the: A, B", graph.getEdge(startVertex, theVertex).toString());
+      assertEquals("the -> black: A, B", graph.getEdge(theVertex, blackVertex).toString());
+      assertEquals("black -> cat: A, B", graph.getEdge(blackVertex, catVertex).toString());
+      assertEquals("cat -> #: A, B", graph.getEdge(catVertex, endVertex).toString());
+    }
 
 
     @Ignore

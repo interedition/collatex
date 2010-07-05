@@ -1,17 +1,22 @@
 package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.experimental.graph.VariantGraphVertex;
+import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
+import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 // This class implements the IVariantGraph interface.
@@ -35,9 +40,21 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     addVertex(endVertex);
   }
 
+  // write
+  // NOTE: tokenA is the token from the Witness
+  // For every token in the witness we have to map a VariantNode
+  // for matches such a node should already exist
+  // however for additions and replacements this will not be the case
+  // then we need to add the arcs
+  // in some cases the arcs may already exist
+  // if they already exist we need to add the witness to the
+  // existing arc!
   @Override
-  public void addWitness(IWitness a) {
-    throw new RuntimeException("!!");
+    public void addWitness(IWitness witness) {
+      witnesses.add(witness);
+      VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(this);
+      List<ITokenMatch> matches = matcher.getMatches(witness);
+      makeEdgesForMatches(witness, matches, matcher.getGraphIndex());
   }
 
   //TODO: implement!
@@ -117,7 +134,42 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     addEdge(begin, end, e);
   }
   
+  //write
+  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, IVariantGraphIndex graphIndex2) {
+    Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
+    witnessTokenToMatch = Maps.newLinkedHashMap();
+    for (ITokenMatch match : matches) {
+      INormalizedToken tokenA = match.getTokenA();
+      witnessTokenToMatch.put(tokenA, match);
+    }
+    IVariantGraphVertex begin = this.getStartVertex();
+    for (INormalizedToken token : witness.getTokens()) {
+      if (!witnessTokenToMatch.containsKey(token)) {
+        // NOTE: here we determine that the token is an addition/replacement!
+        IVariantGraphVertex end = this.addNewVertex(token, witness);
+        addNewEdge(begin, end, witness);
+        begin = end;
+      } else {
+        // NOTE: it is a match!
+        ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
+        IVariantGraphVertex end = graphIndex2.getVertex(tokenMatch.getTokenB());
+        connectBeginToEndVertex(begin, end, witness);
+        end.addToken(witness, token);
+        begin = end;
+      }
+    }
+    // adds edge from last vertex to end vertex
+    IVariantGraphVertex end = getEndVertex();
+    connectBeginToEndVertex(begin, end, witness);
+  }
 
-
-
+  // write
+  private void connectBeginToEndVertex(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
+    if (containsEdge(begin, end)) {
+      IVariantGraphEdge existingEdge = getEdge(begin, end);
+      existingEdge.addWitness(witness);
+    } else {
+      addNewEdge(begin, end, witness);
+    }
+  }
 }
