@@ -9,7 +9,7 @@
 	<description>CollateX is a Java library for collating textual sources, for example, to produce an apparatus.</description>
 	<url>http://collatex.sourceforge.net/</url>
 	<organization>
-		<name>COST Action “Interedition”</name>
+		<name>ESF COST Action “Interedition”</name>
 		<url>http://www.interedition.eu/</url>
 	</organization>
 	<modules>
@@ -17,7 +17,7 @@
 		<module>collatex-nodeps</module>
 		<module>collatex-web</module>
 		<module>collatex-legacy</module>
-	</modules>	
+	</modules>
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -149,6 +149,13 @@
 				<artifactId>maven-site-plugin</artifactId>
 				<configuration>
 					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<configuration>
+					<header>collatex/LICENSE-HEADER.txt</header>
 				</configuration>
 			</plugin>
 		</plugins>
