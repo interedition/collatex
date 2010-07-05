@@ -9,16 +9,20 @@
 
 	<body>
 		<links>
-			<item name="Huygens Instituut" href="http://www.huygensinstituut.knaw.nl/" />
-			<item name="Universität Würzburg" href="http://www.uni-wuerzburg.de/" />
-			<item name="Oxford University" href="http://www.ox.ac.uk/" />
+			<item name="Interedition Home" href="http://www.interedition.eu/" />
+			<item name="Downloads" href="https://launchpad.net/collatex/+download" />
+			<item name="Developer's site" href="https://launchpad.net/collatex" />
 		</links>
 
 		<menu name="CollateX">
-			<item href="download.html" name="Download" />
 			<item href="contribute.html" name="Contribute" />
 		</menu>
 		<menu ref="reports" />
+		<menu name="Partners">
+			<item name="Huygens Instituut" href="http://www.huygensinstituut.knaw.nl/" />
+			<item name="Universität Würzburg" href="http://www.digital-humanities.de/" />
+			<item name="Oxford University" href="http://www.ox.ac.uk/" />
+		</menu>
 	</body>
 
 	<poweredBy />
