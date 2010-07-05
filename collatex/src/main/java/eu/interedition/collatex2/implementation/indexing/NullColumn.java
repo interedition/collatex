@@ -66,5 +66,10 @@ public class NullColumn implements IColumn {
   // TODO Auto-generated method stub
 
   }
+  
+  @Override
+  public String toString() {
+    return "";
+  }
 
 }

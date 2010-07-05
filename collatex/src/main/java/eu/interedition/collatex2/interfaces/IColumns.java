@@ -14,6 +14,8 @@ public interface IColumns {
 
   IColumn getFirstColumn();
 
+  IColumn getLastColumn();
+
   boolean isEmpty();
 
   int size();
