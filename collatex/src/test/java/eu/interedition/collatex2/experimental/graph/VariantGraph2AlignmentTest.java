@@ -124,6 +124,56 @@ public class VariantGraph2AlignmentTest {
       assertEquals("white -> and: B", graph.getEdge(whiteVertex, andVertex).toString());
       assertEquals("and -> black: B", graph.getEdge(andVertex, blackVertex).toString());
     }
+    
+    @Test
+    public void testVariant() {
+      final IWitness w1 = engine.createWitness("A", "the black cat");
+      final IWitness w2 = engine.createWitness("B", "the white cat");
+      final IWitness w3 = engine.createWitness("C", "the green cat");
+      final IWitness w4 = engine.createWitness("D", "the red cat");
+      final IWitness w5 = engine.createWitness("E", "the yellow cat");
+      IVariantGraph graph = VariantGraph2.create(w1);
+      graph.addWitness(w2);
+      graph.addWitness(w3);
+      graph.addWitness(w4);
+      graph.addWitness(w5);
+      final Set<IVariantGraphVertex> vertices = graph.vertexSet();
+      assertEquals(9, vertices.size());
+      Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+      final IVariantGraphVertex startVertex = vertexI.next();
+      final IVariantGraphVertex theVertex = vertexI.next();
+      final IVariantGraphVertex blackVertex = vertexI.next();
+      final IVariantGraphVertex whiteVertex = vertexI.next();
+      final IVariantGraphVertex greenVertex = vertexI.next();
+      final IVariantGraphVertex redVertex = vertexI.next();
+      final IVariantGraphVertex yellowVertex = vertexI.next();
+      final IVariantGraphVertex catVertex = vertexI.next();
+      final IVariantGraphVertex endVertex = vertexI.next();
+      assertEquals("#", startVertex.getNormalized());
+      assertEquals("the", theVertex.getNormalized());
+      assertEquals("black", blackVertex.getNormalized());
+      assertEquals("white", whiteVertex.getNormalized());
+      assertEquals("green", greenVertex.getNormalized());
+      assertEquals("red", redVertex.getNormalized());
+      assertEquals("yellow", yellowVertex.getNormalized());
+      assertEquals("cat", catVertex.getNormalized());
+      assertEquals("#", endVertex.getNormalized());
+      Set<IVariantGraphEdge> edges = graph.edgeSet();
+      assertEquals(12, edges.size());
+      assertEquals("# -> the: A, B, C, D, E", graph.getEdge(startVertex, theVertex).toString());
+      assertEquals("the -> black: A", graph.getEdge(theVertex, blackVertex).toString());
+      assertEquals("black -> cat: A", graph.getEdge(blackVertex, catVertex).toString());
+      assertEquals("cat -> #: A, B, C, D, E", graph.getEdge(catVertex, endVertex).toString());
+      assertEquals("the -> white: B", graph.getEdge(theVertex, whiteVertex).toString());
+      assertEquals("white -> cat: B", graph.getEdge(whiteVertex, catVertex).toString());
+      assertEquals("the -> green: C", graph.getEdge(theVertex, greenVertex).toString());
+      assertEquals("green -> cat: C", graph.getEdge(greenVertex, catVertex).toString());
+      assertEquals("the -> red: D", graph.getEdge(theVertex, redVertex).toString());
+      assertEquals("red -> cat: D", graph.getEdge(redVertex, catVertex).toString());
+      assertEquals("the -> yellow: E", graph.getEdge(theVertex, yellowVertex).toString());
+      assertEquals("yellow -> cat: E", graph.getEdge(yellowVertex, catVertex).toString());
+   }
+
 
     // <!-- TODO -->
     
