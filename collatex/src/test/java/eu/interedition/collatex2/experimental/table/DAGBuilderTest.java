@@ -9,7 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -24,7 +24,7 @@ public class DAGBuilderTest {
   @Test
   public void testSimpleVariantGraphToDAG() {
       IWitness a = engine.createWitness("A", "the first witness");
-      IVariantGraph graph = VariantGraph.create();
+      IVariantGraph graph = VariantGraph2.create();
       graph.addWitness(a);
       DAGBuilder builder = new DAGBuilder();
       DAVariantGraph dag = builder.buildDAG(graph);

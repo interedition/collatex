@@ -58,7 +58,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   //TODO: implement!
   @Override
   public List<String> findRepeatingTokens() {
-    throw new RuntimeException("!!");
+    return Lists.newArrayList();
   }
 
   //TODO: remove!

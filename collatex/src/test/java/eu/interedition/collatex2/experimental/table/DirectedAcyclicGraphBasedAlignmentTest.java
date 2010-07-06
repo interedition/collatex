@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.VariantGraph;
+import eu.interedition.collatex2.experimental.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -21,7 +21,7 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
 
     @Test
     public void testEmptyGraph() {
-      IVariantGraph graph = VariantGraph.create();
+      IVariantGraph graph = VariantGraph2.create();
       IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
       assertEquals(0, table.getRows().size());
     }
@@ -29,7 +29,7 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
     @Test
     public void testFirstWitness() {
       IWitness a = engine.createWitness("A", "the first witness");
-      IVariantGraph graph = VariantGraph.create();
+      IVariantGraph graph = VariantGraph2.create();
       graph.addWitness(a);
       IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
       assertEquals("A: |the|first|witness|", table.getRow(a).rowToString());
@@ -41,7 +41,7 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       IWitness a = engine.createWitness("A", "everything matches");
       IWitness b = engine.createWitness("B", "everything matches");
       IWitness c = engine.createWitness("C", "everything matches");
-      IVariantGraph graph = VariantGraph.create();
+      IVariantGraph graph = VariantGraph2.create();
       graph.addWitness(a);
       graph.addWitness(b);
       graph.addWitness(c);
@@ -57,7 +57,7 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       IWitness w1 = engine.createWitness("A", "a");
       IWitness w2 = engine.createWitness("B", "b");
       IWitness w3 = engine.createWitness("C", "a b");
-      IVariantGraph graph = VariantGraph.create();
+      IVariantGraph graph = VariantGraph2.create();
       graph.addWitness(w1);
       graph.addWitness(w2);
       graph.addWitness(w3);
@@ -75,7 +75,7 @@ public class DirectedAcyclicGraphBasedAlignmentTest {
       final IWitness w3 = engine.createWitness("C", "the green cat");
       final IWitness w4 = engine.createWitness("D", "the red cat");
       final IWitness w5 = engine.createWitness("E", "the yellow cat");
-      IVariantGraph graph = VariantGraph.create();
+      IVariantGraph graph = VariantGraph2.create();
       graph.addWitness(w1);
       graph.addWitness(w2);
       graph.addWitness(w3);

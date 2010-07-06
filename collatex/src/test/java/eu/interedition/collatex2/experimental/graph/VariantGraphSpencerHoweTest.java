@@ -2,7 +2,8 @@ package eu.interedition.collatex2.experimental.graph;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,18 +25,23 @@ public class VariantGraphSpencerHoweTest {
     IWitness w1 = engine.createWitness("A", "a");
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
-    IVariantGraph graph = VariantGraph.create();
+    IVariantGraph graph = VariantGraph2.create();
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
     assertEquals(4, graph.vertexSet().size());
-    final List<IVariantGraphEdge> edges = graph.getEdges();
+    Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+    IVariantGraphVertex startVertex = vertexI.next();
+    IVariantGraphVertex aVertex = vertexI.next();
+    IVariantGraphVertex bVertex = vertexI.next();
+    IVariantGraphVertex endVertex = vertexI.next();
+    final Set<IVariantGraphEdge> edges = graph.edgeSet();
     assertEquals(5, edges.size());
-    assertEquals("# -> a: A, C", edges.get(0).toString());
-    assertEquals("a -> #: A", edges.get(1).toString());
-    assertEquals("# -> b: B", edges.get(2).toString());
-    assertEquals("b -> #: B, C", edges.get(3).toString());
-    assertEquals("a -> b: C", edges.get(4).toString());
+    assertEquals("# -> a: A, C", graph.getEdge(startVertex, aVertex).toString());
+    assertEquals("a -> #: A", graph.getEdge(aVertex, endVertex).toString());
+    assertEquals("# -> b: B", graph.getEdge(startVertex, bVertex).toString());
+    assertEquals("b -> #: B, C", graph.getEdge(bVertex, endVertex).toString());
+    assertEquals("a -> b: C", graph.getEdge(aVertex, bVertex).toString());
   }
   
 
