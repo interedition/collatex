@@ -2,7 +2,7 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
-import eu.interedition.collatex2.experimental.table.CollateXVertex;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 
 public interface IColumn extends Comparable<IColumn> {
 
@@ -27,6 +27,6 @@ public interface IColumn extends Comparable<IColumn> {
   void accept(IAlignmentTableVisitor visitor);
 
   //TODO: remove add methods from interface!
-  void addVertex(CollateXVertex vertex);
+  void addVertex(IVariantGraphVertex vertex);
 
 }

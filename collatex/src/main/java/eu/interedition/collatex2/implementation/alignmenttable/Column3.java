@@ -8,7 +8,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.table.CollateXVertex;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -118,7 +118,7 @@ public class Column3 implements IColumn {
   }
 
   @Override
-  public void addVertex(CollateXVertex vertex) {
+  public void addVertex(IVariantGraphVertex vertex) {
     throw new UnsupportedOperationException();
   }
 

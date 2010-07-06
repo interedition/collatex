@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.implementation.alignmenttable.BaseAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -19,8 +20,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
   private final IVariantGraph                 graph;
-  private final Map<CollateXVertex, IColumn> vertexToColumn;
-  private DAVariantGraph                     dag;
+  private final Map<IVariantGraphVertex, IColumn> vertexToColumn;
 
   public DirectedAcyclicGraphBasedAlignmentTable(IVariantGraph graph) {
     this.graph = graph;
@@ -29,13 +29,10 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
   }
 
   private void init() {
-    // Note: we build the new DAG here (based on the variant graph)
-    DAGBuilder builder = new DAGBuilder();
-    dag = builder.buildDAG(graph);
-    if (!dag.edgeSet().isEmpty()) {
+    if (!graph.isEmpty()) {
       // NOTE: we build a column for each vertex in the longest path
-      List<CollateXVertex> longestPath = dag.getLongestPath();
-      for (CollateXVertex vertex : longestPath) {
+      List<IVariantGraphVertex> longestPath = graph.getLongestPath();
+      for (IVariantGraphVertex vertex : longestPath) {
         IColumn newColumn = addNewColumn(vertex);
         vertexToColumn.put(vertex, newColumn);
       }
@@ -93,7 +90,7 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
     getSigli().add(sigil);
 
     // Note: search the path through the graph for this witness
-    List<CollateXVertex> path = dag.getPathFor(witness);
+    List<IVariantGraphVertex> path = graph.getPath(witness);
     // NOTE: now assign columns to each vertex that is
     // not on the longest path or that is not yet assigned
     IColumn lastColumn = null;
@@ -101,7 +98,7 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
 //    for (CollateXVertex vertex : path) {
 //      System.out.println(vertex.getNormalized());
 //    }
-    for (CollateXVertex vertex : path) {
+    for (IVariantGraphVertex vertex : path) {
 //       System.out.println("Looking for: "+vertex.getNormalized());
       if (vertexToColumn.containsKey(vertex)) {
         // skip... vertex is already placed
@@ -154,7 +151,7 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
 
   }
 
-  private IColumn addNewColumn(CollateXVertex vertex) {
+  private IColumn addNewColumn(IVariantGraphVertex vertex) {
     final IColumn column = new AVGColumn(vertex, columns.size() + 1);
     columns.add(column);
     return column;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -11,10 +12,10 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AVGColumn implements IColumn {
-  private final List<CollateXVertex> vertices;
+  private final List<IVariantGraphVertex> vertices;
   private final int position;
   
-  public AVGColumn(CollateXVertex vertex, int position) {
+  public AVGColumn(IVariantGraphVertex vertex, int position) {
     this.vertices = Lists.newArrayList();
     this.position = position;
     addVertex(vertex);
@@ -37,14 +38,14 @@ public class AVGColumn implements IColumn {
 
   @Override
   public boolean containsWitness(String sigil) {
-    CollateXVertex findVertexForWitness = findVertexForWitness(sigil);
+    IVariantGraphVertex findVertexForWitness = findVertexForWitness(sigil);
     return findVertexForWitness != null;
   }
 
   // should maybe be a map?
-  private CollateXVertex findVertexForWitness(String sigil) {
-    CollateXVertex found = null;
-    for (CollateXVertex vertex : vertices) {
+  private IVariantGraphVertex findVertexForWitness(String sigil) {
+    IVariantGraphVertex found = null;
+    for (IVariantGraphVertex vertex : vertices) {
       if (found == null && vertex.containsWitness(sigil)) {
         found = vertex;
       }
@@ -69,7 +70,7 @@ public class AVGColumn implements IColumn {
 
   @Override
   public INormalizedToken getToken(String sigil) {
-    CollateXVertex vertex = findVertexForWitness(sigil);
+    IVariantGraphVertex vertex = findVertexForWitness(sigil);
     if (vertex == null) {
       throw new RuntimeException("WITNESS "+sigil+" not found in this column!");
     }
@@ -93,7 +94,7 @@ public class AVGColumn implements IColumn {
   }
 
   @Override
-  public void addVertex(CollateXVertex vertex) {
+  public void addVertex(IVariantGraphVertex vertex) {
     vertices.add(vertex);
   }
 }

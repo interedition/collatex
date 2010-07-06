@@ -15,4 +15,8 @@ public interface IVariantGraphVertex {
 
   Set<IWitness> getWitnesses();
 
+  IWitness getWitnessForSigil(String sigil);
+
+  boolean containsWitness(String sigil);
+
 }

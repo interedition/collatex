@@ -9,6 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.experimental.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -26,15 +28,13 @@ public class DAGBuilderTest {
       IWitness a = engine.createWitness("A", "the first witness");
       IVariantGraph graph = VariantGraph2.create();
       graph.addWitness(a);
-      DAGBuilder builder = new DAGBuilder();
-      DAVariantGraph dag = builder.buildDAG(graph);
       // vertices
-      Iterator<CollateXVertex> iterator = dag.iterator();
-      CollateXVertex start = iterator.next(); 
-      CollateXVertex the = iterator.next(); 
-      CollateXVertex first = iterator.next(); 
-      CollateXVertex witness = iterator.next(); 
-      CollateXVertex end = iterator.next(); 
+      Iterator<IVariantGraphVertex> iterator = graph.iterator();
+      IVariantGraphVertex start = iterator.next(); 
+      IVariantGraphVertex the = iterator.next(); 
+      IVariantGraphVertex first = iterator.next(); 
+      IVariantGraphVertex witness = iterator.next(); 
+      IVariantGraphVertex end = iterator.next(); 
       Assert.assertFalse(iterator.hasNext());
       Assert.assertEquals("#", start.getNormalized());       
       Assert.assertEquals("the", the.getNormalized());
@@ -46,13 +46,13 @@ public class DAGBuilderTest {
       Assert.assertEquals("first", first.getToken(a).getContent());
       Assert.assertEquals("witness", witness.getToken(a).getContent());
       // edges
-      Assert.assertTrue(dag.containsEdge(start, the));
-      Assert.assertTrue(dag.containsEdge(the, first));
-      Assert.assertTrue(dag.containsEdge(first, witness));
-      Assert.assertTrue(dag.containsEdge(witness, end));
+      Assert.assertTrue(graph.containsEdge(start, the));
+      Assert.assertTrue(graph.containsEdge(the, first));
+      Assert.assertTrue(graph.containsEdge(first, witness));
+      Assert.assertTrue(graph.containsEdge(witness, end));
       // witnesses on edges
-      Set<CollateXEdge> edgeSet = dag.edgeSet();
-      for (CollateXEdge edge : edgeSet) {
+      Set<IVariantGraphEdge> edgeSet = graph.edgeSet();
+      for (IVariantGraphEdge edge : edgeSet) {
         Assert.assertTrue("Witness "+a.getSigil()+" not present in set!", edge.containsWitness(a));
       }
   }
