@@ -194,6 +194,24 @@ public class VariantGraph2AlignmentTest {
       assertEquals(2, longestPath.size());
     }
 
+    @Test
+    public void testGetPathForWitness() {
+      final IWitness w1 = engine.createWitness("V", "a b c d e f ");
+      final IWitness w2 = engine.createWitness("W", "x y z d e");
+      final IWitness w3 = engine.createWitness("X", "a b x y z");
+      IVariantGraph graph = VariantGraph2.create();
+      graph.addWitness(w1);
+      graph.addWitness(w2);
+      graph.addWitness(w3);
+      List<IVariantGraphVertex> path = graph.getPath(w1);
+      assertEquals("a", path.get(0).getNormalized());
+      assertEquals("b", path.get(1).getNormalized());
+      assertEquals("c", path.get(2).getNormalized());
+      assertEquals("d", path.get(3).getNormalized());
+      assertEquals("e", path.get(4).getNormalized());
+      assertEquals("f", path.get(5).getNormalized());
+      assertEquals(6, path.size());
+    }
 
     // <!-- TODO -->
     

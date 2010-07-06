@@ -50,4 +50,9 @@ public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGra
   public void addWitness(IWitness witness) {
     witnesses.add(witness);
   }
+  
+  public boolean containsWitness(IWitness witness) {
+    return witnesses.contains(witness);
+  }
+
 }

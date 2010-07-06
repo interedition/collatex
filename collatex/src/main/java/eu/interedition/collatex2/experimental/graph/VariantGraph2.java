@@ -2,6 +2,7 @@ package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jgrapht.alg.BellmanFordShortestPath;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
@@ -71,11 +72,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return endVertex;
   }
 
-  @Override
-  public List<IVariantGraphVertex> getPath(IWitness witness) {
-    throw new RuntimeException("!!");
-  }
-
+ 
   @Override
   public IVariantGraphVertex getStartVertex() {
     return startVertex;
@@ -93,6 +90,30 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
 
   public static VariantGraph2 create() {
     return new VariantGraph2();
+  }
+
+  public List<IVariantGraphVertex> getPath(IWitness witness) {
+    List<IVariantGraphVertex> path = Lists.newArrayList();
+    IVariantGraphVertex startVertex = getStartVertex();
+    IVariantGraphVertex currentVertex = startVertex;
+    while (outDegreeOf(currentVertex) > 0) {
+      Set<IVariantGraphEdge> outgoingEdges = outgoingEdgesOf(currentVertex);
+      boolean found = false;
+      for (IVariantGraphEdge edge : outgoingEdges) {
+        if (!found&&edge.containsWitness(witness)) {
+          found = true;
+          IVariantGraphVertex edgeTarget = getEdgeTarget(edge);
+          if (!edgeTarget.getNormalized().equals("#")) {
+            path.add(edgeTarget);
+          }
+          currentVertex = edgeTarget;
+        }
+      }
+      if (!found) {
+        throw new RuntimeException("No valid path found for "+witness.getSigil());
+      }
+    }
+    return path;
   }
 
   //TODO: should the first witness really be a special case like this?

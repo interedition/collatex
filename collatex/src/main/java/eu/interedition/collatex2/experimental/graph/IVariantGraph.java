@@ -34,4 +34,5 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
 
   List<IVariantGraphVertex> getLongestPath();
 
+
 }

@@ -14,6 +14,8 @@ public interface IVariantGraphEdge {
   Set<IWitness> getWitnesses();
   
   void addWitness(IWitness witness);
+
+  boolean containsWitness(IWitness witness);
   
 
 }
