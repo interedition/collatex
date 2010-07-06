@@ -17,12 +17,12 @@ import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
+public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
   private final IVariantGraph                 graph;
   private final Map<IVariantGraphVertex, IColumn> vertexToColumn;
 
-  public DirectedAcyclicGraphBasedAlignmentTable(IVariantGraph graph) {
+  public VariantGraphBasedAlignmentTable(IVariantGraph graph) {
     this.graph = graph;
     vertexToColumn = Maps.newHashMap();
     init();
@@ -152,7 +152,7 @@ public class DirectedAcyclicGraphBasedAlignmentTable extends BaseAlignmentTable 
   }
 
   private IColumn addNewColumn(IVariantGraphVertex vertex) {
-    final IColumn column = new AVGColumn(vertex, columns.size() + 1);
+    final IColumn column = new VariantGraphBasedColumn(vertex, columns.size() + 1);
     columns.add(column);
     return column;
   }

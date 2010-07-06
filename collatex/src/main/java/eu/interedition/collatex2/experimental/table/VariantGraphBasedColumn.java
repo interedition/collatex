@@ -11,11 +11,11 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class AVGColumn implements IColumn {
+public class VariantGraphBasedColumn implements IColumn {
   private final List<IVariantGraphVertex> vertices;
   private final int position;
   
-  public AVGColumn(IVariantGraphVertex vertex, int position) {
+  public VariantGraphBasedColumn(IVariantGraphVertex vertex, int position) {
     this.vertices = Lists.newArrayList();
     this.position = position;
     addVertex(vertex);

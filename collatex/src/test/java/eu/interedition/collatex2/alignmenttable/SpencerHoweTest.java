@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.VariantGraph2;
-import eu.interedition.collatex2.experimental.table.DirectedAcyclicGraphBasedAlignmentTable;
+import eu.interedition.collatex2.experimental.table.VariantGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -39,7 +39,7 @@ public class SpencerHoweTest {
     graph.addWitness(w1);
     graph.addWitness(w2);
     graph.addWitness(w3);
-    IAlignmentTable table = new DirectedAcyclicGraphBasedAlignmentTable(graph);
+    IAlignmentTable table = new VariantGraphBasedAlignmentTable(graph);
     assertEquals("V: |a|b|c| | |d|e|f|", table.getRow(w1).rowToString());
     assertEquals("W: | | |x|y|z|d|e| |", table.getRow(w2).rowToString());
     assertEquals("X: |a|b|x|y|z| | | |", table.getRow(w3).rowToString());
