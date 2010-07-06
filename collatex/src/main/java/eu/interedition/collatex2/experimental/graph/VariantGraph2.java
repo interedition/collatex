@@ -61,12 +61,6 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return Lists.newArrayList();
   }
 
-  //TODO: remove!
-  @Override
-  public List<IVariantGraphEdge> getEdges() {
-    throw new RuntimeException("!!");
-  }
-
   @Override
   public IVariantGraphVertex getEndVertex() {
     return endVertex;

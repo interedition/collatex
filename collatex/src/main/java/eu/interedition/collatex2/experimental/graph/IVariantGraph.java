@@ -9,9 +9,6 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge> {
 
-  //TODO: remove this method --> use edgeSet() method instead
-  List<IVariantGraphEdge> getEdges();
-
   IVariantGraphVertex getStartVertex();
 
   IVariantGraphVertex getEndVertex();
@@ -29,10 +26,8 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
   boolean isEmpty();
 
   //TODO: delete method? add edges based method to interface
-  //TODO: add test!
   List<IVariantGraphVertex> getPath(IWitness witness);
 
   List<IVariantGraphVertex> getLongestPath();
-
 
 }
