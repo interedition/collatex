@@ -20,8 +20,7 @@
 
 -->
 
-[#ftl]
-[@c.page title="REST service"]
+<@c.page title="REST service">
 	<h1>REST service</h1>
 	
 	<p>
@@ -50,7 +49,7 @@
 	        {"id" : "B", "content" : "A black cat in a black basket" },
 	        {"id" : "C", "content" : "A striped cat in a black basket" },
 	        {"id" : "D", "content" : "A striped cat in a white basket" }
-	        ]
+	        >
 }</pre>
 	</p> 
 	
@@ -138,4 +137,4 @@
         <rdg wit="#B">in a basket.</rdg>
     </app>
 </collatex:apparatus>]]></pre>
-[/@c.page]
+</@c.page>
