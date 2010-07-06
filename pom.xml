@@ -5,7 +5,7 @@
 	<artifactId>collatex-project</artifactId>
 	<packaging>pom</packaging>
 	<name>CollateX :: Project</name>
-	<version>0.9-SNAPSHOT</version>
+	<version>0.9</version>
 	<description>CollateX is a Java library for collating textual sources, for example, to produce an apparatus.</description>
 	<url>http://collatex.sourceforge.net/</url>
 	<organization>
@@ -124,34 +124,6 @@
 				<artifactId>maven-resources-plugin</artifactId>
 				<configuration>
 					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1</version>
-				<executions>
-					<execution>
-						<id>install-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-						<phase>install</phase>
-					</execution>
-					<execution>
-						<id>deploy-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-						<phase>deploy</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -287,11 +259,6 @@
 			<name>CollateX Maven Repository</name>
 			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/maven-repository</url>
 		</repository>
-		<site>
-			<id>site.collatex.sourceforge.net</id>
-			<name>CollateX Maven Site</name>
-			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/</url>
-		</site>
 	</distributionManagement>
 	<issueManagement>
 		<system>launchpad.net</system>

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>eu.interedition.collatex</groupId>
 		<artifactId>collatex-project</artifactId>
-		<version>0.9-SNAPSHOT</version>
+		<version>0.9</version>
 	</parent>
 	<artifactId>collatex</artifactId>
 	<name>CollateX</name>
@@ -20,4 +20,35 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<id>install-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+						<phase>install</phase>
+					</execution>
+					<execution>
+						<id>deploy-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<distributionManagement>
+		<site>
+			<id>site.collatex.sourceforge.net</id>
+			<name>CollateX Maven Site</name>
+			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/</url>
+		</site>
+	</distributionManagement>
 </project>
