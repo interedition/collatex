@@ -20,26 +20,6 @@ public class DAVariantGraphTest {
     engine = new CollateXEngine();
   }
 
-  @Test
-  public void testLongestPath() {
-    IWitness w1 = engine.createWitness("A", "a");
-    IWitness w2 = engine.createWitness("B", "b");
-    IWitness w3 = engine.createWitness("C", "a b");
-    IVariantGraph graph = VariantGraph.create();
-    graph.addWitness(w1);
-    graph.addWitness(w2);
-    graph.addWitness(w3);
-    assertEquals(4, graph.vertexSet().size());
-    DAGBuilder builder = new DAGBuilder();
-    DAVariantGraph avg = builder.buildDAG(graph);
-    List<CollateXVertex> longestPath = avg.getLongestPath();
-//    for (CollateXVertex v: longestPath) {
-//      System.out.println(v.getNormalized());
-//    }
-    assertEquals("a", longestPath.get(0).getNormalized());
-    assertEquals("b", longestPath.get(1).getNormalized());
-    assertEquals(2, longestPath.size());
-  }
 
   @Test
   public void testGetPathForWitness() {

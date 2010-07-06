@@ -32,4 +32,6 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
   //TODO: add test!
   List<IVariantGraphVertex> getPath(IWitness witness);
 
+  List<IVariantGraphVertex> getLongestPath();
+
 }

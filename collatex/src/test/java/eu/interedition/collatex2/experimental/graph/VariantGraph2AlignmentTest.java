@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.BeforeClass;
@@ -173,6 +174,25 @@ public class VariantGraph2AlignmentTest {
       assertEquals("the -> yellow: E", graph.getEdge(theVertex, yellowVertex).toString());
       assertEquals("yellow -> cat: E", graph.getEdge(yellowVertex, catVertex).toString());
    }
+
+    @Test
+    public void testLongestPath() {
+      IWitness w1 = engine.createWitness("A", "a");
+      IWitness w2 = engine.createWitness("B", "b");
+      IWitness w3 = engine.createWitness("C", "a b");
+      IVariantGraph graph = VariantGraph2.create();
+      graph.addWitness(w1);
+      graph.addWitness(w2);
+      graph.addWitness(w3);
+      assertEquals(4, graph.vertexSet().size());
+      List<IVariantGraphVertex> longestPath = graph.getLongestPath();
+//      for (CollateXVertex v: longestPath) {
+//        System.out.println(v.getNormalized());
+//      }
+      assertEquals("a", longestPath.get(0).getNormalized());
+      assertEquals("b", longestPath.get(1).getNormalized());
+      assertEquals(2, longestPath.size());
+    }
 
 
     // <!-- TODO -->

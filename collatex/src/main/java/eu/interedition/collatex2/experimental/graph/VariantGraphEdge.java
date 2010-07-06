@@ -3,11 +3,14 @@ package eu.interedition.collatex2.experimental.graph;
 import java.util.Collections;
 import java.util.Set;
 
+import org.jgrapht.graph.DefaultWeightedEdge;
+
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphEdge implements IVariantGraphEdge {
+@SuppressWarnings("serial")
+public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGraphEdge {
   private final IVariantGraphVertex start;
   private final IVariantGraphVertex end;
   private final Set<IWitness>     witnesses;

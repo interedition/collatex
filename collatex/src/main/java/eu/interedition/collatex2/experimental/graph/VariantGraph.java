@@ -226,6 +226,11 @@ public class VariantGraph extends BaseDirectedGraph implements IVariantGraph {
     throw new RuntimeException("NOT IMPLEMENTED!");
   }
 
+  @Override
+  public List<IVariantGraphVertex> getLongestPath() {
+    throw new RuntimeException("NOT IMPLEMENTED!");
+  }
+
 
 
 }

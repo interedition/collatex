@@ -3,15 +3,12 @@ package eu.interedition.collatex2.experimental.graph;
 import java.util.List;
 import java.util.Map;
 
+import org.jgrapht.alg.BellmanFordShortestPath;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
-import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
-import eu.interedition.collatex2.experimental.graph.VariantGraphVertex;
 import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
 import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
@@ -172,4 +169,27 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
       addNewEdge(begin, end, witness);
     }
   }
+
+  @Override
+  public List<IVariantGraphVertex> getLongestPath() {
+      // NOTE: Weights are set to negative value to
+      // generate the longest path instead of the shortest path
+      for (IVariantGraphEdge edge : edgeSet()) {
+        setEdgeWeight(edge, -1);
+      }
+      // NOTE: gets the start vertex of the graph
+      IVariantGraphVertex startVertex = getStartVertex();
+      IVariantGraphVertex endVertex = getEndVertex();
+      // Note: calculates the longest path
+      List<IVariantGraphEdge> findPathBetween = BellmanFordShortestPath.findPathBetween(this, startVertex, endVertex);
+      // Note: gets the end vertices associated with the edges of the path
+      List<IVariantGraphVertex> vertices = Lists.newArrayList();
+      for (IVariantGraphEdge edge : findPathBetween) {
+        IVariantGraphVertex edgeTarget = this.getEdgeTarget(edge);
+        if (edgeTarget != endVertex) {
+          vertices.add(edgeTarget);
+        }
+      }
+      return vertices;
+    }
 }
