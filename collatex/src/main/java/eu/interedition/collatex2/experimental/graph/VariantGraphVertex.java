@@ -1,20 +1,67 @@
 package eu.interedition.collatex2.experimental.graph;
 
-import eu.interedition.collatex2.experimental.table.CollateXVertex;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
+import java.util.Map;
+import java.util.Set;
 
-public class VariantGraphVertex extends CollateXVertex implements IVariantGraphVertex {
-  private final INormalizedToken token;
+import com.google.common.collect.Maps;
+
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IWitness;
+
+public class VariantGraphVertex implements IVariantGraphVertex {
+  private final String normalized;
+  private final Map<IWitness, INormalizedToken> tokenMap;
+
+  public VariantGraphVertex(String normalized) {
+    this.normalized = normalized;
+    this.tokenMap = Maps.newLinkedHashMap();
+  }
 
   public VariantGraphVertex(INormalizedToken token) {
-    super(token.getNormalized());
-    this.token = token;
+    this(token.getNormalized());
   }
 
-  @Override
   public String getNormalized() {
-    return token.getNormalized();
+    return normalized;
   }
 
+  public INormalizedToken getToken(IWitness witness) {
+    if (!tokenMap.containsKey(witness)) {
+      throw new RuntimeException("TOKEN FOR WITNESS "+witness.getSigil()+" NOT FOUND IN VERTEX "+getNormalized()+"!");
+    }
+    return tokenMap.get(witness);
+  }
+  
+  public void addToken(IWitness witness, INormalizedToken token) {
+    tokenMap.put(witness, token);
+  }
+
+  //TODO: change String parameter into IWitness
+  public boolean containsWitness(String sigil) {
+    return (internalGetWitnessForSigil(sigil)!=null);
+  }
+
+  //TODO: change String parameter into IWitness
+  public IWitness getWitnessForSigil(String sigil) {
+    IWitness internalGetWitnessForSigil = internalGetWitnessForSigil(sigil);
+    if (internalGetWitnessForSigil == null) {
+      throw new RuntimeException("Witness with "+sigil+" not found in this vertex!");
+    }
+    return internalGetWitnessForSigil;
+  }
+
+  private IWitness internalGetWitnessForSigil(String sigil) {
+    Set<IWitness> set = tokenMap.keySet();
+    for (IWitness w : set) {
+      if (w.getSigil().equals(sigil)) {
+        return w;
+      }
+    }
+    return null;
+  }
+  
+  public Set<IWitness> getWitnesses() {
+    return tokenMap.keySet();
+  }
 
 }
