@@ -49,7 +49,7 @@
 	        {"id" : "B", "content" : "A black cat in a black basket" },
 	        {"id" : "C", "content" : "A striped cat in a black basket" },
 	        {"id" : "D", "content" : "A striped cat in a white basket" }
-	        >
+	        ]
 }</pre>
 	</p> 
 	
@@ -87,7 +87,7 @@
 	<h2>Output</h2>
 	
 	<p>
-	The output format of the collator, represented in the response to the HTTP POST request, can be chosen via the <code>Accept-Header</code>.
+	The output format of the collator, represented in the response to the HTTP POST request, can be chosen via the <code>Accept</code> HTTP header.
 	The following MIME types aka. output formats are supported:
 	</p>
 	

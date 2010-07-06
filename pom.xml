@@ -128,12 +128,21 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1</version>
 				<executions>
 					<execution>
-						<id>attach-sources</id>
+						<id>install-sources</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>jar-no-fork</goal>
 						</goals>
+						<phase>install</phase>
+					</execution>
+					<execution>
+						<id>deploy-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+						<phase>deploy</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -141,7 +150,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptorRefs>
-						<descriptorRef>bin</descriptorRef>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 				</configuration>
 			</plugin>
@@ -194,7 +203,6 @@
 						</reports>
 					</reportSet>
 				</reportSets>
-
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-report-plugin</artifactId>
@@ -203,10 +211,12 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<encoding>UTF-8</encoding>
-					<doctitle>CollateX</doctitle>
 					<docencoding>UTF-8</docencoding>
 					<links>
 						<link>http://java.sun.com/j2se/1.6.0/docs/api</link>
+						<link>http://google-collections.googlecode.com/svn/trunk/javadoc/</link>
+						<link>http://jackson.codehaus.org/1.4.2/javadoc/</link>
+						<link>http://junit.sourceforge.net/javadoc/</link>
 					</links>
 					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
 					<docletArtifact>
@@ -222,7 +232,6 @@
 				<artifactId>maven-jxr-plugin</artifactId>
 				<configuration>
 					<linkJavadoc>true</linkJavadoc>
-					<docTitle>CollateX</docTitle>
 					<outputEncoding>UTF-8</outputEncoding>
 				</configuration>
 			</plugin>
@@ -250,7 +259,9 @@
 		</developer>
 		<developer>
 			<name>Gregor Middell</name>
+			<url>http://gregor.middell.net/</url>
 			<organization>Universität Würzburg</organization>
+			<organizationUrl>http://www.digital-humanities.de/</organizationUrl>
 		</developer>
 		<developer>
 			<name>Marcin Mielnicki</name>
@@ -263,6 +274,7 @@
 		<developer>
 			<name>Thorsten Vitt</name>
 			<organization>Universität Würzburg</organization>
+			<organizationUrl>http://www.digital-humanities.de/</organizationUrl>
 		</developer>
 		<developer>
 			<name>Joris van Zundert</name>
@@ -275,10 +287,15 @@
 			<name>CollateX Maven Repository</name>
 			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/maven-repository</url>
 		</repository>
+		<site>
+			<id>site.collatex.sourceforge.net</id>
+			<name>CollateX Maven Site</name>
+			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/</url>
+		</site>
 	</distributionManagement>
 	<issueManagement>
-		<system>sourceforge.net</system>
-		<url>http://sourceforge.net/tracker/?group_id=199278</url>
+		<system>launchpad.net</system>
+		<url>https://bugs.launchpad.net/collatex</url>
 	</issueManagement>
 	<licenses>
 		<license>

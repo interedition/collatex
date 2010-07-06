@@ -83,12 +83,12 @@ public class ApiController implements InitializingBean {
     jsonView.setObjectMapper(objectMapper);
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept-Header=application/json" }, method = RequestMethod.POST)
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/json" }, method = RequestMethod.POST)
   public ModelAndView collateToJson(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(jsonView, "alignment", collate(input));
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept-Header=application/xml" }, method = RequestMethod.POST)
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/xml" }, method = RequestMethod.POST)
   public ModelAndView collateToTei(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(teiView, "alignment", collate(input));
   }

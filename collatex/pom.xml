@@ -20,11 +20,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<distributionManagement>
-		<site>
-			<id>site.collatex.sourceforge.net</id>
-			<name>CollateX Maven Site</name>
-			<url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/</url>
-		</site>
-	</distributionManagement>
 </project>

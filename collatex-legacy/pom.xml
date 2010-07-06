@@ -8,24 +8,6 @@
 	</parent>
 	<artifactId>collatex-legacy</artifactId>
 	<name>CollateX :: Legacy components</name>
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**/*.html</include>
-				</includes>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<artifactId>maven-site-plugin</artifactId>
-				<configuration>
-					<generateReports>false</generateReports>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 	<dependencies>
 		<dependency>
 			<groupId>eu.interedition.collatex</groupId>
@@ -80,4 +62,14 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.html</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 </project>
