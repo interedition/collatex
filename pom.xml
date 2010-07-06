@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.interedition.collatex</groupId>
-	<artifactId>project</artifactId>
+	<artifactId>collatex-project</artifactId>
 	<packaging>pom</packaging>
 	<name>CollateX :: Project</name>
 	<version>0.9-SNAPSHOT</version>
@@ -168,8 +168,9 @@
 						<exclude>src/test/resources/**</exclude>
 						<exclude>src/main/webapp/examples.xml</exclude>
 						<exclude>src/main/webapp/darwin.xml</exclude>
-						<exclude>target/**</exclude>
+						<exclude>examples/**</exclude>
 						<exclude>site/**</exclude>
+						<exclude>target/**</exclude>
 					</excludes>
 					<properties>
 						<year>2010</year>
