@@ -3,23 +3,26 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>eu.interedition.collatex</groupId>
-		<artifactId>project</artifactId>
-		<version>1.1-SNAPSHOT</version>
+		<artifactId>collatex-project</artifactId>
+		<version>0.9</version>
 	</parent>
 	<artifactId>collatex-nodeps</artifactId>
 	<name>CollateX :: All-inclusive package</name>
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

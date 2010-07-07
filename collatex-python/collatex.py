@@ -46,18 +46,10 @@ performant as possible by using it and tweaking it as I go.
 I hope to add some easy premade default output formats for inclusion in
 templates, so the Python bindings can at least do whatever the Java API
 can.
-
-To build Collatex I use commands such as:
-
-bzr branch lp:collatex
-export PATH=$PATH:/home/zeth/Sandbox/apache-maven-2.2.1/bin
-mvn clean package
-
 """
 
-# Fill out the following line with where the collatex jar file is located
-# Eventually this should be replaced by something more intelligent
-# when CollateX is packaged.
+# Fill out the following line with where the collatex jar file is located,
+# which you downloaded from the project site.
 JAR_PATH = "interedition/trunk/collatex/collatex-nodeps/target/"
 
 # The following is to manually specify the location of the JVM library
