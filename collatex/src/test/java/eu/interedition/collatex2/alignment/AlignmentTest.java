@@ -32,20 +32,6 @@ public class AlignmentTest {
     factory = new CollateXEngine();
   }
 
-  @Test
-  public void testSimple1() {
-    final IWitness a = factory.createWitness("A", "a b");
-    final IWitness b = factory.createWitness("B", "a c b");
-    final IAlignment ali = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IMatch> matches = ali.getMatches();
-    assertEquals(2, matches.size());
-    assertEquals("a", matches.get(0).getNormalized());
-    assertEquals("b", matches.get(1).getNormalized());
-    final List<IGap> gaps = ali.getGaps();
-    assertEquals(1, gaps.size());
-    assertEquals("\"c\" added", gaps.get(0).toString());
-  }
-
   //Copied from TextAlignmentTest
   @Test
   public void testAlignment() {
