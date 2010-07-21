@@ -16,6 +16,7 @@ import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
+//NOTE: This class is to be made obsolete by SequenceDetection2!
 public class SequenceDetection {
   public static IAlignment improveAlignment(final IAlignment alignment) {
     final List<IMatch> chainedMatches = chainMatches(alignment);

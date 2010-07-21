@@ -81,5 +81,29 @@ public class VGAlignmentTest {
     assertEquals("to be", matches.get(0).getNormalized());
   }
 
+  @Test
+  public void testAddition_AtTheEnd() {
+    final IWitness a = factory.createWitness("A", "to be");
+    final IWitness b = factory.createWitness("B", "to be or not");
+    IVariantGraph graph = VariantGraph2.create(a);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    final List<IMatch2> matches = alignment.getMatches();
+    assertEquals(1, matches.size());
+    assertEquals("to be", matches.get(0).getNormalized());
+  }
+
+  @Test
+  public void testAddition_InTheMiddle() {
+    final IWitness a = factory.createWitness("A", "to be");
+    final IWitness b = factory.createWitness("B", "to think, therefore be");
+    IVariantGraph graph = VariantGraph2.create(a);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    final List<IMatch2> matches = alignment.getMatches();
+    assertEquals(2, matches.size());
+    assertEquals("to", matches.get(0).getNormalized());
+    assertEquals("be", matches.get(1).getNormalized());
+  }
 
 }

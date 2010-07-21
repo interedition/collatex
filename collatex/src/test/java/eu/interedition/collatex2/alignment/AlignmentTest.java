@@ -16,7 +16,6 @@ import com.google.common.collect.Iterables;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
-import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -32,47 +31,6 @@ public class AlignmentTest {
     factory = new CollateXEngine();
   }
 
-
-  @Test
-  public void testAddition_AtTheEnd() {
-    final IWitness a = factory.createWitness("A", "to be");
-    final IWitness b = factory.createWitness("B", "to be or not");
-    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IMatch> matches = alignment.getMatches();
-    assertEquals(1, matches.size());
-    assertEquals("to be", matches.get(0).getNormalized());
-    final List<IGap> gaps = alignment.getGaps();
-    assertEquals(1, gaps.size());
-    final IGap gap = gaps.get(0);
-    assertTrue(gap.isAddition());
-    assertTrue("Phrase A is not empty!", gap.getColumns().isEmpty());
-    assertEquals("or not", gap.getPhrase().getNormalized());
-    final List<IAddition> additions = alignment.getAdditions();
-    assertEquals(1, additions.size());
-    final IAddition addition = additions.get(0);
-    assertEquals("or not", addition.getAddedPhrase().getNormalized());
-  }
-
-  @Test
-  public void testAddition_InTheMiddle() {
-    final IWitness a = factory.createWitness("A", "to be");
-    final IWitness b = factory.createWitness("B", "to think, therefore be");
-    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IMatch> matches = alignment.getMatches();
-    assertEquals(2, matches.size());
-    assertEquals("to", matches.get(0).getNormalized());
-    assertEquals("be", matches.get(1).getNormalized());
-    final List<IGap> gaps = alignment.getGaps();
-    assertEquals(1, gaps.size());
-    final IGap gap = gaps.get(0);
-    assertTrue(gap.isAddition());
-    assertTrue("Phrase A is not empty!", gap.getColumns().isEmpty());
-    assertEquals("think therefore", gap.getPhrase().getNormalized());
-    final List<IAddition> additions = alignment.getAdditions();
-    assertEquals(1, additions.size());
-    final IAddition addition = additions.get(0);
-    assertEquals("think therefore", addition.getAddedPhrase().getNormalized());
-  }
 
   @Test
   public void testTransposition1Matches() {
