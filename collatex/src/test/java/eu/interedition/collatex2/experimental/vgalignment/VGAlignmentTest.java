@@ -35,11 +35,39 @@ public class VGAlignmentTest {
     final IWitness b = factory.createWitness("B", "a c b");
     IVariantGraph graph = VariantGraph2.create(a);
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 ali = aligner.align(b);
-    final List<IMatch2> matches = ali.getMatches();
+    IAlignment2 alignment = aligner.align(b);
+    final List<IMatch2> matches = alignment.getMatches();
     assertEquals(2, matches.size());
     assertEquals("a", matches.get(0).getNormalized());
     assertEquals("b", matches.get(1).getNormalized());
   }
+  
+  //Copied from TextAlignmentTest
+  @Test
+  public void testAlignment() {
+    final IWitness a = factory.createWitness("A", "cat");
+    final IWitness b = factory.createWitness("B", "cat");
+    IVariantGraph graph = VariantGraph2.create(a);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    final List<IMatch2> matches = alignment.getMatches();
+    assertEquals(1, matches.size());
+    assertEquals("cat", matches.get(0).getNormalized());
+  }
+
+  @Test
+  public void testAlignment2Matches() {
+    final IWitness a = factory.createWitness("A", "The black cat");
+    final IWitness b = factory.createWitness("B", "The black and white cat");
+    IVariantGraph graph = VariantGraph2.create(a);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    final List<IMatch2> matches = alignment.getMatches();
+    assertEquals(2, matches.size());
+    assertEquals("the black", matches.get(0).getNormalized());
+    assertEquals("cat", matches.get(1).getNormalized());
+  }
+
+
 
 }

@@ -32,28 +32,6 @@ public class AlignmentTest {
     factory = new CollateXEngine();
   }
 
-  //Copied from TextAlignmentTest
-  @Test
-  public void testAlignment() {
-    final IWitness a = factory.createWitness("A", "cat");
-    final IWitness b = factory.createWitness("B", "cat");
-    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IMatch> matches = alignment.getMatches();
-    assertEquals(1, matches.size());
-    assertEquals("cat", matches.get(0).getNormalized());
-  }
-
-  @Test
-  public void testAlignment2Matches() {
-    final IWitness a = factory.createWitness("A", "The black cat");
-    final IWitness b = factory.createWitness("B", "The black and white cat");
-    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IMatch> matches = alignment.getMatches();
-    assertEquals(2, matches.size());
-    assertEquals("the black", matches.get(0).getNormalized());
-    assertEquals("cat", matches.get(1).getNormalized());
-  }
-
   @Test
   public void testAlignment2Gaps() {
     final IWitness a = factory.createWitness("A", "The black cat");
