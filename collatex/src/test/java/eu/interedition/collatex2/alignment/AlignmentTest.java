@@ -32,17 +32,6 @@ public class AlignmentTest {
   }
 
 
-  @Test
-  public void testTransposition1Matches() {
-    final IWitness a = factory.createWitness("A", "The black dog chases a red cat.");
-    final IWitness b = factory.createWitness("B", "A red cat chases the black dog.");
-    final IAlignment align = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IMatch> matches = align.getMatches();
-    assertEquals(3, matches.size());
-    assertEquals("the black dog", matches.get(0).getNormalized());
-    assertEquals("chases", matches.get(1).getNormalized());
-    assertEquals("a red cat", matches.get(2).getNormalized());
-  }
 
   @Test
   public void testTransposition1Gaps() {

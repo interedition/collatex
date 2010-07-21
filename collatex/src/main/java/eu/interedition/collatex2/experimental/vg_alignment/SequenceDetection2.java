@@ -1,5 +1,6 @@
 package eu.interedition.collatex2.experimental.vg_alignment;
-
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -20,16 +21,20 @@ public class SequenceDetection2 {
     this.tokenMatches = tokenMatches;
   }
 
-  //TODO: this implementation is too simple!
-  //TODO: transpositions are not yet handeled!
   public List<IMatch2> chainTokenMatches() {
+    // prepare
+    final List<ITokenMatch> tokenMatchesSortedForB = sortTokenMatchesForWitness();
     Map<ITokenMatch, ITokenMatch> previousMatchMapA = buildPreviousMatchMap();
+    Map<ITokenMatch, ITokenMatch> previousMatchMapB = buildPreviousMatchMap(tokenMatchesSortedForB);
+    // chain token matches
     List<INormalizedToken> tokensA = null;
     List<INormalizedToken> tokensB = null;
     List<IMatch2> matches = Lists.newArrayList();
     for (ITokenMatch tokenMatch : tokenMatches) {
-      ITokenMatch previous = previousMatchMapA.get(tokenMatch);
-      if (previous == null || tokenMatch.getTokenA().getPosition() - previous.getTokenA().getPosition() != 1) {
+      ITokenMatch previousA = previousMatchMapA.get(tokenMatch);
+      ITokenMatch previousB = previousMatchMapB.get(tokenMatch);
+      // TODO: distance tokenB?
+      if (previousA == null || previousA != previousB || tokenMatch.getTokenA().getPosition() - previousA.getTokenA().getPosition() != 1) {
         // start a new sequence;
         createAndAddChainedMatch(tokensA, tokensB, matches);
         // clear buffer
@@ -45,6 +50,18 @@ public class SequenceDetection2 {
     return matches;
   }
 
+  private List<ITokenMatch> sortTokenMatchesForWitness() {
+    final List<ITokenMatch> matchesForWitness = Lists.newArrayList(tokenMatches);
+    Collections.sort(matchesForWitness, SORT_MATCHES_ON_POSITION_WITNESS);
+    return matchesForWitness;
+  }
+  
+  final Comparator<ITokenMatch> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<ITokenMatch>() {
+    public int compare(final ITokenMatch o1, final ITokenMatch o2) {
+      return o1.getTokenB().getPosition() - o2.getTokenB().getPosition();
+    }
+  };
+
   private void createAndAddChainedMatch(List<INormalizedToken> tokensA, List<INormalizedToken> tokensB, List<IMatch2> matches) {
     // save current state if necessary
     if (tokensA != null && !tokensA.isEmpty()) {
@@ -56,6 +73,10 @@ public class SequenceDetection2 {
   }
   
   private Map<ITokenMatch, ITokenMatch> buildPreviousMatchMap() {
+    return buildPreviousMatchMap(tokenMatches);
+  }
+
+  private Map<ITokenMatch, ITokenMatch> buildPreviousMatchMap(List<ITokenMatch> tokenMatches) {
     final Map<ITokenMatch, ITokenMatch> previousMatches = Maps.newHashMap();
     ITokenMatch previousMatch = null;
     for (final ITokenMatch tokenMatch : tokenMatches) {
