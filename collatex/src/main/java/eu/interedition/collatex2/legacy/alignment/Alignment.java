@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.alignment;
+package eu.interedition.collatex2.legacy.alignment;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;

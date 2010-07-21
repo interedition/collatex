@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.alignment;
+package eu.interedition.collatex2.legacy.alignment;
 
 import java.util.List;
 import java.util.Map;
