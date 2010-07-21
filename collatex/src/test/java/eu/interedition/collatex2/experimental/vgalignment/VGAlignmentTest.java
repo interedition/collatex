@@ -119,4 +119,19 @@ public class VGAlignmentTest {
     assertEquals("the black dog", matches.get(2).getNormalized());
   }
 
+  @Test
+  public void testTransposition2Matches() {
+    final IWitness a = factory.createWitness("A", "d a b");
+    final IWitness b = factory.createWitness("B", "a c b d");
+    IVariantGraph graph = VariantGraph2.create(a);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    final List<IMatch2> matches = alignment.getMatches();
+    assertEquals(3, matches.size());
+    assertEquals("a", matches.get(0).getNormalized());
+    assertEquals("b", matches.get(1).getNormalized());
+    assertEquals("d", matches.get(2).getNormalized());
+  }
+
+
 }

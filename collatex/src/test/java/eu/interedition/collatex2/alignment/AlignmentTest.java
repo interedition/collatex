@@ -1,7 +1,6 @@
 package eu.interedition.collatex2.alignment;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 import java.util.List;
 
@@ -17,8 +16,6 @@ import com.google.common.collect.Iterables;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
 import eu.interedition.collatex2.interfaces.IAlignment;
-import eu.interedition.collatex2.interfaces.IGap;
-import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -29,41 +26,6 @@ public class AlignmentTest {
   @Before
   public void setup() {
     factory = new CollateXEngine();
-  }
-
-
-
-  @Test
-  public void testTransposition1Gaps() {
-    final IWitness a = factory.createWitness("A", "The black dog chases a red cat.");
-    final IWitness b = factory.createWitness("B", "A red cat chases the black dog.");
-    final IAlignment align = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IGap> gaps = align.getGaps();
-    assertTrue(gaps.toString(), gaps.isEmpty());
-  }
-
-  @Test
-  public void testTransposition2Matches() {
-    final IWitness a = factory.createWitness("A", "d a b");
-    final IWitness b = factory.createWitness("B", "a c b d");
-    final IAlignment align = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IMatch> matches = align.getMatches();
-    assertEquals(3, matches.size());
-    assertEquals("d", matches.get(0).getNormalized());
-    assertEquals("a", matches.get(1).getNormalized());
-    assertEquals("b", matches.get(2).getNormalized());
-  }
-
-  @Test
-  public void testTransposition2Gaps() {
-    final IWitness a = factory.createWitness("A", "d a b");
-    final IWitness b = factory.createWitness("B", "a c b d");
-    final IAlignment align = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IGap> gaps = align.getGaps();
-    assertEquals(1, gaps.size());
-    final IGap gap = gaps.get(0);
-    assertTrue(gap.isAddition());
-    assertEquals("c", gap.getPhrase().getNormalized());
   }
 
   @Test
