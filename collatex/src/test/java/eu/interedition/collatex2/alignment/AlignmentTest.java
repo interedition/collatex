@@ -32,39 +32,6 @@ public class AlignmentTest {
     factory = new CollateXEngine();
   }
 
-  @Test
-  public void testAlignment2Gaps() {
-    final IWitness a = factory.createWitness("A", "The black cat");
-    final IWitness b = factory.createWitness("B", "The black and white cat");
-    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IGap> gaps = alignment.getGaps();
-    assertEquals(1, gaps.size());
-    final IGap gap = gaps.get(0);
-    assertTrue(gap.isAddition());
-    assertTrue("Phrase A is not empty!", gap.getColumns().isEmpty());
-    assertEquals("and white", gap.getPhrase().getNormalized());
-  }
-
-  // Note: taken from TextAlignmentTest!
-  @Test
-  public void testAddition_AtTheStart() {
-    final IWitness a = factory.createWitness("A", "to be");
-    final IWitness b = factory.createWitness("B", "not to be");
-    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<IMatch> matches = alignment.getMatches();
-    assertEquals(1, matches.size());
-    assertEquals("to be", matches.get(0).getNormalized());
-    final List<IGap> gaps = alignment.getGaps();
-    assertEquals(1, gaps.size());
-    final IGap gap = gaps.get(0);
-    assertTrue(gap.isAddition());
-    assertTrue("Phrase A is not empty!", gap.getColumns().isEmpty());
-    assertEquals("not", gap.getPhrase().getNormalized());
-    final List<IAddition> additions = alignment.getAdditions();
-    assertEquals(1, additions.size());
-    final IAddition addition = additions.get(0);
-    assertEquals("not", addition.getAddedPhrase().getNormalized());
-  }
 
   @Test
   public void testAddition_AtTheEnd() {

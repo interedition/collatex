@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.experimental.vgalignment;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import eu.interedition.collatex2.alignment.AlignmentTest;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
+import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -20,7 +22,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 //variant graph based alignment
 public class VGAlignmentGapsTest {
   private static final Logger LOG = LoggerFactory.getLogger(AlignmentTest.class);
-  private CollateXEngine factory;
+  private CollateXEngine      factory;
 
   @Before
   public void setup() {
@@ -37,4 +39,32 @@ public class VGAlignmentGapsTest {
     assertEquals("\"c\" added", gaps.get(0).toString());
   }
 
+  @Test
+  public void testAlignment2Gaps() {
+    final IWitness a = factory.createWitness("A", "The black cat");
+    final IWitness b = factory.createWitness("B", "The black and white cat");
+    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
+    final List<IGap> gaps = alignment.getGaps();
+    assertEquals(1, gaps.size());
+    final IGap gap = gaps.get(0);
+    assertTrue(gap.isAddition());
+    assertTrue("Phrase A is not empty!", gap.getColumns().isEmpty());
+    assertEquals("and white", gap.getPhrase().getNormalized());
+  }
+
+  public void testAddition_AtTheStart() {
+    final IWitness a = factory.createWitness("A", "to be");
+    final IWitness b = factory.createWitness("B", "not to be");
+    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
+    final List<IGap> gaps = alignment.getGaps();
+    assertEquals(1, gaps.size());
+    final IGap gap = gaps.get(0);
+    assertTrue(gap.isAddition());
+    assertTrue("Phrase A is not empty!", gap.getColumns().isEmpty());
+    assertEquals("not", gap.getPhrase().getNormalized());
+    final List<IAddition> additions = alignment.getAdditions();
+    assertEquals(1, additions.size());
+    final IAddition addition = additions.get(0);
+    assertEquals("not", addition.getAddedPhrase().getNormalized());
+  }
 }

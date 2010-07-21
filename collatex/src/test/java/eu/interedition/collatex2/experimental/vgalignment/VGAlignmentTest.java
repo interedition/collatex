@@ -68,6 +68,18 @@ public class VGAlignmentTest {
     assertEquals("cat", matches.get(1).getNormalized());
   }
 
+  // Note: taken from TextAlignmentTest!
+  @Test
+  public void testAddition_AtTheStart() {
+    final IWitness a = factory.createWitness("A", "to be");
+    final IWitness b = factory.createWitness("B", "not to be");
+    IVariantGraph graph = VariantGraph2.create(a);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    final List<IMatch2> matches = alignment.getMatches();
+    assertEquals(1, matches.size());
+    assertEquals("to be", matches.get(0).getNormalized());
+  }
 
 
 }
