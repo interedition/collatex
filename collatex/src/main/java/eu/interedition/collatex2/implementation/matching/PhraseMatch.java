@@ -31,4 +31,14 @@ public class PhraseMatch implements IMatch2 {
     return phrase.getNormalized();
   }
 
+  @Override
+  public IPhrase getPhraseA() {
+    return tablePhrase;
+  }
+
+  @Override
+  public IPhrase getPhraseB() {
+    return phrase;
+  }
+
 }

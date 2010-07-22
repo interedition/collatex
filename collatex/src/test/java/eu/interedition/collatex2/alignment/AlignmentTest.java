@@ -29,19 +29,6 @@ public class AlignmentTest {
   }
 
   @Test
-  public void testTransposition1() {
-    final IWitness a = factory.createWitness("A", "d a b");
-    final IWitness b = factory.createWitness("B", "a b d");
-    final IAlignment align = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<ITransposition> transpositions = align.getTranspositions();
-    assertEquals(2, transpositions.size());
-    assertEquals("d", transpositions.get(0).getMatchA().getNormalized());
-    assertEquals("a b", transpositions.get(0).getMatchB().getNormalized());
-    assertEquals("d", transpositions.get(1).getMatchB().getNormalized());
-    assertEquals("a b", transpositions.get(1).getMatchA().getNormalized());
-  }
-
-  @Test
   public void testTransposition2() {
     final IWitness a = factory.createWitness("A", "d a b");
     final IWitness b = factory.createWitness("B", "a c b d");

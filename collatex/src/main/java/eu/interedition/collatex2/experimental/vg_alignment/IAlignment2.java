@@ -6,4 +6,6 @@ public interface IAlignment2 {
 
   List<IMatch2> getMatches();
 
+  List<ITransposition2> getTranspositions();
+
 }

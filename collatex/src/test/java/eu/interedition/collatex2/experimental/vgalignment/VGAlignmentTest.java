@@ -14,6 +14,7 @@ import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.VariantGraph2;
 import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
+import eu.interedition.collatex2.experimental.vg_alignment.ITransposition2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -131,6 +132,21 @@ public class VGAlignmentTest {
     assertEquals("a", matches.get(0).getNormalized());
     assertEquals("b", matches.get(1).getNormalized());
     assertEquals("d", matches.get(2).getNormalized());
+  }
+
+  @Test
+  public void testTransposition1() {
+    final IWitness a = factory.createWitness("A", "d a b");
+    final IWitness b = factory.createWitness("B", "a b d");
+    IVariantGraph graph = VariantGraph2.create(a);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    final List<ITransposition2> transpositions = alignment.getTranspositions();
+    assertEquals(2, transpositions.size());
+    assertEquals("a b", transpositions.get(0).getMatchB().getNormalized());
+    assertEquals("d", transpositions.get(0).getMatchA().getNormalized());
+    assertEquals("d", transpositions.get(1).getMatchB().getNormalized());
+    assertEquals("a b", transpositions.get(1).getMatchA().getNormalized());
   }
 
 
