@@ -1,20 +1,15 @@
 package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.alg.BellmanFordShortestPath;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
-import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 // This class implements the IVariantGraph interface.
@@ -39,20 +34,9 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   }
 
   // write
-  // NOTE: tokenA is the token from the Witness
-  // For every token in the witness we have to map a VariantNode
-  // for matches such a node should already exist
-  // however for additions and replacements this will not be the case
-  // then we need to add the arcs
-  // in some cases the arcs may already exist
-  // if they already exist we need to add the witness to the
-  // existing arc!
   @Override
-    public void addWitness(IWitness witness) {
-      witnesses.add(witness);
-      VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(this);
-      List<ITokenMatch> matches = matcher.getMatches(witness);
-      makeEdgesForMatches(witness, matches, matcher.getGraphIndex());
+  public void addWitness(IWitness witness) {
+    witnesses.add(witness);
   }
 
   //TODO: implement!
@@ -86,6 +70,26 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return new VariantGraph2();
   }
 
+  //TODO: should the first witness really be a special case like this?
+  public static VariantGraph2 create(IWitness a) {
+    VariantGraph2 graph = VariantGraph2.create();
+    //TODO: this is not very nice!
+    //TODO: make getWitnesses read only!
+    graph.getWitnesses().add(a);
+    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
+    for (INormalizedToken token : a.getTokens()) {
+      newVertices.add(graph.addNewVertex(token, a));
+    }
+    IVariantGraphVertex previous = graph.getStartVertex();
+    for (IVariantGraphVertex vertex : newVertices) {
+      graph.addNewEdge(previous, vertex, a);
+      previous = vertex;
+    }
+    graph.addNewEdge(previous, graph.getEndVertex(), a);
+    return graph;
+  }
+
+
   public List<IVariantGraphVertex> getPath(IWitness witness) {
     List<IVariantGraphVertex> path = Lists.newArrayList();
     IVariantGraphVertex startVertex = getStartVertex();
@@ -110,27 +114,8 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return path;
   }
 
-  //TODO: should the first witness really be a special case like this?
-  public static IVariantGraph create(IWitness a) {
-    VariantGraph2 graph = create();
-    //TODO: this is not very nice!
-    //TODO: make getWitnesses read only!
-    graph.getWitnesses().add(a);
-    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
-    for (INormalizedToken token : a.getTokens()) {
-      newVertices.add(graph.addNewVertex(token, a));
-    }
-    IVariantGraphVertex previous = graph.getStartVertex();
-    for (IVariantGraphVertex vertex : newVertices) {
-      graph.addNewEdge(previous, vertex, a);
-      previous = vertex;
-    }
-    graph.addNewEdge(previous, graph.getEndVertex(), a);
-    return graph;
-  }
-  
   //write
-  private IVariantGraphVertex addNewVertex(INormalizedToken token, IWitness w) {
+  public IVariantGraphVertex addNewVertex(INormalizedToken token, IWitness w) {
     final VariantGraphVertex vertex = new VariantGraphVertex(token);
     addVertex(vertex);
     //TODO: is this if still necessary?
@@ -141,70 +126,33 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   }
   
   //write
-  private void addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
+  public void addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
     IVariantGraphEdge e = new VariantGraphEdge(begin, end, witness);
     addEdge(begin, end, e);
   }
   
-  //write
-  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, IVariantGraphIndex graphIndex2) {
-    Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
-    witnessTokenToMatch = Maps.newLinkedHashMap();
-    for (ITokenMatch match : matches) {
-      INormalizedToken tokenA = match.getTokenA();
-      witnessTokenToMatch.put(tokenA, match);
-    }
-    IVariantGraphVertex begin = this.getStartVertex();
-    for (INormalizedToken token : witness.getTokens()) {
-      if (!witnessTokenToMatch.containsKey(token)) {
-        // NOTE: here we determine that the token is an addition/replacement!
-        IVariantGraphVertex end = this.addNewVertex(token, witness);
-        addNewEdge(begin, end, witness);
-        begin = end;
-      } else {
-        // NOTE: it is a match!
-        ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
-        IVariantGraphVertex end = graphIndex2.getVertex(tokenMatch.getTokenB());
-        connectBeginToEndVertex(begin, end, witness);
-        end.addToken(witness, token);
-        begin = end;
-      }
-    }
-    // adds edge from last vertex to end vertex
-    IVariantGraphVertex end = getEndVertex();
-    connectBeginToEndVertex(begin, end, witness);
-  }
 
-  // write
-  private void connectBeginToEndVertex(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
-    if (containsEdge(begin, end)) {
-      IVariantGraphEdge existingEdge = getEdge(begin, end);
-      existingEdge.addWitness(witness);
-    } else {
-      addNewEdge(begin, end, witness);
-    }
-  }
-
+ 
   @Override
   public List<IVariantGraphVertex> getLongestPath() {
-      // NOTE: Weights are set to negative value to
-      // generate the longest path instead of the shortest path
-      for (IVariantGraphEdge edge : edgeSet()) {
-        setEdgeWeight(edge, -1);
-      }
-      // NOTE: gets the start vertex of the graph
-      IVariantGraphVertex startVertex = getStartVertex();
-      IVariantGraphVertex endVertex = getEndVertex();
-      // Note: calculates the longest path
-      List<IVariantGraphEdge> findPathBetween = BellmanFordShortestPath.findPathBetween(this, startVertex, endVertex);
-      // Note: gets the end vertices associated with the edges of the path
-      List<IVariantGraphVertex> vertices = Lists.newArrayList();
-      for (IVariantGraphEdge edge : findPathBetween) {
-        IVariantGraphVertex edgeTarget = this.getEdgeTarget(edge);
-        if (edgeTarget != endVertex) {
-          vertices.add(edgeTarget);
-        }
-      }
-      return vertices;
+    // NOTE: Weights are set to negative value to
+    // generate the longest path instead of the shortest path
+    for (IVariantGraphEdge edge : edgeSet()) {
+      setEdgeWeight(edge, -1);
     }
+    // NOTE: gets the start vertex of the graph
+    IVariantGraphVertex startVertex = getStartVertex();
+    IVariantGraphVertex endVertex = getEndVertex();
+    // Note: calculates the longest path
+    List<IVariantGraphEdge> findPathBetween = BellmanFordShortestPath.findPathBetween(this, startVertex, endVertex);
+    // Note: gets the end vertices associated with the edges of the path
+    List<IVariantGraphVertex> vertices = Lists.newArrayList();
+    for (IVariantGraphEdge edge : findPathBetween) {
+      IVariantGraphVertex edgeTarget = this.getEdgeTarget(edge);
+      if (edgeTarget != endVertex) {
+        vertices.add(edgeTarget);
+      }
+    }
+    return vertices;
+  }
 }

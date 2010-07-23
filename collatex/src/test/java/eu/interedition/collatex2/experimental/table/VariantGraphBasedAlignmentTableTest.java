@@ -1,17 +1,20 @@
 package eu.interedition.collatex2.experimental.table;
 import static org.junit.Assert.assertEquals;
+import junit.framework.Assert;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.VariantGraph2;
+import eu.interedition.collatex2.experimental.graph.creator.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 
-public class VariantGraphBasedAlignmentTest {
+public class VariantGraphBasedAlignmentTableTest {
     private static CollateXEngine engine;
 
     @BeforeClass
@@ -29,8 +32,7 @@ public class VariantGraphBasedAlignmentTest {
     @Test
     public void testFirstWitness() {
       IWitness a = engine.createWitness("A", "the first witness");
-      IVariantGraph graph = VariantGraph2.create();
-      graph.addWitness(a);
+      IVariantGraph graph = VariantGraph2Creator.create(a);
       IAlignmentTable table = new VariantGraphBasedAlignmentTable(graph);
       assertEquals("A: |the|first|witness|", table.getRow(a).rowToString());
       assertEquals(1, table.getRows().size());
@@ -41,10 +43,7 @@ public class VariantGraphBasedAlignmentTest {
       IWitness a = engine.createWitness("A", "everything matches");
       IWitness b = engine.createWitness("B", "everything matches");
       IWitness c = engine.createWitness("C", "everything matches");
-      IVariantGraph graph = VariantGraph2.create();
-      graph.addWitness(a);
-      graph.addWitness(b);
-      graph.addWitness(c);
+      IVariantGraph graph = VariantGraph2Creator.create(a, b, c);
       IAlignmentTable table = new VariantGraphBasedAlignmentTable(graph);
       assertEquals("A: |everything|matches|", table.getRow(a).rowToString());
       assertEquals("B: |everything|matches|", table.getRow(b).rowToString());
@@ -57,10 +56,7 @@ public class VariantGraphBasedAlignmentTest {
       IWitness w1 = engine.createWitness("A", "a");
       IWitness w2 = engine.createWitness("B", "b");
       IWitness w3 = engine.createWitness("C", "a b");
-      IVariantGraph graph = VariantGraph2.create();
-      graph.addWitness(w1);
-      graph.addWitness(w2);
-      graph.addWitness(w3);
+      IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
       IAlignmentTable table = new VariantGraphBasedAlignmentTable(graph);
       assertEquals("A: |a| |", table.getRow(w1).rowToString());
       assertEquals("B: | |b|", table.getRow(w2).rowToString());
@@ -75,12 +71,7 @@ public class VariantGraphBasedAlignmentTest {
       final IWitness w3 = engine.createWitness("C", "the green cat");
       final IWitness w4 = engine.createWitness("D", "the red cat");
       final IWitness w5 = engine.createWitness("E", "the yellow cat");
-      IVariantGraph graph = VariantGraph2.create();
-      graph.addWitness(w1);
-      graph.addWitness(w2);
-      graph.addWitness(w3);
-      graph.addWitness(w4);
-      graph.addWitness(w5);
+      IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3, w4, w5);
       IAlignmentTable table = new VariantGraphBasedAlignmentTable(graph);
       assertEquals("A: |the|black|cat|", table.getRow(w1).rowToString());
       assertEquals("B: |the|white|cat|", table.getRow(w2).rowToString());
@@ -90,5 +81,17 @@ public class VariantGraphBasedAlignmentTest {
       assertEquals(5, table.getRows().size());
     }
 
+    //NOTE: test taken from AlignmentTableTranspositionTest
+    //TODO: rewrite test to work with the new API
+    @Ignore
+    @Test
+    public void testDoubleTransposition2() {
+      final IWitness a = engine.createWitness("A", "a b");
+      final IWitness b = engine.createWitness("B", "b a");
+      final IAlignmentTable alignmentTable = engine.align(a, b);
+      final String expected = "A:  |a|b\n" + "B: b|a| \n";
+      final String actual = alignmentTable.toString();
+      Assert.assertEquals(expected, actual);
+    }
 
 }

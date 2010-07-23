@@ -8,6 +8,7 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import eu.interedition.collatex2.experimental.graph.creator.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -25,10 +26,7 @@ public class VariantGraphSpencerHoweTest {
     IWitness w1 = engine.createWitness("A", "a");
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
-    IVariantGraph graph = VariantGraph2.create();
-    graph.addWitness(w1);
-    graph.addWitness(w2);
-    graph.addWitness(w3);
+    IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
     assertEquals(4, graph.vertexSet().size());
     Iterator<IVariantGraphVertex> vertexI = graph.iterator();
     IVariantGraphVertex startVertex = vertexI.next();

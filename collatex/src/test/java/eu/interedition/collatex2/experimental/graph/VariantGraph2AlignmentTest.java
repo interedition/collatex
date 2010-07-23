@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import eu.interedition.collatex2.experimental.graph.creator.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -70,8 +71,7 @@ public class VariantGraph2AlignmentTest {
     @Test
     public void testFirstWitness() {
         IWitness a = engine.createWitness("A", "the first witness");
-        IVariantGraph graph = VariantGraph2.create();
-        graph.addWitness(a);
+        IVariantGraph graph = VariantGraph2.create(a);
         // vertices
         Iterator<IVariantGraphVertex> iterator = graph.iterator();
         IVariantGraphVertex start = iterator.next(); 
@@ -104,13 +104,14 @@ public class VariantGraph2AlignmentTest {
     /* The unit test below depend on the correct functioning
      * of the GraphIndexMatcher
      */
+    
+    // NOTE: these tests test the VariantGraph2Creator class
 
     @Test
     public void testTwoWitnesses() {
       final IWitness w1 = engine.createWitness("A", "the black cat");
       final IWitness w2 = engine.createWitness("B", "the black cat");
-      IVariantGraph graph = VariantGraph2.create(w1);
-      graph.addWitness(w2);
+      IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
       final Set<IVariantGraphVertex> vertices = graph.vertexSet();
       assertEquals(5, vertices.size());
       Iterator<IVariantGraphVertex> vertexI = graph.iterator();
@@ -132,8 +133,7 @@ public class VariantGraph2AlignmentTest {
     public void testAddition1() {
       final IWitness w1 = engine.createWitness("A", "the black cat");
       final IWitness w2 = engine.createWitness("B", "the white and black cat");
-      IVariantGraph graph = VariantGraph2.create(w1);
-      graph.addWitness(w2);
+      IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
       final Set<IVariantGraphVertex> vertices = graph.vertexSet();
       assertEquals(7, vertices.size());
       Iterator<IVariantGraphVertex> vertexI = graph.iterator();
@@ -169,11 +169,7 @@ public class VariantGraph2AlignmentTest {
       final IWitness w3 = engine.createWitness("C", "the green cat");
       final IWitness w4 = engine.createWitness("D", "the red cat");
       final IWitness w5 = engine.createWitness("E", "the yellow cat");
-      IVariantGraph graph = VariantGraph2.create(w1);
-      graph.addWitness(w2);
-      graph.addWitness(w3);
-      graph.addWitness(w4);
-      graph.addWitness(w5);
+      IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3, w4, w5);
       final Set<IVariantGraphVertex> vertices = graph.vertexSet();
       assertEquals(9, vertices.size());
       Iterator<IVariantGraphVertex> vertexI = graph.iterator();
@@ -216,10 +212,7 @@ public class VariantGraph2AlignmentTest {
       IWitness w1 = engine.createWitness("A", "a");
       IWitness w2 = engine.createWitness("B", "b");
       IWitness w3 = engine.createWitness("C", "a b");
-      IVariantGraph graph = VariantGraph2.create();
-      graph.addWitness(w1);
-      graph.addWitness(w2);
-      graph.addWitness(w3);
+      IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
       assertEquals(4, graph.vertexSet().size());
       List<IVariantGraphVertex> longestPath = graph.getLongestPath();
 //      for (CollateXVertex v: longestPath) {
@@ -235,7 +228,7 @@ public class VariantGraph2AlignmentTest {
       final IWitness w1 = engine.createWitness("V", "a b c d e f ");
       final IWitness w2 = engine.createWitness("W", "x y z d e");
       final IWitness w3 = engine.createWitness("X", "a b x y z");
-      IVariantGraph graph = VariantGraph2.create();
+      IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
       graph.addWitness(w1);
       graph.addWitness(w2);
       graph.addWitness(w3);
@@ -249,11 +242,10 @@ public class VariantGraph2AlignmentTest {
       assertEquals(6, path.size());
     }
 
-    // <!-- TODO -->
-    
+    //NOTE: test taken from AlignmentTableTranspositionTest
     @Ignore
     @Test
-    public void testSimpleTranspositionAB() {
+    public void testDoubleTransposition2() {
       IWitness a = engine.createWitness("A", "a b");
       IWitness b = engine.createWitness("B", "b a");
       IVariantGraph graph = VariantGraph2.create();
