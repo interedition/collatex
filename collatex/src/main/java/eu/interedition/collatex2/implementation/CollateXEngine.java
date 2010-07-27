@@ -12,7 +12,6 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.VariantGraph2;
-import eu.interedition.collatex2.implementation.alignment.GapDetection;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
@@ -35,6 +34,7 @@ import eu.interedition.collatex2.interfaces.IWitnessIndex;
 import eu.interedition.collatex2.legacy.alignment.Alignment;
 import eu.interedition.collatex2.legacy.alignment.SequenceDetection;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
+import eu.interedition.collatex2.todo.gapdetection.GapDetection;
 
 public class CollateXEngine {
   private ITokenizer       tokenizer       = new WhitespaceTokenizer();

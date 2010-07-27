@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.alignment;
+package eu.interedition.collatex2.todo.gapdetection;
 
 import java.util.Collections;
 import java.util.Comparator;
