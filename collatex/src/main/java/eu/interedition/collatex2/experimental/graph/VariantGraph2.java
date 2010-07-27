@@ -6,7 +6,10 @@ import java.util.Set;
 import org.jgrapht.alg.BellmanFordShortestPath;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -39,10 +42,25 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     witnesses.add(witness);
   }
 
-  //TODO: implement!
   @Override
   public List<String> findRepeatingTokens() {
-    return Lists.newArrayList();
+    // remove start and end vertices
+    Set<IVariantGraphVertex> copy = Sets.newLinkedHashSet(vertexSet());
+    copy.remove(startVertex);
+    copy.remove(endVertex);
+    // we map all vertices to their normalized version
+    Multimap<String, IVariantGraphVertex> mapped = ArrayListMultimap.create();
+    for (IVariantGraphVertex v : copy) {
+      mapped.put(v.getNormalized(), v);
+    }
+    // fetch all the duplicate keys and return them 
+    List<String> result = Lists.newArrayList();
+    for (String key : mapped.keySet()) {
+      if (mapped.get(key).size()>1) {
+        result.add(key);
+      }
+    }
+    return result;
   }
 
   @Override

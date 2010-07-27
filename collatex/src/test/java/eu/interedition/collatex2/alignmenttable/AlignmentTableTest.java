@@ -199,18 +199,8 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  @Test
-  public void testRepeatingTokensWithOneWitness() {
-    final IWitness witness = engine.createWitness("a", "a c a t g c a");
-    final IAlignmentTable alignmentTable = engine.align(witness);
-    final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
-    assertEquals(2, repeatingTokens.size());
-    assertTrue(repeatingTokens.contains("a"));
-    assertTrue(repeatingTokens.contains("c"));
-    assertFalse(repeatingTokens.contains("t"));
-    assertFalse(repeatingTokens.contains("g"));
-  }
 
+  //TODO: move test!
   @Test
   public void testRepeatingTokensWithMultipleWitnesses() {
     final IWitness witnessA = engine.createWitness("a", "a c a t g c a");
@@ -224,6 +214,7 @@ public class AlignmentTableTest {
     assertFalse(repeatingTokens.contains("g"));
   }
 
+  //TODO: move test!
   @Test
   public void testRepeatingTokensWithMultipleWitnesses2() {
     final IWitness witnessA = engine.createWitness("A", "everything is unique should be no problem");
