@@ -1,7 +1,6 @@
 package eu.interedition.collatex2.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
@@ -199,20 +198,6 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-
-  //TODO: move test!
-  @Test
-  public void testRepeatingTokensWithMultipleWitnesses() {
-    final IWitness witnessA = engine.createWitness("a", "a c a t g c a");
-    final IWitness witnessB = engine.createWitness("b", "a c a t t c a");
-    final IAlignmentTable alignmentTable = engine.align(witnessA, witnessB);
-    final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
-    assertEquals(3, repeatingTokens.size());
-    assertTrue(repeatingTokens.contains("a"));
-    assertTrue(repeatingTokens.contains("c"));
-    assertTrue(repeatingTokens.contains("t"));
-    assertFalse(repeatingTokens.contains("g"));
-  }
 
   //TODO: move test!
   @Test

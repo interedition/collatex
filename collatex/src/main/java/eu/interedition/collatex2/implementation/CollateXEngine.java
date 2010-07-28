@@ -11,7 +11,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.VariantGraph2;
+import eu.interedition.collatex2.experimental.graph.creator.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
@@ -146,8 +146,7 @@ public class CollateXEngine {
     return stringSet;
   }
 
-  public IVariantGraph graph(IWitness a) {
-    return VariantGraph2.create(a);
+  public IVariantGraph graph(IWitness a, IWitness... witnesses) {
+    return VariantGraph2Creator.create(a, witnesses);
   }
-
 }
