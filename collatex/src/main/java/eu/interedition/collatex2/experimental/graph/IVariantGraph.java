@@ -19,8 +19,6 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
   //NOTE: could extract Indexable interface!
   List<String> findRepeatingTokens();
 
-  void addWitness(IWitness a);
-
   List<IWitness> getWitnesses();
 
   boolean isEmpty();

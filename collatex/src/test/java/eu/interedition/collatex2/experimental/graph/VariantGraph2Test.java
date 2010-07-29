@@ -150,9 +150,6 @@ public class VariantGraph2Test {
     final IWitness w2 = engine.createWitness("W", "x y z d e");
     final IWitness w3 = engine.createWitness("X", "a b x y z");
     IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
-    graph.addWitness(w1);
-    graph.addWitness(w2);
-    graph.addWitness(w3);
     List<IVariantGraphVertex> path = graph.getPath(w1);
     assertEquals("a", path.get(0).getNormalized());
     assertEquals("b", path.get(1).getNormalized());

@@ -135,9 +135,7 @@ public class VariantGraph2AlignmentTest {
     public void testDoubleTransposition2() {
       IWitness a = engine.createWitness("A", "a b");
       IWitness b = engine.createWitness("B", "b a");
-      IVariantGraph graph = VariantGraph2.create();
-      graph.addWitness(a);
-      graph.addWitness(b);
+      IVariantGraph graph = VariantGraph2Creator.create(a, b);
       Iterator<IVariantGraphVertex> iterator = graph.iterator();
       assertEquals("a", iterator.next().getNormalized());
       assertEquals("b", iterator.next().getNormalized());

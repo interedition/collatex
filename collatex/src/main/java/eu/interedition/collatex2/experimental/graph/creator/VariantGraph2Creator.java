@@ -33,7 +33,6 @@ public class VariantGraph2Creator {
   // if they already exist we need to add the witness to the
   // existing arc!
     public void addWitness(IWitness witness) {
-      graph.addWitness(witness);
       VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
       List<ITokenMatch> matches = matcher.getMatches(witness);
       makeEdgesForMatches(witness, matches, matcher.getGraphIndex());

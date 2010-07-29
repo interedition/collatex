@@ -1,5 +1,6 @@
 package eu.interedition.collatex2.experimental.graph;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -25,21 +26,13 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
   private final IVariantGraphVertex startVertex;
   private final IVariantGraphVertex endVertex;
-  private final List<IWitness> witnesses;
 
   private VariantGraph2() {
     super(IVariantGraphEdge.class);
-    this.witnesses = Lists.newArrayList();
     startVertex = new VariantGraphVertex(new NullToken(0, null));
     addVertex(startVertex);
     endVertex = new VariantGraphVertex(new NullToken(0, null));
     addVertex(endVertex);
-  }
-
-  // write
-  @Override
-  public void addWitness(IWitness witness) {
-    witnesses.add(witness);
   }
 
   @Override
@@ -76,12 +69,17 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
 
   @Override
   public List<IWitness> getWitnesses() {
-    return witnesses;
+    Set<IVariantGraphEdge> outgoingEdges = outgoingEdgesOf(startVertex);
+    List<IWitness> totalWitnesses = Lists.newArrayList();
+    for (IVariantGraphEdge edge :  outgoingEdges) {
+      totalWitnesses.addAll(edge.getWitnesses());
+    }
+    return Collections.unmodifiableList(totalWitnesses);
   }
 
   @Override
   public boolean isEmpty() {
-    return witnesses.isEmpty();
+    return getWitnesses().isEmpty();
   }
 
   public static VariantGraph2 create() {
@@ -91,9 +89,6 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   //TODO: should the first witness really be a special case like this?
   public static VariantGraph2 create(IWitness a) {
     VariantGraph2 graph = VariantGraph2.create();
-    //TODO: this is not very nice!
-    //TODO: make getWitnesses read only!
-    graph.getWitnesses().add(a);
     List<IVariantGraphVertex> newVertices = Lists.newArrayList();
     for (INormalizedToken token : a.getTokens()) {
       newVertices.add(graph.addNewVertex(token, a));
