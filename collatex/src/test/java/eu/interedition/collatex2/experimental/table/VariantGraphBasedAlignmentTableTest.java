@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.VariantGraph2;
-import eu.interedition.collatex2.experimental.graph.creator.VariantGraph2Creator;
+import eu.interedition.collatex2.experimental.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;

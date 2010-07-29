@@ -9,11 +9,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import eu.interedition.collatex2.experimental.graph.creator.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraph2AlignmentTest {
+public class VariantGraph2CreatorTest {
     private static CollateXEngine engine;
 
     @BeforeClass

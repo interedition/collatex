@@ -1,14 +1,10 @@
-package eu.interedition.collatex2.experimental.graph.creator;
+package eu.interedition.collatex2.experimental.graph;
 
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
-import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
-import eu.interedition.collatex2.experimental.graph.VariantGraph2;
 import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
 import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
