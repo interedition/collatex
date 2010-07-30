@@ -21,7 +21,7 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class AlignmentTableIndex implements IAlignmentTableIndex {
   private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
-  
+
   //TODO: after all of this.. rename IWitnessIndex to ITokenIndex or something!
   //TODO: store ColumnPhrase in this map instead of IColums
   //The Columns can be retrieved by using columnphrase.getColumns
@@ -61,8 +61,8 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
           index.add(rightPhrase);
         }
       } /*else {
-        logger.debug("Column " + column.getPosition() + " is empty!");
-      }*/
+                  logger.debug("Column " + column.getPosition() + " is empty!");
+                }*/
     }
   }
 
@@ -115,14 +115,14 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     }
   }
 
-//TODO: remove! NOT USED ANYMORE!
+  //TODO: remove! NOT USED ANYMORE!
   public boolean containsNormalizedPhrase(final String normalized) {
     return normalizedToColumns.containsKey(normalized);
   }
 
   public IColumn getColumn(INormalizedToken token) {
     if (!tokenToColumn.containsKey(token)) {
-      throw new RuntimeException("Token "+token.getNormalized() + " not included in index!");
+      throw new RuntimeException("Token " + token.getNormalized() + " not included in index!");
     }
     return tokenToColumn.get(token);
   }
@@ -134,15 +134,15 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
 
   @Override
   public String toString() {
-    String result = "AlignmentTableIndex: (";
+    StringBuilder result = new StringBuilder("AlignmentTableIndex: (");
     String delimiter = "";
     for (final String normalizedPhrase : normalizedToColumns.keySet()) {
-      result += delimiter + normalizedPhrase;
+      result.append(delimiter).append(normalizedPhrase);
       delimiter = ", ";
     }
 
-    result += ")";
-    return result;
+    result.append(")");
+    return result.toString();
   }
 
   //NOTE: From this point on the IWitnessIndex methods start!
@@ -157,8 +157,8 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
   public Collection<IPhrase> getPhrases() {
     List<IPhrase> results = Lists.newArrayList(); // TODO: do the capacity thing!
     for (String normalized : normalizedToColumns.keySet()) {
-     ColumnPhrase columnPhrase = normalizedToColumns.get(normalized);
-     results.add(columnPhrase.getPhrase());
+      ColumnPhrase columnPhrase = normalizedToColumns.get(normalized);
+      results.add(columnPhrase.getPhrase());
     }
     return results;
   }

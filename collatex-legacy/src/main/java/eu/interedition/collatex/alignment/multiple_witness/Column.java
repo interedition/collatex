@@ -52,13 +52,13 @@ public class Column<T extends BaseElement> {
   @Override
   public String toString() {
     final Collection<T> values = wordsProWitness.values();
-    String result = "";
-    String delim = "";
+    StringBuilder result = new StringBuilder();
+    StringBuilder delim = new StringBuilder();
     for (final T word : values) {
-      result += delim + word.getOriginal();
-      delim += " ";
+      result.append(delim).append(word.getOriginal());
+      delim.append(" ");
     }
-    return result;
+    return result.toString();
   }
 
   public boolean containsWitness(final Segment witness) {
@@ -79,8 +79,9 @@ public class Column<T extends BaseElement> {
   }
 
   public void addToSuperbase(final Superbase superbase) {
-    for (final T variant : variants)
+    for (final T variant : variants) {
       superbase.addWord((Word) variant, this);
+    }
   }
 
   public ColumnState getColumnState() {

@@ -8,7 +8,7 @@ import com.sd_editions.collatex.Block.Word;
 public class ReplacementCell extends Cell {
 
   private final Word baseWord;
-  private List<Word> replacementWords;
+  private final List<Word> replacementWords;
 
   public ReplacementCell(Word baseWord, Word replacementWord) {
     this(baseWord, Collections.singletonList(replacementWord));
@@ -30,13 +30,13 @@ public class ReplacementCell extends Cell {
   }
 
   private String replacementsAsString() {
-    String replacementString = "";
+    StringBuilder replacementString = new StringBuilder();
     String divider = "";
     for (Word replacement : replacementWords) {
-      replacementString += divider + replacement.getContent();
+      replacementString.append(divider).append(replacement.getContent());
       divider = " ";
     }
-    return replacementString;
+    return replacementString.toString();
   }
 
   @Override

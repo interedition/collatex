@@ -20,8 +20,8 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphIndex implements IVariantGraphIndex {
 
-  private Multimap<String, INormalizedToken> normalizedToTokens;
-  private LinkedHashMap<INormalizedToken, IVariantGraphVertex> tokenToVertex;
+  private final Multimap<String, INormalizedToken> normalizedToTokens;
+  private final LinkedHashMap<INormalizedToken, IVariantGraphVertex> tokenToVertex;
 
   public static IVariantGraphIndex create(IVariantGraph graph, List<String> findRepeatingTokens) {
     final VariantGraphIndex index = new VariantGraphIndex();
@@ -34,12 +34,12 @@ public class VariantGraphIndex implements IVariantGraphIndex {
     for (IVariantGraphVertex vertex : vertexSet) {
       makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
     }
-//    for (IVariantGraphVertex vertex : graph.getVertices().subList(1, graph.getVertices().size()-1)) {
-//      makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
-//    }
+    //    for (IVariantGraphVertex vertex : graph.getVertices().subList(1, graph.getVertices().size()-1)) {
+    //      makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
+    //    }
     //    for (final String sigil : table.getSigli()) {
-//      findUniquePhrasesForRow(sigil, table, index, repeatingTokens);
-//    }
+    //      findUniquePhrasesForRow(sigil, table, index, repeatingTokens);
+    //    }
     return index;
   }
 
@@ -53,65 +53,62 @@ public class VariantGraphIndex implements IVariantGraphIndex {
     tokenToVertex = Maps.newLinkedHashMap();
   }
 
-//  private static void findUniquePhrasesForRow(final String row, final IAlignmentTable table, final AlignmentTableIndex index, final List<String> findRepeatingTokens) {
-//    // filteren would be nicer.. maar we doen het maar even alles in een!
-//    for (final IColumn column : table.getColumns()) {
-//      if (column.containsWitness(row)) {
-//        makeTokenUnique(row, table, index, findRepeatingTokens, column);
-//      } else {
-//        logger.debug("Column " + column.getPosition() + " is empty!");
-//      }
-//    }
-//  }
+  //  private static void findUniquePhrasesForRow(final String row, final IAlignmentTable table, final AlignmentTableIndex index, final List<String> findRepeatingTokens) {
+  //    // filteren would be nicer.. maar we doen het maar even alles in een!
+  //    for (final IColumn column : table.getColumns()) {
+  //      if (column.containsWitness(row)) {
+  //        makeTokenUnique(row, table, index, findRepeatingTokens, column);
+  //      } else {
+  //        logger.debug("Column " + column.getPosition() + " is empty!");
+  //      }
+  //    }
+  //  }
 
-  
-
-  private static void makeTokenUniqueIfNeeded(final VariantGraphIndex index, final List<String> findRepeatingTokens,
-      final IVariantGraphVertex vertex) {
+  private static void makeTokenUniqueIfNeeded(final VariantGraphIndex index, final List<String> findRepeatingTokens, final IVariantGraphVertex vertex) {
     String normalized = vertex.getNormalized();
     // kijken of ie unique is
     final boolean unique = !findRepeatingTokens.contains(normalized);
     if (unique) {
       List<IVariantGraphVertex> vertices = Lists.newArrayList(vertex);
       index.add(vertices);
-    } 
-//    else {
-//      //System.out.println("We have to combine stuff here!");
-//      final ColumnPhrase leftPhrase = findUniqueColumnPhraseToTheLeft(table, findRepeatingTokens, row, column, token);
-//      final ColumnPhrase rightPhrase = findUniqueColumnPhraseToTheRight(table, findRepeatingTokens, row, column, token);
-//      index.add(leftPhrase);
-//      index.add(rightPhrase);
-//    }
+    }
+    //    else {
+    //      //System.out.println("We have to combine stuff here!");
+    //      final ColumnPhrase leftPhrase = findUniqueColumnPhraseToTheLeft(table, findRepeatingTokens, row, column, token);
+    //      final ColumnPhrase rightPhrase = findUniqueColumnPhraseToTheRight(table, findRepeatingTokens, row, column, token);
+    //      index.add(leftPhrase);
+    //      index.add(rightPhrase);
+    //    }
   }
 
   private void add(List<IVariantGraphVertex> vertices) {
-    String normalized = "";
+    StringBuilder normalized = new StringBuilder();
     String splitter = "";
     for (IVariantGraphVertex vertex : vertices) {
-      normalized += splitter+vertex.getNormalized();
+      normalized.append(splitter).append(vertex.getNormalized());
       splitter = " ";
     }
     for (IVariantGraphVertex vertex : vertices) {
       if (vertex.getWitnesses().isEmpty()) {
-        throw new RuntimeException("STOP! Witness set is not supposed to be empty! Vertex: "+vertex.getNormalized());
+        throw new RuntimeException("STOP! Witness set is not supposed to be empty! Vertex: " + vertex.getNormalized());
       }
       //Note: this code assumes witnesses = an ordered set
       IWitness firstWitness = vertex.getWitnesses().iterator().next();
-      normalizedToTokens.put(normalized, vertex.getToken(firstWitness));
+      normalizedToTokens.put(normalized.toString(), vertex.getToken(firstWitness));
       tokenToVertex.put(vertex.getToken(firstWitness), vertex);
     }
   }
 
   @Override
   public String toString() {
-    String result = "AlignmentGraphIndex: (";
+    StringBuilder result = new StringBuilder("AlignmentGraphIndex: (");
     String delimiter = "";
     for (final String normalizedPhrase : normalizedToTokens.keySet()) {
-      result += delimiter + normalizedPhrase;
+      result.append(delimiter).append(normalizedPhrase);
       delimiter = ", ";
     }
-    result += ")";
-    return result;
+    result.append(")");
+    return result.toString();
   }
 
   @Override
@@ -122,7 +119,7 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   //TODO: this is workaround! store real phrases instead of token!
   @Override
   public IPhrase getPhrase(String normalized) {
-    if(!contains(normalized)) {
+    if (!contains(normalized)) {
       throw new RuntimeException("Item does not exist!");
     }
     Collection<INormalizedToken> tokens = normalizedToTokens.get(normalized);

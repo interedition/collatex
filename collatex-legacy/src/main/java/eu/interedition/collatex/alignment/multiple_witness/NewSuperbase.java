@@ -50,15 +50,14 @@ public class NewSuperbase extends WitnessSegmentPhrases {
 
   @Override
   public String toString() {
-    String result = "Superbase: (";
+    StringBuilder result = new StringBuilder("Superbase: (");
     String delimiter = "";
     for (final Phrase p : getPhrases()) {
-      result += delimiter + p.getSubsegment().getTitle();
+      result.append(delimiter).append(p.getSubsegment().getTitle());
       delimiter = ", ";
     }
-
-    result += ")";
-    return result;
+    result.append(")");
+    return result.toString();
   }
 
 }

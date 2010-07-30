@@ -24,15 +24,15 @@ public class AdditionCell extends Cell {
   }
 
   private String additionsToString() {
-    String additionsAsString = "";
+    StringBuilder additionsAsString = new StringBuilder();
     for (Iterator<Word> iterator = additions.iterator(); iterator.hasNext();) {
       Word addition = iterator.next();
-      additionsAsString += addition.getContent();
+      additionsAsString.append(addition.getContent());
       if (iterator.hasNext()) {
-        additionsAsString += " ";
+        additionsAsString.append(" ");
       }
     }
-    return additionsAsString;
+    return additionsAsString.toString();
   }
 
   @Override

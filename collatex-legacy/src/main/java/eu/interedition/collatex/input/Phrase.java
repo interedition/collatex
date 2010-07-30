@@ -42,13 +42,13 @@ public class Phrase extends BaseElement {
       words.add(word);
     }
 
-    String replacementString = "";
+    StringBuilder replacementString = new StringBuilder();
     String divider = "";
     for (final String replacement : words) {
-      replacementString += divider + replacement;
+      replacementString.append(divider).append(replacement);
       divider = " ";
     }
-    return replacementString;
+    return replacementString.toString();
   }
 
   public Segment getWitness() {

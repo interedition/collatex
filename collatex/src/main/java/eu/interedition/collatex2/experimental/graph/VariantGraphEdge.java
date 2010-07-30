@@ -13,7 +13,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGraphEdge {
   private final IVariantGraphVertex start;
   private final IVariantGraphVertex end;
-  private final Set<IWitness>     witnesses;
+  private final Set<IWitness> witnesses;
 
   public VariantGraphEdge(IVariantGraphVertex start, IVariantGraphVertex end, IWitness witness) {
     this.start = start;
@@ -39,18 +39,18 @@ public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGra
   @Override
   public String toString() {
     String splitter = "";
-    String to = getBeginVertex().getNormalized() + " -> " + getEndVertex().getNormalized() + ": ";
+    StringBuilder to = new StringBuilder(getBeginVertex().getNormalized()).append(" -> ").append(getEndVertex().getNormalized()).append(": ");
     for (IWitness witness : witnesses) {
-      to += splitter + witness.getSigil();
+      to.append(splitter).append(witness.getSigil());
       splitter = ", ";
     }
-    return to;
+    return to.toString();
   }
 
   public void addWitness(IWitness witness) {
     witnesses.add(witness);
   }
-  
+
   public boolean containsWitness(IWitness witness) {
     return witnesses.contains(witness);
   }

@@ -2,7 +2,7 @@ package com.sd_editions.collatex.match;
 
 public abstract class WitnessWordMatch implements Comparable<WitnessWordMatch> {
   int positionInWitness;
-  int type;
+  //  int type;
   protected static int EXACT_MATCH = 1;
   protected static int LEV_MATCH = 2;
 

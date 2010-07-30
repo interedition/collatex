@@ -353,12 +353,14 @@ public class StrongConnectivityInspector<V, E>
             this.finishedData = finishedData;
         }
 
-        VertexData<V> getFinishedData()
+        @Override
+		VertexData<V> getFinishedData()
         {
             return finishedData;
         }
 
-        V getVertex()
+        @Override
+		V getVertex()
         {
             return null;
         }
@@ -378,12 +380,14 @@ public class StrongConnectivityInspector<V, E>
             this.vertex = vertex;
         }
 
-        VertexData<V> getFinishedData()
+        @Override
+		VertexData<V> getFinishedData()
         {
             return null;
         }
 
-        V getVertex()
+        @Override
+		V getVertex()
         {
             return vertex;
         }

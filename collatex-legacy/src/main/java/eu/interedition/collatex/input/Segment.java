@@ -13,11 +13,14 @@ public class Segment extends BaseContainer<Word> implements ICollationResource {
   private final List<Word> words;
 
   public Segment(final Word... _words) {
-    if (_words == null) throw new IllegalArgumentException("List of words cannot be null.");
-    if (_words.length == 0)
+    if (_words == null) {
+      throw new IllegalArgumentException("List of words cannot be null.");
+    }
+    if (_words.length == 0) {
       this.id = Util.generateRandomId();
-    else
+    } else {
       this.id = _words[0].getWitnessId();
+    }
     this.words = Lists.newArrayList(_words);
   }
 
@@ -43,13 +46,13 @@ public class Segment extends BaseContainer<Word> implements ICollationResource {
   // Note: part copied from Phrase
   @Override
   public String toString() {
-    String replacementString = "";
+    StringBuilder replacementString = new StringBuilder();
     String divider = "";
     for (final Word word : words) {
-      replacementString += divider + word;
+      replacementString.append(divider).append(word);
       divider = " ";
     }
-    return replacementString;
+    return replacementString.toString();
   }
 
   public void accept(final IResourceVisitor visitor) {

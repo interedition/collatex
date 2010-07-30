@@ -31,13 +31,13 @@ public class NGram {
   }
 
   public String getNormalized() {
-    String replacementString = "";
+    StringBuilder replacementString = new StringBuilder();
     String divider = "";
     for (final INormalizedToken token : tokens) {
-      replacementString += divider + token.getNormalized();
+      replacementString.append(divider).append(token.getNormalized());
       divider = " ";
     }
-    return replacementString;
+    return replacementString.toString();
 
   }
 

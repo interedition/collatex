@@ -64,10 +64,16 @@ public class ColorMatrix {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ColorMatrix)) return false;
+    if (!(obj instanceof ColorMatrix)) {
+      return false;
+    }
     ColorMatrix otherColorMatrix = (ColorMatrix) obj;
-    if (this.height != otherColorMatrix.height) return false;
-    if (this.width != otherColorMatrix.width) return false;
+    if (this.height != otherColorMatrix.height) {
+      return false;
+    }
+    if (this.width != otherColorMatrix.width) {
+      return false;
+    }
 
     boolean equals = true;
     for (int row = 0; row < this.height; row++) {
@@ -80,15 +86,15 @@ public class ColorMatrix {
 
   @Override
   public String toString() {
-    String string = "";
+    StringBuilder stringBuilder = new StringBuilder();
     for (int[] row : matrix) {
-      string += "| ";
+      stringBuilder.append("| ");
       for (int cell : row) {
-        string += ((cell < 10 && cell >= 0 ? " " : "") + cell + " ");
+        stringBuilder.append(cell < 10 && cell >= 0 ? " " : "").append(cell).append(" ");
       }
-      string += "|\n";
+      stringBuilder.append("|\n");
     }
-    return string;
+    return stringBuilder.toString();
   }
 
   public int getWidth() {

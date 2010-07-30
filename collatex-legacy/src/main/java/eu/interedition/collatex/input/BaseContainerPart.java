@@ -2,6 +2,7 @@ package eu.interedition.collatex.input;
 
 import java.util.List;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 // Note: this class started life as a duplicate of
@@ -51,13 +52,14 @@ public class BaseContainerPart<T extends BaseElement> {
       words.add(word.toString());
     }
 
-    String replacementString = "";
-    String divider = "";
-    for (final String replacement : words) {
-      replacementString += divider + replacement;
-      divider = " ";
-    }
-    return replacementString;
+    //    StringBuilder replacementString = new StringBuilder();
+    //    String divider = "";
+    //    for (final String replacement : words) {
+    //      replacementString.append(divider).append(replacement);
+    //      divider = " ";
+    //    }
+
+    return Joiner.on(" ").join(words);
   }
 
   public BaseContainer<T> getWitness() {

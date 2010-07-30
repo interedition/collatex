@@ -19,8 +19,8 @@ import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.visualization.Visualization;
 
 public class MatchSequenceTest extends TestCase {
-  private final String witnessId1 = "alpha";
-  private final String witnessId2 = "beta";
+  private static final String witnessId1 = "alpha";
+  private static final String witnessId2 = "beta";
   private WitnessBuilder builder;
 
   @Override

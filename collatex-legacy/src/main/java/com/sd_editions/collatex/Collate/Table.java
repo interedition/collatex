@@ -63,12 +63,12 @@ public class Table extends Block {
     System.out.println(replacementWords);
     for (int start = 0; start < replacementWords.size() - 1; start++) {
       for (int end = 1; end < replacementWords.size(); end++) {
-        String joined = "";
+        StringBuilder joined = new StringBuilder();
         for (int i = start; i <= end; i++) {
-          joined += replacementWords.get(i).getContent();
+          joined.append(replacementWords.get(i).getContent());
         }
         System.out.println(joined);
-        joinedWord = new Word(joined);
+        joinedWord = new Word(joined.toString());
         if (baseWord.alignsWith(joinedWord)) {
           joinFound = true;
           joinStartIndex = start;
@@ -128,31 +128,29 @@ public class Table extends Block {
   }
 
   public String toHTML() {
-    String alignmentTableHTML = "<table border=\"1\">";
-    alignmentTableHTML += "<tr><th>Numbers</th>";
+    StringBuilder alignmentTableHTML = new StringBuilder("<table border=\"1\">").//
+        append("<tr><th>Numbers</th>");
     for (int i = 1; i <= size(); i++) {
-      alignmentTableHTML += "<th>";
-      alignmentTableHTML += "" + i;
-      alignmentTableHTML += "</th>";
+      alignmentTableHTML.append("<th>").append(i).append("</th>");
     }
-    alignmentTableHTML += "</tr>";
-    alignmentTableHTML += showRow(0, "Base");
-    alignmentTableHTML += showRow(1, "Witness 1");
-    alignmentTableHTML += showRow(2, "Witness 2");
-    alignmentTableHTML += "</table>";
-    return alignmentTableHTML;
+    alignmentTableHTML.append("</tr>").//
+        append(showRow(0, "Base")).//
+        append(showRow(1, "Witness 1")).//
+        append(showRow(2, "Witness 2")).//
+        append("</table>");
+    return alignmentTableHTML.toString();
   }
 
   private String showRow(int row, String label) {
-    String alignmentTableHTML = "<tr><th>" + label + "</th>";
+    StringBuilder alignmentTableHTML = new StringBuilder("<tr><th>").append(label).append("</th>");
     for (int i = 1; i <= size(); i++) {
       Cell cell = get(row, i);
-      alignmentTableHTML += "<td class=" + cell.getType() + ">";
-      alignmentTableHTML += cell.toHTML();
-      alignmentTableHTML += "</td>";
+      alignmentTableHTML.append("<td class=").append(cell.getType()).append(">").//
+          append(cell.toHTML()).//
+          append("</td>");
     }
-    alignmentTableHTML += "</tr>";
-    return alignmentTableHTML;
+    alignmentTableHTML.append("</tr>");
+    return alignmentTableHTML.toString();
   }
 
 }

@@ -55,17 +55,17 @@ public class MatchSequence<T extends BaseElement> {
   }
 
   public String baseToString() {
-    String result = "";
+    StringBuilder result = new StringBuilder();
     String delimiter = "";
     for (int i = 0; i < sequence.size(); i++) {
       final T baseWord = sequence.get(i).getBaseWord();
       if (i > 0 && (baseWord.getBeginPosition() - sequence.get(i - 1).getBaseWord().getBeginPosition()) > 1) {
-        result += delimiter + "...";
+        result.append(delimiter).append("...");
       }
-      result += delimiter + baseWord.toString();
+      result.append(delimiter).append(baseWord.toString());
       delimiter = " ";
     }
-    return result;
+    return result.toString();
   }
 
   public List<Match<T>> getMatches() {

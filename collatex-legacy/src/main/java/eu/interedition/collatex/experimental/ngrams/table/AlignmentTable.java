@@ -45,19 +45,18 @@ public class AlignmentTable {
     alignment.accept(modificationVisitor);
   }
 
-  // TODO use a StringBuilder or Buffer instead of +=
   // TODO should we store the whitespace in a Word?
   public String toXML() {
-    String result = "<xml>";
+    StringBuilder result = new StringBuilder("<xml>");
     String whitespace = "";
     for (final Element element : cells) {
       if (element != null) {
-        result += whitespace + element.toXML();
+        result.append(whitespace).append(element.toXML());
         whitespace = " ";
       }
     }
-    result += "</xml>";
-    return result;
+    result.append("</xml>");
+    return result.toString();
   }
 
   public void setApp(final int i, final AppElement app) {

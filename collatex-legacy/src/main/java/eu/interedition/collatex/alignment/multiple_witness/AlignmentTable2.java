@@ -75,17 +75,17 @@ public class AlignmentTable2<T extends BaseElement> {
 
   @Override
   public String toString() {
-    String collectedStrings = "";
+    StringBuilder collectedStrings = new StringBuilder();
     for (final Segment witness : witnesses) {
-      collectedStrings += witness.id + ": ";
+      collectedStrings.append(witness.id).append(": ");
       String delim = "";
       for (final Column<T> column : columns) {
-        collectedStrings += delim + cellToString(witness, column);
+        collectedStrings.append(delim).append(cellToString(witness, column));
         delim = "|";
       }
-      collectedStrings += "\n";
+      collectedStrings.append("\n");
     }
-    return collectedStrings;
+    return collectedStrings.toString();
   }
 
   private String cellToString(final Segment witness, final Column<T> column) {

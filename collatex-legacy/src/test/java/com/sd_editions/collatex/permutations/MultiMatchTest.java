@@ -9,8 +9,8 @@ import org.junit.Test;
 import eu.interedition.collatex.input.Word;
 
 public class MultiMatchTest extends TestCase {
-  private final String witnessId1 = "A";
-  private final String witnessId2 = "B";
+  private static final String witnessId1 = "A";
+  private static final String witnessId2 = "B";
 
   @Test
   public void testMultiMatch() {

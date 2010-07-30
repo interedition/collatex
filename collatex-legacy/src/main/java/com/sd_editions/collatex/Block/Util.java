@@ -45,7 +45,7 @@ public class Util {
 
   private static void pp(final Object o, final String string) {
     if (o == null) {
-      System.out.println(o);
+      System.out.println("object is null");
     } else {
       System.out.println(WordUtils.wrap(string, WRAP_AT, "\n  ", false));
     }
