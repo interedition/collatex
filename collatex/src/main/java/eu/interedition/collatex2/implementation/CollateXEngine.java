@@ -37,7 +37,7 @@ import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.todo.gapdetection.GapDetection;
 
 public class CollateXEngine {
-  private ITokenizer       tokenizer       = new WhitespaceTokenizer();
+  private ITokenizer tokenizer = new WhitespaceTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
 
   public void setTokenizer(ITokenizer tokenizer) {
@@ -146,7 +146,7 @@ public class CollateXEngine {
     return stringSet;
   }
 
-  public IVariantGraph graph(IWitness a, IWitness... witnesses) {
-    return VariantGraph2Creator.create(a, witnesses);
+  public IVariantGraph graph(IWitness... witnesses) {
+    return VariantGraph2Creator.create(witnesses);
   }
 }

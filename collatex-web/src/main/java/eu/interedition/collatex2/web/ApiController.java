@@ -35,6 +35,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
@@ -51,8 +52,8 @@ public class ApiController implements InitializingBean {
   protected static final String COLLATEX_NS = "http://interedition.eu/collatex/ns/1.0";
   protected static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
-  private ITokenizer defaultTokenizer = new WhitespaceTokenizer();
-  private ITokenNormalizer defaultNormalizer = new DefaultTokenNormalizer();
+  private final ITokenizer defaultTokenizer = new WhitespaceTokenizer();
+  private final ITokenNormalizer defaultNormalizer = new DefaultTokenNormalizer();
 
   @Autowired
   private ApiObjectMapper objectMapper;
@@ -78,11 +79,26 @@ public class ApiController implements InitializingBean {
     return new ModelAndView("api/alignment", "alignment", collate(input));
   }
 
-  @RequestMapping(value = "collate")
-  public void documentation() {
+  @RequestMapping(value = "collate2", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  public ModelAndView collateToInfoVis(@RequestBody final ApiInput input) throws Exception {
+    return new ModelAndView("api/graph", "graph", collate2(input));
   }
 
+  @RequestMapping(value = "collate")
+  public void documentation() {}
+
   private IAlignmentTable collate(ApiInput input) throws ApiException {
+    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
+    return new CollateXEngine().align(witnesses.toArray(new ApiWitness[witnesses.size()]));
+  }
+
+  private IVariantGraph collate2(ApiInput input) throws ApiException {
+    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
+    ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
+    return new CollateXEngine().graph(array);
+  }
+
+  private List<ApiWitness> checkInputAndExtractWitnesses(ApiInput input) throws ApiException {
     Set<String> sigle = new HashSet<String>();
     for (ApiWitness witness : input.getWitnesses()) {
       String sigil = witness.getSigil();
@@ -112,10 +128,10 @@ public class ApiController implements InitializingBean {
       }
     }
     final List<ApiWitness> witnesses = input.getWitnesses();
-    return new CollateXEngine().align(witnesses.toArray(new ApiWitness[witnesses.size()]));
+    return witnesses;
   }
 
-  @ExceptionHandler({ApiException.class, JsonParseException.class })
+  @ExceptionHandler( { ApiException.class, JsonParseException.class })
   public ModelAndView apiError(HttpServletResponse response, Exception exception) {
     return new ModelAndView(new MappingJacksonJsonView(), new ModelMap("error", exception.getMessage()));
   }
@@ -130,7 +146,7 @@ public class ApiController implements InitializingBean {
 
   private MappingJacksonJsonView jsonView;
 
-  private AbstractView teiView = new AbstractView() {
+  private final AbstractView teiView = new AbstractView() {
 
     @Override
     protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
