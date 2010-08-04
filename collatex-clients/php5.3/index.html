@@ -7,6 +7,9 @@
 <form method="post" action="formhandler.php">
 	<table>
 		<tr>
+			<td colspan="2">CollateX REST-Service: <input type="text" name="rest_service" id="rest_service" size="50" value="http://localhost:8080/collatex-web-0.9/api/collate"/></td>
+		</tr>	
+		<tr>
 			<td>Text1:</td>
 			<td>Text2:</td>
 		</tr>
@@ -23,8 +26,7 @@
 			<td><textarea name="text4" id="text4" rows="10" cols="40"></textarea></td>
 		</tr>
 		<tr>
-			<td>Return output as:</td>
-			<td>
+			<td colspan="2">Return output as:
 				<select name="output_type" id="output_type">
 					<option value="application/xml" selected="selected">xml-tei</option>
 					<option value="application/json">json</option>

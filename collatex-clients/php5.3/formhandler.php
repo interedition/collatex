@@ -12,7 +12,7 @@
 		        ]
 	}';
 	
-	curl_setopt($ch, CURLOPT_URL,"http://localhost:8080/collatex-web-0.9/api/collate");
+	curl_setopt($ch, CURLOPT_URL, $_POST['rest_service']);
 	curl_setopt($ch, CURLOPT_POST, 1);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);

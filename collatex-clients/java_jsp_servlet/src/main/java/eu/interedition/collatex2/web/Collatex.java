@@ -32,6 +32,7 @@ public class Collatex extends HttpServlet {
 		String text3 = request.getParameter("text3").toString();		
 		String text4 = request.getParameter("text4").toString();
 		String outputType = request.getParameter("output_type").toString();
+		String restService = request.getParameter("rest_service").toString();
 
 		String content = "{" +
 							"\"witnesses\" : [ " +
@@ -41,9 +42,8 @@ public class Collatex extends HttpServlet {
 							        "{\"id\" : \"D\", \"content\" : \"" + text4 + "\" } " +
 							        "]" +
 						"}";		
-		String url = "http://localhost:8080/collatex-web-0.9/api/collate";
-		
-		URL server = new URL(url);
+	
+		URL server = new URL(restService);
 		HttpURLConnection connection = (HttpURLConnection) server.openConnection();
 		connection.setDoOutput(true);
 		connection.setDoInput(true);
