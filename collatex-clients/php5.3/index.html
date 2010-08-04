@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Collate-X PHP client</title>
+</head>
+<body>
+<form method="post" action="formhandler.php">
+	<table>
+		<tr>
+			<td>Text1:</td>
+			<td>Text2:</td>
+		</tr>
+		<tr>
+			<td><textarea name="text1" id="text1" rows="10" cols="40"></textarea></td>
+			<td><textarea name="text2" id="text2" rows="10" cols="40"></textarea></td>
+		</tr>
+		<tr>
+			<td>Text3:</td>
+			<td>Text4:</td>
+		</tr>
+		<tr>
+			<td><textarea name="text3" id="text3" rows="10" cols="40"></textarea></td>
+			<td><textarea name="text4" id="text4" rows="10" cols="40"></textarea></td>
+		</tr>
+		<tr>
+			<td>Return output as:</td>
+			<td>
+				<select name="output_type" id="output_type">
+					<option value="application/xml" selected="selected">xml-tei</option>
+					<option value="application/json">json</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><input type="submit" value="Collate!" /></td>
+		</tr>
+	</table>	
+</form>
+</body>
+</html> 
