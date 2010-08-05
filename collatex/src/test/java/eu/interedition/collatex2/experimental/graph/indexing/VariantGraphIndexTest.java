@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
@@ -24,20 +23,14 @@ public class VariantGraphIndexTest {
     final IWitness a = factory.createWitness("A", "the first witness");
     final IVariantGraph graph = factory.graph(a);
     final IVariantGraphIndex index = VariantGraphIndex.create(graph, graph.findRepeatingTokens());
-    assertEquals("AlignmentGraphIndex: (the, first, witness)", index.toString());
+    assertEquals("VariantGraphIndex: (the, first, witness)", index.toString());
   }
   
-  @Ignore
   @Test
   public void test1() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     final IVariantGraph graph = factory.graph(a);
     final IVariantGraphIndex index = VariantGraphIndex.create(graph, graph.findRepeatingTokens());
-    //TODO: Note: duplicated down below!
-    assertTrue(index.contains("cat"));
-    assertTrue(index.contains("and"));
-    assertTrue(index.contains("rat"));
-    assertEquals(15, index.size());
     assertTrue(index.contains("# the"));
     assertTrue(index.contains("# the big"));
     assertTrue(index.contains("# the big black"));
