@@ -199,16 +199,6 @@ public class AlignmentTableTest {
   }
 
 
-  //TODO: move test!
-  @Test
-  public void testRepeatingTokensWithMultipleWitnesses2() {
-    final IWitness witnessA = engine.createWitness("A", "everything is unique should be no problem");
-    final IWitness witnessB = engine.createWitness("B", "this one very different");
-    final IAlignmentTable alignmentTable = engine.align(witnessA, witnessB);
-    final List<String> repeatingTokens = alignmentTable.findRepeatingTokens();
-    assertEquals(0, repeatingTokens.size());
-  }
-
   @Test
   public void testGetRow() {
     final IWitness w1 = engine.createWitness("A", "the black and white cat");

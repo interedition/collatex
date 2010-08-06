@@ -113,6 +113,7 @@ public class VariantGraph2Test {
     assertFalse(repeatingTokens.contains("g"));
   }
 
+  //TODO: Strange: unit test fails because of a cycle ?!
   @Ignore
   @Test
   public void testRepeatingTokensWithMultipleWitnesses() {
@@ -126,6 +127,16 @@ public class VariantGraph2Test {
     assertTrue(repeatingTokens.contains("t"));
     assertFalse(repeatingTokens.contains("g"));
   }
+
+  @Test
+  public void testRepeatingTokensWithMultipleWitnesses2() {
+    final IWitness witnessA = engine.createWitness("A", "everything is unique should be no problem");
+    final IWitness witnessB = engine.createWitness("B", "this one very different");
+    final IVariantGraph graph = engine.graph(witnessA, witnessB);
+    final List<String> repeatingTokens = graph.findRepeatingTokens();
+    assertEquals(0, repeatingTokens.size());
+  }
+
 
   @Test
   public void testLongestPath() {
