@@ -32,12 +32,12 @@ public class GraphVisualisationWrapper {
           append("'data':{").//
           append("'$color':'").append(color(vertex)).append("',").//
           append("'$type':'").append(type(vertex)).append("',").//
-          append("'$dim':15},").//
+          append("'$dim':10},").//
           append("'adjacencies':[");
       for (IVariantGraphEdge edge : graph.outgoingEdgesOf(vertex)) {
         jsonBuilder.append("{'nodeFrom':'").append(vertexId).//
             append("','nodeTo':'").append(edge.getEndVertex().toString()).//
-            append("','data':{'$color':'white'}},");
+            append("','data':{'$color':'grey','$type':'arrow'}},");
       }
       jsonBuilder.append("]},");
     }
