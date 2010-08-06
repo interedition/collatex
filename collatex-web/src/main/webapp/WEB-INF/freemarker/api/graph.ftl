@@ -33,7 +33,10 @@
     {
       "id": "${vertex}",
       "name": "${vertex.normalized}",
-      "data": { "$color": "#83548B", "$type": "circle", "$dim": 10 },
+      "data": {
+       "$color": "[#if vertex.containsWitness('A')]#83548B[#else]#555555[/#if]",
+       "$type": "[#if graph.inDegreeOf(vertex)=1 && graph.outDegreeOf(vertex)=1]circle[#else]triangle[/#if]",
+       "$dim": 15 },
       "adjacencies": [
         [#list graph.outgoingEdgesOf(vertex) as edge]
         { "nodeFrom": "${vertex}", "nodeTo": "${edge.endVertex}", "data": { "$color": "#557EAA" } },
