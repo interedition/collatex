@@ -1,8 +1,10 @@
 package eu.interedition.collatex2.experimental.graph.indexing;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
@@ -21,11 +23,17 @@ public class VariantGraphIndexMatcher {
   }
 
   //TODO: do inversion of control for creation of indexes!!
-  //TODO: take care of repeating tokens (same as IndexMatcher)!
   public List<ITokenMatch> getMatches(IWitness witness) {
-    List<String> repeatingTokens = Lists.newArrayList();
-    IWitnessIndex witnessIndex = new WitnessIndex(witness, repeatingTokens);
-    graphIndex = VariantGraphIndex.create(graph, repeatingTokens);
+    Set<String> repeatingTokens = Sets.newLinkedHashSet();
+    repeatingTokens.addAll(graph.findRepeatingTokens());
+    repeatingTokens.addAll(witness.findRepeatingTokens());
+    // System.out.println(repeatingTokens);
+    //TODO: change into Set?
+    List<String> repeatingTokensList = Lists.newArrayList(repeatingTokens);
+    IWitnessIndex witnessIndex = new WitnessIndex(witness, repeatingTokensList);
+    graphIndex = VariantGraphIndex.create(graph, repeatingTokensList);
+    // System.out.println(graphIndex.keys());
+    // System.out.println(witnessIndex.keys());
     return IndexMatcher.findMatches(graphIndex, witnessIndex);
   }
   

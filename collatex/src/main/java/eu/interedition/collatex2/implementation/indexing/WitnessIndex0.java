@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -131,7 +132,11 @@ public class WitnessIndex0 implements IWitnessIndex {
   @Override
   public IPhrase getPhrase(String normalized) {
     throw new RuntimeException("WHO USES THIS?");
-    //return null;
+  }
+
+  @Override
+  public Set<String> keys() {
+    throw new RuntimeException("WHO USES THIS?");
   }
 
 }

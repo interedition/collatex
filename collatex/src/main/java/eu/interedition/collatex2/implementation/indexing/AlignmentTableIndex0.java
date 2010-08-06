@@ -3,6 +3,7 @@ package eu.interedition.collatex2.implementation.indexing;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import com.google.common.collect.HashMultimap;
@@ -156,5 +157,12 @@ public class AlignmentTableIndex0 implements IAlignmentTableIndex {
     // TODO Auto-generated method stub
     return null;
   }
+  
+  @Override
+  public Set<String> keys() {
+    throw new RuntimeException("NOT IMPLEMENTED!");
+  }
+
+
 
 }

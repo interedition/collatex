@@ -11,7 +11,6 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -113,8 +112,6 @@ public class VariantGraph2Test {
     assertFalse(repeatingTokens.contains("g"));
   }
 
-  //TODO: Strange: unit test fails because of a cycle ?!
-  @Ignore
   @Test
   public void testRepeatingTokensWithMultipleWitnesses() {
     final IWitness witnessA = engine.createWitness("a", "a c a t g c a");
