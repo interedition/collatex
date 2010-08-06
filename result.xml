@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<collatex:apparatus xmlns:collatex="http://interedition.eu/collatex/ns/1.0" xmlns="http://www.tei-c.org/ns/1.0">A <app>
+        <rdg wit="#A #B">black</rdg>
+        <rdg wit="#C #D">striped</rdg>
+    </app> cat in a <app>
+        <rdg wit="#A #B #C">black</rdg>
+        <rdg wit="#D">white</rdg>
+    </app> basket</collatex:apparatus>

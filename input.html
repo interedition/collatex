@@ -1,0 +1,31 @@
+<html>
+  <head>
+  <!--
+    <script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.1/build/yahoo/yahoo-min.js&2.8.1/build/event/event-min.js&2.8.1/build/connection/connection_core-min.js"></script>
+    -->
+  </head>
+  <body>
+
+  <button onclick="doit();">Go!</button>
+  <div id="result"></div>
+
+
+<script type='text/javascript'>
+function doit() {
+  var element = document.getElementById('result');
+  element.innerHTML = '<p><em>Loading ...</em></p>';
+  xmlhttp=new XMLHttpRequest()
+  xmlhttp.open("POST", "http://localhost:8080/collatex-web/api/collate2");
+  //xmlhttp.setRequestHeader('Content-Type', 'application/xhtml+xml');
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      element.innerHTML = this.responseText;
+    }else{
+      element.innerHTML = this.status;
+    }
+  }
+  xmlhttp.send("{\"witnesses\":[{\"id\":\"A\",\"content\":\"A black cat in a black basket\" }]}");
+};
+</script>
+  </body>
+</html>

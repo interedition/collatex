@@ -27,25 +27,25 @@ public class VariantGraphVertex implements IVariantGraphVertex {
 
   public INormalizedToken getToken(IWitness witness) {
     if (!tokenMap.containsKey(witness)) {
-      throw new RuntimeException("TOKEN FOR WITNESS "+witness.getSigil()+" NOT FOUND IN VERTEX "+getNormalized()+"!");
+      throw new RuntimeException("TOKEN FOR WITNESS " + witness.getSigil() + " NOT FOUND IN VERTEX " + getNormalized() + "!");
     }
     return tokenMap.get(witness);
   }
-  
+
   public void addToken(IWitness witness, INormalizedToken token) {
     tokenMap.put(witness, token);
   }
 
   //TODO: change String parameter into IWitness
   public boolean containsWitness(String sigil) {
-    return (internalGetWitnessForSigil(sigil)!=null);
+    return (internalGetWitnessForSigil(sigil) != null);
   }
 
   //TODO: change String parameter into IWitness
   public IWitness getWitnessForSigil(String sigil) {
     IWitness internalGetWitnessForSigil = internalGetWitnessForSigil(sigil);
     if (internalGetWitnessForSigil == null) {
-      throw new RuntimeException("Witness with "+sigil+" not found in this vertex!");
+      throw new RuntimeException("Witness with " + sigil + " not found in this vertex!");
     }
     return internalGetWitnessForSigil;
   }
@@ -59,7 +59,7 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     }
     return null;
   }
-  
+
   public Set<IWitness> getWitnesses() {
     return tokenMap.keySet();
   }
