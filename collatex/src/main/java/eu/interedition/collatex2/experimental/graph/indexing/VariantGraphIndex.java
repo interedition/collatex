@@ -1,15 +1,11 @@
 package eu.interedition.collatex2.experimental.graph.indexing;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
@@ -19,66 +15,86 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphIndex implements IVariantGraphIndex {
+  private final Map<String, List<INormalizedToken>> normalizedToTokens;
+  private final Map<INormalizedToken, IVariantGraphVertex> tokenToVertex;
+  private final IVariantGraph graph;
 
-  private final Multimap<String, INormalizedToken> normalizedToTokens;
-  private final LinkedHashMap<INormalizedToken, IVariantGraphVertex> tokenToVertex;
-
-  public static IVariantGraphIndex create(IVariantGraph graph, List<String> findRepeatingTokens) {
-    final VariantGraphIndex index = new VariantGraphIndex();
-    //TODO: change this for three or more witnesses!
-    //Note: this code skips begin and end vertices!
-    //TODO: make immutable set!
-    Set<IVariantGraphVertex> vertexSet = Sets.newLinkedHashSet(graph.vertexSet());
-    vertexSet.remove(graph.getStartVertex());
-    vertexSet.remove(graph.getEndVertex());
-    for (IVariantGraphVertex vertex : vertexSet) {
-      makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
+  public static IVariantGraphIndex create(IVariantGraph graph, List<String> repeatingTokens) {
+    final VariantGraphIndex index = new VariantGraphIndex(graph);
+    for (IWitness witness: graph.getWitnesses()) {
+      List<IVariantGraphVertex> path = graph.getPath(witness);
+      int position=0; //NOTE: position => index in path
+      for (IVariantGraphVertex vertex : path) {
+        index.makeTokenUniqueIfneeded(position, index, repeatingTokens, vertex, path);
+        position++;
+      }
     }
-    //    for (IVariantGraphVertex vertex : graph.getVertices().subList(1, graph.getVertices().size()-1)) {
-    //      makeTokenUniqueIfNeeded(index, findRepeatingTokens, vertex);
-    //    }
-    //    for (final String sigil : table.getSigli()) {
-    //      findUniquePhrasesForRow(sigil, table, index, repeatingTokens);
-    //    }
     return index;
   }
 
+  //TODO: Remove index parameter!
+  private void makeTokenUniqueIfneeded(int position, VariantGraphIndex index, List<String> repeatingTokens, IVariantGraphVertex vertex, List<IVariantGraphVertex> path) {
+    // System.out.println("Trying "+vertex.getNormalized());
+    String normalized = vertex.getNormalized();
+    // check uniqueness
+    final boolean unique = !repeatingTokens.contains(normalized);
+    if (unique) {
+      List<IVariantGraphVertex> vertices = Lists.newArrayList(vertex);
+      index.add(vertices); //TODO: extract separate add method with single vertex parameter!
+    } else {
+      final List<IVariantGraphVertex> leftVertices = findUniqueVerticesToTheLeft(path, repeatingTokens, position);
+      final List<IVariantGraphVertex> rightVertices = findUniqueVerticesToTheRight(path, repeatingTokens, position);
+      index.add(leftVertices);
+      index.add(rightVertices);
+    }
+  }
+
+  
+  //TODO: I need an index to move to the left and right here!
+  //TODO: or an iterator!
+  private List<IVariantGraphVertex> findUniqueVerticesToTheRight(List<IVariantGraphVertex> path, List<String> repeatingTokens, int the_real_parameter) {
+    List<IVariantGraphVertex> vertices = Lists.newArrayList();
+    boolean found = false; // not nice!
+    int position = the_real_parameter; //TODO
+    for (int i = position ; !found && i < path.size(); i++ ) {
+      IVariantGraphVertex rightVertex = path.get(i);
+      String normalizedNeighbour = rightVertex.getNormalized();
+      found = !repeatingTokens.contains(normalizedNeighbour);
+      vertices.add(rightVertex);
+    }
+    if (!found) {
+      vertices.add(graph.getEndVertex());
+    }
+    return vertices;
+  }
+
+  //TODO: I need an index to move to the left and right here!
+  //TODO: or an iterator!
+  private List<IVariantGraphVertex> findUniqueVerticesToTheLeft(List<IVariantGraphVertex> path, List<String> repeatingTokens, int the_real_parameter) {
+    List<IVariantGraphVertex> vertices = Lists.newArrayList();
+    boolean found = false; // not nice!
+    int position = the_real_parameter; //TODO
+    for (int i = position ; !found && i > -1; i-- ) {
+      IVariantGraphVertex leftVertex = path.get(i);
+      String normalizedNeighbour = leftVertex.getNormalized();
+      found = !repeatingTokens.contains(normalizedNeighbour);
+      vertices.add(0, leftVertex);
+    }
+    if (!found) {
+      vertices.add(0, graph.getStartVertex());
+    }
+    return vertices;
+  }
+  
   @Override
   public IVariantGraphVertex getVertex(INormalizedToken token) {
     return tokenToVertex.get(token);
   }
 
-  private VariantGraphIndex() {
-    normalizedToTokens = ArrayListMultimap.create();
+  private VariantGraphIndex(IVariantGraph graph) {
+    this.graph = graph;
+    normalizedToTokens = Maps.newLinkedHashMap();
     tokenToVertex = Maps.newLinkedHashMap();
-  }
-
-  //  private static void findUniquePhrasesForRow(final String row, final IAlignmentTable table, final AlignmentTableIndex index, final List<String> findRepeatingTokens) {
-  //    // filteren would be nicer.. maar we doen het maar even alles in een!
-  //    for (final IColumn column : table.getColumns()) {
-  //      if (column.containsWitness(row)) {
-  //        makeTokenUnique(row, table, index, findRepeatingTokens, column);
-  //      } else {
-  //        logger.debug("Column " + column.getPosition() + " is empty!");
-  //      }
-  //    }
-  //  }
-
-  private static void makeTokenUniqueIfNeeded(final VariantGraphIndex index, final List<String> findRepeatingTokens, final IVariantGraphVertex vertex) {
-    String normalized = vertex.getNormalized();
-    // kijken of ie unique is
-    final boolean unique = !findRepeatingTokens.contains(normalized);
-    if (unique) {
-      List<IVariantGraphVertex> vertices = Lists.newArrayList(vertex);
-      index.add(vertices);
-    }
-    //    else {
-    //      //System.out.println("We have to combine stuff here!");
-    //      final ColumnPhrase leftPhrase = findUniqueColumnPhraseToTheLeft(table, findRepeatingTokens, row, column, token);
-    //      final ColumnPhrase rightPhrase = findUniqueColumnPhraseToTheRight(table, findRepeatingTokens, row, column, token);
-    //      index.add(leftPhrase);
-    //      index.add(rightPhrase);
-    //    }
   }
 
   private void add(List<IVariantGraphVertex> vertices) {
@@ -88,20 +104,28 @@ public class VariantGraphIndex implements IVariantGraphIndex {
       normalized.append(splitter).append(vertex.getNormalized());
       splitter = " ";
     }
+    // System.out.println("Adding normalized: "+normalized);
+    // fill token map; skip begin and end vertices (which contain no tokens!)
+    List<INormalizedToken> tokens = Lists.newArrayList();
     for (IVariantGraphVertex vertex : vertices) {
+      if (vertex.equals(graph.getStartVertex())||vertex.equals(graph.getEndVertex())) {
+        continue;
+      }
       if (vertex.getWitnesses().isEmpty()) {
         throw new RuntimeException("STOP! Witness set is not supposed to be empty! Vertex: " + vertex.getNormalized());
       }
       //Note: this code assumes witnesses = an ordered set
       IWitness firstWitness = vertex.getWitnesses().iterator().next();
-      normalizedToTokens.put(normalized.toString(), vertex.getToken(firstWitness));
+      INormalizedToken token = vertex.getToken(firstWitness);
       tokenToVertex.put(vertex.getToken(firstWitness), vertex);
+      tokens.add(token);
     }
+    normalizedToTokens.put(normalized.toString(), tokens);
   }
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder("AlignmentGraphIndex: (");
+    StringBuilder result = new StringBuilder("VariantGraphIndex: (");
     String delimiter = "";
     for (final String normalizedPhrase : normalizedToTokens.keySet()) {
       result.append(delimiter).append(normalizedPhrase);
