@@ -7,12 +7,15 @@
 ']
 
 <h1>REST service result</h1>
-	
+
+<p>	
+[#list graph.witnesses as w]
+	<strong>${w.sigil}</strong> : ${w.content}<br/>
+[/#list]
+</p>
+
 <div id="container"> 
   <div id="left-container"> 
-		[#list graph.witnesses() as w]
-			<strong>${w.sigil}</strong> : ${w.content}<br/>
-		[/#list]
     <div id="id-list"></div> 
   </div> 
  
