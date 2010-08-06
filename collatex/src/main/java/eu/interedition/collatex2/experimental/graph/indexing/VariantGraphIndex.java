@@ -3,12 +3,14 @@ package eu.interedition.collatex2.experimental.graph.indexing;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
+import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -109,6 +111,7 @@ public class VariantGraphIndex implements IVariantGraphIndex {
     List<INormalizedToken> tokens = Lists.newArrayList();
     for (IVariantGraphVertex vertex : vertices) {
       if (vertex.equals(graph.getStartVertex())||vertex.equals(graph.getEndVertex())) {
+        tokens.add(new NullToken(0, null)); //This is not very nice!
         continue;
       }
       if (vertex.getWitnesses().isEmpty()) {
@@ -162,5 +165,10 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   @Override
   public int size() {
     return normalizedToTokens.size();
+  }
+
+  @Override
+  public Set<String> keys() {
+    return normalizedToTokens.keySet();
   }
 }

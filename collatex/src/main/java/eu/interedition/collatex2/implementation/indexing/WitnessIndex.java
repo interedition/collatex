@@ -178,4 +178,10 @@ public class WitnessIndex implements IWitnessIndex {
     throw new RuntimeException("Phrase NOT found!");
   }
 
+  @Override
+  public Set<String> keys() {
+    final Set<String> normalizedPhrases = Sets.newLinkedHashSet(transform(phraseCollection, PHRASE_TO_NORMALIZED));
+    return normalizedPhrases;
+  }
+
 }

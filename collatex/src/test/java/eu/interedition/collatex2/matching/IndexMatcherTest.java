@@ -97,21 +97,6 @@ public class IndexMatcherTest {
     assertEquals(4, columnsC.getPosition());
   }
 
-  @Test
-  public void testGetMatchesUsingWitnessIndex() {
-    final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");
-    final IWitness witnessB = factory.createWitness("B", "The big black");
-    final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
-    final List<IMatch> matches = alignment.getMatches();
-    assertEquals(1, matches.size());
-    final IMatch match = matches.get(0);
-    assertEquals("the big black", match.getNormalized());
-    final IColumns columnsA = match.getColumns();
-    assertEquals(1, columnsA.getBeginPosition());
-    assertEquals(3, columnsA.getEndPosition());
-  }
-
   //Note: internally this gives # the big black and the big black cat as matches
   @Test
   public void testGetMatchesUsingWitnessIndexWithOverlapping() {
