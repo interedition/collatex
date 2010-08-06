@@ -45,6 +45,7 @@ import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
+import eu.interedition.collatex2.web.io.GraphVisualisationWrapper;
 
 @Controller
 @RequestMapping("/api/**")
@@ -84,6 +85,11 @@ public class ApiController implements InitializingBean {
     return new ModelAndView("api/graph", "graph", collate2(input));
   }
 
+  @RequestMapping(value = "collate3", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  public ModelAndView collateToInfoVis2(@RequestBody final ApiInput input) throws Exception {
+    return new ModelAndView("api/graph2", "graph", collate3(input));
+  }
+
   @RequestMapping(value = "collate")
   public void documentation() {}
 
@@ -96,6 +102,12 @@ public class ApiController implements InitializingBean {
     final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
     ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
     return new CollateXEngine().graph(array);
+  }
+
+  private GraphVisualisationWrapper collate3(ApiInput input) throws ApiException {
+    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
+    ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
+    return new GraphVisualisationWrapper(array, new CollateXEngine().graph(array));
   }
 
   private List<ApiWitness> checkInputAndExtractWitnesses(ApiInput input) throws ApiException {

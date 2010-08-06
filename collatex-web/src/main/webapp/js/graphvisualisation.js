@@ -140,7 +140,7 @@ function showForcedDirected(json){
       Log.write(perc + '% loaded...');
     },
     onComplete: function(){
-      Log.write('done');
+      Log.write('');
       fd.animate({
         modes: ['linear'],
         transition: $jit.Trans.Elastic.easeOut,
