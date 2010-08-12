@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.implementation.indexing;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -151,17 +150,6 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
   public boolean contains(String normalized) {
     System.out.println(normalizedToColumns.keySet());
     return normalizedToColumns.containsKey(normalized);
-  }
-
-  //For this to work I need the ColumnPhrases here!
-  @Override
-  public Collection<IPhrase> getPhrases() {
-    List<IPhrase> results = Lists.newArrayList(); // TODO: do the capacity thing!
-    for (String normalized : normalizedToColumns.keySet()) {
-      ColumnPhrase columnPhrase = normalizedToColumns.get(normalized);
-      results.add(columnPhrase.getPhrase());
-    }
-    return results;
   }
 
   @Override

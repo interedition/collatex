@@ -1,15 +1,17 @@
 1. VariantGraph
 	Create graph from one witness
 2. Token matching
-a	Index Witness
-b	Index VariantGraph
-C	VariantGraphIndexMatcher; compare indices
+a	VariantGraphIndex 
+		index tokens of VariantGraph
+b	WitnessIndex
+		index tokens of Witness
+C	VariantGraphIndexMatcher 
+		compare indices
 3. Sequence Detection
 
 
 
 Notes:
-2a Remove GetPhrases method from IWitnessIndex
 2c Move over unit tests from IndexMatcherTest to VariantGraphIndexMatcherTest
 3  Check correctness when omissions occur 
 

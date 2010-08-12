@@ -61,11 +61,6 @@ public class WitnessIndex0 implements IWitnessIndex {
     return phraseBag.size();
   }
 
-  @Override
-  public Collection<IPhrase> getPhrases() {
-    return phraseBag;
-  }
-
   private Multimap<String, IPhrase> seed(final List<INormalizedToken> tokens) {
     final Multimap<String, IPhrase> phraseMap = HashMultimap.create();
     for (final INormalizedToken token : tokens) {
