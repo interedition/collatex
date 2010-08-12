@@ -1,18 +1,20 @@
 1. VariantGraph
 	Create graph from one witness
-2. Token matching
-a	VariantGraphIndex 
+2. VariantGraphCreator
+	3. Token matching
+	a	VariantGraphIndex 
 		index tokens of VariantGraph
-b	WitnessIndex
+	b	WitnessIndex
 		index tokens of Witness
-C	VariantGraphIndexMatcher 
+	C	VariantGraphIndexMatcher 
 		compare indices
-3. Sequence Detection
-
+	4. Sequence Detection
+	5. Transposition detection
 
 
 Notes:
-2c Move over unit tests from IndexMatcherTest to VariantGraphIndexMatcherTest
-3  Check correctness when omissions occur 
+1. Topological values are unique and ascending?!
+3c Move over unit tests from IndexMatcherTest to VariantGraphIndexMatcherTest
+4  Check correctness when omissions occur 
 
 
