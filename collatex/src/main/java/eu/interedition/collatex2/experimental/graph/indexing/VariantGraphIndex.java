@@ -18,7 +18,6 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphIndex implements IVariantGraphIndex {
   private final Map<String, List<INormalizedToken>> normalizedToTokens;
-  private final Map<INormalizedToken, IVariantGraphVertex> tokenToVertex;
   private final IVariantGraph graph;
 
   public static IVariantGraphIndex create(IVariantGraph graph, List<String> repeatingTokens) {
@@ -88,15 +87,9 @@ public class VariantGraphIndex implements IVariantGraphIndex {
     return vertices;
   }
   
-  @Override
-  public IVariantGraphVertex getVertex(INormalizedToken token) {
-    return tokenToVertex.get(token);
-  }
-
   private VariantGraphIndex(IVariantGraph graph) {
     this.graph = graph;
     normalizedToTokens = Maps.newLinkedHashMap();
-    tokenToVertex = Maps.newLinkedHashMap();
   }
 
   private void add(List<IVariantGraphVertex> vertices) {
@@ -120,7 +113,6 @@ public class VariantGraphIndex implements IVariantGraphIndex {
       //Note: this code assumes witnesses = an ordered set
       IWitness firstWitness = vertex.getWitnesses().iterator().next();
       INormalizedToken token = vertex.getToken(firstWitness);
-      tokenToVertex.put(vertex.getToken(firstWitness), vertex);
       tokens.add(token);
     }
     normalizedToTokens.put(normalized.toString(), tokens);

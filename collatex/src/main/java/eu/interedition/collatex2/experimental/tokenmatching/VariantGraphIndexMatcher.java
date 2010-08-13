@@ -38,9 +38,4 @@ public class VariantGraphIndexMatcher implements ITokenMatcher {
     // System.out.println(witnessIndex.keys());
     return IndexMatcher.findMatches(graphIndex, witnessIndex);
   }
-  
-  //TODO: REMOVE THIS METHOD!
-  public IVariantGraphIndex getGraphIndex() {
-    return graphIndex;
-  }
 }
