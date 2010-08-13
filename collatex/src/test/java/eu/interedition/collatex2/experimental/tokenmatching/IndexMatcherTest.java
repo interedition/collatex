@@ -15,12 +15,10 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.experimental.tokenmatching.legacy.AlignmentTableIndexMatcher;
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -37,65 +35,7 @@ public class IndexMatcherTest {
     factory = new CollateXEngine();
   }
 
-  @Test
-  public void testEverythingIsUnique() {
-    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
-    final IWitness witnessB = factory.createWitness("B", "everything is unique");
-    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, witnessA, witnessB);
-    final List<IMatch> matches = alignment.getMatches();
-    assertEquals(1, matches.size());
-    final IMatch match = matches.get(0);
-    assertEquals("everything is unique", match.getNormalized());
-    final IColumns columnsA = match.getColumns();
-    assertEquals(1, columnsA.getBeginPosition());
-    assertEquals(3, columnsA.getEndPosition());
-  }
 
-  @Test
-  public void testEverythingIsUniqueTwoWitnesses() {
-    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
-    final IWitness witnessB = factory.createWitness("B", "this one very different");
-    final IWitness witnessC = factory.createWitness("C", "everything is different");
-    final IAlignmentTable table = factory.align(witnessA, witnessB);
-    AlignmentTableIndexMatcher indexMatcher = new AlignmentTableIndexMatcher(table);
-    List<ITokenMatch> matches = indexMatcher.getMatches(witnessC);
-    assertEquals(3, matches.size());
-    final ITokenMatch match = matches.get(0);
-    assertEquals("everything", match.getNormalized());
-    final INormalizedToken columnsA = match.getTableToken();
-    assertEquals(1, columnsA.getPosition());
-    final ITokenMatch match2 = matches.get(1);
-    assertEquals("is", match2.getNormalized());
-    final INormalizedToken columnsB = match2.getTableToken();
-    assertEquals(2, columnsB.getPosition());
-    final ITokenMatch match3 = matches.get(2);
-    assertEquals("different", match3.getNormalized());
-    final INormalizedToken columnsC = match3.getTableToken();
-    assertEquals(4, columnsC.getPosition());
-  }
-
-  @Test
-  public void testOverlappingMatches() {
-    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
-    final IWitness witnessB = factory.createWitness("B", "this one is different");
-    final IWitness witnessC = factory.createWitness("C", "everything is different");
-    final IAlignmentTable table = factory.align(witnessA, witnessB);
-    AlignmentTableIndexMatcher indexMatcher = new AlignmentTableIndexMatcher(table);
-    final List<ITokenMatch> matches = indexMatcher.getMatches(witnessC);
-    assertEquals(3, matches.size());
-    final ITokenMatch match = matches.get(0);
-    assertEquals("everything", match.getNormalized());
-    final INormalizedToken columnsA = match.getTableToken();
-    assertEquals(1, columnsA.getPosition());
-    final ITokenMatch match2 = matches.get(1);
-    assertEquals("is", match2.getNormalized());
-    final INormalizedToken columnsB = match2.getTableToken();
-    assertEquals(3, columnsB.getPosition());
-    final ITokenMatch match3 = matches.get(2);
-    assertEquals("different", match3.getNormalized());
-    final INormalizedToken columnsC = match3.getTableToken();
-    assertEquals(4, columnsC.getPosition());
-  }
 
   //Note: internally this gives # the big black and the big black cat as matches
   @Test

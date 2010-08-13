@@ -8,7 +8,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.tokenmatching.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -21,7 +20,6 @@ public class VariantGraphIndexMatcherTest {
     factory = new CollateXEngine();
   }
 
-  //NOTE: tests taken from IndexMatcherTest!
   @Test
   public void testEverythingIsUnique() {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
@@ -34,6 +32,35 @@ public class VariantGraphIndexMatcherTest {
     assertEquals("is: 2 -> 2", matches.get(1).toString());
     assertEquals("unique: 3 -> 3", matches.get(2).toString());
   }
+  
+  @Test
+  public void testEverythingIsUniqueTwoWitnesses() {
+    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
+    final IWitness witnessB = factory.createWitness("B", "this one very different");
+    final IWitness witnessC = factory.createWitness("C", "everything is different");
+    IVariantGraph graph = factory.graph(witnessA, witnessB);
+    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    List<ITokenMatch> matches = matcher.getMatches(witnessC);
+    assertEquals(3, matches.size());
+    assertEquals("everything", matches.get(0).getNormalized());
+    assertEquals("is", matches.get(1).getNormalized());
+    assertEquals("different", matches.get(2).getNormalized());
+  }
+
+  @Test
+  public void testOverlappingMatches() {
+    final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
+    final IWitness witnessB = factory.createWitness("B", "this one is different");
+    final IWitness witnessC = factory.createWitness("C", "everything is different");
+    IVariantGraph graph = factory.graph(witnessA, witnessB);
+    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    List<ITokenMatch> matches = matcher.getMatches(witnessC);
+    assertEquals(3, matches.size());
+    assertEquals("everything", matches.get(0).getNormalized());
+    assertEquals("is", matches.get(1).getNormalized());
+    assertEquals("different", matches.get(2).getNormalized());
+  }
+
   
   @Test
   public void testGetMatchesUsingWitnessIndex() {
