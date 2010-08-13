@@ -20,6 +20,7 @@ public class VariantGraph2Creator {
     this.graph = graph;
   }
 
+  // TODO: use the VariantGraphAligner here!
   // write
   // NOTE: tokenA is the token from the Witness
   // For every token in the witness we have to map a VariantNode
