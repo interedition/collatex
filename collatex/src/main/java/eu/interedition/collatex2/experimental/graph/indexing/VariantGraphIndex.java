@@ -154,15 +154,6 @@ public class VariantGraphIndex implements IVariantGraphIndex {
   }
 
   @Override
-  public Collection<IPhrase> getPhrases() {
-    List<IPhrase> phrases = Lists.newArrayList();
-    for (String key : normalizedToTokens.keySet()) {
-      phrases.add(getPhrase(key));
-    }
-    return phrases;
-  }
-
-  @Override
   public int size() {
     return normalizedToTokens.size();
   }

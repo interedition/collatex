@@ -1,10 +1,10 @@
 package eu.interedition.collatex2.implementation.matching;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +23,13 @@ public class IndexMatcher {
 
   public static List<ITokenMatch> findMatches(final IWitnessIndex tableIndex, final IWitnessIndex witnessIndex) {
     final List<PhraseMatch> matches = Lists.newArrayList();
-    final Collection<IPhrase> phrases = witnessIndex.getPhrases();
-    for (final IPhrase phrase : phrases) {
-      // IndexMatcher.LOG.debug("Looking for phrase: " +
-      // phrase.getNormalized());
-      if (tableIndex.contains(phrase.getNormalized())) {
+    final Set<String> keys = witnessIndex.keys();
+    for (final String key : keys) {
+      // IndexMatcher.LOG.debug("Looking for phrase: " + key);
+      if (tableIndex.contains(key)) {
         // IndexMatcher.LOG.debug("FOUND!");
-        final IPhrase tablePhrase = tableIndex.getPhrase(phrase.getNormalized());
+        final IPhrase phrase = witnessIndex.getPhrase(key);
+        final IPhrase tablePhrase = tableIndex.getPhrase(key);
         matches.add(new PhraseMatch(tablePhrase, phrase));
       }
     }

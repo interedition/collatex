@@ -107,10 +107,10 @@ public class IndexingTest {
   //  }
 
   private void assertContains(final IWitnessIndex index, final String phrase) {
-    assertTrue("phrase '" + phrase + "' not found in index [" + Joiner.on(", ").join(index.getPhrases()) + "]", index.contains(phrase));
+    assertTrue("phrase '" + phrase + "' not found in index [" + Joiner.on(", ").join(index.keys()) + "]", index.contains(phrase));
   }
 
   private void assertDoesNotContain(final IWitnessIndex index, final String phrase) {
-    assertFalse("phrase '" + phrase + "' found in index " + index.getPhrases().iterator().next().getSigil() + ", shouldn't be there!", index.contains(phrase));
+    assertFalse("phrase '" + phrase + "' found in index, shouldn't be there!", index.contains(phrase));
   }
 }

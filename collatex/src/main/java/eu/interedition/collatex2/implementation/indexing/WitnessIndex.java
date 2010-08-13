@@ -164,11 +164,6 @@ public class WitnessIndex implements IWitnessIndex {
   }
 
   @Override
-  public Collection<IPhrase> getPhrases() {
-    return phraseCollection;
-  }
-
-  @Override
   public IPhrase getPhrase(String normalized) {
     for (IPhrase phrase : phraseCollection) {
       if (phrase.getNormalized().equals(normalized)) {

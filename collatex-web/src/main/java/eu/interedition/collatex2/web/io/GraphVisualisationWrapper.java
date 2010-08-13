@@ -75,14 +75,13 @@ public class GraphVisualisationWrapper {
   private String color(IVariantGraphVertex vertex) {
     if (vertex.getWitnesses().size() == 0) {
       return COLORS[0];
-    } else {
-      DijkstraShortestPath<IVariantGraphVertex, IVariantGraphEdge> dsp = new DijkstraShortestPath<IVariantGraphVertex, IVariantGraphEdge>(graph, startvertex, vertex);
-      int topologicalIndex = (int) dsp.getPathLength();
-      if (topologicalIndex > COLORS.length) {
-        return "white";
-      }
-      return COLORS[topologicalIndex];
+    } 
+    DijkstraShortestPath<IVariantGraphVertex, IVariantGraphEdge> dsp = new DijkstraShortestPath<IVariantGraphVertex, IVariantGraphEdge>(graph, startvertex, vertex);
+    int topologicalIndex = (int) dsp.getPathLength();
+    if (topologicalIndex > COLORS.length) {
+      return "white";
     }
+    return COLORS[topologicalIndex];
   }
 
   public ApiWitness[] getWitnesses() {
