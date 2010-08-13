@@ -2,7 +2,10 @@ package eu.interedition.collatex2.graphvizrestlet;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 
+import org.apache.commons.io.IOUtils;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
@@ -26,8 +29,14 @@ public class SVGResource extends ServerResource {
       toFile.write(dot);
       toFile.close();
       //      String[] cmd = { "cmd", "/c", "mvn" };
+      // Windows
+      //      String[] cmd = { "cmd", "/c", "\"C:\\Program Files\\Graphviz2.26.3\\bin\\dot.exe\" -GRankdir=LR -Gid=VariantGraph -Tsvg " + INPUT_DOT };
       String[] cmd = { "/bin/sh", "-c", "dot -GRankdir=LR -Gid=VariantGraph -Tsvg " + INPUT_DOT };
       Process p = Runtime.getRuntime().exec(cmd);
+
+      extracted(p.getErrorStream());
+      extracted(p.getInputStream());
+
       return new SVGRepresentation(p.getInputStream());
       //      StringBuffer result = new StringBuffer("");
       //      String s = "";
@@ -41,5 +50,11 @@ public class SVGResource extends ServerResource {
       e.printStackTrace();
     }
     return null;
+  }
+
+  private void extracted(InputStream inputStream) throws IOException {
+    StringWriter stringWriter = new StringWriter();
+    IOUtils.copy(inputStream, stringWriter);
+    System.out.println(stringWriter.toString());
   }
 }

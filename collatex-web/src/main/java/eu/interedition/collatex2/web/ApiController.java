@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.codehaus.jackson.JsonParseException;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
+import org.jgrapht.ext.IntegerNameProvider;
 import org.jgrapht.ext.VertexNameProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,12 +130,7 @@ public class ApiController implements InitializingBean {
     final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
     ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
     IVariantGraph graph = new CollateXEngine().graph(array);
-    VertexNameProvider<IVariantGraphVertex> vertexIDProvider = new VertexNameProvider<IVariantGraphVertex>() {
-      @Override
-      public String getVertexName(IVariantGraphVertex v) {
-        return v.toString().replaceAll("eu.interedition.collatex2.experimental.graph.VariantGraphVertex@", "v");
-      }
-    };
+    VertexNameProvider<IVariantGraphVertex> vertexIDProvider = new IntegerNameProvider<IVariantGraphVertex>();
     VertexNameProvider<IVariantGraphVertex> vertexLabelProvider = new VertexNameProvider<IVariantGraphVertex>() {
       @Override
       public String getVertexName(IVariantGraphVertex v) {
