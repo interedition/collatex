@@ -1,6 +1,9 @@
 package eu.interedition.collatex2.web;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +18,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.codehaus.jackson.JsonParseException;
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.EdgeNameProvider;
+import org.jgrapht.ext.VertexNameProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,10 +38,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
+import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
@@ -43,6 +52,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
+import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
 import eu.interedition.collatex2.web.io.GraphVisualisationWrapper;
@@ -90,6 +100,11 @@ public class ApiController implements InitializingBean {
     return new ModelAndView("api/graph2", "graph", collate3(input));
   }
 
+  @RequestMapping(value = "dot", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  public ModelAndView collateToDot(@RequestBody final ApiInput input) throws Exception {
+    return new ModelAndView("api/dot", "dot", collate4(input));
+  }
+
   @RequestMapping(value = "collate")
   public void documentation() {}
 
@@ -108,6 +123,45 @@ public class ApiController implements InitializingBean {
     final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
     ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
     return new GraphVisualisationWrapper(array, new CollateXEngine().graph(array));
+  }
+
+  private String collate4(ApiInput input) throws ApiException {
+    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
+    ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
+    IVariantGraph graph = new CollateXEngine().graph(array);
+    VertexNameProvider<IVariantGraphVertex> vertexIDProvider = new VertexNameProvider<IVariantGraphVertex>() {
+      @Override
+      public String getVertexName(IVariantGraphVertex v) {
+        return v.toString().replaceAll("eu.interedition.collatex2.experimental.graph.VariantGraphVertex@", "v");
+      }
+    };
+    VertexNameProvider<IVariantGraphVertex> vertexLabelProvider = new VertexNameProvider<IVariantGraphVertex>() {
+      @Override
+      public String getVertexName(IVariantGraphVertex v) {
+        //        List<String> witnessLabels = Lists.newArrayList();
+        //        for (IWitness witness : v.getWitnesses()) {
+        //          witnessLabels.add(witness.getSigil() + ":" + v.getToken(witness).getContent());
+        //        }
+        //        Collections.sort(witnessLabels);
+        //        return Joiner.on(",").join(witnessLabels);
+        return v.getNormalized();
+      }
+    };
+    EdgeNameProvider<IVariantGraphEdge> edgeLabelProvider = new EdgeNameProvider<IVariantGraphEdge>() {
+      @Override
+      public String getEdgeName(IVariantGraphEdge e) {
+        List<String> sigils = Lists.newArrayList();
+        for (IWitness witness : e.getWitnesses()) {
+          sigils.add(witness.getSigil());
+        }
+        Collections.sort(sigils);
+        return Joiner.on(",").join(sigils);
+      }
+    };
+    DOTExporter<IVariantGraphVertex, IVariantGraphEdge> exporter = new DOTExporter<IVariantGraphVertex, IVariantGraphEdge>(vertexIDProvider, vertexLabelProvider, edgeLabelProvider);
+    Writer writer = new StringWriter();
+    exporter.export(writer, graph);
+    return writer.toString();
   }
 
   private List<ApiWitness> checkInputAndExtractWitnesses(ApiInput input) throws ApiException {

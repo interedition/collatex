@@ -4,14 +4,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.EdgeNameProvider;
+import org.jgrapht.ext.VertexNameProvider;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -36,10 +46,10 @@ public class VariantGraph2Test {
     assertEquals(0, graph.getWitnesses().size());
     assertTrue(graph.isEmpty());
   }
-  
+
   @Test
   public void testOneWitness() {
-    IWitness a = engine.createWitness("A", "only one witness");   
+    IWitness a = engine.createWitness("A", "only one witness");
     IVariantGraph graph = VariantGraph2.create(a);
     final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(5, vertices.size());
@@ -66,24 +76,24 @@ public class VariantGraph2Test {
     assertTrue(graph.containsEdge(secondVertex, thirdVertex));
     assertTrue(graph.containsEdge(thirdVertex, endVertex));
   }
-  
+
   @Test
   public void testFirstWitness() {
     IWitness a = engine.createWitness("A", "the first witness");
     IVariantGraph graph = VariantGraph2.create(a);
     // vertices
     Iterator<IVariantGraphVertex> iterator = graph.iterator();
-    IVariantGraphVertex start = iterator.next(); 
-    IVariantGraphVertex the = iterator.next(); 
-    IVariantGraphVertex first = iterator.next(); 
-    IVariantGraphVertex witness = iterator.next(); 
-    IVariantGraphVertex end = iterator.next(); 
+    IVariantGraphVertex start = iterator.next();
+    IVariantGraphVertex the = iterator.next();
+    IVariantGraphVertex first = iterator.next();
+    IVariantGraphVertex witness = iterator.next();
+    IVariantGraphVertex end = iterator.next();
     Assert.assertFalse(iterator.hasNext());
-    Assert.assertEquals("#", start.getNormalized());       
+    Assert.assertEquals("#", start.getNormalized());
     Assert.assertEquals("the", the.getNormalized());
     Assert.assertEquals("first", first.getNormalized());
     Assert.assertEquals("witness", witness.getNormalized());
-    Assert.assertEquals("#", end.getNormalized());       
+    Assert.assertEquals("#", end.getNormalized());
     // tokens on vertices
     Assert.assertEquals("the", the.getToken(a).getContent());
     Assert.assertEquals("first", first.getToken(a).getContent());
@@ -96,7 +106,7 @@ public class VariantGraph2Test {
     // witnesses on edges
     Set<IVariantGraphEdge> edgeSet = graph.edgeSet();
     for (IVariantGraphEdge edge : edgeSet) {
-      Assert.assertTrue("Witness "+a.getSigil()+" not present in set!", edge.containsWitness(a));
+      Assert.assertTrue("Witness " + a.getSigil() + " not present in set!", edge.containsWitness(a));
     }
   }
 
@@ -134,7 +144,6 @@ public class VariantGraph2Test {
     assertEquals(0, repeatingTokens.size());
   }
 
-
   @Test
   public void testLongestPath() {
     IWitness w1 = engine.createWitness("A", "a");
@@ -143,9 +152,9 @@ public class VariantGraph2Test {
     IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
     assertEquals(4, graph.vertexSet().size());
     List<IVariantGraphVertex> longestPath = graph.getLongestPath();
-//    for (CollateXVertex v: longestPath) {
-//      System.out.println(v.getNormalized());
-//    }
+    //    for (CollateXVertex v: longestPath) {
+    //      System.out.println(v.getNormalized());
+    //    }
     assertEquals("a", longestPath.get(0).getNormalized());
     assertEquals("b", longestPath.get(1).getNormalized());
     assertEquals(2, longestPath.size());
@@ -167,4 +176,45 @@ public class VariantGraph2Test {
     assertEquals(6, path.size());
   }
 
+  @Ignore
+  @Test
+  public void testGraph2Dot() {
+    final IWitness w1 = engine.createWitness("A", "the quick brown fox");
+    final IWitness w2 = engine.createWitness("B", "the quick and the dead");
+    final IWitness w3 = engine.createWitness("C", "the slow blue dead fox");
+    IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
+    VertexNameProvider<IVariantGraphVertex> vertexIDProvider = new VertexNameProvider<IVariantGraphVertex>() {
+      @Override
+      public String getVertexName(IVariantGraphVertex v) {
+        return v.toString().replaceAll("eu.interedition.collatex2.experimental.graph.", "").replace('@', '_');
+      }
+    };
+    VertexNameProvider<IVariantGraphVertex> vertexLabelProvider = new VertexNameProvider<IVariantGraphVertex>() {
+      @Override
+      public String getVertexName(IVariantGraphVertex v) {
+        //        List<String> witnessLabels = Lists.newArrayList();
+        //        for (IWitness witness : v.getWitnesses()) {
+        //          witnessLabels.add(witness.getSigil() + ":" + v.getToken(witness).getContent());
+        //        }
+        //        Collections.sort(witnessLabels);
+        //        return Joiner.on(",").join(witnessLabels);
+        return v.getNormalized();
+      }
+    };
+    EdgeNameProvider<IVariantGraphEdge> edgeLabelProvider = new EdgeNameProvider<IVariantGraphEdge>() {
+      @Override
+      public String getEdgeName(IVariantGraphEdge e) {
+        List<String> sigils = Lists.newArrayList();
+        for (IWitness witness : e.getWitnesses()) {
+          sigils.add(witness.getSigil());
+        }
+        Collections.sort(sigils);
+        return Joiner.on(",").join(sigils);
+      }
+    };
+    DOTExporter<IVariantGraphVertex, IVariantGraphEdge> exporter = new DOTExporter<IVariantGraphVertex, IVariantGraphEdge>(vertexIDProvider, vertexLabelProvider, edgeLabelProvider);
+    Writer writer = new StringWriter();
+    exporter.export(writer, graph);
+    assertEquals("", writer.toString());
+  }
 }
