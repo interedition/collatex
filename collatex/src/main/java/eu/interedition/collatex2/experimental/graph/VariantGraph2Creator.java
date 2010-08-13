@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
 import eu.interedition.collatex2.experimental.tokenmatching.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
@@ -33,11 +32,21 @@ public class VariantGraph2Creator {
   public void addWitness(IWitness witness) {
     VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witness);
-    makeEdgesForMatches(witness, matches, matcher.getGraphIndex());
+    makeEdgesForMatches(witness, matches);
   }
 
   //write
-  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, IVariantGraphIndex graphIndex2) {
+  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches) {
+    // Map Tokens in the Graph to Vertices
+    Map<INormalizedToken, IVariantGraphVertex> graphTokenToVertex;
+    graphTokenToVertex = Maps.newLinkedHashMap();
+    for (IVariantGraphVertex vertex: graph.vertexSet()) {
+      for (IWitness witness2 : vertex.getWitnesses()) {
+        INormalizedToken token = vertex.getToken(witness2);
+        graphTokenToVertex.put(token, vertex);
+      }
+    }
+    ////
     Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
     witnessTokenToMatch = Maps.newLinkedHashMap();
     for (ITokenMatch match : matches) {
@@ -54,7 +63,7 @@ public class VariantGraph2Creator {
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
-        IVariantGraphVertex end = graphIndex2.getVertex(tokenMatch.getTokenB());
+        IVariantGraphVertex end = graphTokenToVertex.get(tokenMatch.getTokenB());
         connectBeginToEndVertex(begin, end, witness);
         end.addToken(witness, token);
         begin = end;
