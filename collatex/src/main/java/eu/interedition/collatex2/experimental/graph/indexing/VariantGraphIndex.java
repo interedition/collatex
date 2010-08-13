@@ -15,12 +15,13 @@ import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class VariantGraphIndex implements IVariantGraphIndex {
+public class VariantGraphIndex implements IWitnessIndex {
   private final Map<String, List<INormalizedToken>> normalizedToTokens;
   private final IVariantGraph graph;
 
-  public static IVariantGraphIndex create(IVariantGraph graph, List<String> repeatingTokens) {
+  public static IWitnessIndex create(IVariantGraph graph, List<String> repeatingTokens) {
     final VariantGraphIndex index = new VariantGraphIndex(graph);
     for (IWitness witness: graph.getWitnesses()) {
       List<IVariantGraphVertex> path = graph.getPath(witness);
