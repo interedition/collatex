@@ -14,7 +14,7 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class VariantGraphIndexMatcher {
+public class VariantGraphIndexMatcher implements ITokenMatcher {
   private final IVariantGraph graph;
   private IVariantGraphIndex graphIndex;
 

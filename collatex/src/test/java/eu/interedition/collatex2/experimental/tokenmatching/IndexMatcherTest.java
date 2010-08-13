@@ -57,8 +57,8 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one very different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    AlignmentTableIndexMatcher indexMatcher = new AlignmentTableIndexMatcher(table, witnessC);
-    List<ITokenMatch> matches = indexMatcher.getMatches();
+    AlignmentTableIndexMatcher indexMatcher = new AlignmentTableIndexMatcher(table);
+    List<ITokenMatch> matches = indexMatcher.getMatches(witnessC);
     assertEquals(3, matches.size());
     final ITokenMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
@@ -80,8 +80,8 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one is different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    AlignmentTableIndexMatcher indexMatcher = new AlignmentTableIndexMatcher(table, witnessC);
-    final List<ITokenMatch> matches = indexMatcher.getMatches();
+    AlignmentTableIndexMatcher indexMatcher = new AlignmentTableIndexMatcher(table);
+    final List<ITokenMatch> matches = indexMatcher.getMatches(witnessC);
     assertEquals(3, matches.size());
     final ITokenMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
@@ -149,8 +149,8 @@ public class IndexMatcherTest {
     final IWitness a = factory.createWitness("A", "a");
     final IWitness b = factory.createWitness("B", "a a");
     final IAlignmentTable table = factory.align(a);
-    AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table, b);
-    List<ITokenMatch> matches = matcher.getMatches();
+    AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table);
+    List<ITokenMatch> matches = matcher.getMatches(b);
     assertEquals(1, matches.size());
     ITokenMatch match = matches.get(0);
     assertEquals(1, match.getTableToken().getPosition());
@@ -163,8 +163,8 @@ public class IndexMatcherTest {
     final IWitness a = factory.createWitness("A", "a a");
     final IWitness b = factory.createWitness("B", "a");
     final IAlignmentTable table = factory.align(a);
-    AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table, b);
-    List<ITokenMatch> matches = matcher.getMatches();
+    AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table);
+    List<ITokenMatch> matches = matcher.getMatches(b);
     assertEquals(1, matches.size());
     ITokenMatch match = matches.get(0);
     assertEquals(1, match.getTableToken().getPosition());

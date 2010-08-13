@@ -79,8 +79,8 @@ public class CollateXEngine {
 
   // TODO: rename this method!
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
-    AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table, witness);
-    final List<IMatch> matches = matcher.getColumnMatches();
+    AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table);
+    final List<IMatch> matches = matcher.getColumnMatches(witness);
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;

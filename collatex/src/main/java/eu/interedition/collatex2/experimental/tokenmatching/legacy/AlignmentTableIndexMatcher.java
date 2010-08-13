@@ -8,6 +8,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.experimental.tokenmatching.ITokenMatcher;
 import eu.interedition.collatex2.experimental.tokenmatching.IndexMatcher;
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
@@ -23,24 +24,23 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class AlignmentTableIndexMatcher {
+//TODO: LEGACY CLASS REMOVE ! REMOVE !
+public class AlignmentTableIndexMatcher extends IndexMatcher implements ITokenMatcher {
   private final IAlignmentTable table;
-  private final IWitness witness;
   private IAlignmentTableIndex alignmentTableIndex;
 
-  public AlignmentTableIndexMatcher(IAlignmentTable table, IWitness witness) {
+  public AlignmentTableIndexMatcher(IAlignmentTable table) {
     this.table = table;
-    this.witness = witness;
   }
 
-  public List<ITokenMatch> getMatches() {
+  public List<ITokenMatch> getMatches(IWitness witness) {
     final List<String> repeatingTokens = combineRepeatingTokens(table, witness);
     alignmentTableIndex = AlignmentTableIndex.create(table, repeatingTokens);
     return IndexMatcher.findMatches(alignmentTableIndex, new WitnessIndex(witness, repeatingTokens));
   }
 
-  public List<IMatch> getColumnMatches() {
-    List<ITokenMatch> tokenMatches = getMatches();
+  public List<IMatch> getColumnMatches(IWitness witness) {
+    List<ITokenMatch> tokenMatches = getMatches(witness);
     List<IMatch> columnMatches = Lists.newArrayList();
     for (ITokenMatch tokenMatch : tokenMatches) {
       INormalizedToken tableToken = tokenMatch.getTableToken();
