@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.matching;
+package eu.interedition.collatex2.experimental.tokenmatching.legacy;
 
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;

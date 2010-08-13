@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.matching;
+package eu.interedition.collatex2.experimental.tokenmatching.legacy;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,6 +8,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.experimental.tokenmatching.IndexMatcher;
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph.indexing;
+package eu.interedition.collatex2.experimental.tokenmatching;
 
 import java.util.List;
 import java.util.Set;
@@ -7,8 +7,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
+import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
+import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndex;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
-import eu.interedition.collatex2.implementation.matching.IndexMatcher;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;

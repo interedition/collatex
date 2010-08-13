@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph.indexing;
+package eu.interedition.collatex2.experimental.tokenmatching;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.experimental.graph.IVariantGraph;
+import eu.interedition.collatex2.experimental.tokenmatching.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;

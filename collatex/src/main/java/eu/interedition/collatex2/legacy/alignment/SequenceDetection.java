@@ -6,8 +6,8 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.experimental.tokenmatching.legacy.Match;
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IColumn;

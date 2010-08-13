@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.matching;
+package eu.interedition.collatex2.experimental.tokenmatching;
 
 import java.util.Collections;
 import java.util.Iterator;

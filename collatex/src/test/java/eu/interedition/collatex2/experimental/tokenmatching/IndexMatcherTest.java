@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.matching;
+package eu.interedition.collatex2.experimental.tokenmatching;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -13,9 +13,9 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.experimental.tokenmatching.legacy.AlignmentTableIndexMatcher;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
-import eu.interedition.collatex2.implementation.matching.AlignmentTableIndexMatcher;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumns;

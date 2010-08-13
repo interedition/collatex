@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
-import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
+import eu.interedition.collatex2.experimental.tokenmatching.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
