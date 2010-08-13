@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.interedition.collatex2.implementation.matching;
+package eu.interedition.collatex2.experimental.tokenmatching;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 

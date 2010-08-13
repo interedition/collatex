@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.matching;
+package eu.interedition.collatex2.experimental.tokenmatching;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,7 +21,7 @@ import eu.interedition.collatex2.interfaces.IWitnessIndex;
 public class IndexMatcher {
   public static final Logger LOG = LoggerFactory.getLogger(IndexMatcher.class);
 
-  public static List<ITokenMatch> findMatches(final IWitnessIndex tableIndex, final IWitnessIndex witnessIndex) {
+  protected static List<ITokenMatch> findMatches(final IWitnessIndex tableIndex, final IWitnessIndex witnessIndex) {
     final List<PhraseMatch> matches = Lists.newArrayList();
     final Set<String> keys = witnessIndex.keys();
     for (final String key : keys) {
@@ -37,7 +37,7 @@ public class IndexMatcher {
     return IndexMatcher.joinOverlappingMatches(matches);
   }
 
-  public static List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches) {
+  private static List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches) {
     final List<ITokenMatch> newMatches = IndexMatcher.filterMatchesBasedOnPositionMatches(matches);
     IndexMatcher.LOG.debug("filtered matches: " + newMatches);
     return newMatches;
@@ -50,7 +50,7 @@ public class IndexMatcher {
   // columns
   // NOTE: --> not the optimal alignment
   @SuppressWarnings("boxing")
-  public static List<ITokenMatch> filterMatchesBasedOnPositionMatches(final List<PhraseMatch> matches) {
+  private static List<ITokenMatch> filterMatchesBasedOnPositionMatches(final List<PhraseMatch> matches) {
     final Map<Integer, INormalizedToken> tableTokenMap = Maps.newHashMap();
     final Map<Integer, INormalizedToken> witnessTokenMap = Maps.newHashMap();
     List<PhraseMatch> filteredMatches = filterAwaySecondChoicesMultipleTokensOneColumn(filterAwaySecondChoicesMultipleColumnsOneToken(matches));
@@ -93,7 +93,7 @@ public class IndexMatcher {
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!
   // NOTE: multiple columns match with the same token!
-  public static List<PhraseMatch> filterAwaySecondChoicesMultipleColumnsOneToken(List<PhraseMatch> matches) {
+  private static List<PhraseMatch> filterAwaySecondChoicesMultipleColumnsOneToken(List<PhraseMatch> matches) {
     List<PhraseMatch> filteredMatches = Lists.newArrayList();
     final Map<INormalizedToken, INormalizedToken> tokenToTable = Maps.newLinkedHashMap();
     for (final PhraseMatch match : matches) {
@@ -137,7 +137,7 @@ public class IndexMatcher {
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!
   // NOTE: multiple witness tokens match with the same table column!
-  public static List<PhraseMatch> filterAwaySecondChoicesMultipleTokensOneColumn(List<PhraseMatch> matches) {
+  private static List<PhraseMatch> filterAwaySecondChoicesMultipleTokensOneColumn(List<PhraseMatch> matches) {
     List<PhraseMatch> filteredMatches = Lists.newArrayList();
     final Map<INormalizedToken, INormalizedToken> tableToToken = Maps.newLinkedHashMap();
     for (final PhraseMatch match : matches) {

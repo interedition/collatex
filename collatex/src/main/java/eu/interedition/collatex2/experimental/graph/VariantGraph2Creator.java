@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.graph.indexing.IVariantGraphIndex;
-import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndexMatcher;
+import eu.interedition.collatex2.experimental.tokenmatching.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -20,6 +20,7 @@ public class VariantGraph2Creator {
     this.graph = graph;
   }
 
+  // TODO: use the VariantGraphAligner here!
   // write
   // NOTE: tokenA is the token from the Witness
   // For every token in the witness we have to map a VariantNode
