@@ -15,7 +15,6 @@
 
 Notes:
 1. Topological values are unique and ascending?!
-4c Move over unit tests from IndexMatcherTest to VariantGraphIndexMatcherTest
 3a  Check correctness when omissions occur 
 
 
