@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.tokenmatching.legacy;
+package eu.interedition.collatex2.legacy.tokenmatching;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,7 +47,7 @@ public class AlignmentTableIndexMatcher extends IndexMatcher implements ITokenMa
       IColumn column = alignmentTableIndex.getColumn(tableToken);
       IPhrase witnessPhrase = new Phrase(Lists.newArrayList(tokenMatch.getWitnessToken()));
       IColumns columns = new Columns(Lists.newArrayList(column));
-      IMatch columnMatch = new Match(columns, witnessPhrase);
+      IMatch columnMatch = new ColumnPhraseMatch(columns, witnessPhrase);
       columnMatches.add(columnMatch);
     }
     // Sort the ColumnMatches here

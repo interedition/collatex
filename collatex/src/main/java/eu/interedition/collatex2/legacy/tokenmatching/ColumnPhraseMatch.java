@@ -1,15 +1,15 @@
-package eu.interedition.collatex2.experimental.tokenmatching.legacy;
+package eu.interedition.collatex2.legacy.tokenmatching;
 
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
-public class Match implements IMatch {
+public class ColumnPhraseMatch implements IMatch {
 
   private final IColumns a;
   private final IPhrase b;
 
-  public Match(final IColumns columnsA, final IPhrase witnessPhrase) {
+  public ColumnPhraseMatch(final IColumns columnsA, final IPhrase witnessPhrase) {
     this.a = columnsA;
     this.b = witnessPhrase;
   }
