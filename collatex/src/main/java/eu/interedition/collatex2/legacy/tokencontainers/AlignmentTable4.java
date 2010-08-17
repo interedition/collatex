@@ -21,6 +21,7 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 import eu.interedition.collatex2.todo.gapdetection.Gap;
 
 public class AlignmentTable4 extends BaseAlignmentTable implements IAlignmentTable {
@@ -162,5 +163,10 @@ public class AlignmentTable4 extends BaseAlignmentTable implements IAlignmentTab
   @Override
   public IRow getRow(IWitness witness) {
     return getRow(witness.getSigil());
+  }
+
+  @Override
+  public IWitnessIndex getTokenIndex(List<String> repeatingTokens) {
+    return AlignmentTableIndex.create(this, repeatingTokens);
   }
 }

@@ -16,6 +16,7 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
@@ -155,6 +156,11 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
     final IColumn column = new VariantGraphBasedColumn(vertex, columns.size() + 1);
     columns.add(column);
     return column;
+  }
+
+  @Override
+  public IWitnessIndex getTokenIndex(List<String> repeatingTokens) {
+    throw new RuntimeException("DO NOT INDEX THIS STRUCTURE!");
   }
 
 }
