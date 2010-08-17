@@ -147,12 +147,6 @@ public class AlignmentTableIndex0 implements IAlignmentTableIndex {
   }
 
   @Override
-  public IColumn getColumn(INormalizedToken token) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  @Override
   public Set<String> keys() {
     throw new RuntimeException("NOT IMPLEMENTED!");
   }

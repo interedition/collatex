@@ -4,7 +4,7 @@ public interface IAlignmentTableIndex extends IWitnessIndex {
 
   boolean containsNormalizedPhrase(final String normalized);
 
-  IColumn getColumn(final INormalizedToken token);
+//  IColumn getColumn(final INormalizedToken token);
 
   int size();
 

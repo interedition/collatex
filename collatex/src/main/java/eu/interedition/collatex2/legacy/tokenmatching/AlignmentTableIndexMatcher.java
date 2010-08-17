@@ -3,9 +3,11 @@ package eu.interedition.collatex2.legacy.tokenmatching;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.tokenmatching.ITokenMatcher;
@@ -40,11 +42,18 @@ public class AlignmentTableIndexMatcher extends IndexMatcher implements ITokenMa
   }
 
   public List<IMatch> getColumnMatches(IWitness witness) {
+    Map<INormalizedToken, IColumn> tokenToColumn = Maps.newLinkedHashMap();
+    for (IColumn column : table.getColumns()) {
+      for (String sigil : column.getSigli()) {
+        INormalizedToken token = column.getToken(sigil);
+        tokenToColumn.put(token, column);
+      }
+    }
     List<ITokenMatch> tokenMatches = getMatches(witness);
     List<IMatch> columnMatches = Lists.newArrayList();
     for (ITokenMatch tokenMatch : tokenMatches) {
       INormalizedToken tableToken = tokenMatch.getTableToken();
-      IColumn column = alignmentTableIndex.getColumn(tableToken);
+      IColumn column = tokenToColumn.get(tableToken);
       IPhrase witnessPhrase = new Phrase(Lists.newArrayList(tokenMatch.getWitnessToken()));
       IColumns columns = new Columns(Lists.newArrayList(column));
       IMatch columnMatch = new ColumnPhraseMatch(columns, witnessPhrase);

@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.implementation.indexing;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,11 +26,9 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
   //The Columns can be retrieved by using columnphrase.getColumns
   //TODO: rename field!
   private final Map<String, ColumnPhrase> normalizedToColumns;
-  private final Map<INormalizedToken, IColumn> tokenToColumn;
 
   private AlignmentTableIndex() {
     this.normalizedToColumns = Maps.newLinkedHashMap();
-    this.tokenToColumn = Maps.newLinkedHashMap();
   }
 
   public static IAlignmentTableIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
@@ -107,24 +104,11 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
 
   private void add(final ColumnPhrase phrase) {
     normalizedToColumns.put(phrase.getNormalized(), phrase);
-    IPhrase thephrase = phrase.getPhrase();
-    Iterator<IColumn> columns = phrase.getColumns().getColumns().iterator();
-    for (INormalizedToken token : thephrase.getTokens()) {
-      IColumn column = columns.next();
-      tokenToColumn.put(token, column);
-    }
   }
 
   //TODO: remove! NOT USED ANYMORE!
   public boolean containsNormalizedPhrase(final String normalized) {
     return normalizedToColumns.containsKey(normalized);
-  }
-
-  public IColumn getColumn(INormalizedToken token) {
-    if (!tokenToColumn.containsKey(token)) {
-      throw new RuntimeException("Token " + token.getNormalized() + " not included in index!");
-    }
-    return tokenToColumn.get(token);
   }
 
   @Override
