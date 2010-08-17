@@ -1,10 +1,12 @@
-package eu.interedition.collatex2.implementation.alignmenttable;
+package eu.interedition.collatex2.legacy.tokencontainers;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.alignmenttable.Column3;
+import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;

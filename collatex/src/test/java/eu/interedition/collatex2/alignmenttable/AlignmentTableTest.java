@@ -12,13 +12,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTable4;
 
 public class AlignmentTableTest {
   private static CollateXEngine engine;

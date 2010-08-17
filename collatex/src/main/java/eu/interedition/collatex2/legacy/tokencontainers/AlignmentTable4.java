@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.alignmenttable;
+package eu.interedition.collatex2.legacy.tokencontainers;
 
 import java.util.Collection;
 import java.util.List;
@@ -7,6 +7,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
+import eu.interedition.collatex2.implementation.alignmenttable.BaseAlignmentTable;
+import eu.interedition.collatex2.implementation.alignmenttable.Column3;
+import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
