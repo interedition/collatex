@@ -12,13 +12,14 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class AlignmentTableIndex implements IAlignmentTableIndex {
+//TODO: legacy class REMOVE! REMOVE!
+public class AlignmentTableIndex implements IWitnessIndex {
   private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
 
   //TODO: after all of this.. rename IWitnessIndex to ITokenIndex or something!
@@ -31,7 +32,7 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     this.normalizedToColumns = Maps.newLinkedHashMap();
   }
 
-  public static IAlignmentTableIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
+  public static IWitnessIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
     final AlignmentTableIndex index = new AlignmentTableIndex();
     for (final String sigil : table.getSigli()) {
       findUniquePhrasesForRow(sigil, table, index, repeatingTokens);
@@ -106,16 +107,6 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     normalizedToColumns.put(phrase.getNormalized(), phrase);
   }
 
-  //TODO: remove! NOT USED ANYMORE!
-  public boolean containsNormalizedPhrase(final String normalized) {
-    return normalizedToColumns.containsKey(normalized);
-  }
-
-  @Override
-  public int size() {
-    return normalizedToColumns.size();
-  }
-
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder("AlignmentTableIndex: (");
@@ -147,4 +138,8 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     return normalizedToColumns.keySet();
   }
 
+  @Override
+  public int size() {
+    return normalizedToColumns.size();
+  }
 }

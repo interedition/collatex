@@ -13,13 +13,13 @@ import com.google.common.collect.Multimap;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class AlignmentTableIndex0 implements IAlignmentTableIndex {
+public class AlignmentTableIndex0 implements IWitnessIndex {
   Map<String, IColumns> columnsForNormalizedPhrase;
 
   public AlignmentTableIndex0(final IAlignmentTable table) {

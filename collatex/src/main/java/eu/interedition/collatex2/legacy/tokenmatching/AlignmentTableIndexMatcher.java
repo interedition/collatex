@@ -17,7 +17,6 @@ import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -25,11 +24,12 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 //TODO: LEGACY CLASS REMOVE ! REMOVE !
 public class AlignmentTableIndexMatcher extends IndexMatcher implements ITokenMatcher {
   private final IAlignmentTable table;
-  private IAlignmentTableIndex alignmentTableIndex;
+  private IWitnessIndex alignmentTableIndex;
 
   public AlignmentTableIndexMatcher(IAlignmentTable table) {
     this.table = table;
