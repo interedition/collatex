@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.legacy.tokenmatching;
+package eu.interedition.collatex2.experimental.tokenmatching;
 
 import java.util.List;
 import java.util.Set;
@@ -6,8 +6,6 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.experimental.tokenmatching.ITokenMatcher;
-import eu.interedition.collatex2.experimental.tokenmatching.IndexMatcher;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
@@ -15,10 +13,10 @@ import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 //TODO: LEGACY CLASS REMOVE ! REMOVE !
-public class AlignmentTableIndexMatcher extends IndexMatcher implements ITokenMatcher {
+public class GenericTokenIndexMatcher extends IndexMatcher implements ITokenMatcher {
   private final ITokenContainer table;
 
-  public AlignmentTableIndexMatcher(ITokenContainer table) {
+  public GenericTokenIndexMatcher(ITokenContainer table) {
     this.table = table;
   }
 
