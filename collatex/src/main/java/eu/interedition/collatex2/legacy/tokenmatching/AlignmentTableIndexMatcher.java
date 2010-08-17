@@ -8,12 +8,12 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.experimental.tokenmatching.ITokenMatcher;
 import eu.interedition.collatex2.experimental.tokenmatching.IndexMatcher;
-import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableIndex;
 
 //TODO: LEGACY CLASS REMOVE ! REMOVE !
 public class AlignmentTableIndexMatcher extends IndexMatcher implements ITokenMatcher {

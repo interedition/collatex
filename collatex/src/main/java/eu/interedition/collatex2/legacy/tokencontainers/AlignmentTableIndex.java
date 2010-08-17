@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.indexing;
+package eu.interedition.collatex2.legacy.tokencontainers;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +11,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
+import eu.interedition.collatex2.implementation.indexing.ColumnPhrase;
+import eu.interedition.collatex2.implementation.indexing.NullColumn;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
