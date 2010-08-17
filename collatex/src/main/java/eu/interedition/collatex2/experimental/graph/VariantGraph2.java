@@ -12,9 +12,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndex;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 // This class implements the IVariantGraph interface.
 // The IVariantGraph interface is an extension of the DiGraph interface
@@ -167,5 +169,10 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
       }
     }
     return vertices;
+  }
+
+  @Override
+  public IWitnessIndex getTokenIndex(List<String> repeatingTokens) {
+    return VariantGraphIndex.create(this, repeatingTokens);
   }
 }

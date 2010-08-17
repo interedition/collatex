@@ -6,35 +6,30 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndex;
 import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-
-//TODO: this TokenMatcher could be made more generic if a
-//TODO: ITokenContainer interface was introduced!
+//TODO: this class is very similar to GenericTokenIndexMatcher!
+//TODO: remove one or the other!
 public class VariantGraphIndexMatcher implements ITokenMatcher {
-  private final IVariantGraph graph;
+  private final ITokenContainer graph;
   private IWitnessIndex graphIndex;
 
-  public VariantGraphIndexMatcher(IVariantGraph graph) {
+  public VariantGraphIndexMatcher(ITokenContainer graph) {
     this.graph = graph;
   }
 
+  //TODO: change into Set?
   public List<ITokenMatch> getMatches(IWitness witness) {
     Set<String> repeatingTokens = Sets.newLinkedHashSet();
     repeatingTokens.addAll(graph.findRepeatingTokens());
     repeatingTokens.addAll(witness.findRepeatingTokens());
-    // System.out.println(repeatingTokens);
-    //TODO: change into Set?
     List<String> repeatingTokensList = Lists.newArrayList(repeatingTokens);
     IWitnessIndex witnessIndex = new WitnessIndex(witness, repeatingTokensList);
-    graphIndex = VariantGraphIndex.create(graph, repeatingTokensList);
-    // System.out.println(graphIndex.keys());
-    // System.out.println(witnessIndex.keys());
+    graphIndex = graph.getTokenIndex(repeatingTokensList);
     return IndexMatcher.findMatches(graphIndex, witnessIndex);
   }
 }

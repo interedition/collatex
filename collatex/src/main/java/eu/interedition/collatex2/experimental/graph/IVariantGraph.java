@@ -5,9 +5,10 @@ import java.util.List;
 
 import org.jgrapht.DirectedGraph;
 
+import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge> {
+public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge>, ITokenContainer {
 
   IVariantGraphVertex getStartVertex();
 
@@ -15,9 +16,6 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
 
   // Iterates over vertices in topological order
   Iterator<IVariantGraphVertex> iterator();
-
-  //NOTE: could extract Indexable interface!
-  List<String> findRepeatingTokens();
 
   List<IWitness> getWitnesses();
 

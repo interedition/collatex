@@ -12,7 +12,6 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-//TODO: LEGACY CLASS REMOVE ! REMOVE !
 public class GenericTokenIndexMatcher extends IndexMatcher implements ITokenMatcher {
   private final ITokenContainer table;
 
@@ -25,7 +24,8 @@ public class GenericTokenIndexMatcher extends IndexMatcher implements ITokenMatc
     IWitnessIndex tableIndex = table.getTokenIndex(repeatingTokens);
     return IndexMatcher.findMatches(tableIndex, new WitnessIndex(witness, repeatingTokens));
   }
-
+  
+  //TODO: change return type from List into Set?
   private List<String> combineRepeatingTokens(final ITokenContainer table, final IWitness witness) {
     final Set<String> repeatingTokens = Sets.newHashSet();
     repeatingTokens.addAll(table.findRepeatingTokens());
