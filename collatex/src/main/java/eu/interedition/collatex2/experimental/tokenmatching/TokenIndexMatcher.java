@@ -19,14 +19,17 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
+import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class VariantGraphIndexMatcher implements ITokenMatcher {
-  private static final Logger LOG = LoggerFactory.getLogger(VariantGraphIndexMatcher.class);
+//TODO: remove explicit dependency on NullToken
+//TODO: remove explicit dependency on WitnessIndex
+public class TokenIndexMatcher implements ITokenMatcher {
+  private static final Logger LOG = LoggerFactory.getLogger(TokenIndexMatcher.class);
   private final ITokenContainer base;
 
-  public VariantGraphIndexMatcher(ITokenContainer base) {
+  public TokenIndexMatcher(ITokenContainer base) {
     this.base = base;
   }
 
@@ -57,13 +60,13 @@ public class VariantGraphIndexMatcher implements ITokenMatcher {
         matches.add(new PhraseMatch(tablePhrase, phrase));
       }
     }
-    VariantGraphIndexMatcher.LOG.debug("unfiltered matches: " + matches);
+    TokenIndexMatcher.LOG.debug("unfiltered matches: " + matches);
     return joinOverlappingMatches(matches);
   }
 
   private List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches) {
     final List<ITokenMatch> newMatches = filterMatchesBasedOnPositionMatches(matches);
-    VariantGraphIndexMatcher.LOG.debug("filtered matches: " + newMatches);
+    TokenIndexMatcher.LOG.debug("filtered matches: " + newMatches);
     return newMatches;
   }
 
@@ -152,7 +155,7 @@ public class VariantGraphIndexMatcher implements ITokenMatcher {
       if (!foundAlternative) {
         filteredMatches.add(match);
       } else {
-        VariantGraphIndexMatcher.LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
+        TokenIndexMatcher.LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
       }
     }
     return filteredMatches;
@@ -196,7 +199,7 @@ public class VariantGraphIndexMatcher implements ITokenMatcher {
       if (!foundAlternative) {
         filteredMatches.add(match);
       } else {
-        VariantGraphIndexMatcher.LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
+        TokenIndexMatcher.LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
       }
     }
     return filteredMatches;

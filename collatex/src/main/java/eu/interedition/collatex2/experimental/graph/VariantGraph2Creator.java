@@ -6,7 +6,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.tokenmatching.VariantGraphIndexMatcher;
+import eu.interedition.collatex2.experimental.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -30,7 +30,7 @@ public class VariantGraph2Creator {
   // if they already exist we need to add the witness to the
   // existing arc!
   public void addWitness(IWitness witness) {
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witness);
     makeEdgesForMatches(witness, matches);
   }

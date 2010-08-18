@@ -12,7 +12,7 @@ import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphIndexMatcherTest {
+public class TokenIndexMatcherTest {
   private static CollateXEngine factory;
 
   @BeforeClass
@@ -25,7 +25,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = factory.createWitness("B", "everything is unique");
     IVariantGraph graph = factory.graph(witnessA);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(3, matches.size());
     assertEquals("everything: 1 -> 1", matches.get(0).toString());
@@ -39,7 +39,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one very different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     IVariantGraph graph = factory.graph(witnessA, witnessB);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessC);
     assertEquals(3, matches.size());
     assertEquals("everything", matches.get(0).getNormalized());
@@ -53,7 +53,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one is different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     IVariantGraph graph = factory.graph(witnessA, witnessB);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessC);
     assertEquals(3, matches.size());
     assertEquals("everything", matches.get(0).getNormalized());
@@ -67,7 +67,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "The big black");
     final IVariantGraph graph = factory.graph(witnessA);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(3, matches.size());
     assertEquals("the: 1 -> 1", matches.get(0).toString());
@@ -81,7 +81,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "the big black cat");
     final IVariantGraph graph = factory.graph(witnessA);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(4, matches.size());
     assertEquals("the: 1 -> 1", matches.get(0).toString());
@@ -95,7 +95,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "the black cat and the black mat");
     final IWitness witnessB = factory.createWitness("B", "the black dog and the black mat");
     final IVariantGraph graph = factory.graph(witnessA);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(6, matches.size());
     assertEquals("the: 1 -> 1", matches.get(0).toString());
@@ -111,7 +111,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "The black cat");
     final IWitness witnessB = factory.createWitness("B", "The black and white cat");
     final IVariantGraph graph = factory.graph(witnessA);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(3, matches.size());
     assertEquals("the: 1 -> 1", matches.get(0).toString());
@@ -125,7 +125,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "a");
     final IWitness witnessB = factory.createWitness("B", "a a");
     final IVariantGraph graph = factory.graph(witnessA);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(1, matches.size());
     ITokenMatch match = matches.get(0);
@@ -139,7 +139,7 @@ public class VariantGraphIndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "a a");
     final IWitness witnessB = factory.createWitness("B", "a");
     final IVariantGraph graph = factory.graph(witnessA);
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(1, matches.size());
     ITokenMatch match = matches.get(0);
