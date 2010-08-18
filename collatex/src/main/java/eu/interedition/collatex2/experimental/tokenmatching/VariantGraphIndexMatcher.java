@@ -12,25 +12,26 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-//TODO: this class is very similar to GenericTokenIndexMatcher!
-//TODO: remove one or the other!
-public class VariantGraphIndexMatcher extends GenericTokenIndexMatcher implements ITokenMatcher {
-  private final ITokenContainer graph;
-  private IWitnessIndex graphIndex;
+public class VariantGraphIndexMatcher extends IndexMatcher implements ITokenMatcher {
+  private final ITokenContainer base;
 
   public VariantGraphIndexMatcher(ITokenContainer base) {
-    super(base);
-    this.graph = base;
+    this.base = base;
   }
 
-  //TODO: change into Set?
   public List<ITokenMatch> getMatches(IWitness witness) {
-    Set<String> repeatingTokens = Sets.newLinkedHashSet();
-    repeatingTokens.addAll(graph.findRepeatingTokens());
-    repeatingTokens.addAll(witness.findRepeatingTokens());
-    List<String> repeatingTokensList = Lists.newArrayList(repeatingTokens);
-    IWitnessIndex witnessIndex = new WitnessIndex(witness, repeatingTokensList);
-    graphIndex = graph.getTokenIndex(repeatingTokensList);
-    return IndexMatcher.findMatches(graphIndex, witnessIndex);
+    final List<String> repeatedTokens = combineRepeatedTokens(base, witness);
+    IWitnessIndex basseIndex = base.getTokenIndex(repeatedTokens);
+    return IndexMatcher.findMatches(basseIndex, new WitnessIndex(witness, repeatedTokens));
   }
+  
+  //TODO: change return type from List into Set?
+  private List<String> combineRepeatedTokens(final ITokenContainer table, final IWitness witness) {
+    final Set<String> repeatedTokens = Sets.newHashSet();
+    repeatedTokens.addAll(table.findRepeatingTokens());
+    repeatedTokens.addAll(witness.findRepeatingTokens());
+    return Lists.newArrayList(repeatedTokens);
+  }
+
+
 }
