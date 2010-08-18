@@ -13,7 +13,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.tokenmatching.GenericTokenIndexMatcher;
+import eu.interedition.collatex2.experimental.tokenmatching.ITokenMatcher;
+import eu.interedition.collatex2.experimental.tokenmatching.VariantGraphIndexMatcher;
 import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.implementation.modifications.Omission;
@@ -146,7 +147,7 @@ public class Alignment implements IAlignment {
         tokenToColumn.put(token, column);
       }
     }
-    GenericTokenIndexMatcher matcher = new GenericTokenIndexMatcher(table);
+    ITokenMatcher matcher = new VariantGraphIndexMatcher(table);
     List<ITokenMatch> tokenMatches = matcher.getMatches(witness);
     List<IMatch> columnMatches = Lists.newArrayList();
     for (ITokenMatch tokenMatch : tokenMatches) {

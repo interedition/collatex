@@ -14,12 +14,13 @@ import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 //TODO: this class is very similar to GenericTokenIndexMatcher!
 //TODO: remove one or the other!
-public class VariantGraphIndexMatcher implements ITokenMatcher {
+public class VariantGraphIndexMatcher extends GenericTokenIndexMatcher implements ITokenMatcher {
   private final ITokenContainer graph;
   private IWitnessIndex graphIndex;
 
-  public VariantGraphIndexMatcher(ITokenContainer graph) {
-    this.graph = graph;
+  public VariantGraphIndexMatcher(ITokenContainer base) {
+    super(base);
+    this.graph = base;
   }
 
   //TODO: change into Set?

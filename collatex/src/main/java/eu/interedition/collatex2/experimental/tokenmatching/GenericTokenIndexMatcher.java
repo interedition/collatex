@@ -12,10 +12,10 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class GenericTokenIndexMatcher extends IndexMatcher implements ITokenMatcher {
+public class GenericTokenIndexMatcher extends IndexMatcher {
   private final ITokenContainer table;
 
-  public GenericTokenIndexMatcher(ITokenContainer table) {
+  protected GenericTokenIndexMatcher(ITokenContainer table) {
     this.table = table;
   }
 
