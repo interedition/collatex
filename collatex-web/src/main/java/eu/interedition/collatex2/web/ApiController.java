@@ -35,7 +35,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
@@ -43,6 +42,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
 import eu.interedition.collatex2.web.io.GraphVisualisationWrapper;
