@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.modifications;
+package eu.interedition.collatex2.todo.modifications;
 
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;

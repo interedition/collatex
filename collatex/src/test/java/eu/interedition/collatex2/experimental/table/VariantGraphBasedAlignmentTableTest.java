@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import eu.interedition.collatex2.experimental.output.table.VariantGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;

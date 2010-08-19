@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.interedition.collatex2.experimental.table.VariantGraphBasedAlignmentTable;
+import eu.interedition.collatex2.experimental.output.table.VariantGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
