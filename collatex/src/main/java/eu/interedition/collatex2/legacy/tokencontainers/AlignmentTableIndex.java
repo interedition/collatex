@@ -18,23 +18,20 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 //TODO: legacy class REMOVE! REMOVE!
-public class AlignmentTableIndex implements IWitnessIndex {
+public class AlignmentTableIndex implements ITokenIndex {
   private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
 
-  //TODO: after all of this.. rename IWitnessIndex to ITokenIndex or something!
-  //TODO: store ColumnPhrase in this map instead of IColums
-  //The Columns can be retrieved by using columnphrase.getColumns
-  //TODO: rename field!
+  //TODO: rename field normalizedToColumns!
   private final Map<String, ColumnPhrase> normalizedToColumns;
 
   private AlignmentTableIndex() {
     this.normalizedToColumns = Maps.newLinkedHashMap();
   }
 
-  public static IWitnessIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
+  public static ITokenIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
     final AlignmentTableIndex index = new AlignmentTableIndex();
     for (final String sigil : table.getSigli()) {
       findUniquePhrasesForRow(sigil, table, index, repeatingTokens);

@@ -16,7 +16,7 @@ import eu.interedition.collatex2.experimental.graph.indexing.VariantGraphIndex;
 import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 // This class implements the IVariantGraph interface.
 // The IVariantGraph interface is an extension of the DiGraph interface
@@ -38,7 +38,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   }
 
   @Override
-  public List<String> findRepeatingTokens() {
+  public List<String> getRepeatedTokens() {
     // remove start and end vertices
     Set<IVariantGraphVertex> copy = Sets.newLinkedHashSet(vertexSet());
     copy.remove(startVertex);
@@ -172,7 +172,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   }
 
   @Override
-  public IWitnessIndex getTokenIndex(List<String> repeatingTokens) {
+  public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
     return VariantGraphIndex.create(this, repeatingTokens);
   }
 }

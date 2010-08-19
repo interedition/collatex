@@ -27,7 +27,7 @@ import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.legacy.alignment.Alignment;
 import eu.interedition.collatex2.legacy.alignment.SequenceDetection;
 import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTable4;
@@ -84,7 +84,7 @@ public class CollateXEngine {
     return alignment;
   }
 
-  public static IWitnessIndex createWitnessIndex(final IWitness witness) {
+  public static ITokenIndex createWitnessIndex(final IWitness witness) {
     return new WitnessIndex(witness, witness.findRepeatingTokens());
   }
 

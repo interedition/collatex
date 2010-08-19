@@ -5,8 +5,8 @@ import java.util.List;
 
 public interface ITokenContainer {
 
-  List<String> findRepeatingTokens();
+  List<String> getRepeatedTokens();
 
-  IWitnessIndex getTokenIndex(List<String> repeatingTokens);
+  ITokenIndex getTokenIndex(List<String> repeatedTokens);
 
 }

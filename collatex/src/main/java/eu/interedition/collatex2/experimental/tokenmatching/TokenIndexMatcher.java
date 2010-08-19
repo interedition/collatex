@@ -21,7 +21,7 @@ import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 //TODO: remove explicit dependency on NullToken
 //TODO: remove explicit dependency on WitnessIndex
@@ -35,27 +35,27 @@ public class TokenIndexMatcher implements ITokenMatcher {
 
   public List<ITokenMatch> getMatches(IWitness witness) {
     final List<String> repeatedTokens = combineRepeatedTokens(witness);
-    IWitnessIndex baseIndex = base.getTokenIndex(repeatedTokens);
+    ITokenIndex baseIndex = base.getTokenIndex(repeatedTokens);
     return findMatches(baseIndex, new WitnessIndex(witness, repeatedTokens));
   }
   
   //TODO: change return type from List into Set?
   private List<String> combineRepeatedTokens(final IWitness witness) {
     final Set<String> repeatedTokens = Sets.newHashSet();
-    repeatedTokens.addAll(base.findRepeatingTokens());
+    repeatedTokens.addAll(base.getRepeatedTokens());
     repeatedTokens.addAll(witness.findRepeatingTokens());
     return Lists.newArrayList(repeatedTokens);
   }
 
 
-  private List<ITokenMatch> findMatches(final IWitnessIndex tableIndex, final IWitnessIndex witnessIndex) {
+  private List<ITokenMatch> findMatches(final ITokenIndex tableIndex, final ITokenIndex tokenIndex) {
     final List<PhraseMatch> matches = Lists.newArrayList();
-    final Set<String> keys = witnessIndex.keys();
+    final Set<String> keys = tokenIndex.keys();
     for (final String key : keys) {
       // IndexMatcher.LOG.debug("Looking for phrase: " + key);
       if (tableIndex.contains(key)) {
         // IndexMatcher.LOG.debug("FOUND!");
-        final IPhrase phrase = witnessIndex.getPhrase(key);
+        final IPhrase phrase = tokenIndex.getPhrase(key);
         final IPhrase tablePhrase = tableIndex.getPhrase(key);
         matches.add(new PhraseMatch(tablePhrase, phrase));
       }

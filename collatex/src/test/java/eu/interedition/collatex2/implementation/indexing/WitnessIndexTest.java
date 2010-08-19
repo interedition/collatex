@@ -12,7 +12,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 public class WitnessIndexTest {
   private static final Logger LOG = LoggerFactory.getLogger(WitnessIndexTest.class);
@@ -26,7 +26,7 @@ public class WitnessIndexTest {
   @Test
   public void test() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
-    final IWitnessIndex index = new WitnessIndex(witnessA, witnessA.findRepeatingTokens());
+    final ITokenIndex index = new WitnessIndex(witnessA, witnessA.findRepeatingTokens());
     // The index should contain all unique n-grams with 
     //   0 or more tokens         occurring multiple times in the witness, and
     //   exactly 1 token (or '#') occurring only once      in the witness
@@ -51,7 +51,7 @@ public class WitnessIndexTest {
   @Test
   public void test2() {
     final IWitness witnessA = factory.createWitness("A", "the big black");
-    final IWitnessIndex index = new WitnessIndex(witnessA, Lists.newArrayList("the", "big", "black"));
+    final ITokenIndex index = new WitnessIndex(witnessA, Lists.newArrayList("the", "big", "black"));
     LOG.debug(index.keys().toString());
     assertEquals(6, index.size());
     assertTrue(index.contains("# the"));
@@ -66,7 +66,7 @@ public class WitnessIndexTest {
   @Test
   public void test1() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
+    final ITokenIndex index = CollateXEngine.createWitnessIndex(a);
     assertEquals(6, index.size());
     assertTrue(index.contains("# tobe"));
     assertTrue(index.contains("tobe or"));

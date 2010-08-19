@@ -18,9 +18,9 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
-public class AlignmentTableIndex0 implements IWitnessIndex {
+public class AlignmentTableIndex0 implements ITokenIndex {
   Map<String, IColumns> columnsForNormalizedPhrase;
 
   public AlignmentTableIndex0(final IAlignmentTable table) {

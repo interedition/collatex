@@ -19,9 +19,9 @@ import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
-public class WitnessIndex implements IWitnessIndex {
+public class WitnessIndex implements ITokenIndex {
   List<IPhrase> phraseCollection = Lists.newArrayList();
   private static final Function<INormalizedToken, IPhrase> TOKEN_TO_PHRASE = new Function<INormalizedToken, IPhrase>() {
     @Override

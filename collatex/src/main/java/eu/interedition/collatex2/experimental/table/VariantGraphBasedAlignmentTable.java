@@ -16,7 +16,7 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
@@ -71,7 +71,7 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
   }
 
   @Override
-  public List<String> findRepeatingTokens() {
+  public List<String> getRepeatedTokens() {
     // TODO Auto-generated method stub
     return null;
   }
@@ -159,7 +159,7 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
   }
 
   @Override
-  public IWitnessIndex getTokenIndex(List<String> repeatingTokens) {
+  public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
     throw new RuntimeException("DO NOT INDEX THIS STRUCTURE!");
   }
 
