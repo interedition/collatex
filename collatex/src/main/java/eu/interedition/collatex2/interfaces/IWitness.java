@@ -2,7 +2,7 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
-public interface IWitness {
+public interface IWitness extends ITokenContainer {
 
   // Note: not pleased with this method! implement Iterable!
   List<INormalizedToken> getTokens();
@@ -12,7 +12,5 @@ public interface IWitness {
   int size();
 
   String getSigil();
-
-  List<String> findRepeatingTokens();
 
 }

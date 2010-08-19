@@ -85,7 +85,7 @@ public class CollateXEngine {
   }
 
   public static ITokenIndex createWitnessIndex(final IWitness witness) {
-    return new WitnessIndex(witness, witness.findRepeatingTokens());
+    return new WitnessIndex(witness, witness.getRepeatedTokens());
   }
 
   // TODO: remove? seems only used in tests!

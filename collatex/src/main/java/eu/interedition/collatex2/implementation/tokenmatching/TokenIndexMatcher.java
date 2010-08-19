@@ -43,7 +43,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
   private List<String> combineRepeatedTokens(final IWitness witness) {
     final Set<String> repeatedTokens = Sets.newHashSet();
     repeatedTokens.addAll(base.getRepeatedTokens());
-    repeatedTokens.addAll(witness.findRepeatingTokens());
+    repeatedTokens.addAll(witness.getRepeatedTokens());
     return Lists.newArrayList(repeatedTokens);
   }
 

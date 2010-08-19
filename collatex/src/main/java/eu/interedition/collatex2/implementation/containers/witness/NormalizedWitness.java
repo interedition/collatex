@@ -12,6 +12,7 @@ import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
@@ -66,7 +67,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   }
 
   @Override
-  public List<String> findRepeatingTokens() {
+  public List<String> getRepeatedTokens() {
     final Multimap<String, INormalizedToken> normalizedTokenMap = ArrayListMultimap.create();
     for (final INormalizedToken token : getTokens()) {
       normalizedTokenMap.put(token.getNormalized(), token);
@@ -79,5 +80,10 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
       }
     }
     return repeatingNormalizedTokens;
+  }
+
+  @Override
+  public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
+    return new WitnessIndex(this, repeatedTokens);
   }
 }
