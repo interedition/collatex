@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
@@ -24,7 +23,6 @@ import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 //TODO: remove explicit dependency on NullToken
-//TODO: remove explicit dependency on WitnessIndex
 public class TokenIndexMatcher implements ITokenMatcher {
   private static final Logger LOG = LoggerFactory.getLogger(TokenIndexMatcher.class);
   private final ITokenContainer base;
@@ -36,7 +34,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
   public List<ITokenMatch> getMatches(IWitness witness) {
     final List<String> repeatedTokens = combineRepeatedTokens(witness);
     ITokenIndex baseIndex = base.getTokenIndex(repeatedTokens);
-    return findMatches(baseIndex, new WitnessIndex(witness, repeatedTokens));
+    return findMatches(baseIndex, witness.getTokenIndex(repeatedTokens));
   }
   
   //TODO: change return type from List into Set?
