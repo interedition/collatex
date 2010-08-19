@@ -11,10 +11,10 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
-import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
+import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
-import eu.interedition.collatex2.input.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
