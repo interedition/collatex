@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.implementation.containers.graph;
 
 import java.util.Map;
 import java.util.Set;
@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphVertex implements IVariantGraphVertex {

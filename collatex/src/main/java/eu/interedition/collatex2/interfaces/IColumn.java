@@ -2,7 +2,6 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 
 public interface IColumn extends Comparable<IColumn> {
 

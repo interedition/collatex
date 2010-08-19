@@ -1,12 +1,10 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.interfaces;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.jgrapht.DirectedGraph;
 
-import eu.interedition.collatex2.interfaces.ITokenContainer;
-import eu.interedition.collatex2.interfaces.IWitness;
 
 public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge>, ITokenContainer {
 

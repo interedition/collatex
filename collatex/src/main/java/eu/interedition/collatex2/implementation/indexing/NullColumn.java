@@ -2,11 +2,11 @@ package eu.interedition.collatex2.implementation.indexing;
 
 import java.util.List;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
 public class NullColumn implements IColumn {
 

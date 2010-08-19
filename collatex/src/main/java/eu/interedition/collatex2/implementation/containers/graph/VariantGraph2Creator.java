@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.implementation.containers.graph;
 
 import java.util.List;
 import java.util.Map;
@@ -9,6 +9,9 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex2.experimental.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraph2Creator {

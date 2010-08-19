@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.implementation.containers.graph;
 
 import java.util.Collections;
 import java.util.Set;
@@ -7,6 +7,8 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 @SuppressWarnings("serial")

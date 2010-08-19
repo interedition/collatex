@@ -1,8 +1,7 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.interfaces;
 
 import java.util.Set;
 
-import eu.interedition.collatex2.interfaces.IWitness;
 
 public interface IVariantGraphEdge {
 
