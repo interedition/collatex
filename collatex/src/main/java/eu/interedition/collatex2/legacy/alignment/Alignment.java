@@ -13,11 +13,11 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.implementation.modifications.Omission;
 import eu.interedition.collatex2.implementation.modifications.Replacement;
 import eu.interedition.collatex2.implementation.modifications.Transposition;
+import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;

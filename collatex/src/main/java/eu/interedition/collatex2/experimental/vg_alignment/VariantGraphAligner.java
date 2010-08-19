@@ -2,7 +2,7 @@ package eu.interedition.collatex2.experimental.vg_alignment;
 
 import java.util.List;
 
-import eu.interedition.collatex2.experimental.tokenmatching.TokenIndexMatcher;
+import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.tokenmatching;
+package eu.interedition.collatex2.implementation.tokenmatching;
 
 import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
 import eu.interedition.collatex2.interfaces.IPhrase;
