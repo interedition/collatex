@@ -1,16 +1,16 @@
-package eu.interedition.collatex2.implementation.indexing;
+package eu.interedition.collatex2.legacy.indexing;
 
 import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
 
 public class ColumnPhrase {
   // IColumns columns is a consecutive list of IColumn-s

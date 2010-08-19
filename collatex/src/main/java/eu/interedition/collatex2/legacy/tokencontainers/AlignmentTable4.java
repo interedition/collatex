@@ -7,9 +7,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
-import eu.interedition.collatex2.implementation.alignmenttable.BaseAlignmentTable;
-import eu.interedition.collatex2.implementation.alignmenttable.Column3;
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -22,6 +19,9 @@ import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
+import eu.interedition.collatex2.legacy.alignmenttable.BaseAlignmentTable;
+import eu.interedition.collatex2.legacy.alignmenttable.Column3;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
 import eu.interedition.collatex2.todo.gapdetection.Gap;
 
 public class AlignmentTable4 extends BaseAlignmentTable implements IAlignmentTable {

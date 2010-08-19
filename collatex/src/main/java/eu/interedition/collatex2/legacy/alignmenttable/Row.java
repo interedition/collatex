@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.alignmenttable;
+package eu.interedition.collatex2.legacy.alignmenttable;
 
 import java.util.Iterator;
 import java.util.List;

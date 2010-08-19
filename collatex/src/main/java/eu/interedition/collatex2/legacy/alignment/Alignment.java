@@ -14,7 +14,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.tokenmatching.TokenIndexMatcher;
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.implementation.modifications.Omission;
 import eu.interedition.collatex2.implementation.modifications.Replacement;
@@ -35,6 +34,7 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
 import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 
 public class Alignment implements IAlignment {

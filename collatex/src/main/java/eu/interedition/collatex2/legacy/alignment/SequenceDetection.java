@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -14,6 +13,7 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
 import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 
 //NOTE: This class is to be made obsolete by SequenceDetection2!

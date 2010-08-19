@@ -11,14 +11,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.implementation.indexing.ColumnPhrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
+import eu.interedition.collatex2.legacy.indexing.ColumnPhrase;
 
 public class AlignmentTableIndex0 implements ITokenIndex {
   Map<String, IColumns> columnsForNormalizedPhrase;

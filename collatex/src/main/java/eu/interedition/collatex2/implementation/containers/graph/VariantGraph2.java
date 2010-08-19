@@ -12,13 +12,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
+import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 // This class implements the IVariantGraph interface.
 // The IVariantGraph interface is an extension of the DiGraph interface
@@ -26,6 +26,7 @@ import eu.interedition.collatex2.interfaces.ITokenIndex;
 // The VariantGraph contains a start and an end vertex.
 // The VariantGraph contains a List of witnesses that have
 // been added to the Graph.
+// TODO: Remove dependency on NullToken class!
 @SuppressWarnings("serial")
 public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
   private final IVariantGraphVertex startVertex;

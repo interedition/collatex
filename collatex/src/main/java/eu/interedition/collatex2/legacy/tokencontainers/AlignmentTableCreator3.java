@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Stack;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.alignmenttable.Column3;
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
@@ -22,6 +20,8 @@ import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.legacy.alignment.Alignment;
+import eu.interedition.collatex2.legacy.alignmenttable.Column3;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
 import eu.interedition.collatex2.todo.gapdetection.Gap;
 
 public class AlignmentTableCreator3 implements IAligner {

@@ -21,12 +21,12 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultiset;
 
-import eu.interedition.collatex2.implementation.indexing.NullToken;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
+import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 public class WitnessIndex0 implements ITokenIndex {
   private Logger log = LoggerFactory.getLogger(WitnessIndex0.class); 
