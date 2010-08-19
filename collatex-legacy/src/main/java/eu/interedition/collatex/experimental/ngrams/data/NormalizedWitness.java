@@ -6,6 +6,7 @@ import java.util.List;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
@@ -54,7 +55,13 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   }
 
   @Override
-  public List<String> findRepeatingTokens() {
+  public List<String> getRepeatedTokens() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
     // TODO Auto-generated method stub
     return null;
   }
