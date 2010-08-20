@@ -1,52 +1,58 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<title>REST service result :: CollateX</title>
-	<link rel="stylesheet" type="text/css" href="/collatex-web/css/collatex.css" />
-	
-</head>
-<body>
-	<div id="mainmenu">
-		<a href="/collatex-web/examples/usecases" title="Use Cases">Use cases</a> |
-		<a href="/collatex-web/examples/darwin" title="Darwin">Darwin</a> |
-		<a href="/collatex-web/api/collate" title="REST service">REST service</a>
-	</div>
-	
 
-<h1>REST service result</h1>
+Macro page has no such argument: head
+The problematic instruction:
+----------
+==> macro page [on line 27, column 1 in collatex.ftl]
+ in user-directive c.page [on line 2, column 1 in api/dot.ftl]
+----------
 
-.dot output:
-<pre>
-digraph G {
-  1 [label = "#"];
-  2 [label = "#"];
-  3 [label = "a"];
-  4 [label = "black"];
-  5 [label = "cat"];
-  6 [label = "in"];
-  7 [label = "a"];
-  8 [label = "black"];
-  9 [label = "basket"];
-  10 [label = "happy"];
-  11 [label = "striped"];
-  12 [label = "white"];
-  1 -> 3 [label = "A,B,C,D"];
-  3 -> 4 [label = "A"];
-  4 -> 5 [label = "A,B"];
-  5 -> 6 [label = "A,B,C,D"];
-  6 -> 7 [label = "A,B,C,D"];
-  7 -> 8 [label = "A,B,C"];
-  8 -> 9 [label = "A,B,C"];
-  9 -> 2 [label = "A,B,C,D"];
-  3 -> 10 [label = "B"];
-  10 -> 4 [label = "B"];
-  3 -> 11 [label = "C,D"];
-  11 -> 5 [label = "C,D"];
-  7 -> 12 [label = "D"];
-  12 -> 9 [label = "D"];
-}
-
-</pre>
-</body>
-</html>
+Java backtrace for programmers:
+----------
+freemarker.template.TemplateException: Macro page has no such argument: head
+	at freemarker.core.Environment.visit(Environment.java:565)
+	at freemarker.core.UnifiedCall.accept(UnifiedCall.java:106)
+	at freemarker.core.Environment.visit(Environment.java:210)
+	at freemarker.core.Environment.process(Environment.java:190)
+	at freemarker.template.Template.process(Template.java:237)
+	at org.springframework.web.servlet.view.freemarker.FreeMarkerView.processTemplate(FreeMarkerView.java:366)
+	at org.springframework.web.servlet.view.freemarker.FreeMarkerView.doRender(FreeMarkerView.java:283)
+	at org.springframework.web.servlet.view.freemarker.FreeMarkerView.renderMergedTemplateModel(FreeMarkerView.java:233)
+	at org.springframework.web.servlet.view.AbstractTemplateView.renderMergedOutputModel(AbstractTemplateView.java:167)
+	at org.springframework.web.servlet.view.AbstractView.render(AbstractView.java:250)
+	at org.springframework.web.servlet.DispatcherServlet.render(DispatcherServlet.java:1060)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:798)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:716)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:644)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:560)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:727)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:820)
+	at org.mortbay.jetty.servlet.ServletHolder.handle(ServletHolder.java:511)
+	at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:390)
+	at org.mortbay.jetty.security.SecurityHandler.handle(SecurityHandler.java:216)
+	at org.mortbay.jetty.servlet.SessionHandler.handle(SessionHandler.java:182)
+	at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)
+	at org.mortbay.jetty.webapp.WebAppContext.handle(WebAppContext.java:440)
+	at org.mortbay.jetty.servlet.Dispatcher.forward(Dispatcher.java:327)
+	at org.mortbay.jetty.servlet.Dispatcher.forward(Dispatcher.java:126)
+	at org.tuckey.web.filters.urlrewrite.NormalRewrittenUrl.doRewrite(NormalRewrittenUrl.java:195)
+	at org.tuckey.web.filters.urlrewrite.RuleChain.handleRewrite(RuleChain.java:159)
+	at org.tuckey.web.filters.urlrewrite.RuleChain.doRules(RuleChain.java:141)
+	at org.tuckey.web.filters.urlrewrite.UrlRewriter.processRequest(UrlRewriter.java:90)
+	at org.tuckey.web.filters.urlrewrite.UrlRewriteFilter.doFilter(UrlRewriteFilter.java:417)
+	at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)
+	at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:388)
+	at org.mortbay.jetty.security.SecurityHandler.handle(SecurityHandler.java:216)
+	at org.mortbay.jetty.servlet.SessionHandler.handle(SessionHandler.java:182)
+	at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)
+	at org.mortbay.jetty.webapp.WebAppContext.handle(WebAppContext.java:440)
+	at org.mortbay.jetty.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:230)
+	at org.mortbay.jetty.handler.HandlerCollection.handle(HandlerCollection.java:114)
+	at org.mortbay.jetty.handler.HandlerWrapper.handle(HandlerWrapper.java:152)
+	at org.mortbay.jetty.Server.handle(Server.java:326)
+	at org.mortbay.jetty.HttpConnection.handleRequest(HttpConnection.java:542)
+	at org.mortbay.jetty.HttpConnection$RequestHandler.content(HttpConnection.java:943)
+	at org.mortbay.jetty.HttpParser.parseNext(HttpParser.java:756)
+	at org.mortbay.jetty.HttpParser.parseAvailable(HttpParser.java:218)
+	at org.mortbay.jetty.HttpConnection.handle(HttpConnection.java:404)
+	at org.mortbay.io.nio.SelectChannelEndPoint.run(SelectChannelEndPoint.java:410)
+	at org.mortbay.thread.QueuedThreadPool$PoolThread.run(QueuedThreadPool.java:582)

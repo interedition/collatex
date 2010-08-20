@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.interedition.collatex</groupId>
-	<artifactId>project</artifactId>
+	<artifactId>collatex-project</artifactId>
 	<packaging>pom</packaging>
 	<name>CollateX :: Project</name>
 	<version>1.1-SNAPSHOT</version>
 	<description>CollateX is a Java library for collating textual sources, for example, to produce an apparatus.</description>
 	<url>http://collatex.sourceforge.net/</url>
 	<organization>
-		<name>COST Action “Interedition”</name>
+		<name>ESF COST Action “Interedition”</name>
 		<url>http://www.interedition.eu/</url>
 	</organization>
 	<modules>
@@ -18,6 +18,7 @@
 		<module>collatex-nodeps</module>
 		<module>collatex-web</module>
 		<module>collatex-legacy</module>
+		<module>collatex-clients</module>
 	</modules>
 	<dependencies>
 		<dependency>
@@ -93,6 +94,11 @@
 				<artifactId>org.restlet.ext.json</artifactId>
 				<version>${restlet.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>1.3.2</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<repositories>
@@ -128,6 +134,39 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<artifactId>maven-site-plugin</artifactId>
+				<configuration>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<configuration>
+					<header>HEADER</header>
+					<encoding>UTF-8</encoding>
+					<excludes>
+						<exclude>HEADER</exclude>
+						<exclude>LICENSE</exclude>
+						<exclude>NOTICE</exclude>
+						<exclude>README</exclude>
+						<exclude>**/*.apt</exclude>
+						<exclude>**/*.py</exclude>
+						<exclude>**/*.rb</exclude>
+						<exclude>src/test/resources/**</exclude>
+						<exclude>src/main/webapp/examples.xml</exclude>
+						<exclude>src/main/webapp/darwin.xml</exclude>
+						<exclude>examples/**</exclude>
+						<exclude>site/**</exclude>
+						<exclude>target/**</exclude>
+					</excludes>
+					<properties>
+						<year>2010</year>
+					</properties>
+				</configuration>
+			</plugin>
+
+			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
 					<execution>
@@ -144,12 +183,6 @@
 					<descriptorRefs>
 						<descriptorRef>bin</descriptorRef>
 					</descriptorRefs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-site-plugin</artifactId>
-				<configuration>
-					<outputEncoding>UTF-8</outputEncoding>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -182,7 +215,18 @@
 					<docencoding>UTF-8</docencoding>
 					<links>
 						<link>http://java.sun.com/j2se/1.6.0/docs/api</link>
+						<link>http://google-collections.googlecode.com/svn/trunk/javadoc/</link>
+						<link>http://jackson.codehaus.org/1.4.2/javadoc/</link>
+						<link>http://junit.sourceforge.net/javadoc/</link>
 					</links>
+					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+					<docletArtifact>
+						<groupId>org.umlgraph</groupId>
+						<artifactId>doclet</artifactId>
+						<version>5.1</version>
+					</docletArtifact>
+					<additionalparam>all</additionalparam>
+					<useStandardDocletOptions>true</useStandardDocletOptions>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -217,7 +261,9 @@
 		</developer>
 		<developer>
 			<name>Gregor Middell</name>
+			<url>http://gregor.middell.net/</url>
 			<organization>Universität Würzburg</organization>
+			<organizationUrl>http://www.digital-humanities.de/</organizationUrl>
 		</developer>
 		<developer>
 			<name>Marcin Mielnicki</name>
@@ -230,6 +276,7 @@
 		<developer>
 			<name>Thorsten Vitt</name>
 			<organization>Universität Würzburg</organization>
+			<organizationUrl>http://www.digital-humanities.de/</organizationUrl>
 		</developer>
 		<developer>
 			<name>Joris van Zundert</name>
@@ -244,8 +291,8 @@
 		</repository>
 	</distributionManagement>
 	<issueManagement>
-		<system>sourceforge.net</system>
-		<url>http://sourceforge.net/tracker/?group_id=199278</url>
+		<system>launchpad.net</system>
+		<url>https://bugs.launchpad.net/collatex</url>
 	</issueManagement>
 	<licenses>
 		<license>

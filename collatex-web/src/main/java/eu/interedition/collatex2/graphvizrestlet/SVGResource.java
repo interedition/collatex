@@ -31,7 +31,7 @@ public class SVGResource extends ServerResource {
       //      String[] cmd = { "cmd", "/c", "mvn" };
       // Windows
       //      String[] cmd = { "cmd", "/c", "\"C:\\Program Files\\Graphviz2.26.3\\bin\\dot.exe\" -GRankdir=LR -Gid=VariantGraph -Tsvg " + INPUT_DOT };
-      String[] cmd = { "/bin/sh", "-c", "dot -GRankdir=LR -Gid=VariantGraph -Tsvg " + INPUT_DOT };
+      String[] cmd = { "/bin/sh", "-c", "dot -Grankdir=LR -Gid=VariantGraph -Tsvg " + INPUT_DOT };
       Process p = Runtime.getRuntime().exec(cmd);
 
       extracted(p.getErrorStream());

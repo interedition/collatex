@@ -76,14 +76,24 @@ public class ApiController implements InitializingBean {
     jsonView.setObjectMapper(objectMapper);
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept-Header=application/json" }, method = RequestMethod.POST)
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/json" }, method = RequestMethod.POST)
   public ModelAndView collateToJson(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(jsonView, "alignment", collate(input));
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept-Header=application/xml" }, method = RequestMethod.POST)
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/xml" }, method = RequestMethod.POST)
   public ModelAndView collateToTei(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(teiView, "alignment", collate(input));
+  }
+
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
+  public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
+    System.out.println("collateToSvg");
+    String collate2svg = collate2svg(input);
+    System.out.println(collate2svg);
+    ModelAndView modelAndView = new ModelAndView("api/svg", "svg", collate2svg);
+    System.out.println(modelAndView);
+    return modelAndView;
   }
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
@@ -103,7 +113,7 @@ public class ApiController implements InitializingBean {
 
   @RequestMapping(value = "dot", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
   public ModelAndView collateToDot(@RequestBody final ApiInput input) throws Exception {
-    return new ModelAndView("api/dot", "dot", collate4(input));
+    return new ModelAndView("api/dot", "dot", collate2dot(input));
   }
 
   @RequestMapping(value = "collate")
@@ -126,7 +136,12 @@ public class ApiController implements InitializingBean {
     return new GraphVisualisationWrapper(array, new CollateXEngine().graph(array));
   }
 
-  private String collate4(ApiInput input) throws ApiException {
+  private String collate2svg(ApiInput input) throws ApiException {
+    String dot = collate2dot(input);
+    return dot;
+  }
+
+  private String collate2dot(ApiInput input) throws ApiException {
     final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
     ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
     IVariantGraph graph = new CollateXEngine().graph(array);
@@ -134,12 +149,6 @@ public class ApiController implements InitializingBean {
     VertexNameProvider<IVariantGraphVertex> vertexLabelProvider = new VertexNameProvider<IVariantGraphVertex>() {
       @Override
       public String getVertexName(IVariantGraphVertex v) {
-        //        List<String> witnessLabels = Lists.newArrayList();
-        //        for (IWitness witness : v.getWitnesses()) {
-        //          witnessLabels.add(witness.getSigil() + ":" + v.getToken(witness).getContent());
-        //        }
-        //        Collections.sort(witnessLabels);
-        //        return Joiner.on(",").join(witnessLabels);
         return v.getNormalized();
       }
     };
