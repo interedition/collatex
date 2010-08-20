@@ -49,13 +49,17 @@ public class VariantGraph2Creator {
         graphTokenToVertex.put(token, vertex);
       }
     }
-    ////
+    // Map Tokens in the Witness to the Matches
     Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
     witnessTokenToMatch = Maps.newLinkedHashMap();
     for (ITokenMatch match : matches) {
       INormalizedToken tokenA = match.getTokenA();
       witnessTokenToMatch.put(tokenA, match);
     }
+    addWitnessToGraph(witness, graphTokenToVertex, witnessTokenToMatch);
+  }
+
+  private void addWitnessToGraph(IWitness witness, Map<INormalizedToken, IVariantGraphVertex> graphTokenToVertex, Map<INormalizedToken, ITokenMatch> witnessTokenToMatch) {
     IVariantGraphVertex begin = graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
       if (!witnessTokenToMatch.containsKey(token)) {
