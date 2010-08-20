@@ -1,5 +1,6 @@
 package eu.interedition.collatex2.web;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -17,6 +18,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.codehaus.jackson.JsonParseException;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
@@ -56,11 +60,11 @@ import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
-import eu.interedition.collatex2.web.io.GraphVisualisationWrapper;
 
 @Controller
 @RequestMapping("/api/**")
 public class ApiController implements InitializingBean {
+  private static final String SVG_SERVER = "http://localhost:1080/svg";
   protected static final String COLLATEX_NS = "http://interedition.eu/collatex/ns/1.0";
   protected static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
@@ -88,32 +92,24 @@ public class ApiController implements InitializingBean {
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
   public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
-    System.out.println("collateToSvg");
-    String collate2svg = collate2svg(input);
-    System.out.println(collate2svg);
-    ModelAndView modelAndView = new ModelAndView("api/svg", "svg", collate2svg);
-    System.out.println(modelAndView);
+    String svg = collate2svg(input);
+    ModelAndView modelAndView = new ModelAndView(svgView, "svg", svg);
     return modelAndView;
+  }
+
+  private String collate2svg(ApiInput input) throws ApiException, HttpException, IOException {
+    String dot = collate2dot(input);
+    HttpClient client = new HttpClient();
+    PostMethod postMethod = new PostMethod(SVG_SERVER);
+    postMethod.setParameter("dot", dot);
+    client.executeMethod(postMethod);
+    String svg = postMethod.getResponseBodyAsString();
+    return svg;
   }
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
   public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView("api/alignment", "alignment", collate(input));
-  }
-
-  @RequestMapping(value = "collate2", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
-  public ModelAndView collateToInfoVis(@RequestBody final ApiInput input) throws Exception {
-    return new ModelAndView("api/graph", "graph", collate2(input));
-  }
-
-  @RequestMapping(value = "collate3", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
-  public ModelAndView collateToInfoVis2(@RequestBody final ApiInput input) throws Exception {
-    return new ModelAndView("api/graph2", "graph", collate3(input));
-  }
-
-  @RequestMapping(value = "dot", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
-  public ModelAndView collateToDot(@RequestBody final ApiInput input) throws Exception {
-    return new ModelAndView("api/dot", "dot", collate2dot(input));
   }
 
   @RequestMapping(value = "collate")
@@ -122,23 +118,6 @@ public class ApiController implements InitializingBean {
   private IAlignmentTable collate(ApiInput input) throws ApiException {
     final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
     return new CollateXEngine().align(witnesses.toArray(new ApiWitness[witnesses.size()]));
-  }
-
-  private IVariantGraph collate2(ApiInput input) throws ApiException {
-    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
-    ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
-    return new CollateXEngine().graph(array);
-  }
-
-  private GraphVisualisationWrapper collate3(ApiInput input) throws ApiException {
-    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
-    ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
-    return new GraphVisualisationWrapper(array, new CollateXEngine().graph(array));
-  }
-
-  private String collate2svg(ApiInput input) throws ApiException {
-    String dot = collate2dot(input);
-    return dot;
   }
 
   private String collate2dot(ApiInput input) throws ApiException {
@@ -238,6 +217,18 @@ public class ApiController implements InitializingBean {
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
       TransformerUtils.enableIndenting(transformer, 4);
       transformer.transform(new DOMSource(xml), new StreamResult(out));
+      out.flush();
+    }
+  };
+  private final AbstractView svgView = new AbstractView() {
+
+    @Override
+    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+      String svg = (String) model.get("svg");
+      Assert.notNull(svg);
+      response.setCharacterEncoding("UTF-8");
+      PrintWriter out = response.getWriter();
+      out.write(svg);
       out.flush();
     }
   };
