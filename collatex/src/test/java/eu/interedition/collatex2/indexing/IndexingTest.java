@@ -14,7 +14,7 @@ import com.google.common.base.Joiner;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 public class IndexingTest {
   private CollateXEngine factory;
@@ -30,7 +30,7 @@ public class IndexingTest {
   public void test2() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     log.debug("witness = [the big black cat and the big black rat]");
-    final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
+    final ITokenIndex index = CollateXEngine.createWitnessIndex(a);
     assertContains(index, "# the big black");
     assertContains(index, "the big black cat");
     assertContains(index, "cat");
@@ -44,7 +44,7 @@ public class IndexingTest {
   @Test
   public void test1a() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
+    final ITokenIndex index = CollateXEngine.createWitnessIndex(a);
     assertEquals(6, index.size());
     assertContains(index, "# tobe");
     assertContains(index, "tobe or");
@@ -60,7 +60,7 @@ public class IndexingTest {
   @Test
   public void test2a() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
-    final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);
+    final ITokenIndex index = CollateXEngine.createWitnessIndex(a);
     assertContains(index, "# the big black");
     assertContains(index, "the big black cat");
     assertContains(index, "cat");
@@ -78,8 +78,8 @@ public class IndexingTest {
     final IWitness b = factory.createWitness("B", "and the big black cat ate the big rat");
     log.debug("witness a = [the big black cat and the big black rat]");
     log.debug("witness b = [and the big black cat ate the big rat]");
-    final IWitnessIndex indexA = CollateXEngine.createWitnessIndex(a);
-    final IWitnessIndex indexB = CollateXEngine.createWitnessIndex(b);
+    final ITokenIndex indexA = CollateXEngine.createWitnessIndex(a);
+    final ITokenIndex indexB = CollateXEngine.createWitnessIndex(b);
     assertContains(indexA, "# the big black");
     assertContains(indexB, "# the big black");
     assertContains(indexA, "the big black cat");
@@ -106,11 +106,11 @@ public class IndexingTest {
   //    assertEquals(5, index.size());
   //  }
 
-  private void assertContains(final IWitnessIndex index, final String phrase) {
+  private void assertContains(final ITokenIndex index, final String phrase) {
     assertTrue("phrase '" + phrase + "' not found in index [" + Joiner.on(", ").join(index.keys()) + "]", index.contains(phrase));
   }
 
-  private void assertDoesNotContain(final IWitnessIndex index, final String phrase) {
+  private void assertDoesNotContain(final ITokenIndex index, final String phrase) {
     assertFalse("phrase '" + phrase + "' found in index, shouldn't be there!", index.contains(phrase));
   }
 }

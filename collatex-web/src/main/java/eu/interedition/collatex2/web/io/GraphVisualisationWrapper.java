@@ -4,9 +4,9 @@ import java.util.Iterator;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.IVariantGraphEdge;
-import eu.interedition.collatex2.experimental.graph.IVariantGraphVertex;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.web.ApiWitness;
 
 public class GraphVisualisationWrapper {

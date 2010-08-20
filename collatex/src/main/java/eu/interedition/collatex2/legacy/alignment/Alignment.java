@@ -6,22 +6,36 @@ import static com.google.common.collect.Iterables.transform;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.implementation.modifications.Addition;
-import eu.interedition.collatex2.implementation.modifications.Omission;
-import eu.interedition.collatex2.implementation.modifications.Replacement;
-import eu.interedition.collatex2.implementation.modifications.Transposition;
+import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
+import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IOmission;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
+import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.ITransposition;
+import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
+import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
+import eu.interedition.collatex2.todo.modifications.Addition;
+import eu.interedition.collatex2.todo.modifications.Omission;
+import eu.interedition.collatex2.todo.modifications.Replacement;
+import eu.interedition.collatex2.todo.modifications.Transposition;
 
 public class Alignment implements IAlignment {
   private final List<IMatch> matches;
@@ -123,6 +137,36 @@ public class Alignment implements IAlignment {
   @Override
   public List<IOmission> getOmissions() {
     return Lists.newArrayList(transform(filter(getGaps(), OMISSION_PREDICATE), GAP_TO_OMISSION));
+  }
+
+  public static List<IMatch> getColumnMatches(IAlignmentTable table, IWitness witness) {
+    Map<INormalizedToken, IColumn> tokenToColumn = Maps.newLinkedHashMap();
+    for (IColumn column : table.getColumns()) {
+      for (String sigil : column.getSigli()) {
+        INormalizedToken token = column.getToken(sigil);
+        tokenToColumn.put(token, column);
+      }
+    }
+    ITokenMatcher matcher = new TokenIndexMatcher(table);
+    List<ITokenMatch> tokenMatches = matcher.getMatches(witness);
+    List<IMatch> columnMatches = Lists.newArrayList();
+    for (ITokenMatch tokenMatch : tokenMatches) {
+      INormalizedToken tableToken = tokenMatch.getTableToken();
+      IColumn column = tokenToColumn.get(tableToken);
+      IPhrase witnessPhrase = new Phrase(Lists.newArrayList(tokenMatch.getWitnessToken()));
+      IColumns columns = new Columns(Lists.newArrayList(column));
+      IMatch columnMatch = new ColumnPhraseMatch(columns, witnessPhrase);
+      columnMatches.add(columnMatch);
+    }
+    // Sort the ColumnMatches here
+    // otherwise the gapdetection goes ballistic!
+    Collections.sort(columnMatches, new Comparator<IMatch>() {
+      @Override
+      public int compare(IMatch o1, IMatch o2) {
+        return o1.getColumns().getBeginPosition() - o2.getColumns().getBeginPosition();
+      }
+    });
+    return columnMatches;
   }
 
   //	  public void accept(final ModificationVisitor modificationVisitor) {

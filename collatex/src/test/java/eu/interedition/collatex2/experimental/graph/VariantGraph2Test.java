@@ -24,6 +24,11 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraph2Test {
@@ -114,7 +119,7 @@ public class VariantGraph2Test {
   public void testRepeatingTokensWithOneWitness() {
     final IWitness witness = engine.createWitness("a", "a c a t g c a");
     final IVariantGraph graph = engine.graph(witness);
-    final List<String> repeatingTokens = graph.findRepeatingTokens();
+    final List<String> repeatingTokens = graph.getRepeatedTokens();
     assertEquals(2, repeatingTokens.size());
     assertTrue(repeatingTokens.contains("a"));
     assertTrue(repeatingTokens.contains("c"));
@@ -127,7 +132,7 @@ public class VariantGraph2Test {
     final IWitness witnessA = engine.createWitness("a", "a c a t g c a");
     final IWitness witnessB = engine.createWitness("b", "a c a t t c a");
     final IVariantGraph graph = engine.graph(witnessA, witnessB);
-    final List<String> repeatingTokens = graph.findRepeatingTokens();
+    final List<String> repeatingTokens = graph.getRepeatedTokens();
     assertEquals(3, repeatingTokens.size());
     assertTrue(repeatingTokens.contains("a"));
     assertTrue(repeatingTokens.contains("c"));
@@ -140,7 +145,7 @@ public class VariantGraph2Test {
     final IWitness witnessA = engine.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = engine.createWitness("B", "this one very different");
     final IVariantGraph graph = engine.graph(witnessA, witnessB);
-    final List<String> repeatingTokens = graph.findRepeatingTokens();
+    final List<String> repeatingTokens = graph.getRepeatedTokens();
     assertEquals(0, repeatingTokens.size());
   }
 

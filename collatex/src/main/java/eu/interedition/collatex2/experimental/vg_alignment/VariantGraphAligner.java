@@ -2,9 +2,9 @@ package eu.interedition.collatex2.experimental.vg_alignment;
 
 import java.util.List;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.tokenmatching.VariantGraphIndexMatcher;
+import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphAligner {
@@ -23,7 +23,7 @@ public class VariantGraphAligner {
   }
 
   public IAlignment2 align(IWitness witness) {
-    VariantGraphIndexMatcher matcher = new VariantGraphIndexMatcher(graph);
+    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> tokenMatches = matcher.getMatches(witness);
     SequenceDetection2 seqDetection = new SequenceDetection2(tokenMatches);
     List<IMatch2> matches = seqDetection.chainTokenMatches();

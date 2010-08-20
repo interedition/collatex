@@ -15,6 +15,7 @@
 
 Notes:
 1. Topological values are unique and ascending?!
+2. Remove dependency on VariantGraphIndex
 3a  Check correctness when omissions occur 
 
 

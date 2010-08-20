@@ -13,16 +13,16 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.VariantGraph2;
 import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
 import eu.interedition.collatex2.experimental.vg_alignment.ITransposition2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.ITransposition;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 //NOTE: these unit tests replace the tests in AlignmentTest!

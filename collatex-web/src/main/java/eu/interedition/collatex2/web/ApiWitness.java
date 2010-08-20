@@ -6,7 +6,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-import eu.interedition.collatex2.input.NormalizedWitness;
+import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class ApiWitness extends NormalizedWitness {

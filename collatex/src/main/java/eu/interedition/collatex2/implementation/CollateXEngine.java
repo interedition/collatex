@@ -10,15 +10,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.experimental.graph.IVariantGraph;
-import eu.interedition.collatex2.experimental.graph.VariantGraph2Creator;
-import eu.interedition.collatex2.experimental.tokenmatching.legacy.AlignmentTableIndexMatcher;
-import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
-import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
-import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
+import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
-import eu.interedition.collatex2.input.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -29,10 +25,13 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.legacy.alignment.Alignment;
 import eu.interedition.collatex2.legacy.alignment.SequenceDetection;
+import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTable4;
+import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.todo.gapdetection.GapDetection;
 
@@ -79,15 +78,14 @@ public class CollateXEngine {
 
   // TODO: rename this method!
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
-    AlignmentTableIndexMatcher matcher = new AlignmentTableIndexMatcher(table);
-    final List<IMatch> matches = matcher.getColumnMatches(witness);
+    final List<IMatch> matches = Alignment.getColumnMatches(table, witness);
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;
   }
 
-  public static IWitnessIndex createWitnessIndex(final IWitness witness) {
-    return new WitnessIndex(witness, witness.findRepeatingTokens());
+  public static ITokenIndex createWitnessIndex(final IWitness witness) {
+    return new WitnessIndex(witness, witness.getRepeatedTokens());
   }
 
   // TODO: remove? seems only used in tests!

@@ -6,8 +6,6 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.tokenmatching.legacy.Match;
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -15,6 +13,8 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
+import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 
 //NOTE: This class is to be made obsolete by SequenceDetection2!
 public class SequenceDetection {
@@ -85,7 +85,7 @@ public class SequenceDetection {
     if (!columnsA.isEmpty()) {
       final IColumns columns = new Columns(columnsA);
       final Phrase phrase = new Phrase(tokensB);
-      chainedMatches.add(new Match(columns, phrase));
+      chainedMatches.add(new ColumnPhraseMatch(columns, phrase));
     }
   }
 
