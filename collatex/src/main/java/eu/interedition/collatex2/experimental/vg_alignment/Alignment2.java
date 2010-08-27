@@ -6,17 +6,25 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.interfaces.ITokenMatch;
+
 public class Alignment2 implements IAlignment2 {
 
   private final List<IMatch2> matches;
+  private final List<ITokenMatch> tokenMatches;
 
-  public Alignment2(List<IMatch2> matches) {
+  public Alignment2(List<ITokenMatch> tokenMatches, List<IMatch2> matches) {
+    this.tokenMatches = tokenMatches;
     this.matches = matches;
   }
 
   @Override
   public List<IMatch2> getMatches() {
     return matches;
+  }
+  
+  public List<ITokenMatch> getTokenMatches() {
+    return tokenMatches;
   }
   
   @Override

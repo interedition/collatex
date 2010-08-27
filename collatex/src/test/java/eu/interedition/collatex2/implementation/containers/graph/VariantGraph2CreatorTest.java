@@ -145,4 +145,26 @@ public class VariantGraph2CreatorTest {
       System.out.println(graph.vertexSet().size());
     }
 
+    // TODO: rename test: mirrored transpositions with match in between!
+    //NOTE: test taken from AlignmentTableTranspositionTest
+    @Test
+    public void testTranspositionsAreStoredInAlignmentTable() {
+      final IWitness a = engine.createWitness("A", "the black and white cat");
+      final IWitness b = engine.createWitness("B", "the white and black cat");
+      IVariantGraph graph = VariantGraph2Creator.create(a, b);
+      Iterator<IVariantGraphVertex> iterator = graph.iterator();
+      assertEquals("#", iterator.next().getNormalized());
+      assertEquals("the", iterator.next().getNormalized());
+      assertEquals("black", iterator.next().getNormalized());
+      assertEquals("white", iterator.next().getNormalized());
+      assertEquals("and", iterator.next().getNormalized());
+      assertEquals("white", iterator.next().getNormalized());
+      assertEquals("black", iterator.next().getNormalized());
+      assertEquals("cat", iterator.next().getNormalized());
+//       final IAlignmentTable alignmentTable = engine.align(a, b);
+//      String expected = "A: the|black|and|white|cat\n";
+//      expected += "B: the|white|and|black|cat\n";
+//      assertEquals(expected, alignmentTable.toString());
+    }
+
 }

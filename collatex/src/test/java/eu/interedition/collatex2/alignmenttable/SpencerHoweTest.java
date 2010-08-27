@@ -2,6 +2,7 @@ package eu.interedition.collatex2.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class SpencerHoweTest {
   private CollateXEngine engine = new CollateXEngine();
 
   @Test
-  //@Ignore
+  @Ignore
   public void testATSpencerHowe() {
     final IWitness w1 = engine.createWitness("V", "a b c d e f ");
     final IWitness w2 = engine.createWitness("W", "x y z d e");
