@@ -48,9 +48,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.containers.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
@@ -92,13 +96,12 @@ public class ApiController implements InitializingBean {
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
   public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
-    String svg = collate2svg(input);
+    String svg = convert2svg(jcollate2dot(input));
     ModelAndView modelAndView = new ModelAndView(svgView, "svg", svg);
     return modelAndView;
   }
 
-  private String collate2svg(ApiInput input) throws ApiException, HttpException, IOException {
-    String dot = collate2dot(input);
+  private String convert2svg(String dot) throws IOException, HttpException {
     HttpClient client = new HttpClient();
     PostMethod postMethod = new PostMethod(SVG_SERVER);
     postMethod.setParameter("dot", dot);
@@ -145,6 +148,39 @@ public class ApiController implements InitializingBean {
     DOTExporter<IVariantGraphVertex, IVariantGraphEdge> exporter = new DOTExporter<IVariantGraphVertex, IVariantGraphEdge>(vertexIDProvider, vertexLabelProvider, edgeLabelProvider);
     Writer writer = new StringWriter();
     exporter.export(writer, graph);
+    return writer.toString();
+  }
+
+  static final VertexNameProvider<IJVariantGraphVertex> VERTEX_ID_PROVIDER = new IntegerNameProvider<IJVariantGraphVertex>();
+  static final VertexNameProvider<IJVariantGraphVertex> VERTEX_LABEL_PROVIDER = new VertexNameProvider<IJVariantGraphVertex>() {
+    @Override
+    public String getVertexName(IJVariantGraphVertex v) {
+      return v.getNormalized();
+    }
+  };
+  static final EdgeNameProvider<IJVariantGraphEdge> EDGE_LABEL_PROVIDER = new EdgeNameProvider<IJVariantGraphEdge>() {
+    @Override
+    public String getEdgeName(IJVariantGraphEdge e) {
+      List<String> sigils = Lists.newArrayList();
+      for (IWitness witness : e.getWitnesses()) {
+        sigils.add(witness.getSigil());
+      }
+      Collections.sort(sigils);
+      return Joiner.on(",").join(sigils);
+    }
+  };
+  static final DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge> DOT_EXPORTER = new DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge>(//
+      VERTEX_ID_PROVIDER, VERTEX_LABEL_PROVIDER, EDGE_LABEL_PROVIDER //
+  );
+
+  private String jcollate2dot(ApiInput input) throws ApiException {
+    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
+    ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
+    IVariantGraph graph = new CollateXEngine().graph(array);
+
+    IJVariantGraph jgraph = JVariantGraphCreator.parallelSegmentate(graph);
+    Writer writer = new StringWriter();
+    DOT_EXPORTER.export(writer, jgraph);
     return writer.toString();
   }
 

@@ -40,8 +40,8 @@ public class VariantGraph2Creator {
     IAlignment2 alignment = aligner.align(witness);
     List<ITokenMatch> matches = alignment.getTokenMatches();
     List<ITransposition2> transpositions = alignment.getTranspositions();
-//    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
-//    List<ITokenMatch> matches = matcher.getMatches(witness);
+    //    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
+    //    List<ITokenMatch> matches = matcher.getMatches(witness);
     makeEdgesForMatches(witness, matches, transpositions);
   }
 
@@ -50,7 +50,7 @@ public class VariantGraph2Creator {
     // Map Tokens in the Graph to Vertices
     Map<INormalizedToken, IVariantGraphVertex> graphTokenToVertex;
     graphTokenToVertex = Maps.newLinkedHashMap();
-    for (IVariantGraphVertex vertex: graph.vertexSet()) {
+    for (IVariantGraphVertex vertex : graph.vertexSet()) {
       for (IWitness witness2 : vertex.getWitnesses()) {
         INormalizedToken token = vertex.getToken(witness2);
         graphTokenToVertex.put(token, vertex);
@@ -66,7 +66,7 @@ public class VariantGraph2Creator {
     // delete transpositions from map
     // TODO: Rename IMatch2 to IMatchSequence?
     for (ITransposition2 trans : transpositions) {
-      IMatch2 matchA = trans.getMatchA(); 
+      IMatch2 matchA = trans.getMatchA();
       // TODO: check whether 
       // it is matchA
       for (INormalizedToken witnessToken : matchA.getPhraseA().getTokens()) {
