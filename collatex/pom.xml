@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>eu.interedition.collatex</groupId>
-		<artifactId>project</artifactId>
+		<artifactId>collatex-project</artifactId>
 		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>collatex</artifactId>
