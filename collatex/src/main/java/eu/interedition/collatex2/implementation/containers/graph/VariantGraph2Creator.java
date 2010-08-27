@@ -87,14 +87,14 @@ public class VariantGraph2Creator {
       IVariantGraphVertex end;
       if (!witnessTokenToMatch.containsKey(token)) {
         // NOTE: here we determine that the token is an addition/replacement!
-        end = graph.addNewVertex(token, witness);
+        end = graph.addNewVertex(token.getNormalized());
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
         end = graphTokenToVertex.get(tokenMatch.getTokenB());
-        end.addToken(witness, token);
       }
       connectBeginToEndVertex(current, end, witness);
+      end.addToken(witness, token);
       current = end;
     }
     // adds edge from last vertex to end vertex

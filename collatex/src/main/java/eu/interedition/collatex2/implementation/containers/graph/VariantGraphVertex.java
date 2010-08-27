@@ -18,10 +18,6 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     this.tokenMap = Maps.newLinkedHashMap();
   }
 
-  public VariantGraphVertex(INormalizedToken token) {
-    this(token.getNormalized());
-  }
-
   public String getNormalized() {
     return normalized;
   }
