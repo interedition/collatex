@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.graph;
+package eu.interedition.collatex2.implementation.containers.graph;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,7 +10,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -144,6 +143,28 @@ public class VariantGraph2CreatorTest {
       assertEquals("b", iterator.next().getNormalized());
       assertEquals("a", iterator.next().getNormalized());
       System.out.println(graph.vertexSet().size());
+    }
+
+    // TODO: rename test: mirrored transpositions with match in between!
+    //NOTE: test taken from AlignmentTableTranspositionTest
+    @Test
+    public void testTranspositionsAreStoredInAlignmentTable() {
+      final IWitness a = engine.createWitness("A", "the black and white cat");
+      final IWitness b = engine.createWitness("B", "the white and black cat");
+      IVariantGraph graph = VariantGraph2Creator.create(a, b);
+      Iterator<IVariantGraphVertex> iterator = graph.iterator();
+      assertEquals("#", iterator.next().getNormalized());
+      assertEquals("the", iterator.next().getNormalized());
+      assertEquals("black", iterator.next().getNormalized());
+      assertEquals("white", iterator.next().getNormalized());
+      assertEquals("and", iterator.next().getNormalized());
+      assertEquals("white", iterator.next().getNormalized());
+      assertEquals("black", iterator.next().getNormalized());
+      assertEquals("cat", iterator.next().getNormalized());
+//       final IAlignmentTable alignmentTable = engine.align(a, b);
+//      String expected = "A: the|black|and|white|cat\n";
+//      expected += "B: the|white|and|black|cat\n";
+//      assertEquals(expected, alignmentTable.toString());
     }
 
 }

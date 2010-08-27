@@ -27,7 +27,7 @@ public class VariantGraphAligner {
     List<ITokenMatch> tokenMatches = matcher.getMatches(witness);
     SequenceDetection2 seqDetection = new SequenceDetection2(tokenMatches);
     List<IMatch2> matches = seqDetection.chainTokenMatches();
-    return new Alignment2(matches);
+    return new Alignment2(tokenMatches, matches);
   }
 
 }

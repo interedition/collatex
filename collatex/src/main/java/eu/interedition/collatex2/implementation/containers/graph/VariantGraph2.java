@@ -13,12 +13,11 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
-import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 // This class implements the IVariantGraph interface.
 // The IVariantGraph interface is an extension of the DiGraph interface
@@ -34,9 +33,9 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
 
   private VariantGraph2() {
     super(IVariantGraphEdge.class);
-    startVertex = new VariantGraphVertex(new NullToken(0, null));
+    startVertex = new VariantGraphVertex("#");
     addVertex(startVertex);
-    endVertex = new VariantGraphVertex(new NullToken(0, null));
+    endVertex = new VariantGraphVertex("#");
     addVertex(endVertex);
   }
 
@@ -96,7 +95,9 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     VariantGraph2 graph = VariantGraph2.create();
     List<IVariantGraphVertex> newVertices = Lists.newArrayList();
     for (INormalizedToken token : a.getTokens()) {
-      newVertices.add(graph.addNewVertex(token, a));
+      final IVariantGraphVertex vertex = graph.addNewVertex(token.getNormalized());
+      vertex.addToken(a, token);
+      newVertices.add(vertex);
     }
     IVariantGraphVertex previous = graph.getStartVertex();
     for (IVariantGraphVertex vertex : newVertices) {
@@ -133,13 +134,9 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   }
 
   //write
-  public IVariantGraphVertex addNewVertex(INormalizedToken token, IWitness w) {
-    final VariantGraphVertex vertex = new VariantGraphVertex(token);
+  public IVariantGraphVertex addNewVertex(String normalized) {
+    final VariantGraphVertex vertex = new VariantGraphVertex(normalized);
     addVertex(vertex);
-    //TODO: is this if still necessary?
-    if (w!=null) {
-      vertex.addToken(w, token);
-    }
     return vertex;
   }
   

@@ -73,16 +73,6 @@ public class AlignmentTableTranspositionTest {
     Assert.assertEquals(expected, actual);
   }
 
-  // TODO: rename test: mirrored transpositions with match in between!
-  @Test
-  public void testTranspositionsAreStoredInAlignmentTable() {
-    final IWitness a = engine.createWitness("A", "the black and white cat");
-    final IWitness b = engine.createWitness("B", "the white and black cat");
-    final IAlignmentTable alignmentTable = engine.align(a, b);
-    String expected = "A: the|black|and|white|cat\n";
-    expected += "B: the|white|and|black|cat\n";
-    assertEquals(expected, alignmentTable.toString());
-  }
 
   @Test
   public void testTransposition() {

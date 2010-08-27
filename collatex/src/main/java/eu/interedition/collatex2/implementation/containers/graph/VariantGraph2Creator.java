@@ -6,7 +6,10 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
+import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
+import eu.interedition.collatex2.experimental.vg_alignment.ITransposition2;
+import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -33,13 +36,17 @@ public class VariantGraph2Creator {
   // if they already exist we need to add the witness to the
   // existing arc!
   public void addWitness(IWitness witness) {
-    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
-    List<ITokenMatch> matches = matcher.getMatches(witness);
-    makeEdgesForMatches(witness, matches);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(witness);
+    List<ITokenMatch> matches = alignment.getTokenMatches();
+    List<ITransposition2> transpositions = alignment.getTranspositions();
+//    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
+//    List<ITokenMatch> matches = matcher.getMatches(witness);
+    makeEdgesForMatches(witness, matches, transpositions);
   }
 
   //write
-  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches) {
+  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, List<ITransposition2> transpositions) {
     // Map Tokens in the Graph to Vertices
     Map<INormalizedToken, IVariantGraphVertex> graphTokenToVertex;
     graphTokenToVertex = Maps.newLinkedHashMap();
@@ -49,32 +56,50 @@ public class VariantGraph2Creator {
         graphTokenToVertex.put(token, vertex);
       }
     }
-    ////
+    // Map Tokens in the Witness to the Matches
     Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
     witnessTokenToMatch = Maps.newLinkedHashMap();
     for (ITokenMatch match : matches) {
       INormalizedToken tokenA = match.getTokenA();
       witnessTokenToMatch.put(tokenA, match);
     }
-    IVariantGraphVertex begin = graph.getStartVertex();
+    // delete transpositions from map
+    // TODO: Rename IMatch2 to IMatchSequence?
+    for (ITransposition2 trans : transpositions) {
+      IMatch2 matchA = trans.getMatchA(); 
+      // TODO: check whether 
+      // it is matchA
+      for (INormalizedToken witnessToken : matchA.getPhraseA().getTokens()) {
+        // NOTE: sanity check
+        if (witnessTokenToMatch.containsKey(witnessToken)) {
+          witnessTokenToMatch.remove(witnessToken);
+        } else {
+          throw new RuntimeException("Could not remove match from map!");
+        }
+      }
+    }
+    addWitnessToGraph(witness, graphTokenToVertex, witnessTokenToMatch);
+  }
+
+  private void addWitnessToGraph(IWitness witness, Map<INormalizedToken, IVariantGraphVertex> graphTokenToVertex, Map<INormalizedToken, ITokenMatch> witnessTokenToMatch) {
+    IVariantGraphVertex current = graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
+      IVariantGraphVertex end;
       if (!witnessTokenToMatch.containsKey(token)) {
         // NOTE: here we determine that the token is an addition/replacement!
-        IVariantGraphVertex end = graph.addNewVertex(token, witness);
-        graph.addNewEdge(begin, end, witness);
-        begin = end;
+        end = graph.addNewVertex(token.getNormalized());
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
-        IVariantGraphVertex end = graphTokenToVertex.get(tokenMatch.getTokenB());
-        connectBeginToEndVertex(begin, end, witness);
-        end.addToken(witness, token);
-        begin = end;
+        end = graphTokenToVertex.get(tokenMatch.getTokenB());
       }
+      connectBeginToEndVertex(current, end, witness);
+      end.addToken(witness, token);
+      current = end;
     }
     // adds edge from last vertex to end vertex
     IVariantGraphVertex end = graph.getEndVertex();
-    connectBeginToEndVertex(begin, end, witness);
+    connectBeginToEndVertex(current, end, witness);
   }
 
   // write
