@@ -82,25 +82,24 @@ public class VariantGraph2Creator {
   }
 
   private void addWitnessToGraph(IWitness witness, Map<INormalizedToken, IVariantGraphVertex> graphTokenToVertex, Map<INormalizedToken, ITokenMatch> witnessTokenToMatch) {
-    IVariantGraphVertex begin = graph.getStartVertex();
+    IVariantGraphVertex current = graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
+      IVariantGraphVertex end;
       if (!witnessTokenToMatch.containsKey(token)) {
         // NOTE: here we determine that the token is an addition/replacement!
-        IVariantGraphVertex end = graph.addNewVertex(token, witness);
-        graph.addNewEdge(begin, end, witness);
-        begin = end;
+        end = graph.addNewVertex(token, witness);
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
-        IVariantGraphVertex end = graphTokenToVertex.get(tokenMatch.getTokenB());
-        connectBeginToEndVertex(begin, end, witness);
+        end = graphTokenToVertex.get(tokenMatch.getTokenB());
         end.addToken(witness, token);
-        begin = end;
       }
+      connectBeginToEndVertex(current, end, witness);
+      current = end;
     }
     // adds edge from last vertex to end vertex
     IVariantGraphVertex end = graph.getEndVertex();
-    connectBeginToEndVertex(begin, end, witness);
+    connectBeginToEndVertex(current, end, witness);
   }
 
   // write
