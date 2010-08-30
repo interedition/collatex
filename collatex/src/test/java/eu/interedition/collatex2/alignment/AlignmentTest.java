@@ -26,6 +26,7 @@ import static junit.framework.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -257,5 +258,20 @@ public class AlignmentTest {
     assertEquals("a", transpositions.get(2).getMatchB().getNormalized());
     assertEquals("e", transpositions.get(3).getMatchA().getNormalized());
     assertEquals("b", transpositions.get(3).getMatchB().getNormalized());
+  }
+
+  //TODO: make this test work!
+  @Test
+  @Ignore
+  public void testBeckettLotsOfRepetition() {
+    final IWitness a = factory.createWitness("A", "from the days & nights when day followed on night & night on day.");
+    final IWitness b = factory.createWitness("B", "from the days and nights when day followed fast on night and night on day.");
+    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
+    List<IMatch> matches = alignment.getMatches();
+    assertEquals("from the days", matches.get(0).getNormalized());
+    assertEquals("nights when day followed", matches.get(1).getNormalized());
+    assertEquals("on night", matches.get(2).getNormalized());
+    assertEquals("night on day", matches.get(3).getNormalized());
+    assertEquals(4, matches.size());
   }
 }
