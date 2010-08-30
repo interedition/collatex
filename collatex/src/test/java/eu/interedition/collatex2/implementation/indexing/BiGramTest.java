@@ -1,0 +1,39 @@
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
+ * Copyright (C) 2010 ESF COST Action "Interedition".
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package eu.interedition.collatex2.implementation.indexing;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
+import eu.interedition.collatex2.input.Token;
+
+public class BiGramTest {
+  @Test
+  public void testContains() {
+    final Token token = new Token("A", "token", 1);
+    final Token token2 = new Token("A", "token2", 2);
+    final Token token3 = new Token("B", "token", 1);
+    final BiGram bigram = BiGram.create(token, token2, new DefaultTokenNormalizer());
+    Assert.assertTrue(bigram.contains(token));
+    Assert.assertFalse(bigram.contains(token3));
+  }
+}
