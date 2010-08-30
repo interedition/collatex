@@ -22,6 +22,7 @@ package eu.interedition.collatex2.implementation.indexing;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +36,13 @@ import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
-public class AlignmentTableIndex implements IAlignmentTableIndex {
+public class AlignmentTableIndex implements IAlignmentTableIndex, ITokenIndex {
   private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
   
-  private final Map<String, IColumns> normalizedToColumns;
+  private final Map<String, ColumnPhrase> normalizedToColumns;
 
   private AlignmentTableIndex() {
     this.normalizedToColumns = Maps.newLinkedHashMap();
@@ -117,7 +120,7 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
   }
 
   private void add(final ColumnPhrase phrase) {
-    normalizedToColumns.put(phrase.getNormalized(), phrase.getColumns());
+    normalizedToColumns.put(phrase.getNormalized(), phrase);
   }
 
   @Override
@@ -125,13 +128,13 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     return normalizedToColumns.containsKey(normalized);
   }
 
-  @Override
-  public IColumns getColumns(final String normalized) {
-    if (!containsNormalizedPhrase(normalized)) {
-      throw new RuntimeException("No such element " + normalized + " in AlignmentTableIndex!");
-    }
-    return normalizedToColumns.get(normalized);
-  }
+//  @Override
+//  public IColumns getColumns(final String normalized) {
+//    if (!containsNormalizedPhrase(normalized)) {
+//      throw new RuntimeException("No such element " + normalized + " in AlignmentTableIndex!");
+//    }
+//    return normalizedToColumns.get(normalized);
+//  }
 
   @Override
   public int size() {
@@ -151,4 +154,23 @@ public class AlignmentTableIndex implements IAlignmentTableIndex {
     return result;
   }
 
+  //NOTE: From this point on the IWitnessIndex methods start!
+  @Override
+  public boolean contains(String normalized) {
+    System.out.println(normalizedToColumns.keySet());
+    return normalizedToColumns.containsKey(normalized);
+  }
+
+  @Override
+  public IPhrase getPhrase(String normalized) {
+    ColumnPhrase columnPhrase = normalizedToColumns.get(normalized);
+    return columnPhrase.getPhrase();
+  }
+
+  @Override
+  public Set<String> keys() {
+    return normalizedToColumns.keySet();
+  }
+
+ 
 }

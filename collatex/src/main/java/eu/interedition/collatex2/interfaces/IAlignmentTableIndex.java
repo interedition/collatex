@@ -20,11 +20,11 @@
 
 package eu.interedition.collatex2.interfaces;
 
-public interface IAlignmentTableIndex {
+public interface IAlignmentTableIndex extends ITokenIndex {
 
   boolean containsNormalizedPhrase(final String normalized);
 
-  IColumns getColumns(final String normalized);
+//  IColumns getColumns(final String normalized);
 
   int size();
 

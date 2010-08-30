@@ -34,7 +34,6 @@ import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.ICallback;
-import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class AlignmentTableIndexTest {
@@ -79,9 +78,9 @@ public class AlignmentTableIndexTest {
     assertTrue(index.containsNormalizedPhrase("rat"));
     assertEquals(15, index.size());
 
-    final IColumns columns = index.getColumns("the big black cat");
-    assertEquals(1, columns.getBeginPosition());
-    assertEquals(4, columns.getEndPosition());
+//    final IColumns columns = index.getColumns("the big black cat");
+//    assertEquals(1, columns.getBeginPosition());
+//    assertEquals(4, columns.getEndPosition());
   }
 
   @Test

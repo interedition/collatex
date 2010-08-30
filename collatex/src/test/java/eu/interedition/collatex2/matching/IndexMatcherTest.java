@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Function;
@@ -36,7 +35,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
-import eu.interedition.collatex2.implementation.matching.IndexMatcher;
+import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumns;
@@ -71,7 +70,7 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one very different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = IndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
+    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
@@ -96,7 +95,7 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one is different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = IndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
+    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
@@ -164,15 +163,15 @@ public class IndexMatcherTest {
     //    assertEquals(4, columnsA.getEndPosition());
   }
 
-  //NOTE: joining is already tested in other tests!
-  @Ignore
-  @Test
-  public void testJoinOverlappingMatches() {
-    // TODO make this testcase
-    final List<IMatch> matches = Lists.newArrayList();
-    final List<IMatch> joined = IndexMatcher.joinOverlappingMatches(matches);
-    assertEquals(1, joined.size());
-  }
+//  //NOTE: joining is already tested in other tests!
+//  @Ignore
+//  @Test
+//  public void testJoinOverlappingMatches() {
+//    // TODO make this testcase
+//    final List<IMatch> matches = Lists.newArrayList();
+//    final List<IMatch> joined = IndexMatcher.joinOverlappingMatches(matches);
+//    assertEquals(1, joined.size());
+//  }
 
   @Test
   public void testMatchesWithIndex() {

@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 import eu.interedition.collatex2.implementation.alignment.Gap;
+import eu.interedition.collatex2.implementation.indexing.AlignmentTableIndex;
 import eu.interedition.collatex2.implementation.modifications.Addition;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -39,6 +40,7 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 public class AlignmentTable4 implements IAlignmentTable {
   private final List<String> sigli;
@@ -215,5 +217,15 @@ public class AlignmentTable4 implements IAlignmentTable {
       rows.add(getRow(sigil));
     }
     return rows;
+  }
+
+  @Override
+  public Collection<? extends String> getRepeatedTokens() {
+    return findRepeatingTokens();
+  }
+
+  @Override
+  public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
+    return AlignmentTableIndex.create(this, repeatedTokens);
   }
 }

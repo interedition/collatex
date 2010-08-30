@@ -29,8 +29,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
+import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
@@ -98,5 +100,15 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
       }
     }
     return repeatingNormalizedTokens;
+  }
+
+  @Override
+  public Collection<? extends String> getRepeatedTokens() {
+    return findRepeatingTokens();
+  }
+
+  @Override
+  public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
+    return new WitnessIndex(this, repeatedTokens);
   }
 }

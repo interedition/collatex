@@ -23,6 +23,7 @@ package eu.interedition.collatex2.implementation.indexing;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import com.google.common.collect.HashMultimap;
@@ -36,6 +37,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class AlignmentTableIndex0 implements IAlignmentTableIndex {
   Map<String, IColumns> columnsForNormalizedPhrase;
@@ -150,6 +152,24 @@ public class AlignmentTableIndex0 implements IAlignmentTableIndex {
       harvestMap.put(entry.getKey(), entry.getValue().getColumns());
     }
     return harvestMap;
+  }
+
+  @Override
+  public boolean contains(String key) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public IPhrase getPhrase(String key) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Set<String> keys() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

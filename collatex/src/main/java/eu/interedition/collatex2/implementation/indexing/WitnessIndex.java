@@ -38,10 +38,11 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class WitnessIndex implements IWitnessIndex {
+public class WitnessIndex implements IWitnessIndex, ITokenIndex {
   List<IPhrase> phraseCollection = Lists.newArrayList();
   private static final Function<INormalizedToken, IPhrase> TOKEN_TO_PHRASE = new Function<INormalizedToken, IPhrase>() {
     @Override
@@ -186,6 +187,23 @@ public class WitnessIndex implements IWitnessIndex {
   @Override
   public Collection<IPhrase> getPhrases() {
     return phraseCollection;
+  }
+
+  @Override
+  public IPhrase getPhrase(String key) {
+    for (IPhrase phrase : phraseCollection) {
+      if (phrase.getNormalized().equals(key)) {
+        return phrase;
+      }
+    }
+    throw new RuntimeException("Phrase NOT found!");
+
+  }
+
+  @Override
+  public Set<String> keys() {
+    final Set<String> normalizedPhrases = Sets.newLinkedHashSet(transform(phraseCollection, PHRASE_TO_NORMALIZED));
+    return normalizedPhrases;
   }
 
 }

@@ -22,7 +22,7 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
-public interface IAlignmentTable {
+public interface IAlignmentTable extends ITokenContainer {
 
   List<String> getSigli();
 
