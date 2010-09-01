@@ -259,9 +259,7 @@ public class AlignmentTest {
     assertEquals("b", transpositions.get(3).getMatchB().getNormalized());
   }
 
-  //TODO: make this test work!
   @Test
-  //@Ignore
   public void testBeckettLotsOfRepetition() {
     final IWitness a = factory.createWitness("A", "from the days & nights when day followed on night & night on day.");
     final IWitness b = factory.createWitness("B", "from the days and nights when day followed fast on night and night on day.");

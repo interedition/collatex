@@ -166,16 +166,6 @@ public class IndexMatcherTest {
     //    assertEquals(4, columnsA.getEndPosition());
   }
 
-//  //NOTE: joining is already tested in other tests!
-//  @Ignore
-//  @Test
-//  public void testJoinOverlappingMatches() {
-//    // TODO make this testcase
-//    final List<IMatch> matches = Lists.newArrayList();
-//    final List<IMatch> joined = IndexMatcher.joinOverlappingMatches(matches);
-//    assertEquals(1, joined.size());
-//  }
-
   @Test
   public void testMatchesWithIndex() {
     final IWitness a = factory.createWitness("A", "The black cat");

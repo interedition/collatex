@@ -37,8 +37,9 @@ public class TranspositionAlignmentTest {
     Assert.assertEquals("A:  | |y| \n" + "B: x| |y|z\n" + "C:  |z|y| \n", engine.align(a, b, c).toString());
   }
 
-  @Ignore
+  //TODO: for this test to work we need VariantGraph based alignment!
   @Test
+  @Ignore
   public void transposeInTwoPairs() {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("A", "y x");

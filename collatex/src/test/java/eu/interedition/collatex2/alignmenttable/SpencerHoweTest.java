@@ -46,6 +46,7 @@ public class SpencerHoweTest {
 
   private CollateXEngine engine = new CollateXEngine();
 
+  //TODO: need variant graph based alignment for this test to work!
   @Test
   @Ignore
   public void testEverythingMatches() {
