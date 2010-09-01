@@ -20,12 +20,10 @@
 
 package eu.interedition.collatex2.implementation.indexing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,23 +81,30 @@ public class AlignmentTableIndexTest {
 
   }
 
-  @Ignore
   @Test
   public void testCreateAlignmentTableIndex() {
     final IWitness a = factory.createWitness("A", "the first witness");
     final IAlignmentTable table = factory.align(a);
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
-    assertEquals("AlignmentTableIndex: (the, first, witness)", index.toString());
+    // test unigrams
+    assertTrue(index.contains("the"));
+    assertTrue(index.contains("first"));
+    assertTrue(index.contains("witness"));
+//    assertEquals("AlignmentTableIndex: (the, first, witness)", index.toString());
   }
 
-  @Ignore
   @Test
   public void testCreateAlignmentTableIndexWithVariation() {
     final IWitness a = factory.createWitness("A", "the first witness");
     final IWitness b = factory.createWitness("B", "the second witness");
     final IAlignmentTable table = factory.align(a, b);
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
-    assertEquals("AlignmentTableIndex: (the, first, witness, second)", index.toString());
+    // test unigrams
+    assertTrue(index.contains("the"));
+    assertTrue(index.contains("first"));
+    assertTrue(index.contains("second"));
+    assertTrue(index.contains("witness"));
+//    assertEquals("AlignmentTableIndex: (the, first, witness, second)", index.toString());
   }
 
   @Test
