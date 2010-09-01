@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>eu.interedition.collatex</groupId>
 		<artifactId>collatex-project</artifactId>
-		<version>0.9</version>
+		<version>0.9.1-RC1</version>
 	</parent>
 	<artifactId>collatex</artifactId>
 	<name>CollateX</name>
