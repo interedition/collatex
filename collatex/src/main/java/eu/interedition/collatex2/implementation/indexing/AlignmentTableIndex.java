@@ -55,6 +55,8 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, ITokenIndex {
         if (!cell.isEmpty()) {
           INormalizedToken token = cell.getToken();
           tokens.add(token);
+        } else {
+          tokens.add(new NullToken(-1, row.getSigil()));
         }
       }
       // do unigram indexing

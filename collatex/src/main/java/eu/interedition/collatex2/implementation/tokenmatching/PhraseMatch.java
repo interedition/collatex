@@ -20,4 +20,8 @@ public class PhraseMatch {
     return witnessPhrase;
   }
 
+  @Override
+  public String toString() {
+    return basePhrase.getContent() + " -> "+witnessPhrase.getContent();
+  }
 }

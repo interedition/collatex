@@ -21,5 +21,10 @@ public class TokenMatch implements ITokenMatch {
   public INormalizedToken getWitnessToken() {
     return witnessToken;
   }
+  
+  @Override
+  public String toString() {
+    return baseToken.getContent() + " -> "+witnessToken.getContent();
+  }
 
 }
