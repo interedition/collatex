@@ -76,8 +76,20 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, ITokenIndex {
       for (BiGram gram : biGrams) {
         normalizedToPhrase.put(gram.getNormalized(), new Phrase(Lists.newArrayList(gram.getFirstToken(), gram.getLastToken())));
       }
+      // System.out.println("!!"+biGrams);
+      if (!biGrams.isEmpty()) {
+        // do the trigram indexing
+        List<BiGram> bigramsTodo = Lists.newArrayList(biGrams);//biGrams.subList(1, biGrams.size()-1);
+        BiGram current = bigramsTodo.remove(0);
+        for (BiGram nextBigram : bigramsTodo) {
+          NGram ngram = NGram.create(current);
+          ngram.add(nextBigram);
+          current = nextBigram;
+  //        System.out.println("!!"+ngram.getNormalized());
+          normalizedToPhrase.put(ngram.getNormalized(), new Phrase(Lists.newArrayList(ngram)));
+        }
+      }
     }
-
   }
 
   public static IAlignmentTableIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {

@@ -43,11 +43,12 @@ public class WitnessIndex implements IWitnessIndex, ITokenIndex {
   //NOTE: repeated Tokens are ignored and can be deleted later!
   public WitnessIndex(IWitness witness, List<String> repeatedTokens) {
     this.map = Maps.newLinkedHashMap();
-    // do the unigram indexing... remove duplicates!
+    // do the unigram indexing... 
     final Multimap<String, INormalizedToken> normalizedTokenMap = ArrayListMultimap.create();
     for (final INormalizedToken token : witness.getTokens()) {
       normalizedTokenMap.put(token.getNormalized(), token);
     }
+    // remove duplicates in unigram index!
     for (final String key : normalizedTokenMap.keySet()) {
       final Collection<INormalizedToken> tokenCollection = normalizedTokenMap.get(key);
       if (tokenCollection.size() == 1) {
@@ -61,6 +62,16 @@ public class WitnessIndex implements IWitnessIndex, ITokenIndex {
     List<BiGram> biGrams = bigramIndex.getBiGrams();
     for (BiGram gram : biGrams) {
       map.put(gram.getNormalized(), new Phrase(Lists.newArrayList(gram.getFirstToken(), gram.getLastToken())));
+    }
+    // do the trigram indexing
+    List<BiGram> bigramsTodo = biGrams.subList(1, biGrams.size());
+    BiGram current = biGrams.get(0);
+    for (BiGram nextBigram : bigramsTodo) {
+      NGram ngram = NGram.create(current);
+      ngram.add(nextBigram);
+      current = nextBigram;
+//      System.out.println("!!"+ngram.getNormalized());
+      map.put(ngram.getNormalized(), new Phrase(Lists.newArrayList(ngram)));
     }
   }
 

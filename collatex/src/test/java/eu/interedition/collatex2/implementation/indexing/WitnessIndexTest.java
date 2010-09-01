@@ -48,6 +48,7 @@ public class WitnessIndexTest {
   public void testBigrams1() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitnessIndex index = new WitnessIndex(witnessA, witnessA.findRepeatingTokens());
+    // test bigrams
     assertTrue(index.contains("# the"));
     assertTrue(index.contains("big black")); //NOT!
     assertTrue(index.contains("black cat"));
@@ -55,6 +56,15 @@ public class WitnessIndexTest {
     assertTrue(index.contains("and the"));
     assertTrue(index.contains("black rat"));
     assertTrue(index.contains("rat #"));
+    // test trigrams
+    assertTrue(index.contains("# the big"));
+    assertTrue(index.contains("the big black")); //NOT!
+    assertTrue(index.contains("big black cat"));
+    assertTrue(index.contains("black cat and"));
+    assertTrue(index.contains("cat and the"));
+    assertTrue(index.contains("and the big"));
+    assertTrue(index.contains("big black rat"));
+    assertTrue(index.contains("black rat #"));
   }
 
 

@@ -57,32 +57,29 @@ public class AlignmentTableIndexTest {
     return aligner;
   }
 
-  @Ignore
   @Test
   public void test() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IAlignmentTable table = createAligner().add(witnessA).getResult();
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
-    assertTrue(index.containsNormalizedPhrase("# the"));
-    assertTrue(index.containsNormalizedPhrase("# the big"));
-    assertTrue(index.containsNormalizedPhrase("# the big black"));
-    assertTrue(index.containsNormalizedPhrase("the big black cat"));
-    assertTrue(index.containsNormalizedPhrase("big black cat"));
-    assertTrue(index.containsNormalizedPhrase("black cat"));
-    assertTrue(index.containsNormalizedPhrase("cat"));
-    assertTrue(index.containsNormalizedPhrase("and"));
-    assertTrue(index.containsNormalizedPhrase("and the"));
-    assertTrue(index.containsNormalizedPhrase("and the big"));
-    assertTrue(index.containsNormalizedPhrase("and the big black"));
-    assertTrue(index.containsNormalizedPhrase("the big black rat"));
-    assertTrue(index.containsNormalizedPhrase("big black rat"));
-    assertTrue(index.containsNormalizedPhrase("black rat"));
-    assertTrue(index.containsNormalizedPhrase("rat"));
-    assertEquals(15, index.size());
+    // test bigrams
+    assertTrue(index.contains("# the"));
+    assertTrue(index.contains("big black")); //NOT!
+    assertTrue(index.contains("black cat"));
+    assertTrue(index.contains("cat and"));
+    assertTrue(index.contains("and the"));
+    assertTrue(index.contains("black rat"));
+    assertTrue(index.contains("rat #"));
+    // test trigrams
+    assertTrue(index.contains("# the big"));
+    assertTrue(index.contains("the big black")); //NOT!
+    assertTrue(index.contains("big black cat"));
+    assertTrue(index.contains("black cat and"));
+    assertTrue(index.contains("cat and the"));
+    assertTrue(index.contains("and the big"));
+    assertTrue(index.contains("big black rat"));
+    assertTrue(index.contains("black rat #"));
 
-//    final IColumns columns = index.getColumns("the big black cat");
-//    assertEquals(1, columns.getBeginPosition());
-//    assertEquals(4, columns.getEndPosition());
   }
 
   @Ignore
