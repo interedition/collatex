@@ -22,6 +22,7 @@ package eu.interedition.collatex2.implementation.indexing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -64,7 +65,7 @@ public class AlignmentTableIndexTest {
     final IAlignmentTableIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
     // test bigrams
     assertTrue(index.contains("# the"));
-    assertTrue(index.contains("big black")); //NOT!
+    assertFalse(index.contains("big black")); 
     assertTrue(index.contains("black cat"));
     assertTrue(index.contains("cat and"));
     assertTrue(index.contains("and the"));
@@ -72,7 +73,7 @@ public class AlignmentTableIndexTest {
     assertTrue(index.contains("rat #"));
     // test trigrams
     assertTrue(index.contains("# the big"));
-    assertTrue(index.contains("the big black")); //NOT!
+    assertFalse(index.contains("the big black"));
     assertTrue(index.contains("big black cat"));
     assertTrue(index.contains("black cat and"));
     assertTrue(index.contains("cat and the"));

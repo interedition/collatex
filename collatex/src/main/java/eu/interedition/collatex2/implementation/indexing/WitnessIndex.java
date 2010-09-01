@@ -44,24 +44,15 @@ public class WitnessIndex implements IWitnessIndex, ITokenIndex {
   public WitnessIndex(IWitness witness, List<String> repeatedTokens) {
     this.map = Maps.newLinkedHashMap();
     // do the unigram indexing... 
-    final Multimap<String, INormalizedToken> normalizedTokenMap = ArrayListMultimap.create();
+    final Multimap<String, IPhrase> normalizedTokenMap = ArrayListMultimap.create();
     for (final INormalizedToken token : witness.getTokens()) {
-      normalizedTokenMap.put(token.getNormalized(), token);
+      normalizedTokenMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
     }
-    // remove duplicates in unigram index!
-    for (final String key : normalizedTokenMap.keySet()) {
-      final Collection<INormalizedToken> tokenCollection = normalizedTokenMap.get(key);
-      if (tokenCollection.size() == 1) {
-        List<INormalizedToken> firstToken = Lists.newArrayList(normalizedTokenMap.get(key));
-        map.put(key, new Phrase(firstToken));
-      }
-    }
-
-    // do the bidgram indexing TODO: remove duplicates in index!
+    // do the bigram indexing 
     BiGramIndex bigramIndex = BiGramIndex.create(witness);
     List<BiGram> biGrams = bigramIndex.getBiGrams();
     for (BiGram gram : biGrams) {
-      map.put(gram.getNormalized(), new Phrase(Lists.newArrayList(gram.getFirstToken(), gram.getLastToken())));
+      normalizedTokenMap.put(gram.getNormalized(), new Phrase(Lists.newArrayList(gram.getFirstToken(), gram.getLastToken())));
     }
     // do the trigram indexing
     List<BiGram> bigramsTodo = biGrams.subList(1, biGrams.size());
@@ -70,8 +61,15 @@ public class WitnessIndex implements IWitnessIndex, ITokenIndex {
       NGram ngram = NGram.create(current);
       ngram.add(nextBigram);
       current = nextBigram;
-//      System.out.println("!!"+ngram.getNormalized());
-      map.put(ngram.getNormalized(), new Phrase(Lists.newArrayList(ngram)));
+      normalizedTokenMap.put(ngram.getNormalized(), new Phrase(Lists.newArrayList(ngram)));
+    }
+    // remove duplicates in ngram index!
+    for (final String key : normalizedTokenMap.keySet()) {
+      final Collection<IPhrase> tokenCollection = normalizedTokenMap.get(key);
+      if (tokenCollection.size() == 1) {
+        List<IPhrase> firstPhrase = Lists.newArrayList(normalizedTokenMap.get(key));
+        map.put(key, firstPhrase.get(0));
+      }
     }
   }
 

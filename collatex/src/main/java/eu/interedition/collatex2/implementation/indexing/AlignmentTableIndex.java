@@ -58,25 +58,16 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, ITokenIndex {
         }
       }
       // do unigram indexing
-      final Multimap<String, INormalizedToken> normalizedTokenMap = ArrayListMultimap.create();
+      final Multimap<String, IPhrase> normalizedTokenMap = ArrayListMultimap.create();
       for (final INormalizedToken token : tokens) {
-        normalizedTokenMap.put(token.getNormalized(), token);
+        normalizedTokenMap.put(token.getNormalized(), new Phrase(Lists.newArrayList(token)));
       }
-      for (final String key : normalizedTokenMap.keySet()) {
-        final Collection<INormalizedToken> tokenCollection = normalizedTokenMap.get(key);
-        if (tokenCollection.size() == 1) {
-          List<INormalizedToken> firstToken = Lists.newArrayList(normalizedTokenMap.get(key));
-          normalizedToPhrase.put(key, new Phrase(firstToken));
-        }
-      }
-
       // do bigram indexing
       BiGramIndex index = BiGramIndex.create(tokens);
       List<BiGram> biGrams = index.getBiGrams();
       for (BiGram gram : biGrams) {
-        normalizedToPhrase.put(gram.getNormalized(), new Phrase(Lists.newArrayList(gram.getFirstToken(), gram.getLastToken())));
+        normalizedTokenMap.put(gram.getNormalized(), new Phrase(Lists.newArrayList(gram.getFirstToken(), gram.getLastToken())));
       }
-      // System.out.println("!!"+biGrams);
       if (!biGrams.isEmpty()) {
         // do the trigram indexing
         List<BiGram> bigramsTodo = Lists.newArrayList(biGrams);//biGrams.subList(1, biGrams.size()-1);
@@ -86,7 +77,14 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, ITokenIndex {
           ngram.add(nextBigram);
           current = nextBigram;
   //        System.out.println("!!"+ngram.getNormalized());
-          normalizedToPhrase.put(ngram.getNormalized(), new Phrase(Lists.newArrayList(ngram)));
+          normalizedTokenMap.put(ngram.getNormalized(), new Phrase(Lists.newArrayList(ngram)));
+        }
+      }
+      for (final String key : normalizedTokenMap.keySet()) {
+        final Collection<IPhrase> tokenCollection = normalizedTokenMap.get(key);
+        if (tokenCollection.size() == 1) {
+          List<IPhrase> firstPhrase = Lists.newArrayList(normalizedTokenMap.get(key));
+          normalizedToPhrase.put(key, firstPhrase.get(0));
         }
       }
     }
