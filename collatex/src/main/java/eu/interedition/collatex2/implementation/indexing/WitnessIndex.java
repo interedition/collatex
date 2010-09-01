@@ -55,13 +55,15 @@ public class WitnessIndex implements IWitnessIndex, ITokenIndex {
       normalizedTokenMap.put(gram.getNormalized(), new Phrase(Lists.newArrayList(gram.getFirstToken(), gram.getLastToken())));
     }
     // do the trigram indexing
-    List<BiGram> bigramsTodo = biGrams.subList(1, biGrams.size());
-    BiGram current = biGrams.get(0);
-    for (BiGram nextBigram : bigramsTodo) {
-      NGram ngram = NGram.create(current);
-      ngram.add(nextBigram);
-      current = nextBigram;
-      normalizedTokenMap.put(ngram.getNormalized(), new Phrase(Lists.newArrayList(ngram)));
+    if (!biGrams.isEmpty()) {
+      List<BiGram> bigramsTodo = biGrams.subList(1, biGrams.size());
+      BiGram current = biGrams.get(0);
+      for (BiGram nextBigram : bigramsTodo) {
+        NGram ngram = NGram.create(current);
+        ngram.add(nextBigram);
+        current = nextBigram;
+        normalizedTokenMap.put(ngram.getNormalized(), new Phrase(Lists.newArrayList(ngram)));
+      }
     }
     // remove duplicates in ngram index!
     for (final String key : normalizedTokenMap.keySet()) {
