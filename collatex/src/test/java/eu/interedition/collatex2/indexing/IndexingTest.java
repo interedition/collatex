@@ -62,6 +62,7 @@ public class IndexingTest {
   }
 
   @Test
+  @Ignore
   public void test1a() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
     final IWitnessIndex index = CollateXEngine.createWitnessIndex(a);

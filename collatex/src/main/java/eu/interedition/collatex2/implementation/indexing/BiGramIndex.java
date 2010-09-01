@@ -22,6 +22,10 @@ public class BiGramIndex implements Iterable<BiGram> {
     this.biGrams1 = biGrams1;
   }
 
+  public BiGramIndex() {
+    this.biGrams1 = Lists.newArrayList();
+  }
+
   // TODO remove!
   public Map normalize() {
     final Map<String, BiGram> biGramMapped1 = normalize(biGrams1);
@@ -29,24 +33,14 @@ public class BiGramIndex implements Iterable<BiGram> {
   }
 
   public static BiGramIndex create(final IWitness a) {
-    final List<BiGram> biGrams1 = BiGramIndex.calculate(a);
-    return new BiGramIndex(biGrams1);
+    return create(a.getTokens());
   }
 
-  // TODO replace calls to this method with calls to create!
-  // TODO make this method private
-  public static List<BiGram> calculate(final IWitness w) {
-    final List<INormalizedToken> tokensTodo = Lists.newArrayList(w.getTokens());
-    tokensTodo.add(new NullToken(w.size() + 1, w.getSigil()));
-    INormalizedToken previous = new NullToken(0, w.getSigil());
-    final List<BiGram> bigrams = Lists.newArrayList();
-    for (final INormalizedToken next : tokensTodo) {
-      final BiGram tuple = new BiGram(previous, next);
-      bigrams.add(tuple);
-      previous = next;
-    }
-    return bigrams;
-  }
+//  // TODO replace calls to this method with calls to create!
+//  // TODO make this method private
+//  public static List<BiGram> calculate(final IWitness w) {
+//    final List<INormalizedToken> tokens = w.getTokens();
+//  }
 
   // TODO integrate the two static functions into one!
   private static Map<String, BiGram> normalize(final List<BiGram> ngrams) {
@@ -96,5 +90,21 @@ public class BiGramIndex implements Iterable<BiGram> {
   @Override
   public Iterator<BiGram> iterator() {
     return biGrams1.iterator();
+  }
+
+  public static BiGramIndex create(List<INormalizedToken> tokens) {
+    if (tokens.isEmpty()) {
+      return new BiGramIndex();
+    }
+    final List<INormalizedToken> tokensTodo = Lists.newArrayList(tokens);
+    tokensTodo.add(new NullToken(tokens.size() + 1, tokens.get(0).getSigil()));
+    INormalizedToken previous = new NullToken(0, tokens.get(0).getSigil());
+    final List<BiGram> bigrams = Lists.newArrayList();
+    for (final INormalizedToken next : tokensTodo) {
+      final BiGram tuple = new BiGram(previous, next);
+      bigrams.add(tuple);
+      previous = next;
+    }
+    return new BiGramIndex(bigrams);
   }
 }
