@@ -20,14 +20,13 @@
 
 package eu.interedition.collatex2.interfaces;
 
-import java.util.Collection;
 
-public interface IWitnessIndex {
+public interface IWitnessIndex extends ITokenIndex {
 
-  boolean contains(String normalized);
+  // boolean contains(String normalized);
 
-  int size();
+  // int size();
 
-  Collection<IPhrase> getPhrases();
+  //  Collection<IPhrase> getPhrases();
 
 }

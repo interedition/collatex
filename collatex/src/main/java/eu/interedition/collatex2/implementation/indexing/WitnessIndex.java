@@ -81,11 +81,6 @@ public class WitnessIndex implements IWitnessIndex, ITokenIndex {
   }
 
   @Override
-  public Collection<IPhrase> getPhrases() {
-    throw new RuntimeException("Remove this method!");
-  }
-
-  @Override
   public int size() {
     return map.size();
   }

@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -78,11 +79,6 @@ public class WitnessIndex0 implements IWitnessIndex {
   @Override
   public int size() {
     return phraseBag.size();
-  }
-
-  @Override
-  public Collection<IPhrase> getPhrases() {
-    return phraseBag;
   }
 
   private Multimap<String, IPhrase> seed(final List<INormalizedToken> tokens) {
@@ -146,6 +142,16 @@ public class WitnessIndex0 implements IWitnessIndex {
     final List<IPhrase> values = Lists.newArrayList(phraseMap.values());
     Collections.sort(values, Phrase.PHRASECOMPARATOR);
     return values;
+  }
+
+  @Override
+  public IPhrase getPhrase(String key) {
+    throw new RuntimeException("NOT IMPLEMENTED!");
+  }
+
+  @Override
+  public Set<String> keys() {
+    throw new RuntimeException("NOT IMPLEMENTED!");
   }
 
 }
