@@ -34,10 +34,13 @@ public interface IWitness {
 
   String getSigil();
 
+  //TODO: remove method!
+  //TODO: Think about python bindings!
   List<String> findRepeatingTokens();
 
   ITokenIndex getTokenIndex(List<String> repeatedTokens);
 
+  //TODO: remove method!
   Collection<? extends String> getRepeatedTokens();
 
 }

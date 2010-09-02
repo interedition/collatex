@@ -7,6 +7,7 @@ public interface ITokenContainer {
 
   ITokenIndex getTokenIndex(List<String> repeatedTokens);
 
+  //TODO: remove!
   Collection<? extends String> getRepeatedTokens();
 
 }

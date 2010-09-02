@@ -38,6 +38,8 @@ public interface IAlignmentTable extends ITokenContainer {
 
   void addAddition(IAddition addition);
 
+  //TODO: remove this method!
+  //TODO: think about python bindings!
   List<String> findRepeatingTokens();
 
   void accept(IAlignmentTableVisitor visitor);
