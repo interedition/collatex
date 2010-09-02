@@ -35,14 +35,13 @@ import com.google.common.collect.Multimap;
 
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IAlignmentTableIndex;
 import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 
-public class AlignmentTableIndex implements IAlignmentTableIndex, ITokenIndex {
+public class AlignmentTableIndex implements ITokenIndex {
   private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
   
   private final Map<String, IPhrase> normalizedToPhrase;
@@ -91,17 +90,9 @@ public class AlignmentTableIndex implements IAlignmentTableIndex, ITokenIndex {
     }
   }
 
-  public static IAlignmentTableIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
+  public static ITokenIndex create(final IAlignmentTable table, final List<String> repeatingTokens) {
     final AlignmentTableIndex index = new AlignmentTableIndex(table);
-//    
-//      findUniquePhrasesForRow(sigil, table, index, repeatingTokens);
-//    }
     return index;
-  }
-
-  @Override
-  public boolean containsNormalizedPhrase(String normalized) {
-    return contains(normalized);
   }
 
   @Override
