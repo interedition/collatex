@@ -178,6 +178,20 @@ public class IndexMatcherTest {
     assertEquals(2, matches.size());
   }
 
+  @Ignore
+  @Test
+  public void testDroughtOfMay() {
+    final IWitness a = factory.createWitness("A", "When April with his showers sweet with fruit The drought of March has pierced unto the root");
+    final IWitness b = factory.createWitness("B", "When showers sweet with April fruit The March of drought has pierced to the root");
+    final IWitness c = factory.createWitness("C", "When showers sweet with April fruit The drought of March has pierced the rood");
+    final IAlignmentTable table = factory.align(a,b);
+    final IAlignment alignment = factory.createAlignmentUsingIndex(table, c);
+    final List<IMatch> matches = alignment.getMatches();
+    assertContains(matches, "showers sweet with");
+    assertContains(matches, "has pierced");
+    assertEquals(2, matches.size());
+  }
+
   final Function<IMatch, String> function = new Function<IMatch, String>() {
     @Override
     public String apply(final IMatch match) {
