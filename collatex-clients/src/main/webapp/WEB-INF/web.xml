@@ -13,7 +13,7 @@
     <description></description>
     <display-name>Collatex</display-name>
     <servlet-name>Collatex</servlet-name>
-    <servlet-class>eu.interedition.collatex2.web.Collatex</servlet-class>
+    <servlet-class>eu.interedition.collatex2.web.CollatexClient</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>Collatex</servlet-name>
