@@ -280,7 +280,16 @@
 
   for (i in examples.example){
 	  var example = examples.example[i];
-    document.write("<button onClick='showExample(\""+example.text1+"\",\""+example.text2+"\",\""+example.text3+"\",\""+example.text3+"\",\""+example.text4+"\",\""+example.text5+"\",\""+example.text6+"\");'>"+example.name+"</button>");
+    document.write("<button onClick='showExample(\""+
+    	    example.text1+"\",\""+
+    	    example.text2+"\",\""+
+    	    example.text3+"\",\""+
+    	    example.text3+"\",\""+
+    	    example.text4+"\",\""+
+    	    example.text5+"\",\""+
+    	    example.text6+"\");'>"+
+    	    example.name+
+    	    "</button>");
   }
 </script>
 
