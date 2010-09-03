@@ -1,0 +1,34 @@
+digraph G {
+  1 [label = "#"];
+  2 [label = "#"];
+  3 [label = "i"];
+  4 [label = "bought"];
+  5 [label = "this"];
+  6 [label = "glass"];
+  7 [label = "because"];
+  8 [label = "it"];
+  9 [label = "matches"];
+  10 [label = "those"];
+  11 [label = "dinner"];
+  12 [label = "plates"];
+  13 [label = "glasses"];
+  14 [label = "those"];
+  15 [label = "glasses"];
+  1 -> 3 [label = "A,B,C,D"];
+  3 -> 4 [label = "A,B,C,D"];
+  4 -> 5 [label = "A"];
+  5 -> 6 [label = "A"];
+  6 -> 7 [label = "A"];
+  7 -> 8 [label = "A"];
+  8 -> 9 [label = "A"];
+  9 -> 10 [label = "A"];
+  10 -> 11 [label = "A"];
+  11 -> 12 [label = "A"];
+  12 -> 2 [label = "A"];
+  4 -> 10 [label = "B"];
+  10 -> 13 [label = "B"];
+  13 -> 2 [label = "B"];
+  4 -> 14 [label = "C,D"];
+  14 -> 15 [label = "C,D"];
+  15 -> 2 [label = "C,D"];
+}

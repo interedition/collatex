@@ -14,4 +14,11 @@ public class NormalizedTokenTest {
     final INormalizedToken result = NormalizedToken.normalize(token);
     Assert.assertEquals("notnormalized", result.getNormalized());
   }
+
+  @Test
+  public void testPunctuationToken() {
+    final Token token = new Token("P", "#@$!", 1);
+    final INormalizedToken result = NormalizedToken.normalize(token);
+    Assert.assertEquals("#@$!", result.getNormalized());
+  }
 }

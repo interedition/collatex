@@ -1,9 +1,9 @@
 package eu.interedition.collatex2.interfaces;
 
-import java.util.List;
+import java.util.Set;
 
 public interface IJVariantGraphEdge {
 
-  List<IWitness> getWitnesses();
+  Set<IWitness> getWitnesses();
 
 }

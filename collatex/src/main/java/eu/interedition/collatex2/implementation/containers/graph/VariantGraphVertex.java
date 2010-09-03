@@ -61,4 +61,9 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     return tokenMap.keySet();
   }
 
+  @Override
+  public String toString() {
+    return "[" + getNormalized() + "]";
+  }
+
 }

@@ -3,6 +3,8 @@ package eu.interedition.collatex.experimental.ngrams.data;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class NormalizedToken extends Token implements INormalizedToken {
@@ -25,6 +27,10 @@ public class NormalizedToken extends Token implements INormalizedToken {
     final boolean find = matcher.find();
     if (find) {
       normalized = matcher.replaceAll("");
+    }
+    // but if the token content was only punctuation, we end up with nothing, so:
+    if (StringUtils.isEmpty(normalized)) {
+      normalized = token.getContent();
     }
     final NormalizedToken normalizedT = create(token, normalized);
     return normalizedT;

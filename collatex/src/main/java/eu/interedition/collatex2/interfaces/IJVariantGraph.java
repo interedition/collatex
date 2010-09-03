@@ -4,4 +4,6 @@ import org.jgrapht.DirectedGraph;
 
 public interface IJVariantGraph extends DirectedGraph<IJVariantGraphVertex, IJVariantGraphEdge> {
 
+  IJVariantGraphVertex getStartVertex();
+
 }

@@ -12,20 +12,16 @@
 			<td colspan="2">CollateX REST-Service: <input type="text" name="rest_service" id="rest_service" size="50" value="http://localhost:8080/collatex-web/api/collate"/></td>
 		</tr>
 		<tr>
-			<td>Text1:</td>
-			<td>Text2:</td>
+			<td>Witness A : <input size="250" name="text1" id="text1"/></td>
 		</tr>
 		<tr>
-			<td><textarea name="text1" id="text1" rows="10" cols="40"></textarea></td>
-			<td><textarea name="text2" id="text2" rows="10" cols="40"></textarea></td>
+			<td>Witness B : <input size="250" name="text2" id="text2"/></td>
 		</tr>
 		<tr>
-			<td>Text3:</td>
-			<td>Text4:</td>
+			<td>Witness C : <input size="250" name="text3" id="text3"/></td>
 		</tr>
 		<tr>
-			<td><textarea name="text3" id="text3" rows="10" cols="40"></textarea></td>
-			<td><textarea name="text4" id="text4" rows="10" cols="40"></textarea></td>
+			<td>Witness D : <input size="250" name="text4" id="text4"/></td>
 		</tr>
 		<tr>
 			<td colspan="2">Return output as:

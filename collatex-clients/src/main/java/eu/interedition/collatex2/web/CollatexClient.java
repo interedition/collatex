@@ -14,6 +14,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Servlet implementation class Collatex
  */
@@ -41,8 +46,7 @@ public class CollatexClient extends HttpServlet {
     String outputType = request.getParameter("output_type").toString();
     String restService = request.getParameter("rest_service").toString();
 
-    String content = "{" + "\"witnesses\" : [ " + "{\"id\" : \"A\", \"content\" : \"" + text1 + "\" }, " + "{\"id\" : \"B\", \"content\" : \"" + text2 + "\" }, " + "{\"id\" : \"C\", \"content\" : \""
-        + text3 + "\" }, " + "{\"id\" : \"D\", \"content\" : \"" + text4 + "\" } " + "]" + "}";
+    String jsonContent = createJson(text1, text2, text3, text4);
 
     URL server = new URL(restService);
     HttpURLConnection connection = (HttpURLConnection) server.openConnection();
@@ -54,7 +58,8 @@ public class CollatexClient extends HttpServlet {
     connection.setRequestMethod("POST");
 
     Writer writer = new OutputStreamWriter(connection.getOutputStream());
-    writer.write(content);
+    writer.write(jsonContent);
+    System.out.println("content sent: " + jsonContent);
     writer.flush();
     writer.close();
 
@@ -69,6 +74,25 @@ public class CollatexClient extends HttpServlet {
     reader.close();
     servletOutput.close();
 
+  }
+
+  static char baseId = Character.valueOf('A').charValue();
+
+  private String createJson(String... witnesses) {
+    JSONArray jsonWitnesses = new JSONArray();
+    for (int i = 0; i < witnesses.length; i++) {
+      String witness = witnesses[i];
+      if (StringUtils.isNotEmpty(witness)) {
+        JSONObject jsonWitness = new JSONObject();
+        jsonWitness.put("id", Character.valueOf((char) (baseId + i)));
+        jsonWitness.put("content", witness);
+        jsonWitnesses.add(jsonWitness);
+      }
+    }
+    JSONObject object = new JSONObject();
+    object.put("witnesses", jsonWitnesses);
+    String jsonContent = object.toString();
+    return jsonContent;
   }
 
   /**

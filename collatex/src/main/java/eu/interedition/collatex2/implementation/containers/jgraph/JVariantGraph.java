@@ -10,9 +10,27 @@ import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
 
 public class JVariantGraph implements IJVariantGraph {
+  private final IJVariantGraphVertex startVertex;
+  private final JVariantGraphVertex endVertex;
+
+  public JVariantGraph() {
+    startVertex = new JVariantGraphVertex("#");
+    addVertex(startVertex);
+    endVertex = new JVariantGraphVertex("#");
+    addVertex(getEndVertex());
+  }
 
   public static IJVariantGraph create() {
     return new JVariantGraph();
+  }
+
+  @Override
+  public IJVariantGraphVertex getStartVertex() {
+    return startVertex;
+  }
+
+  public IJVariantGraphVertex getEndVertex() {
+    return endVertex;
   }
 
   @Override
