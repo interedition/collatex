@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Set;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -25,24 +24,28 @@ public class JVariantGraphCreatorTest {
     engine = new CollateXEngine();
   }
 
-  @Ignore
+  //  @Ignore
   @Test
-  public void testTwoWitnesses() {
+  public void testJoinTwoIdenticalWitnesses() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the black cat");
     IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
     IJVariantGraph joinedGraph = JVariantGraphCreator.parallelSegmentate(graph);
     IJVariantGraphVertex startVertex = joinedGraph.getStartVertex();
+    assertEquals("#", startVertex.getNormalized());
+    assertEquals(0, startVertex.getWitnesses().size());
+
     Set<IJVariantGraphEdge> outgoingEdges = joinedGraph.outgoingEdgesOf(startVertex);
     assertEquals(1, outgoingEdges.size());
 
     IJVariantGraphEdge edge = outgoingEdges.iterator().next();
+    IJVariantGraphVertex vertex = joinedGraph.getEdgeTarget(edge);
+    assertEquals("the black cat", vertex.getNormalized());
+
     Set<IWitness> witnesses = edge.getWitnesses();
     assertEquals(2, witnesses.size());
     assertTrue(witnesses.contains(w1));
     assertTrue(witnesses.contains(w2));
 
-    IJVariantGraphVertex vertex = joinedGraph.getEdgeTarget(edge);
-    assertEquals("the black cat", vertex.getNormalized());
   }
 }

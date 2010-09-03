@@ -53,7 +53,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     // fetch all the duplicate keys and return them 
     List<String> result = Lists.newArrayList();
     for (String key : mapped.keySet()) {
-      if (mapped.get(key).size()>1) {
+      if (mapped.get(key).size() > 1) {
         result.add(key);
       }
     }
@@ -65,7 +65,6 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return endVertex;
   }
 
- 
   @Override
   public IVariantGraphVertex getStartVertex() {
     return startVertex;
@@ -75,7 +74,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   public List<IWitness> getWitnesses() {
     Set<IVariantGraphEdge> outgoingEdges = outgoingEdgesOf(startVertex);
     List<IWitness> totalWitnesses = Lists.newArrayList();
-    for (IVariantGraphEdge edge :  outgoingEdges) {
+    for (IVariantGraphEdge edge : outgoingEdges) {
       totalWitnesses.addAll(edge.getWitnesses());
     }
     return Collections.unmodifiableList(totalWitnesses);
@@ -108,7 +107,6 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return graph;
   }
 
-
   public List<IVariantGraphVertex> getPath(IWitness witness) {
     List<IVariantGraphVertex> path = Lists.newArrayList();
     IVariantGraphVertex startVertex = getStartVertex();
@@ -117,7 +115,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
       Set<IVariantGraphEdge> outgoingEdges = outgoingEdgesOf(currentVertex);
       boolean found = false;
       for (IVariantGraphEdge edge : outgoingEdges) {
-        if (!found&&edge.containsWitness(witness)) {
+        if (!found && edge.containsWitness(witness)) {
           found = true;
           IVariantGraphVertex edgeTarget = getEdgeTarget(edge);
           if (!edgeTarget.getNormalized().equals("#")) {
@@ -127,7 +125,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
         }
       }
       if (!found) {
-        throw new RuntimeException("No valid path found for "+witness.getSigil());
+        throw new RuntimeException("No valid path found for " + witness.getSigil());
       }
     }
     return path;
@@ -139,15 +137,13 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     addVertex(vertex);
     return vertex;
   }
-  
+
   //write
   public void addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
     IVariantGraphEdge e = new VariantGraphEdge(begin, end, witness);
     addEdge(begin, end, e);
   }
-  
 
- 
   @Override
   public List<IVariantGraphVertex> getLongestPath() {
     // NOTE: Weights are set to negative value to

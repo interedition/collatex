@@ -37,21 +37,18 @@ public class CollatexClient extends HttpServlet {
    * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
    */
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    // TODO Auto-generated method stub
-    String text1 = request.getParameter("text1").toString();
-    String text2 = request.getParameter("text2").toString();
-    String text3 = request.getParameter("text3").toString();
-    String text4 = request.getParameter("text4").toString();
-    String text5 = request.getParameter("text5").toString();
-    String text6 = request.getParameter("text6").toString();
-    String outputType = request.getParameter("output_type").toString();
-    String restService = request.getParameter("rest_service").toString();
+  public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+    String[] witnessInput = new String[7];
+    for (int i = 0; i < witnessInput.length; i++) {
+      witnessInput[i] = request.getParameter("text" + (i + 1));
+    }
+    final String outputType = request.getParameter("output_type");
+    final String restService = request.getParameter("rest_service");
 
-    String jsonContent = createJson(text1, text2, text3, text4, text5, text6);
+    final String jsonContent = createJson(witnessInput);
 
-    URL server = new URL(restService);
-    HttpURLConnection connection = (HttpURLConnection) server.openConnection();
+    final URL server = new URL(restService);
+    final HttpURLConnection connection = (HttpURLConnection) server.openConnection();
     connection.setDoOutput(true);
     connection.setDoInput(true);
     connection.setUseCaches(false);
@@ -59,15 +56,15 @@ public class CollatexClient extends HttpServlet {
     connection.setRequestProperty("Accept", outputType);
     connection.setRequestMethod("POST");
 
-    Writer writer = new OutputStreamWriter(connection.getOutputStream());
+    final Writer writer = new OutputStreamWriter(connection.getOutputStream());
     writer.write(jsonContent);
-    System.out.println("content sent: " + jsonContent);
+    //    System.out.println("content sent: " + jsonContent);
     writer.flush();
     writer.close();
 
-    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
     response.setContentType(outputType);
-    PrintWriter servletOutput = response.getWriter();
+    final PrintWriter servletOutput = response.getWriter();
 
     String line = null;
     while (null != (line = reader.readLine())) {
@@ -78,22 +75,22 @@ public class CollatexClient extends HttpServlet {
 
   }
 
-  static char baseId = Character.valueOf('A').charValue();
+  private static char BASE_ID = Character.valueOf('A').charValue();
 
-  private String createJson(String... witnesses) {
-    JSONArray jsonWitnesses = new JSONArray();
+  private String createJson(final String... witnesses) {
+    final JSONArray jsonWitnesses = new JSONArray();
     for (int i = 0; i < witnesses.length; i++) {
-      String witness = witnesses[i];
+      final String witness = witnesses[i];
       if (StringUtils.isNotEmpty(witness)) {
-        JSONObject jsonWitness = new JSONObject();
-        jsonWitness.put("id", Character.valueOf((char) (baseId + i)));
+        final JSONObject jsonWitness = new JSONObject();
+        jsonWitness.put("id", Character.valueOf((char) (BASE_ID + i)));
         jsonWitness.put("content", witness);
         jsonWitnesses.add(jsonWitness);
       }
     }
-    JSONObject object = new JSONObject();
+    final JSONObject object = new JSONObject();
     object.put("witnesses", jsonWitnesses);
-    String jsonContent = object.toString();
+    final String jsonContent = object.toString();
     return jsonContent;
   }
 
@@ -101,10 +98,10 @@ public class CollatexClient extends HttpServlet {
    * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
    */
   @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+  protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
     try {
       doGet(request, response);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();// handle the error here
     }
   }

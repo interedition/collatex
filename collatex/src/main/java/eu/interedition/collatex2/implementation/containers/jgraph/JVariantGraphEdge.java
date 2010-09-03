@@ -3,19 +3,37 @@ package eu.interedition.collatex2.implementation.containers.jgraph;
 import java.util.Set;
 
 import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class JVariantGraphEdge implements IJVariantGraphEdge {
-  private final IVariantGraphEdge vertex;
+  private final Set<IWitness> witnesses;
+  private final IJVariantGraphVertex beginVertex;
+  private final IJVariantGraphVertex endVertex;
 
-  public JVariantGraphEdge(IVariantGraphEdge vertex) {
-    this.vertex = vertex;
+  public JVariantGraphEdge(IJVariantGraphVertex beginVertex, IJVariantGraphVertex endVertex) {
+    this.beginVertex = beginVertex;
+    this.endVertex = endVertex;
+    Set<IWitness> beginWitnesses = beginVertex.getWitnesses();
+    Set<IWitness> endWitnesses = endVertex.getWitnesses();
+    if (beginWitnesses.isEmpty()) {
+      witnesses = endWitnesses;
+    } else {
+      witnesses = beginWitnesses;
+      if (!endWitnesses.isEmpty()) {
+        witnesses.retainAll(endVertex.getWitnesses());
+      }
+    }
   }
 
   @Override
   public Set<IWitness> getWitnesses() {
-    return vertex.getWitnesses();
+    return witnesses;
+  }
+
+  @Override
+  public String toString() {
+    return beginVertex + " --{" + witnesses + "}-> " + endVertex;
   }
 
 }
