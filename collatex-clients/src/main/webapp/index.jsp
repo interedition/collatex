@@ -24,6 +24,12 @@
 			<td>Witness D : <input size="250" name="text4" id="text4"/></td>
 		</tr>
 		<tr>
+			<td>Witness E : <input size="250" name="text4" id="text5"/></td>
+		</tr>
+		<tr>
+			<td>Witness F : <input size="250" name="text4" id="text6"/></td>
+		</tr>
+		<tr>
 			<td colspan="2">Return output as:
 				<select name="output_type" id="output_type">
 					<option value="application/xml" selected="selected">xml-tei</option>

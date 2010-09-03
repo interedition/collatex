@@ -43,10 +43,12 @@ public class CollatexClient extends HttpServlet {
     String text2 = request.getParameter("text2").toString();
     String text3 = request.getParameter("text3").toString();
     String text4 = request.getParameter("text4").toString();
+    String text5 = request.getParameter("text5").toString();
+    String text6 = request.getParameter("text6").toString();
     String outputType = request.getParameter("output_type").toString();
     String restService = request.getParameter("rest_service").toString();
 
-    String jsonContent = createJson(text1, text2, text3, text4);
+    String jsonContent = createJson(text1, text2, text3, text4, text5, text6);
 
     URL server = new URL(restService);
     HttpURLConnection connection = (HttpURLConnection) server.openConnection();
