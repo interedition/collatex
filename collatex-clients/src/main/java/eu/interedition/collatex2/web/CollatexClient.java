@@ -38,7 +38,7 @@ public class CollatexClient extends HttpServlet {
    */
   @Override
   public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-    String[] witnessInput = { "", "", "", "", "", "" };
+    String[] witnessInput = new String[7];
     for (int i = 0; i < witnessInput.length; i++) {
       witnessInput[i] = request.getParameter("text" + (i + 1));
     }
