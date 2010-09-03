@@ -17,6 +17,7 @@
 		<module>collatex-nodeps</module>
 		<module>collatex-web</module>
 		<module>collatex-legacy</module>
+		<module>collatex-clients</module>
 	</modules>
 	<dependencies>
 		<dependency>
@@ -183,6 +184,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<encoding>UTF-8</encoding>
+					<doctitle>CollateX</doctitle>
 					<docencoding>UTF-8</docencoding>
 					<links>
 						<link>http://java.sun.com/j2se/1.6.0/docs/api</link>
@@ -204,6 +206,7 @@
 				<artifactId>maven-jxr-plugin</artifactId>
 				<configuration>
 					<linkJavadoc>true</linkJavadoc>
+					<docTitle>CollateX</docTitle>
 					<outputEncoding>UTF-8</outputEncoding>
 				</configuration>
 			</plugin>
