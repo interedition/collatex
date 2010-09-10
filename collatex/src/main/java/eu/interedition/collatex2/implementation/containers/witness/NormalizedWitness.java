@@ -19,9 +19,8 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   private String sigil;
   private List<INormalizedToken> tokens;
 
-  public NormalizedWitness() {    
-  }
-  
+  public NormalizedWitness() {}
+
   public NormalizedWitness(final String sigil, final List<INormalizedToken> tokens) {
     this.sigil = sigil;
     this.tokens = tokens;
@@ -40,7 +39,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   public void setTokens(List<INormalizedToken> tokens) {
     this.tokens = tokens;
   }
-  
+
   public String getSigil() {
     return sigil;
   }
@@ -48,7 +47,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   public void setSigil(String sigil) {
     this.sigil = sigil;
   }
-  
+
   // TODO check whether iterator.remove() throws exception!
   @Override
   public Iterator<INormalizedToken> iterator() {
@@ -85,5 +84,10 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   @Override
   public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
     return new WitnessIndex(this, repeatedTokens);
+  }
+
+  @Override
+  public String toString() {
+    return getSigil();
   }
 }

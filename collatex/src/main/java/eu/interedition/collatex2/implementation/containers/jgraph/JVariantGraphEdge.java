@@ -2,6 +2,8 @@ package eu.interedition.collatex2.implementation.containers.jgraph;
 
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
 import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -17,9 +19,9 @@ public class JVariantGraphEdge implements IJVariantGraphEdge {
     Set<IWitness> beginWitnesses = beginVertex.getWitnesses();
     Set<IWitness> endWitnesses = endVertex.getWitnesses();
     if (beginWitnesses.isEmpty()) {
-      witnesses = endWitnesses;
+      witnesses = Sets.newHashSet(endWitnesses);
     } else {
-      witnesses = beginWitnesses;
+      witnesses = Sets.newHashSet(beginWitnesses);
       if (!endWitnesses.isEmpty()) {
         witnesses.retainAll(endVertex.getWitnesses());
       }

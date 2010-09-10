@@ -12,9 +12,9 @@ public class JVariantGraphVertex implements IJVariantGraphVertex {
   private final StringBuilder normalized;
   private final Set<IWitness> witnesses;
 
-  public JVariantGraphVertex(IVariantGraphVertex startVertex) {
-    normalized = new StringBuilder(startVertex.getNormalized());
-    witnesses = startVertex.getWitnesses();
+  public JVariantGraphVertex(IVariantGraphVertex vgVertex) {
+    normalized = new StringBuilder(vgVertex.getNormalized());
+    witnesses = vgVertex.getWitnesses();
   }
 
   public JVariantGraphVertex(String normalizedToken) {

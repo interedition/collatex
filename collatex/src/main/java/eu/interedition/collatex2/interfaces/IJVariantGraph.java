@@ -6,4 +6,10 @@ public interface IJVariantGraph extends DirectedGraph<IJVariantGraphVertex, IJVa
 
   IJVariantGraphVertex getStartVertex();
 
+  void setStartVertex(IJVariantGraphVertex startVertex);
+
+  IJVariantGraphVertex getEndVertex();
+
+  void setEndVertex(IJVariantGraphVertex endVertex);
+
 }
