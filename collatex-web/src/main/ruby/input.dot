@@ -1,11 +1,24 @@
 digraph G {
-  1 [label = "#"];
-  2 [label = "#"];
-  3 [label = "the"];
-  4 [label = "black"];
-  5 [label = "cat"];
-  1 -> 3 [label = "A,B,C,D"];
-  3 -> 4 [label = "A,B,C,D"];
-  4 -> 5 [label = "A,B,C,D"];
-  5 -> 2 [label = "A,B,C,D"];
+  108 [label = "#"];
+  109 [label = "#"];
+  110 [label = "the"];
+  111 [label = "very first march"];
+  112 [label = "of"];
+  113 [label = "drought"];
+  114 [label = "hath"];
+  115 [label = "march"];
+  116 [label = "drought"];
+  117 [label = "of march"];
+  108 -> 110 [label = "A,B,C"];
+  110 -> 111 [label = "A"];
+  111 -> 112 [label = "A"];
+  112 -> 113 [label = "A"];
+  113 -> 114 [label = "A"];
+  114 -> 109 [label = "A,B,C"];
+  112 -> 115 [label = "B"];
+  115 -> 114 [label = "B"];
+  110 -> 116 [label = "B,C"];
+  116 -> 112 [label = "B"];
+  116 -> 117 [label = "C"];
+  117 -> 114 [label = "C"];
 }

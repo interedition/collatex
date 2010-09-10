@@ -62,8 +62,8 @@ public class JVariantGraphCreatorTest {
 
   @Test
   public void testJoinTwoDifferentWitnesses() {
-    final IWitness w1 = engine.createWitness("A", "the nice black cat");
-    final IWitness w2 = engine.createWitness("B", "the bad white cat");
+    final IWitness w1 = engine.createWitness("A", "the nice black cat shared his food");
+    final IWitness w2 = engine.createWitness("B", "the bad white cat spilled his food again");
     IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
     IJVariantGraph joinedGraph = JVariantGraphCreator.parallelSegmentate(graph);
     LOG.info("joinedGraph=" + joinedGraph);
@@ -84,12 +84,16 @@ public class JVariantGraphCreatorTest {
     assertTrue(witnesses.contains(w2));
 
     List<String> phrases = extractPhrases(joinedGraph);
-    assertEquals(phrases.toString(), 6, phrases.size());
+    assertEquals(phrases.toString(), 10, phrases.size());
     assertTrue(phrases.contains("#"));
     assertTrue(phrases.contains("the"));
     assertTrue(phrases.contains("nice black"));
     assertTrue(phrases.contains("bad white"));
     assertTrue(phrases.contains("cat"));
+    assertTrue(phrases.contains("shared"));
+    assertTrue(phrases.contains("spilled"));
+    assertTrue(phrases.contains("his food"));
+    assertTrue(phrases.contains("again"));
   }
 
   @Test
