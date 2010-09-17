@@ -33,11 +33,10 @@ import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
-public class WitnessIndex implements IWitnessIndex, ITokenIndex {
+public class WitnessIndex implements IWitnessIndex {
   private final Map<String, IPhrase> map;
 
   //NOTE: repeated Tokens are ignored and can be deleted later!
