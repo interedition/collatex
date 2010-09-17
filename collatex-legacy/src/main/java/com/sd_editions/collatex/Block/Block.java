@@ -29,6 +29,7 @@ import com.google.common.collect.Maps;
  * This shouldn't be used itself, use one of its subclasses or create your own
  *
  */
+@Deprecated
 public abstract class Block {
 
   /* The Block's name */

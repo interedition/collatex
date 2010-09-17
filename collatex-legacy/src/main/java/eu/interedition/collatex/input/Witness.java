@@ -22,6 +22,7 @@ package eu.interedition.collatex.input;
 
 import eu.interedition.collatex.input.visitors.JSONObjectVisitor;
 
+@Deprecated
 public class Witness {
 
   private final Segment _segment;

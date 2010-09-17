@@ -19,7 +19,7 @@
  */
 
 package eu.interedition.collatex.tokenization;
-
+@Deprecated
 public class Token {
   private final String _original;
   private final String _text;

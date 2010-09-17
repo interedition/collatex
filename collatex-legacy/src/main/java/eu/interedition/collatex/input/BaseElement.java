@@ -19,7 +19,7 @@
  */
 
 package eu.interedition.collatex.input;
-
+@Deprecated
 public abstract class BaseElement {
 
   public abstract String getWitnessId();

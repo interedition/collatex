@@ -22,6 +22,7 @@ package eu.interedition.collatex;
 
 import java.util.Random;
 
+@Deprecated
 public class Util {
   private static Random random = new Random();
 

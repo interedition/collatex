@@ -28,6 +28,7 @@ import com.google.common.collect.Sets;
  * Maintains an association between Blocks.
  *
  */
+@Deprecated
 public class BlockStructure {
   HashSet<Block> blocks;
   Block rootBlock;

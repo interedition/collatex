@@ -19,7 +19,7 @@
  */
 
 package eu.interedition.collatex.input;
-
+@Deprecated
 public abstract class BaseContainer<T extends BaseElement> {
 
   public abstract T getElementOnWordPosition(final int k);

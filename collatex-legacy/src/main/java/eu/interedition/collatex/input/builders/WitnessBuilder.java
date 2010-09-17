@@ -33,9 +33,9 @@ import eu.interedition.collatex.input.Segment;
 import eu.interedition.collatex.input.Witness;
 import eu.interedition.collatex.input.Word;
 import eu.interedition.collatex.tokenization.WitnessTokenizer;
-
+@Deprecated
 public class WitnessBuilder {
-
+  
   public enum ContentType {
     TEXT_XML("text/xml"), TEXT_PLAIN("text/plain");
 

@@ -24,7 +24,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.sd_editions.collatex.match.Subsegment;
-
+@Deprecated
 public class Phrase extends BaseElement {
   private final Segment witness;
   private final int startPosition;

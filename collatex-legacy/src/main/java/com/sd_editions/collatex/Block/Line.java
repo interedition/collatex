@@ -24,15 +24,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-/**
- *
- *
- *
- *
- *
- *
- *
- */
+@Deprecated
 public class Line extends Block {
 
   int lineNumber;

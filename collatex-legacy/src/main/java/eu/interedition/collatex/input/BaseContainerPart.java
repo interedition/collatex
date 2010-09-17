@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 // for instance...
 // anyway it should take BaseElements in
 // TODO rename Word to Element!
+@Deprecated
 public class BaseContainerPart<T extends BaseElement> {
   private final BaseContainer<T> _witness;
   private final int startPosition;

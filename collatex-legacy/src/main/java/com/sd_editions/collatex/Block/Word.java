@@ -22,6 +22,7 @@ package com.sd_editions.collatex.Block;
 
 import org.apache.commons.lang.StringUtils;
 
+@Deprecated
 public class Word extends Block {
   private String content;
 

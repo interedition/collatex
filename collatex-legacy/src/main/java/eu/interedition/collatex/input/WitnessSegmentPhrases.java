@@ -26,6 +26,7 @@ import java.util.List;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
+@Deprecated
 public class WitnessSegmentPhrases extends BaseContainer<Phrase> {
   private final String _witnessId;
   private final List<Phrase> _phrases;

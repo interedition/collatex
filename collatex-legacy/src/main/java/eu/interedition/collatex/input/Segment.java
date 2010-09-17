@@ -28,6 +28,7 @@ import eu.interedition.collatex.Util;
 import eu.interedition.collatex.input.visitors.ICollationResource;
 import eu.interedition.collatex.input.visitors.IResourceVisitor;
 
+@Deprecated
 public class Segment extends BaseContainer<Word> implements ICollationResource {
   public final String id;
   private final List<Word> words;

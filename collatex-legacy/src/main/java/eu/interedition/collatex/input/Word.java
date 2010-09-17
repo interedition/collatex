@@ -24,6 +24,7 @@ import eu.interedition.collatex.input.visitors.ICollationResource;
 import eu.interedition.collatex.input.visitors.IResourceVisitor;
 import eu.interedition.collatex.tokenization.Token;
 
+@Deprecated
 public class Word extends BaseElement implements ICollationResource {
   private final String witnessId;
   public final String original;

@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.input.builders.WitnessBuilder;
 import eu.interedition.collatex.input.visitors.JSONObjectVisitor;
-
+@Deprecated
 public class WitnessSet {
   private final List<Witness> _witnesses;
 
