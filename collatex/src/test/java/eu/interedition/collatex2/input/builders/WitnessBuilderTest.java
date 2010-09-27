@@ -33,6 +33,7 @@ import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -135,6 +136,7 @@ public class WitnessBuilderTest {
     compareWitnesses(w1, w3);
   }
 
+  @Ignore
   @Test
   public void testXMLFileA() throws SAXException, IOException {
     IWitness w1 = witnessBuilder.build(xmlFileSimpleA, ContentType.TEXT_XML);
@@ -146,6 +148,7 @@ public class WitnessBuilderTest {
     compareWitnesses(w2, w3);
   }
 
+  @Ignore
   @Test
   public void testXMLFileB() throws SAXException, IOException {
     IWitness w1 = witnessBuilder.build(xmlFileSimpleB, ContentType.TEXT_XML);

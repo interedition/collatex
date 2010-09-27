@@ -21,6 +21,7 @@
 package eu.interedition.collatex2.web;
 
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,14 +55,18 @@ import org.w3c.dom.Element;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
+import eu.interedition.collatex2.output.ApparatusEntry;
+import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
 
@@ -71,11 +76,12 @@ public class ApiController implements InitializingBean {
   protected static final String COLLATEX_NS = "http://interedition.eu/collatex/ns/1.0";
   protected static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
-  private ITokenizer defaultTokenizer = new WhitespaceTokenizer();
-  private ITokenNormalizer defaultNormalizer = new DefaultTokenNormalizer();
+  private final ITokenizer defaultTokenizer = new WhitespaceTokenizer();
+  private final ITokenNormalizer defaultNormalizer = new DefaultTokenNormalizer();
 
   @Autowired
   private ApiObjectMapper objectMapper;
+  private String string;
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -93,14 +99,46 @@ public class ApiController implements InitializingBean {
     return new ModelAndView(teiView, "alignment", collate(input));
   }
 
+  //  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  //  public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
+  //    return new ModelAndView("api/alignment", "alignment", collate(input));
+  //  }
+
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
-  public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
-    return new ModelAndView("api/alignment", "alignment", collate(input));
+  public ModelAndView collateToHtmlP(@RequestBody final ApiInput input) throws Exception {
+    List<Map<String, Object>> rows = parallelSegmentationRows(input);
+    return new ModelAndView("api/apparatus", "rows", rows);
+  }
+
+  static final Phrase EMPTY_PHRASE = new Phrase(Lists.<INormalizedToken> newArrayList());
+
+  private List<Map<String, Object>> parallelSegmentationRows(final ApiInput input) throws ApiException {
+    IAlignmentTable alignmentTable = collate(input);
+    ParallelSegmentationApparatus apparatus = new CollateXEngine().createApparatus(alignmentTable);
+
+    List<ApparatusEntry> entries = apparatus.getEntries();
+    List<Map<String, Object>> rows = Lists.newArrayList();
+    for (String sigil : alignmentTable.getSigli()) {
+      List<String> phrases = Lists.newArrayList();
+      for (ApparatusEntry apparatusEntry : entries) {
+        String phrase = apparatusEntry.containsWitness(sigil) ? apparatusEntry.getPhrase(sigil).getContent() : "";
+        phrases.add(phrase);
+      }
+      Map<String, Object> row = rowMap(sigil, phrases);
+      rows.add(row);
+    }
+    return rows;
+  }
+
+  private Map<String, Object> rowMap(String sigil, Collection<String> phrases) {
+    Map<String, Object> row = Maps.newHashMap();
+    row.put("sigil", sigil);
+    row.put("cells", phrases);
+    return row;
   }
 
   @RequestMapping(value = "collate")
-  public void documentation() {
-  }
+  public void documentation() {}
 
   private IAlignmentTable collate(ApiInput input) throws ApiException {
     Set<String> sigle = new HashSet<String>();
@@ -135,7 +173,7 @@ public class ApiController implements InitializingBean {
     return new CollateXEngine().align(witnesses.toArray(new ApiWitness[witnesses.size()]));
   }
 
-  @ExceptionHandler({ApiException.class, JsonParseException.class })
+  @ExceptionHandler( { ApiException.class, JsonParseException.class })
   public ModelAndView apiError(HttpServletResponse response, Exception exception) {
     return new ModelAndView(new MappingJacksonJsonView(), new ModelMap("error", exception.getMessage()));
   }
@@ -150,7 +188,7 @@ public class ApiController implements InitializingBean {
 
   private MappingJacksonJsonView jsonView;
 
-  private AbstractView teiView = new AbstractView() {
+  private final AbstractView teiView = new AbstractView() {
 
     @Override
     protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
