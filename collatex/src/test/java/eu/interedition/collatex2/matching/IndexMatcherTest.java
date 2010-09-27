@@ -184,12 +184,40 @@ public class IndexMatcherTest {
     final IWitness a = factory.createWitness("A", "When April with his showers sweet with fruit The drought of March has pierced unto the root");
     final IWitness b = factory.createWitness("B", "When showers sweet with April fruit The March of drought has pierced to the root");
     final IWitness c = factory.createWitness("C", "When showers sweet with April fruit The drought of March has pierced the rood");
-    final IAlignmentTable table = factory.align(a,b);
+    final IAlignmentTable table = factory.align(a, b);
     final IAlignment alignment = factory.createAlignmentUsingIndex(table, c);
     final List<IMatch> matches = alignment.getMatches();
     assertContains(matches, "showers sweet with");
     assertContains(matches, "has pierced");
     assertEquals(2, matches.size());
+  }
+
+  @Test
+  public void testTwoEqualPossibilities1() {
+    // test a -> a a
+    final IWitness witnessA = factory.createWitness("A", "a b");
+    final IWitness witnessB = factory.createWitness("B", "a b a b");
+    final IAlignmentTable table = factory.align(witnessA);
+    //    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witnessB);
+    assertEquals(2, matches.size());
+    IMatch match = matches.get(0);
+    assertEquals(1, match.getColumns().getBeginPosition());
+    assertEquals(1, match.getPhrase().getBeginPosition());
+  }
+
+  @Test
+  public void testTwoEqualPossibilities2() {
+    // test a -> a a
+    final IWitness witnessA = factory.createWitness("A", "a b a b");
+    final IWitness witnessB = factory.createWitness("B", "a b");
+    final IAlignmentTable table = factory.align(witnessA);
+    //    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witnessB);
+    assertEquals(2, matches.size());
+    IMatch match = matches.get(0);
+    assertEquals(1, match.getColumns().getBeginPosition());
+    assertEquals(1, match.getPhrase().getBeginPosition());
   }
 
   final Function<IMatch, String> function = new Function<IMatch, String>() {
