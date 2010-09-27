@@ -20,8 +20,6 @@
 
 package eu.interedition.collatex.input;
 
-import org.junit.Ignore;
-
 import junit.framework.TestCase;
 
 public class WordTest extends TestCase {
@@ -33,8 +31,7 @@ public class WordTest extends TestCase {
   }
 
   //TODO: escape UTF-8 characters?
-  @Ignore
-  public void testNormalize2() {
+  public void xTestNormalize2() {
     Word word = new Word(witnessId, "ειπων", 2);
     assertEquals("ειπων", word._normalized);
   }
