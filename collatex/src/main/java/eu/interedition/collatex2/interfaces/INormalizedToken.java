@@ -20,6 +20,13 @@
 
 package eu.interedition.collatex2.interfaces;
 
+/**
+ * The normalized version of the token. 
+ */
 public interface INormalizedToken extends IToken {
-  String getNormalized();
+  /**
+   * The normalized representation of the content of this token.
+   * @return The normalized content.
+   */
+	String getNormalized();
 }

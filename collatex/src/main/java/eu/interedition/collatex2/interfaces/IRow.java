@@ -21,8 +21,25 @@
 package eu.interedition.collatex2.interfaces;
 
 
+/**
+ * 
+ * A row of an alignment table which represents a single witness
+ * 
+ * 
+ * TODO: consider whether this should be an inner interface since an IRow must exist within the context of an IAlignmentTable so the rows and columns will probably end up in the alignment table.
+ *
+ */
 public interface IRow extends Iterable<ICell> {
-
+	
+  /**
+   * get the witness sigil
+   * 
+   * This identifies a witness
+   * 
+   * TODO: should this be uniquely enforce within a collection of witnesses
+   * 
+   * @return the witness sigil
+   */
   String getSigil();
   
  }

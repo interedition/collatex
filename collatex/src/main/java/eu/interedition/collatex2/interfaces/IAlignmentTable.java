@@ -22,6 +22,11 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
+/**
+ * 
+ * A table consisting of rows as witnesses and columns containing aligned tokens
+ * 
+ */
 public interface IAlignmentTable extends ITokenContainer {
 
   List<String> getSigli();
@@ -46,6 +51,12 @@ public interface IAlignmentTable extends ITokenContainer {
 
   IRow getRow(String sigil);
   
+  /**
+   * Retrieve the alignment table rows.
+   * Each row represents a single witness.
+   * 
+   * @return alignment table rows
+   */
   List<IRow> getRows();
 
 }

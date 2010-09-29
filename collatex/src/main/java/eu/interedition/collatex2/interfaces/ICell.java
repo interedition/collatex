@@ -20,10 +20,26 @@
 
 package eu.interedition.collatex2.interfaces;
 
+/**
+ * 
+ * An alignment table cell represents the position of a witness token in alignment position with other witnesses in the table.
+ * Empty cells occur where this witness has nothing to represent at this postion in the alignment.
+ * 
+ */
 public interface ICell {
   
+  /**
+   * It is important to call this method before attempting to call getToken to determine if a token is actually present.
+   * Empty cells occur where this witness has nothing to represent at this postion in the alignment.
+   * @return whether or not this cell is empty
+   */
   boolean isEmpty();
   
+  /**
+   * Retrieve the token for this cell if present
+   * @see isEmpty()
+   * @return the token for this cell
+   */
   INormalizedToken getToken();
   
   int getPosition();

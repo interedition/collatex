@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// TODO: normalizing spacing in project
+
 package eu.interedition.collatex2.implementation;
 
 import java.util.Collection;
@@ -54,6 +56,16 @@ import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.IWitnessIndex;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 
+/**
+ * 
+ * @author Interedition Dev Team
+ * @author Ronald Haentjens Dekker
+ *
+ * CollateXEngine 
+ * 
+ * Public client factory class entry point into CollateX collation library
+ * 
+ */
 public class CollateXEngine {
   private ITokenizer tokenizer = new WhitespaceTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
@@ -66,12 +78,29 @@ public class CollateXEngine {
     this.tokenNormalizer = tokenNormalizer;
   }
   
+  /**
+   * align the witnesses
+   * 
+   * @param witnesses - the witnesses
+   * @return the alignment of the witnesses
+   * 
+   * @todo
+   * We're not sure what we want to do with the name of this method: alignment vs. collation
+   * Terminology check
+   */
   public IAlignmentTable align(IWitness... witnesses) {
     return createAligner().add(witnesses).getResult();
   }
   
-  public IWitness createWitness(final String sigil, final String words) {
-    final Iterable<IToken> tokens = tokenizer.tokenize(sigil, words);
+  /**
+   * Create an instance of an IWitness object
+   * 
+   * @param sigil - the unique id for this witness
+   * @param text - the body of the witness
+   * @return
+   */
+  public IWitness createWitness(final String sigil, final String text) {
+    final Iterable<IToken> tokens = tokenizer.tokenize(sigil, text);
     return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
   }
 

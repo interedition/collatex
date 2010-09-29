@@ -23,6 +23,12 @@ package eu.interedition.collatex2.interfaces;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * IWitness
+ * 
+ * Representation of a single textual witness
+ *
+ */
 public interface IWitness {
 
   // Note: not pleased with this method! implement Iterable!
