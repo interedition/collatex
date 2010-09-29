@@ -31,7 +31,7 @@ import java.util.List;
  */
 public interface IWitness {
 
-  // Note: not pleased with this method! implement Iterable!
+  // Note: This should return a non-modifiable container
   List<INormalizedToken> getTokens();
 
   IPhrase createPhrase(final int startPosition, final int endPosition);
