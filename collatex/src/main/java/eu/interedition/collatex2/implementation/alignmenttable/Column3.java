@@ -123,13 +123,13 @@ public class Column3 implements IColumn {
   }
 
   @Override
-  public List<String> getSigli() {
+  public List<String> getSigla() {
     return Lists.newArrayList(sigliToTokens.keySet());
   }
 
   public void accept(final IAlignmentTableVisitor visitor) {
     visitor.visitColumn(this);
-    final List<String> sigli = this.getSigli();
+    final List<String> sigli = this.getSigla();
     for (final String sigel : sigli) {
       final INormalizedToken token = getToken(sigel);
       visitor.visitToken(sigel, token);

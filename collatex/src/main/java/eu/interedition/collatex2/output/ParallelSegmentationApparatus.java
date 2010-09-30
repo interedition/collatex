@@ -38,21 +38,21 @@ public class ParallelSegmentationApparatus {
   private static Logger logger = LoggerFactory.getLogger(ParallelSegmentationApparatus.class);
   
   private final List<ApparatusEntry> entries;
-  private List<String> sigli;
+  private List<String> sigla;
 
   public List<ApparatusEntry> getEntries() {
     return entries;
   }
 
-  public List<String> getSigli() {
-    if (this.sigli == null) {
+  public List<String> getSigla() {
+    if (this.sigla == null) {
       final Set<String> sigli = Sets.newLinkedHashSet();
       for (final ApparatusEntry column : entries) {
-        sigli.addAll(column.getSigli());
+        sigli.addAll(column.getSigla());
       }
-      this.sigli = Lists.newArrayList(sigli);
+      this.sigla = Lists.newArrayList(sigli);
     }
-    return this.sigli;
+    return this.sigla;
   }
 
   /**
@@ -67,19 +67,19 @@ public class ParallelSegmentationApparatus {
     IColumn previousEntry = null; // Note: in the next step we have to compare
                                    // two columns with each other
     for (final IColumn column : alignmentTable.getColumns()) {
-      boolean needNewCell = previousEntry == null || !previousEntry.getState().equals(column.getState()) || !column.getSigli().equals(previousEntry.getSigli());
-      if (previousEntry != null && previousEntry.getState() == ColumnState.VARIANT && previousEntry.getSigli().size() > column.getSigli().size()
-          && previousEntry.getSigli().containsAll(column.getSigli())) {
+      boolean needNewCell = previousEntry == null || !previousEntry.getState().equals(column.getState()) || !column.getSigla().equals(previousEntry.getSigla());
+      if (previousEntry != null && previousEntry.getState() == ColumnState.VARIANT && previousEntry.getSigla().size() > column.getSigla().size()
+          && previousEntry.getSigla().containsAll(column.getSigla())) {
         needNewCell = false;
       }
       if (needNewCell) {
-        final List<String> sigli = alignmentTable.getSigli();
+        final List<String> sigli = alignmentTable.getSigla();
         logger.debug("!!!" + sigli);
         mergedEntry = new ApparatusEntry(sigli);
         entries.add(mergedEntry);
       }
 
-      final List<String> sigli = alignmentTable.getSigli();
+      final List<String> sigli = alignmentTable.getSigla();
       for (final String sigil : sigli) {
         if (column.containsWitness(sigil)) {
           final INormalizedToken token = column.getToken(sigil);

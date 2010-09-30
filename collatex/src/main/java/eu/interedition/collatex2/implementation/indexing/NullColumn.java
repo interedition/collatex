@@ -76,7 +76,7 @@ public class NullColumn implements IColumn {
   }
 
   @Override
-  public List<String> getSigli() {
+  public List<String> getSigla() {
     // TODO Auto-generated method stub
     return null;
   }

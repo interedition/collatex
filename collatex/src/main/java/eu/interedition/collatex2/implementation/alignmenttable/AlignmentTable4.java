@@ -57,7 +57,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   }
 
   @Override
-  public List<String> getSigli() {
+  public List<String> getSigla() {
     return sigli;
   }
 
@@ -68,7 +68,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public String toString() {
     final StringBuilder stringBuilder = new StringBuilder();
-    for (final String sigil : getSigli()) {
+    for (final String sigil : getSigla()) {
       stringBuilder.append(sigil).append(": ");
       String delim = "";
       for (final IColumn column : getColumns()) {
@@ -91,7 +91,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   public static String alignmentTableToHTML(final IAlignmentTable alignmentTable) {
     final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
 
-    for (final String witnessId : alignmentTable.getSigli()) {
+    for (final String witnessId : alignmentTable.getSigla()) {
       tableHTML.append("<tr>").//
           append("<th>Witness ").append(witnessId).append(":</th>");
       for (final IColumn column : alignmentTable.getColumns()) {

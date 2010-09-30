@@ -40,7 +40,7 @@ public interface IColumn extends Comparable<IColumn> {
 
   ColumnState getState();
 
-  List<String> getSigli();
+  List<String> getSigla();
 
   void accept(IAlignmentTableVisitor visitor);
 

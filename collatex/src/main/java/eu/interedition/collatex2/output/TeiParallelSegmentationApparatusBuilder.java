@@ -52,7 +52,7 @@ public class TeiParallelSegmentationApparatusBuilder {
     for (final ApparatusEntry entry : apparatus.getEntries()) {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
-      for (String sigel : entry.getSigli()) {
+      for (String sigel : entry.getSigla()) {
         content2WitMap.put(entry.getPhrase(sigel).getContent(), sigel);
       }
 

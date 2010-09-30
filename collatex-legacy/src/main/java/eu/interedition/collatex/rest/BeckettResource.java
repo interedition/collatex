@@ -55,7 +55,7 @@ public class BeckettResource extends ServerResource {
       //      sigli.remove("11-2");
       //      sigli.remove("12-1");
 
-      final List<String> sigli = sse.getSigli();
+      final List<String> sigli = sse.getSigla();
       final List<String> shownSigli = sigli.subList(0, 26);
       shownSigli.remove("11-1"); // andleft is missing!
       shownSigli.remove("11-2"); // died is weggevallen

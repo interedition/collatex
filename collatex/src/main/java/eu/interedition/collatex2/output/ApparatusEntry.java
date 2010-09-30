@@ -34,11 +34,11 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class ApparatusEntry {
 
-  private final List<String> sigli;
+  private final List<String> sigla;
   private final Multimap<String, INormalizedToken> sigilToTokens;
 
   public ApparatusEntry(final List<String> sigli) {
-    this.sigli = sigli;
+    this.sigla = sigli;
     this.sigilToTokens = LinkedHashMultimap.create();
   }
 
@@ -54,17 +54,17 @@ public class ApparatusEntry {
     return new Phrase(Lists.newArrayList(sigilToTokens.get(witnessId)));
   }
 
-  public List<String> getSigli() {
-    return sigli;
+  public List<String> getSigla() {
+    return sigla;
   }
 
   public Set<String> getEmptyCells() {
-    final Set<String> emptySigli = Sets.newLinkedHashSet(sigli);
+    final Set<String> emptySigli = Sets.newLinkedHashSet(sigla);
     emptySigli.removeAll(sigilToTokens.keySet());
     return emptySigli;
   }
 
   public boolean hasEmptyCells() {
-    return sigli.size() != sigilToTokens.keySet().size();
+    return sigla.size() != sigilToTokens.keySet().size();
   }
 }
