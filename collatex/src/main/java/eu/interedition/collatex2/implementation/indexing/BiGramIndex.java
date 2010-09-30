@@ -27,7 +27,7 @@ public class BiGramIndex implements Iterable<BiGram> {
   }
 
   // TODO remove!
-  public Map normalize() {
+  public Map<String, BiGram> normalize() {
     final Map<String, BiGram> biGramMapped1 = normalize(biGrams1);
     return biGramMapped1;
   }

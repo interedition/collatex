@@ -20,28 +20,30 @@
 
 package eu.interedition.collatex2.interfaces;
 
-import java.util.List;
 
-public interface IColumn extends Comparable<IColumn> {
-
-  boolean containsWitness(String sigil);
-
-  INormalizedToken getToken(String sigil);
-
-  List<INormalizedToken> getVariants();
-
-  void addVariant(INormalizedToken token);
-
-  void addMatch(INormalizedToken token);
-
+/**
+ * 
+ * A row of an alignment table which represents a single witness
+ * 
+ * 
+ * TODO: consider whether this should be an inner interface since an IRow must exist within the context of an IAlignmentTable so the rows and columns will probably end up in the alignment table.
+ *
+ */
+public interface IColumn extends Iterable<ICell> {
+	
+  /**
+   * get the position of this column within the alignment table
+   * 
+   * @return the position of this column
+   */
   int getPosition();
-
-  void setPosition(int position);
-
-  ColumnState getState();
-
-  List<String> getSigli();
-
-  void accept(IAlignmentTableVisitor visitor);
-
-}
+  
+  /**
+   * get the internal representation of the alignment column
+   * This is only intended for internal use
+   * 
+   * @return the internal alignment column
+   */
+  IInternalColumn getInternalColumn();
+  
+ }

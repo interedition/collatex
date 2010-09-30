@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex2.implementation.alignment;
 
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -28,9 +28,9 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 public class Gap implements IGap {
   private final IColumns columns;
   private final IPhrase phrase;
-  private final IColumn nextColumn;
+  private final IInternalColumn nextColumn;
 
-  public Gap(final IColumns columns, final IPhrase phrase, final IColumn nextColumn) {
+  public Gap(final IColumns columns, final IPhrase phrase, final IInternalColumn nextColumn) {
     this.columns = columns;
     this.phrase = phrase;
     this.nextColumn = nextColumn;
@@ -72,7 +72,7 @@ public class Gap implements IGap {
   }
 
   @Override
-  public IColumn getNextColumn() {
+  public IInternalColumn getNextColumn() {
     return nextColumn;
   }
 }

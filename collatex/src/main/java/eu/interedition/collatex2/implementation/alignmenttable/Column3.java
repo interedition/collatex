@@ -30,10 +30,10 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class Column3 implements IColumn {
+public class Column3 implements IInternalColumn {
   private final Map<String, INormalizedToken> sigliToTokens;
   private final List<INormalizedToken> variants;
   private int _position;
@@ -99,7 +99,7 @@ public class Column3 implements IColumn {
   }
 
   @Override
-  public int compareTo(final IColumn other) {
+  public int compareTo(final IInternalColumn other) {
     return (getPosition() - other.getPosition());
   }
 
@@ -135,5 +135,4 @@ public class Column3 implements IColumn {
       visitor.visitToken(sigel, token);
     }
   }
-
 }

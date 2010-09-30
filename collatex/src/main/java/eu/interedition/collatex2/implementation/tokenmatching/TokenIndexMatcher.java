@@ -24,6 +24,7 @@ import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -152,7 +153,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!
   // NOTE: multiple witness tokens match with the same table column!
-  private static List<ITokenMatch> filterAwaySecondChoicesMultipleTokensOneColumn(List<ITokenMatch> matches, Map<INormalizedToken, IColumn> baseTokenToColumn) {
+  private static List<ITokenMatch> filterAwaySecondChoicesMultipleTokensOneColumn(List<ITokenMatch> matches, Map<INormalizedToken, IInternalColumn> baseTokenToColumn) {
     List<ITokenMatch> filteredMatches = Lists.newArrayList();
     Multimap<INormalizedToken, INormalizedToken> witnessToken2baseToken = ArrayListMultimap.create();
 
@@ -160,7 +161,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
       witnessToken2baseToken.put(match.getWitnessToken(), match.getBaseToken());
     }
 
-    Multimap<INormalizedToken, IColumn> witnessToken2column = ArrayListMultimap.create();
+    Multimap<INormalizedToken, IInternalColumn> witnessToken2column = ArrayListMultimap.create();
     for (Entry<INormalizedToken, Collection<INormalizedToken>> entry : witnessToken2baseToken.asMap().entrySet()) {
       INormalizedToken witnessToken = entry.getKey();
       for (INormalizedToken baseToken : entry.getValue()) {
@@ -168,17 +169,17 @@ public class TokenIndexMatcher implements ITokenMatcher {
       }
     }
 
-    Map<INormalizedToken, IColumn> columnForWitnessToken = Maps.newHashMap();
-    for (Entry<INormalizedToken, Collection<IColumn>> entry : witnessToken2column.asMap().entrySet()) {
+    Map<INormalizedToken, IInternalColumn> columnForWitnessToken = Maps.newHashMap();
+    for (Entry<INormalizedToken, Collection<IInternalColumn>> entry : witnessToken2column.asMap().entrySet()) {
       columnForWitnessToken.put(entry.getKey(), entry.getValue().iterator().next());
     }
 
-    Map<IColumn, INormalizedToken> columnToBaseToken = Maps.newHashMap();
-    for (Entry<INormalizedToken, IColumn> entry : baseTokenToColumn.entrySet()) {
+    Map<IInternalColumn, INormalizedToken> columnToBaseToken = Maps.newHashMap();
+    for (Entry<INormalizedToken, IInternalColumn> entry : baseTokenToColumn.entrySet()) {
       columnToBaseToken.put(entry.getValue(), entry.getKey());
     }
 
-    for (Entry<INormalizedToken, IColumn> entry : columnForWitnessToken.entrySet()) {
+    for (Entry<INormalizedToken, IInternalColumn> entry : columnForWitnessToken.entrySet()) {
       INormalizedToken witnessToken = entry.getKey();
       INormalizedToken baseToken = columnToBaseToken.get(entry.getValue());
       filteredMatches.add(new TokenMatch(baseToken, witnessToken));
@@ -190,11 +191,11 @@ public class TokenIndexMatcher implements ITokenMatcher {
   //NOTE: This method becomes legacy when the VariantGraph code is integrated!
   public static List<IMatch> getMatchesUsingWitnessIndex(IAlignmentTable table, IWitness witness) {
     // Map base tokens to IColumn
-    Map<INormalizedToken, IColumn> baseTokenToColumn = Maps.newLinkedHashMap();
-    for (IColumn column : table.getColumns()) {
-      for (String sigil : column.getSigli()) {
-        INormalizedToken baseToken = column.getToken(sigil);
-        baseTokenToColumn.put(baseToken, column);
+    Map<INormalizedToken, IInternalColumn> baseTokenToColumn = Maps.newLinkedHashMap();
+    for (IColumn col : table.getColumns()) {
+      for (String sigil : col.getInternalColumn().getSigli()) {
+        INormalizedToken baseToken = col.getInternalColumn().getToken(sigil);
+        baseTokenToColumn.put(baseToken, col.getInternalColumn());
       }
     }
     // Do the token matching
@@ -207,7 +208,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
     for (ITokenMatch match : filteredMatches) {
       INormalizedToken base = match.getBaseToken();
       INormalizedToken witnessT = match.getWitnessToken();
-      IColumn column = baseTokenToColumn.get(base);
+      IInternalColumn column = baseTokenToColumn.get(base);
       IColumns columns = new Columns(Lists.newArrayList(column));
       IPhrase phrase = new Phrase(Lists.newArrayList(witnessT));
       IMatch columnMatch = new Match(columns, phrase);

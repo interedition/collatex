@@ -25,9 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -42,7 +39,6 @@ import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 public class AlignmentTableIndex implements ITokenIndex {
-  private static Logger logger = LoggerFactory.getLogger(AlignmentTableIndex.class);
   
   private final Map<String, IPhrase> normalizedToPhrase;
 

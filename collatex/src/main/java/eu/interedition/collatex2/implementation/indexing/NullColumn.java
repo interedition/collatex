@@ -24,10 +24,10 @@ import java.util.List;
 
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class NullColumn implements IColumn {
+public class NullColumn implements IInternalColumn {
 
   private final int position;
 
@@ -70,7 +70,7 @@ public class NullColumn implements IColumn {
   }
 
   @Override
-  public int compareTo(final IColumn o) {
+  public int compareTo(final IInternalColumn o) {
     // TODO Auto-generated method stub
     return 0;
   }

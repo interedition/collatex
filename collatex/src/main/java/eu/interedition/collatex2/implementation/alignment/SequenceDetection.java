@@ -30,7 +30,7 @@ import eu.interedition.collatex2.implementation.alignmenttable.Columns;
 import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignment;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -57,7 +57,7 @@ public class SequenceDetection {
     final Map<IMatch, IMatch> previousMatchMapA = SequenceDetection.buildPreviousMatchMap(matchesSortedForA);
     final Map<IMatch, IMatch> previousMatchMapB = SequenceDetection.buildPreviousMatchMap(matchesSortedForB);
     // make buffer
-    List<IColumn> columnsA = Lists.newArrayList();
+    List<IInternalColumn> columnsA = Lists.newArrayList();
     List<INormalizedToken> tokensB = Lists.newArrayList();
     // chain the matches
     for (int index = 0; index < unchainedMatches.size(); index++) {
@@ -100,7 +100,7 @@ public class SequenceDetection {
     return previousMatches;
   }
 
-  private static void createChainedMatchAndAddToList(final List<IMatch> chainedMatches, final List<IColumn> columnsA, final List<INormalizedToken> tokensB) {
+  private static void createChainedMatchAndAddToList(final List<IMatch> chainedMatches, final List<IInternalColumn> columnsA, final List<INormalizedToken> tokensB) {
     if (!columnsA.isEmpty()) {
       final IColumns columns = new Columns(columnsA);
       final Phrase phrase = new Phrase(tokensB);
