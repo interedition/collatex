@@ -26,12 +26,12 @@
 	<#list paragraphs as p>
 		<h2>${p_index + 1}.</h2>
 		
-		<#if p.sigli?has_content>
+		<#if p.sigla?has_content>
 			<table>
-				<tr><#list p.sigli as s><th>${s?html}</th></#list></tr>
+				<tr><#list p.sigla as s><th>${s?html}</th></#list></tr>
 				<#list p.entries as e>
 					<tr>
-						<#list p.sigli as s>
+						<#list p.sigla as s>
 							<td><#if e.containsWitness(s)>${e.getPhrase(s).content?html}<#else>&ndash;</#if></td>
 						</#list>
 					</tr>
