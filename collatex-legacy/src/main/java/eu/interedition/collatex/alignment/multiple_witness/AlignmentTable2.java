@@ -131,7 +131,7 @@ public class AlignmentTable2<T extends BaseElement> {
   public static <T extends BaseElement> String alignmentTableToHTML(final AlignmentTable2<T> alignmentTable) {
     final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
 
-    for (final String witnessId : alignmentTable.getSigli()) {
+    for (final String witnessId : alignmentTable.getSigla()) {
       tableHTML.append("<tr>");
       tableHTML.append("<th>Witness ").append(witnessId).append(":</th>");
       for (final Column<T> column : alignmentTable.getColumns()) {
@@ -149,7 +149,7 @@ public class AlignmentTable2<T extends BaseElement> {
     return tableHTML.toString();
   }
 
-  public List<String> getSigli() {
+  public List<String> getSigla() {
     return _sigli;
   }
 

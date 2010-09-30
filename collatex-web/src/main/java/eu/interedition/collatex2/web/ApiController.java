@@ -118,7 +118,7 @@ public class ApiController implements InitializingBean {
 
     List<ApparatusEntry> entries = apparatus.getEntries();
     List<Map<String, Object>> rows = Lists.newArrayList();
-    for (String sigil : alignmentTable.getSigli()) {
+    for (String sigil : alignmentTable.getSigla()) {
       List<String> phrases = Lists.newArrayList();
       for (ApparatusEntry apparatusEntry : entries) {
         String phrase = apparatusEntry.containsWitness(sigil) ? apparatusEntry.getPhrase(sigil).getContent() : "";

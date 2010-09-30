@@ -193,7 +193,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
     // Map base tokens to IColumn
     Map<INormalizedToken, IInternalColumn> baseTokenToColumn = Maps.newLinkedHashMap();
     for (IColumn col : table.getColumns()) {
-      for (String sigil : col.getInternalColumn().getSigli()) {
+      for (String sigil : col.getInternalColumn().getSigla()) {
         INormalizedToken baseToken = col.getInternalColumn().getToken(sigil);
         baseTokenToColumn.put(baseToken, col.getInternalColumn());
       }

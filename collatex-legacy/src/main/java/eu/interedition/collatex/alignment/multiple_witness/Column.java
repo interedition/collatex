@@ -107,7 +107,7 @@ public class Column<T extends BaseElement> {
     return state;
   }
 
-  public Set<String> getSigli() {
+  public Set<String> getSigla() {
     return wordsProWitness.keySet();
   }
 

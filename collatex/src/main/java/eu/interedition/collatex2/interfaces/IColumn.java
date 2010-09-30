@@ -46,4 +46,4 @@ public interface IColumn extends Iterable<ICell> {
    */
   IInternalColumn getInternalColumn();
   
- }
+}

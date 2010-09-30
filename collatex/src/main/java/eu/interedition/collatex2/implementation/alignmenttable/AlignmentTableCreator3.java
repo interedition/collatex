@@ -64,8 +64,8 @@ public class AlignmentTableCreator3 implements IAligner {
   @Override
   public IAligner add(IWitness... witnesses) {
     for (IWitness witness : witnesses) {
-      final boolean tableIsEmpty = alignmentTable.getSigli().isEmpty();
-      alignmentTable.getSigli().add(witness.getSigil());
+      final boolean tableIsEmpty = alignmentTable.getSigla().isEmpty();
+      alignmentTable.getSigla().add(witness.getSigil());
       if (tableIsEmpty) {
         for (final INormalizedToken token : witness.getTokens()) {
           alignmentTable.add(new Column3(token, alignmentTable.size() + 1));

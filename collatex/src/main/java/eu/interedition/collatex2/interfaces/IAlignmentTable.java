@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface IAlignmentTable extends ITokenContainer {
 
-  List<String> getSigli();
+  List<String> getSigla();
 
   List<IColumn> getColumns();
 

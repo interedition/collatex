@@ -34,14 +34,14 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class ColumnPhrase {
   // IColumns columns is a consecutive list of IColumn-s
-  // sigli is a list of witness siglis, such that for each IColumn in columns, there is a token in that column for all of the sigli, and all theses tokens match. 
+  // sigla is a list of witness sigla, such that for each IColumn in columns, there is a token in that column for all of the sigli, and all theses tokens match. 
   private IColumns columns;
-  private List<String> sigli;
+  private List<String> sigla;
   String name;
 
-  public ColumnPhrase(final String _name, final IColumns _columns, final Collection<String> _sigli) {
+  public ColumnPhrase(final String _name, final IColumns _columns, final Collection<String> _sigla) {
     this.setColumns(_columns);
-    this.setSigli(_sigli);
+    this.setSigla(_sigla);
     this.name = _name;
   }
 
@@ -52,7 +52,7 @@ public class ColumnPhrase {
     if (column instanceof NullColumn) {
       name = new StringBuilder("# ").append(name).toString();
     } else {
-      final String normalized = column.getToken(getSigli().get(0)).getNormalized();
+      final String normalized = column.getToken(getSigla().get(0)).getNormalized();
       name = new StringBuilder(normalized).append(" ").append(name).toString();
     }
   }
@@ -64,7 +64,7 @@ public class ColumnPhrase {
     if (column instanceof NullColumn) {
       name = new StringBuilder(name).append(" #").toString();
     } else {
-      final String normalized = column.getToken(getSigli().get(0)).getNormalized();
+      final String normalized = column.getToken(getSigla().get(0)).getNormalized();
       name = new StringBuilder(name).append(" ").append(normalized).toString();
     }
   }
@@ -73,12 +73,12 @@ public class ColumnPhrase {
     return name;
   }
 
-  public void setSigli(final Collection<String> sigli1) {
-    this.sigli = Lists.newArrayList(sigli1);
+  public void setSigla(final Collection<String> sigla) {
+    this.sigla = Lists.newArrayList(sigla);
   }
 
-  public List<String> getSigli() {
-    return sigli;
+  public List<String> getSigla() {
+    return sigla;
   }
 
   public void setColumns(final IColumns columns1) {
@@ -91,7 +91,7 @@ public class ColumnPhrase {
 
   public IPhrase getPhrase() {
     List<INormalizedToken> tokens = Lists.newArrayList(); //TODO: do the capacity thing!
-    final String sigil = getSigli().get(0);
+    final String sigil = getSigla().get(0);
     for (IInternalColumn column : columns.getColumns()) {
       tokens.add(column.getToken(sigil));
     }

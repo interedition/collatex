@@ -38,21 +38,21 @@ public class ParallelSegmentationApparatus {
   private static Logger logger = LoggerFactory.getLogger(ParallelSegmentationApparatus.class);
   
   private final List<ApparatusEntry> entries;
-  private List<String> sigli;
+  private List<String> sigla;
 
   public List<ApparatusEntry> getEntries() {
     return entries;
   }
 
-  public List<String> getSigli() {
-    if (this.sigli == null) {
+  public List<String> getSigla() {
+    if (this.sigla == null) {
       final Set<String> sigli = Sets.newLinkedHashSet();
       for (final ApparatusEntry column : entries) {
-        sigli.addAll(column.getSigli());
+        sigli.addAll(column.getSigla());
       }
-      this.sigli = Lists.newArrayList(sigli);
+      this.sigla = Lists.newArrayList(sigli);
     }
-    return this.sigli;
+    return this.sigla;
   }
 
   /**
@@ -67,19 +67,19 @@ public class ParallelSegmentationApparatus {
     IColumn previousEntry = null; // Note: in the next step we have to compare
                                    // two columns with each other
     for (final IColumn col : alignmentTable.getColumns()) {
-      boolean needNewCell = previousEntry == null || !previousEntry.getInternalColumn().getState().equals(col.getInternalColumn().getState()) || !col.getInternalColumn().getSigli().equals(previousEntry.getInternalColumn().getSigli());
-      if (previousEntry != null && previousEntry.getInternalColumn().getState() == ColumnState.VARIANT && previousEntry.getInternalColumn().getSigli().size() > col.getInternalColumn().getSigli().size()
-          && previousEntry.getInternalColumn().getSigli().containsAll(col.getInternalColumn().getSigli())) {
+      boolean needNewCell = previousEntry == null || !previousEntry.getInternalColumn().getState().equals(col.getInternalColumn().getState()) || !col.getInternalColumn().getSigla().equals(previousEntry.getInternalColumn().getSigla());
+      if (previousEntry != null && previousEntry.getInternalColumn().getState() == ColumnState.VARIANT && previousEntry.getInternalColumn().getSigla().size() > col.getInternalColumn().getSigla().size()
+          && previousEntry.getInternalColumn().getSigla().containsAll(col.getInternalColumn().getSigla())) {
         needNewCell = false;
       }
       if (needNewCell) {
-        final List<String> sigli = alignmentTable.getSigli();
+        final List<String> sigli = alignmentTable.getSigla();
         logger.debug("!!!" + sigli);
         mergedEntry = new ApparatusEntry(sigli);
         entries.add(mergedEntry);
       }
 
-      final List<String> sigli = alignmentTable.getSigli();
+      final List<String> sigli = alignmentTable.getSigla();
       for (final String sigil : sigli) {
         if (col.getInternalColumn().containsWitness(sigil)) {
           final INormalizedToken token = col.getInternalColumn().getToken(sigil);

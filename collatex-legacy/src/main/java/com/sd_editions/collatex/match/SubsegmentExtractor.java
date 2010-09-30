@@ -342,11 +342,11 @@ public class SubsegmentExtractor {
     return new UnfixedAlignment<Phrase>(fixed, unfixed);
   }
 
-  public List<String> getSigli() {
-    final List<String> sigli = Lists.newArrayList();
+  public List<String> getSigla() {
+    final List<String> sigla = Lists.newArrayList();
     for (final Segment segment : segments) {
-      sigli.add(segment.id);
+      sigla.add(segment.id);
     }
-    return sigli;
+    return sigla;
   }
 }

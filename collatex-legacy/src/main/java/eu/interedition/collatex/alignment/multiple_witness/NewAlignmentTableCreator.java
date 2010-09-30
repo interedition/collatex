@@ -56,16 +56,16 @@ public class NewAlignmentTableCreator {
   }
 
   private static void addSegmentPhrases(final AlignmentTable2 table, final WitnessSegmentPhrases seg) {
-    if (table.getSigli().isEmpty()) {
+    if (table.getSigla().isEmpty()) {
       for (final Phrase phrase : seg.getPhrases()) {
         table.add(new Column<Phrase>(phrase));
       }
-      table.getSigli().add(seg.getWitnessId());
+      table.getSigla().add(seg.getWitnessId());
       return;
     }
 
     // hey! that is duplicated!
-    table.getSigli().add(seg.getWitnessId());
+    table.getSigla().add(seg.getWitnessId());
 
     // make the superbase from the alignment table
     final NewSuperbase superbase = NewSuperbase.create(table);

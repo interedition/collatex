@@ -60,7 +60,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   }
 
   @Override
-  public List<String> getSigli() {
+  public List<String> getSigla() {
     return sigli;
   }
   
@@ -71,7 +71,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public String toString() {
     final StringBuilder stringBuilder = new StringBuilder();
-    for (final String sigil : getSigli()) {
+    for (final String sigil : getSigla()) {
       stringBuilder.append(sigil).append(": ");
       String delim = "";
       for (final IInternalColumn column : getInternalColumns()) {
@@ -93,7 +93,6 @@ public class AlignmentTable4 implements IAlignmentTable {
 
   public static String alignmentTableToHTML(final IAlignmentTable alignmentTable) {
     final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
-
     for (final IRow row : alignmentTable.getRows()) {
       tableHTML.append("<tr>").
           append("<th>Witness ").append(row.getSigil()).append(":</th>");
@@ -224,8 +223,8 @@ public class AlignmentTable4 implements IAlignmentTable {
 
   public IColumn getColumn(int position) {
     ArrayList<ICell> cells = Lists.newArrayList();
-    IInternalColumn col = columns.get(position);
-    for (String sig : getSigli()) {
+    IInternalColumn col = columns.get(position-1);
+    for (String sig : getSigla()) {
     	ICell cell = new Cell(col, sig);
     	cells.add(cell);
     }
@@ -235,7 +234,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public List<IColumn> getColumns() {
 	  List<IColumn> cols = Lists.newArrayList();
-	  for (int i = 0; i < columns.size(); ++i) {
+	  for (int i = 1; i <= columns.size(); ++i) {
 		  cols.add(getColumn(i));
 	  }
 	  return cols;

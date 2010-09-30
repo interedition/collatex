@@ -26,7 +26,7 @@ import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IOmission;
 import eu.interedition.collatex2.interfaces.IReplacement;
@@ -94,7 +94,7 @@ public class HumanReadableAlignmentCallback implements ICallback {
       html.append(" after <i>" + table.getColumns().get(table.size() - 1) + "</i>");
     } else {
       // TODO: you want to have IAddition.getPreviousColumn
-      final IColumn nextColumn = addition.getNextColumn();
+      final IInternalColumn nextColumn = addition.getNextColumn();
       int position = nextColumn.getPosition();
       html.append("between <i>" + table.getColumns().get(position - 2) + "</i> and <i>" + nextColumn + "</i>");
     }
