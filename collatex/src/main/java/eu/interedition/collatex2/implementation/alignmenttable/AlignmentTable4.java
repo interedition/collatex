@@ -252,7 +252,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   public class AlignmentTable4Column implements IColumn {
 
 	private int position;
-    private List<ICell> cells;
+	private List<ICell> cells;
 	private IInternalColumn internalColumn;
 
 	// TODO: remove internalColumn exposure
