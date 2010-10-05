@@ -81,7 +81,6 @@ public class ApiController implements InitializingBean {
 
   @Autowired
   private ApiObjectMapper objectMapper;
-  private String string;
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -159,9 +158,6 @@ public class ApiController implements InitializingBean {
 
       int tokenPosition = 0;
       for (ApiToken token : witness.getApiTokens()) {
-        if (token.getContent() == null || token.getContent().trim().length() == 0) {
-          throw new ApiException("Empty token in " + sigil);
-        }
         token.setSigil(sigil);
         token.setPosition(++tokenPosition);
         if (token.getNormalized() == null || token.getNormalized().trim().length() == 0) {
