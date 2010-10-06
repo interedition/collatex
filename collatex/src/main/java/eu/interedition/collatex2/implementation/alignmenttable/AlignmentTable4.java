@@ -20,7 +20,9 @@
 
 package eu.interedition.collatex2.implementation.alignmenttable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -35,6 +37,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -44,7 +47,7 @@ import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 public class AlignmentTable4 implements IAlignmentTable {
   private final List<String> sigli;
-  private final List<IColumn> columns;
+  private final List<IInternalColumn> columns;
 
   public AlignmentTable4() {
     this.sigli = Lists.newArrayList();
@@ -52,7 +55,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   }
 
   @Override
-  public void add(final IColumn column) {
+  public void add(final IInternalColumn column) {
     columns.add(column);
   }
 
@@ -60,8 +63,8 @@ public class AlignmentTable4 implements IAlignmentTable {
   public List<String> getSigla() {
     return sigli;
   }
-
-  public List<IColumn> getColumns() {
+  
+  public List<IInternalColumn> getInternalColumns() {
     return columns;
   }
 
@@ -71,7 +74,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     for (final String sigil : getSigla()) {
       stringBuilder.append(sigil).append(": ");
       String delim = "";
-      for (final IColumn column : getColumns()) {
+      for (final IInternalColumn column : getInternalColumns()) {
         stringBuilder.append(delim).append(cellToString(sigil, column));
         delim = "|";
       }
@@ -80,7 +83,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     return stringBuilder.toString();
   }
 
-  private String cellToString(final String sigil, final IColumn column) {
+  private String cellToString(final String sigil, final IInternalColumn column) {
     if (!column.containsWitness(sigil)) {
       return " ";
     }
@@ -90,15 +93,14 @@ public class AlignmentTable4 implements IAlignmentTable {
 
   public static String alignmentTableToHTML(final IAlignmentTable alignmentTable) {
     final StringBuilder tableHTML = new StringBuilder("<div id=\"alignment-table\"><h4>Alignment Table:</h4>\n<table border=\"1\" class=\"alignment\">\n");
-
-    for (final String witnessId : alignmentTable.getSigla()) {
-      tableHTML.append("<tr>").//
-          append("<th>Witness ").append(witnessId).append(":</th>");
-      for (final IColumn column : alignmentTable.getColumns()) {
+    for (final IRow row : alignmentTable.getRows()) {
+      tableHTML.append("<tr>").
+          append("<th>Witness ").append(row.getSigil()).append(":</th>");
+      for (final ICell cell : row) {
         tableHTML.append("<td>");
-        if (column.containsWitness(witnessId)) {
+        if (!cell.isEmpty()) {
           // TODO this was normalized!
-          tableHTML.append(column.getToken(witnessId).getContent()); // TODO add escaping!
+          tableHTML.append(cell.getToken().getContent()); // TODO add escaping!
         }
         tableHTML.append("</td>");
       }
@@ -111,7 +113,7 @@ public class AlignmentTable4 implements IAlignmentTable {
 
   private void addVariantAtTheEnd(final IPhrase witnessPhrase) {
     for (final INormalizedToken token : witnessPhrase.getTokens()) {
-      final IColumn extraColumn = new Column3(token, size() + 1);
+      final IInternalColumn extraColumn = new Column3(token, size() + 1);
       columns.add(extraColumn);
     }
   }
@@ -119,21 +121,21 @@ public class AlignmentTable4 implements IAlignmentTable {
   // Note: this is a visitor that walks over the columns!
   public void accept(final IAlignmentTableVisitor visitor) {
     visitor.visitTable(this);
-    for (final IColumn column : columns) {
+    for (final IInternalColumn column : columns) {
       column.accept(visitor);
     }
     visitor.postVisitTable(this);
   }
 
-  public void addVariantBefore(final IColumn column, final IPhrase witnessPhrase) {
+  public void addVariantBefore(final IInternalColumn column, final IPhrase witnessPhrase) {
     int startPosition = column.getPosition();
     for (int i = startPosition; i <= columns.size(); i++) {
-      final IColumn mcolumn = columns.get(i - 1);
+      final IInternalColumn mcolumn = columns.get(i - 1);
       final int position = mcolumn.getPosition();
       mcolumn.setPosition(position + witnessPhrase.size());
     }
     for (final INormalizedToken token : witnessPhrase.getTokens()) {
-      final IColumn extraColumn = new Column3(token, startPosition);
+      final IInternalColumn extraColumn = new Column3(token, startPosition);
       columns.add(startPosition - 1, extraColumn);
       startPosition++;
     }
@@ -142,13 +144,13 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public IColumns createColumns(final int startPosition, final int endPosition) {
     // NOTE: We make a new List here to prevent ConcurrentModificationExceptions!
-    final List<IColumn> subList = Lists.newArrayList(columns.subList(startPosition - 1, endPosition));
+    final List<IInternalColumn> subList = Lists.newArrayList(columns.subList(startPosition - 1, endPosition));
     return new Columns(subList);
   }
 
   @Override
   public int size() {
-    return getColumns().size();
+    return getInternalColumns().size();
   }
 
   public void addReplacement(final IReplacement replacement) {
@@ -156,7 +158,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     final IPhrase replacementPhrase = replacement.getReplacementPhrase();
     if (replacementPhrase.size() > originalColumns.size()) {
       Columns columns = new Columns();
-      final IColumn nextColumn = replacement.getNextColumn();
+      final IInternalColumn nextColumn = replacement.getNextColumn();
       final IPhrase additionalPhrase = replacementPhrase.createSubPhrase(originalColumns.size() + 1, replacementPhrase.size());
       Gap gap = new Gap(columns, additionalPhrase, nextColumn);
       final IAddition addition = Addition.create(gap);
@@ -173,7 +175,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     if (addition.isAtTheEnd()) {
       addVariantAtTheEnd(witnessPhrase);
     } else {
-      final IColumn column = addition.getNextColumn();
+      final IInternalColumn column = addition.getNextColumn();
       addVariantBefore(column, witnessPhrase);
     }
   }
@@ -181,8 +183,8 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public List<String> findRepeatingTokens() {
     //transform
-    final Multimap<String, IColumn> columnsForTokenMap = ArrayListMultimap.create();
-    for (final IColumn column : getColumns()) {
+    final Multimap<String, IInternalColumn> columnsForTokenMap = ArrayListMultimap.create();
+    for (final IInternalColumn column : getInternalColumns()) {
       final List<INormalizedToken> variants = column.getVariants();
       for (final INormalizedToken token : variants) {
         columnsForTokenMap.put(token.getNormalized(), column);
@@ -191,7 +193,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     //predicate
     final List<String> repeatingNormalizedTokens = Lists.newArrayList();
     for (final String tokenName : columnsForTokenMap.keySet()) {
-      final Collection<IColumn> columnCollection = columnsForTokenMap.get(tokenName);
+      final Collection<IInternalColumn> columnCollection = columnsForTokenMap.get(tokenName);
       if (columnCollection.size() > 1) {
         //System.out.println("Repeating token: " + key + " in columns " + xcolumns.toString());
         repeatingNormalizedTokens.add(tokenName);
@@ -203,7 +205,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   @Override
   public IRow getRow(String sigil) {
     List<ICell> cells = Lists.newArrayList();
-    for (IColumn column : columns) {
+    for (IInternalColumn column : columns) {
       ICell cell = new Cell(column, sigil);
       cells.add(cell);
     }
@@ -219,6 +221,24 @@ public class AlignmentTable4 implements IAlignmentTable {
     return rows;
   }
 
+  public IColumn getColumn(int position) {
+    ArrayList<ICell> cells = Lists.newArrayList();
+    IInternalColumn col = columns.get(position-1);
+    for (String sig : getSigla()) {
+    	ICell cell = new Cell(col, sig);
+    	cells.add(cell);
+    }
+    return new AlignmentTable4Column(position, cells, col);
+  }
+  
+  @Override
+  public List<IColumn> getColumns() {
+	  List<IColumn> cols = Lists.newArrayList();
+	  for (int i = 1; i <= columns.size(); ++i) {
+		  cols.add(getColumn(i));
+	  }
+	  return cols;
+  }
   @Override
   public Collection<? extends String> getRepeatedTokens() {
     return findRepeatingTokens();
@@ -228,4 +248,35 @@ public class AlignmentTable4 implements IAlignmentTable {
   public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
     return AlignmentTableIndex.create(this, repeatedTokens);
   }
+
+  public class AlignmentTable4Column implements IColumn {
+
+	private int position;
+	private List<ICell> cells;
+	private IInternalColumn internalColumn;
+
+	// TODO: remove internalColumn exposure
+	AlignmentTable4Column(int position, List<ICell> cells, IInternalColumn internalColumn) {
+		this.internalColumn = internalColumn;
+		this.position = position;
+		this.cells = cells;
+	}
+	@Override
+	public Iterator<ICell> iterator() {
+		return cells.iterator();
+	}
+
+	@Override
+	public int getPosition() {
+		return position;
+	}
+	// TODO: hack remove
+	@Override
+	public IInternalColumn getInternalColumn() {
+		return internalColumn;
+	}
+	  
+  }
+  
+
 }

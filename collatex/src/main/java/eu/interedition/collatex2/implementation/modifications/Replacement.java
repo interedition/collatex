@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex2.implementation.modifications;
 
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -29,9 +29,9 @@ import eu.interedition.collatex2.interfaces.IReplacement;
 public class Replacement implements IReplacement {
   private final IColumns _original;
   private final IPhrase _replacement;
-  private final IColumn _nextColumn;
+  private final IInternalColumn _nextColumn;
 
-  private Replacement(final IColumns gapA, final IPhrase replacement, final IColumn nextColumn) {
+  private Replacement(final IColumns gapA, final IPhrase replacement, final IInternalColumn nextColumn) {
     _original = gapA;
     _replacement = replacement;
     _nextColumn = nextColumn;
@@ -59,7 +59,7 @@ public class Replacement implements IReplacement {
 
   //TODO: do we need to make this defensive?
   @Override
-  public IColumn getNextColumn() {
+  public IInternalColumn getNextColumn() {
     return _nextColumn;
   }
 

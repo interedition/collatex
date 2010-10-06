@@ -32,7 +32,7 @@ import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -154,12 +154,12 @@ public class AlignmentTableCreator3 implements IAligner {
   private static IGap makeReplacementOutOfTransposition(final ITransposition top, IAlignmentTable table) {
     final IColumns columns = top.getMatchA().getColumns();
     final IPhrase phrase = top.getMatchB().getPhrase();
-    final IColumn lastColumn = columns.getLastColumn();
-    final IColumn nextColumn;
+    final IInternalColumn lastColumn = columns.getLastColumn();
+    final IInternalColumn nextColumn;
     if (lastColumn.getPosition() == table.size()){
       nextColumn = null;
     } else {
-      nextColumn = table.getColumns().get(lastColumn.getPosition());
+      nextColumn = table.getColumns().get(lastColumn.getPosition()).getInternalColumn();
     }
     final IGap gap = new Gap(columns, phrase, nextColumn);
     return gap;
@@ -194,7 +194,7 @@ public class AlignmentTableCreator3 implements IAligner {
     // NOTE: so the next column should be in the transposition!
     // TODO add next column to addition, transposition, etc
     // TODO and use that!
-    final IColumn nextColumn = t.getMatchA().getColumns().getFirstColumn();
+    final IInternalColumn nextColumn = t.getMatchA().getColumns().getFirstColumn();
     final IGap addition = new Gap(columns, phrase, nextColumn);
     // Note: this is not nice; this adds to the original list!
     return addition;

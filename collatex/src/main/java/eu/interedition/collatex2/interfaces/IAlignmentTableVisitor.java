@@ -27,7 +27,7 @@ public interface IAlignmentTableVisitor {
 
   public void postVisitTable(IAlignmentTable table);
 
-  public void visitColumn(IColumn column);
+  public void visitColumn(IInternalColumn column);
 
   public void visitToken(String sigel, INormalizedToken token);
 }

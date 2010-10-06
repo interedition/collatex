@@ -34,6 +34,6 @@ public interface IGap {
 
   IPhrase getPhrase();
 
-  IColumn getNextColumn();
+  IInternalColumn getNextColumn();
 
 }

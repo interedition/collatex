@@ -32,15 +32,15 @@ public interface IColumns {
 
   int getEndPosition();
 
-  IColumn getFirstColumn();
+  IInternalColumn getFirstColumn();
 
-  IColumn getLastColumn();
+  IInternalColumn getLastColumn();
 
   boolean isEmpty();
 
   int size();
 
   //Note: exposes internal list; implement Collection instead?
-  List<IColumn> getColumns();
+  List<IInternalColumn> getColumns();
 
 }

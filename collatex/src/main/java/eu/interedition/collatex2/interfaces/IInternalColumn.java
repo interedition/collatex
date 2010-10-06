@@ -20,14 +20,28 @@
 
 package eu.interedition.collatex2.interfaces;
 
-public interface IReplacement extends IModification {
+import java.util.List;
 
-  IColumns getOriginalColumns();
+public interface IInternalColumn extends Comparable <IInternalColumn> {
 
-  IPhrase getReplacementPhrase();
+  boolean containsWitness(String sigil);
 
-  IInternalColumn getNextColumn();
+  INormalizedToken getToken(String sigil);
+
+  List<INormalizedToken> getVariants();
+
+  void addVariant(INormalizedToken token);
+
+  void addMatch(INormalizedToken token);
 
   int getPosition();
+
+  void setPosition(int position);
+
+  ColumnState getState();
+
+  List<String> getSigla();
+
+  void accept(IAlignmentTableVisitor visitor);
 
 }

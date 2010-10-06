@@ -21,14 +21,14 @@
 package eu.interedition.collatex2.implementation.alignmenttable;
 
 import eu.interedition.collatex2.interfaces.ICell;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class Cell implements ICell {
-  private final IColumn column;
+  private final IInternalColumn column;
   private final String sigil;
 
-  public Cell(IColumn column, String sigil) {
+  public Cell(IInternalColumn column, String sigil) {
     this.column = column;
     this.sigil = sigil;
   }

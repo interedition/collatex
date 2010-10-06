@@ -33,7 +33,7 @@ public interface IAlignmentTable extends ITokenContainer {
 
   List<IColumn> getColumns();
 
-  void add(IColumn column);
+  void add(IInternalColumn column);
 
   IColumns createColumns(int startIndex, int endIndex);
 

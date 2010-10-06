@@ -146,7 +146,7 @@ public class AlignmentTableTest {
     final IWitness temp = engine.createWitness("B", "in between");
     final IPhrase tobeadded = temp.createPhrase(1, 2);
     final IColumn column = table.getColumns().get(2);
-    ((AlignmentTable4) table).addVariantBefore(column, tobeadded);
+    ((AlignmentTable4) table).addVariantBefore(column.getInternalColumn(), tobeadded);
 
     final List<IColumn> columns = table.getColumns();
     Assert.assertEquals(1, columns.get(0).getPosition());

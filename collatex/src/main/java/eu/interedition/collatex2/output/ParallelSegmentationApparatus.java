@@ -66,10 +66,10 @@ public class ParallelSegmentationApparatus {
     ApparatusEntry mergedEntry = null;
     IColumn previousEntry = null; // Note: in the next step we have to compare
                                    // two columns with each other
-    for (final IColumn column : alignmentTable.getColumns()) {
-      boolean needNewCell = previousEntry == null || !previousEntry.getState().equals(column.getState()) || !column.getSigla().equals(previousEntry.getSigla());
-      if (previousEntry != null && previousEntry.getState() == ColumnState.VARIANT && previousEntry.getSigla().size() > column.getSigla().size()
-          && previousEntry.getSigla().containsAll(column.getSigla())) {
+    for (final IColumn col : alignmentTable.getColumns()) {
+      boolean needNewCell = previousEntry == null || !previousEntry.getInternalColumn().getState().equals(col.getInternalColumn().getState()) || !col.getInternalColumn().getSigla().equals(previousEntry.getInternalColumn().getSigla());
+      if (previousEntry != null && previousEntry.getInternalColumn().getState() == ColumnState.VARIANT && previousEntry.getInternalColumn().getSigla().size() > col.getInternalColumn().getSigla().size()
+          && previousEntry.getInternalColumn().getSigla().containsAll(col.getInternalColumn().getSigla())) {
         needNewCell = false;
       }
       if (needNewCell) {
@@ -81,13 +81,13 @@ public class ParallelSegmentationApparatus {
 
       final List<String> sigli = alignmentTable.getSigla();
       for (final String sigil : sigli) {
-        if (column.containsWitness(sigil)) {
-          final INormalizedToken token = column.getToken(sigil);
+        if (col.getInternalColumn().containsWitness(sigil)) {
+          final INormalizedToken token = col.getInternalColumn().getToken(sigil);
           mergedEntry.addToken(sigil, token);
         }
       }
 
-      previousEntry = column;
+      previousEntry = col;
 
     }
     return new ParallelSegmentationApparatus(entries);
