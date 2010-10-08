@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -96,5 +97,11 @@ public class VariantGraphBasedColumn implements IColumn {
   @Override
   public void addVertex(IVariantGraphVertex vertex) {
     vertices.add(vertex);
+  }
+
+  @Override
+  public IInternalColumn getInternalColumn() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

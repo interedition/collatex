@@ -35,6 +35,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableIndex;
 
 public class AlignmentTableIndexTest {
   protected static final Logger LOG = LoggerFactory.getLogger(AlignmentTableIndexTest.class);
@@ -60,7 +61,7 @@ public class AlignmentTableIndexTest {
   public void test() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IAlignmentTable table = createAligner().add(witnessA).getResult();
-    final ITokenIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
+    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
     // test bigrams
     assertTrue(index.contains("# the"));
     assertFalse(index.contains("big black")); 
@@ -84,7 +85,7 @@ public class AlignmentTableIndexTest {
   public void testCreateAlignmentTableIndex() {
     final IWitness a = factory.createWitness("A", "the first witness");
     final IAlignmentTable table = factory.align(a);
-    final ITokenIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
+    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
     // test unigrams
     assertTrue(index.contains("the"));
     assertTrue(index.contains("first"));
@@ -96,7 +97,7 @@ public class AlignmentTableIndexTest {
     final IWitness a = factory.createWitness("A", "the first witness");
     final IWitness b = factory.createWitness("B", "the second witness");
     final IAlignmentTable table = factory.align(a, b);
-    final ITokenIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
+    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
     // test unigrams
     assertTrue(index.contains("the"));
     assertTrue(index.contains("first"));
@@ -110,7 +111,7 @@ public class AlignmentTableIndexTest {
     final IWitness b = factory.createWitness("B", "second");
     final IWitness c = factory.createWitness("C", "third");
     final IAlignmentTable table = factory.align(a, b, c);
-    final ITokenIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
+    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
     assertTrue(index.contains("# first"));
     assertTrue(index.contains("first #"));
     assertTrue(index.contains("# second"));
@@ -125,7 +126,7 @@ public class AlignmentTableIndexTest {
     final IWitness b = factory.createWitness("B", "match");
     final IWitness c = factory.createWitness("C", "match");
     final IAlignmentTable table = factory.align(a, b, c);
-    final ITokenIndex index = AlignmentTableIndex.create(table, table.findRepeatingTokens());
+    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
     assertTrue(index.contains("# first"));
     assertTrue(index.contains("first #"));
     assertTrue(index.contains("# match"));

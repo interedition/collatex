@@ -10,6 +10,7 @@ import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -42,12 +43,6 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
 
   @Override
   public void accept(IAlignmentTableVisitor visitor) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void add(IColumn column) {
     // TODO Auto-generated method stub
 
   }
@@ -163,4 +158,15 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
     throw new RuntimeException("DO NOT INDEX THIS STRUCTURE!");
   }
 
+  @Override
+  public List<String> getSigla() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void add(IInternalColumn column) {
+    // TODO Auto-generated method stub
+    
+  }
 }

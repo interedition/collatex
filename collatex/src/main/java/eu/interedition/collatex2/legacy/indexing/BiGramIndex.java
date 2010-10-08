@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.indexing;
+package eu.interedition.collatex2.legacy.indexing;
 
 import java.util.Iterator;
 import java.util.List;

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -14,16 +15,15 @@ import com.google.common.collect.Multimap;
 
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
-import eu.interedition.collatex2.legacy.alignmenttable.Columns;
-import eu.interedition.collatex2.legacy.indexing.ColumnPhrase;
-import eu.interedition.collatex2.legacy.indexing.NullColumn;
+import eu.interedition.collatex2.legacy.indexing.BiGram;
+import eu.interedition.collatex2.legacy.indexing.BiGramIndex;
+import eu.interedition.collatex2.legacy.indexing.NGram;
+import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 //TODO: legacy class REMOVE! REMOVE!
 public class AlignmentTableIndex implements ITokenIndex {

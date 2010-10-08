@@ -154,7 +154,7 @@ public class Alignment implements IAlignment {
       INormalizedToken tableToken = tokenMatch.getTableToken();
       IColumn column = tokenToColumn.get(tableToken);
       IPhrase witnessPhrase = new Phrase(Lists.newArrayList(tokenMatch.getWitnessToken()));
-      IColumns columns = new Columns(Lists.newArrayList(column));
+      IColumns columns = new Columns(Lists.newArrayList(column.getInternalColumn()));
       IMatch columnMatch = new ColumnPhraseMatch(columns, witnessPhrase);
       columnMatches.add(columnMatch);
     }

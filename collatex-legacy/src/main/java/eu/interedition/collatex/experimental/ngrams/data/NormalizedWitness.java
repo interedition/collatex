@@ -20,7 +20,6 @@
 
 package eu.interedition.collatex.experimental.ngrams.data;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -76,25 +75,13 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   }
 
   @Override
+  public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public List<String> getRepeatedTokens() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Collection<? extends String> getRepeatedTokens() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
     // TODO Auto-generated method stub
     return null;
   }

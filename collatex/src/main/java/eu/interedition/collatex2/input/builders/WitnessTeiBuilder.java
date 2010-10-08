@@ -40,8 +40,8 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.Util;
+import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
 import eu.interedition.collatex2.input.NormalizedToken;
-import eu.interedition.collatex2.input.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.IWitness;

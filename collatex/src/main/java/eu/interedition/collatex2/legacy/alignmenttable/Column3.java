@@ -116,9 +116,4 @@ public class Column3 implements IInternalColumn {
       visitor.visitToken(sigel, token);
     }
   }
-
-  @Override
-  public void addVertex(IVariantGraphVertex vertex) {
-    throw new UnsupportedOperationException();
-  }
 }

@@ -14,8 +14,10 @@ import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
-import eu.interedition.collatex2.legacy.indexing.NullToken;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
+import eu.interedition.collatex2.legacy.indexing.BiGram;
+import eu.interedition.collatex2.legacy.indexing.BiGramIndex;
+import eu.interedition.collatex2.legacy.indexing.NGram;
 
 public class WitnessIndex implements IWitnessIndex {
   private final Map<String, IPhrase> map;

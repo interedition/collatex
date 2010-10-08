@@ -32,7 +32,7 @@ public class BaseAlignmentTable {
   public final IRow getRow(String sigil) {
     List<ICell> cells = Lists.newArrayList();
     for (IColumn column : columns) {
-      ICell cell = new Cell(column, sigil);
+      ICell cell = new Cell(column.getInternalColumn(), sigil);
       cells.add(cell);
     }
     return new Row(sigil, cells);

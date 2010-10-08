@@ -63,7 +63,7 @@ public class AlignmentTableIndex0 implements ITokenIndex {
       }
 
       for (final String tokenName : sigliForTokenMap.keySet()) {
-        final Columns _columns = new Columns(Lists.newArrayList(tableColumn));
+        final Columns _columns = new Columns(Lists.newArrayList(tableColumn.getInternalColumn()));
         final Collection<String> _sigli = sigliForTokenMap.get(tokenName);
         final ColumnPhrase columnPhrase = new ColumnPhrase(tokenName, _columns, _sigli);
         columnPhraseMap.put(tokenName, columnPhrase);

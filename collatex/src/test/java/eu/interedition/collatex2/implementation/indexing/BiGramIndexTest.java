@@ -30,6 +30,8 @@ import org.junit.Test;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.input.Token;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.indexing.BiGram;
+import eu.interedition.collatex2.legacy.indexing.BiGramIndex;
 
 public class BiGramIndexTest {
   private static CollateXEngine factory;

@@ -24,6 +24,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,8 +34,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Joiner;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
+import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class IndexingTest {
   private CollateXEngine factory;
@@ -127,11 +129,11 @@ public class IndexingTest {
   //    assertEquals(5, index.size());
   //  }
 
-  private void assertContains(final IWitnessIndex index, final String phrase) {
+  private void assertContains(final ITokenIndex index, final String phrase) {
     assertTrue("phrase '" + phrase + "' not found in index [" + Joiner.on(", ").join(index.keys()) + "]", index.contains(phrase));
   }
 
-  private void assertDoesNotContain(final IWitnessIndex index, final String phrase) {
+  private void assertDoesNotContain(final ITokenIndex index, final String phrase) {
     assertFalse("phrase '" + phrase + "' found in index " + index.keys().iterator().next() + ", shouldn't be there!", index.contains(phrase));
   }
 }

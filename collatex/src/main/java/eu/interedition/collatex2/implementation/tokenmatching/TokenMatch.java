@@ -37,10 +37,6 @@ public class TokenMatch implements ITokenMatch {
     return baseToken;
   }
 
-  private IToken getMatchingToken() {
-    return baseToken;
-  }
-
   @Override
   public INormalizedToken getTokenA() {
     return witnessToken;

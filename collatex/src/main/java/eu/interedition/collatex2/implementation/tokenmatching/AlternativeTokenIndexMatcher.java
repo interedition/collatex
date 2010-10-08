@@ -23,11 +23,11 @@ import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 //TODO: remove explicit dependency on NullToken
-public class TokenIndexMatcher implements ITokenMatcher {
+public class AlternativeTokenIndexMatcher implements ITokenMatcher {
   private static final Logger LOG = LoggerFactory.getLogger(TokenIndexMatcher.class);
   private final ITokenContainer base;
 
-  public TokenIndexMatcher(ITokenContainer base) {
+  public AlternativeTokenIndexMatcher(ITokenContainer base) {
     this.base = base;
   }
 
@@ -58,13 +58,13 @@ public class TokenIndexMatcher implements ITokenMatcher {
         matches.add(new PhraseMatch(tablePhrase, phrase));
       }
     }
-    TokenIndexMatcher.LOG.debug("unfiltered matches: " + matches);
+    LOG.debug("unfiltered matches: " + matches);
     return joinOverlappingMatches(matches);
   }
 
   private List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches) {
     final List<ITokenMatch> newMatches = filterMatchesBasedOnPositionMatches(matches);
-    TokenIndexMatcher.LOG.debug("filtered matches: " + newMatches);
+    LOG.debug("filtered matches: " + newMatches);
     return newMatches;
   }
 
@@ -153,7 +153,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
       if (!foundAlternative) {
         filteredMatches.add(match);
       } else {
-        TokenIndexMatcher.LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
+        LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
       }
     }
     return filteredMatches;
@@ -197,7 +197,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
       if (!foundAlternative) {
         filteredMatches.add(match);
       } else {
-        TokenIndexMatcher.LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
+        LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
       }
     }
     return filteredMatches;

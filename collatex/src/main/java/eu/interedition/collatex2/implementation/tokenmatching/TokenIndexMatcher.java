@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +18,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.implementation.alignmenttable.Columns;
-import eu.interedition.collatex2.implementation.indexing.NullToken;
-import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -34,6 +31,9 @@ import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.alignmenttable.Columns;
+import eu.interedition.collatex2.legacy.indexing.NullToken;
+import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 
 //TODO: remove explicit dependency on NullToken
 public class TokenIndexMatcher implements ITokenMatcher {
@@ -211,7 +211,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
       IInternalColumn column = baseTokenToColumn.get(base);
       IColumns columns = new Columns(Lists.newArrayList(column));
       IPhrase phrase = new Phrase(Lists.newArrayList(witnessT));
-      IMatch columnMatch = new Match(columns, phrase);
+      IMatch columnMatch = new ColumnPhraseMatch(columns, phrase);
       result.add(columnMatch);
     }
     // System.out.println("!!"+result);

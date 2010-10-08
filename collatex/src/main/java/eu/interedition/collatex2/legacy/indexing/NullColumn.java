@@ -73,9 +73,4 @@ public class NullColumn implements IInternalColumn {
     return "";
   }
 
-  @Override
-  public void addVertex(IVariantGraphVertex vertex) {
-    throw new UnsupportedOperationException();
-  }
-
 }

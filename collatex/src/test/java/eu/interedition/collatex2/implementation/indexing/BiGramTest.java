@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.input.Token;
+import eu.interedition.collatex2.legacy.indexing.BiGram;
 
 public class BiGramTest {
   @Test
