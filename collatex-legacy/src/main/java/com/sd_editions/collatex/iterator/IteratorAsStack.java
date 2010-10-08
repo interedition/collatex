@@ -33,22 +33,26 @@ public class IteratorAsStack implements Stack {
     this.delegate = iterator;
   }
 
+  @Override
   public Object peek() {
     if (isEmpty()) throw new NoSuchElementException();
     return topElement;
   }
 
+  @Override
   public Object pop() {
     Object result = peek();
     topElementSet = false;
     return result;
   }
 
+  @Override
   @SuppressWarnings("unused")
   public void push(Object object) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean isEmpty() {
     if (!topElementSet && delegate.hasNext()) {
       topElement = delegate.next();

@@ -45,6 +45,7 @@ public class XMLInputPlugin implements IntInputPlugin {
     this.xmlFile = xmlFile1;
   }
 
+  @Override
   public BlockStructure readFile() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     try {
       SAXHandler saxHandler = new SAXHandler();
@@ -58,6 +59,7 @@ public class XMLInputPlugin implements IntInputPlugin {
     }
   }
 
+  @Override
   public void registerInputPlugin() {
     // Do nothing for the moment
   }

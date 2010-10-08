@@ -23,6 +23,7 @@ public class Alignment2 implements IAlignment2 {
     return matches;
   }
   
+  @Override
   public List<ITokenMatch> getTokenMatches() {
     return tokenMatches;
   }
@@ -44,6 +45,7 @@ public class Alignment2 implements IAlignment2 {
   }
 
   final Comparator<IMatch2> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<IMatch2>() {
+    @Override
     public int compare(final IMatch2 o1, final IMatch2 o2) {
       return o1.getPhraseB().getBeginPosition() - o2.getPhraseB().getBeginPosition();
     }

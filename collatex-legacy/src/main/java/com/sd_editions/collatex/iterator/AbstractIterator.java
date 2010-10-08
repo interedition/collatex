@@ -27,6 +27,7 @@ public abstract class AbstractIterator implements Iterator<Object> {
 
   private Boolean hasNext;
 
+  @Override
   final public Object next() {
     if (!hasNext()) {
       throw new NoSuchElementException();
@@ -35,6 +36,7 @@ public abstract class AbstractIterator implements Iterator<Object> {
     return doNext();
   }
 
+  @Override
   final public boolean hasNext() {
     if (hasNext == null) {
       hasNext = Boolean.valueOf(doHasNext());
@@ -42,6 +44,7 @@ public abstract class AbstractIterator implements Iterator<Object> {
     return hasNext.booleanValue();
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

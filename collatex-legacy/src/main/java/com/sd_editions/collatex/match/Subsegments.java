@@ -152,6 +152,7 @@ public class Subsegments {
   }
 
   final Predicate<Subsegment> IS_REMOVABLE = new Predicate<Subsegment>() {
+    @Override
     public boolean apply(final Subsegment s) {
       return s.canRemove();
     }

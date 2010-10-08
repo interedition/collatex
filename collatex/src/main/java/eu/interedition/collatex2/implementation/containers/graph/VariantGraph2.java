@@ -107,6 +107,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return graph;
   }
 
+  @Override
   public List<IVariantGraphVertex> getPath(IWitness witness) {
     List<IVariantGraphVertex> path = Lists.newArrayList();
     IVariantGraphVertex startVertex = getStartVertex();

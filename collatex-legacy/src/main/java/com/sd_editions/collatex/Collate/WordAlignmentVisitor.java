@@ -50,11 +50,13 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     result = Lists.newArrayList();
   }
 
+  @Override
   public void visitBlockStructure(BlockStructure blockStructure) {
     Block rootBlock = blockStructure.getRootBlock();
     rootBlock.accept(this);
   }
 
+  @Override
   public void visitLine(Line line) {
     createResult();
     this.witnessBlock = witnessBlock.getFirstChild();
@@ -89,6 +91,7 @@ public class WordAlignmentVisitor implements IntBlockVisitor {
     return false;
   }
 
+  @Override
   public void visitWord(Word baseWord) {
     Word witnessWord = (Word) witnessBlock;
     //    System.out.println("visitWord: comparing " + baseWord + " + " + witnessWord);

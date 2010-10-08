@@ -43,6 +43,7 @@ public class Token implements IToken {
     this.position = position;
   }
 
+  @Override
   public String getSigil() {
     return sigil;
   }
@@ -51,6 +52,7 @@ public class Token implements IToken {
     this.sigil = sigil;
   }
 
+  @Override
   public String getContent() {
     return content;
   }
@@ -59,6 +61,7 @@ public class Token implements IToken {
     this.content = content;
   }
 
+  @Override
   public int getPosition() {
     return position;
   }

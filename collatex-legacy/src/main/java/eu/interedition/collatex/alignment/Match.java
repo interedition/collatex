@@ -64,6 +64,7 @@ public class Match<T extends BaseElement> implements Comparable<Match> {
     return word1.hashCode() + word2.hashCode();
   }
 
+  @Override
   public int compareTo(final Match m2) {
     return getBaseWord().getBeginPosition() - m2.getBaseWord().getBeginPosition();
   }

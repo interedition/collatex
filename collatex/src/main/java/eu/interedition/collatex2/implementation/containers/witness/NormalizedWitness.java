@@ -32,6 +32,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   }
 
   // Note: not pleased with this method! implement Iterable!
+  @Override
   public List<INormalizedToken> getTokens() {
     return tokens;
   }
@@ -40,6 +41,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
     this.tokens = tokens;
   }
 
+  @Override
   public String getSigil() {
     return sigil;
   }
@@ -54,6 +56,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
     return tokens.iterator();
   }
 
+  @Override
   public IPhrase createPhrase(final int startPosition, final int endPosition) {
     // TODO this problemCase shouldn't occur
     final boolean problemCase = (startPosition - 1 > endPosition);
@@ -61,6 +64,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
     return new Phrase(subList);
   }
 
+  @Override
   public int size() {
     return tokens.size();
   }

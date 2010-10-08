@@ -63,6 +63,7 @@ public class SequenceDetection {
   // TODO add test!
   private static <T extends BaseElement> List<Match<T>> sortMatchesForBase(final Set<Match<T>> matches) {
     final Comparator<Match<T>> comparator = new Comparator<Match<T>>() {
+      @Override
       public int compare(final Match<T> o1, final Match<T> o2) {
         return o1.getBaseWord().getBeginPosition() - o2.getBaseWord().getBeginPosition();
       }
@@ -74,6 +75,7 @@ public class SequenceDetection {
 
   private static <T extends BaseElement> List<Match<T>> sortMatchesForWitness(final Set<Match<T>> matches) {
     final Comparator<Match> comparator = new Comparator<Match>() {
+      @Override
       public int compare(final Match o1, final Match o2) {
         return o1.getWitnessWord().getBeginPosition() - o2.getWitnessWord().getBeginPosition();
       }
@@ -95,6 +97,7 @@ public class SequenceDetection {
 
   public static <T extends BaseElement> List<MatchSequence<T>> sortSequencesForWitness(final List<MatchSequence<T>> matchSequences) {
     final Comparator<MatchSequence<T>> comparator = new Comparator<MatchSequence<T>>() {
+      @Override
       @SuppressWarnings("boxing")
       public int compare(final MatchSequence<T> o1, final MatchSequence<T> o2) {
         return o1.getSegmentPosition() - o2.getSegmentPosition();

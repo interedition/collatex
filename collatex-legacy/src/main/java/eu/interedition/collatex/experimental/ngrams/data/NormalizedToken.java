@@ -36,6 +36,7 @@ public class NormalizedToken extends Token implements INormalizedToken {
     this.normalized = normalized;
   }
 
+  @Override
   public String getNormalized() {
     return normalized;
   }

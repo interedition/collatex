@@ -32,6 +32,7 @@ import com.sd_editions.collatex.Block.Word;
 
 public abstract class AbstractPlainTextInputPlugin implements IntInputPlugin {
 
+  @Override
   public BlockStructure readFile() throws FileNotFoundException, IOException, BlockStructureCascadeException {
     Reader reader = getReader();
     StreamTokenizer st = new StreamTokenizer(reader);
@@ -73,6 +74,7 @@ public abstract class AbstractPlainTextInputPlugin implements IntInputPlugin {
 
   protected abstract Reader getReader() throws FileNotFoundException;
 
+  @Override
   public void registerInputPlugin() {
   // Do nothing
   }

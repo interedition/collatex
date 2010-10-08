@@ -6,7 +6,6 @@ import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
 public class NullColumn implements IInternalColumn {
 

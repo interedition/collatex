@@ -106,6 +106,7 @@ public class AlignmentTable4 implements IAlignmentTable {
   }
 
   // Note: this is a visitor that walks over the columns!
+  @Override
   public void accept(final IAlignmentTableVisitor visitor) {
     visitor.visitTable(this);
     for (final IInternalColumn column : columns) {
@@ -141,6 +142,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     return getInternalColumns().size();
   }
 
+  @Override
   public void addReplacement(final IReplacement replacement) {
     final IColumns originalColumns = replacement.getOriginalColumns();
     final IPhrase replacementPhrase = replacement.getReplacementPhrase();
@@ -158,6 +160,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     }
   }
 
+  @Override
   public void addAddition(final IAddition addition) {
     final IPhrase witnessPhrase = addition.getAddedPhrase();
     if (addition.isAtTheEnd()) {
@@ -168,6 +171,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     }
   }
 
+  @Override
   public List<String> getRepeatedTokens() {
     // transform
     final Multimap<String, IInternalColumn> columnsForTokenMap = ArrayListMultimap.create();
@@ -200,6 +204,7 @@ public class AlignmentTable4 implements IAlignmentTable {
     return new Row(sigil, cells);
   }
 
+  @Override
   public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
     return AlignmentTableIndex.create(this, repeatingTokens);
   }

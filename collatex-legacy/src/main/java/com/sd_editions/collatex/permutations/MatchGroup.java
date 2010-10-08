@@ -55,6 +55,7 @@ public class MatchGroup implements Iterable<Match> {
     return matches.size();
   }
 
+  @Override
   public Iterator<Match> iterator() {
     return matches.iterator();
   }

@@ -40,6 +40,7 @@ public class NormalizedToken extends Token implements INormalizedToken {
   }
 
 
+  @Override
   public String getNormalized() {
     return normalized;
   }

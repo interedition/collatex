@@ -55,6 +55,7 @@ public class MatchPermutator {
     //      if (!pmatch.isFixed() && Lists.newArrayList(findAlternatives(pmatches, pmatch)).size() == 1) pmatch.fix();
     //    }
     Predicate<PMatch> unFixedMatch = new Predicate<PMatch>() {
+      @Override
       public boolean apply(PMatch pmatch) {
         return !pmatch.isFixed();
       }
@@ -89,6 +90,7 @@ public class MatchPermutator {
 
   Iterable<PMatch> fixPMatch(Iterable<PMatch> pmatches, final PMatch alternative) {
     Predicate<PMatch> fixedAndNonConflictingPMatches = new Predicate<PMatch>() {
+      @Override
       public boolean apply(PMatch pm) {
         return pm.isFixed() || (!pm.getBaseWord().equals(alternative.getBaseWord()) && !pm.getWitnessWord().equals(alternative.getWitnessWord()));
       }
@@ -108,6 +110,7 @@ public class MatchPermutator {
 
   Iterable<PMatch> findAlternatives(Iterable<PMatch> pmatches, final PMatch pmatch) {
     Predicate<PMatch> unfixedAlternativeToGivenPMatch = new Predicate<PMatch>() {
+      @Override
       public boolean apply(PMatch pm) {
         return !pm.isFixed() && (pm.getBaseWord().equals(pmatch.getBaseWord()) || pm.getWitnessWord().equals(pmatch.getWitnessWord()));
       }

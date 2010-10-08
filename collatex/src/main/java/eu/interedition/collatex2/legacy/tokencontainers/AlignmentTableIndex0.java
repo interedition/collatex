@@ -48,6 +48,7 @@ public class AlignmentTableIndex0 implements ITokenIndex {
   /* (non-Javadoc)
    * @see eu.interedition.collatex2.implementation.indexing.IAligmentTableIndex#size()
    */
+  @Override
   public int size() {
     return columnsForNormalizedPhrase.keySet().size();
   }

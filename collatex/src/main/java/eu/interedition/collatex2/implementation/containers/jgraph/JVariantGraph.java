@@ -28,10 +28,12 @@ public class JVariantGraph extends DirectedAcyclicGraph<IJVariantGraphVertex, IJ
     return startVertex;
   }
 
+  @Override
   public IJVariantGraphVertex getEndVertex() {
     return endVertex;
   }
 
+  @Override
   public void setStartVertex(IJVariantGraphVertex startVertex) {
     if (!containsVertex(startVertex)) {
       addVertex(startVertex);
@@ -39,6 +41,7 @@ public class JVariantGraph extends DirectedAcyclicGraph<IJVariantGraphVertex, IJ
     this.startVertex = startVertex;
   }
 
+  @Override
   public void setEndVertex(IJVariantGraphVertex endVertex) {
     if (!containsVertex(endVertex)) {
       addVertex(endVertex);

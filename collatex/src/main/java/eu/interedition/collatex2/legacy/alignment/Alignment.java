@@ -47,20 +47,24 @@ public class Alignment implements IAlignment {
     this.gaps = gaps;
   }
 
+  @Override
   public List<IMatch> getMatches() {
     return matches;
   }
 
+  @Override
   public List<IGap> getGaps() {
     return gaps;
   }
 
   final Comparator<IMatch> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<IMatch>() {
+    @Override
     public int compare(final IMatch o1, final IMatch o2) {
       return o1.getPhrase().getBeginPosition() - o2.getPhrase().getBeginPosition();
     }
   };
 
+  @Override
   public List<IMatch> getMatchesSortedForWitness() {
     final List<IMatch> matchesForWitness = Lists.newArrayList(matches);
     Collections.sort(matchesForWitness, SORT_MATCHES_ON_POSITION_WITNESS);

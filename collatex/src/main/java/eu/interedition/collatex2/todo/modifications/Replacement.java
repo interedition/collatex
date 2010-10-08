@@ -25,14 +25,17 @@ public class Replacement implements IReplacement {
     return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getFirstColumn().getPosition();
   }
 
+  @Override
   public int getPosition() {
     return _original.getFirstColumn().getPosition();
   }
 
+  @Override
   public IColumns getOriginalColumns() {
     return _original;
   }
 
+  @Override
   public IPhrase getReplacementPhrase() {
     return _replacement;
   }

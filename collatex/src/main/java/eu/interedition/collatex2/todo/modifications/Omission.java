@@ -11,10 +11,12 @@ public class Omission implements IOmission {
     this.columns = gapA;
   }
 
+  @Override
   public IColumns getOmittedColumns() {
     return columns;
   }
 
+  @Override
   public int getPosition() {
     return columns.getFirstColumn().getPosition();
   }

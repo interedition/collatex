@@ -39,6 +39,7 @@ public class AlignmentTableCreator3 implements IAligner {
     alignmentTable = engine.createAlignmentTable();
   }
 
+  @Override
   public void setCallback(ICallback callback) {
     this.callback = callback;
   }

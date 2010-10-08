@@ -24,7 +24,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,7 +35,6 @@ import com.google.common.base.Joiner;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
 
 public class IndexingTest {
   private CollateXEngine factory;

@@ -26,6 +26,7 @@ import eu.interedition.collatex.alignment.Gap;
 
 public class ValidNonMatchPredicate implements Predicate<Gap> {
 
+  @Override
   public boolean apply(Gap nonMatch) {
     return nonMatch.isValid();
   }

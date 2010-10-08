@@ -57,6 +57,7 @@ public class SequenceDetection2 {
   }
   
   final Comparator<ITokenMatch> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<ITokenMatch>() {
+    @Override
     public int compare(final ITokenMatch o1, final ITokenMatch o2) {
       return o1.getTokenB().getPosition() - o2.getTokenB().getPosition();
     }

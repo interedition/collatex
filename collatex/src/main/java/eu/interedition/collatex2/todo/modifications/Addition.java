@@ -18,6 +18,7 @@ public class Addition implements IAddition {
     return getNextColumn().getPosition();
   }
 
+  @Override
   public IPhrase getAddedPhrase() {
     return addition;
   }

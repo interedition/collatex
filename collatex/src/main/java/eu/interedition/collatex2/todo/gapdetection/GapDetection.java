@@ -52,6 +52,7 @@ public class GapDetection {
       matchingNgramsForB.add(m.getPhrase());
     }
     final Comparator<IPhrase> comparator = new Comparator<IPhrase>() {
+      @Override
       public int compare(final IPhrase o1, final IPhrase o2) {
         return o1.getBeginPosition() - o2.getBeginPosition();
       }

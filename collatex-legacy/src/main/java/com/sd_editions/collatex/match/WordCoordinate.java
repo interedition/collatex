@@ -50,6 +50,7 @@ public class WordCoordinate implements Comparable<WordCoordinate> {
     return "[" + LETTER[witnessNumber] + "," + (positionInWitness + 1) + "]";
   }
 
+  @Override
   public int compareTo(WordCoordinate o) {
     if (this.getWitnessNumber() == o.getWitnessNumber()) {
       return Integer.valueOf(this.getPositionInWitness()).compareTo(Integer.valueOf(o.getPositionInWitness()));

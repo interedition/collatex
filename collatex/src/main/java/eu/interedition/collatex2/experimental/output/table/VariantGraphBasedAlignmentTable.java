@@ -73,6 +73,7 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
 
   // for now I am going to do things lazy..
   // we will see where the actual init goes..
+  @Override
   public IRow getRow(IWitness witness) {
     if (!this.getSigli().contains(witness.getSigil())) {
       lazyConstructColumns(witness);

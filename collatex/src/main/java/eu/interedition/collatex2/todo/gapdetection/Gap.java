@@ -27,26 +27,32 @@ public class Gap implements IGap {
     return columns.toString() + " -> " + phrase.getSigil() + ": " + phrase.getNormalized();
   }
 
+  @Override
   public IColumns getColumns() {
     return columns;
   }
 
+  @Override
   public IPhrase getPhrase() {
     return phrase;
   }
 
+  @Override
   public boolean isEmpty() {
     return columns.isEmpty() && phrase.isEmpty();
   }
 
+  @Override
   public boolean isReplacement() {
     return !columns.isEmpty() && !phrase.isEmpty();
   }
 
+  @Override
   public boolean isAddition() {
     return columns.isEmpty() && !phrase.isEmpty();
   }
 
+  @Override
   public boolean isOmission() {
     return !columns.isEmpty() && phrase.isEmpty();
   }

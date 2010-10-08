@@ -12,7 +12,6 @@ import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
 public class Column3 implements IInternalColumn {
   private final Map<String, INormalizedToken> sigliToTokens;
@@ -108,6 +107,7 @@ public class Column3 implements IInternalColumn {
     return Lists.newArrayList(sigliToTokens.keySet());
   }
 
+  @Override
   public void accept(final IAlignmentTableVisitor visitor) {
     visitor.visitColumn(this);
     final List<String> sigli = this.getSigla();

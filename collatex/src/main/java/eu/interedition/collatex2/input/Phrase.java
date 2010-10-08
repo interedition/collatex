@@ -58,6 +58,7 @@ public class Phrase implements IPhrase {
   //    tokens.add(nextBiGram.getLastToken());
   //  }
 
+  @Override
   public String getNormalized() {
     final StringBuilder normalized = new StringBuilder();
     String divider = "";
@@ -82,6 +83,7 @@ public class Phrase implements IPhrase {
   }
 
   // TODO add test for defensive behavior!
+  @Override
   public INormalizedToken getFirstToken() {
     if (isEmpty()) {
       throw new RuntimeException("This ngram is empty!");
@@ -94,6 +96,7 @@ public class Phrase implements IPhrase {
     return tokens.get(tokens.size() - 1);
   }
 
+  @Override
   public boolean isEmpty() {
     return tokens.isEmpty();
   }

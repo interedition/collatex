@@ -76,6 +76,7 @@ public class Segment extends BaseContainer<Word> implements ICollationResource {
     return replacementString.toString();
   }
 
+  @Override
   public void accept(final IResourceVisitor visitor) {
     visitor.visitSegment(this);
     final List<Word> words2 = getWords();

@@ -20,8 +20,6 @@
 
 package eu.interedition.collatex2.interfaces;
 
-import java.util.Set;
-
 public interface IWitnessIndex extends ITokenIndex {
 
   // boolean contains(String normalized);

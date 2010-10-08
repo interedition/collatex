@@ -31,6 +31,7 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
     this.base = base;
   }
 
+  @Override
   public List<ITokenMatch> getMatches(IWitness witness) {
     final List<String> repeatedTokens = combineRepeatedTokens(witness);
     ITokenIndex baseIndex = base.getTokenIndex(repeatedTokens);

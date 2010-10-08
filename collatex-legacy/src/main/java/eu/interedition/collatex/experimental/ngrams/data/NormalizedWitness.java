@@ -42,6 +42,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   /* (non-Javadoc)
    * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#getTokens()
    */
+  @Override
   public List<INormalizedToken> getTokens() {
     return tokens;
   }
@@ -49,6 +50,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   /* (non-Javadoc)
    * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#getSigil()
    */
+  @Override
   public String getSigil() {
     return sigil;
   }
@@ -65,6 +67,7 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   /* (non-Javadoc)
   * @see eu.interedition.collatex.experimental.ngrams.data.IRealWitness#size()
   */
+  @Override
   public int size() {
     return tokens.size();
   }

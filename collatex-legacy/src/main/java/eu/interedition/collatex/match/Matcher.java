@@ -89,6 +89,7 @@ public class Matcher {
 
   static <T extends BaseElement> Iterable<Match<T>> findAlternatives(final Iterable<Match<T>> pmatches, final Match<T> pmatch) {
     final Predicate<Match<T>> unfixedAlternativeToGivenPMatch = new Predicate<Match<T>>() {
+      @Override
       public boolean apply(final Match<T> pm) {
         return pm != pmatch && (pm.getBaseWord().equals(pmatch.getBaseWord()) || pm.getWitnessWord().equals(pmatch.getWitnessWord()));
       }

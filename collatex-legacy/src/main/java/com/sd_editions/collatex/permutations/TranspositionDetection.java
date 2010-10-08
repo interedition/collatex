@@ -59,6 +59,7 @@ public class TranspositionDetection {
 
   public static <T extends BaseElement> List<Tuple2<MatchSequence<T>>> filterAwayRealMatches(final List<Tuple2<MatchSequence<T>>> possibleMatches) {
     final List<Tuple2<MatchSequence<T>>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence<T>>>() {
+      @Override
       public boolean apply(final Tuple2<MatchSequence<T>> tuple) {
         return !tuple.left.code.equals(tuple.right.code);
       }
@@ -88,6 +89,7 @@ public class TranspositionDetection {
 
   public static List<MatchSequence> getMatches(final List<Tuple2<MatchSequence>> possibleMatches) {
     final List<Tuple2<MatchSequence>> filteredMatchSequences = Lists.newArrayList(Iterables.filter(possibleMatches, new Predicate<Tuple2<MatchSequence>>() {
+      @Override
       public boolean apply(final Tuple2<MatchSequence> tuple) {
         return tuple.left.code.equals(tuple.right.code);
       }

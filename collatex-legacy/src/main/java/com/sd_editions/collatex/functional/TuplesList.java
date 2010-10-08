@@ -37,6 +37,7 @@ public class TuplesList implements Iterable<Tuple> {
     return arrL.size();
   }
 
+  @Override
   public Iterator<Tuple> iterator() {
     return arrL.iterator();
   }

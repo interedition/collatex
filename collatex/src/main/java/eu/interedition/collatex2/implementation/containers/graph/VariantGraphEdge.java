@@ -24,6 +24,7 @@ public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGra
     addWitness(witness);
   }
 
+  @Override
   public Set<IWitness> getWitnesses() {
     return Collections.unmodifiableSet(witnesses);
   }
@@ -49,10 +50,12 @@ public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGra
     return to.toString();
   }
 
+  @Override
   public void addWitness(IWitness witness) {
     witnesses.add(witness);
   }
 
+  @Override
   public boolean containsWitness(IWitness witness) {
     return witnesses.contains(witness);
   }

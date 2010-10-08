@@ -118,6 +118,7 @@ public class CollateCore {
    */
   public void sortPermutationsByNonMatches(List<Alignment> matchNonMatchList) {
     Comparator<Alignment> comparator = new Comparator<Alignment>() {
+      @Override
       public int compare(Alignment o1, Alignment o2) {
         return o1.getGaps().size() - o2.getGaps().size();
       }
@@ -127,6 +128,7 @@ public class CollateCore {
 
   public void sortPermutationsByVariation(List<Alignment> matchNonMatchList) {
     Comparator<Alignment> comparator = new Comparator<Alignment>() {
+      @Override
       public int compare(Alignment o1, Alignment o2) {
         return Double.compare(o1.getVariationMeasure(), o2.getVariationMeasure());
       }
@@ -136,6 +138,7 @@ public class CollateCore {
 
   public List<Addition> getAdditions(List<Gap> nonMatches) {
     List<Gap> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<Gap>() {
+      @Override
       public boolean apply(Gap arg0) {
         return arg0.isAddition();
       }
@@ -149,6 +152,7 @@ public class CollateCore {
 
   public List<Omission> getOmissions(List<Gap> nonMatches) {
     List<Gap> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<Gap>() {
+      @Override
       public boolean apply(Gap arg0) {
         return arg0.isOmission();
       }
@@ -162,6 +166,7 @@ public class CollateCore {
 
   public List<Replacement> getReplacements(List<Gap> nonMatches) {
     List<Gap> nonMatches_filter = Lists.newArrayList(Iterables.filter(nonMatches, new Predicate<Gap>() {
+      @Override
       public boolean apply(Gap arg0) {
         return arg0.isReplacement();
       }

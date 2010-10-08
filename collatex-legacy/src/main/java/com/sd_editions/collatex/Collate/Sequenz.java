@@ -61,6 +61,7 @@ public class Sequenz implements Comparable<Sequenz> {
     }
   }
 
+  @Override
   public int compareTo(Sequenz tmp) {
     //1. length 2.TransPosSeq or no 3.differenz betwein baseIndex and witnessIndex
     if (this.seq.size() > tmp.seq.size()) {

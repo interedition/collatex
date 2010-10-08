@@ -38,10 +38,12 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
   /**
    * Not implement at the moment
    */
+  @Override
   public void add(E block) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean hasNext() {
     return !(nextBlock == null || bs.getNumberOfBlocks() == 0);
   }
@@ -50,6 +52,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
    *
    * @return true if the BlockStructure has a previous Block
    */
+  @Override
   public boolean hasPrevious() {
     //Current block actually represents the next block in the iteration, so we need to set back
     return (this.previousBlock != null);
@@ -60,6 +63,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
    *
    * @return The next Block in the BlockStructure
    */
+  @Override
   @SuppressWarnings("unchecked")
   public E next() {
     if (this.nextBlock == null) {
@@ -80,6 +84,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
   /**
    * Not implement at the moment
    */
+  @Override
   public int nextIndex() {
     throw new UnsupportedOperationException();
   }
@@ -89,6 +94,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
    *
    * @return The previous block
    */
+  @Override
   @SuppressWarnings("unchecked")
   public E previous() {
     //Right the previous block is the previous previous of the next block
@@ -103,6 +109,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
   /**
    * Not implement at the moment
    */
+  @Override
   public int previousIndex() {
     throw new UnsupportedOperationException();
   }
@@ -110,6 +117,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
   /**
    * Not implement at the moment
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }
@@ -117,6 +125,7 @@ public class BlockStructureListIterator<E> implements ListIterator<E> {
   /**
    * Not implement at the moment
    */
+  @Override
   public void set(E block) {
     throw new UnsupportedOperationException();
   }

@@ -22,6 +22,7 @@ public class Columns implements IColumns {
 
   //NOTE: for now we assume that phraseA is longer than phraseB!
   //NOTE: this method is only for matches!
+  @Override
   public void addMatchPhrase(final IPhrase phraseB) {
     if (phraseB.size() > columns.size()) {
       // System.out.println(columns.size());
@@ -38,6 +39,7 @@ public class Columns implements IColumns {
 
   //NOTE: for now we assume that phraseA is longer than phraseB!
   //NOTE: this method is only for variants!
+  @Override
   public void addVariantPhrase(final IPhrase phraseB) {
     if (phraseB.size() > columns.size()) {
       // System.out.println("!!" + toString() + ":" + phraseB.toString());
@@ -71,6 +73,7 @@ public class Columns implements IColumns {
     return columns.get(0);
   }
 
+  @Override
   public IInternalColumn getLastColumn() {
     if (isEmpty()) {
       throw new RuntimeException("Columns are empty!");

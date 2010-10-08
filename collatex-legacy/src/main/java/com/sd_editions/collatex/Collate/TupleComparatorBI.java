@@ -26,6 +26,7 @@ import java.util.Comparator;
 public class TupleComparatorBI implements Comparator<Tuple>, Serializable {
   private static final long serialVersionUID = 2724931576152430838L;
 
+  @Override
   public int compare(Tuple tupA, Tuple tupB) {
     double valTup_A = transformTuple(tupA);
     double valTup_B = transformTuple(tupB);

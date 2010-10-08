@@ -47,6 +47,7 @@ public class Tuple implements Comparable<Tuple> {
     return witnessIndex;
   }
 
+  @Override
   public int compareTo(Tuple tmp) {
     int newer = Math.abs(tmp.baseIndex - tmp.witnessIndex);
     int me = Math.abs(this.baseIndex - this.witnessIndex);
