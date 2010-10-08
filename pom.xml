@@ -6,7 +6,7 @@
 	<artifactId>collatex-project</artifactId>
 	<packaging>pom</packaging>
 	<name>CollateX :: Project</name>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version>
 	<description>CollateX is a Java library for collating textual sources, for example, to produce an apparatus.</description>
 	<url>http://collatex.sourceforge.net/</url>
 	<organization>
@@ -170,7 +170,6 @@
 					</properties>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
@@ -207,7 +206,6 @@
 						</reports>
 					</reportSet>
 				</reportSets>
-
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-report-plugin</artifactId>

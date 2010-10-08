@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
@@ -26,12 +26,12 @@ public class GapDetection {
     final List<IPhrase> matchingPhrasesForB = calculateMatchingPhrasesForB(matches);
     final List<IColumns> gapColumnsForA = calculateGapColumnsForA(matchingColumnsForA, witnessA);
     final List<IPhrase> gapPhrasesForB = calculateGapPhrasesFor(matchingPhrasesForB, witnessB);
-    final List<IColumn> nextColumns = getNextColumns(matchingColumnsForA);
+    final List<IInternalColumn> nextColumns = getNextColumns(matchingColumnsForA);
     final List<IGap> gaps = Lists.newArrayList();
     for (int i = 0; i < gapColumnsForA.size(); i++) {
       final IColumns gapA = gapColumnsForA.get(i);
       final IPhrase gapB = gapPhrasesForB.get(i);
-      final IColumn nextMatchToken = nextColumns.get(i);
+      final IInternalColumn nextMatchToken = nextColumns.get(i);
       final IGap gap = new Gap(gapA, gapB, nextMatchToken);
       gaps.add(gap);
     }
@@ -91,10 +91,10 @@ public class GapDetection {
   }
 
   //TODO add test!
-  private static List<IColumn> getNextColumns(final List<IColumns> matchPhrases) {
-    final List<IColumn> nextMatches = Lists.newArrayList();
+  private static List<IInternalColumn> getNextColumns(final List<IColumns> matchPhrases) {
+    final List<IInternalColumn> nextMatches = Lists.newArrayList();
     for (final IColumns phrase : matchPhrases) {
-      final IColumn nextMatchToken = phrase.getFirstColumn();
+      final IInternalColumn nextMatchToken = phrase.getFirstColumn();
       nextMatches.add(nextMatchToken);
     }
     // Note: the last gap does not have a next match!

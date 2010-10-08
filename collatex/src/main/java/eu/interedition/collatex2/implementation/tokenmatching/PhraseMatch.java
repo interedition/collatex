@@ -1,44 +1,43 @@
 package eu.interedition.collatex2.implementation.tokenmatching;
 
-import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
 
 public class PhraseMatch implements IMatch2 {
 
-  private final IPhrase tablePhrase;
-  private final IPhrase phrase; //witness
+  private final IPhrase basePhrase;
+  private final IPhrase witnessPhrase;
 
-  public PhraseMatch(IPhrase tablePhrase, IPhrase phrase) {
-    this.tablePhrase = tablePhrase;
-    this.phrase = phrase;
+  public PhraseMatch(IPhrase basePhrase, IPhrase witnessPhrase) {
+    this.basePhrase = basePhrase;
+    this.witnessPhrase = witnessPhrase;
   }
 
   public IPhrase getTablePhrase() {
-    return tablePhrase;
+    return basePhrase;
   }
 
   public IPhrase getPhrase() {
-    return phrase;
+    return witnessPhrase;
   }
-  
+
   @Override
   public String toString() {
-    return phrase+" -> "+tablePhrase;
+    return basePhrase.getContent() + " -> "+witnessPhrase.getContent();
   }
 
   @Override
   public String getNormalized() {
-    return phrase.getNormalized();
+    return witnessPhrase.getNormalized();
   }
 
   @Override
   public IPhrase getPhraseA() {
-    return tablePhrase;
+    return basePhrase;
   }
 
   @Override
   public IPhrase getPhraseB() {
-    return phrase;
+    return witnessPhrase;
   }
-
 }

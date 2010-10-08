@@ -1,22 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
+	<!--
+
+		CollateX - a Java library for collating textual sources, for example, to produce an apparatus. Copyright (C) 2010 ESF COST Action "Interedition". This program is free software: you can redistribute
+		it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This
+		program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+		Public License for more details. You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+	-->
+
 <project name="CollateX" xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
 	<bannerRight>
 		<name>Left Banner</name>
 		<src>images/collatex_logo_small.png</src>
 		<alt>CollateX</alt>
-		<href>http://collatex.sourceforge.net/</href>
+		<href>/index.html</href>
 	</bannerRight>
 
 	<body>
 		<links>
-			<item name="Huygens Instituut" href="http://www.huygensinstituut.knaw.nl/" />
-			<item name="Universität Würzburg" href="http://www.uni-wuerzburg.de/" />
-			<item name="Oxford University" href="http://www.ox.ac.uk/" />
+			<item name="Maven Repository" href="/maven-repository/" />
+			<item name="Downloads" href="https://launchpad.net/collatex/+download" />
+			<item name="Interedition Home" href="http://www.interedition.eu/" />
+			<item name="Developer's site" href="https://launchpad.net/collatex" />
 		</links>
 
 		<menu name="CollateX">
-			<item href="download.html" name="Download" />
-			<item href="contribute.html" name="Contribute" />
+			<item name="Introduction" href="/index.html" />
+			<item name="Demo Service" href="http://gregor.middell.net/collatex/" />
+		</menu>
+		<menu name="Partners">
+			<item name="Huygens Instituut" href="http://www.huygensinstituut.knaw.nl/" />
+			<item name="Universität Würzburg" href="http://www.digital-humanities.de/" />
+			<item name="Oxford University" href="http://www.ox.ac.uk/" />
+			<item name="Univ. of Birmingham" href="http://www.itsee.bham.ac.uk/" />
 		</menu>
 		<menu ref="reports" />
 	</body>

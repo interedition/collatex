@@ -1,3 +1,23 @@
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
+ * Copyright (C) 2010 ESF COST Action "Interedition".
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package eu.interedition.collatex2.web;
 
 import java.util.List;
@@ -6,7 +26,7 @@ import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICallback;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IOmission;
 import eu.interedition.collatex2.interfaces.IReplacement;
@@ -74,7 +94,7 @@ public class HumanReadableAlignmentCallback implements ICallback {
       html.append(" after <i>" + table.getColumns().get(table.size() - 1) + "</i>");
     } else {
       // TODO: you want to have IAddition.getPreviousColumn
-      final IColumn nextColumn = addition.getNextColumn();
+      final IInternalColumn nextColumn = addition.getNextColumn();
       int position = nextColumn.getPosition();
       html.append("between <i>" + table.getColumns().get(position - 2) + "</i> and <i>" + nextColumn + "</i>");
     }

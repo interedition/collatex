@@ -1,3 +1,23 @@
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
+ * Copyright (C) 2010 ESF COST Action "Interedition".
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package eu.interedition.collatex2.web;
 
 import java.io.IOException;
@@ -5,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +67,13 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
+import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IJVariantGraph;
 import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
@@ -62,6 +85,8 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.output.ApparatusEntry;
+import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
 
@@ -110,9 +135,42 @@ public class ApiController implements InitializingBean {
     return svg;
   }
 
+  //  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  //  public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
+  //    return new ModelAndView("api/alignment", "alignment", collate(input));
+  //  }
+
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
-  public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
-    return new ModelAndView("api/alignment", "alignment", collate(input));
+  public ModelAndView collateToHtmlP(@RequestBody final ApiInput input) throws Exception {
+    List<Map<String, Object>> rows = parallelSegmentationRows(input);
+    return new ModelAndView("api/apparatus", "rows", rows);
+  }
+
+  static final Phrase EMPTY_PHRASE = new Phrase(Lists.<INormalizedToken> newArrayList());
+
+  private List<Map<String, Object>> parallelSegmentationRows(final ApiInput input) throws ApiException {
+    IAlignmentTable alignmentTable = collate(input);
+    ParallelSegmentationApparatus apparatus = new CollateXEngine().createApparatus(alignmentTable);
+
+    List<ApparatusEntry> entries = apparatus.getEntries();
+    List<Map<String, Object>> rows = Lists.newArrayList();
+    for (String sigil : alignmentTable.getSigla()) {
+      List<String> phrases = Lists.newArrayList();
+      for (ApparatusEntry apparatusEntry : entries) {
+        String phrase = apparatusEntry.containsWitness(sigil) ? apparatusEntry.getPhrase(sigil).getContent() : "";
+        phrases.add(phrase);
+      }
+      Map<String, Object> row = rowMap(sigil, phrases);
+      rows.add(row);
+    }
+    return rows;
+  }
+
+  private Map<String, Object> rowMap(String sigil, Collection<String> phrases) {
+    Map<String, Object> row = Maps.newHashMap();
+    row.put("sigil", sigil);
+    row.put("cells", phrases);
+    return row;
   }
 
   @RequestMapping(value = "collate")
@@ -203,9 +261,6 @@ public class ApiController implements InitializingBean {
 
       int tokenPosition = 0;
       for (ApiToken token : witness.getApiTokens()) {
-        if (token.getContent() == null || token.getContent().trim().length() == 0) {
-          throw new ApiException("Empty token in " + sigil);
-        }
         token.setSigil(sigil);
         token.setPosition(++tokenPosition);
         if (token.getNormalized() == null || token.getNormalized().trim().length() == 0) {

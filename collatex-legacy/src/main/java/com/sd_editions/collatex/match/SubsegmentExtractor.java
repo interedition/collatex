@@ -1,3 +1,23 @@
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
+ * Copyright (C) 2010 ESF COST Action "Interedition".
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sd_editions.collatex.match;
 
 import static com.google.common.collect.Iterables.filter;
@@ -322,11 +342,11 @@ public class SubsegmentExtractor {
     return new UnfixedAlignment<Phrase>(fixed, unfixed);
   }
 
-  public List<String> getSigli() {
-    final List<String> sigli = Lists.newArrayList();
+  public List<String> getSigla() {
+    final List<String> sigla = Lists.newArrayList();
     for (final Segment segment : segments) {
-      sigli.add(segment.id);
+      sigla.add(segment.id);
     }
-    return sigli;
+    return sigla;
   }
 }

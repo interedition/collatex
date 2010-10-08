@@ -1,3 +1,25 @@
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
+ * Copyright (C) 2010 ESF COST Action "Interedition".
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// TODO: normalizing spacing in project
+
 package eu.interedition.collatex2.implementation;
 
 import java.util.Collection;
@@ -13,8 +35,16 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
 import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
+import eu.interedition.collatex2.implementation.alignment.Alignment;
+import eu.interedition.collatex2.implementation.alignment.GapDetection;
+import eu.interedition.collatex2.implementation.alignment.SequenceDetection;
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTable4;
+import eu.interedition.collatex2.implementation.alignmenttable.AlignmentTableCreator3;
+import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
+import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
+import eu.interedition.collatex2.input.NormalizedWitness;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -35,6 +65,16 @@ import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.todo.gapdetection.GapDetection;
 
+/**
+ * 
+ * @author Interedition Dev Team
+ * @author Ronald Haentjens Dekker
+ *
+ * CollateXEngine 
+ * 
+ * Public client factory class entry point into CollateX collation library
+ * 
+ */
 public class CollateXEngine {
   private ITokenizer tokenizer = new WhitespaceTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
@@ -47,12 +87,29 @@ public class CollateXEngine {
     this.tokenNormalizer = tokenNormalizer;
   }
 
+  /**
+   * align the witnesses
+   * 
+   * @param witnesses - the witnesses
+   * @return the alignment of the witnesses
+   * 
+   * @todo
+   * We're not sure what we want to do with the name of this method: alignment vs. collation
+   * Terminology check
+   */
   public IAlignmentTable align(IWitness... witnesses) {
     return createAligner().add(witnesses).getResult();
   }
 
-  public IWitness createWitness(final String sigil, final String words) {
-    final Iterable<IToken> tokens = tokenizer.tokenize(sigil, words);
+  /**
+   * Create an instance of an IWitness object
+   * 
+   * @param sigil - the unique id for this witness
+   * @param text - the body of the witness
+   * @return
+   */
+  public IWitness createWitness(final String sigil, final String text) {
+    final Iterable<IToken> tokens = tokenizer.tokenize(sigil, text);
     return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
   }
 
@@ -78,7 +135,7 @@ public class CollateXEngine {
 
   // TODO: rename this method!
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
-    final List<IMatch> matches = Alignment.getColumnMatches(table, witness);
+    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witness);
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;

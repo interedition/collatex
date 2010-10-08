@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+	<!-- where to put the version number? -->
+    <info organisation="eu.interedition.collatex" module="collatex"/>
+    <dependencies>
+        <dependency org="org.slf4j" name="slf4j-api" rev="1.5.11"/>
+        <dependency org="com.google.collections" name="google-collections" rev="1.0"/>
+    </dependencies>
+</ivy-module>

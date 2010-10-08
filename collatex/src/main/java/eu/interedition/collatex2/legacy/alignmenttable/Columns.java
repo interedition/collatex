@@ -4,15 +4,15 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Columns implements IColumns {
-  private final List<IColumn> columns;
+  private final List<IInternalColumn> columns;
 
-  public Columns(final List<IColumn> columns1) {
+  public Columns(final List<IInternalColumn> columns1) {
     this.columns = columns1;
   }
 
@@ -30,7 +30,7 @@ public class Columns implements IColumns {
     }
     final List<INormalizedToken> tokens = phraseB.getTokens();
     for (int i = 0; i < phraseB.size(); i++) {
-      final IColumn column = columns.get(i);
+      final IInternalColumn column = columns.get(i);
       final INormalizedToken token = tokens.get(i);
       column.addMatch(token);
     }
@@ -47,7 +47,7 @@ public class Columns implements IColumns {
     }
     final List<INormalizedToken> tokens = phraseB.getTokens();
     for (int i = 0; i < phraseB.size(); i++) {
-      final IColumn column = columns.get(i);
+      final IInternalColumn column = columns.get(i);
       final INormalizedToken token = tokens.get(i);
       column.addVariant(token);
     }
@@ -64,14 +64,14 @@ public class Columns implements IColumns {
   }
 
   @Override
-  public IColumn getFirstColumn() {
+  public IInternalColumn getFirstColumn() {
     if (isEmpty()) {
       throw new RuntimeException("Columns are empty!");
     }
     return columns.get(0);
   }
 
-  public IColumn getLastColumn() {
+  public IInternalColumn getLastColumn() {
     if (isEmpty()) {
       throw new RuntimeException("Columns are empty!");
     }
@@ -87,7 +87,7 @@ public class Columns implements IColumns {
   public String toString() {
     StringBuffer buffer = new StringBuffer();
     String splitter="";
-    for (IColumn column : columns) {
+    for (IInternalColumn column : columns) {
       buffer.append(splitter);
       buffer.append(column.toString());
       splitter = " ";
@@ -106,7 +106,7 @@ public class Columns implements IColumns {
   }
 
   @Override
-  public List<IColumn> getColumns() {
+  public List<IInternalColumn> getColumns() {
     return columns;
   }
 

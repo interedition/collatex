@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 import eu.interedition.collatex2.input.Phrase;
+import eu.interedition.collatex2.implementation.indexing.WitnessIndex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
@@ -82,9 +83,15 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   }
 
   @Override
+  public Collection<? extends String> getRepeatedTokens() {
+    return findRepeatingTokens();
+  }
+
+  @Override
   public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
     return new WitnessIndex(this, repeatedTokens);
   }
+
 
   @Override
   public String toString() {

@@ -1,3 +1,23 @@
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
+ * Copyright (C) 2010 ESF COST Action "Interedition".
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package eu.interedition.collatex2.alignmenttable;
 
 import java.util.List;
@@ -10,7 +30,7 @@ import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ColumnState;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.legacy.alignmenttable.Column3;
@@ -30,7 +50,7 @@ public class ColumnTest {
   public void testGetWordNonExistingGivesException() {
     final IWitness witness = factory.createWitness("A", "a test string");
     final INormalizedToken word = witness.getTokens().get(0);
-    final IColumn column = new Column3(word, 1);
+    final IInternalColumn column = new Column3(word, 1);
     column.getToken("B");
   }
 
@@ -38,7 +58,7 @@ public class ColumnTest {
   public void testFirstToken() {
     final IWitness witness = factory.createWitness("A", "a test string");
     final INormalizedToken word = witness.getTokens().get(0);
-    final IColumn column = new Column3(word, 1);
+    final IInternalColumn column = new Column3(word, 1);
     Assert.assertTrue(column.containsWitness("A"));
     Assert.assertFalse(column.containsWitness("B"));
     Assert.assertEquals(ColumnState.NEW, column.getState());
@@ -52,7 +72,7 @@ public class ColumnTest {
     final INormalizedToken word = witness.getTokens().get(0);
     final INormalizedToken wordB = witnessB.getTokens().get(0);
     final INormalizedToken wordC = witnessC.getTokens().get(0);
-    final IColumn column = new Column3(word, 1);
+    final IInternalColumn column = new Column3(word, 1);
     column.addVariant(wordB);
     column.addVariant(wordC);
     final List<INormalizedToken> variants = column.getVariants();
@@ -73,7 +93,7 @@ public class ColumnTest {
     final IWitness b = factory.createWitness("B", "match");
     final INormalizedToken wordA = a.getTokens().get(0);
     final INormalizedToken wordB = b.getTokens().get(0);
-    final IColumn column = new Column3(wordA, 1);
+    final IInternalColumn column = new Column3(wordA, 1);
     column.addMatch(wordB);
     final List<INormalizedToken> variants = column.getVariants();
     Assert.assertEquals(1, variants.size());
@@ -92,7 +112,7 @@ public class ColumnTest {
     final INormalizedToken word = witness.getTokens().get(0);
     final INormalizedToken wordB = witnessB.getTokens().get(0);
     final INormalizedToken wordC = witnessC.getTokens().get(0);
-    final IColumn column = new Column3(word, 1);
+    final IInternalColumn column = new Column3(word, 1);
     column.addMatch(wordB);
     column.addVariant(wordC);
     final List<INormalizedToken> variants = column.getVariants();

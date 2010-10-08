@@ -1,3 +1,23 @@
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
+ * Copyright (C) 2010 ESF COST Action "Interedition".
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package eu.interedition.collatex2.output;
 
 import java.util.List;
@@ -18,21 +38,21 @@ public class ParallelSegmentationApparatus {
   private static Logger logger = LoggerFactory.getLogger(ParallelSegmentationApparatus.class);
   
   private final List<ApparatusEntry> entries;
-  private List<String> sigli;
+  private List<String> sigla;
 
   public List<ApparatusEntry> getEntries() {
     return entries;
   }
 
-  public List<String> getSigli() {
-    if (this.sigli == null) {
+  public List<String> getSigla() {
+    if (this.sigla == null) {
       final Set<String> sigli = Sets.newLinkedHashSet();
       for (final ApparatusEntry column : entries) {
-        sigli.addAll(column.getSigli());
+        sigli.addAll(column.getSigla());
       }
-      this.sigli = Lists.newArrayList(sigli);
+      this.sigla = Lists.newArrayList(sigli);
     }
-    return this.sigli;
+    return this.sigla;
   }
 
   /**
@@ -46,28 +66,28 @@ public class ParallelSegmentationApparatus {
     ApparatusEntry mergedEntry = null;
     IColumn previousEntry = null; // Note: in the next step we have to compare
                                    // two columns with each other
-    for (final IColumn column : alignmentTable.getColumns()) {
-      boolean needNewCell = previousEntry == null || !previousEntry.getState().equals(column.getState()) || !column.getSigli().equals(previousEntry.getSigli());
-      if (previousEntry != null && previousEntry.getState() == ColumnState.VARIANT && previousEntry.getSigli().size() > column.getSigli().size()
-          && previousEntry.getSigli().containsAll(column.getSigli())) {
+    for (final IColumn col : alignmentTable.getColumns()) {
+      boolean needNewCell = previousEntry == null || !previousEntry.getInternalColumn().getState().equals(col.getInternalColumn().getState()) || !col.getInternalColumn().getSigla().equals(previousEntry.getInternalColumn().getSigla());
+      if (previousEntry != null && previousEntry.getInternalColumn().getState() == ColumnState.VARIANT && previousEntry.getInternalColumn().getSigla().size() > col.getInternalColumn().getSigla().size()
+          && previousEntry.getInternalColumn().getSigla().containsAll(col.getInternalColumn().getSigla())) {
         needNewCell = false;
       }
       if (needNewCell) {
-        final List<String> sigli = alignmentTable.getSigli();
+        final List<String> sigli = alignmentTable.getSigla();
         logger.debug("!!!" + sigli);
         mergedEntry = new ApparatusEntry(sigli);
         entries.add(mergedEntry);
       }
 
-      final List<String> sigli = alignmentTable.getSigli();
+      final List<String> sigli = alignmentTable.getSigla();
       for (final String sigil : sigli) {
-        if (column.containsWitness(sigil)) {
-          final INormalizedToken token = column.getToken(sigil);
+        if (col.getInternalColumn().containsWitness(sigil)) {
+          final INormalizedToken token = col.getInternalColumn().getToken(sigil);
           mergedEntry.addToken(sigil, token);
         }
       }
 
-      previousEntry = column;
+      previousEntry = col;
 
     }
     return new ParallelSegmentationApparatus(entries);

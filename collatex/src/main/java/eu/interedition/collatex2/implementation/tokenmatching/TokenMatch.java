@@ -1,50 +1,53 @@
 package eu.interedition.collatex2.implementation.tokenmatching;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 
 public class TokenMatch implements ITokenMatch {
-  //TODO: remove duplication here! I look witnessToken and matchingToken the best!
-  private final INormalizedToken tableToken;
-  private final INormalizedToken token;
+  private final INormalizedToken baseToken;
+  private final INormalizedToken witnessToken;
 
-  public TokenMatch(INormalizedToken tableToken, INormalizedToken token) {
-    this.tableToken = tableToken;
-    this.token = token; //TODO: rename!
+  public TokenMatch(INormalizedToken baseToken, INormalizedToken witnessToken) {
+    this.baseToken = baseToken;
+    this.witnessToken = witnessToken;
   }
 
   @Override
-  public String getNormalized() {
-    return token.getNormalized();
-  }
-
-  @Override
-  public INormalizedToken getTableToken() {
-    return tableToken;
+  public INormalizedToken getBaseToken() {
+   return baseToken;
   }
 
   @Override
   public INormalizedToken getWitnessToken() {
-    return token;
+    return witnessToken;
   }
   
+  @Override
+  public String toString() {
+    return baseToken.getContent() + " -> "+witnessToken.getContent();
+  }
+
+  @Override
+  public String getNormalized() {
+    return witnessToken.getNormalized();
+  }
+
+  @Override
+  public INormalizedToken getTableToken() {
+    return baseToken;
+  }
+
   private IToken getMatchingToken() {
-    return tableToken;
+    return baseToken;
   }
 
   @Override
   public INormalizedToken getTokenA() {
-    return token;
+    return witnessToken;
   }
 
   @Override
   public INormalizedToken getTokenB() {
-    return tableToken;
-  }
-
-  @Override
-  public String toString() {
-    return getNormalized() + ": "+getWitnessToken().getPosition()+" -> "+getMatchingToken().getPosition();
+    return baseToken;
   }
 }

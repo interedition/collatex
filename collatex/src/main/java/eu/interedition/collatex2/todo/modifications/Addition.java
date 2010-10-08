@@ -1,15 +1,15 @@
 package eu.interedition.collatex2.todo.modifications;
 
 import eu.interedition.collatex2.interfaces.IAddition;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Addition implements IAddition {
   private final IPhrase addition;
-  private final IColumn nextColumn;
+  private final IInternalColumn nextColumn;
 
-  private Addition(final IColumn nextColumn, final IPhrase addition) {
+  private Addition(final IInternalColumn nextColumn, final IPhrase addition) {
     this.nextColumn = nextColumn;
     this.addition = addition;
   }
@@ -46,7 +46,7 @@ public class Addition implements IAddition {
   }
 
   @Override
-  public IColumn getNextColumn() {
+  public IInternalColumn getNextColumn() {
     if (isAtTheEnd()) {
       throw new RuntimeException("There is no next match!");
     }

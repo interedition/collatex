@@ -126,13 +126,13 @@ public class WitnessIndex0 implements ITokenIndex {
   }
 
   @Override
-  public IPhrase getPhrase(String normalized) {
-    throw new RuntimeException("WHO USES THIS?");
+  public IPhrase getPhrase(String key) {
+    throw new RuntimeException("NOT IMPLEMENTED!");
   }
 
   @Override
   public Set<String> keys() {
-    throw new RuntimeException("WHO USES THIS?");
+    throw new RuntimeException("NOT IMPLEMENTED!");
   }
 
 }

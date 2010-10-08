@@ -10,11 +10,11 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
-import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
-public class Column3 implements IColumn {
+public class Column3 implements IInternalColumn {
   private final Map<String, INormalizedToken> sigliToTokens;
   private final List<INormalizedToken> variants;
   private int _position;
@@ -80,7 +80,7 @@ public class Column3 implements IColumn {
   }
 
   @Override
-  public int compareTo(final IColumn other) {
+  public int compareTo(final IInternalColumn other) {
     return (getPosition() - other.getPosition());
   }
 
@@ -104,13 +104,13 @@ public class Column3 implements IColumn {
   }
 
   @Override
-  public List<String> getSigli() {
+  public List<String> getSigla() {
     return Lists.newArrayList(sigliToTokens.keySet());
   }
 
   public void accept(final IAlignmentTableVisitor visitor) {
     visitor.visitColumn(this);
-    final List<String> sigli = this.getSigli();
+    final List<String> sigli = this.getSigla();
     for (final String sigel : sigli) {
       final INormalizedToken token = getToken(sigel);
       visitor.visitToken(sigel, token);
@@ -121,5 +121,4 @@ public class Column3 implements IColumn {
   public void addVertex(IVariantGraphVertex vertex) {
     throw new UnsupportedOperationException();
   }
-
 }
