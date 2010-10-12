@@ -18,10 +18,7 @@ import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
 import eu.interedition.collatex2.experimental.vg_alignment.ITransposition2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
-import eu.interedition.collatex2.interfaces.IAlignment;
-import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -176,11 +173,13 @@ public class VGAlignmentTest {
   public void testTransposition3() {
     final IWitness a = factory.createWitness("1", "a b x c d e");
     final IWitness b = factory.createWitness("2", "c e y a d b");
-    final IAlignment align = PairwiseAlignmentHelper.align(factory, a, b);
-    final List<ITransposition> transpositions = align.getTranspositions();
-    LOG.debug("transpositions=[" + Joiner.on(", ").join(Iterables.transform(transpositions, new Function<ITransposition, String>() {
+    IVariantGraph graph = VariantGraph2.create(a);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    final List<ITransposition2> transpositions = alignment.getTranspositions();
+    LOG.debug("transpositions=[" + Joiner.on(", ").join(Iterables.transform(transpositions, new Function<ITransposition2, String>() {
       @Override
-      public String apply(final ITransposition from) {
+      public String apply(final ITransposition2 from) {
         return from.getMatchA().getNormalized() + "=>" + from.getMatchB().getNormalized();
       }
     })) + "]");
