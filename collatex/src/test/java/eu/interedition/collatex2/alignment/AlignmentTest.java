@@ -26,6 +26,7 @@ import static junit.framework.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -259,6 +260,10 @@ public class AlignmentTest {
     assertEquals("b", transpositions.get(3).getMatchB().getNormalized());
   }
 
+  //TODO: This test only works with the
+  //TODO: AlternativeTokenIndexMatcher and the AlternativeWitnessIndex
+  //TODO: and the yet to be made AlternativeVariantGraphIndex!
+  @Ignore
   @Test
   public void testBeckettLotsOfRepetition() {
     final IWitness a = factory.createWitness("A", "from the days & nights when day followed on night & night on day.");
