@@ -326,21 +326,22 @@ public class AlignmentTable4 implements IAlignmentTable {
   }
 
   @Override
-  public IRow getRow(IWitness witness) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public List<IRow> getRows() {
-    // TODO Auto-generated method stub
-    return null;
+    List<IRow> rows = Lists.newArrayList();
+    for (String sigil: sigli) {
+      rows.add(getRow(sigil));
+    }
+    return rows;
   }
 
   @Override
   public boolean isEmpty() {
-    // TODO Auto-generated method stub
-    return false;
+    throw new RuntimeException("NOT IMPLEMENTED!");
+  }
+
+  @Override
+  public IRow getRow(IWitness witness) {
+    throw new RuntimeException("NOT IMPLEMENTED!");
   }
 
 }
