@@ -28,6 +28,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.legacy.indexing.NullToken;
 
+//TODO: DELETE CLASS!
 public class WitnessIndex0 implements ITokenIndex {
   private Logger log = LoggerFactory.getLogger(WitnessIndex0.class); 
   Multiset<IPhrase> phraseBag = TreeMultiset.create();

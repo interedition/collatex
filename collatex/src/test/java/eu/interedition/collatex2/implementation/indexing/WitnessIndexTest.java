@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
+import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 
@@ -49,7 +49,7 @@ public class WitnessIndexTest {
   @Test
   public void testBigrams1() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
-    final ITokenIndex index = new WitnessIndex(witnessA, witnessA.getRepeatedTokens());
+    final ITokenIndex index = new AlternativeWitnessIndex(witnessA, witnessA.getRepeatedTokens());
     // The index should contain all unique n-grams with 
     //   0 or more tokens         occurring multiple times in the witness, and
     //   exactly 1 token (or '#') occurring only once      in the witness
@@ -76,7 +76,7 @@ public class WitnessIndexTest {
   @Test
   public void test2() {
     final IWitness witnessA = factory.createWitness("A", "the big black");
-    final ITokenIndex index = new WitnessIndex(witnessA, Lists.newArrayList("the", "big", "black"));
+    final ITokenIndex index = new AlternativeWitnessIndex(witnessA, Lists.newArrayList("the", "big", "black"));
     LOG.debug(index.keys().toString());
     assertEquals(6, index.size());
     assertTrue(index.contains("# the"));

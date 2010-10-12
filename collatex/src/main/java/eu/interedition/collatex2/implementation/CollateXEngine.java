@@ -34,7 +34,7 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
-import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
+import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
@@ -135,7 +135,7 @@ public class CollateXEngine {
   }
 
   public static ITokenIndex createWitnessIndex(final IWitness witness) {
-    return new WitnessIndex(witness, witness.getRepeatedTokens());
+    return new AlternativeWitnessIndex(witness, witness.getRepeatedTokens());
   }
 
   // TODO: remove? seems only used in tests!
