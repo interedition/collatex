@@ -78,7 +78,6 @@ public class Column3 implements IInternalColumn {
     return state;
   }
 
-  @Override
   public int compareTo(final IInternalColumn other) {
     return (getPosition() - other.getPosition());
   }

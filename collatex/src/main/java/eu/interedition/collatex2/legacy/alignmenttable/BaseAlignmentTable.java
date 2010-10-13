@@ -12,17 +12,17 @@ import eu.interedition.collatex2.interfaces.IRow;
 //TODO: make class implement the IAlignmentTable interface
 //TODO: all the other methods are specific to the old implementation
 public class BaseAlignmentTable {
-  protected final List<String> sigli;
+  protected final List<String> sigla;
   protected final List<IColumn> columns;
 
   public BaseAlignmentTable() {
-    this.sigli = Lists.newArrayList();
+    this.sigla = Lists.newArrayList();
     this.columns = Lists.newArrayList();
   }
   
   public final List<IRow> getRows() {
     List<IRow> rows = Lists.newArrayList();
-    for (String sigil: sigli) {
+    for (String sigil: sigla) {
       rows.add(getRow(sigil));
     }
     return rows;
@@ -50,8 +50,8 @@ public class BaseAlignmentTable {
     return columns;
   }
 
-  public final List<String> getSigli() {
-    return sigli;
+  public final List<String> getSigla() {
+    return sigla;
   }
 
 }

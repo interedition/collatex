@@ -49,13 +49,7 @@ public class NullColumn implements IInternalColumn {
     return null;
   }
 
-  @Override
-  public int compareTo(final IInternalColumn o) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
+   @Override
   public List<String> getSigla() {
     // TODO Auto-generated method stub
     return null;

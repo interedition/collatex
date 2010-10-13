@@ -22,7 +22,7 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
-public interface IInternalColumn extends Comparable <IInternalColumn> {
+public interface IInternalColumn {
 
   boolean containsWitness(String sigil);
 

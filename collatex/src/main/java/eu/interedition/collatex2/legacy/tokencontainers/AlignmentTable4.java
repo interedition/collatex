@@ -257,13 +257,7 @@ public class AlignmentTable4 implements IAlignmentTable {
       return internalColumn;
     }
 
-    @Override
-    public int compareTo(IColumn o) {
-      // TODO Auto-generated method stub
-      return 0;
-    }
-
-    @Override
+     @Override
     public boolean containsWitness(String sigil) {
       // TODO Auto-generated method stub
       return false;

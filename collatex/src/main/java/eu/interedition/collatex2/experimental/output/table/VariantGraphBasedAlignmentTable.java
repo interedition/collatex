@@ -75,7 +75,7 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
   // we will see where the actual init goes..
   @Override
   public IRow getRow(IWitness witness) {
-    if (!this.getSigli().contains(witness.getSigil())) {
+    if (!this.getSigla().contains(witness.getSigil())) {
       lazyConstructColumns(witness);
     }
     return super.getRow(witness.getSigil());
@@ -84,7 +84,7 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
   // NOTE: Ignore possible cycles in VariantGraph for now!
   private void lazyConstructColumns(IWitness witness) {
     String sigil = witness.getSigil();
-    getSigli().add(sigil);
+    getSigla().add(sigil);
 
     // Note: search the path through the graph for this witness
     List<IVariantGraphVertex> path = graph.getPath(witness);
@@ -157,12 +157,6 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
   @Override
   public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
     throw new RuntimeException("DO NOT INDEX THIS STRUCTURE!");
-  }
-
-  @Override
-  public List<String> getSigla() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override

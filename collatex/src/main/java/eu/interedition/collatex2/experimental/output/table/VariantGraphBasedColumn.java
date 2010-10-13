@@ -12,7 +12,7 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphBasedColumn implements IColumn {
+public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   private final List<IVariantGraphVertex> vertices;
   private final int position;
   
@@ -90,17 +90,17 @@ public class VariantGraphBasedColumn implements IColumn {
   }
 
   @Override
-  public int compareTo(IColumn o) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public void addVertex(IVariantGraphVertex vertex) {
     vertices.add(vertex);
   }
 
   @Override
   public IInternalColumn getInternalColumn() {
+    return this;
+  }
+
+  @Override
+  public List<String> getSigla() {
     // TODO Auto-generated method stub
     return null;
   }
