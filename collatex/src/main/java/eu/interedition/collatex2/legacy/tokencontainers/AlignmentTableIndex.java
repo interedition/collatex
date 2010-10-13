@@ -34,7 +34,6 @@ public class AlignmentTableIndex implements ITokenIndex {
 
   private AlignmentTableIndex(IAlignmentTable table) {
     this.normalizedToPhrase = Maps.newLinkedHashMap();
-    System.out.println("!!!!!!!!!"+table+"##");
     for (IRow row : table.getRows()) {
       List<INormalizedToken> tokens = Lists.newArrayList(); 
       for (ICell cell : row) {
