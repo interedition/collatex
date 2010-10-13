@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.vgalignment;
+package eu.interedition.collatex2.implementation.vg_analysis;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -14,18 +14,18 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
 import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
-import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
 import eu.interedition.collatex2.experimental.vg_alignment.ITransposition2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
+import eu.interedition.collatex2.implementation.vg_analysis.IMatch2;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 //NOTE: these unit tests replace the tests in AlignmentTest!
 //TODO: have to be rewritten to work with VariantGraph alignment!
-public class VGAlignmentTest {
-  private static final Logger LOG = LoggerFactory.getLogger(VGAlignmentTest.class);
+public class VGAnalysisTest {
+  private static final Logger LOG = LoggerFactory.getLogger(VGAnalysisTest.class);
   private CollateXEngine factory;
 
   @Before

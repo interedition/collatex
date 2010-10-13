@@ -1,7 +1,7 @@
 package eu.interedition.collatex2.implementation.tokenmatching;
 
+import eu.interedition.collatex2.implementation.vg_analysis.IMatch2;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.experimental.vg_alignment.IMatch2;
 
 public class PhraseMatch implements IMatch2 {
 

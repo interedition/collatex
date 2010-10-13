@@ -2,6 +2,7 @@ package eu.interedition.collatex2.experimental.vg_alignment;
 
 import java.util.List;
 
+import eu.interedition.collatex2.implementation.vg_analysis.IMatch2;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 
 public interface IAlignment2 {

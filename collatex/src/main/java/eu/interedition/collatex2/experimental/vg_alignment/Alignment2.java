@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.implementation.vg_analysis.IMatch2;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 
 public class Alignment2 implements IAlignment2 {

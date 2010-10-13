@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.vg_alignment;
+package eu.interedition.collatex2.implementation.vg_analysis;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
