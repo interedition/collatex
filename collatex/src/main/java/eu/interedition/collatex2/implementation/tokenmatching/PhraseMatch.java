@@ -1,9 +1,9 @@
 package eu.interedition.collatex2.implementation.tokenmatching;
 
-import eu.interedition.collatex2.implementation.vg_analysis.IMatch2;
+import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
-public class PhraseMatch implements IMatch2 {
+public class PhraseMatch implements ISequence {
 
   private final IPhrase basePhrase;
   private final IPhrase witnessPhrase;

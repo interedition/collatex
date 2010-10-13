@@ -9,7 +9,7 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.experimental.vg_alignment.ITransposition2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
-import eu.interedition.collatex2.implementation.vg_analysis.IMatch2;
+import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -66,7 +66,7 @@ public class VariantGraph2Creator {
     // delete transpositions from map
     // TODO: Rename IMatch2 to IMatchSequence?
     for (ITransposition2 trans : transpositions) {
-      IMatch2 matchA = trans.getMatchA();
+      ISequence matchA = trans.getMatchA();
       // TODO: check whether 
       // it is matchA
       for (INormalizedToken witnessToken : matchA.getPhraseA().getTokens()) {

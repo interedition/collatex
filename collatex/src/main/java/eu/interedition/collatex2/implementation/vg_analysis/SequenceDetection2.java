@@ -21,7 +21,7 @@ public class SequenceDetection2 {
     this.tokenMatches = tokenMatches;
   }
 
-  public List<IMatch2> chainTokenMatches() {
+  public List<ISequence> chainTokenMatches() {
     // prepare
     final List<ITokenMatch> tokenMatchesSortedForB = sortTokenMatchesForWitness();
     Map<ITokenMatch, ITokenMatch> previousMatchMapA = buildPreviousMatchMap();
@@ -29,7 +29,7 @@ public class SequenceDetection2 {
     // chain token matches
     List<INormalizedToken> tokensA = null;
     List<INormalizedToken> tokensB = null;
-    List<IMatch2> matches = Lists.newArrayList();
+    List<ISequence> matches = Lists.newArrayList();
     for (ITokenMatch tokenMatch : tokenMatches) {
       ITokenMatch previousA = previousMatchMapA.get(tokenMatch);
       ITokenMatch previousB = previousMatchMapB.get(tokenMatch);
@@ -63,12 +63,12 @@ public class SequenceDetection2 {
     }
   };
 
-  private void createAndAddChainedMatch(List<INormalizedToken> tokensA, List<INormalizedToken> tokensB, List<IMatch2> matches) {
+  private void createAndAddChainedMatch(List<INormalizedToken> tokensA, List<INormalizedToken> tokensB, List<ISequence> matches) {
     // save current state if necessary
     if (tokensA != null && !tokensA.isEmpty()) {
       IPhrase phraseA = new Phrase(tokensA);
       IPhrase phraseB = new Phrase(tokensB);
-      IMatch2 match = new PhraseMatch(phraseA, phraseB);
+      ISequence match = new PhraseMatch(phraseA, phraseB);
       matches.add(match);
     }
   }

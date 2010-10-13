@@ -32,12 +32,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
 import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
+import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
+import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
+import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
+import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -47,6 +53,7 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -196,5 +203,15 @@ public class CollateXEngine {
 
   public IVariantGraph graph(IWitness... witnesses) {
     return VariantGraph2Creator.create(witnesses);
+  }
+
+  public IAnalysis analyse(IVariantGraph graph, IWitness b) {
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(b);
+    //TODO: move this code to an analyzer class?
+    List<ITokenMatch> tokenMatches = alignment.getTokenMatches();
+    SequenceDetection2 sequenceDetection = new SequenceDetection2(tokenMatches);
+    List<ISequence> sequences = sequenceDetection.chainTokenMatches();
+    return new Analysis(sequences);
   }
 }

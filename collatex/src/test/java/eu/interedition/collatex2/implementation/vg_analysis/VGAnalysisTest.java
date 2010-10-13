@@ -18,7 +18,7 @@ import eu.interedition.collatex2.experimental.vg_alignment.ITransposition2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
-import eu.interedition.collatex2.implementation.vg_analysis.IMatch2;
+import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -37,10 +37,9 @@ public class VGAnalysisTest {
   public void testSimple1() {
     final IWitness a = factory.createWitness("A", "a b");
     final IWitness b = factory.createWitness("B", "a c b");
-    IVariantGraph graph = VariantGraph2.create(a);
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
-    final List<IMatch2> matches = alignment.getMatches();
+    IVariantGraph graph = factory.graph(a);
+    IAnalysis analysis = factory.analyse(graph, b);
+    final List<ISequence> matches = analysis.getSequences();
     assertEquals(2, matches.size());
     assertEquals("a", matches.get(0).getNormalized());
     assertEquals("b", matches.get(1).getNormalized());
@@ -51,25 +50,23 @@ public class VGAnalysisTest {
   public void testAlignment() {
     final IWitness a = factory.createWitness("A", "cat");
     final IWitness b = factory.createWitness("B", "cat");
-    IVariantGraph graph = VariantGraph2.create(a);
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
-    final List<IMatch2> matches = alignment.getMatches();
-    assertEquals(1, matches.size());
-    assertEquals("cat", matches.get(0).getNormalized());
+    IVariantGraph graph = factory.graph(a);
+    IAnalysis analysis = factory.analyse(graph, b);
+    final List<ISequence> sequences = analysis.getSequences();
+    assertEquals(1, sequences.size());
+    assertEquals("cat", sequences.get(0).getNormalized());
   }
 
   @Test
-  public void testAlignment2Matches() {
+  public void testAlignment2Sequences() {
     final IWitness a = factory.createWitness("A", "The black cat");
     final IWitness b = factory.createWitness("B", "The black and white cat");
-    IVariantGraph graph = VariantGraph2.create(a);
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
-    final List<IMatch2> matches = alignment.getMatches();
-    assertEquals(2, matches.size());
-    assertEquals("the black", matches.get(0).getNormalized());
-    assertEquals("cat", matches.get(1).getNormalized());
+    IVariantGraph graph = factory.graph(a);
+    IAnalysis analysis = factory.analyse(graph, b);
+    final List<ISequence> sequences = analysis.getSequences();
+    assertEquals(2, sequences.size());
+    assertEquals("the black", sequences.get(0).getNormalized());
+    assertEquals("cat", sequences.get(1).getNormalized());
   }
 
   // Note: taken from TextAlignmentTest!
@@ -77,64 +74,59 @@ public class VGAnalysisTest {
   public void testAddition_AtTheStart() {
     final IWitness a = factory.createWitness("A", "to be");
     final IWitness b = factory.createWitness("B", "not to be");
-    IVariantGraph graph = VariantGraph2.create(a);
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
-    final List<IMatch2> matches = alignment.getMatches();
-    assertEquals(1, matches.size());
-    assertEquals("to be", matches.get(0).getNormalized());
+    IVariantGraph graph = factory.graph(a);
+    IAnalysis analysis = factory.analyse(graph, b);
+    final List<ISequence> sequences = analysis.getSequences();
+    assertEquals(1, sequences.size());
+    assertEquals("to be", sequences.get(0).getNormalized());
   }
 
   @Test
   public void testAddition_AtTheEnd() {
     final IWitness a = factory.createWitness("A", "to be");
     final IWitness b = factory.createWitness("B", "to be or not");
-    IVariantGraph graph = VariantGraph2.create(a);
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
-    final List<IMatch2> matches = alignment.getMatches();
-    assertEquals(1, matches.size());
-    assertEquals("to be", matches.get(0).getNormalized());
+    IVariantGraph graph = factory.graph(a);
+    IAnalysis analysis = factory.analyse(graph, b);
+    final List<ISequence> sequences = analysis.getSequences();
+    assertEquals(1, sequences.size());
+    assertEquals("to be", sequences.get(0).getNormalized());
   }
 
   @Test
   public void testAddition_InTheMiddle() {
     final IWitness a = factory.createWitness("A", "to be");
     final IWitness b = factory.createWitness("B", "to think, therefore be");
-    IVariantGraph graph = VariantGraph2.create(a);
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
-    final List<IMatch2> matches = alignment.getMatches();
-    assertEquals(2, matches.size());
-    assertEquals("to", matches.get(0).getNormalized());
-    assertEquals("be", matches.get(1).getNormalized());
+    IVariantGraph graph = factory.graph(a);
+    IAnalysis analysis = factory.analyse(graph, b);
+    final List<ISequence> sequences = analysis.getSequences();
+    assertEquals(2, sequences.size());
+    assertEquals("to", sequences.get(0).getNormalized());
+    assertEquals("be", sequences.get(1).getNormalized());
   }
 
   @Test
-  public void testTransposition1Matches() {
+  public void testTransposition1Sequences() {
     final IWitness a = factory.createWitness("A", "The black dog chases a red cat.");
     final IWitness b = factory.createWitness("B", "A red cat chases the black dog.");
-    IVariantGraph graph = VariantGraph2.create(a);
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
-    final List<IMatch2> matches = alignment.getMatches();
-    assertEquals("a red cat", matches.get(0).getNormalized());
-    assertEquals("chases", matches.get(1).getNormalized());
-    assertEquals("the black dog", matches.get(2).getNormalized());
+    IVariantGraph graph = factory.graph(a);
+    IAnalysis analysis = factory.analyse(graph, b);
+    final List<ISequence> sequences = analysis.getSequences();
+    assertEquals("a red cat", sequences.get(0).getNormalized());
+    assertEquals("chases", sequences.get(1).getNormalized());
+    assertEquals("the black dog", sequences.get(2).getNormalized());
   }
 
   @Test
-  public void testTransposition2Matches() {
+  public void testTransposition2Sequences() {
     final IWitness a = factory.createWitness("A", "d a b");
     final IWitness b = factory.createWitness("B", "a c b d");
-    IVariantGraph graph = VariantGraph2.create(a);
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
-    final List<IMatch2> matches = alignment.getMatches();
-    assertEquals(3, matches.size());
-    assertEquals("a", matches.get(0).getNormalized());
-    assertEquals("b", matches.get(1).getNormalized());
-    assertEquals("d", matches.get(2).getNormalized());
+    IVariantGraph graph = factory.graph(a);
+    IAnalysis analysis = factory.analyse(graph, b);
+    final List<ISequence> sequences = analysis.getSequences();
+    assertEquals(3, sequences.size());
+    assertEquals("a", sequences.get(0).getNormalized());
+    assertEquals("b", sequences.get(1).getNormalized());
+    assertEquals("d", sequences.get(2).getNormalized());
   }
 
   @Test
