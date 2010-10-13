@@ -1,6 +1,5 @@
-package eu.interedition.collatex2.experimental.vg_alignment;
+package eu.interedition.collatex2.implementation.vg_analysis;
 
-import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 
 
 public class Transposition2 implements ITransposition2 {
@@ -13,12 +12,12 @@ public class Transposition2 implements ITransposition2 {
   }
 
   @Override
-  public ISequence getMatchA() {
+  public ISequence getSequenceA() {
     return matchA;
   }
 
   @Override
-  public ISequence getMatchB() {
+  public ISequence getSequenceB() {
     return matchB;
   }
 

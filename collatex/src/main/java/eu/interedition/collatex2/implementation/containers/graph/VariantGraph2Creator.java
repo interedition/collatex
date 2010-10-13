@@ -7,9 +7,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
-import eu.interedition.collatex2.experimental.vg_alignment.ITransposition2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
+import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
+import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
+import eu.interedition.collatex2.implementation.vg_analysis.ITransposition2;
+import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -25,7 +28,6 @@ public class VariantGraph2Creator {
     this.graph = graph;
   }
 
-  // TODO: use the VariantGraphAligner here!
   // write
   // NOTE: tokenA is the token from the Witness
   // For every token in the witness we have to map a VariantNode
@@ -36,12 +38,16 @@ public class VariantGraph2Creator {
   // if they already exist we need to add the witness to the
   // existing arc!
   public void addWitness(IWitness witness) {
+    // align the witness
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
     IAlignment2 alignment = aligner.align(witness);
     List<ITokenMatch> matches = alignment.getTokenMatches();
-    List<ITransposition2> transpositions = alignment.getTranspositions();
-    //    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
-    //    List<ITokenMatch> matches = matcher.getMatches(witness);
+    // analyze the results
+    // TODO: Make separate analyzer class?
+    SequenceDetection2 seqDetection = new SequenceDetection2(matches);
+    List<ISequence> sequences = seqDetection.chainTokenMatches();
+    IAnalysis analysis = new Analysis(sequences);
+    List<ITransposition2> transpositions = analysis.getTranspositions();
     makeEdgesForMatches(witness, matches, transpositions);
   }
 
@@ -66,7 +72,7 @@ public class VariantGraph2Creator {
     // delete transpositions from map
     // TODO: Rename IMatch2 to IMatchSequence?
     for (ITransposition2 trans : transpositions) {
-      ISequence matchA = trans.getMatchA();
+      ISequence matchA = trans.getSequenceA();
       // TODO: check whether 
       // it is matchA
       for (INormalizedToken witnessToken : matchA.getPhraseA().getTokens()) {
