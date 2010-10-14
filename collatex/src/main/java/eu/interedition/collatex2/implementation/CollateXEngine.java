@@ -39,7 +39,6 @@ import eu.interedition.collatex2.implementation.containers.witness.NormalizedWit
 import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
-import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
@@ -135,7 +134,7 @@ public class CollateXEngine {
 
   // TODO: rename this method!
   public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
-    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witness);
+    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witness);
     final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
     final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
     return alignment;

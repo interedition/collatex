@@ -1,7 +1,6 @@
 package eu.interedition.collatex2.implementation.tokenmatching;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -14,12 +13,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.input.Phrase;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IColumns;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
-import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
@@ -27,9 +20,7 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
-import eu.interedition.collatex2.legacy.alignmenttable.Columns;
 import eu.interedition.collatex2.legacy.indexing.NullToken;
-import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 
 //TODO: Use AlternativeTokenIndexMatcher when
 //TODO: AlternativeVariantGraphIndex is ready!
@@ -213,45 +204,6 @@ public class TokenIndexMatcher implements ITokenMatcher {
       }
     }
     return filteredMatches;
-  }
-
-  public static List<IMatch> getMatchesUsingWitnessIndex(IAlignmentTable table, IWitness witness) {
-    // Map base tokens to IColumn
-    Map<INormalizedToken, IInternalColumn> baseTokenToColumn = Maps.newLinkedHashMap();
-    for (IColumn col : table.getColumns()) {
-      for (String sigil : col.getInternalColumn().getSigla()) {
-        INormalizedToken baseToken = col.getInternalColumn().getToken(sigil);
-        baseTokenToColumn.put(baseToken, col.getInternalColumn());
-      }
-    }
-    // Do the token matching
-    TokenIndexMatcher matcher = new TokenIndexMatcher(table);
-    // Convert matches to legacy
-    List<IMatch> result = Lists.newArrayList();
-    List<ITokenMatch> matches = matcher.getMatches(witness);
-    for (ITokenMatch match : matches) {
-      INormalizedToken base = match.getBaseToken();
-      INormalizedToken witnessT = match.getWitnessToken();
-      IInternalColumn column = baseTokenToColumn.get(base);
-      IColumns columns = new Columns(Lists.newArrayList(column));
-      IPhrase phrase = new Phrase(Lists.newArrayList(witnessT));
-      IMatch columnMatch = new ColumnPhraseMatch(columns, phrase);
-      result.add(columnMatch);
-    }
-    // System.out.println("!!"+result);
-    // Order results based on position in table
-    List<IMatch> ordered = Lists.newArrayList(result);
-    Comparator<? super IMatch> c = new Comparator<IMatch>() {
-
-      @Override
-      public int compare(IMatch o1, IMatch o2) {
-        return o1.getColumns().getBeginPosition() - o2.getColumns().getBeginPosition();
-      }
-
-    };
-    Collections.sort(ordered, c);
-    // System.out.println("!!"+ordered);
-    return ordered;
   }
   
 }

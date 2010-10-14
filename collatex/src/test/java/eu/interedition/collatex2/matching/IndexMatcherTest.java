@@ -36,12 +36,12 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
-import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 
 public class IndexMatcherTest {
   private static CollateXEngine factory;
@@ -71,7 +71,7 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one very different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
+    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witnessC);
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
@@ -96,7 +96,7 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one is different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witnessC);
+    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witnessC);
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
@@ -199,7 +199,7 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "a b a b");
     final IAlignmentTable table = factory.align(witnessA);
     //    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
-    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witnessB);
+    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witnessB);
     assertEquals(2, matches.size());
     IMatch match = matches.get(0);
     assertEquals(1, match.getColumns().getBeginPosition());
@@ -213,7 +213,7 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "a b");
     final IAlignmentTable table = factory.align(witnessA);
     //    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
-    final List<IMatch> matches = TokenIndexMatcher.getMatchesUsingWitnessIndex(table, witnessB);
+    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witnessB);
     assertEquals(2, matches.size());
     IMatch match = matches.get(0);
     assertEquals(1, match.getColumns().getBeginPosition());
