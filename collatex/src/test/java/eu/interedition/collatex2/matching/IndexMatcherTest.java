@@ -71,7 +71,7 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one very different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witnessC);
+    final List<IMatch> matches = factory.alignOldStyle(table, witnessC).getMatches();
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
@@ -96,7 +96,7 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one is different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witnessC);
+    final List<IMatch> matches = factory.alignOldStyle(table, witnessC).getMatches();
     assertEquals(3, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
@@ -138,9 +138,8 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "the big black cat");
     final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witnessB);
+    final IAlignment alignment = factory.analyseOldStyle(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
-    //    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
     assertEquals("the big black cat", match.getNormalized());
@@ -156,7 +155,7 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "the black cat and the black mat");
     final IWitness witnessB = factory.createWitness("B", "the black dog and the black mat");
     final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witnessB);
+    final IAlignment alignment = factory.analyseOldStyle(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
     assertEquals(2, matches.size());
     final IMatch match = matches.get(0);
@@ -171,7 +170,7 @@ public class IndexMatcherTest {
     final IWitness a = factory.createWitness("A", "The black cat");
     final IWitness b = factory.createWitness("B", "The black and white cat");
     final IAlignmentTable table = factory.align(a);
-    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, b);
+    final IAlignment alignment = factory.analyseOldStyle(table, b);
     final List<IMatch> matches = alignment.getMatches();
     assertContains(matches, "the black");
     assertContains(matches, "cat");
@@ -198,8 +197,7 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "a b");
     final IWitness witnessB = factory.createWitness("B", "a b a b");
     final IAlignmentTable table = factory.align(witnessA);
-    //    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
-    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witnessB);
+    final List<IMatch> matches = factory.alignOldStyle(table, witnessB).getMatches();
     assertEquals(2, matches.size());
     IMatch match = matches.get(0);
     assertEquals(1, match.getColumns().getBeginPosition());
@@ -212,8 +210,7 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "a b a b");
     final IWitness witnessB = factory.createWitness("B", "a b");
     final IAlignmentTable table = factory.align(witnessA);
-    //    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
-    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witnessB);
+    final List<IMatch> matches = factory.alignOldStyle(table, witnessB).getMatches();
     assertEquals(2, matches.size());
     IMatch match = matches.get(0);
     assertEquals(1, match.getColumns().getBeginPosition());

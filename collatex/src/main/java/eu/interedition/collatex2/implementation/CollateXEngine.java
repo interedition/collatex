@@ -44,6 +44,7 @@ import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
 import eu.interedition.collatex2.interfaces.IAligner;
+import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -55,6 +56,7 @@ import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.alignment.SequenceDetection;
 import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTable4;
 import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
@@ -200,4 +202,16 @@ public class CollateXEngine {
     List<ISequence> sequences = sequenceDetection.chainTokenMatches();
     return new Analysis(sequences);
   }
+  
+  public IAlignment analyseOldStyle(IAlignmentTable table, IWitness witness) {
+    final IAlignment alignment_without_seq = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
+    final IAlignment alignment = SequenceDetection.improveAlignment(alignment_without_seq);
+    return alignment;
+  }
+  
+  public IAlignment alignOldStyle(IAlignmentTable table, IWitness witness) {
+    final IAlignment alignment_without_seq = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
+    return alignment_without_seq;
+  }
+
 }

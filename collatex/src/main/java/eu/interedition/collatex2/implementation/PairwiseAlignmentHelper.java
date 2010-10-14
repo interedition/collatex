@@ -23,11 +23,14 @@ package eu.interedition.collatex2.implementation;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.legacy.alignment.SequenceDetection;
 import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 
 public class PairwiseAlignmentHelper {
   public static IAlignment align(CollateXEngine engine, IWitness a, IWitness b) {
     IAlignmentTable table = engine.align(a);
-    return AlignmentTableCreator3.createAlignmentUsingIndex(table, b);
+    IAlignment alignment_without_seq = AlignmentTableCreator3.createAlignmentUsingIndex(table, b);
+    final IAlignment alignment = SequenceDetection.improveAlignment(alignment_without_seq);
+    return alignment;
   }
 }

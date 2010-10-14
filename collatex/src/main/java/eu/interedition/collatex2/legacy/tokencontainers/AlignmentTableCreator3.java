@@ -68,7 +68,8 @@ public class AlignmentTableCreator3 implements IAligner {
         continue;
       }
 
-      final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(alignmentTable, witness);
+      final IAlignment alignment_without_seq = AlignmentTableCreator3.createAlignmentUsingIndex(alignmentTable, witness);
+      final IAlignment alignment = SequenceDetection.improveAlignment(alignment_without_seq);
       callback.alignment(alignment);
       final IAlignment alignment2 = makeAddDelFromTrans(alignmentTable, alignment);
       addMatchesToAlignmentTable(alignment2);
@@ -85,13 +86,6 @@ public class AlignmentTableCreator3 implements IAligner {
 
   // TODO: rename this method!
   public static IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
-    final List<IMatch> matches = getMatchesUsingWitnessIndex(table, witness);
-    final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
-    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
-    return alignment;
-  }
-
-  public static List<IMatch> getMatchesUsingWitnessIndex(IAlignmentTable table, IWitness witness) {
     // Map base tokens to IColumn
     Map<INormalizedToken, IInternalColumn> baseTokenToColumn = Maps.newLinkedHashMap();
     for (IColumn col : table.getColumns()) {
@@ -104,8 +98,8 @@ public class AlignmentTableCreator3 implements IAligner {
     TokenIndexMatcher matcher = new TokenIndexMatcher(table);
     // Convert matches to legacy
     List<IMatch> result = Lists.newArrayList();
-    List<ITokenMatch> matches = matcher.getMatches(witness);
-    for (ITokenMatch match : matches) {
+    List<ITokenMatch> matches1 = matcher.getMatches(witness);
+    for (ITokenMatch match : matches1) {
       INormalizedToken base = match.getBaseToken();
       INormalizedToken witnessT = match.getWitnessToken();
       IInternalColumn column = baseTokenToColumn.get(base);
@@ -118,16 +112,18 @@ public class AlignmentTableCreator3 implements IAligner {
     // Order results based on position in table
     List<IMatch> ordered = Lists.newArrayList(result);
     Comparator<? super IMatch> c = new Comparator<IMatch>() {
-  
+    
       @Override
       public int compare(IMatch o1, IMatch o2) {
         return o1.getColumns().getBeginPosition() - o2.getColumns().getBeginPosition();
       }
-  
+    
     };
     Collections.sort(ordered, c);
-    // System.out.println("!!"+ordered);
-    return ordered;
+    final List<IMatch> matches = ordered;
+    final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
+    final Alignment alignment2 = new Alignment(matches, gaps);
+    return alignment2;
   }
 
   private static void addMatchesToAlignmentTable(final IAlignment alignment) {
