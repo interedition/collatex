@@ -29,10 +29,12 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.legacy.alignment.Alignment;
+import eu.interedition.collatex2.legacy.alignment.SequenceDetection;
 import eu.interedition.collatex2.legacy.alignmenttable.Column3;
 import eu.interedition.collatex2.legacy.alignmenttable.Columns;
 import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 import eu.interedition.collatex2.todo.gapdetection.Gap;
+import eu.interedition.collatex2.todo.gapdetection.GapDetection;
 
 public class AlignmentTableCreator3 implements IAligner {
 
@@ -66,7 +68,7 @@ public class AlignmentTableCreator3 implements IAligner {
         continue;
       }
 
-      final IAlignment alignment = engine.createAlignmentUsingIndex(alignmentTable, witness);
+      final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(alignmentTable, witness);
       callback.alignment(alignment);
       final IAlignment alignment2 = makeAddDelFromTrans(alignmentTable, alignment);
       addMatchesToAlignmentTable(alignment2);
@@ -79,6 +81,14 @@ public class AlignmentTableCreator3 implements IAligner {
   @Override
   public IAlignmentTable getResult() {
     return alignmentTable;
+  }
+
+  // TODO: rename this method!
+  public static IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
+    final List<IMatch> matches = getMatchesUsingWitnessIndex(table, witness);
+    final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
+    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
+    return alignment;
   }
 
   public static List<IMatch> getMatchesUsingWitnessIndex(IAlignmentTable table, IWitness witness) {

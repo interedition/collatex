@@ -122,7 +122,7 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "The big black");
     final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
     assertEquals(1, matches.size());
     final IMatch match = matches.get(0);
@@ -138,7 +138,7 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "the big black cat");
     final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
     //    final List<IMatch> matches = Factory.getMatchesUsingWitnessIndex(table, witnessB, new NormalizedLevenshtein());
     assertEquals(1, matches.size());
@@ -156,7 +156,7 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "the black cat and the black mat");
     final IWitness witnessB = factory.createWitness("B", "the black dog and the black mat");
     final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = factory.createAlignmentUsingIndex(table, witnessB);
+    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witnessB);
     final List<IMatch> matches = alignment.getMatches();
     assertEquals(2, matches.size());
     final IMatch match = matches.get(0);
@@ -171,7 +171,7 @@ public class IndexMatcherTest {
     final IWitness a = factory.createWitness("A", "The black cat");
     final IWitness b = factory.createWitness("B", "The black and white cat");
     final IAlignmentTable table = factory.align(a);
-    final IAlignment alignment = factory.createAlignmentUsingIndex(table, b);
+    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, b);
     final List<IMatch> matches = alignment.getMatches();
     assertContains(matches, "the black");
     assertContains(matches, "cat");
@@ -185,7 +185,7 @@ public class IndexMatcherTest {
     final IWitness b = factory.createWitness("B", "When showers sweet with April fruit The March of drought has pierced to the root");
     final IWitness c = factory.createWitness("C", "When showers sweet with April fruit The drought of March has pierced the rood");
     final IAlignmentTable table = factory.align(a, b);
-    final IAlignment alignment = factory.createAlignmentUsingIndex(table, c);
+    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, c);
     final List<IMatch> matches = alignment.getMatches();
     assertContains(matches, "showers sweet with");
     assertContains(matches, "has pierced");

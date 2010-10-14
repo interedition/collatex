@@ -44,9 +44,7 @@ import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
 import eu.interedition.collatex2.interfaces.IAligner;
-import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -57,12 +55,9 @@ import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.legacy.alignment.Alignment;
-import eu.interedition.collatex2.legacy.alignment.SequenceDetection;
 import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTable4;
 import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
-import eu.interedition.collatex2.todo.gapdetection.GapDetection;
 
 /**
  * 
@@ -130,14 +125,6 @@ public class CollateXEngine {
 
   public static IMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
-  }
-
-  // TODO: rename this method!
-  public IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
-    final List<IMatch> matches = AlignmentTableCreator3.getMatchesUsingWitnessIndex(table, witness);
-    final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
-    final IAlignment alignment = SequenceDetection.improveAlignment(new Alignment(matches, gaps));
-    return alignment;
   }
 
   public static ITokenIndex createWitnessIndex(final IWitness witness) {
