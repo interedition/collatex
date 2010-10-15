@@ -35,8 +35,8 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
-import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
 import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
+import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
@@ -44,7 +44,6 @@ import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
 import eu.interedition.collatex2.interfaces.IAligner;
-import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -56,7 +55,6 @@ import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.legacy.alignment.SequenceDetection;
 import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTable4;
 import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
@@ -203,15 +201,18 @@ public class CollateXEngine {
     return new Analysis(sequences);
   }
   
-  public IAlignment analyseOldStyle(IAlignmentTable table, IWitness witness) {
-    final IAlignment alignment_without_seq = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
-    final IAlignment alignment = SequenceDetection.improveAlignment(alignment_without_seq);
-    return alignment;
+  //TODO: rename to analyseTable
+  public IAnalysis analyseOldStyle(IAlignmentTable table, IWitness witness) {
+    final IAlignment2 alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
+    SequenceDetection2 detection = new SequenceDetection2(alignment);
+    List<ISequence> sequences = detection.chainTokenMatches();
+    return new Analysis(sequences);
   }
   
-  public IAlignment alignOldStyle(IAlignmentTable table, IWitness witness) {
-    final IAlignment alignment_without_seq = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
-    return alignment_without_seq;
+  //TODO: rename to alignTable
+  public IAlignment2 alignOldStyle(IAlignmentTable table, IWitness witness) {
+    final IAlignment2 alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
+    return alignment;
   }
 
 }

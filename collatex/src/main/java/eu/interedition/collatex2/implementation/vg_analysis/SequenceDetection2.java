@@ -7,6 +7,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.implementation.tokenmatching.PhraseMatch;
 import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -19,6 +20,10 @@ public class SequenceDetection2 {
 
   public SequenceDetection2(List<ITokenMatch> tokenMatches) {
     this.tokenMatches = tokenMatches;
+  }
+
+  public SequenceDetection2(IAlignment2 alignment) {
+    this.tokenMatches = alignment.getTokenMatches();
   }
 
   public List<ISequence> chainTokenMatches() {

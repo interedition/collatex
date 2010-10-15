@@ -9,6 +9,8 @@ import java.util.Stack;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.experimental.vg_alignment.Alignment2;
+import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.tokenmatching.TokenIndexMatcher;
 import eu.interedition.collatex2.input.Phrase;
@@ -38,7 +40,6 @@ import eu.interedition.collatex2.todo.gapdetection.GapDetection;
 
 public class AlignmentTableCreator3 implements IAligner {
 
-  private final CollateXEngine engine;
   private IAlignmentTable alignmentTable;
   private ICallback callback = new ICallback() {
     @Override
@@ -47,7 +48,6 @@ public class AlignmentTableCreator3 implements IAligner {
   };
 
   public AlignmentTableCreator3(CollateXEngine engine) {
-    this.engine = engine;
     alignmentTable = engine.createAlignmentTable();
   }
 
@@ -67,38 +67,30 @@ public class AlignmentTableCreator3 implements IAligner {
         }
         continue;
       }
-
-      final IAlignment alignment_without_seq = AlignmentTableCreator3.createAlignmentUsingIndex(alignmentTable, witness);
-      final IAlignment alignment = SequenceDetection.improveAlignment(alignment_without_seq);
+      IAlignment alignment = oldStyleAnalyse(alignmentTable, witness);
       callback.alignment(alignment);
-      final IAlignment alignment2 = makeAddDelFromTrans(alignmentTable, alignment);
-      addMatchesToAlignmentTable(alignment2);
-      addReplacementsToAlignmentTable(alignmentTable, alignment2);
-      addAdditionsToAlignmentTable(alignmentTable, alignment2);      
+      final IAlignment alignment3 = makeAddDelFromTrans(alignmentTable, alignment);
+      addMatchesToAlignmentTable(alignment3);
+      addReplacementsToAlignmentTable(alignmentTable, alignment3);
+      addAdditionsToAlignmentTable(alignmentTable, alignment3);      
     }
     return this;
   }
 
-  @Override
-  public IAlignmentTable getResult() {
-    return alignmentTable;
-  }
-
-  // TODO: rename this method!
-  public static IAlignment createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
+  public static IAlignment oldStyleAnalyse(IAlignmentTable alignmentTable, IWitness witness) {
     // Map base tokens to IColumn
     Map<INormalizedToken, IInternalColumn> baseTokenToColumn = Maps.newLinkedHashMap();
-    for (IColumn col : table.getColumns()) {
+    for (IColumn col : alignmentTable.getColumns()) {
       for (String sigil : col.getInternalColumn().getSigla()) {
         INormalizedToken baseToken = col.getInternalColumn().getToken(sigil);
         baseTokenToColumn.put(baseToken, col.getInternalColumn());
       }
     }
-    // Do the token matching
-    TokenIndexMatcher matcher = new TokenIndexMatcher(table);
+
+    final IAlignment2 alignment_without_seq = AlignmentTableCreator3.createAlignmentUsingIndex(alignmentTable, witness);
+    List<ITokenMatch> matches1 = alignment_without_seq.getTokenMatches();
     // Convert matches to legacy
     List<IMatch> result = Lists.newArrayList();
-    List<ITokenMatch> matches1 = matcher.getMatches(witness);
     for (ITokenMatch match : matches1) {
       INormalizedToken base = match.getBaseToken();
       INormalizedToken witnessT = match.getWitnessToken();
@@ -121,9 +113,25 @@ public class AlignmentTableCreator3 implements IAligner {
     };
     Collections.sort(ordered, c);
     final List<IMatch> matches = ordered;
-    final List<IGap> gaps = GapDetection.detectGap(matches, table, witness);
+    // OLD STYLE ANALYSIS FOLLOWS!
+    final List<IGap> gaps = GapDetection.detectGap(matches, alignmentTable, witness);
     final Alignment alignment2 = new Alignment(matches, gaps);
-    return alignment2;
+
+    final IAlignment alignment = SequenceDetection.improveAlignment(alignment2);
+    return alignment;
+  }
+  
+  @Override
+  public IAlignmentTable getResult() {
+    return alignmentTable;
+  }
+
+  // TODO: rename this method!
+  public static IAlignment2 createAlignmentUsingIndex(final IAlignmentTable table, final IWitness witness) {
+    // Do the token matching
+    TokenIndexMatcher matcher = new TokenIndexMatcher(table);
+    List<ITokenMatch> matches1 = matcher.getMatches(witness);
+    return new Alignment2(matches1);
   }
 
   private static void addMatchesToAlignmentTable(final IAlignment alignment) {

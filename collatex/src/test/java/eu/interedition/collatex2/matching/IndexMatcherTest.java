@@ -36,12 +36,16 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.PairwiseAlignmentHelper;
+import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
+import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IMatch;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 
 public class IndexMatcherTest {
   private static CollateXEngine factory;
@@ -71,23 +75,20 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one very different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = factory.alignOldStyle(table, witnessC).getMatches();
+    final List<ITokenMatch> matches = factory.alignOldStyle(table, witnessC).getTokenMatches();
     assertEquals(3, matches.size());
-    final IMatch match = matches.get(0);
+    final ITokenMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
-    final IColumns columnsA = match.getColumns();
-    assertEquals(1, columnsA.getBeginPosition());
-    assertEquals(1, columnsA.getEndPosition());
-    final IMatch match2 = matches.get(1);
+    INormalizedToken baseToken = match.getBaseToken();
+    assertEquals(1, baseToken.getPosition());
+    final ITokenMatch match2 = matches.get(1);
     assertEquals("is", match2.getNormalized());
-    final IColumns columnsB = match2.getColumns();
-    assertEquals(2, columnsB.getBeginPosition());
-    assertEquals(2, columnsB.getEndPosition());
-    final IMatch match3 = matches.get(2);
+    INormalizedToken baseTokenB = match2.getBaseToken();
+    assertEquals(2, baseTokenB.getPosition());
+    final ITokenMatch match3 = matches.get(2);
     assertEquals("different", match3.getNormalized());
-    final IColumns columnsC = match3.getColumns();
-    assertEquals(4, columnsC.getBeginPosition());
-    assertEquals(4, columnsC.getEndPosition());
+    INormalizedToken baseTokenC = match3.getBaseToken();
+    assertEquals(4, baseTokenC.getPosition());
   }
 
   @Test
@@ -96,23 +97,20 @@ public class IndexMatcherTest {
     final IWitness witnessB = factory.createWitness("B", "this one is different");
     final IWitness witnessC = factory.createWitness("C", "everything is different");
     final IAlignmentTable table = factory.align(witnessA, witnessB);
-    final List<IMatch> matches = factory.alignOldStyle(table, witnessC).getMatches();
+    final List<ITokenMatch> matches = factory.alignOldStyle(table, witnessC).getTokenMatches();
     assertEquals(3, matches.size());
-    final IMatch match = matches.get(0);
+    final ITokenMatch match = matches.get(0);
     assertEquals("everything", match.getNormalized());
-    final IColumns columnsA = match.getColumns();
-    assertEquals(1, columnsA.getBeginPosition());
-    assertEquals(1, columnsA.getEndPosition());
-    final IMatch match2 = matches.get(1);
+    INormalizedToken baseTokenA = match.getBaseToken();
+    assertEquals(1, baseTokenA.getPosition());
+    final ITokenMatch match2 = matches.get(1);
     assertEquals("is", match2.getNormalized());
-    final IColumns columnsB = match2.getColumns();
-    assertEquals(3, columnsB.getBeginPosition());
-    assertEquals(3, columnsB.getEndPosition());
-    final IMatch match3 = matches.get(2);
+    INormalizedToken baseTokenB = match2.getBaseToken();
+    assertEquals(3, baseTokenB.getPosition());
+    final ITokenMatch match3 = matches.get(2);
     assertEquals("different", match3.getNormalized());
-    final IColumns columnsC = match3.getColumns();
-    assertEquals(4, columnsC.getBeginPosition());
-    assertEquals(4, columnsC.getEndPosition());
+    INormalizedToken baseTokenC = match3.getBaseToken();
+    assertEquals(4, baseTokenC.getPosition());
   }
 
   //TODO: to make this work we need ngrams of 4 tokens!
@@ -122,12 +120,12 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "The big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "The big black");
     final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witnessB);
-    final List<IMatch> matches = alignment.getMatches();
+    final IAnalysis alignment = factory.analyseOldStyle(table, witnessB);
+    final List<ISequence> matches = alignment.getSequences();
     assertEquals(1, matches.size());
-    final IMatch match = matches.get(0);
+    final ISequence match = matches.get(0);
     assertEquals("the big black", match.getNormalized());
-    final IColumns columnsA = match.getColumns();
+    final IPhrase columnsA = match.getPhraseA();
     assertEquals(1, columnsA.getBeginPosition());
     assertEquals(3, columnsA.getEndPosition());
   }
@@ -138,12 +136,12 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = factory.createWitness("B", "the big black cat");
     final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = factory.analyseOldStyle(table, witnessB);
-    final List<IMatch> matches = alignment.getMatches();
+    final IAnalysis alignment = factory.analyseOldStyle(table, witnessB);
+    final List<ISequence> matches = alignment.getSequences();
     assertEquals(1, matches.size());
-    final IMatch match = matches.get(0);
+    final ISequence match = matches.get(0);
     assertEquals("the big black cat", match.getNormalized());
-    final IColumns columnsA = match.getColumns();
+    final IPhrase columnsA = match.getPhraseA();
     assertEquals(1, columnsA.getBeginPosition());
     assertEquals(4, columnsA.getEndPosition());
   }
@@ -155,11 +153,11 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "the black cat and the black mat");
     final IWitness witnessB = factory.createWitness("B", "the black dog and the black mat");
     final IAlignmentTable table = factory.align(witnessA);
-    final IAlignment alignment = factory.analyseOldStyle(table, witnessB);
-    final List<IMatch> matches = alignment.getMatches();
+    final IAnalysis alignment = factory.analyseOldStyle(table, witnessB);
+    final List<ISequence> matches = alignment.getSequences();
     assertEquals(2, matches.size());
-    final IMatch match = matches.get(0);
-    assertEquals("the black", match.getNormalized());
+    final ISequence sequence = matches.get(0);
+    assertEquals("the black", sequence.getNormalized());
     //    final IColumns columnsA = match.getColumnsA();
     //    assertEquals(1, columnsA.getBeginPosition());
     //    assertEquals(4, columnsA.getEndPosition());
@@ -170,8 +168,8 @@ public class IndexMatcherTest {
     final IWitness a = factory.createWitness("A", "The black cat");
     final IWitness b = factory.createWitness("B", "The black and white cat");
     final IAlignmentTable table = factory.align(a);
-    final IAlignment alignment = factory.analyseOldStyle(table, b);
-    final List<IMatch> matches = alignment.getMatches();
+    final IAnalysis alignment = factory.analyseOldStyle(table, b);
+    final List<ISequence> matches = alignment.getSequences();
     assertContains(matches, "the black");
     assertContains(matches, "cat");
     assertEquals(2, matches.size());
@@ -184,8 +182,8 @@ public class IndexMatcherTest {
     final IWitness b = factory.createWitness("B", "When showers sweet with April fruit The March of drought has pierced to the root");
     final IWitness c = factory.createWitness("C", "When showers sweet with April fruit The drought of March has pierced the rood");
     final IAlignmentTable table = factory.align(a, b);
-    final IAlignment alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, c);
-    final List<IMatch> matches = alignment.getMatches();
+    final IAnalysis alignment = factory.analyseOldStyle(table, c);
+    final List<ISequence> matches = alignment.getSequences();
     assertContains(matches, "showers sweet with");
     assertContains(matches, "has pierced");
     assertEquals(2, matches.size());
@@ -197,11 +195,10 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "a b");
     final IWitness witnessB = factory.createWitness("B", "a b a b");
     final IAlignmentTable table = factory.align(witnessA);
-    final List<IMatch> matches = factory.alignOldStyle(table, witnessB).getMatches();
+    final List<ITokenMatch> matches = factory.alignOldStyle(table, witnessB).getTokenMatches();
     assertEquals(2, matches.size());
-    IMatch match = matches.get(0);
-    assertEquals(1, match.getColumns().getBeginPosition());
-    assertEquals(1, match.getPhrase().getBeginPosition());
+    ITokenMatch match = matches.get(0);
+    assertEquals(1, match.getWitnessToken().getPosition());
   }
 
   @Test
@@ -210,21 +207,20 @@ public class IndexMatcherTest {
     final IWitness witnessA = factory.createWitness("A", "a b a b");
     final IWitness witnessB = factory.createWitness("B", "a b");
     final IAlignmentTable table = factory.align(witnessA);
-    final List<IMatch> matches = factory.alignOldStyle(table, witnessB).getMatches();
+    final List<ITokenMatch> matches = factory.alignOldStyle(table, witnessB).getTokenMatches();
     assertEquals(2, matches.size());
-    IMatch match = matches.get(0);
-    assertEquals(1, match.getColumns().getBeginPosition());
-    assertEquals(1, match.getPhrase().getBeginPosition());
+    ITokenMatch match = matches.get(0);
+    assertEquals(1, match.getBaseToken().getPosition());
   }
 
-  final Function<IMatch, String> function = new Function<IMatch, String>() {
+  final Function<ISequence, String> function = new Function<ISequence, String>() {
     @Override
-    public String apply(final IMatch match) {
+    public String apply(final ISequence match) {
       return match.getNormalized();
     }
   };
 
-  private void assertContains(final List<IMatch> matches, final String string) {
+  private void assertContains(final List<ISequence> matches, final String string) {
     final Iterable<String> normalizedMatches = Iterables.transform(matches, function);
     assertTrue(string + " not found in matches: " + Joiner.on(",").join(normalizedMatches), Lists.newArrayList(normalizedMatches).contains(string));
   }
