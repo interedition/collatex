@@ -32,14 +32,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.experimental.output.table.VariantGraphBasedAlignmentTable;
-import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
-import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
 import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
+import eu.interedition.collatex2.implementation.output.table.VariantGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.output.table;
+package eu.interedition.collatex2.implementation.output.table;
 
 import java.util.List;
 
