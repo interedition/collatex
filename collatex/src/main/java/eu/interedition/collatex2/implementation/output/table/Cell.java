@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.legacy.alignmenttable;
+package eu.interedition.collatex2.implementation.output.table;
 
 import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IInternalColumn;

@@ -18,7 +18,6 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
-import eu.interedition.collatex2.legacy.alignmenttable.BaseAlignmentTable;
 
 public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
