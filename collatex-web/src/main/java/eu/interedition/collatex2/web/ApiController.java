@@ -70,7 +70,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.jgraph.JVariantGraphCreator;
+import eu.interedition.collatex2.implementation.output.apparatus.ApparatusEntry;
+import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
+import eu.interedition.collatex2.implementation.output.apparatus.TeiParallelSegmentationApparatusBuilder;
+import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.input.Phrase;
@@ -85,9 +88,6 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.output.ApparatusEntry;
-import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
-import eu.interedition.collatex2.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
 
 @Controller

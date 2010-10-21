@@ -40,9 +40,9 @@ import org.w3c.dom.NodeList;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 
 @Controller
 @RequestMapping("/examples/**")
