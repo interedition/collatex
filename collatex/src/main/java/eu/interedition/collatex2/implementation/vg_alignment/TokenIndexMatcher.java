@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.tokenmatching;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import java.util.Collections;
 import java.util.Iterator;
