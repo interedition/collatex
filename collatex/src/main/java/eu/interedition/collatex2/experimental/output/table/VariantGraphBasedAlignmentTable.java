@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
+import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
@@ -164,4 +165,34 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
     // TODO Auto-generated method stub
     
   }
+
+  @Override
+  public String toString() {
+    //NOTE INIT (temp)
+    List<IWitness> witnesses = graph.getWitnesses();
+    for (IWitness witness : witnesses) {
+      lazyConstructColumns(witness);
+    }
+    //NOTE END INIT (Temp)
+    final StringBuilder stringBuilder = new StringBuilder();
+    for (final IRow row : getRows()) {
+      stringBuilder.append(row.getSigil()).append(": ");
+      String delim = "";
+      for (final ICell cell : row) {
+        stringBuilder.append(delim).append(cellToString(cell));
+        delim = "|";
+      }
+      stringBuilder.append("\n");
+    }
+    return stringBuilder.toString();
+  }
+
+  private String cellToString(final ICell cell) {
+    if (cell.isEmpty()) {
+      return " ";
+    }
+    //TODO should not be getnormalized!
+    return cell.getToken().getNormalized().toString();
+  }
+
 }

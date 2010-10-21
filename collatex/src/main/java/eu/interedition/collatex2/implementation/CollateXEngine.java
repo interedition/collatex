@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.experimental.output.table.VariantGraphBasedAlignmentTable;
 import eu.interedition.collatex2.experimental.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.experimental.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
@@ -43,7 +44,6 @@ import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
-import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -55,8 +55,6 @@ import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTable4;
-import eu.interedition.collatex2.legacy.tokencontainers.AlignmentTableCreator3;
 import eu.interedition.collatex2.output.ParallelSegmentationApparatus;
 
 /**
@@ -92,7 +90,9 @@ public class CollateXEngine {
    * Terminology check
    */
   public IAlignmentTable align(IWitness... witnesses) {
-    return createAligner().add(witnesses).getResult();
+    IVariantGraph vg = VariantGraph2Creator.create(witnesses);
+    VariantGraphBasedAlignmentTable table = new VariantGraphBasedAlignmentTable(vg);
+    return table;
   }
 
   /**
@@ -107,17 +107,17 @@ public class CollateXEngine {
     return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
   }
 
-  public IAligner createAligner() {
-    return new AlignmentTableCreator3(this);
-  }
+//  public IAligner createAligner() {
+//    return new AlignmentTableCreator3(this);
+//  }
 
   public ParallelSegmentationApparatus createApparatus(final IAlignmentTable alignmentTable) {
     return ParallelSegmentationApparatus.build(alignmentTable);
   }
 
-  public IAlignmentTable createAlignmentTable() {
-    return new AlignmentTable4();
-  }
+//  public IAlignmentTable createAlignmentTable() {
+//    return new AlignmentTable4();
+//  }
 
   public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
@@ -201,18 +201,18 @@ public class CollateXEngine {
     return new Analysis(sequences);
   }
   
-  //TODO: rename to analyseTable
-  public IAnalysis analyseOldStyle(IAlignmentTable table, IWitness witness) {
-    final IAlignment2 alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
-    SequenceDetection2 detection = new SequenceDetection2(alignment);
-    List<ISequence> sequences = detection.chainTokenMatches();
-    return new Analysis(sequences);
-  }
-  
-  //TODO: rename to alignTable
-  public IAlignment2 alignOldStyle(IAlignmentTable table, IWitness witness) {
-    final IAlignment2 alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
-    return alignment;
-  }
+//  //TODO: rename to analyseTable
+//  public IAnalysis analyseOldStyle(IAlignmentTable table, IWitness witness) {
+//    final IAlignment2 alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
+//    SequenceDetection2 detection = new SequenceDetection2(alignment);
+//    List<ISequence> sequences = detection.chainTokenMatches();
+//    return new Analysis(sequences);
+//  }
+//  
+//  //TODO: rename to alignTable
+//  public IAlignment2 alignOldStyle(IAlignmentTable table, IWitness witness) {
+//    final IAlignment2 alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
+//    return alignment;
+//  }
 
 }

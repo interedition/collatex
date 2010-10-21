@@ -28,6 +28,7 @@ import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class TranspositionAlignmentTest {
+  @Ignore
   @Test
   public void transposeInOnePair() {
     CollateXEngine engine = new CollateXEngine();
