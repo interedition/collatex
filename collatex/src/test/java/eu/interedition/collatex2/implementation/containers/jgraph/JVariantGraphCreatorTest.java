@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
+import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.interfaces.IJVariantGraph;
 import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;

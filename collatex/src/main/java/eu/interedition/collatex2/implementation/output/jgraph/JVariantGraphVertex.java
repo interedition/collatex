@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.containers.jgraph;
+package eu.interedition.collatex2.implementation.output.jgraph;
 
 import java.util.Set;
 
