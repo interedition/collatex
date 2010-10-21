@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.input.builders;
+package eu.interedition.collatex2.implementation.input.builders;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +31,8 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.Util;
 import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
-import eu.interedition.collatex2.implementation.tokenization.WhitespaceTokenizer;
-import eu.interedition.collatex2.input.NormalizedToken;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;

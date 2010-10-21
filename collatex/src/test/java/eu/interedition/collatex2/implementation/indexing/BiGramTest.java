@@ -23,8 +23,8 @@ package eu.interedition.collatex2.implementation.indexing;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
-import eu.interedition.collatex2.input.Token;
+import eu.interedition.collatex2.implementation.input.Token;
+import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.legacy.indexing.BiGram;
 
 public class BiGramTest {

@@ -37,8 +37,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import eu.interedition.collatex2.implementation.tokenization.DefaultTokenNormalizer;
-import eu.interedition.collatex2.input.builders.WitnessBuilder.ContentType;
+import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
+import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder.ContentType;
+import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 

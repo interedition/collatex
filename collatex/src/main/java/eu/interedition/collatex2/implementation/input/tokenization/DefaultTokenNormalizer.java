@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.tokenization;
+package eu.interedition.collatex2.implementation.input.tokenization;
 
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
-import eu.interedition.collatex2.input.NormalizedToken;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;

@@ -18,12 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.tokenization;
+package eu.interedition.collatex2.implementation.input.tokenization;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-import eu.interedition.collatex2.input.Token;
+import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 

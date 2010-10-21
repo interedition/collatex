@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.input.Phrase;
+import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;

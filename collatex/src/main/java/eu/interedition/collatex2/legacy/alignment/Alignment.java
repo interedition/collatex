@@ -13,8 +13,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenIndexMatcher;
-import eu.interedition.collatex2.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;

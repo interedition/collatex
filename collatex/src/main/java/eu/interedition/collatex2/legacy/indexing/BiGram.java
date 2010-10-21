@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex2.legacy.indexing;
 
-import eu.interedition.collatex2.input.Token;
+import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 

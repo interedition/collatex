@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
+
 public class DefaultTokenNormalizerTest {
   @Test
   public void testNormalizer1() {

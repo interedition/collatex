@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.input;
+package eu.interedition.collatex2.implementation.input;
 
 import java.util.Comparator;
 import java.util.List;
