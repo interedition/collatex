@@ -192,13 +192,18 @@ public class CollateXEngine {
   }
 
   public IAnalysis analyse(IVariantGraph graph, IWitness b) {
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(b);
+    IAlignment2 alignment = align(graph, b);
     //TODO: move this code to an analyzer class?
     List<ITokenMatch> tokenMatches = alignment.getTokenMatches();
     SequenceDetection2 sequenceDetection = new SequenceDetection2(tokenMatches);
     List<ISequence> sequences = sequenceDetection.chainTokenMatches();
     return new Analysis(sequences);
+  }
+
+  public IAlignment2 align(IVariantGraph graph, IWitness witness) {
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
+    IAlignment2 alignment = aligner.align(witness);
+    return alignment;
   }
   
 //  //TODO: rename to analyseTable

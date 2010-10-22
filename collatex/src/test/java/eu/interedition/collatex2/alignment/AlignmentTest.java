@@ -242,20 +242,4 @@ public class AlignmentTest {
 //    assertEquals("b", transpositions.get(3).getMatchB().getNormalized());
 //  }
 //
-//  //TODO: This test only works with the
-//  //TODO: AlternativeTokenIndexMatcher and the AlternativeWitnessIndex
-//  //TODO: and the yet to be made AlternativeVariantGraphIndex!
-//  @Ignore
-//  @Test
-//  public void testBeckettLotsOfRepetition() {
-//    final IWitness a = factory.createWitness("A", "from the days & nights when day followed on night & night on day.");
-//    final IWitness b = factory.createWitness("B", "from the days and nights when day followed fast on night and night on day.");
-//    final IAlignment alignment = PairwiseAlignmentHelper.align(factory, a, b);
-//    List<IMatch> matches = alignment.getMatches();
-//    assertEquals("from the days", matches.get(0).getNormalized());
-//    assertEquals("nights when day followed", matches.get(1).getNormalized());
-//    assertEquals("on night", matches.get(2).getNormalized());
-//    assertEquals("night on day", matches.get(3).getNormalized());
-//    assertEquals(4, matches.size());
-//  }
 }
