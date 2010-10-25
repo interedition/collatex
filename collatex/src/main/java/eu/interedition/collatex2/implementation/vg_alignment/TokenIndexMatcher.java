@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.implementation.vg_alignment;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +15,10 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 //TODO: Use AlternativeTokenIndexMatcher when
@@ -37,7 +36,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
   public List<ITokenMatch> getMatches(IWitness witness) {
     final List<String> repeatedTokens = combineRepeatedTokens(witness);
     ITokenIndex baseIndex = base.getTokenIndex(repeatedTokens);
-    return findMatches(baseIndex, witness.getTokenIndex(repeatedTokens));
+    return findMatches(baseIndex, witness.getTokenIndex(repeatedTokens), witness);
   }
   
   //TODO: change return type from List into Set?
@@ -49,7 +48,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
   }
 
 
-  private List<ITokenMatch> findMatches(final ITokenIndex tableIndex, final ITokenIndex tokenIndex) {
+  private List<ITokenMatch> findMatches(final ITokenIndex tableIndex, final ITokenIndex tokenIndex, IWitness witness) {
     final List<PhraseMatch> matches = Lists.newArrayList();
     final Set<String> keys = tokenIndex.keys();
     for (final String key : keys) {
@@ -62,11 +61,11 @@ public class TokenIndexMatcher implements ITokenMatcher {
       }
     }
     LOG.debug("unfiltered matches: " + matches);
-    return joinOverlappingMatches(matches);
+    return joinOverlappingMatches(matches, witness);
   }
 
-  private List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches) {
-    final List<ITokenMatch> newMatches = filterMatchesBasedOnPositionMatches(matches);
+  private List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches, IWitness witness) {
+    final List<ITokenMatch> newMatches = filterMatchesBasedOnPositionMatches(matches, witness);
     LOG.debug("filtered matches: " + newMatches);
     return newMatches;
   }
@@ -78,9 +77,9 @@ public class TokenIndexMatcher implements ITokenMatcher {
   // columns
   // NOTE: --> not the optimal alignment
   @SuppressWarnings("boxing")
-  private List<ITokenMatch> filterMatchesBasedOnPositionMatches(final List<PhraseMatch> matches) {
-    final Map<Integer, INormalizedToken> tableTokenMap = Maps.newHashMap();
-    final Map<Integer, INormalizedToken> witnessTokenMap = Maps.newHashMap();
+  private List<ITokenMatch> filterMatchesBasedOnPositionMatches(final List<PhraseMatch> matches, IWitness witness) {
+    Map<INormalizedToken, INormalizedToken> witnessToTable;
+    witnessToTable = Maps.newLinkedHashMap();
     List<PhraseMatch> filteredMatches = filterAwaySecondChoicesMultipleTokensOneColumn(filterAwaySecondChoicesMultipleColumnsOneToken(matches));
     for (final PhraseMatch match : filteredMatches) {
       // step 1. Gather data
@@ -99,24 +98,20 @@ public class TokenIndexMatcher implements ITokenMatcher {
       for (TokenPair pair : pairs) {
         final INormalizedToken column = pair.tableToken;
         final INormalizedToken token = pair.witnessToken;
-        final int position = token.getPosition();
-        // System.out.println(column.getContent() + ":" + column.getSigil() +
-        // ":" + position);
-        tableTokenMap.put(position, column);
-        witnessTokenMap.put(position, token);
+        witnessToTable.put(token, column);
       }
     }
+
     final List<ITokenMatch> newMatches = Lists.newArrayList();
-    final List<Integer> positions = Lists.newArrayList(tableTokenMap.keySet());
-    Collections.sort(positions); // TODO: remove sort here!
-    for (final Integer position : positions) {
-      final INormalizedToken tableToken = tableTokenMap.get(position);
-      final INormalizedToken token = witnessTokenMap.get(position);
-      final ITokenMatch newMatch = new TokenMatch(tableToken, token);
-      newMatches.add(newMatch);
+    for (final INormalizedToken token : witness.getTokens()) {
+      final INormalizedToken tableToken = witnessToTable.get(token);
+      if (tableToken!=null) {
+        final ITokenMatch newMatch = new TokenMatch(tableToken, token);
+        newMatches.add(newMatch);
+      }
     }
     return newMatches;
-  }
+ }
 
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!

@@ -48,7 +48,7 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
   public List<ITokenMatch> getMatches(IWitness witness) {
     final List<String> repeatedTokens = combineRepeatedTokens(witness);
     ITokenIndex baseIndex = base.getTokenIndex(repeatedTokens);
-    return findMatches(baseIndex, witness.getTokenIndex(repeatedTokens));
+    return findMatches(baseIndex, witness.getTokenIndex(repeatedTokens), witness);
   }
 
   //TODO: change return type from List into Set?
@@ -59,7 +59,7 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
     return Lists.newArrayList(repeatedTokens);
   }
 
-  private List<ITokenMatch> findMatches(final ITokenIndex tableIndex, final ITokenIndex tokenIndex) {
+  private List<ITokenMatch> findMatches(final ITokenIndex tableIndex, final ITokenIndex tokenIndex, IWitness witness) {
     final List<PhraseMatch> matches = Lists.newArrayList();
     final Set<String> keys = tokenIndex.keys();
     for (final String key : keys) {
@@ -72,11 +72,11 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
       }
     }
     TokenIndexMatcher.LOG.debug("unfiltered matches: " + matches);
-    return joinOverlappingMatches(matches);
+    return joinOverlappingMatches(matches, witness);
   }
 
-  private List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches) {
-    final List<ITokenMatch> newMatches = filterMatchesBasedOnPositionMatches(matches);
+  private List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches, IWitness witness) {
+    final List<ITokenMatch> newMatches = filterMatchesBasedOnPositionMatches(matches, witness);
     TokenIndexMatcher.LOG.debug("filtered matches: " + newMatches);
     return newMatches;
   }
@@ -88,9 +88,9 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
   // columns
   // NOTE: --> not the optimal alignment
   @SuppressWarnings("boxing")
-  private List<ITokenMatch> filterMatchesBasedOnPositionMatches(final List<PhraseMatch> matches) {
-    final Map<Integer, INormalizedToken> tableTokenMap = Maps.newHashMap();
-    final Map<Integer, INormalizedToken> witnessTokenMap = Maps.newHashMap();
+  private List<ITokenMatch> filterMatchesBasedOnPositionMatches(final List<PhraseMatch> matches, IWitness witness) {
+    Map<INormalizedToken, INormalizedToken> witnessToTable;
+    witnessToTable = Maps.newLinkedHashMap();
     //BB niet hier al de SecondChoices uitfilteren, maar aangeven, zodat in getMatchesUsingWitnessIndex beslist kan worden welke alternatieven weg kunnen
     //    List<PhraseMatch> filteredMatches = filterAwaySecondChoicesMultipleTokensOneColumn(filterAwaySecondChoicesMultipleColumnsOneToken(matches));
     //    for (final PhraseMatch match : filteredMatches) {
@@ -107,25 +107,23 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
           pairs.add(new TokenPair(tableToken, token));
         }
       }
+      
       // step 2. Split phrase matches
       for (TokenPair pair : pairs) {
         final INormalizedToken column = pair.tableToken;
         final INormalizedToken token = pair.witnessToken;
-        final int position = token.getPosition();
-        // System.out.println(column.getContent() + ":" + column.getSigil() +
-        // ":" + position);
-        tableTokenMap.put(position, column);
-        witnessTokenMap.put(position, token);
+        witnessToTable.put(token, column);
       }
+      
     }
+
     final List<ITokenMatch> newMatches = Lists.newArrayList();
-    final List<Integer> positions = Lists.newArrayList(tableTokenMap.keySet());
-    Collections.sort(positions); // TODO: remove sort here!
-    for (final Integer position : positions) {
-      final INormalizedToken tableToken = tableTokenMap.get(position);
-      final INormalizedToken token = witnessTokenMap.get(position);
-      final ITokenMatch newMatch = new TokenMatch(tableToken, token);
-      newMatches.add(newMatch);
+    for (final INormalizedToken token : witness.getTokens()) {
+      final INormalizedToken tableToken = witnessToTable.get(token);
+      if (tableToken!=null) {
+        final ITokenMatch newMatch = new TokenMatch(tableToken, token);
+        newMatches.add(newMatch);
+      }
     }
     return newMatches;
   }
