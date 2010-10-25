@@ -26,4 +26,9 @@ public class MockToken implements IToken {
     return null;
   }
 
+  @Override
+  public boolean isNear(IToken b) {
+    throw new RuntimeException("NOT IMPLEMENTED!");
+  }
+
 }

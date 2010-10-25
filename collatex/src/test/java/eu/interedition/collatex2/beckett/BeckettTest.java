@@ -1,7 +1,10 @@
 package eu.interedition.collatex2.beckett;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -11,15 +14,30 @@ import org.junit.Test;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-
 public class BeckettTest {
   private static CollateXEngine factory;
   
   @BeforeClass
   public static void setup() {
     factory = new CollateXEngine();
+  }
+  
+  @Test
+  public void testNodeIsNear() {
+    IWitness witness = factory.createWitness("A", "a b c d e f g h i j k l");
+    List<INormalizedToken> tokens = witness.getTokens();
+    Iterator<INormalizedToken> iterator = tokens.iterator();
+    INormalizedToken a = iterator.next();
+    INormalizedToken b = iterator.next();
+    INormalizedToken c = iterator.next();
+    INormalizedToken d = iterator.next();
+    assertTrue(a.isNear(b));
+    assertFalse(a.isNear(c));
+    assertFalse(b.isNear(d));
+    assertTrue(c.isNear(d));
   }
   
 //TODO: This test only works with the

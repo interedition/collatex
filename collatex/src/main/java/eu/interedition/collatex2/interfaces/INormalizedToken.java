@@ -28,5 +28,6 @@ public interface INormalizedToken extends IToken {
    * The normalized representation of the content of this token.
    * @return The normalized content.
    */
-	String getNormalized();
+  String getNormalized();
+
 }
