@@ -20,7 +20,9 @@
 
 package eu.interedition.collatex.experimental.ngrams.data;
 
-public class Token {
+import eu.interedition.collatex2.interfaces.IToken;
+
+public class Token implements IToken {
   private final String sigil;
   private final String content;
   private final int position;
@@ -59,6 +61,11 @@ public class Token {
   @Override
   public int hashCode() {
     return content.hashCode();
+  }
+
+  @Override
+  public boolean isNear(IToken b) {
+    throw new RuntimeException("LEGACY CLASS DO NOT USE!");
   }
 
 }
