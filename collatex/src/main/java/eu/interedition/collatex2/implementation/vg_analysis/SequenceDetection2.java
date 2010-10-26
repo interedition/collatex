@@ -28,9 +28,9 @@ public class SequenceDetection2 {
 
   public List<ISequence> chainTokenMatches() {
     // prepare
-    final List<ITokenMatch> tokenMatchesSortedForB = sortTokenMatchesForWitness();
+    final List<ITokenMatch> tokenMatchesSortedForBase = sortTokenMatchesForBase();
     Map<ITokenMatch, ITokenMatch> previousMatchMapA = buildPreviousMatchMap();
-    Map<ITokenMatch, ITokenMatch> previousMatchMapB = buildPreviousMatchMap(tokenMatchesSortedForB);
+    Map<ITokenMatch, ITokenMatch> previousMatchMapB = buildPreviousMatchMap(tokenMatchesSortedForBase);
     // chain token matches
     List<INormalizedToken> tokensA = null;
     List<INormalizedToken> tokensB = null;
@@ -55,13 +55,13 @@ public class SequenceDetection2 {
     return matches;
   }
 
-  private List<ITokenMatch> sortTokenMatchesForWitness() {
-    final List<ITokenMatch> matchesForWitness = Lists.newArrayList(tokenMatches);
-    Collections.sort(matchesForWitness, SORT_MATCHES_ON_POSITION_WITNESS);
-    return matchesForWitness;
+  private List<ITokenMatch> sortTokenMatchesForBase() {
+    final List<ITokenMatch> matchesForBase = Lists.newArrayList(tokenMatches);
+    Collections.sort(matchesForBase, SORT_MATCHES_ON_POSITION_BASE);
+    return matchesForBase;
   }
   
-  final Comparator<ITokenMatch> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<ITokenMatch>() {
+  final Comparator<ITokenMatch> SORT_MATCHES_ON_POSITION_BASE = new Comparator<ITokenMatch>() {
     @Override
     public int compare(final ITokenMatch o1, final ITokenMatch o2) {
       return o1.getTokenB().getPosition() - o2.getTokenB().getPosition();
