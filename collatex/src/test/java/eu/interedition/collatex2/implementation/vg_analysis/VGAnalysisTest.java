@@ -5,6 +5,7 @@ import static junit.framework.Assert.assertEquals;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +125,7 @@ public class VGAnalysisTest {
     assertEquals("d", sequences.get(2).getNormalized());
   }
 
+  @Ignore
   @Test
   public void testTransposition1() {
     final IWitness a = factory.createWitness("A", "d a b");
@@ -138,6 +140,7 @@ public class VGAnalysisTest {
     assertEquals("a b", transpositions.get(1).getSequenceA().getNormalized());
   }
 
+  @Ignore
   @Test
   public void testTransposition2() {
     final IWitness a = factory.createWitness("A", "d a b");
@@ -154,6 +157,7 @@ public class VGAnalysisTest {
     assertEquals("d", transpositions.get(2).getSequenceB().getNormalized());
   }
 
+  @Ignore
   @Test
   public void testTransposition3() {
     final IWitness a = factory.createWitness("1", "a b x c d e");

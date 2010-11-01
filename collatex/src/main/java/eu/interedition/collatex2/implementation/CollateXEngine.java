@@ -195,7 +195,7 @@ public class CollateXEngine {
     IAlignment2 alignment = align(graph, b);
     //TODO: move this code to an analyzer class?
     List<ITokenMatch> tokenMatches = alignment.getTokenMatches();
-    SequenceDetection2 sequenceDetection = new SequenceDetection2(tokenMatches);
+    SequenceDetection2 sequenceDetection = new SequenceDetection2(tokenMatches, graph, b);
     List<ISequence> sequences = sequenceDetection.chainTokenMatches();
     return new Analysis(sequences);
   }

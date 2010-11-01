@@ -10,17 +10,24 @@ import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.implementation.vg_alignment.PhraseMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 
 public class SequenceDetection2 {
 
   private final List<ITokenMatch> tokenMatches;
+  private final ITokenContainer base;
+  private final ITokenContainer witness;
 
-  public SequenceDetection2(List<ITokenMatch> tokenMatches) {
+  public SequenceDetection2(List<ITokenMatch> tokenMatches, ITokenContainer base, ITokenContainer witness) {
     this.tokenMatches = tokenMatches;
+    this.base = base;
+    this.witness = witness;
   }
 
-  public SequenceDetection2(IAlignment2 alignment) {
+  public SequenceDetection2(IAlignment2 alignment, ITokenContainer base, ITokenContainer witness) {
+    this.base = base;
+    this.witness = witness;
     this.tokenMatches = alignment.getTokenMatches();
   }
 
@@ -33,7 +40,7 @@ public class SequenceDetection2 {
     List<ISequence> matches = Lists.newArrayList();
     for (ITokenMatch tokenMatch : tokenMatches) {
       ITokenMatch previous = previousMatchMap.get(tokenMatch);
-      if (previous == null || !previous.getTokenA().isNear(tokenMatch.getTokenA()) || !previous.getTokenB().isNear(tokenMatch.getTokenB())) {
+      if (previous == null || !base.isNear(previous.getBaseToken(), tokenMatch.getBaseToken()) || !witness.isNear(previous.getWitnessToken(), tokenMatch.getWitnessToken())) {
         // start a new sequence;
         createAndAddChainedMatch(tokensA, tokensB, matches);
         // clear buffer

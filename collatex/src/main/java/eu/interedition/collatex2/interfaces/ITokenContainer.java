@@ -8,5 +8,7 @@ public interface ITokenContainer {
 
   //TODO: remove!
   List<String> getRepeatedTokens();
+  
+  boolean isNear(IToken a, IToken b);
 
 }

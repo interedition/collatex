@@ -72,4 +72,18 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     return "[" + getNormalized() + "]";
   }
 
+  @Override
+  public int getPosition() {
+    throw new RuntimeException("WRONG! THIS METHOD WILL BE REMOVED!");
+  }
+
+  @Override
+  public String getSigil() {
+    throw new RuntimeException("WRONG!");
+  }
+
+  @Override
+  public String getContent() {
+    throw new RuntimeException("Do not call this method! Call getToken(IWitness).getContent() instead.");
+  }
 }

@@ -111,10 +111,8 @@ public class VariantGraphIndex implements ITokenIndex {
       if (vertex.getWitnesses().isEmpty()) {
         throw new RuntimeException("STOP! Witness set is not supposed to be empty! Vertex: " + vertex.getNormalized());
       }
-      //Note: this code assumes witnesses = an ordered set
-      IWitness firstWitness = vertex.getWitnesses().iterator().next();
-      INormalizedToken token = vertex.getToken(firstWitness);
-      tokens.add(token);
+      //Note: the vertex is a normalized token all by itself!
+      tokens.add(vertex);
     }
     normalizedToTokens.put(normalized.toString(), tokens);
   }

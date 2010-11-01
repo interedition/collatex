@@ -24,4 +24,6 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
 
   List<IVariantGraphVertex> getLongestPath();
 
+  List<INormalizedToken> getTokens(IWitness witness);
+
 }

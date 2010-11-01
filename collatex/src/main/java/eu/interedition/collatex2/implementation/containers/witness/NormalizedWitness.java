@@ -12,6 +12,7 @@ import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -94,5 +95,10 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   @Override
   public String toString() {
     return getSigil();
+  }
+
+  @Override
+  public boolean isNear(IToken a, IToken b) {
+    return b.getPosition() - a.getPosition() == 1;
   }
 }

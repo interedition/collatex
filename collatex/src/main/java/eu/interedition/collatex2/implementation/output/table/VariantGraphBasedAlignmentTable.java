@@ -14,6 +14,7 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
+import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -192,6 +193,11 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
     }
     //TODO should not be getnormalized!
     return cell.getToken().getNormalized().toString();
+  }
+
+  @Override
+  public boolean isNear(IToken a, IToken b) {
+    throw new RuntimeException("DELETE THIS METHOD!");
   }
 
 }

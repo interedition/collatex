@@ -13,6 +13,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
@@ -171,5 +172,27 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   @Override
   public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
     return VariantGraphIndex.create(this, repeatingTokens);
+  }
+
+  @Override
+  public List<INormalizedToken> getTokens(IWitness witness) {
+    List<IVariantGraphVertex> vertices = getPath(witness);
+    List<INormalizedToken> tokens = Lists.newArrayList();
+    for (IVariantGraphVertex vertex : vertices) {
+      tokens.add(vertex);
+    }
+     return tokens;
+  }
+
+  @Override
+  public boolean isNear(IToken a, IToken b) {
+    // sanity check!
+    if (!(a instanceof IVariantGraphVertex)) {
+      throw new RuntimeException("IToken a is not of type IVariantGraphVertex!");
+    }
+    if (!(b instanceof IVariantGraphVertex)) {
+      throw new RuntimeException("IToken b is not of type IVariantGraphVertex!");
+    }
+    return containsEdge((IVariantGraphVertex) a, (IVariantGraphVertex) b);
   }
 }

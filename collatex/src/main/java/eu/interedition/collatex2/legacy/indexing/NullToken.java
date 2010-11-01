@@ -1,7 +1,6 @@
 package eu.interedition.collatex2.legacy.indexing;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IToken;
 
 public class NullToken implements INormalizedToken {
   private final int position;
@@ -30,10 +29,5 @@ public class NullToken implements INormalizedToken {
   @Override
   public String getContent() {
     return "";
-  }
-
-  @Override
-  public boolean isNear(IToken b) {
-    throw new RuntimeException("THIS METHOD SHOULD NOT BE CALLED!");
   }
 }

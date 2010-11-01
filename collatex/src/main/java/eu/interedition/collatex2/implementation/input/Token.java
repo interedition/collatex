@@ -89,9 +89,4 @@ public class Token implements IToken {
     return hc;
   }
 
-  @Override
-  public boolean isNear(IToken b) {
-    return b.getPosition() - this.getPosition() == 1;
-  }
-
 }

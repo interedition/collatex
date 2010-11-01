@@ -29,9 +29,9 @@ public class TokenIndexMatcherTest {
     TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(3, matches.size());
-    assertEquals("everything: 1 -> 1", matches.get(0).toString());
-    assertEquals("is: 2 -> 2", matches.get(1).toString());
-    assertEquals("unique: 3 -> 3", matches.get(2).toString());
+    assertEquals("everything: 1 -> [everything]", matches.get(0).toString());
+    assertEquals("is: 2 -> [is]", matches.get(1).toString());
+    assertEquals("unique: 3 -> [unique]", matches.get(2).toString());
   }
   
   @Test
@@ -71,9 +71,9 @@ public class TokenIndexMatcherTest {
     TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(3, matches.size());
-    assertEquals("the: 1 -> 1", matches.get(0).toString());
-    assertEquals("big: 2 -> 2", matches.get(1).toString());
-    assertEquals("black: 3 -> 3", matches.get(2).toString());
+    assertEquals("the: 1 -> [the]", matches.get(0).toString());
+    assertEquals("big: 2 -> [big]", matches.get(1).toString());
+    assertEquals("black: 3 -> [black]", matches.get(2).toString());
   }
 
   //Note: internally this gives # the big black and the big black cat as matches
@@ -85,10 +85,10 @@ public class TokenIndexMatcherTest {
     TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(4, matches.size());
-    assertEquals("the: 1 -> 1", matches.get(0).toString());
-    assertEquals("big: 2 -> 2", matches.get(1).toString());
-    assertEquals("black: 3 -> 3", matches.get(2).toString());
-    assertEquals("cat: 4 -> 4", matches.get(3).toString());
+    assertEquals("the: 1 -> [the]", matches.get(0).toString());
+    assertEquals("big: 2 -> [big]", matches.get(1).toString());
+    assertEquals("black: 3 -> [black]", matches.get(2).toString());
+    assertEquals("cat: 4 -> [cat]", matches.get(3).toString());
   }
 
   @Test
@@ -99,12 +99,12 @@ public class TokenIndexMatcherTest {
     TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(6, matches.size());
-    assertEquals("the: 1 -> 1", matches.get(0).toString());
-    assertEquals("black: 2 -> 2", matches.get(1).toString());
-    assertEquals("and: 4 -> 4", matches.get(2).toString());
-    assertEquals("the: 5 -> 5", matches.get(3).toString());
-    assertEquals("black: 6 -> 6", matches.get(4).toString());
-    assertEquals("mat: 7 -> 7", matches.get(5).toString());
+    assertEquals("the: 1 -> [the]", matches.get(0).toString());
+    assertEquals("black: 2 -> [black]", matches.get(1).toString());
+    assertEquals("and: 4 -> [and]", matches.get(2).toString());
+    assertEquals("the: 5 -> [the]", matches.get(3).toString());
+    assertEquals("black: 6 -> [black]", matches.get(4).toString());
+    assertEquals("mat: 7 -> [mat]", matches.get(5).toString());
   }
 
   @Test
@@ -115,9 +115,9 @@ public class TokenIndexMatcherTest {
     TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(3, matches.size());
-    assertEquals("the: 1 -> 1", matches.get(0).toString());
-    assertEquals("black: 2 -> 2", matches.get(1).toString());
-    assertEquals("cat: 5 -> 3", matches.get(2).toString());
+    assertEquals("the: 1 -> [the]", matches.get(0).toString());
+    assertEquals("black: 2 -> [black]", matches.get(1).toString());
+    assertEquals("cat: 5 -> [cat]", matches.get(2).toString());
   }
   
   @Test
@@ -130,8 +130,8 @@ public class TokenIndexMatcherTest {
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(1, matches.size());
     ITokenMatch match = matches.get(0);
-    assertEquals(1, match.getTableToken().getPosition());
-    assertEquals(1, match.getWitnessToken().getPosition());
+    assertEquals(graph.getTokens(witnessA).get(0), match.getBaseToken());
+    assertEquals(witnessB.getTokens().get(0), match.getWitnessToken());
   }
 
   @Test
@@ -144,8 +144,8 @@ public class TokenIndexMatcherTest {
     List<ITokenMatch> matches = matcher.getMatches(witnessB);
     assertEquals(1, matches.size());
     ITokenMatch match = matches.get(0);
-    assertEquals(1, match.getTableToken().getPosition());
-    assertEquals(1, match.getWitnessToken().getPosition());
+    assertEquals(graph.getTokens(witnessA).get(0), match.getBaseToken());
+    assertEquals(witnessB.getTokens().get(0), match.getWitnessToken());
   }
 
 

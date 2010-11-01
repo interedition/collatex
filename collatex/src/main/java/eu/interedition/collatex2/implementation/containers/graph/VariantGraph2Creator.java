@@ -44,7 +44,7 @@ public class VariantGraph2Creator {
     List<ITokenMatch> matches = alignment.getTokenMatches();
     // analyze the results
     // TODO: Make separate analyzer class?
-    SequenceDetection2 seqDetection = new SequenceDetection2(matches);
+    SequenceDetection2 seqDetection = new SequenceDetection2(matches, graph, witness);
     List<ISequence> sequences = seqDetection.chainTokenMatches();
     IAnalysis analysis = new Analysis(sequences);
     List<ITransposition2> transpositions = analysis.getTranspositions();
@@ -53,15 +53,6 @@ public class VariantGraph2Creator {
 
   //write
   private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, List<ITransposition2> transpositions) {
-    // Map Tokens in the Graph to Vertices
-    Map<INormalizedToken, IVariantGraphVertex> graphTokenToVertex;
-    graphTokenToVertex = Maps.newLinkedHashMap();
-    for (IVariantGraphVertex vertex : graph.vertexSet()) {
-      for (IWitness witness2 : vertex.getWitnesses()) {
-        INormalizedToken token = vertex.getToken(witness2);
-        graphTokenToVertex.put(token, vertex);
-      }
-    }
     // Map Tokens in the Witness to the Matches
     Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
     witnessTokenToMatch = Maps.newLinkedHashMap();
@@ -84,10 +75,10 @@ public class VariantGraph2Creator {
         }
       }
     }
-    addWitnessToGraph(witness, graphTokenToVertex, witnessTokenToMatch);
+    addWitnessToGraph(witness, witnessTokenToMatch);
   }
 
-  private void addWitnessToGraph(IWitness witness, Map<INormalizedToken, IVariantGraphVertex> graphTokenToVertex, Map<INormalizedToken, ITokenMatch> witnessTokenToMatch) {
+  private void addWitnessToGraph(IWitness witness, Map<INormalizedToken, ITokenMatch> witnessTokenToMatch) {
     IVariantGraphVertex current = graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
       IVariantGraphVertex end;
@@ -97,7 +88,7 @@ public class VariantGraph2Creator {
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
-        end = graphTokenToVertex.get(tokenMatch.getTokenB());
+        end = (IVariantGraphVertex) tokenMatch.getTokenB();
       }
       connectBeginToEndVertex(current, end, witness);
       end.addToken(witness, token);

@@ -24,7 +24,7 @@ public class TokenMatch implements ITokenMatch {
   
   @Override
   public String toString() {
-    return baseToken.getNormalized() + ": " + getWitnessToken().getPosition() + " -> "+getBaseToken().getPosition();
+    return baseToken.getNormalized() + ": " + getWitnessToken().getPosition() + " -> "+getBaseToken();
   }
 
   @Override

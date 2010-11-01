@@ -23,7 +23,7 @@ public class PhraseMatch implements ISequence {
 
   @Override
   public String toString() {
-    return basePhrase.getContent() + " -> "+witnessPhrase.getContent();
+    return basePhrase.getNormalized() + " -> "+witnessPhrase.getNormalized();
   }
 
   @Override

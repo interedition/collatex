@@ -36,6 +36,4 @@ public interface IToken {
  */
   String getContent();
 
-  boolean isNear(IToken b);
-
 }

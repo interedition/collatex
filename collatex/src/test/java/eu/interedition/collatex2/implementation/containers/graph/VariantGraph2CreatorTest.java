@@ -147,6 +147,7 @@ public class VariantGraph2CreatorTest {
 
     // TODO: rename test: mirrored transpositions with match in between!
     //NOTE: test taken from AlignmentTableTranspositionTest
+    @Ignore
     @Test
     public void testTranspositionsAreStoredInAlignmentTable() {
       final IWitness a = engine.createWitness("A", "the black and white cat");
