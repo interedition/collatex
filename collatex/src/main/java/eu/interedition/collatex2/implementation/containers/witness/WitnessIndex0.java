@@ -2,13 +2,12 @@ package eu.interedition.collatex2.implementation.containers.witness;
 
 import static com.google.common.collect.Iterables.transform;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +23,8 @@ import com.google.common.collect.TreeMultiset;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
-import eu.interedition.collatex2.legacy.indexing.NullToken;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 //TODO: DELETE CLASS!
 public class WitnessIndex0 implements ITokenIndex {
@@ -97,27 +95,27 @@ public class WitnessIndex0 implements ITokenIndex {
   }
 
   private void addExpandedPhrases(final Multimap<String, IPhrase> newPhraseMap, final Collection<IPhrase> phrases, final List<INormalizedToken> tokens, final Collection<String> repeatingTokens) {
-    for (final IPhrase phrase : phrases) {
-      final int beforePosition = phrase.getBeginPosition() - 1;
-      final int afterPosition = phrase.getEndPosition();
-
-      final INormalizedToken beforeToken = (beforePosition > 0) ? tokens.get(beforePosition - 1) : new NullToken(phrase.getBeginPosition(), phrase.getSigil());
-      final INormalizedToken afterToken = (afterPosition < tokens.size()) ? tokens.get(afterPosition) : new NullToken(phrase.getEndPosition(), phrase.getSigil());
-
-      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
-      leftExpandedTokenList.addAll(phrase.getTokens());
-      final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
-
-      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phrase.getTokens());
-      rightExpandedTokenList.add(afterToken);
-      final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
-
-      final String leftPhraseId = leftExpandedPhrase.getNormalized();
-      newPhraseMap.put(leftPhraseId, leftExpandedPhrase);
-
-      final String rightPhraseId = rightExpandedPhrase.getNormalized();
-      newPhraseMap.put(rightPhraseId, rightExpandedPhrase);
-    }
+//    for (final IPhrase phrase : phrases) {
+//      final int beforePosition = phrase.getBeginPosition() - 1;
+//      final int afterPosition = phrase.getEndPosition();
+//
+//      final INormalizedToken beforeToken = (beforePosition > 0) ? tokens.get(beforePosition - 1) : new NullToken(phrase.getBeginPosition(), phrase.getSigil());
+//      final INormalizedToken afterToken = (afterPosition < tokens.size()) ? tokens.get(afterPosition) : new NullToken(phrase.getEndPosition(), phrase.getSigil());
+//
+//      final ArrayList<INormalizedToken> leftExpandedTokenList = Lists.newArrayList(beforeToken);
+//      leftExpandedTokenList.addAll(phrase.getTokens());
+//      final IPhrase leftExpandedPhrase = new Phrase(leftExpandedTokenList);
+//
+//      final ArrayList<INormalizedToken> rightExpandedTokenList = Lists.newArrayList(phrase.getTokens());
+//      rightExpandedTokenList.add(afterToken);
+//      final IPhrase rightExpandedPhrase = new Phrase(rightExpandedTokenList);
+//
+//      final String leftPhraseId = leftExpandedPhrase.getNormalized();
+//      newPhraseMap.put(leftPhraseId, leftExpandedPhrase);
+//
+//      final String rightPhraseId = rightExpandedPhrase.getNormalized();
+//      newPhraseMap.put(rightPhraseId, rightExpandedPhrase);
+//    }
   }
 
   private List<IPhrase> harvest(final Map<String, IPhrase> phraseMap) {

@@ -1,7 +1,5 @@
 package eu.interedition.collatex2.todo.gapdetection;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
+import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -51,13 +49,13 @@ public class GapDetection {
     for (final IMatch m : matches) {
       matchingNgramsForB.add(m.getPhrase());
     }
-    final Comparator<IPhrase> comparator = new Comparator<IPhrase>() {
-      @Override
-      public int compare(final IPhrase o1, final IPhrase o2) {
-        return o1.getBeginPosition() - o2.getBeginPosition();
-      }
-    };
-    Collections.sort(matchingNgramsForB, comparator);
+//    final Comparator<IPhrase> comparator = new Comparator<IPhrase>() {
+//      @Override
+//      public int compare(final IPhrase o1, final IPhrase o2) {
+//        return o1.getBeginPosition() - o2.getBeginPosition();
+//      }
+//    };
+//    Collections.sort(matchingNgramsForB, comparator);
     return matchingNgramsForB;
   }
 
@@ -82,8 +80,8 @@ public class GapDetection {
     IPhrase previous = null;
     final List<IPhrase> gaps = Lists.newArrayList();
     for (final IPhrase current : matchingNgrams) {
-      final int position = current.getBeginPosition();
-      gaps.add(witness.createPhrase(currentIndex, position - 1));
+//      final int position = current.getBeginPosition();
+//      gaps.add(witness.createPhrase(currentIndex, position - 1));
       previous = current;
       currentIndex = 1 + previous.getEndPosition();
     }

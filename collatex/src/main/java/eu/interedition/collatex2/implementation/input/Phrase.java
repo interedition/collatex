@@ -111,11 +111,6 @@ public class Phrase implements IPhrase {
   }
 
   @Override
-  public int getBeginPosition() {
-    return getFirstToken().getPosition();
-  }
-
-  @Override
   public int getEndPosition() {
     return getLastToken().getPosition();
   }
@@ -158,10 +153,10 @@ public class Phrase implements IPhrase {
 
   @Override
   public int compareTo(final IPhrase other) {
-    final int beginDelta = getBeginPosition() - other.getBeginPosition();
-    if (beginDelta != 0) {
-      return beginDelta;
-    }
+//    final int beginDelta = getBeginPosition() - other.getBeginPosition();
+//    if (beginDelta != 0) {
+//      return beginDelta;
+//    }
     final int endDelta = getEndPosition() - other.getEndPosition();
     if (endDelta != 0) {
       return endDelta;

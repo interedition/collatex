@@ -28,7 +28,7 @@ public interface IPhrase extends Comparable<IPhrase> {
 
   String getContent();
 
-  int getBeginPosition();
+//  int getBeginPosition();
 
   int getEndPosition();
 

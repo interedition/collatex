@@ -3,8 +3,6 @@ package eu.interedition.collatex2.legacy.alignment;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -45,18 +43,19 @@ public class Alignment implements IAlignment {
     return gaps;
   }
 
-  final Comparator<IMatch> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<IMatch>() {
-    @Override
-    public int compare(final IMatch o1, final IMatch o2) {
-      return o1.getPhrase().getBeginPosition() - o2.getPhrase().getBeginPosition();
-    }
-  };
+//  final Comparator<IMatch> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<IMatch>() {
+//    @Override
+//    public int compare(final IMatch o1, final IMatch o2) {
+//      return o1.getPhrase().getBeginPosition() - o2.getPhrase().getBeginPosition();
+//    }
+//  };
 
   @Override
   public List<IMatch> getMatchesSortedForWitness() {
-    final List<IMatch> matchesForWitness = Lists.newArrayList(matches);
-    Collections.sort(matchesForWitness, SORT_MATCHES_ON_POSITION_WITNESS);
-    return matchesForWitness;
+    throw new RuntimeException("NOT implemented!");
+//    final List<IMatch> matchesForWitness = Lists.newArrayList(matches);
+//    Collections.sort(matchesForWitness, SORT_MATCHES_ON_POSITION_WITNESS);
+//    return matchesForWitness;
   }
 
   @Override

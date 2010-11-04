@@ -38,7 +38,7 @@ public class Addition implements IAddition {
 
   @Override
   public boolean isAtTheBeginning() {
-    return addition.getBeginPosition() == 1;
+    throw new RuntimeException("NOT implemented!");
   }
 
   @Override
