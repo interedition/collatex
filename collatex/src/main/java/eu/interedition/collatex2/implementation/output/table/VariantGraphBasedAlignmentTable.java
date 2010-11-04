@@ -14,11 +14,9 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IRow;
-import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
 
@@ -62,12 +60,6 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
 
   @Override
   public IColumns createColumns(int startIndex, int endIndex) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public List<String> getRepeatedTokens() {
     // TODO Auto-generated method stub
     return null;
   }
@@ -155,12 +147,7 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
     return column;
   }
 
-  @Override
-  public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
-    throw new RuntimeException("DO NOT INDEX THIS STRUCTURE!");
-  }
-
-  @Override
+    @Override
   public void add(IInternalColumn column) {
     // TODO Auto-generated method stub
     
@@ -193,11 +180,6 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
     }
     //TODO should not be getnormalized!
     return cell.getToken().getNormalized().toString();
-  }
-
-  @Override
-  public boolean isNear(IToken a, IToken b) {
-    throw new RuntimeException("DELETE THIS METHOD!");
   }
 
 }

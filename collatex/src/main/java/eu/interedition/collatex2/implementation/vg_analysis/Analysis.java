@@ -1,17 +1,23 @@
 package eu.interedition.collatex2.implementation.vg_analysis;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenContainer;
 
 
 public class Analysis implements IAnalysis {
   private final List<ISequence> sequences;
+  private final ITokenContainer base;
 
-  public Analysis(List<ISequence> sequences) {
+  public Analysis(List<ISequence> sequences, ITokenContainer base) {
     this.sequences = sequences;
+    this.base = base;
   }
   
   @Override
@@ -19,36 +25,39 @@ public class Analysis implements IAnalysis {
     return sequences;
   }
   
-  //TODO: Method is disabled, because it used getPosition method!
-  //TODO: rewrite functionality to work with sorting on positions!
   @Override
   public List<ITransposition2> getTranspositions() {
-//    final List<ISequence> matchesA = sequences;
-//    final List<ISequence> matchesB = getSequencesSortedForWitness();
+    List<ISequence> sequencesSortedForBase = sortSequencesForBase();
     final List<ITransposition2> transpositions = Lists.newArrayList();
-//    for (int i = 0; i < matchesA.size(); i++) {
-//      final ISequence matchA = matchesA.get(i);
-//      final ISequence matchB = matchesB.get(i);
-//      if (!matchA.equals(matchB)) {
-//        // TODO: I have got no idea why have to mirror the matches here!
-//        transpositions.add(new Transposition2(matchB, matchA));
-//      }
-//    }
+    for (int i = 0; i < sequences.size(); i++) {
+      final ISequence sequenceWitness = sequences.get(i);
+      final ISequence sequenceBase = sequencesSortedForBase.get(i);
+      if (!sequenceWitness.equals(sequenceBase)) {
+        // TODO: I have got no idea why have to mirror the sequences here!
+        transpositions.add(new Transposition2(sequenceBase, sequenceWitness));
+      }
+    }
     return transpositions;
   }
 
-  final Comparator<ISequence> SORT_MATCHES_ON_POSITION_WITNESS = new Comparator<ISequence>() {
-    @Override
-    public int compare(final ISequence o1, final ISequence o2) {
-      return o1.getPhraseB().getBeginPosition() - o2.getPhraseB().getBeginPosition();
+  private List<ISequence> sortSequencesForBase() {
+    // prepare map
+    Map<INormalizedToken, ISequence> tokenToSequenceMap = Maps.newLinkedHashMap();
+    for (ISequence sequence : sequences) {
+      //NOTE:  THIS IS WEIRD! should be sequence.getBasePhrase! 
+      INormalizedToken firstToken = sequence.getWitnessPhrase().getFirstToken();
+      tokenToSequenceMap.put(firstToken, sequence);
     }
-  };
-
-  private List<ISequence> getSequencesSortedForWitness() {
-    final List<ISequence> matchesForWitness = Lists.newArrayList(sequences);
-    Collections.sort(matchesForWitness, SORT_MATCHES_ON_POSITION_WITNESS);
-    return matchesForWitness;
+    // sort sequences
+    List<ISequence> orderedSequences = Lists.newArrayList();
+    Iterator<INormalizedToken> tokenIterator = base.tokenIterator();
+    while(tokenIterator.hasNext()) {
+      INormalizedToken token = tokenIterator.next();
+      if (tokenToSequenceMap.containsKey(token)) {
+        ISequence sequence = tokenToSequenceMap.get(token);
+        orderedSequences.add(sequence);
+      }
+    }
+    return orderedSequences;
   }
-
-
 }

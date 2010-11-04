@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.implementation.containers.graph;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -194,5 +195,27 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
       throw new RuntimeException("IToken b is not of type IVariantGraphVertex!");
     }
     return containsEdge((IVariantGraphVertex) a, (IVariantGraphVertex) b);
+  }
+
+  @Override
+  public Iterator<INormalizedToken> tokenIterator() {
+    final Iterator<IVariantGraphVertex> verticesIterator = iterator();
+    return new Iterator<INormalizedToken>() {
+      @Override
+      public boolean hasNext() {
+        return verticesIterator.hasNext();
+      }
+
+      @Override
+      public INormalizedToken next() {
+        IVariantGraphVertex vertex = verticesIterator.next();
+        return vertex;
+      }
+
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    };
   }
 }

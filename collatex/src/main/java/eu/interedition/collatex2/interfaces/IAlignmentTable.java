@@ -27,7 +27,7 @@ import java.util.List;
  * A table consisting of rows as witnesses and columns containing aligned tokens
  * 
  */
-public interface IAlignmentTable extends ITokenContainer {
+public interface IAlignmentTable {
 
   List<String> getSigla();
 

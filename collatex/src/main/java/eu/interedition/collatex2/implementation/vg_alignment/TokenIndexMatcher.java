@@ -49,7 +49,7 @@ public class TokenIndexMatcher implements ITokenMatcher {
 
 
   private List<ITokenMatch> findMatches(final ITokenIndex tableIndex, final ITokenIndex tokenIndex, IWitness witness) {
-    final List<PhraseMatch> matches = Lists.newArrayList();
+    final List<Sequence> matches = Lists.newArrayList();
     final Set<String> keys = tokenIndex.keys();
     for (final String key : keys) {
       // IndexMatcher.LOG.debug("Looking for phrase: " + key);
@@ -57,14 +57,14 @@ public class TokenIndexMatcher implements ITokenMatcher {
         // IndexMatcher.LOG.debug("FOUND!");
         final IPhrase phrase = tokenIndex.getPhrase(key);
         final IPhrase tablePhrase = tableIndex.getPhrase(key);
-        matches.add(new PhraseMatch(tablePhrase, phrase));
+        matches.add(new Sequence(tablePhrase, phrase));
       }
     }
     LOG.debug("unfiltered matches: " + matches);
     return joinOverlappingMatches(matches, witness);
   }
 
-  private List<ITokenMatch> joinOverlappingMatches(final List<PhraseMatch> matches, IWitness witness) {
+  private List<ITokenMatch> joinOverlappingMatches(final List<Sequence> matches, IWitness witness) {
     final List<ITokenMatch> newMatches = filterMatchesBasedOnPositionMatches(matches, witness);
     LOG.debug("filtered matches: " + newMatches);
     return newMatches;
@@ -77,11 +77,11 @@ public class TokenIndexMatcher implements ITokenMatcher {
   // columns
   // NOTE: --> not the optimal alignment
   @SuppressWarnings("boxing")
-  private List<ITokenMatch> filterMatchesBasedOnPositionMatches(final List<PhraseMatch> matches, IWitness witness) {
+  private List<ITokenMatch> filterMatchesBasedOnPositionMatches(final List<Sequence> matches, IWitness witness) {
     Map<INormalizedToken, INormalizedToken> witnessToTable;
     witnessToTable = Maps.newLinkedHashMap();
-    List<PhraseMatch> filteredMatches = filterAwaySecondChoicesMultipleTokensOneColumn(filterAwaySecondChoicesMultipleColumnsOneToken(matches));
-    for (final PhraseMatch match : filteredMatches) {
+    List<Sequence> filteredMatches = filterAwaySecondChoicesMultipleTokensOneColumn(filterAwaySecondChoicesMultipleColumnsOneToken(matches));
+    for (final Sequence match : filteredMatches) {
       // step 1. Gather data
       List<TokenPair> pairs = Lists.newArrayList();
       final IPhrase tablePhrase = match.getTablePhrase();
@@ -116,10 +116,10 @@ public class TokenIndexMatcher implements ITokenMatcher {
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!
   // NOTE: multiple columns match with the same token!
-  private List<PhraseMatch> filterAwaySecondChoicesMultipleColumnsOneToken(List<PhraseMatch> matches) {
-    List<PhraseMatch> filteredMatches = Lists.newArrayList();
+  private List<Sequence> filterAwaySecondChoicesMultipleColumnsOneToken(List<Sequence> matches) {
+    List<Sequence> filteredMatches = Lists.newArrayList();
     final Map<INormalizedToken, INormalizedToken> tokenToTable = Maps.newLinkedHashMap();
-    for (final PhraseMatch match : matches) {
+    for (final Sequence match : matches) {
       // step 1. Gather data
       List<TokenPair> pairs = Lists.newArrayList();
       final IPhrase tablePhrase = match.getTablePhrase();
@@ -160,10 +160,10 @@ public class TokenIndexMatcher implements ITokenMatcher {
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!
   // NOTE: multiple witness tokens match with the same table column!
-  private List<PhraseMatch> filterAwaySecondChoicesMultipleTokensOneColumn(List<PhraseMatch> matches) {
-    List<PhraseMatch> filteredMatches = Lists.newArrayList();
+  private List<Sequence> filterAwaySecondChoicesMultipleTokensOneColumn(List<Sequence> matches) {
+    List<Sequence> filteredMatches = Lists.newArrayList();
     final Map<INormalizedToken, INormalizedToken> tableToToken = Maps.newLinkedHashMap();
-    for (final PhraseMatch match : matches) {
+    for (final Sequence match : matches) {
       // step 1. Gather data
       List<TokenPair> pairs = Lists.newArrayList();
       final IPhrase tablePhrase = match.getTablePhrase();

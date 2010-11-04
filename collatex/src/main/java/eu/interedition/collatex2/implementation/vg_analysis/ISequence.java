@@ -6,8 +6,8 @@ public interface ISequence {
 
   String getNormalized();
   
-  IPhrase getPhraseA();
+  IPhrase getBasePhrase();
   
-  IPhrase getPhraseB();
+  IPhrase getWitnessPhrase();
 
 }

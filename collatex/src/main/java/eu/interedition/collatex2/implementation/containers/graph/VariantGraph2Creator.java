@@ -46,7 +46,7 @@ public class VariantGraph2Creator {
     // TODO: Make separate analyzer class?
     SequenceDetection2 seqDetection = new SequenceDetection2(matches, graph, witness);
     List<ISequence> sequences = seqDetection.chainTokenMatches();
-    IAnalysis analysis = new Analysis(sequences);
+    IAnalysis analysis = new Analysis(sequences, graph);
     List<ITransposition2> transpositions = analysis.getTranspositions();
     makeEdgesForMatches(witness, matches, transpositions);
   }
@@ -66,7 +66,7 @@ public class VariantGraph2Creator {
       ISequence matchA = trans.getSequenceA();
       // TODO: check whether 
       // it is matchA
-      for (INormalizedToken witnessToken : matchA.getPhraseA().getTokens()) {
+      for (INormalizedToken witnessToken : matchA.getBasePhrase().getTokens()) {
         // NOTE: sanity check
         if (witnessTokenToMatch.containsKey(witnessToken)) {
           witnessTokenToMatch.remove(witnessToken);

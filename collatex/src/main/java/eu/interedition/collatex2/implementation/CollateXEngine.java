@@ -197,7 +197,7 @@ public class CollateXEngine {
     List<ITokenMatch> tokenMatches = alignment.getTokenMatches();
     SequenceDetection2 sequenceDetection = new SequenceDetection2(tokenMatches, graph, b);
     List<ISequence> sequences = sequenceDetection.chainTokenMatches();
-    return new Analysis(sequences);
+    return new Analysis(sequences, graph);
   }
 
   public IAlignment2 align(IVariantGraph graph, IWitness witness) {

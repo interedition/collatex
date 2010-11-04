@@ -6,32 +6,20 @@ import static com.google.common.collect.Iterables.transform;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenIndexMatcher;
 import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IMatch;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IOmission;
-import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IReplacement;
-import eu.interedition.collatex2.interfaces.ITokenMatch;
-import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.ITransposition;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.legacy.alignmenttable.Columns;
-import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 import eu.interedition.collatex2.todo.modifications.Addition;
 import eu.interedition.collatex2.todo.modifications.Omission;
 import eu.interedition.collatex2.todo.modifications.Replacement;
@@ -144,33 +132,34 @@ public class Alignment implements IAlignment {
   }
 
   public static List<IMatch> getColumnMatches(IAlignmentTable table, IWitness witness) {
-    Map<INormalizedToken, IColumn> tokenToColumn = Maps.newLinkedHashMap();
-    for (IColumn column : table.getColumns()) {
-      for (String sigil : column.getSigli()) {
-        INormalizedToken token = column.getToken(sigil);
-        tokenToColumn.put(token, column);
-      }
-    }
-    ITokenMatcher matcher = new TokenIndexMatcher(table);
-    List<ITokenMatch> tokenMatches = matcher.getMatches(witness);
-    List<IMatch> columnMatches = Lists.newArrayList();
-    for (ITokenMatch tokenMatch : tokenMatches) {
-      INormalizedToken tableToken = tokenMatch.getTableToken();
-      IColumn column = tokenToColumn.get(tableToken);
-      IPhrase witnessPhrase = new Phrase(Lists.newArrayList(tokenMatch.getWitnessToken()));
-      IColumns columns = new Columns(Lists.newArrayList(column.getInternalColumn()));
-      IMatch columnMatch = new ColumnPhraseMatch(columns, witnessPhrase);
-      columnMatches.add(columnMatch);
-    }
-    // Sort the ColumnMatches here
-    // otherwise the gapdetection goes ballistic!
-    Collections.sort(columnMatches, new Comparator<IMatch>() {
-      @Override
-      public int compare(IMatch o1, IMatch o2) {
-        return o1.getColumns().getBeginPosition() - o2.getColumns().getBeginPosition();
-      }
-    });
-    return columnMatches;
+    return null;
+//    Map<INormalizedToken, IColumn> tokenToColumn = Maps.newLinkedHashMap();
+//    for (IColumn column : table.getColumns()) {
+//      for (String sigil : column.getSigli()) {
+//        INormalizedToken token = column.getToken(sigil);
+//        tokenToColumn.put(token, column);
+//      }
+//    }
+//    ITokenMatcher matcher = new TokenIndexMatcher(table);
+//    List<ITokenMatch> tokenMatches = matcher.getMatches(witness);
+//    List<IMatch> columnMatches = Lists.newArrayList();
+//    for (ITokenMatch tokenMatch : tokenMatches) {
+//      INormalizedToken tableToken = tokenMatch.getTableToken();
+//      IColumn column = tokenToColumn.get(tableToken);
+//      IPhrase witnessPhrase = new Phrase(Lists.newArrayList(tokenMatch.getWitnessToken()));
+//      IColumns columns = new Columns(Lists.newArrayList(column.getInternalColumn()));
+//      IMatch columnMatch = new ColumnPhraseMatch(columns, witnessPhrase);
+//      columnMatches.add(columnMatch);
+//    }
+//    // Sort the ColumnMatches here
+//    // otherwise the gapdetection goes ballistic!
+//    Collections.sort(columnMatches, new Comparator<IMatch>() {
+//      @Override
+//      public int compare(IMatch o1, IMatch o2) {
+//        return o1.getColumns().getBeginPosition() - o2.getColumns().getBeginPosition();
+//      }
+//    });
+//    return columnMatches;
   }
 
   //	  public void accept(final ModificationVisitor modificationVisitor) {

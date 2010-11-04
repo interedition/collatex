@@ -101,4 +101,9 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   public boolean isNear(IToken a, IToken b) {
     return b.getPosition() - a.getPosition() == 1;
   }
+
+  @Override
+  public Iterator<INormalizedToken> tokenIterator() {
+    return iterator();
+  }
 }

@@ -36,6 +36,8 @@ public interface IPhrase extends Comparable<IPhrase> {
 
   INormalizedToken getFirstToken();
 
+  INormalizedToken getLastToken();
+
   String getSigil();
 
   List<INormalizedToken> getTokens();
@@ -47,5 +49,6 @@ public interface IPhrase extends Comparable<IPhrase> {
   void addTokenToLeft(INormalizedToken leftToken);
 
   void addTokenToRight(INormalizedToken rightToken);
+
 
 }
