@@ -28,10 +28,6 @@ public interface IPhrase extends Comparable<IPhrase> {
 
   String getContent();
 
-//  int getBeginPosition();
-
-  int getEndPosition();
-
   boolean isEmpty();
 
   INormalizedToken getFirstToken();

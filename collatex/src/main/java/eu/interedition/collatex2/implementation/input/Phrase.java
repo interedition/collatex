@@ -111,11 +111,6 @@ public class Phrase implements IPhrase {
   }
 
   @Override
-  public int getEndPosition() {
-    return getLastToken().getPosition();
-  }
-
-  @Override
   public String toString() {
     if (isEmpty()) {
       return "<empty>";
@@ -157,10 +152,10 @@ public class Phrase implements IPhrase {
 //    if (beginDelta != 0) {
 //      return beginDelta;
 //    }
-    final int endDelta = getEndPosition() - other.getEndPosition();
-    if (endDelta != 0) {
-      return endDelta;
-    }
+//    final int endDelta = getEndPosition() - other.getEndPosition();
+//    if (endDelta != 0) {
+//      return endDelta;
+//    }
     final int sizeDelta = getTokens().size() - other.getTokens().size();
     return sizeDelta;
   }

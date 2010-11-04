@@ -83,7 +83,7 @@ public class GapDetection {
 //      final int position = current.getBeginPosition();
 //      gaps.add(witness.createPhrase(currentIndex, position - 1));
       previous = current;
-      currentIndex = 1 + previous.getEndPosition();
+//      currentIndex = 1 + previous.getEndPosition();
     }
     gaps.add(witness.createPhrase(currentIndex, witness.size()));
     return gaps;
