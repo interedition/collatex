@@ -2,12 +2,13 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.Set;
 
-
 public interface IVariantGraphVertex extends INormalizedToken {
 
   String getNormalized();
 
   INormalizedToken getToken(IWitness witness);
+
+  INormalizedToken getVertexKey();
 
   void addToken(IWitness witness, INormalizedToken token);
 

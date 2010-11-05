@@ -17,10 +17,11 @@ import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 public class JVariantGraphCreator {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreator.class);
   private static IJVariantGraph joinedGraph;
+  private static Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap;
 
   public static IJVariantGraph parallelSegmentate(final IVariantGraph unjoinedGraph) {
     joinedGraph = JVariantGraph.create();
-    Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap = Maps.newHashMap();
+    vertexMap = Maps.newHashMap();
 
     IVariantGraphVertex startVgVertex = unjoinedGraph.getStartVertex();
     JVariantGraphVertex startJvgVertex = new JVariantGraphVertex(startVgVertex);
@@ -34,15 +35,14 @@ public class JVariantGraphCreator {
 
     Set<IVariantGraphEdge> outgoingEdges = unjoinedGraph.outgoingEdgesOf(startVgVertex);
     for (IVariantGraphEdge vgEdge : outgoingEdges) {
-      IVariantGraphVertex targetVgVertex = unjoinedGraph.getEdgeTarget(vgEdge);
-      process(unjoinedGraph, vertexMap, targetVgVertex, startJvgVertex, vgEdge);
+      processEdge(vgEdge, unjoinedGraph, startJvgVertex);
     }
 
     return joinedGraph;
   }
 
-  private static void process(final IVariantGraph unjoinedGraph, final Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap, IVariantGraphVertex vgVertex, IJVariantGraphVertex lastJvgVertex,
-      IVariantGraphEdge vgEdge) {
+  private static void processEdge(IVariantGraphEdge vgEdge, final IVariantGraph unjoinedGraph, IJVariantGraphVertex lastJvgVertex) {
+    IVariantGraphVertex vgVertex = unjoinedGraph.getEdgeTarget(vgEdge);
     IJVariantGraphVertex jvgVertex;
     if (vertexMap.containsKey(vgVertex)) {
       jvgVertex = vertexMap.get(vgVertex);
@@ -67,12 +67,11 @@ public class JVariantGraphCreator {
         vertexMap.put(targetVgVertex, jvgVertex);
         checkNextVertex(unjoinedGraph, vertexMap, targetVgVertex, jvgVertex);
       } else {
-        process(unjoinedGraph, vertexMap, targetVgVertex, jvgVertex, outgoingEdges.iterator().next());
+        processEdge(outgoingEdges.iterator().next(), unjoinedGraph, jvgVertex);
       }
     } else {
       for (IVariantGraphEdge vgEdge : outgoingEdges) {
-        IVariantGraphVertex targetVgVertex = unjoinedGraph.getEdgeTarget(vgEdge);
-        process(unjoinedGraph, vertexMap, targetVgVertex, jvgVertex, vgEdge);
+        processEdge(vgEdge, unjoinedGraph, jvgVertex);
       }
     }
   }
@@ -84,66 +83,5 @@ public class JVariantGraphCreator {
   private static boolean vertexHasOutgoingEdges(final IVariantGraph unjoinedGraph, IVariantGraphVertex startVertex) {
     return unjoinedGraph.outDegreeOf(startVertex) > 0;
   }
-
-  //---------------------------//
-  //  public static IJVariantGraph parallelSegmentate0(final IVariantGraph unjoinedGraph) {
-  //    joinedGraph = JVariantGraph.create();
-  //    final Set<IVariantGraphVertex> processedVertices = Sets.newHashSet();
-  //    final IVariantGraphVertex startVertex = unjoinedGraph.getStartVertex();
-  //    final IJVariantGraphVertex lastJoinedVertex = joinedGraph.getStartVertex();
-  //    growJoinedGraph(unjoinedGraph, processedVertices, startVertex, lastJoinedVertex);
-  //    return joinedGraph;
-  //  }
-
-  //  private static void growJoinedGraph(final IVariantGraph unjoinedGraph, final Set<IVariantGraphVertex> processedVertices, IVariantGraphVertex startVertex, final IJVariantGraphVertex lastJoinedVertex) {
-  //    while (vertexHasOutgoingEdges(unjoinedGraph, startVertex)) {
-  //      LOG.info("startVertex={}", startVertex);
-  //      for (final IVariantGraphEdge edge : unjoinedGraph.outgoingEdgesOf(startVertex)) {
-  //        LOG.info("edge={}", edge);
-  //        IVariantGraphVertex currentVertex = edge.getEndVertex();
-  //        if (!processedVertices.contains(currentVertex)) {
-  //          final IJVariantGraphVertex currentJoinedVertex = new JVariantGraphVertex(currentVertex);
-  //          //        joinedGraph.addVertex(currentJoinedVertex);
-  //          currentVertex = recurse(unjoinedGraph, processedVertices, lastJoinedVertex, currentVertex, currentJoinedVertex);
-  //        }
-  //        startVertex = currentVertex;
-  //      }
-  //    }
-  //  }
-
-  //  private static IVariantGraphVertex recurse(final IVariantGraph unjoinedGraph, final Set<IVariantGraphVertex> processedVertices, final IJVariantGraphVertex lastJoinedVertex,
-  //      IVariantGraphVertex currentVertex, final IJVariantGraphVertex currentJoinedVertex) {
-  //    if (unjoinedGraph.outDegreeOf(currentVertex) == 1) {
-  //      final IVariantGraphEdge outEdge = unjoinedGraph.outgoingEdgesOf(currentVertex).iterator().next();
-  //      final IVariantGraphVertex nextVertex = outEdge.getEndVertex();
-  //      if (vertexHasOneIncomingEdge(unjoinedGraph, nextVertex) && vertexHasOutgoingEdges(unjoinedGraph, nextVertex)) {
-  //        // join currentVertex with nextVertex
-  //        currentJoinedVertex.addVariantGraphVertex(nextVertex);
-  //        LOG.info("currentJoinedVertex=" + currentJoinedVertex);
-  //        processedVertices.add(currentVertex);
-  //        if (!processedVertices.contains(nextVertex)) {
-  //          recurse(unjoinedGraph, processedVertices, lastJoinedVertex, nextVertex, currentJoinedVertex);
-  //        }
-  //      } else {
-  //        currentVertex = nextVertex;
-  //        if (!processedVertices.contains(currentVertex)) {
-  //          addAndRecurse(unjoinedGraph, processedVertices, lastJoinedVertex, currentVertex, currentJoinedVertex);
-  //        }
-  //      }
-  //    } else {
-  //      if (!processedVertices.contains(currentVertex)) {
-  //        addAndRecurse(unjoinedGraph, processedVertices, lastJoinedVertex, currentVertex, currentJoinedVertex);
-  //      }
-  //    }
-  //    return currentVertex;
-  //  }
-
-  //  private static void addAndRecurse(final IVariantGraph unjoinedGraph, final Set<IVariantGraphVertex> processedVertices, final IJVariantGraphVertex lastJoinedVertex,
-  //      final IVariantGraphVertex currentVertex, final IJVariantGraphVertex currentJoinedVertex) {
-  //    joinedGraph.addVertex(currentJoinedVertex);
-  //    joinedGraph.addEdge(lastJoinedVertex, currentJoinedVertex, new JVariantGraphEdge(lastJoinedVertex, currentJoinedVertex, vgEdge));
-  //    LOG.info("joinedGraph=" + joinedGraph);
-  //    growJoinedGraph(unjoinedGraph, processedVertices, currentVertex, lastJoinedVertex);
-  //  }
 
 }

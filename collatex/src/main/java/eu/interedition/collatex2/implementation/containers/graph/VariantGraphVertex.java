@@ -12,9 +12,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class VariantGraphVertex implements IVariantGraphVertex {
   private final String normalized;
   private final Map<IWitness, INormalizedToken> tokenMap;
+  private final INormalizedToken vertexKey;
 
-  public VariantGraphVertex(String normalized) {
+  public VariantGraphVertex(String normalized, INormalizedToken vertexKey) {
     this.normalized = normalized;
+    this.vertexKey = vertexKey;
     this.tokenMap = Maps.newLinkedHashMap();
   }
 
@@ -85,5 +87,9 @@ public class VariantGraphVertex implements IVariantGraphVertex {
   @Override
   public String getContent() {
     throw new RuntimeException("Do not call this method! Call getToken(IWitness).getContent() instead.");
+  }
+
+  public INormalizedToken getVertexKey() {
+    return vertexKey;
   }
 }

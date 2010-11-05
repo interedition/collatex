@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.jgrapht.alg.BellmanFordShortestPath;
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
+import org.jgrapht.graph.SimpleDirectedGraph;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
@@ -29,11 +29,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 // been added to the Graph.
 // TODO: Remove dependency on NullToken class!
 @SuppressWarnings("serial")
-public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
+public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
   private final IVariantGraphVertex startVertex;
   private final IVariantGraphVertex endVertex;
 
-  private VariantGraph2() {
+  private CyclicVariantGraph() {
     super(IVariantGraphEdge.class);
     startVertex = new VariantGraphVertex("#", null);
     addVertex(startVertex);
@@ -87,13 +87,13 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return getWitnesses().isEmpty();
   }
 
-  public static VariantGraph2 create() {
-    return new VariantGraph2();
+  public static CyclicVariantGraph create() {
+    return new CyclicVariantGraph();
   }
 
   //TODO: should the first witness really be a special case like this?
-  public static VariantGraph2 create(IWitness a) {
-    VariantGraph2 graph = VariantGraph2.create();
+  public static CyclicVariantGraph create(IWitness a) {
+    CyclicVariantGraph graph = CyclicVariantGraph.create();
     List<IVariantGraphVertex> newVertices = Lists.newArrayList();
     for (INormalizedToken token : a.getTokens()) {
       final IVariantGraphVertex vertex = graph.addNewVertex(token.getNormalized(), token);
@@ -217,5 +217,10 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
         throw new UnsupportedOperationException();
       }
     };
+  }
+
+  @Override
+  public Iterator<IVariantGraphVertex> iterator() {
+    return null;
   }
 }

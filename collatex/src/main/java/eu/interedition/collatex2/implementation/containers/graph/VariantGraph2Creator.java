@@ -51,40 +51,64 @@ public class VariantGraph2Creator {
     makeEdgesForMatches(witness, matches, transpositions);
   }
 
-  //write
+  ///write
+  //  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, List<ITransposition2> transpositions) {
+  //    // Map Tokens in the Witness to the Matches
+  //    Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
+  //    witnessTokenToMatch = Maps.newLinkedHashMap();
+  //    for (ITokenMatch match : matches) {
+  //      INormalizedToken tokenA = match.getTokenA();
+  //      witnessTokenToMatch.put(tokenA, match);
+  //    }
+  //    // delete transpositions from map
+  //    // TODO: Rename IMatch2 to IMatchSequence?
+  //    for (ITransposition2 trans : transpositions) {
+  //      ISequence sequenceA = trans.getSequenceA();
+  //      // TODO: check whether it is matchA
+  //      for (INormalizedToken witnessToken : sequenceA.getBasePhrase().getTokens()) {
+  //        // NOTE: sanity check
+  //        if (witnessTokenToMatch.containsKey(witnessToken)) {
+  //          witnessTokenToMatch.remove(witnessToken);
+  //        } else {
+  //          throw new RuntimeException("Could not remove match from map!");
+  //        }
+  //      }
+  //    }
+  //    addWitnessToGraph(witness, witnessTokenToMatch);
+  //  }
+
   private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, List<ITransposition2> transpositions) {
     // Map Tokens in the Witness to the Matches
     Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
+    Map<INormalizedToken, ITokenMatch> witnessTokenToTranspositionMatch;
     witnessTokenToMatch = Maps.newLinkedHashMap();
+    witnessTokenToTranspositionMatch = Maps.newLinkedHashMap();
     for (ITokenMatch match : matches) {
       INormalizedToken tokenA = match.getTokenA();
       witnessTokenToMatch.put(tokenA, match);
     }
-    // delete transpositions from map
-    // TODO: Rename IMatch2 to IMatchSequence?
     for (ITransposition2 trans : transpositions) {
-      ISequence matchA = trans.getSequenceA();
-      // TODO: check whether 
-      // it is matchA
-      for (INormalizedToken witnessToken : matchA.getBasePhrase().getTokens()) {
-        // NOTE: sanity check
+      ISequence sequenceA = trans.getSequenceA();
+      for (INormalizedToken witnessToken : sequenceA.getBasePhrase().getTokens()) {
         if (witnessTokenToMatch.containsKey(witnessToken)) {
-          witnessTokenToMatch.remove(witnessToken);
+          ITokenMatch tokenMatch = witnessTokenToMatch.remove(witnessToken);
+          witnessTokenToTranspositionMatch.put(witnessToken, tokenMatch);
         } else {
           throw new RuntimeException("Could not remove match from map!");
         }
       }
     }
-    addWitnessToGraph(witness, witnessTokenToMatch);
+    addWitnessToGraph(witness, witnessTokenToMatch, witnessTokenToTranspositionMatch);
   }
 
-  private void addWitnessToGraph(IWitness witness, Map<INormalizedToken, ITokenMatch> witnessTokenToMatch) {
+  private void addWitnessToGraph(IWitness witness, Map<INormalizedToken, ITokenMatch> witnessTokenToMatch, Map<INormalizedToken, ITokenMatch> witnessTokenToTranspositionMatch) {
     IVariantGraphVertex current = graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
       IVariantGraphVertex end;
       if (!witnessTokenToMatch.containsKey(token)) {
         // NOTE: here we determine that the token is an addition/replacement!
-        end = graph.addNewVertex(token.getNormalized());
+        INormalizedToken vertexKey = (witnessTokenToTranspositionMatch.containsKey(token)) ? witnessTokenToTranspositionMatch.get(token).getTokenA() : token;
+        end = graph.addNewVertex(token.getNormalized(), vertexKey);
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);

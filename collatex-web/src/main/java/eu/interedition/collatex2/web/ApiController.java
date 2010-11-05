@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +70,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.cgraph.CVariantGraphCreator;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
@@ -121,7 +122,8 @@ public class ApiController implements InitializingBean {
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
   public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
-    String svg = convert2svg(jcollate2dot(input));
+    String svg = convert2svg(ccollate2dot(input));
+    //    String svg = convert2svg(jcollate2dot(input));
     ModelAndView modelAndView = new ModelAndView(svgView, "svg", svg);
     return modelAndView;
   }
@@ -209,14 +211,14 @@ public class ApiController implements InitializingBean {
     return writer.toString();
   }
 
-  static final VertexNameProvider<IJVariantGraphVertex> VERTEX_ID_PROVIDER = new IntegerNameProvider<IJVariantGraphVertex>();
-  static final VertexNameProvider<IJVariantGraphVertex> VERTEX_LABEL_PROVIDER = new VertexNameProvider<IJVariantGraphVertex>() {
+  static final VertexNameProvider<IJVariantGraphVertex> JVERTEX_ID_PROVIDER = new IntegerNameProvider<IJVariantGraphVertex>();
+  static final VertexNameProvider<IJVariantGraphVertex> JVERTEX_LABEL_PROVIDER = new VertexNameProvider<IJVariantGraphVertex>() {
     @Override
     public String getVertexName(IJVariantGraphVertex v) {
       return v.getNormalized();
     }
   };
-  static final EdgeNameProvider<IJVariantGraphEdge> EDGE_LABEL_PROVIDER = new EdgeNameProvider<IJVariantGraphEdge>() {
+  static final EdgeNameProvider<IJVariantGraphEdge> JEDGE_LABEL_PROVIDER = new EdgeNameProvider<IJVariantGraphEdge>() {
     @Override
     public String getEdgeName(IJVariantGraphEdge e) {
       List<String> sigils = Lists.newArrayList();
@@ -227,7 +229,28 @@ public class ApiController implements InitializingBean {
       return Joiner.on(",").join(sigils);
     }
   };
-  static final DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge> DOT_EXPORTER = new DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge>(//
+  static final DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge> JDOT_EXPORTER = new DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge>(//
+      JVERTEX_ID_PROVIDER, JVERTEX_LABEL_PROVIDER, JEDGE_LABEL_PROVIDER //
+  );
+  static final VertexNameProvider<IVariantGraphVertex> VERTEX_ID_PROVIDER = new IntegerNameProvider<IVariantGraphVertex>();
+  static final VertexNameProvider<IVariantGraphVertex> VERTEX_LABEL_PROVIDER = new VertexNameProvider<IVariantGraphVertex>() {
+    @Override
+    public String getVertexName(IVariantGraphVertex v) {
+      return v.getNormalized();
+    }
+  };
+  static final EdgeNameProvider<IVariantGraphEdge> EDGE_LABEL_PROVIDER = new EdgeNameProvider<IVariantGraphEdge>() {
+    @Override
+    public String getEdgeName(IVariantGraphEdge e) {
+      List<String> sigils = Lists.newArrayList();
+      for (IWitness witness : e.getWitnesses()) {
+        sigils.add(witness.getSigil());
+      }
+      Collections.sort(sigils);
+      return Joiner.on(",").join(sigils);
+    }
+  };
+  static final DOTExporter<IVariantGraphVertex, IVariantGraphEdge> CDOT_EXPORTER = new DOTExporter<IVariantGraphVertex, IVariantGraphEdge>(//
       VERTEX_ID_PROVIDER, VERTEX_LABEL_PROVIDER, EDGE_LABEL_PROVIDER //
   );
 
@@ -238,7 +261,18 @@ public class ApiController implements InitializingBean {
 
     IJVariantGraph jgraph = JVariantGraphCreator.parallelSegmentate(graph);
     Writer writer = new StringWriter();
-    DOT_EXPORTER.export(writer, jgraph);
+    JDOT_EXPORTER.export(writer, jgraph);
+    return writer.toString();
+  }
+
+  private String ccollate2dot(ApiInput input) throws ApiException {
+    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
+    ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
+    IVariantGraph graph = new CollateXEngine().graph(array);
+
+    IVariantGraph cgraph = CVariantGraphCreator.getCyclicVariantGraph(graph);
+    Writer writer = new StringWriter();
+    CDOT_EXPORTER.export(writer, cgraph);
     return writer.toString();
   }
 
