@@ -61,13 +61,26 @@
   }
 
   var examples = { "example" : [
-	  {
-		  "name":"The black cat",
+   	{
+ 		  "name":"PR1",
+ 		  "text1":"The black cat",
+ 		  "text2":"The black and white cat",
+ 		  "text3":"The black and green cat"
+ 		},{
+		  "name":"PR2",
 		  "text1":"The black cat",
 		  "text2":"The black and white cat",
 		  "text3":"The black and green cat",
 		  "text4":"The black very special cat",
 		  "text5":"The black not very special cat"
+		},{
+		  "name":"PR3",
+		  "text1":"He was agast, so",
+		  "text2":"He was agast",
+		  "text3":"So he was agast",
+		  "text4":"He was so agast",
+		  "text5":"He was agast and feerd",
+		  "text6":"So was he agast"
 		},{
 			"name":"The black dog chases a red cat",
 			"text1":"The black dog chases a red cat.",
@@ -105,14 +118,6 @@
 		  "text1":"a cat or dog",
 		  "text2":"a cat and dog and",
 		  "text3":"a cat and dog and"
-		},{
-		  "name":"agast",
-		  "text1":"He was agast, so",
-		  "text2":"He was agast",
-		  "text3":"So he was agast",
-		  "text4":"He was so agast",
-		  "text5":"He was agast and feerd",
-		  "text6":"So was he agast"
 		},{
 		  "name":"big head",
 		  "text1":"the big bug had a big head",

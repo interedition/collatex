@@ -20,106 +20,121 @@
 
 package eu.interedition.collatex2.implementation.indexing;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 
 public class AlignmentTableIndexTest {
-  protected static final Logger LOG = LoggerFactory.getLogger(AlignmentTableIndexTest.class);
-  private CollateXEngine factory;
+	protected static final Logger LOG = LoggerFactory
+			.getLogger(AlignmentTableIndexTest.class);
+	private CollateXEngine factory;
 
-  @Before
-  public void setup() {
-    factory = new CollateXEngine();
-  }
+	@Before
+	public void setup() {
+		factory = new CollateXEngine();
+	}
 
-//  private IAligner createAligner() {
-//    IAligner aligner = factory.createAligner();
-//    aligner.setCallback(new ICallback() {
-//      @Override
-//      public void alignment(final IAlignment alignment) {
-//        LOG.debug(alignment.getMatches().toString());
-//      }
-//    });
-//    return aligner;
-//  }
+	@Test
+	public void dummy() {
+		assertTrue(true);
+	}
 
-//  @Test
-//  public void test() {
-//    final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
-//    final IAlignmentTable table = createAligner().add(witnessA).getResult();
-//    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
-//    // test bigrams
-//    assertTrue(index.contains("# the"));
-//    assertFalse(index.contains("big black")); 
-//    assertTrue(index.contains("black cat"));
-//    assertTrue(index.contains("cat and"));
-//    assertTrue(index.contains("and the"));
-//    assertTrue(index.contains("black rat"));
-//    assertTrue(index.contains("rat #"));
-//    // test trigrams
-//    assertTrue(index.contains("# the big"));
-//    assertFalse(index.contains("the big black"));
-//    assertTrue(index.contains("big black cat"));
-//    assertTrue(index.contains("black cat and"));
-//    assertTrue(index.contains("cat and the"));
-//    assertTrue(index.contains("and the big"));
-//    assertTrue(index.contains("big black rat"));
-//    assertTrue(index.contains("black rat #"));
-//  }
+	// private IAligner createAligner() {
+	// IAligner aligner = factory.createAligner();
+	// aligner.setCallback(new ICallback() {
+	// @Override
+	// public void alignment(final IAlignment alignment) {
+	// LOG.debug(alignment.getMatches().toString());
+	// }
+	// });
+	// return aligner;
+	// }
 
-//  @Test
-//  public void testCreateAlignmentTableIndex() {
-//    final IWitness a = factory.createWitness("A", "the first witness");
-//    final IAlignmentTable table = factory.align(a);
-//    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
-//    // test unigrams
-//    assertTrue(index.contains("the"));
-//    assertTrue(index.contains("first"));
-//    assertTrue(index.contains("witness"));
-//  }
+	// @Test
+	// public void test() {
+	// final IWitness witnessA = factory.createWitness("A",
+	// "the big black cat and the big black rat");
+	// final IAlignmentTable table = createAligner().add(witnessA).getResult();
+	// final ITokenIndex index = AlignmentTableIndex.create(table,
+	// table.getRepeatedTokens());
+	// // test bigrams
+	// assertTrue(index.contains("# the"));
+	// assertFalse(index.contains("big black"));
+	// assertTrue(index.contains("black cat"));
+	// assertTrue(index.contains("cat and"));
+	// assertTrue(index.contains("and the"));
+	// assertTrue(index.contains("black rat"));
+	// assertTrue(index.contains("rat #"));
+	// // test trigrams
+	// assertTrue(index.contains("# the big"));
+	// assertFalse(index.contains("the big black"));
+	// assertTrue(index.contains("big black cat"));
+	// assertTrue(index.contains("black cat and"));
+	// assertTrue(index.contains("cat and the"));
+	// assertTrue(index.contains("and the big"));
+	// assertTrue(index.contains("big black rat"));
+	// assertTrue(index.contains("black rat #"));
+	// }
 
-//  @Test
-//  public void testCreateAlignmentTableIndexWithVariation() {
-//    final IWitness a = factory.createWitness("A", "the first witness");
-//    final IWitness b = factory.createWitness("B", "the second witness");
-//    final IAlignmentTable table = factory.align(a, b);
-//    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
-//    // test unigrams
-//    assertTrue(index.contains("the"));
-//    assertTrue(index.contains("first"));
-//    assertTrue(index.contains("second"));
-//    assertTrue(index.contains("witness"));
-//  }
+	// @Test
+	// public void testCreateAlignmentTableIndex() {
+	// final IWitness a = factory.createWitness("A", "the first witness");
+	// final IAlignmentTable table = factory.align(a);
+	// final ITokenIndex index = AlignmentTableIndex.create(table,
+	// table.getRepeatedTokens());
+	// // test unigrams
+	// assertTrue(index.contains("the"));
+	// assertTrue(index.contains("first"));
+	// assertTrue(index.contains("witness"));
+	// }
 
-//  @Test
-//  public void testAlignmentTableIndex() {
-//    final IWitness a = factory.createWitness("A", "first");
-//    final IWitness b = factory.createWitness("B", "second");
-//    final IWitness c = factory.createWitness("C", "third");
-//    final IAlignmentTable table = factory.align(a, b, c);
-//    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
-//    assertTrue(index.contains("# first"));
-//    assertTrue(index.contains("first #"));
-//    assertTrue(index.contains("# second"));
-//    assertTrue(index.contains("second #"));
-//    assertTrue(index.contains("# third"));
-//    assertTrue(index.contains("third #"));
-//  }
+	// @Test
+	// public void testCreateAlignmentTableIndexWithVariation() {
+	// final IWitness a = factory.createWitness("A", "the first witness");
+	// final IWitness b = factory.createWitness("B", "the second witness");
+	// final IAlignmentTable table = factory.align(a, b);
+	// final ITokenIndex index = AlignmentTableIndex.create(table,
+	// table.getRepeatedTokens());
+	// // test unigrams
+	// assertTrue(index.contains("the"));
+	// assertTrue(index.contains("first"));
+	// assertTrue(index.contains("second"));
+	// assertTrue(index.contains("witness"));
+	// }
 
-//  @Test
-//  public void testAlignmentTableIndex2() {
-//    final IWitness a = factory.createWitness("A", "first");
-//    final IWitness b = factory.createWitness("B", "match");
-//    final IWitness c = factory.createWitness("C", "match");
-//    final IAlignmentTable table = factory.align(a, b, c);
-//    final ITokenIndex index = AlignmentTableIndex.create(table, table.getRepeatedTokens());
-//    assertTrue(index.contains("# first"));
-//    assertTrue(index.contains("first #"));
-//    assertTrue(index.contains("# match"));
-//    assertTrue(index.contains("match #"));
-//  }
+	// @Test
+	// public void testAlignmentTableIndex() {
+	// final IWitness a = factory.createWitness("A", "first");
+	// final IWitness b = factory.createWitness("B", "second");
+	// final IWitness c = factory.createWitness("C", "third");
+	// final IAlignmentTable table = factory.align(a, b, c);
+	// final ITokenIndex index = AlignmentTableIndex.create(table,
+	// table.getRepeatedTokens());
+	// assertTrue(index.contains("# first"));
+	// assertTrue(index.contains("first #"));
+	// assertTrue(index.contains("# second"));
+	// assertTrue(index.contains("second #"));
+	// assertTrue(index.contains("# third"));
+	// assertTrue(index.contains("third #"));
+	// }
+
+	// @Test
+	// public void testAlignmentTableIndex2() {
+	// final IWitness a = factory.createWitness("A", "first");
+	// final IWitness b = factory.createWitness("B", "match");
+	// final IWitness c = factory.createWitness("C", "match");
+	// final IAlignmentTable table = factory.align(a, b, c);
+	// final ITokenIndex index = AlignmentTableIndex.create(table,
+	// table.getRepeatedTokens());
+	// assertTrue(index.contains("# first"));
+	// assertTrue(index.contains("first #"));
+	// assertTrue(index.contains("# match"));
+	// assertTrue(index.contains("match #"));
+	// }
 
 }
