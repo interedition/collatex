@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.todo.gapdetection;
+package eu.interedition.collatex2.legacy.gapdetection;
 
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IColumns;

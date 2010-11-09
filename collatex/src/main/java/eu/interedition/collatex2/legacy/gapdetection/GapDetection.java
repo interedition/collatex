@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.todo.gapdetection;
+package eu.interedition.collatex2.legacy.gapdetection;
 
 import java.util.List;
 
