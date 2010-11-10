@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IRow;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 //TODO: make class abstract
 //TODO: make class implement the IAlignmentTable interface
@@ -75,6 +76,10 @@ public class BaseAlignmentTable {
     }
     //TODO should not be getnormalized!
     return cell.getToken().getNormalized().toString();
+  }
+
+  public IRow getRow(IWitness witness) {
+    return this.getRow(witness.getSigil());
   }
 
 }

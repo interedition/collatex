@@ -12,7 +12,6 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.IReplacement;
-import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -67,16 +66,6 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
   public IColumns createColumns(int startIndex, int endIndex) {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  // for now I am going to do things lazy..
-  // we will see where the actual init goes..
-  @Override
-  public IRow getRow(IWitness witness) {
-    if (!this.getSigla().contains(witness.getSigil())) {
-      lazyConstructColumns(witness);
-    }
-    return super.getRow(witness.getSigil());
   }
 
   // NOTE: Ignore possible cycles in VariantGraph for now!
