@@ -37,6 +37,12 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
         IColumn newColumn = addNewColumn(vertex);
         vertexToColumn.put(vertex, newColumn);
       }
+      //NOTE INIT (temp)
+      List<IWitness> witnesses = graph.getWitnesses();
+      for (IWitness witness : witnesses) {
+        lazyConstructColumns(witness);
+      }
+      //NOTE END INIT (Temp)
     }
   }
 
@@ -155,12 +161,6 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
 
   @Override
   public String toString() {
-    //NOTE INIT (temp)
-    List<IWitness> witnesses = graph.getWitnesses();
-    for (IWitness witness : witnesses) {
-      lazyConstructColumns(witness);
-    }
-    //NOTE END INIT (Temp)
     final StringBuilder stringBuilder = new StringBuilder();
     for (final IRow row : getRows()) {
       stringBuilder.append(row.getSigil()).append(": ");
