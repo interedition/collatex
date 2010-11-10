@@ -66,11 +66,13 @@ public class GapDetection {
     final List<IColumns> gaps = Lists.newArrayList();
     for (final IColumns current : matchingNgrams) {
       final int position = current.getBeginPosition();
-      gaps.add(table.createColumns(currentIndex, position - 1));
+      //NOTE: legacy!
+      //gaps.add(table.createColumns(currentIndex, position - 1));
       previous = current;
       currentIndex = 1 + previous.getEndPosition();
     }
-    gaps.add(table.createColumns(currentIndex, table.size()));
+    //NOTE: legacy!
+    //gaps.add(table.createColumns(currentIndex, table.size()));
     return gaps;
   }
 

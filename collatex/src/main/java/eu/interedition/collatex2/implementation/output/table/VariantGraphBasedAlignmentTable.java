@@ -5,13 +5,8 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IColumns;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
-import eu.interedition.collatex2.interfaces.IReplacement;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -42,30 +37,6 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
       }
       //NOTE END INIT (Temp)
     }
-  }
-
-  @Override
-  public void accept(IAlignmentTableVisitor visitor) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void addAddition(IAddition addition) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void addReplacement(IReplacement replacement) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public IColumns createColumns(int startIndex, int endIndex) {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   // NOTE: Ignore possible cycles in VariantGraph for now!
@@ -139,12 +110,6 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
     final IColumn column = new VariantGraphBasedColumn(vertex, columns.size() + 1);
     columns.add(column);
     return column;
-  }
-
-    @Override
-  public void add(IInternalColumn column) {
-    // TODO Auto-generated method stub
-    
   }
 
 }
