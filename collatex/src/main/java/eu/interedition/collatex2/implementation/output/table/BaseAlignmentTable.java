@@ -54,4 +54,27 @@ public class BaseAlignmentTable {
     return sigla;
   }
 
+  @Override
+  public String toString() {
+    final StringBuilder stringBuilder = new StringBuilder();
+    for (final IRow row : getRows()) {
+      stringBuilder.append(row.getSigil()).append(": ");
+      String delim = "";
+      for (final ICell cell : row) {
+        stringBuilder.append(delim).append(cellToString(cell));
+        delim = "|";
+      }
+      stringBuilder.append("\n");
+    }
+    return stringBuilder.toString();
+  }
+
+  String cellToString(final ICell cell) {
+    if (cell.isEmpty()) {
+      return " ";
+    }
+    //TODO should not be getnormalized!
+    return cell.getToken().getNormalized().toString();
+  }
+
 }
