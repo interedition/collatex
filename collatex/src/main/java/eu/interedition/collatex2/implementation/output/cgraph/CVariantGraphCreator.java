@@ -48,9 +48,11 @@ public class CVariantGraphCreator {
     IVariantGraphVertex avgTargetVertex = acyclicGraph.getEdgeTarget(avgEdge);
     //    boolean avgTargetVertexIsNew = !a2cVertexMap.containsKey(avgTargetVertex);
     INormalizedToken vertexKey = avgTargetVertex.getVertexKey();
-    LOG.info("vertexKey={}", vertexKey);
+    //    LOG.info("vertexKey={}", vertexKey);
     IVariantGraphVertex cvgTargetVertex;
-    if (vertexKey != null) {
+    if (vertexKey == null) {
+      cvgTargetVertex = a2cVertexMap.get(avgTargetVertex);
+    } else {
       if (keyToken2Vertex.containsKey(vertexKey)) {
         cvgTargetVertex = keyToken2Vertex.get(vertexKey);
       } else {
@@ -59,11 +61,9 @@ public class CVariantGraphCreator {
         cyclicGraph.addVertex(cvgTargetVertex);
         a2cVertexMap.put(avgTargetVertex, cvgTargetVertex);
       }
-    } else {
-      cvgTargetVertex = a2cVertexMap.get(avgTargetVertex);
     }
     VariantGraphEdge cvgEdge = convertEdge(avgEdge);
-    LOG.info("cvgLastVertex={}, cvgTargetVertex={}", cvgLastVertex, cvgTargetVertex);
+    //    LOG.info("cvgLastVertex={}, cvgTargetVertex={}", cvgLastVertex, cvgTargetVertex);
     cyclicGraph.addEdge(cvgLastVertex, cvgTargetVertex, cvgEdge);
     //    if (avgTargetVertexIsNew) {
     processVertex(avgTargetVertex, acyclicGraph, cvgTargetVertex);
