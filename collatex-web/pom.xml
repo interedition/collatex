@@ -62,7 +62,7 @@
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.4.2</version>
+			<version>1.6.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
@@ -87,7 +87,7 @@
 		</dependency>
 	</dependencies>
 	<properties>
-		<spring.version>3.0.2.RELEASE</spring.version>
+		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
 	<build>
 		<plugins>

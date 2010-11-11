@@ -24,13 +24,7 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-// This class implements the IVariantGraph interface.
-// The IVariantGraph interface is an extension of the DiGraph interface
-// The implementation is based on a DAG.
-// The VariantGraph contains a start and an end vertex.
-// The VariantGraph contains a List of witnesses that have
-// been added to the Graph.
-// TODO: Remove dependency on NullToken class!
+// TODO: Clean this class up, it's now mostly a copy of eu.interedition.collatex2.implementation.containers.graph.VariantGraph2
 @SuppressWarnings("serial")
 public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
   private final IVariantGraphVertex startVertex;
@@ -94,7 +88,6 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
     return new CyclicVariantGraph();
   }
 
-  //TODO: should the first witness really be a special case like this?
   public static CyclicVariantGraph create(IWitness a) {
     CyclicVariantGraph graph = CyclicVariantGraph.create();
     List<IVariantGraphVertex> newVertices = Lists.newArrayList();
