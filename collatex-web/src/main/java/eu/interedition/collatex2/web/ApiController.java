@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +73,6 @@ import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
-import eu.interedition.collatex2.implementation.output.apparatus.ApparatusEntry;
-import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.apparatus.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -135,36 +133,37 @@ public class ApiController implements InitializingBean {
     return svg;
   }
 
-  //  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
-  //  public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
-  //    return new ModelAndView("api/alignment", "alignment", collate(input));
-  //  }
-
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
-  public ModelAndView collateToHtmlP(@RequestBody final ApiInput input) throws Exception {
-    List<Map<String, Object>> rows = parallelSegmentationRows(input);
-    return new ModelAndView("api/apparatus", "rows", rows);
+  public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
+    return new ModelAndView("api/alignment", "alignment", collate(input));
   }
+
+//  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+//  public ModelAndView collateToHtmlP(@RequestBody final ApiInput input) throws Exception {
+//    List<Map<String, Object>> rows = parallelSegmentationRows(input);
+//    return new ModelAndView("api/apparatus", "rows", rows);
+//  }
 
   static final Phrase EMPTY_PHRASE = new Phrase(Lists.<INormalizedToken> newArrayList());
 
-  private List<Map<String, Object>> parallelSegmentationRows(final ApiInput input) throws ApiException {
-    IAlignmentTable alignmentTable = collate(input);
-    ParallelSegmentationApparatus apparatus = new CollateXEngine().createApparatus(alignmentTable);
-
-    List<ApparatusEntry> entries = apparatus.getEntries();
-    List<Map<String, Object>> rows = Lists.newArrayList();
-    for (String sigil : alignmentTable.getSigla()) {
-      List<String> phrases = Lists.newArrayList();
-      for (ApparatusEntry apparatusEntry : entries) {
-        String phrase = apparatusEntry.containsWitness(sigil) ? apparatusEntry.getPhrase(sigil).getContent() : "";
-        phrases.add(phrase);
-      }
-      Map<String, Object> row = rowMap(sigil, phrases);
-      rows.add(row);
-    }
-    return rows;
-  }
+  //TODO: Parallel segmentation for Alignment Tables is not enabled for the moment!
+//  private List<Map<String, Object>> parallelSegmentationRows(final ApiInput input) throws ApiException {
+//    IAlignmentTable alignmentTable = collate(input);
+//    ParallelSegmentationApparatus apparatus = new CollateXEngine().createApparatus(alignmentTable);
+//
+//    List<ApparatusEntry> entries = apparatus.getEntries();
+//    List<Map<String, Object>> rows = Lists.newArrayList();
+//    for (String sigil : alignmentTable.getSigla()) {
+//      List<String> phrases = Lists.newArrayList();
+//      for (ApparatusEntry apparatusEntry : entries) {
+//        String phrase = apparatusEntry.containsWitness(sigil) ? apparatusEntry.getPhrase(sigil).getContent() : "";
+//        phrases.add(phrase);
+//      }
+//      Map<String, Object> row = rowMap(sigil, phrases);
+//      rows.add(row);
+//    }
+//    return rows;
+//  }
 
   private Map<String, Object> rowMap(String sigil, Collection<String> phrases) {
     Map<String, Object> row = Maps.newHashMap();
