@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.containers.graph;
+package eu.interedition.collatex2.implementation.output.cgraph;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -13,6 +13,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphIndex;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenIndex;

@@ -107,12 +107,12 @@ public class VariantGraph2Creator {
       IVariantGraphVertex end;
       if (!witnessTokenToMatch.containsKey(token)) {
         // NOTE: here we determine that the token is an addition/replacement!
-        INormalizedToken vertexKey = (witnessTokenToTranspositionMatch.containsKey(token)) ? witnessTokenToTranspositionMatch.get(token).getTokenA() : token;
+        INormalizedToken vertexKey = (witnessTokenToTranspositionMatch.containsKey(token)) ? ((IVariantGraphVertex) witnessTokenToTranspositionMatch.get(token).getTokenB()).getVertexKey() : token;
         end = graph.addNewVertex(token.getNormalized(), vertexKey);
       } else {
         // NOTE: it is a match!
         ITokenMatch tokenMatch = witnessTokenToMatch.get(token);
-        end = (IVariantGraphVertex) tokenMatch.getTokenB();
+        end = (IVariantGraphVertex) tokenMatch.getBaseToken();
       }
       connectBeginToEndVertex(current, end, witness);
       end.addToken(witness, token);
