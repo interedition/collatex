@@ -134,6 +134,22 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
+  //TODO: make VariantGraphBasedAlignmentTable work with ranking!
+  @Ignore
+  @Test
+  public void testTranspositionAndReplacement() {
+    final IWitness w1 = engine.createWitness("A", "The black dog chases a red cat.");
+    final IWitness w2 = engine.createWitness("B", "A red cat chases the black dog.");
+    final IWitness w3 = engine.createWitness("C", "A red cat chases the yellow dog");
+    final IAlignmentTable table = engine.align(w1, w2, w3);
+    String expected = "A: the|black|dog|chases|a|red|cat\n";
+    expected += "B: a|red|cat|chases|the|black|dog\n";
+    expected += "C: a|red|cat|chases|the|yellow|dog\n";
+    assertEquals(expected, table.toString());
+  }
+  
+  //NOTE: by default we align to the left!
+  //NOTE: right alignment would be nicer in this specific case!
   //TODO: AI This one is tricky!
   @Ignore
   @Test
