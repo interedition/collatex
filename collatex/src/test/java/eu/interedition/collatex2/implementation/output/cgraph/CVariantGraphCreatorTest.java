@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ public class CVariantGraphCreatorTest {
     assertEquals(9, cvgVertexSet.size()); // # unique tokens + start,end token
   }
 
+  @Ignore
   @Test
   public void test2() {
     CollateXEngine engine = new CollateXEngine();
