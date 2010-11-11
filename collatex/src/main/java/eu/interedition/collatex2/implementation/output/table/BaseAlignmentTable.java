@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IRow;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 //TODO: make class abstract
 //TODO: make class implement the IAlignmentTable interface
@@ -52,6 +53,33 @@ public class BaseAlignmentTable {
 
   public final List<String> getSigla() {
     return sigla;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder stringBuilder = new StringBuilder();
+    for (final IRow row : getRows()) {
+      stringBuilder.append(row.getSigil()).append(": ");
+      String delim = "";
+      for (final ICell cell : row) {
+        stringBuilder.append(delim).append(cellToString(cell));
+        delim = "|";
+      }
+      stringBuilder.append("\n");
+    }
+    return stringBuilder.toString();
+  }
+
+  String cellToString(final ICell cell) {
+    if (cell.isEmpty()) {
+      return " ";
+    }
+    //TODO should not be getnormalized!
+    return cell.getToken().getNormalized().toString();
+  }
+
+  public IRow getRow(IWitness witness) {
+    return this.getRow(witness.getSigil());
   }
 
 }

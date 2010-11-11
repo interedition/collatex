@@ -29,26 +29,6 @@ import java.util.List;
  */
 public interface IAlignmentTable {
 
-  List<String> getSigla();
-
-  List<IColumn> getColumns();
-
-  void add(IInternalColumn column);
-
-  IColumns createColumns(int startIndex, int endIndex);
-
-  int size();
-
-  void addReplacement(IReplacement replacement);
-
-  void addAddition(IAddition addition);
-
-  void accept(IAlignmentTableVisitor visitor);
-
-  IRow getRow(IWitness witness);
-  
-  IRow getRow(String sigil);
-  
   /**
    * Retrieve the alignment table rows.
    * Each row represents a single witness.
@@ -57,6 +37,16 @@ public interface IAlignmentTable {
    */
   List<IRow> getRows();
 
+  IRow getRow(IWitness witness);
+  
+  IRow getRow(String sigil);
+  
+  List<IColumn> getColumns();
+
+  List<String> getSigla();
+
   boolean isEmpty();
+
+  int size();
 
 }

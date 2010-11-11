@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.alignmenttable;
+package eu.interedition.collatex2.output.alignmenttable;
 
 import java.util.List;
 import java.util.NoSuchElementException;
