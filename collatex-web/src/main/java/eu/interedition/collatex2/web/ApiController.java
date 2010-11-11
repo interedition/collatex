@@ -120,8 +120,8 @@ public class ApiController implements InitializingBean {
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
   public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
-    String svg = convert2svg(ccollate2dot(input));
-    //    String svg = convert2svg(jcollate2dot(input));
+    String svg = convert2svg(ccollate2dot(input)); // cyclic, unjoined graph
+    //    String svg = convert2svg(jcollate2dot(input)); // acyclic joined graph
     ModelAndView modelAndView = new ModelAndView(svgView, "svg", svg);
     return modelAndView;
   }
@@ -140,32 +140,32 @@ public class ApiController implements InitializingBean {
     return new ModelAndView("api/alignment", "alignment", collate(input));
   }
 
-//  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
-//  public ModelAndView collateToHtmlP(@RequestBody final ApiInput input) throws Exception {
-//    List<Map<String, Object>> rows = parallelSegmentationRows(input);
-//    return new ModelAndView("api/apparatus", "rows", rows);
-//  }
+  //  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  //  public ModelAndView collateToHtmlP(@RequestBody final ApiInput input) throws Exception {
+  //    List<Map<String, Object>> rows = parallelSegmentationRows(input);
+  //    return new ModelAndView("api/apparatus", "rows", rows);
+  //  }
 
   static final Phrase EMPTY_PHRASE = new Phrase(Lists.<INormalizedToken> newArrayList());
 
   //TODO: Parallel segmentation for Alignment Tables is not enabled for the moment!
-//  private List<Map<String, Object>> parallelSegmentationRows(final ApiInput input) throws ApiException {
-//    IAlignmentTable alignmentTable = collate(input);
-//    ParallelSegmentationApparatus apparatus = new CollateXEngine().createApparatus(alignmentTable);
-//
-//    List<ApparatusEntry> entries = apparatus.getEntries();
-//    List<Map<String, Object>> rows = Lists.newArrayList();
-//    for (String sigil : alignmentTable.getSigla()) {
-//      List<String> phrases = Lists.newArrayList();
-//      for (ApparatusEntry apparatusEntry : entries) {
-//        String phrase = apparatusEntry.containsWitness(sigil) ? apparatusEntry.getPhrase(sigil).getContent() : "";
-//        phrases.add(phrase);
-//      }
-//      Map<String, Object> row = rowMap(sigil, phrases);
-//      rows.add(row);
-//    }
-//    return rows;
-//  }
+  //  private List<Map<String, Object>> parallelSegmentationRows(final ApiInput input) throws ApiException {
+  //    IAlignmentTable alignmentTable = collate(input);
+  //    ParallelSegmentationApparatus apparatus = new CollateXEngine().createApparatus(alignmentTable);
+  //
+  //    List<ApparatusEntry> entries = apparatus.getEntries();
+  //    List<Map<String, Object>> rows = Lists.newArrayList();
+  //    for (String sigil : alignmentTable.getSigla()) {
+  //      List<String> phrases = Lists.newArrayList();
+  //      for (ApparatusEntry apparatusEntry : entries) {
+  //        String phrase = apparatusEntry.containsWitness(sigil) ? apparatusEntry.getPhrase(sigil).getContent() : "";
+  //        phrases.add(phrase);
+  //      }
+  //      Map<String, Object> row = rowMap(sigil, phrases);
+  //      rows.add(row);
+  //    }
+  //    return rows;
+  //  }
 
   private Map<String, Object> rowMap(String sigil, Collection<String> phrases) {
     Map<String, Object> row = Maps.newHashMap();
