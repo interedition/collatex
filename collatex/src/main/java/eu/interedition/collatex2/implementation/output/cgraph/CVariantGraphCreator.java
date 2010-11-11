@@ -41,31 +41,33 @@ public class CVariantGraphCreator {
     for (IVariantGraphEdge avgEdge : outgoingEdges) {
       processEdge(avgEdge, acyclicGraph, cvgVertex);
     }
-    //    LOG.info("cyclicGraph={}", cyclicGraph);
   }
 
   private static void processEdge(IVariantGraphEdge avgEdge, final IVariantGraph acyclicGraph, IVariantGraphVertex cvgLastVertex) {
     LOG.info("processEdge(avgEdge=({}),cvgLastVertex=({}))", new Object[] { avgEdge, cvgLastVertex });
     IVariantGraphVertex avgTargetVertex = acyclicGraph.getEdgeTarget(avgEdge);
-    boolean avgTargetVertexIsNew = !a2cVertexMap.containsKey(avgTargetVertex);
+    //    boolean avgTargetVertexIsNew = !a2cVertexMap.containsKey(avgTargetVertex);
     INormalizedToken vertexKey = avgTargetVertex.getVertexKey();
     LOG.info("vertexKey={}", vertexKey);
     IVariantGraphVertex cvgTargetVertex;
-    if (keyToken2Vertex.containsKey(vertexKey)) {
-      cvgTargetVertex = keyToken2Vertex.get(vertexKey);
+    if (vertexKey != null) {
+      if (keyToken2Vertex.containsKey(vertexKey)) {
+        cvgTargetVertex = keyToken2Vertex.get(vertexKey);
+      } else {
+        cvgTargetVertex = new VariantGraphVertex(avgTargetVertex.getNormalized(), avgTargetVertex.getVertexKey());
+        keyToken2Vertex.put(vertexKey, cvgTargetVertex);
+        cyclicGraph.addVertex(cvgTargetVertex);
+        a2cVertexMap.put(avgTargetVertex, cvgTargetVertex);
+      }
     } else {
-      cvgTargetVertex = new VariantGraphVertex(avgTargetVertex.getNormalized(), null);
-      keyToken2Vertex.put(vertexKey, cvgTargetVertex);
-      cyclicGraph.addVertex(cvgTargetVertex);
-      a2cVertexMap.put(avgTargetVertex, cvgTargetVertex);
+      cvgTargetVertex = a2cVertexMap.get(avgTargetVertex);
     }
     VariantGraphEdge cvgEdge = convertEdge(avgEdge);
     LOG.info("cvgLastVertex={}, cvgTargetVertex={}", cvgLastVertex, cvgTargetVertex);
     cyclicGraph.addEdge(cvgLastVertex, cvgTargetVertex, cvgEdge);
-    if (avgTargetVertexIsNew) {
-      processVertex(avgTargetVertex, acyclicGraph, cvgTargetVertex);
-    }
-    //    LOG.info("cyclicGraph={}", cyclicGraph);
+    //    if (avgTargetVertexIsNew) {
+    processVertex(avgTargetVertex, acyclicGraph, cvgTargetVertex);
+    //    }
   }
 
   private static VariantGraphEdge convertEdge(IVariantGraphEdge avgEdge) {
