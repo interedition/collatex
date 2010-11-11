@@ -44,56 +44,56 @@ public class AlignmentTableTest {
     engine = new CollateXEngine();
   }
 
-//  //NOTE: MOVED THIS ONE TO DAGT TEST
-//  @Test
-//  public void testFirstWitness() {
-//    final IWitness w1 = engine.createWitness("A", "the black cat");
-//    final IAlignmentTable table = engine.createAligner().add(w1).getResult();
-//    final String expected = "A: the|black|cat\n";
-//    assertEquals(expected, table.toString());
-//  }
-//
-//  //NOTE: MOVED THIS ONE TO DAGT TEST
-//  @Test
-//  public void testEverythingMatches() {
-//    final IWitness w1 = engine.createWitness("A", "the black cat");
-//    final IWitness w2 = engine.createWitness("B", "the black cat");
-//    final IWitness w3 = engine.createWitness("C", "the black cat");
-//    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3).getResult();
-//    String expected = "A: the|black|cat\n";
-//    expected += "B: the|black|cat\n";
-//    expected += "C: the|black|cat\n";
-//    assertEquals(expected, table.toString());
-//  }
+  //NOTE: MOVED THIS ONE TO DAGT TEST
+  @Test
+  public void testFirstWitness() {
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IAlignmentTable table = engine.align(w1);
+    final String expected = "A: the|black|cat\n";
+    assertEquals(expected, table.toString());
+  }
+  
+  //NOTE: MOVED THIS ONE TO DAGT TEST
+  @Test
+  public void testEverythingMatches() {
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the black cat");
+    final IWitness w3 = engine.createWitness("C", "the black cat");
+    final IAlignmentTable table = engine.align(w1, w2, w3);
+    String expected = "A: the|black|cat\n";
+    expected += "B: the|black|cat\n";
+    expected += "C: the|black|cat\n";
+    assertEquals(expected, table.toString());
+  }
 
-//  //NOTE: Moved this one to DAGT test
-//  @Test
-//  public void testVariant() {
-//    final IWitness w1 = engine.createWitness("A", "the black cat");
-//    final IWitness w2 = engine.createWitness("B", "the white cat");
-//    final IWitness w3 = engine.createWitness("C", "the green cat");
-//    final IWitness w4 = engine.createWitness("D", "the red cat");
-//    final IWitness w5 = engine.createWitness("E", "the yellow cat");
-//    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3, w4, w5).getResult();
-//    String expected = "A: the|black|cat\n";
-//    expected += "B: the|white|cat\n";
-//    expected += "C: the|green|cat\n";
-//    expected += "D: the|red|cat\n";
-//    expected += "E: the|yellow|cat\n";
-//    assertEquals(expected, table.toString());
-//  }
-//
-//  @Test
-//  public void testOmission() {
-//    final IWitness w1 = engine.createWitness("A", "the black cat");
-//    final IWitness w2 = engine.createWitness("B", "the cat");
-//    final IWitness w3 = engine.createWitness("C", "the black cat");
-//    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3).getResult();
-//    String expected = "A: the|black|cat\n";
-//    expected += "B: the| |cat\n";
-//    expected += "C: the|black|cat\n";
-//    assertEquals(expected, table.toString());
-//  }
+  //NOTE: Moved this one to DAGT test
+  @Test
+  public void testVariant() {
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the white cat");
+    final IWitness w3 = engine.createWitness("C", "the green cat");
+    final IWitness w4 = engine.createWitness("D", "the red cat");
+    final IWitness w5 = engine.createWitness("E", "the yellow cat");
+    final IAlignmentTable table = engine.align(w1, w2, w3, w4, w5);
+    String expected = "A: the|black|cat\n";
+    expected += "B: the|white|cat\n";
+    expected += "C: the|green|cat\n";
+    expected += "D: the|red|cat\n";
+    expected += "E: the|yellow|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
+  @Test
+  public void testOmission() {
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the cat");
+    final IWitness w3 = engine.createWitness("C", "the black cat");
+    final IAlignmentTable table = engine.align(w1, w2, w3);
+    String expected = "A: the|black|cat\n";
+    expected += "B: the| |cat\n";
+    expected += "C: the|black|cat\n";
+    assertEquals(expected, table.toString());
+  }
 
   //NOTE: implemented on VariantGraph
   @Test
@@ -106,70 +106,50 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-//  @Test
-//  public void testAddition2() {
-//    final IWitness w1 = engine.createWitness("A", "the cat");
-//    final IWitness w2 = engine.createWitness("B", "before the cat");
-//    final IWitness w3 = engine.createWitness("C", "the black cat");
-//    final IWitness w4 = engine.createWitness("D", "the cat walks");
-//    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3, w4).getResult();
-//    String expected = "A:  |the| |cat| \n";
-//    expected += "B: before|the| |cat| \n";
-//    expected += "C:  |the|black|cat| \n";
-//    expected += "D:  |the| |cat|walks\n";
-//    assertEquals(expected, table.toString());
-//  }
+  @Test
+  public void testAddition2() {
+    final IWitness w1 = engine.createWitness("A", "the cat");
+    final IWitness w2 = engine.createWitness("B", "before the cat");
+    final IWitness w3 = engine.createWitness("C", "the black cat");
+    final IWitness w4 = engine.createWitness("D", "the cat walks");
+    final IAlignmentTable table = engine.align(w1, w2, w3, w4);
+    String expected = "A:  |the| |cat| \n";
+    expected += "B: before|the| |cat| \n";
+    expected += "C:  |the|black|cat| \n";
+    expected += "D:  |the| |cat|walks\n";
+    assertEquals(expected, table.toString());
+  }
 
-//  @Test
-//  public void testAddition3() {
-//    final IWitness w1 = engine.createWitness("A", "the cat");
-//    final IWitness w2 = engine.createWitness("B", "before the cat");
-//    final IWitness w3 = engine.createWitness("C", "the black cat");
-//    final IWitness w4 = engine.createWitness("D", "just before midnight the cat walks");
-//    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3, w4).getResult();
-//    String expected = "A:  | | |the| |cat| \n";
-//    expected += "B:  |before| |the| |cat| \n";
-//    expected += "C:  | | |the|black|cat| \n";
-//    expected += "D: just|before|midnight|the| |cat|walks\n";
-//
-//    assertEquals(expected, table.toString());
-//  }
+  @Test
+  public void testAddition3() {
+    final IWitness w1 = engine.createWitness("A", "the cat");
+    final IWitness w2 = engine.createWitness("B", "before the cat");
+    final IWitness w3 = engine.createWitness("C", "the black cat");
+    final IWitness w4 = engine.createWitness("D", "just before midnight the cat walks");
+    final IAlignmentTable table = engine.align(w1, w2, w3, w4);
+    String expected = "A:  | | |the| |cat| \n";
+    expected += "B:  |before| |the| |cat| \n";
+    expected += "C:  | | |the|black|cat| \n";
+    expected += "D: just|before|midnight|the| |cat|walks\n";
+    assertEquals(expected, table.toString());
+  }
 
-//  // TODO: rewrite test to use addAddition
-//  @Test
-//  public void testAddVariantBeforeColumnAndPositions() {
-//    final IWitness witness = engine.createWitness("A", "two before two after");
-//    IAlignmentTable table = engine.createAligner().add(witness).getResult();
-//
-//    final IWitness temp = engine.createWitness("B", "in between");
-//    final IPhrase tobeadded = temp.createPhrase(1, 2);
-//    final IColumn column = table.getColumns().get(2);
-//    ((AlignmentTable4) table).addVariantBefore(column.getInternalColumn(), tobeadded);
-//
-//    final List<IColumn> columns = table.getColumns();
-//    Assert.assertEquals(1, columns.get(0).getPosition());
-//    Assert.assertEquals(2, columns.get(1).getPosition());
-//    Assert.assertEquals(3, columns.get(2).getPosition());
-//    Assert.assertEquals(4, columns.get(3).getPosition());
-//    Assert.assertEquals(5, columns.get(4).getPosition());
-//    Assert.assertEquals(6, columns.get(5).getPosition());
-//  }
-
-//  @Test
-//  public void testVariation() {
-//    final IWitness w1 = engine.createWitness("A", "the black cat");
-//    final IWitness w2 = engine.createWitness("B", "the black and white cat");
-//    final IWitness w3 = engine.createWitness("C", "the black very special cat");
-//    final IWitness w4 = engine.createWitness("D", "the black not very special cat");
-//    final IAlignmentTable table = engine.createAligner().add(w1, w2, w3, w4).getResult();
-//    String expected = "A: the|black| | | |cat\n";
-//    expected += "B: the|black| |and|white|cat\n";
-//    expected += "C: the|black| |very|special|cat\n";
-//    expected += "D: the|black|not|very|special|cat\n";
-//    assertEquals(expected, table.toString());
-//  }
-
+  //TODO: AI This one is tricky!
   @Ignore
+  @Test
+  public void testVariation() {
+    final IWitness w1 = engine.createWitness("A", "the black cat");
+    final IWitness w2 = engine.createWitness("B", "the black and white cat");
+    final IWitness w3 = engine.createWitness("C", "the black very special cat");
+    final IWitness w4 = engine.createWitness("D", "the black not very special cat");
+    final IAlignmentTable table = engine.align(w1, w2, w3, w4);
+    String expected = "A: the|black| | | |cat\n";
+    expected += "B: the|black| |and|white|cat\n";
+    expected += "C: the|black| |very|special|cat\n";
+    expected += "D: the|black|not|very|special|cat\n";
+    assertEquals(expected, table.toString());
+  }
+
   @Test
   public void testWitnessReorder() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -215,8 +195,6 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-
-  @Ignore
   @Test
   public void testGetRow() {
     final IWitness w1 = engine.createWitness("A", "the black and white cat");
@@ -237,6 +215,7 @@ public class AlignmentTableTest {
     assertTrue(!iteratorB.hasNext());
   }
   
+  //TODO: Ai! Strange exception! Check this test!
   @Ignore
   @Test
   public void testGetRows() {

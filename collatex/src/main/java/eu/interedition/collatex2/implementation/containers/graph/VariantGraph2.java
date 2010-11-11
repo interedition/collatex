@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.implementation.containers.graph;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +28,6 @@ import eu.interedition.collatex2.interfaces.IWitness;
 // The VariantGraph contains a start and an end vertex.
 // The VariantGraph contains a List of witnesses that have
 // been added to the Graph.
-// TODO: Remove dependency on NullToken class!
 @SuppressWarnings("serial")
 public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
   private final IVariantGraphVertex startVertex;
@@ -79,6 +79,13 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     for (IVariantGraphEdge edge : outgoingEdges) {
       totalWitnesses.addAll(edge.getWitnesses());
     }
+    //NOTE: set of outgoingEdges in unordered!
+    //NOTE: so the list of witnesses is sorted here!
+    Collections.sort(totalWitnesses, new Comparator<IWitness>() {
+      @Override
+      public int compare(IWitness arg0, IWitness arg1) {
+        return arg0.getSigil().compareTo(arg1.getSigil());
+      } });
     return Collections.unmodifiableList(totalWitnesses);
   }
 
