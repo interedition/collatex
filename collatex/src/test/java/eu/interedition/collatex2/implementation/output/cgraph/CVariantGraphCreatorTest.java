@@ -4,13 +4,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.EdgeNameProvider;
+import org.jgrapht.ext.IntegerNameProvider;
+import org.jgrapht.ext.VertexNameProvider;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -87,6 +96,39 @@ public class CVariantGraphCreatorTest {
     assertTrue(edgeWitnesses.contains(b));
     assertTrue(edgeWitnesses.contains(c));
     assertEquals(3, edgeWitnesses.size());
+
+    String dot = dotOutput(cgraph);
+    assertNotNull(dot);
+    LOG.info(dot);
+  }
+
+  static final VertexNameProvider<IVariantGraphVertex> VERTEX_ID_PROVIDER = new IntegerNameProvider<IVariantGraphVertex>();
+  static final VertexNameProvider<IVariantGraphVertex> VERTEX_LABEL_PROVIDER = new VertexNameProvider<IVariantGraphVertex>() {
+    @Override
+    public String getVertexName(IVariantGraphVertex v) {
+      return v.getNormalized();
+    }
+  };
+  static final EdgeNameProvider<IVariantGraphEdge> EDGE_LABEL_PROVIDER = new EdgeNameProvider<IVariantGraphEdge>() {
+    @Override
+    public String getEdgeName(IVariantGraphEdge e) {
+      List<String> sigils = Lists.newArrayList();
+      for (IWitness witness : e.getWitnesses()) {
+        sigils.add(witness.getSigil());
+      }
+      Collections.sort(sigils);
+      return Joiner.on(",").join(sigils);
+    }
+  };
+  static final DOTExporter<IVariantGraphVertex, IVariantGraphEdge> CDOT_EXPORTER = new DOTExporter<IVariantGraphVertex, IVariantGraphEdge>(//
+      VERTEX_ID_PROVIDER, VERTEX_LABEL_PROVIDER, EDGE_LABEL_PROVIDER //
+  );
+
+  private String dotOutput(IVariantGraph cgraph) {
+    Writer writer = new StringWriter();
+    CDOT_EXPORTER.export(writer, cgraph);
+    String string = writer.toString();
+    return string;
   }
 
   private IVariantGraphEdge extractedEdge(Set<IVariantGraphEdge> edgeSet, String begin, String end) {
@@ -99,4 +141,5 @@ public class CVariantGraphCreatorTest {
     }
     return null;
   }
+
 }

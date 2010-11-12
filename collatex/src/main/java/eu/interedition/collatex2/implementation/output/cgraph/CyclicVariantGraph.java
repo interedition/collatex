@@ -1,20 +1,14 @@
 package eu.interedition.collatex2.implementation.output.cgraph;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.jgrapht.alg.BellmanFordShortestPath;
+import org.apache.commons.lang.NotImplementedException;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraphIndex;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
@@ -24,7 +18,6 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-// TODO: Clean this class up, it's now mostly a copy of eu.interedition.collatex2.implementation.containers.graph.VariantGraph2
 @SuppressWarnings("serial")
 public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
   private final IVariantGraphVertex startVertex;
@@ -36,52 +29,6 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
     addVertex(startVertex);
     endVertex = new VariantGraphVertex("#", null);
     addVertex(endVertex);
-  }
-
-  @Override
-  public List<String> getRepeatedTokens() {
-    // remove start and end vertices
-    Set<IVariantGraphVertex> copy = Sets.newLinkedHashSet(vertexSet());
-    copy.remove(startVertex);
-    copy.remove(endVertex);
-    // we map all vertices to their normalized version
-    Multimap<String, IVariantGraphVertex> mapped = ArrayListMultimap.create();
-    for (IVariantGraphVertex v : copy) {
-      mapped.put(v.getNormalized(), v);
-    }
-    // fetch all the duplicate keys and return them 
-    List<String> result = Lists.newArrayList();
-    for (String key : mapped.keySet()) {
-      if (mapped.get(key).size() > 1) {
-        result.add(key);
-      }
-    }
-    return result;
-  }
-
-  @Override
-  public IVariantGraphVertex getEndVertex() {
-    return endVertex;
-  }
-
-  @Override
-  public IVariantGraphVertex getStartVertex() {
-    return startVertex;
-  }
-
-  @Override
-  public List<IWitness> getWitnesses() {
-    Set<IVariantGraphEdge> outgoingEdges = outgoingEdgesOf(startVertex);
-    List<IWitness> totalWitnesses = Lists.newArrayList();
-    for (IVariantGraphEdge edge : outgoingEdges) {
-      totalWitnesses.addAll(edge.getWitnesses());
-    }
-    return Collections.unmodifiableList(totalWitnesses);
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return getWitnesses().isEmpty();
   }
 
   public static CyclicVariantGraph create() {
@@ -105,31 +52,6 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
     return graph;
   }
 
-  @Override
-  public List<IVariantGraphVertex> getPath(IWitness witness) {
-    List<IVariantGraphVertex> path = Lists.newArrayList();
-    IVariantGraphVertex startVertex = getStartVertex();
-    IVariantGraphVertex currentVertex = startVertex;
-    while (outDegreeOf(currentVertex) > 0) {
-      Set<IVariantGraphEdge> outgoingEdges = outgoingEdgesOf(currentVertex);
-      boolean found = false;
-      for (IVariantGraphEdge edge : outgoingEdges) {
-        if (!found && edge.containsWitness(witness)) {
-          found = true;
-          IVariantGraphVertex edgeTarget = getEdgeTarget(edge);
-          if (!edgeTarget.getNormalized().equals("#")) {
-            path.add(edgeTarget);
-          }
-          currentVertex = edgeTarget;
-        }
-      }
-      if (!found) {
-        throw new RuntimeException("No valid path found for " + witness.getSigil());
-      }
-    }
-    return path;
-  }
-
   //write
   public IVariantGraphVertex addNewVertex(String normalized, INormalizedToken vertexKey) {
     final VariantGraphVertex vertex = new VariantGraphVertex(normalized, vertexKey);
@@ -144,79 +66,62 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
   }
 
   @Override
+  public IVariantGraphVertex getEndVertex() {
+    return endVertex;
+  }
+
+  @Override
+  public IVariantGraphVertex getStartVertex() {
+    return startVertex;
+  }
+
+  @Override
+  public List<String> getRepeatedTokens() {
+    throw new NotImplementedException("NOT IMPLEMENTED!");
+  }
+
+  @Override
+  public List<IWitness> getWitnesses() {
+    throw new NotImplementedException("NOT IMPLEMENTED!");
+  }
+
+  @Override
+  public boolean isEmpty() {
+    throw new NotImplementedException("NOT IMPLEMENTED!");
+  }
+
+  @Override
+  public List<IVariantGraphVertex> getPath(IWitness witness) {
+    throw new NotImplementedException("NOT IMPLEMENTED!");
+  }
+
+  @Override
   public List<IVariantGraphVertex> getLongestPath() {
-    // NOTE: Weights are set to negative value to
-    // generate the longest path instead of the shortest path
-    for (IVariantGraphEdge edge : edgeSet()) {
-      setEdgeWeight(edge, -1);
-    }
-    // NOTE: gets the start vertex of the graph
-    IVariantGraphVertex startVertex = getStartVertex();
-    IVariantGraphVertex endVertex = getEndVertex();
-    // Note: calculates the longest path
-    List<IVariantGraphEdge> findPathBetween = BellmanFordShortestPath.findPathBetween(this, startVertex, endVertex);
-    // Note: gets the end vertices associated with the edges of the path
-    List<IVariantGraphVertex> vertices = Lists.newArrayList();
-    for (IVariantGraphEdge edge : findPathBetween) {
-      IVariantGraphVertex edgeTarget = this.getEdgeTarget(edge);
-      if (edgeTarget != endVertex) {
-        vertices.add(edgeTarget);
-      }
-    }
-    return vertices;
+    throw new NotImplementedException("NOT IMPLEMENTED!");
   }
 
   @Override
   public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
-    return VariantGraphIndex.create(this, repeatingTokens);
+    throw new NotImplementedException("NOT IMPLEMENTED!");
   }
 
   @Override
   public List<INormalizedToken> getTokens(IWitness witness) {
-    List<IVariantGraphVertex> vertices = getPath(witness);
-    List<INormalizedToken> tokens = Lists.newArrayList();
-    for (IVariantGraphVertex vertex : vertices) {
-      tokens.add(vertex);
-    }
-    return tokens;
+    throw new NotImplementedException("NOT IMPLEMENTED!");
   }
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    // sanity check!
-    if (!(a instanceof IVariantGraphVertex)) {
-      throw new RuntimeException("IToken a is not of type IVariantGraphVertex!");
-    }
-    if (!(b instanceof IVariantGraphVertex)) {
-      throw new RuntimeException("IToken b is not of type IVariantGraphVertex!");
-    }
-    return containsEdge((IVariantGraphVertex) a, (IVariantGraphVertex) b);
+    throw new NotImplementedException("NOT IMPLEMENTED!");
   }
 
   @Override
   public Iterator<INormalizedToken> tokenIterator() {
-    final Iterator<IVariantGraphVertex> verticesIterator = iterator();
-    return new Iterator<INormalizedToken>() {
-      @Override
-      public boolean hasNext() {
-        return verticesIterator.hasNext();
-      }
-
-      @Override
-      public INormalizedToken next() {
-        IVariantGraphVertex vertex = verticesIterator.next();
-        return vertex;
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-    };
+    throw new NotImplementedException("NOT IMPLEMENTED!");
   }
 
   @Override
   public Iterator<IVariantGraphVertex> iterator() {
-    return null;
+    throw new NotImplementedException("NOT IMPLEMENTED!");
   }
 }
