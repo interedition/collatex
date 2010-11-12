@@ -1,9 +1,0 @@
-curl -X POST \
-  --data-binary "{\"witnesses\":[{\"id\":\"A\",\"content\":\"A black cat in a black basket\" },{\"id\":\"B\", \"content\" : \"A black cat in a black basket\" },	        {\"id\" : \"C\", \"content\" : \"A striped cat in a black basket\" },{\"id\" : \"D\", \"content\" : \"A striped cat in a white basket\" }]}" \
-  -H"Content-Type: application/json;charset=UTF-8" \
-  -H"Accept-Header: application/xml" \
-  http://localhost:8080/collatex-web/api/collate
-
-
-# start
-cd collatex-web;mvn jetty:run
