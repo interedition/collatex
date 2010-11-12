@@ -21,7 +21,7 @@ public class CVariantGraphCreator {
 
   public static IVariantGraph getCyclicVariantGraph(final IVariantGraph acyclicGraph) {
     keyToken2Vertex = Maps.newHashMap();
-    a2cVertexMap = Maps.newHashMap();
+    a2cVertexMap = Maps.newHashMap(); // maps vertex in acyclic graph to vertex in cyclic graph
     cyclicGraph = CyclicVariantGraph.create();
 
     a2cVertexMap.put(acyclicGraph.getStartVertex(), cyclicGraph.getStartVertex());
@@ -34,7 +34,7 @@ public class CVariantGraphCreator {
         if (keyToken2Vertex.containsKey(vertexKey)) {
           cvgVertex = keyToken2Vertex.get(vertexKey);
         } else {
-          cvgVertex = new VariantGraphVertex(avgVertex.getNormalized(), avgVertex.getVertexKey());
+          cvgVertex = new VariantGraphVertex(avgVertex.getNormalized(), vertexKey);
           keyToken2Vertex.put(vertexKey, cvgVertex);
           cyclicGraph.addVertex(cvgVertex);
         }
