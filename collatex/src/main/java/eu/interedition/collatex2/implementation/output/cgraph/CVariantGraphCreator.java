@@ -15,14 +15,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class CVariantGraphCreator {
   //  private static final Logger LOG = LoggerFactory.getLogger(CVariantGraphCreator.class);
-  private static IVariantGraph cyclicGraph;
-  private static Map<INormalizedToken, IVariantGraphVertex> keyToken2Vertex;
-  private static Map<IVariantGraphVertex, IVariantGraphVertex> a2cVertexMap;
 
   public static IVariantGraph getCyclicVariantGraph(final IVariantGraph acyclicGraph) {
-    keyToken2Vertex = Maps.newHashMap();
-    a2cVertexMap = Maps.newHashMap(); // maps vertex in acyclic graph to vertex in cyclic graph
-    cyclicGraph = CyclicVariantGraph.create();
+    Map<INormalizedToken, IVariantGraphVertex> keyToken2Vertex = Maps.newHashMap();
+    Map<IVariantGraphVertex, IVariantGraphVertex> a2cVertexMap = Maps.newHashMap(); // maps vertex in acyclic graph to vertex in cyclic graph
+    IVariantGraph cyclicGraph = CyclicVariantGraph.create();
 
     a2cVertexMap.put(acyclicGraph.getStartVertex(), cyclicGraph.getStartVertex());
     a2cVertexMap.put(acyclicGraph.getEndVertex(), cyclicGraph.getEndVertex());
