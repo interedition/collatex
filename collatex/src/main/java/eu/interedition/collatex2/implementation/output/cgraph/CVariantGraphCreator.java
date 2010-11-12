@@ -52,7 +52,7 @@ public class CVariantGraphCreator {
         cvgEdge = cyclicGraph.getEdge(cvgStart, cvgEnd);
       } else {
         cvgEdge = new VariantGraphEdge(cvgStart, cvgEnd, witnessIterator.next());
-        cyclicGraph.addEdge(a2cVertexMap.get(avgEdge.getBeginVertex()), a2cVertexMap.get(avgEdge.getEndVertex()), cvgEdge);
+        cyclicGraph.addEdge(cvgStart, cvgEnd, cvgEdge);
       }
       while (witnessIterator.hasNext()) {
         cvgEdge.addWitness(witnessIterator.next());
