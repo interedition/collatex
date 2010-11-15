@@ -69,8 +69,7 @@ public class AlignmentTableTest {
     assertEquals("C: |the|black|cat|", table.getRow(c).rowToString());
     assertEquals(3, table.getRows().size());
   }
-
-  //NOTE: Moved this one to DAGT test
+  
   @Test
   public void testVariant() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -79,12 +78,12 @@ public class AlignmentTableTest {
     final IWitness w4 = engine.createWitness("D", "the red cat");
     final IWitness w5 = engine.createWitness("E", "the yellow cat");
     final IAlignmentTable table = engine.align(w1, w2, w3, w4, w5);
-    String expected = "A: the|black|cat\n";
-    expected += "B: the|white|cat\n";
-    expected += "C: the|green|cat\n";
-    expected += "D: the|red|cat\n";
-    expected += "E: the|yellow|cat\n";
-    assertEquals(expected, table.toString());
+    assertEquals("A: |the|black|cat|", table.getRow(w1).rowToString());
+    assertEquals("B: |the|white|cat|", table.getRow(w2).rowToString());
+    assertEquals("C: |the|green|cat|", table.getRow(w3).rowToString());
+    assertEquals("D: |the|red|cat|", table.getRow(w4).rowToString());
+    assertEquals("E: |the|yellow|cat|", table.getRow(w5).rowToString());
+    assertEquals(5, table.getRows().size());
   }
 
   @Test
@@ -99,7 +98,6 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //NOTE: implemented on VariantGraph
   @Test
   public void testAddition1() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -181,6 +179,20 @@ public class AlignmentTableTest {
     expected += "D: the|black| |very|special|cat\n";
     assertEquals(expected, table.toString());
   }
+  
+  @Test
+  public void testSimpleSpencerHowe() {
+    IWitness w1 = engine.createWitness("A", "a");
+    IWitness w2 = engine.createWitness("B", "b");
+    IWitness w3 = engine.createWitness("C", "a b");
+    final IAlignmentTable table = engine.align(w1, w2, w3);
+    assertEquals("A: |a| |", table.getRow(w1).rowToString());
+    assertEquals("B: | |b|", table.getRow(w2).rowToString());
+    assertEquals("C: |a|b|", table.getRow(w3).rowToString());
+    assertEquals(3, table.getRows().size());
+  }
+  
+
 
   // Note: tests toString method
   @Test

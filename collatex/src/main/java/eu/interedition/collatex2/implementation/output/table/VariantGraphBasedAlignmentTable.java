@@ -16,7 +16,7 @@ public class VariantGraphBasedAlignmentTable extends BaseAlignmentTable implemen
   private final IVariantGraph                 graph;
   private final Map<IVariantGraphVertex, IColumn> vertexToColumn;
 
-  public VariantGraphBasedAlignmentTable(IVariantGraph graph) {
+  private VariantGraphBasedAlignmentTable(IVariantGraph graph) {
     this.graph = graph;
     vertexToColumn = Maps.newHashMap();
     init();
