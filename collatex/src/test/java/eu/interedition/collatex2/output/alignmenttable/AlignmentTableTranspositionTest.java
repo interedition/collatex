@@ -82,6 +82,19 @@ public class AlignmentTableTranspositionTest {
 //    // 2: b c -> a
 //  }
 
+  //TODO: rewrite test to work with the new API
+  @Ignore
+  @Test
+  public void testDoubleTransposition2() {
+    final IWitness a = engine.createWitness("A", "a b");
+    final IWitness b = engine.createWitness("B", "b a");
+    final IAlignmentTable alignmentTable = engine.align(a, b);
+    final String expected = "A:  |a|b\n" + "B: b|a| \n";
+    final String actual = alignmentTable.toString();
+    Assert.assertEquals(expected, actual);
+  }
+
+
   @Ignore
   @Test
   public void testDoubleTransposition3() {
