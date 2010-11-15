@@ -50,26 +50,24 @@ public class AlignmentTableTest {
     assertEquals(0, table.getRows().size());
   }
 
-  //NOTE: MOVED THIS ONE TO DAGT TEST
   @Test
   public void testFirstWitness() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IAlignmentTable table = engine.align(w1);
-    final String expected = "A: the|black|cat\n";
-    assertEquals(expected, table.toString());
+    IWitness a = engine.createWitness("A", "the black cat");
+    final IAlignmentTable table = engine.align(a);
+    assertEquals("A: |the|black|cat|", table.getRow(a).rowToString());
+    assertEquals(1, table.getRows().size());
   }
   
-  //NOTE: MOVED THIS ONE TO DAGT TEST
   @Test
   public void testEverythingMatches() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IWitness w2 = engine.createWitness("B", "the black cat");
-    final IWitness w3 = engine.createWitness("C", "the black cat");
-    final IAlignmentTable table = engine.align(w1, w2, w3);
-    String expected = "A: the|black|cat\n";
-    expected += "B: the|black|cat\n";
-    expected += "C: the|black|cat\n";
-    assertEquals(expected, table.toString());
+    final IWitness a = engine.createWitness("A", "the black cat");
+    final IWitness b = engine.createWitness("B", "the black cat");
+    final IWitness c = engine.createWitness("C", "the black cat");
+    final IAlignmentTable table = engine.align(a, b, c);
+    assertEquals("A: |the|black|cat|", table.getRow(a).rowToString());
+    assertEquals("B: |the|black|cat|", table.getRow(b).rowToString());
+    assertEquals("C: |the|black|cat|", table.getRow(c).rowToString());
+    assertEquals(3, table.getRows().size());
   }
 
   //NOTE: Moved this one to DAGT test

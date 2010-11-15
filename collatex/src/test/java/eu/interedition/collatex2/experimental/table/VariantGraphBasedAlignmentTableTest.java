@@ -22,29 +22,7 @@ public class VariantGraphBasedAlignmentTableTest {
       engine = new CollateXEngine();
     }
 
-    @Test
-    public void testFirstWitness() {
-      IWitness a = engine.createWitness("A", "the first witness");
-      IVariantGraph graph = VariantGraph2Creator.create(a);
-      IAlignmentTable table = new VariantGraphBasedAlignmentTable(graph);
-      assertEquals("A: |the|first|witness|", table.getRow(a).rowToString());
-      assertEquals(1, table.getRows().size());
-    }
-    
-    @Test
-    public void testMultipleEqualWitnesses() {
-      IWitness a = engine.createWitness("A", "everything matches");
-      IWitness b = engine.createWitness("B", "everything matches");
-      IWitness c = engine.createWitness("C", "everything matches");
-      IVariantGraph graph = VariantGraph2Creator.create(a, b, c);
-      IAlignmentTable table = new VariantGraphBasedAlignmentTable(graph);
-      assertEquals("A: |everything|matches|", table.getRow(a).rowToString());
-      assertEquals("B: |everything|matches|", table.getRow(b).rowToString());
-      assertEquals("C: |everything|matches|", table.getRow(c).rowToString());
-      assertEquals(3, table.getRows().size());
-    }
-
-    @Test
+     @Test
     public void testSimpleSpencerHowe() {
       IWitness w1 = engine.createWitness("A", "a");
       IWitness w2 = engine.createWitness("B", "b");
