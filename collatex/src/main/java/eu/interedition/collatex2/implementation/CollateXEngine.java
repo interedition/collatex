@@ -38,7 +38,7 @@ import eu.interedition.collatex2.implementation.containers.witness.NormalizedWit
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
-import eu.interedition.collatex2.implementation.output.table.VariantGraphBasedAlignmentTable;
+import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
@@ -91,7 +91,7 @@ public class CollateXEngine {
    */
   public IAlignmentTable align(IWitness... witnesses) {
     IVariantGraph vg = VariantGraph2Creator.create(witnesses);
-    VariantGraphBasedAlignmentTable table = new VariantGraphBasedAlignmentTable(vg);
+    RankedGraphBasedAlignmentTable table = new RankedGraphBasedAlignmentTable(vg);
     return table;
   }
 
