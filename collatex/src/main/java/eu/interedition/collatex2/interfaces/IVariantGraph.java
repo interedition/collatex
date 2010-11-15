@@ -19,11 +19,12 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
 
   boolean isEmpty();
 
+  List<INormalizedToken> getTokens(IWitness witness);
+
   //TODO: delete method? add edges based method to interface
   List<IVariantGraphVertex> getPath(IWitness witness);
 
+  //TODO: this method can be removed!
   List<IVariantGraphVertex> getLongestPath();
-
-  List<INormalizedToken> getTokens(IWitness witness);
 
 }
