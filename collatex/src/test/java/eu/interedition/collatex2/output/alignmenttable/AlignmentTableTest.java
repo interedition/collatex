@@ -134,8 +134,6 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //TODO: make VariantGraphBasedAlignmentTable work with ranking!
-  @Ignore
   @Test
   public void testTranspositionAndReplacement() {
     final IWitness w1 = engine.createWitness("A", "The black dog chases a red cat.");
@@ -231,8 +229,6 @@ public class AlignmentTableTest {
     assertTrue(!iteratorB.hasNext());
   }
   
-  //TODO: Ai! Strange exception! Check this test!
-  @Ignore
   @Test
   public void testGetRows() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
