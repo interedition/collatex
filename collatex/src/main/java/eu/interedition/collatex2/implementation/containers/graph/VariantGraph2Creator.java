@@ -135,6 +135,9 @@ public class VariantGraph2Creator {
 
   public static IVariantGraph create(IWitness... witnesses) {
     List<IWitness> witnessList = Lists.newArrayList(witnesses);
+    if (witnessList.isEmpty()) {
+      return VariantGraph2.create();
+    }
     IWitness w1 = witnessList.remove(0);
     IWitness[] w2 = witnessList.toArray(new IWitness[witnessList.size()]);
     VariantGraph2 graph = VariantGraph2.create(w1);

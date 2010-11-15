@@ -44,6 +44,12 @@ public class AlignmentTableTest {
     engine = new CollateXEngine();
   }
 
+  @Test
+  public void testEmptyGraph() {
+    IAlignmentTable table = engine.align();
+    assertEquals(0, table.getRows().size());
+  }
+
   //NOTE: MOVED THIS ONE TO DAGT TEST
   @Test
   public void testFirstWitness() {
