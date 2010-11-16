@@ -59,6 +59,9 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
     return position;
   }
 
+  //TODO: rename to getSigla()!
+  //TODO: if the method is still used!
+  //TODO: see method down below!
   @Override
   public List<String> getSigli() {
     throw new UnsupportedOperationException();
@@ -66,7 +69,10 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
 
   @Override
   public ColumnState getState() {
-    throw new UnsupportedOperationException();
+    if (vertices.size()==1) {
+      return ColumnState.MATCH;
+    }
+    return ColumnState.VARIANT;
   }
 
   @Override

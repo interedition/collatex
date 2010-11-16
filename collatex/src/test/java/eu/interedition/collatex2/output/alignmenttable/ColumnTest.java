@@ -20,6 +20,10 @@
 
 package eu.interedition.collatex2.output.alignmenttable;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -30,6 +34,8 @@ import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ColumnState;
+import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -46,22 +52,25 @@ public class ColumnTest {
     factory = new CollateXEngine();
   }
 
+  @Test
+  public void testFirstToken() {
+    final IWitness witness = factory.createWitness("A", "a test string");
+    final IAlignmentTable table = factory.align(witness);
+    List<IColumn> columns = table.getColumns();
+    IColumn column1 = columns.get(0);
+    assertTrue(column1.containsWitness("A"));
+    assertFalse(column1.containsWitness("B"));
+    assertEquals(ColumnState.MATCH, column1.getState());
+  }
+
+  //TODO: Remove Column3 class!
+  
   @Test(expected = NoSuchElementException.class)
   public void testGetWordNonExistingGivesException() {
     final IWitness witness = factory.createWitness("A", "a test string");
     final INormalizedToken word = witness.getTokens().get(0);
     final IInternalColumn column = new Column3(word, 1);
     column.getToken("B");
-  }
-
-  @Test
-  public void testFirstToken() {
-    final IWitness witness = factory.createWitness("A", "a test string");
-    final INormalizedToken word = witness.getTokens().get(0);
-    final IInternalColumn column = new Column3(word, 1);
-    Assert.assertTrue(column.containsWitness("A"));
-    Assert.assertFalse(column.containsWitness("B"));
-    Assert.assertEquals(ColumnState.NEW, column.getState());
   }
 
   @Test

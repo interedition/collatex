@@ -19,7 +19,8 @@
  */
 
 package eu.interedition.collatex2.interfaces;
-
+//TODO: remove new, change Match to INVARIANT
+//TODO: remove add methods!
 public enum ColumnState {
   NEW, MATCH, VARIANT;
 
