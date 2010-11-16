@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.implementation.output.table;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 
@@ -50,13 +51,20 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   //TODO: see method down below!
   @Override
   public List<String> getSigli() {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
+  //TODO: add test (see parallel segmentation tests)
   @Override
   public List<String> getSigla() {
-    // TODO Auto-generated method stub
-    return null;
+    List<String> sigla = Lists.newArrayList();
+    for (IVariantGraphVertex vertex : vertices) {
+      Set<IWitness> witnesses = vertex.getWitnesses();
+      for (IWitness witness : witnesses) {
+        sigla.add(witness.getSigil());
+      }
+    }
+    return sigla;
   }
 
   //TODO: make non public!
