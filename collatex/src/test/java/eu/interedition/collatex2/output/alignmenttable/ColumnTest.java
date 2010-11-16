@@ -34,10 +34,7 @@ import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.legacy.alignmenttable.Column3;
 
 public class ColumnTest {
   private static CollateXEngine factory;
@@ -113,13 +110,11 @@ public class ColumnTest {
 //  assertEquals("variant", variants.get(1).getNormalized());
   }
 
-  //TODO: Remove Column3 class!
-  
   @Test(expected = NoSuchElementException.class)
   public void testGetWordNonExistingGivesException() {
     final IWitness witness = factory.createWitness("A", "a test string");
-    final INormalizedToken word = witness.getTokens().get(0);
-    final IInternalColumn column = new Column3(word, 1);
+    IAlignmentTable table = factory.align(witness);
+    IColumn column = table.getColumns().get(0);
     column.getToken("B");
   }
 

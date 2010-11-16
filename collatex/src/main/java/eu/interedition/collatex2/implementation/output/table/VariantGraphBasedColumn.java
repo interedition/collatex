@@ -1,6 +1,7 @@
 package eu.interedition.collatex2.implementation.output.table;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
@@ -35,7 +36,7 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   public INormalizedToken getToken(String sigil) {
     IVariantGraphVertex vertex = findVertexForWitness(sigil);
     if (vertex == null) {
-      throw new RuntimeException("WITNESS "+sigil+" not found in this column!");
+      throw new NoSuchElementException("Witness " + sigil + " is not present in this column");
     }
     IWitness witness = vertex.getWitnessForSigil(sigil);
     return vertex.getToken(witness);
@@ -54,7 +55,7 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
     throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
-  //TODO: add test (see parallel segmentation tests)
+  //TODO: add/re-enable test (see parallel segmentation tests)
   @Override
   public List<String> getSigla() {
     List<String> sigla = Lists.newArrayList();

@@ -10,7 +10,6 @@ import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.legacy.alignmenttable.Columns;
 
 public class ColumnPhrase {
   // IColumns columns is a consecutive list of IColumn-s
