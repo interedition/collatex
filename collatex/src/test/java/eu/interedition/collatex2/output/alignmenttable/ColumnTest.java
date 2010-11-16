@@ -86,6 +86,21 @@ public class ColumnTest {
 
   }
 
+  @Test
+  public void testAddMatch() {
+    final IWitness a = factory.createWitness("A", "match");
+    final IWitness b = factory.createWitness("B", "match");
+    IAlignmentTable table = factory.align(a, b);
+    IColumn column = table.getColumns().get(0);
+    Assert.assertTrue(column.containsWitness("A"));
+    Assert.assertTrue(column.containsWitness("B"));
+    Assert.assertFalse(column.containsWitness("C"));
+    Assert.assertEquals(ColumnState.MATCH, column.getState());
+//  final List<INormalizedToken> variants = column.getVariants();
+//  Assert.assertEquals(1, variants.size());
+//  Assert.assertEquals("match", variants.get(0).getNormalized());
+  }
+  
   //TODO: Remove Column3 class!
   
   @Test(expected = NoSuchElementException.class)
@@ -97,22 +112,6 @@ public class ColumnTest {
   }
 
 
-  @Test
-  public void testAddMatch() {
-    final IWitness a = factory.createWitness("A", "match");
-    final IWitness b = factory.createWitness("B", "match");
-    final INormalizedToken wordA = a.getTokens().get(0);
-    final INormalizedToken wordB = b.getTokens().get(0);
-    final IInternalColumn column = new Column3(wordA, 1);
-    column.addMatch(wordB);
-    final List<INormalizedToken> variants = column.getVariants();
-    Assert.assertEquals(1, variants.size());
-    Assert.assertEquals("match", variants.get(0).getNormalized());
-    Assert.assertTrue(column.containsWitness("A"));
-    Assert.assertTrue(column.containsWitness("B"));
-    Assert.assertFalse(column.containsWitness("C"));
-    Assert.assertEquals(ColumnState.MATCH, column.getState());
-  }
 
   @Test
   public void testMixedColumn() {
