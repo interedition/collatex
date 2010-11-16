@@ -23,51 +23,6 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   }
   
   @Override
-  public void accept(IAlignmentTableVisitor visitor) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void addMatch(INormalizedToken token) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void addVariant(INormalizedToken token) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean containsWitness(String sigil) {
-    IVariantGraphVertex findVertexForWitness = findVertexForWitness(sigil);
-    return findVertexForWitness != null;
-  }
-
-  // should maybe be a map?
-  private IVariantGraphVertex findVertexForWitness(String sigil) {
-    IVariantGraphVertex found = null;
-    for (IVariantGraphVertex vertex : vertices) {
-      if (found == null && vertex.containsWitness(sigil)) {
-        found = vertex;
-      }
-    }
-    return found;
-  }
-
-  @Override
-  public int getPosition() {
-    return position;
-  }
-
-  //TODO: rename to getSigla()!
-  //TODO: if the method is still used!
-  //TODO: see method down below!
-  @Override
-  public List<String> getSigli() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public ColumnState getState() {
     if (vertices.size()==1) {
       return ColumnState.MATCH;
@@ -86,23 +41,16 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   }
 
   @Override
-  public List<INormalizedToken> getVariants() {
+  public int getPosition() {
+    return position;
+  }
+
+  //TODO: rename to getSigla()!
+  //TODO: if the method is still used!
+  //TODO: see method down below!
+  @Override
+  public List<String> getSigli() {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setPosition(int position) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void addVertex(IVariantGraphVertex vertex) {
-    vertices.add(vertex);
-  }
-
-  @Override
-  public IInternalColumn getInternalColumn() {
-    return this;
   }
 
   @Override
@@ -110,4 +58,63 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
     // TODO Auto-generated method stub
     return null;
   }
+
+  //TODO: make non public!
+  @Override
+  public void addVertex(IVariantGraphVertex vertex) {
+    vertices.add(vertex);
+  }
+
+  //TODO: make IInternalColumn and IColumn interface
+  //TODO: one and the same!
+  @Override
+  public IInternalColumn getInternalColumn() {
+    return this;
+  }
+
+  //NOTE: ONLY USED IN TESTS!
+  @Override
+  public boolean containsWitness(String sigil) {
+    IVariantGraphVertex findVertexForWitness = findVertexForWitness(sigil);
+    return findVertexForWitness != null;
+  }
+
+  //TODO: No longer supported methods!
+  @Override
+  public List<INormalizedToken> getVariants() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void accept(IAlignmentTableVisitor visitor) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void addMatch(INormalizedToken token) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void addVariant(INormalizedToken token) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setPosition(int position) {
+    throw new UnsupportedOperationException();
+  }
+  
+  // should maybe be a map?
+  private IVariantGraphVertex findVertexForWitness(String sigil) {
+    IVariantGraphVertex found = null;
+    for (IVariantGraphVertex vertex : vertices) {
+      if (found == null && vertex.containsWitness(sigil)) {
+        found = vertex;
+      }
+    }
+    return found;
+  }
+
+
 }

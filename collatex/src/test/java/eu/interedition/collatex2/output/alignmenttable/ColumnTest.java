@@ -63,6 +63,29 @@ public class ColumnTest {
     assertEquals(ColumnState.MATCH, column1.getState());
   }
 
+  @Test
+  public void testAddVariant() {
+    final IWitness witness = factory.createWitness("A", "first");
+    final IWitness witnessB = factory.createWitness("B", "second");
+    final IWitness witnessC = factory.createWitness("C", "third");
+    final IAlignmentTable table = factory.align(witness, witnessB, witnessC);
+    List<IColumn> columns = table.getColumns();
+    IColumn column1 = columns.get(0);
+    //NOTE: containsWitness method is only used in tests!
+    assertTrue(column1.containsWitness("A"));
+    assertTrue(column1.containsWitness("B"));
+    assertTrue(column1.containsWitness("C"));
+    assertFalse(column1.containsWitness("D"));
+    assertEquals(ColumnState.VARIANT, column1.getState());
+    //NOTE: getVariants method was only used in this test!
+//  final List<INormalizedToken> variants = column1.getVariants();
+//  assertEquals(3, variants.size());
+//  assertEquals("first", variants.get(0).getNormalized());
+//  assertEquals("second", variants.get(1).getNormalized());
+//  assertEquals("third", variants.get(2).getNormalized());
+
+  }
+
   //TODO: Remove Column3 class!
   
   @Test(expected = NoSuchElementException.class)
@@ -73,28 +96,6 @@ public class ColumnTest {
     column.getToken("B");
   }
 
-  @Test
-  public void testAddVariant() {
-    final IWitness witness = factory.createWitness("A", "first");
-    final IWitness witnessB = factory.createWitness("B", "second");
-    final IWitness witnessC = factory.createWitness("C", "third");
-    final INormalizedToken word = witness.getTokens().get(0);
-    final INormalizedToken wordB = witnessB.getTokens().get(0);
-    final INormalizedToken wordC = witnessC.getTokens().get(0);
-    final IInternalColumn column = new Column3(word, 1);
-    column.addVariant(wordB);
-    column.addVariant(wordC);
-    final List<INormalizedToken> variants = column.getVariants();
-    Assert.assertEquals(3, variants.size());
-    Assert.assertEquals("first", variants.get(0).getNormalized());
-    Assert.assertEquals("second", variants.get(1).getNormalized());
-    Assert.assertEquals("third", variants.get(2).getNormalized());
-    Assert.assertTrue(column.containsWitness("A"));
-    Assert.assertTrue(column.containsWitness("B"));
-    Assert.assertTrue(column.containsWitness("C"));
-    Assert.assertFalse(column.containsWitness("D"));
-    Assert.assertEquals(ColumnState.VARIANT, column.getState());
-  }
 
   @Test
   public void testAddMatch() {

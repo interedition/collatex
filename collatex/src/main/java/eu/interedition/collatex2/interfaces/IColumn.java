@@ -37,34 +37,42 @@ import java.util.List;
 // TODO: Do not expose addXXXX methods!
 // TODO: Rename getSigli to getSigla()!
 public interface IColumn {
-
-  boolean containsWitness(String sigil);
-
+  
   INormalizedToken getToken(String sigil);
 
-  List<INormalizedToken> getVariants();
+  ColumnState getState();
 
-  void addVariant(INormalizedToken token);
+  //TODO: rename to getSigla()!
+  List<String> getSigli();
 
-  void addMatch(INormalizedToken token);
-	
+  //TODO: remove add methods from interface!
+  void addVertex(IVariantGraphVertex vertex);
+
   /**
    * get the position of this column within the alignment table
    * 
    * @return the position of this column
    */
+  //TODO: Warning: seems to be used only in tests!
   int getPosition();
 
+  //TODO: Warning method is only used in test!
+  boolean containsWitness(String sigil);
+
+  //TODO: Warning method is only used in test!
+  List<INormalizedToken> getVariants();
+
+  //TODO: remove add method!
+  void addVariant(INormalizedToken token);
+
+  //TODO: remove add method!
+  void addMatch(INormalizedToken token);
+	
+  //TODO: remove set method!
   void setPosition(int position);
 
-  ColumnState getState();
-
-  List<String> getSigli();
-
+  //TODO: not used anymore?
   void accept(IAlignmentTableVisitor visitor);
-
-  //TODO: remove add methods from interface!
-  void addVertex(IVariantGraphVertex vertex);
 
   /**
    * get the internal representation of the alignment column
