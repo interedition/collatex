@@ -52,7 +52,7 @@ public class ColumnTest {
     IColumn column1 = columns.get(0);
     assertTrue(column1.containsWitness("A"));
     assertFalse(column1.containsWitness("B"));
-    assertEquals(ColumnState.MATCH, column1.getState());
+    assertEquals(ColumnState.INVARIANT, column1.getState());
   }
 
   @Test
@@ -86,7 +86,7 @@ public class ColumnTest {
     assertTrue(column.containsWitness("A"));
     assertTrue(column.containsWitness("B"));
     assertFalse(column.containsWitness("C"));
-    assertEquals(ColumnState.MATCH, column.getState());
+    assertEquals(ColumnState.INVARIANT, column.getState());
 //  final List<INormalizedToken> variants = column.getVariants();
 //  assertEquals(1, variants.size());
 //  assertEquals("match", variants.get(0).getNormalized());

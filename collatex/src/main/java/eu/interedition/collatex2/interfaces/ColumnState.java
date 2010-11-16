@@ -19,17 +19,7 @@
  */
 
 package eu.interedition.collatex2.interfaces;
-//TODO: remove new, change Match to INVARIANT
-//TODO: remove add methods!
+
 public enum ColumnState {
-  NEW, MATCH, VARIANT;
-
-  public ColumnState addMatch() {
-    if (this == VARIANT) return VARIANT;
-    return MATCH;
-  }
-
-  public ColumnState addVariant() {
-    return VARIANT;
-  }
+  INVARIANT, VARIANT;
 }

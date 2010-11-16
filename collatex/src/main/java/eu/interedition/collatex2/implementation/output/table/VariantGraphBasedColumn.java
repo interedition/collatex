@@ -27,7 +27,7 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   @Override
   public ColumnState getState() {
     if (vertices.size()==1) {
-      return ColumnState.MATCH;
+      return ColumnState.INVARIANT;
     }
     return ColumnState.VARIANT;
   }
