@@ -125,5 +125,14 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
     return found;
   }
 
+  //NOTE: base and witness are assumed to exist in the column!
+  //NOTE: checks should have been performed before calling this method!
+  @Override
+  public boolean isMatch(String baseSigil, String witnessSigil) {
+    IVariantGraphVertex baseV = findVertexForWitness(baseSigil);
+    IVariantGraphVertex witnessV  = findVertexForWitness(witnessSigil);    
+    return baseV == witnessV;
+  }
+
 
 }

@@ -66,4 +66,9 @@ public class NullColumn implements IInternalColumn {
     return "";
   }
 
+  @Override
+  public boolean isMatch(String base, String sigil) {
+    throw new RuntimeException("DO NOT CALL THIS METHOD!");
+  }
+
 }
