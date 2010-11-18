@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.output;
+package eu.interedition.collatex2.implementation.output.apparatus;
 
 import static org.junit.Assert.assertTrue;
 
