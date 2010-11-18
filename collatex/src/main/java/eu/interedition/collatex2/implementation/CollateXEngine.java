@@ -45,6 +45,7 @@ import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -204,6 +205,11 @@ public class CollateXEngine {
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
     IAlignment2 alignment = aligner.align(witness);
     return alignment;
+  }
+
+  public IAligner createAligner() {
+    // TODO Auto-generated method stub
+    return null;
   }
   
 //  //TODO: rename to analyseTable
