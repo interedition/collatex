@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.indexing;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
