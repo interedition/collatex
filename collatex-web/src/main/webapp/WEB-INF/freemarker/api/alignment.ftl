@@ -25,8 +25,8 @@
 .none        {color: black;}
 .match       {color: grey;}
 .addition    {color: red;font-weight:bold;}
-.omission    {color: blue;font-weight:bold;}
 .replacement {color: green;font-weight:bold;}
+.omission    {color: blue;font-weight:bold;}
 .baserow {background:lightcyan;}
 table {border-style:solid;border-width:1px;border-collapse:collapse;}
 td, th {border-style:dotted;border-width:1px;padding:3px;}
@@ -45,12 +45,14 @@ td, th {border-style:dotted;border-width:1px;padding:3px;}
 		</#list>
 	</table>
 	
-  <p>Modifications:
-  <span class="none">NONE</span>
-  <span class="match">MATCH</span>
-  <span class="addition">ADDITION</span>
-  <span class="omission">OMISSION</span>
-  <span class="replacement">REPLACEMENT</span></p>
+  <p>
+    Modifications:
+    <span class="none">NONE</span>
+    <span class="match">MATCH</span>
+    <span class="addition">ADDITION</span>
+    <span class="replacement">REPLACEMENT</span>
+    <span class="omission">OMISSION</span>
+  </p>
 
   <#list alignment.sigla as s>
   Base: ${s}
@@ -59,7 +61,7 @@ td, th {border-style:dotted;border-width:1px;padding:3px;}
       <tr<#if r.sigil == s> class="baserow"</#if>>
         <th>${r.sigil?html}</th>
         <#list r.iterator() as cell>
-          <td align="center"><#if cell.empty>&ndash;<#else><span class="${cell.getModification(s)?lower_case}">${cell.token.content?html}</span></#if></td>
+          <td align="center"><#if cell.empty><span class="omission">&ndash;</span><#else><span class="${cell.getModification(s)?lower_case}">${cell.token.content?html}</span></#if></td>
         </#list>
       </tr>
     </#list>
