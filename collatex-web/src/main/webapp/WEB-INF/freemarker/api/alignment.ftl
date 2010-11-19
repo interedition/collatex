@@ -21,16 +21,48 @@
 -->
 
 <@c.page title="REST service result">
+<style type="text/css">
+.none        {color: black;}
+.match       {color: red;}
+.addition    {color: orange;}
+.omission    {color: blue;}
+.replacement {color: purple;}
+.baserow {background:yellow;}
+</style>
 	<h1>REST service result</h1>
-	
-	<table>
+
+  Baseless:	
+	<table border="1">
 		<#list alignment.rows as r>
 			<tr>
 				<th>${r.sigil?html}</th>
 				<#list r.iterator() as cell>
-					<td><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></td>
+					<#if cell.empty><td align="center">&ndash;</td><#else><td>${cell.token.content?html}</td></#if>
 				</#list>
 			</tr>
 		</#list>
 	</table>
+	
+  <p>Modifications:
+  <span class="none">NONE</span>
+  <span class="addition">ADDITION</span>
+  <span class="omission">OMISSION</span>
+  <span class="match">MATCH</span>
+  <span class="replacement">REPLACEMENT</span></p>
+
+  <#list alignment.sigla as s>
+  Base: ${s}
+  <table border="1">
+    <#list alignment.rows as r>
+      <tr<#if r.sigil == s> class="baserow"</#if>>
+        <th>${r.sigil?html}</th>
+        <#list r.iterator() as cell>
+          <#if cell.empty><td align="center">&ndash;</td><#else><td><span class="${cell.getModification(s)?lower_case}">${cell.token.content?html}</span></td></#if>
+        </#list>
+      </tr>
+    </#list>
+  </table>
+  <br/>
+  </#list>
+
 </@c.page>

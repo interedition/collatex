@@ -17,13 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+ @CHARSET "UTF-8";
 
-@CHARSET "UTF-8";
 html {
 	font-family: Georgia, "Times New Roman", Times, serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,h2,h3,h4,h5,h6 {
 	color: grey;
 	font-size: 1.5em;
 }
@@ -36,7 +36,7 @@ tr {
 	border: 0;
 }
 
-th, td {
+th,td {
 	border: 1px solid grey;
 	padding: 0.5em;
 }
@@ -44,8 +44,29 @@ th, td {
 pre {
 	background: #eee;
 }
+
 #mainmenu {
 	color: grey;
 	text-align: right;
 	font-size: smaller;
+}
+
+.none {
+	color: black;
+}
+
+.match {
+	color: red;
+}
+
+.addition {
+	color: orange;
+}
+
+.omission {
+	color: blue;
+}
+
+.replacement {
+	color: purple;
 }
