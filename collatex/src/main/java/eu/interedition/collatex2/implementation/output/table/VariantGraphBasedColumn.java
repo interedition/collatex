@@ -17,16 +17,16 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   private final List<IVariantGraphVertex> vertices;
   private final int position;
-  
+
   public VariantGraphBasedColumn(IVariantGraphVertex vertex, int position) {
     this.vertices = Lists.newArrayList();
     this.position = position;
     addVertex(vertex);
   }
-  
+
   @Override
   public ColumnState getState() {
-    if (vertices.size()==1) {
+    if (vertices.size() == 1) {
       return ColumnState.INVARIANT;
     }
     return ColumnState.VARIANT;
@@ -113,9 +113,9 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   public void setPosition(int position) {
     throw new UnsupportedOperationException();
   }
-  
+
   // should maybe be a map?
-  private IVariantGraphVertex findVertexForWitness(String sigil) {
+  protected IVariantGraphVertex findVertexForWitness(String sigil) {
     IVariantGraphVertex found = null;
     for (IVariantGraphVertex vertex : vertices) {
       if (found == null && vertex.containsWitness(sigil)) {
@@ -130,9 +130,8 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   @Override
   public boolean isMatch(String baseSigil, String witnessSigil) {
     IVariantGraphVertex baseV = findVertexForWitness(baseSigil);
-    IVariantGraphVertex witnessV  = findVertexForWitness(witnessSigil);    
+    IVariantGraphVertex witnessV = findVertexForWitness(witnessSigil);
     return baseV == witnessV;
   }
-
 
 }

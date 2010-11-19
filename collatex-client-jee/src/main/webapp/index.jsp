@@ -11,27 +11,14 @@
 				<tr>
 					<td colspan="2">CollateX REST-Service: <input type="text" name="rest_service" id="rest_service" size="50" value="http://localhost:8080/collatex-web/api/collate"/></td>
 				</tr>
-				<tr>
-					<td>Witness A : <input size="250" name="text1" id="text1"/></td>
-				</tr>
-				<tr>
-					<td>Witness B : <input size="250" name="text2" id="text2"/></td>
-				</tr>
-				<tr>
-					<td>Witness C : <input size="250" name="text3" id="text3"/></td>
-				</tr>
-				<tr>
-					<td>Witness D : <input size="250" name="text4" id="text4"/></td>
-				</tr>
-				<tr>
-					<td>Witness E : <input size="250" name="text5" id="text5"/></td>
-				</tr>
-				<tr>
-					<td>Witness F : <input size="250" name="text6" id="text6"/></td>
-				</tr>
-				<tr>
-					<td>Witness G : <input size="250" name="text7" id="text7"/></td>
-				</tr>
+
+				<tr><td>Witness A : <input size="250" name="text1" id="text1"/></td></tr>
+				<tr><td>Witness B : <input size="250" name="text2" id="text2"/></td></tr>
+				<tr><td>Witness C : <input size="250" name="text3" id="text3"/></td></tr>
+				<tr><td>Witness D : <input size="250" name="text4" id="text4"/></td></tr>
+				<tr><td>Witness E : <input size="250" name="text5" id="text5"/></td></tr>
+				<tr><td>Witness F : <input size="250" name="text6" id="text6"/></td></tr>
+				<tr><td>Witness G : <input size="250" name="text7" id="text7"/></td></tr>
 
         <tr>
 					<td colspan="2">Return output as:
@@ -43,12 +30,14 @@
 						</select>
 					</td>
 				</tr>
+				
 				<tr>
 					<td><input type="submit" value="Collate!" /></td>
 				</tr>
 			</table>	
     </form>
-    Examples:<br/>
+
+Examples:<br/>
 
 <script type="text/javascript">
   function showExample(text1,text2,text3,text4,text5,text6,text7) {

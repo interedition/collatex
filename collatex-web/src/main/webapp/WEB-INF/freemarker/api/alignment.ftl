@@ -62,12 +62,25 @@ th {background:lightblue;}
       <tr<#if r.sigil == s> class="baserow"</#if>>
         <th>${r.sigil?html}</th>
         <#list r.iterator() as cell>
-          <td align="center"><#if cell.empty><span class="${cell.getModification(s)?lower_case}">&ndash;</span><#else><span class="${cell.getModification(s)?lower_case}">${cell.token.content?html}</span></#if></td>
+          <td align="center"><span class="${cell.getModification(s)?lower_case}"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></span></td>
         </#list>
       </tr>
     </#list>
   </table>
   <br/>
   </#list>
+  
+  Vertex coloring: (hover over cell to see color hexvalue)
+  <table>
+    <#list alignment.rows as r>
+      <tr>
+        <th>${r.sigil?html}</th>
+        <#list r.iterator() as cell>
+          <td align="center"><span style="color:${cell.getColor(r.sigil)}" title="${cell.getColor(r.sigil)?upper_case}"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></span></td>
+        </#list>
+      </tr>
+    </#list>
+  </table>
+  
 
 </@c.page>

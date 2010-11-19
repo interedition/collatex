@@ -27,23 +27,29 @@ package eu.interedition.collatex2.interfaces;
  * 
  */
 public interface ICell {
-  
+
   /**
    * It is important to call this method before attempting to call getToken to determine if a token is actually present.
    * Empty cells occur where this witness has nothing to represent at this postion in the alignment.
    * @return whether or not this cell is empty
    */
   boolean isEmpty();
-  
+
   /**
    * Retrieve the token for this cell if present
    * @see isEmpty()
    * @return the token for this cell
    */
   INormalizedToken getToken();
-  
+
   int getPosition();
 
   public Modification getModification(String baseSigil);
-  
+
+  /**
+   * Get a colorvalue for this cell
+   * cells from the same vertex get the same color
+   */
+  String getColor(String sigil);
+
 }
