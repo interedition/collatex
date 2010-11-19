@@ -32,11 +32,28 @@
 				<tr>
 					<td>Witness G : <input size="250" name="text7" id="text7"/></td>
 				</tr>
+
 				<tr>
+          <td colspan="2">Set base:
+            <select name="base_id" id="obase_id">
+              <option value="" selected="selected">baseless</option>
+              <option value="A">A</option>
+              <option value="A">B</option>
+              <option value="A">C</option>
+              <option value="A">D</option>
+              <option value="A">E</option>
+              <option value="A">F</option>
+              <option value="A">G</option>
+            </select>
+          </td>
+        </tr>
+
+        <tr>
 					<td colspan="2">Return output as:
 						<select name="output_type" id="output_type">
 							<option value="application/xml" selected="selected">xml-tei</option>
-							<option value="application/json">json</option>
+              <option value="application/json">json</option>
+              <option value="application/xhtml+xml;charset=utf-8">html</option>
 							<option value="image/svg+xml">svg</option>
 						</select>
 					</td>

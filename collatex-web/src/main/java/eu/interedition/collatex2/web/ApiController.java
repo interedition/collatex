@@ -135,7 +135,7 @@ public class ApiController implements InitializingBean {
     return svg;
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json" }, method = RequestMethod.POST)
+  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/xhtml+xml;charset=utf-8" }, method = RequestMethod.POST)
   public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView("api/alignment", "alignment", collate(input));
   }
