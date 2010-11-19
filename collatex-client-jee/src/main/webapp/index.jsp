@@ -52,7 +52,7 @@
 
 <script type="text/javascript">
   function showExample(text1,text2,text3,text4,text5,text6,text7) {
-    form = document.form;
+    var form = document.form;
     form.text1.value=text1;
     form.text2.value=text2;
     form.text3.value=text3;

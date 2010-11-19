@@ -24,9 +24,9 @@
 <style type="text/css">
 .none        {color: black;}
 .match       {color: grey;}
-.addition    {color: red;font-weight:bold;}
+.addition    {color: blue;font-weight:bold;}
 .replacement {color: green;font-weight:bold;}
-.omission    {color: blue;font-weight:bold;}
+.omission    {color: red;font-weight:bold;}
 .baserow {background:lightcyan;}
 table {border-style:solid;border-width:1px;border-collapse:collapse;}
 td, th {border-style:dotted;border-width:1px;padding:3px;}
@@ -62,7 +62,7 @@ th {background:lightblue;}
       <tr<#if r.sigil == s> class="baserow"</#if>>
         <th>${r.sigil?html}</th>
         <#list r.iterator() as cell>
-          <td align="center"><#if cell.empty><span class="omission">&ndash;</span><#else><span class="${cell.getModification(s)?lower_case}">${cell.token.content?html}</span></#if></td>
+          <td align="center"><#if cell.empty><span class="${cell.getModification(s)?lower_case}">&ndash;</span><#else><span class="${cell.getModification(s)?lower_case}">${cell.token.content?html}</span></#if></td>
         </#list>
       </tr>
     </#list>
