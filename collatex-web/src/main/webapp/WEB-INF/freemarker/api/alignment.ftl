@@ -23,11 +23,11 @@
 <@c.page title="REST service result">
 <style type="text/css">
 .none        {color: black;}
-.match       {color: red;}
-.addition    {color: orange;}
+.match       {color: grey;}
+.addition    {color: red;}
 .omission    {color: blue;}
 .replacement {color: purple;}
-.baserow {background:yellow;}
+.baserow {background:lightcyan;}
 </style>
 	<h1>REST service result</h1>
 
@@ -45,9 +45,9 @@
 	
   <p>Modifications:
   <span class="none">NONE</span>
+  <span class="match">MATCH</span>
   <span class="addition">ADDITION</span>
   <span class="omission">OMISSION</span>
-  <span class="match">MATCH</span>
   <span class="replacement">REPLACEMENT</span></p>
 
   <#list alignment.sigla as s>
