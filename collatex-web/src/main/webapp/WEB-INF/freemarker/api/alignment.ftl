@@ -24,20 +24,22 @@
 <style type="text/css">
 .none        {color: black;}
 .match       {color: grey;}
-.addition    {color: red;}
-.omission    {color: blue;}
-.replacement {color: purple;}
+.addition    {color: red;font-weight:bold;}
+.omission    {color: blue;font-weight:bold;}
+.replacement {color: green;font-weight:bold;}
 .baserow {background:lightcyan;}
+table {border-style:solid;border-width:1px;border-collapse:collapse;}
+td, th {border-style:dotted;border-width:1px;padding:3px;}
 </style>
 	<h1>REST service result</h1>
 
   Baseless:	
-	<table border="1">
+	<table>
 		<#list alignment.rows as r>
 			<tr>
 				<th>${r.sigil?html}</th>
 				<#list r.iterator() as cell>
-					<#if cell.empty><td align="center">&ndash;</td><#else><td>${cell.token.content?html}</td></#if>
+					<td align="center"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></td>
 				</#list>
 			</tr>
 		</#list>
@@ -52,12 +54,12 @@
 
   <#list alignment.sigla as s>
   Base: ${s}
-  <table border="1">
+  <table>
     <#list alignment.rows as r>
       <tr<#if r.sigil == s> class="baserow"</#if>>
         <th>${r.sigil?html}</th>
         <#list r.iterator() as cell>
-          <#if cell.empty><td align="center">&ndash;</td><#else><td><span class="${cell.getModification(s)?lower_case}">${cell.token.content?html}</span></td></#if>
+          <td align="center"><#if cell.empty>&ndash;<#else><span class="${cell.getModification(s)?lower_case}">${cell.token.content?html}</span></#if></td>
         </#list>
       </tr>
     </#list>
