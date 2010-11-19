@@ -30,6 +30,7 @@
 .baserow {background:lightcyan;}
 table {border-style:solid;border-width:1px;border-collapse:collapse;}
 td, th {border-style:dotted;border-width:1px;padding:3px;}
+th {background:lightblue;}
 </style>
 	<h1>REST service result</h1>
 
