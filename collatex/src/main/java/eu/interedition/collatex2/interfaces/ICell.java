@@ -43,5 +43,7 @@ public interface ICell {
   INormalizedToken getToken();
   
   int getPosition();
+
+  public Modification getModification(String baseSigil);
   
 }

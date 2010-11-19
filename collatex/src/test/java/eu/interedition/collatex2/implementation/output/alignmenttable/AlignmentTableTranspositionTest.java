@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.output.alignmenttable;
+package eu.interedition.collatex2.implementation.output.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
 import junit.framework.Assert;
@@ -81,6 +81,19 @@ public class AlignmentTableTranspositionTest {
 //    // 1: a -> b c
 //    // 2: b c -> a
 //  }
+
+  //TODO: rewrite test to work with the new API
+  @Ignore
+  @Test
+  public void testDoubleTransposition2() {
+    final IWitness a = engine.createWitness("A", "a b");
+    final IWitness b = engine.createWitness("B", "b a");
+    final IAlignmentTable alignmentTable = engine.align(a, b);
+    final String expected = "A:  |a|b\n" + "B: b|a| \n";
+    final String actual = alignmentTable.toString();
+    Assert.assertEquals(expected, actual);
+  }
+
 
   @Ignore
   @Test

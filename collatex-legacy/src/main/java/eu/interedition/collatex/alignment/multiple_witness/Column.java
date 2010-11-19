@@ -50,18 +50,18 @@ public class Column<T extends BaseElement> {
   private void initColumn(final T word) {
     wordsProWitness.put(word.getWitnessId(), word);
     variants.add(word);
-    state = ColumnState.NEW;
+    //    state = ColumnState.NEW;
   }
 
   public void addMatch(final T word) {
     wordsProWitness.put(word.getWitnessId(), word);
-    state = state.addMatch();
+    //    state = state.addMatch();
   }
 
   public void addVariant(final T word) {
     wordsProWitness.put(word.getWitnessId(), word);
     variants.add(word);
-    state = state.addVariant();
+    //    state = state.addVariant();
   }
 
   public void toXML(final StringBuilder builder) {

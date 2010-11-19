@@ -79,8 +79,9 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     for (IVariantGraphEdge edge : outgoingEdges) {
       totalWitnesses.addAll(edge.getWitnesses());
     }
-    //NOTE: set of outgoingEdges in unordered!
-    //NOTE: so the list of witnesses is sorted here!
+    //NOTE: The set of outgoingEdges is unordered!
+    //NOTE: That is unexpected behavior so the list of witnesses
+    //NOTE: is sorted here! WOULD HAVE: insert order
     Collections.sort(totalWitnesses, new Comparator<IWitness>() {
       @Override
       public int compare(IWitness arg0, IWitness arg1) {
@@ -154,6 +155,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     addEdge(begin, end, e);
   }
 
+  //TODO: this method can be removed! Or move to utility class.
   @Override
   public List<IVariantGraphVertex> getLongestPath() {
     // NOTE: Weights are set to negative value to

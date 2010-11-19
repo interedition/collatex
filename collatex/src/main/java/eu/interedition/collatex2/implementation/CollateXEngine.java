@@ -38,13 +38,14 @@ import eu.interedition.collatex2.implementation.containers.witness.NormalizedWit
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
-import eu.interedition.collatex2.implementation.output.table.VariantGraphBasedAlignmentTable;
+import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -91,7 +92,7 @@ public class CollateXEngine {
    */
   public IAlignmentTable align(IWitness... witnesses) {
     IVariantGraph vg = VariantGraph2Creator.create(witnesses);
-    VariantGraphBasedAlignmentTable table = new VariantGraphBasedAlignmentTable(vg);
+    RankedGraphBasedAlignmentTable table = new RankedGraphBasedAlignmentTable(vg);
     return table;
   }
 
@@ -204,6 +205,11 @@ public class CollateXEngine {
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
     IAlignment2 alignment = aligner.align(witness);
     return alignment;
+  }
+
+  public IAligner createAligner() {
+    // TODO Auto-generated method stub
+    return null;
   }
   
 //  //TODO: rename to analyseTable

@@ -18,20 +18,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.output;
+package eu.interedition.collatex2.implementation.output.apparatus;
 
-import static org.junit.Assert.assertTrue;
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.interfaces.IAligner;
 
 public class TeiParallelSegmentationApparatusBuilderTest {
 	private static CollateXEngine engine = new CollateXEngine();
@@ -49,27 +56,48 @@ public class TeiParallelSegmentationApparatusBuilderTest {
 		transformer.setOutputProperty(OutputKeys.INDENT, "no");
 	}
 
-	@Test
-	public void dummy() {
-		assertTrue(true);
-	}
+    private void assertApparatusEquals(String apparatusStr, String...
+        witnesses) throws Exception {
+        IAligner aligner = engine.createAligner();
+        int wc = 0;
+        for (String witness : witnesses) {
+        aligner.add(engine.createWitness("W" + (++wc), witness));
+        }
+        Document xml = documentBuilder.newDocument();
+        Element root =
+        xml.createElementNS(TeiParallelSegmentationApparatusBuilder.TEI_NS,
+        "text");
+        xml.appendChild(root);
+       
+        TeiParallelSegmentationApparatusBuilder.build(engine.createApparatus(aligner.getResult()),
+        root);
+        StringWriter out = new StringWriter();
+        transformer.transform(new DOMSource(xml), new StreamResult(out));
+        String result = out.toString();
+        result =
+        result.substring("<text xmlns=\"http://www.tei-c.org/ns/1.0\">".length());
+        result = result.substring(0, result.length() - "</text>".length());
+        Assert.assertEquals(apparatusStr, result);
+        }
 
-	// /**
-	// * The first example from #6
-	// * (http://arts-itsee.bham.ac.uk/trac/interedition/ticket/6) (without
-	// witness
-	// * C for now)
-	// *
-	// * @throws Exception
-	// */
-	// @Test
-	// public void testSimpleSubstitutionOutput() throws Exception {
-	// assertApparatusEquals(//
-	// "the black <app><rdg wit=\"#W1\">cat</rdg><rdg wit=\"#W2 #W3\">dog</rdg></app> and the black mat",//
-	// "the black cat and the black mat",//
-	// "the black dog and the black mat",//
-	// "the black dog and the black mat");
-	// }
+
+	 /**
+	 * The first example from #6
+	 * (http://arts-itsee.bham.ac.uk/trac/interedition/ticket/6) (without
+	 witness
+	 * C for now)
+	 *
+	 * @throws Exception
+	 */
+	@Ignore 
+    @Test
+	 public void testSimpleSubstitutionOutput() throws Exception {
+	 assertApparatusEquals(//
+	 "the black <app><rdg wit=\"#W1\">cat</rdg><rdg wit=\"#W2 #W3\">dog</rdg></app> and the black mat",//
+	 "the black cat and the black mat",//
+	 "the black dog and the black mat",//
+	 "the black dog and the black mat");
+	 }
 
 	// /**
 	// * Second example from #6. Tests addition, deletion and multiple words in
@@ -133,30 +161,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
 	// "the white and black cat");
 	// }
 
-	// private void assertApparatusEquals(String apparatusStr, String...
-	// witnesses) throws Exception {
-	// IAligner aligner = engine.createAligner();
-	// int wc = 0;
-	// for (String witness : witnesses) {
-	// aligner.add(engine.createWitness("W" + (++wc), witness));
-	// }
-	// Document xml = documentBuilder.newDocument();
-	// Element root =
-	// xml.createElementNS(TeiParallelSegmentationApparatusBuilder.TEI_NS,
-	// "text");
-	// xml.appendChild(root);
-	//
-	// TeiParallelSegmentationApparatusBuilder.build(engine.createApparatus(aligner.getResult()),
-	// root);
-	// StringWriter out = new StringWriter();
-	// transformer.transform(new DOMSource(xml), new StreamResult(out));
-	// String result = out.toString();
-	// result =
-	// result.substring("<text xmlns=\"http://www.tei-c.org/ns/1.0\">".length());
-	// result = result.substring(0, result.length() - "</text>".length());
-	// Assert.assertEquals(apparatusStr, result);
-	// }
-	// TODO: reenable test!
+	 // TODO: reenable test!
 	// @Test
 	// public void testNearMatches() {
 	// Witness w1 = builder.build("A", "the black cat");

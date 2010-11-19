@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.output.alignmenttable;
+package eu.interedition.collatex2.implementation.output.alignmenttable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,29 +44,32 @@ public class AlignmentTableTest {
     engine = new CollateXEngine();
   }
 
-  //NOTE: MOVED THIS ONE TO DAGT TEST
   @Test
-  public void testFirstWitness() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IAlignmentTable table = engine.align(w1);
-    final String expected = "A: the|black|cat\n";
-    assertEquals(expected, table.toString());
-  }
-  
-  //NOTE: MOVED THIS ONE TO DAGT TEST
-  @Test
-  public void testEverythingMatches() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IWitness w2 = engine.createWitness("B", "the black cat");
-    final IWitness w3 = engine.createWitness("C", "the black cat");
-    final IAlignmentTable table = engine.align(w1, w2, w3);
-    String expected = "A: the|black|cat\n";
-    expected += "B: the|black|cat\n";
-    expected += "C: the|black|cat\n";
-    assertEquals(expected, table.toString());
+  public void testEmptyGraph() {
+    IAlignmentTable table = engine.align();
+    assertEquals(0, table.getRows().size());
   }
 
-  //NOTE: Moved this one to DAGT test
+  @Test
+  public void testFirstWitness() {
+    IWitness a = engine.createWitness("A", "the black cat");
+    final IAlignmentTable table = engine.align(a);
+    assertEquals("A: |the|black|cat|", table.getRow(a).rowToString());
+    assertEquals(1, table.getRows().size());
+  }
+  
+  @Test
+  public void testEverythingMatches() {
+    final IWitness a = engine.createWitness("A", "the black cat");
+    final IWitness b = engine.createWitness("B", "the black cat");
+    final IWitness c = engine.createWitness("C", "the black cat");
+    final IAlignmentTable table = engine.align(a, b, c);
+    assertEquals("A: |the|black|cat|", table.getRow(a).rowToString());
+    assertEquals("B: |the|black|cat|", table.getRow(b).rowToString());
+    assertEquals("C: |the|black|cat|", table.getRow(c).rowToString());
+    assertEquals(3, table.getRows().size());
+  }
+  
   @Test
   public void testVariant() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -75,12 +78,12 @@ public class AlignmentTableTest {
     final IWitness w4 = engine.createWitness("D", "the red cat");
     final IWitness w5 = engine.createWitness("E", "the yellow cat");
     final IAlignmentTable table = engine.align(w1, w2, w3, w4, w5);
-    String expected = "A: the|black|cat\n";
-    expected += "B: the|white|cat\n";
-    expected += "C: the|green|cat\n";
-    expected += "D: the|red|cat\n";
-    expected += "E: the|yellow|cat\n";
-    assertEquals(expected, table.toString());
+    assertEquals("A: |the|black|cat|", table.getRow(w1).rowToString());
+    assertEquals("B: |the|white|cat|", table.getRow(w2).rowToString());
+    assertEquals("C: |the|green|cat|", table.getRow(w3).rowToString());
+    assertEquals("D: |the|red|cat|", table.getRow(w4).rowToString());
+    assertEquals("E: |the|yellow|cat|", table.getRow(w5).rowToString());
+    assertEquals(5, table.getRows().size());
   }
 
   @Test
@@ -95,7 +98,6 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
-  //NOTE: implemented on VariantGraph
   @Test
   public void testAddition1() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
@@ -134,6 +136,20 @@ public class AlignmentTableTest {
     assertEquals(expected, table.toString());
   }
 
+  @Test
+  public void testTranspositionAndReplacement() {
+    final IWitness w1 = engine.createWitness("A", "The black dog chases a red cat.");
+    final IWitness w2 = engine.createWitness("B", "A red cat chases the black dog.");
+    final IWitness w3 = engine.createWitness("C", "A red cat chases the yellow dog");
+    final IAlignmentTable table = engine.align(w1, w2, w3);
+    String expected = "A: the|black|dog|chases|a|red|cat\n";
+    expected += "B: a|red|cat|chases|the|black|dog\n";
+    expected += "C: a|red|cat|chases|the|yellow|dog\n";
+    assertEquals(expected, table.toString());
+  }
+  
+  //NOTE: by default we align to the left!
+  //NOTE: right alignment would be nicer in this specific case!
   //TODO: AI This one is tricky!
   @Ignore
   @Test
@@ -163,6 +179,20 @@ public class AlignmentTableTest {
     expected += "D: the|black| |very|special|cat\n";
     assertEquals(expected, table.toString());
   }
+  
+  @Test
+  public void testSimpleSpencerHowe() {
+    IWitness w1 = engine.createWitness("A", "a");
+    IWitness w2 = engine.createWitness("B", "b");
+    IWitness w3 = engine.createWitness("C", "a b");
+    final IAlignmentTable table = engine.align(w1, w2, w3);
+    assertEquals("A: |a| |", table.getRow(w1).rowToString());
+    assertEquals("B: | |b|", table.getRow(w2).rowToString());
+    assertEquals("C: |a|b|", table.getRow(w3).rowToString());
+    assertEquals(3, table.getRows().size());
+  }
+  
+
 
   // Note: tests toString method
   @Test
@@ -215,8 +245,6 @@ public class AlignmentTableTest {
     assertTrue(!iteratorB.hasNext());
   }
   
-  //TODO: Ai! Strange exception! Check this test!
-  @Ignore
   @Test
   public void testGetRows() {
     final IWitness w1 = engine.createWitness("A", "the black cat");

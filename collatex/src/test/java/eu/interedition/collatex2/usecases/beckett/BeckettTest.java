@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.beckett;
+package eu.interedition.collatex2.usecases.beckett;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

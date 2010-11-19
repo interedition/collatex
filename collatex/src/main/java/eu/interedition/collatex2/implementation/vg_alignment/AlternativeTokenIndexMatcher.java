@@ -31,7 +31,7 @@ import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenMatcher;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.legacy.alignmenttable.Columns;
+import eu.interedition.collatex2.legacy.indexing.Columns;
 import eu.interedition.collatex2.legacy.indexing.NullToken;
 import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 

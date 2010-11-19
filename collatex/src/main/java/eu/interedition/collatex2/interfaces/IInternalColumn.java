@@ -28,6 +28,14 @@ public interface IInternalColumn {
 
   INormalizedToken getToken(String sigil);
 
+  ColumnState getState();
+
+  List<String> getSigla();
+
+  boolean isMatch(String baseSigil, String witnessSigil);
+
+  //DOUBT ABOUT THE REST OF THE METHODS!
+  //TODO: check 0.9.1 branch!
   List<INormalizedToken> getVariants();
 
   void addVariant(INormalizedToken token);
@@ -37,10 +45,6 @@ public interface IInternalColumn {
   int getPosition();
 
   void setPosition(int position);
-
-  ColumnState getState();
-
-  List<String> getSigla();
 
   void accept(IAlignmentTableVisitor visitor);
 

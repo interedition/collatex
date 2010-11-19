@@ -9,7 +9,7 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: make class abstract
+//TODO: make class abstract, implemented methods final
 //TODO: make class implement the IAlignmentTable interface
 //TODO: all the other methods are specific to the old implementation
 public class BaseAlignmentTable {
@@ -23,7 +23,7 @@ public class BaseAlignmentTable {
   
   public final List<IRow> getRows() {
     List<IRow> rows = Lists.newArrayList();
-    for (String sigil: sigla) {
+    for (String sigil: getSigla()) {
       rows.add(getRow(sigil));
     }
     return rows;
@@ -51,7 +51,7 @@ public class BaseAlignmentTable {
     return columns;
   }
 
-  public final List<String> getSigla() {
+  public List<String> getSigla(){
     return sigla;
   }
 
