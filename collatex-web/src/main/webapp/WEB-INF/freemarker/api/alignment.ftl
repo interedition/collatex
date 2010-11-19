@@ -22,6 +22,7 @@
 
 <@c.page title="REST service result">
 <style type="text/css">
+.hilite      {color:black;background: orange;}
 .none        {color: black;}
 .match       {color: grey;}
 .addition    {color: blue;font-weight:bold;}
@@ -76,11 +77,27 @@ th {background:lightblue;}
       <tr>
         <th>${r.sigil?html}</th>
         <#list r.iterator() as cell>
-          <td align="center"><span style="color:${cell.getColor(r.sigil)}" title="${cell.getColor(r.sigil)?upper_case}"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></span></td>
+          <#assign c = cell.getColor(r.sigil)> 
+          <#assign c1 = cell.getColor(r.sigil)?replace("#","")> 
+          <td align="center" class="c${c1}" onmouseover="hilitematches('c${c1}')" onmouseout="unhilitematches('c${c1}')"><span style="color:${c}" title="${c?upper_case}"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></span></td>
         </#list>
       </tr>
     </#list>
   </table>
+
+<script type="text/javascript" src="http://api.prototypejs.org/javascripts/pdoc/prototype.js"></script>
+<script>
+function hilitematches(c){
+  $$('.'+c).each(function(td) {
+    td.addClassName('hilite');
+  });
+}  
+function unhilitematches(c){
+  $$('.'+c).each(function(td) {
+    td.removeClassName('hilite');
+  });
+}  
+</script>
   
 
 </@c.page>
