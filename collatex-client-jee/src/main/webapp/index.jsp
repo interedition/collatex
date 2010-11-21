@@ -73,6 +73,11 @@ Examples:<br/>
 		  "text5":"He was agast and feerd",
 		  "text6":"So was he agast"
 		},{
+			"name":"Spencer and Howe",
+			"text1":"A B C D E F",
+			"text2":"X Y Z D E",
+			"text3":"A B X Y Z"	
+		},{
 			"name":"The black dog chases a red cat",
 			"text1":"The black dog chases a red cat.",
 			"text2":"A red cat chases the black dog.",
