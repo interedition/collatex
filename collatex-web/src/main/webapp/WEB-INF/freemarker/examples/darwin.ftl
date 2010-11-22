@@ -21,7 +21,14 @@
 -->
 
 <@c.page title="Darwin">
+<style type="text/css">
+.invariant {background: lightgrey;}
+.semi_invariant {background: grey;}
+.variant   {color:lightgrey; background: black;}
+</style>
+
 	<h1>Darwin</h1>
+	(<span class="invariant">INVARIANT</span>, <span class="semi_invariant">SEMI-INVARIANT</span>, <span class="variant">VARIANT</span>)
 	
 	<#list paragraphs as p>
 		<h2>${p_index + 1}.</h2>
@@ -32,7 +39,7 @@
 				<#list p.entries as e>
 					<tr>
 						<#list p.sigla as s>
-							<td><#if e.containsWitness(s)>${e.getPhrase(s).content?html}<#else>&ndash;</#if></td>
+							<td class="${e.state?lower_case}"><#if e.containsWitness(s)>${e.getPhrase(s).content?html}<#else>&ndash;</#if></td>
 						</#list>
 					</tr>
 				</#list>

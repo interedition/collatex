@@ -29,6 +29,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
+import eu.interedition.collatex2.interfaces.ApparatusEntryState;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
@@ -66,5 +67,21 @@ public class ApparatusEntry {
 
   public boolean hasEmptyCells() {
     return sigla.size() != sigilToTokens.keySet().size();
+  }
+
+  // QAD method to visualize rowstate in Darwin examples
+  public ApparatusEntryState getState() {
+    Set<String> phrases = Sets.newHashSet();
+    for (String sigil : sigla) {
+      phrases.add(getPhrase(sigil).getNormalized());
+    }
+
+    if (phrases.size() == 1) {
+      return ApparatusEntryState.INVARIANT;
+    } else if (phrases.size() == 2 && hasEmptyCells()) {
+      return ApparatusEntryState.SEMI_INVARIANT;
+    } else {
+      return ApparatusEntryState.VARIANT;
+    }
   }
 }
