@@ -43,4 +43,23 @@ public class PeterUsesCasesTest {
     assertEquals(5, vertices.get(5).getRank());
   }
 
+  @Test
+  public void testAgastTranspositionHandeling() {
+    IWitness a = factory.createWitness("A", "He was agast, so");
+    IWitness b = factory.createWitness("B", "He was agast");
+    IWitness c = factory.createWitness("C", "So he was agast");
+    IVariantGraph graph = factory.graph(a, b, c);
+    VariantGraphRanker ranker = new VariantGraphRanker(graph);
+    List<IRankedVariantGraphVertex> vertices = ranker.getRankedVertices();
+    assertEquals("so", vertices.get(0).getNormalized());
+    assertEquals(1, vertices.get(0).getRank());
+    assertEquals("he", vertices.get(1).getNormalized());
+    assertEquals(2, vertices.get(1).getRank());
+    assertEquals("was", vertices.get(2).getNormalized());
+    assertEquals(3, vertices.get(2).getRank());
+    assertEquals("agast", vertices.get(3).getNormalized());
+    assertEquals(4, vertices.get(3).getRank());
+    assertEquals("so", vertices.get(4).getNormalized());
+    assertEquals(5, vertices.get(4).getRank());
+  }
 }

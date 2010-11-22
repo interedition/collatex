@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -132,23 +131,25 @@ public class VariantGraph2CreatorTest {
 
 
     //NOTE: test taken from AlignmentTableTranspositionTest
-    @Ignore
     @Test
     public void testDoubleTransposition2() {
       IWitness a = engine.createWitness("A", "a b");
       IWitness b = engine.createWitness("B", "b a");
       IVariantGraph graph = VariantGraph2Creator.create(a, b);
       Iterator<IVariantGraphVertex> iterator = graph.iterator();
-      assertEquals("a", iterator.next().getNormalized());
+      assertEquals("#", iterator.next().getNormalized());
       assertEquals("b", iterator.next().getNormalized());
       assertEquals("a", iterator.next().getNormalized());
-      System.out.println(graph.vertexSet().size());
+      assertEquals("b", iterator.next().getNormalized());
+      assertEquals("#", iterator.next().getNormalized());
+      assertEquals(5, graph.vertexSet().size());
     }
 
-    // TODO: rename test: mirrored transpositions with match in between!
+    //TODO: add test with an addition or omission in between!
+    
     //NOTE: test taken from AlignmentTableTranspositionTest
     @Test
-    public void testTranspositionsAreStoredInAlignmentTable() {
+    public void testMirroredTranspositionsWithMatchInBetween() {
       final IWitness a = engine.createWitness("A", "the black and white cat");
       final IWitness b = engine.createWitness("B", "the white and black cat");
       IVariantGraph graph = VariantGraph2Creator.create(a, b);

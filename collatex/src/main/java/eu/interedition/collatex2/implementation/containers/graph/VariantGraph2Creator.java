@@ -1,7 +1,9 @@
 package eu.interedition.collatex2.implementation.containers.graph;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -51,32 +53,6 @@ public class VariantGraph2Creator {
     makeEdgesForMatches(witness, matches, transpositions);
   }
 
-  ///write
-  //  private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, List<ITransposition2> transpositions) {
-  //    // Map Tokens in the Witness to the Matches
-  //    Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
-  //    witnessTokenToMatch = Maps.newLinkedHashMap();
-  //    for (ITokenMatch match : matches) {
-  //      INormalizedToken tokenA = match.getTokenA();
-  //      witnessTokenToMatch.put(tokenA, match);
-  //    }
-  //    // delete transpositions from map
-  //    // TODO: Rename IMatch2 to IMatchSequence?
-  //    for (ITransposition2 trans : transpositions) {
-  //      ISequence sequenceA = trans.getSequenceA();
-  //      // TODO: check whether it is matchA
-  //      for (INormalizedToken witnessToken : sequenceA.getBasePhrase().getTokens()) {
-  //        // NOTE: sanity check
-  //        if (witnessTokenToMatch.containsKey(witnessToken)) {
-  //          witnessTokenToMatch.remove(witnessToken);
-  //        } else {
-  //          throw new RuntimeException("Could not remove match from map!");
-  //        }
-  //      }
-  //    }
-  //    addWitnessToGraph(witness, witnessTokenToMatch);
-  //  }
-
   private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, List<ITransposition2> transpositions) {
     // Map Tokens in the Witness to the Matches
     Map<INormalizedToken, ITokenMatch> witnessTokenToMatch;
@@ -87,19 +63,66 @@ public class VariantGraph2Creator {
       INormalizedToken tokenA = match.getTokenA();
       witnessTokenToMatch.put(tokenA, match);
     }
-    for (ITransposition2 trans : transpositions) {
-      ISequence sequenceA = trans.getSequenceA();
-      for (INormalizedToken witnessToken : sequenceA.getBasePhrase().getTokens()) {
-        if (witnessTokenToMatch.containsKey(witnessToken)) {
-          ITokenMatch tokenMatch = witnessTokenToMatch.remove(witnessToken);
-          witnessTokenToTranspositionMatch.put(witnessToken, tokenMatch);
-        } else {
-          throw new RuntimeException("Could not remove match from map!");
-        }
-      }
+    final Stack<ITransposition2> transToCheck = new Stack<ITransposition2>();
+    transToCheck.addAll(transpositions);
+    Collections.reverse(transToCheck);
+    while (!transToCheck.isEmpty()) {
+      final ITransposition2 top = transToCheck.pop();
+      // System.out.println("Detected transposition: "+top.getSequenceA().toString());
+      final ITransposition2 mirrored = findMirroredTransposition(transToCheck, top);
+        if (mirrored != null && transpositionsAreNear(top, mirrored)) {
+          // System.out.println("Detected mirror: "+mirrored.getSequenceA().toString());
+          // System.out.println("Keeping: transposition " + top.toString());
+          // System.out.println("Removing: transposition " + mirrored.toString());
+          // remove mirrored transpositions (a->b, b->a) from transpositions
+          transToCheck.remove(mirrored);
+          // make addition out of mirrored transposition
+          // keep top transposition as match!
+          // remove tokens from sequence from the matches!
+          ISequence sequenceA = mirrored.getSequenceA();
+          removeSequenceFromMatches(witnessTokenToMatch, witnessTokenToTranspositionMatch, sequenceA); 
+       } else {
+         // treat transposition as a replacement
+         ISequence sequenceA = top.getSequenceA();
+         removeSequenceFromMatches(witnessTokenToMatch, witnessTokenToTranspositionMatch, sequenceA);
+       }
     }
     addWitnessToGraph(witness, witnessTokenToMatch, witnessTokenToTranspositionMatch);
   }
+
+  //FIXME: why does getWitnessPhrase work and not getBasePhrase?
+  // Note: this only calculates the distance between the vertices in the graph.
+  // Note: it does not take into account a possible distance in the tokens in the witness!
+  private boolean transpositionsAreNear(ITransposition2 top, ITransposition2 mirrored) {
+    INormalizedToken lastToken = top.getSequenceA().getWitnessPhrase().getLastToken();
+    INormalizedToken firstToken = mirrored.getSequenceA().getWitnessPhrase().getFirstToken();
+    //    System.out.println(lastToken.getClass());
+    //    System.out.println(firstToken.getClass());
+    boolean isNear = graph.isNear(lastToken, firstToken);
+    return isNear;
+  }
+
+  private void removeSequenceFromMatches(Map<INormalizedToken, ITokenMatch> witnessTokenToMatch, Map<INormalizedToken, ITokenMatch> witnessTokenToTranspositionMatch, ISequence sequenceA) {
+    for (INormalizedToken witnessToken : sequenceA.getBasePhrase().getTokens()) {
+      if (!witnessTokenToMatch.containsKey(witnessToken)) {
+        throw new RuntimeException("Could not remove match from map!");
+      }  
+      ITokenMatch tokenMatch = witnessTokenToMatch.remove(witnessToken);
+      witnessTokenToTranspositionMatch.put(witnessToken, tokenMatch);
+    }
+  }
+
+  private static ITransposition2 findMirroredTransposition(final Stack<ITransposition2> transToCheck, final ITransposition2 original) {
+    for (final ITransposition2 transposition : transToCheck) {
+      if (transposition.getSequenceA().getNormalized().equals(original.getSequenceB().getNormalized())) {
+        if (transposition.getSequenceB().getNormalized().equals(original.getSequenceA().getNormalized())) {
+          return transposition;
+        }
+      }
+    }
+    return null;
+  }
+
 
   private void addWitnessToGraph(IWitness witness, Map<INormalizedToken, ITokenMatch> witnessTokenToMatch, Map<INormalizedToken, ITokenMatch> witnessTokenToTranspositionMatch) {
     IVariantGraphVertex current = graph.getStartVertex();
