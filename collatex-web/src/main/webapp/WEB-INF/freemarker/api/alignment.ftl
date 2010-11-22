@@ -22,26 +22,27 @@
 
 <@c.page title="REST service result">
 <style type="text/css">
+.invariant  {color:black; background: lightgrey;}
+.variant  {color:lightgrey; background: black;}
 .hilite      {color:black;background: orange;}
-.none        {color: black;}
-.match       {color: grey;}
-.addition    {color: blue;font-weight:bold;}
-.replacement {color: green;font-weight:bold;}
-.omission    {color: red;font-weight:bold;}
-.baserow {background:lightcyan;}
+.none        {color:black;background: LightGoldenRodYellow;}
+.match,.baserow th       {color:black;background: lightcoral;}
+.addition    {color:black;background: lightblue;}
+.replacement {color:black;background: lightgreen;}
+.omission    {color:black;background: yellow;}
 table {border-style:solid;border-width:1px;border-collapse:collapse;}
 td, th {border-style:dotted;border-width:1px;padding:3px;}
-th {background:lightblue;}
+th {background:white;}
 </style>
 	<h1>REST service result</h1>
 
-  Baseless:	
+  Baseless:	(<span class="invariant">INVARIANT</span>, <span class="variant">VARIANT</span>)
 	<table>
 		<#list alignment.rows as r>
 			<tr>
 				<th>${r.sigil?html}</th>
 				<#list r.iterator() as cell>
-					<td align="center"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></td>
+					<td align="center" class="${cell.column.state?lower_case}"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></td>
 				</#list>
 			</tr>
 		</#list>
@@ -63,7 +64,7 @@ th {background:lightblue;}
       <tr<#if r.sigil == s> class="baserow"</#if>>
         <th>${r.sigil?html}</th>
         <#list r.iterator() as cell>
-          <td align="center"><span class="${cell.getModification(s)?lower_case}"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></span></td>
+          <td align="center" class="${cell.getModification(s)?lower_case}"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></td>
         </#list>
       </tr>
     </#list>

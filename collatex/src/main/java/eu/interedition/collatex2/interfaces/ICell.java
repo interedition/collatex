@@ -52,4 +52,6 @@ public interface ICell {
    */
   String getColor(String sigil);
 
+  IInternalColumn getColumn();
+
 }

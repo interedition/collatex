@@ -8,11 +8,17 @@ import eu.interedition.collatex2.interfaces.Modification;
 
 public class Cell implements ICell {
   private final IInternalColumn column;
+
   private final String sigil;
 
   public Cell(IInternalColumn column, String sigil) {
     this.column = column;
     this.sigil = sigil;
+  }
+
+  @Override
+  public IInternalColumn getColumn() {
+    return column;
   }
 
   @Override
