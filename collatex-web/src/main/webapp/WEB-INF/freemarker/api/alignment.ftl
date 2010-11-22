@@ -22,14 +22,17 @@
 
 <@c.page title="REST service result">
 <style type="text/css">
-.invariant  {color:black; background: lightgrey;}
-.variant  {color:lightgrey; background: black;}
-.hilite      {color:black;background: orange;}
-.none        {color:black;background: LightGoldenRodYellow;}
-.match,.baserow th       {color:black;background: lightcoral;}
-.addition    {color:black;background: lightblue;}
-.replacement {color:black;background: lightgreen;}
-.omission    {color:black;background: yellow;}
+.invariant {background: lightgrey;}
+.variant   {color:lightgrey; background: black;}
+
+.hilite {background: orange;}
+
+.match,.baserow th {background: lightcoral;}
+.none        {background: LightGoldenRodYellow;}
+.addition    {background: lightblue;}
+.replacement {background: lightgreen;}
+.omission    {background: yellow;}
+
 table {border-style:solid;border-width:1px;border-collapse:collapse;}
 td, th {border-style:dotted;border-width:1px;padding:3px;}
 th {background:white;}
