@@ -76,9 +76,10 @@ public class ApparatusEntry {
       phrases.add(getPhrase(sigil).getNormalized());
     }
 
-    if (phrases.size() == 1) {
+    int size = phrases.size();
+    if (size == 1) {
       return ApparatusEntryState.INVARIANT;
-    } else if (phrases.size() == 2 && hasEmptyCells()) {
+    } else if (size == 2 && hasEmptyCells()) {
       return ApparatusEntryState.SEMI_INVARIANT;
     } else {
       return ApparatusEntryState.VARIANT;
