@@ -51,7 +51,7 @@ th {background:white;}
 		</#list>
 	</table>
 	
-  <p>
+ <#-- <p>
     Modifications:
     <span class="none">NONE</span>
     <span class="match">MATCH</span>
@@ -74,6 +74,7 @@ th {background:white;}
   </table>
   <br/>
   </#list>
+  -->
   
   Vertex coloring: (hover over cell to see color hexvalue)
   <table>
