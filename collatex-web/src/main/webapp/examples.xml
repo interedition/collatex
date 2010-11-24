@@ -33,18 +33,18 @@
         <witness>The black cat</witness>
         <witness>The, black cat</witness>
     </example>
-    <example>
+<!--    <example>
         <witness>the white and black cat</witness>
         <witness>The black cat</witness>
         <witness>the black and white cat</witness>
         <witness>the black and green cat</witness>
-    </example>
+    </example> -->
     <example>
         <witness>a cat or dog</witness>
         <witness>a cat and dog and</witness>
         <witness>a cat and dog and</witness>
     </example>
-    <example>
+     <example>
         <witness>He was agast, so</witness>
         <witness>He was agast</witness>
         <witness>So he was agast</witness>
@@ -81,13 +81,11 @@
         <witness>the drought of march hath</witness>
         <witness>the drought of march hath</witness>
     </example>
-    <!-- 
     <example>
         <witness>When April with his showers sweet with fruit The drought of March has pierced unto the root</witness>
         <witness>When showers sweet with April fruit The March of drought has pierced to the root</witness>
         <witness>When showers sweet with April fruit The drought of March has pierced the rood</witness>
     </example>
-     -->
     <example>
         <witness>This Carpenter hadde wedded newe a wyf</witness>
         <witness>This Carpenter hadde wedded a newe wyf</witness>
@@ -119,5 +117,5 @@
     <example>
         <witness>I bought this glass, because it matches those dinner plates.</witness>
         <witness>I bought those glasses.</witness>
-    </example>
+    </example>  
 </examples>
