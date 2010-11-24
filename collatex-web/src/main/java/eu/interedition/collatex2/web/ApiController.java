@@ -120,8 +120,8 @@ public class ApiController implements InitializingBean {
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
   public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
-    String svg = convert2svg(ccollate2dot(input)); // cyclic, unjoined graph
-    //    String svg = convert2svg(jcollate2dot(input)); // acyclic joined graph
+    // String svg = convert2svg(ccollate2dot(input)); // cyclic, unjoined graph
+    String svg = convert2svg(jcollate2dot(input)); // acyclic joined graph
     ModelAndView modelAndView = new ModelAndView(svgView, "svg", svg);
     return modelAndView;
   }
