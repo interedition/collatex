@@ -3,7 +3,6 @@ package eu.interedition.collatex2.implementation.output.cgraph;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import com.google.common.collect.Lists;
@@ -77,51 +76,51 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
 
   @Override
   public List<String> getRepeatedTokens() {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public List<IWitness> getWitnesses() {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public boolean isEmpty() {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public List<IVariantGraphVertex> getPath(IWitness witness) {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public List<IVariantGraphVertex> getLongestPath() {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public List<INormalizedToken> getTokens(IWitness witness) {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public Iterator<INormalizedToken> tokenIterator() {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 
   @Override
   public Iterator<IVariantGraphVertex> iterator() {
-    throw new NotImplementedException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 }
