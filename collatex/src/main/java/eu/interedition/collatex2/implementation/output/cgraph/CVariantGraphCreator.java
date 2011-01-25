@@ -40,15 +40,15 @@ public class CVariantGraphCreator {
     }
 
     for (IVariantGraphEdge avgEdge : acyclicGraph.edgeSet()) {
-      IVariantGraphVertex cvgStart = a2cVertexMap.get(avgEdge.getBeginVertex());
-      IVariantGraphVertex cvgEnd = a2cVertexMap.get(avgEdge.getEndVertex());
+      IVariantGraphVertex cvgStart = a2cVertexMap.get(acyclicGraph.getEdgeSource(avgEdge));
+      IVariantGraphVertex cvgEnd = a2cVertexMap.get(acyclicGraph.getEdgeTarget(avgEdge));
 
       Iterator<IWitness> witnessIterator = avgEdge.getWitnesses().iterator();
       IVariantGraphEdge cvgEdge;
       if (cyclicGraph.containsEdge(cvgStart, cvgEnd)) {
         cvgEdge = cyclicGraph.getEdge(cvgStart, cvgEnd);
       } else {
-        cvgEdge = new VariantGraphEdge(cvgStart, cvgEnd, witnessIterator.next());
+        cvgEdge = new VariantGraphEdge(witnessIterator.next());
         cyclicGraph.addEdge(cvgStart, cvgEnd, cvgEdge);
       }
       while (witnessIterator.hasNext()) {

@@ -39,7 +39,7 @@ public class JGraphToSegmentedVariantGraphConverter {
       IJVariantGraphVertex edgeSource = joinedVariantGraph.getEdgeSource(edge);    
       IJVariantGraphVertex edgeTarget = joinedVariantGraph.getEdgeTarget(edge);
       //TODO: aargh: I dont like this default constructor at all!
-      IVariantGraphEdge newEdge = new VariantGraphEdge(null, null, null);
+      IVariantGraphEdge newEdge = new VariantGraphEdge(null);
       for (IWitness witness : edge.getWitnesses()) {
         newEdge.addWitness(witness);
       }

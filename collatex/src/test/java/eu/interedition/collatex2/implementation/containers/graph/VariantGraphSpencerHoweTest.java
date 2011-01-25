@@ -38,11 +38,11 @@ public class VariantGraphSpencerHoweTest {
     IVariantGraphVertex endVertex = vertexI.next();
     final Set<IVariantGraphEdge> edges = graph.edgeSet();
     assertEquals(5, edges.size());
-    assertEquals("# -> a: A, C", graph.getEdge(startVertex, aVertex).toString());
-    assertEquals("a -> #: A", graph.getEdge(aVertex, endVertex).toString());
-    assertEquals("# -> b: B", graph.getEdge(startVertex, bVertex).toString());
-    assertEquals("b -> #: B, C", graph.getEdge(bVertex, endVertex).toString());
-    assertEquals("a -> b: C", graph.getEdge(aVertex, bVertex).toString());
+    assertEquals(": A, C", graph.getEdge(startVertex, aVertex).toString());
+    assertEquals(": A", graph.getEdge(aVertex, endVertex).toString());
+    assertEquals(": B", graph.getEdge(startVertex, bVertex).toString());
+    assertEquals(": B, C", graph.getEdge(bVertex, endVertex).toString());
+    assertEquals(": C", graph.getEdge(aVertex, bVertex).toString());
   }
   
 

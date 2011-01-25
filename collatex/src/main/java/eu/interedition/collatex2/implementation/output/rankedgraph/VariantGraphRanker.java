@@ -39,7 +39,7 @@ public class VariantGraphRanker {
         Set<IVariantGraphEdge> incomingEdges = graph.incomingEdgesOf(vertex);
         int maxRankParent = -1;
         for (IVariantGraphEdge edgeFromParent : incomingEdges) {
-          IVariantGraphVertex parent = edgeFromParent.getBeginVertex();
+          IVariantGraphVertex parent = graph.getEdgeSource(edgeFromParent);
           maxRankParent = Math.max(maxRankParent, vertexToRankMap.get(parent));
         }
         int rank = maxRankParent+1;

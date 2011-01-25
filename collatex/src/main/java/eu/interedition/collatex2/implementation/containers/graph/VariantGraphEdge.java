@@ -8,18 +8,14 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 @SuppressWarnings("serial")
 public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGraphEdge {
-  private final IVariantGraphVertex start;
-  private final IVariantGraphVertex end;
   private final Set<IWitness> witnesses;
 
-  public VariantGraphEdge(IVariantGraphVertex start, IVariantGraphVertex end, IWitness witness) {
-    this.start = start;
-    this.end = end;
+  //TODO: remove params!
+  public VariantGraphEdge(IWitness witness) {
     this.witnesses = Sets.newLinkedHashSet();
     addWitness(witness);
   }
@@ -30,19 +26,9 @@ public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGra
   }
 
   @Override
-  public IVariantGraphVertex getBeginVertex() {
-    return start;
-  }
-
-  @Override
-  public IVariantGraphVertex getEndVertex() {
-    return end;
-  }
-
-  @Override
   public String toString() {
     String splitter = "";
-    StringBuilder to = new StringBuilder(getBeginVertex().getNormalized()).append(" -> ").append(getEndVertex().getNormalized()).append(": ");
+    StringBuilder to = new StringBuilder().append(": ");
     for (IWitness witness : witnesses) {
       to.append(splitter).append(witness.getSigil());
       splitter = ", ";

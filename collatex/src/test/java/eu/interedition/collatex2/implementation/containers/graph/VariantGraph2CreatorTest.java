@@ -44,10 +44,10 @@ public class VariantGraph2CreatorTest {
       final IVariantGraphVertex endVertex = vertexI.next();
       Set<IVariantGraphEdge> edges = graph.edgeSet();
       assertEquals(4, edges.size());
-      assertEquals("# -> the: A, B", graph.getEdge(startVertex, theVertex).toString());
-      assertEquals("the -> black: A, B", graph.getEdge(theVertex, blackVertex).toString());
-      assertEquals("black -> cat: A, B", graph.getEdge(blackVertex, catVertex).toString());
-      assertEquals("cat -> #: A, B", graph.getEdge(catVertex, endVertex).toString());
+      assertEquals(": A, B", graph.getEdge(startVertex, theVertex).toString());
+      assertEquals(": A, B", graph.getEdge(theVertex, blackVertex).toString());
+      assertEquals(": A, B", graph.getEdge(blackVertex, catVertex).toString());
+      assertEquals(": A, B", graph.getEdge(catVertex, endVertex).toString());
     }
 
 
@@ -75,13 +75,13 @@ public class VariantGraph2CreatorTest {
       assertEquals("#", endVertex.getNormalized());
       Set<IVariantGraphEdge> edges = graph.edgeSet();
       assertEquals(7, edges.size());
-      assertEquals("# -> the: A, B", graph.getEdge(startVertex, theVertex).toString());
-      assertEquals("the -> black: A", graph.getEdge(theVertex, blackVertex).toString());
-      assertEquals("black -> cat: A, B", graph.getEdge(blackVertex, catVertex).toString());
-      assertEquals("cat -> #: A, B", graph.getEdge(catVertex, endVertex).toString());
-      assertEquals("the -> white: B", graph.getEdge(theVertex, whiteVertex).toString());
-      assertEquals("white -> and: B", graph.getEdge(whiteVertex, andVertex).toString());
-      assertEquals("and -> black: B", graph.getEdge(andVertex, blackVertex).toString());
+      assertEquals(": A, B", graph.getEdge(startVertex, theVertex).toString());
+      assertEquals(": A", graph.getEdge(theVertex, blackVertex).toString());
+      assertEquals(": A, B", graph.getEdge(blackVertex, catVertex).toString());
+      assertEquals(": A, B", graph.getEdge(catVertex, endVertex).toString());
+      assertEquals(": B", graph.getEdge(theVertex, whiteVertex).toString());
+      assertEquals(": B", graph.getEdge(whiteVertex, andVertex).toString());
+      assertEquals(": B", graph.getEdge(andVertex, blackVertex).toString());
     }
     
     @Test
@@ -115,18 +115,18 @@ public class VariantGraph2CreatorTest {
       assertEquals("#", endVertex.getNormalized());
       Set<IVariantGraphEdge> edges = graph.edgeSet();
       assertEquals(12, edges.size());
-      assertEquals("# -> the: A, B, C, D, E", graph.getEdge(startVertex, theVertex).toString());
-      assertEquals("the -> black: A", graph.getEdge(theVertex, blackVertex).toString());
-      assertEquals("black -> cat: A", graph.getEdge(blackVertex, catVertex).toString());
-      assertEquals("cat -> #: A, B, C, D, E", graph.getEdge(catVertex, endVertex).toString());
-      assertEquals("the -> white: B", graph.getEdge(theVertex, whiteVertex).toString());
-      assertEquals("white -> cat: B", graph.getEdge(whiteVertex, catVertex).toString());
-      assertEquals("the -> green: C", graph.getEdge(theVertex, greenVertex).toString());
-      assertEquals("green -> cat: C", graph.getEdge(greenVertex, catVertex).toString());
-      assertEquals("the -> red: D", graph.getEdge(theVertex, redVertex).toString());
-      assertEquals("red -> cat: D", graph.getEdge(redVertex, catVertex).toString());
-      assertEquals("the -> yellow: E", graph.getEdge(theVertex, yellowVertex).toString());
-      assertEquals("yellow -> cat: E", graph.getEdge(yellowVertex, catVertex).toString());
+      assertEquals(": A, B, C, D, E", graph.getEdge(startVertex, theVertex).toString());
+      assertEquals(": A", graph.getEdge(theVertex, blackVertex).toString());
+      assertEquals(": A", graph.getEdge(blackVertex, catVertex).toString());
+      assertEquals(": A, B, C, D, E", graph.getEdge(catVertex, endVertex).toString());
+      assertEquals(": B", graph.getEdge(theVertex, whiteVertex).toString());
+      assertEquals(": B", graph.getEdge(whiteVertex, catVertex).toString());
+      assertEquals(": C", graph.getEdge(theVertex, greenVertex).toString());
+      assertEquals(": C", graph.getEdge(greenVertex, catVertex).toString());
+      assertEquals(": D", graph.getEdge(theVertex, redVertex).toString());
+      assertEquals(": D", graph.getEdge(redVertex, catVertex).toString());
+      assertEquals(": E", graph.getEdge(theVertex, yellowVertex).toString());
+      assertEquals(": E", graph.getEdge(yellowVertex, catVertex).toString());
    }
 
 

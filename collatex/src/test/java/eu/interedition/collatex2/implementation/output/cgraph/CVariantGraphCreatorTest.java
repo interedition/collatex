@@ -91,7 +91,7 @@ public class CVariantGraphCreatorTest {
     assertNotNull(cvgVertexSet);
     assertEquals(10, cvgVertexSet.size()); // # unique tokens + start,end token
 
-    Set<IWitness> edgeWitnesses = extractedEdge(edgeSet, "red", "cat").getWitnesses();
+    Set<IWitness> edgeWitnesses = extractedEdge(cgraph, edgeSet, "red", "cat").getWitnesses();
     assertTrue(edgeWitnesses.contains(a));
     assertTrue(edgeWitnesses.contains(b));
     assertTrue(edgeWitnesses.contains(c));
@@ -131,10 +131,10 @@ public class CVariantGraphCreatorTest {
     return string;
   }
 
-  private IVariantGraphEdge extractedEdge(Set<IVariantGraphEdge> edgeSet, String begin, String end) {
+  private IVariantGraphEdge extractedEdge(IVariantGraph graph, Set<IVariantGraphEdge> edgeSet, String begin, String end) {
     for (IVariantGraphEdge cvgEdge : edgeSet) {
-      String normalizedBegin = cvgEdge.getBeginVertex().getNormalized();
-      String normalizedEnd = cvgEdge.getEndVertex().getNormalized();
+      String normalizedBegin = graph.getEdgeSource(cvgEdge).getNormalized();
+      String normalizedEnd = graph.getEdgeTarget(cvgEdge).getNormalized();
       if (normalizedBegin.equals(begin) && normalizedEnd.equals(end)) {
         return cvgEdge;
       }
