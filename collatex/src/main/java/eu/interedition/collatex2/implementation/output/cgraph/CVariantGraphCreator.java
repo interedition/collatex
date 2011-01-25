@@ -48,7 +48,8 @@ public class CVariantGraphCreator {
       if (cyclicGraph.containsEdge(cvgStart, cvgEnd)) {
         cvgEdge = cyclicGraph.getEdge(cvgStart, cvgEnd);
       } else {
-        cvgEdge = new VariantGraphEdge(witnessIterator.next());
+        cvgEdge = new VariantGraphEdge();
+        cvgEdge.addWitness(witnessIterator.next());
         cyclicGraph.addEdge(cvgStart, cvgEnd, cvgEdge);
       }
       while (witnessIterator.hasNext()) {

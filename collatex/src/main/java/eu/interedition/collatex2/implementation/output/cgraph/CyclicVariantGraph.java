@@ -60,8 +60,9 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
 
   //write
   public void addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
-    IVariantGraphEdge e = new VariantGraphEdge(witness);
-    addEdge(begin, end, e);
+    IVariantGraphEdge edge = new VariantGraphEdge();
+    edge.addWitness(witness);
+    addEdge(begin, end, edge);
   }
 
   @Override

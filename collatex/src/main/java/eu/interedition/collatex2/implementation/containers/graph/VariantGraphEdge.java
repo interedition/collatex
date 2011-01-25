@@ -14,10 +14,8 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGraphEdge {
   private final Set<IWitness> witnesses;
 
-  //TODO: remove params!
-  public VariantGraphEdge(IWitness witness) {
+  public VariantGraphEdge() {
     this.witnesses = Sets.newLinkedHashSet();
-    addWitness(witness);
   }
 
   @Override
