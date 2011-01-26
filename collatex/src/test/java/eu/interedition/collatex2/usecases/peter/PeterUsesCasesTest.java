@@ -10,6 +10,8 @@ import org.junit.Test;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.output.rankedgraph.IRankedVariantGraphVertex;
 import eu.interedition.collatex2.implementation.output.rankedgraph.VariantGraphRanker;
+import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraph;
+import eu.interedition.collatex2.implementation.output.segmented_graph.NonSegmentedGraphConverter;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -27,7 +29,9 @@ public class PeterUsesCasesTest {
     IWitness b = factory.createWitness("B", "The black and white cat");
     IWitness c = factory.createWitness("C", "The black and green cat");
     IVariantGraph graph = factory.graph(a, b, c);
-    VariantGraphRanker ranker = new VariantGraphRanker(graph);
+    NonSegmentedGraphConverter converter = new NonSegmentedGraphConverter();
+    ISegmentedVariantGraph segmentedVariantGraph = converter.convertGraph(graph);
+    VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
     List<IRankedVariantGraphVertex> vertices = ranker.getRankedVertices();
     assertEquals("the", vertices.get(0).getNormalized());
     assertEquals(1, vertices.get(0).getRank());
@@ -49,7 +53,9 @@ public class PeterUsesCasesTest {
     IWitness b = factory.createWitness("B", "He was agast");
     IWitness c = factory.createWitness("C", "So he was agast");
     IVariantGraph graph = factory.graph(a, b, c);
-    VariantGraphRanker ranker = new VariantGraphRanker(graph);
+    NonSegmentedGraphConverter converter = new NonSegmentedGraphConverter();
+    ISegmentedVariantGraph segmentedVariantGraph = converter.convertGraph(graph);
+    VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
     List<IRankedVariantGraphVertex> vertices = ranker.getRankedVertices();
     assertEquals("so", vertices.get(0).getNormalized());
     assertEquals(1, vertices.get(0).getRank());

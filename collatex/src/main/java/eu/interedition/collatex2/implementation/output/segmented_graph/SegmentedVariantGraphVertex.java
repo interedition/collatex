@@ -14,4 +14,12 @@ public class SegmentedVariantGraphVertex implements
     this.phraseForEachWitness = phraseForEachWitness;
   }
 
+  @Override
+  public String getNormalized() {
+    if (phraseForEachWitness.isEmpty()) {
+      return "#";
+    }
+    return phraseForEachWitness.values().iterator().next().getNormalized();
+  }
+
 }

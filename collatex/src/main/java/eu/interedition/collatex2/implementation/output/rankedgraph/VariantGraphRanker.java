@@ -8,22 +8,22 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraph;
+import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
 public class VariantGraphRanker {
 
-  private final IVariantGraph graph;
+  private final ISegmentedVariantGraph graph;
 
-  public VariantGraphRanker(IVariantGraph graph) {
+  public VariantGraphRanker(ISegmentedVariantGraph graph) {
     this.graph = graph;
   }
 
   public Iterator<IRankedVariantGraphVertex> iterator() {
-    final Map<IVariantGraphVertex, Integer> vertexToRankMap = Maps.newLinkedHashMap();
-    final Iterator<IVariantGraphVertex> iterator = graph.iterator();
-    IVariantGraphVertex startVertex = iterator.next();
+    final Map<ISegmentedVariantGraphVertex, Integer> vertexToRankMap = Maps.newLinkedHashMap();
+    final Iterator<ISegmentedVariantGraphVertex> iterator = graph.iterator();
+    ISegmentedVariantGraphVertex startVertex = iterator.next();
     vertexToRankMap.put(startVertex, 0);
     return new Iterator<IRankedVariantGraphVertex>() {
 
@@ -35,11 +35,11 @@ public class VariantGraphRanker {
 
       @Override
       public IRankedVariantGraphVertex next() {
-        IVariantGraphVertex vertex = iterator.next();
+        ISegmentedVariantGraphVertex vertex = iterator.next();
         Set<IVariantGraphEdge> incomingEdges = graph.incomingEdgesOf(vertex);
         int maxRankParent = -1;
         for (IVariantGraphEdge edgeFromParent : incomingEdges) {
-          IVariantGraphVertex parent = graph.getEdgeSource(edgeFromParent);
+          ISegmentedVariantGraphVertex parent = graph.getEdgeSource(edgeFromParent);
           maxRankParent = Math.max(maxRankParent, vertexToRankMap.get(parent));
         }
         int rank = maxRankParent+1;

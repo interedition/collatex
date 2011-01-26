@@ -7,6 +7,8 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.output.rankedgraph.IRankedVariantGraphVertex;
 import eu.interedition.collatex2.implementation.output.rankedgraph.VariantGraphRanker;
+import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraph;
+import eu.interedition.collatex2.implementation.output.segmented_graph.NonSegmentedGraphConverter;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -25,7 +27,9 @@ public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable implement
   }
 
   private void init() {
-    VariantGraphRanker ranker = new VariantGraphRanker(graph);
+    NonSegmentedGraphConverter converter = new NonSegmentedGraphConverter();
+    ISegmentedVariantGraph segmentedVariantGraph = converter.convertGraph(graph);
+    VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
     Iterator<IRankedVariantGraphVertex> iterator = ranker.iterator();
     Iterator<IVariantGraphVertex> vertexIterator = graph.iterator();
     //skip startVertex
