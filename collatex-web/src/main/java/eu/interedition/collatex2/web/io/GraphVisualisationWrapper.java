@@ -36,7 +36,7 @@ public class GraphVisualisationWrapper {
           append("'adjacencies':[");
       for (IVariantGraphEdge edge : graph.outgoingEdgesOf(vertex)) {
         jsonBuilder.append("{'nodeFrom':'").append(vertexId).//
-            append("','nodeTo':'").append(edge.getEndVertex().toString()).//
+            append("','nodeTo':'").append(graph.getEdgeTarget(edge).toString()).//
             append("','data':{'$color':'grey','$type':'arrow'}},");
       }
       jsonBuilder.append("]},");
