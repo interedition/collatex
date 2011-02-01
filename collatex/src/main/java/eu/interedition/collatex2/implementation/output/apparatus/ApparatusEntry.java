@@ -20,11 +20,13 @@
 
 package eu.interedition.collatex2.implementation.output.apparatus;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
@@ -37,22 +39,35 @@ public class ApparatusEntry {
 
   private final List<String> sigla;
   private final Multimap<String, INormalizedToken> sigilToTokens;
-
-  public ApparatusEntry(final List<String> sigli) {
-    this.sigla = sigli;
+  private final Map<String, IPhrase> sigilToPhrase;
+  
+  //NOTE: List of sigla also contains witnesses which are empty!
+  public ApparatusEntry(final List<String> sigla) {
+    this.sigla = sigla;
+    //TODO: remove!
     this.sigilToTokens = LinkedHashMultimap.create();
+    this.sigilToPhrase = Maps.newLinkedHashMap();
+  }
+  
+  public void addPhrase(String sigil, IPhrase phrase) {
+    sigilToPhrase.put(sigil, phrase);
   }
 
+  //TODO: remove!
   public void addToken(final String sigil, final INormalizedToken token) {
     sigilToTokens.put(sigil, token);
   }
 
   public boolean containsWitness(final String sigil) {
-    return sigilToTokens.containsKey(sigil);
+    return sigilToPhrase.containsKey(sigil);
   }
 
+  //Note: empty cell return empty phrase!
   public IPhrase getPhrase(final String witnessId) {
-    return new Phrase(Lists.newArrayList(sigilToTokens.get(witnessId)));
+    if (!sigilToPhrase.containsKey(witnessId)) {
+      return new Phrase(Collections.EMPTY_LIST);
+    }
+    return sigilToPhrase.get(witnessId);
   }
 
   public List<String> getSigla() {
@@ -61,12 +76,12 @@ public class ApparatusEntry {
 
   public Set<String> getEmptyCells() {
     final Set<String> emptySigli = Sets.newLinkedHashSet(sigla);
-    emptySigli.removeAll(sigilToTokens.keySet());
+    emptySigli.removeAll(sigilToPhrase.keySet());
     return emptySigli;
   }
 
   public boolean hasEmptyCells() {
-    return sigla.size() != sigilToTokens.keySet().size();
+    return sigla.size() != sigilToPhrase.keySet().size();
   }
 
   // QAD method to visualize rowstate in Darwin examples

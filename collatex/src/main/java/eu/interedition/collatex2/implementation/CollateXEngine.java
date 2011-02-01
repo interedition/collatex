@@ -112,8 +112,8 @@ public class CollateXEngine {
 //    return new AlignmentTableCreator3(this);
 //  }
 
-  public ParallelSegmentationApparatus createApparatus(final IAlignmentTable alignmentTable) {
-    return ParallelSegmentationApparatus.build(alignmentTable);
+  public ParallelSegmentationApparatus createApparatus(final IVariantGraph variantGraph) {
+    return ParallelSegmentationApparatus.build(variantGraph);
   }
 
 //  public IAlignmentTable createAlignmentTable() {
@@ -211,6 +211,11 @@ public class CollateXEngine {
     // TODO Auto-generated method stub
     return null;
   }
+
+  public ParallelSegmentationApparatus createApparatus(IAlignmentTable result) {
+    throw new RuntimeException("Not allowed!");
+  }
+
   
 //  //TODO: rename to analyseTable
 //  public IAnalysis analyseOldStyle(IAlignmentTable table, IWitness witness) {

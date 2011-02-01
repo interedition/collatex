@@ -40,6 +40,7 @@ import org.w3c.dom.Element;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IAligner;
 
+//TODO: re-enable these unit tests!
 public class TeiParallelSegmentationApparatusBuilderTest {
 	private static CollateXEngine engine = new CollateXEngine();
 	private static DocumentBuilderFactory dbf = DocumentBuilderFactory

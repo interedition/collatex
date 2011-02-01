@@ -20,6 +20,7 @@
 
 package eu.interedition.collatex2.implementation.output.apparatus;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -29,10 +30,16 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.interfaces.ColumnState;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
+import eu.interedition.collatex2.implementation.output.rankedgraph.IRankedVariantGraphVertex;
+import eu.interedition.collatex2.implementation.output.rankedgraph.VariantGraphRanker;
+import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraph;
+import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraphVertex;
+import eu.interedition.collatex2.implementation.output.segmented_graph.JGraphToSegmentedVariantGraphConverter;
+import eu.interedition.collatex2.interfaces.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class ParallelSegmentationApparatus {
   private static Logger logger = LoggerFactory.getLogger(ParallelSegmentationApparatus.class);
@@ -56,40 +63,60 @@ public class ParallelSegmentationApparatus {
   }
 
   /**
-   * To merge or not to merge; that is the question.
+   * Factory method that builds a ParallelSegmentationApparatus from a VariantGraph
    * 
-   * @param alignmentTable
-   * @return
    */
-  public static ParallelSegmentationApparatus build(final IAlignmentTable alignmentTable) {
-    final List<ApparatusEntry> entries = Lists.newArrayList();
-    ApparatusEntry mergedEntry = null;
-    IColumn previousEntry = null; // Note: in the next step we have to compare
-                                   // two columns with each other
-    for (final IColumn col : alignmentTable.getColumns()) {
-      boolean needNewCell = previousEntry == null || !previousEntry.getInternalColumn().getState().equals(col.getInternalColumn().getState()) || !col.getInternalColumn().getSigla().equals(previousEntry.getInternalColumn().getSigla());
-      if (previousEntry != null && previousEntry.getInternalColumn().getState() == ColumnState.VARIANT && previousEntry.getInternalColumn().getSigla().size() > col.getInternalColumn().getSigla().size()
-          && previousEntry.getInternalColumn().getSigla().containsAll(col.getInternalColumn().getSigla())) {
-        needNewCell = false;
+  
+  public static ParallelSegmentationApparatus build(IVariantGraph graph) {
+    // we first create a SegmentedVariantGraph from the IVariantGraph
+    // therefore create a JoinedGraph first
+    IJVariantGraph joinedGraph = JVariantGraphCreator.parallelSegmentate(graph);
+    JGraphToSegmentedVariantGraphConverter converter = new JGraphToSegmentedVariantGraphConverter();
+    ISegmentedVariantGraph segmentedVariantGraph = converter.convert(joinedGraph);
+    
+    // NOTE: forget the normal variant graph after this point; only use the segmented one!
+    // TODO: look at the other piece of code also!
+    VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
+    List<ApparatusEntry> entries = Lists.newArrayList();
+    Iterator<IRankedVariantGraphVertex> iterator = ranker.iterator();
+    Iterator<ISegmentedVariantGraphVertex> vertexIterator = segmentedVariantGraph.iterator();
+    //skip startVertex
+    vertexIterator.next();
+    while(iterator.hasNext()) {
+      //nextVertex is a IRankedVariantGraphVertex which is not the 
+      //same as a real vertex!
+      IRankedVariantGraphVertex nextVertex = iterator.next();
+      ISegmentedVariantGraphVertex next = vertexIterator.next();
+      if (next.equals(graph.getEndVertex())) {
+        continue;
       }
-      if (needNewCell) {
-        final List<String> sigli = alignmentTable.getSigla();
-        logger.debug("!!!" + sigli);
-        mergedEntry = new ApparatusEntry(sigli);
-        entries.add(mergedEntry);
-      }
-
-      final List<String> sigli = alignmentTable.getSigla();
-      for (final String sigil : sigli) {
-        if (col.getInternalColumn().containsWitness(sigil)) {
-          final INormalizedToken token = col.getInternalColumn().getToken(sigil);
-          mergedEntry.addToken(sigil, token);
+      int rank = nextVertex.getRank();
+//      System.out.println("DEBUG: "+nextVertex.getNormalized()+":"+nextVertex.getRank());
+      if (rank>entries.size()) {
+        //Note: doing this over and over and over is not very efficient
+        //Note: it might be better to make a graph and vertices based implementation
+        List<IWitness> witnesses = graph.getWitnesses();
+        List<String> sigla = Lists.newArrayList();
+        for (IWitness witness : witnesses) {
+          sigla.add(witness.getSigil());
+        }
+        ApparatusEntry apparatusEntry = new ApparatusEntry(sigla);
+        for (IWitness witness : next.getWitnesses()) {
+          IPhrase phrase = next.getPhrase(witness);
+          apparatusEntry.addPhrase(witness.getSigil(), phrase);
+        }
+        entries.add(apparatusEntry);
+      } else {
+        ApparatusEntry apparatusEntry = entries.get(rank-1);
+        for (IWitness witness : next.getWitnesses()) {
+          IPhrase phrase = next.getPhrase(witness);
+          apparatusEntry.addPhrase(witness.getSigil(), phrase);
         }
       }
-
-      previousEntry = col;
-
     }
+
+    
+    // convert SegmentedVariantGraph to ParallelSegmentationApparatus
     return new ParallelSegmentationApparatus(entries);
   }
 
