@@ -25,27 +25,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.ApparatusEntryState;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class ApparatusEntry {
 
   private final List<String> sigla;
-  private final Multimap<String, INormalizedToken> sigilToTokens;
   private final Map<String, IPhrase> sigilToPhrase;
   
   //NOTE: List of sigla also contains witnesses which are empty!
   public ApparatusEntry(final List<String> sigla) {
     this.sigla = sigla;
-    //TODO: remove!
-    this.sigilToTokens = LinkedHashMultimap.create();
     this.sigilToPhrase = Maps.newLinkedHashMap();
   }
   
@@ -53,16 +47,12 @@ public class ApparatusEntry {
     sigilToPhrase.put(sigil, phrase);
   }
 
-  //TODO: remove!
-  public void addToken(final String sigil, final INormalizedToken token) {
-    sigilToTokens.put(sigil, token);
-  }
-
   public boolean containsWitness(final String sigil) {
     return sigilToPhrase.containsKey(sigil);
   }
 
   //Note: empty cell return empty phrase!
+  @SuppressWarnings("unchecked")
   public IPhrase getPhrase(final String witnessId) {
     if (!sigilToPhrase.containsKey(witnessId)) {
       return new Phrase(Collections.EMPTY_LIST);
