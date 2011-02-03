@@ -1,13 +1,15 @@
 package eu.interedition.collatex2.implementation.output.rankedgraph;
 
+import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraphVertex;
+
 public class RankedVariantGraphVertex implements IRankedVariantGraphVertex {
 
   private final int rank;
-  private final String normalized;
+  private final ISegmentedVariantGraphVertex vertex;
 
-  public RankedVariantGraphVertex(int rank, String normalized) {
+  public RankedVariantGraphVertex(int rank, ISegmentedVariantGraphVertex vertex) {
     this.rank = rank;
-    this.normalized = normalized;
+    this.vertex = vertex;
   }
 
   @Override
@@ -16,8 +18,8 @@ public class RankedVariantGraphVertex implements IRankedVariantGraphVertex {
   }
 
   @Override
-  public String getNormalized() {
-    return normalized;
+  public ISegmentedVariantGraphVertex getVertex() {
+    return vertex;
   }
 
 }

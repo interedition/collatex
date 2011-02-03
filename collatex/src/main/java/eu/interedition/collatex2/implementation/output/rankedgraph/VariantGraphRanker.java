@@ -44,7 +44,7 @@ public class VariantGraphRanker {
         }
         int rank = maxRankParent+1;
         vertexToRankMap.put(vertex, rank);
-        return new RankedVariantGraphVertex(rank, vertex.getNormalized());
+        return new RankedVariantGraphVertex(rank, vertex);
       }
 
       @Override

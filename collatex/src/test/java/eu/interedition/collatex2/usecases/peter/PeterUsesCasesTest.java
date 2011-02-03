@@ -33,17 +33,17 @@ public class PeterUsesCasesTest {
     ISegmentedVariantGraph segmentedVariantGraph = converter.convertGraph(graph);
     VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
     List<IRankedVariantGraphVertex> vertices = ranker.getRankedVertices();
-    assertEquals("the", vertices.get(0).getNormalized());
+    assertEquals("the", vertices.get(0).getVertex().getNormalized());
     assertEquals(1, vertices.get(0).getRank());
-    assertEquals("black", vertices.get(1).getNormalized());
+    assertEquals("black", vertices.get(1).getVertex().getNormalized());
     assertEquals(2, vertices.get(1).getRank());
-    assertEquals("and", vertices.get(2).getNormalized());
+    assertEquals("and", vertices.get(2).getVertex().getNormalized());
     assertEquals(3, vertices.get(2).getRank());
-    assertEquals("white", vertices.get(3).getNormalized());
+    assertEquals("white", vertices.get(3).getVertex().getNormalized());
     assertEquals(4, vertices.get(3).getRank());
-    assertEquals("green", vertices.get(4).getNormalized());
+    assertEquals("green", vertices.get(4).getVertex().getNormalized());
     assertEquals(4, vertices.get(4).getRank());
-    assertEquals("cat", vertices.get(5).getNormalized());
+    assertEquals("cat", vertices.get(5).getVertex().getNormalized());
     assertEquals(5, vertices.get(5).getRank());
   }
 
@@ -57,15 +57,15 @@ public class PeterUsesCasesTest {
     ISegmentedVariantGraph segmentedVariantGraph = converter.convertGraph(graph);
     VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
     List<IRankedVariantGraphVertex> vertices = ranker.getRankedVertices();
-    assertEquals("so", vertices.get(0).getNormalized());
+    assertEquals("so", vertices.get(0).getVertex().getNormalized());
     assertEquals(1, vertices.get(0).getRank());
-    assertEquals("he", vertices.get(1).getNormalized());
+    assertEquals("he", vertices.get(1).getVertex().getNormalized());
     assertEquals(2, vertices.get(1).getRank());
-    assertEquals("was", vertices.get(2).getNormalized());
+    assertEquals("was", vertices.get(2).getVertex().getNormalized());
     assertEquals(3, vertices.get(2).getRank());
-    assertEquals("agast", vertices.get(3).getNormalized());
+    assertEquals("agast", vertices.get(3).getVertex().getNormalized());
     assertEquals(4, vertices.get(3).getRank());
-    assertEquals("so", vertices.get(4).getNormalized());
+    assertEquals("so", vertices.get(4).getVertex().getNormalized());
     assertEquals(5, vertices.get(4).getRank());
   }
 }
