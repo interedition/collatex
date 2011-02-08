@@ -16,11 +16,11 @@ import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
 public class JVariantGraphCreator {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreator.class);
-  private static IVariantGraph unjoinedGraph;
-  private static IJVariantGraph joinedGraph;
-  private static Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap;
+  private IVariantGraph unjoinedGraph;
+  private IJVariantGraph joinedGraph;
+  private Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap;
 
-  public static IJVariantGraph parallelSegmentate(final IVariantGraph _unjoinedGraph) {
+  public IJVariantGraph parallelSegmentate(final IVariantGraph _unjoinedGraph) {
     unjoinedGraph = _unjoinedGraph;
     //    LOG.info("edges: {}", unjoinedGraph.edgeSet().size());
     joinedGraph = JVariantGraph.create();
@@ -44,7 +44,7 @@ public class JVariantGraphCreator {
     return joinedGraph;
   }
 
-  private static void processEdge(IVariantGraphEdge vgEdge, IJVariantGraphVertex lastJvgVertex) {
+  private void processEdge(IVariantGraphEdge vgEdge, IJVariantGraphVertex lastJvgVertex) {
     //    LOG.info("edge: {} {}", vgEdge, vgEdge.hashCode());
     IVariantGraphVertex vgVertex = unjoinedGraph.getEdgeTarget(vgEdge);
     IJVariantGraphVertex jvgVertex;
@@ -64,7 +64,7 @@ public class JVariantGraphCreator {
     }
   }
 
-  private static void checkNextVertex(IVariantGraphVertex vgVertex, IJVariantGraphVertex jvgVertex) {
+  private void checkNextVertex(IVariantGraphVertex vgVertex, IJVariantGraphVertex jvgVertex) {
     Set<IVariantGraphEdge> outgoingEdges = unjoinedGraph.outgoingEdgesOf(vgVertex);
     if (outgoingEdges.size() == 1) {
       IVariantGraphVertex targetVgVertex = unjoinedGraph.getEdgeTarget(outgoingEdges.iterator().next());
@@ -84,11 +84,11 @@ public class JVariantGraphCreator {
     }
   }
 
-  private static boolean vertexHasOneIncomingEdge(final IVariantGraphVertex vertex) {
+  private boolean vertexHasOneIncomingEdge(final IVariantGraphVertex vertex) {
     return unjoinedGraph.inDegreeOf(vertex) == 1;
   }
 
-  private static boolean vertexHasOutgoingEdges(IVariantGraphVertex vertex) {
+  private boolean vertexHasOutgoingEdges(IVariantGraphVertex vertex) {
     return unjoinedGraph.outDegreeOf(vertex) > 0;
   }
 

@@ -37,7 +37,8 @@ public class JVariantGraphCreatorTest {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the black cat");
     IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
-    IJVariantGraph joinedGraph = JVariantGraphCreator.parallelSegmentate(graph);
+    JVariantGraphCreator creator = new JVariantGraphCreator();
+    IJVariantGraph joinedGraph = creator.parallelSegmentate(graph);
     LOG.info("joinedGraph=" + joinedGraph);
     IJVariantGraphVertex startVertex = joinedGraph.getStartVertex();
     assertEquals("#", startVertex.getNormalized());
@@ -66,7 +67,8 @@ public class JVariantGraphCreatorTest {
     final IWitness w1 = engine.createWitness("A", "the nice black cat shared his food");
     final IWitness w2 = engine.createWitness("B", "the bad white cat spilled his food again");
     IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
-    IJVariantGraph joinedGraph = JVariantGraphCreator.parallelSegmentate(graph);
+    JVariantGraphCreator creator = new JVariantGraphCreator();
+    IJVariantGraph joinedGraph = creator.parallelSegmentate(graph);
     LOG.info("joinedGraph=" + joinedGraph);
     IJVariantGraphVertex startVertex = joinedGraph.getStartVertex();
     assertEquals("#", startVertex.getNormalized());
@@ -102,7 +104,8 @@ public class JVariantGraphCreatorTest {
     final IWitness w1 = engine.createWitness("A", "Blackie, the black cat");
     final IWitness w2 = engine.createWitness("B", "Whitney, the white cat");
     IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
-    IJVariantGraph joinedGraph = JVariantGraphCreator.parallelSegmentate(graph);
+    JVariantGraphCreator creator = new JVariantGraphCreator();
+    IJVariantGraph joinedGraph = creator.parallelSegmentate(graph);
     LOG.info("joinedGraph=" + joinedGraph);
     IJVariantGraphVertex startVertex = joinedGraph.getStartVertex();
     assertEquals("#", startVertex.getNormalized());

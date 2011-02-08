@@ -60,7 +60,8 @@ public class ParallelSegmentationApparatus {
   public static ParallelSegmentationApparatus build(IVariantGraph graph) {
     // we first create a SegmentedVariantGraph from the IVariantGraph
     // therefore create a JoinedGraph first
-    IJVariantGraph joinedGraph = JVariantGraphCreator.parallelSegmentate(graph);
+    JVariantGraphCreator creator = new JVariantGraphCreator();
+    IJVariantGraph joinedGraph = creator.parallelSegmentate(graph);
     JGraphToSegmentedVariantGraphConverter converter = new JGraphToSegmentedVariantGraphConverter();
     ISegmentedVariantGraph segmentedVariantGraph = converter.convert(joinedGraph);
     
