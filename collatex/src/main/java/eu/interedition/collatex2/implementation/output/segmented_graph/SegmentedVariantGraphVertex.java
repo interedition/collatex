@@ -35,5 +35,10 @@ public class SegmentedVariantGraphVertex implements
   public IPhrase getPhrase(IWitness witness) {
     return phraseForEachWitness.get(witness);
   }
+
+  @Override
+  public boolean containsWitness(IWitness witness) {
+    return phraseForEachWitness.containsKey(witness);
+  }
  
 }

@@ -37,6 +37,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.interfaces.IWitness;
+
 /**
  * Apparatus element serializing to the output format specified in ticket #6.
  * 
@@ -52,8 +54,8 @@ public class TeiParallelSegmentationApparatusBuilder {
     for (final ApparatusEntry entry : apparatus.getEntries()) {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
-      for (String sigel : entry.getSigla()) {
-        content2WitMap.put(entry.getPhrase(sigel).getContent(), sigel);
+      for (IWitness witness : entry.getWitnesses()) {
+        content2WitMap.put(entry.getPhrase(witness).getContent(), witness.getSigil());
       }
 
       if ((content2WitMap.keySet().size() == 1) && !entry.hasEmptyCells()) {

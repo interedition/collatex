@@ -8,10 +8,13 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public interface ISegmentedVariantGraphVertex {
 
+  //NOTE: This method is only used in tests! Remove?
   String getNormalized();
 
   List<IWitness> getWitnesses();
 
   IPhrase getPhrase(IWitness witness);
+
+  boolean containsWitness(IWitness witness);
 
 }

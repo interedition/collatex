@@ -22,13 +22,11 @@ package eu.interedition.collatex2.implementation.output.apparatus;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.implementation.output.rankedgraph.IRankedVariantGraphVertex;
@@ -37,7 +35,6 @@ import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmente
 import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraphVertex;
 import eu.interedition.collatex2.implementation.output.segmented_graph.JGraphToSegmentedVariantGraphConverter;
 import eu.interedition.collatex2.interfaces.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -45,23 +42,16 @@ public class ParallelSegmentationApparatus {
   private static Logger logger = LoggerFactory.getLogger(ParallelSegmentationApparatus.class);
   
   private final List<ApparatusEntry> entries;
-  private List<String> sigla;
+  private final List<IWitness> witnesses;
 
   public List<ApparatusEntry> getEntries() {
     return entries;
   }
 
-  public List<String> getSigla() {
-    if (this.sigla == null) {
-      final Set<String> sigli = Sets.newLinkedHashSet();
-      for (final ApparatusEntry column : entries) {
-        sigli.addAll(column.getSigla());
-      }
-      this.sigla = Lists.newArrayList(sigli);
-    }
-    return this.sigla;
+  public List<IWitness> getWitnesses() {
+    return witnesses;
   }
-
+  
   /**
    * Factory method that builds a ParallelSegmentationApparatus from a VariantGraph
    * 
@@ -91,7 +81,6 @@ public class ParallelSegmentationApparatus {
         continue;
       }
       int rank = nextVertex.getRank();
-//      System.out.println("DEBUG: "+nextVertex.getNormalized()+":"+nextVertex.getRank());
       if (rank>entries.size()) {
         //Note: doing this over and over and over is not very efficient
         //Note: it might be better to make a graph and vertices based implementation
@@ -101,26 +90,20 @@ public class ParallelSegmentationApparatus {
           sigla.add(witness.getSigil());
         }
         ApparatusEntry apparatusEntry = new ApparatusEntry(sigla);
-        for (IWitness witness : next.getWitnesses()) {
-          IPhrase phrase = next.getPhrase(witness);
-          apparatusEntry.addPhrase(witness.getSigil(), phrase);
-        }
+        apparatusEntry.addVertex(next);
         entries.add(apparatusEntry);
       } else {
         ApparatusEntry apparatusEntry = entries.get(rank-1);
-        for (IWitness witness : next.getWitnesses()) {
-          IPhrase phrase = next.getPhrase(witness);
-          apparatusEntry.addPhrase(witness.getSigil(), phrase);
-        }
+        apparatusEntry.addVertex(next);
       }
     }
-
     
     // convert SegmentedVariantGraph to ParallelSegmentationApparatus
-    return new ParallelSegmentationApparatus(entries);
+    return new ParallelSegmentationApparatus(graph.getWitnesses(), entries);
   }
 
-  private ParallelSegmentationApparatus(final List<ApparatusEntry> entries) {
+  private ParallelSegmentationApparatus(List<IWitness> witnesses, final List<ApparatusEntry> entries) {
+    this.witnesses = witnesses;
     this.entries = entries;
   }
 }

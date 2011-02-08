@@ -22,72 +22,97 @@ package eu.interedition.collatex2.implementation.output.apparatus;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
+import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.ApparatusEntryState;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IWitness;
 
+//TODO: make this class SegmentedGraphVertex based!
+//TODO: QAD implementation can then be removed!
+//TODO: Extract interface for this class! Do not expose Vertex in the interface!
 public class ApparatusEntry {
 
   private final List<String> sigla;
-  private final Map<String, IPhrase> sigilToPhrase;
+  private final Set<ISegmentedVariantGraphVertex> vertices;
   
   //NOTE: List of sigla also contains witnesses which are empty!
   public ApparatusEntry(final List<String> sigla) {
     this.sigla = sigla;
-    this.sigilToPhrase = Maps.newLinkedHashMap();
+    this.vertices = Sets.newLinkedHashSet();
   }
   
-  public void addPhrase(String sigil, IPhrase phrase) {
-    sigilToPhrase.put(sigil, phrase);
+  public void addVertex(ISegmentedVariantGraphVertex vertex) {
+    vertices.add(vertex);
   }
 
-  public boolean containsWitness(final String sigil) {
-    return sigilToPhrase.containsKey(sigil);
-  }
-
-  //Note: empty cell return empty phrase!
-  @SuppressWarnings("unchecked")
-  public IPhrase getPhrase(final String witnessId) {
-    if (!sigilToPhrase.containsKey(witnessId)) {
-      return new Phrase(Collections.EMPTY_LIST);
+  public List<IWitness> getWitnesses() {
+    List<IWitness> witnesses = Lists.newArrayList();
+    for (ISegmentedVariantGraphVertex vertex : vertices) {
+      witnesses.addAll(vertex.getWitnesses());
     }
-    return sigilToPhrase.get(witnessId);
+    return witnesses;
+  }
+
+  public boolean containsWitness(IWitness witness) {
+    ISegmentedVariantGraphVertex result = null;
+    for (ISegmentedVariantGraphVertex vertex : vertices) {
+      if (vertex.containsWitness(witness)) {
+        result = vertex;
+        break;
+      }
+    }
+    return result != null;
+  }
+  
+  //Note: an empty cell returns an empty phrase!
+  @SuppressWarnings("unchecked")
+  public IPhrase getPhrase(final IWitness witness) {
+    ISegmentedVariantGraphVertex result = null;
+    for (ISegmentedVariantGraphVertex vertex : vertices) {
+      if (vertex.containsWitness(witness)) {
+        result = vertex;
+        break;
+      }
+    }
+    if (result == null) {
+      return new Phrase(Collections.EMPTY_LIST);
+    }  
+    return result.getPhrase(witness);
   }
 
   public List<String> getSigla() {
     return sigla;
   }
 
-  public Set<String> getEmptyCells() {
-    final Set<String> emptySigli = Sets.newLinkedHashSet(sigla);
-    emptySigli.removeAll(sigilToPhrase.keySet());
-    return emptySigli;
-  }
-
   public boolean hasEmptyCells() {
-    return sigla.size() != sigilToPhrase.keySet().size();
+    int witnessSize = 0;
+    for (ISegmentedVariantGraphVertex vertex : vertices) {
+      witnessSize += vertex.getWitnesses().size();
+    }
+    return sigla.size() != witnessSize;
   }
 
   // QAD method to visualize rowstate in Darwin examples
   public ApparatusEntryState getState() {
-    Set<String> phrases = Sets.newHashSet();
-    for (String sigil : sigla) {
-      phrases.add(getPhrase(sigil).getNormalized());
-    }
-
-    int size = phrases.size();
-    if (size == 1) {
-      return ApparatusEntryState.INVARIANT;
-    } else if (size == 2 && hasEmptyCells()) {
-      return ApparatusEntryState.SEMI_INVARIANT;
-    } else {
-      return ApparatusEntryState.VARIANT;
-    }
+    return ApparatusEntryState.INVARIANT;
+//    Set<String> phrases = Sets.newHashSet();
+//    for (String sigil : sigla) {
+//      phrases.add(getPhrase(sigil).getNormalized());
+//    }
+//
+//    int size = phrases.size();
+//    if (size == 1) {
+//      return ApparatusEntryState.INVARIANT;
+//    } else if (size == 2 && hasEmptyCells()) {
+//      return ApparatusEntryState.SEMI_INVARIANT;
+//    } else {
+//      return ApparatusEntryState.VARIANT;
+//    }
   }
 }
