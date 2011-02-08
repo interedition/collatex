@@ -18,9 +18,11 @@ public class JVariantGraphCreator {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreator.class);
   private static IJVariantGraph joinedGraph;
   private static Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap;
+  private static IVariantGraph unjoinedGraph;
 
-  public static IJVariantGraph parallelSegmentate(final IVariantGraph unjoinedGraph) {
-    LOG.info("edges: {}", unjoinedGraph.edgeSet().size());
+  public static IJVariantGraph parallelSegmentate(final IVariantGraph _unjoinedGraph) {
+    unjoinedGraph = _unjoinedGraph;
+    //    LOG.info("edges: {}", unjoinedGraph.edgeSet().size());
     joinedGraph = JVariantGraph.create();
     vertexMap = Maps.newHashMap();
 
@@ -36,14 +38,14 @@ public class JVariantGraphCreator {
 
     Set<IVariantGraphEdge> outgoingEdges = unjoinedGraph.outgoingEdgesOf(startVgVertex);
     for (IVariantGraphEdge vgEdge : outgoingEdges) {
-      processEdge(vgEdge, unjoinedGraph, startJvgVertex);
+      processEdge(vgEdge, startJvgVertex);
     }
 
     return joinedGraph;
   }
 
-  private static void processEdge(IVariantGraphEdge vgEdge, final IVariantGraph unjoinedGraph, IJVariantGraphVertex lastJvgVertex) {
-    LOG.info("edge: {} {}", vgEdge, vgEdge.hashCode());
+  private static void processEdge(IVariantGraphEdge vgEdge, IJVariantGraphVertex lastJvgVertex) {
+    //    LOG.info("edge: {} {}", vgEdge, vgEdge.hashCode());
     IVariantGraphVertex vgVertex = unjoinedGraph.getEdgeTarget(vgEdge);
     IJVariantGraphVertex jvgVertex;
     boolean vgVertexIsNew = true;
@@ -58,36 +60,36 @@ public class JVariantGraphCreator {
     JVariantGraphEdge jvgEdge = new JVariantGraphEdge(lastJvgVertex, jvgVertex, vgEdge);
     joinedGraph.addEdge(lastJvgVertex, jvgVertex, jvgEdge);
     if (vgVertexIsNew) {
-      checkNextVertex(unjoinedGraph, vertexMap, vgVertex, jvgVertex);
+      checkNextVertex(vgVertex, jvgVertex);
     }
   }
 
-  private static void checkNextVertex(final IVariantGraph unjoinedGraph, final Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap, IVariantGraphVertex vgVertex, IJVariantGraphVertex jvgVertex) {
+  private static void checkNextVertex(IVariantGraphVertex vgVertex, IJVariantGraphVertex jvgVertex) {
     Set<IVariantGraphEdge> outgoingEdges = unjoinedGraph.outgoingEdgesOf(vgVertex);
     if (outgoingEdges.size() == 1) {
       IVariantGraphVertex targetVgVertex = unjoinedGraph.getEdgeTarget(outgoingEdges.iterator().next());
-      if (vertexHasOneIncomingEdge(unjoinedGraph, targetVgVertex) && vertexHasOutgoingEdges(unjoinedGraph, targetVgVertex)) {
+      if (vertexHasOneIncomingEdge(targetVgVertex) && vertexHasOutgoingEdges(targetVgVertex)) {
         if (!vertexMap.containsKey(targetVgVertex)) {
           jvgVertex.addVariantGraphVertex(targetVgVertex);
         }
         vertexMap.put(targetVgVertex, jvgVertex);
-        checkNextVertex(unjoinedGraph, vertexMap, targetVgVertex, jvgVertex);
+        checkNextVertex(targetVgVertex, jvgVertex);
       } else {
-        processEdge(outgoingEdges.iterator().next(), unjoinedGraph, jvgVertex);
+        processEdge(outgoingEdges.iterator().next(), jvgVertex);
       }
     } else {
       for (IVariantGraphEdge vgEdge : outgoingEdges) {
-        processEdge(vgEdge, unjoinedGraph, jvgVertex);
+        processEdge(vgEdge, jvgVertex);
       }
     }
   }
 
-  private static boolean vertexHasOneIncomingEdge(final IVariantGraph unjoinedGraph, final IVariantGraphVertex nextVertex) {
-    return unjoinedGraph.inDegreeOf(nextVertex) == 1;
+  private static boolean vertexHasOneIncomingEdge(final IVariantGraphVertex vertex) {
+    return unjoinedGraph.inDegreeOf(vertex) == 1;
   }
 
-  private static boolean vertexHasOutgoingEdges(final IVariantGraph unjoinedGraph, IVariantGraphVertex startVertex) {
-    return unjoinedGraph.outDegreeOf(startVertex) > 0;
+  private static boolean vertexHasOutgoingEdges(IVariantGraphVertex vertex) {
+    return unjoinedGraph.outDegreeOf(vertex) > 0;
   }
 
 }
