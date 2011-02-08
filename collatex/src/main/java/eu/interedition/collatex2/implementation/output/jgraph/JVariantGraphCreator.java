@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.interfaces.IJVariantGraph;
 import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
@@ -18,6 +19,7 @@ public class JVariantGraphCreator {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreator.class);
   private static IJVariantGraph joinedGraph;
   private static Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap;
+  private static Set<IVariantGraphEdge> vgEdgesChecked = Sets.newHashSet();;
 
   public static IJVariantGraph parallelSegmentate(final IVariantGraph unjoinedGraph) {
     joinedGraph = JVariantGraph.create();
@@ -42,18 +44,21 @@ public class JVariantGraphCreator {
   }
 
   private static void processEdge(IVariantGraphEdge vgEdge, final IVariantGraph unjoinedGraph, IJVariantGraphVertex lastJvgVertex) {
-    IVariantGraphVertex vgVertex = unjoinedGraph.getEdgeTarget(vgEdge);
-    IJVariantGraphVertex jvgVertex;
-    if (vertexMap.containsKey(vgVertex)) {
-      jvgVertex = vertexMap.get(vgVertex);
-    } else {
-      jvgVertex = new JVariantGraphVertex(vgVertex);
-      vertexMap.put(vgVertex, jvgVertex);
-      joinedGraph.addVertex(jvgVertex);
+    if (!vgEdgesChecked.contains(vgEdge)) {
+      IVariantGraphVertex vgVertex = unjoinedGraph.getEdgeTarget(vgEdge);
+      IJVariantGraphVertex jvgVertex;
+      if (vertexMap.containsKey(vgVertex)) {
+        jvgVertex = vertexMap.get(vgVertex);
+      } else {
+        jvgVertex = new JVariantGraphVertex(vgVertex);
+        vertexMap.put(vgVertex, jvgVertex);
+        joinedGraph.addVertex(jvgVertex);
+      }
+      JVariantGraphEdge jvgEdge = new JVariantGraphEdge(lastJvgVertex, jvgVertex, vgEdge);
+      joinedGraph.addEdge(lastJvgVertex, jvgVertex, jvgEdge);
+      vgEdgesChecked.add(vgEdge);
+      checkNextVertex(unjoinedGraph, vertexMap, vgVertex, jvgVertex);
     }
-    JVariantGraphEdge jvgEdge = new JVariantGraphEdge(lastJvgVertex, jvgVertex, vgEdge);
-    joinedGraph.addEdge(lastJvgVertex, jvgVertex, jvgEdge);
-    checkNextVertex(unjoinedGraph, vertexMap, vgVertex, jvgVertex);
   }
 
   private static void checkNextVertex(final IVariantGraph unjoinedGraph, final Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap, IVariantGraphVertex vgVertex, IJVariantGraphVertex jvgVertex) {
