@@ -32,14 +32,13 @@
 	
 	<#list paragraphs as p>
 		<h2>${p_index + 1}.</h2>
-		
-		<#if p.sigla?has_content>
+		<#if p.witnesses?has_content>
 			<table>
-				<tr><#list p.sigla as s><th>${s?html}</th></#list></tr>
+				<tr><#list p.witnesses as w><th>${w?html}</th></#list></tr>
 				<#list p.entries as e>
 					<tr>
-						<#list p.sigla as s>
-							<td class="${e.state?lower_case}"><#if e.containsWitness(s)>${e.getPhrase(s).content?html}<#else>&ndash;</#if></td>
+						<#list p.witnesses as w>
+							<td class="${e.state?lower_case}"><#if e.containsWitness(w)>${e.getPhrase(w).content?html}<#else>&ndash;</#if></td>
 						</#list>
 					</tr>
 				</#list>
