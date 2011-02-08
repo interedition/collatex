@@ -16,9 +16,9 @@ import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
 public class JVariantGraphCreator {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreator.class);
+  private static IVariantGraph unjoinedGraph;
   private static IJVariantGraph joinedGraph;
   private static Map<IVariantGraphVertex, IJVariantGraphVertex> vertexMap;
-  private static IVariantGraph unjoinedGraph;
 
   public static IJVariantGraph parallelSegmentate(final IVariantGraph _unjoinedGraph) {
     unjoinedGraph = _unjoinedGraph;
