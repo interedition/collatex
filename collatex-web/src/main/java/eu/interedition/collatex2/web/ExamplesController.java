@@ -69,12 +69,10 @@ public class ExamplesController implements InitializingBean {
   public ModelMap collateDarwin() {
     List<ParallelSegmentationApparatus> alignments = Lists.newArrayListWithCapacity(darwin.size());
     
-    IWitness[] paragraph =   darwin.get(3);
-    
-  // for (IWitness[] paragraph : darwin) {
+   for (IWitness[] paragraph : darwin) {
       IVariantGraph graph = engine.graph(paragraph);
       alignments.add(engine.createApparatus(graph));
-  // }
+   }
     return new ModelMap("paragraphs", alignments);
   }
   

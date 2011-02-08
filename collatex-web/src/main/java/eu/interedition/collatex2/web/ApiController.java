@@ -258,7 +258,8 @@ public class ApiController implements InitializingBean {
     ApiWitness[] array = witnesses.toArray(new ApiWitness[witnesses.size()]);
     IVariantGraph graph = new CollateXEngine().graph(array);
 
-    IJVariantGraph jgraph = JVariantGraphCreator.parallelSegmentate(graph);
+    JVariantGraphCreator creator = new JVariantGraphCreator();
+    IJVariantGraph jgraph = creator.parallelSegmentate(graph);
     Writer writer = new StringWriter();
     JDOT_EXPORTER.export(writer, jgraph);
     return writer.toString();
