@@ -33,8 +33,6 @@ import eu.interedition.collatex2.interfaces.ApparatusEntryState;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: make this class SegmentedGraphVertex based!
-//TODO: QAD implementation can then be removed!
 //TODO: Extract interface for this class! Do not expose Vertex in the interface!
 public class ApparatusEntry {
 
@@ -98,21 +96,15 @@ public class ApparatusEntry {
     return sigla.size() != witnessSize;
   }
 
-  // QAD method to visualize rowstate in Darwin examples
   public ApparatusEntryState getState() {
-    return ApparatusEntryState.INVARIANT;
-//    Set<String> phrases = Sets.newHashSet();
-//    for (String sigil : sigla) {
-//      phrases.add(getPhrase(sigil).getNormalized());
-//    }
-//
-//    int size = phrases.size();
-//    if (size == 1) {
-//      return ApparatusEntryState.INVARIANT;
-//    } else if (size == 2 && hasEmptyCells()) {
-//      return ApparatusEntryState.SEMI_INVARIANT;
-//    } else {
-//      return ApparatusEntryState.VARIANT;
-//    }
+    int size = vertices.size();
+    if (size == 1) {
+      boolean emptyCells = hasEmptyCells();
+      if (!emptyCells) {
+        return ApparatusEntryState.INVARIANT;
+      } 
+      return ApparatusEntryState.SEMI_INVARIANT;  
+    }
+    return ApparatusEntryState.VARIANT;
   }
 }
