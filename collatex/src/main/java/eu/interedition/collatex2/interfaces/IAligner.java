@@ -21,7 +21,7 @@
 package eu.interedition.collatex2.interfaces;
 
 public interface IAligner {
-  IAlignmentTable getResult();
+  IVariantGraph getResult();
 
   IAligner add(IWitness... witnesses);
   

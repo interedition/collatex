@@ -23,11 +23,14 @@ public class JGraphToSegmentedVariantGraphConverter {
   public ISegmentedVariantGraph convert(IJVariantGraph joinedVariantGraph) {
     Set<IJVariantGraphVertex> vertexSet = joinedVariantGraph.vertexSet();
     Map<IJVariantGraphVertex, ISegmentedVariantGraphVertex> newVertices = createNewVertices(vertexSet);
-    ISegmentedVariantGraph segmentedVariantGraph = new SegmentedVariantGraph();
+    SegmentedVariantGraph segmentedVariantGraph = new SegmentedVariantGraph();
     for (ISegmentedVariantGraphVertex vertex : newVertices.values()) {
       segmentedVariantGraph.addVertex(vertex);
     }
     addEdgesToGraph(joinedVariantGraph, newVertices, segmentedVariantGraph);
+    // set new end vertex
+    ISegmentedVariantGraphVertex newEndVertex = newVertices.get(joinedVariantGraph.getEndVertex());
+    segmentedVariantGraph.setEndVertex(newEndVertex);
     return segmentedVariantGraph;
   }
 

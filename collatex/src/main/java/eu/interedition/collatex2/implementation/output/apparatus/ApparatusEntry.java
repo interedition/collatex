@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
@@ -36,12 +35,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 //TODO: Extract interface for this class! Do not expose Vertex in the interface!
 public class ApparatusEntry {
 
-  private final List<String> sigla;
+  private final List<IWitness> witnesses;
   private final Set<ISegmentedVariantGraphVertex> vertices;
   
-  //NOTE: List of sigla also contains witnesses which are empty!
-  public ApparatusEntry(final List<String> sigla) {
-    this.sigla = sigla;
+  public ApparatusEntry(List<IWitness> witnesses) {
+    this.witnesses = witnesses;
     this.vertices = Sets.newLinkedHashSet();
   }
   
@@ -50,13 +48,11 @@ public class ApparatusEntry {
   }
 
   public List<IWitness> getWitnesses() {
-    List<IWitness> witnesses = Lists.newArrayList();
-    for (ISegmentedVariantGraphVertex vertex : vertices) {
-      witnesses.addAll(vertex.getWitnesses());
-    }
     return witnesses;
   }
 
+  //This means that a reading is not empty!
+  //TODO: rename!
   public boolean containsWitness(IWitness witness) {
     ISegmentedVariantGraphVertex result = null;
     for (ISegmentedVariantGraphVertex vertex : vertices) {
@@ -84,16 +80,12 @@ public class ApparatusEntry {
     return result.getPhrase(witness);
   }
 
-  public List<String> getSigla() {
-    return sigla;
-  }
-
   public boolean hasEmptyCells() {
-    int witnessSize = 0;
+    int nonEmptyWitnessSize = 0;
     for (ISegmentedVariantGraphVertex vertex : vertices) {
-      witnessSize += vertex.getWitnesses().size();
+      nonEmptyWitnessSize += vertex.getWitnesses().size();
     }
-    return sigla.size() != witnessSize;
+    return getWitnesses().size() != nonEmptyWitnessSize;
   }
 
   public ApparatusEntryState getState() {

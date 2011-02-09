@@ -17,9 +17,19 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
  */
 @SuppressWarnings("serial")
 public class SegmentedVariantGraph extends DirectedAcyclicGraph<ISegmentedVariantGraphVertex, IVariantGraphEdge> implements ISegmentedVariantGraph {
-
+    private ISegmentedVariantGraphVertex endVertex;
+    
 	public SegmentedVariantGraph() {
 		super(VariantGraphEdge.class);
 	}
+
+  @Override
+  public ISegmentedVariantGraphVertex getEndVertex() {
+    return endVertex;
+  }
+
+  protected void setEndVertex(ISegmentedVariantGraphVertex endVertex) {
+    this.endVertex = endVertex;
+  }
 
 }

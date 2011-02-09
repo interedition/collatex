@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
 import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
@@ -80,6 +81,38 @@ public class CollateXEngine {
     this.tokenNormalizer = tokenNormalizer;
   }
 
+
+  /**
+   * Create an instance of an IWitness object
+   * 
+   * @param sigil - the unique id for this witness
+   * @param text - the body of the witness
+   * @return
+   */
+  public IWitness createWitness(final String sigil, final String text) {
+    final Iterable<IToken> tokens = tokenizer.tokenize(sigil, text);
+    return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
+  }
+
+  public IAligner createAligner() {
+    VariantGraph2 graph = new VariantGraph2(); 
+    return new VariantGraph2Creator(graph);
+  }
+
+  /**
+   * align the witnesses
+   * 
+   * @param witnesses - the witnesses
+   * @return the alignment of the witnesses as a VariantGraph
+   * 
+   * @todo
+   * We're not sure what we want to do with the name of this method: alignment vs. collation
+   * Terminology check
+   */
+  public IVariantGraph graph(IWitness... witnesses) {
+    return VariantGraph2Creator.create(witnesses);
+  }
+
   /**
    * align the witnesses
    * 
@@ -96,29 +129,13 @@ public class CollateXEngine {
     return table;
   }
 
-  /**
-   * Create an instance of an IWitness object
-   * 
-   * @param sigil - the unique id for this witness
-   * @param text - the body of the witness
-   * @return
-   */
-  public IWitness createWitness(final String sigil, final String text) {
-    final Iterable<IToken> tokens = tokenizer.tokenize(sigil, text);
-    return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
-  }
-
-//  public IAligner createAligner() {
-//    return new AlignmentTableCreator3(this);
-//  }
-
   public ParallelSegmentationApparatus createApparatus(final IVariantGraph variantGraph) {
     return ParallelSegmentationApparatus.build(variantGraph);
   }
 
-//  public IAlignmentTable createAlignmentTable() {
-//    return new AlignmentTable4();
-//  }
+  public ParallelSegmentationApparatus createApparatus(IAlignmentTable result) {
+    throw new RuntimeException("Not allowed! --> use createApparatus(VG) instead.");
+  }
 
   public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
@@ -188,10 +205,6 @@ public class CollateXEngine {
     return stringSet;
   }
 
-  public IVariantGraph graph(IWitness... witnesses) {
-    return VariantGraph2Creator.create(witnesses);
-  }
-
   public IAnalysis analyse(IVariantGraph graph, IWitness b) {
     IAlignment2 alignment = align(graph, b);
     //TODO: move this code to an analyzer class?
@@ -205,15 +218,6 @@ public class CollateXEngine {
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
     IAlignment2 alignment = aligner.align(witness);
     return alignment;
-  }
-
-  public IAligner createAligner() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public ParallelSegmentationApparatus createApparatus(IAlignmentTable result) {
-    throw new RuntimeException("Not allowed!");
   }
 
   

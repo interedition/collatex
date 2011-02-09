@@ -33,7 +33,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   private final IVariantGraphVertex startVertex;
   private final IVariantGraphVertex endVertex;
 
-  private VariantGraph2() {
+  public VariantGraph2() {
     super(IVariantGraphEdge.class);
     startVertex = new VariantGraphVertex("#", null);
     addVertex(startVertex);
@@ -99,7 +99,8 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return new VariantGraph2();
   }
 
-  //TODO: should the first witness really be a special case like this?
+  //TODO: remove this method! This is just an optimalization
+  // move it to the addWitness method
   public static VariantGraph2 create(IWitness a) {
     VariantGraph2 graph = VariantGraph2.create();
     List<IVariantGraphVertex> newVertices = Lists.newArrayList();

@@ -15,6 +15,8 @@ import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition2;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
+import eu.interedition.collatex2.interfaces.IAligner;
+import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -22,7 +24,7 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraph2Creator {
+public class VariantGraph2Creator implements IAligner {
 
   private final VariantGraph2 graph;
 
@@ -169,6 +171,24 @@ public class VariantGraph2Creator {
       creator.addWitness(witness);
     }
     return graph;
+  }
+
+  @Override
+  public IVariantGraph getResult() {
+    return graph;
+  }
+
+  @Override
+  public IAligner add(IWitness... witnesses) {
+    for (IWitness witness : witnesses) {
+      addWitness(witness);
+    }
+    return this;
+  }
+
+  @Override
+  public void setCallback(ICallback callback) {
+    throw new RuntimeException("NOT IMPLEMENTED!");
   }
 
 }

@@ -78,25 +78,18 @@ public class ParallelSegmentationApparatus {
       //same as a real vertex!
       IRankedVariantGraphVertex nextVertex = iterator.next();
       ISegmentedVariantGraphVertex next = vertexIterator.next();
-      if (next.equals(graph.getEndVertex())) {
+      if (next.equals(segmentedVariantGraph.getEndVertex())) {
         continue;
       }
+      ApparatusEntry apparatusEntry;
       int rank = nextVertex.getRank();
       if (rank>entries.size()) {
-        //Note: doing this over and over and over is not very efficient
-        //Note: it might be better to make a graph and vertices based implementation
-        List<IWitness> witnesses = graph.getWitnesses();
-        List<String> sigla = Lists.newArrayList();
-        for (IWitness witness : witnesses) {
-          sigla.add(witness.getSigil());
-        }
-        ApparatusEntry apparatusEntry = new ApparatusEntry(sigla);
-        apparatusEntry.addVertex(next);
+        apparatusEntry = new ApparatusEntry(graph.getWitnesses());
         entries.add(apparatusEntry);
       } else {
-        ApparatusEntry apparatusEntry = entries.get(rank-1);
-        apparatusEntry.addVertex(next);
+        apparatusEntry = entries.get(rank-1);
       }
+      apparatusEntry.addVertex(next);
     }
     
     // convert SegmentedVariantGraph to ParallelSegmentationApparatus

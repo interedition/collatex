@@ -10,4 +10,6 @@ public interface ISegmentedVariantGraph extends DirectedGraph<ISegmentedVariantG
 
   Iterator<ISegmentedVariantGraphVertex> iterator();
 
+  ISegmentedVariantGraphVertex getEndVertex();
+
 }
