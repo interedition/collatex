@@ -16,7 +16,6 @@ import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition2;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
 import eu.interedition.collatex2.interfaces.IAligner;
-import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -184,11 +183,6 @@ public class VariantGraph2Creator implements IAligner {
       addWitness(witness);
     }
     return this;
-  }
-
-  @Override
-  public void setCallback(ICallback callback) {
-    throw new RuntimeException("NOT IMPLEMENTED!");
   }
 
 }

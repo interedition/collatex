@@ -18,12 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
-public interface ITransposition extends IModification {
+import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
-  IMatch getMatchA();
+public interface IReplacement extends IModification {
 
-  IMatch getMatchB();
+  IColumns getOriginalColumns();
+
+  IPhrase getReplacementPhrase();
+
+  IInternalColumn getNextColumn();
+
+  int getPosition();
 
 }

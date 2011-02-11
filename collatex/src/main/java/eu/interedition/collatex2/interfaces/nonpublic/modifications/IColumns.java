@@ -18,8 +18,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
-public interface ICallback {
-  void alignment(IAlignment alignment);
+import java.util.List;
+
+import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IPhrase;
+
+public interface IColumns {
+
+  void addMatchPhrase(IPhrase phrase);
+
+  void addVariantPhrase(IPhrase phrase);
+
+  int getBeginPosition();
+
+  int getEndPosition();
+
+  IInternalColumn getFirstColumn();
+
+  IInternalColumn getLastColumn();
+
+  boolean isEmpty();
+
+  int size();
+
+  //Note: exposes internal list; implement Collection instead?
+  List<IInternalColumn> getColumns();
+
 }

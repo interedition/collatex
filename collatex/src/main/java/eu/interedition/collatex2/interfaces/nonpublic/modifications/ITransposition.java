@@ -18,24 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
-import java.util.List;
 
-public interface IAlignment {
+public interface ITransposition extends IModification {
 
-  List<IMatch> getMatches();
+  IMatch getMatchA();
 
-  List<IMatch> getMatchesSortedForWitness();
-
-  List<IGap> getGaps();
-
-  List<ITransposition> getTranspositions();
-
-  List<IAddition> getAdditions();
-
-  List<IReplacement> getReplacements();
-
-  List<IOmission> getOmissions();
+  IMatch getMatchB();
 
 }

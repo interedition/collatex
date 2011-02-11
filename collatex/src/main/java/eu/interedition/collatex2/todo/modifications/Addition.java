@@ -1,9 +1,9 @@
 package eu.interedition.collatex2.todo.modifications;
 
-import eu.interedition.collatex2.interfaces.IAddition;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
-import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IAddition;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IGap;
 
 public class Addition implements IAddition {
   private final IPhrase addition;

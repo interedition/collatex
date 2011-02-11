@@ -5,9 +5,9 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IInternalColumn;
-import eu.interedition.collatex2.interfaces.IColumns;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
 
 public class Columns implements IColumns {
   private final List<IInternalColumn> columns;

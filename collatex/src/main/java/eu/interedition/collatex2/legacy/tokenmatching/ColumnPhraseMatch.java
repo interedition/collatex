@@ -1,8 +1,8 @@
 package eu.interedition.collatex2.legacy.tokenmatching;
 
-import eu.interedition.collatex2.interfaces.IColumns;
-import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
 
 public class ColumnPhraseMatch implements IMatch {
 

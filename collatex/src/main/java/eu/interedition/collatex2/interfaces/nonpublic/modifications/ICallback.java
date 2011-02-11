@@ -18,16 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
-public interface IReplacement extends IModification {
 
-  IColumns getOriginalColumns();
-
-  IPhrase getReplacementPhrase();
-
-  IInternalColumn getNextColumn();
-
-  int getPosition();
-
+public interface ICallback {
+  void alignment(IAlignment alignment);
 }

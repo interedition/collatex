@@ -1,9 +1,9 @@
 package eu.interedition.collatex2.legacy.gapdetection;
 
 import eu.interedition.collatex2.interfaces.IInternalColumn;
-import eu.interedition.collatex2.interfaces.IColumns;
-import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IGap;
 
 public class Gap implements IGap {
   private final IColumns columns;

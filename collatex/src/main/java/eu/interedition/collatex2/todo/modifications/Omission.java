@@ -1,8 +1,8 @@
 package eu.interedition.collatex2.todo.modifications;
 
-import eu.interedition.collatex2.interfaces.IColumns;
-import eu.interedition.collatex2.interfaces.IGap;
-import eu.interedition.collatex2.interfaces.IOmission;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IGap;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IOmission;
 
 public class Omission implements IOmission {
   private final IColumns columns;

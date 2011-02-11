@@ -20,6 +20,7 @@
 
 package eu.interedition.collatex2.interfaces;
 
+
 /**
  * 
  * An alignment table cell represents the position of a witness token in alignment position with other witnesses in the table.
@@ -43,8 +44,6 @@ public interface ICell {
   INormalizedToken getToken();
 
   int getPosition();
-
-  public Modification getModification(String baseSigil);
 
   /**
    * Get a colorvalue for this cell

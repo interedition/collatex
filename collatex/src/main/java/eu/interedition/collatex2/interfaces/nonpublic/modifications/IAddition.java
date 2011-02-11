@@ -18,12 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
-public interface IOmission extends IModification {
+import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
-  int getPosition();
+public interface IAddition extends IModification {
+  IPhrase getAddedPhrase();
 
-  IColumns getOmittedColumns();
+  IInternalColumn getNextColumn();
 
+  boolean isAtTheBeginning();
+
+  boolean isAtTheEnd();
+  
 }

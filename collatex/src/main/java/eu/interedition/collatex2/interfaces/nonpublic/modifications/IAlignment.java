@@ -18,29 +18,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
 import java.util.List;
 
-public interface IColumns {
 
-  void addMatchPhrase(IPhrase phrase);
+public interface IAlignment {
 
-  void addVariantPhrase(IPhrase phrase);
+  List<IMatch> getMatches();
 
-  int getBeginPosition();
+  List<IMatch> getMatchesSortedForWitness();
 
-  int getEndPosition();
+  List<IGap> getGaps();
 
-  IInternalColumn getFirstColumn();
+  List<ITransposition> getTranspositions();
 
-  IInternalColumn getLastColumn();
+  List<IAddition> getAdditions();
 
-  boolean isEmpty();
+  List<IReplacement> getReplacements();
 
-  int size();
-
-  //Note: exposes internal list; implement Collection instead?
-  List<IInternalColumn> getColumns();
+  List<IOmission> getOmissions();
 
 }

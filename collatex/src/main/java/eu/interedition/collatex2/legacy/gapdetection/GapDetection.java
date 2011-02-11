@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IColumns;
-import eu.interedition.collatex2.interfaces.IGap;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
-import eu.interedition.collatex2.interfaces.IMatch;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IGap;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
 
 public class GapDetection {
 

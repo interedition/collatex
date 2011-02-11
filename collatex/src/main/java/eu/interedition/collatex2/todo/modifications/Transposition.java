@@ -1,7 +1,7 @@
 package eu.interedition.collatex2.todo.modifications;
 
-import eu.interedition.collatex2.interfaces.IMatch;
-import eu.interedition.collatex2.interfaces.ITransposition;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.ITransposition;
 
 public class Transposition implements ITransposition {
 
