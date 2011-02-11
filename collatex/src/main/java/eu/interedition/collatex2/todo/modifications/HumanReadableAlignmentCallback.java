@@ -18,19 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.web;
+package eu.interedition.collatex2.todo.modifications;
 
 import java.util.List;
 
-import eu.interedition.collatex2.interfaces.IAddition;
-import eu.interedition.collatex2.interfaces.IAlignment;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.ICallback;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
-import eu.interedition.collatex2.interfaces.IMatch;
-import eu.interedition.collatex2.interfaces.IOmission;
-import eu.interedition.collatex2.interfaces.IReplacement;
-import eu.interedition.collatex2.interfaces.ITransposition;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IAddition;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IAlignment;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.ICallback;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IOmission;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IReplacement;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.ITransposition;
 
 public class HumanReadableAlignmentCallback implements ICallback {
   private static final String   BR = "<br/>";
