@@ -24,8 +24,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -55,7 +53,7 @@ public class VariantGraph2Test {
   @Test
   public void testOneWitness() {
     IWitness a = engine.createWitness("A", "only one witness");
-    IVariantGraph graph = VariantGraph2.create(a);
+    IVariantGraph graph = engine.graph(a);
     final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(5, vertices.size());
     Iterator<IVariantGraphVertex> vertexI = graph.iterator();
@@ -85,7 +83,7 @@ public class VariantGraph2Test {
   @Test
   public void testFirstWitness() {
     IWitness a = engine.createWitness("A", "the first witness");
-    IVariantGraph graph = VariantGraph2.create(a);
+    IVariantGraph graph = engine.graph(a);
     // vertices
     Iterator<IVariantGraphVertex> iterator = graph.iterator();
     IVariantGraphVertex start = iterator.next();
@@ -154,7 +152,7 @@ public class VariantGraph2Test {
     IWitness w1 = engine.createWitness("A", "a");
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
-    IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
+    IVariantGraph graph = engine.graph(w1, w2, w3);
     assertEquals(4, graph.vertexSet().size());
     List<IVariantGraphVertex> longestPath = graph.getLongestPath();
     //    for (CollateXVertex v: longestPath) {
@@ -170,7 +168,7 @@ public class VariantGraph2Test {
     final IWitness w1 = engine.createWitness("V", "a b c d e f ");
     final IWitness w2 = engine.createWitness("W", "x y z d e");
     final IWitness w3 = engine.createWitness("X", "a b x y z");
-    IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
+    IVariantGraph graph = engine.graph(w1, w2, w3);
     List<IVariantGraphVertex> path = graph.getPath(w1);
     assertEquals("a", path.get(0).getNormalized());
     assertEquals("b", path.get(1).getNormalized());
@@ -187,7 +185,7 @@ public class VariantGraph2Test {
     final IWitness w1 = engine.createWitness("A", "the quick brown fox");
     final IWitness w2 = engine.createWitness("B", "the quick and the dead");
     final IWitness w3 = engine.createWitness("C", "the slow blue dead fox");
-    IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3);
+    IVariantGraph graph = engine.graph(w1, w2, w3);
     VertexNameProvider<IVariantGraphVertex> vertexIDProvider = new VertexNameProvider<IVariantGraphVertex>() {
       @Override
       public String getVertexName(IVariantGraphVertex v) {

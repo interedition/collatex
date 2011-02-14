@@ -33,7 +33,6 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
 import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
 import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
@@ -96,7 +95,7 @@ public class CollateXEngine {
 
   public IAligner createAligner() {
     VariantGraph2 graph = new VariantGraph2(); 
-    return new VariantGraph2Creator(graph);
+    return new VariantGraphAligner(graph);
   }
 
   /**
@@ -110,7 +109,9 @@ public class CollateXEngine {
    * Terminology check
    */
   public IVariantGraph graph(IWitness... witnesses) {
-    return VariantGraph2Creator.create(witnesses);
+    IAligner aligner = createAligner();
+    aligner.add(witnesses);
+    return aligner.getResult();
   }
 
   /**
@@ -124,7 +125,7 @@ public class CollateXEngine {
    * Terminology check
    */
   public IAlignmentTable align(IWitness... witnesses) {
-    IVariantGraph vg = VariantGraph2Creator.create(witnesses);
+    IVariantGraph vg = graph(witnesses);
     RankedGraphBasedAlignmentTable table = new RankedGraphBasedAlignmentTable(vg);
     return table;
   }

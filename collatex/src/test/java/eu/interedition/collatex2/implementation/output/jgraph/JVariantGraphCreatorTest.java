@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2Creator;
-import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.interfaces.IJVariantGraph;
 import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
@@ -36,7 +34,7 @@ public class JVariantGraphCreatorTest {
   public void testJoinTwoIdenticalWitnesses() {
     final IWitness w1 = engine.createWitness("A", "the black cat");
     final IWitness w2 = engine.createWitness("B", "the black cat");
-    IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
+    IVariantGraph graph = engine.graph(w1, w2);
     JVariantGraphCreator creator = new JVariantGraphCreator();
     IJVariantGraph joinedGraph = creator.parallelSegmentate(graph);
     LOG.info("joinedGraph=" + joinedGraph);
@@ -66,7 +64,7 @@ public class JVariantGraphCreatorTest {
   public void testJoinTwoDifferentWitnesses() {
     final IWitness w1 = engine.createWitness("A", "the nice black cat shared his food");
     final IWitness w2 = engine.createWitness("B", "the bad white cat spilled his food again");
-    IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
+    IVariantGraph graph = engine.graph(w1, w2);
     JVariantGraphCreator creator = new JVariantGraphCreator();
     IJVariantGraph joinedGraph = creator.parallelSegmentate(graph);
     LOG.info("joinedGraph=" + joinedGraph);
@@ -103,7 +101,7 @@ public class JVariantGraphCreatorTest {
   public void testJoinTwoDifferentWitnesses2() {
     final IWitness w1 = engine.createWitness("A", "Blackie, the black cat");
     final IWitness w2 = engine.createWitness("B", "Whitney, the white cat");
-    IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
+    IVariantGraph graph = engine.graph(w1, w2);
     JVariantGraphCreator creator = new JVariantGraphCreator();
     IJVariantGraph joinedGraph = creator.parallelSegmentate(graph);
     LOG.info("joinedGraph=" + joinedGraph);

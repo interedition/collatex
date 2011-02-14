@@ -99,24 +99,24 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return new VariantGraph2();
   }
 
-  //TODO: remove this method! This is just an optimalization
-  // move it to the addWitness method
-  public static VariantGraph2 create(IWitness a) {
-    VariantGraph2 graph = VariantGraph2.create();
-    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
-    for (INormalizedToken token : a.getTokens()) {
-      final IVariantGraphVertex vertex = graph.addNewVertex(token.getNormalized(), token);
-      vertex.addToken(a, token);
-      newVertices.add(vertex);
-    }
-    IVariantGraphVertex previous = graph.getStartVertex();
-    for (IVariantGraphVertex vertex : newVertices) {
-      graph.addNewEdge(previous, vertex, a);
-      previous = vertex;
-    }
-    graph.addNewEdge(previous, graph.getEndVertex(), a);
-    return graph;
-  }
+//  //TODO: remove this method! This is just an optimalization
+//  // move it as a special case to the addWitness method
+//  public static VariantGraph2 create(IWitness a) {
+//    VariantGraph2 graph = VariantGraph2.create();
+//    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
+//    for (INormalizedToken token : a.getTokens()) {
+//      final IVariantGraphVertex vertex = graph.addNewVertex(token.getNormalized(), token);
+//      vertex.addToken(a, token);
+//      newVertices.add(vertex);
+//    }
+//    IVariantGraphVertex previous = graph.getStartVertex();
+//    for (IVariantGraphVertex vertex : newVertices) {
+//      graph.addNewEdge(previous, vertex, a);
+//      previous = vertex;
+//    }
+//    graph.addNewEdge(previous, graph.getEndVertex(), a);
+//    return graph;
+//  }
 
   @Override
   public List<IVariantGraphVertex> getPath(IWitness witness) {
@@ -143,19 +143,6 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return path;
   }
 
-  //write
-  public IVariantGraphVertex addNewVertex(String normalized, INormalizedToken vertexKey) {
-    final VariantGraphVertex vertex = new VariantGraphVertex(normalized, vertexKey);
-    addVertex(vertex);
-    return vertex;
-  }
-
-  //write
-  public void addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
-    IVariantGraphEdge edge = new VariantGraphEdge();
-    edge.addWitness(witness);
-    addEdge(begin, end, edge);
-  }
 
   //TODO: this method can be removed! Or move to utility class.
   @Override

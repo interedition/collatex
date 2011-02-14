@@ -14,7 +14,7 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraph2CreatorTest {
+public class VariantGraph2AlignerTest {
     private static CollateXEngine engine;
 
     @BeforeClass
@@ -23,17 +23,16 @@ public class VariantGraph2CreatorTest {
     }
 
 
-    /* The unit test below depend on the correct functioning
+    /* NOTE: these tests test the VariantGraphAligner class
+     * The unit test below depend on the correct functioning
      * of the GraphIndexMatcher
      */
     
-    // NOTE: these tests test the VariantGraph2Creator class
-
     @Test
     public void testTwoWitnesses() {
       final IWitness w1 = engine.createWitness("A", "the black cat");
       final IWitness w2 = engine.createWitness("B", "the black cat");
-      IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
+      IVariantGraph graph = engine.graph(w1, w2);
       final Set<IVariantGraphVertex> vertices = graph.vertexSet();
       assertEquals(5, vertices.size());
       Iterator<IVariantGraphVertex> vertexI = graph.iterator();
@@ -55,7 +54,7 @@ public class VariantGraph2CreatorTest {
     public void testAddition1() {
       final IWitness w1 = engine.createWitness("A", "the black cat");
       final IWitness w2 = engine.createWitness("B", "the white and black cat");
-      IVariantGraph graph = VariantGraph2Creator.create(w1, w2);
+      IVariantGraph graph = engine.graph(w1, w2);
       final Set<IVariantGraphVertex> vertices = graph.vertexSet();
       assertEquals(7, vertices.size());
       Iterator<IVariantGraphVertex> vertexI = graph.iterator();
@@ -91,7 +90,7 @@ public class VariantGraph2CreatorTest {
       final IWitness w3 = engine.createWitness("C", "the green cat");
       final IWitness w4 = engine.createWitness("D", "the red cat");
       final IWitness w5 = engine.createWitness("E", "the yellow cat");
-      IVariantGraph graph = VariantGraph2Creator.create(w1, w2, w3, w4, w5);
+      IVariantGraph graph = engine.graph(w1, w2, w3, w4, w5);
       final Set<IVariantGraphVertex> vertices = graph.vertexSet();
       assertEquals(9, vertices.size());
       Iterator<IVariantGraphVertex> vertexI = graph.iterator();
@@ -135,7 +134,7 @@ public class VariantGraph2CreatorTest {
     public void testDoubleTransposition2() {
       IWitness a = engine.createWitness("A", "a b");
       IWitness b = engine.createWitness("B", "b a");
-      IVariantGraph graph = VariantGraph2Creator.create(a, b);
+      IVariantGraph graph = engine.graph(a, b);
       Iterator<IVariantGraphVertex> iterator = graph.iterator();
       assertEquals("#", iterator.next().getNormalized());
       assertEquals("b", iterator.next().getNormalized());
@@ -152,7 +151,7 @@ public class VariantGraph2CreatorTest {
     public void testMirroredTranspositionsWithMatchInBetween() {
       final IWitness a = engine.createWitness("A", "the black and white cat");
       final IWitness b = engine.createWitness("B", "the white and black cat");
-      IVariantGraph graph = VariantGraph2Creator.create(a, b);
+      IVariantGraph graph = engine.graph(a, b);
       Iterator<IVariantGraphVertex> iterator = graph.iterator();
       assertEquals("#", iterator.next().getNormalized());
       assertEquals("the", iterator.next().getNormalized());
