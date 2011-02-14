@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
@@ -50,6 +51,10 @@ public class VariantGraphAligner implements IAligner {
   // if they already exist we need to add the witness to the
   // existing arc!
   public void addWitness(IWitness witness) {
+    if (graph.isEmpty()) {
+      useShortCut(witness);
+      return;
+    }
     // align the witness
     IAlignment2 alignment = align(witness);
     // analyze the results
@@ -58,6 +63,21 @@ public class VariantGraphAligner implements IAligner {
     List<ITransposition2> transpositions = analysis.getTranspositions();
     List<ITokenMatch> matches = alignment.getTokenMatches();
     makeEdgesForMatches(witness, matches, transpositions);
+  }
+
+  private void useShortCut(IWitness firstWitness) {
+    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
+    for (INormalizedToken token : firstWitness.getTokens()) {
+      final IVariantGraphVertex vertex = addNewVertex(token.getNormalized(), token);
+      vertex.addToken(firstWitness, token);
+      newVertices.add(vertex);
+    }
+    IVariantGraphVertex previous = graph.getStartVertex();
+    for (IVariantGraphVertex vertex : newVertices) {
+      addNewEdge(previous, vertex, firstWitness);
+      previous = vertex;
+    }
+    addNewEdge(previous, graph.getEndVertex(), firstWitness);
   }
 
   private void makeEdgesForMatches(IWitness witness, List<ITokenMatch> matches, List<ITransposition2> transpositions) {
@@ -163,21 +183,6 @@ public class VariantGraphAligner implements IAligner {
     }
   }
 
-
-//  public static IVariantGraph create(IWitness... witnesses) {
-//    List<IWitness> witnessList = Lists.newArrayList(witnesses);
-//    if (witnessList.isEmpty()) {
-//      return VariantGraph2.create();
-//    }
-//    IWitness w1 = witnessList.remove(0);
-//    IWitness[] w2 = witnessList.toArray(new IWitness[witnessList.size()]);
-//    VariantGraph2 graph = VariantGraph2.create(w1);
-//    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-//    for (IWitness witness : w2) {
-//      aligner.addWitness(witness);
-//    }
-//    return graph;
-//  }
 
   @Override
   public IVariantGraph getResult() {

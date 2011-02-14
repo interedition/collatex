@@ -39,7 +39,7 @@ public class VariantGraph2Test {
 
   @Test
   public void testEmptyGraph() {
-    IVariantGraph graph = VariantGraph2.create();
+    IVariantGraph graph = new VariantGraph2();
     assertEquals(2, graph.vertexSet().size());
     IVariantGraphVertex startVertex = graph.getStartVertex();
     assertEquals("#", startVertex.getNormalized());
