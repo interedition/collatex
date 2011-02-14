@@ -1,4 +1,5 @@
 package eu.interedition.collatex2.implementation.vg_analysis;
+
 import java.util.List;
 import java.util.Map;
 
@@ -19,15 +20,9 @@ public class SequenceDetection2 {
   private final ITokenContainer base;
   private final ITokenContainer witness;
 
-  public SequenceDetection2(List<ITokenMatch> tokenMatches, ITokenContainer base, ITokenContainer witness) {
-    this.tokenMatches = tokenMatches;
-    this.base = base;
-    this.witness = witness;
-  }
-
-  public SequenceDetection2(IAlignment2 alignment, ITokenContainer base, ITokenContainer witness) {
-    this.base = base;
-    this.witness = witness;
+  public SequenceDetection2(IAlignment2 alignment) {
+    this.base = alignment.getGraph();
+    this.witness = alignment.getWitness();
     this.tokenMatches = alignment.getTokenMatches();
   }
 

@@ -41,17 +41,14 @@ import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegment
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
-import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
+import eu.interedition.collatex2.implementation.vg_analysis.Analyzer;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
-import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
-import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
-import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -95,6 +92,10 @@ public class CollateXEngine {
 
   public IAligner createAligner() {
     VariantGraph2 graph = new VariantGraph2(); 
+    return createAligner(graph);
+  }
+
+  private VariantGraphAligner createAligner(IVariantGraph graph) {
     return new VariantGraphAligner(graph);
   }
 
@@ -128,6 +129,18 @@ public class CollateXEngine {
     IVariantGraph vg = graph(witnesses);
     RankedGraphBasedAlignmentTable table = new RankedGraphBasedAlignmentTable(vg);
     return table;
+  }
+
+  public IAlignment2 align(IVariantGraph graph, IWitness witness) {
+    VariantGraphAligner aligner = createAligner(graph);
+    IAlignment2 alignment = aligner.align(witness);
+    return alignment;
+  }
+
+  public IAnalysis analyse(IVariantGraph graph, IWitness witness) {
+    IAlignment2 alignment = align(graph, witness);
+    Analyzer analyzer = new Analyzer();
+    return analyzer.analyze(alignment);
   }
 
   public ParallelSegmentationApparatus createApparatus(final IVariantGraph variantGraph) {
@@ -206,34 +219,7 @@ public class CollateXEngine {
     return stringSet;
   }
 
-  public IAnalysis analyse(IVariantGraph graph, IWitness b) {
-    IAlignment2 alignment = align(graph, b);
-    //TODO: move this code to an analyzer class?
-    List<ITokenMatch> tokenMatches = alignment.getTokenMatches();
-    SequenceDetection2 sequenceDetection = new SequenceDetection2(tokenMatches, graph, b);
-    List<ISequence> sequences = sequenceDetection.chainTokenMatches();
-    return new Analysis(sequences, graph);
-  }
-
-  public IAlignment2 align(IVariantGraph graph, IWitness witness) {
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(witness);
-    return alignment;
-  }
 
   
-//  //TODO: rename to analyseTable
-//  public IAnalysis analyseOldStyle(IAlignmentTable table, IWitness witness) {
-//    final IAlignment2 alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
-//    SequenceDetection2 detection = new SequenceDetection2(alignment);
-//    List<ISequence> sequences = detection.chainTokenMatches();
-//    return new Analysis(sequences);
-//  }
-//  
-//  //TODO: rename to alignTable
-//  public IAlignment2 alignOldStyle(IAlignmentTable table, IWitness witness) {
-//    final IAlignment2 alignment = AlignmentTableCreator3.createAlignmentUsingIndex(table, witness);
-//    return alignment;
-//  }
 
 }

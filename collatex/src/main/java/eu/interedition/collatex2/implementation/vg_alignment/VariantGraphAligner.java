@@ -9,11 +9,10 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
-import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
+import eu.interedition.collatex2.implementation.vg_analysis.Analyzer;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition2;
-import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection2;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
@@ -37,7 +36,7 @@ public class VariantGraphAligner implements IAligner {
   public IAlignment2 align(IWitness witness) {
     TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
     List<ITokenMatch> tokenMatches = matcher.getMatches(witness);
-    return new Alignment2(tokenMatches);
+    return new Alignment2(graph, witness, tokenMatches);
   }
 
 
@@ -52,15 +51,12 @@ public class VariantGraphAligner implements IAligner {
   // existing arc!
   public void addWitness(IWitness witness) {
     // align the witness
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    IAlignment2 alignment = aligner.align(witness);
-    List<ITokenMatch> matches = alignment.getTokenMatches();
+    IAlignment2 alignment = align(witness);
     // analyze the results
-    // TODO: Make separate analyzer class?
-    SequenceDetection2 seqDetection = new SequenceDetection2(matches, graph, witness);
-    List<ISequence> sequences = seqDetection.chainTokenMatches();
-    IAnalysis analysis = new Analysis(sequences, graph);
+    Analyzer analyzer = new Analyzer();
+    IAnalysis analysis = analyzer.analyze(alignment);
     List<ITransposition2> transpositions = analysis.getTranspositions();
+    List<ITokenMatch> matches = alignment.getTokenMatches();
     makeEdgesForMatches(witness, matches, transpositions);
   }
 
