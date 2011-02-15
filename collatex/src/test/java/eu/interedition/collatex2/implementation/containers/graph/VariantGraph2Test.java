@@ -24,6 +24,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -152,9 +153,12 @@ public class VariantGraph2Test {
     IWitness w1 = engine.createWitness("A", "a");
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
-    IVariantGraph graph = engine.graph(w1, w2, w3);
+    VariantGraph2 graph = new VariantGraph2();
+    VariantGraphAligner aligner = engine.createAligner(graph);
+    aligner.add(w1, w2, w3);
     assertEquals(4, graph.vertexSet().size());
-    List<IVariantGraphVertex> longestPath = graph.getLongestPath();
+    VariantGraphUtil util = new VariantGraphUtil(graph);
+    List<IVariantGraphVertex> longestPath = util.getLongestPath();
     //    for (CollateXVertex v: longestPath) {
     //      System.out.println(v.getNormalized());
     //    }
@@ -169,14 +173,16 @@ public class VariantGraph2Test {
     final IWitness w2 = engine.createWitness("W", "x y z d e");
     final IWitness w3 = engine.createWitness("X", "a b x y z");
     IVariantGraph graph = engine.graph(w1, w2, w3);
-    List<IVariantGraphVertex> path = graph.getPath(w1);
-    assertEquals("a", path.get(0).getNormalized());
-    assertEquals("b", path.get(1).getNormalized());
-    assertEquals("c", path.get(2).getNormalized());
-    assertEquals("d", path.get(3).getNormalized());
-    assertEquals("e", path.get(4).getNormalized());
-    assertEquals("f", path.get(5).getNormalized());
-    assertEquals(6, path.size());
+    List<IVariantGraphEdge> path = graph.getPath(w1);
+    assertEquals("#", graph.getEdgeSource(path.get(0)).getNormalized());
+    assertEquals("a", graph.getEdgeTarget(path.get(0)).getNormalized());
+    assertEquals("b", graph.getEdgeTarget(path.get(1)).getNormalized());
+    assertEquals("c", graph.getEdgeTarget(path.get(2)).getNormalized());
+    assertEquals("d", graph.getEdgeTarget(path.get(3)).getNormalized());
+    assertEquals("e", graph.getEdgeTarget(path.get(4)).getNormalized());
+    assertEquals("f", graph.getEdgeTarget(path.get(5)).getNormalized());
+    assertEquals("#", graph.getEdgeTarget(path.get(6)).getNormalized());
+    assertEquals(7, path.size());
   }
 
   @Ignore

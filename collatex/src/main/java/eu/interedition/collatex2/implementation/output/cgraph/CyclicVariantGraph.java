@@ -91,12 +91,7 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
   }
 
   @Override
-  public List<IVariantGraphVertex> getPath(IWitness witness) {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
-  }
-
-  @Override
-  public List<IVariantGraphVertex> getLongestPath() {
+  public List<IVariantGraphEdge> getPath(IWitness witness) {
     throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 

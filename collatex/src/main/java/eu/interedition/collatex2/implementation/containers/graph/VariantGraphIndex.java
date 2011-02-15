@@ -11,110 +11,26 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.legacy.indexing.NullToken;
 
+//TODO: remove the explicit usage of NullToken in this class and in TokenIndexMatcher class!
 public class VariantGraphIndex implements ITokenIndex {
   private final Map<String, List<INormalizedToken>> normalizedToTokens;
-  private final IVariantGraph graph;
 
   public static ITokenIndex create(IVariantGraph graph, List<String> repeatingTokens) {
-    final VariantGraphIndex index = new VariantGraphIndex(graph);
+    final VariantGraphIndex index = new VariantGraphIndex();
     for (IWitness witness: graph.getWitnesses()) {
-      List<IVariantGraphVertex> path = graph.getPath(witness);
+      List<INormalizedToken> tokens = graph.getTokens(witness);
       int position=0; //NOTE: position => index in path
-      for (IVariantGraphVertex vertex : path) {
-        index.makeTokenUniqueIfneeded(position, index, repeatingTokens, vertex, path);
+      for (INormalizedToken token : tokens) {
+        index.makeTokenUniqueIfneeded(token, tokens, position, repeatingTokens);
         position++;
       }
     }
     return index;
-  }
-
-  //TODO: Remove index parameter!
-  private void makeTokenUniqueIfneeded(int position, VariantGraphIndex index, List<String> repeatingTokens, IVariantGraphVertex vertex, List<IVariantGraphVertex> path) {
-    // System.out.println("Trying "+vertex.getNormalized());
-    String normalized = vertex.getNormalized();
-    // check uniqueness
-    final boolean unique = !repeatingTokens.contains(normalized);
-    if (unique) {
-      List<IVariantGraphVertex> vertices = Lists.newArrayList(vertex);
-      index.add(vertices); //TODO: extract separate add method with single vertex parameter!
-    } else {
-      final List<IVariantGraphVertex> leftVertices = findUniqueVerticesToTheLeft(path, repeatingTokens, position);
-      final List<IVariantGraphVertex> rightVertices = findUniqueVerticesToTheRight(path, repeatingTokens, position);
-      index.add(leftVertices);
-      index.add(rightVertices);
-    }
-  }
-
-  
-  //TODO: I need an index to move to the left and right here!
-  //TODO: or an iterator!
-  private List<IVariantGraphVertex> findUniqueVerticesToTheRight(List<IVariantGraphVertex> path, List<String> repeatingTokens, int the_real_parameter) {
-    List<IVariantGraphVertex> vertices = Lists.newArrayList();
-    boolean found = false; // not nice!
-    int position = the_real_parameter; //TODO
-    for (int i = position ; !found && i < path.size(); i++ ) {
-      IVariantGraphVertex rightVertex = path.get(i);
-      String normalizedNeighbour = rightVertex.getNormalized();
-      found = !repeatingTokens.contains(normalizedNeighbour);
-      vertices.add(rightVertex);
-    }
-    if (!found) {
-      vertices.add(graph.getEndVertex());
-    }
-    return vertices;
-  }
-
-  //TODO: I need an index to move to the left and right here!
-  //TODO: or an iterator!
-  private List<IVariantGraphVertex> findUniqueVerticesToTheLeft(List<IVariantGraphVertex> path, List<String> repeatingTokens, int the_real_parameter) {
-    List<IVariantGraphVertex> vertices = Lists.newArrayList();
-    boolean found = false; // not nice!
-    int position = the_real_parameter; //TODO
-    for (int i = position ; !found && i > -1; i-- ) {
-      IVariantGraphVertex leftVertex = path.get(i);
-      String normalizedNeighbour = leftVertex.getNormalized();
-      found = !repeatingTokens.contains(normalizedNeighbour);
-      vertices.add(0, leftVertex);
-    }
-    if (!found) {
-      vertices.add(0, graph.getStartVertex());
-    }
-    return vertices;
-  }
-  
-  private VariantGraphIndex(IVariantGraph graph) {
-    this.graph = graph;
-    normalizedToTokens = Maps.newLinkedHashMap();
-  }
-
-  private void add(List<IVariantGraphVertex> vertices) {
-    StringBuilder normalized = new StringBuilder();
-    String splitter = "";
-    for (IVariantGraphVertex vertex : vertices) {
-      normalized.append(splitter).append(vertex.getNormalized());
-      splitter = " ";
-    }
-    // System.out.println("Adding normalized: "+normalized);
-    // fill token map; skip begin and end vertices (which contain no tokens!)
-    List<INormalizedToken> tokens = Lists.newArrayList();
-    for (IVariantGraphVertex vertex : vertices) {
-      if (vertex.equals(graph.getStartVertex())||vertex.equals(graph.getEndVertex())) {
-        tokens.add(new NullToken(0, null)); //This is not very nice!
-        continue;
-      }
-      if (vertex.getWitnesses().isEmpty()) {
-        throw new RuntimeException("STOP! Witness set is not supposed to be empty! Vertex: " + vertex.getNormalized());
-      }
-      //Note: the vertex is a normalized token all by itself!
-      tokens.add(vertex);
-    }
-    normalizedToTokens.put(normalized.toString(), tokens);
   }
 
   @Override
@@ -153,4 +69,71 @@ public class VariantGraphIndex implements ITokenIndex {
   public Set<String> keys() {
     return normalizedToTokens.keySet();
   }
+
+  private VariantGraphIndex() {
+    normalizedToTokens = Maps.newLinkedHashMap();
+  }
+
+  //NOTE: Remove index parameter?
+  private void makeTokenUniqueIfneeded(INormalizedToken token, List<INormalizedToken> tokens, int position, List<String> repeatingTokens) {
+    // System.out.println("Trying "+token.getNormalized());
+    String normalized = token.getNormalized();
+    // check uniqueness
+    final boolean unique = !repeatingTokens.contains(normalized);
+    if (unique) {
+      List<INormalizedToken> tempList = Lists.newArrayList(token);
+      addAll(tempList); //TODO: extract separate add method with single vertex parameter!
+    } else {
+      final List<INormalizedToken> leftTokens = findUniqueTokensToTheLeft(tokens, repeatingTokens, position);
+      final List<INormalizedToken> rightTokens = findUniqueTokensToTheRight(tokens, repeatingTokens, position);
+      addAll(leftTokens);
+      addAll(rightTokens);
+    }
+  }
+
+  
+  //NOTE: I need an index to move to the left and right here!
+  //NOTE: or an iterator!
+  private List<INormalizedToken> findUniqueTokensToTheLeft(List<INormalizedToken> path, List<String> repeatingTokens, int position) {
+    List<INormalizedToken> tokens = Lists.newArrayList();
+    boolean found = false; // not nice!
+    for (int i = position ; !found && i > -1; i-- ) {
+      INormalizedToken leftToken = path.get(i);
+      String normalizedNeighbour = leftToken.getNormalized();
+      found = !repeatingTokens.contains(normalizedNeighbour);
+      tokens.add(0, leftToken);
+    }
+    if (!found) {
+      tokens.add(0, new NullToken(0, null));
+    }
+    return tokens;
+  }
+  
+  //NOTE: I need an index to move to the left and right here!
+  //NOTE: or an iterator!
+  private List<INormalizedToken> findUniqueTokensToTheRight(List<INormalizedToken> path, List<String> repeatingTokens, int position) {
+    List<INormalizedToken> tokens = Lists.newArrayList();
+    boolean found = false; // not nice!
+    for (int i = position ; !found && i < path.size(); i++ ) {
+      INormalizedToken rightToken = path.get(i);
+      String normalizedNeighbour = rightToken.getNormalized();
+      found = !repeatingTokens.contains(normalizedNeighbour);
+      tokens.add(rightToken);
+    }
+    if (!found) {
+      tokens.add(new NullToken(0, null));
+    }
+    return tokens;
+  }
+
+  private void addAll(List<INormalizedToken> tokens) {
+    StringBuilder normalized = new StringBuilder();
+    String splitter = "";
+    for (INormalizedToken token : tokens) {
+      normalized.append(splitter).append(token.getNormalized());
+      splitter = " ";
+    }
+    normalizedToTokens.put(normalized.toString(), tokens);
+  }
+
 }

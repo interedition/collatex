@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.jgrapht.alg.BellmanFordShortestPath;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -63,6 +62,12 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return result;
   }
 
+  //TODO: make this method internal to the token matching process!
+  @Override
+  public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
+    return VariantGraphIndex.create(this, repeatingTokens);
+  }
+
   @Override
   public IVariantGraphVertex getEndVertex() {
     return endVertex;
@@ -96,23 +101,19 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     return getWitnesses().isEmpty();
   }
 
-  //TODO: return edges instead of vertices?
   @Override
-  public List<IVariantGraphVertex> getPath(IWitness witness) {
-    List<IVariantGraphVertex> path = Lists.newArrayList();
-    IVariantGraphVertex startVertex = getStartVertex();
-    IVariantGraphVertex currentVertex = startVertex;
-    while (outDegreeOf(currentVertex) > 0) {
+  public List<IVariantGraphEdge> getPath(IWitness witness) {
+    List<IVariantGraphEdge> path = Lists.newArrayList();
+    IVariantGraphVertex currentVertex = getStartVertex();
+    while (currentVertex != getEndVertex()) {
       Set<IVariantGraphEdge> outgoingEdges = outgoingEdgesOf(currentVertex);
       boolean found = false;
       for (IVariantGraphEdge edge : outgoingEdges) {
         if (!found && edge.containsWitness(witness)) {
           found = true;
-          IVariantGraphVertex edgeTarget = getEdgeTarget(edge);
-          if (!edgeTarget.getNormalized().equals("#")) {
-            path.add(edgeTarget);
-          }
-          currentVertex = edgeTarget;
+          path.add(edge);
+          currentVertex = getEdgeTarget(edge);
+          continue;
         }
       }
       if (!found) {
@@ -123,42 +124,16 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   }
 
 
-  //TODO: this method can be removed! Or move to utility class.
-  @Override
-  public List<IVariantGraphVertex> getLongestPath() {
-    // NOTE: Weights are set to negative value to
-    // generate the longest path instead of the shortest path
-    for (IVariantGraphEdge edge : edgeSet()) {
-      setEdgeWeight(edge, -1);
-    }
-    // NOTE: gets the start vertex of the graph
-    IVariantGraphVertex startVertex = getStartVertex();
-    IVariantGraphVertex endVertex = getEndVertex();
-    // Note: calculates the longest path
-    List<IVariantGraphEdge> findPathBetween = BellmanFordShortestPath.findPathBetween(this, startVertex, endVertex);
-    // Note: gets the end vertices associated with the edges of the path
-    List<IVariantGraphVertex> vertices = Lists.newArrayList();
-    for (IVariantGraphEdge edge : findPathBetween) {
-      IVariantGraphVertex edgeTarget = this.getEdgeTarget(edge);
-      if (edgeTarget != endVertex) {
-        vertices.add(edgeTarget);
-      }
-    }
-    return vertices;
-  }
-
-  //TODO: make this method internal to the token matching process!
-  @Override
-  public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
-    return VariantGraphIndex.create(this, repeatingTokens);
-  }
 
   @Override
   public List<INormalizedToken> getTokens(IWitness witness) {
-    List<IVariantGraphVertex> vertices = getPath(witness);
+    List<IVariantGraphEdge> edges = getPath(witness);
     List<INormalizedToken> tokens = Lists.newArrayList();
-    for (IVariantGraphVertex vertex : vertices) {
-      tokens.add(vertex);
+    for (IVariantGraphEdge edge : edges) {
+      IVariantGraphVertex vertex = getEdgeTarget(edge);
+      if (vertex != getEndVertex()) {
+        tokens.add(vertex);
+      }  
     }
     return tokens;
   }

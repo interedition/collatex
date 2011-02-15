@@ -95,7 +95,7 @@ public class CollateXEngine {
     return createAligner(graph);
   }
 
-  private VariantGraphAligner createAligner(IVariantGraph graph) {
+  public VariantGraphAligner createAligner(IVariantGraph graph) {
     return new VariantGraphAligner(graph);
   }
 
