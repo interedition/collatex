@@ -22,21 +22,26 @@ package eu.interedition.collatex2.implementation.input;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
+//TODO: rename to WitnessToken!
+//TODO: move this to containers.witness!
 public class NormalizedToken extends Token implements INormalizedToken {
   private String normalized;
+  protected int position;
 
   public NormalizedToken() {
     super();
   }
 
+  //NOTE: is this constructor still used?
   public NormalizedToken(INormalizedToken other) {
     super(other);
     this.normalized = other.getNormalized();
   }
 
   public NormalizedToken(final String sigil, final String content, final int position, final String normalized) {
-    super(sigil, content, position);
+    super(sigil, content);
     this.normalized = normalized;
+    this.position = position;
   }
 
 
@@ -48,4 +53,35 @@ public class NormalizedToken extends Token implements INormalizedToken {
   public void setNormalized(String normalized) {
     this.normalized = normalized;
   }
+  
+  @Override
+  public int getPosition() {
+    return position;
+  }
+
+  public void setPosition(int position) {
+    this.position = position;
+  }
+
+  @Override
+  public String toString() {
+    return getNormalized() + ": "+position;
+  }
+  
+  @Override
+  public boolean equals(final Object obj) {
+    if ((obj != null) && (obj instanceof NormalizedToken)) {
+      final NormalizedToken token = (NormalizedToken) obj;
+      return super.equals(obj) && (position == token.position);
+    }
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    int hc = super.hashCode();
+    hc = hc * 59 + position;
+    return hc;
+  }
+
 }

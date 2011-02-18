@@ -27,14 +27,12 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
-import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
+import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
@@ -47,7 +45,6 @@ import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
@@ -85,9 +82,10 @@ public class CollateXEngine {
    * @param text - the body of the witness
    * @return
    */
+  // TODO: pass Tokenizer to the Builder!
   public IWitness createWitness(final String sigil, final String text) {
-    final Iterable<IToken> tokens = tokenizer.tokenize(sigil, text);
-    return new NormalizedWitness(sigil, Lists.newArrayList(Iterables.transform(tokens, tokenNormalizer)));
+    WitnessBuilder builder = new WitnessBuilder(tokenNormalizer);
+    return builder.build(sigil, text);
   }
 
   public IAligner createAligner() {

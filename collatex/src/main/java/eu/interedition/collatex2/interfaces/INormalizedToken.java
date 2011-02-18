@@ -30,4 +30,7 @@ public interface INormalizedToken extends IToken {
    */
   String getNormalized();
 
+  // TODO: Should getPosition() be on the interface? 
+  int getPosition();
+
 }

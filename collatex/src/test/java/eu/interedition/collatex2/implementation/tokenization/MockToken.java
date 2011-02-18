@@ -15,12 +15,6 @@ public class MockToken implements IToken {
   }
 
   @Override
-  public int getPosition() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
   public String getSigil() {
     // TODO Auto-generated method stub
     return null;

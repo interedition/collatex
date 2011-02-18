@@ -25,7 +25,6 @@ import eu.interedition.collatex2.interfaces.IToken;
 public class Token implements IToken {
   private String sigil;
   private String content;
-  private int position;
 
   // private String trailingWhitespace; // TODO
   // private int characterPosition; // TODO
@@ -34,13 +33,12 @@ public class Token implements IToken {
   }
 
   public Token(IToken other) {
-    this(other.getSigil(), other.getContent(), other.getPosition());
+    this(other.getSigil(), other.getContent());
   }
 
-  public Token(final String sigil, final String content, final int position) {
+  public Token(final String sigil, final String content) {
     this.sigil = sigil;
     this.content = content;
-    this.position = position;
   }
 
   @Override
@@ -62,20 +60,10 @@ public class Token implements IToken {
   }
 
   @Override
-  public int getPosition() {
-    return position;
-  }
-
-  public void setPosition(int position) {
-    this.position = position;
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     if ((obj != null) && (obj instanceof Token)) {
       final Token token = (Token) obj;
-      return sigil.equals(token.sigil) && content.equals(token.content) && (position == token.position);
-
+      return sigil.equals(token.sigil) && content.equals(token.content);
     }
     return super.equals(obj);
   }
@@ -85,7 +73,6 @@ public class Token implements IToken {
     int hc = 17;
     hc = hc * 59 + sigil.hashCode();
     hc = hc * 59 + content.hashCode();
-    hc = hc * 59 + position;
     return hc;
   }
 

@@ -44,7 +44,6 @@ public class WhitespaceTokenizer implements ITokenizer {
       @Override
       public Iterator<IToken> iterator() {
         return new Iterator<IToken>() {
-          private int counter = 0;
 
           @Override
           public void remove() {
@@ -53,7 +52,7 @@ public class WhitespaceTokenizer implements ITokenizer {
 
           @Override
           public IToken next() {
-            return new Token(sigle, tokenIterator.next(), ++counter);
+            return new Token(sigle, tokenIterator.next());
           }
 
           @Override

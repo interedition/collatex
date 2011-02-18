@@ -9,6 +9,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -99,7 +100,14 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    return b.getPosition() - a.getPosition() == 1;
+    // sanity check!
+    if (!(a instanceof NormalizedToken)) {
+      throw new RuntimeException("Token a is not a NormalizedToken!");
+    }
+    if (!(b instanceof NormalizedToken)) {
+      throw new RuntimeException("Token b is not a NormalizedToken!");
+    }
+    return ((NormalizedToken)b).getPosition() - ((NormalizedToken)a).getPosition() == 1;
   }
 
   @Override

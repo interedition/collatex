@@ -17,7 +17,7 @@ public class DefaultTokenNormalizerTest {
   }
 
   private void testNormalization(String content, String expected) {
-    assertEquals(expected, new DefaultTokenNormalizer().apply(new MockToken(content)).getNormalized());
+    assertEquals(expected, new DefaultTokenNormalizer().apply(new MockToken(content)));
   }
 
 }

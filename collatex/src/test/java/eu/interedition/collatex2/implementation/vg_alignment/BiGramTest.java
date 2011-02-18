@@ -30,9 +30,9 @@ import eu.interedition.collatex2.legacy.indexing.BiGram;
 public class BiGramTest {
   @Test
   public void testContains() {
-    final Token token = new Token("A", "token", 1);
-    final Token token2 = new Token("A", "token2", 2);
-    final Token token3 = new Token("B", "token", 1);
+    final Token token = new Token("A", "token");
+    final Token token2 = new Token("A", "token2");
+    final Token token3 = new Token("B", "token");
     final BiGram bigram = BiGram.create(token, token2, new DefaultTokenNormalizer());
     Assert.assertTrue(bigram.contains(token));
     Assert.assertFalse(bigram.contains(token3));

@@ -38,12 +38,13 @@ public class NGramIndex {
     NGram currentNGram = NGram.create(biGrams.remove(0));
     newNGrams.add(currentNGram);
     for (final BiGram nextBiGram : biGrams) {
-      if (nextBiGram.getFirstToken().getPosition() - currentNGram.getLastToken().getPosition() > 1) {
-        currentNGram = NGram.create(nextBiGram);
-        newNGrams.add(currentNGram);
-      } else {
-        currentNGram.add(nextBiGram);
-      }
+      //NOTE: Code is remarked because of the use of Token.getPosition();
+//      if (nextBiGram.getFirstToken().getPosition() - currentNGram.getLastToken().getPosition() > 1) {
+//        currentNGram = NGram.create(nextBiGram);
+//        newNGrams.add(currentNGram);
+//      } else {
+//        currentNGram.add(nextBiGram);
+//      }
     }
     return newNGrams;
   }
