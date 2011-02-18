@@ -18,6 +18,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
@@ -32,7 +33,6 @@ import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
 import eu.interedition.collatex2.legacy.indexing.Columns;
-import eu.interedition.collatex2.legacy.indexing.NullToken;
 import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 
 //TODO: remove explicit dependency on NullToken

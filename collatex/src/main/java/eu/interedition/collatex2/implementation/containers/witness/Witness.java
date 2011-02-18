@@ -9,7 +9,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
-import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -17,18 +16,18 @@ import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
+public class Witness implements Iterable<INormalizedToken>, IWitness {
   private String sigil;
   private List<INormalizedToken> tokens;
 
-  public NormalizedWitness() {}
+  public Witness() {}
 
-  public NormalizedWitness(final String sigil, final List<INormalizedToken> tokens) {
+  public Witness(final String sigil, final List<INormalizedToken> tokens) {
     this.sigil = sigil;
     this.tokens = tokens;
   }
 
-  public NormalizedWitness(final String sigil) {
+  public Witness(final String sigil) {
     this.sigil = sigil;
     this.tokens = Lists.newArrayList();
   }
@@ -101,13 +100,13 @@ public class NormalizedWitness implements Iterable<INormalizedToken>, IWitness {
   @Override
   public boolean isNear(IToken a, IToken b) {
     // sanity check!
-    if (!(a instanceof NormalizedToken)) {
+    if (!(a instanceof WitnessToken)) {
       throw new RuntimeException("Token a is not a NormalizedToken!");
     }
-    if (!(b instanceof NormalizedToken)) {
+    if (!(b instanceof WitnessToken)) {
       throw new RuntimeException("Token b is not a NormalizedToken!");
     }
-    return ((NormalizedToken)b).getPosition() - ((NormalizedToken)a).getPosition() == 1;
+    return ((WitnessToken)b).position - ((WitnessToken)a).position == 1;
   }
 
   @Override

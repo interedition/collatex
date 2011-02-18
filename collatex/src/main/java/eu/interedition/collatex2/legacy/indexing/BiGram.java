@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex2.legacy.indexing;
 
-import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
@@ -50,8 +50,8 @@ public class BiGram {
   }
 
   public static BiGram create(final Token token, final Token token2, ITokenNormalizer normalizer) {
-    INormalizedToken tokenA = new NormalizedToken(token.getSigil(), token.getContent(), -1, normalizer.apply(token));
-    INormalizedToken tokenB = new NormalizedToken(token2.getSigil(), token2.getContent(), -1, normalizer.apply(token2));
+    INormalizedToken tokenA = new WitnessToken(token.getSigil(), token.getContent(), -1, normalizer.apply(token));
+    INormalizedToken tokenB = new WitnessToken(token2.getSigil(), token2.getContent(), -1, normalizer.apply(token2));
     return new BiGram(tokenA, tokenB);
   }
 

@@ -75,11 +75,6 @@ public class VariantGraphVertex implements IVariantGraphVertex {
   }
 
   @Override
-  public int getPosition() {
-    throw new RuntimeException("WRONG! THIS METHOD WILL BE REMOVED!");
-  }
-
-  @Override
   public String getSigil() {
     throw new RuntimeException("WRONG!");
   }

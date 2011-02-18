@@ -10,6 +10,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -97,8 +98,8 @@ public class BiGramIndex implements Iterable<BiGram> {
       return new BiGramIndex();
     }
     final List<INormalizedToken> tokensTodo = Lists.newArrayList(tokens);
-    tokensTodo.add(new NullToken(tokens.size() + 1, tokens.get(0).getSigil()));
-    INormalizedToken previous = new NullToken(0, tokens.get(0).getSigil());
+    tokensTodo.add(new NullToken(tokens.get(0).getSigil()));
+    INormalizedToken previous = new NullToken(tokens.get(0).getSigil());
     final List<BiGram> bigrams = Lists.newArrayList();
     for (final INormalizedToken next : tokensTodo) {
       final BiGram tuple = new BiGram(previous, next);

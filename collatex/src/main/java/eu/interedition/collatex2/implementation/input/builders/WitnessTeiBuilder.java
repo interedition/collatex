@@ -40,8 +40,8 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.Util;
-import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
-import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -87,12 +87,12 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
       int counter = 1;
       for (int i = 0; i < nodes.getLength(); i++) {
         String value = nodes.item(i).getTextContent();
-        NormalizedToken t = new NormalizedToken(id, value, counter++, value);
+        WitnessToken t = new WitnessToken(id, value, counter++, value);
         t.setNormalized(tokenNormalizer.apply(t));
         tokenList.add(t);
       }
     }
-    return new NormalizedWitness(id, tokenList);
+    return new Witness(id, tokenList);
   }
 
   private Object evaluate(XPath xpath, Document doc, String exprression) {

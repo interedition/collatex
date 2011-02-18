@@ -30,8 +30,8 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.Util;
-import eu.interedition.collatex2.implementation.containers.witness.NormalizedWitness;
-import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
@@ -88,11 +88,11 @@ public class WitnessBuilder {
       IToken nextToken = tokenIterator.next();
       if (!nextToken.getContent().equals("")) {
         String normalized = tokenNormalizer.apply(nextToken);
-        tokenList.add(new NormalizedToken(witnessId, nextToken.getContent(), position, normalized));
+        tokenList.add(new WitnessToken(witnessId, nextToken.getContent(), position, normalized));
         position++;
       }
     }
-    return new NormalizedWitness(witnessId, tokenList);
+    return new Witness(witnessId, tokenList);
   }
 
   public IWitness build(String witness) {

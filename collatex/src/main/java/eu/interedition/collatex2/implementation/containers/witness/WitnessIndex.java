@@ -15,12 +15,12 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
-import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 //TODO: Use this WitnessIndex as long as the Alternative
 //TODO: VariantGraphIndex is not ready!!!
@@ -51,13 +51,13 @@ public class WitnessIndex implements ITokenIndex {
 
     for (final INormalizedToken token : tokens) {
       LOG.debug(token.getContent());
-      if (!positionsInPhrases.contains(token.getPosition()) && repeatingTokens.contains(token.getNormalized())) {
+      if (!positionsInPhrases.contains(((WitnessToken)token).position) && repeatingTokens.contains(token.getNormalized())) {
         phraseCollection.add(findUniquePhraseToTheLeft(token, repeatingTokens, tokens));
         phraseCollection.add(findUniquePhraseToTheRight(token, repeatingTokens, tokens));
         //        phraseCollection.add(leftExpandedPhrase(token, tokens, repeatingTokens, positionsInPhrases));
         //        phraseCollection.add(rightExpandedPhrase(token, tokens, repeatingTokens, positionsInPhrases));
       } else {
-        positionsInPhrases.add(token.getPosition());
+        positionsInPhrases.add(((WitnessToken)token).position);
       }
     }
     LOG.debug(phraseCollection.toString());
@@ -68,14 +68,14 @@ public class WitnessIndex implements ITokenIndex {
     // combine to the left
     final IPhrase phrase = new Phrase(Lists.newArrayList(token));
     boolean found = false;
-    for (int i = token.getPosition() - 1; !found && i > 0; i--) {
+    for (int i = ((WitnessToken)token).position - 1; !found && i > 0; i--) {
       final INormalizedToken leftToken = tokens.get(i - 1);
       final String normalizedNeighbour = leftToken.getNormalized();
       found = !repeatingTokens.contains(normalizedNeighbour);
       phrase.addTokenToLeft(leftToken);
     }
     if (!found) {
-      phrase.addTokenToLeft(new NullToken(1, token.getSigil()));
+      phrase.addTokenToLeft(new NullToken(token.getSigil()));
     }
     return phrase;
   }
@@ -83,14 +83,14 @@ public class WitnessIndex implements ITokenIndex {
   private static IPhrase findUniquePhraseToTheRight(final INormalizedToken token, final List<String> repeatingTokens, final List<INormalizedToken> tokens) {
     final IPhrase phrase = new Phrase(Lists.newArrayList(token));
     boolean found = false;
-    for (int i = token.getPosition() + 1; !found && i < tokens.size() + 1; i++) {
+    for (int i = ((WitnessToken)token).position + 1; !found && i < tokens.size() + 1; i++) {
       final INormalizedToken rightToken = tokens.get(i - 1);
       final String normalizedNeighbour = rightToken.getNormalized();
       found = !repeatingTokens.contains(normalizedNeighbour);
       phrase.addTokenToRight(rightToken);
     }
     if (!found) {
-      phrase.addTokenToRight(new NullToken(tokens.size(), token.getSigil()));
+      phrase.addTokenToRight(new NullToken(token.getSigil()));
     }
     return phrase;
   }
@@ -102,14 +102,14 @@ public class WitnessIndex implements ITokenIndex {
     final String sigil = token.getSigil();
     INormalizedToken leftMostToken = token;
     do {
-      final int leftPosition = leftMostToken.getPosition() - 1;
+      final int leftPosition = ((WitnessToken)leftMostToken).position - 1;
       LOG.debug(Integer.toString(leftPosition));
       final INormalizedToken leftToken;
       if (leftPosition > 0) {
         leftToken = tokens.get(leftPosition - 1);
         //        tokenPositionsInPhrase.add(leftPosition);
       } else {
-        leftToken = new NullToken(leftMostToken.getPosition(), sigil);
+        leftToken = new NullToken(sigil);
       }
       tokenlist.add(0, leftToken);
       leftMostToken = leftToken;
@@ -125,9 +125,9 @@ public class WitnessIndex implements ITokenIndex {
     //    tokenPositionsInPhrase.add(token.getPosition());
     INormalizedToken rightMostToken = token;
     do {
-      final int rightPosition = rightMostToken.getPosition() + 1;
+      final int rightPosition = ((WitnessToken)rightMostToken).position + 1;
    //   LOG.debug(Integer.toString(rightPosition));
-      final INormalizedToken rightToken = (rightPosition < tokens.size()) ? tokens.get(rightPosition) : new NullToken(rightMostToken.getPosition(), token.getSigil());
+      final INormalizedToken rightToken = (rightPosition < tokens.size()) ? tokens.get(rightPosition) : new NullToken(token.getSigil());
       tokenlist.add(rightToken);
       //      tokenPositionsInPhrase.add(rightPosition - 1);
       rightMostToken = rightToken;

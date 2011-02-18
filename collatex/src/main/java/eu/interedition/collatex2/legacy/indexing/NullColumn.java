@@ -2,6 +2,7 @@ package eu.interedition.collatex2.legacy.indexing;
 
 import java.util.List;
 
+import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
@@ -33,7 +34,7 @@ public class NullColumn implements IInternalColumn {
 
   @Override
   public INormalizedToken getToken(final String sigil) {
-    return new NullToken(0, sigil);
+    return new NullToken(sigil);
   }
 
   @Override

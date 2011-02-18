@@ -8,13 +8,13 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.legacy.indexing.NullToken;
 
 //TODO: remove the explicit usage of NullToken in this class and in TokenIndexMatcher class!
 public class VariantGraphIndex implements ITokenIndex {
@@ -104,7 +104,7 @@ public class VariantGraphIndex implements ITokenIndex {
       tokens.add(0, leftToken);
     }
     if (!found) {
-      tokens.add(0, new NullToken(0, null));
+      tokens.add(0, new NullToken(null));
     }
     return tokens;
   }
@@ -121,7 +121,7 @@ public class VariantGraphIndex implements ITokenIndex {
       tokens.add(rightToken);
     }
     if (!found) {
-      tokens.add(new NullToken(0, null));
+      tokens.add(new NullToken(null));
     }
     return tokens;
   }
