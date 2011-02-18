@@ -75,11 +75,6 @@ public class VariantGraphVertex implements IVariantGraphVertex {
   }
 
   @Override
-  public String getSigil() {
-    throw new RuntimeException("WRONG!");
-  }
-
-  @Override
   public String getContent() {
     throw new RuntimeException("Do not call this method! Call getToken(IWitness).getContent() instead.");
   }

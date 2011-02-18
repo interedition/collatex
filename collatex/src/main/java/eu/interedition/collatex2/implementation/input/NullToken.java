@@ -10,11 +10,6 @@ public class NullToken implements INormalizedToken {
   }
 
   @Override
-  public String getSigil() {
-    throw new RuntimeException("DO NOT CALL THIS METHOD!");
-  }
-
-  @Override
   public String getContent() {
     return "";
   }

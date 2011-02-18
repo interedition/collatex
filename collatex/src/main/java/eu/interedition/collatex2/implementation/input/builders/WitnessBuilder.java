@@ -81,14 +81,14 @@ public class WitnessBuilder {
 
   public IWitness build(String witnessId, String witness) {
     WhitespaceTokenizer tokenizer = new WhitespaceTokenizer();
-    Iterator<IToken> tokenIterator = tokenizer.tokenize(witnessId, witness).iterator();
+    Iterator<IToken> tokenIterator = tokenizer.tokenize(witness).iterator();
     List<INormalizedToken> tokenList = Lists.newArrayList();
     int position = 1;
     while (tokenIterator.hasNext()) {
       IToken nextToken = tokenIterator.next();
       if (!nextToken.getContent().equals("")) {
         String normalized = tokenNormalizer.apply(nextToken).getNormalized();
-        tokenList.add(new WitnessToken(witnessId, nextToken.getContent(), position, normalized));
+        tokenList.add(new WitnessToken(nextToken.getContent(), position, normalized));
         position++;
       }
     }

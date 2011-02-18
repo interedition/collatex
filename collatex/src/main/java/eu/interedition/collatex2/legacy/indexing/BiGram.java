@@ -50,8 +50,8 @@ public class BiGram {
   }
 
   public static BiGram create(final Token token, final Token token2, ITokenNormalizer normalizer) {
-    INormalizedToken tokenA = new WitnessToken(token.getSigil(), token.getContent(), -1, normalizer.apply(token).getNormalized());
-    INormalizedToken tokenB = new WitnessToken(token2.getSigil(), token2.getContent(), -1, normalizer.apply(token2).getNormalized());
+    INormalizedToken tokenA = new WitnessToken(token.getContent(), -1, normalizer.apply(token).getNormalized());
+    INormalizedToken tokenB = new WitnessToken(token2.getContent(), -1, normalizer.apply(token2).getNormalized());
     return new BiGram(tokenA, tokenB);
   }
 

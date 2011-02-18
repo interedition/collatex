@@ -23,6 +23,7 @@ package eu.interedition.collatex2.implementation.vg_alignment;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.legacy.indexing.BiGram;
@@ -30,9 +31,9 @@ import eu.interedition.collatex2.legacy.indexing.BiGram;
 public class BiGramTest {
   @Test
   public void testContains() {
-    final Token token = new Token("A", "token");
-    final Token token2 = new Token("A", "token2");
-    final Token token3 = new Token("B", "token");
+    final Token token = new WitnessToken("A", -1, "token");
+    final Token token2 = new WitnessToken("A", -1, "token2");
+    final Token token3 = new WitnessToken("B", -1, "token");
     final BiGram bigram = BiGram.create(token, token2, new DefaultTokenNormalizer());
     Assert.assertTrue(bigram.contains(token));
     Assert.assertFalse(bigram.contains(token3));

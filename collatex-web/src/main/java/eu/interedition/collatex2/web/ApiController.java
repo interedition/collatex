@@ -289,13 +289,12 @@ public class ApiController implements InitializingBean {
       sigle.add(sigil);
 
       if ((witness.getTokens() == null) && (witness.getContent() != null)) {
-        Iterable<INormalizedToken> tokens = Iterables.transform(defaultTokenizer.tokenize(sigil, witness.getContent()), defaultNormalizer);
+        Iterable<INormalizedToken> tokens = Iterables.transform(defaultTokenizer.tokenize(witness.getContent()), defaultNormalizer);
         witness.setTokens(Lists.newArrayList(Iterables.transform(tokens, TO_API_TOKEN)));
       }
 
       int tokenPosition = 0;
       for (ApiToken token : witness.getApiTokens()) {
-        token.setSigil(sigil);
         token.setPosition(++tokenPosition);
         if (token.getNormalized() == null || token.getNormalized().trim().length() == 0) {
           token.setNormalized(defaultNormalizer.apply(token).getNormalized());

@@ -37,8 +37,8 @@ public class WitnessToken extends Token implements INormalizedToken {
     this.normalized = other.getNormalized();
   }
 
-  public WitnessToken(final String sigil, final String content, final int position, final String normalized) {
-    super(sigil, content);
+  public WitnessToken(final String content, final int position, final String normalized) {
+    super(content);
     this.normalized = normalized;
     this.position = position;
   }

@@ -37,7 +37,7 @@ import eu.interedition.collatex2.interfaces.ITokenizer;
 public class WhitespaceTokenizer implements ITokenizer {
 
   @Override
-  public Iterable<IToken> tokenize(final String sigle, String content) {
+  public Iterable<IToken> tokenize(String content) {
     final Iterator<String> tokenIterator = Arrays.asList(content.split("\\s+")).iterator();
     return new Iterable<IToken>() {
 
@@ -52,7 +52,7 @@ public class WhitespaceTokenizer implements ITokenizer {
 
           @Override
           public IToken next() {
-            return new Token(sigle, tokenIterator.next());
+            return new Token(tokenIterator.next());
           }
 
           @Override

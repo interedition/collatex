@@ -53,7 +53,7 @@ public class BiGramIndexTest {
   public void testRemoveTokenFromIndex() {
     final IWitness a = factory.createWitness("A", "a b c d");
     final BiGramIndex index = BiGramIndex.create(a);
-    final BiGramIndex result = index.removeBiGramsWithToken(new Token("A", "c"));
+    final BiGramIndex result = index.removeBiGramsWithToken(new Token("c"));
     Assert.assertEquals(3, result.size());
   }
 

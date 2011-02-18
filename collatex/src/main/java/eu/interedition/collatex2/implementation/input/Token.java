@@ -23,7 +23,6 @@ package eu.interedition.collatex2.implementation.input;
 import eu.interedition.collatex2.interfaces.IToken;
 
 public class Token implements IToken {
-  private String sigil;
   private String content;
 
   // private String trailingWhitespace; // TODO
@@ -33,21 +32,11 @@ public class Token implements IToken {
   }
 
   public Token(IToken other) {
-    this(other.getSigil(), other.getContent());
+    this(other.getContent());
   }
 
-  public Token(final String sigil, final String content) {
-    this.sigil = sigil;
+  public Token(final String content) {
     this.content = content;
-  }
-
-  @Override
-  public String getSigil() {
-    return sigil;
-  }
-
-  public void setSigil(String sigil) {
-    this.sigil = sigil;
   }
 
   @Override
@@ -63,7 +52,7 @@ public class Token implements IToken {
   public boolean equals(final Object obj) {
     if ((obj != null) && (obj instanceof Token)) {
       final Token token = (Token) obj;
-      return sigil.equals(token.sigil) && content.equals(token.content);
+      return content.equals(token.content);
     }
     return super.equals(obj);
   }
@@ -71,7 +60,6 @@ public class Token implements IToken {
   @Override
   public int hashCode() {
     int hc = 17;
-    hc = hc * 59 + sigil.hashCode();
     hc = hc * 59 + content.hashCode();
     return hc;
   }
