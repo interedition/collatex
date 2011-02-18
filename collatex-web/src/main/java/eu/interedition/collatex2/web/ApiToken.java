@@ -33,12 +33,12 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 @JsonSerialize(using = ApiToken.Serializer.class)
 @JsonIgnoreProperties( { "position", "sigil" })
-public class ApiToken extends NormalizedToken {
+public class ApiToken extends WitnessToken {
   private Map<String, Object> metadata;
 
   public ApiToken() {
