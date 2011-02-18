@@ -34,8 +34,6 @@ public interface IPhrase extends Comparable<IPhrase> {
 
   INormalizedToken getLastToken();
 
-  String getSigil();
-
   List<INormalizedToken> getTokens();
 
   int size();

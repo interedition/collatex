@@ -75,7 +75,7 @@ public class WitnessIndex implements ITokenIndex {
       phrase.addTokenToLeft(leftToken);
     }
     if (!found) {
-      phrase.addTokenToLeft(new NullToken(token.getSigil()));
+      phrase.addTokenToLeft(new NullToken());
     }
     return phrase;
   }
@@ -90,7 +90,7 @@ public class WitnessIndex implements ITokenIndex {
       phrase.addTokenToRight(rightToken);
     }
     if (!found) {
-      phrase.addTokenToRight(new NullToken(token.getSigil()));
+      phrase.addTokenToRight(new NullToken());
     }
     return phrase;
   }
@@ -99,7 +99,6 @@ public class WitnessIndex implements ITokenIndex {
   private IPhrase leftExpandedPhrase(final INormalizedToken token, final List<INormalizedToken> tokens, final Collection<String> repeatingTokens, final Set<Integer> tokenPositionsInPhrase) {
     final List<INormalizedToken> tokenlist = Lists.newArrayList(token);
     //    tokenPositionsInPhrase.add(token.getPosition());
-    final String sigil = token.getSigil();
     INormalizedToken leftMostToken = token;
     do {
       final int leftPosition = ((WitnessToken)leftMostToken).position - 1;
@@ -109,7 +108,7 @@ public class WitnessIndex implements ITokenIndex {
         leftToken = tokens.get(leftPosition - 1);
         //        tokenPositionsInPhrase.add(leftPosition);
       } else {
-        leftToken = new NullToken(sigil);
+        leftToken = new NullToken();
       }
       tokenlist.add(0, leftToken);
       leftMostToken = leftToken;
@@ -127,7 +126,7 @@ public class WitnessIndex implements ITokenIndex {
     do {
       final int rightPosition = ((WitnessToken)rightMostToken).position + 1;
    //   LOG.debug(Integer.toString(rightPosition));
-      final INormalizedToken rightToken = (rightPosition < tokens.size()) ? tokens.get(rightPosition) : new NullToken(token.getSigil());
+      final INormalizedToken rightToken = (rightPosition < tokens.size()) ? tokens.get(rightPosition) : new NullToken();
       tokenlist.add(rightToken);
       //      tokenPositionsInPhrase.add(rightPosition - 1);
       rightMostToken = rightToken;

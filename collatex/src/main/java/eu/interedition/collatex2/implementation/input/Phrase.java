@@ -119,11 +119,6 @@ public class Phrase implements IPhrase {
   }
 
   @Override
-  public String getSigil() {
-    return getFirstToken().getSigil();
-  }
-
-  @Override
   public List<INormalizedToken> getTokens() {
     return tokens;
   }

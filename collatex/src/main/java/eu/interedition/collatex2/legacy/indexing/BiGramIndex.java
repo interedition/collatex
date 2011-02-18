@@ -98,8 +98,8 @@ public class BiGramIndex implements Iterable<BiGram> {
       return new BiGramIndex();
     }
     final List<INormalizedToken> tokensTodo = Lists.newArrayList(tokens);
-    tokensTodo.add(new NullToken(tokens.get(0).getSigil()));
-    INormalizedToken previous = new NullToken(tokens.get(0).getSigil());
+    tokensTodo.add(new NullToken());
+    INormalizedToken previous = new NullToken();
     final List<BiGram> bigrams = Lists.newArrayList();
     for (final INormalizedToken next : tokensTodo) {
       final BiGram tuple = new BiGram(previous, next);

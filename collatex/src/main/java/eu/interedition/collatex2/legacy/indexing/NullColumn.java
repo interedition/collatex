@@ -34,7 +34,7 @@ public class NullColumn implements IInternalColumn {
 
   @Override
   public INormalizedToken getToken(final String sigil) {
-    return new NullToken(sigil);
+    return new NullToken();
   }
 
   @Override

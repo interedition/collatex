@@ -30,7 +30,7 @@ public class GapDetection {
       final IColumns gapA = gapColumnsForA.get(i);
       final IPhrase gapB = gapPhrasesForB.get(i);
       final IInternalColumn nextMatchToken = nextColumns.get(i);
-      final IGap gap = new Gap(gapA, gapB, nextMatchToken);
+      final IGap gap = new Gap(witnessB, gapA, gapB, nextMatchToken);
       gaps.add(gap);
     }
     return gaps;

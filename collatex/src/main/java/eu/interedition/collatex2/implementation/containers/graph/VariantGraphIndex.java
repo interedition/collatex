@@ -104,7 +104,7 @@ public class VariantGraphIndex implements ITokenIndex {
       tokens.add(0, leftToken);
     }
     if (!found) {
-      tokens.add(0, new NullToken(null));
+      tokens.add(0, new NullToken());
     }
     return tokens;
   }
@@ -121,7 +121,7 @@ public class VariantGraphIndex implements ITokenIndex {
       tokens.add(rightToken);
     }
     if (!found) {
-      tokens.add(new NullToken(null));
+      tokens.add(new NullToken());
     }
     return tokens;
   }
