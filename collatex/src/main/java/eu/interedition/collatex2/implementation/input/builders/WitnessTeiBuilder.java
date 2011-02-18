@@ -88,7 +88,7 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
       for (int i = 0; i < nodes.getLength(); i++) {
         String value = nodes.item(i).getTextContent();
         WitnessToken t = new WitnessToken(id, value, counter++, value);
-        t.setNormalized(tokenNormalizer.apply(t));
+        t.setNormalized(tokenNormalizer.apply(t).getNormalized());
         tokenList.add(t);
       }
     }

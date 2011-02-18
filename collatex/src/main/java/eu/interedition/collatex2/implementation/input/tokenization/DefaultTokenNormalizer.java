@@ -22,6 +22,8 @@ package eu.interedition.collatex2.implementation.input.tokenization;
 
 import java.util.regex.Pattern;
 
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 
@@ -35,12 +37,12 @@ public class DefaultTokenNormalizer implements ITokenNormalizer {
   private final static Pattern PUNCT = Pattern.compile("\\p{Punct}");
   
   @Override
-  public String apply(IToken token) {
+  public INormalizedToken apply(IToken token) {
     String normalized = PUNCT.matcher(token.getContent().toLowerCase()).replaceAll("");
     // but if the token content was only punctuation, we end up with nothing, so:
     if (normalized == null || normalized.length() == 0) {
       normalized = token.getContent();
     }
-    return normalized;
+    return new NormalizedToken(token, normalized);
   }
 }
