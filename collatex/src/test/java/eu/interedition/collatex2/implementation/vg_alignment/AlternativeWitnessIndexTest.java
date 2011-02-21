@@ -21,8 +21,8 @@
 package eu.interedition.collatex2.implementation.vg_alignment;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -33,12 +33,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
-import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
+import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.todo.alternativeindexing.AlternativeWitnessIndex;
 
-public class WitnessIndexTest {
-  private static final Logger LOG = LoggerFactory.getLogger(WitnessIndexTest.class);
+public class AlternativeWitnessIndexTest {
+  private static final Logger LOG = LoggerFactory.getLogger(AlternativeWitnessIndexTest.class);
   private CollateXEngine factory;
 
   @Before
@@ -71,28 +71,14 @@ public class WitnessIndexTest {
     assertTrue(index.contains("black rat #"));
   }
 
-
-  @Ignore
-  @Test
-  public void test2() {
-    final IWitness witnessA = factory.createWitness("A", "the big black");
-    final ITokenIndex index = new AlternativeWitnessIndex(witnessA, Lists.newArrayList("the", "big", "black"));
-    LOG.debug(index.keys().toString());
-    assertEquals(6, index.size());
-    assertTrue(index.contains("# the"));
-    assertTrue(index.contains("# the big"));
-    assertTrue(index.contains("# the big black"));
-    assertTrue(index.contains("the big black #"));
-    assertTrue(index.contains("big black #"));
-    assertTrue(index.contains("black #"));
-    assertEquals(6, index.size());
-  }
-
+  
+  //TODO: update expectations!
   @Ignore
   @Test
   public void test1() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final ITokenIndex index = CollateXEngine.createWitnessIndex(a);
+    final ITokenIndex index = new AlternativeWitnessIndex(a, a.getRepeatedTokens());
+    LOG.debug(index.keys().toString());
     assertEquals(6, index.size());
     assertTrue(index.contains("# tobe"));
     assertTrue(index.contains("tobe or"));
@@ -103,5 +89,24 @@ public class WitnessIndexTest {
     assertTrue(index.contains("not tobe"));
     assertTrue(index.contains("tobe #"));
   }
+
+  @Test
+  public void test2() {
+    final IWitness witnessA = factory.createWitness("A", "the big black");
+    final ITokenIndex index = new AlternativeWitnessIndex(witnessA, Lists.newArrayList("the", "big", "black"));
+    LOG.debug(index.keys().toString());
+    assertEquals(10, index.size());
+    assertTrue(index.contains("the"));
+    assertTrue(index.contains("big"));
+    assertTrue(index.contains("black"));
+    assertTrue(index.contains("# the"));
+    assertTrue(index.contains("the big"));
+    assertTrue(index.contains("big black"));
+    assertTrue(index.contains("black #"));
+    assertTrue(index.contains("# the big"));
+    assertTrue(index.contains("the big black"));
+    assertTrue(index.contains("big black #"));
+  }
+
 
 }

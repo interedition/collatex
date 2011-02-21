@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.todo.alternativeindexing;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +20,10 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
+import eu.interedition.collatex2.implementation.vg_alignment.Sequence;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenIndexMatcher;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenMatch;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenPair;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
@@ -71,13 +75,13 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
         matches.add(new Sequence(tablePhrase, phrase));
       }
     }
-    TokenIndexMatcher.LOG.debug("unfiltered matches: " + matches);
+    AlternativeTokenIndexMatcher.LOG.debug("unfiltered matches: " + matches);
     return joinOverlappingMatches(matches, witness);
   }
 
   private List<ITokenMatch> joinOverlappingMatches(final List<Sequence> matches, IWitness witness) {
     final List<ITokenMatch> newMatches = filterMatchesBasedOnPositionMatches(matches, witness);
-    TokenIndexMatcher.LOG.debug("filtered matches: " + newMatches);
+    AlternativeTokenIndexMatcher.LOG.debug("filtered matches: " + newMatches);
     return newMatches;
   }
 

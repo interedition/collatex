@@ -24,6 +24,8 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,39 +35,23 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Joiner;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class IndexingTest {
+public class WitnessIndexingTest {
   private CollateXEngine factory;
-  private Logger log = LoggerFactory.getLogger(IndexingTest.class);
+  private Logger log = LoggerFactory.getLogger(WitnessIndexingTest.class);
   
   @Before
   public void setup() {
     factory = new CollateXEngine();
   }
 
-  @Ignore
   @Test
-  public void test2() {
-    final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
-    log.debug("witness = [the big black cat and the big black rat]");
-    final ITokenIndex index = CollateXEngine.createWitnessIndex(a);
-    assertContains(index, "# the big black");
-    assertContains(index, "the big black cat");
-    assertContains(index, "cat");
-    assertContains(index, "and");
-    assertContains(index, "and the big black");
-    assertContains(index, "the big black rat");
-    assertContains(index, "rat");
-    assertEquals(7, index.size());
-  }
-
-  @Test
-  @Ignore
   public void test1a() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final ITokenIndex index = CollateXEngine.createWitnessIndex(a);
+    final ITokenIndex index = new WitnessIndex(a, a.getRepeatedTokens());
     assertEquals(6, index.size());
     assertContains(index, "# tobe");
     assertContains(index, "tobe or");
@@ -77,21 +63,30 @@ public class IndexingTest {
     assertContains(index, "tobe #");
   }
 
-  @Ignore
   @Test
-  public void test2a() {
+  public void test2() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
-    final ITokenIndex index = CollateXEngine.createWitnessIndex(a);
-    assertContains(index, "# the big black");
-    assertContains(index, "the big black cat");
-    assertContains(index, "cat");
-    assertContains(index, "and");
-    assertContains(index, "and the big black");
-    assertContains(index, "the big black rat");
-    assertContains(index, "rat");
-    assertEquals(7, index.size());
+    log.debug("witness = [the big black cat and the big black rat]");
+    final ITokenIndex index = new WitnessIndex(a, a.getRepeatedTokens());
+    assertTrue(index.contains("# the"));
+    assertTrue(index.contains("the big black cat"));
+    assertTrue(index.contains("# the big"));
+    assertTrue(index.contains("big black cat"));
+    assertTrue(index.contains("# the big black"));
+    assertTrue(index.contains("black cat"));
+    assertTrue(index.contains("cat"));
+    assertTrue(index.contains("and"));
+    assertTrue(index.contains("and the"));
+    assertTrue(index.contains("the big black rat"));
+    assertTrue(index.contains("and the big"));
+    assertTrue(index.contains("big black rat"));
+    assertTrue(index.contains("and the big black")); 
+    assertTrue(index.contains("black rat"));
+    assertTrue(index.contains("rat"));
+    assertEquals(15, index.size());
   }
 
+  //TODO: there is no way that these expectations could be correct!
   @Ignore
   @Test
   public void testTwoWitnesses() {
@@ -99,8 +94,10 @@ public class IndexingTest {
     final IWitness b = factory.createWitness("B", "and the big black cat ate the big rat");
     log.debug("witness a = [the big black cat and the big black rat]");
     log.debug("witness b = [and the big black cat ate the big rat]");
-    final ITokenIndex indexA = CollateXEngine.createWitnessIndex(a);
-    final ITokenIndex indexB = CollateXEngine.createWitnessIndex(b);
+    List<String> repeatedTokens = a.getRepeatedTokens();
+    repeatedTokens.addAll(b.getRepeatedTokens());
+    final ITokenIndex indexA = new WitnessIndex(a, repeatedTokens);
+    final ITokenIndex indexB = new WitnessIndex(b, repeatedTokens);
     assertContains(indexA, "# the big black");
     assertContains(indexB, "# the big black");
     assertContains(indexA, "the big black cat");
@@ -113,19 +110,6 @@ public class IndexingTest {
     assertContains(indexA, "rat");
     assertEquals(7, indexA.size());
   }
-
-  //  @Test
-  //  public void test3() {
-  //    final IWitness a = factory.createWitness("A", "X C A B Y C A Z A B W");
-  //    Log.info("witness = [X C A B Y C A Z A B W]");
-  //    final IWitnessIndex index = Factory.createWitnessIndex(a);
-  //    assertContains(index,"# the big black"));
-  //    assertContains(index,"the big black cat"));
-  //    assertContains(index,"and"));
-  //    assertContains(index,"and the big black"));
-  //    assertContains(index,"the big black rat"));
-  //    assertEquals(5, index.size());
-  //  }
 
   private void assertContains(final ITokenIndex index, final String phrase) {
     assertTrue("phrase '" + phrase + "' not found in index [" + Joiner.on(", ").join(index.keys()) + "]", index.contains(phrase));

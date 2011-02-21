@@ -31,7 +31,6 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
-import eu.interedition.collatex2.implementation.containers.witness.AlternativeWitnessIndex;
 import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
@@ -45,7 +44,6 @@ import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -155,10 +153,6 @@ public class CollateXEngine {
 
   public static IMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
-  }
-
-  public static ITokenIndex createWitnessIndex(final IWitness witness) {
-    return new AlternativeWitnessIndex(witness, witness.getRepeatedTokens());
   }
 
   // TODO: remove? seems only used in tests!

@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.containers.witness;
+package eu.interedition.collatex2.todo.alternativeindexing;
 
 import java.util.Collection;
 import java.util.List;
