@@ -65,7 +65,7 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
   //TODO: make this method internal to the token matching process!
   @Override
   public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
-    return VariantGraphIndex.create(this, repeatingTokens);
+    return new VariantGraphIndex(this, repeatingTokens);
   }
 
   @Override
