@@ -36,16 +36,6 @@ public interface IInternalColumn {
 
   //DOUBT ABOUT THE REST OF THE METHODS!
   //TODO: check 0.9.1 branch!
-  List<INormalizedToken> getVariants();
-
-  void addVariant(INormalizedToken token);
-
-  void addMatch(INormalizedToken token);
-
   int getPosition();
-
-  void setPosition(int position);
-
-  void accept(IAlignmentTableVisitor visitor);
 
 }

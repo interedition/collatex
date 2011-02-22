@@ -7,7 +7,6 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.ColumnState;
-import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -47,14 +46,6 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
     return position;
   }
 
-  //TODO: rename to getSigla()!
-  //TODO: if the method is still used!
-  //TODO: see method down below!
-  @Override
-  public List<String> getSigli() {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
-  }
-
   //TODO: add/re-enable test (see parallel segmentation tests)
   @Override
   public List<String> getSigla() {
@@ -88,31 +79,6 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
     return findVertexForWitness != null;
   }
 
-  //TODO: No longer supported methods!
-  @Override
-  public List<INormalizedToken> getVariants() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void accept(IAlignmentTableVisitor visitor) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void addMatch(INormalizedToken token) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void addVariant(INormalizedToken token) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setPosition(int position) {
-    throw new UnsupportedOperationException();
-  }
 
   // should maybe be a map?
   protected IVariantGraphVertex findVertexForWitness(String sigil) {

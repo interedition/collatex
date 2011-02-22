@@ -33,7 +33,8 @@ public class Columns implements IColumns {
     for (int i = 0; i < phraseB.size(); i++) {
       final IInternalColumn column = columns.get(i);
       final INormalizedToken token = tokens.get(i);
-      column.addMatch(token);
+      // NOTE: REMARKED because of the use of legacy API!
+      //      column.addMatch(token);
     }
   }
 
@@ -51,7 +52,8 @@ public class Columns implements IColumns {
     for (int i = 0; i < phraseB.size(); i++) {
       final IInternalColumn column = columns.get(i);
       final INormalizedToken token = tokens.get(i);
-      column.addVariant(token);
+      // NOTE: REMARKED because of the use of legacy API!
+      //      column.addVariant(token);
     }
   }
 

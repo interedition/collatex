@@ -20,7 +20,6 @@
 
 package eu.interedition.collatex2.interfaces;
 
-import java.util.List;
 
 /**
  * 
@@ -34,16 +33,12 @@ import java.util.List;
 // TODO: The IColumn interface should contain less methods
 // TODO: and have Iterable ICells (see CollateX branch 0.9.1)
 // TODO: Do not expose getToken(sigil)!
-// TODO: Do not expose addXXXX methods!
 // TODO: Rename getSigli to getSigla()!
 public interface IColumn {
   
   INormalizedToken getToken(String sigil);
 
   ColumnState getState();
-
-  //TODO: rename to getSigla()!
-  List<String> getSigli();
 
   //TODO: remove add methods from interface!
   void addVertex(IVariantGraphVertex vertex);
@@ -58,21 +53,6 @@ public interface IColumn {
 
   //TODO: Warning method is only used in test!
   boolean containsWitness(String sigil);
-
-  //TODO: Warning method is only used in test!
-  List<INormalizedToken> getVariants();
-
-  //TODO: remove add method!
-  void addVariant(INormalizedToken token);
-
-  //TODO: remove add method!
-  void addMatch(INormalizedToken token);
-	
-  //TODO: remove set method!
-  void setPosition(int position);
-
-  //TODO: not used anymore?
-  void accept(IAlignmentTableVisitor visitor);
 
   /**
    * get the internal representation of the alignment column

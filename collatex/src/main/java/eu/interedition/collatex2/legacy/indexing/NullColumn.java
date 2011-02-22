@@ -4,7 +4,6 @@ import java.util.List;
 
 import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.interfaces.ColumnState;
-import eu.interedition.collatex2.interfaces.IAlignmentTableVisitor;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
@@ -15,12 +14,6 @@ public class NullColumn implements IInternalColumn {
   public NullColumn(final int position) {
     this.position = position;
   }
-
-  @Override
-  public void addMatch(final INormalizedToken token) {}
-
-  @Override
-  public void addVariant(final INormalizedToken token) {}
 
   @Override
   public boolean containsWitness(final String sigil) {
@@ -38,14 +31,6 @@ public class NullColumn implements IInternalColumn {
   }
 
   @Override
-  public List<INormalizedToken> getVariants() {
-    return null;
-  }
-
-  @Override
-  public void setPosition(final int position) {}
-
-  @Override
   public ColumnState getState() {
     return null;
   }
@@ -56,12 +41,6 @@ public class NullColumn implements IInternalColumn {
     return null;
   }
 
-  @Override
-  public void accept(final IAlignmentTableVisitor visitor) {
-  // TODO Auto-generated method stub
-
-  }
-  
   @Override
   public String toString() {
     return "";
