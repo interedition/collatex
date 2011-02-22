@@ -99,5 +99,14 @@ public class VariantGraphIndexTest {
     assertEquals("VariantGraphIndex: (first, match)", index.toString());
   }
 
+  @Test
+  public void testIndexWithTwoWitnesses() {
+    final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
+    final IWitness b = factory.createWitness("B", "the big black rat and the small white rat");
+    IVariantGraph graph = factory.graph(a, b);
+    ITokenIndex index = new VariantGraphIndex(graph, graph.getRepeatedTokens());
+    assertEquals("VariantGraphIndex: (# the, the big black cat, # the big, big black cat, # the big black, black cat, cat, and, and the, the big black rat #, and the big, big black rat #, and the big black, black rat #, and the big black rat, rat #, the big black rat and, big black rat and, black rat and, # the big black rat, rat and, the small, small, white, white rat)", index.toString());
+  }
+
 
 }

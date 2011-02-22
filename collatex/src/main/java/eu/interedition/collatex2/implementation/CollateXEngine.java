@@ -22,13 +22,6 @@
 
 package eu.interedition.collatex2.implementation;
 
-import java.util.List;
-import java.util.Set;
-
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
-
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
@@ -154,42 +147,6 @@ public class CollateXEngine {
     throw new RuntimeException("Near matches are not yet supported!");
   }
 
-  // TODO: remove? seems only used in tests!
-  protected static Set<String> getPhrasesWithMultiples(final IWitness... witnesses) {
-    final Set<String> stringSet = Sets.newHashSet();
-    for (final IWitness witness : witnesses) {
-      final Multiset<String> tokenSet = HashMultiset.create();
-      final List<INormalizedToken> tokens = witness.getTokens();
-      for (final INormalizedToken token : tokens) {
-        tokenSet.add(token.getNormalized());
-      }
-      boolean duplicationFound = false;
-      for (final String tokenString : tokenSet.elementSet()) {
-        if (tokenSet.count(tokenString) > 1) {
-          duplicationFound = true;
-          stringSet.add(tokenString);
-        }
-      }
-      if (duplicationFound) {
-        // als er een dubbele gevonden is, kijk dan of deze uitgebreid kan
-        // worden naar rechts
-        for (int i = 0; i < tokens.size() - 1; i++) {
-          final String currentNormalized = tokens.get(i).getNormalized();
-          final String nextNormalized = tokens.get(i + 1).getNormalized();
-          if (stringSet.contains(currentNormalized) && stringSet.contains(nextNormalized)) {
-            tokenSet.add(currentNormalized + " " + nextNormalized);
-          }
-        }
-      }
-      for (final String tokenString : tokenSet.elementSet()) {
-        if (tokenSet.count(tokenString) > 1) {
-          duplicationFound = true;
-          stringSet.add(tokenString);
-        }
-      }
-    }
-    return stringSet;
-  }
 
 
   
