@@ -3,14 +3,15 @@ package eu.interedition.collatex2.implementation.containers.graph;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraphIndex;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 
 public class VariantGraphIndexTest {
   private static CollateXEngine factory;
@@ -19,6 +20,20 @@ public class VariantGraphIndexTest {
   public static void setup() {
     factory = new CollateXEngine();
   }
+  
+  @Test
+  public void testGetRepeatedTokensWithMultipleWitnesses() {
+    final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
+    final IWitness b = factory.createWitness("B", "the big black rat and the small white rat");
+    IVariantGraph graph = factory.graph(a, b);
+    final List<String> repeatedTokens = graph.getRepeatedTokens();
+    final String[] expectedTokens = { "the", "big", "black", "rat" };
+    assertEquals(expectedTokens.length, repeatedTokens.size());
+    for (final String expected : expectedTokens) {
+      assertTrue(repeatedTokens.contains(expected));
+    }
+  }
+
 
   @Test
   public void testCreateVariantGraphIndex() {

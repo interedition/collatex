@@ -22,7 +22,6 @@
 
 package eu.interedition.collatex2.implementation;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -153,25 +152,6 @@ public class CollateXEngine {
 
   public static IMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
-  }
-
-  // TODO: remove? seems only used in tests!
-  protected static Set<String> getTokensWithMultiples(final Collection<IWitness> witnesses) {
-    final Set<String> stringSet = Sets.newHashSet();
-    for (final IWitness witness : witnesses) {
-      final Multiset<String> tokenSet = HashMultiset.create();
-      final List<INormalizedToken> tokens = witness.getTokens();
-      for (final INormalizedToken token : tokens) {
-        tokenSet.add(token.getNormalized());
-      }
-      final Set<String> elementSet = tokenSet.elementSet();
-      for (final String tokenString : elementSet) {
-        if (tokenSet.count(tokenString) > 1) {
-          stringSet.add(tokenString);
-        }
-      }
-    }
-    return stringSet;
   }
 
   // TODO: remove? seems only used in tests!

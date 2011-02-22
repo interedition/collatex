@@ -29,8 +29,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class FactoryTest {
@@ -41,17 +39,6 @@ public class FactoryTest {
     factory = new CollateXEngine();
   }
 
-  @Test
-  public void testGetTokensWithMultiples() {
-    final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
-    final IWitness b = factory.createWitness("B", "the big black rat and the small white rat");
-    final Set<String> tokensWithMultiples = CollateXEngine.getTokensWithMultiples(Lists.newArrayList(a, b));
-    final String[] expectedTokens = { "the", "big", "black", "rat" };
-    assertEquals(expectedTokens.length, tokensWithMultiples.size());
-    for (final String expected : expectedTokens) {
-      assertContains(tokensWithMultiples, expected);
-    }
-  }
 
   @Ignore
   @Test
