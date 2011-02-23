@@ -11,7 +11,6 @@ import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdg
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -92,11 +91,6 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
 
   @Override
   public List<IVariantGraphEdge> getPath(IWitness witness) {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
-  }
-
-  @Override
-  public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
     throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
 

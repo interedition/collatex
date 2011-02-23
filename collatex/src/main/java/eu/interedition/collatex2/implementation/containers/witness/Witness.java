@@ -13,7 +13,6 @@ import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IToken;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class Witness implements Iterable<INormalizedToken>, IWitness {
@@ -85,12 +84,6 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
     }
     return repeatingNormalizedTokens;
   }
-
-  @Override
-  public ITokenIndex getTokenIndex(List<String> repeatedTokens) {
-    return new WitnessIndex(this, repeatedTokens);
-  }
-
 
   @Override
   public String toString() {

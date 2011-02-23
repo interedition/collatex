@@ -18,6 +18,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphIndex;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.vg_alignment.Sequence;
@@ -29,10 +31,10 @@ import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenMatcher;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
@@ -42,17 +44,19 @@ import eu.interedition.collatex2.legacy.tokenmatching.ColumnPhraseMatch;
 //TODO: remove explicit dependency on NullToken
 public class AlternativeTokenIndexMatcher implements ITokenMatcher {
   private static final Logger LOG = LoggerFactory.getLogger(TokenIndexMatcher.class);
-  private final ITokenContainer base;
+  private final IVariantGraph base;
 
-  public AlternativeTokenIndexMatcher(ITokenContainer base) {
+  public AlternativeTokenIndexMatcher(IVariantGraph base) {
     this.base = base;
   }
 
   @Override
   public List<ITokenMatch> getMatches(IWitness witness) {
     final List<String> repeatedTokens = combineRepeatedTokens(witness);
-    ITokenIndex baseIndex = base.getTokenIndex(repeatedTokens);
-    return findMatches(baseIndex, witness.getTokenIndex(repeatedTokens), witness);
+    //TODO: Make AlternativeVariantGraphIndex class!
+    ITokenIndex baseIndex = new VariantGraphIndex(base, repeatedTokens);
+    ITokenIndex witnessIndex = new WitnessIndex(witness, repeatedTokens);
+    return findMatches(baseIndex, witnessIndex, witness);
   }
 
   //TODO: change return type from List into Set?
@@ -203,7 +207,7 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
     }
     //TODO: this should work on a VariantGraph, not on a table!
     // Do the token matching
-    TokenIndexMatcher matcher = new TokenIndexMatcher((ITokenContainer) table);
+    TokenIndexMatcher matcher = new TokenIndexMatcher((IVariantGraph) table);
     // Convert matches to legacy
     List<IMatch> result = Lists.newArrayList();
     //BB hier is+ de alignmenttable aanwezig, en moet de informatie over multiple matches verwerkt worden, i.e. 

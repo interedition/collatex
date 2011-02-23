@@ -5,8 +5,6 @@ import java.util.List;
 
 public interface ITokenContainer {
 
-  ITokenIndex getTokenIndex(List<String> repeatedTokens);
-
   //TODO: remove! (when AlternativeTokenIndexMatcher is used!)
   List<String> getRepeatedTokens();
   

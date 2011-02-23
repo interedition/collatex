@@ -15,7 +15,6 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -60,12 +59,6 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
       }
     }
     return result;
-  }
-
-  //TODO: make this method internal to the token matching process!
-  @Override
-  public ITokenIndex getTokenIndex(List<String> repeatingTokens) {
-    return new VariantGraphIndex(this, repeatingTokens);
   }
 
   @Override

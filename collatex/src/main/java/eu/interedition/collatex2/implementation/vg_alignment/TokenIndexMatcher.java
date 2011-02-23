@@ -12,13 +12,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphIndex;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
 import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.ITokenMatcher;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 //TODO: Use AlternativeTokenIndexMatcher when
@@ -26,17 +28,18 @@ import eu.interedition.collatex2.interfaces.IWitness;
 //TODO: remove explicit dependency on NullToken
 public class TokenIndexMatcher implements ITokenMatcher {
   static final Logger LOG = LoggerFactory.getLogger(TokenIndexMatcher.class);
-  private final ITokenContainer base;
+  private final IVariantGraph base;
 
-  public TokenIndexMatcher(ITokenContainer base) {
+  public TokenIndexMatcher(IVariantGraph base) {
     this.base = base;
   }
 
   @Override
   public List<ITokenMatch> getMatches(IWitness witness) {
     final List<String> repeatedTokens = combineRepeatedTokens(witness);
-    ITokenIndex baseIndex = base.getTokenIndex(repeatedTokens);
-    return findMatches(baseIndex, witness.getTokenIndex(repeatedTokens), witness);
+    ITokenIndex baseIndex = new VariantGraphIndex(base, repeatedTokens);
+    ITokenIndex witnessIndex = new WitnessIndex(witness, repeatedTokens);
+    return findMatches(baseIndex, witnessIndex, witness);
   }
   
   //TODO: change return type from List into Set?

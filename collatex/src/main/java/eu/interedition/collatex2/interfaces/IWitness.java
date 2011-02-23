@@ -39,9 +39,6 @@ public interface IWitness extends ITokenContainer {
 
   String getSigil();
 
-  @Override
-  ITokenIndex getTokenIndex(List<String> repeatedTokens);
-
   //TODO: remove method!
   @Override
   List<String> getRepeatedTokens();
