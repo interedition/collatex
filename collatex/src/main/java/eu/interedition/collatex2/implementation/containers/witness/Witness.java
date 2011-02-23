@@ -1,13 +1,10 @@
 package eu.interedition.collatex2.implementation.containers.witness;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -67,22 +64,6 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
   @Override
   public int size() {
     return tokens.size();
-  }
-
-  @Override
-  public List<String> getRepeatedTokens() {
-    final Multimap<String, INormalizedToken> normalizedTokenMap = ArrayListMultimap.create();
-    for (final INormalizedToken token : getTokens()) {
-      normalizedTokenMap.put(token.getNormalized(), token);
-    }
-    final List<String> repeatingNormalizedTokens = Lists.newArrayList();
-    for (final String key : normalizedTokenMap.keySet()) {
-      final Collection<INormalizedToken> tokenCollection = normalizedTokenMap.get(key);
-      if (tokenCollection.size() > 1) {
-        repeatingNormalizedTokens.add(key);
-      }
-    }
-    return repeatingNormalizedTokens;
   }
 
   @Override

@@ -39,7 +39,4 @@ public interface IWitness extends ITokenContainer {
 
   String getSigil();
 
-  //TODO: remove method!
-  @Override
-  List<String> getRepeatedTokens();
 }

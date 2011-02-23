@@ -24,6 +24,8 @@ import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -49,7 +51,8 @@ public class AlternativeWitnessIndexTest {
   @Test
   public void testBigrams1() {
     final IWitness witnessA = factory.createWitness("A", "the big black cat and the big black rat");
-    final ITokenIndex index = new AlternativeWitnessIndex(witnessA, witnessA.getRepeatedTokens());
+    List<String> repeatedTokens = TokenIndexUtil.getRepeatedTokens(witnessA);
+    final ITokenIndex index = new AlternativeWitnessIndex(witnessA, repeatedTokens);
     // The index should contain all unique n-grams with 
     //   0 or more tokens         occurring multiple times in the witness, and
     //   exactly 1 token (or '#') occurring only once      in the witness
@@ -77,7 +80,8 @@ public class AlternativeWitnessIndexTest {
   @Test
   public void test1() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final ITokenIndex index = new AlternativeWitnessIndex(a, a.getRepeatedTokens());
+    List<String> repeatedTokens = TokenIndexUtil.getRepeatedTokens(a);
+    final ITokenIndex index = new AlternativeWitnessIndex(a, repeatedTokens);
     LOG.debug(index.keys().toString());
     assertEquals(6, index.size());
     assertTrue(index.contains("# tobe"));

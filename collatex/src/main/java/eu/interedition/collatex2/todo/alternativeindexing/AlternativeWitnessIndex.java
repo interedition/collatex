@@ -13,8 +13,8 @@ import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.IWitnessIndex;
 import eu.interedition.collatex2.legacy.indexing.BiGram;
 import eu.interedition.collatex2.legacy.indexing.BiGramIndex;
 import eu.interedition.collatex2.legacy.indexing.NGram;
@@ -25,7 +25,7 @@ import eu.interedition.collatex2.legacy.indexing.NGram;
 //TODO: use the AlternativeTokenIndexMatcher
 //TODO: change the filtering after the matching
 //TODO: to work on vertices instead of columns
-public class AlternativeWitnessIndex implements IWitnessIndex {
+public class AlternativeWitnessIndex implements ITokenIndex {
   private final Map<String, IPhrase> map;
 
   //NOTE: repeated Tokens are ignored and can be deleted later!

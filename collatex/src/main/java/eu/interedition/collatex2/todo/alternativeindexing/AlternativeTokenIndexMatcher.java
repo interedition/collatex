@@ -24,6 +24,7 @@ import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.vg_alignment.Sequence;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenIndexMatcher;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenIndexUtil;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenMatch;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenPair;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
@@ -62,8 +63,8 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
   //TODO: change return type from List into Set?
   private List<String> combineRepeatedTokens(final IWitness witness) {
     final Set<String> repeatedTokens = Sets.newHashSet();
-    repeatedTokens.addAll(base.getRepeatedTokens());
-    repeatedTokens.addAll(witness.getRepeatedTokens());
+    repeatedTokens.addAll(TokenIndexUtil.getRepeatedTokens(base));
+    repeatedTokens.addAll(TokenIndexUtil.getRepeatedTokens(witness));
     return Lists.newArrayList(repeatedTokens);
   }
 

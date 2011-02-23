@@ -49,9 +49,21 @@ public class WitnessIndexingTest {
   }
 
   @Test
+  public void test() {
+    final IWitness witness = new CollateXEngine().createWitness("a", "a b a d b f a");
+    final List<String> repeatedTokens = TokenIndexUtil.getRepeatedTokens(witness);
+    assertEquals(2, repeatedTokens.size());
+    assertTrue(repeatedTokens.contains("a"));
+    assertTrue(repeatedTokens.contains("b"));
+    assertFalse(repeatedTokens.contains("d"));
+    assertFalse(repeatedTokens.contains("f"));
+  }
+
+  @Test
   public void test1a() {
     final IWitness a = factory.createWitness("A", "tobe or not tobe");
-    final ITokenIndex index = new WitnessIndex(a, a.getRepeatedTokens());
+    final List<String> repeatedTokens = TokenIndexUtil.getRepeatedTokens(a);
+    final ITokenIndex index = new WitnessIndex(a, repeatedTokens);
     assertEquals(6, index.size());
     assertContains(index, "# tobe");
     assertContains(index, "tobe or");
@@ -67,7 +79,8 @@ public class WitnessIndexingTest {
   public void test2() {
     final IWitness a = factory.createWitness("A", "the big black cat and the big black rat");
     log.debug("witness = [the big black cat and the big black rat]");
-    final ITokenIndex index = new WitnessIndex(a, a.getRepeatedTokens());
+    final List<String> repeatedTokens = TokenIndexUtil.getRepeatedTokens(a);
+    final ITokenIndex index = new WitnessIndex(a, repeatedTokens);
     assertTrue(index.contains("# the"));
     assertTrue(index.contains("the big black cat"));
     assertTrue(index.contains("# the big"));
@@ -94,8 +107,8 @@ public class WitnessIndexingTest {
     final IWitness b = factory.createWitness("B", "and the big black cat ate the big rat");
     log.debug("witness a = [the big black cat and the big black rat]");
     log.debug("witness b = [and the big black cat ate the big rat]");
-    List<String> repeatedTokens = a.getRepeatedTokens();
-    repeatedTokens.addAll(b.getRepeatedTokens());
+    final List<String> repeatedTokens = TokenIndexUtil.getRepeatedTokens(a);
+    repeatedTokens.addAll(TokenIndexUtil.getRepeatedTokens(b));
     final ITokenIndex indexA = new WitnessIndex(a, repeatedTokens);
     final ITokenIndex indexB = new WitnessIndex(b, repeatedTokens);
     assertContains(indexA, "# the big black");

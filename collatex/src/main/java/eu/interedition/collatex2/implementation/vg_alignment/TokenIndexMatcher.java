@@ -45,8 +45,8 @@ public class TokenIndexMatcher implements ITokenMatcher {
   //TODO: change return type from List into Set?
   private List<String> combineRepeatedTokens(final IWitness witness) {
     final Set<String> repeatedTokens = Sets.newHashSet();
-    repeatedTokens.addAll(base.getRepeatedTokens());
-    repeatedTokens.addAll(witness.getRepeatedTokens());
+    repeatedTokens.addAll(TokenIndexUtil.getRepeatedTokens(base));
+    repeatedTokens.addAll(TokenIndexUtil.getRepeatedTokens(witness));
     return Lists.newArrayList(repeatedTokens);
   }
 

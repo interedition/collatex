@@ -75,11 +75,6 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
   }
 
   @Override
-  public List<String> getRepeatedTokens() {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
-  }
-
-  @Override
   public List<IWitness> getWitnesses() {
     throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }

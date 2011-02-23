@@ -1,7 +1,6 @@
 package eu.interedition.collatex2.implementation.containers.graph;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
@@ -112,40 +111,6 @@ public class VariantGraph2Test {
     for (IVariantGraphEdge edge : edgeSet) {
       Assert.assertTrue("Witness " + a.getSigil() + " not present in set!", edge.containsWitness(a));
     }
-  }
-
-  @Test
-  public void testRepeatingTokensWithOneWitness() {
-    final IWitness witness = engine.createWitness("a", "a c a t g c a");
-    final IVariantGraph graph = engine.graph(witness);
-    final List<String> repeatingTokens = graph.getRepeatedTokens();
-    assertEquals(2, repeatingTokens.size());
-    assertTrue(repeatingTokens.contains("a"));
-    assertTrue(repeatingTokens.contains("c"));
-    assertFalse(repeatingTokens.contains("t"));
-    assertFalse(repeatingTokens.contains("g"));
-  }
-
-  @Test
-  public void testRepeatingTokensWithMultipleWitnesses() {
-    final IWitness witnessA = engine.createWitness("a", "a c a t g c a");
-    final IWitness witnessB = engine.createWitness("b", "a c a t t c a");
-    final IVariantGraph graph = engine.graph(witnessA, witnessB);
-    final List<String> repeatingTokens = graph.getRepeatedTokens();
-    assertEquals(3, repeatingTokens.size());
-    assertTrue(repeatingTokens.contains("a"));
-    assertTrue(repeatingTokens.contains("c"));
-    assertTrue(repeatingTokens.contains("t"));
-    assertFalse(repeatingTokens.contains("g"));
-  }
-
-  @Test
-  public void testRepeatingTokensWithMultipleWitnesses2() {
-    final IWitness witnessA = engine.createWitness("A", "everything is unique should be no problem");
-    final IWitness witnessB = engine.createWitness("B", "this one very different");
-    final IVariantGraph graph = engine.graph(witnessA, witnessB);
-    final List<String> repeatingTokens = graph.getRepeatedTokens();
-    assertEquals(0, repeatingTokens.size());
   }
 
   @Test

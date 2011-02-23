@@ -8,10 +8,7 @@ import java.util.Set;
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
@@ -37,28 +34,6 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     addVertex(startVertex);
     endVertex = new VariantGraphVertex("#", null);
     addVertex(endVertex);
-  }
-
-  //TODO: Make this an internal method of the token matching process!
-  @Override
-  public List<String> getRepeatedTokens() {
-    // remove start and end vertices
-    Set<IVariantGraphVertex> copy = Sets.newLinkedHashSet(vertexSet());
-    copy.remove(startVertex);
-    copy.remove(endVertex);
-    // we map all vertices to their normalized version
-    Multimap<String, IVariantGraphVertex> mapped = ArrayListMultimap.create();
-    for (IVariantGraphVertex v : copy) {
-      mapped.put(v.getNormalized(), v);
-    }
-    // fetch all the duplicate keys and return them 
-    List<String> result = Lists.newArrayList();
-    for (String key : mapped.keySet()) {
-      if (mapped.get(key).size() > 1) {
-        result.add(key);
-      }
-    }
-    return result;
   }
 
   @Override
