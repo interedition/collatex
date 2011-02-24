@@ -9,26 +9,27 @@ import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
 
 public class ColumnPhrase {
   // IColumns columns is a consecutive list of IColumn-s
   // sigla is a list of witness sigla, such that for each IColumn in columns, there is a token in that column for all of the sigli, and all theses tokens match. 
   private IColumns columns;
-  private List<String> sigla;
+  private List<IWitness> witnesses;
   String name;
 
-  public ColumnPhrase(final String _name, final IColumns _columns, final Collection<String> _sigla) {
+  public ColumnPhrase(final String _name, final IColumns _columns, final List<IWitness> witnesses) {
     this.setColumns(_columns);
-    this.setSigla(_sigla);
+    this.witnesses = witnesses;
     this.name = _name;
   }
 
   public IPhrase getPhrase() {
     List<INormalizedToken> tokens = Lists.newArrayList(); //TODO: do the capacity thing!
-    final String sigil = getSigla().get(0);
+    final IWitness witness = witnesses.get(0);
     for (IInternalColumn column : columns.getColumns()) {
-      tokens.add(column.getToken(sigil));
+      tokens.add(column.getToken(witness));
     }
     return new Phrase(tokens);
   }
@@ -40,7 +41,7 @@ public class ColumnPhrase {
     if (column instanceof NullColumn) {
       name = new StringBuilder("# ").append(name).toString();
     } else {
-      final String normalized = column.getToken(getSigla().get(0)).getNormalized();
+      final String normalized = column.getToken(witnesses.get(0)).getNormalized();
       name = new StringBuilder(normalized).append(" ").append(name).toString();
     }
   }
@@ -52,7 +53,7 @@ public class ColumnPhrase {
     if (column instanceof NullColumn) {
       name = new StringBuilder(name).append(" #").toString();
     } else {
-      final String normalized = column.getToken(getSigla().get(0)).getNormalized();
+      final String normalized = column.getToken(witnesses.get(0)).getNormalized();
       name = new StringBuilder(name).append(" ").append(normalized).toString();
     }
   }
@@ -61,12 +62,12 @@ public class ColumnPhrase {
     return name;
   }
 
-  public void setSigla(final Collection<String> sigla) {
-    this.sigla = Lists.newArrayList(sigla);
+  public void setSigla(final Collection<IWitness> witnesses) {
+    this.witnesses = Lists.newArrayList(witnesses);
   }
 
-  public List<String> getSigla() {
-    return sigla;
+  public List<IWitness> getWitnesses() {
+    return witnesses;
   }
 
   public void setColumns(final IColumns columns1) {

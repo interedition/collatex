@@ -17,5 +17,7 @@ public interface IVariantGraphVertex extends INormalizedToken {
   IWitness getWitnessForSigil(String sigil);
 
   boolean containsWitness(String sigil);
+  
+  boolean containsWitness(IWitness witness);
 
 }

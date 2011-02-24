@@ -230,12 +230,12 @@ public class AlignmentTableTest {
     final IWitness w1 = engine.createWitness("A", "the black and white cat");
     final IWitness w2 = engine.createWitness("B", "the red cat");
     IAlignmentTable table = engine.align(w1, w2);
-    IRow rowA = table.getRow("A");
+    IRow rowA = table.getRow(w1);
     Iterator<ICell> iteratorA = rowA.iterator();
     assertEquals("the", iteratorA.next().getToken().getNormalized());
     assertEquals(2, iteratorA.next().getPosition());
     assertTrue(!iteratorA.next().isEmpty());
-    IRow rowB = table.getRow("B");
+    IRow rowB = table.getRow(w2);
     Iterator<ICell> iteratorB = rowB.iterator();
     assertEquals("the", iteratorB.next().getToken().getNormalized());
     assertEquals("red", iteratorB.next().getToken().getNormalized());

@@ -50,8 +50,8 @@ public class ColumnTest {
     final IAlignmentTable table = factory.align(witness);
     List<IColumn> columns = table.getColumns();
     IColumn column1 = columns.get(0);
-    assertTrue(column1.containsWitness("A"));
-    assertFalse(column1.containsWitness("B"));
+    assertTrue(column1.containsWitness(witness));
+    assertFalse(column1.containsWitness(factory.createWitness("nonexisting", "")));
     assertEquals(ColumnState.INVARIANT, column1.getState());
   }
 
@@ -64,10 +64,10 @@ public class ColumnTest {
     List<IColumn> columns = table.getColumns();
     IColumn column1 = columns.get(0);
     //NOTE: containsWitness method is only used in tests!
-    assertTrue(column1.containsWitness("A"));
-    assertTrue(column1.containsWitness("B"));
-    assertTrue(column1.containsWitness("C"));
-    assertFalse(column1.containsWitness("D"));
+    assertTrue(column1.containsWitness(witness));
+    assertTrue(column1.containsWitness(witnessB));
+    assertTrue(column1.containsWitness(witnessC));
+    assertFalse(column1.containsWitness(factory.createWitness("nonexisting", "")));
     assertEquals(ColumnState.VARIANT, column1.getState());
     //NOTE: getVariants method was only used in this test!
 //  final List<INormalizedToken> variants = column1.getVariants();
@@ -83,9 +83,9 @@ public class ColumnTest {
     final IWitness b = factory.createWitness("B", "match");
     IAlignmentTable table = factory.align(a, b);
     IColumn column = table.getColumns().get(0);
-    assertTrue(column.containsWitness("A"));
-    assertTrue(column.containsWitness("B"));
-    assertFalse(column.containsWitness("C"));
+    assertTrue(column.containsWitness(a));
+    assertTrue(column.containsWitness(b));
+    assertFalse(column.containsWitness(factory.createWitness("nonexisting", "")));
     assertEquals(ColumnState.INVARIANT, column.getState());
 //  final List<INormalizedToken> variants = column.getVariants();
 //  assertEquals(1, variants.size());
@@ -99,10 +99,10 @@ public class ColumnTest {
     final IWitness witnessC = factory.createWitness("C", "variant");
     IAlignmentTable table = factory.align(witness, witnessB, witnessC);
     IColumn column = table.getColumns().get(0);
-    assertTrue(column.containsWitness("A"));
-    assertTrue(column.containsWitness("B"));
-    assertTrue(column.containsWitness("C"));
-    assertFalse(column.containsWitness("D"));
+    assertTrue(column.containsWitness(witness));
+    assertTrue(column.containsWitness(witnessB));
+    assertTrue(column.containsWitness(witnessC));
+    assertFalse(column.containsWitness(factory.createWitness("nonexisting", "")));
     assertEquals(ColumnState.VARIANT, column.getState());
 //  final List<INormalizedToken> variants = column.getVariants();
 //  assertEquals(2, variants.size());
@@ -115,7 +115,7 @@ public class ColumnTest {
     final IWitness witness = factory.createWitness("A", "a test string");
     IAlignmentTable table = factory.align(witness);
     IColumn column = table.getColumns().get(0);
-    column.getToken("B");
+    column.getToken(factory.createWitness("nonexcisting", ""));
   }
 
 

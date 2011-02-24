@@ -6,6 +6,7 @@ import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NullColumn implements IInternalColumn {
 
@@ -16,7 +17,7 @@ public class NullColumn implements IInternalColumn {
   }
 
   @Override
-  public boolean containsWitness(final String sigil) {
+  public boolean containsWitness(final IWitness witness) {
     return false;
   }
 
@@ -26,7 +27,7 @@ public class NullColumn implements IInternalColumn {
   }
 
   @Override
-  public INormalizedToken getToken(final String sigil) {
+  public INormalizedToken getToken(final IWitness witness) {
     return new NullToken();
   }
 
@@ -36,7 +37,7 @@ public class NullColumn implements IInternalColumn {
   }
 
    @Override
-  public List<String> getSigla() {
+  public List<IWitness> getWitnesses() {
     // TODO Auto-generated method stub
     return null;
   }
@@ -47,7 +48,7 @@ public class NullColumn implements IInternalColumn {
   }
 
   @Override
-  public boolean isMatch(String base, String sigil) {
+  public boolean isMatch(IWitness base, IWitness sigil) {
     throw new RuntimeException("DO NOT CALL THIS METHOD!");
   }
 

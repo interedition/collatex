@@ -49,7 +49,7 @@ public interface ICell {
    * Get a colorvalue for this cell
    * cells from the same vertex get the same color
    */
-  String getColor(String sigil);
+  String getColor();
 
   IInternalColumn getColumn();
 

@@ -24,15 +24,15 @@ import java.util.List;
 
 public interface IInternalColumn {
 
-  boolean containsWitness(String sigil);
+  boolean containsWitness(IWitness witness);
 
-  INormalizedToken getToken(String sigil);
+  INormalizedToken getToken(IWitness witness);
+
+  List<IWitness> getWitnesses();
 
   ColumnState getState();
 
-  List<String> getSigla();
-
-  boolean isMatch(String baseSigil, String witnessSigil);
+  boolean isMatch(IWitness base, IWitness witness);
 
   //DOUBT ABOUT THE REST OF THE METHODS!
   //TODO: check 0.9.1 branch!

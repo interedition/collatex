@@ -3,13 +3,10 @@ package eu.interedition.collatex2.implementation.output.table;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.implementation.output.rankedgraph.IRankedVariantGraphVertex;
 import eu.interedition.collatex2.implementation.output.rankedgraph.VariantGraphRanker;
 import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraph;
 import eu.interedition.collatex2.implementation.output.segmented_graph.NonSegmentedGraphConverter;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -17,8 +14,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 //TODO: remove explicit dependency on rankedgraph implementation classes!
 //TODO: The maximum dependency is implementation classes of the same package!
-//TODO: make base alignment table abstract and so on!
-public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable implements IAlignmentTable {
+public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
   private final IVariantGraph graph;
 
   public RankedGraphBasedAlignmentTable(IVariantGraph graph) {
@@ -60,13 +56,8 @@ public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable implement
   }
   
   @Override
-  public final List<String> getSigla() {
-    List<IWitness> witnesses = graph.getWitnesses();
-    List<String> sigla = Lists.newArrayList();
-    for (IWitness witness : witnesses) {
-      sigla.add(witness.getSigil());
-    }
-    return sigla;
+  public final List<IWitness> getWitnesses() {
+    return graph.getWitnesses();
   }
 
 }

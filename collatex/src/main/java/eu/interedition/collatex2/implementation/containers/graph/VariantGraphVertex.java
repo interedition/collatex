@@ -38,13 +38,18 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     tokenMap.put(witness, token);
   }
 
-  //TODO: change String parameter into IWitness
+  @Override
+  public boolean containsWitness(IWitness witness) {
+    return tokenMap.containsKey(witness);
+  }
+
+  //TODO: REMOVE!
   @Override
   public boolean containsWitness(String sigil) {
     return (internalGetWitnessForSigil(sigil) != null);
   }
 
-  //TODO: change String parameter into IWitness
+  //TODO: REMOVE!
   @Override
   public IWitness getWitnessForSigil(String sigil) {
     IWitness internalGetWitnessForSigil = internalGetWitnessForSigil(sigil);
@@ -82,4 +87,5 @@ public class VariantGraphVertex implements IVariantGraphVertex {
   public INormalizedToken getVertexKey() {
     return vertexKey;
   }
+
 }

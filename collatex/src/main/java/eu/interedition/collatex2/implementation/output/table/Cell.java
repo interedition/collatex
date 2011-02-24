@@ -4,15 +4,15 @@ import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class Cell implements ICell {
   private final IInternalColumn column;
+  private final IWitness witness;
 
-  private final String sigil;
-
-  public Cell(IInternalColumn column, String sigil) {
+  public Cell(IInternalColumn column, IWitness witness) {
     this.column = column;
-    this.sigil = sigil;
+    this.witness = witness;
   }
 
   @Override
@@ -26,9 +26,9 @@ public class Cell implements ICell {
   }
 
   @Override
-  public String getColor(String sigil) {
-    IVariantGraphVertex findVertexForWitness = ((VariantGraphBasedColumn) column).findVertexForWitness(sigil);
-    return findVertexForWitness == null ? "black" : color(findVertexForWitness.getVertexKey().hashCode());
+  public String getColor() {
+    IVariantGraphVertex vertexForWitness = ((VariantGraphBasedColumn) column).findVertexForWitness(witness);
+    return vertexForWitness == null ? "black" : color(vertexForWitness.getVertexKey().hashCode());
   }
 
   private String color(int hashCode) {
@@ -37,11 +37,11 @@ public class Cell implements ICell {
 
   @Override
   public INormalizedToken getToken() {
-    return column.getToken(sigil);
+    return column.getToken(witness);
   }
 
   @Override
   public boolean isEmpty() {
-    return !column.containsWitness(sigil);
+    return !column.containsWitness(witness);
   }
 }

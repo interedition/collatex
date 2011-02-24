@@ -39,11 +39,9 @@ public interface IAlignmentTable {
 
   IRow getRow(IWitness witness);
   
-  IRow getRow(String sigil);
-  
   List<IColumn> getColumns();
 
-  List<String> getSigla();
+  List<IWitness> getWitnesses();
 
   boolean isEmpty();
 

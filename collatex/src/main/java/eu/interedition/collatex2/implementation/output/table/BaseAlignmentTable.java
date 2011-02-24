@@ -4,39 +4,34 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.ICell;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IRow;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: make class abstract, implemented methods final
-//TODO: make class implement the IAlignmentTable interface
-//TODO: all the other methods are specific to the old implementation
-public class BaseAlignmentTable {
-  protected final List<String> sigla;
+public abstract class BaseAlignmentTable implements IAlignmentTable {
   protected final List<IColumn> columns;
 
   public BaseAlignmentTable() {
-    this.sigla = Lists.newArrayList();
     this.columns = Lists.newArrayList();
   }
   
   public final List<IRow> getRows() {
     List<IRow> rows = Lists.newArrayList();
-    for (String sigil: getSigla()) {
-      rows.add(getRow(sigil));
+    for (IWitness witness: getWitnesses()) {
+      rows.add(getRow(witness));
     }
     return rows;
   }
 
-  //TODO: REMOVE!
-  public final IRow getRow(String sigil) {
+  public final IRow getRow(IWitness witness) {
     List<ICell> cells = Lists.newArrayList();
     for (IColumn column : columns) {
-      ICell cell = new Cell(column.getInternalColumn(), sigil);
+      ICell cell = new Cell(column.getInternalColumn(), witness);
       cells.add(cell);
     }
-    return new Row(sigil, cells);
+    return new Row(witness.getSigil(), cells);
   }
 
   public final boolean isEmpty() {
@@ -51,10 +46,8 @@ public class BaseAlignmentTable {
     return columns;
   }
 
-  public List<String> getSigla(){
-    return sigla;
-  }
-
+  public abstract List<IWitness> getWitnesses();
+  
   @Override
   public String toString() {
     final StringBuilder stringBuilder = new StringBuilder();
@@ -78,8 +71,5 @@ public class BaseAlignmentTable {
     return cell.getToken().getNormalized().toString();
   }
 
-  public IRow getRow(IWitness witness) {
-    return this.getRow(witness.getSigil());
-  }
 
 }

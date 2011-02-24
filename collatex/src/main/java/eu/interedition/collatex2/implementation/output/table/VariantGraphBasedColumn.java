@@ -32,12 +32,11 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   }
 
   @Override
-  public INormalizedToken getToken(String sigil) {
-    IVariantGraphVertex vertex = findVertexForWitness(sigil);
+  public INormalizedToken getToken(IWitness witness) {
+    IVariantGraphVertex vertex = findVertexForWitness(witness);
     if (vertex == null) {
-      throw new NoSuchElementException("Witness " + sigil + " is not present in this column");
+      throw new NoSuchElementException("Witness " + witness.getSigil() + " is not present in this column");
     }
-    IWitness witness = vertex.getWitnessForSigil(sigil);
     return vertex.getToken(witness);
   }
 
@@ -48,15 +47,13 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
 
   //TODO: add/re-enable test (see parallel segmentation tests)
   @Override
-  public List<String> getSigla() {
-    List<String> sigla = Lists.newArrayList();
+  public List<IWitness> getWitnesses() {
+    List<IWitness> totalWitnesses = Lists.newArrayList();
     for (IVariantGraphVertex vertex : vertices) {
       Set<IWitness> witnesses = vertex.getWitnesses();
-      for (IWitness witness : witnesses) {
-        sigla.add(witness.getSigil());
-      }
+      totalWitnesses.addAll(witnesses);
     }
-    return sigla;
+    return totalWitnesses;
   }
 
   //TODO: make non public!
@@ -74,29 +71,28 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
 
   //NOTE: ONLY USED IN TESTS!
   @Override
-  public boolean containsWitness(String sigil) {
-    IVariantGraphVertex findVertexForWitness = findVertexForWitness(sigil);
+  public boolean containsWitness(IWitness witness) {
+    IVariantGraphVertex findVertexForWitness = findVertexForWitness(witness);
     return findVertexForWitness != null;
   }
 
 
   // should maybe be a map?
-  protected IVariantGraphVertex findVertexForWitness(String sigil) {
-    IVariantGraphVertex found = null;
+  protected IVariantGraphVertex findVertexForWitness(IWitness witness) {
     for (IVariantGraphVertex vertex : vertices) {
-      if (found == null && vertex.containsWitness(sigil)) {
-        found = vertex;
+      if (vertex.containsWitness(witness)) {
+        return vertex;
       }
     }
-    return found;
+    return null;
   }
 
   //NOTE: base and witness are assumed to exist in the column!
   //NOTE: checks should have been performed before calling this method!
   @Override
-  public boolean isMatch(String baseSigil, String witnessSigil) {
-    IVariantGraphVertex baseV = findVertexForWitness(baseSigil);
-    IVariantGraphVertex witnessV = findVertexForWitness(witnessSigil);
+  public boolean isMatch(IWitness base, IWitness witness) {
+    IVariantGraphVertex baseV = findVertexForWitness(base);
+    IVariantGraphVertex witnessV = findVertexForWitness(witness);
     return baseV == witnessV;
   }
 

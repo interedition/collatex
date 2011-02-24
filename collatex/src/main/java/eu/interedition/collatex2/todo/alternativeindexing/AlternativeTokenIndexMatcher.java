@@ -201,8 +201,8 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
     // Map base tokens to IColumn
     Map<INormalizedToken, IInternalColumn> baseTokenToColumn = Maps.newLinkedHashMap();
     for (IColumn col : table.getColumns()) {
-      for (String sigil : col.getInternalColumn().getSigla()) {
-        INormalizedToken baseToken = col.getInternalColumn().getToken(sigil);
+      for (IWitness w : col.getInternalColumn().getWitnesses()) {
+        INormalizedToken baseToken = col.getInternalColumn().getToken(w);
         baseTokenToColumn.put(baseToken, col.getInternalColumn());
       }
     }

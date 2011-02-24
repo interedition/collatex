@@ -36,7 +36,7 @@ package eu.interedition.collatex2.interfaces;
 // TODO: Rename getSigli to getSigla()!
 public interface IColumn {
   
-  INormalizedToken getToken(String sigil);
+  INormalizedToken getToken(IWitness witness);
 
   ColumnState getState();
 
@@ -52,7 +52,7 @@ public interface IColumn {
   int getPosition();
 
   //TODO: Warning method is only used in test!
-  boolean containsWitness(String sigil);
+  boolean containsWitness(IWitness witness);
 
   /**
    * get the internal representation of the alignment column
