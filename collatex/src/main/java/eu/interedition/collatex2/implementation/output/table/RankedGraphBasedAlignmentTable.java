@@ -12,7 +12,7 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: remove explicit dependency on rankedgraph implementation classes!
+//TODO: remove explicit dependency on ranked graph implementation classes!
 //TODO: The maximum dependency is implementation classes of the same package!
 public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
   private final IVariantGraph graph;
@@ -41,7 +41,7 @@ public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
       int rank = nextVertex.getRank();
 //      System.out.println("DEBUG: "+nextVertex.getNormalized()+":"+nextVertex.getRank());
       if (rank>columns.size()) {
-        addNewColumn(next, nextVertex.getRank());
+        addNewColumn(next);
       } else {
         columns.get(rank-1).addVertex(next);
       }
@@ -49,8 +49,8 @@ public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
 //    System.out.println("TOTAL number of columns: "+columns.size());
   }
 
-  private IColumn addNewColumn(IVariantGraphVertex vertex, int rank) {
-    final IColumn column = new VariantGraphBasedColumn(vertex, rank);
+  private IColumn addNewColumn(IVariantGraphVertex vertex) {
+    final IColumn column = new VariantGraphBasedColumn(vertex);
     columns.add(column);
     return column;
   }

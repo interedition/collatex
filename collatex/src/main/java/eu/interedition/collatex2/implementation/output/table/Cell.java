@@ -21,11 +21,6 @@ public class Cell implements ICell {
   }
 
   @Override
-  public int getPosition() {
-    return column.getPosition();
-  }
-
-  @Override
   public String getColor() {
     IVariantGraphVertex vertexForWitness = ((VariantGraphBasedColumn) column).findVertexForWitness(witness);
     return vertexForWitness == null ? "black" : color(vertexForWitness.getVertexKey().hashCode());

@@ -95,7 +95,7 @@ public class HumanReadableAlignmentCallback implements ICallback {
     } else {
       // TODO: you want to have IAddition.getPreviousColumn
       final IInternalColumn nextColumn = addition.getNextColumn();
-      int position = nextColumn.getPosition();
+      int position = addition.getPosition();
       html.append("between <i>" + table.getColumns().get(position - 2) + "</i> and <i>" + nextColumn + "</i>");
     }
     return html.toString();

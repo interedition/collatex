@@ -22,12 +22,12 @@ public class Replacement implements IReplacement {
     final String baseWords = _original.toString();
     // TODO Not getNormalized!
     final String replacementWords = _replacement.getNormalized();
-    return "replacement: " + baseWords + " / " + replacementWords + " position: " + _original.getFirstColumn().getPosition();
+    return "replacement: " + baseWords + " / " + replacementWords + " position: " + getPosition();
   }
 
   @Override
   public int getPosition() {
-    return _original.getFirstColumn().getPosition();
+    return -1;
   }
 
   @Override

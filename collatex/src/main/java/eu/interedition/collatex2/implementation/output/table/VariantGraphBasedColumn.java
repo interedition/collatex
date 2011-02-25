@@ -15,11 +15,9 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
   private final List<IVariantGraphVertex> vertices;
-  private final int position;
 
-  public VariantGraphBasedColumn(IVariantGraphVertex vertex, int position) {
+  public VariantGraphBasedColumn(IVariantGraphVertex vertex) {
     this.vertices = Lists.newArrayList();
-    this.position = position;
     addVertex(vertex);
   }
 
@@ -38,11 +36,6 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
       throw new NoSuchElementException("Witness " + witness.getSigil() + " is not present in this column");
     }
     return vertex.getToken(witness);
-  }
-
-  @Override
-  public int getPosition() {
-    return position;
   }
 
   //TODO: add/re-enable test (see parallel segmentation tests)

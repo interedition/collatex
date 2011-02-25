@@ -31,5 +31,7 @@ public interface IAddition extends IModification {
   boolean isAtTheBeginning();
 
   boolean isAtTheEnd();
+
+  int getPosition();
   
 }

@@ -59,12 +59,12 @@ public class Columns implements IColumns {
 
   @Override
   public int getBeginPosition() {
-    return getFirstColumn().getPosition();
+    throw new RuntimeException("NOT IMPLEMENTED ANYMORE!");
   }
 
   @Override
   public int getEndPosition() {
-    return getLastColumn().getPosition();
+    throw new RuntimeException("NOT IMPLEMENTED ANYMORE!");
   }
 
   @Override

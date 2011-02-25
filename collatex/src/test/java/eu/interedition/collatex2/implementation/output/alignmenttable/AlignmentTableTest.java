@@ -233,7 +233,6 @@ public class AlignmentTableTest {
     IRow rowA = table.getRow(w1);
     Iterator<ICell> iteratorA = rowA.iterator();
     assertEquals("the", iteratorA.next().getToken().getNormalized());
-    assertEquals(2, iteratorA.next().getPosition());
     assertTrue(!iteratorA.next().isEmpty());
     IRow rowB = table.getRow(w2);
     Iterator<ICell> iteratorB = rowB.iterator();

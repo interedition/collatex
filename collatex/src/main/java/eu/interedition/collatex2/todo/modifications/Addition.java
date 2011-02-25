@@ -15,7 +15,7 @@ public class Addition implements IAddition {
   }
 
   public int getPosition() {
-    return getNextColumn().getPosition();
+    return -1;
   }
 
   @Override

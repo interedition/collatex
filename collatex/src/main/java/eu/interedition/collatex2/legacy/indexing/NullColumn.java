@@ -10,20 +10,12 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NullColumn implements IInternalColumn {
 
-  private final int position;
-
-  public NullColumn(final int position) {
-    this.position = position;
+  public NullColumn() {
   }
 
   @Override
   public boolean containsWitness(final IWitness witness) {
     return false;
-  }
-
-  @Override
-  public int getPosition() {
-    return position;
   }
 
   @Override

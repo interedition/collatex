@@ -18,7 +18,7 @@ public class Omission implements IOmission {
 
   @Override
   public int getPosition() {
-    return columns.getFirstColumn().getPosition();
+    return -1;
   }
 
   //TODO should not be getNormalized!

@@ -43,32 +43,6 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     return tokenMap.containsKey(witness);
   }
 
-  //TODO: REMOVE!
-  @Override
-  public boolean containsWitness(String sigil) {
-    return (internalGetWitnessForSigil(sigil) != null);
-  }
-
-  //TODO: REMOVE!
-  @Override
-  public IWitness getWitnessForSigil(String sigil) {
-    IWitness internalGetWitnessForSigil = internalGetWitnessForSigil(sigil);
-    if (internalGetWitnessForSigil == null) {
-      throw new RuntimeException("Witness with " + sigil + " not found in this vertex!");
-    }
-    return internalGetWitnessForSigil;
-  }
-
-  private IWitness internalGetWitnessForSigil(String sigil) {
-    Set<IWitness> set = tokenMap.keySet();
-    for (IWitness w : set) {
-      if (w.getSigil().equals(sigil)) {
-        return w;
-      }
-    }
-    return null;
-  }
-
   @Override
   public Set<IWitness> getWitnesses() {
     return tokenMap.keySet();

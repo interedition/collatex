@@ -8,16 +8,12 @@ public interface IVariantGraphVertex extends INormalizedToken {
 
   INormalizedToken getToken(IWitness witness);
 
-  INormalizedToken getVertexKey();
-
-  void addToken(IWitness witness, INormalizedToken token);
+  boolean containsWitness(IWitness witness);
 
   Set<IWitness> getWitnesses();
 
-  IWitness getWitnessForSigil(String sigil);
+  INormalizedToken getVertexKey();
 
-  boolean containsWitness(String sigil);
-  
-  boolean containsWitness(IWitness witness);
+  void addToken(IWitness witness, INormalizedToken token);
 
 }

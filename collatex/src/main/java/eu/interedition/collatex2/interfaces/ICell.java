@@ -24,14 +24,14 @@ package eu.interedition.collatex2.interfaces;
 /**
  * 
  * An alignment table cell represents the position of a witness token in alignment position with other witnesses in the table.
- * Empty cells occur where this witness has nothing to represent at this postion in the alignment.
+ * Empty cells occur where this witness has nothing to represent at this position in the alignment.
  * 
  */
 public interface ICell {
 
   /**
    * It is important to call this method before attempting to call getToken to determine if a token is actually present.
-   * Empty cells occur where this witness has nothing to represent at this postion in the alignment.
+   * Empty cells occur where this witness has nothing to represent at this position in the alignment.
    * @return whether or not this cell is empty
    */
   boolean isEmpty();
@@ -43,10 +43,8 @@ public interface ICell {
    */
   INormalizedToken getToken();
 
-  int getPosition();
-
   /**
-   * Get a colorvalue for this cell
+   * Get a color value for this cell
    * cells from the same vertex get the same color
    */
   String getColor();

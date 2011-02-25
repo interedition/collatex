@@ -32,27 +32,16 @@ package eu.interedition.collatex2.interfaces;
 // TODO: some cleanups went missing during the merge!
 // TODO: The IColumn interface should contain less methods
 // TODO: and have Iterable ICells (see CollateX branch 0.9.1)
-// TODO: Do not expose getToken(sigil)!
-// TODO: Rename getSigli to getSigla()!
 public interface IColumn {
   
+  boolean containsWitness(IWitness witness);
+
   INormalizedToken getToken(IWitness witness);
 
   ColumnState getState();
 
   //TODO: remove add methods from interface!
   void addVertex(IVariantGraphVertex vertex);
-
-  /**
-   * get the position of this column within the alignment table
-   * 
-   * @return the position of this column
-   */
-  //TODO: Warning: seems to be used only in tests!
-  int getPosition();
-
-  //TODO: Warning method is only used in test!
-  boolean containsWitness(IWitness witness);
 
   /**
    * get the internal representation of the alignment column

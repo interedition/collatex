@@ -22,6 +22,8 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.List;
 
+//DOUBT ABOUT THE REST OF THE METHODS!
+//TODO: check 0.9.1 branch!
 public interface IInternalColumn {
 
   boolean containsWitness(IWitness witness);
@@ -33,9 +35,5 @@ public interface IInternalColumn {
   ColumnState getState();
 
   boolean isMatch(IWitness base, IWitness witness);
-
-  //DOUBT ABOUT THE REST OF THE METHODS!
-  //TODO: check 0.9.1 branch!
-  int getPosition();
 
 }
