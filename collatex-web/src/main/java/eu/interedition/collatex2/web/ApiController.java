@@ -77,9 +77,6 @@ import eu.interedition.collatex2.implementation.output.apparatus.TeiParallelSegm
 import eu.interedition.collatex2.implementation.output.cgraph.CVariantGraphCreator;
 import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
@@ -87,6 +84,9 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
 
 @Controller

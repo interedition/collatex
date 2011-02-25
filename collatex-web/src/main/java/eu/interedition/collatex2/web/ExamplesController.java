@@ -40,8 +40,8 @@ import org.w3c.dom.NodeList;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IApparatus;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -67,7 +67,7 @@ public class ExamplesController implements InitializingBean {
 
   @RequestMapping("darwin")
   public ModelMap collateDarwin() {
-    List<ParallelSegmentationApparatus> alignments = Lists.newArrayListWithCapacity(darwin.size());
+    List<IApparatus> alignments = Lists.newArrayListWithCapacity(darwin.size());
     
    for (IWitness[] paragraph : darwin) {
       IVariantGraph graph = engine.graph(paragraph);
