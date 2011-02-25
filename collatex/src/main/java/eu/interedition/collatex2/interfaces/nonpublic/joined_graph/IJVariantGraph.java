@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.interfaces;
+package eu.interedition.collatex2.interfaces.nonpublic.joined_graph;
 
 import org.jgrapht.DirectedGraph;
 

@@ -34,6 +34,7 @@ import eu.interedition.collatex2.implementation.vg_analysis.Analyzer;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IApparatus;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
@@ -131,11 +132,11 @@ public class CollateXEngine {
     return analyzer.analyze(alignment);
   }
 
-  public ParallelSegmentationApparatus createApparatus(final IVariantGraph variantGraph) {
+  public IApparatus createApparatus(final IVariantGraph variantGraph) {
     return ParallelSegmentationApparatus.build(variantGraph);
   }
 
-  public ParallelSegmentationApparatus createApparatus(IAlignmentTable result) {
+  public IApparatus createApparatus(IAlignmentTable result) {
     throw new RuntimeException("Not allowed! --> use createApparatus(VG) instead.");
   }
 

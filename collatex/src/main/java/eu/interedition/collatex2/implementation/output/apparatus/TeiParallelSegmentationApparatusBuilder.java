@@ -37,6 +37,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.interfaces.IApparatus;
+import eu.interedition.collatex2.interfaces.IApparatusEntry;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 /**
@@ -47,11 +49,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class TeiParallelSegmentationApparatusBuilder {
   public static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
-  public static void build(ParallelSegmentationApparatus apparatus, Node parent) {
+  public static void build(IApparatus apparatus, Node parent) {
     Document doc = (parent.getNodeType() == Node.DOCUMENT_NODE ? (Document) parent : parent.getOwnerDocument());
     // FIXME: this should be dealt with on the tokenizer level!
     final String separator = " ";
-    for (final ApparatusEntry entry : apparatus.getEntries()) {
+    for (final IApparatusEntry entry : apparatus.getEntries()) {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
       for (IWitness witness : entry.getWitnesses()) {

@@ -12,9 +12,9 @@ import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenIndexUtil;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.nonpublic.alignment.ITokenIndex;
 
 public class VariantGraphIndexTest {
   private static CollateXEngine factory;

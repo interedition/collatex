@@ -6,9 +6,9 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
 
 public class JVariantGraphVertex implements IJVariantGraphVertex {
   private final StringBuilder normalized;

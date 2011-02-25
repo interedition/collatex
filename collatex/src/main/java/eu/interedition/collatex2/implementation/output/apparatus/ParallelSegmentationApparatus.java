@@ -34,20 +34,24 @@ import eu.interedition.collatex2.implementation.output.rankedgraph.VariantGraphR
 import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraph;
 import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraphVertex;
 import eu.interedition.collatex2.implementation.output.segmented_graph.JGraphToSegmentedVariantGraphConverter;
-import eu.interedition.collatex2.interfaces.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.IApparatus;
+import eu.interedition.collatex2.interfaces.IApparatusEntry;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
 
-public class ParallelSegmentationApparatus {
+public class ParallelSegmentationApparatus implements IApparatus {
   private static Logger logger = LoggerFactory.getLogger(ParallelSegmentationApparatus.class);
   
-  private final List<ApparatusEntry> entries;
+  private final List<IApparatusEntry> entries;
   private final List<IWitness> witnesses;
 
-  public List<ApparatusEntry> getEntries() {
+  @Override
+  public List<IApparatusEntry> getEntries() {
     return entries;
   }
 
+  @Override
   public List<IWitness> getWitnesses() {
     return witnesses;
   }
@@ -68,7 +72,7 @@ public class ParallelSegmentationApparatus {
     // NOTE: forget the normal variant graph after this point; only use the segmented one!
     // TODO: look at the other piece of code also!
     VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
-    List<ApparatusEntry> entries = Lists.newArrayList();
+    List<IApparatusEntry> entries = Lists.newArrayList();
     Iterator<IRankedVariantGraphVertex> iterator = ranker.iterator();
     Iterator<ISegmentedVariantGraphVertex> vertexIterator = segmentedVariantGraph.iterator();
     //skip startVertex
@@ -81,7 +85,7 @@ public class ParallelSegmentationApparatus {
       if (next.equals(segmentedVariantGraph.getEndVertex())) {
         continue;
       }
-      ApparatusEntry apparatusEntry;
+      IApparatusEntry apparatusEntry;
       int rank = nextVertex.getRank();
       if (rank>entries.size()) {
         apparatusEntry = new ApparatusEntry(graph.getWitnesses());
@@ -89,14 +93,14 @@ public class ParallelSegmentationApparatus {
       } else {
         apparatusEntry = entries.get(rank-1);
       }
-      apparatusEntry.addVertex(next);
+      ((ApparatusEntry)apparatusEntry).addVertex(next);
     }
     
     // convert SegmentedVariantGraph to ParallelSegmentationApparatus
     return new ParallelSegmentationApparatus(graph.getWitnesses(), entries);
   }
 
-  private ParallelSegmentationApparatus(List<IWitness> witnesses, final List<ApparatusEntry> entries) {
+  private ParallelSegmentationApparatus(List<IWitness> witnesses, final List<IApparatusEntry> entries) {
     this.witnesses = witnesses;
     this.entries = entries;
   }

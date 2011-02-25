@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.interfaces.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
 
 public class JVariantGraphCreator {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreator.class);

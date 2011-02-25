@@ -36,8 +36,8 @@ import com.google.common.base.Joiner;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.witness.WitnessIndex;
-import eu.interedition.collatex2.interfaces.ITokenIndex;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.nonpublic.alignment.ITokenIndex;
 
 public class WitnessIndexingTest {
   private CollateXEngine factory;

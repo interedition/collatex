@@ -29,11 +29,11 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.ApparatusEntryState;
+import eu.interedition.collatex2.interfaces.IApparatusEntry;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: Extract interface for this class! Do not expose Vertex in the interface!
-public class ApparatusEntry {
+public class ApparatusEntry implements IApparatusEntry {
 
   private final List<IWitness> witnesses;
   private final Set<ISegmentedVariantGraphVertex> vertices;
@@ -47,12 +47,14 @@ public class ApparatusEntry {
     vertices.add(vertex);
   }
 
+  @Override
   public List<IWitness> getWitnesses() {
     return witnesses;
   }
 
   //This means that a reading is not empty!
   //TODO: rename!
+  @Override
   public boolean containsWitness(IWitness witness) {
     ISegmentedVariantGraphVertex result = null;
     for (ISegmentedVariantGraphVertex vertex : vertices) {
@@ -65,6 +67,7 @@ public class ApparatusEntry {
   }
   
   //Note: an empty cell returns an empty phrase!
+  @Override
   @SuppressWarnings("unchecked")
   public IPhrase getPhrase(final IWitness witness) {
     ISegmentedVariantGraphVertex result = null;
@@ -80,6 +83,7 @@ public class ApparatusEntry {
     return result.getPhrase(witness);
   }
 
+  @Override
   public boolean hasEmptyCells() {
     int nonEmptyWitnessSize = 0;
     for (ISegmentedVariantGraphVertex vertex : vertices) {
@@ -88,6 +92,7 @@ public class ApparatusEntry {
     return getWitnesses().size() != nonEmptyWitnessSize;
   }
 
+  @Override
   public ApparatusEntryState getState() {
     int size = vertices.size();
     if (size == 1) {

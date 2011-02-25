@@ -9,14 +9,14 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.interfaces.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IJVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
 
 public class JGraphToSegmentedVariantGraphConverter {
 
