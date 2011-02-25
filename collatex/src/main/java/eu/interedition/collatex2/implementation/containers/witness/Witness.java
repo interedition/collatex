@@ -53,7 +53,7 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
     return tokens.iterator();
   }
 
-  @Override
+  // NOTE: this method is not on the IWitness interface
   public IPhrase createPhrase(final int startPosition, final int endPosition) {
     // TODO this problemCase shouldn't occur
     final boolean problemCase = (startPosition - 1 > endPosition);

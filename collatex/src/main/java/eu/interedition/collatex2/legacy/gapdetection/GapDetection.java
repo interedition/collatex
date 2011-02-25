@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
@@ -87,7 +88,7 @@ public class GapDetection {
       previous = current;
 //      currentIndex = 1 + previous.getEndPosition();
     }
-    gaps.add(witness.createPhrase(currentIndex, witness.size()));
+    gaps.add(((Witness)witness).createPhrase(currentIndex, witness.size()));
     return gaps;
   }
 

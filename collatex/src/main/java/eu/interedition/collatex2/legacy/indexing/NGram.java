@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -41,7 +42,7 @@ public class NGram implements Iterable<INormalizedToken> {
   }
 
   public static NGram create(final IWitness aa, final int startPosition, final int endPosition) {
-    final List<INormalizedToken> tokens2 = aa.createPhrase(startPosition, endPosition).getTokens();
+    final List<INormalizedToken> tokens2 = ((Witness)aa).createPhrase(startPosition, endPosition).getTokens();
     return new NGram(tokens2);
   }
 
