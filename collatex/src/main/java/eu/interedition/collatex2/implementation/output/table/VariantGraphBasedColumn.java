@@ -48,9 +48,7 @@ public class VariantGraphBasedColumn implements IColumn {
     return totalWitnesses;
   }
 
-  //TODO: make non public!
-  @Override
-  public void addVertex(IVariantGraphVertex vertex) {
+  protected void addVertex(IVariantGraphVertex vertex) {
     vertices.add(vertex);
   }
 

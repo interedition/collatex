@@ -6,7 +6,6 @@ import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class NullColumn implements IColumn {
@@ -39,10 +38,4 @@ public class NullColumn implements IColumn {
   public String toString() {
     return "";
   }
-
-  @Override
-  public void addVertex(IVariantGraphVertex vertex) {
-    throw new RuntimeException("DO NOT CALL!");
-  }
-
 }

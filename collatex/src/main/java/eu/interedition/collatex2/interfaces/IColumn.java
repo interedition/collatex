@@ -46,7 +46,4 @@ public interface IColumn {
 
   ColumnState getState();
 
-  //TODO: remove add methods from interface!
-  void addVertex(IVariantGraphVertex vertex);
-
 }

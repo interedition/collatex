@@ -43,7 +43,7 @@ public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
       if (rank>columns.size()) {
         addNewColumn(next);
       } else {
-        columns.get(rank-1).addVertex(next);
+        ((VariantGraphBasedColumn)columns.get(rank-1)).addVertex(next);
       }
     }
 //    System.out.println("TOTAL number of columns: "+columns.size());
