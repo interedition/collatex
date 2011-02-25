@@ -1,6 +1,6 @@
 package eu.interedition.collatex2.legacy.gapdetection;
 
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
@@ -9,10 +9,10 @@ import eu.interedition.collatex2.interfaces.nonpublic.modifications.IGap;
 public class Gap implements IGap {
   private final IColumns columns;
   private final IPhrase phrase;
-  private final IInternalColumn nextColumn;
+  private final IColumn nextColumn;
   private final IWitness witness;
 
-  public Gap(IWitness witness, final IColumns columns, final IPhrase phrase, final IInternalColumn nextColumn) {
+  public Gap(IWitness witness, final IColumns columns, final IPhrase phrase, final IColumn nextColumn) {
     this.columns = columns;
     this.phrase = phrase;
     this.nextColumn = nextColumn;
@@ -61,7 +61,7 @@ public class Gap implements IGap {
   }
 
   @Override
-  public IInternalColumn getNextColumn() {
+  public IColumn getNextColumn() {
     return nextColumn;
   }
 }

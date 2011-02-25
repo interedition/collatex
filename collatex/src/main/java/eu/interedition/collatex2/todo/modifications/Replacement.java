@@ -1,6 +1,6 @@
 package eu.interedition.collatex2.todo.modifications;
 
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IGap;
@@ -9,9 +9,9 @@ import eu.interedition.collatex2.interfaces.nonpublic.modifications.IReplacement
 public class Replacement implements IReplacement {
   private final IColumns _original;
   private final IPhrase _replacement;
-  private final IInternalColumn _nextColumn;
+  private final IColumn _nextColumn;
 
-  private Replacement(final IColumns gapA, final IPhrase replacement, final IInternalColumn nextColumn) {
+  private Replacement(final IColumns gapA, final IPhrase replacement, final IColumn nextColumn) {
     _original = gapA;
     _replacement = replacement;
     _nextColumn = nextColumn;
@@ -42,7 +42,7 @@ public class Replacement implements IReplacement {
 
   //TODO: do we need to make this defensive?
   @Override
-  public IInternalColumn getNextColumn() {
+  public IColumn getNextColumn() {
     return _nextColumn;
   }
 

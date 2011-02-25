@@ -49,6 +49,6 @@ public interface ICell {
    */
   String getColor();
 
-  IInternalColumn getColumn();
+  IColumn getColumn();
 
 }

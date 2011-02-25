@@ -22,7 +22,7 @@ package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
 import java.util.List;
 
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public interface IColumns {
@@ -35,15 +35,15 @@ public interface IColumns {
 
   int getEndPosition();
 
-  IInternalColumn getFirstColumn();
+  IColumn getFirstColumn();
 
-  IInternalColumn getLastColumn();
+  IColumn getLastColumn();
 
   boolean isEmpty();
 
   int size();
 
   //Note: exposes internal list; implement Collection instead?
-  List<IInternalColumn> getColumns();
+  List<IColumn> getColumns();
 
 }

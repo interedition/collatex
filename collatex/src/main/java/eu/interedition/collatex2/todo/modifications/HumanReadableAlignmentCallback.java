@@ -23,7 +23,7 @@ package eu.interedition.collatex2.todo.modifications;
 import java.util.List;
 
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IAddition;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IAlignment;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.ICallback;
@@ -94,7 +94,7 @@ public class HumanReadableAlignmentCallback implements ICallback {
       html.append(" after <i>" + table.getColumns().get(table.size() - 1) + "</i>");
     } else {
       // TODO: you want to have IAddition.getPreviousColumn
-      final IInternalColumn nextColumn = addition.getNextColumn();
+      final IColumn nextColumn = addition.getNextColumn();
       int position = addition.getPosition();
       html.append("between <i>" + table.getColumns().get(position - 2) + "</i> and <i>" + nextColumn + "</i>");
     }

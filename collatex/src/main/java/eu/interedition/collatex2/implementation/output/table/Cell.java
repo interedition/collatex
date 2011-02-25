@@ -1,22 +1,22 @@
 package eu.interedition.collatex2.implementation.output.table;
 
 import eu.interedition.collatex2.interfaces.ICell;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class Cell implements ICell {
-  private final IInternalColumn column;
+  private final IColumn column;
   private final IWitness witness;
 
-  public Cell(IInternalColumn column, IWitness witness) {
+  public Cell(IColumn column, IWitness witness) {
     this.column = column;
     this.witness = witness;
   }
 
   @Override
-  public IInternalColumn getColumn() {
+  public IColumn getColumn() {
     return column;
   }
 

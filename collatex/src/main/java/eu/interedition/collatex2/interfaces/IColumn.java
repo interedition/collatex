@@ -20,6 +20,8 @@
 
 package eu.interedition.collatex2.interfaces;
 
+import java.util.List;
+
 
 /**
  * 
@@ -29,6 +31,8 @@ package eu.interedition.collatex2.interfaces;
  * TODO: consider whether this should be an inner interface since an IRow must exist within the context of an IAlignmentTable so the rows and columns will probably end up in the alignment table.
  *
  */
+//DOUBT ABOUT THE REST OF THE METHODS!
+//TODO: check 0.9.1 branch!
 // TODO: some cleanups went missing during the merge!
 // TODO: The IColumn interface should contain less methods
 // TODO: and have Iterable ICells (see CollateX branch 0.9.1)
@@ -38,17 +42,11 @@ public interface IColumn {
 
   INormalizedToken getToken(IWitness witness);
 
+  List<IWitness> getWitnesses();
+
   ColumnState getState();
 
   //TODO: remove add methods from interface!
   void addVertex(IVariantGraphVertex vertex);
-
-  /**
-   * get the internal representation of the alignment column
-   * This is only intended for internal use
-   * 
-   * @return the internal alignment column
-   */
-  IInternalColumn getInternalColumn();
 
 }

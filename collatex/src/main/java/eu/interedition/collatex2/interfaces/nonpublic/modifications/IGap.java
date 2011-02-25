@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public interface IGap {
@@ -37,6 +37,6 @@ public interface IGap {
 
   IPhrase getPhrase();
 
-  IInternalColumn getNextColumn();
+  IColumn getNextColumn();
 
 }

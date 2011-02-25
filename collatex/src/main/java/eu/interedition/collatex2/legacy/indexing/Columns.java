@@ -4,15 +4,15 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.nonpublic.modifications.IColumns;
 
 public class Columns implements IColumns {
-  private final List<IInternalColumn> columns;
+  private final List<IColumn> columns;
 
-  public Columns(final List<IInternalColumn> columns1) {
+  public Columns(final List<IColumn> columns1) {
     this.columns = columns1;
   }
 
@@ -31,7 +31,7 @@ public class Columns implements IColumns {
     }
     final List<INormalizedToken> tokens = phraseB.getTokens();
     for (int i = 0; i < phraseB.size(); i++) {
-      final IInternalColumn column = columns.get(i);
+      final IColumn column = columns.get(i);
       final INormalizedToken token = tokens.get(i);
       // NOTE: REMARKED because of the use of legacy API!
       //      column.addMatch(token);
@@ -50,7 +50,7 @@ public class Columns implements IColumns {
     }
     final List<INormalizedToken> tokens = phraseB.getTokens();
     for (int i = 0; i < phraseB.size(); i++) {
-      final IInternalColumn column = columns.get(i);
+      final IColumn column = columns.get(i);
       final INormalizedToken token = tokens.get(i);
       // NOTE: REMARKED because of the use of legacy API!
       //      column.addVariant(token);
@@ -68,7 +68,7 @@ public class Columns implements IColumns {
   }
 
   @Override
-  public IInternalColumn getFirstColumn() {
+  public IColumn getFirstColumn() {
     if (isEmpty()) {
       throw new RuntimeException("Columns are empty!");
     }
@@ -76,7 +76,7 @@ public class Columns implements IColumns {
   }
 
   @Override
-  public IInternalColumn getLastColumn() {
+  public IColumn getLastColumn() {
     if (isEmpty()) {
       throw new RuntimeException("Columns are empty!");
     }
@@ -92,7 +92,7 @@ public class Columns implements IColumns {
   public String toString() {
     StringBuffer buffer = new StringBuffer();
     String splitter="";
-    for (IInternalColumn column : columns) {
+    for (IColumn column : columns) {
       buffer.append(splitter);
       buffer.append(column.toString());
       splitter = " ";
@@ -111,7 +111,7 @@ public class Columns implements IColumns {
   }
 
   @Override
-  public List<IInternalColumn> getColumns() {
+  public List<IColumn> getColumns() {
     return columns;
   }
 

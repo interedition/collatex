@@ -4,11 +4,12 @@ import java.util.List;
 
 import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.interfaces.ColumnState;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class NullColumn implements IInternalColumn {
+public class NullColumn implements IColumn {
 
   public NullColumn() {
   }
@@ -40,8 +41,8 @@ public class NullColumn implements IInternalColumn {
   }
 
   @Override
-  public boolean isMatch(IWitness base, IWitness sigil) {
-    throw new RuntimeException("DO NOT CALL THIS METHOD!");
+  public void addVertex(IVariantGraphVertex vertex) {
+    throw new RuntimeException("DO NOT CALL!");
   }
 
 }

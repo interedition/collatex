@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public interface IReplacement extends IModification {
@@ -29,7 +29,7 @@ public interface IReplacement extends IModification {
 
   IPhrase getReplacementPhrase();
 
-  IInternalColumn getNextColumn();
+  IColumn getNextColumn();
 
   int getPosition();
 

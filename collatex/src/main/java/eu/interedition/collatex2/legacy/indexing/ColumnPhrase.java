@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -28,14 +28,14 @@ public class ColumnPhrase {
   public IPhrase getPhrase() {
     List<INormalizedToken> tokens = Lists.newArrayList(); //TODO: do the capacity thing!
     final IWitness witness = witnesses.get(0);
-    for (IInternalColumn column : columns.getColumns()) {
+    for (IColumn column : columns.getColumns()) {
       tokens.add(column.getToken(witness));
     }
     return new Phrase(tokens);
   }
 
-  public void addColumnToLeft(final IInternalColumn column) {
-    final List<IInternalColumn> columnList = getColumns().getColumns();
+  public void addColumnToLeft(final IColumn column) {
+    final List<IColumn> columnList = columns.getColumns();
     columnList.add(0, column);
     setColumns(new Columns(columnList));
     if (column instanceof NullColumn) {
@@ -46,8 +46,8 @@ public class ColumnPhrase {
     }
   }
 
-  public void addColumnToRight(final IInternalColumn column) {
-    final List<IInternalColumn> columnList = getColumns().getColumns();
+  public void addColumnToRight(final IColumn column) {
+    final List<IColumn> columnList = columns.getColumns();
     columnList.add(column);
     setColumns(new Columns(columnList));
     if (column instanceof NullColumn) {

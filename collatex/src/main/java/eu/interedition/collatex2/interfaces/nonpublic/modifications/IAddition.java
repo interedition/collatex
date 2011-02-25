@@ -20,13 +20,13 @@
 
 package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
-import eu.interedition.collatex2.interfaces.IInternalColumn;
+import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public interface IAddition extends IModification {
   IPhrase getAddedPhrase();
 
-  IInternalColumn getNextColumn();
+  IColumn getNextColumn();
 
   boolean isAtTheBeginning();
 

@@ -8,12 +8,11 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.ColumnState;
 import eu.interedition.collatex2.interfaces.IColumn;
-import eu.interedition.collatex2.interfaces.IInternalColumn;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
+public class VariantGraphBasedColumn implements IColumn {
   private final List<IVariantGraphVertex> vertices;
 
   public VariantGraphBasedColumn(IVariantGraphVertex vertex) {
@@ -55,14 +54,6 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
     vertices.add(vertex);
   }
 
-  //TODO: make IInternalColumn and IColumn interface
-  //TODO: one and the same!
-  @Override
-  public IInternalColumn getInternalColumn() {
-    return this;
-  }
-
-  //NOTE: ONLY USED IN TESTS!
   @Override
   public boolean containsWitness(IWitness witness) {
     IVariantGraphVertex findVertexForWitness = findVertexForWitness(witness);
@@ -78,15 +69,6 @@ public class VariantGraphBasedColumn implements IColumn, IInternalColumn {
       }
     }
     return null;
-  }
-
-  //NOTE: base and witness are assumed to exist in the column!
-  //NOTE: checks should have been performed before calling this method!
-  @Override
-  public boolean isMatch(IWitness base, IWitness witness) {
-    IVariantGraphVertex baseV = findVertexForWitness(base);
-    IVariantGraphVertex witnessV = findVertexForWitness(witness);
-    return baseV == witnessV;
   }
 
 }

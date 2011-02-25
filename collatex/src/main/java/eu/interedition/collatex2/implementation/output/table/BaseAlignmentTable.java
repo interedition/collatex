@@ -28,7 +28,7 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
   public final IRow getRow(IWitness witness) {
     List<ICell> cells = Lists.newArrayList();
     for (IColumn column : columns) {
-      ICell cell = new Cell(column.getInternalColumn(), witness);
+      ICell cell = new Cell(column, witness);
       cells.add(cell);
     }
     return new Row(witness.getSigil(), cells);
