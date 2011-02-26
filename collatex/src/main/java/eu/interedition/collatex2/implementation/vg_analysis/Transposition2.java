@@ -3,22 +3,27 @@ package eu.interedition.collatex2.implementation.vg_analysis;
 
 
 public class Transposition2 implements ITransposition2 {
-  private final ISequence matchA;
-  private final ISequence matchB;
+  private final ISequence sequenceA;
+  private final ISequence sequenceB;
 
-  public Transposition2(ISequence matchA, ISequence matchB) {
-    this.matchA = matchA;
-    this.matchB = matchB;
+  public Transposition2(ISequence sequenceA, ISequence sequenceB) {
+    this.sequenceA = sequenceA;
+    this.sequenceB = sequenceB;
   }
 
   @Override
   public ISequence getSequenceA() {
-    return matchA;
+    return sequenceA;
   }
 
   @Override
   public ISequence getSequenceB() {
-    return matchB;
+    return sequenceB;
+  }
+  
+  @Override
+  public String toString() {
+    return sequenceA.toString() + " -> "+sequenceB.toString();
   }
 
 }

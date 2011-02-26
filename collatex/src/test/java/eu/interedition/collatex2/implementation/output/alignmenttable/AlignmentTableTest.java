@@ -54,7 +54,7 @@ public class AlignmentTableTest {
   public void testFirstWitness() {
     IWitness a = engine.createWitness("A", "the black cat");
     final IAlignmentTable table = engine.align(a);
-    assertEquals("A: |the|black|cat|", table.getRow(a).rowToString());
+    assertEquals("A: |the|black|cat|", table.getRow(a).toString());
     assertEquals(1, table.getRows().size());
   }
   
@@ -64,9 +64,9 @@ public class AlignmentTableTest {
     final IWitness b = engine.createWitness("B", "the black cat");
     final IWitness c = engine.createWitness("C", "the black cat");
     final IAlignmentTable table = engine.align(a, b, c);
-    assertEquals("A: |the|black|cat|", table.getRow(a).rowToString());
-    assertEquals("B: |the|black|cat|", table.getRow(b).rowToString());
-    assertEquals("C: |the|black|cat|", table.getRow(c).rowToString());
+    assertEquals("A: |the|black|cat|", table.getRow(a).toString());
+    assertEquals("B: |the|black|cat|", table.getRow(b).toString());
+    assertEquals("C: |the|black|cat|", table.getRow(c).toString());
     assertEquals(3, table.getRows().size());
   }
   
@@ -78,11 +78,11 @@ public class AlignmentTableTest {
     final IWitness w4 = engine.createWitness("D", "the red cat");
     final IWitness w5 = engine.createWitness("E", "the yellow cat");
     final IAlignmentTable table = engine.align(w1, w2, w3, w4, w5);
-    assertEquals("A: |the|black|cat|", table.getRow(w1).rowToString());
-    assertEquals("B: |the|white|cat|", table.getRow(w2).rowToString());
-    assertEquals("C: |the|green|cat|", table.getRow(w3).rowToString());
-    assertEquals("D: |the|red|cat|", table.getRow(w4).rowToString());
-    assertEquals("E: |the|yellow|cat|", table.getRow(w5).rowToString());
+    assertEquals("A: |the|black|cat|", table.getRow(w1).toString());
+    assertEquals("B: |the|white|cat|", table.getRow(w2).toString());
+    assertEquals("C: |the|green|cat|", table.getRow(w3).toString());
+    assertEquals("D: |the|red|cat|", table.getRow(w4).toString());
+    assertEquals("E: |the|yellow|cat|", table.getRow(w5).toString());
     assertEquals(5, table.getRows().size());
   }
 
@@ -186,9 +186,9 @@ public class AlignmentTableTest {
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
     final IAlignmentTable table = engine.align(w1, w2, w3);
-    assertEquals("A: |a| |", table.getRow(w1).rowToString());
-    assertEquals("B: | |b|", table.getRow(w2).rowToString());
-    assertEquals("C: |a|b|", table.getRow(w3).rowToString());
+    assertEquals("A: |a| |", table.getRow(w1).toString());
+    assertEquals("B: | |b|", table.getRow(w2).toString());
+    assertEquals("C: |a|b|", table.getRow(w3).toString());
     assertEquals(3, table.getRows().size());
   }
   

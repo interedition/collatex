@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.implementation.vg_alignment.old;
 
 import static org.junit.Assert.assertTrue;
 

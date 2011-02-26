@@ -115,7 +115,12 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
     if (!(b instanceof IVariantGraphVertex)) {
       throw new RuntimeException("IToken b is not of type IVariantGraphVertex!");
     }
-    return containsEdge((IVariantGraphVertex) a, (IVariantGraphVertex) b);
+    //NOTE: there should be only one path from a to b
+    //NOTE: This code seems to work, but it might be better to  
+    //NOTE: use the vertex graph ranker to determine the distance between vertices
+    boolean connected = containsEdge((IVariantGraphVertex) a, (IVariantGraphVertex) b);
+    connected = connected && inDegreeOf((IVariantGraphVertex)b) == 1;
+    return connected;
   }
 
   @Override

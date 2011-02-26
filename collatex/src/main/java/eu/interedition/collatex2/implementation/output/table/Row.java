@@ -26,7 +26,7 @@ public class Row implements IRow {
   }
   
   @Override
-  public String rowToString() {
+  public String toString() {
     StringBuffer resultRow = new StringBuffer();
     resultRow.append(getSigil());
     resultRow.append(": ");

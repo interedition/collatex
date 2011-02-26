@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.containers.graph;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import static org.junit.Assert.assertEquals;
 

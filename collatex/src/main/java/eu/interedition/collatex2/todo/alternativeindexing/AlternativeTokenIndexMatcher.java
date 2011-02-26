@@ -105,8 +105,8 @@ public class AlternativeTokenIndexMatcher implements ITokenMatcher {
     for (final Sequence match : matches) {
       // step 1. Gather data
       List<TokenPair> pairs = Lists.newArrayList();
-      final IPhrase tablePhrase = match.getTablePhrase();
-      final IPhrase witnessPhrase = match.getPhrase();
+      final IPhrase tablePhrase = match.getBasePhrase();
+      final IPhrase witnessPhrase = match.getWitnessPhrase();
       final Iterator<INormalizedToken> tokens = witnessPhrase.getTokens().iterator();
       for (final INormalizedToken tableToken : tablePhrase.getTokens()) {
         final INormalizedToken token = tokens.next();

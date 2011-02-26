@@ -42,6 +42,4 @@ public interface IRow extends Iterable<ICell> {
    */
   String getSigil();
 
-  String rowToString();
-  
  }

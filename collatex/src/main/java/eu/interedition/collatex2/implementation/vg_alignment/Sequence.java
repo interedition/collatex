@@ -13,26 +13,6 @@ public class Sequence implements ISequence {
     this.witnessPhrase = witnessPhrase;
   }
 
-  //TODO: Delete method!
-  public IPhrase getTablePhrase() {
-    return basePhrase;
-  }
-
-  //TODO: Delete method!
-  public IPhrase getPhrase() {
-    return witnessPhrase;
-  }
-
-  @Override
-  public String toString() {
-    return basePhrase.getNormalized() + " -> "+witnessPhrase.getNormalized();
-  }
-
-  @Override
-  public String getNormalized() {
-    return witnessPhrase.getNormalized();
-  }
-
   @Override
   public IPhrase getBasePhrase() {
     return basePhrase;
@@ -41,5 +21,15 @@ public class Sequence implements ISequence {
   @Override
   public IPhrase getWitnessPhrase() {
     return witnessPhrase;
+  }
+
+  @Override
+  public String getNormalized() {
+    return witnessPhrase.getNormalized();
+  }
+
+  @Override
+  public String toString() {
+    return basePhrase.getNormalized();
   }
 }

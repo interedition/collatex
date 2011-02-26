@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.output.alignmenttable;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import static org.junit.Assert.assertEquals;
 import junit.framework.Assert;

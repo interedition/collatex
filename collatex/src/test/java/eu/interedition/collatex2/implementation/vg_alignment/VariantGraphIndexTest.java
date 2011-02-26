@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.containers.graph;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphIndex;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenIndexUtil;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
