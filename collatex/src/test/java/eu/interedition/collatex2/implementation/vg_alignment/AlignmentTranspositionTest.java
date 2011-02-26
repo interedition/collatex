@@ -41,4 +41,16 @@ public class AlignmentTranspositionTest {
     assertEquals("C: |So|he|was|agast| |", table.getRow(c).toString());
   }
 
+  //TODO: it would be nice if He was agast stayed in one place!
+  @Test
+  public void testTransposition2Reordered() {
+    IWitness a = factory.createWitness("A", "So he was agast");
+    IWitness b = factory.createWitness("B", "He was agast");
+    IWitness c = factory.createWitness("C", "He was agast, so");
+    IAlignmentTable table = factory.align(a, b, c);
+    assertEquals("A: | | | |So|he|was|agast|", table.getRow(a).toString());
+    assertEquals("B: | | | | |He|was|agast|", table.getRow(b).toString());
+    assertEquals("C: |He|was|agast,|so| | | |", table.getRow(c).toString());
+  }
+
 }
