@@ -33,12 +33,12 @@
         <witness>The black cat</witness>
         <witness>The, black cat</witness>
     </example>
-<!--    <example>
+    <example>
         <witness>the white and black cat</witness>
         <witness>The black cat</witness>
         <witness>the black and white cat</witness>
         <witness>the black and green cat</witness>
-    </example> -->
+    </example> 
     <example>
         <witness>a cat or dog</witness>
         <witness>a cat and dog and</witness>
