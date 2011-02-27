@@ -115,7 +115,7 @@ public class ApiController implements InitializingBean {
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/xml" }, method = RequestMethod.POST)
   public ModelAndView collateToTei(@RequestBody final ApiInput input) throws Exception {
-    return new ModelAndView(teiView, "alignment", collate(input));
+    return new ModelAndView(teiView, "alignment", collateToGraph(input));
   }
 
   @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
@@ -180,6 +180,11 @@ public class ApiController implements InitializingBean {
   private IAlignmentTable collate(ApiInput input) throws ApiException {
     final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
     return new CollateXEngine().align(witnesses.toArray(new ApiWitness[witnesses.size()]));
+  }
+
+  private IVariantGraph collateToGraph(ApiInput input) throws ApiException {
+    final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
+    return new CollateXEngine().graph(witnesses.toArray(new ApiWitness[witnesses.size()]));
   }
 
   private String collate2dot(ApiInput input) throws ApiException {
@@ -324,15 +329,15 @@ public class ApiController implements InitializingBean {
 
     @Override
     protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-      IAlignmentTable alignmentTable = (IAlignmentTable) model.get("alignment");
-      Assert.notNull(alignmentTable);
+      IVariantGraph variantGraph = (IVariantGraph) model.get("alignment");
+      Assert.notNull(variantGraph);
 
       Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
       Element root = xml.createElementNS(COLLATEX_NS, "collatex:apparatus");
       xml.appendChild(root);
       root.setAttribute("xmlns", TEI_NS);
 
-      TeiParallelSegmentationApparatusBuilder.build(new CollateXEngine().createApparatus(alignmentTable), root);
+      TeiParallelSegmentationApparatusBuilder.build(new CollateXEngine().createApparatus(variantGraph), root);
 
       response.setContentType("application/xml");
       response.setCharacterEncoding("UTF-8");
