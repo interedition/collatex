@@ -82,8 +82,8 @@ th {background:white;}
       <tr>
         <th>${r.sigil?html}</th>
         <#list r.iterator() as cell>
-          <#assign c = cell.getColor(r.sigil)> 
-          <#assign c1 = cell.getColor(r.sigil)?replace("#","")> 
+          <#assign c = cell.getColor()> 
+          <#assign c1 = cell.getColor()?replace("#","")> 
           <td align="center" class="c${c1}" onmouseover="hilitematches('c${c1}')" onmouseout="unhilitematches('c${c1}')"><span style="color:${c}" title="${c?upper_case}"><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></span></td>
         </#list>
       </tr>
