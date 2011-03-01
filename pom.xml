@@ -17,7 +17,7 @@
 		<module>collatex</module>
 		<module>collatex-nodeps</module>
 		<module>collatex-web</module>
-		<module>collatex-legacy</module>
+		<!--  <module>collatex-legacy</module>  -->
 		<module>collatex-client-jee</module>
 	</modules>
 	<dependencies>
