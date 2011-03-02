@@ -90,7 +90,6 @@ import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGrap
 import eu.interedition.collatex2.web.io.ApiObjectMapper;
 
 @Controller
-@RequestMapping("/api/**")
 public class ApiController implements InitializingBean {
   private static final String SVG_SERVER = "http://localhost:1080/svg";
   protected static final String COLLATEX_NS = "http://interedition.eu/collatex/ns/1.0";
@@ -108,17 +107,22 @@ public class ApiController implements InitializingBean {
     jsonView.setObjectMapper(objectMapper);
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/json" }, method = RequestMethod.POST)
+  @RequestMapping(value= "/")
+  public String redirectFromRoot() {
+    return "redirect:/api/collate";
+  }
+  
+  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=application/json" }, method = RequestMethod.POST)
   public ModelAndView collateToJson(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(jsonView, "alignment", collate(input));
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/xml" }, method = RequestMethod.POST)
+  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=application/xml" }, method = RequestMethod.POST)
   public ModelAndView collateToTei(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(teiView, "alignment", collateToGraph(input));
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
+  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
   public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
     // String svg = convert2svg(ccollate2dot(input)); // cyclic, unjoined graph
     String svg = convert2svg(jcollate2dot(input)); // acyclic joined graph
@@ -135,7 +139,7 @@ public class ApiController implements InitializingBean {
     return svg;
   }
 
-  @RequestMapping(value = "collate", headers = { "Content-Type=application/json", "Accept=application/xhtml+xml;charset=utf-8" }, method = RequestMethod.POST)
+  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=application/xhtml+xml;charset=utf-8" }, method = RequestMethod.POST)
   public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView("api/alignment", "alignment", collate(input));
   }
@@ -174,7 +178,7 @@ public class ApiController implements InitializingBean {
     return row;
   }
 
-  @RequestMapping(value = "collate")
+  @RequestMapping(value = "/api/collate")
   public void documentation() {}
 
   private IAlignmentTable collate(ApiInput input) throws ApiException {

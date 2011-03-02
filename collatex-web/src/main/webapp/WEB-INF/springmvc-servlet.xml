@@ -25,6 +25,9 @@
 	<context:component-scan base-package="eu.interedition.collatex2.web" />
 	<mvc:annotation-driven />
 
+	<mvc:resources location="/css/" mapping="/css/**"/>
+	<mvc:resources location="/js/" mapping="/js/**"/>
+	
 	<bean id="handlerAdapter"
 		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="messageConverters">
