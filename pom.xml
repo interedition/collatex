@@ -139,12 +139,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-site-plugin</artifactId>
-				<configuration>
-					<outputEncoding>UTF-8</outputEncoding>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>com.mycila.maven-license-plugin</groupId>
 				<artifactId>maven-license-plugin</artifactId>
 				<configuration>
@@ -191,57 +185,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<reporting>
-		<plugins>
-			<plugin>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>index</report>
-							<report>dependencies</report>
-							<report>project-team</report>
-							<report>issue-tracking</report>
-							<report>license</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-			<plugin>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<doctitle>CollateX</doctitle>
-					<docencoding>UTF-8</docencoding>
-					<links>
-						<link>http://java.sun.com/j2se/1.6.0/docs/api</link>
-						<link>http://google-collections.googlecode.com/svn/trunk/javadoc/</link>
-						<link>http://jackson.codehaus.org/1.4.2/javadoc/</link>
-						<link>http://junit.sourceforge.net/javadoc/</link>
-					</links>
-					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-					<docletArtifact>
-						<groupId>org.umlgraph</groupId>
-						<artifactId>doclet</artifactId>
-						<version>5.1</version>
-					</docletArtifact>
-					<additionalparam>all</additionalparam>
-					<useStandardDocletOptions>true</useStandardDocletOptions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<configuration>
-					<linkJavadoc>true</linkJavadoc>
-					<docTitle>CollateX</docTitle>
-					<outputEncoding>UTF-8</outputEncoding>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
 	<developers>
 		<developer>
 			<name>Ronald Haentjens Dekker</name>

@@ -25,14 +25,16 @@
 			<artifactId>jgrapht-jdk1.5</artifactId>
 			<version>0.7.3</version>
 		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.5</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0-beta-3</version>
+				<configuration>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>2.1</version>
@@ -55,6 +57,57 @@
 			</plugin>
 		</plugins>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>dependencies</report>
+							<report>project-team</report>
+							<report>issue-tracking</report>
+							<report>license</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<doctitle>CollateX</doctitle>
+					<docencoding>UTF-8</docencoding>
+					<links>
+						<link>http://java.sun.com/j2se/1.6.0/docs/api</link>
+						<link>http://google-collections.googlecode.com/svn/trunk/javadoc/</link>
+						<link>http://jackson.codehaus.org/1.4.2/javadoc/</link>
+						<link>http://junit.sourceforge.net/javadoc/</link>
+					</links>
+					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+					<docletArtifact>
+						<groupId>org.umlgraph</groupId>
+						<artifactId>doclet</artifactId>
+						<version>5.1</version>
+					</docletArtifact>
+					<additionalparam>all</additionalparam>
+					<useStandardDocletOptions>true</useStandardDocletOptions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<configuration>
+					<linkJavadoc>true</linkJavadoc>
+					<docTitle>CollateX</docTitle>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 	<distributionManagement>
 		<site>
 			<id>site.collatex.sourceforge.net</id>
