@@ -75,6 +75,7 @@ import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenN
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.implementation.output.cgraph.CVariantGraphCreator;
+import eu.interedition.collatex2.implementation.output.graphml.GraphMLBuilder;
 import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -125,10 +126,17 @@ public class ApiController implements InitializingBean {
   @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
   public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
     // String svg = convert2svg(ccollate2dot(input)); // cyclic, unjoined graph
+    // String svg = convert2svg(collate2dot(input)); // acyclic unjoined graph
     String svg = convert2svg(jcollate2dot(input)); // acyclic joined graph
     ModelAndView modelAndView = new ModelAndView(svgView, "svg", svg);
     return modelAndView;
   }
+  
+  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=application/graphml+xml" }, method = RequestMethod.POST)
+  public ModelAndView collateToGraphML(@RequestBody final ApiInput input) throws Exception {
+    return new ModelAndView(graphMLView, "alignment", collateToGraph(input));
+  }
+
 
   private String convert2svg(String dot) throws IOException, HttpException {
     HttpClient client = new HttpClient();
@@ -365,4 +373,27 @@ public class ApiController implements InitializingBean {
       out.flush();
     }
   };
+  
+  private final AbstractView graphMLView = new AbstractView() {
+
+    @Override
+    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+      IVariantGraph variantGraph = (IVariantGraph) model.get("alignment");
+      Assert.notNull(variantGraph);
+
+      Document graphXML = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+      GraphMLBuilder.build(variantGraph, graphXML);
+
+      response.setContentType("application/graphml+xml");
+      response.setCharacterEncoding("UTF-8");
+      PrintWriter out = response.getWriter();
+
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      TransformerUtils.enableIndenting(transformer, 4);
+      transformer.transform(new DOMSource(graphXML), new StreamResult(out));
+      out.flush();
+    }
+  };
+
 }

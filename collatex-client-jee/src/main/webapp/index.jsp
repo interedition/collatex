@@ -24,9 +24,10 @@
 					<td colspan="2">Return output as:
 						<select name="output_type" id="output_type">
 							<option value="application/xml" selected="selected">xml-tei</option>
-              <option value="application/json">json</option>
-              <option value="application/xhtml+xml;charset=utf-8">html</option>
+              				<option value="application/json">json</option>
+              				<option value="application/xhtml+xml;charset=utf-8">html</option>
 							<option value="image/svg+xml">svg</option>
+							<option value="application/graphml+xml">graphml</option>
 						</select>
 					</td>
 				</tr>
