@@ -73,10 +73,9 @@ public class CollateXEngine {
    * @param text - the body of the witness
    * @return
    */
-  // TODO: pass Tokenizer to the Builder!
   public IWitness createWitness(final String sigil, final String text) {
     WitnessBuilder builder = new WitnessBuilder(tokenNormalizer);
-    return builder.build(sigil, text);
+    return builder.build(sigil, text, tokenizer);
   }
 
   public IAligner createAligner() {

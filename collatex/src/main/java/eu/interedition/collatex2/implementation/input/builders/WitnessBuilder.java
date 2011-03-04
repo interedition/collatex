@@ -36,6 +36,7 @@ import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTok
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
+import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class WitnessBuilder {
@@ -79,9 +80,8 @@ public class WitnessBuilder {
     }
   }
 
-  public IWitness build(String witnessId, String witness) {
-    WhitespaceTokenizer tokenizer = new WhitespaceTokenizer();
-    Iterator<IToken> tokenIterator = tokenizer.tokenize(witness).iterator();
+  public IWitness build(String witnessId, String text, ITokenizer tokenizer) {
+    Iterator<IToken> tokenIterator = tokenizer.tokenize(text).iterator();
     List<INormalizedToken> tokenList = Lists.newArrayList();
     int position = 1;
     while (tokenIterator.hasNext()) {
@@ -97,14 +97,14 @@ public class WitnessBuilder {
 
   public IWitness build(String witness) {
     /* no witnessId? generate a random one */
-    return build(Util.generateRandomId(), witness);
+    return build(Util.generateRandomId(), witness, new WhitespaceTokenizer());
   }
 
   public IWitness[] buildWitnesses(String... _witnesses) {
     /* no witnessId? generate a random one */
     IWitness[] witnesses = new IWitness[_witnesses.length];
     for (int i = 0; i < witnesses.length; i++) {
-      witnesses[i] = build("" + (i + 1), _witnesses[i]);
+      witnesses[i] = build("" + (i + 1), _witnesses[i], new WhitespaceTokenizer());
     }
     return witnesses;
   }
