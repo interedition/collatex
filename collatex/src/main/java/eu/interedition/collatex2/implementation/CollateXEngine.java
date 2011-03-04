@@ -135,14 +135,17 @@ public class CollateXEngine {
     return ParallelSegmentationApparatus.build(variantGraph);
   }
 
+  @Deprecated
   public IApparatus createApparatus(IAlignmentTable result) {
     throw new RuntimeException("Not allowed! --> use createApparatus(VG) instead.");
   }
 
+  @Deprecated
   public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
   }
 
+  @Deprecated
   public static IMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
     throw new RuntimeException("Near matches are not yet supported!");
   }
