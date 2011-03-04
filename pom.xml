@@ -206,6 +206,10 @@
 			<organization>University of Birmingham</organization>
 		</developer>
 		<developer>
+			<name>Troy A. Griffitts</name>
+			<organization>University of Birmingham</organization>
+		</developer>
+		<developer>
 			<name>Gregor Middell</name>
 			<url>http://gregor.middell.net/</url>
 			<organization>Universität Würzburg</organization>
@@ -214,6 +218,10 @@
 		<developer>
 			<name>Marcin Mielnicki</name>
 			<organization>Poznan Supercomputing &amp; Networking Center</organization>
+		</developer>
+		<developer>
+			<name>Leif-Jöran Olsson</name>
+			<organization>Institutionen för svenska språket, Göteborgs universitet</organization>
 		</developer>
 		<developer>
 			<name>Tomasz Parkola</name>

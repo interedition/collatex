@@ -3,7 +3,7 @@
 	------
 	Gregor Middell
 	------
-	2010-07-06
+	2011-04-03
 	
 About
 
@@ -20,11 +20,13 @@ Currently, we offer three components:
   
   * <<<collatex-web>>> -- a demo web application, showcasing how a REST-based web service could be built on top of <CollateX>
   
+  * <<<collatex-client>>> -- a demo client application, showcasing how a client could connect to a CollateX Web service
+  
   * <<<collatex-python>>> -- python language bindings, suitable for embedding <CollateX> into Python applications
   
 Documentation
 
-  The <CollateX> project is at a very early stage of development and therefore has not been very well documented yet.
+  The <CollateX> project is at an early stage of development and therefore has not been very well documented yet.
 We are working on making tutorials for common use cases and a complete reference documentation available soon.
 Meanwhile please refer to the {{{apidocs/index.html}Javadoc}} for usage instructions.
 Or even better: Use the force and read the {{{https://code.launchpad.net/collatex} source.}} 
@@ -46,13 +48,13 @@ Just add the following repository declaration to your project descriptor
 </repositories>
 +----
 
-  and declare the following dependency with the appropriate version, e.g. <<<0.9>>>:
+  and declare the following dependency with the appropriate version, e.g. <<<1.0>>>:
   
 +----
 <dependency>
 	<groupId>eu.interedition.collatex</groupId>
 	<artifactId>collatex</artifactId>
-	<version>0.9</version>
+	<version>1.0</version>
 </dependency>
 +----
 
