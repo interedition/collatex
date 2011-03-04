@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>eu.interedition.collatex</groupId>
 		<artifactId>collatex-project</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0</version>
 	</parent>
 	<artifactId>collatex-nodeps</artifactId>
 	<name>CollateX :: All-inclusive package</name>
