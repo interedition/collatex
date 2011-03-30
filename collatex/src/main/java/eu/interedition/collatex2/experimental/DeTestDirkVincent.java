@@ -52,5 +52,17 @@ public class DeTestDirkVincent {
     expectedSequence = new TokenSequence(any, light2);
     assertEquals(expectedSequence, secondSequence);
   }
-  
+
+  @Test
+  public void testDirkVincent3() {
+    CollateXEngine factory = new CollateXEngine();
+    IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
+    IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+    MyNewAligner aligner = new MyNewAligner();
+    List<IAlignedToken> tokens = aligner.align(a, b);
+    IAlignedToken its = tokens.get(0);
+    INormalizedToken itsB = b.getTokens().get(0);
+    //TODO: het zou ook met een map kunnen (zonder multimap dan natuurlijk)
+    assertEquals(itsB, its.getAlignedToken());
+  }
 }
