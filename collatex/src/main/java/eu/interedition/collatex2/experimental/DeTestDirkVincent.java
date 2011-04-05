@@ -75,20 +75,21 @@ public class DeTestDirkVincent {
   }
   
   
-  //TODO: maybe call it linker instead of alignment?
   @Test
   public void testDirkVincent4() {
     CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    MyNewAligner aligner = new MyNewAligner();
-    Map<INormalizedToken, INormalizedToken> tokens = aligner.align(a, b);
+    MyNewLinker linker = new MyNewLinker();
+    Map<INormalizedToken, INormalizedToken> tokens = linker.link(a, b);
     INormalizedToken itsA = a.getTokens().get(0);
     INormalizedToken itsB = b.getTokens().get(0);
     assertEquals(itsB, tokens.get(itsA));
     INormalizedToken lightA = a.getTokens().get(2);
     INormalizedToken lightB = b.getTokens().get(3);
     assertEquals(lightB, tokens.get(lightA));
-    //TODO: Add extra assertions!
+    INormalizedToken light2A = a.getTokens().get(11);
+    INormalizedToken light2B = b.getTokens().get(6);
+    assertEquals(light2B, tokens.get(light2A));
   }
 }
