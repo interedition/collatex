@@ -63,8 +63,8 @@ public class DeTestDirkVincent {
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     WitnessAfgeleide afgeleider = new WitnessAfgeleide();
-    IWitness afgeleideWitness = afgeleider.calculateAfgeleide(b, matches);
-    Iterator<INormalizedToken> tokenIterator = afgeleideWitness.tokenIterator();
+    List<INormalizedToken> afgeleideWitness = afgeleider.calculateAfgeleide(b, matches);
+    Iterator<INormalizedToken> tokenIterator = afgeleideWitness.iterator();
     assertEquals("Its", tokenIterator.next().getContent());
     assertEquals("soft", tokenIterator.next().getContent());
     assertEquals("light", tokenIterator.next().getContent());
@@ -86,5 +86,9 @@ public class DeTestDirkVincent {
     INormalizedToken itsA = a.getTokens().get(0);
     INormalizedToken itsB = b.getTokens().get(0);
     assertEquals(itsB, tokens.get(itsA));
+    INormalizedToken lightA = a.getTokens().get(2);
+    INormalizedToken lightB = b.getTokens().get(3);
+    assertEquals(lightB, tokens.get(lightA));
+    //TODO: Add extra assertions!
   }
 }

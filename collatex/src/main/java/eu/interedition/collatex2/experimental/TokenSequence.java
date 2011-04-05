@@ -41,4 +41,14 @@ public class TokenSequence implements ITokenSequence {
     
     return bla.toString();
   }
+
+  @Override
+  public INormalizedToken getFirstToken() {
+    return tokens[0];
+  }
+
+  @Override
+  public INormalizedToken getLastToken() {
+    return tokens[tokens.length-1];
+  }
 }
