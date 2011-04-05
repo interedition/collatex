@@ -1,8 +1,9 @@
 package eu.interedition.collatex2.experimental;
 
 import java.util.List;
+import java.util.Map;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
@@ -20,20 +21,39 @@ public class MyNewAligner {
     this.graph = graph;
   }
 
-  public void addWitness(IWitness firstWitness) {
-    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
-    for (INormalizedToken token : firstWitness.getTokens()) {
-      final IVariantGraphVertex vertex = addNewVertex(token.getNormalized(), token);
-      vertex.addToken(firstWitness, token);
-      newVertices.add(vertex);
+  public void addWitness(IWitness witness) {
+    Map<INormalizedToken, IVariantGraphVertex> vertices = createVerticesForNonMatches(witness.getTokens());
+    addWitnessTokensToVertices(witness, vertices);
+    addEdges(witness, vertices);
+  }
+
+  private Map<INormalizedToken, IVariantGraphVertex> createVerticesForNonMatches(List<INormalizedToken> tokens) {
+    Map<INormalizedToken, IVariantGraphVertex> newVertices = Maps.newLinkedHashMap();
+    for (INormalizedToken token : tokens) {
+      IVariantGraphVertex vertex = addNewVertex(token.getNormalized(), token);
+      newVertices.put(token, vertex);
     }
+    return newVertices;
+  }
+
+  private void addWitnessTokensToVertices(IWitness witness, Map<INormalizedToken, IVariantGraphVertex> vertices) {
+    for (INormalizedToken token : witness.getTokens()) {
+      IVariantGraphVertex vertex = vertices.get(token);
+      vertex.addToken(witness, token);
+    }
+  }
+
+  //TODO: make adding new edge optional!
+  private void addEdges(IWitness witness, Map<INormalizedToken, IVariantGraphVertex> vertices) {
     IVariantGraphVertex previous = graph.getStartVertex();
-    for (IVariantGraphVertex vertex : newVertices) {
-      addNewEdge(previous, vertex, firstWitness);
+    for (INormalizedToken token : witness.getTokens()) {
+      IVariantGraphVertex vertex = vertices.get(token);
+      addNewEdge(previous, vertex, witness);
       previous = vertex;
     }
-    addNewEdge(previous, graph.getEndVertex(), firstWitness);
+    addNewEdge(previous, graph.getEndVertex(), witness);
   }
+
   
   //write
   private IVariantGraphVertex addNewVertex(String normalized, INormalizedToken vertexKey) {
