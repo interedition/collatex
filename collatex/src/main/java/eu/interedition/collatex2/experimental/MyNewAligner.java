@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.experimental;
 
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -22,51 +21,57 @@ public class MyNewAligner {
   }
 
   public void addWitness(IWitness witness) {
-    Map<INormalizedToken, IVariantGraphVertex> vertices = createVerticesForNonMatches(witness.getTokens());
-    addWitnessTokensToVertices(witness, vertices);
-    addEdges(witness, vertices);
-  }
-
-  private Map<INormalizedToken, IVariantGraphVertex> createVerticesForNonMatches(List<INormalizedToken> tokens) {
-    Map<INormalizedToken, IVariantGraphVertex> newVertices = Maps.newLinkedHashMap();
-    for (INormalizedToken token : tokens) {
-      IVariantGraphVertex vertex = addNewVertex(token.getNormalized(), token);
-      newVertices.put(token, vertex);
+    Map<INormalizedToken, INormalizedToken> linkedTokens;
+    IWitness the_witness;
+    if (graph.isEmpty()) {
+      linkedTokens = Maps.newLinkedHashMap();
+      the_witness = witness;
+    } else {
+      //TODO: make superwitness here!
+      IWitness a = graph.getWitnesses().get(0);
+      MyNewLinker linker = new MyNewLinker();
+      linkedTokens = linker.link(a, witness);
+      the_witness = witness;
     }
-    return newVertices;
-  }
-
-  private void addWitnessTokensToVertices(IWitness witness, Map<INormalizedToken, IVariantGraphVertex> vertices) {
-    for (INormalizedToken token : witness.getTokens()) {
-      IVariantGraphVertex vertex = vertices.get(token);
-      vertex.addToken(witness, token);
-    }
-  }
-
-  //TODO: make adding new edge optional!
-  private void addEdges(IWitness witness, Map<INormalizedToken, IVariantGraphVertex> vertices) {
-    IVariantGraphVertex previous = graph.getStartVertex();
-    for (INormalizedToken token : witness.getTokens()) {
-      IVariantGraphVertex vertex = vertices.get(token);
-      addNewEdge(previous, vertex, witness);
+    
+    IVariantGraphVertex previous =  graph.getStartVertex();
+    for (INormalizedToken token : the_witness.getTokens()) {
+      // determine whether this token is a match or not
+      IVariantGraphVertex vertex = linkedTokens.containsKey(token) ? findVertex(linkedTokens.get(token)) : addNewVertex(token.getNormalized(), token);
+      IVariantGraphEdge edge = linkedTokens.containsKey(token) ? graph.getEdge(previous, vertex) : addNewEdge(previous, vertex);
+      vertex.addToken(the_witness, token);
+      edge.addWitness(the_witness);
       previous = vertex;
     }
-    addNewEdge(previous, graph.getEndVertex(), witness);
+    IVariantGraphEdge edge = graph.getEdge(previous, graph.getEndVertex());
+    if (edge == null) edge = addNewEdge(previous, graph.getEndVertex());
+    edge.addWitness(the_witness);
   }
 
+  //TODO: this method should be deleted after the superbase is reintroduced!
+  private IVariantGraphVertex findVertex(INormalizedToken token) {
+    for (IVariantGraphVertex vertex: graph.vertexSet()) {
+      for (IWitness witness : vertex.getWitnesses()) {
+        INormalizedToken other = vertex.getToken(witness);
+        if (other == token) return vertex;
+      }
+    }
+    throw new RuntimeException("THIS SHOULD NOT BE POSSIBLE!");
+  }
   
   //write
   private IVariantGraphVertex addNewVertex(String normalized, INormalizedToken vertexKey) {
-    final VariantGraphVertex vertex = new VariantGraphVertex(normalized, vertexKey);
+    IVariantGraphVertex vertex = new VariantGraphVertex(normalized, vertexKey);
     graph.addVertex(vertex);
     return vertex;
   }
 
   //write
-  private void addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
+  private IVariantGraphEdge addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end) {
+    // System.out.println("Add edge between "+begin.getNormalized()+ " and " + end.getNormalized());
     IVariantGraphEdge edge = new VariantGraphEdge();
-    edge.addWitness(witness);
     graph.addEdge(begin, end, edge);
+    return edge;
   }
 
 
