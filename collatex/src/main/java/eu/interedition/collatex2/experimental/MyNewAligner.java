@@ -22,30 +22,29 @@ public class MyNewAligner {
 
   public void addWitness(IWitness witness) {
     Map<INormalizedToken, INormalizedToken> linkedTokens;
-    IWitness the_witness;
     if (graph.isEmpty()) {
       linkedTokens = Maps.newLinkedHashMap();
-      the_witness = witness;
     } else {
       //TODO: make superwitness here!
       IWitness a = graph.getWitnesses().get(0);
       MyNewLinker linker = new MyNewLinker();
       linkedTokens = linker.link(a, witness);
-      the_witness = witness;
     }
     
     IVariantGraphVertex previous =  graph.getStartVertex();
-    for (INormalizedToken token : the_witness.getTokens()) {
+    for (INormalizedToken token : witness.getTokens()) {
       // determine whether this token is a match or not
+      // System.out.println(token+":"+linkedTokens.containsKey(token));
       IVariantGraphVertex vertex = linkedTokens.containsKey(token) ? findVertex(linkedTokens.get(token)) : addNewVertex(token.getNormalized(), token);
-      IVariantGraphEdge edge = linkedTokens.containsKey(token) ? graph.getEdge(previous, vertex) : addNewEdge(previous, vertex);
-      vertex.addToken(the_witness, token);
-      edge.addWitness(the_witness);
+      IVariantGraphEdge edge = graph.getEdge(previous, vertex);
+      if (edge == null) edge = addNewEdge(previous, vertex);
+      vertex.addToken(witness, token);
+      edge.addWitness(witness);
       previous = vertex;
     }
     IVariantGraphEdge edge = graph.getEdge(previous, graph.getEndVertex());
     if (edge == null) edge = addNewEdge(previous, graph.getEndVertex());
-    edge.addWitness(the_witness);
+    edge.addWitness(witness);
   }
 
   //TODO: this method should be deleted after the superbase is reintroduced!

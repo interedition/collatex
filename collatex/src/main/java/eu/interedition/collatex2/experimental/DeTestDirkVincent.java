@@ -112,4 +112,22 @@ public class DeTestDirkVincent {
     assertEquals("neither", iterator.next().getNormalized());
     assertEquals("daylight", iterator.next().getNormalized());
   }
+  
+  @Test
+  public void testDirkVincent6() {
+    CollateXEngine factory = new CollateXEngine();
+    IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
+    IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+    IVariantGraph graph = new VariantGraph2();
+    MyNewAligner aligner = new MyNewAligner(graph);
+    aligner.addWitness(a);
+    aligner.addWitness(b);
+    Iterator<IVariantGraphVertex> iterator = graph.iterator();
+    assertEquals("#", iterator.next().getNormalized()); // start vertex
+    assertEquals("its", iterator.next().getNormalized());
+    assertEquals("soft", iterator.next().getNormalized());
+    assertEquals("changeless", iterator.next().getNormalized()); // addition
+    assertEquals("light", iterator.next().getNormalized());
+  }
+
 }
