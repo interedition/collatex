@@ -13,7 +13,7 @@ public class MyNewMatcher {
     for (INormalizedToken tokenA : a.getTokens()) {
       for (INormalizedToken tokenB : b.getTokens()) {
         if (tokenA.getNormalized().equals(tokenB.getNormalized())) {
-          matches.put(tokenA, tokenB);
+          matches.put(tokenB, tokenA);
         }
       }
     }

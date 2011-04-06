@@ -15,27 +15,27 @@ public class MyNewLinker {
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
-    for (INormalizedToken token: a.getTokens()) {
+    for (INormalizedToken token: b.getTokens()) {
       if (matches.keys().count(token)==1) {
         alignedTokens.put(token, matches.get(token).get(0));
       }
     }
-    IWitnessIndex index = new MyNewWitnessIndex(a, matches);
+    IWitnessIndex index = new MyNewWitnessIndex(b, matches);
     WitnessAfgeleide afgeleider = new WitnessAfgeleide();
-    List<INormalizedToken> afgeleide = afgeleider.calculateAfgeleide(b, matches);
+    List<INormalizedToken> afgeleide = afgeleider.calculateAfgeleide(a, matches);
     for (ITokenSequence sequence : index.getTokenSequences()) {
-      //System.out.println("Trying to find token sequence: "+sequence);
+      // System.out.println("Trying to find token sequence: "+sequence);
       INormalizedToken fixedToken = matches.get(sequence.getFirstToken()).get(0);
       List<INormalizedToken> possibilities = matches.get(sequence.getLastToken());
       for (INormalizedToken possibility : possibilities) {
+        // System.out.println("Trying possibilty: "+possibility);
         int distance = afgeleide.indexOf(possibility) - afgeleide.indexOf(fixedToken);
         if (distance == 1) {
           alignedTokens.put(sequence.getLastToken(), possibility);
-          //System.out.println(possibility+" wins !");
+          // System.out.println(possibility+" wins !");
         }
       }
     }
     return alignedTokens;
   }
-
 }

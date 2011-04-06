@@ -11,9 +11,9 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class WitnessAfgeleide {
 
-  public List<INormalizedToken> calculateAfgeleide(IWitness b, ListMultimap<INormalizedToken, INormalizedToken> matches) {
+  public List<INormalizedToken> calculateAfgeleide(IWitness a, ListMultimap<INormalizedToken, INormalizedToken> matches) {
     List<INormalizedToken> matchingTokens = Lists.newArrayList();
-    for (INormalizedToken token : b.getTokens()) {
+    for (INormalizedToken token : a.getTokens()) {
       if (matches.containsValue(token)) {
         matchingTokens.add(token);
       }  

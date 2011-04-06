@@ -26,8 +26,8 @@ public class DeTestDirkVincent {
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
-    INormalizedToken its = a.getTokens().get(0);
-    INormalizedToken light = a.getTokens().get(2);
+    INormalizedToken its = b.getTokens().get(0);
+    INormalizedToken light = b.getTokens().get(3);
     List<INormalizedToken> matchedTokens;
     matchedTokens = matches.get(its);
     assertEquals("Its", matchedTokens.get(0).getContent());
@@ -44,16 +44,16 @@ public class DeTestDirkVincent {
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     //TODO: nu moet ik een witness index maken van de base
     //met de tokens erin die een unieke sequence voorstellen voor dubbelvoorkomend woord
-    IWitnessIndex index = new MyNewWitnessIndex(a, matches);
+    IWitnessIndex index = new MyNewWitnessIndex(b, matches);
     List<ITokenSequence> sequences = index.getTokenSequences();
-    INormalizedToken soft = a.getTokens().get(1);
-    INormalizedToken light = a.getTokens().get(2);
-    INormalizedToken any = a.getTokens().get(10);
-    INormalizedToken light2 = a.getTokens().get(11);
-    ITokenSequence firstSequence = sequences.get(0);
-    ITokenSequence secondSequence = sequences.get(1);
+    INormalizedToken soft = b.getTokens().get(1);
+    INormalizedToken light = b.getTokens().get(3);
     ITokenSequence expectedSequence = new TokenSequence(soft, light);
+    ITokenSequence firstSequence = sequences.get(0);
     assertEquals(expectedSequence, firstSequence);
+    INormalizedToken any = b.getTokens().get(5);
+    INormalizedToken light2 = b.getTokens().get(6);
+    ITokenSequence secondSequence = sequences.get(1);
     expectedSequence = new TokenSequence(any, light2);
     assertEquals(expectedSequence, secondSequence);
   }
@@ -66,7 +66,7 @@ public class DeTestDirkVincent {
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     WitnessAfgeleide afgeleider = new WitnessAfgeleide();
-    List<INormalizedToken> afgeleideWitness = afgeleider.calculateAfgeleide(b, matches);
+    List<INormalizedToken> afgeleideWitness = afgeleider.calculateAfgeleide(a, matches);
     Iterator<INormalizedToken> tokenIterator = afgeleideWitness.iterator();
     assertEquals("Its", tokenIterator.next().getContent());
     assertEquals("soft", tokenIterator.next().getContent());
@@ -87,13 +87,13 @@ public class DeTestDirkVincent {
     Map<INormalizedToken, INormalizedToken> tokens = linker.link(a, b);
     INormalizedToken itsA = a.getTokens().get(0);
     INormalizedToken itsB = b.getTokens().get(0);
-    assertEquals(itsB, tokens.get(itsA));
+    assertEquals(itsA, tokens.get(itsB));
     INormalizedToken lightA = a.getTokens().get(2);
     INormalizedToken lightB = b.getTokens().get(3);
-    assertEquals(lightB, tokens.get(lightA));
+    assertEquals(lightA, tokens.get(lightB));
     INormalizedToken light2A = a.getTokens().get(11);
     INormalizedToken light2B = b.getTokens().get(6);
-    assertEquals(light2B, tokens.get(light2A));
+    assertEquals(light2A, tokens.get(light2B));
   }
   
   @Test
