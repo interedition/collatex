@@ -15,12 +15,14 @@ public class MyNewLinker {
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
+    IMatchResult matchResult = analyzer.analyze(a, b);
     for (INormalizedToken token: b.getTokens()) {
-      if (matches.keys().count(token)==1) {
+      if (matches.keys().count(token)==1&&!matchResult.getUnsureTokens().contains(token)) {
         alignedTokens.put(token, matches.get(token).get(0));
       }
     }
-    IWitnessIndex index = new MyNewWitnessIndex(b, matches);
+    IWitnessIndex index = new MyNewWitnessIndex(b, matches, matchResult);
     WitnessAfgeleide afgeleider = new WitnessAfgeleide();
     List<INormalizedToken> afgeleide = afgeleider.calculateAfgeleide(a, matches);
     for (ITokenSequence sequence : index.getTokenSequences()) {
