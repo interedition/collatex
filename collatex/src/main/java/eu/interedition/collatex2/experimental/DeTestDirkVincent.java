@@ -1,10 +1,12 @@
 package eu.interedition.collatex2.experimental;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -157,5 +159,46 @@ public class DeTestDirkVincent {
     assertEquals("any", tokenIterator.next().getNormalized()); 
     assertEquals("light", tokenIterator.next().getNormalized());
   }
+  
+  @Test
+  public void testDirkVincent8() {
+    // lots of setup
+    CollateXEngine factory = new CollateXEngine();
+    IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
+    IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+    IVariantGraph graph = new VariantGraph2();
+    MyNewAligner aligner = new MyNewAligner(graph);
+    aligner.addWitness(a);
+    aligner.addWitness(b);
+    System.out.println("it starts here!");
+    SuperbaseCreator creator = new SuperbaseCreator();
+    IWitness superbase = creator.create(graph);
+    IWitness c = factory.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
+    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
+    IMatchResult result = analyzer.analyze(superbase, c);
+    Set<INormalizedToken> unmatchedTokens = result.getUnmatchedTokens();
+    assertTrue(unmatchedTokens.contains(c.getTokens().get(1)));
+    assertTrue(unmatchedTokens.contains(c.getTokens().get(2)));
+    Set<INormalizedToken> unsureTokens = result.getUnsureTokens();
+    System.out.println(unsureTokens);
+       assertTrue(unsureTokens.contains(c.getTokens().get(3)));
+    assertTrue(unsureTokens.contains(c.getTokens().get(6)));
+    assertTrue(unsureTokens.contains(c.getTokens().get(13))); // &
+    assertTrue(unsureTokens.contains(c.getTokens().get(16))); // day
+  }
+  
+  //TODO: test 9
+    
+    //NOTE: this really should be the wrapper by the real aligner
+    //TODO: the variantgraph builder stuff should be renamed!
+    
+    
+//    MyNewLinker linker = new MyNewLinker();
+//    Map<INormalizedToken, INormalizedToken> link = linker.link(superbase, c);
+//    for (INormalizedToken witnessToken : c.getTokens()) {
+//      if (link.get(witnessToken) ==null) {
+//        System.out.println(witnessToken.toString()); //link.get(witness);
+//      }
+//    }
 
 }
