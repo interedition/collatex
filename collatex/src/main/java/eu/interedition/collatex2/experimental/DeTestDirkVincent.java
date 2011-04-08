@@ -130,4 +130,32 @@ public class DeTestDirkVincent {
     assertEquals("light", iterator.next().getNormalized());
   }
 
+  @Test
+  public void testDirkVincent7() {
+    CollateXEngine factory = new CollateXEngine();
+    IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
+    IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+    IVariantGraph graph = new VariantGraph2();
+    MyNewAligner aligner = new MyNewAligner(graph);
+    aligner.addWitness(a);
+    aligner.addWitness(b);
+    SuperbaseCreator creator = new SuperbaseCreator();
+    IWitness superbase = creator.create(graph);
+    Iterator<INormalizedToken> tokenIterator = superbase.tokenIterator();
+    assertEquals("its", tokenIterator.next().getNormalized());
+    assertEquals("soft", tokenIterator.next().getNormalized());
+    assertEquals("changeless", tokenIterator.next().getNormalized());
+    assertEquals("light", tokenIterator.next().getNormalized());
+    assertEquals("neither", tokenIterator.next().getNormalized());
+    assertEquals("daylight", tokenIterator.next().getNormalized()); 
+    assertEquals("nor", tokenIterator.next().getNormalized()); 
+    assertEquals("moonlight", tokenIterator.next().getNormalized());
+    assertEquals("nor", tokenIterator.next().getNormalized()); 
+    assertEquals("starlight", tokenIterator.next().getNormalized());
+    assertEquals("nor", tokenIterator.next().getNormalized()); 
+    assertEquals("unlike", tokenIterator.next().getNormalized());
+    assertEquals("any", tokenIterator.next().getNormalized()); 
+    assertEquals("light", tokenIterator.next().getNormalized());
+  }
+
 }
