@@ -216,4 +216,37 @@ public class DeTestDirkVincent {
     assertTrue(unlinkedTokens.contains(c.getTokens().get(23)));
     assertEquals(5, unlinkedTokens.size());
   }
+  
+  //Test alignment with 3 witnesses; superbase should be in aligner to make this test work 
+  @Test
+  public void testDirkVincent10() {
+    // lots of setup
+    CollateXEngine factory = new CollateXEngine();
+    IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
+    IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+    IWitness c = factory.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
+    IVariantGraph graph = new VariantGraph2();
+    MyNewAligner aligner = new MyNewAligner(graph);
+    aligner.add(a, b, c);
+    Iterator<IVariantGraphVertex> iterator = graph.iterator();
+    assertEquals("#", iterator.next().getNormalized()); // start vertex
+    assertEquals("its", iterator.next().getNormalized());
+    assertEquals("soft", iterator.next().getNormalized());
+    assertEquals("changeless", iterator.next().getNormalized());
+    assertEquals("faint", iterator.next().getNormalized());
+    assertEquals("unchanging", iterator.next().getNormalized());
+    assertEquals("light", iterator.next().getNormalized());
+    assertEquals("neither", iterator.next().getNormalized());
+    assertEquals("daylight", iterator.next().getNormalized()); 
+    assertEquals("nor", iterator.next().getNormalized()); 
+    assertEquals("moonlight", iterator.next().getNormalized());
+    assertEquals("nor", iterator.next().getNormalized()); 
+    assertEquals("starlight", iterator.next().getNormalized());
+    assertEquals("nor", iterator.next().getNormalized()); 
+    assertEquals("unlike", iterator.next().getNormalized());
+    assertEquals("any", iterator.next().getNormalized());
+    assertEquals("light", iterator.next().getNormalized()); 
+    assertEquals("he", iterator.next().getNormalized());
+    assertEquals("could", iterator.next().getNormalized());
+  }
 }

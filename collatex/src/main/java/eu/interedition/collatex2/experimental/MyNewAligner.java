@@ -26,17 +26,17 @@ public class MyNewAligner implements IAligner {
     if (graph.isEmpty()) {
       linkedTokens = Maps.newLinkedHashMap();
     } else {
-      //TODO: make superwitness here!
-      IWitness a = graph.getWitnesses().get(0);
+      SuperbaseCreator creator = new SuperbaseCreator();
+      IWitness superbase = creator.create(graph);
       MyNewLinker linker = new MyNewLinker();
-      linkedTokens = linker.link(a, witness);
+      linkedTokens = linker.link(superbase, witness);
     }
     
     IVariantGraphVertex previous =  graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
       // determine whether this token is a match or not
       // System.out.println(token+":"+linkedTokens.containsKey(token));
-      IVariantGraphVertex vertex = linkedTokens.containsKey(token) ? findVertex(linkedTokens.get(token)) : addNewVertex(token.getNormalized(), token);
+      IVariantGraphVertex vertex = linkedTokens.containsKey(token) ? (IVariantGraphVertex) linkedTokens.get(token) : addNewVertex(token.getNormalized(), token);
       IVariantGraphEdge edge = graph.getEdge(previous, vertex);
       if (edge == null) edge = addNewEdge(previous, vertex);
       vertex.addToken(witness, token);
@@ -48,17 +48,6 @@ public class MyNewAligner implements IAligner {
     edge.addWitness(witness);
   }
 
-  //TODO: this method should be deleted after the superbase is reintroduced!
-  private IVariantGraphVertex findVertex(INormalizedToken token) {
-    for (IVariantGraphVertex vertex: graph.vertexSet()) {
-      for (IWitness witness : vertex.getWitnesses()) {
-        INormalizedToken other = vertex.getToken(witness);
-        if (other == token) return vertex;
-      }
-    }
-    throw new RuntimeException("THIS SHOULD NOT BE POSSIBLE!");
-  }
-  
   //write
   private IVariantGraphVertex addNewVertex(String normalized, INormalizedToken vertexKey) {
     // System.out.println("Add vertex "+normalized);
