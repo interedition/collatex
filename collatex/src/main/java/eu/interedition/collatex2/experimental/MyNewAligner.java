@@ -6,13 +6,14 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class MyNewAligner {
+public class MyNewAligner implements IAligner {
 
   private final IVariantGraph graph;
 
@@ -60,6 +61,7 @@ public class MyNewAligner {
   
   //write
   private IVariantGraphVertex addNewVertex(String normalized, INormalizedToken vertexKey) {
+    // System.out.println("Add vertex "+normalized);
     IVariantGraphVertex vertex = new VariantGraphVertex(normalized, vertexKey);
     graph.addVertex(vertex);
     return vertex;
@@ -71,6 +73,19 @@ public class MyNewAligner {
     IVariantGraphEdge edge = new VariantGraphEdge();
     graph.addEdge(begin, end, edge);
     return edge;
+  }
+
+  @Override
+  public IVariantGraph getResult() {
+    return graph;
+  }
+
+  @Override
+  public IAligner add(IWitness... witnesses) {
+    for (IWitness witness : witnesses) {
+      addWitness(witness);
+    }
+    return this;
   }
 
 

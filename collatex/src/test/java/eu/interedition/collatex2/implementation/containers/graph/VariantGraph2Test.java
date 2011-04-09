@@ -43,7 +43,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -139,7 +139,7 @@ public class VariantGraph2Test {
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
     VariantGraph2 graph = new VariantGraph2();
-    VariantGraphAligner aligner = engine.createAligner(graph);
+    IAligner aligner = engine.createAligner(graph);
     aligner.add(w1, w2, w3);
     assertEquals(4, graph.vertexSet().size());
     VariantGraphUtil util = new VariantGraphUtil(graph);
