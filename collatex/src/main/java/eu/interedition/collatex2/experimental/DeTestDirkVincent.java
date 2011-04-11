@@ -22,6 +22,19 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DeTestDirkVincent {
 
+  // helper method
+  private void checkGraph(IVariantGraph graph, String... expected) {
+    Iterator<IVariantGraphVertex> iterator = graph.iterator();
+    assertEquals(graph.getStartVertex(), iterator.next());
+    for (String exp : expected) {
+      assertTrue(iterator.hasNext());
+      IVariantGraphVertex vertex = iterator.next();
+      assertEquals(exp, vertex.getNormalized());
+    }
+    assertEquals(graph.getEndVertex(), iterator.next());
+    assertTrue(!iterator.hasNext());
+  }
+
   @Test
   public void testDirkVincent() {
     CollateXEngine factory = new CollateXEngine();
@@ -249,4 +262,25 @@ public class DeTestDirkVincent {
     assertEquals("he", iterator.next().getNormalized());
     assertEquals("could", iterator.next().getNormalized());
   }
+  
+  @Test
+  public void testSentence42() {
+    CollateXEngine factory = new CollateXEngine();
+    IWitness a = factory.createWitness("06-1", "The same clock as when for example Magee once died.");
+    IWitness b = factory.createWitness("06-2", "The same as when for example Magee once died.");
+    IVariantGraph graph = new VariantGraph2();
+    MyNewAligner aligner = new MyNewAligner(graph);
+    aligner.add(a, b);
+    //TODO: assert punctuation in separate String!
+    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died");
+    IWitness c = factory.createWitness("08-01","The same as when for example McKee once died .");
+    aligner.addWitness(c);
+    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "once", "died", ".");
+    IWitness d = factory.createWitness("08-02", "The same as when among others Darly once died & left him.");
+    aligner.addWitness(d);
+    //TODO: handling of punctuation is wrong here!s
+    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", ".", "&", "left", "him");
+
+  }
+
 }
