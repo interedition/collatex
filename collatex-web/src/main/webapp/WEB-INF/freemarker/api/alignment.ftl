@@ -51,6 +51,8 @@ th {background:white;}
 		</#list>
 	</table>
   
+ <#-- <p>
+
   <br/>
   <br/>
   
@@ -65,7 +67,10 @@ th {background:white;}
 			</tr>
 		</#list>
 	</table>
+	</p>
 	
+  -->
+
  <#-- <p>
     Modifications:
     <span class="none">NONE</span>
@@ -91,6 +96,8 @@ th {background:white;}
   </#list>
   -->
   
+ <#-- <p>
+
   <br/>
   <br/>
   
@@ -107,6 +114,7 @@ th {background:white;}
       </tr>
     </#list>
   </table>
+	</p>
 
 <script type="text/javascript" src="http://api.prototypejs.org/javascripts/pdoc/prototype.js"></script>
 <script>
@@ -121,6 +129,8 @@ function unhilitematches(c){
   });
 }  
 </script>
+	
+  -->
   
 
 </@c.page>
