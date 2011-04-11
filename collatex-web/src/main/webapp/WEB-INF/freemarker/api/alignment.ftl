@@ -39,7 +39,8 @@ th {background:white;}
 </style>
 	<h1>REST service result</h1>
 
-  Alignment table:	
+  Alignment table:
+  	
 	<table>
 		<#list alignment.rows as r>
 			<tr>
@@ -51,8 +52,8 @@ th {background:white;}
 		</#list>
 	</table>
   
- <#-- <p>
-
+ <#-- 
+ 
   <br/>
   <br/>
   
@@ -67,7 +68,6 @@ th {background:white;}
 			</tr>
 		</#list>
 	</table>
-	</p>
 	
   -->
 
@@ -96,11 +96,11 @@ th {background:white;}
   </#list>
   -->
   
- <#-- <p>
+ <#-- 
 
   <br/>
   <br/>
-  
+     
   Vertex coloring: (hover over cell to see color hexvalue)
   <table>
     <#list alignment.rows as r>
@@ -114,8 +114,7 @@ th {background:white;}
       </tr>
     </#list>
   </table>
-	</p>
-
+ 
 <script type="text/javascript" src="http://api.prototypejs.org/javascripts/pdoc/prototype.js"></script>
 <script>
 function hilitematches(c){
