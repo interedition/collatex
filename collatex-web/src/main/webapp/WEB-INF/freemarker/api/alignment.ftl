@@ -39,6 +39,21 @@ th {background:white;}
 </style>
 	<h1>REST service result</h1>
 
+  Alignment table:	
+	<table>
+		<#list alignment.rows as r>
+			<tr>
+				<th>${r.sigil?html}</th>
+				<#list r.iterator() as cell>
+					<td><#if cell.empty>&ndash;<#else>${cell.token.content?html}</#if></td>
+				</#list>
+			</tr>
+		</#list>
+	</table>
+  
+  <br/>
+  <br/>
+  
   Baseless:	(<span class="invariant">INVARIANT</span>, <span class="variant">VARIANT</span>)
 	<table>
 		<#list alignment.rows as r>
@@ -75,6 +90,9 @@ th {background:white;}
   <br/>
   </#list>
   -->
+  
+  <br/>
+  <br/>
   
   Vertex coloring: (hover over cell to see color hexvalue)
   <table>
