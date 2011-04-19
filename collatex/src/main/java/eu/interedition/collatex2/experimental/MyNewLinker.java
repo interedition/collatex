@@ -22,9 +22,10 @@ public class MyNewLinker {
         alignedTokens.put(token, matches.get(token).get(0));
       }
     }
-    IWitnessIndex index = new MyNewWitnessIndex(b, matches, matchResult);
     WitnessAfgeleide afgeleider = new WitnessAfgeleide();
     List<INormalizedToken> afgeleide = afgeleider.calculateAfgeleide(a, matches);
+    MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
+    IWitnessIndex index = indexer.index(b, matches, matchResult);
     for (ITokenSequence sequence : index.getTokenSequences()) {
       // System.out.println("Trying to find token sequence: "+sequence);
       INormalizedToken fixedToken = matches.get(sequence.getFirstToken()).get(0);

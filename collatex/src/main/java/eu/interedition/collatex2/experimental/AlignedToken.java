@@ -5,8 +5,10 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 public class AlignedToken implements IAlignedToken {
 
   private final INormalizedToken tokenB;
+  private final INormalizedToken tokenA;
 
   public AlignedToken(INormalizedToken token, INormalizedToken tokenB) {
+    this.tokenA = token;
     this.tokenB = tokenB;
   }
 
@@ -15,4 +17,8 @@ public class AlignedToken implements IAlignedToken {
     return tokenB;
   }
 
+  @Override
+  public INormalizedToken getWitnessToken() {
+    return tokenA;
+  }
 }

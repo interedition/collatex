@@ -6,4 +6,6 @@ public interface IAlignedToken {
 
   INormalizedToken getAlignedToken();
 
+  INormalizedToken getWitnessToken();
+
 }

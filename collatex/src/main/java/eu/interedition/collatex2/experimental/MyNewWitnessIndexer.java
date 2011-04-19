@@ -8,18 +8,15 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class MyNewWitnessIndex implements IWitnessIndex {
-  private final List<ITokenSequence> tokenSequences;
-
-  public MyNewWitnessIndex(IWitness witness, ListMultimap<INormalizedToken, INormalizedToken> matches, IMatchResult result) {
-    this.tokenSequences = Lists.newArrayList();
+public class MyNewWitnessIndexer {
+  public IWitnessIndex index(IWitness witness, ListMultimap<INormalizedToken, INormalizedToken> matches, IMatchResult result) {
+    List<ITokenSequence> tokenSequences = Lists.newArrayList();
     // here we try to do the mapping
-    // TODO: move this operation out of the constructor method!
     // we lopen alle woorden uit de witness af
     // daarna kijken we in de matches map
     // drie mogelijkheden... geen match, enkele match, multiple match
     // we skippen de woorden met geen of een enkele match
-    INormalizedToken previous =  null;
+    INormalizedToken previous =  new StartToken();
     for (INormalizedToken token : witness.getTokens()) {
       if (result.getUnsureTokens().contains(token)) {
         tokenSequences.add(new TokenSequence(previous, token));
@@ -29,11 +26,6 @@ public class MyNewWitnessIndex implements IWitnessIndex {
         previous = token;
       }
     }
+    return new NewWitnessIndex(tokenSequences);
   }
-
-  @Override
-  public List<ITokenSequence> getTokenSequences() {
-    return tokenSequences;
-  }
-
 }

@@ -33,13 +33,15 @@ public class TokenSequence implements ITokenSequence {
   
   @Override
   public String toString() {
-    StringBuilder bla = new StringBuilder("TokenSequence: ");
+    StringBuilder buffer = new StringBuilder("TokenSequence: ");
     for  (int i=0; i < tokens.length; i++) {
       INormalizedToken token = tokens[i];
-      bla.append(token.toString()).append(", ");
+      if (token==null) {
+        throw new RuntimeException("token is null");
+      } 
+      buffer.append(token.toString()).append(", ");
     }
-    
-    return bla.toString();
+    return buffer.toString();
   }
 
   @Override

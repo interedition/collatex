@@ -60,7 +60,8 @@ public class DeTestDirkVincent {
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
     IMatchResult result = analyzer.analyze(a, b);
-    IWitnessIndex index = new MyNewWitnessIndex(b, matches, result);
+    MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
+    IWitnessIndex index = indexer.index(b, matches, result);
     List<ITokenSequence> sequences = index.getTokenSequences();
     INormalizedToken soft = b.getTokens().get(1);
     INormalizedToken light = b.getTokens().get(3);
@@ -281,6 +282,60 @@ public class DeTestDirkVincent {
     //TODO: handling of punctuation is wrong here!s
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", ".", "&", "left", "him");
 
+  }
+  
+  // Unit test slaagt niet om dat er nog geen begin # match is !
+  @Test
+  public void testDirkVincentSomehowFailling() {
+    CollateXEngine factory = new CollateXEngine();
+    IWitness a = factory.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
+    IWitness b = factory.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
+    // here we go figure out the code that we need
+    // graph = data structure were we put the result in
+    IVariantGraph graph = new VariantGraph2();
+    // build the variant graph with one witness (A)
+    MyNewAligner aligner = new MyNewAligner(graph);
+    aligner.add(a);
+    // Build the superbase van the graph
+    SuperbaseCreator creator = new SuperbaseCreator();
+    IWitness superbase = creator.create(graph);
+    MyNewMatcher matcher = new MyNewMatcher();
+    //NOTE: matches is not yet used here!
+    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, b);
+    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
+    IMatchResult analyze = analyzer.analyze(superbase, b);
+    System.out.println(analyze.getUnmatchedTokens());
+    System.out.println(analyze.getUnsureTokens());
+    //TODO: afgeleide zou start vertex en end vertex moeten bevatten!
+    WitnessAfgeleide afgeleideCreator = new WitnessAfgeleide();
+    //in stead of the matches, wouldn't it be better to use the match analyzer result?
+    List<INormalizedToken> calculateAfgeleide = afgeleideCreator.calculateAfgeleide(superbase, matches);
+    System.out.println("Afgeleide: "+calculateAfgeleide);
+    MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
+    IWitnessIndex index = indexer.index(b, matches, analyze);
+//    for (ITokenSequence seq : index.getTokenSequences()) {
+//      System.out.println(seq.toString());
+//    }
+    Iterator<ITokenSequence> iterator = index.getTokenSequences().iterator();
+    assertEquals("TokenSequence: #: 0, he: 3, ", iterator.next().toString());
+    
+    
+    
+    
+    
+    
+    
+    
+    //  MyNewLinker linker = new MyNewLinker();
+//  linker.link(a, b);
+//  fail();
+//    MyNewMatchSequencer sequencer = new MyNewMatchSequencer();
+//    List<IAlignedToken> alignedTokens = sequencer.process(matches);
+//    //    Iterator<IAlignedToken> iterator = alignedTokens.iterator();
+//    //    assertEquals()
+//    // geen zin om hier test voor te schrijven!
+//    // om dit goed te testen heb je drie waarden nodig
+//    // previous witness token, witness token, matched base token
   }
 
 }
