@@ -9,7 +9,7 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 
-public class WitnessAfgeleide {
+public class BaseAfgeleider {
 
   public List<INormalizedToken> calculateAfgeleide(IWitness a, ListMultimap<INormalizedToken, INormalizedToken> matches) {
     List<INormalizedToken> matchingTokens = Lists.newArrayList();

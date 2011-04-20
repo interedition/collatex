@@ -22,13 +22,20 @@ public class MyNewLinker {
         alignedTokens.put(token, matches.get(token).get(0));
       }
     }
-    WitnessAfgeleide afgeleider = new WitnessAfgeleide();
+    matches.put(new StartToken(), a.getTokens().get(0));
+    BaseAfgeleider afgeleider = new BaseAfgeleider();
     List<INormalizedToken> afgeleide = afgeleider.calculateAfgeleide(a, matches);
+    // System.out.println("Afgeleide: "+afgeleide);
     MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
     IWitnessIndex index = indexer.index(b, matches, matchResult);
     for (ITokenSequence sequence : index.getTokenSequences()) {
       // System.out.println("Trying to find token sequence: "+sequence);
-      INormalizedToken fixedToken = matches.get(sequence.getFirstToken()).get(0);
+      final INormalizedToken fixedWitnessToken = sequence.getFirstToken();
+      final List<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
+      if (matchesForFixedTokenWitness.isEmpty()) {
+        throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
+      }
+      INormalizedToken fixedToken = matchesForFixedTokenWitness.get(0);
       List<INormalizedToken> possibilities = matches.get(sequence.getLastToken());
       for (INormalizedToken possibility : possibilities) {
         // System.out.println("Trying possibilty: "+possibility);

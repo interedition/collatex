@@ -18,9 +18,7 @@ public class SuperbaseCreator {
     Iterator<IVariantGraphVertex> iterator = graph.iterator();
     while (iterator.hasNext()) {
       IVariantGraphVertex vertex = iterator.next();
-      if (vertex != graph.getStartVertex() && vertex != graph.getEndVertex()) {
-        superbaseTokens.add(vertex);
-      }
+      superbaseTokens.add(vertex);
     }
     return new Witness("superbase", superbaseTokens);
   }
