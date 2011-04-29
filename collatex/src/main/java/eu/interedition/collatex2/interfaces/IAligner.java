@@ -20,10 +20,14 @@
 
 package eu.interedition.collatex2.interfaces;
 
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+
 
 public interface IAligner {
   IVariantGraph getResult();
 
   IAligner add(IWitness... witnesses);
+
+  IAlignment2 align(IWitness witness);
   
 }

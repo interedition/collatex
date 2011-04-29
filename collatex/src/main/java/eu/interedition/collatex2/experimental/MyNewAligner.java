@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -77,5 +78,8 @@ public class MyNewAligner implements IAligner {
     return this;
   }
 
-
+  @Override
+  public IAlignment2 align(IWitness witness) {
+    throw new RuntimeException("NOT YET IMPLEMENTED!");
+  }
 }

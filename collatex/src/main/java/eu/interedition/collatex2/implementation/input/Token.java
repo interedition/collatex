@@ -64,4 +64,8 @@ public class Token implements IToken {
     return hc;
   }
 
+  @Override
+  public String toString() {
+    return content;
+  }
 }

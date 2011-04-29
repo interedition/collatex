@@ -22,6 +22,8 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DeTestDirkVincent {
 
+  private static CollateXEngine factory = new MyNewCollateXEngine();
+
   // helper method
   private void checkGraph(IVariantGraph graph, String... expected) {
     Iterator<IVariantGraphVertex> iterator = graph.iterator();
@@ -37,7 +39,6 @@ public class DeTestDirkVincent {
 
   @Test
   public void testDirkVincent() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     MyNewMatcher matcher = new MyNewMatcher();
@@ -53,7 +54,6 @@ public class DeTestDirkVincent {
   
   @Test
   public void testDirkVincent2() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     MyNewMatcher matcher = new MyNewMatcher();
@@ -77,7 +77,6 @@ public class DeTestDirkVincent {
 
   @Test
   public void testVincentDirk3() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     MyNewMatcher matcher = new MyNewMatcher();
@@ -97,7 +96,6 @@ public class DeTestDirkVincent {
   
   @Test
   public void testDirkVincent4() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     MyNewLinker linker = new MyNewLinker();
@@ -115,7 +113,6 @@ public class DeTestDirkVincent {
   
   @Test
   public void testDirkVincent5() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IVariantGraph graph = new VariantGraph2();
     MyNewAligner aligner = new MyNewAligner(graph);
@@ -131,7 +128,6 @@ public class DeTestDirkVincent {
   
   @Test
   public void testDirkVincent6() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = new VariantGraph2();
@@ -148,7 +144,6 @@ public class DeTestDirkVincent {
 
   @Test
   public void testDirkVincent7() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = new VariantGraph2();
@@ -178,7 +173,6 @@ public class DeTestDirkVincent {
   @Test
   public void testDirkVincent8() {
     // lots of setup
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = new VariantGraph2();
@@ -203,7 +197,6 @@ public class DeTestDirkVincent {
   @Test
   public void testDirkVincent9() {
     // lots of setup
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = new VariantGraph2();
@@ -236,7 +229,6 @@ public class DeTestDirkVincent {
   @Test
   public void testDirkVincent10() {
     // lots of setup
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IWitness c = factory.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
@@ -265,30 +257,10 @@ public class DeTestDirkVincent {
     assertEquals("could", iterator.next().getNormalized());
   }
   
-  @Test
-  public void testSentence42() {
-    CollateXEngine factory = new CollateXEngine();
-    IWitness a = factory.createWitness("06-1", "The same clock as when for example Magee once died.");
-    IWitness b = factory.createWitness("06-2", "The same as when for example Magee once died.");
-    IVariantGraph graph = new VariantGraph2();
-    MyNewAligner aligner = new MyNewAligner(graph);
-    aligner.add(a, b);
-    //TODO: assert punctuation in separate String!
-    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died");
-    IWitness c = factory.createWitness("08-01","The same as when for example McKee once died .");
-    aligner.addWitness(c);
-    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "once", "died", ".");
-    IWitness d = factory.createWitness("08-02", "The same as when among others Darly once died & left him.");
-    aligner.addWitness(d);
-    //TODO: handling of punctuation is wrong here!s
-    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", ".", "&", "left", "him");
-
-  }
 
   //TODO: enable test!
   @Test
   public void testStartTokenWitnessIndexing() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
     IWitness b = factory.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
 //  assert this some how! (information is contained in the linker!
@@ -304,7 +276,6 @@ public class DeTestDirkVincent {
     
   @Test
   public void testLinkingWithStartToken() {
-    CollateXEngine factory = new CollateXEngine();
     IWitness a = factory.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
     IWitness b = factory.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
     IVariantGraph graph = new VariantGraph2();
@@ -326,6 +297,22 @@ public class DeTestDirkVincent {
     assertTrue(!link.containsKey(b.getTokens().get(9))); 
     assertTrue(link.containsKey(b.getTokens().get(10))); // to
     assertTrue(link.containsKey(b.getTokens().get(11))); // his
+  }
+
+  @Test
+  public void testSentence42() {
+    IWitness a = factory.createWitness("06-1", "The same clock as when for example Magee once died.");
+    IWitness b = factory.createWitness("06-2", "The same as when for example Magee once died.");
+    IVariantGraph graph = new VariantGraph2();
+    MyNewAligner aligner = new MyNewAligner(graph);
+    aligner.add(a, b);
+    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died", ".");
+    IWitness c = factory.createWitness("08-01","The same as when for example McKee once died .");
+    aligner.addWitness(c);
+    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "once", "died", ".");
+    IWitness d = factory.createWitness("08-02", "The same as when among others Darly once died & left him.");
+    aligner.addWitness(d);
+    checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
   }
 
 }
