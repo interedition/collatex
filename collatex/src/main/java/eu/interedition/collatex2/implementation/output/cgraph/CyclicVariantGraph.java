@@ -22,6 +22,7 @@ package eu.interedition.collatex2.implementation.output.cgraph;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -128,4 +129,10 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
   public Iterator<IVariantGraphVertex> iterator() {
     throw new UnsupportedOperationException("NOT IMPLEMENTED!");
   }
+  
+  @Override
+  public Map<IVariantGraphVertex, IVariantGraphVertex> getTransposedTokens() {
+	  throw new UnsupportedOperationException("Cyclic graphs have no transpositions");
+  }
+
 }

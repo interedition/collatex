@@ -22,6 +22,7 @@ package eu.interedition.collatex2.interfaces;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.jgrapht.DirectedGraph;
 
@@ -42,5 +43,7 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
   List<INormalizedToken> getTokens(IWitness witness);
 
   List<IVariantGraphEdge> getPath(IWitness witness);
+  
+  Map<IVariantGraphVertex, IVariantGraphVertex> getTransposedTokens();
 
 }

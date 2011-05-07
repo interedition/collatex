@@ -28,6 +28,8 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -168,6 +170,22 @@ public class VariantGraph2Test {
     assertEquals("f", graph.getEdgeTarget(path.get(5)).getNormalized());
     assertEquals("#", graph.getEdgeTarget(path.get(6)).getNormalized());
     assertEquals(7, path.size());
+  }
+  
+  @Test
+  public void testTranspositions() {
+	  final IWitness w1 = engine.createWitness("A", "the black and white cat");
+	  final IWitness w2 = engine.createWitness("B", "the white and black cat");
+	  IVariantGraph graph = engine.graph(w1, w2);
+	  Map<IVariantGraphVertex, IVariantGraphVertex> transposed = graph.getTransposedTokens();
+	  assertEquals(2, transposed.size());
+	  final IWitness w3 = engine.createWitness("C", "the black and black cat");
+	  graph = engine.graph(w1, w2, w3);
+	  transposed = graph.getTransposedTokens();
+	  assertEquals(2, transposed.size());
+	  for ( Entry<IVariantGraphVertex, IVariantGraphVertex> nodePair : transposed.entrySet()) {
+		  assertEquals(nodePair.getKey().getNormalized(), nodePair.getValue().getNormalized());
+	  }
   }
 
   @Ignore

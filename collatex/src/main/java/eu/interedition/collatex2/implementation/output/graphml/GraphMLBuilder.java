@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.commons.collections.bidimap.DualHashBidiMap;
 
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
@@ -63,7 +64,8 @@ public class GraphMLBuilder {
 
 	private enum Keys {
 		NODE_TOKEN("d0", NODE_TAG, "token", "string"), NODE_NUMBER("d1",
-				NODE_TAG, "number", "int");
+				NODE_TAG, "number", "int"), NODE_IDENTICAL("d2", NODE_TAG, 
+						"identical", "string");
 
 		private String name;
 		private String keyId;
@@ -103,6 +105,7 @@ public class GraphMLBuilder {
 		// add key elements for node
 		rootElement.appendChild(Keys.NODE_NUMBER.getKeyElement(graphXML));
 		rootElement.appendChild(Keys.NODE_TOKEN.getKeyElement(graphXML));
+		rootElement.appendChild(Keys.NODE_IDENTICAL.getKeyElement(graphXML));
 
 		// add key elements (witnesses) and prepare mapping of sigil to its
 		// graphml id
@@ -127,28 +130,33 @@ public class GraphMLBuilder {
 		List<Element> edges = new ArrayList<Element>();
 
 		// TODO is it possible to improve the performance by not using this map?
-		Map<IVariantGraphVertex, Integer> vertexToId = new HashMap<IVariantGraphVertex, Integer>();
-
+		DualHashBidiMap vertexToId = new DualHashBidiMap();
+		Map<IVariantGraphVertex, IVariantGraphVertex> transpositions = variantGraph.getTransposedTokens();
+		
 		Iterator<IVariantGraphVertex> vertexIterator = variantGraph.iterator();
 		int vertexNumber = 0;
 		while (vertexIterator.hasNext()) {
+			String vertexNodeID = "n" + vertexNumber;
 			IVariantGraphVertex vertex = vertexIterator.next();
-
 			String token = vertex.getNormalized();
-
-			nodes.add(createNodeElement(vertexNumber, token, graphXML));
-
-			vertexToId.put(vertex, vertexNumber);
-
+			nodes.add(createNodeElement(vertexNodeID, token, graphXML));
+			vertexToId.put(vertex, vertexNodeID);
+			// Do we need to keep track of a transposed node to add later?
 			edges.addAll(createEdgeElements(
 					variantGraph.incomingEdgesOf(vertex), vertexToId,
 					sigilToId, variantGraph, graphXML, edges.size()));
-
 			vertexNumber++;
 		}
-
+		
 		// add nodes
 		for (Element n : nodes) {
+			// See if we need to add an 'identical' tag for a transposition.
+			// This is best done here, after all the nodes have been created.
+			IVariantGraphVertex vertex = (IVariantGraphVertex) vertexToId.getKey(n.getAttribute(ID_ATT));
+			if(transpositions.containsKey(vertex)) {
+				String txpID = (String) vertexToId.get(transpositions.get(vertex));
+				n.appendChild(Keys.NODE_IDENTICAL.getDataElement(txpID, graphXML));
+			}
 			graph.appendChild(n);
 		}
 
@@ -178,7 +186,7 @@ public class GraphMLBuilder {
 
 	private static List<? extends Element> createEdgeElements(
 			Set<IVariantGraphEdge> incomingEdges,
-			Map<IVariantGraphVertex, Integer> vertexToNumber,
+			DualHashBidiMap vertexToID,
 			Map<String, Integer> witnessToNumber, IVariantGraph variantGraph,
 			Document graphXML, Integer nextEdgeNumber) {
 
@@ -190,7 +198,7 @@ public class GraphMLBuilder {
 			IVariantGraphVertex target = variantGraph.getEdgeTarget(edge);
 
 			Element edgeElement = createEdgeElement(source, target,
-					vertexToNumber, graphXML, counter++);
+					vertexToID, graphXML, counter++);
 
 			// append information about witnesses to the edge
 			for (IWitness w : edge.getWitnesses()) {
@@ -214,26 +222,22 @@ public class GraphMLBuilder {
 
 	private static Element createEdgeElement(IVariantGraphVertex source,
 			IVariantGraphVertex target,
-			Map<IVariantGraphVertex, Integer> vertexToNumber, Document doc,
+			DualHashBidiMap vertexToID, Document doc,
 			Integer edgeNumber) {
 
 		Element edge = doc.createElement(EDGE_TAG);
 		edge.setAttribute(ID_ATT, edgeNumber.toString());
-		edge.setAttribute(SOURCE_ATT,
-				String.valueOf(vertexToNumber.get(source)));
-		edge.setAttribute(TARGET_ATT,
-				String.valueOf(vertexToNumber.get(target)));
+		edge.setAttribute(SOURCE_ATT, (String) vertexToID.get(source));
+		edge.setAttribute(TARGET_ATT, (String) vertexToID.get(target));
 
 		return edge;
 	}
 
-	private static Element createNodeElement(int vertexNumber, String token,
-			Document doc) {
+	private static Element createNodeElement(String vertexID, String token, Document doc) {
 		Element node = doc.createElement(NODE_TAG);
-		node.setAttribute(ID_ATT, String.valueOf(vertexNumber));
+		node.setAttribute(ID_ATT, vertexID);
 		node.appendChild(Keys.NODE_TOKEN.getDataElement(token, doc));
-		node.appendChild(Keys.NODE_NUMBER.getDataElement(
-				String.valueOf(vertexNumber), doc));
+		node.appendChild(Keys.NODE_NUMBER.getDataElement(vertexID, doc));
 		return node;
 	}
 

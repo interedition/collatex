@@ -24,11 +24,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
@@ -162,4 +164,28 @@ public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVa
       }
     };
   }
+  
+  // The variant graph is acyclic by default.  Sometimes we want to know which
+  // nodes on that graph are really the same (transposed) node as appears elsewhere.
+  // This method returns a map containing all transposed nodes and, for each, the
+  // node it is a transposed duplicate of.
+  @Override
+  public Map<IVariantGraphVertex, IVariantGraphVertex> getTransposedTokens() {
+	  Map<INormalizedToken, IVariantGraphVertex> keyToken2Vertex = Maps.newHashMap();
+	  Map<IVariantGraphVertex, IVariantGraphVertex> transposedNodes = Maps.newHashMap();
+
+	  for (IVariantGraphVertex avgVertex : vertexSet()) {
+		  if( avgVertex != getStartVertex() && avgVertex != getEndVertex()) {
+			  INormalizedToken vertexKey = avgVertex.getVertexKey();
+			  if (keyToken2Vertex.containsKey(vertexKey)) {
+				  IVariantGraphVertex origVertex = keyToken2Vertex.get(vertexKey);
+				  transposedNodes.put(avgVertex, origVertex);
+			  } else {
+				  keyToken2Vertex.put(vertexKey, avgVertex);
+			  }
+		  }
+	  }
+	  return transposedNodes;
+  }
+
 }
