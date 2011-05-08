@@ -46,7 +46,7 @@ public class GraphMLBuilder {
 	private static final String EDGE_TAG = "edge";
 	private static final String EDGEDEFAULT_DEFAULT_VALUE = "directed";
 	private static final String EDGEDEFAULT_ATT = "edgedefault";
-	private static final String GRAPH_ID = "0";
+	private static final String GRAPH_ID = "g0";
 	private static final String GRAPH_TAG = "graph";
 	private static final String GRAPHML_NS = "http://graphml.graphdrawing.org/xmlns";
 	private static final String XMLNS_ATT = "xmlns";
@@ -55,6 +55,15 @@ public class GraphMLBuilder {
 	private static final String XSISL_ATT = "xsi:schemaLocation";
 	private static final String GRAPHML_XMLNSXSI = "http://www.w3.org/2001/XMLSchema-instance";
 	private static final String GRAPHML_XSISL = "http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd";
+	private static final String PARSENODES_ATT = "parse.nodes";
+	private static final String PARSEEDGES_ATT = "parse.edges";
+	private static final String PARSENODEIDS_ATT = "parse.nodeids";
+	private static final String PARSENODEIDS_DEFAULT_VALUE = "canonical";
+	private static final String PARSEEDGEIDS_ATT = "parse.edgeids";
+	private static final String PARSEEDGEIDS_DEFAULT_VALUE = "canonical";
+	private static final String PARSEORDER_ATT = "parse.order";
+	private static final String PARSEORDER_DEFAULT_VALUE = "nodesfirst";
+
 	private static final String ATTR_TYPE_ATT = "attr.type";
 	private static final String ATTR_NAME_ATT = "attr.name";
 	private static final String FOR_ATT = "for";
@@ -101,7 +110,7 @@ public class GraphMLBuilder {
 		// add root element
 		Element rootElement = createRootElement(graphXML);
 		graphXML.appendChild(rootElement);
-
+		
 		// add key elements for node
 		rootElement.appendChild(Keys.NODE_NUMBER.getKeyElement(graphXML));
 		rootElement.appendChild(Keys.NODE_TOKEN.getKeyElement(graphXML));
@@ -121,7 +130,6 @@ public class GraphMLBuilder {
 		// add graph element
 		Element graph = graphXML.createElement(GRAPH_TAG);
 		graph.setAttribute(ID_ATT, GRAPH_ID);
-		graph.setAttribute(EDGEDEFAULT_ATT, EDGEDEFAULT_DEFAULT_VALUE);
 
 		rootElement.appendChild(graph);
 
@@ -157,6 +165,7 @@ public class GraphMLBuilder {
 				String txpID = vertexToId.get(transpositions.get(vertex));
 				n.appendChild(Keys.NODE_IDENTICAL.getDataElement(txpID, graphXML));
 			}
+			// Now append the element to the XML graph.
 			graph.appendChild(n);
 		}
 
@@ -164,6 +173,10 @@ public class GraphMLBuilder {
 		for (Element e : edges) {
 			graph.appendChild(e);
 		}
+		
+		// add parsing helper information to the graph root element
+		setParseAttributes(graph, vertexNumber, edges.size());
+		
 	}
 
 	private static Element createRootElement(Document graphXML) {
@@ -174,6 +187,17 @@ public class GraphMLBuilder {
 		return rootElement;
 	}
 
+	private static void setParseAttributes(Element graph, Integer vertices, 
+			Integer edges) {
+		graph.setAttribute(EDGEDEFAULT_ATT, EDGEDEFAULT_DEFAULT_VALUE);
+		graph.setAttribute(PARSENODES_ATT, vertices.toString());
+		graph.setAttribute(PARSEEDGES_ATT, edges.toString());
+		graph.setAttribute(PARSENODEIDS_ATT, PARSENODEIDS_DEFAULT_VALUE);
+		graph.setAttribute(PARSEEDGEIDS_ATT, PARSEEDGEIDS_DEFAULT_VALUE);
+		graph.setAttribute(PARSEORDER_ATT, PARSEORDER_DEFAULT_VALUE);
+
+	}
+	
 	private static Element createKeyWitnessElementForEdge(IWitness w,
 			Document doc, String id) {
 		Element keyElement = doc.createElement(KEY_TAG);
@@ -226,7 +250,7 @@ public class GraphMLBuilder {
 			Integer edgeNumber) {
 
 		Element edge = doc.createElement(EDGE_TAG);
-		edge.setAttribute(ID_ATT, edgeNumber.toString());
+		edge.setAttribute(ID_ATT, 'e' + edgeNumber.toString());
 		edge.setAttribute(SOURCE_ATT, vertexToID.get(source));
 		edge.setAttribute(TARGET_ATT, vertexToID.get(target));
 
