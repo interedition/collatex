@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import com.google.common.collect.HashBiMap;
 
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
@@ -130,7 +130,7 @@ public class GraphMLBuilder {
 		List<Element> edges = new ArrayList<Element>();
 
 		// TODO is it possible to improve the performance by not using this map?
-		DualHashBidiMap vertexToId = new DualHashBidiMap();
+		HashBiMap<IVariantGraphVertex, String> vertexToId = HashBiMap.create();
 		Map<IVariantGraphVertex, IVariantGraphVertex> transpositions = variantGraph.getTransposedTokens();
 		
 		Iterator<IVariantGraphVertex> vertexIterator = variantGraph.iterator();
@@ -152,9 +152,9 @@ public class GraphMLBuilder {
 		for (Element n : nodes) {
 			// See if we need to add an 'identical' tag for a transposition.
 			// This is best done here, after all the nodes have been created.
-			IVariantGraphVertex vertex = (IVariantGraphVertex) vertexToId.getKey(n.getAttribute(ID_ATT));
+			IVariantGraphVertex vertex = vertexToId.inverse().get(n.getAttribute(ID_ATT));
 			if(transpositions.containsKey(vertex)) {
-				String txpID = (String) vertexToId.get(transpositions.get(vertex));
+				String txpID = vertexToId.get(transpositions.get(vertex));
 				n.appendChild(Keys.NODE_IDENTICAL.getDataElement(txpID, graphXML));
 			}
 			graph.appendChild(n);
@@ -186,7 +186,7 @@ public class GraphMLBuilder {
 
 	private static List<? extends Element> createEdgeElements(
 			Set<IVariantGraphEdge> incomingEdges,
-			DualHashBidiMap vertexToID,
+			HashBiMap<IVariantGraphVertex, String> vertexToID,
 			Map<String, Integer> witnessToNumber, IVariantGraph variantGraph,
 			Document graphXML, Integer nextEdgeNumber) {
 
@@ -222,13 +222,13 @@ public class GraphMLBuilder {
 
 	private static Element createEdgeElement(IVariantGraphVertex source,
 			IVariantGraphVertex target,
-			DualHashBidiMap vertexToID, Document doc,
+			HashBiMap<IVariantGraphVertex, String> vertexToID, Document doc,
 			Integer edgeNumber) {
 
 		Element edge = doc.createElement(EDGE_TAG);
 		edge.setAttribute(ID_ATT, edgeNumber.toString());
-		edge.setAttribute(SOURCE_ATT, (String) vertexToID.get(source));
-		edge.setAttribute(TARGET_ATT, (String) vertexToID.get(target));
+		edge.setAttribute(SOURCE_ATT, vertexToID.get(source));
+		edge.setAttribute(TARGET_ATT, vertexToID.get(target));
 
 		return edge;
 	}
