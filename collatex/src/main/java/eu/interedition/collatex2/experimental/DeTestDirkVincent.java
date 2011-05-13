@@ -15,6 +15,8 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
+import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
+import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -299,8 +301,10 @@ public class DeTestDirkVincent {
     assertTrue(link.containsKey(b.getTokens().get(11))); // his
   }
 
+  // punctuation should be treated as separate tokens for this test to succeed
+  // transpositions should be handled correctly for this test to succeed
   @Test
-  public void testSentence42() {
+  public void testSentence42Transposition() {
     IWitness a = factory.createWitness("06-1", "The same clock as when for example Magee once died.");
     IWitness b = factory.createWitness("06-2", "The same as when for example Magee once died.");
     IVariantGraph graph = new VariantGraph2();
@@ -313,6 +317,17 @@ public class DeTestDirkVincent {
     IWitness d = factory.createWitness("08-02", "The same as when among others Darly once died & left him.");
     aligner.addWitness(d);
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
+    IWitness e = factory.createWitness("xxx", "The same as when Darly among others once died and left him.");
+    IAnalysis analysis = aligner.analyze(e);
+    List<ISequence> sequences = analysis.getSequences();
+    assertEquals("The same as when", sequences.get(0).getWitnessPhrase().getContent());
+    assertEquals("Darly", sequences.get(1).getWitnessPhrase().getContent());
+    assertEquals("among others", sequences.get(2).getWitnessPhrase().getContent());
+    assertEquals("once died left him .", sequences.get(3).getWitnessPhrase().getContent());
   }
+
+  
+  // aligner.align(e);
+  // aligner.addWitness(e);
 
 }

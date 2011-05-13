@@ -21,4 +21,9 @@ public class AlignedToken implements IAlignedToken {
   public INormalizedToken getWitnessToken() {
     return tokenA;
   }
+  
+  @Override
+  public String toString() {
+    return tokenA.getContent();
+  }
 }

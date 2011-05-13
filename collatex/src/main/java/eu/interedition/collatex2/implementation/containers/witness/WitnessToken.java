@@ -59,7 +59,7 @@ public class WitnessToken extends Token implements INormalizedToken {
 
   @Override
   public String toString() {
-    return getNormalized() + ": "+position;
+    return ">"+ getNormalized()+"<" + ": "+position;
   }
   
   @Override

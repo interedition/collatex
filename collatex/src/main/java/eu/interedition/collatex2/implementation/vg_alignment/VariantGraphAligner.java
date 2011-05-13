@@ -231,5 +231,10 @@ public class VariantGraphAligner implements IAligner {
     graph.addEdge(begin, end, edge);
   }
 
+  @Override
+  public IAnalysis analyze(IWitness witness) {
+    throw new RuntimeException("This functionality is not supported by this implementation!");
+  }
+
 
 }
