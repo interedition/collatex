@@ -64,8 +64,7 @@ public class Analysis implements IAnalysis {
     // prepare map
     Map<INormalizedToken, ISequence> tokenToSequenceMap = Maps.newLinkedHashMap();
     for (ISequence sequence : sequences) {
-      //NOTE:  THIS IS WEIRD! should be sequence.getBasePhrase! 
-      INormalizedToken firstToken = sequence.getWitnessPhrase().getFirstToken();
+      INormalizedToken firstToken = sequence.getBasePhrase().getFirstToken();
       tokenToSequenceMap.put(firstToken, sequence);
     }
     // sort sequences

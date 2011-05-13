@@ -17,6 +17,7 @@ import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
+import eu.interedition.collatex2.implementation.vg_analysis.ITransposition2;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -324,6 +325,9 @@ public class DeTestDirkVincent {
     assertEquals("Darly", sequences.get(1).getWitnessPhrase().getContent());
     assertEquals("among others", sequences.get(2).getWitnessPhrase().getContent());
     assertEquals("once died left him .", sequences.get(3).getWitnessPhrase().getContent());
+    List<ITransposition2> transpositions = analysis.getTranspositions();
+    assertEquals("darly", transpositions.get(0).getSequenceB().getNormalized());
+    assertEquals("among others", transpositions.get(1).getSequenceB().getNormalized());
   }
 
   

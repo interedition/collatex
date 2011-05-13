@@ -62,8 +62,8 @@ public class SequenceDetection2 {
         tokensA = Lists.newArrayList();
         tokensB = Lists.newArrayList();
       }
-      INormalizedToken tokenA = tokenMatch.getTokenA();
-      INormalizedToken tokenB = tokenMatch.getTokenB();
+      INormalizedToken tokenA = tokenMatch.getBaseToken();
+      INormalizedToken tokenB = tokenMatch.getWitnessToken();
       tokensA.add(tokenA);
       tokensB.add(tokenB);
     }

@@ -137,12 +137,11 @@ public class VariantGraphAligner implements IAligner {
     addWitnessToGraph(witness, witnessTokenToMatch, witnessTokenToTranspositionMatch);
   }
 
-  //FIXME: why does getWitnessPhrase work and not getBasePhrase?
   // Note: this only calculates the distance between the vertices in the graph.
   // Note: it does not take into account a possible distance in the tokens in the witness!
   private boolean transpositionsAreNear(ITransposition2 top, ITransposition2 mirrored) {
-    INormalizedToken lastToken = top.getSequenceA().getWitnessPhrase().getLastToken();
-    INormalizedToken firstToken = mirrored.getSequenceA().getWitnessPhrase().getFirstToken();
+    INormalizedToken lastToken = top.getSequenceA().getBasePhrase().getLastToken();
+    INormalizedToken firstToken = mirrored.getSequenceA().getBasePhrase().getFirstToken();
     //    System.out.println(lastToken.getClass());
     //    System.out.println(firstToken.getClass());
     boolean isNear = graph.isNear(lastToken, firstToken);
@@ -150,7 +149,7 @@ public class VariantGraphAligner implements IAligner {
   }
 
   private void removeSequenceFromMatches(Map<INormalizedToken, ITokenMatch> witnessTokenToMatch, Map<INormalizedToken, ITokenMatch> witnessTokenToTranspositionMatch, ISequence sequenceA) {
-    for (INormalizedToken witnessToken : sequenceA.getBasePhrase().getTokens()) {
+    for (INormalizedToken witnessToken : sequenceA.getWitnessPhrase().getTokens()) {
       if (!witnessTokenToMatch.containsKey(witnessToken)) {
         throw new RuntimeException("Could not remove match from map!");
       }  
