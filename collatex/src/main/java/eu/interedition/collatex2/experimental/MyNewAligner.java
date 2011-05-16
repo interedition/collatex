@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.experimental;
 
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -10,7 +9,6 @@ import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVer
 import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
-import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -23,13 +21,14 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class MyNewAligner implements IAligner {
 
   private final IVariantGraph graph;
+  private Analysis analysis;
 
   public MyNewAligner(IVariantGraph graph) {
     this.graph = graph;
   }
 
   public void addWitness(IWitness witness) {
-    Map<INormalizedToken, INormalizedToken> linkedTokens = linkWitnessTokensToTokensInGraph(witness);
+    Map<INormalizedToken, INormalizedToken> linkedTokens = alignWitnessTokensToTokensInGraph(witness);
     
     IVariantGraphVertex previous =  graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
@@ -47,17 +46,18 @@ public class MyNewAligner implements IAligner {
     edge.addWitness(witness);
   }
 
-  private Map<INormalizedToken, INormalizedToken> linkWitnessTokensToTokensInGraph(IWitness witness) {
-    Map<INormalizedToken, INormalizedToken> linkedTokens;
+  private Map<INormalizedToken, INormalizedToken> alignWitnessTokensToTokensInGraph(IWitness witness) {
     if (graph.isEmpty()) {
-      linkedTokens = Maps.newLinkedHashMap();
-    } else {
-      SuperbaseCreator creator = new SuperbaseCreator();
-      IWitness superbase = creator.create(graph);
-      MyNewLinker linker = new MyNewLinker();
-      linkedTokens = linker.link(superbase, witness);
-    }
-    return linkedTokens;
+      return Maps.newLinkedHashMap();
+    } 
+    SuperbaseCreator creator = new SuperbaseCreator();
+    IWitness superbase = creator.create(graph);
+    TheRealAligner aligner = new TheRealAligner();
+    Map<INormalizedToken, INormalizedToken> alignedTokens;
+    alignedTokens = aligner.align(superbase, witness);
+    //NOTE: This is not very nice!
+    this.analysis = aligner.getAnalysis();
+    return alignedTokens;
   }
 
   //write
@@ -89,22 +89,13 @@ public class MyNewAligner implements IAligner {
     return this;
   }
 
-  public IAnalysis analyze(IWitness witness) {
-    Map<INormalizedToken, INormalizedToken> linkedTokens = linkWitnessTokensToTokensInGraph(witness);
-    //TODO: note the superbase is created twice!
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(graph);
-    // maak hier nu de match sequences
-    SequenceDetection3 detection = new SequenceDetection3();
-    List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
-    //System.out.println(sequences);
-    // daarna transposition detection
-    return new Analysis(sequences, graph);
-    // dan hebben we genoeg info voor de alignment
-  }
 
   @Override
   public IAlignment2 align(IWitness witness) {
     throw new RuntimeException("NOT YET IMPLEMENTED!");
+  }
+
+  public IAnalysis getAnalysis() {
+    return analysis;
   }
 }

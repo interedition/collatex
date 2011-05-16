@@ -21,7 +21,6 @@
 package eu.interedition.collatex2.interfaces;
 
 import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
-import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 
 
 public interface IAligner {
@@ -31,9 +30,6 @@ public interface IAligner {
   //maybe move this method to the variant graph builder?
   IAligner add(IWitness... witnesses);
 
-  //Move this method to somewhere else!
-  IAnalysis analyze(IWitness witness);
-  
   IAlignment2 align(IWitness witness);
   
 }

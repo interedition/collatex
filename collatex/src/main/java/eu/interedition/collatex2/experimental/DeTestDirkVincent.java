@@ -319,7 +319,8 @@ public class DeTestDirkVincent {
     aligner.addWitness(d);
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
     IWitness e = factory.createWitness("xxx", "The same as when Darly among others once died and left him.");
-    IAnalysis analysis = aligner.analyze(e);
+    aligner.addWitness(e);
+    IAnalysis analysis = aligner.getAnalysis();
     List<ISequence> sequences = analysis.getSequences();
     assertEquals("The same as when", sequences.get(0).getWitnessPhrase().getContent());
     assertEquals("Darly", sequences.get(1).getWitnessPhrase().getContent());
