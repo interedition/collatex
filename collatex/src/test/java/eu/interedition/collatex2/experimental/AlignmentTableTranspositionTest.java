@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.experimental;
 
 import static org.junit.Assert.assertEquals;
 import junit.framework.Assert;
@@ -39,10 +39,26 @@ public class AlignmentTableTranspositionTest {
 
   @BeforeClass
   public static void setup() {
-    engine = new CollateXEngine();
+    engine = new MyNewCollateXEngine();
   }
 
-//  //Note: this is more of an alignment test.. no table is involved here! 
+  @Test
+  public void testDoubleTransposition2() {
+    IWitness a = engine.createWitness("A", "a b");
+    IWitness b = engine.createWitness("B", "b a");
+    IAlignmentTable alignmentTable = engine.align(a, b);
+    assertEquals("A: | |a|b|", alignmentTable.getRow(a).toString());
+    assertEquals("B: |b|a| |", alignmentTable.getRow(b).toString());
+  }
+
+
+  
+  
+  
+  
+  
+  
+  //  //Note: this is more of an alignment test.. no table is involved here! 
 //  @Test
 //  public void testNoTransposition() {
 //    final IWitness a = engine.createWitness("A", "no transposition");
@@ -81,18 +97,6 @@ public class AlignmentTableTranspositionTest {
 //    // 1: a -> b c
 //    // 2: b c -> a
 //  }
-
-  //TODO: rewrite test to work with the new API
-  @Ignore
-  @Test
-  public void testDoubleTransposition2() {
-    final IWitness a = engine.createWitness("A", "a b");
-    final IWitness b = engine.createWitness("B", "b a");
-    final IAlignmentTable alignmentTable = engine.align(a, b);
-    final String expected = "A:  |a|b\n" + "B: b|a| \n";
-    final String actual = alignmentTable.toString();
-    Assert.assertEquals(expected, actual);
-  }
 
 
   @Ignore
