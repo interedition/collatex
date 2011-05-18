@@ -43,6 +43,15 @@ public class AlignmentTableTranspositionTest {
   }
 
   @Test
+  public void testTransposition() {
+    IWitness a = engine.createWitness("A", "the cat is black");
+    IWitness b = engine.createWitness("B", "black is the cat");
+    IAlignmentTable table = engine.align(a, b);
+    assertEquals("A: |the|cat|is|black| |", table.getRow(a).toString());
+    assertEquals("B: |black| |is|the|cat|", table.getRow(b).toString());
+  }
+
+  @Test
   public void testDoubleTransposition2() {
     IWitness a = engine.createWitness("A", "a b");
     IWitness b = engine.createWitness("B", "b a");
@@ -51,6 +60,26 @@ public class AlignmentTableTranspositionTest {
     assertEquals("B: |b|a| |", alignmentTable.getRow(b).toString());
   }
 
+  @Test
+  public void testDoubleTransposition3() {
+    IWitness a = engine.createWitness("A", "a b c");
+    IWitness b = engine.createWitness("B", "b a c");
+    IAlignmentTable alignmentTable = engine.align(a, b);
+    assertEquals("A: | |a|b|c|", alignmentTable.getRow(a).toString()); 
+    assertEquals("B: |b|a| |c|", alignmentTable.getRow(b).toString());
+  }
+
+  @Ignore
+  @Test
+  public void testAdditionInCombinationWithTransposition() {
+    IWitness a = engine.createWitness("A", "the cat is very happy");
+    IWitness b = engine.createWitness("B", "very happy is the cat");
+    IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
+    IAlignmentTable table = engine.align(a, b, c);
+    assertEquals("A: |the|cat| | |is|very|happy|", table.getRow(a).toString());
+    assertEquals("B: |very|happy| | |is|the|cat|", table.getRow(b).toString()); // ???
+    assertEquals("C: very|delitied|and|happy|is|the|cat\n", table.getRow(c).toString());
+  }
 
   
   
@@ -99,42 +128,7 @@ public class AlignmentTableTranspositionTest {
 //  }
 
 
-  @Ignore
-  @Test
-  public void testDoubleTransposition3() {
-    final IWitness a = engine.createWitness("A", "a b c");
-    final IWitness b = engine.createWitness("B", "b a c");
-    final IAlignmentTable alignmentTable = engine.align(a, b);
-    final String expected = "A:  |a|b|c\n" + "B: b|a| |c\n";
-    final String actual = alignmentTable.toString();
-    Assert.assertEquals(expected, actual);
-  }
 
-  @Ignore
-  @Test
-  public void testTransposition() {
-    final IWitness a = engine.createWitness("A", "the cat is black");
-    final IWitness b = engine.createWitness("B", "black is the cat");
-    final IAlignmentTable table = engine.align(a, b);
-    String expected;
-    expected = "A: the|cat|is|black| \n";
-    expected += "B: black| |is|the|cat\n";
-    assertEquals(expected, table.toString());
-  }
-
-  @Ignore
-  @Test
-  public void testAdditionInCombinationWithTransposition() {
-    final IWitness a = engine.createWitness("A", "the cat is very happy");
-    final IWitness b = engine.createWitness("B", "very happy is the cat");
-    final IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
-    final IAlignmentTable table = engine.align(a, b, c);
-    String expected;
-    expected = "A: the| | |cat|is|very|happy\n";
-    expected += "B: very| | |happy|is|the|cat\n";
-    expected += "C: very|delitied|and|happy|is|the|cat\n";
-    assertEquals(expected, table.toString());
-  }
 
   @Ignore
   @Test
