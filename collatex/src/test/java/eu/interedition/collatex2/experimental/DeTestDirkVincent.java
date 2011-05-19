@@ -56,29 +56,6 @@ public class DeTestDirkVincent {
   }
   
   @Test
-  public void testDirkVincent2() {
-    IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
-    IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    MyNewMatcher matcher = new MyNewMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
-    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
-    IMatchResult result = analyzer.analyze(a, b);
-    MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
-    IWitnessIndex index = indexer.index(b, matches, result);
-    List<ITokenSequence> sequences = index.getTokenSequences();
-    INormalizedToken soft = b.getTokens().get(1);
-    INormalizedToken light = b.getTokens().get(3);
-    ITokenSequence expectedSequence = new TokenSequence(soft, light);
-    ITokenSequence firstSequence = sequences.get(0);
-    assertEquals(expectedSequence, firstSequence);
-    INormalizedToken any = b.getTokens().get(5);
-    INormalizedToken light2 = b.getTokens().get(6);
-    ITokenSequence secondSequence = sequences.get(1);
-    expectedSequence = new TokenSequence(any, light2);
-    assertEquals(expectedSequence, secondSequence);
-  }
-
-  @Test
   public void testVincentDirk3() {
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
