@@ -69,6 +69,8 @@ public class AlignmentTableTranspositionTest {
     assertEquals("B: |b|a| |c|", alignmentTable.getRow(b).toString());
   }
 
+  //TODO: The Linker does not work good enough, it can not handle
+  //TODO: the "very happy" repetition yet
   @Ignore
   @Test
   public void testAdditionInCombinationWithTransposition() {

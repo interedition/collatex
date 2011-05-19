@@ -96,24 +96,6 @@ public class DeTestDirkVincent {
     assertEquals("could", tokenIterator.next().getContent());
   }
   
-  
-  @Test
-  public void testDirkVincent4() {
-    IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
-    IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    MyNewLinker linker = new MyNewLinker();
-    Map<INormalizedToken, INormalizedToken> tokens = linker.link(a, b);
-    INormalizedToken itsA = a.getTokens().get(0);
-    INormalizedToken itsB = b.getTokens().get(0);
-    assertEquals(itsA, tokens.get(itsB));
-    INormalizedToken lightA = a.getTokens().get(2);
-    INormalizedToken lightB = b.getTokens().get(3);
-    assertEquals(lightA, tokens.get(lightB));
-    INormalizedToken light2A = a.getTokens().get(11);
-    INormalizedToken light2B = b.getTokens().get(6);
-    assertEquals(light2A, tokens.get(light2B));
-  }
-  
   @Test
   public void testDirkVincent5() {
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
