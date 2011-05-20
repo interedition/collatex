@@ -34,6 +34,7 @@
 <body>
 	<div id="mainmenu">
 		<a href="${ctx}/examples/usecases" title="Use Cases">Use cases</a> |
+		<a href="${ctx}/examples/beckett" title="Beckett">Beckett</a> |
 		<a href="${ctx}/examples/darwin" title="Darwin">Darwin</a> |
 		<a href="${ctx}/api/collate" title="REST service">REST service</a>
 	</div>
