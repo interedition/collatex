@@ -1,13 +1,24 @@
 package eu.interedition.collatex2.experimental;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class TokenSequence implements ITokenSequence {
 
   private final INormalizedToken[] tokens;
-
-  public TokenSequence(INormalizedToken... tokens) {
+  private final boolean gotoleft;
+  
+  public TokenSequence(boolean gotoleft, INormalizedToken... tokens) {
     this.tokens = tokens;
+    this.gotoleft = gotoleft;
+  }
+
+  public TokenSequence(List<INormalizedToken> tokens2, boolean gotoleft) {
+    this.tokens = tokens2.toArray(new INormalizedToken[tokens2.size()]);
+    this.gotoleft = gotoleft;
   }
 
   //NOTE: sloppy implemented!
@@ -52,5 +63,27 @@ public class TokenSequence implements ITokenSequence {
   @Override
   public INormalizedToken getLastToken() {
     return tokens[tokens.length-1];
+  }
+  
+  public List<INormalizedToken> getTokens() {
+    return Lists.newArrayList(tokens);
+  }
+  
+  //Note: just for testing purposes
+  public String getNormalized() {
+    //hmm: I have written this code before!
+    String separator = "";
+    StringBuffer buffer = new StringBuffer();
+    for (INormalizedToken token : getTokens()) {
+      buffer.append(separator);
+      buffer.append(token.getNormalized());
+      separator = " ";
+    }
+    return buffer.toString();
+  }
+  
+  @Override
+  public boolean isLeftAligned() {
+    return gotoleft;
   }
 }
