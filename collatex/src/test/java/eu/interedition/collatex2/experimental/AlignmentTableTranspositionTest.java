@@ -96,6 +96,32 @@ public class AlignmentTableTranspositionTest {
     assertEquals("B: |A|white|cat|in|a|black|basket|", table.getRow(w2).toString());
   }
 
+  @Test
+  public void transposeInOnePair() {
+    CollateXEngine engine = new CollateXEngine();
+    IWitness a = engine.createWitness("A", "y");
+    IWitness b = engine.createWitness("B", "x y z");
+    IWitness c = engine.createWitness("C", "z y");
+    final IAlignmentTable table = engine.align(a, b, c);
+    assertEquals("A: | |y| |", table.getRow(a).toString());
+    assertEquals("B: |x|y|z|", table.getRow(b).toString());
+    assertEquals("C: |z|y| |", table.getRow(c).toString());
+  }
+  
+  @Test
+  public void transposeInTwoPairs() {
+    CollateXEngine engine = new CollateXEngine();
+    IWitness a = engine.createWitness("A", "y x");
+    IWitness b = engine.createWitness("B", "x y z");
+    IWitness c = engine.createWitness("C", "z y");
+    final IAlignmentTable table = engine.align(a, b, c);
+    assertEquals("A: | |y|x|", table.getRow(a).toString());
+    assertEquals("B: |x|y|z|", table.getRow(b).toString());
+    assertEquals("C: |z|y| |", table.getRow(c).toString());
+  }
+
+
+
 ////Note: this is more of an alignment test.. no table is involved here! 
 //@Test
 //public void testNoTransposition() {
