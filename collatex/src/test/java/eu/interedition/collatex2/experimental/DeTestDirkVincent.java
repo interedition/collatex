@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -205,30 +204,6 @@ public class DeTestDirkVincent {
   }
     
     
-  @Test
-  public void testLinkingWithStartToken() {
-    IWitness a = factory.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
-    IWitness b = factory.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
-    IVariantGraph graph = new VariantGraph2();
-    MyNewAligner aligner = new MyNewAligner(graph);
-    aligner.add(a);
-    SuperbaseCreator superbaseCreator = new SuperbaseCreator();
-    IWitness superbase = superbaseCreator.create(graph);
-    MyNewLinker linker = new MyNewLinker();
-    Map<INormalizedToken, INormalizedToken> link = linker.link(superbase, b);
-    assertTrue(!link.containsKey(b.getTokens().get(0)));
-    assertTrue(!link.containsKey(b.getTokens().get(1)));
-    assertTrue(!link.containsKey(b.getTokens().get(2)));
-    assertTrue(!link.containsKey(b.getTokens().get(3)));
-    assertTrue(!link.containsKey(b.getTokens().get(4)));
-    assertTrue(!link.containsKey(b.getTokens().get(5)));
-    assertTrue(!link.containsKey(b.getTokens().get(6)));
-    assertTrue(!link.containsKey(b.getTokens().get(7)));
-    assertTrue(link.containsKey(b.getTokens().get(8))); // again 
-    assertTrue(!link.containsKey(b.getTokens().get(9))); 
-    assertTrue(link.containsKey(b.getTokens().get(10))); // to
-    assertTrue(link.containsKey(b.getTokens().get(11))); // his
-  }
 
   // punctuation should be treated as separate tokens for this test to succeed
   // transpositions should be handled correctly for this test to succeed

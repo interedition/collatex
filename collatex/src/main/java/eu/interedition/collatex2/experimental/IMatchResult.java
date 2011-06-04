@@ -9,5 +9,7 @@ public interface IMatchResult {
   Set<INormalizedToken> getUnmatchedTokens();
 
   Set<INormalizedToken> getUnsureTokens();
+  
+  Set<INormalizedToken> getSureTokens();
 
 }
