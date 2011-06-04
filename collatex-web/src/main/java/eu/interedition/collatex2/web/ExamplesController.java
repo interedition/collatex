@@ -32,6 +32,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -55,14 +56,15 @@ public class ExamplesController implements InitializingBean {
 
   private List<IWitness[]> usecases;
   private List<IWitness[]> darwin;
+  private List<IWitness[]> beckett;
   
   @RequestMapping("usecases")
-  public ModelMap collateUseCases() {
+  public ModelAndView collateUseCases() {
     List<IAlignmentTable> alignments = Lists.newArrayListWithCapacity(usecases.size());
     for (IWitness[] example : usecases) {
       alignments.add(engine.align(example));
     }
-    return new ModelMap("examples", alignments);
+    return new ModelAndView("examples/usecases", "examples", alignments);
   }
 
   @RequestMapping("darwin")
@@ -75,11 +77,21 @@ public class ExamplesController implements InitializingBean {
    }
     return new ModelMap("paragraphs", alignments);
   }
-  
+
+  @RequestMapping("beckett")
+  public ModelAndView collateBeckettExamples() {
+    List<IAlignmentTable> alignments = Lists.newArrayListWithCapacity(beckett.size());
+    for (IWitness[] example : beckett) {
+      alignments.add(engine.align(example));
+    }
+    return new ModelAndView("examples/usecases", "examples", alignments);
+  }
+
   @Override
   public void afterPropertiesSet() throws Exception {
     usecases = parseWitnesses(applicationContext.getResource("/examples.xml"));
     darwin = parseWitnesses(applicationContext.getResource("/darwin.xml"));
+    beckett = parseWitnesses(applicationContext.getResource("/beckett.xml"));
   }
   
   private List<IWitness[]> parseWitnesses(Resource resource) throws Exception {

@@ -11,3 +11,6 @@ lib
 target
 clips.txt
 META-INF
+*.iml
+*.ipr
+*.iws
