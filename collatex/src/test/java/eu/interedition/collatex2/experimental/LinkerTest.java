@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -75,21 +74,27 @@ public class LinkerTest {
     assertEquals(5, unlinkedTokens.size());
   }
 
-  //TODO: Linking does not work good enough, it can not yet handle
-  //TODO: the repetition of "the cat" and "very happy"
-  @Ignore
   @Test
   public void testLinkingRepetitionCausedByTransposition() {
-    // IWitness a = "the cat is very happy";
-    // IWitness b = "very happy is the cat";
-    IWitness superbase = engine.createWitness("superbase", "the cat very happy is very happy the cat");
+    IWitness a = engine.createWitness("a","the cat is very happy");
+    IWitness b = engine.createWitness("b", "very happy is the cat");
+    IVariantGraph graph = engine.graph(a, b);
+    IWitness superbase = new SuperbaseCreator().create(graph);
     IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
     MyNewLinker linker = new MyNewLinker();
     Map<INormalizedToken, INormalizedToken> tokens = linker.link(superbase, c);
-    //System.out.println(tokens);
-    INormalizedToken verySB = superbase.getTokens().get(2);
+    INormalizedToken verySB = superbase.getTokens().get(3);
     INormalizedToken veryC = c.getTokens().get(0);
+    INormalizedToken happySB = superbase.getTokens().get(4);
+    INormalizedToken happyC = c.getTokens().get(3);
+    INormalizedToken theSB = superbase.getTokens().get(8);
+    INormalizedToken theC = c.getTokens().get(5);
+    INormalizedToken catSB = superbase.getTokens().get(9);
+    INormalizedToken catC = c.getTokens().get(6);
     assertEquals(verySB, tokens.get(veryC));
+    assertEquals(happySB, tokens.get(happyC));
+    assertEquals(theSB, tokens.get(theC));
+    assertEquals(catSB, tokens.get(catC));
   }
 
 }

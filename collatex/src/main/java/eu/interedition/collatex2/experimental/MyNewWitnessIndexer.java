@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -91,7 +90,7 @@ public class MyNewWitnessIndexer {
       }
     }
     if (!found) {
-      tokens.add(new NullToken());
+      tokens.add(new EndToken(path.size()));
     }
     return tokens;
   }

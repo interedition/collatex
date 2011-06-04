@@ -14,9 +14,12 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class MyNewLinker {
 
   public Map<INormalizedToken, INormalizedToken> link(IWitness a, IWitness b) {
+    // result map
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
+    // do the matching
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+    // put sure matches in the result map
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
     IMatchResult matchResult = analyzer.analyze(a, b);
     for (INormalizedToken token: b.getTokens()) {
@@ -24,19 +27,28 @@ public class MyNewLinker {
         alignedTokens.put(token, matches.get(token).get(0));
       }
     }
-    matches.put(new StartToken(), a.getTokens().get(0));
+    // add start and end tokens as matches
+    final INormalizedToken startNullToken = a.getTokens().get(0);
+    matches.put(new StartToken(), startNullToken);
+    final INormalizedToken endNullToken = a.getTokens().get(a.size()-1);
+    matches.put(new EndToken(b.size()), endNullToken);
+    // Calculate 'afgeleide': Ignore non matches from the base
     BaseAfgeleider afgeleider = new BaseAfgeleider();
     List<INormalizedToken> afgeleide = afgeleider.calculateAfgeleide(a, matches);
-    // System.out.println("Afgeleide: "+afgeleide);
+    // Calculate witness sequences using indexer
     MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
     IWitnessIndex index = indexer.index(b, matchResult);
+    // try and find matches in the base for each sequence in the witness 
     for (ITokenSequence sequence : index.getTokenSequences()) {
-      //TODO: remove this constraint!
-      if (!sequence.expandsToTheRight()) {
-        continue;
+      // System.out.println("Trying to find token sequence: "+sequence.getNormalized());
+      List<INormalizedToken> matchedBaseTokens;
+      if (sequence.expandsToTheRight()) {
+        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheRight(sequence, matches, afgeleide);
+      } else {
+        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheLeft(sequence, matches, afgeleide);
       }
-      List<INormalizedToken> matchedBaseTokens = findMatchingBaseTokensForSequenceToTheRight(sequence, matches, afgeleide);
       if (!matchedBaseTokens.isEmpty()) {
+        // System.out.println("Matched!");
         for (INormalizedToken token : sequence.getTokens()) {
           INormalizedToken possibility = matchedBaseTokens.remove(0);
           alignedTokens.put(token, possibility);
@@ -49,16 +61,44 @@ public class MyNewLinker {
   // This method should return the matching base tokens for a given sequence 
   // Note: this method works for sequences that have the fixed token on the left and expand to the right
   public List<INormalizedToken> findMatchingBaseTokensForSequenceToTheRight(ITokenSequence sequence, ListMultimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
-//    System.out.println("Trying to find token sequence: "+sequence.getNormalized());
     final INormalizedToken fixedWitnessToken = sequence.getFirstToken();
     final List<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
     if (matchesForFixedTokenWitness.isEmpty()) {
       throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
     }
+    if (matchesForFixedTokenWitness.size()!=1) {
+      throw new RuntimeException("Multiple matches found in base for fixed witness token! tokens: "+fixedWitnessToken);
+    }
     INormalizedToken fixedBaseToken = matchesForFixedTokenWitness.get(0);
     // traverse here the rest of the token sequence
     List<INormalizedToken> restTokens = Lists.newArrayList(sequence.getTokens());
-    restTokens.remove(sequence.getFirstToken());
+    restTokens.remove(fixedWitnessToken);
+    return tryTheDifferentPossibilities(matches, afgeleide, fixedBaseToken, restTokens, 1);
+  }
+
+  // This method should return the matching base tokens for a given sequence 
+  // Note: this method works for sequences that have the fixed token on the right and expand to the left
+  public List<INormalizedToken> findMatchingBaseTokensForSequenceToTheLeft(ITokenSequence sequence, ListMultimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
+    final INormalizedToken fixedWitnessToken = sequence.getLastToken();
+    final List<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
+    if (matchesForFixedTokenWitness.isEmpty()) {
+      throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
+    }
+    if (matchesForFixedTokenWitness.size()!=1) {
+      throw new RuntimeException("Multiple matches found in base for fixed witness token! tokens: "+fixedWitnessToken);
+    }
+    INormalizedToken fixedBaseToken = matchesForFixedTokenWitness.get(0);
+    // traverse here the rest of the token sequence
+    List<INormalizedToken> restTokens = Lists.newArrayList(sequence.getTokens());
+    restTokens.remove(fixedWitnessToken);
+    Collections.reverse(restTokens);
+    final List<INormalizedToken> matchedBaseTokens = tryTheDifferentPossibilities(matches, afgeleide, fixedBaseToken, restTokens, -1);
+    Collections.reverse(matchedBaseTokens);
+    return matchedBaseTokens;
+  }
+
+  private List<INormalizedToken> tryTheDifferentPossibilities(ListMultimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide, INormalizedToken fixedBaseToken,
+      List<INormalizedToken> restTokens, int expectedDirection) {
     boolean validWholeSequence = true;
     List<INormalizedToken> matchedBaseTokens = Lists.newArrayList(fixedBaseToken);
     INormalizedToken lastToken = fixedBaseToken;
@@ -66,8 +106,8 @@ public class MyNewLinker {
       List<INormalizedToken> possibilities = matches.get(token);
       boolean valid = false;
       for (INormalizedToken possibility : possibilities) {
-        int distance = afgeleide.indexOf(possibility) - afgeleide.indexOf(lastToken);
-        if (distance == 1) {
+        int direction = afgeleide.indexOf(possibility) - afgeleide.indexOf(lastToken);
+        if (direction == expectedDirection) {
           matchedBaseTokens.add(possibility);
           lastToken = possibility;
           valid = true;
@@ -80,7 +120,6 @@ public class MyNewLinker {
       }
     }  
     if (validWholeSequence) {
-//      System.out.println("Matched!");
       return matchedBaseTokens;
     } 
     return Collections.emptyList();
