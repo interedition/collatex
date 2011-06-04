@@ -1,5 +1,6 @@
 package eu.interedition.collatex2.experimental;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,47 +32,57 @@ public class MyNewLinker {
     IWitnessIndex index = indexer.index(b, matchResult);
     for (ITokenSequence sequence : index.getTokenSequences()) {
       //TODO: remove this constraint!
-      if (!sequence.isLeftAligned()) {
+      if (!sequence.expandsToTheRight()) {
         continue;
       }
-      // System.out.println("Trying to find token sequence: "+sequence.getNormalized());
-      final INormalizedToken fixedWitnessToken = sequence.getFirstToken();
-      final List<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
-      if (matchesForFixedTokenWitness.isEmpty()) {
-        throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
-      }
-      INormalizedToken fixedToken = matchesForFixedTokenWitness.get(0);
-      // traverse here the rest of the token sequence
-      List<INormalizedToken> restTokens = Lists.newArrayList(sequence.getTokens());
-      restTokens.remove(sequence.getFirstToken());
-      boolean validWholeSequence = true;
-      List<INormalizedToken> matchedBaseTokens = Lists.newArrayList();
-      INormalizedToken lastToken = fixedToken;
-      for (INormalizedToken token : restTokens) {
-        List<INormalizedToken> possibilities = matches.get(token);
-        boolean valid = false;
-        for (INormalizedToken possibility : possibilities) {
-          int distance = afgeleide.indexOf(possibility) - afgeleide.indexOf(lastToken);
-          if (distance == 1) {
-            matchedBaseTokens.add(possibility);
-            lastToken = possibility;
-            valid = true;
-            break;
-          }
-        }
-        validWholeSequence = valid;
-        if (!valid) {
-          break;
-        }
-      }  
-      if (validWholeSequence) {
-        // System.out.println("Matched!");
-        for (INormalizedToken token : restTokens) {
+      List<INormalizedToken> matchedBaseTokens = findMatchingBaseTokensForSequenceToTheRight(sequence, matches, afgeleide);
+      if (!matchedBaseTokens.isEmpty()) {
+        for (INormalizedToken token : sequence.getTokens()) {
           INormalizedToken possibility = matchedBaseTokens.remove(0);
           alignedTokens.put(token, possibility);
         }  
       }
     }
     return alignedTokens;
+  }
+  
+  // This method should return the matching base tokens for a given sequence 
+  // Note: this method works for sequences that have the fixed token on the left and expand to the right
+  public List<INormalizedToken> findMatchingBaseTokensForSequenceToTheRight(ITokenSequence sequence, ListMultimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
+//    System.out.println("Trying to find token sequence: "+sequence.getNormalized());
+    final INormalizedToken fixedWitnessToken = sequence.getFirstToken();
+    final List<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
+    if (matchesForFixedTokenWitness.isEmpty()) {
+      throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
+    }
+    INormalizedToken fixedBaseToken = matchesForFixedTokenWitness.get(0);
+    // traverse here the rest of the token sequence
+    List<INormalizedToken> restTokens = Lists.newArrayList(sequence.getTokens());
+    restTokens.remove(sequence.getFirstToken());
+    boolean validWholeSequence = true;
+    List<INormalizedToken> matchedBaseTokens = Lists.newArrayList(fixedBaseToken);
+    INormalizedToken lastToken = fixedBaseToken;
+    for (INormalizedToken token : restTokens) {
+      List<INormalizedToken> possibilities = matches.get(token);
+      boolean valid = false;
+      for (INormalizedToken possibility : possibilities) {
+        int distance = afgeleide.indexOf(possibility) - afgeleide.indexOf(lastToken);
+        if (distance == 1) {
+          matchedBaseTokens.add(possibility);
+          lastToken = possibility;
+          valid = true;
+          break;
+        }
+      }
+      validWholeSequence = valid;
+      if (!valid) {
+        break;
+      }
+    }  
+    if (validWholeSequence) {
+//      System.out.println("Matched!");
+      return matchedBaseTokens;
+    } 
+    return Collections.emptyList();
   }
 }
