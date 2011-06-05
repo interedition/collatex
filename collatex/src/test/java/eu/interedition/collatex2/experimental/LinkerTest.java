@@ -122,4 +122,20 @@ public class LinkerTest {
     assertEquals(catSB, tokens.get(catC));
   }
 
+  @Test
+  public void testTwoEqualPossibilities1() {
+    // test a -> a a
+    final IWitness witnessA = engine.createWitness("A", "a");
+    final IWitness witnessB = engine.createWitness("B", "a a");
+    final IVariantGraph graph = engine.graph(witnessA);
+    IWitness superbase = new SuperbaseCreator().create(graph);
+    MyNewLinker linker = new MyNewLinker();
+    Map<INormalizedToken, INormalizedToken> tokens = linker.link2(superbase, witnessB);
+    assertEquals(1, tokens.size());
+    INormalizedToken expectedBaseToken = graph.getTokens(witnessA).get(0);
+    INormalizedToken witnessToken = witnessB.getTokens().get(0);
+    assertEquals(expectedBaseToken, tokens.get(witnessToken));
+  }
+
+
 }
