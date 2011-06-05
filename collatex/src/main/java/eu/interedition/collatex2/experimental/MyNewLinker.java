@@ -72,7 +72,7 @@ public class MyNewLinker {
     }
     // run the old filter method 
     List<Sequence> sequences1 = filterAwaySecondChoicesMultipleTokensOneColumn(sequences);
-    System.out.println(sequences1);
+   // System.out.println(sequences1);
     // do the matching
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
@@ -138,7 +138,7 @@ public class MyNewLinker {
       if (!foundAlternative) {
         filteredMatches.add(sequence);
       } else {
-        LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
+ //       LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
       }
     }
     return filteredMatches;
