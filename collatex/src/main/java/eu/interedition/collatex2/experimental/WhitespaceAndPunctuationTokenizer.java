@@ -16,12 +16,18 @@ public class WhitespaceAndPunctuationTokenizer implements ITokenizer {
   public Iterable<IToken> tokenize(String content) {
     List<IToken> tokens = Lists.newArrayList(); 
     StringTokenizer tokenizer = new StringTokenizer(content, " ,.-()?;:\n", true);
+    Token previous = null;
     while (tokenizer.hasMoreTokens()) {
       String trail = tokenizer.nextToken();
-      //check whitespaceOrPunctuation;
+      //check whether token is whitespace or punctuation or actual content;
       if (!trail.trim().isEmpty()) {
-        tokens.add(new Token(trail));
-//        System.out.println(">"+trail+"<");
+        final Token token = new Token(trail);
+        tokens.add(token);
+        previous = token;
+      } else {
+        if (previous != null) {
+          previous.setTrailingWhitespace(trail);
+        }
       }
     }
  

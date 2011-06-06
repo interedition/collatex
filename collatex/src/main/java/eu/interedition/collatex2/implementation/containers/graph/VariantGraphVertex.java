@@ -82,4 +82,9 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     return vertexKey;
   }
 
+  @Override
+  public String getTrailingWhitespace() {
+    throw new RuntimeException("Do not call this method! Call getToken(IWitness).getTrailingWhitespace() instead.");
+  }
+
 }
