@@ -254,8 +254,8 @@
         </repository>
     </distributionManagement>
     <issueManagement>
-        <system>launchpad.net</system>
-        <url>https://bugs.launchpad.net/collatex</url>
+        <system>GitHub</system>
+        <url>https://github.com/gremid/collatex/issues/</url>
     </issueManagement>
     <licenses>
         <license>
