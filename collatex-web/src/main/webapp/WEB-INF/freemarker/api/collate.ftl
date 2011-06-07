@@ -142,115 +142,147 @@
 	
 	<h3>Example: Variant graph in GraphML format</h3>
 	
-	<p>For the example witnesses from the Input section above, the output in GraphML format will look as follows:</p>
+	<p>For the example witnesses from the Input section above, the output in GraphML format will look as follows.  
+	The 'identical' key, not used here, is set for those nodes that are transposed duplicates of other nodes.
+	</p>
 	<pre><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
     <key attr.name="number" attr.type="int" for="node" id="d1"/>
     <key attr.name="token" attr.type="string" for="node" id="d0"/>
+    <key attr.name="identical" attr.type="string" for="node" id="d2"/>
     <key attr.name="A" attr.type="string" for="edge" id="w0"/>
     <key attr.name="B" attr.type="string" for="edge" id="w1"/>
     <key attr.name="C" attr.type="string" for="edge" id="w2"/>
     <key attr.name="D" attr.type="string" for="edge" id="w3"/>
-    <graph edgedefault="directed" id="0">
-        <node id="0">
+    <graph edgedefault="directed" id="g0" parse.edgeids="canonical" parse.edges="12" parse.nodeids="canonical" parse.nodes="11" parse.order="nodesfirst">
+        <node id="n0">
             <data key="d0">#</data>
-            <data key="d1">0</data>
+            <data key="d1">n0</data>
         </node>
-        <node id="1">
+        <node id="n1">
             <data key="d0">a</data>
-            <data key="d1">1</data>
+            <data key="d1">n1</data>
         </node>
-        <node id="2">
+        <node id="n2">
             <data key="d0">black</data>
-            <data key="d1">2</data>
+            <data key="d1">n2</data>
         </node>
-        <node id="3">
+        <node id="n3">
             <data key="d0">striped</data>
-            <data key="d1">3</data>
+            <data key="d1">n3</data>
         </node>
-        <node id="4">
+        <node id="n4">
             <data key="d0">cat</data>
-            <data key="d1">4</data>
+            <data key="d1">n4</data>
         </node>
-        <node id="5">
+        <node id="n5">
             <data key="d0">in</data>
-            <data key="d1">5</data>
+            <data key="d1">n5</data>
         </node>
-        <node id="6">
+        <node id="n6">
             <data key="d0">a</data>
-            <data key="d1">6</data>
+            <data key="d1">n6</data>
         </node>
-        <node id="7">
+        <node id="n7">
             <data key="d0">black</data>
-            <data key="d1">7</data>
+            <data key="d1">n7</data>
         </node>
-        <node id="8">
+        <node id="n8">
             <data key="d0">white</data>
-            <data key="d1">8</data>
+            <data key="d1">n8</data>
         </node>
-        <node id="9">
+        <node id="n9">
             <data key="d0">basket</data>
-            <data key="d1">9</data>
+            <data key="d1">n9</data>
         </node>
-        <node id="10">
+        <node id="n10">
             <data key="d0">#</data>
-            <data key="d1">10</data>
+            <data key="d1">n10</data>
         </node>
-        <edge id="0" source="0" target="1">
+        <edge id="e0" source="n0" target="n1">
             <data key="w0">A</data>
-            <data key="w1">B</data>
-            <data key="w2">C</data>
             <data key="w3">D</data>
-        </edge>
-        <edge id="1" source="1" target="2">
-            <data key="w0">A</data>
+            <data key="w2">C</data>
             <data key="w1">B</data>
         </edge>
-        <edge id="2" source="1" target="3">
-            <data key="w2">C</data>
-            <data key="w3">D</data>
-        </edge>
-        <edge id="3" source="2" target="4">
+        <edge id="e1" source="n1" target="n2">
             <data key="w0">A</data>
             <data key="w1">B</data>
         </edge>
-        <edge id="4" source="3" target="4">
-            <data key="w2">C</data>
+        <edge id="e2" source="n1" target="n3">
             <data key="w3">D</data>
+            <data key="w2">C</data>
         </edge>
-        <edge id="5" source="4" target="5">
+        <edge id="e3" source="n2" target="n4">
             <data key="w0">A</data>
             <data key="w1">B</data>
-            <data key="w2">C</data>
-            <data key="w3">D</data>
         </edge>
-        <edge id="6" source="5" target="6">
+        <edge id="e4" source="n3" target="n4">
+            <data key="w3">D</data>
+            <data key="w2">C</data>
+        </edge>
+        <edge id="e5" source="n4" target="n5">
+            <data key="w0">A</data>
+            <data key="w3">D</data>
+            <data key="w2">C</data>
+            <data key="w1">B</data>
+        </edge>
+        <edge id="e6" source="n5" target="n6">
+            <data key="w0">A</data>
+            <data key="w3">D</data>
+            <data key="w2">C</data>
+            <data key="w1">B</data>
+        </edge>
+        <edge id="e7" source="n6" target="n7">
+            <data key="w0">A</data>
+            <data key="w2">C</data>
+            <data key="w1">B</data>
+        </edge>
+        <edge id="e8" source="n6" target="n8">
+            <data key="w3">D</data>
+            <data key="w2">C</data>
+        </edge>
+        <edge id="e3" source="n2" target="n4">
             <data key="w0">A</data>
             <data key="w1">B</data>
-            <data key="w2">C</data>
-            <data key="w3">D</data>
         </edge>
-        <edge id="7" source="6" target="7">
+        <edge id="e4" source="n3" target="n4">
+            <data key="w3">D</data>
+            <data key="w2">C</data>
+        </edge>
+        <edge id="e5" source="n4" target="n5">
             <data key="w0">A</data>
-            <data key="w1">B</data>
-            <data key="w2">C</data>
-        </edge>
-        <edge id="8" source="6" target="8">
             <data key="w3">D</data>
+            <data key="w2">C</data>
+            <data key="w1">B</data>
         </edge>
-        <edge id="9" source="7" target="9">
+        <edge id="e6" source="n5" target="n6">
             <data key="w0">A</data>
-            <data key="w1">B</data>
-            <data key="w2">C</data>
-        </edge>
-        <edge id="10" source="8" target="9">
             <data key="w3">D</data>
+            <data key="w2">C</data>
+            <data key="w1">B</data>
         </edge>
-        <edge id="11" source="9" target="10">
+        <edge id="e7" source="n6" target="n7">
             <data key="w0">A</data>
-            <data key="w1">B</data>
             <data key="w2">C</data>
+            <data key="w1">B</data>
+        </edge>
+        <edge id="e8" source="n6" target="n8">
             <data key="w3">D</data>
+        </edge>
+        <edge id="e9" source="n7" target="n9">
+            <data key="w0">A</data>
+            <data key="w2">C</data>
+            <data key="w1">B</data>
+        </edge>
+        <edge id="e10" source="n8" target="n9">
+            <data key="w3">D</data>
+        </edge>
+        <edge id="e11" source="n9" target="n10">
+            <data key="w0">A</data>
+            <data key="w3">D</data>
+            <data key="w2">C</data>
+            <data key="w1">B</data>
         </edge>
     </graph>
 </graphml>]]></pre>

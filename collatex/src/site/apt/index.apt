@@ -28,7 +28,7 @@ Documentation
 
   The <CollateX> project is at an early stage of development and therefore has not been very well documented yet.
 We are working on making tutorials for common use cases and a complete reference documentation available soon.
-Meanwhile please refer to the {{{apidocs/index.html}Javadoc}} for usage instructions.
+Meanwhile please refer to the {{{./apidocs/index.html}Javadoc}} for usage instructions.
 Or even better: Use the force and read the {{{https://code.launchpad.net/collatex} source.}} 
   
 

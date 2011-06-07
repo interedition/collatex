@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import com.google.common.collect.HashBiMap;
 
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
@@ -45,7 +46,7 @@ public class GraphMLBuilder {
 	private static final String EDGE_TAG = "edge";
 	private static final String EDGEDEFAULT_DEFAULT_VALUE = "directed";
 	private static final String EDGEDEFAULT_ATT = "edgedefault";
-	private static final String GRAPH_ID = "0";
+	private static final String GRAPH_ID = "g0";
 	private static final String GRAPH_TAG = "graph";
 	private static final String GRAPHML_NS = "http://graphml.graphdrawing.org/xmlns";
 	private static final String XMLNS_ATT = "xmlns";
@@ -54,6 +55,15 @@ public class GraphMLBuilder {
 	private static final String XSISL_ATT = "xsi:schemaLocation";
 	private static final String GRAPHML_XMLNSXSI = "http://www.w3.org/2001/XMLSchema-instance";
 	private static final String GRAPHML_XSISL = "http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd";
+	private static final String PARSENODES_ATT = "parse.nodes";
+	private static final String PARSEEDGES_ATT = "parse.edges";
+	private static final String PARSENODEIDS_ATT = "parse.nodeids";
+	private static final String PARSENODEIDS_DEFAULT_VALUE = "canonical";
+	private static final String PARSEEDGEIDS_ATT = "parse.edgeids";
+	private static final String PARSEEDGEIDS_DEFAULT_VALUE = "canonical";
+	private static final String PARSEORDER_ATT = "parse.order";
+	private static final String PARSEORDER_DEFAULT_VALUE = "nodesfirst";
+
 	private static final String ATTR_TYPE_ATT = "attr.type";
 	private static final String ATTR_NAME_ATT = "attr.name";
 	private static final String FOR_ATT = "for";
@@ -63,7 +73,8 @@ public class GraphMLBuilder {
 
 	private enum Keys {
 		NODE_TOKEN("d0", NODE_TAG, "token", "string"), NODE_NUMBER("d1",
-				NODE_TAG, "number", "int");
+				NODE_TAG, "number", "int"), NODE_IDENTICAL("d2", NODE_TAG, 
+						"identical", "string");
 
 		private String name;
 		private String keyId;
@@ -99,10 +110,11 @@ public class GraphMLBuilder {
 		// add root element
 		Element rootElement = createRootElement(graphXML);
 		graphXML.appendChild(rootElement);
-
+		
 		// add key elements for node
 		rootElement.appendChild(Keys.NODE_NUMBER.getKeyElement(graphXML));
 		rootElement.appendChild(Keys.NODE_TOKEN.getKeyElement(graphXML));
+		rootElement.appendChild(Keys.NODE_IDENTICAL.getKeyElement(graphXML));
 
 		// add key elements (witnesses) and prepare mapping of sigil to its
 		// graphml id
@@ -118,7 +130,6 @@ public class GraphMLBuilder {
 		// add graph element
 		Element graph = graphXML.createElement(GRAPH_TAG);
 		graph.setAttribute(ID_ATT, GRAPH_ID);
-		graph.setAttribute(EDGEDEFAULT_ATT, EDGEDEFAULT_DEFAULT_VALUE);
 
 		rootElement.appendChild(graph);
 
@@ -127,28 +138,34 @@ public class GraphMLBuilder {
 		List<Element> edges = new ArrayList<Element>();
 
 		// TODO is it possible to improve the performance by not using this map?
-		Map<IVariantGraphVertex, Integer> vertexToId = new HashMap<IVariantGraphVertex, Integer>();
-
+		HashBiMap<IVariantGraphVertex, String> vertexToId = HashBiMap.create();
+		Map<IVariantGraphVertex, IVariantGraphVertex> transpositions = variantGraph.getTransposedTokens();
+		
 		Iterator<IVariantGraphVertex> vertexIterator = variantGraph.iterator();
 		int vertexNumber = 0;
 		while (vertexIterator.hasNext()) {
+			String vertexNodeID = "n" + vertexNumber;
 			IVariantGraphVertex vertex = vertexIterator.next();
-
 			String token = vertex.getNormalized();
-
-			nodes.add(createNodeElement(vertexNumber, token, graphXML));
-
-			vertexToId.put(vertex, vertexNumber);
-
+			nodes.add(createNodeElement(vertexNodeID, token, graphXML));
+			vertexToId.put(vertex, vertexNodeID);
+			// Do we need to keep track of a transposed node to add later?
 			edges.addAll(createEdgeElements(
 					variantGraph.incomingEdgesOf(vertex), vertexToId,
 					sigilToId, variantGraph, graphXML, edges.size()));
-
 			vertexNumber++;
 		}
-
+		
 		// add nodes
 		for (Element n : nodes) {
+			// See if we need to add an 'identical' tag for a transposition.
+			// This is best done here, after all the nodes have been created.
+			IVariantGraphVertex vertex = vertexToId.inverse().get(n.getAttribute(ID_ATT));
+			if(transpositions.containsKey(vertex)) {
+				String txpID = vertexToId.get(transpositions.get(vertex));
+				n.appendChild(Keys.NODE_IDENTICAL.getDataElement(txpID, graphXML));
+			}
+			// Now append the element to the XML graph.
 			graph.appendChild(n);
 		}
 
@@ -156,6 +173,10 @@ public class GraphMLBuilder {
 		for (Element e : edges) {
 			graph.appendChild(e);
 		}
+		
+		// add parsing helper information to the graph root element
+		setParseAttributes(graph, vertexNumber, edges.size());
+		
 	}
 
 	private static Element createRootElement(Document graphXML) {
@@ -166,6 +187,17 @@ public class GraphMLBuilder {
 		return rootElement;
 	}
 
+	private static void setParseAttributes(Element graph, Integer vertices, 
+			Integer edges) {
+		graph.setAttribute(EDGEDEFAULT_ATT, EDGEDEFAULT_DEFAULT_VALUE);
+		graph.setAttribute(PARSENODES_ATT, vertices.toString());
+		graph.setAttribute(PARSEEDGES_ATT, edges.toString());
+		graph.setAttribute(PARSENODEIDS_ATT, PARSENODEIDS_DEFAULT_VALUE);
+		graph.setAttribute(PARSEEDGEIDS_ATT, PARSEEDGEIDS_DEFAULT_VALUE);
+		graph.setAttribute(PARSEORDER_ATT, PARSEORDER_DEFAULT_VALUE);
+
+	}
+	
 	private static Element createKeyWitnessElementForEdge(IWitness w,
 			Document doc, String id) {
 		Element keyElement = doc.createElement(KEY_TAG);
@@ -178,7 +210,7 @@ public class GraphMLBuilder {
 
 	private static List<? extends Element> createEdgeElements(
 			Set<IVariantGraphEdge> incomingEdges,
-			Map<IVariantGraphVertex, Integer> vertexToNumber,
+			HashBiMap<IVariantGraphVertex, String> vertexToID,
 			Map<String, Integer> witnessToNumber, IVariantGraph variantGraph,
 			Document graphXML, Integer nextEdgeNumber) {
 
@@ -190,7 +222,7 @@ public class GraphMLBuilder {
 			IVariantGraphVertex target = variantGraph.getEdgeTarget(edge);
 
 			Element edgeElement = createEdgeElement(source, target,
-					vertexToNumber, graphXML, counter++);
+					vertexToID, graphXML, counter++);
 
 			// append information about witnesses to the edge
 			for (IWitness w : edge.getWitnesses()) {
@@ -214,26 +246,22 @@ public class GraphMLBuilder {
 
 	private static Element createEdgeElement(IVariantGraphVertex source,
 			IVariantGraphVertex target,
-			Map<IVariantGraphVertex, Integer> vertexToNumber, Document doc,
+			HashBiMap<IVariantGraphVertex, String> vertexToID, Document doc,
 			Integer edgeNumber) {
 
 		Element edge = doc.createElement(EDGE_TAG);
-		edge.setAttribute(ID_ATT, edgeNumber.toString());
-		edge.setAttribute(SOURCE_ATT,
-				String.valueOf(vertexToNumber.get(source)));
-		edge.setAttribute(TARGET_ATT,
-				String.valueOf(vertexToNumber.get(target)));
+		edge.setAttribute(ID_ATT, 'e' + edgeNumber.toString());
+		edge.setAttribute(SOURCE_ATT, vertexToID.get(source));
+		edge.setAttribute(TARGET_ATT, vertexToID.get(target));
 
 		return edge;
 	}
 
-	private static Element createNodeElement(int vertexNumber, String token,
-			Document doc) {
+	private static Element createNodeElement(String vertexID, String token, Document doc) {
 		Element node = doc.createElement(NODE_TAG);
-		node.setAttribute(ID_ATT, String.valueOf(vertexNumber));
+		node.setAttribute(ID_ATT, vertexID);
 		node.appendChild(Keys.NODE_TOKEN.getDataElement(token, doc));
-		node.appendChild(Keys.NODE_NUMBER.getDataElement(
-				String.valueOf(vertexNumber), doc));
+		node.appendChild(Keys.NODE_NUMBER.getDataElement(vertexID, doc));
 		return node;
 	}
 
