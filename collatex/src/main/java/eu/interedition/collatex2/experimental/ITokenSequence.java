@@ -12,7 +12,7 @@ public interface ITokenSequence {
 
   String getNormalized();
 
-  boolean isLeftAligned();
+  boolean expandsToTheRight();
 
   List<INormalizedToken> getTokens();
   

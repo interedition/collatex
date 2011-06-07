@@ -15,14 +15,17 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class MatchResultAnalyzer {
 
   public IMatchResult analyze(IWitness superbase, IWitness witness) {
+    //Warning: TheAligner does matching also!
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, witness);
+    // unmatched tokens
     Set<INormalizedToken> unmatchedTokens = Sets.newLinkedHashSet();
     for (INormalizedToken token : witness.getTokens()) {
       if (!matches.containsKey(token)) {
         unmatchedTokens.add(token);
       }
     }
+    // unsure tokens (have to check: base -> witness, and witness -> base) 
     Set<INormalizedToken> unsureTokens = Sets.newLinkedHashSet();
     for (INormalizedToken token : witness.getTokens()) {
       int count = matches.keys().count(token);
@@ -44,7 +47,14 @@ public class MatchResultAnalyzer {
         unsureTokens.add(entry.getKey());
       }
     }
-    return new MatchResult(unmatchedTokens, unsureTokens);
+    // sure tokens
+    // have to check unsure tokens because of (base -> witness && witness -> base)
+    Set<INormalizedToken> sureTokens = Sets.newLinkedHashSet();
+    for (INormalizedToken token: witness.getTokens()) {
+      if (matches.keys().count(token)==1&&!unsureTokens.contains(token)) {
+        sureTokens.add(token);
+      }
+    }
+    return new MatchResult(unmatchedTokens, unsureTokens, sureTokens);
   }
-
 }

@@ -33,4 +33,9 @@ public class NullToken implements INormalizedToken {
   public String getContent() {
     return "";
   }
+
+  @Override
+  public String getTrailingWhitespace() {
+    return "";
+  }
 }

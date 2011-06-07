@@ -48,6 +48,9 @@ public class Analysis implements IAnalysis {
   @Override
   public List<ITransposition2> getTranspositions() {
     List<ISequence> sequencesSortedForBase = sortSequencesForBase();
+    if (sequencesSortedForBase.size()!=sequences.size()) {
+      throw new RuntimeException("Something went wrong in the linking process!");
+    }
     final List<ITransposition2> transpositions = Lists.newArrayList();
     for (int i = 0; i < sequences.size(); i++) {
       final ISequence sequenceWitness = sequences.get(i);

@@ -24,19 +24,21 @@ import eu.interedition.collatex2.interfaces.IToken;
 
 public class Token implements IToken {
   private String content;
-
-  // private String trailingWhitespace; // TODO
-  // private int characterPosition; // TODO
+  private String trailingWhitespace; 
+  // private int characterPosition; // TODO?
 
   public Token() {
+    this.trailingWhitespace = "";
   }
 
   public Token(IToken other) {
+    //TODO: Whitespace is not taken from other Token!
     this(other.getContent());
   }
 
   public Token(final String content) {
     this.content = content;
+    this.trailingWhitespace = "";
   }
 
   @Override
@@ -46,6 +48,15 @@ public class Token implements IToken {
 
   public void setContent(String content) {
     this.content = content;
+  }
+
+  @Override
+  public String getTrailingWhitespace() {
+    return trailingWhitespace;
+  }
+
+  public void setTrailingWhitespace(String whitespace) {
+    this.trailingWhitespace = whitespace;
   }
 
   @Override

@@ -32,4 +32,6 @@ public interface IToken {
  */
   String getContent();
 
+String getTrailingWhitespace();
+
 }

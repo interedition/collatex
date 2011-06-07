@@ -2,8 +2,7 @@ package eu.interedition.collatex2.experimental;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.StringTokenizer;
 
 import com.google.common.collect.Lists;
 
@@ -15,27 +14,22 @@ public class WhitespaceAndPunctuationTokenizer implements ITokenizer {
 
   @Override
   public Iterable<IToken> tokenize(String content) {
-    //TODO: move compiled pattern out of here!
-    // (.+)(\\s+)(.+)
-    // (.*)(\\p{Punct}+)(.*)
-    Pattern pattern = Pattern.compile("(.*)([\\s+||\\p{Punct}]+)(.*)");
     List<IToken> tokens = Lists.newArrayList(); 
-    Matcher matcher = pattern.matcher(content);
-    while (matcher.find()) {
-      content = matcher.group(1);
-      String whitespaceOrPunctuation = matcher.group(2);
-      String trail = matcher.group(3);
-      //check whitespaceOrPunctuation;
-      if (!trail.isEmpty()) {
-        tokens.add(0, new Token(trail));
+    StringTokenizer tokenizer = new StringTokenizer(content, " ,.-()?;:\n", true);
+    Token previous = null;
+    while (tokenizer.hasMoreTokens()) {
+      String trail = tokenizer.nextToken();
+      //check whether token is whitespace or punctuation or actual content;
+      if (!trail.trim().isEmpty()) {
+        final Token token = new Token(trail);
+        tokens.add(token);
+        previous = token;
+      } else {
+        if (previous != null) {
+          previous.setTrailingWhitespace(trail);
+        }
       }
-      if (!whitespaceOrPunctuation.trim().isEmpty()) {
-        tokens.add(0, new Token(whitespaceOrPunctuation));
-      }
-      matcher = pattern.matcher(content);
     }
-    tokens.add(0, new Token(content));
-    // System.out.println(tokens);
  
     final Iterator<IToken> tokenIterator = tokens.iterator();
     return new Iterable<IToken>() {
@@ -62,5 +56,4 @@ public class WhitespaceAndPunctuationTokenizer implements ITokenizer {
       }
     };
   }
-
 }

@@ -83,7 +83,7 @@ public class TokenSequence implements ITokenSequence {
   }
   
   @Override
-  public boolean isLeftAligned() {
+  public boolean expandsToTheRight() {
     return gotoleft;
   }
 }

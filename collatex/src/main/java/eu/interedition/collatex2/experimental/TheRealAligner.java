@@ -20,7 +20,7 @@ public class TheRealAligner {
   public Map<INormalizedToken, INormalizedToken> align(IWitness superbase, IWitness witness) {
     // 1. Do the matching and linking of tokens
     MyNewLinker linker = new MyNewLinker();
-    Map<INormalizedToken, INormalizedToken> linkedTokens = linker.link(superbase, witness);
+    Map<INormalizedToken, INormalizedToken> linkedTokens = linker.link2(superbase, witness);
     // 2. Determine sequences
     SequenceDetection3 detection = new SequenceDetection3();
     List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);

@@ -55,6 +55,7 @@ import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
  */
 public class CollateXEngine {
   private ITokenizer tokenizer = new WhitespaceTokenizer();
+  // private ITokenizer tokenizer = new WhitespaceAndPunctuationTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
 
   public void setTokenizer(ITokenizer tokenizer) {

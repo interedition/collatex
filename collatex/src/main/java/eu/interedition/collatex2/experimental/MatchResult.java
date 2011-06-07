@@ -8,10 +8,12 @@ public class MatchResult implements IMatchResult {
 
   private final Set<INormalizedToken> unmatchedTokens;
   private final Set<INormalizedToken> unsureTokens;
+  private final Set<INormalizedToken> sureTokens;
 
-  public MatchResult(Set<INormalizedToken> unmatchedTokens, Set<INormalizedToken> unsureTokens) {
+  public MatchResult(Set<INormalizedToken> unmatchedTokens, Set<INormalizedToken> unsureTokens, Set<INormalizedToken> sureTokens) {
     this.unmatchedTokens = unmatchedTokens;
     this.unsureTokens = unsureTokens;
+    this.sureTokens = sureTokens;
   }
 
   @Override
@@ -22,6 +24,11 @@ public class MatchResult implements IMatchResult {
   @Override
   public Set<INormalizedToken> getUnsureTokens() {
     return unsureTokens;
+  }
+
+  @Override
+  public Set<INormalizedToken> getSureTokens() {
+    return sureTokens;
   }
 
 }

@@ -141,20 +141,6 @@ public class TokenIndexMatcherTest {
   }
   
   @Test
-  public void testTwoEqualPossibilities1() {
-    // test a -> a a
-    final IWitness witnessA = factory.createWitness("A", "a");
-    final IWitness witnessB = factory.createWitness("B", "a a");
-    final IVariantGraph graph = factory.graph(witnessA);
-    TokenIndexMatcher matcher = new TokenIndexMatcher(graph);
-    List<ITokenMatch> matches = matcher.getMatches(witnessB);
-    assertEquals(1, matches.size());
-    ITokenMatch match = matches.get(0);
-    assertEquals(graph.getTokens(witnessA).get(0), match.getBaseToken());
-    assertEquals(witnessB.getTokens().get(0), match.getWitnessToken());
-  }
-
-  @Test
   public void testTwoEqualPossibilities2() {
     // test a a -> a
     final IWitness witnessA = factory.createWitness("A", "a a");

@@ -33,4 +33,9 @@ public class MockToken implements IToken {
   public String getContent() {
     return content;
   }
+
+  @Override
+  public String getTrailingWhitespace() {
+    return "";
+  }
 }
