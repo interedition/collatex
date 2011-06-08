@@ -277,5 +277,6 @@
     <properties>
         <slf4j.version>1.5.11</slf4j.version>
         <restlet.version>2.0-RC2</restlet.version>
+        <spring.version>3.0.5.RELEASE</spring.version>
     </properties>
 </project>
