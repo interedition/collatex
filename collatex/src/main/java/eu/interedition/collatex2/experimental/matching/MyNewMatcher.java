@@ -9,21 +9,25 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class MyNewMatcher {
-  private final Comparator<INormalizedToken> matchingFunction;
+  private Comparator<INormalizedToken> tokenComparator;
   
   public MyNewMatcher() {
-    this.matchingFunction = new EqualsMatcher();
+    this.tokenComparator = new EqualsTokenComparator();
   }
   
   public ListMultimap<INormalizedToken, INormalizedToken> match(IWitness a, IWitness b) {
     ListMultimap<INormalizedToken, INormalizedToken> matches = ArrayListMultimap.create();
     for (INormalizedToken tokenA : a.getTokens()) {
       for (INormalizedToken tokenB : b.getTokens()) {
-        if (this.matchingFunction.compare(tokenA, tokenB)==1) {
+        if (this.tokenComparator.compare(tokenA, tokenB)==1) {
           matches.put(tokenB, tokenA);
         }
       }
     }
     return matches;
+  }
+
+  public void setTokenComparator(Comparator<INormalizedToken> tokenComparator) {
+    this.tokenComparator = tokenComparator;
   }
 }

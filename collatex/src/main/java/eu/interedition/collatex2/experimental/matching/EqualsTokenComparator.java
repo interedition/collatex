@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class EqualsMatcher implements Comparator<INormalizedToken> {
+public class EqualsTokenComparator implements Comparator<INormalizedToken> {
 
   @Override
   public int compare(INormalizedToken base, INormalizedToken witness) {
