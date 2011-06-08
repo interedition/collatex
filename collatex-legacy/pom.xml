@@ -4,8 +4,8 @@
 	<parent>
 		<groupId>eu.interedition.collatex</groupId>
 		<artifactId>collatex-project</artifactId>
-		<version>1.0</version>
-	</parent>
+        <version>1.1-SNAPSHOT</version>
+    </parent>
 	<artifactId>collatex-legacy</artifactId>
 	<name>CollateX :: Legacy components</name>
 	<dependencies>

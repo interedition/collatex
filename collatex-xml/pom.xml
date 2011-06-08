@@ -6,11 +6,11 @@
     <parent>
         <groupId>eu.interedition.collatex</groupId>
         <artifactId>collatex-project</artifactId>
-        <version>1.0</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
     <groupId>eu.interedition.collatex</groupId>
     <artifactId>collatex-xml</artifactId>
-    <version>1.0</version>
+    <name>CollateX :: XML witness support</name>
     <dependencies>
         <dependency>
             <groupId>org.lmnl</groupId>

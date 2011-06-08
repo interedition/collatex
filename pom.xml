@@ -6,7 +6,7 @@
     <artifactId>collatex-project</artifactId>
     <packaging>pom</packaging>
     <name>CollateX :: Project</name>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <description>CollateX is a Java library for collating textual sources, for example, to produce an apparatus.
     </description>
     <url>http://collatex.sourceforge.net/</url>
@@ -30,9 +30,9 @@
             <version>${slf4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.collections</groupId>
-            <artifactId>google-collections</artifactId>
-            <version>1.0</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>r09</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
