@@ -1,9 +1,11 @@
 package eu.interedition.collatex2.experimental;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,18 +65,20 @@ public class MyNewLinker {
   //this method is just a bridge between the old and the new situation
   public Map<INormalizedToken, INormalizedToken> link2(IWitness a, IWitness b) {
     Map<ITokenSequence, IPhrase> linkedSequences = link(a, b);
+    // order the sequences here (first the sequences that expand to the left, then all sequences that expand to the right!)
+    List<ITokenSequence> sequences0 = orderSequences(linkedSequences.keySet());
     // need to convert map<tokenseq, phrase> to List<Sequence> here
     List<Sequence> sequences = Lists.newArrayList();
-    for (ITokenSequence seq : linkedSequences.keySet()) {
+    for (ITokenSequence seq : sequences0) {
       IPhrase basePhrase = linkedSequences.get(seq);
       IPhrase witnessPhrase = new Phrase(seq.getTokens());
       Sequence sequence = new Sequence(basePhrase, witnessPhrase);
       sequences.add(sequence);
     }
     // run the old filter method 
-    List<Sequence> sequences1 = filterAwaySecondChoicesMultipleTokensOneColumn(sequences);
-   // System.out.println(sequences1);
-    // do the matching
+    List<Sequence> sequences1 = filterAwaySecondChoicesMultipleColumnsOneToken(sequences);
+    List<Sequence> sequences2 = filterAwaySecondChoicesMultipleTokensOneColumn(sequences1);
+     // do the matching
     MyNewMatcher matcher = new MyNewMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     // Calculate MatchResult
@@ -87,7 +91,7 @@ public class MyNewLinker {
       alignedTokens.put(token, matches.get(token).get(0));
     }
     // add matched sequences to the aligned tokens
-    for (Sequence sequence : sequences1) {
+    for (Sequence sequence : sequences2) {
       IPhrase matchedBasePhrase = sequence.getBasePhrase();
       Iterator<INormalizedToken> iterator = matchedBasePhrase.getTokens().iterator();
       for (INormalizedToken witnessToken : sequence.getWitnessPhrase().getTokens()) {
@@ -101,9 +105,28 @@ public class MyNewLinker {
     return alignedTokens;
   }
   
+  private List<ITokenSequence> orderSequences(Set<ITokenSequence> set) {
+    Comparator<ITokenSequence> comp = new Comparator<ITokenSequence>() {
+      @Override
+      public int compare(ITokenSequence o1, ITokenSequence o2) {
+        if (o1.expandsToTheRight() == o2.expandsToTheRight()) {
+          return 0;
+        }
+        if (o1.expandsToTheRight() && !o2.expandsToTheRight()) {
+          return -1;
+        }
+        return 1;
+      }
+    };
+    List<ITokenSequence> sorted = Lists.newArrayList(set);
+    Collections.sort(sorted, comp);
+    return sorted;
+  }
+
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!
   // NOTE: multiple witness tokens match with the same table column!
+  //EXPECT GRAPH -> Witness TOKEN HERE
   private List<Sequence> filterAwaySecondChoicesMultipleTokensOneColumn(List<Sequence> sequences) {
     List<Sequence> filteredMatches = Lists.newArrayList();
     final Map<INormalizedToken, INormalizedToken> tableToToken = Maps.newLinkedHashMap();
@@ -115,8 +138,8 @@ public class MyNewLinker {
       final Iterator<INormalizedToken> tokens = witnessPhrase.getTokens().iterator();
       for (final INormalizedToken tableToken : tablePhrase.getTokens()) {
         final INormalizedToken token = tokens.next();
-        // skip NullColumn and NullToken
-        if (!(tableToken instanceof NullToken)) {
+        // skip Start and End Token in variant graph... string equals is not very nice!
+        if (!(tableToken.getNormalized().equals("#"))) {
           pairs.add(new TokenPair(tableToken, token));
         }
       }
@@ -139,7 +162,52 @@ public class MyNewLinker {
       if (!foundAlternative) {
         filteredMatches.add(sequence);
       } else {
- //       LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
+//        LOG.debug("!Phrase '" + witnessPhrase + "' is an alternative! skipping...");
+      }
+    }
+    return filteredMatches;
+  }
+
+  // check whether this match has an alternative that is equal in weight
+  // if so, then skip the alternative!
+  // NOTE: multiple columns match with the same token!
+  // EXPECT WITNESS TOKEN TO GRAPH TOKEN HERE!
+  private List<Sequence> filterAwaySecondChoicesMultipleColumnsOneToken(List<Sequence> sequences) {
+    List<Sequence> filteredMatches = Lists.newArrayList();
+    final Map<INormalizedToken, INormalizedToken> tokenToTable = Maps.newLinkedHashMap();
+    for (final Sequence sequence : sequences) {
+      // step 1. Gather data
+      List<TokenPair> pairs = Lists.newArrayList();
+      final IPhrase tablePhrase = sequence.getBasePhrase();
+      final IPhrase witnessPhrase = sequence.getWitnessPhrase();
+      final Iterator<INormalizedToken> tokens = witnessPhrase.getTokens().iterator();
+      for (final INormalizedToken tableToken : tablePhrase.getTokens()) {
+        final INormalizedToken token = tokens.next();
+        // skip NullColumn and NullToken
+        if (!(tableToken instanceof NullToken)) {
+          pairs.add(new TokenPair(tableToken, token));
+        }
+      }
+      // step 2. Look for alternative
+      boolean foundAlternative = false;
+      for (TokenPair pair : pairs) {
+        // check for alternative here!
+        final INormalizedToken tableToken = pair.tableToken;
+        final INormalizedToken token = pair.witnessToken;
+        if (tokenToTable.containsKey(token)) {
+          INormalizedToken existingTable = tokenToTable.get(token);
+          if (existingTable != tableToken) {
+            foundAlternative = true;
+          }
+        } else {
+          tokenToTable.put(token, tableToken);
+        }
+      }
+      // step 3. Decide what to do
+      if (!foundAlternative) {
+        filteredMatches.add(sequence);
+      } else {
+//        LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
       }
     }
     return filteredMatches;

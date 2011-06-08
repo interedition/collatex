@@ -247,7 +247,6 @@ public class LinkerTest {
     assertEquals("cat: 5 -> [cat]", matches.get(2).toString());
   }
 
-  @Ignore
   @Test
   public void testTwoEqualPossibilities2() {
     // test a a -> a
