@@ -21,7 +21,7 @@
         <!--  <module>collatex-legacy</module>  -->
         <module>collatex-client-jee</module>
         <module>collatex-cocoon</module>
-        <module>collatex-xml</module>
+        <module>collatex-persistence</module>
     </modules>
     <dependencies>
         <dependency>

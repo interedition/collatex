@@ -9,9 +9,13 @@
         <version>1.1-SNAPSHOT</version>
     </parent>
     <groupId>eu.interedition.collatex</groupId>
-    <artifactId>collatex-xml</artifactId>
-    <name>CollateX :: XML witness support</name>
+    <artifactId>collatex-persistence</artifactId>
+    <name>CollateX :: Persistence support</name>
     <dependencies>
+        <dependency>
+            <groupId>eu.interedition.collatex</groupId>
+            <artifactId>collatex</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.lmnl</groupId>
             <artifactId>lmnl4j-api</artifactId>
