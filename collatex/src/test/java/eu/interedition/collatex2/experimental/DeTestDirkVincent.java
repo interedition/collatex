@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.google.common.collect.ListMultimap;
 
+import eu.interedition.collatex2.experimental.matching.MyNewMatcher;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
