@@ -28,7 +28,7 @@ public class LinkerTest {
 
   @BeforeClass
   public static void setup() {
-    engine = new MyNewCollateXEngine();
+    engine = new CollateXEngine();
   }
 
   //convenience method

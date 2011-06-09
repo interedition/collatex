@@ -22,7 +22,7 @@ public class WitnessIndexerTest {
 
   @BeforeClass
   public static void setup() {
-    engine = new MyNewCollateXEngine();
+    engine = new CollateXEngine();
   }
 
   @Test

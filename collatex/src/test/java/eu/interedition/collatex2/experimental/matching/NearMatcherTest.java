@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import com.google.common.collect.ListMultimap;
 
-import eu.interedition.collatex2.experimental.MyNewCollateXEngine;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.matching.NearTokenComparator;
 import eu.interedition.collatex2.implementation.matching.TokenMatcher;
@@ -17,7 +16,7 @@ public class NearMatcherTest {
   
   @Test
   public void testTokenMatchingWithNearTokenComparator() {
-    CollateXEngine engine = new MyNewCollateXEngine();
+    CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("A", "near matching yeah");
     IWitness b = engine.createWitness("B", "nar matching");
     TokenMatcher matcher = new TokenMatcher();

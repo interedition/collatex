@@ -13,6 +13,7 @@ import com.google.common.collect.ListMultimap;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
+import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.implementation.matching.IMatchResult;
 import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
 import eu.interedition.collatex2.implementation.matching.TokenMatcher;
@@ -29,7 +30,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DeTestDirkVincent {
 
-  private static CollateXEngine factory = new MyNewCollateXEngine();
+  private static CollateXEngine factory = new CollateXEngine();
 
   // helper method
   private void checkGraph(IVariantGraph graph, String... expected) {
@@ -215,6 +216,7 @@ public class DeTestDirkVincent {
   // transpositions should be handled correctly for this test to succeed
   @Test
   public void testSentence42Transposition() {
+    factory.setTokenizer(new WhitespaceAndPunctuationTokenizer());
     IWitness a = factory.createWitness("06-1", "The same clock as when for example Magee once died.");
     IWitness b = factory.createWitness("06-2", "The same as when for example Magee once died.");
     IVariantGraph graph = new VariantGraph2();
