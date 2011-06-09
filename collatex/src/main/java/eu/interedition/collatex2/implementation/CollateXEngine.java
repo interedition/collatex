@@ -85,8 +85,8 @@ public class CollateXEngine {
   }
 
   public IAligner createAligner(IVariantGraph graph) {
+    // return new VariantGraphAligner(graph);
     return new VariantGraphAligner(graph);
-    //return new MyNewAligner(graph);
   }
 
   /**

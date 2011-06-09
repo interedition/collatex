@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.matching;
+package eu.interedition.collatex2.implementation.matching;
 
 import java.util.Comparator;
 
@@ -8,10 +8,10 @@ import com.google.common.collect.ListMultimap;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class MyNewMatcher {
+public class TokenMatcher {
   private Comparator<INormalizedToken> tokenComparator;
   
-  public MyNewMatcher() {
+  public TokenMatcher() {
     this.tokenComparator = new EqualsTokenComparator();
   }
   

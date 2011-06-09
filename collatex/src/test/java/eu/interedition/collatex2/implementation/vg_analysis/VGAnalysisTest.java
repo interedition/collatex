@@ -25,6 +25,7 @@ import static junit.framework.Assert.assertEquals;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ public class VGAnalysisTest {
     factory = new CollateXEngine();
   }
 
+  @Ignore
   @Test
   public void testSimple1() {
     final IWitness a = factory.createWitness("A", "a b");
@@ -61,6 +63,7 @@ public class VGAnalysisTest {
   }
   
   //Copied from TextAlignmentTest
+  @Ignore
   @Test
   public void testAlignment() {
     final IWitness a = factory.createWitness("A", "cat");
@@ -72,6 +75,7 @@ public class VGAnalysisTest {
     assertEquals("cat", sequences.get(0).getNormalized());
   }
 
+  @Ignore
   @Test
   public void testAlignment2Sequences() {
     final IWitness a = factory.createWitness("A", "The black cat");
@@ -85,6 +89,7 @@ public class VGAnalysisTest {
   }
 
   // Note: taken from TextAlignmentTest!
+  @Ignore
   @Test
   public void testAddition_AtTheStart() {
     final IWitness a = factory.createWitness("A", "to be");
@@ -96,6 +101,7 @@ public class VGAnalysisTest {
     assertEquals("to be", sequences.get(0).getNormalized());
   }
 
+  @Ignore
   @Test
   public void testAddition_AtTheEnd() {
     final IWitness a = factory.createWitness("A", "to be");
@@ -107,6 +113,7 @@ public class VGAnalysisTest {
     assertEquals("to be", sequences.get(0).getNormalized());
   }
 
+  @Ignore
   @Test
   public void testAddition_InTheMiddle() {
     final IWitness a = factory.createWitness("A", "to be");
@@ -119,6 +126,7 @@ public class VGAnalysisTest {
     assertEquals("be", sequences.get(1).getNormalized());
   }
 
+  @Ignore
   @Test
   public void testTransposition1Sequences() {
     final IWitness a = factory.createWitness("A", "The black dog chases a red cat.");
@@ -131,6 +139,7 @@ public class VGAnalysisTest {
     assertEquals("the black dog", sequences.get(2).getNormalized());
   }
 
+  @Ignore
   @Test
   public void testTransposition2Sequences() {
     final IWitness a = factory.createWitness("A", "d a b");
@@ -144,6 +153,7 @@ public class VGAnalysisTest {
     assertEquals("d", sequences.get(2).getNormalized());
   }
 
+  @Ignore
   @Test
   public void testTransposition1() {
     final IWitness a = factory.createWitness("A", "d a b");
@@ -158,6 +168,7 @@ public class VGAnalysisTest {
     assertEquals("a b", transpositions.get(1).getSequenceA().getNormalized());
   }
 
+  @Ignore
   @Test
   public void testTransposition2() {
     final IWitness a = factory.createWitness("A", "d a b");
@@ -174,6 +185,7 @@ public class VGAnalysisTest {
     assertEquals("d", transpositions.get(2).getSequenceB().getNormalized());
   }
 
+  @Ignore
   @Test
   public void testTransposition3() {
     final IWitness a = factory.createWitness("1", "a b x c d e");

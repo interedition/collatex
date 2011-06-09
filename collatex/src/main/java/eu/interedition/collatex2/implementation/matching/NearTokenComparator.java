@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental.matching;
+package eu.interedition.collatex2.implementation.matching;
 
 import java.util.Comparator;
 

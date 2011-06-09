@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
+import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.interfaces.IToken;
 
 public class WSPunctuationTokenizerTest {
