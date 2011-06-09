@@ -1,16 +1,17 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.implementation.matching.IMatchResult;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class MyNewWitnessIndexer {
+public class WitnessIndexer {
   private final List<ITokenSequence> tokenSequences;
 
-  public MyNewWitnessIndexer() {
+  public WitnessIndexer() {
     tokenSequences = Lists.newArrayList();
   }
 
@@ -32,7 +33,7 @@ public class MyNewWitnessIndexer {
 //        previous = token;
 //      }
 //    }
-    return new NewWitnessIndex(tokenSequences);
+    return new WitnessIndex(tokenSequences);
   }
   
   protected void processTokens(List<INormalizedToken> tokens, IMatchResult result) {      

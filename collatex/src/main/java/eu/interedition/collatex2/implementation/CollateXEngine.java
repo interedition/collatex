@@ -22,7 +22,6 @@
 
 package eu.interedition.collatex2.implementation;
 
-import eu.interedition.collatex2.experimental.MyNewAligner;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
@@ -30,6 +29,7 @@ import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTok
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.vg_analysis.Analyzer;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.interfaces.IAligner;
@@ -86,7 +86,7 @@ public class CollateXEngine {
 
   public IAligner createAligner(IVariantGraph graph) {
     // return new VariantGraphAligner(graph);
-    return new MyNewAligner(graph);
+    return new VariantGraphAligner(graph);
   }
 
   /**

@@ -28,7 +28,6 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
-import eu.interedition.collatex2.implementation.vg_alignment.Sequence;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenContainer;

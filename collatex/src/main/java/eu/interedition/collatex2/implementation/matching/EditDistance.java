@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.interedition.collatex2.experimental.matching;
+package eu.interedition.collatex2.implementation.matching;
 
 public final class EditDistance {
     private static final int MAX_DISTANCE_COMPARISON = 2500;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,21 +14,22 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.experimental.matching.MyNewMatcher;
 import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.vg_alignment.Sequence;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenPair;
+import eu.interedition.collatex2.implementation.matching.IMatchResult;
+import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
+import eu.interedition.collatex2.implementation.matching.TokenMatcher;
+import eu.interedition.collatex2.implementation.vg_analysis.Sequence;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class MyNewLinker {
-  static final Logger LOG = LoggerFactory.getLogger(MyNewLinker.class);
+public class TokenLinker {
+  static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
   public Map<ITokenSequence, IPhrase> link(IWitness a, IWitness b) {
     // do the matching
-    MyNewMatcher matcher = new MyNewMatcher();
+    TokenMatcher matcher = new TokenMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     // add start and end tokens as matches
     final INormalizedToken startNullToken = a.getTokens().get(0);
@@ -39,7 +40,7 @@ public class MyNewLinker {
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
     IMatchResult matchResult = analyzer.analyze(a, b);
     // Calculate witness sequences using indexer
-    MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
+    WitnessIndexer indexer = new WitnessIndexer();
     IWitnessIndex index = indexer.index(b, matchResult);
     // Calculate 'afgeleide': Ignore non matches from the base
     BaseAfgeleider afgeleider = new BaseAfgeleider();
@@ -79,7 +80,7 @@ public class MyNewLinker {
     List<Sequence> sequences1 = filterAwaySecondChoicesMultipleColumnsOneToken(sequences);
     List<Sequence> sequences2 = filterAwaySecondChoicesMultipleTokensOneColumn(sequences1);
      // do the matching
-    MyNewMatcher matcher = new MyNewMatcher();
+    TokenMatcher matcher = new TokenMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     // Calculate MatchResult
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();

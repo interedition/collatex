@@ -8,6 +8,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.matching.IMatchResult;
+import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
+import eu.interedition.collatex2.implementation.vg_alignment.ITokenSequence;
+import eu.interedition.collatex2.implementation.vg_alignment.IWitnessIndex;
+import eu.interedition.collatex2.implementation.vg_alignment.WitnessIndexer;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenSequence;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -25,7 +31,7 @@ public class WitnessIndexerTest {
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
     IMatchResult result = analyzer.analyze(a, b);
-    MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
+    WitnessIndexer indexer = new WitnessIndexer();
     IWitnessIndex index = indexer.index(b, result);
     List<ITokenSequence> sequences = index.getTokenSequences();
     INormalizedToken soft = b.getTokens().get(1);
@@ -53,7 +59,7 @@ public class WitnessIndexerTest {
     //TODO: strange that I don't have to pass the matches to the analyzer here!
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
     IMatchResult result = analyzer.analyze(superbase, c);
-    MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
+    WitnessIndexer indexer = new WitnessIndexer();
     IWitnessIndex index = indexer.index(c, result);
     List<ITokenSequence> sequences = index.getTokenSequences();
     assertEquals("# very", sequences.get(0).getNormalized());

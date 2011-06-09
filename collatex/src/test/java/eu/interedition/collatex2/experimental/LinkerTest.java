@@ -14,6 +14,9 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
+import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenMatch;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
@@ -31,7 +34,7 @@ public class LinkerTest {
   //convenience method
   private List<ITokenMatch> createTokenMatches2(final IVariantGraph graph, final IWitness witnessB) {
     IWitness superbase = new SuperbaseCreator().create(graph);
-    MyNewLinker linker = new MyNewLinker();
+    TokenLinker linker = new TokenLinker();
     Map<INormalizedToken, INormalizedToken> tokens = linker.link2(superbase, witnessB);
     List<ITokenMatch> matches = Lists.newArrayList();
     for (INormalizedToken witnessToken : tokens.keySet()) {
@@ -46,7 +49,7 @@ public class LinkerTest {
   public void testDirkVincent4() {
     IWitness a = engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    MyNewLinker linker = new MyNewLinker();
+    TokenLinker linker = new TokenLinker();
     Map<INormalizedToken, INormalizedToken> tokens = linker.link2(a, b);
     INormalizedToken itsA = a.getTokens().get(0);
     INormalizedToken itsB = b.getTokens().get(0);
@@ -65,7 +68,7 @@ public class LinkerTest {
     IWitness a = engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = new VariantGraph2();
-    MyNewAligner aligner = new MyNewAligner(graph);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
     aligner.addWitness(a);
     aligner.addWitness(b);
     SuperbaseCreator creator = new SuperbaseCreator();
@@ -75,7 +78,7 @@ public class LinkerTest {
     IWitness c = engine.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
     //NOTE: this really should be the wrapper by the real aligner
     //TODO: the variantgraph builder stuff should be renamed!
-    MyNewLinker linker = new MyNewLinker();
+    TokenLinker linker = new TokenLinker();
     Map<INormalizedToken, INormalizedToken> link = linker.link2(superbase, c);
     List<INormalizedToken> unlinkedTokens = Lists.newArrayList();
     for (INormalizedToken witnessToken : c.getTokens()) {
@@ -96,11 +99,11 @@ public class LinkerTest {
     IWitness a = engine.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
     IWitness b = engine.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
     IVariantGraph graph = new VariantGraph2();
-    MyNewAligner aligner = new MyNewAligner(graph);
+    VariantGraphAligner aligner = new VariantGraphAligner(graph);
     aligner.add(a);
     SuperbaseCreator superbaseCreator = new SuperbaseCreator();
     IWitness superbase = superbaseCreator.create(graph);
-    MyNewLinker linker = new MyNewLinker();
+    TokenLinker linker = new TokenLinker();
     Map<INormalizedToken, INormalizedToken> link = linker.link2(superbase, b);
     assertTrue(!link.containsKey(b.getTokens().get(0)));
     assertTrue(!link.containsKey(b.getTokens().get(1)));
@@ -123,7 +126,7 @@ public class LinkerTest {
     IVariantGraph graph = engine.graph(a, b);
     IWitness superbase = new SuperbaseCreator().create(graph);
     IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
-    MyNewLinker linker = new MyNewLinker();
+    TokenLinker linker = new TokenLinker();
     Map<INormalizedToken, INormalizedToken> tokens = linker.link2(superbase, c);
     INormalizedToken verySB = superbase.getTokens().get(3);
     INormalizedToken veryC = c.getTokens().get(0);
@@ -146,7 +149,7 @@ public class LinkerTest {
     final IWitness witnessB = engine.createWitness("B", "a a");
     final IVariantGraph graph = engine.graph(witnessA);
     IWitness superbase = new SuperbaseCreator().create(graph);
-    MyNewLinker linker = new MyNewLinker();
+    TokenLinker linker = new TokenLinker();
     Map<INormalizedToken, INormalizedToken> tokens = linker.link2(superbase, witnessB);
     assertEquals(1, tokens.size());
     INormalizedToken expectedBaseToken = graph.getTokens(witnessA).get(0);

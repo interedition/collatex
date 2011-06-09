@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 
