@@ -18,9 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.implementation.vg_analysis;
 
-import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.interfaces.IPhrase;
 
 public class Sequence implements ISequence {

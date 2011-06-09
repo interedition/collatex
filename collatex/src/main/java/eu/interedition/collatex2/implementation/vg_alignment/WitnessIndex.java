@@ -1,11 +1,11 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import java.util.List;
 
-public class NewWitnessIndex implements IWitnessIndex {
+public class WitnessIndex implements IWitnessIndex {
   private final List<ITokenSequence> tokenSequences;
 
-  public NewWitnessIndex(List<ITokenSequence> tokenSequences) {
+  public WitnessIndex(List<ITokenSequence> tokenSequences) {
     this.tokenSequences = tokenSequences;
   }
 

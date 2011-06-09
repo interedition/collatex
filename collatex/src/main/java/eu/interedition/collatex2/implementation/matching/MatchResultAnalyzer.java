@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.matching;
 
 import java.util.Collection;
 import java.util.Map.Entry;
@@ -9,7 +9,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.experimental.matching.MyNewMatcher;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -17,7 +16,7 @@ public class MatchResultAnalyzer {
 
   public IMatchResult analyze(IWitness superbase, IWitness witness) {
     //Warning: TheAligner does matching also!
-    MyNewMatcher matcher = new MyNewMatcher();
+    TokenMatcher matcher = new TokenMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, witness);
     // unmatched tokens
     Set<INormalizedToken> unmatchedTokens = Sets.newLinkedHashSet();
