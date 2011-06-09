@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import java.util.List;
 
@@ -44,15 +44,7 @@ public class TokenSequence implements ITokenSequence {
   
   @Override
   public String toString() {
-    StringBuilder buffer = new StringBuilder("TokenSequence: ");
-    for  (int i=0; i < tokens.length; i++) {
-      INormalizedToken token = tokens[i];
-      if (token==null) {
-        throw new RuntimeException("token is null");
-      } 
-      buffer.append(token.toString()).append(", ");
-    }
-    return buffer.toString();
+    return getNormalized();
   }
 
   @Override

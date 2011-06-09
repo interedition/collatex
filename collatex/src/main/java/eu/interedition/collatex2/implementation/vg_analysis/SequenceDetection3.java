@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.vg_analysis;
 
 import java.util.List;
 import java.util.Map;
@@ -8,8 +8,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.vg_alignment.Sequence;
-import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
