@@ -7,6 +7,7 @@ import org.lmnl.Text;
  */
 public class Witness {
   private int id;
+  private Text source;
   private Text text;
   private Collation collation;
 
@@ -16,6 +17,14 @@ public class Witness {
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  public Text getSource() {
+    return source;
+  }
+
+  public void setSource(Text source) {
+    this.source = source;
   }
 
   public Text getText() {
