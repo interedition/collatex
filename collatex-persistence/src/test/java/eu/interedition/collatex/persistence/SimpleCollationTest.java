@@ -3,13 +3,14 @@ package eu.interedition.collatex.persistence;
 import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
-import eu.interedition.collatex2.experimental.MyNewCollateXEngine;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
-import org.junit.Assert;
 import org.junit.Test;
-import org.lmnl.*;
+import org.lmnl.QNameImpl;
+import org.lmnl.Text;
+import org.lmnl.TextContentReader;
+import org.lmnl.TextRepository;
 import org.lmnl.rdbms.RelationalAnnotationFactory;
 import org.lmnl.xml.SimpleXMLParserConfiguration;
 import org.lmnl.xml.XMLParser;
@@ -24,7 +25,6 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringReader;
 import java.net.URL;
 
 /**
@@ -48,7 +48,7 @@ public class SimpleCollationTest extends AbstractTest {
   @Autowired
   private SessionFactory sessionFactory;
 
-  private MyNewCollateXEngine engine = new MyNewCollateXEngine();
+  private CollateXEngine engine = new CollateXEngine();
 
   @Test
   public void collate() throws IOException, TransformerException, XMLStreamException {
@@ -63,7 +63,7 @@ public class SimpleCollationTest extends AbstractTest {
 
     parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "lb"));
 
-    for (String resource : new String[] { "0101.xml", "0105.xml", "0109.xml"}) {
+    for (String resource : new String[]{"0101.xml", "0105.xml", "0109.xml"}) {
       final Witness witness = new Witness();
       witness.setCollation(collation);
 
