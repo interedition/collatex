@@ -6,10 +6,10 @@
     <parent>
         <artifactId>collatex-project</artifactId>
         <groupId>eu.interedition.collatex</groupId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
     </parent>
     <artifactId>collatex-cocoon</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <name>CollateX :: Cocoon block</name>
     <dependencies>
         <dependency>
