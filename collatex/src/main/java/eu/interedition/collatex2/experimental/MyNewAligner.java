@@ -25,7 +25,6 @@ import eu.interedition.collatex2.interfaces.IWitness;
 //TODO: rename to my new variant graph builder
 //TODO: extract the real aligner out of this class
 public class MyNewAligner implements IAligner {
-
   private final IVariantGraph graph;
   private Analysis analysis;
 
@@ -34,13 +33,26 @@ public class MyNewAligner implements IAligner {
   }
 
   public void addWitness(IWitness witness) {
-    Map<INormalizedToken, INormalizedToken> linkedTokens = alignWitnessTokensToTokensInGraph(witness);
-    
+    // 1. Do the matching and linking of tokens
+    SuperbaseCreator creator = new SuperbaseCreator();
+    IWitness superbase = creator.create(graph);
+    Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, superbase);
+    // 2. Determine sequences
+    SequenceDetection3 detection = new SequenceDetection3();
+    List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
+    // 3. Determine transpositions of the sequences
+    Analysis analysis = new Analysis(sequences, superbase); 
+    //NOTE: This is not very nice!
+    this.analysis = analysis;
+    List<ITransposition2> transpositions = analysis.getTranspositions();
+    Map<INormalizedToken, INormalizedToken> alignedTokens;
+    alignedTokens = MyNewAligner.determineAlignedTokens(linkedTokens, transpositions, witness);
     IVariantGraphVertex previous =  graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
       // determine whether this token is a match or not
       // System.out.println(token+":"+linkedTokens.containsKey(token));
-      IVariantGraphVertex vertex = linkedTokens.containsKey(token) ? (IVariantGraphVertex) linkedTokens.get(token) : addNewVertex(token.getNormalized(), token);
+      INormalizedToken vertexKey = linkedTokens.containsKey(token)  ? ((IVariantGraphVertex)linkedTokens.get(token)).getVertexKey() : token;
+      IVariantGraphVertex vertex = alignedTokens.containsKey(token) ? (IVariantGraphVertex) linkedTokens.get(token) : addNewVertex(token.getNormalized(), vertexKey);
       IVariantGraphEdge edge = graph.getEdge(previous, vertex);
       if (edge == null) edge = addNewEdge(previous, vertex);
       vertex.addToken(witness, token);
@@ -52,26 +64,15 @@ public class MyNewAligner implements IAligner {
     edge.addWitness(witness);
   }
 
-  private Map<INormalizedToken, INormalizedToken> alignWitnessTokensToTokensInGraph(IWitness witness) {
+  private Map<INormalizedToken, INormalizedToken> linkTheTokens(
+      IWitness witness, IWitness superbase) {
+    Map<INormalizedToken, INormalizedToken> linkedTokens;
     if (graph.isEmpty()) {
-      return Maps.newLinkedHashMap();
+      linkedTokens = Maps.newLinkedHashMap();
     } 
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(graph);
-    Map<INormalizedToken, INormalizedToken> alignedTokens;
-    // 1. Do the matching and linking of tokens
     MyNewLinker linker = new MyNewLinker();
-    Map<INormalizedToken, INormalizedToken> linkedTokens = linker.link2(superbase, witness);
-    // 2. Determine sequences
-    SequenceDetection3 detection = new SequenceDetection3();
-    List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
-    // 3. Determine transpositions of the sequences
-    Analysis analysis = new Analysis(sequences, superbase); 
-    //NOTE: This is not very nice!
-    this.analysis = analysis;
-    List<ITransposition2> transpositions = analysis.getTranspositions();
-    alignedTokens = MyNewAligner.determineAlignedTokens(linkedTokens, transpositions, witness);
-    return alignedTokens;
+    linkedTokens = linker.link2(superbase, witness);
+    return linkedTokens;
   }
 
   //write

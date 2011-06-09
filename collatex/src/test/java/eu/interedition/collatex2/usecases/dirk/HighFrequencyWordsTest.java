@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -68,6 +69,7 @@ public class HighFrequencyWordsTest {
     //TODO: etc
   }
   
+  @Ignore
   @Test
   public void testGraphAlignment() {
     IWitness witnessA = factory.createWitness("A", "a b c d");
