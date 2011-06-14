@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.*;
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.interfaces.*;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.transformation.AbstractSAXTransformer;
@@ -34,6 +35,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   public CollateXTransformer() {
     super();
     this.defaultNamespaceURI = COLLATEX_NS;
+    engine.setTokenizer(new WhitespaceAndPunctuationTokenizer());
   }
 
   public void startTransformingElement(String uri, String name, String raw, Attributes attr) throws ProcessingException,
