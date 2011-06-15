@@ -41,6 +41,8 @@ import org.w3c.dom.NodeList;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
+import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IApparatus;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -80,7 +82,7 @@ public class ExamplesController implements InitializingBean {
 
   @RequestMapping("beckett")
   public ModelAndView collateBeckettExamples() {
-    List<IAlignmentTable> alignments = Lists.newArrayListWithCapacity(beckett.size());
+ 	List<IAlignmentTable> alignments = Lists.newArrayListWithCapacity(beckett.size());
     for (IWitness[] example : beckett) {
       alignments.add(engine.align(example));
     }
@@ -91,7 +93,10 @@ public class ExamplesController implements InitializingBean {
   public void afterPropertiesSet() throws Exception {
     usecases = parseWitnesses(applicationContext.getResource("/examples.xml"));
     darwin = parseWitnesses(applicationContext.getResource("/darwin.xml"));
+    engine.setTokenizer(new WhitespaceAndPunctuationTokenizer());
     beckett = parseWitnesses(applicationContext.getResource("/beckett.xml"));
+    //NOTE: This is not thread safe!
+    engine.setTokenizer(new WhitespaceTokenizer());
   }
   
   private List<IWitness[]> parseWitnesses(Resource resource) throws Exception {
