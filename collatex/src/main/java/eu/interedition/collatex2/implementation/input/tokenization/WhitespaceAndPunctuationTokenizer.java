@@ -15,7 +15,7 @@ public class WhitespaceAndPunctuationTokenizer implements ITokenizer {
   @Override
   public Iterable<IToken> tokenize(String content) {
     List<IToken> tokens = Lists.newArrayList(); 
-    StringTokenizer tokenizer = new StringTokenizer(content, " ,.-()?;:\n", true);
+    StringTokenizer tokenizer = new StringTokenizer(content, " ,.-[]()?!;:\n", true);
     Token previous = null;
     while (tokenizer.hasMoreTokens()) {
       String trail = tokenizer.nextToken();
