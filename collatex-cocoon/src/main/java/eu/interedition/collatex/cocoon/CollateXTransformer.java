@@ -83,7 +83,9 @@ public class CollateXTransformer extends AbstractSAXTransformer {
         rowAttrs.addAttribute(namespaceURI, "sigil", "sigil", "CDATA", row.getSigil());
         sendStartElementEventNS("row", rowAttrs);
         for (ICell cell : row) {
-          sendStartElementEventNS("cell", EMPTY_ATTRIBUTES);
+          final AttributesImpl cellAttrs = new AttributesImpl();
+          cellAttrs.addCDATAAttribute(namespaceURI, "state", cell.getColumn().getState().toString().toLowerCase());
+          sendStartElementEventNS("cell", cellAttrs);
           if (!cell.isEmpty()) {
             sendTextEvent(cell.getToken().getContent());
           }
