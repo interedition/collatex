@@ -18,6 +18,8 @@ public class DecisionGraph extends DirectedAcyclicGraph<DGVertex, DGEdge> {
     //TODO: the end vertex is unique by itself...
     //TODO: override the equals!
     end = new DGVertex(new EndToken(8));
+    addVertex(v1);
+    addVertex(end);
   }
 
   public void add(DGVertex... vertices) {
@@ -28,7 +30,7 @@ public class DecisionGraph extends DirectedAcyclicGraph<DGVertex, DGEdge> {
 
   public void add(DGEdge... edges) {
     for (DGEdge e : edges) {
-      addEdge(e.getBeginVertex(), e.getEndVertex(), e);
+      addEdge(e.getBeginVertex(), e.getTargetVertex(), e);
     }
   }
 

@@ -16,7 +16,7 @@ public class DGEdge {
     return v1;
   }
 
-  public DGVertex getEndVertex() {
+  public DGVertex getTargetVertex() {
     return v2;
   }
 
