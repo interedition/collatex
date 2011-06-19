@@ -35,6 +35,16 @@ public class DecisionGraphTest {
     IVariantGraph vGraph = engine.graph(a);
     DecisionGraph decisionGraph = buildDecisionGraph(vGraph, b);
     assertEquals(4, decisionGraph.vertexSet().size());
+    Iterator<DGVertex> topologicalOrder = decisionGraph.iterator();
+    DGVertex start = topologicalOrder.next();
+    //TODO: move stop to the end!
+    DGVertex stop = topologicalOrder.next();
+    DGVertex the1 = topologicalOrder.next();
+    DGVertex the2 = topologicalOrder.next();
+    DGEdge edge1 = decisionGraph.edge(start, the1);
+    DGEdge edge2 = decisionGraph.edge(start, the2);
+    assertEquals(new Integer(0), edge1.getWeight());
+    assertEquals(new Integer(1), edge2.getWeight());
   }
 
   @Test

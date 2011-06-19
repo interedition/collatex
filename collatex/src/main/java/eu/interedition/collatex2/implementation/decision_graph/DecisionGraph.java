@@ -42,4 +42,17 @@ public class DecisionGraph extends DirectedAcyclicGraph<DGVertex, DGEdge> {
     return end;
   }
 
+  public DGEdge edge(DGVertex source, DGVertex target) {
+    if (!this.containsVertex(source)) {
+      throw new RuntimeException("Source vertex does not exist in the graph!");
+    }
+    if (!this.containsVertex(target)) {
+      throw new RuntimeException("Target vertex does not exist in the graph!");
+    }
+    if (!this.containsEdge(source, target)) {
+      throw new RuntimeException("Edge does not exist in the graph! Vertices do exist!");
+    }
+    return this.getEdge(source, target);
+  }
+
 }
