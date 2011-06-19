@@ -42,7 +42,11 @@ public class DecisionGraphCreator {
       }
       lastConstructedVertices = newConstructedVertices;
     }
-    //TODO: add edges to the end vertex!
+    for (DGVertex lastVertex : lastConstructedVertices) {
+      INormalizedToken lastToken = lastVertex.getToken();
+      int gap = vGraph.isNear(lastToken, vGraph.getEndVertex()) ?  0 : 1;
+      dGraph.add(new DGEdge(lastVertex, dGraph.getEndVertex(), gap));
+    }
     return dGraph;
   }
 

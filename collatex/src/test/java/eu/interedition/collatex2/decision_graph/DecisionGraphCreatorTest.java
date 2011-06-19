@@ -30,8 +30,6 @@ public class DecisionGraphCreatorTest {
     // fetch vertices
     Iterator<DGVertex> topologicalOrder = decisionGraph.iterator();
     DGVertex start = topologicalOrder.next();
-    //TODO: move stop to the end!
-    DGVertex stop = topologicalOrder.next();
     DGVertex the1 = topologicalOrder.next();
     DGVertex the2 = topologicalOrder.next();
     DGVertex red = topologicalOrder.next();
@@ -43,6 +41,7 @@ public class DecisionGraphCreatorTest {
     DGVertex black = topologicalOrder.next();
     DGVertex cat3 = topologicalOrder.next();
     DGVertex cat4 = topologicalOrder.next();
+    DGVertex stop = topologicalOrder.next();
     
     // fetch edges
     DGEdge edge1 = decisionGraph.edge(start, the1);
@@ -59,6 +58,8 @@ public class DecisionGraphCreatorTest {
     DGEdge edge12 = decisionGraph.edge(the4, black);
     DGEdge edge13 = decisionGraph.edge(black, cat3);
     DGEdge edge14 = decisionGraph.edge(black, cat4);
+    DGEdge edge15 = decisionGraph.edge(cat3, stop);
+    DGEdge edge16 = decisionGraph.edge(cat4, stop);
     
     // assert weight edges
     assertEquals(new Integer(0), edge1.getWeight());
@@ -75,6 +76,8 @@ public class DecisionGraphCreatorTest {
     assertEquals(new Integer(0), edge12.getWeight());
     assertEquals(new Integer(1), edge13.getWeight());
     assertEquals(new Integer(0), edge14.getWeight());
+    assertEquals(new Integer(1), edge15.getWeight());
+    assertEquals(new Integer(0), edge16.getWeight());
   }
 
 
