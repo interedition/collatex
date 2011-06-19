@@ -1,18 +1,14 @@
 package eu.interedition.collatex2.decision_graph;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 
-import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.decision_graph.DGEdge;
 import eu.interedition.collatex2.implementation.decision_graph.DGVertex;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraph;
+import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphVisitor;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -67,13 +63,7 @@ public class DecisionGraphTest {
     dGraph.add(end);
     dGraph.add(e7, e8);
     
-    Map<DGVertex, Integer> vertexToMinWeight = determineMinWeightForEachVertex(dGraph);
-    
-    
-    // we moeten de weight van de end vertex hebben om de rest te filteren..
-    DGVertex endVertex = dGraph.getEndVertex();
-    int minGaps = vertexToMinWeight.get(endVertex);
-    System.out.println("Mininum number of gaps in the alignment: "+minGaps);
+    DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph);
     
     // ik kan nu een nieuwe graph maken waarbij ik alle vertices en edges die niet kleiner 
     // of gelijk de minimum weight zijn deleten
@@ -95,28 +85,6 @@ public class DecisionGraphTest {
 //    System.out.println(paths);
 //    DGEdge[] bla = new DGEdge[] { new DGEdge(start, start, minGaps), new DGEdge(start, start, minGaps) };
 
-  }
-
-  private Map<DGVertex, Integer> determineMinWeightForEachVertex(DecisionGraph graph) {
-    // bepalen minimaal aantal gaps in de decision graph
-    Map<DGVertex, Integer> vertexToMinWeight = Maps.newLinkedHashMap();
-    Iterator<DGVertex> iterator = graph.iterator();
-    // setup map with startvertex
-    DGVertex startVertex = iterator.next(); 
-    vertexToMinWeight.put(startVertex, 0);
-    while (iterator.hasNext()) {
-      DGVertex next = iterator.next();
-      Set<DGEdge> incomingEdgesOf = graph.incomingEdgesOf(next);
-      // bepaal de nieuwe weight for elk van de incoming edges
-      Map<DGEdge, Integer> edgeToTotalWeight = Maps.newLinkedHashMap();
-      for (DGEdge incomingEdge : incomingEdgesOf) {
-        edgeToTotalWeight.put(incomingEdge, vertexToMinWeight.get(incomingEdge.getBeginVertex())+incomingEdge.getWeight());
-      }
-      Integer min = Collections.min(edgeToTotalWeight.values());
-      vertexToMinWeight.put(next, min);
-    }
-    System.out.println(vertexToMinWeight);
-    return vertexToMinWeight;
   }
   
   // we kunnen natuurlijk de graph in een tree converten
