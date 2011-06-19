@@ -19,7 +19,7 @@ public class DecisionGraphCreatorTest {
   // All the witness are equal
   // There are choices to be made however, since there is duplication of tokens
   @Test
-  public void testDGAlignmentEverythingEqual() {
+  public void testBuildingDGEverythingEqual() {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
@@ -80,5 +80,36 @@ public class DecisionGraphCreatorTest {
     assertEquals(new Integer(0), edge16.getWeight());
   }
 
-
+  @Test
+  public void testDecisionGraphOmission() {
+    CollateXEngine engine = new CollateXEngine();
+    IWitness a = engine.createWitness("a", "The red cat and the black cat");
+    IWitness b = engine.createWitness("b", "the black cat");
+    IVariantGraph graph = engine.graph(a);
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
+    Iterator<DGVertex> topologicalOrder = dGraph.iterator();
+    DGVertex v1 = topologicalOrder.next();
+    DGVertex vThe1 = topologicalOrder.next();
+    DGVertex vThe2 = topologicalOrder.next();
+    DGEdge e1 = dGraph.edge(v1, vThe1);
+    DGEdge e2 = dGraph.edge(v1, vThe2); 
+    assertEquals(new Integer(0), e1.getWeight()); // 0 = no gap -> ENumeration?
+    assertEquals(new Integer(1), e2.getWeight()); // 1 = gap
+    DGVertex vB = topologicalOrder.next();
+    DGEdge e3 = dGraph.edge(vThe1, vB); // , 1 
+    DGEdge e4 = dGraph.edge(vThe2, vB); // , 0
+    assertEquals(new Integer(1), e3.getWeight());
+    assertEquals(new Integer(0), e4.getWeight());
+    DGVertex vC1 = topologicalOrder.next();
+    DGVertex vC2 = topologicalOrder.next();
+    DGEdge e5 = dGraph.edge(vB, vC1); // , 1
+    DGEdge e6 = dGraph.edge(vB, vC2); // , 0
+    assertEquals(new Integer(1), e5.getWeight());
+    assertEquals(new Integer(0), e6.getWeight());
+    DGVertex end = topologicalOrder.next();
+    DGEdge e7 = dGraph.edge(vC1, end); // , 1
+    DGEdge e8 = dGraph.edge(vC2, end); // , 0
+    assertEquals(new Integer(1), e7.getWeight());
+    assertEquals(new Integer(0), e8.getWeight());
+  }
 }

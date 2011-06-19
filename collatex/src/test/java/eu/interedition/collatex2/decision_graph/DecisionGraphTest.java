@@ -3,11 +3,9 @@ package eu.interedition.collatex2.decision_graph;
 
 import org.junit.Test;
 
-
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.decision_graph.DGEdge;
-import eu.interedition.collatex2.implementation.decision_graph.DGVertex;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraph;
+import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphCreator;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphVisitor;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -36,33 +34,7 @@ public class DecisionGraphTest {
     
 
     // we use a weighted DAG to make alignment decisions
-    
-    // eerst de vertices
-    DecisionGraph dGraph = new DecisionGraph(graph.getStartVertex());
-    DGVertex v1 = dGraph.getStartVertex();
-    DGVertex vThe1 = new DGVertex(a.getTokens().get(0));
-    DGVertex vThe2 = new DGVertex(a.getTokens().get(4));
-    DGEdge e1 = new DGEdge(v1, vThe1, 0); // 0 = no gap -> ENumeration?
-    DGEdge e2 = new DGEdge(v1, vThe2, 1); // 1 = gap
-    dGraph.add(v1, vThe1, vThe2);
-    dGraph.add(e1, e2);
-    DGVertex vB = new DGVertex(a.getTokens().get(5));
-    DGEdge e3 = new DGEdge(vThe1, vB, 1); 
-    DGEdge e4 = new DGEdge(vThe2, vB, 0);
-    dGraph.add(vB);
-    dGraph.add(e3, e4);
-    DGVertex vC1 = new DGVertex(a.getTokens().get(2));
-    DGVertex vC2 = new DGVertex(a.getTokens().get(6));
-    DGEdge e5 = new DGEdge(vB, vC1, 1);
-    DGEdge e6 = new DGEdge(vB, vC2, 0);
-    dGraph.add(vC1, vC2);
-    dGraph.add(e5, e6);
-    DGVertex end = dGraph.getEndVertex();
-    DGEdge e7 = new DGEdge(vC1, end, 1);
-    DGEdge e8 = new DGEdge(vC2, end, 0);
-    dGraph.add(end);
-    dGraph.add(e7, e8);
-    
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
     DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph);
     
     // ik kan nu een nieuwe graph maken waarbij ik alle vertices en edges die niet kleiner 
