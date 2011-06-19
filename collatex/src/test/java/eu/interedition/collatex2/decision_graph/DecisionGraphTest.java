@@ -1,60 +1,22 @@
 package eu.interedition.collatex2.decision_graph;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
 
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.decision_graph.DGEdge;
 import eu.interedition.collatex2.implementation.decision_graph.DGVertex;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraph;
-import eu.interedition.collatex2.implementation.matching.TokenMatcher;
-import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DecisionGraphTest {
-
-  // All the witness are equal
-  // There are choices to be made however, since there is duplication of tokens
-  @Test
-  public void testDGAlignmentEverythingEqual() {
-    CollateXEngine engine = new CollateXEngine();
-    IWitness a = engine.createWitness("a", "The red cat and the black cat");
-    IWitness b = engine.createWitness("b", "The red cat and the black cat");
-    IVariantGraph vGraph = engine.graph(a);
-    DecisionGraph decisionGraph = buildDecisionGraph(vGraph, b);
-    assertEquals(5, decisionGraph.vertexSet().size());
-    Iterator<DGVertex> topologicalOrder = decisionGraph.iterator();
-    //TODO: move stop to the end!
-    DGVertex start = topologicalOrder.next();
-    // fetch vertices
-    DGVertex stop = topologicalOrder.next();
-    DGVertex the1 = topologicalOrder.next();
-    DGVertex the2 = topologicalOrder.next();
-    DGVertex red = topologicalOrder.next();
-    // fetch edges
-    DGEdge edge1 = decisionGraph.edge(start, the1);
-    DGEdge edge2 = decisionGraph.edge(start, the2);
-    DGEdge edge3 = decisionGraph.edge(the1, red);
-    DGEdge edge4 = decisionGraph.edge(the2, red);
-    // assert weight edges
-    assertEquals(new Integer(0), edge1.getWeight());
-    assertEquals(new Integer(1), edge2.getWeight());
-    assertEquals(new Integer(0), edge3.getWeight());
-    assertEquals(new Integer(1), edge4.getWeight());
-  }
 
   @Test
   public void testDecisionGraphOmission() {
@@ -133,41 +95,6 @@ public class DecisionGraphTest {
 //    System.out.println(paths);
 //    DGEdge[] bla = new DGEdge[] { new DGEdge(start, start, minGaps), new DGEdge(start, start, minGaps) };
 
-  }
-
-  private DecisionGraph buildDecisionGraph(IVariantGraph vGraph, IWitness b) {
-    // build the decision graph from the matches and the vgraph
-    DecisionGraph dGraph = new DecisionGraph(vGraph.getStartVertex());
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(vGraph);
-    TokenMatcher matcher = new TokenMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, b);
-    Set<DGVertex> lastConstructedVertices = Sets.newLinkedHashSet();
-    lastConstructedVertices.add(dGraph.getStartVertex());
-    for (INormalizedToken wToken : b.getTokens()) {
-      List<INormalizedToken> matchingTokens = matches.get(wToken);
-      // Ik moet hier alle aangemaakte vertices in de DGraph opvangen
-      Set<DGVertex> newConstructedVertices = Sets.newLinkedHashSet();
-      for (INormalizedToken match : matchingTokens) {
-        DGVertex dgVertex = new DGVertex(match);
-        dGraph.add(dgVertex);
-        newConstructedVertices.add(dgVertex);
-        // TODO: you don't want to always draw an edge 
-        // TODO: in the case of ngrams in witness and superbase
-        // TODO: less edges are needed
-        for (DGVertex lastVertex : lastConstructedVertices) {
-          INormalizedToken lastToken = lastVertex.getToken();
-          int gap = vGraph.isNear(lastToken, match) ?  0 : 1;
-          dGraph.add(new DGEdge(lastVertex, dgVertex, gap));
-        }
-      }
-      lastConstructedVertices = newConstructedVertices;
-      // TODO: remove this arbitriary limit
-      if (wToken.getContent().equals("red")) {
-        break;
-      }
-    }
-    return dGraph;
   }
 
   private Map<DGVertex, Integer> determineMinWeightForEachVertex(DecisionGraph graph) {
