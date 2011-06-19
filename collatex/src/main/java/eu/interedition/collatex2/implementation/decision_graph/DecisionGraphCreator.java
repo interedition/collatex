@@ -41,11 +41,8 @@ public class DecisionGraphCreator {
         }
       }
       lastConstructedVertices = newConstructedVertices;
-      // TODO: remove this arbitriary limit
-      if (wToken.getContent().equals("red")) {
-        break;
-      }
     }
+    //TODO: add edges to the end vertex!
     return dGraph;
   }
 
