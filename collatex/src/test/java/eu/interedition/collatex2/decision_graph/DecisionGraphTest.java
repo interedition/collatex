@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.decision_graph.DGEdge;
@@ -34,17 +35,25 @@ public class DecisionGraphTest {
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
     DecisionGraph decisionGraph = buildDecisionGraph(vGraph, b);
-    assertEquals(4, decisionGraph.vertexSet().size());
+    assertEquals(5, decisionGraph.vertexSet().size());
     Iterator<DGVertex> topologicalOrder = decisionGraph.iterator();
-    DGVertex start = topologicalOrder.next();
     //TODO: move stop to the end!
+    DGVertex start = topologicalOrder.next();
+    // fetch vertices
     DGVertex stop = topologicalOrder.next();
     DGVertex the1 = topologicalOrder.next();
     DGVertex the2 = topologicalOrder.next();
+    DGVertex red = topologicalOrder.next();
+    // fetch edges
     DGEdge edge1 = decisionGraph.edge(start, the1);
     DGEdge edge2 = decisionGraph.edge(start, the2);
+    DGEdge edge3 = decisionGraph.edge(the1, red);
+    DGEdge edge4 = decisionGraph.edge(the2, red);
+    // assert weight edges
     assertEquals(new Integer(0), edge1.getWeight());
     assertEquals(new Integer(1), edge2.getWeight());
+    assertEquals(new Integer(0), edge3.getWeight());
+    assertEquals(new Integer(1), edge4.getWeight());
   }
 
   @Test
@@ -52,6 +61,7 @@ public class DecisionGraphTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
+    IVariantGraph graph = engine.graph(a);
     
     //  the -> The
     //  the -> the
@@ -70,36 +80,36 @@ public class DecisionGraphTest {
     // we use a weighted DAG to make alignment decisions
     
     // eerst de vertices
-    DecisionGraph graph = new DecisionGraph();
-    DGVertex v1 = graph.getStartVertex();
+    DecisionGraph dGraph = new DecisionGraph(graph.getStartVertex());
+    DGVertex v1 = dGraph.getStartVertex();
     DGVertex vThe1 = new DGVertex(a.getTokens().get(0));
     DGVertex vThe2 = new DGVertex(a.getTokens().get(4));
     DGEdge e1 = new DGEdge(v1, vThe1, 0); // 0 = no gap -> ENumeration?
     DGEdge e2 = new DGEdge(v1, vThe2, 1); // 1 = gap
-    graph.add(v1, vThe1, vThe2);
-    graph.add(e1, e2);
+    dGraph.add(v1, vThe1, vThe2);
+    dGraph.add(e1, e2);
     DGVertex vB = new DGVertex(a.getTokens().get(5));
     DGEdge e3 = new DGEdge(vThe1, vB, 1); 
     DGEdge e4 = new DGEdge(vThe2, vB, 0);
-    graph.add(vB);
-    graph.add(e3, e4);
+    dGraph.add(vB);
+    dGraph.add(e3, e4);
     DGVertex vC1 = new DGVertex(a.getTokens().get(2));
     DGVertex vC2 = new DGVertex(a.getTokens().get(6));
     DGEdge e5 = new DGEdge(vB, vC1, 1);
     DGEdge e6 = new DGEdge(vB, vC2, 0);
-    graph.add(vC1, vC2);
-    graph.add(e5, e6);
-    DGVertex end = graph.getEndVertex();
+    dGraph.add(vC1, vC2);
+    dGraph.add(e5, e6);
+    DGVertex end = dGraph.getEndVertex();
     DGEdge e7 = new DGEdge(vC1, end, 1);
     DGEdge e8 = new DGEdge(vC2, end, 0);
-    graph.add(end);
-    graph.add(e7, e8);
+    dGraph.add(end);
+    dGraph.add(e7, e8);
     
-    Map<DGVertex, Integer> vertexToMinWeight = determineMinWeightForEachVertex(graph);
+    Map<DGVertex, Integer> vertexToMinWeight = determineMinWeightForEachVertex(dGraph);
     
     
     // we moeten de weight van de end vertex hebben om de rest te filteren..
-    DGVertex endVertex = graph.getEndVertex();
+    DGVertex endVertex = dGraph.getEndVertex();
     int minGaps = vertexToMinWeight.get(endVertex);
     System.out.println("Mininum number of gaps in the alignment: "+minGaps);
     
@@ -127,22 +137,35 @@ public class DecisionGraphTest {
 
   private DecisionGraph buildDecisionGraph(IVariantGraph vGraph, IWitness b) {
     // build the decision graph from the matches and the vgraph
-    DecisionGraph dGraph = new DecisionGraph();
-    INormalizedToken lastToken = vGraph.getStartVertex();
-    DGVertex lastVertex = dGraph.getStartVertex();
+    DecisionGraph dGraph = new DecisionGraph(vGraph.getStartVertex());
     SuperbaseCreator creator = new SuperbaseCreator();
     IWitness superbase = creator.create(vGraph);
     TokenMatcher matcher = new TokenMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, b);
-    for (INormalizedToken token : b.getTokens()) {
-      List<INormalizedToken> matchingTokens = matches.get(token);
+    Set<DGVertex> lastConstructedVertices = Sets.newLinkedHashSet();
+    lastConstructedVertices.add(dGraph.getStartVertex());
+    for (INormalizedToken wToken : b.getTokens()) {
+      List<INormalizedToken> matchingTokens = matches.get(wToken);
+      // Ik moet hier alle aangemaakte vertices in de DGraph opvangen
+      Set<DGVertex> newConstructedVertices = Sets.newLinkedHashSet();
       for (INormalizedToken match : matchingTokens) {
-        DGVertex dgVertex = new DGVertex(token);
+        DGVertex dgVertex = new DGVertex(match);
         dGraph.add(dgVertex);
-        int gap = vGraph.isNear(lastToken, match) ?  0 : 1;
-        dGraph.add(new DGEdge(lastVertex, dgVertex, gap));
+        newConstructedVertices.add(dgVertex);
+        // TODO: you don't want to always draw an edge 
+        // TODO: in the case of ngrams in witness and superbase
+        // TODO: less edges are needed
+        for (DGVertex lastVertex : lastConstructedVertices) {
+          INormalizedToken lastToken = lastVertex.getToken();
+          int gap = vGraph.isNear(lastToken, match) ?  0 : 1;
+          dGraph.add(new DGEdge(lastVertex, dgVertex, gap));
+        }
       }
-      break;
+      lastConstructedVertices = newConstructedVertices;
+      // TODO: remove this arbitriary limit
+      if (wToken.getContent().equals("red")) {
+        break;
+      }
     }
     return dGraph;
   }

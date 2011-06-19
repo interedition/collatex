@@ -10,8 +10,12 @@ public class DGVertex {
     this.normalizedToken = normalizedToken;
   }
 
+  public INormalizedToken getToken() {
+    return normalizedToken;
+  }
+
   @Override
   public String toString() {
-    return normalizedToken.getContent();
+    return normalizedToken.toString();
   }
 }

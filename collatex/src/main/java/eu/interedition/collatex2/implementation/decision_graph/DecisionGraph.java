@@ -3,7 +3,7 @@ package eu.interedition.collatex2.implementation.decision_graph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import eu.interedition.collatex2.implementation.vg_alignment.EndToken;
-import eu.interedition.collatex2.implementation.vg_alignment.StartToken;
+import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
 @SuppressWarnings("serial")
 public class DecisionGraph extends DirectedAcyclicGraph<DGVertex, DGEdge> {
@@ -11,9 +11,9 @@ public class DecisionGraph extends DirectedAcyclicGraph<DGVertex, DGEdge> {
   private final DGVertex v1;
   private final DGVertex end;
 
-  public DecisionGraph() {
+  public DecisionGraph(IVariantGraphVertex startVertex) {
     super(DGEdge.class);
-    v1 = new DGVertex(new StartToken());
+    v1 = new DGVertex(startVertex);
     //TODO: that eight there is not handy!
     //TODO: the end vertex is unique by itself...
     //TODO: override the equals!
