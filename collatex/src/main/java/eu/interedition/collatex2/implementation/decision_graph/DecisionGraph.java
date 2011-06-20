@@ -5,6 +5,8 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import eu.interedition.collatex2.implementation.vg_alignment.EndToken;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
+// we use a weighted DAG to make alignment decisions
+
 @SuppressWarnings("serial")
 public class DecisionGraph extends DirectedAcyclicGraph<DGVertex, DGEdge> {
 

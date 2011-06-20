@@ -1,64 +1,43 @@
 package eu.interedition.collatex2.decision_graph;
 
 
-import org.junit.Test;
-
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.decision_graph.DecisionGraph;
-import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphCreator;
-import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphVisitor;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DecisionGraphTest {
 
-  @Test
-  public void testDecisionGraphOmission() {
-    CollateXEngine engine = new CollateXEngine();
-    IWitness a = engine.createWitness("a", "The red cat and the black cat");
-    IWitness b = engine.createWitness("b", "the black cat");
-    IVariantGraph graph = engine.graph(a);
-    
-    //  the -> The
-    //  the -> the
-    //  black -> black
-    //  cat -> cat
-    //  cat -> cat
-    // bij een decision tree zou de black wegvallen
-    // we maken er een graaf van, dan krijgen we twee cirkels als het ware
-    // shortest path
-    // bij elke vertex bijhouden wat de minimum weight daar is
-    // bij elke edge bijhouden of hij deel uitmaakt van het shortest path
-    // dan zou het mogelijk moeten zijn om meerdere shortest paths 
-    // te reconstrueren
-    
-
-    // we use a weighted DAG to make alignment decisions
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
-    DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph);
-    
-    // ik kan nu een nieuwe graph maken waarbij ik alle vertices en edges die niet kleiner 
-    // of gelijk de minimum weight zijn deleten
-    // maar of dat echt nodig is
-    // is nog maar de vraag
-    
-    
-    
-    // we moeten bijhouden welk pad we gelopen hebben in de vorm van edges
-    // ook moeten we bijhouden welke stappen we nog moeten zetten
-    // daar twijfel ik tussen de vertices en de edges
-    // aangezien je wil recursen bij meerdere vertices..
-    // en dan dus een bepaalde edge meegeven om te doen...
-    // laten we initialisen met een bepaalde edge
-//    DGVertex start = graph.getStartVertex();
-//    List<List<DGEdge>> initialpaths = Lists.newArrayList();
-//    initialpaths.add(new ArrayList<DGEdge>());
-//    List<List<DGEdge>> paths = traverseVertex(initialpaths, graph, vertexToMinWeight, minGaps, start);
-//    System.out.println(paths);
-//    DGEdge[] bla = new DGEdge[] { new DGEdge(start, start, minGaps), new DGEdge(start, start, minGaps) };
-
-  }
   
+  //  the -> The
+  //  the -> the
+  //  black -> black
+  //  cat -> cat
+  //  cat -> cat
+  // bij een decision tree zou de black wegvallen
+  // we maken er een graaf van, dan krijgen we twee cirkels als het ware
+  // shortest path
+  // bij elke vertex bijhouden wat de minimum weight daar is
+  // bij elke edge bijhouden of hij deel uitmaakt van het shortest path
+  // dan zou het mogelijk moeten zijn om meerdere shortest paths 
+  // te reconstrueren
+
+  // ik kan nu een nieuwe graph maken waarbij ik alle vertices en edges die niet kleiner 
+  // of gelijk de minimum weight zijn deleten
+  // maar of dat echt nodig is
+  // is nog maar de vraag
+  
+  
+  
+  // we moeten bijhouden welk pad we gelopen hebben in de vorm van edges
+  // ook moeten we bijhouden welke stappen we nog moeten zetten
+  // daar twijfel ik tussen de vertices en de edges
+  // aangezien je wil recursen bij meerdere vertices..
+  // en dan dus een bepaalde edge meegeven om te doen...
+  // laten we initialisen met een bepaalde edge
+//  DGVertex start = graph.getStartVertex();
+//  List<List<DGEdge>> initialpaths = Lists.newArrayList();
+//  initialpaths.add(new ArrayList<DGEdge>());
+//  List<List<DGEdge>> paths = traverseVertex(initialpaths, graph, vertexToMinWeight, minGaps, start);
+//  System.out.println(paths);
+
+  //  DGEdge[] bla = new DGEdge[] { new DGEdge(start, start, minGaps), new DGEdge(start, start, minGaps) };
   // we kunnen natuurlijk de graph in een tree converten
   // door strategies de vertex te dupliceren
   // dan kun je alle paden vinden door de leaf nodes af te lopen
