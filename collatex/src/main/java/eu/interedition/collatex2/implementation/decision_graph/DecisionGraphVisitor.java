@@ -2,6 +2,7 @@ package eu.interedition.collatex2.implementation.decision_graph;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,6 +10,13 @@ import com.google.common.collect.Maps;
 
 public class DecisionGraphVisitor {
 
+  private final DecisionGraph dGraph;
+
+  public DecisionGraphVisitor(DecisionGraph dGraph) {
+    this.dGraph = dGraph;
+  }
+
+  //TODO: remove static!
   public static Map<DGVertex, Integer> determineMinWeightForEachVertex(DecisionGraph graph) {
     // bepalen minimaal aantal gaps in de decision graph
     Map<DGVertex, Integer> vertexToMinWeight = Maps.newLinkedHashMap();
@@ -31,6 +39,7 @@ public class DecisionGraphVisitor {
     return vertexToMinWeight;
   }
 
+  //TODO: remove static!
   public static int determineMinimumNumberOfGaps(DecisionGraph dGraph) {
     // we moeten de weight van de end vertex hebben om de rest te filteren..
     Map<DGVertex, Integer> vertexToMinWeight = determineMinWeightForEachVertex(dGraph);
@@ -38,6 +47,12 @@ public class DecisionGraphVisitor {
     int minGaps = vertexToMinWeight.get(endVertex);
     //System.out.println("Mininum number of gaps in the alignment: "+minGaps);
     return minGaps;
+  }
+
+  //TODO: implement!
+  public List<DGEdge> getShortestPath() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }
