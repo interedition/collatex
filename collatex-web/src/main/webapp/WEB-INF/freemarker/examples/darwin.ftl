@@ -23,8 +23,9 @@
 <@c.page title="Darwin">
 <style type="text/css">
 .invariant {background: lightgrey;}
-.semi_invariant {background: grey;}
-.variant   {color:lightgrey; background: black;}
+.semi_invariant {background: lightgrey;}
+<!-- .semi_invariant {color:lightgrey; background: black;} -->
+.variant    {background: grey;} 
 </style>
 
 	<h1>Darwin</h1>
