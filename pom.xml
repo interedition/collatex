@@ -51,7 +51,7 @@
             <dependency>
                 <groupId>eu.interedition.collatex</groupId>
                 <artifactId>collatex</artifactId>
-                <version>${pom.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -275,8 +275,8 @@
         </license>
     </licenses>
     <properties>
+        <spring.version>3.0.5.RELEASE</spring.version>
         <slf4j.version>1.5.11</slf4j.version>
         <restlet.version>2.0-RC2</restlet.version>
-        <spring.version>3.0.5.RELEASE</spring.version>
     </properties>
 </project>
