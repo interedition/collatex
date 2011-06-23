@@ -6,7 +6,7 @@
     <artifactId>collatex-project</artifactId>
     <packaging>pom</packaging>
     <name>CollateX :: Project</name>
-    <version>1.1</version>
+    <version>1.3-SNAPSHOT</version>
     <description>CollateX is a Java library for collating textual sources, for example, to produce an apparatus.
     </description>
     <url>http://collatex.sourceforge.net/</url>
