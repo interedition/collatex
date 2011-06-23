@@ -21,7 +21,7 @@
         <!--  <module>collatex-legacy</module>  -->
         <module>collatex-client-jee</module>
         <module>collatex-cocoon</module>
-        <module>collatex-xml</module>
+        <module>collatex-persistence</module>
     </modules>
     <dependencies>
         <dependency>
@@ -275,6 +275,7 @@
         </license>
     </licenses>
     <properties>
+        <spring.version>3.0.5.RELEASE</spring.version>
         <slf4j.version>1.5.11</slf4j.version>
         <restlet.version>2.0-RC2</restlet.version>
     </properties>

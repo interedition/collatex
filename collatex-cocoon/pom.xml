@@ -9,7 +9,6 @@
         <version>1.3-SNAPSHOT</version>
     </parent>
     <artifactId>collatex-cocoon</artifactId>
-    <version>1.3-SNAPSHOT</version>
     <name>CollateX :: Cocoon block</name>
     <dependencies>
         <dependency>
