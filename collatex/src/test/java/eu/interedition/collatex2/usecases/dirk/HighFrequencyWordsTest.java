@@ -32,7 +32,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -75,7 +75,7 @@ public class HighFrequencyWordsTest {
     IWitness witnessA = factory.createWitness("A", "a b c d");
     IWitness witnessB = factory.createWitness("B", "a b d");
     IVariantGraph graph = factory.graph(witnessA);
-    IAlignment2 alignment = factory.align(graph, witnessB);
+    IAlignment alignment = factory.align(graph, witnessB);
     List<ITokenMatch> tokenMatches = alignment.getTokenMatches();
     ITokenMatch match1 = tokenMatches.get(0);
     ITokenMatch match2 = tokenMatches.get(1);

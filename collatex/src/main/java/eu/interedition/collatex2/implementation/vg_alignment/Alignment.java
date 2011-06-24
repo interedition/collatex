@@ -18,21 +18,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_analysis;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import java.util.List;
 
-import eu.interedition.collatex2.implementation.vg_alignment.IAlignment;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
 
-public class Analyzer {
+public class Alignment implements IAlignment {
 
-  public IAnalysis analyze(IAlignment alignment) {
-    SequenceDetection2 seqDetection = new SequenceDetection2(alignment);
-    List<ISequence> sequences = seqDetection.chainTokenMatches();
-    IVariantGraph graph = alignment.getGraph();
-    IAnalysis analysis = new Analysis(sequences, graph);
-    return analysis;
+  private final IVariantGraph graph;
+  private final IWitness witness;
+  private final List<ITokenMatch> tokenMatches;
+
+  public Alignment(IVariantGraph graph, IWitness witness, List<ITokenMatch> tokenMatches) {
+    this.graph = graph;
+    this.witness = witness;
+    this.tokenMatches = tokenMatches;
   }
 
+  @Override
+  public IVariantGraph getGraph() {
+    return graph;
+  }
+
+  @Override
+  public IWitness getWitness() {
+    return witness;
+  }
+
+  @Override
+  public List<ITokenMatch> getTokenMatches() {
+    return tokenMatches;
+  }
 }

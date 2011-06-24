@@ -18,10 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces.nonpublic.modifications;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
-public interface IModification {
+import java.util.List;
 
-  // void accept(final ModificationVisitor modificationVisitor);
+import eu.interedition.collatex2.interfaces.ITokenMatch;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
+
+public interface IAlignment {
+
+  List<ITokenMatch> getTokenMatches();
+  
+  IWitness getWitness();
+
+  IVariantGraph getGraph();
 
 }

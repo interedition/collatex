@@ -28,20 +28,17 @@ import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenN
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
-import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.vg_analysis.Analyzer;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IApparatus;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
 
 /**
  * 
@@ -121,14 +118,14 @@ public class CollateXEngine {
     return table;
   }
 
-  public IAlignment2 align(IVariantGraph graph, IWitness witness) {
+  public IAlignment align(IVariantGraph graph, IWitness witness) {
     IAligner aligner = createAligner(graph);
-    IAlignment2 alignment = aligner.align(witness);
+    IAlignment alignment = aligner.align(witness);
     return alignment;
   }
 
   public IAnalysis analyse(IVariantGraph graph, IWitness witness) {
-    IAlignment2 alignment = align(graph, witness);
+    IAlignment alignment = align(graph, witness);
     Analyzer analyzer = new Analyzer();
     return analyzer.analyze(alignment);
   }
@@ -141,19 +138,4 @@ public class CollateXEngine {
   public IApparatus createApparatus(IAlignmentTable result) {
     throw new RuntimeException("Not allowed! --> use createApparatus(VG) instead.");
   }
-
-  @Deprecated
-  public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
-    throw new RuntimeException("Near matches are not yet supported!");
-  }
-
-  @Deprecated
-  public static IMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
-    throw new RuntimeException("Near matches are not yet supported!");
-  }
-
-
-
-  
-
 }

@@ -106,7 +106,7 @@ public class VariantGraphAligner implements IAligner {
 
 
   @Override
-  public IAlignment2 align(IWitness witness) {
+  public IAlignment align(IWitness witness) {
     throw new RuntimeException("NOT YET IMPLEMENTED!");
   }
 

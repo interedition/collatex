@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
@@ -39,7 +39,7 @@ public class SequenceDetection2 {
   private final ITokenContainer base;
   private final ITokenContainer witness;
 
-  public SequenceDetection2(IAlignment2 alignment) {
+  public SequenceDetection2(IAlignment alignment) {
     this.base = alignment.getGraph();
     this.witness = alignment.getWitness();
     this.tokenMatches = alignment.getTokenMatches();
