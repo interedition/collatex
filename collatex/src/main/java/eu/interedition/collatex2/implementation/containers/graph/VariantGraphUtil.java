@@ -30,9 +30,9 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 
 public class VariantGraphUtil {
-  private final VariantGraph2 graph;
+  private final VariantGraph graph;
 
-  public VariantGraphUtil(VariantGraph2 graph) {
+  public VariantGraphUtil(VariantGraph graph) {
     this.graph = graph;
   }
 

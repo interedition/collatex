@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
@@ -67,7 +66,7 @@ public class LinkerTest {
     // lots of setup
     IWitness a = engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    IVariantGraph graph = new VariantGraph2();
+    IVariantGraph graph = new VariantGraph();
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
     aligner.addWitness(a);
     aligner.addWitness(b);
@@ -98,7 +97,7 @@ public class LinkerTest {
   public void testLinkingWithStartToken() {
     IWitness a = engine.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
     IWitness b = engine.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
-    IVariantGraph graph = new VariantGraph2();
+    IVariantGraph graph = new VariantGraph();
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
     aligner.add(a);
     SuperbaseCreator superbaseCreator = new SuperbaseCreator();
