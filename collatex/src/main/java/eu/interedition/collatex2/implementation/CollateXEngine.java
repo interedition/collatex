@@ -116,9 +116,4 @@ public class CollateXEngine {
   public IApparatus createApparatus(final IVariantGraph variantGraph) {
     return ParallelSegmentationApparatus.build(variantGraph);
   }
-
-  @Deprecated
-  public IApparatus createApparatus(IAlignmentTable result) {
-    throw new RuntimeException("Not allowed! --> use createApparatus(VG) instead.");
-  }
 }

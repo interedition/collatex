@@ -24,12 +24,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.Util;
 import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
@@ -97,7 +97,7 @@ public class WitnessBuilder {
 
   public IWitness build(String witness) {
     /* no witnessId? generate a random one */
-    return build(Util.generateRandomId(), witness, new WhitespaceTokenizer());
+    return build(generateRandomId(), witness, new WhitespaceTokenizer());
   }
 
   public IWitness[] buildWitnesses(String... _witnesses) {
@@ -109,4 +109,9 @@ public class WitnessBuilder {
     return witnesses;
   }
 
+  private static final Random random = new Random();
+
+  protected static String generateRandomId() {
+    return Long.toString(Math.abs(random.nextLong()), 5);
+  }
 }
