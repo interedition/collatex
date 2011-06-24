@@ -9,13 +9,6 @@
 	</parent>
 	<artifactId>collatex</artifactId>
 	<name>CollateX</name>
-	<repositories>
-		<repository>
-   			<id>tinkerpop-repository</id>
-   			<name>TinkerPop Maven2 Repository</name>
-   			<url>http://tinkerpop.com/maven2</url>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.tinkerpop.blueprints</groupId>
