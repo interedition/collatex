@@ -24,12 +24,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphEdge;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphVertex;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -135,4 +135,8 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
 	  throw new UnsupportedOperationException("Cyclic graphs have no transpositions");
   }
 
+  @Override
+  public IVariantGraph add(IWitness witness) {
+    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
+  }
 }

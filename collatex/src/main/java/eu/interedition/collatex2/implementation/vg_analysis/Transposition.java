@@ -20,15 +20,30 @@
 
 package eu.interedition.collatex2.implementation.vg_analysis;
 
-import java.util.List;
 
 
-public interface IAnalysis {
+public class Transposition implements ITransposition {
+  private final ISequence sequenceA;
+  private final ISequence sequenceB;
 
-  // purpose: detect sequences in the token matches and combine
-  // them together into sequences
-  List<ISequence> getSequences();
+  public Transposition(ISequence sequenceA, ISequence sequenceB) {
+    this.sequenceA = sequenceA;
+    this.sequenceB = sequenceB;
+  }
+
+  @Override
+  public ISequence getSequenceA() {
+    return sequenceA;
+  }
+
+  @Override
+  public ISequence getSequenceB() {
+    return sequenceB;
+  }
   
-  List<ITransposition> getTranspositions();
+  @Override
+  public String toString() {
+    return sequenceA.toString() + " -> "+sequenceB.toString();
+  }
 
 }

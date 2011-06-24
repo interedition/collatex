@@ -22,17 +22,14 @@
 
 package eu.interedition.collatex2.implementation;
 
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
+import eu.interedition.collatex2.implementation.vg_alignment.IVariantGraphListener;
+import eu.interedition.collatex2.implementation.vg_alignment.NoOpVariantGraphListener;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraph;
 import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
-import eu.interedition.collatex2.implementation.vg_alignment.IAlignment;
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
-import eu.interedition.collatex2.implementation.vg_analysis.Analyzer;
-import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
-import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IApparatus;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
@@ -76,16 +73,6 @@ public class CollateXEngine {
     return builder.build(sigil, text, tokenizer);
   }
 
-  public IAligner createAligner() {
-    VariantGraph graph = new VariantGraph();
-    return createAligner(graph);
-  }
-
-  public IAligner createAligner(IVariantGraph graph) {
-    // return new VariantGraphAligner(graph);
-    return new VariantGraphAligner(graph);
-  }
-
   /**
    * align the witnesses
    * 
@@ -97,9 +84,15 @@ public class CollateXEngine {
    * Terminology check
    */
   public IVariantGraph graph(IWitness... witnesses) {
-    IAligner aligner = createAligner();
-    aligner.add(witnesses);
-    return aligner.getResult();
+    return graph(new NoOpVariantGraphListener(), witnesses);
+  }
+
+  public IVariantGraph graph(IVariantGraphListener listener, IWitness... witnesses) {
+    VariantGraph graph = new VariantGraph(listener);
+    for (IWitness witness : witnesses) {
+      graph.add(witness);
+    }
+    return graph;
   }
 
   /**
@@ -113,21 +106,11 @@ public class CollateXEngine {
    * Terminology check
    */
   public IAlignmentTable align(IWitness... witnesses) {
-    IVariantGraph vg = graph(witnesses);
-    RankedGraphBasedAlignmentTable table = new RankedGraphBasedAlignmentTable(vg);
-    return table;
+    return align(graph(witnesses));
   }
 
-  public IAlignment align(IVariantGraph graph, IWitness witness) {
-    IAligner aligner = createAligner(graph);
-    IAlignment alignment = aligner.align(witness);
-    return alignment;
-  }
-
-  public IAnalysis analyse(IVariantGraph graph, IWitness witness) {
-    IAlignment alignment = align(graph, witness);
-    Analyzer analyzer = new Analyzer();
-    return analyzer.analyze(alignment);
+  public IAlignmentTable align(IVariantGraph graph) {
+    return new RankedGraphBasedAlignmentTable(graph);
   }
 
   public IApparatus createApparatus(final IVariantGraph variantGraph) {

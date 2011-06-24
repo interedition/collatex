@@ -24,6 +24,7 @@ import static junit.framework.Assert.assertEquals;
 
 import java.util.List;
 
+import eu.interedition.collatex2.implementation.vg_alignment.MemoryzingVariantGraphListener;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -54,8 +55,9 @@ public class VGAnalysisTest {
   public void testSimple1() {
     final IWitness a = factory.createWitness("A", "a b");
     final IWitness b = factory.createWitness("B", "a c b");
+
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
+    IAnalysis analysis = analyse(graph, b);
     final List<ISequence> sequences = analysis.getSequences();
     assertEquals(2, sequences.size());
     assertEquals("a", sequences.get(0).getNormalized());
@@ -69,7 +71,7 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "cat");
     final IWitness b = factory.createWitness("B", "cat");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
+    IAnalysis analysis = analyse(graph, b);
     final List<ISequence> sequences = analysis.getSequences();
     assertEquals(1, sequences.size());
     assertEquals("cat", sequences.get(0).getNormalized());
@@ -81,7 +83,7 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "The black cat");
     final IWitness b = factory.createWitness("B", "The black and white cat");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
+    IAnalysis analysis = analyse(graph, b);
     final List<ISequence> sequences = analysis.getSequences();
     assertEquals(2, sequences.size());
     assertEquals("the black", sequences.get(0).getNormalized());
@@ -95,7 +97,7 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "to be");
     final IWitness b = factory.createWitness("B", "not to be");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
+    IAnalysis analysis = analyse(graph, b);
     final List<ISequence> sequences = analysis.getSequences();
     assertEquals(1, sequences.size());
     assertEquals("to be", sequences.get(0).getNormalized());
@@ -107,7 +109,7 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "to be");
     final IWitness b = factory.createWitness("B", "to be or not");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
+    IAnalysis analysis = analyse(graph, b);
     final List<ISequence> sequences = analysis.getSequences();
     assertEquals(1, sequences.size());
     assertEquals("to be", sequences.get(0).getNormalized());
@@ -119,7 +121,7 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "to be");
     final IWitness b = factory.createWitness("B", "to think, therefore be");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
+    IAnalysis analysis = analyse(graph, b);
     final List<ISequence> sequences = analysis.getSequences();
     assertEquals(2, sequences.size());
     assertEquals("to", sequences.get(0).getNormalized());
@@ -132,7 +134,7 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "The black dog chases a red cat.");
     final IWitness b = factory.createWitness("B", "A red cat chases the black dog.");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
+    IAnalysis analysis = analyse(graph, b);
     final List<ISequence> sequences = analysis.getSequences();
     assertEquals("a red cat", sequences.get(0).getNormalized());
     assertEquals("chases", sequences.get(1).getNormalized());
@@ -145,7 +147,7 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "d a b");
     final IWitness b = factory.createWitness("B", "a c b d");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
+    IAnalysis analysis = analyse(graph, b);
     final List<ISequence> sequences = analysis.getSequences();
     assertEquals(3, sequences.size());
     assertEquals("a", sequences.get(0).getNormalized());
@@ -159,8 +161,8 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "d a b");
     final IWitness b = factory.createWitness("B", "a b d");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
-    List<ITransposition2> transpositions = analysis.getTranspositions();
+    IAnalysis analysis = analyse(graph, b);
+    List<ITransposition> transpositions = analysis.getTranspositions();
     assertEquals(2, transpositions.size());
     assertEquals("a b", transpositions.get(0).getSequenceB().getNormalized());
     assertEquals("d", transpositions.get(0).getSequenceA().getNormalized());
@@ -174,8 +176,8 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("A", "d a b");
     final IWitness b = factory.createWitness("B", "a c b d");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
-    List<ITransposition2> transpositions = analysis.getTranspositions();
+    IAnalysis analysis = analyse(graph, b);
+    List<ITransposition> transpositions = analysis.getTranspositions();
     assertEquals(3, transpositions.size());
     assertEquals("d", transpositions.get(0).getSequenceA().getNormalized());
     assertEquals("a", transpositions.get(0).getSequenceB().getNormalized());
@@ -191,11 +193,11 @@ public class VGAnalysisTest {
     final IWitness a = factory.createWitness("1", "a b x c d e");
     final IWitness b = factory.createWitness("2", "c e y a d b");
     IVariantGraph graph = factory.graph(a);
-    IAnalysis analysis = factory.analyse(graph, b);
-    List<ITransposition2> transpositions = analysis.getTranspositions();
-    LOG.debug("transpositions=[" + Joiner.on(", ").join(Iterables.transform(transpositions, new Function<ITransposition2, String>() {
+    IAnalysis analysis = analyse(graph, b);
+    List<ITransposition> transpositions = analysis.getTranspositions();
+    LOG.debug("transpositions=[" + Joiner.on(", ").join(Iterables.transform(transpositions, new Function<ITransposition, String>() {
       @Override
-      public String apply(final ITransposition2 from) {
+      public String apply(final ITransposition from) {
         return from.getSequenceA().getNormalized() + "=>" + from.getSequenceB().getNormalized();
       }
     })) + "]");
@@ -210,5 +212,11 @@ public class VGAnalysisTest {
     assertEquals("b", transpositions.get(3).getSequenceB().getNormalized());
   }
 
+  private IAnalysis analyse(IVariantGraph graph, IWitness witness) {
+    final MemoryzingVariantGraphListener listener = new MemoryzingVariantGraphListener();
 
+    factory.graph(listener, witness);
+
+    return new Analyzer().analyze(listener.getAlignment());
+  }
 }

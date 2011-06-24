@@ -46,18 +46,18 @@ public class Analysis implements IAnalysis {
   }
   
   @Override
-  public List<ITransposition2> getTranspositions() {
+  public List<ITransposition> getTranspositions() {
     List<ISequence> sequencesSortedForBase = sortSequencesForBase();
     if (sequencesSortedForBase.size()!=sequences.size()) {
       throw new RuntimeException("Something went wrong in the linking process!");
     }
-    final List<ITransposition2> transpositions = Lists.newArrayList();
+    final List<ITransposition> transpositions = Lists.newArrayList();
     for (int i = 0; i < sequences.size(); i++) {
       final ISequence sequenceWitness = sequences.get(i);
       final ISequence sequenceBase = sequencesSortedForBase.get(i);
       if (!sequenceWitness.equals(sequenceBase)) {
         // TODO: I have got no idea why have to mirror the sequences here!
-        transpositions.add(new Transposition2(sequenceBase, sequenceWitness));
+        transpositions.add(new Transposition(sequenceBase, sequenceWitness));
       }
     }
     return transpositions;

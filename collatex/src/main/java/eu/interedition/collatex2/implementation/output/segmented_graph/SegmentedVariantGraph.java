@@ -20,9 +20,9 @@
 
 package eu.interedition.collatex2.implementation.output.segmented_graph;
 
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphEdge;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 
 

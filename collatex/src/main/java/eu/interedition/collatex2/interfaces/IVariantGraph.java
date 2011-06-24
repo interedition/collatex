@@ -29,6 +29,8 @@ import org.jgrapht.DirectedGraph;
 
 public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge>, ITokenContainer {
 
+  IVariantGraph add(IWitness witness);
+
   IVariantGraphVertex getStartVertex();
 
   IVariantGraphVertex getEndVertex();

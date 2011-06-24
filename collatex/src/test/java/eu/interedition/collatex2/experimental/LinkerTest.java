@@ -2,25 +2,20 @@ package eu.interedition.collatex2.experimental;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import eu.interedition.collatex2.implementation.vg_alignment.*;
+import eu.interedition.collatex2.interfaces.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
-import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenMatch;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.ITokenMatch;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IWitness;
 
 public class LinkerTest {
   private static CollateXEngine engine;
@@ -63,57 +58,45 @@ public class LinkerTest {
   
   @Test
   public void testDirkVincent9() {
-    // lots of setup
-    IWitness a = engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
-    IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    IVariantGraph graph = new VariantGraph();
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    aligner.addWitness(a);
-    aligner.addWitness(b);
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(graph);
-    // real test starts here
-    // System.out.println("Real TEST STARTS HERE!");
-    IWitness c = engine.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
-    //NOTE: this really should be the wrapper by the real aligner
-    //TODO: the variantgraph builder stuff should be renamed!
-    TokenLinker linker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> link = linker.link2(superbase, c);
-    List<INormalizedToken> unlinkedTokens = Lists.newArrayList();
-    for (INormalizedToken witnessToken : c.getTokens()) {
-      if (link.get(witnessToken) ==null) {
-        unlinkedTokens.add(witnessToken);
-      }
-    }
-    assertTrue(unlinkedTokens.contains(c.getTokens().get(1)));
-    assertTrue(unlinkedTokens.contains(c.getTokens().get(2)));
-    assertTrue(unlinkedTokens.contains(c.getTokens().get(21)));
-    assertTrue(unlinkedTokens.contains(c.getTokens().get(22)));
-    assertTrue(unlinkedTokens.contains(c.getTokens().get(23)));
-    assertEquals(5, unlinkedTokens.size());
+    final MemoryzingVariantGraphListener listener = new MemoryzingVariantGraphListener();
+    IVariantGraph graph = engine.graph(listener);
+
+    graph.add(engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa."));
+    graph.add(engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa."));
+
+    final IWitness c = engine.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
+    graph.add(c);
+
+    final Map<INormalizedToken, INormalizedToken> linkedTokenMap = listener.getLinkedTokenMap();
+    final Set<INormalizedToken> linkedWitnessTokens = linkedTokenMap.keySet();
+    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(1)));
+    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(2)));
+    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(21)));
+    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(22)));
+    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(23)));
   }
 
   @Test
   public void testLinkingWithStartToken() {
-    IWitness a = engine.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
-    IWitness b = engine.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
-    IVariantGraph graph = new VariantGraph();
-    VariantGraphAligner aligner = new VariantGraphAligner(graph);
-    aligner.add(a);
-    SuperbaseCreator superbaseCreator = new SuperbaseCreator();
-    IWitness superbase = superbaseCreator.create(graph);
-    TokenLinker linker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> link = linker.link2(superbase, b);
-    assertTrue(!link.containsKey(b.getTokens().get(0)));
-    assertTrue(!link.containsKey(b.getTokens().get(1)));
-    assertTrue(!link.containsKey(b.getTokens().get(2)));
-    assertTrue(!link.containsKey(b.getTokens().get(3)));
-    assertTrue(!link.containsKey(b.getTokens().get(4)));
-    assertTrue(!link.containsKey(b.getTokens().get(5)));
-    assertTrue(!link.containsKey(b.getTokens().get(6)));
-    assertTrue(!link.containsKey(b.getTokens().get(7)));
-    assertTrue(link.containsKey(b.getTokens().get(8))); // again 
-    assertTrue(!link.containsKey(b.getTokens().get(9))); 
+    final IWitness a = engine.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
+    final IWitness b = engine.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
+
+    final MemoryzingVariantGraphListener listener = new MemoryzingVariantGraphListener();
+    final IVariantGraph graph = engine.graph(listener);
+    graph.add(a);
+    graph.add(b);
+
+    final Map<INormalizedToken, INormalizedToken> link = listener.getLinkedTokenMap();
+    assertFalse(link.containsKey(b.getTokens().get(0)));
+    assertFalse(link.containsKey(b.getTokens().get(1)));
+    assertFalse(link.containsKey(b.getTokens().get(2)));
+    assertFalse(link.containsKey(b.getTokens().get(3)));
+    assertFalse(link.containsKey(b.getTokens().get(4)));
+    assertFalse(link.containsKey(b.getTokens().get(5)));
+    assertFalse(link.containsKey(b.getTokens().get(6)));
+    assertFalse(link.containsKey(b.getTokens().get(7)));
+    assertTrue(link.containsKey(b.getTokens().get(8))); // again
+    assertFalse(link.containsKey(b.getTokens().get(9)));
     assertTrue(link.containsKey(b.getTokens().get(10))); // to
     assertTrue(link.containsKey(b.getTokens().get(11))); // his
   }

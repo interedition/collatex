@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.containers.graph;
+package eu.interedition.collatex2.implementation.vg_alignment;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,12 +50,29 @@ public class VariantGraph extends DirectedAcyclicGraph<IVariantGraphVertex, IVar
   private final IVariantGraphVertex startVertex;
   private final IVariantGraphVertex endVertex;
 
-  public VariantGraph() {
+  private final IVariantGraphListener listener;
+  private final VariantGraphAligner aligner;
+
+  public VariantGraph(IVariantGraphListener listener) {
     super(IVariantGraphEdge.class);
-    startVertex = new VariantGraphVertex("#", null);
+
+    this.listener = listener;
+    this.aligner = new VariantGraphAligner(this);
+
+    this.startVertex = new VariantGraphVertex("#", null);
     addVertex(startVertex);
-    endVertex = new VariantGraphVertex("#", null);
+
+    this.endVertex = new VariantGraphVertex("#", null);
     addVertex(endVertex);
+  }
+
+  IVariantGraphListener listener() {
+    return listener;
+  }
+
+  public IVariantGraph add(IWitness witness) {
+    aligner.add(witness);
+    return this;
   }
 
   @Override

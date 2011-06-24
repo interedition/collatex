@@ -27,7 +27,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;

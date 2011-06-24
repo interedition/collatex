@@ -30,6 +30,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import eu.interedition.collatex2.implementation.containers.witness.Witness;
+import eu.interedition.collatex2.interfaces.IWitness;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,11 +58,11 @@ public class TeiParallelSegmentationApparatusBuilderTest {
 	}
 
     private void assertApparatusEquals(String apparatusStr, String...
-        witnesses) throws Exception {
-        IAligner aligner = engine.createAligner();
+        witnessContents) throws Exception {
         int wc = 0;
-        for (String witness : witnesses) {
-        aligner.add(engine.createWitness("W" + (++wc), witness));
+        IWitness[] witnesses = new IWitness[witnessContents.length];
+        for (String witness : witnessContents) {
+          witnesses[wc] = engine.createWitness("W" + (++wc), witness);
         }
         Document xml = documentBuilder.newDocument();
         Element root =
@@ -68,7 +70,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
         "text");
         xml.appendChild(root);
        
-        TeiParallelSegmentationApparatusBuilder.build(engine.createApparatus(aligner.getResult()),
+        TeiParallelSegmentationApparatusBuilder.build(engine.createApparatus(engine.graph(witnesses)),
         root);
         StringWriter out = new StringWriter();
         transformer.transform(new DOMSource(xml), new StreamResult(out));
