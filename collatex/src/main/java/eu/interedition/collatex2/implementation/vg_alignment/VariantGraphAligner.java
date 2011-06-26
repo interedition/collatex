@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
-import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection3;
@@ -21,49 +20,58 @@ public class VariantGraphAligner implements IAligner {
     this.graph = graph;
   }
 
-  public void addWitness(IWitness witness) {
-    // 1. Do the matching and linking of tokens
-    final SuperbaseCreator creator = new SuperbaseCreator();
-    final IWitness superbase = creator.create(graph);
-    graph.listener().newSuperbase(superbase);
+  @Override
+  public IAligner add(IWitness... witnesses) {
+    for (IWitness witness : witnesses) {
+      // 1. Do the matching and linking of tokens
+      final SuperbaseCreator creator = new SuperbaseCreator();
+      final IWitness superbase = creator.create(graph);
+      graph.listener().newSuperbase(superbase);
 
-    final Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, superbase);
-    graph.listener().newLinkedTokenMap(graph, witness, linkedTokens);
+      final Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, superbase);
+      graph.listener().newLinkedTokenMap(graph, witness, linkedTokens);
 
-    final List<ITokenMatch> tokenMatches = new ArrayList<ITokenMatch>(linkedTokens.size());
-    for (Map.Entry<INormalizedToken, INormalizedToken> tokenLink : linkedTokens.entrySet()) {
-      tokenMatches.add(new TokenMatch(tokenLink.getValue(), tokenLink.getKey()));
-    }
-    graph.listener().newAlignment(new Alignment(graph, witness, tokenMatches));
+      final List<ITokenMatch> tokenMatches = new ArrayList<ITokenMatch>(linkedTokens.size());
+      for (Map.Entry<INormalizedToken, INormalizedToken> tokenLink : linkedTokens.entrySet()) {
+        tokenMatches.add(new TokenMatch(tokenLink.getValue(), tokenLink.getKey()));
+      }
+      graph.listener().newAlignment(new Alignment(graph, witness, tokenMatches));
 
-    // 2. Determine sequences
-    SequenceDetection3 detection = new SequenceDetection3();
-    List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
+      // 2. Determine sequences
+      SequenceDetection3 detection = new SequenceDetection3();
+      List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
 
-    // 3. Determine transpositions of the sequences
-    final Analysis analysis = new Analysis(sequences, superbase);
+      // 3. Determine transpositions of the sequences
+      final Analysis analysis = new Analysis(sequences, superbase);
 
-    List<ITransposition> transpositions = analysis.getTranspositions();
-    Map<INormalizedToken, INormalizedToken> alignedTokens;
-    alignedTokens = VariantGraphAligner.determineAlignedTokens(linkedTokens, transpositions, witness);
-    IVariantGraphVertex previous =  graph.getStartVertex();
-    for (INormalizedToken token : witness.getTokens()) {
-      // determine whether this token is a match or not
-      // System.out.println(token+":"+linkedTokens.containsKey(token));
-      INormalizedToken vertexKey = linkedTokens.containsKey(token)  ? ((IVariantGraphVertex)linkedTokens.get(token)).getVertexKey() : token;
-      IVariantGraphVertex vertex = alignedTokens.containsKey(token) ? (IVariantGraphVertex) linkedTokens.get(token) : addNewVertex(token.getNormalized(), vertexKey);
-      IVariantGraphEdge edge = graph.getEdge(previous, vertex);
-      if (edge == null) edge = addNewEdge(previous, vertex);
-      vertex.addToken(witness, token);
+      List<ITransposition> transpositions = analysis.getTranspositions();
+      Map<INormalizedToken, INormalizedToken> alignedTokens;
+      alignedTokens = VariantGraphAligner.determineAlignedTokens(linkedTokens, transpositions, witness);
+      IVariantGraphVertex previous =  graph.getStartVertex();
+      for (INormalizedToken token : witness.getTokens()) {
+        // determine whether this token is a match or not
+        // System.out.println(token+":"+linkedTokens.containsKey(token));
+        INormalizedToken vertexKey = linkedTokens.containsKey(token)  ? ((IVariantGraphVertex)linkedTokens.get(token)).getVertexKey() : token;
+        IVariantGraphVertex vertex = alignedTokens.containsKey(token) ? (IVariantGraphVertex) linkedTokens.get(token) : addNewVertex(token.getNormalized(), vertexKey);
+        IVariantGraphEdge edge = graph.getEdge(previous, vertex);
+        if (edge == null) edge = addNewEdge(previous, vertex);
+        vertex.addToken(witness, token);
+        edge.addWitness(witness);
+        previous = vertex;
+      }
+
+      graph.listener().newAnalysis(analysis);
+
+      IVariantGraphEdge edge = graph.getEdge(previous, graph.getEndVertex());
+      if (edge == null) edge = addNewEdge(previous, graph.getEndVertex());
       edge.addWitness(witness);
-      previous = vertex;
     }
+    return this;
+  }
 
-    graph.listener().newAnalysis(analysis);
-
-    IVariantGraphEdge edge = graph.getEdge(previous, graph.getEndVertex());
-    if (edge == null) edge = addNewEdge(previous, graph.getEndVertex());
-    edge.addWitness(witness);
+  @Override
+  public IVariantGraph getResult() {
+    return graph;
   }
 
   private Map<INormalizedToken, INormalizedToken> linkTheTokens(
@@ -71,7 +79,7 @@ public class VariantGraphAligner implements IAligner {
     Map<INormalizedToken, INormalizedToken> linkedTokens;
     if (graph.isEmpty()) {
       linkedTokens = Maps.newLinkedHashMap();
-    } 
+    }
     TokenLinker linker = new TokenLinker();
     linkedTokens = linker.link2(superbase, witness);
     return linkedTokens;
@@ -91,19 +99,6 @@ public class VariantGraphAligner implements IAligner {
     IVariantGraphEdge edge = new VariantGraphEdge();
     graph.addEdge(begin, end, edge);
     return edge;
-  }
-
-  @Override
-  public IVariantGraph getResult() {
-    return graph;
-  }
-
-  @Override
-  public IAligner add(IWitness... witnesses) {
-    for (IWitness witness : witnesses) {
-      addWitness(witness);
-    }
-    return this;
   }
 
 
