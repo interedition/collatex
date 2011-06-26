@@ -1,6 +1,6 @@
 package eu.interedition.collatex.persistence;
 
-import org.lmnl.Text;
+import eu.interedition.text.Text;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

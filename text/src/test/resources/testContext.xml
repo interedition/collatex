@@ -18,7 +18,7 @@
 				<prop key="hibernate.hbm2ddl.auto">create</prop>
 			</props>
 		</property>
-		<property name="mappingResources" value="/org/lmnl/rdbms/lmnl.hbm.xml" />
+		<property name="mappingResources" value="/eu/interedition/text/rdbms/text.hbm.xml" />
 	</bean>
 
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
@@ -28,37 +28,37 @@
 	<tx:advice id="transactionAdvice" />
 
 	<aop:config>
-		<aop:pointcut expression="execution(* org.lmnl.rdbms.Relational*.*(..))" id="persistingMethods" />
+		<aop:pointcut expression="execution(* eu.interedition.text.rdbms.Relational*.*(..))" id="persistingMethods" />
 		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="persistingMethods" />
 	</aop:config>
 
-	<bean id="nameRepository" class="org.lmnl.rdbms.RelationalQNameRepository">
+	<bean id="nameRepository" class="eu.interedition.text.rdbms.RelationalQNameRepository">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-	<bean id="textRepository" class="org.lmnl.rdbms.RelationalTextRepository">
+	<bean id="textRepository" class="eu.interedition.text.rdbms.RelationalTextRepository">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-	<bean id="annotationFactory" class="org.lmnl.rdbms.RelationalAnnotationFactory">
+	<bean id="annotationFactory" class="eu.interedition.text.rdbms.RelationalAnnotationFactory">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="nameRepository" ref="nameRepository" />
 		<property name="textRepository" ref="textRepository" />
 	</bean>
 
-	<bean id="annotationFinder" class="org.lmnl.rdbms.RelationalAnnotationRepository">
+	<bean id="annotationFinder" class="eu.interedition.text.rdbms.RelationalAnnotationRepository">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="nameRepository" ref="nameRepository" />
 	</bean>
 
-	<bean id="xmlParser" class="org.lmnl.rdbms.RelationalXMLParser">
+	<bean id="xmlParser" class="eu.interedition.text.rdbms.RelationalXMLParser">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="textRepository" ref="textRepository" />
 		<property name="nameRepository" ref="nameRepository" />
 		<property name="annotationFactory" ref="annotationFactory" />
 	</bean>
 
-	<bean id="eventGenerator" class="org.lmnl.event.EventGenerator">
+	<bean id="eventGenerator" class="eu.interedition.text.event.EventGenerator">
 		<property name="annotationRepository" ref="annotationFinder" />
 	</bean>
 </beans>
