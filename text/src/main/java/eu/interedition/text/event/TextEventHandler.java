@@ -7,6 +7,9 @@ import java.util.Set;
 
 
 public interface TextEventHandler {
+
+  void start();
+
   void start(int offset, Set<Annotation> annotations);
 
   void empty(int offset, Set<Annotation> annotations);
@@ -15,4 +18,5 @@ public interface TextEventHandler {
 
   void text(Range r, char[] text);
 
+  void end();
 }

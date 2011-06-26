@@ -1,16 +1,15 @@
 package eu.interedition.collatex.persistence;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.text.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.junit.Test;
-import eu.interedition.text.QNameImpl;
-import eu.interedition.text.Text;
-import eu.interedition.text.TextContentReader;
-import eu.interedition.text.TextRepository;
 import eu.interedition.text.rdbms.RelationalAnnotationFactory;
 import eu.interedition.text.xml.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
@@ -26,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -46,7 +47,13 @@ public class SimpleCollationTest extends AbstractTest {
   private TextRepository textRepository;
 
   @Autowired
+  private AnnotationRepository annotationRepository;
+
+  @Autowired
   private SessionFactory sessionFactory;
+
+  @Autowired
+  private TokenAnnotator tokenAnnotator;
 
   private CollateXEngine engine = new CollateXEngine();
 
@@ -85,16 +92,39 @@ public class SimpleCollationTest extends AbstractTest {
 
       session.save(witness);
 
-      System.out.println();
-      System.out.println(Strings.repeat("=", 80));
-      textRepository.read(witness.getText(), new TextContentReader() {
-        @Override
-        public void read(Reader content, int contentLength) throws IOException {
-          CharStreams.copy(content, System.out);
-        }
-      });
-      System.out.println();
-      System.out.println(Strings.repeat("=", 80));
+      tokenAnnotator.tokenize(witness);
+      printTokenizedWitness(witness);
     }
+  }
+
+  private void printTokenizedWitness(Witness witness) throws IOException {
+    System.out.println(Strings.padStart(witness.toString(), 80, '='));
+
+    final Text text = witness.getText();
+    int read = 0;
+
+    final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
+    for (Annotation token : annotationRepository.find(text, TokenAnnotator.TOKEN_NAME)) {
+        final Range range = token.getRange();
+        if (read < range.getStart()) {
+            ranges.put(new Range(read, range.getStart()), false);
+        }
+        ranges.put(token.getRange(), true);
+        read = token.getRange().getEnd();
+    }
+
+    final int length = textRepository.length(text);
+    if (read < length) {
+        ranges.put(new Range(read, length), false);
+    }
+
+    final SortedMap<Range, String> texts = textRepository.bulkRead(text, Sets.newTreeSet(ranges.keySet()));
+    for (Map.Entry<Range, Boolean> range : ranges.entrySet()) {
+        System.out.print(range.getValue() ? "[" : "");
+        System.out.print(texts.get(range.getKey()));
+        System.out.print(range.getValue() ? "]" : "");
+    }
+    System.out.println();
+
   }
 }

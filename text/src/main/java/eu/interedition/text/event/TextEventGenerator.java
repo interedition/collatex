@@ -57,6 +57,8 @@ public class TextEventGenerator {
         int next = 0;
         int pageEnd = 0;
 
+        handler.start();
+
         while (true) {
           if ((offset % pageSize) == 0) {
             pageEnd = Math.min(offset + pageSize, contentLength);
@@ -112,6 +114,8 @@ public class TextEventGenerator {
             offset += currentText.length;
           }
         }
+
+        handler.end();
       }
     });
   }

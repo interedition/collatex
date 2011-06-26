@@ -21,6 +21,9 @@ public class TextEventGeneratorTest extends AbstractXMLTest {
 
   private final TextEventHandler DEBUG_HANDLER = new TextEventHandler() {
 
+    public void start() {
+    }
+
     public void start(int offset, Set<Annotation> annotations) {
       printDebugMessage("START: [" + offset + "] " + Iterables.toString(annotations));
     }
@@ -35,6 +38,9 @@ public class TextEventGeneratorTest extends AbstractXMLTest {
 
     public void text(Range r, char[] text) {
       printDebugMessage("TEXT: " + r + " == \"" + new String(text) + "\"");
+    }
+
+    public void end() {
     }
   };
 }
