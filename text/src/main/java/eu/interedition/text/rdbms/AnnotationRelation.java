@@ -22,6 +22,7 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
 import eu.interedition.text.Range;
@@ -129,4 +130,16 @@ public class AnnotationRelation implements Annotation {
   // text.substring(Math.min(deleted.getEnd(), length), length);
   // }
   // }
+
+  public int compareTo(Annotation o) {
+    final int rangeComparison = range.compareTo(o.getRange());
+    if (rangeComparison != 0) {
+      return rangeComparison;
+    }
+    final int nameComparison = name.compareTo(o.getName());
+    if (nameComparison != 0) {
+      return nameComparison;
+    }
+    return Ordering.arbitrary().compare(this, o);
+  }
 }

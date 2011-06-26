@@ -32,7 +32,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.SortedMap;
 
-import static eu.interedition.text.Annotation.LMNL_NS_URI;
+import static eu.interedition.text.Annotation.INTEREDITION_NS_URI;
 
 /**
  * Base class for tests providing utility functions.
@@ -42,14 +42,10 @@ import static eu.interedition.text.Annotation.LMNL_NS_URI;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/testContext.xml")
 public abstract class AbstractTest {
-  protected static final QName XML_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "xml");
-  protected static final QName TEXT_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "text");
-  protected static final QName OFFSET_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "offsets");
-
   /**
    * Test namespace.
    */
-  protected static final URI TEST_NS = URI.create("urn:lmnl-test-ns");
+  protected static final URI TEST_NS = URI.create("urn:text-test-ns");
 
   /**
    * A logger for debug output.

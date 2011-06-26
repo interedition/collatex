@@ -28,12 +28,11 @@ import java.net.URI;
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
  */
-public interface Annotation {
+public interface Annotation extends Comparable<Annotation> {
   /**
    * The LMNL namespace, mainly used as a default.
    */
-  final URI LMNL_NS_URI = URI.create("http://lmnl.net/namespaces/lmnl");
-
+  final URI INTEREDITION_NS_URI = URI.create("http://interedition.eu/ns");
 
   QName getName();
 

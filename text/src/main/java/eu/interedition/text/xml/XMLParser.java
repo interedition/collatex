@@ -20,8 +20,8 @@ import java.util.Stack;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 public abstract class XMLParser {
-  public static final QName OFFSET_DELTA_NAME = new QNameImpl(Annotation.LMNL_NS_URI, "offset");
-  public static final QName NODE_PATH_NAME = new QNameImpl(Annotation.LMNL_NS_URI, "xmlNode");
+  public static final QName OFFSET_DELTA_NAME = new QNameImpl(Annotation.INTEREDITION_NS_URI, "offset");
+  public static final QName NODE_PATH_NAME = new QNameImpl(Annotation.INTEREDITION_NS_URI, "xmlNode");
 
   private final TransformerFactory transformerFactory;
   private final XMLInputFactory xmlInputFactory;

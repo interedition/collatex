@@ -46,7 +46,7 @@
 		<property name="textRepository" ref="textRepository" />
 	</bean>
 
-	<bean id="annotationFinder" class="eu.interedition.text.rdbms.RelationalAnnotationRepository">
+	<bean id="annotationRepository" class="eu.interedition.text.rdbms.RelationalAnnotationRepository">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="nameRepository" ref="nameRepository" />
 	</bean>
@@ -58,7 +58,9 @@
 		<property name="annotationFactory" ref="annotationFactory" />
 	</bean>
 
-	<bean id="eventGenerator" class="eu.interedition.text.event.EventGenerator">
-		<property name="annotationRepository" ref="annotationFinder" />
+	<bean id="eventGenerator" class="eu.interedition.text.event.TextEventGenerator">
+        <property name="nameRepository" ref="nameRepository" />
+		<property name="annotationRepository" ref="annotationRepository" />
+        <property name="textRepository" ref="textRepository" />
 	</bean>
 </beans>
