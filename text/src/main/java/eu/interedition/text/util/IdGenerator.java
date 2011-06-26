@@ -27,23 +27,21 @@ import eu.interedition.text.Range;
 /**
  * Callback interface implemented by objects, which generate unique
  * <code>xml:id</code> values for XStandoff <i>segments</i>.
- * 
+ *
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
- * 
  */
 public interface IdGenerator {
-	/**
-	 * Returns a unique <code>xml:id</code> value for a given segment.
-	 * 
-	 * @param range
-	 *                the text segment's address, for which an identifier is
-	 *                needed
-	 * @return <code>xml:id</code>-compliant identifier value
-	 */
-	String next(Annotation annotation);
+  /**
+   * Returns a unique <code>xml:id</code> value for a given segment.
+   *
+   * @param range the text segment's address, for which an identifier is
+   *              needed
+   * @return <code>xml:id</code>-compliant identifier value
+   */
+  String next(Annotation annotation);
 
-	String next(Range address);
+  String next(Range address);
 
-	void reset();
+  void reset();
 }

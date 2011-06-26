@@ -5,5 +5,5 @@ import java.io.Reader;
 
 public interface TextContentReader {
 
-	void read(Reader content, int contentLength) throws IOException;
+  void read(Reader content, int contentLength) throws IOException;
 }

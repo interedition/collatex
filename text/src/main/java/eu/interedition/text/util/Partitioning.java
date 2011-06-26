@@ -21,84 +21,81 @@
 
 package eu.interedition.text.util;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import eu.interedition.text.Annotation;
-import eu.interedition.text.Range;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.Range;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Function deriving a set of non-overlapping segments from an (optionally
  * filtered) collection of range annotations.
- * 
  * <p/>
- * 
+ * <p/>
+ * <p/>
  * The segments in the resulting set strictly follow each other and are derived
  * from range boundaries in the argument. Thus the segments partition the text
  * segment covered by all given range annotations.
- * 
  * <p/>
- * 
+ * <p/>
+ * <p/>
  * A common use case for such segments is the {@link OverlapIndexer indexing of
  * overlapping range annotations} or the construction of new, non-overlapping
  * range annotations according to the partitioning.
- * 
+ *
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
- * 
  */
 public class Partitioning implements Function<Iterable<Annotation>, SortedSet<Range>> {
 
-	private final Predicate<Annotation> filterPredicate;
+  private final Predicate<Annotation> filterPredicate;
 
-	/**
-	 * Creates a function doing complete/ unfiltered partitioning of passed
-	 * range annotation collections.
-	 * 
-	 * @see #Partitioning(Predicate)
-	 */
-	public Partitioning() {
-		this(null);
-	}
+  /**
+   * Creates a function doing complete/ unfiltered partitioning of passed
+   * range annotation collections.
+   *
+   * @see #Partitioning(Predicate)
+   */
+  public Partitioning() {
+    this(null);
+  }
 
-	/**
-	 * Creates a partitioning function with the input collection of range
-	 * annotations being filtered.
-	 * 
-	 * @param filterPredicate
-	 *                a filter predicate to determine the subset of range
-	 *                annotations constituting the partitioning
-	 */
-	public Partitioning(Predicate<Annotation> filterPredicate) {
-		this.filterPredicate = filterPredicate;
-	}
+  /**
+   * Creates a partitioning function with the input collection of range
+   * annotations being filtered.
+   *
+   * @param filterPredicate a filter predicate to determine the subset of range
+   *                        annotations constituting the partitioning
+   */
+  public Partitioning(Predicate<Annotation> filterPredicate) {
+    this.filterPredicate = filterPredicate;
+  }
 
-	public SortedSet<Range> apply(Iterable<Annotation> from) {
-		SortedSet<Integer> offsets = Sets.newTreeSet();
+  public SortedSet<Range> apply(Iterable<Annotation> from) {
+    SortedSet<Integer> offsets = Sets.newTreeSet();
 
-		if (filterPredicate != null) {
-			from = Iterables.filter(from, filterPredicate);
-		}
+    if (filterPredicate != null) {
+      from = Iterables.filter(from, filterPredicate);
+    }
 
-		for (Annotation a : from) {
-			offsets.add(a.getRange().getStart());
-			offsets.add(a.getRange().getEnd());
-		}
+    for (Annotation a : from) {
+      offsets.add(a.getRange().getStart());
+      offsets.add(a.getRange().getEnd());
+    }
 
-		SortedSet<Range> partition = new TreeSet<Range>();
-		int start = -1;
-		for (int end : offsets) {
-			if (start >= 0) {
-				partition.add(new Range(start, end));
-			}
-			start = end;
-		}
-		return partition;
-	}
+    SortedSet<Range> partition = new TreeSet<Range>();
+    int start = -1;
+    for (int end : offsets) {
+      if (start >= 0) {
+        partition.add(new Range(start, end));
+      }
+      start = end;
+    }
+    return partition;
+  }
 
 }

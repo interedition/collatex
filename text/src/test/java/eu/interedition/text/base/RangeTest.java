@@ -25,18 +25,17 @@ import org.junit.Test;
 
 /**
  * Tests operations on range addresses like offset manipulation.
- * 
+ *
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
- * 
  */
 public class RangeTest {
 
-	/**
-	 * Tests generation of ranges relative to another.
-	 */
-	@Test
-	public void relativeRanges() {
+  /**
+   * Tests generation of ranges relative to another.
+   */
+  @Test
+  public void relativeRanges() {
 //		Assert.assertEquals("Prefix #1", new LmnlRangeAddress(0, 20), new LmnlRangeAddress(0, 20).relativeTo(new LmnlRangeAddress(0, 40)));
 //		Assert.assertEquals("Prefix #2", new LmnlRangeAddress(0, 10), new LmnlRangeAddress(10, 20).relativeTo(new LmnlRangeAddress(10, 40)));
 //
@@ -50,5 +49,5 @@ public class RangeTest {
 //		Assert.assertEquals("Overlap #1", new LmnlRangeAddress(0, 5), new LmnlRangeAddress(10, 20).relativeTo(new LmnlRangeAddress(15, 20)));
 //		Assert.assertEquals("Overlap #2", new LmnlRangeAddress(0, 5), new LmnlRangeAddress(15, 30).relativeTo(new LmnlRangeAddress(15, 20)));
 //		Assert.assertEquals("Overlap #3", new LmnlRangeAddress(0, 10), new LmnlRangeAddress(10, 30).relativeTo(new LmnlRangeAddress(15, 25)));
-	}
+  }
 }

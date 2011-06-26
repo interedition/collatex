@@ -4,7 +4,7 @@ import java.net.URI;
 
 public interface QName extends Comparable<QName> {
 
-	URI getNamespaceURI();
+  URI getNamespaceURI();
 
-	String getLocalName();
+  String getLocalName();
 }

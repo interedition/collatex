@@ -21,75 +21,72 @@
 
 package eu.interedition.text;
 
-import static eu.interedition.text.Annotation.LMNL_NS_URI;
-
-import java.net.URI;
-import java.util.List;
-import java.util.SortedMap;
-
-import org.junit.runner.RunWith;
 import eu.interedition.text.util.OverlapIndexer;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.net.URI;
+import java.util.List;
+import java.util.SortedMap;
+
+import static eu.interedition.text.Annotation.LMNL_NS_URI;
+
 /**
  * Base class for tests providing utility functions.
- * 
+ *
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
- * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/testContext.xml")
 public abstract class AbstractTest {
-	protected static final QName XML_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "xml");
-	protected static final QName TEXT_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "text");
-	protected static final QName OFFSET_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "offsets");
+  protected static final QName XML_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "xml");
+  protected static final QName TEXT_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "text");
+  protected static final QName OFFSET_ANNOTATION_NAME = new QNameImpl(LMNL_NS_URI, "offsets");
 
-	/**
-	 * Test namespace.
-	 */
-	protected static final URI TEST_NS = URI.create("urn:lmnl-test-ns");
+  /**
+   * Test namespace.
+   */
+  protected static final URI TEST_NS = URI.create("urn:lmnl-test-ns");
 
-	/**
-	 * A logger for debug output.
-	 */
-	protected static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class.getPackage().getName());
+  /**
+   * A logger for debug output.
+   */
+  protected static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class.getPackage().getName());
 
-	/**
-	 * Prints the given {@link OverlapIndexer range index} to the log.
-	 * 
-	 * @param index
-	 *                the range index to output
-	 */
-	protected void printDebugMessage(SortedMap<Range, List<Annotation>> index) {
-		if (LOG.isDebugEnabled()) {
-			final StringBuilder str = new StringBuilder();
-			for (Range segment : index.keySet()) {
-				str.append("[" + segment + ": { ");
-				boolean first = true;
-				for (Annotation annotation : index.get(segment)) {
-					if (first) {
-						first = false;
-					} else {
-						str.append(", ");
-					}
-					str.append(annotation.toString());
-				}
-				str.append(" }]\n");
-			}
-			LOG.debug(str.toString());
-		}
-	}
+  /**
+   * Prints the given {@link OverlapIndexer range index} to the log.
+   *
+   * @param index the range index to output
+   */
+  protected void printDebugMessage(SortedMap<Range, List<Annotation>> index) {
+    if (LOG.isDebugEnabled()) {
+      final StringBuilder str = new StringBuilder();
+      for (Range segment : index.keySet()) {
+        str.append("[" + segment + ": { ");
+        boolean first = true;
+        for (Annotation annotation : index.get(segment)) {
+          if (first) {
+            first = false;
+          } else {
+            str.append(", ");
+          }
+          str.append(annotation.toString());
+        }
+        str.append(" }]\n");
+      }
+      LOG.debug(str.toString());
+    }
+  }
 
-	/**
-	 * Prints the given message to the log.
-	 * 
-	 * @param msg
-	 *                the debug message
-	 */
-	protected void printDebugMessage(String msg) {
-		LOG.debug(msg);
-	}
+  /**
+   * Prints the given message to the log.
+   *
+   * @param msg the debug message
+   */
+  protected void printDebugMessage(String msg) {
+    LOG.debug(msg);
+  }
 }

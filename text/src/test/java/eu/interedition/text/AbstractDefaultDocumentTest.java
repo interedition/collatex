@@ -21,68 +21,64 @@
 
 package eu.interedition.text;
 
+import eu.interedition.text.rdbms.RelationalAnnotationFactory;
 import org.junit.After;
 import org.junit.Before;
-import eu.interedition.text.rdbms.RelationalAnnotationFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Base class for tests using an in-memory document model.
- * 
+ *
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
- * 
  */
 @Transactional
 public abstract class AbstractDefaultDocumentTest extends AbstractTest {
-	
-	@Autowired
-	protected RelationalAnnotationFactory annotationFactory;
-	
-	/**
-	 * The in-memory document model to run tests against.
-	 */
-	protected Text document;
 
-	/**
-	 * Creates a new document model before every test.
-	 */
-	@Before
-	public void createDocument() {
-		document = annotationFactory.newText();
-	}
+  @Autowired
+  protected RelationalAnnotationFactory annotationFactory;
 
-	/**
-	 * Removes the document model.
-	 */
-	@After
-	public void cleanDocument() {
-		document = null;
-	}
+  /**
+   * The in-memory document model to run tests against.
+   */
+  protected Text document;
 
-	/**
-	 * Adds a simple {@link Annotation annotation} to the test
-	 * document.
-	 * 
-	 * @param name
-	 *                the local name of the annotation (its namespace will
-	 *                be {@link #TEST_NS})
-	 * @param start
-	 *                its start offset
-	 * @param end
-	 *                its end offset
-	 * @return 
-	 */
-	protected Annotation addTestAnnotation(String name, int start, int end) {
-		return annotationFactory.create(document, new QNameImpl(TEST_NS, name), new Range(start, end));
-	}
+  /**
+   * Creates a new document model before every test.
+   */
+  @Before
+  public void createDocument() {
+    document = annotationFactory.newText();
+  }
 
-	/**
-	 * Overridden by test classes to provide the textual contents of the
-	 * test document.
-	 * 
-	 * @return the textual contents of the test document's annotation
-	 */
-	protected abstract String documentText();
+  /**
+   * Removes the document model.
+   */
+  @After
+  public void cleanDocument() {
+    document = null;
+  }
+
+  /**
+   * Adds a simple {@link Annotation annotation} to the test
+   * document.
+   *
+   * @param name  the local name of the annotation (its namespace will
+   *              be {@link #TEST_NS})
+   * @param start its start offset
+   * @param end   its end offset
+   * @return
+   */
+  protected Annotation addTestAnnotation(String name, int start, int end) {
+    return annotationFactory.create(document, new QNameImpl(TEST_NS, name), new Range(start, end));
+  }
+
+  /**
+   * Overridden by test classes to provide the textual contents of the
+   * test document.
+   *
+   * @return the textual contents of the test document's annotation
+   */
+  protected abstract String documentText();
 }

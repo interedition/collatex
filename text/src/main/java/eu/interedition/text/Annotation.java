@@ -29,15 +29,15 @@ import java.net.URI;
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 public interface Annotation {
-	/**
-	 * The LMNL namespace, mainly used as a default.
-	 */
-	final URI LMNL_NS_URI = URI.create("http://lmnl.net/namespaces/lmnl");
+  /**
+   * The LMNL namespace, mainly used as a default.
+   */
+  final URI LMNL_NS_URI = URI.create("http://lmnl.net/namespaces/lmnl");
 
 
-	QName getName();
-	
-	Range getRange();
-	
-	Object getData();
+  QName getName();
+
+  Range getRange();
+
+  Object getData();
 }

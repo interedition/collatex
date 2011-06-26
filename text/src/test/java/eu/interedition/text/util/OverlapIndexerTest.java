@@ -21,40 +21,39 @@
 
 package eu.interedition.text.util;
 
-import org.junit.Test;
 import eu.interedition.text.AbstractDefaultDocumentTest;
 import eu.interedition.text.AnnotationRepository;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Tests the calculation of overlap indizes.
- * 
+ *
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
- * 
  */
 public class OverlapIndexerTest extends AbstractDefaultDocumentTest {
 
-	@Autowired
-	private AnnotationRepository annotationRepository;
-	
-	/**
-	 * Indexes a very simple document.
-	 */
-	@Test
-	public void indexSimpleDocument() {
-		addTestAnnotation("a", 0, 2);
-		addTestAnnotation("b", 1, 4);
-		addTestAnnotation("c", 0, 1);
-		addTestAnnotation("d", 0, 6);
-		addTestAnnotation("e", 2, 3);
+  @Autowired
+  private AnnotationRepository annotationRepository;
 
-		printDebugMessage(document.toString());
-		printDebugMessage(new OverlapIndexer().apply(annotationRepository.find(document)));
-	}
+  /**
+   * Indexes a very simple document.
+   */
+  @Test
+  public void indexSimpleDocument() {
+    addTestAnnotation("a", 0, 2);
+    addTestAnnotation("b", 1, 4);
+    addTestAnnotation("c", 0, 1);
+    addTestAnnotation("d", 0, 6);
+    addTestAnnotation("e", 2, 3);
 
-	@Override
-	protected String documentText() {
-		return "abcdef";
-	}
+    printDebugMessage(document.toString());
+    printDebugMessage(new OverlapIndexer().apply(annotationRepository.find(document)));
+  }
+
+  @Override
+  protected String documentText() {
+    return "abcdef";
+  }
 }

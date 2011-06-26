@@ -1,28 +1,28 @@
 package eu.interedition.text.event;
 
-import org.junit.Test;
 import eu.interedition.text.AbstractXMLTest;
 import eu.interedition.text.Annotation;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EventGeneratorTest extends AbstractXMLTest {
 
-	@Autowired
-	private EventGenerator generator;
-	
-	@Test
-	public void generateEvents() throws EventHandlerException {
-		generator.generate(document("archimedes-palimpsest-tei.xml"), DEBUG_HANDLER);
-	}
+  @Autowired
+  private EventGenerator generator;
 
-	private final EventHandler DEBUG_HANDLER = new EventHandler() {
+  @Test
+  public void generateEvents() throws EventHandlerException {
+    generator.generate(document("archimedes-palimpsest-tei.xml"), DEBUG_HANDLER);
+  }
 
-		public void startAnnotation(Annotation annotation) {
-			printDebugMessage("START: " + annotation);
-		}
+  private final EventHandler DEBUG_HANDLER = new EventHandler() {
 
-		public void endAnnotation(Annotation annotation) {
-			printDebugMessage("END: " + annotation);
-		}
-	};
+    public void startAnnotation(Annotation annotation) {
+      printDebugMessage("START: " + annotation);
+    }
+
+    public void endAnnotation(Annotation annotation) {
+      printDebugMessage("END: " + annotation);
+    }
+  };
 }

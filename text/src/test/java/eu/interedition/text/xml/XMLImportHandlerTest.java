@@ -21,9 +21,13 @@
 
 package eu.interedition.text.xml;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
-import static junit.framework.Assert.assertTrue;
-import static eu.interedition.text.xml.XMLParser.OFFSET_DELTA_NAME;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
+import eu.interedition.text.*;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -32,94 +36,87 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import eu.interedition.text.*;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.io.CharStreams;
+import static eu.interedition.text.xml.XMLParser.OFFSET_DELTA_NAME;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Tests the generation of LOMs from XML sources.
- * 
+ *
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
- * 
  */
 public class XMLImportHandlerTest extends AbstractXMLTest {
 
-	@Autowired
-	private TextRepository textRepository;
+  @Autowired
+  private TextRepository textRepository;
 
-	@Autowired
-	private AnnotationRepository annotationRepository;
+  @Autowired
+  private AnnotationRepository annotationRepository;
 
-	@Test
-	public void showTextContents() throws IOException {
-        //final String resource = "ignt-0101.xml";
-		final String resource = "george-algabal-tei.xml";
-        //final String resource = "homer-iliad-tei.xml";
-        final Text source = source(resource);
-		final Text document = document(resource);
+  @Test
+  public void showTextContents() throws IOException {
+    //final String resource = "ignt-0101.xml";
+    final String resource = "george-algabal-tei.xml";
+    //final String resource = "homer-iliad-tei.xml";
+    final Text source = source(resource);
+    final Text document = document(resource);
 
-		final int textLength = textRepository.length(document);
-		assertTrue(textLength > 0);
+    final int textLength = textRepository.length(document);
+    assertTrue(textLength > 0);
 
-		if (LOG.isDebugEnabled()) {
-			final SortedMap<String, Annotation> annotations = Maps.newTreeMap();
-			for (Annotation annotation : annotationRepository.find(document)) {
-                final Object data = annotation.getData();
-				if (data == null || !Map.class.isAssignableFrom(data.getClass())) {
-					LOG.debug(annotation + " has no attributes");
-					continue;
-				}
-                @SuppressWarnings("unchecked")
-				final Map<QName, String> attrs = (Map<QName, String>) data;
-				final String nodePath = attrs.get(XMLParser.NODE_PATH_NAME);
-				if (nodePath == null) {
-					LOG.debug(annotation + " has no XML node path");
-					continue;
-				}
-				if (annotations.containsKey(nodePath)) {
-					LOG.debug(nodePath + " already assigned to " + annotations.get(nodePath));
-				}
-				annotations.put(nodePath, annotation);
-			}
-			for (Map.Entry<String, Annotation> annotation : annotations.entrySet()) {
-				LOG.debug(annotation.getKey() + " ==> " + annotation.getValue());
-			}
+    if (LOG.isDebugEnabled()) {
+      final SortedMap<String, Annotation> annotations = Maps.newTreeMap();
+      for (Annotation annotation : annotationRepository.find(document)) {
+        final Object data = annotation.getData();
+        if (data == null || !Map.class.isAssignableFrom(data.getClass())) {
+          LOG.debug(annotation + " has no attributes");
+          continue;
+        }
+        @SuppressWarnings("unchecked")
+        final Map<QName, String> attrs = (Map<QName, String>) data;
+        final String nodePath = attrs.get(XMLParser.NODE_PATH_NAME);
+        if (nodePath == null) {
+          LOG.debug(annotation + " has no XML node path");
+          continue;
+        }
+        if (annotations.containsKey(nodePath)) {
+          LOG.debug(nodePath + " already assigned to " + annotations.get(nodePath));
+        }
+        annotations.put(nodePath, annotation);
+      }
+      for (Map.Entry<String, Annotation> annotation : annotations.entrySet()) {
+        LOG.debug(annotation.getKey() + " ==> " + annotation.getValue());
+      }
 
-			if (LOG.isDebugEnabled()) {
-				textRepository.read(document, new TextContentReader() {
-					
-					public void read(Reader content, int contentLength) throws IOException {
-						LOG.debug(CharStreams.toString(content));
-					}
-				});
-			}
+      if (LOG.isDebugEnabled()) {
+        textRepository.read(document, new TextContentReader() {
 
-			final List<Range> textRanges = Lists.newArrayList();
-			final List<Range> sourceRanges = Lists.newArrayList();
+          public void read(Reader content, int contentLength) throws IOException {
+            LOG.debug(CharStreams.toString(content));
+          }
+        });
+      }
 
-			for (Annotation offset : annotationRepository.find(document, OFFSET_DELTA_NAME)) {
-				textRanges.add(offset.getRange());
-				sourceRanges.add((Range) offset.getData());
-			}
+      final List<Range> textRanges = Lists.newArrayList();
+      final List<Range> sourceRanges = Lists.newArrayList();
 
-			final SortedMap<Range, String> texts = textRepository.bulkRead(document, Sets.newTreeSet(textRanges));
-			final SortedMap<Range, String> sources = textRepository.bulkRead(source, Sets.newTreeSet(sourceRanges));
+      for (Annotation offset : annotationRepository.find(document, OFFSET_DELTA_NAME)) {
+        textRanges.add(offset.getRange());
+        sourceRanges.add((Range) offset.getData());
+      }
 
-			final Iterator<Range> sourceRangesIt = sourceRanges.iterator();
-			for (Range textRange : textRanges) {
-				if (!sourceRangesIt.hasNext()) {
-					break;
-				}
-				final Range sourceRange = sourceRangesIt.next();
-				//LOG.debug(textRange + " ==> " + sourceRange);
-				LOG.debug(texts.get(textRange) + " ==> " + sources.get(sourceRange));
-			}
-		}
+      final SortedMap<Range, String> texts = textRepository.bulkRead(document, Sets.newTreeSet(textRanges));
+      final SortedMap<Range, String> sources = textRepository.bulkRead(source, Sets.newTreeSet(sourceRanges));
 
-	}
+      final Iterator<Range> sourceRangesIt = sourceRanges.iterator();
+      for (Range textRange : textRanges) {
+        if (!sourceRangesIt.hasNext()) {
+          break;
+        }
+        final Range sourceRange = sourceRangesIt.next();
+        //LOG.debug(textRange + " ==> " + sourceRange);
+        LOG.debug(texts.get(textRange) + " ==> " + sources.get(sourceRange));
+      }
+    }
+
+  }
 }
