@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Layered Markup and Annotation Language for Java (lmnl4j):
+    implementation of LMNL, a markup language supporting layered and/or
+    overlapping annotations.
+
+    Copyright (C) 2010 the respective authors.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
+<project name="Layered Markup and Annotation Language for Java" xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+	<body>
+		<links>
+			<item name="Project Home" href="index.html" />
+			<item name="Project @ Launchpad" href="https://launchpad.net/lmnl4j/" />
+			<item name="LMNL Wiki" href="http://www.lmnl.org/wiki/" />
+		</links>
+
+		<menu name="lmnl4j">
+			<item href="index.html" name="About" />
+			<item href="install.html" name="Install" />
+			<item href="use-cases.html" name="Use cases" />
+			<item href="apidocs/index.html" name="Javadoc" />
+			<item href="xref/index.html" name="Source" />
+			<item href="repository/" name="Maven Repo." />
+		</menu>
+		<menu ref="reports" />
+	</body>
+
+	<!-- <poweredBy />  -->
+</project>

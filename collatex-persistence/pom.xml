@@ -13,12 +13,12 @@
     <name>CollateX :: Persistence support</name>
     <dependencies>
         <dependency>
-            <groupId>eu.interedition.collatex</groupId>
-            <artifactId>collatex</artifactId>
+            <groupId>eu.interedition</groupId>
+            <artifactId>text</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.lmnl</groupId>
-            <artifactId>lmnl4j-api</artifactId>
+            <groupId>eu.interedition.collatex</groupId>
+            <artifactId>collatex</artifactId>
         </dependency>
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>

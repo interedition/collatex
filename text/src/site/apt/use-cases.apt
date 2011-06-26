@@ -1,0 +1,61 @@
+	------
+	Use cases
+	------
+	Gregor Middell
+	------
+	2010-06-11
+
+Transforming a XML document into a LOM
+
+  * {{{apidocs/org/lmnl/xml/SaxBasedLmnlBuilder.html} org.lmnl.xml.SaxBasedLmnlBuilder (Javadoc)}}
+  
+  * {{{apidocs/org/lmnl/xml/PlainTextXmlFilter.html} org.lmnl.xml.PlainTextXmlFilter (Javadoc)}}
+
++----
+URI uri = URI.create("http://www.edition.com/source.tei");
+DefaultLmnlDocument document = new DefaultLmnlDocument(uri);
+
+SaxBasedLmnlBuilder builder = new SaxBasedLmnlBuilder(new PlainTextXmlFilter()//
+		.withLineElements(Sets.newHashSet("lg", "l", "sp", "speaker", "stage", "div", "head", "p"))//
+		.withElementOnlyElements(Sets.newHashSet("document", "surface", "zone", "subst")));
+builder.build(new InputSource(uri.toASCIIString()), document);
++----
+
+Reading and transforming TEI-P5 into a LOM
+
+  * {{{apidocs/org/lmnl/xml/tei/TeiMarkupConverter.html} org.lmnl.xml.tei.TeiMarkupConverter (Javadoc)}}
+
++----
+DefaultLmnlDocument d = document("george-algabal-tei.xml");
+new TeiMarkupConverter().convert(d);
+Assert.assertTrue("<*b/> substitutes in document", Iterables.any(d, new Predicate<LmnlAnnotation>() {
+
+	@Override
+	public boolean apply(LmnlAnnotation input) {
+		final String name = input.getLocalName();
+		return name.equals("page") || name.equals("line") || name.equals("column");
+	}
+}));
+Assert.assertFalse("No spans in document", Iterables.any(d.getAnnotations(), new Predicate<LmnlAnnotation>() {
+
+	@Override
+	public boolean apply(LmnlAnnotation input) {
+		return input.getLocalName().endsWith("Span");
+	}
+}));
++----
+
+Serializing a LOM to JSON
+
+  * {{{apidocs/org/lmnl/lom/LmnlLayer.html#serialize(org.codehaus.jackson.JsonGenerator)} org.lmnl.lom.LmnlLayer#serialize() (Javadoc)}}
+  
++----
+LmnlDocument document;
+HttpServletResponse response;
+
+response.setContentType("application/json");
+response.setCharacterEncoding("UTF-8");
+
+final JsonGenerator jg = new JsonFactory().createJsonGenerator(response.getWriter());
+document.serialize(jg);
+jg.flush();

@@ -1,0 +1,43 @@
+	------
+	About
+	------
+	Gregor Middell
+	------
+	2010-06-11
+
+What it is
+
+  This Java library provides a LMNL Object Model (LOM) implementation, a model suited to represent
+marked-up text with multi-layered annotations, that can overlap arbitrarily. The basic concepts of
+a LOM, namely <documents>, <layers>, <annotations> and <ranges>, are borrowed from the experimental 
+markup language {{{http://www.lmnl.org/wiki/}LMNL}}, the <<Layered Markup and Annotation Language>> 
+as invented by {{{http://www.jenitennison.com/}Jeni Tennison}} and {{{http://www.piez.org/wendell/}
+Wendell Piez}}.
+
+[images/LOM.png] Simplified UML class diagram depicting a LOM's central entities
+
+  Instead of supporting its own syntax for data interchange involving LMNL documents (LOM
+instances), this implementation strives to be a cleanroom adaptation of LMNL's concepts. That is
+why it concentrates on the data model and not on a suitable document format, as it has been 
+originally proposed for LMNL as a genuine markup language. Providing means for input/output of the 
+modelled data is currently left to the user of lmnl4j, although several ways to achieve this can be
+easily thought of. The serializiation of an entire LOM in 
+{{{http://en.wikipedia.org/wiki/JSON}JavaScript Object Notation (JSON)}} has been implemented as a
+mere proof-of-concept, although it might as well find its practical use as a data format in 
+{{{http://en.wikipedia.org/wiki/Ajax_(programming)}Ajax-based}} web applications.
+
+What you can do with it
+
+  lmnl4j can help in any project, where document-centric markup is used and the limitations of
+XML in supporting multiple (possibly overlapping) hierarchies of markup pose a major challenge
+worth the trade-off to expect, when one pursues a non-XML-based approach.
+
+  For a list of code snippets illustrating the usage of lmnl4j, please see the page on
+{{{use-cases.html} typical use cases}} and also take a look at the {{{apidocs/index.html}API
+docs}}.
+  
+How to install/use it
+
+  For installation instructions, please see the {{{install.html} following document}}. Again, until
+a user guide is available, please refer to the {{{apidocs/index.html}Javadoc}} for usage
+instructions.

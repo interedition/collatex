@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:tei="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Transcription of folios 0000-100r of the Archimedes Palimpsest. (= Archimedes
+                    folio Arch53v, On the Sphere and Cylinder)</title>
+                <respStmt>
+                    <resp>Sponsor</resp>
+                    <name>The Owner of the Archimedes Palimpsest</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Responsible for primary transcription (Dublin Core creator)</resp>
+                    <name>Reviel Netz</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Responsible for primary transcription (Dublin Core creator)</resp>
+                    <name>Nigel Wilson</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Mike Toth</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Will Noel</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Doug Emery</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Alexander Lee</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Neel Smith</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Christopher Blackwell</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Jennifer Adams</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Jennifer Curtin</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>William Dolan</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Scott Dubè</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Connor Hayden</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Michael Kinney</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Katherine Schmieg</name>
+                </respStmt>
+                <respStmt>
+                    <resp>Contributor</resp>
+                    <name>Stephanie Wheeler</name>
+                </respStmt>
+            </titleStmt>
+            <publicationStmt>
+                <idno>5329</idno>
+                <publisher>Owner of the Archimedes Palimpsest</publisher>
+                <date>2008</date>
+                <availability>
+                    <p>Licensed for use under Creative Commons Attribution 3.0 Unported, license
+                        http://creativecommons.org/licenses/by/3.0/legalcode.</p>
+                    <p>It is requested that copies of any published articles based on the
+                        information in this data set are set to The Curator of Manuscripts, The
+                        Walters Art Museum, 600 North Charles Street, Baltimore MD 21201.</p>
+                </availability>
+            </publicationStmt>
+            <sourceDesc>
+                <listBibl>
+                    <bibl> Privately owned parchment codex: "The Archimedes Palimpsest". </bibl>
+                    <bibl> Multispectral Digital Image Product of the Archimedes Palimpsest (The
+                        Owner of the Archimedes Palimpsest, 2008). </bibl>
+                    <bibl> Heiberg, J. L., Archimedis Opera omnia cum commentariis Eutocii (Leipzig:
+                        Teubner, 1910–15; reprinted 1972). </bibl>
+                    <bibl> Christie’s New York, 29th October 1998 Sale, no. 9058, The Archimedes
+                        Palimpsest. </bibl>
+                    <bibl> A. Papadopoulos-Kerameus, Hierosolymitike Bibliotheke, vol. 4 (St
+                        Petersburg, 1899), 329–331, MS 355. </bibl>
+                </listBibl>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <langUsage>
+                <language ident="grc">accented ancient Greek in beta code</language>
+                <language ident="grc-c">accented ancient Greek in Unicode-C Greek characters</language>
+                <language ident="eng">English</language>
+            </langUsage>
+            <textClass>
+                <keywords scheme="internal">
+                    <list>
+                        <item>Content: Archimedes</item>
+                        <item>Content: On the Sphere and Cylinder</item>
+                        <item>Archimedes Palimpsest</item>
+                        <item>Greek Manuscript</item>
+                        <item>Byzantine Manuscript</item>
+                        <item>Parchment Manuscript</item>
+                        <item>13th Century Manuscript</item>
+                        <item>10th Century Manuscript</item>
+                        <item>Private Collection</item>
+                        <item>Foliation scheme: Prayer book foliation, ordered by sequence of
+                            columnar undertext</item>
+                    </list>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <facsimile>
+        <surface lrx="8160" lry="10880" ulx="0" uly="0">
+            <graphic url="0000-100r_Arch53v_Sinar_LED570_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED617_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED700_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED365_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_RAKIRL_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED445_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_pseudo_no-veil.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED505_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_RAKBLL_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED870_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED625_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED735_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_RAKBLR_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_true_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_TNGSTN_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_RAKIRR_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_pseudo_sharpie.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_ultraviolet_norm8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED470_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_LED530_01_pack8.tif"/>
+            <graphic url="0000-100r_Arch53v_Heiberg_ultraviolet_stitch.tif"/>
+            <graphic url="0000-100r_Arch53v_Heiberg_visible_stitch.tif"/>
+            <graphic url="0000-100r_Arch53v_Sinar_uvblue_norm8.tif"/>
+            <zone lrx="3900" lry="4422" ulx="1780" uly="4230" xml:id="z100r1_01"/>
+            <zone lrx="3900" lry="4614" ulx="1780" uly="4422" xml:id="z100r1_02"/>
+            <zone lrx="3900" lry="4806" ulx="1780" uly="4614" xml:id="z100r1_03"/>
+            <zone lrx="3900" lry="5030" ulx="1780" uly="4838" xml:id="z100r1_04"/>
+            <zone lrx="3900" lry="5254" ulx="1780" uly="5062" xml:id="z100r1_05"/>
+            <zone lrx="3900" lry="5494" ulx="1780" uly="5302" xml:id="z100r1_06"/>
+            <zone lrx="3900" lry="5718" ulx="1780" uly="5526" xml:id="z100r1_07"/>
+            <zone lrx="3900" lry="5944" ulx="1780" uly="5720" xml:id="z100r1_08"/>
+            <zone lrx="3932" lry="6168" ulx="1812" uly="5944" xml:id="z100r1_09"/>
+            <zone lrx="3932" lry="6392" ulx="1812" uly="6168" xml:id="z100r1_10"/>
+            <zone lrx="3932" lry="6616" ulx="1812" uly="6392" xml:id="z100r1_11"/>
+            <zone lrx="3932" lry="6840" ulx="1812" uly="6616" xml:id="z100r1_12"/>
+            <zone lrx="3932" lry="7024" ulx="1812" uly="6840" xml:id="z100r1_13"/>
+            <zone lrx="3932" lry="7216" ulx="1812" uly="7032" xml:id="z100r1_14"/>
+            <zone lrx="3932" lry="7408" ulx="1812" uly="7224" xml:id="z100r1_15"/>
+            <zone lrx="3932" lry="7616" ulx="1812" uly="7432" xml:id="z100r1_16"/>
+            <zone lrx="3932" lry="7824" ulx="1812" uly="7640" xml:id="z100r1_17"/>
+            <zone lrx="3932" lry="8016" ulx="1812" uly="7832" xml:id="z100r1_18"/>
+            <zone lrx="4240" lry="5144" ulx="3928" uly="4864" xml:id="z100rprop_20"/>
+            <zone lrx="6596" lry="5360" ulx="4132" uly="5144" xml:id="z100r2_01"/>
+            <zone lrx="6596" lry="5584" ulx="4432" uly="5368" xml:id="z100r2_02"/>
+            <zone lrx="6596" lry="5808" ulx="4432" uly="5592" xml:id="z100r2_03"/>
+            <zone lrx="6596" lry="6016" ulx="4432" uly="5800" xml:id="z100r2_04"/>
+            <zone lrx="6596" lry="6240" ulx="4432" uly="6024" xml:id="z100r2_05"/>
+            <zone lrx="6596" lry="6464" ulx="4432" uly="6248" xml:id="z100r2_06"/>
+            <zone lrx="6596" lry="6688" ulx="4432" uly="6472" xml:id="z100r2_07"/>
+            <zone lrx="6596" lry="6912" ulx="4432" uly="6696" xml:id="z100r2_08"/>
+            <zone lrx="6596" lry="7136" ulx="4432" uly="6920" xml:id="z100r2_09"/>
+            <zone lrx="6596" lry="7376" ulx="4432" uly="7160" xml:id="z100r2_10"/>
+            <zone lrx="6596" lry="7600" ulx="4432" uly="7384" xml:id="z100r2_11"/>
+            <zone lrx="6596" lry="7808" ulx="4432" uly="7592" xml:id="z100r2_12"/>
+            <zone lrx="6596" lry="8000" ulx="4432" uly="7784" xml:id="z100r2_13"/>
+        </surface>
+    </facsimile>
+    <text xml:lang="grc-c">
+        <body>
+            <ab>
+                <seg n="100r1" type="folio">
+                    <seg n="1" type="line" facs="z100r1_01">τοῦτο ἴσος <abbr>ἐστὶν</abbr> ὁ ΜΝΞ <seg
+                            type="word"><unclear>κῶ</unclear>νος</seg>
+                        <unclear>τῶι</unclear> Α</seg>
+                    <seg n="2" type="line" facs="z100r1_02">ΒΓ <seg type="word"
+                            >κών<unclear>ω</unclear>ι</seg>· ἐὰν γὰρ ὦσι δύο κῶνοι</seg>
+                    <seg n="3" type="line" facs="z100r1_03">ἰσοσκελεῖς, ἡ δὲ τοῦ ἑτέρου <seg
+                            type="word">κώ<unclear>ν</unclear><supplied reason="lost"
+                        >ου</supplied></seg></seg>
+                    <seg n="4" type="line" facs="z100r1_04">ἐπιφάνεια ἴση ἦ τῆι τοῦ ἑτέρου</seg>
+                    <seg n="5" type="line" facs="z100r1_05">βάσει, ἔτι δὲ ἡ ἀπὸ τοῦ κέντρου</seg>
+                    <seg n="6" type="line" facs="z100r1_06">τῆς βάσεως ἐπὶ τὴν πλευρὰν</seg>
+                    <seg n="7" type="line" facs="z100r1_07">τοῦ κώνου λεγομένη κάθετος</seg>
+                    <seg n="8" type="line" facs="z100r1_08">τῶι ὕψει ἴση, ἴσοι ἔσονται οἱ κῶνοι,</seg>
+                    <seg n="9" type="line" facs="z100r1_09">τὴν δὲ τοῦ ΟΠΡ κώνου βάσιν ἴσην</seg>
+                    <seg n="10" type="line" facs="z100r1_10">εἶναι τῆι ἐπιφανείαι τοῦ ΔΒΕ <w
+                            part="I">κώ</w></seg>
+                    <seg n="11" type="line" facs="z100r1_11"><w part="F">νου</w>, <seg type="word"
+                                >ὕ<unclear>ψ</unclear>ος</seg> δὲ τῆι ΖΗ διὰ δὴ τούτοις </seg>
+                    <seg n="12" type="line" facs="z100r1_12">ἴσος <expan>ἐστὶν</expan> ὁ
+                            ΟΠ<unclear>Ρ</unclear> κῶνος τῶι ΒΔ ΖΕ <w part="I">ῥόμ</w></seg>
+                    <seg n="13" type="line" facs="z100r1_13"><w part="F">βωι</w>· τοῦτο γὰρ
+                        προαπεδείχθη. ἐπεὶ</seg>
+                    <seg n="14" type="line" facs="z100r1_14">δὲ ἡ τοῦ Α<supplied reason="lost"
+                        >Β</supplied>Γ κώνου ἐπιφάνεια</seg>
+                    <seg n="15" type="line" facs="z100r1_15">σύγκειται ἔκ τε τῆς τοῦ ΔΒΕ <w part="I"
+                            >ἐπι</w></seg>
+                    <seg n="16" type="line" facs="z100r1_16"><w part="F">φανείας</w> καὶ τῆς μεταξὺ
+                        τῶν</seg>
+                    <seg n="17" type="line" facs="z100r1_17">ΔΕ ΑΓ, ἀλλ’ ἡ μὲν τοῦ ΑΒΓ κώνου</seg>
+                    <seg n="18" type="line" facs="z100r1_18">ἐπιφάνεια ἴση <expan>ἐστὶ</expan> τῆι
+                        βάσει τοῦ</seg>
+                    <gap/>
+                </seg>
+                <seg n="100r2" type="folio">
+                    <num value="21">ΚΑ</num>
+                </seg>
+                <seg n="100r2" type="folio">
+                    <seg n="1" type="line" facs="z100r2_01">ἐὰν ῥόμβου ἐξ ἰσοσκελῶν <choice>
+                            <abbr>κωνω</abbr>
+                            <expan>κώνων</expan>
+                        </choice></seg>
+                    <seg n="2" type="line" facs="z100r2_02">συγκειμένου ὁ ἕτερος κῶνος</seg>
+                    <seg n="3" type="line" facs="z100r2_03">ἐπιπέδῶι <seg type="word"
+                                >τμηθῆ<unclear>ι</unclear></seg> παραλλήλῶι</seg>
+                    <seg n="4" type="line" facs="z100r2_04">τῆι βάσει, ἀπὸ δὲ τοῦ γενομένου</seg>
+                    <seg n="5" type="line" facs="z100r2_05">κύκλου κῶνος ἀναγραφῆι <w part="I"
+                        >κο</w></seg>
+                    <seg n="6" type="line" facs="z100r2_06"><w part="F">ρυφὴν</w> ἔχων τὴν αὐτὴν τῶι
+                            <seg type="unclearword">ἑ</seg></seg>
+                    <seg n="7" type="line" facs="z100r2_07"><seg type="wordend"
+                            ><unclear>τ</unclear>έρωι</seg> κώνωι, ἀπὸ δὲ τοῦ ὅλου <w part="I"
+                        >ῥόμ</w></seg>
+                    <seg n="8" type="line" facs="z100r2_08"><w part="F">βου</w> ὁ γενόμενος ῥόμβος
+                            <w part="I">ἀφαι</w></seg>
+                    <seg n="9" type="line" facs="z100r2_09"><w part="F">ρεθῆ</w>, <seg type="word">
+                            <supplied reason="lost">τῶι</supplied>
+                        </seg>
+                        <seg type="word"><supplied reason="lost">π</supplied>εριλείμματι</seg> ἴσος
+                            <expan>ἔσται</expan></seg>
+                    <seg n="10" type="line" facs="z100r2_10">ὁ κῶνος ὁ βάσιν μὲν ἔχων <seg
+                            type="word">ἴσ<expan>ην</expan></seg></seg>
+                    <seg n="11" type="line" facs="z100r2_11"><seg type="word"
+                                ><unclear>τ</unclear>ῆ<supplied reason="lost">ι</supplied></seg>
+                        <seg type="word">ἐπ<supplied reason="lost"
+                            >ι</supplied><unclear>φ</unclear>ανείαι</seg> τοῦ κώνου τῆι </seg>
+                    <seg n="12" type="line" facs="z100r2_12"><seg type="word">
+                            <supplied reason="lost">μετα</supplied>
+                            <unclear>ξ</unclear>
+                            <supplied reason="lost">ὺ</supplied>
+                        </seg> τῶν παραλλήλων <seg type="suppliedword">ἐπι</seg></seg>
+                    <seg n="13" type="line" facs="z100r2_13"><seg type="wordend">
+                            <supplied reason="lost">πέδων</supplied>
+                        </seg>, <supplied reason="lost">ὕψος</supplied> δὲ <seg type="word"
+                                >ἴ<unclear>σ</unclear>ον</seg> τὸ ἀπὸ <choice>
+                            <abbr>τ</abbr>
+                            <expan>τῆς</expan>
+                        </choice></seg>
+                </seg>
+            </ab>
+        </body>
+    </text>
+</TEI>

@@ -1,0 +1,51 @@
+<!--
+
+    Layered Markup and Annotation Language for Java (lmnl4j):
+    implementation of LMNL, a markup language supporting layered and/or
+    overlapping annotations.
+
+    Copyright (C) 2010 the respective authors.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>LMNL LOM</title>
+</head>
+<body>
+A LMNL Object Model (LOM) implementation for representing marked-up text with multi-layered annotations, that can overlap
+arbitrarily.
+
+<p />
+
+<img src="../images/LOM.png" alt="LOM UML class diagram" style="float: right; margin: 1em"/>
+A simplified UML class diagram depicting a LOM's central entities is shown on the right. 
+The basic concepts, namely <i>documents</i>, <i>layers</i>, <i>annotations</i> and <i>ranges</i>, are derived from the experimental 
+markup language <a href="http://www.lmnl.org/wiki/" title="LMNL Wiki">LMNL</a>, the <q>Layered Markup and Annotation Language</q> 
+as invented by <a href="http://www.jenitennison.com/" title="Homepage">Jeni Tennison</a> and 
+<a href="http://www.piez.org/wendell/" title="Homepage">Wendell Piez</a>. Instead of supporting its own syntax for input/output of
+LMNL documents (LOM instances) though, as it has been originally proposed for LMNL as a genuine markup language, this implementation
+strives to be a cleanroom adaptation of LMNL, that concentrates on the data model. As a means of an extensible input/output format,
+serializiation of a LOM in <a href="http://en.wikipedia.org/wiki/JSON"  title="wikipedia.org">JavaScript Object Notation (JSON)</a>
+is offered.
+ 
+<p style="clear: both" />
+
+@author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
+</body>
+</html>

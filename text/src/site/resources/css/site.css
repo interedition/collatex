@@ -1,0 +1,126 @@
+/**
+ * Layered Markup and Annotation Language for Java (lmnl4j):
+ * implementation of LMNL, a markup language supporting layered and/or
+ * overlapping annotations.
+ *
+ * Copyright (C) 2010 the respective authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@CHARSET "UTF-8";
+
+body,td,select,input,li {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 100%;
+}
+
+p {
+	font-size: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:link, a:visited, a:active, a:hover {
+	color: #660;
+	text-decoration: underline;
+}
+
+h2, h3, h4 {
+	background-color: #fff;
+	border: 0;
+	border-bottom: 1px solid black;
+	color: #660;
+}
+
+h2 {
+	font-size: x-large;
+	font-weight: 900;
+	padding: 4px 4px 4px 6px;
+}
+
+h3, h4 {
+	font-size: large;
+	font-weight: normal;
+	padding: 4px 4px 4px 6px;
+}
+
+h5 {
+	color: #600;
+	padding: 4px 4px 4px 6px;
+}
+
+#breadcrumbs {
+	font-size: small;
+	background-color: #fff;
+	border-bottom: 1px solid #AAAAAA;
+	border-top: 1px solid #AAAAAA;
+	margin: 0.5em;
+}
+
+#leftColumn {
+	background-color: #fff;
+	border: 0;
+	margin: 1em;
+}
+
+#navcolumn h5 {
+	border-bottom: 1px solid #AAAAAA;
+	color: #000000;
+	font-size: smaller;
+	padding-top: 2px;
+}
+
+#navcolumn li {
+	font-size: small;
+}
+
+table.bodyTable th {
+	background-color: #BBBBBB;
+	color: white;
+	font-weight: bold;
+	text-align: left;
+}
+
+table.bodyTable tr.a {
+	background-color: #DDDDDD;
+}
+
+table.bodyTable tr.b {
+	background-color: #EEEEEE;
+}
+
+.source {
+	border: 1px dashed #999999;
+}
+
+dl {
+	background-color: #cfc;
+	border: 1px solid #AAAAAA;
+	padding: 4px 4px 4px 6px;
+}
+
+dt {
+	color: #660;
+}
+
+#organizationLogo img,#projectLogo img,#projectLogo span {
+	margin: 8px;
+}
+
+#banner {
+	margin: 0.5em;
+}

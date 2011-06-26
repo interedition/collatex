@@ -1,0 +1,41 @@
+	------
+	Installation
+	------
+	Gregor Middell
+	------
+	2010-06-11
+
+
+Maven-based
+
+  The easiest way of using lmnl4j and its dependencies in your project is via
+{{{http://maven.apache.org/}Maven}}. Just add the following repository declaration to your project
+descriptor
+
++----
+<repositories>
+	<repository>
+		<id>lmnl4j</id>
+		<name>lmnl4j Maven Repository</name>
+		<url>http://www.middell.net/lmnl4j/repository</url>
+	</repository>
+</repositories>
++----
+
+  and declare the following dependency with the appropriate version, e.g. <<<0.9>>>:
+  
++----
+<dependency>
+	<groupId>org.lmnl</groupId>
+	<artifactId>lmnl4j-api</artifactId>
+	<version>0.9</version>
+</dependency>
++----
+ 
+Downloading the library
+
+  Alternatively to using Maven for dependency management, you can download lmnl4j in various
+archive formats from the {{{https://launchpad.net/lmnl4j/}Launchpad project page}} and add the
+contained JAR to your classpath directly. Note though, that lmnl4j has runtime dependencies, which
+are documented {{{dependencies.html}here}} (heading "compile") and whose availability on the
+classpath you would have to ensure manually. 
