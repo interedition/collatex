@@ -93,8 +93,8 @@ public class Tokenizer {
     }
 
     @Override
-    public void text(Range r, char[] content) {
-      for (char c : content) {
+    public void text(Range r, String content) {
+      for (char c : content.toCharArray()) {
         if (settings.isBoundary(text, offset, c)) {
           lastIsTokenBoundary = true;
         } else {

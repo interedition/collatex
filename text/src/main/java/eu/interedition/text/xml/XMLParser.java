@@ -228,10 +228,14 @@ public abstract class XMLParser {
       final String text = reader.getText();
       final int textLength = text.length();
       for (int cc = 0; cc < textLength; cc++) {
-        final char currentChar = text.charAt(cc);
-        if (!preserveSpace && configuration.isCompressingWhitespace() && Character.isWhitespace(lastChar)
-                && Character.isWhitespace(currentChar)) {
-          continue;
+        char currentChar = text.charAt(cc);
+        if (!preserveSpace && configuration.isCompressingWhitespace()) {
+          if (Character.isWhitespace(lastChar) && Character.isWhitespace(currentChar)) {
+            continue;
+          }
+          if (currentChar == '\n' || currentChar == '\r') {
+            currentChar = ' ';
+          }
         }
         textBuffer.write(Character.toString(lastChar = currentChar).getBytes(charset));
         textOffset++;

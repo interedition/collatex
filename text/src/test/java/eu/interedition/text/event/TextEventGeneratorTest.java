@@ -36,8 +36,8 @@ public class TextEventGeneratorTest extends AbstractXMLTest {
       printDebugMessage("END: [" + offset + "] " + Iterables.toString(annotations));
     }
 
-    public void text(Range r, char[] text) {
-      printDebugMessage("TEXT: " + r + " == \"" + new String(text) + "\"");
+    public void text(Range r, String text) {
+      printDebugMessage("TEXT: " + r + " == \"" + text + "\"");
     }
 
     public void end() {

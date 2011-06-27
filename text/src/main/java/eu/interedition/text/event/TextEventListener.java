@@ -16,7 +16,7 @@ public interface TextEventListener {
 
   void end(int offset, Set<Annotation> annotations);
 
-  void text(Range r, char[] text);
+  void text(Range r, String text);
 
   void end();
 }

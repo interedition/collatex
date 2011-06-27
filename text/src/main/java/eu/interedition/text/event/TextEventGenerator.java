@@ -109,9 +109,11 @@ public class TextEventGenerator {
           final int readTo = Math.min(pageEnd, next);
           if (offset < readTo) {
             final char[] currentText = new char[readTo - offset];
-            Preconditions.checkState(content.read(currentText) == currentText.length);
-            listener.text(new Range(offset, offset + currentText.length), currentText);
-            offset += currentText.length;
+            int read = content.read(currentText);
+            if (read > 0) {
+              listener.text(new Range(offset, offset + read), new String(currentText, 0, read));
+              offset += read;
+            }
           }
         }
 

@@ -21,7 +21,7 @@ public class TextEventAdapter implements TextEventListener {
   public void end(int offset, Set<Annotation> annotations) {
   }
 
-  public void text(Range r, char[] text) {
+  public void text(Range r, String text) {
   }
 
   public void end() {
