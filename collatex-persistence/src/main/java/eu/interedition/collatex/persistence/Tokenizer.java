@@ -3,7 +3,7 @@ package eu.interedition.collatex.persistence;
 import com.google.common.base.Preconditions;
 import eu.interedition.text.*;
 import eu.interedition.text.event.TextEventGenerator;
-import eu.interedition.text.event.TextEventHandler;
+import eu.interedition.text.event.TextEventListener;
 import eu.interedition.text.rdbms.RelationalAnnotationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,17 +13,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Service
 @Transactional
-public class TokenAnnotator {
+public class Tokenizer {
   public static final QName TOKEN_NAME = new QNameImpl(Annotation.INTEREDITION_NS_URI, "token");
 
-  private static final Logger LOG = LoggerFactory.getLogger(TokenAnnotator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
   @Autowired
   private RelationalAnnotationFactory annotationFactory;
@@ -40,7 +39,7 @@ public class TokenAnnotator {
     this.pageSize = pageSize;
   }
 
-  public void tokenize(final Witness witness) throws IOException {
+  public void tokenize(Witness witness, TokenizerSettings settings) throws IOException {
     final Text text = witness.getText();
     Preconditions.checkNotNull(text);
 
@@ -48,20 +47,22 @@ public class TokenAnnotator {
       annotationFactory.delete(token);
     }
 
-    eventGenerator.generate(new AnnotatingTextEventProcessor(witness), text, null, pageSize);
+    eventGenerator.generate(new AnnotatingTextEventProcessor(witness, settings), text, null, pageSize);
   }
 
-  private class AnnotatingTextEventProcessor implements TextEventHandler {
+  private class AnnotatingTextEventProcessor implements TextEventListener {
     private final Witness witness;
+    private final TokenizerSettings settings;
     private final Text text;
 
-    int numTokens = 0;
-    int offset = 0;
-    int start = Integer.MAX_VALUE;
-    boolean prevIsTokenContent = false;
+    private boolean lastIsTokenBoundary = true;
+    private int offset = 0;
+    private int tokenStart = Integer.MAX_VALUE;
+    private int tokenCount = 0;
 
-    private AnnotatingTextEventProcessor(Witness witness) {
+    private AnnotatingTextEventProcessor(Witness witness, TokenizerSettings settings) {
       this.witness = witness;
+      this.settings = settings;
       this.text = witness.getText();
     }
 
@@ -72,31 +73,38 @@ public class TokenAnnotator {
 
     @Override
     public void start(int offset, Set<Annotation> annotations) {
+      if (settings.startingAnnotationsAreBoundary(text, offset, annotations)) {
+        lastIsTokenBoundary = true;
+      }
     }
 
     @Override
     public void empty(int offset, Set<Annotation> annotations) {
+      if (settings.emptyAnnotationsAreBoundary(text, offset, annotations)) {
+        lastIsTokenBoundary = true;
+      }
     }
 
     @Override
     public void end(int offset, Set<Annotation> annotations) {
+      if (settings.endingAnnotationsAreBoundary(text, offset, annotations)) {
+        lastIsTokenBoundary = true;
+      }
     }
 
     @Override
     public void text(Range r, char[] content) {
       for (char c : content) {
-        if (isTokenBoundary(c)) {
-          prevIsTokenContent = false;
+        if (settings.isBoundary(text, offset, c)) {
+          lastIsTokenBoundary = true;
         } else {
-          if (!prevIsTokenContent && start < offset) {
-            createToken(text, start, offset);
-            numTokens++;
-            start = Integer.MAX_VALUE;
+          if (lastIsTokenBoundary) {
+            token();
           }
-          if (start > offset) {
-            start = offset;
+          if (tokenStart > offset) {
+            tokenStart = offset;
           }
-          prevIsTokenContent = true;
+          lastIsTokenBoundary = false;
         }
 
         offset++;
@@ -105,20 +113,16 @@ public class TokenAnnotator {
 
     @Override
     public void end() {
-      if (start < offset) {
-        createToken(text, start, offset);
-        numTokens++;
+      token();
+      LOG.debug(witness + " has " + tokenCount + " token(s)");
+    }
+
+    private void token() {
+      if (tokenStart < offset) {
+        annotationFactory.create(text, TOKEN_NAME, new Range(tokenStart, offset));
+        tokenCount++;
+        tokenStart = Integer.MAX_VALUE;
       }
-
-      LOG.debug(witness + " has " + numTokens + " token(s)");
     }
-
-    protected void createToken(Text text, int start, int end) {
-      annotationFactory.create(text, TOKEN_NAME, new Range(start, end));
-    }
-  }
-
-  protected boolean isTokenBoundary(char c) {
-    return Character.isWhitespace(c);
   }
 }

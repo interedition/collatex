@@ -3,7 +3,6 @@ package eu.interedition.collatex.persistence;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.text.*;
@@ -23,7 +22,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.util.Map;
 import java.util.SortedMap;
@@ -53,7 +51,7 @@ public class SimpleCollationTest extends AbstractTest {
   private SessionFactory sessionFactory;
 
   @Autowired
-  private TokenAnnotator tokenAnnotator;
+  private Tokenizer tokenizer;
 
   private CollateXEngine engine = new CollateXEngine();
 
@@ -92,7 +90,7 @@ public class SimpleCollationTest extends AbstractTest {
 
       session.save(witness);
 
-      tokenAnnotator.tokenize(witness);
+      tokenizer.tokenize(witness, new WhitespaceTokenizerSettings());
       printTokenizedWitness(witness);
     }
   }
@@ -104,7 +102,7 @@ public class SimpleCollationTest extends AbstractTest {
     int read = 0;
 
     final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
-    for (Annotation token : annotationRepository.find(text, TokenAnnotator.TOKEN_NAME)) {
+    for (Annotation token : annotationRepository.find(text, Tokenizer.TOKEN_NAME)) {
         final Range range = token.getRange();
         if (read < range.getStart()) {
             ranges.put(new Range(read, range.getStart()), false);

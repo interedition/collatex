@@ -16,10 +16,10 @@ public class TextEventGeneratorTest extends AbstractXMLTest {
 
   @Test
   public void generateEvents() throws IOException {
-    generator.generate(DEBUG_HANDLER, document(), Collections.<QName>singleton(new QNameImpl("http://www.tei-c.org/ns/1.0", "seg")));
+    generator.generate(DEBUG_LISTENER, document(), Collections.<QName>singleton(new QNameImpl("http://www.tei-c.org/ns/1.0", "seg")));
   }
 
-  private final TextEventHandler DEBUG_HANDLER = new TextEventHandler() {
+  private final TextEventListener DEBUG_LISTENER = new TextEventListener() {
 
     public void start() {
     }

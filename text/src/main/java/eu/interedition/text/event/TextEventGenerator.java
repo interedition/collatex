@@ -38,15 +38,15 @@ public class TextEventGenerator {
     this.textRepository = textRepository;
   }
 
-  public void generate(final TextEventHandler handler, final Text text) throws IOException {
-    generate(handler, text, null);
+  public void generate(final TextEventListener listener, final Text text) throws IOException {
+    generate(listener, text, null);
   }
 
-  public void generate(final TextEventHandler handler, final Text text, final Set<QName> names) throws IOException {
-    generate(handler, text, names, Integer.MAX_VALUE);
+  public void generate(final TextEventListener listener, final Text text, final Set<QName> names) throws IOException {
+    generate(listener, text, names, Integer.MAX_VALUE);
   }
 
-  public void generate(final TextEventHandler handler, final Text text, final Set<QName> names, final int pageSize) throws IOException {
+  public void generate(final TextEventListener listener, final Text text, final Set<QName> names, final int pageSize) throws IOException {
     textRepository.read(text, new TextContentReader() {
 
       public void read(Reader content, int contentLength) throws IOException {
@@ -57,7 +57,7 @@ public class TextEventGenerator {
         int next = 0;
         int pageEnd = 0;
 
-        handler.start();
+        listener.start();
 
         while (true) {
           if ((offset % pageSize) == 0) {
@@ -90,13 +90,13 @@ public class TextEventGenerator {
             final Set<Annotation> endEvents = (!ends.isEmpty() && offset == ends.firstKey() ? ends.remove(ends.firstKey()) : Sets.<Annotation>newHashSet());
 
             final Set<Annotation> terminating = Sets.filter(endEvents, Predicates.not(EMPTY));
-            if (!terminating.isEmpty()) handler.end(offset, terminating);
+            if (!terminating.isEmpty()) listener.end(offset, terminating);
 
             final Set<Annotation> empty = Sets.filter(startEvents, EMPTY);
-            if (!empty.isEmpty()) handler.empty(offset, empty);
+            if (!empty.isEmpty()) listener.empty(offset, empty);
 
             final Set<Annotation> starting = Sets.filter(startEvents, Predicates.not(EMPTY));
-            if (!starting.isEmpty()) handler.start(offset, starting);
+            if (!starting.isEmpty()) listener.start(offset, starting);
 
 
             next = Math.min(starts.isEmpty() ? contentLength : starts.firstKey(), ends.isEmpty() ? contentLength : ends.firstKey());
@@ -110,12 +110,12 @@ public class TextEventGenerator {
           if (offset < readTo) {
             final char[] currentText = new char[readTo - offset];
             Preconditions.checkState(content.read(currentText) == currentText.length);
-            handler.text(new Range(offset, offset + currentText.length), currentText);
+            listener.text(new Range(offset, offset + currentText.length), currentText);
             offset += currentText.length;
           }
         }
 
-        handler.end();
+        listener.end();
       }
     });
   }
