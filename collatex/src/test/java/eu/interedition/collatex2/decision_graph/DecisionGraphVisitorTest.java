@@ -1,9 +1,11 @@
 package eu.interedition.collatex2.decision_graph;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -61,6 +63,27 @@ public class DecisionGraphVisitorTest {
     // I expect 6 vertices
     // start, 2 x the, black, cat en end
     assertVertices(dGraph2, "#", "the", "the", "black", "cat", "#");
+  }
+  
+  
+  //When there are multiple paths with the same minimum number of gaps
+  //do a second pass that tries to find the longest common sequence
+  @Ignore
+  @Test
+  public void testTryToFindMinimumAmountOfSequences() {
+    CollateXEngine engine = new CollateXEngine();
+    IWitness a = engine.createWitness("a", "The red cat and the black cat");
+    IWitness b = engine.createWitness("b", "the black cat");
+    IVariantGraph graph = engine.graph(a);
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
+    DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
+    DecisionGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
+    Map<DGVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
+    System.out.println(determineMinSequences);
+    
+    //    Map<DGVertex, Integer> longestCommonSeqW = visitor.assignLCSWeight(dGraph2);
+  //TODO: add asserts!
+    fail();
   }
 
   // TODO
