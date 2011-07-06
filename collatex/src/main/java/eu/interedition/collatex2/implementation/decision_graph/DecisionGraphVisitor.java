@@ -43,7 +43,7 @@ public class DecisionGraphVisitor {
       Integer min = Collections.min(edgeToTotalWeight.values());
       vertexToMinWeight.put(next, min);
     }
-    System.out.println(vertexToMinWeight);
+//    System.out.println(vertexToMinWeight);
     return vertexToMinWeight;
   }
 
@@ -97,83 +97,60 @@ public class DecisionGraphVisitor {
     return topoVertices;
   }
 
-  //NOTE: very experimental!
-  //NOTE: this method is a real simple implementation
-  //NOTE: not correct in all cases!
-  public Map<DGVertex, Integer> assignLCSWeight(DecisionGraph dGraph2) {
-    DGVertex endVertex = dGraph2.getEndVertex();
-    Map<DGVertex, Integer> maxLCS = Maps.newLinkedHashMap();
-    maxLCS.put(endVertex, 0);
-    // misschien moet ik hier gewoon de topological order nemen in reverse!
-    List<DGVertex> reverse = Lists.reverse(getVerticesInTopologicalOrder(dGraph2));
-    Iterator<DGVertex> vertexIterator = reverse.iterator();
-    vertexIterator.next(); // NOTE: skip end vertex
-    DGVertex vertex;
-    //TODO: Use vertex iterator here! In that case I would lose
-    //TODO: the do while construction!
-    do {
-      vertex = vertexIterator.next();
-      System.out.println("#"+vertex);
-      Map<DGEdge, Integer> determineMaxLCSForVertex = determineMaxLCSForVertex(dGraph2, maxLCS, vertex);
-      System.out.println(determineMaxLCSForVertex.size());
-      Integer max = Collections.max(determineMaxLCSForVertex.values());
-      maxLCS.put(vertex, max);
-    } while (vertex != dGraph2.getStartVertex()); 
-    System.out.println("Max LCS"+maxLCS);
-    return maxLCS;
-  }
-
-  private Map<DGEdge, Integer> determineMaxLCSForVertex(DecisionGraph dGraph2, Map<DGVertex, Integer> maxLCS, DGVertex vertex) {
-    Set<DGEdge> outgoingEdges = dGraph2.outgoingEdgesOf(vertex);
-    // nu proberen we het maximum LCS te berekenen van al de OUTgoing edges
-    Map<DGEdge, Integer> lcs = Maps.newLinkedHashMap();
-    for (DGEdge outgoing: outgoingEdges) {
-      System.out.println("!"+outgoing.getWeight());
-      DGVertex targetVertex = outgoing.getTargetVertex();
-      Integer maxLCSParent = maxLCS.get(targetVertex);
-      if (outgoing.getWeight()==0) {
-        lcs.put(outgoing, maxLCSParent+1);
-      } else {
-        //NOTE: I can return here either 0..
-        //NOTE: Then I would have to traverse specifically through parts of the graph
-        //NOTE: where there is doubt of which route to take 
-        //NOTE: or I return the MaxLCS encountered so far
-        //NOTE: which leads to an artificially high value
-        lcs.put(outgoing, maxLCSParent);
-      }
-    }
-    return lcs;
-  }
-  
   public Map<DGVertex, Integer> determineMinSequences(DecisionGraph graph) {
     DGVertex endVertex = graph.getEndVertex();
     Map<DGVertex, Integer> minSeq = Maps.newLinkedHashMap();
     Map<DGVertex, Integer> gapOrNoGap = Maps.newLinkedHashMap();
-    minSeq.put(endVertex, 1);
-    gapOrNoGap.put(endVertex, 0); // insert gap in the end 
+    minSeq.put(endVertex, 1); //TODO: CHECK THIS.. !!
+    gapOrNoGap.put(endVertex, 0); // insert gap in the end //TODO: check this!!
     // Take topological order of vertices in reserve!
     List<DGVertex> reverse = Lists.reverse(getVerticesInTopologicalOrder(graph));
     Iterator<DGVertex> vertexIterator = reverse.iterator();
     vertexIterator.next(); // NOTE: skip end vertex
     while(vertexIterator.hasNext()) {
       DGVertex vertex = vertexIterator.next();
-      Set<DGEdge> outgoingEdgesOf = graph.outgoingEdgesOf(vertex);
-      //TODO: which ones of the outgoing edges should we chose when there are 
-      //multiple ones? Ik zou de edge met de minimum maxLCS nemen?
-      for (DGEdge outgoing : outgoingEdgesOf) {
-        DGVertex targetVertex = outgoing.getTargetVertex();
-        if(targetVertex.getToken().getNormalized().equals("the")) {
-          System.out.println("DEBUG "+gapOrNoGap.get(targetVertex)+":"+outgoing.getWeight());
-        }
-        if (gapOrNoGap.get(targetVertex)==0&&outgoing.getWeight()==1) {
-          minSeq.put(vertex, 1+minSeq.get(targetVertex));
-        } else {
-          minSeq.put(vertex, minSeq.get(targetVertex));
-        }
-        gapOrNoGap.put(vertex, outgoing.getWeight());
-      }
+      Map<DGEdge, Integer> determineMinSequencesProEdge = determineMinSequencesForVertex(graph, minSeq, gapOrNoGap, vertex);
+      Integer min = Collections.min(determineMinSequencesProEdge.values());
+//      System.out.println("Debugging: "+vertex.getToken().toString()+":"+determineMinSequencesProEdge);
+      DGEdge minEdge = findTheMinimumEdge(determineMinSequencesProEdge, min);
+      minSeq.put(vertex, min);
+      gapOrNoGap.put(vertex, minEdge.getWeight());
     }
     return minSeq;
   }
+
+  private DGEdge findTheMinimumEdge(Map<DGEdge, Integer> determineMinSequencesProEdge, Integer min) {
+    DGEdge result = null;
+    for (DGEdge edge: determineMinSequencesProEdge.keySet()) {
+      if (determineMinSequencesProEdge.get(edge)==min) {
+        result = edge;
+        break;
+      }
+    }
+    if (result == null) {
+      throw new RuntimeException("This is not supposed to happen!");
+    }
+    return result;
+  }
+
+  private Map<DGEdge, Integer> determineMinSequencesForVertex(DecisionGraph graph, Map<DGVertex, Integer> minSeq, Map<DGVertex, Integer> gapOrNoGap, DGVertex vertex) {
+    Set<DGEdge> outgoingEdgesOf = graph.outgoingEdgesOf(vertex);
+    Map<DGEdge, Integer> edges = Maps.newLinkedHashMap();
+    for (DGEdge outgoing : outgoingEdgesOf) {
+      DGVertex targetVertex = outgoing.getTargetVertex();
+      //Note: Gaps causes extra sequences.
+      //Note: A sequence at the start vertex does not count, cause
+      //Note: it will be an empty sequence, cause there are no more tokens
+      if (vertex!=graph.getStartVertex()&&gapOrNoGap.get(targetVertex)==0&&outgoing.getWeight()==1) {
+        edges.put(outgoing, 1+minSeq.get(targetVertex));
+      } else {
+        edges.put(outgoing, minSeq.get(targetVertex));
+      }
+    }
+    return edges;
+  }
+  
+
+  
 
 }

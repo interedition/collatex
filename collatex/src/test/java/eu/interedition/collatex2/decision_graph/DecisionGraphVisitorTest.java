@@ -1,13 +1,11 @@
 package eu.interedition.collatex2.decision_graph;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,6 +20,14 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DecisionGraphVisitorTest {
+
+  public void assertVertices(DecisionGraph dGraph, String... normalized) {
+    Iterator<DGVertex> topologicIterator = dGraph.iterator();
+    for (String expectedNormalized : normalized) {
+      assertTrue("not enough vertices!", topologicIterator.hasNext());
+      assertEquals(expectedNormalized, topologicIterator.next().getToken().getNormalized());
+    }
+  }
 
   // All the witness are equal
   // There are choices to be made however, since there is duplication of tokens
@@ -68,7 +74,6 @@ public class DecisionGraphVisitorTest {
   
   //When there are multiple paths with the same minimum number of gaps
   //do a second pass that tries to find the longest common sequence
-  @Ignore
   @Test
   public void testTryToFindMinimumAmountOfSequences() {
     CollateXEngine engine = new CollateXEngine();
@@ -79,11 +84,14 @@ public class DecisionGraphVisitorTest {
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
     DecisionGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     Map<DGVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
-    System.out.println(determineMinSequences);
-    
-    //    Map<DGVertex, Integer> longestCommonSeqW = visitor.assignLCSWeight(dGraph2);
-  //TODO: add asserts!
-    fail();
+    // asserts
+    Iterator<DGVertex> dgVerticesIterator = dGraph2.iterator();
+    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
+    assertEquals(new Integer(2), determineMinSequences.get(dgVerticesIterator.next()));
+    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
+    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
+    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
+    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
   }
 
   // TODO
@@ -104,14 +112,6 @@ public class DecisionGraphVisitorTest {
     // they all should have weight 0
     Iterator<DGEdge> edges = path.iterator();
     assertEquals(new Integer(0), edges.next().getWeight());
-  }
-
-  public void assertVertices(DecisionGraph dGraph, String... normalized) {
-    Iterator<DGVertex> topologicIterator = dGraph.iterator();
-    for (String expectedNormalized : normalized) {
-      Assert.assertTrue("not enough vertices!", topologicIterator.hasNext());
-      Assert.assertEquals(expectedNormalized, topologicIterator.next().getToken().getNormalized());
-    }
   }
 
 }
