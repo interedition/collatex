@@ -3,7 +3,6 @@ package eu.interedition.text.repository;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
-import com.google.common.io.Files;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.rdbms.RelationalTextRepository;
@@ -17,7 +16,6 @@ import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -66,25 +64,11 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
         public Text doInTransaction(TransactionStatus status) {
           try {
             if (MediaType.TEXT_PLAIN.isCompatibleWith(contentType)) {
-              final File tempFile = File.createTempFile(getClass().toString(), ".txt");
-              tempFile.deleteOnExit();
-
-              InputStreamReader bodyReader = null;
-              CountingWriter tempWriter = null;
-              BufferedReader textReader = null;
+              Reader textContent = null;
               try {
-                bodyReader = new InputStreamReader(inputMessage.getBody(), charset);
-                tempWriter = new CountingWriter(new OutputStreamWriter(new FileOutputStream(tempFile)));
-                CharStreams.copy(bodyReader, tempWriter);
-
-                final Text text = textRepository.create(Text.Type.PLAIN);
-                textReader = Files.newReader(tempFile, xmlParser.getCharset());
-                return text;
+                return textRepository.create(textContent = new InputStreamReader(inputMessage.getBody(), charset));
               } finally {
-                Closeables.close(bodyReader, false);
-                Closeables.close(tempWriter, false);
-                Closeables.close(textReader, false);
-                tempFile.delete();
+                Closeables.close(textContent, false);
               }
             } else {
               return xmlParser.load(new StreamSource(inputMessage.getBody()));

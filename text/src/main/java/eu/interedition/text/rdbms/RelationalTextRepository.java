@@ -3,10 +3,13 @@ package eu.interedition.text.rdbms;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
+import com.google.common.io.Files;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
+import eu.interedition.text.xml.XMLParser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -15,14 +18,15 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import javax.sql.DataSource;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
@@ -51,6 +55,31 @@ public class RelationalTextRepository implements TextRepository {
     relationalText.setId(textInsert.executeAndReturnKey(textData).intValue());
 
     return relationalText;
+  }
+
+  public Text create(Reader content) throws IOException {
+    final File tempFile = File.createTempFile(getClass().toString(), ".txt");
+    try {
+      CountingWriter tempWriter = null;
+      try {
+        tempWriter = new CountingWriter(new OutputStreamWriter(new FileOutputStream(tempFile), XMLParser.DEFAULT_CHARSET));
+        CharStreams.copy(content, tempWriter);
+      } finally {
+        Closeables.close(tempWriter, false);
+      }
+
+      BufferedReader textReader = null;
+      try {
+        final Text text = create(Text.Type.PLAIN);
+        textReader = Files.newReader(tempFile, XMLParser.DEFAULT_CHARSET);
+        write(text, textReader, tempWriter.length);
+        return text;
+      } finally {
+        Closeables.close(textReader, false);
+      }
+    } finally {
+      tempFile.delete();
+    }
   }
 
   public void delete(Text text) {
@@ -159,5 +188,32 @@ public class RelationalTextRepository implements TextRepository {
     }
 
     protected abstract T read(Clob content) throws SQLException, IOException;
+  }
+
+  private static class CountingWriter extends FilterWriter {
+
+    private int length = 0;
+
+    private CountingWriter(Writer out) {
+      super(out);
+    }
+
+    @Override
+    public void write(int c) throws IOException {
+      super.write(c);
+      length++;
+    }
+
+    @Override
+    public void write(char[] cbuf, int off, int len) throws IOException {
+      super.write(cbuf, off, len);
+      length += len;
+    }
+
+    @Override
+    public void write(String str, int off, int len) throws IOException {
+      super.write(str, off, len);
+      length += len;
+    }
   }
 }

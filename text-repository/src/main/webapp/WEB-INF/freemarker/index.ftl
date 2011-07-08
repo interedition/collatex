@@ -4,7 +4,7 @@
 
 <div style="font-size: larger; text-align: center; margin: 2em; padding-top: 6em">
 
-    <div id="error-message" style="color: #FF3366; margin-bottom: 0.5em">&nbsp;</div>
+    <div id="error-message" class="error" style="margin-bottom: 0.5em">&nbsp;</div>
 
     <form id="goto-text-form">
         <label for="text-id">Text&nbsp;#&nbsp;</label>

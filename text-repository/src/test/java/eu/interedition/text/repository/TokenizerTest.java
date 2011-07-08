@@ -28,7 +28,6 @@ public class TokenizerTest extends AbstractTest {
   private static final Logger LOG = LoggerFactory.getLogger(TokenizerTest.class);
 
   private static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
-  private static final String TEI_SIG_GE_NS = "http://www.tei-c.org/ns/geneticEditions";
 
   @Autowired
   private XMLParser parser;

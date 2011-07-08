@@ -1,8 +1,12 @@
 package eu.interedition.text.repository;
 
 import eu.interedition.text.QName;
+import eu.interedition.text.rdbms.RelationalQName;
 import eu.interedition.text.util.QNames;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonValue;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.net.URI;
 
@@ -10,28 +14,32 @@ import java.net.URI;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class QNameBean implements QName {
+  private String id;
   private URI namespaceURI;
   private String localName;
 
-  public String getNs() {
-    return (namespaceURI == null ? null : namespaceURI.toString());
+  public QNameBean() {
   }
 
-  public void setNs(String ns) {
-    namespaceURI = (ns == null ? null : URI.create(ns));
+  public String getId() {
+    return id;
   }
 
-  @JsonIgnore
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  @JsonProperty("ns")
   @Override
   public URI getNamespaceURI() {
     return namespaceURI;
   }
 
-  @JsonIgnore
   public void setNamespaceURI(URI namespaceURI) {
     this.namespaceURI = namespaceURI;
   }
 
+  @JsonProperty("n")
   @Override
   public String getLocalName() {
     return localName;
