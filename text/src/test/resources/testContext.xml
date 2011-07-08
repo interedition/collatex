@@ -6,61 +6,13 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-	<jdbc:embedded-database type="H2" id="dataSource" />
+	<jdbc:embedded-database type="H2" id="repositoryDataSource" />
 
-	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
-				<prop key="hibernate.default_batch_fetch_size">16</prop>
-				<prop key="hibernate.jdbc.batch_size">30</prop>
-				<prop key="hibernate.hbm2ddl.auto">create</prop>
-			</props>
-		</property>
-		<property name="mappingResources" value="/eu/interedition/text/rdbms/text.hbm.xml" />
-	</bean>
+    <jdbc:initialize-database data-source="repositoryDataSource">
+        <jdbc:script location="/eu/interedition/text/rdbms/h2-schema.sql" />
+    </jdbc:initialize-database>
 
-	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
-
-	<tx:advice id="transactionAdvice" />
-
-	<aop:config>
-		<aop:pointcut expression="execution(* eu.interedition.text.rdbms.Relational*.*(..))" id="persistingMethods" />
-		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="persistingMethods" />
-	</aop:config>
-
-	<bean id="nameRepository" class="eu.interedition.text.rdbms.RelationalQNameRepository">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
-
-	<bean id="textRepository" class="eu.interedition.text.rdbms.RelationalTextRepository">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
-
-	<bean id="annotationFactory" class="eu.interedition.text.rdbms.RelationalAnnotationFactory">
-		<property name="sessionFactory" ref="sessionFactory" />
-		<property name="nameRepository" ref="nameRepository" />
-		<property name="textRepository" ref="textRepository" />
-	</bean>
-
-	<bean id="annotationRepository" class="eu.interedition.text.rdbms.RelationalAnnotationRepository">
-		<property name="sessionFactory" ref="sessionFactory" />
-		<property name="nameRepository" ref="nameRepository" />
-	</bean>
-
-	<bean id="xmlParser" class="eu.interedition.text.rdbms.RelationalXMLParser">
-		<property name="sessionFactory" ref="sessionFactory" />
-		<property name="textRepository" ref="textRepository" />
-		<property name="nameRepository" ref="nameRepository" />
-		<property name="annotationFactory" ref="annotationFactory" />
-	</bean>
-
-	<bean id="eventGenerator" class="eu.interedition.text.event.TextEventGenerator">
-        <property name="nameRepository" ref="nameRepository" />
-		<property name="annotationRepository" ref="annotationRepository" />
-        <property name="textRepository" ref="textRepository" />
-	</bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource"  ref="repositoryDataSource"/>
+    </bean>
 </beans>

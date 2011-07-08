@@ -25,12 +25,14 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.interedition.text.rdbms.RelationalAnnotationFactory;
+import eu.interedition.text.rdbms.RelationalQNameRepository;
+import eu.interedition.text.util.QNameImpl;
 import eu.interedition.text.xml.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.transform.stream.StreamSource;
@@ -61,10 +63,13 @@ public abstract class AbstractXMLTest extends AbstractTest {
   private SimpleXMLParserConfiguration parserConfiguration = new SimpleXMLParserConfiguration();
 
   @Autowired
-  private RelationalAnnotationFactory annotationFactory;
+  private TextRepository textRepository;
 
   @Autowired
   private XMLParser xmlParser;
+
+  @Autowired
+  private RelationalQNameRepository nameRepository;
 
   @Before
   public void configureXMLParser() {
@@ -91,9 +96,14 @@ public abstract class AbstractXMLTest extends AbstractTest {
   @After
   public void removeDocuments() {
     for (Iterator<Text> documentIt = documents.values().iterator(); documentIt.hasNext(); ) {
-      annotationFactory.delete(documentIt.next());
+      textRepository.delete(documentIt.next());
       documentIt.remove();
     }
+  }
+
+  @AfterTransaction
+  public void clearNameCache() {
+    nameRepository.clearCache();
   }
 
   /**
@@ -120,17 +130,10 @@ public abstract class AbstractXMLTest extends AbstractTest {
   protected synchronized void load(String resource) {
     try {
       if (RESOURCES.contains(resource) && !documents.containsKey(resource)) {
-
-        Text xml = annotationFactory.newText();
         final URI uri = AbstractXMLTest.class.getResource("/" + resource).toURI();
-
-        xmlParser.load(xml, new StreamSource(uri.toASCIIString()));
+        final Text xml = xmlParser.load(new StreamSource(uri.toASCIIString()));
         sources.put(resource, xml);
-
-        final Text text = annotationFactory.newText();
-        xmlParser.parse(xml, text, parserConfiguration);
-
-        documents.put(resource, text);
+        documents.put(resource, xmlParser.parse(xml, parserConfiguration));
       }
     } catch (Exception e) {
       throw Throwables.propagate(e);

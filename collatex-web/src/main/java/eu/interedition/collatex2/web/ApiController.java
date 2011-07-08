@@ -20,28 +20,28 @@
 
 package eu.interedition.collatex2.web;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.PostMethod;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
+import com.google.common.io.FileBackedOutputStream;
+import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.input.Phrase;
+import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
+import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
+import eu.interedition.collatex2.implementation.output.apparatus.TeiParallelSegmentationApparatusBuilder;
+import eu.interedition.collatex2.implementation.output.cgraph.CVariantGraphCreator;
+import eu.interedition.collatex2.implementation.output.graphml.GraphMLBuilder;
+import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
+import eu.interedition.collatex2.interfaces.*;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
+import eu.interedition.collatex2.web.io.ApiObjectMapper;
 import org.codehaus.jackson.JsonParseException;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
@@ -63,41 +63,27 @@ import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
-import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
-import eu.interedition.collatex2.implementation.output.apparatus.TeiParallelSegmentationApparatusBuilder;
-import eu.interedition.collatex2.implementation.output.cgraph.CVariantGraphCreator;
-import eu.interedition.collatex2.implementation.output.graphml.GraphMLBuilder;
-import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.ITokenNormalizer;
-import eu.interedition.collatex2.interfaces.ITokenizer;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
-import eu.interedition.collatex2.web.io.ApiObjectMapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
 
 @Controller
 public class ApiController implements InitializingBean {
-  private static final String SVG_SERVER = "http://localhost:1080/svg";
   protected static final String COLLATEX_NS = "http://interedition.eu/collatex/ns/1.0";
   protected static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
+  private static final String GRAPHVIZ_DOT = System.getProperty("collatex.graphviz.dot", "/usr/bin/dot");
 
   private final ITokenizer defaultTokenizer = new WhitespaceTokenizer();
   private final ITokenNormalizer defaultNormalizer = new DefaultTokenNormalizer();
+
 
   @Autowired
   private ApiObjectMapper objectMapper;
@@ -108,46 +94,70 @@ public class ApiController implements InitializingBean {
     jsonView.setObjectMapper(objectMapper);
   }
 
-  @RequestMapping(value= "/")
+  @RequestMapping(value = "/")
   public String redirectFromRoot() {
     return "redirect:/api/collate";
   }
-  
-  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=application/json" }, method = RequestMethod.POST)
+
+  @RequestMapping(value = "/api/collate", headers = {"Content-Type=application/json", "Accept=application/json"}, method = RequestMethod.POST)
   public ModelAndView collateToJson(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(jsonView, "alignment", collate(input));
   }
 
-  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=application/xml" }, method = RequestMethod.POST)
+  @RequestMapping(value = "/api/collate", headers = {"Content-Type=application/json", "Accept=application/xml"}, method = RequestMethod.POST)
   public ModelAndView collateToTei(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(teiView, "alignment", collateToGraph(input));
   }
 
-  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=image/svg+xml" }, method = RequestMethod.POST)
-  public ModelAndView collateToSvg(@RequestBody final ApiInput input) throws Exception {
-    // String svg = convert2svg(ccollate2dot(input)); // cyclic, unjoined graph
-    // String svg = convert2svg(collate2dot(input)); // acyclic unjoined graph
-    String svg = convert2svg(jcollate2dot(input)); // acyclic joined graph
-    ModelAndView modelAndView = new ModelAndView(svgView, "svg", svg);
-    return modelAndView;
+  @RequestMapping(value = "/api/collate", headers = {"Content-Type=application/json", "Accept=image/svg+xml"}, method = RequestMethod.POST)
+  public void collateToSvg(@RequestBody final ApiInput input, HttpServletResponse response) throws Exception {
+    // final String dot = ccollate2dot(input); // cyclic, unjoined graph
+    // final String dot = collate2dot(input); // acyclic unjoined graph
+    final String dot = jcollate2dot(input);
+
+    final Process dotProc = Runtime.getRuntime().exec(GRAPHVIZ_DOT + " -Grankdir=LR -Gid=VariantGraph -Tsvg");
+    final OutputStream dotStdin = new BufferedOutputStream(dotProc.getOutputStream());
+    try {
+      ByteStreams.copy(ByteStreams.newInputStreamSupplier(dot.getBytes(Charset.defaultCharset())), dotStdin);
+    } finally {
+      Closeables.close(dotStdin, false);
+    }
+
+    InputStream svgResult = null;
+    final FileBackedOutputStream svgBuf = new FileBackedOutputStream(102400);
+    try {
+      ByteStreams.copy(svgResult = new BufferedInputStream(dotProc.getInputStream()), svgBuf);
+    } finally {
+      Closeables.close(svgBuf, false);
+      Closeables.close(svgResult, false);
+    }
+
+    InputStream svgSource = null;
+    try {
+      if (dotProc.waitFor() == 0) {
+        response.setContentType("image/svg+xml");
+
+        final OutputStream responseStream = response.getOutputStream();
+        ByteStreams.copy(svgSource = svgBuf.getSupplier().getInput(), responseStream);
+        responseStream.flush();
+
+        return;
+      }
+    } catch (InterruptedException e) {
+    } finally {
+      Closeables.closeQuietly(svgSource);
+    }
+
+    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
   }
-  
-  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=application/graphml+xml" }, method = RequestMethod.POST)
+
+  @RequestMapping(value = "/api/collate", headers = {"Content-Type=application/json", "Accept=application/graphml+xml"}, method = RequestMethod.POST)
   public ModelAndView collateToGraphML(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView(graphMLView, "alignment", collateToGraph(input));
   }
 
 
-  private String convert2svg(String dot) throws IOException, HttpException {
-    HttpClient client = new HttpClient();
-    PostMethod postMethod = new PostMethod(SVG_SERVER);
-    postMethod.setParameter("dot", dot);
-    client.executeMethod(postMethod);
-    String svg = postMethod.getResponseBodyAsString();
-    return svg;
-  }
-
-  @RequestMapping(value = "/api/collate", headers = { "Content-Type=application/json", "Accept=application/xhtml+xml;charset=utf-8" }, method = RequestMethod.POST)
+  @RequestMapping(value = "/api/collate", headers = {"Content-Type=application/json", "Accept=application/xhtml+xml;charset=utf-8"}, method = RequestMethod.POST)
   public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView("api/alignment", "alignment", collate(input));
   }
@@ -158,7 +168,7 @@ public class ApiController implements InitializingBean {
   //    return new ModelAndView("api/apparatus", "rows", rows);
   //  }
 
-  static final Phrase EMPTY_PHRASE = new Phrase(Lists.<INormalizedToken> newArrayList());
+  static final Phrase EMPTY_PHRASE = new Phrase(Lists.<INormalizedToken>newArrayList());
 
   //TODO: Parallel segmentation for Alignment Tables is not enabled for the moment!
   //  private List<Map<String, Object>> parallelSegmentationRows(final ApiInput input) throws ApiException {
@@ -187,7 +197,8 @@ public class ApiController implements InitializingBean {
   }
 
   @RequestMapping(value = "/api/collate")
-  public void documentation() {}
+  public void documentation() {
+  }
 
   private IAlignmentTable collate(ApiInput input) throws ApiException {
     final List<ApiWitness> witnesses = checkInputAndExtractWitnesses(input);
@@ -246,7 +257,7 @@ public class ApiController implements InitializingBean {
     }
   };
   static final DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge> JDOT_EXPORTER = new DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge>(//
-      JVERTEX_ID_PROVIDER, JVERTEX_LABEL_PROVIDER, JEDGE_LABEL_PROVIDER //
+          JVERTEX_ID_PROVIDER, JVERTEX_LABEL_PROVIDER, JEDGE_LABEL_PROVIDER //
   );
   static final VertexNameProvider<IVariantGraphVertex> VERTEX_ID_PROVIDER = new IntegerNameProvider<IVariantGraphVertex>();
   static final VertexNameProvider<IVariantGraphVertex> VERTEX_LABEL_PROVIDER = new VertexNameProvider<IVariantGraphVertex>() {
@@ -267,7 +278,7 @@ public class ApiController implements InitializingBean {
     }
   };
   static final DOTExporter<IVariantGraphVertex, IVariantGraphEdge> CDOT_EXPORTER = new DOTExporter<IVariantGraphVertex, IVariantGraphEdge>(//
-      VERTEX_ID_PROVIDER, VERTEX_LABEL_PROVIDER, EDGE_LABEL_PROVIDER //
+          VERTEX_ID_PROVIDER, VERTEX_LABEL_PROVIDER, EDGE_LABEL_PROVIDER //
   );
 
   private String jcollate2dot(ApiInput input) throws ApiException {
@@ -322,7 +333,7 @@ public class ApiController implements InitializingBean {
     return witnesses;
   }
 
-  @ExceptionHandler( { ApiException.class, JsonParseException.class })
+  @ExceptionHandler({ApiException.class, JsonParseException.class})
   public ModelAndView apiError(HttpServletResponse response, Exception exception) {
     return new ModelAndView(new MappingJacksonJsonView(), new ModelMap("error", exception.getMessage()));
   }
@@ -361,19 +372,6 @@ public class ApiController implements InitializingBean {
       out.flush();
     }
   };
-  private final AbstractView svgView = new AbstractView() {
-
-    @Override
-    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-      String svg = (String) model.get("svg");
-      Assert.notNull(svg);
-      response.setCharacterEncoding("UTF-8");
-      PrintWriter out = response.getWriter();
-      out.write(svg);
-      out.flush();
-    }
-  };
-  
   private final AbstractView graphMLView = new AbstractView() {
 
     @Override

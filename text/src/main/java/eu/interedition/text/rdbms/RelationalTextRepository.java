@@ -6,43 +6,62 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextContentReader;
 import eu.interedition.text.TextRepository;
-import org.hibernate.SessionFactory;
-import org.hibernate.jdbc.Work;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
+import javax.sql.DataSource;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.sql.*;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.sql.Clob;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
 
 public class RelationalTextRepository implements TextRepository {
 
-  private SessionFactory sessionFactory;
-  private String contentColumn = "content";
-  private String textRelation = "lmnl_text";
+  private SimpleJdbcTemplate jt;
+  private SimpleJdbcInsert textInsert;
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public void setDataSource(DataSource dataSource) {
+    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.textInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_content").usingGeneratedKeyColumns("id"));
   }
 
-  public void setContentColumn(String contentColumn) {
-    this.contentColumn = contentColumn;
+  public Text create(Text.Type type) {
+    final Date created = new Date();
+
+    final Map<String, Object> textData = Maps.newHashMap();
+    textData.put("created", created);
+    textData.put("type", type.ordinal());
+    textData.put("content", "");
+
+    final RelationalText relationalText = new RelationalText();
+    relationalText.setCreated(created);
+    relationalText.setType(type);
+    relationalText.setId(textInsert.executeAndReturnKey(textData).intValue());
+
+    return relationalText;
   }
 
-  public void setTextRelation(String textRelation) {
-    this.textRelation = textRelation;
+  public void delete(Text text) {
+    jt.update("delete from text_content where id = ?", ((RelationalText) text).getId());
   }
 
-  public void read(Text text, final TextContentReader reader) throws IOException {
-    sessionFactory.getCurrentSession().doWork(new TextContentRetrieval<Void>(text) {
+  public void read(Text text, final TextReader reader) throws IOException {
+    read(new ReaderCallback<Void>(text) {
 
       @Override
-      protected Void retrieve(Clob content) throws SQLException, IOException {
+      protected Void read(Clob content) throws SQLException, IOException {
         Reader contentReader = null;
         try {
           reader.read(contentReader = content.getCharacterStream(), (int) content.length());
@@ -61,24 +80,21 @@ public class RelationalTextRepository implements TextRepository {
   }
 
   public int length(Text text) throws IOException {
-    final TextContentRetrieval<Integer> contentLengthRetrieval = new TextContentRetrieval<Integer>(text) {
+    return read(new ReaderCallback<Integer>(text) {
 
       @Override
-      protected Integer retrieve(Clob content) throws SQLException, IOException {
+      protected Integer read(Clob content) throws SQLException, IOException {
         return (int) content.length();
       }
-    };
-
-    sessionFactory.getCurrentSession().doWork(contentLengthRetrieval);
-    return contentLengthRetrieval.returnValue;
+    });
   }
 
   public SortedMap<Range, String> bulkRead(Text text, final SortedSet<Range> ranges) throws IOException {
     final SortedMap<Range, String> results = Maps.newTreeMap();
-    sessionFactory.getCurrentSession().doWork(new TextContentRetrieval<Void>(text) {
+    read(new ReaderCallback<Void>(text) {
 
       @Override
-      protected Void retrieve(Clob content) throws SQLException, IOException {
+      protected Void read(Clob content) throws SQLException, IOException {
         for (Range range : ranges) {
           results.put(range, content.getSubString(range.getStart() + 1, range.length()));
         }
@@ -89,51 +105,59 @@ public class RelationalTextRepository implements TextRepository {
   }
 
   public void write(final Text text, final Reader contents, final int contentLength) throws IOException {
-    sessionFactory.getCurrentSession().doWork(new Work() {
-
-      public void execute(Connection connection) throws SQLException {
-        final PreparedStatement updateStmt = connection.prepareStatement("UPDATE " + textRelation + " SET "
-                + contentColumn + " = ? WHERE id = ?");
-        try {
-          updateStmt.setCharacterStream(1, contents, contentLength);
-          updateStmt.setInt(2, ((TextRelation) text).getId());
-          updateStmt.executeUpdate();
-        } finally {
-          updateStmt.close();
-        }
-
+    jt.getJdbcOperations().execute("update text_content set content = ? where id = ?", new PreparedStatementCallback<Void>() {
+      public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
+        ps.setCharacterStream(1, new BufferedReader(contents), contentLength);
+        ps.setInt(2, ((RelationalText) text).getId());
+        ps.executeUpdate();
+        return null;
       }
     });
   }
 
-  private abstract class TextContentRetrieval<T> implements Work {
-    private final Text text;
-    private T returnValue;
 
-    public TextContentRetrieval(Text text) {
-      this.text = text;
-    }
+  private <T> T read(final ReaderCallback<T> callback) {
+    return DataAccessUtils.requiredUniqueResult(jt.query("select content from text_content where id = ?",
+            new RowMapper<T>() {
 
-    public void execute(Connection connection) throws SQLException {
-      final PreparedStatement contentStmt = connection.prepareStatement("SELECT " + contentColumn + " FROM "
-              + textRelation + " WHERE id = ?");
-      try {
-        contentStmt.setInt(1, ((TextRelation) text).getId());
-        final ResultSet resultSet = contentStmt.executeQuery();
-        try {
-          if (resultSet.next()) {
-            returnValue = retrieve(resultSet.getClob(1));
-          }
-        } finally {
-          resultSet.close();
-        }
-      } catch (IOException e) {
-        Throwables.propagate(e);
-      } finally {
-        contentStmt.close();
+              public T mapRow(ResultSet rs, int rowNum) throws SQLException {
+                try {
+                  return (callback.result = callback.read(rs.getClob(1)));
+                } catch (IOException e) {
+                  throw new SQLException(e);
+                }
+              }
+            }, callback.text.getId()));
+  }
+
+  public Text load(int id) {
+    return DataAccessUtils.requiredUniqueResult(jt.query("select " + select("t") + " from text_content t where t.id = ?", new RowMapper<Text>() {
+      public Text mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return mapText(rs, "t");
       }
+    }, id));
+  }
+
+  static String select(String tableName) {
+    return Util.select(tableName, "id", "created", "type");
+  }
+
+  static RelationalText mapText(ResultSet rs, String prefix) throws SQLException {
+    final RelationalText relationalText = new RelationalText();
+    relationalText.setId(rs.getInt(prefix + "_id"));
+    relationalText.setCreated(rs.getDate(prefix + "_created"));
+    relationalText.setType(Text.Type.values()[rs.getInt(prefix + "_type")]);
+    return relationalText;
+  }
+
+  private abstract class ReaderCallback<T> {
+    private final RelationalText text;
+    private T result;
+
+    private ReaderCallback(Text text) {
+      this.text = (RelationalText) text;
     }
 
-    protected abstract T retrieve(Clob content) throws SQLException, IOException;
+    protected abstract T read(Clob content) throws SQLException, IOException;
   }
 }

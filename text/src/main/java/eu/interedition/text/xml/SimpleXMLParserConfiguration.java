@@ -14,6 +14,8 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
   protected Set<QName> notableElements = Sets.newHashSet();
   protected char notableCharacter = '\u25CA';
   protected boolean compressingWhitespace = true;
+  protected OffsetDeltaHandler offsetDeltaHandler;
+  protected NodePathHandler nodePathHandler;
 
   public void addLineElement(QName lineElementName) {
     lineElements.add(lineElementName);
@@ -81,5 +83,21 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
 
   public void setCompressingWhitespace(boolean compressingWhitespace) {
     this.compressingWhitespace = compressingWhitespace;
+  }
+
+  public OffsetDeltaHandler getOffsetDeltaHandler() {
+    return offsetDeltaHandler;
+  }
+
+  public void setOffsetDeltaHandler(OffsetDeltaHandler offsetDeltaHandler) {
+    this.offsetDeltaHandler = offsetDeltaHandler;
+  }
+
+  public NodePathHandler getNodePathHandler() {
+    return nodePathHandler;
+  }
+
+  public void setNodePathHandler(NodePathHandler nodePathHandler) {
+    this.nodePathHandler = nodePathHandler;
   }
 }

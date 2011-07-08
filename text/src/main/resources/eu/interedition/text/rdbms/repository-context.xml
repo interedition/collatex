@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="nameRepository" class="eu.interedition.text.rdbms.RelationalQNameRepository">
+        <property name="dataSource" ref="repositoryDataSource" />
+    </bean>
+
+    <bean id="textRepository" class="eu.interedition.text.rdbms.RelationalTextRepository">
+        <property name="dataSource" ref="repositoryDataSource" />
+    </bean>
+
+    <bean id="annotationRepository" class="eu.interedition.text.rdbms.RelationalAnnotationRepository">
+        <property name="dataSource" ref="repositoryDataSource" />
+        <property name="nameRepository" ref="nameRepository" />
+        <property name="textRepository" ref="textRepository" />
+    </bean>
+
+    <bean id="annotationDataRepository" class="eu.interedition.text.rdbms.RelationalAnnotationDataRepository">
+        <property name="dataSource" ref="repositoryDataSource" />
+        <property name="nameRepository" ref="nameRepository" />
+    </bean>
+
+    <bean id="xmlParser" class="eu.interedition.text.rdbms.RelationalXMLParser">
+        <property name="dataSource" ref="repositoryDataSource" />
+        <property name="textRepository" ref="textRepository" />
+        <property name="nameRepository" ref="nameRepository" />
+        <property name="annotationRepository" ref="annotationRepository" />
+        <property name="annotationDataRepository"  ref="annotationDataRepository" />
+    </bean>
+
+    <bean id="eventGenerator" class="eu.interedition.text.event.TextEventGenerator">
+        <property name="nameRepository" ref="nameRepository" />
+        <property name="annotationRepository" ref="annotationRepository" />
+        <property name="textRepository" ref="textRepository" />
+    </bean>
+
+</beans>

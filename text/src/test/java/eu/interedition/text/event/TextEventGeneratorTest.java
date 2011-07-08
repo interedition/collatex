@@ -2,6 +2,7 @@ package eu.interedition.text.event;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.text.*;
+import eu.interedition.text.util.QNameImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

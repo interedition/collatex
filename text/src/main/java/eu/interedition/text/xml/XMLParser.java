@@ -1,10 +1,12 @@
 package eu.interedition.text.xml;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import eu.interedition.text.*;
+import eu.interedition.text.util.QNameImpl;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -14,21 +16,21 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Stack;
 
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 public abstract class XMLParser {
-  public static final QName OFFSET_DELTA_NAME = new QNameImpl(Annotation.INTEREDITION_NS_URI, "offset");
-  public static final QName NODE_PATH_NAME = new QNameImpl(Annotation.INTEREDITION_NS_URI, "xmlNode");
+  public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
   private final TransformerFactory transformerFactory;
   private final XMLInputFactory xmlInputFactory;
 
   private TextRepository textRepository;
 
-  private Charset charset = Charset.forName("UTF-8");
+  private Charset charset = DEFAULT_CHARSET;
   private boolean removeLeadingWhitespace = true;
   private int textBufferSize = 100000;
   private int xmlEventBatchSize = 1000;
@@ -43,6 +45,10 @@ public abstract class XMLParser {
 
   public void setTextRepository(TextRepository textRepository) {
     this.textRepository = textRepository;
+  }
+
+  public Charset getCharset() {
+    return charset;
   }
 
   public void setCharset(Charset charset) {
@@ -61,7 +67,7 @@ public abstract class XMLParser {
     this.xmlEventBatchSize = xmlEventBatchSize;
   }
 
-  public void load(Text text, Source xml) throws IOException, TransformerException {
+  public Text load(Source xml) throws IOException, TransformerException {
     File sourceContents = File.createTempFile(getClass().getName(), ".xml");
     sourceContents.deleteOnExit();
 
@@ -79,29 +85,35 @@ public abstract class XMLParser {
       final int sourceContentLength = contentLength(sourceContentReader);
       sourceContentReader.close();
 
+      final Text text = textRepository.create(Text.Type.XML);
       sourceContentReader = new InputStreamReader(new FileInputStream(sourceContents), charset);
       updateText(text, sourceContentReader, sourceContentLength);
+      return text;
     } finally {
       Closeables.close(sourceContentReader, false);
       sourceContents.delete();
     }
   }
 
-  public void parse(Text source, Text target, XMLParserConfiguration configuration)
+  public Text parse(Text source, XMLParserConfiguration configuration)
           throws IOException, XMLStreamException {
     Session session = null;
     try {
+      Preconditions.checkArgument(source.getType() == Text.Type.XML);
+      final Text target = textRepository.create(Text.Type.PLAIN);
+
       session = new Session(source, target, configuration);
       textRepository.read(source, session);
+
+      return target;
     } catch (Throwable t) {
       Throwables.propagateIfInstanceOf(t, IOException.class);
       Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
-      Throwables.propagate(t);
+      throw Throwables.propagate(t);
     } finally {
       if (session != null) {
         session.dispose();
       }
-
     }
   }
 
@@ -109,12 +121,9 @@ public abstract class XMLParser {
     textRepository.write(text, reader, contentLength);
   }
 
-  protected abstract Annotation startAnnotation(Session session, QName name, Map<QName, String> attrs, int start,
-                                                Iterable<Integer> nodePath);
+  protected abstract Annotation startAnnotation(Session session, QName name, Map<QName, String> attrs, int start);
 
-  protected abstract void endAnnotation(Annotation annotation, int end);
-
-  protected abstract void newOffsetDelta(Session session, Range textRange, Range sourceRange);
+  protected abstract Annotation endAnnotation(Annotation annotation, int end);
 
   protected void newXMLEventBatch() {
   }
@@ -127,7 +136,7 @@ public abstract class XMLParser {
     return contentLength;
   }
 
-  protected class Session implements TextContentReader {
+  public class Session implements TextRepository.TextReader {
     public final Text source;
     public final Text target;
     public final XMLParserConfiguration configuration;
@@ -143,6 +152,8 @@ public abstract class XMLParser {
     protected Range lastDeltaTextRange = Range.NULL;
     protected Range lastDeltaSourceRange = Range.NULL;
 
+    protected OffsetDeltaHandler offsetDeltaHandler;
+    private NodePathHandler nodePathHandler;
     protected char notableCharacter;
     protected char lastChar = (removeLeadingWhitespace ? ' ' : 0);
     private XMLStreamReader reader;
@@ -151,6 +162,8 @@ public abstract class XMLParser {
       this.source = source;
       this.target = target;
       this.configuration = configuration;
+      this.offsetDeltaHandler = configuration.getOffsetDeltaHandler();
+      this.nodePathHandler = configuration.getNodePathHandler();
       this.notableCharacter = configuration.getNotableCharacter();
       this.nodePath.push(0);
     }
@@ -169,7 +182,7 @@ public abstract class XMLParser {
         }
       }
 
-      final Annotation annotation = XMLParser.this.startAnnotation(this, name, attributes, textOffset, nodePath);
+      final Annotation annotation = XMLParser.this.startAnnotation(this, name, attributes, textOffset);
 
       elementContext.push(annotation);
 
@@ -190,16 +203,22 @@ public abstract class XMLParser {
     protected void insertSpecialChar(char specialChar) throws IOException {
       textBuffer.write(Character.toString(lastChar = specialChar).getBytes(charset));
 
-      final int sourceOffset = lastDeltaSourceRange.getEnd();
-      newOffsetDelta(this, lastDeltaTextRange = new Range(textOffset, ++textOffset),//
-              lastDeltaSourceRange = new Range(sourceOffset, sourceOffset));
+      if (offsetDeltaHandler != null) {
+        final int sourceOffset = lastDeltaSourceRange.getEnd();
+        offsetDeltaHandler.newOffsetDelta(target, source, lastDeltaTextRange = new Range(textOffset, ++textOffset),//
+                lastDeltaSourceRange = new Range(sourceOffset, sourceOffset));
+      }
     }
 
     protected void endAnnotation() throws IOException {
       nodePath.pop();
       spacePreservationContext.pop();
       inclusionContext.pop();
-      XMLParser.this.endAnnotation(elementContext.pop(), textOffset);
+      final Annotation annotation = XMLParser.this.endAnnotation(elementContext.pop(), textOffset);
+      if (nodePathHandler != null) {
+        nodePathHandler.newNodePath(annotation, Collections.unmodifiableList(nodePath));
+      }
+
     }
 
     protected void nextSibling() {
@@ -249,16 +268,18 @@ public abstract class XMLParser {
     }
 
     protected void checkOffsetDelta(int sourceOffset) {
-      if (lastDeltaSourceRange.getEnd() < sourceOffset || lastDeltaTextRange.getEnd() < textOffset) {
-        newOffsetDelta(this, lastDeltaTextRange = new Range(lastDeltaTextRange.getEnd(), textOffset),//
-                lastDeltaSourceRange = new Range(lastDeltaSourceRange.getEnd(), sourceOffset));
+      if (offsetDeltaHandler != null) {
+        if (lastDeltaSourceRange.getEnd() < sourceOffset || lastDeltaTextRange.getEnd() < textOffset) {
+          offsetDeltaHandler.newOffsetDelta(target, source, lastDeltaTextRange = new Range(lastDeltaTextRange.getEnd(), textOffset),//
+                  lastDeltaSourceRange = new Range(lastDeltaSourceRange.getEnd(), sourceOffset));
+        }
       }
     }
 
     protected void writeText() {
       if (textStartOffset >= 0 && textOffset > textStartOffset) {
         Annotation text = XMLParser.this.startAnnotation(this, QNameImpl.TEXT_QNAME,
-                Maps.<QName, String>newHashMap(), textStartOffset, nodePath);
+                Maps.<QName, String>newHashMap(), textStartOffset);
         XMLParser.this.endAnnotation(text, textOffset);
       }
       textStartOffset = -1;
@@ -296,6 +317,7 @@ public abstract class XMLParser {
                 if (XMLNS_ATTRIBUTE_NS_URI.equals(attrQName.getNamespaceURI())) {
                   continue;
                 }
+
                 attributes.put(new QNameImpl(attrQName), reader.getAttributeValue(ac));
               }
 

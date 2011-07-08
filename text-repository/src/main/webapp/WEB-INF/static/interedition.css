@@ -1,0 +1,17 @@
+body {
+    margin: auto; /* center in viewport */
+    width: 960px;
+}
+
+h1 {
+    padding: 1em;
+    text-align: right;
+    background: #1E90FF;
+    color: #FFFFFF;
+}
+
+a {
+    color: #666666;
+    font-weight: bold;
+    text-decoration: none;
+}

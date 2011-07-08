@@ -1,6 +1,5 @@
 package eu.interedition.text.event;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
@@ -47,7 +46,7 @@ public class TextEventGenerator {
   }
 
   public void generate(final TextEventListener listener, final Text text, final Set<QName> names, final int pageSize) throws IOException {
-    textRepository.read(text, new TextContentReader() {
+    textRepository.read(text, new TextRepository.TextReader() {
 
       public void read(Reader content, int contentLength) throws IOException {
         final SortedMap<Integer, Set<Annotation>> starts = Maps.newTreeMap();

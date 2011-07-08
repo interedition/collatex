@@ -4,18 +4,22 @@ import eu.interedition.text.QName;
 
 public interface XMLParserConfiguration {
 
-  public abstract boolean isLineElement(QName name);
+  boolean isLineElement(QName name);
 
-  public abstract boolean isContainerElement(QName name);
+  boolean isContainerElement(QName name);
 
-  public abstract boolean included(QName name);
+  boolean included(QName name);
 
-  public abstract boolean excluded(QName name);
+  boolean excluded(QName name);
 
-  public abstract char getNotableCharacter();
+  char getNotableCharacter();
 
-  public abstract boolean isNotable(QName name);
+  boolean isNotable(QName name);
 
-  public abstract boolean isCompressingWhitespace();
+  boolean isCompressingWhitespace();
+
+  OffsetDeltaHandler getOffsetDeltaHandler();
+
+  NodePathHandler getNodePathHandler();
 
 }

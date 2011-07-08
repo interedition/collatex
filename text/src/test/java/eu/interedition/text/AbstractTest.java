@@ -21,7 +21,6 @@
 
 package eu.interedition.text;
 
-import eu.interedition.text.util.OverlapIndexer;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +28,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
-import java.util.List;
-import java.util.SortedMap;
-
-import static eu.interedition.text.Annotation.INTEREDITION_NS_URI;
 
 /**
  * Base class for tests providing utility functions.
@@ -40,7 +35,7 @@ import static eu.interedition.text.Annotation.INTEREDITION_NS_URI;
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:/testContext.xml")
+@ContextConfiguration(locations = {"classpath:/testContext.xml", "classpath:/eu/interedition/text/rdbms/repository-context.xml"})
 public abstract class AbstractTest {
   /**
    * Test namespace.
@@ -51,31 +46,6 @@ public abstract class AbstractTest {
    * A logger for debug output.
    */
   protected static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class.getPackage().getName());
-
-  /**
-   * Prints the given {@link OverlapIndexer range index} to the log.
-   *
-   * @param index the range index to output
-   */
-  protected void printDebugMessage(SortedMap<Range, List<Annotation>> index) {
-    if (LOG.isDebugEnabled()) {
-      final StringBuilder str = new StringBuilder();
-      for (Range segment : index.keySet()) {
-        str.append("[" + segment + ": { ");
-        boolean first = true;
-        for (Annotation annotation : index.get(segment)) {
-          if (first) {
-            first = false;
-          } else {
-            str.append(", ");
-          }
-          str.append(annotation.toString());
-        }
-        str.append(" }]\n");
-      }
-      LOG.debug(str.toString());
-    }
-  }
 
   /**
    * Prints the given message to the log.

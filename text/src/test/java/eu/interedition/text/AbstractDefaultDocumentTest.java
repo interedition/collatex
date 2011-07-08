@@ -21,7 +21,7 @@
 
 package eu.interedition.text;
 
-import eu.interedition.text.rdbms.RelationalAnnotationFactory;
+import eu.interedition.text.util.QNameImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,10 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class AbstractDefaultDocumentTest extends AbstractTest {
 
   @Autowired
-  protected RelationalAnnotationFactory annotationFactory;
+  private TextRepository textRepository;
+
+  @Autowired
+  private AnnotationRepository annotationRepository;
 
   /**
    * The in-memory document model to run tests against.
@@ -49,7 +52,7 @@ public abstract class AbstractDefaultDocumentTest extends AbstractTest {
    */
   @Before
   public void createDocument() {
-    document = annotationFactory.newText();
+    document = textRepository.create(Text.Type.PLAIN);
   }
 
   /**
@@ -71,7 +74,7 @@ public abstract class AbstractDefaultDocumentTest extends AbstractTest {
    * @return
    */
   protected Annotation addTestAnnotation(String name, int start, int end) {
-    return annotationFactory.create(document, new QNameImpl(TEST_NS, name), new Range(start, end));
+    return annotationRepository.create(document, new QNameImpl(TEST_NS, name), new Range(start, end));
   }
 
   /**

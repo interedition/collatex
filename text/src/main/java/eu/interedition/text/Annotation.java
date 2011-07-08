@@ -30,13 +30,11 @@ import java.net.URI;
  */
 public interface Annotation extends Comparable<Annotation> {
   /**
-   * The LMNL namespace, mainly used as a default.
+   * Namespace, mainly used as a default.
    */
   final URI INTEREDITION_NS_URI = URI.create("http://interedition.eu/ns");
 
   QName getName();
 
   Range getRange();
-
-  Object getData();
 }

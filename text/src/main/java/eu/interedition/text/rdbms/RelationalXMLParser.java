@@ -1,61 +1,93 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.base.Joiner;
-import eu.interedition.text.Annotation;
-import eu.interedition.text.QName;
-import eu.interedition.text.QNameRepository;
-import eu.interedition.text.Range;
+import eu.interedition.text.*;
+import eu.interedition.text.util.QNameImpl;
 import eu.interedition.text.xml.XMLParser;
-import org.hibernate.SessionFactory;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
-import java.io.Serializable;
+import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RelationalXMLParser extends XMLParser {
   private static final Joiner PATH_JOINER = Joiner.on('.');
 
-  protected SessionFactory sessionFactory;
-  protected QNameRepository nameRepository;
-  protected RelationalAnnotationFactory annotationFactory;
+  protected DataSource dataSource;
+  protected SimpleJdbcTemplate jt;
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  protected QNameRepository nameRepository;
+  protected AnnotationRepository annotationRepository;
+  protected AnnotationDataRepository annotationDataRepository;
+
+  protected ThreadLocal<Map<Annotation, Map<String, Object>>> annotations = new ThreadLocal<Map<Annotation, Map<String, Object>>>();
+
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
   }
 
   public void setNameRepository(QNameRepository nameRepository) {
     this.nameRepository = nameRepository;
   }
 
-  public void setAnnotationFactory(RelationalAnnotationFactory annotationFactory) {
-    this.annotationFactory = annotationFactory;
+  public void setAnnotationRepository(AnnotationRepository annotationRepository) {
+    this.annotationRepository = annotationRepository;
   }
 
-  protected Annotation startAnnotation(Session session, QName name, Map<QName, String> attrs, int start,
-                                       Iterable<Integer> nodePath) {
-    attrs.put(XMLParser.NODE_PATH_NAME, PATH_JOINER.join(nodePath));
-
-    AnnotationRelation annotation = new AnnotationRelation();
-    annotation.setText((TextRelation) session.target);
-    annotation.setName(nameRepository.get(name));
-    annotation.setRange(new Range(start, start));
-    annotation.setSerializableData((Serializable) attrs);
-    return annotation;
+  public void setAnnotationDataRepository(AnnotationDataRepository annotationDataRepository) {
+    this.annotationDataRepository = annotationDataRepository;
   }
 
-  protected void endAnnotation(Annotation annotation, int offset) {
-    annotation.getRange().setEnd(offset);
-    sessionFactory.getCurrentSession().save(annotation);
+  protected Annotation startAnnotation(Session session, QName name, Map<QName, String> attrs, int start) {
+
+    final Map<String, Object> annotation = new HashMap<String, Object>();
+    annotation.put("text", session.target);
+    annotation.put("name", name);
+    annotation.put("start", start);
+    annotation.put("attributes", attrs);
+
+    Map<Annotation, Map<String, Object>> annotations = this.annotations.get();
+    if (annotations == null) {
+      this.annotations.set(annotations = new HashMap<Annotation, Map<String, Object>>());
+    }
+
+    final AnnotationHandle annotationHandle = new AnnotationHandle(name, new Range(start, start));
+    annotations.put(annotationHandle, annotation);
+    return annotationHandle;
   }
 
-  @Override
-  protected void newOffsetDelta(Session session, Range textRange, Range sourceRange) {
-    annotationFactory.create(session.target, OFFSET_DELTA_NAME,//
-            textRange).setSerializableData(sourceRange);
+  protected Annotation endAnnotation(Annotation annotation, int offset) {
+    final Map<String, Object> annotationData = annotations.get().remove(annotation);
+
+    final Annotation created =//
+            annotationRepository.create((RelationalText) annotationData.get("text"), (QName) annotationData.get("name"),//
+                    new Range((Integer) annotationData.get("start"), offset));
+
+    annotationDataRepository.set(created, (Map<QName, String>) annotationData.get("attributes"));
+    return created;
   }
 
-  protected void newXMLEventBatch() {
-    org.hibernate.Session session = sessionFactory.getCurrentSession();
-    session.flush();
-    session.clear();
+  private static class AnnotationHandle implements Annotation {
+
+    private final QName name;
+    private final Range range;
+
+    private AnnotationHandle(QName name, Range range) {
+      this.name = name;
+      this.range = range;
+    }
+
+    public QName getName() {
+      return name;
+    }
+
+    public Range getRange() {
+      return range;
+    }
+
+    public int compareTo(Annotation o) {
+      throw new UnsupportedOperationException();
+    }
   }
 }

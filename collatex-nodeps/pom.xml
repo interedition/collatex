@@ -31,9 +31,5 @@
 			<groupId>eu.interedition.collatex</groupId>
 			<artifactId>collatex</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-jdk14</artifactId>
-		</dependency>
 	</dependencies>
 </project>
