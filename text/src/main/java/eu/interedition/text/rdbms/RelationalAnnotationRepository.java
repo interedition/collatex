@@ -109,17 +109,12 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     params.add(((RelationalAnnotationSet) from).getId());
 
     final Set<RelationalAnnotation> annotations = Sets.newHashSet(Iterables.filter(toRemove, RelationalAnnotation.class));
-    if (annotations.size() == 1) {
-      sql.append("annotation = ?");
-      params.add(annotations.iterator().next().getId());
-    } else {
-      sql.append("annotation in (");
-      for (Iterator<RelationalAnnotation> it = annotations.iterator(); it.hasNext(); ) {
-        params.add(it.next().getId());
-        sql.append("?").append(it.hasNext() ? ", " : "");
-      }
-      sql.append(")");
+    sql.append("annotation in (");
+    for (Iterator<RelationalAnnotation> it = annotations.iterator(); it.hasNext(); ) {
+      params.add(it.next().getId());
+      sql.append("?").append(it.hasNext() ? ", " : "");
     }
+    sql.append(")");
 
     jt.update(sql.toString(), params.toArray(new Object[params.size()]));
   }
@@ -186,7 +181,68 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     sql.append(" join text_qname an on a.name = an.id");
     sql.append(" join text_content t on a.text = t.id");
 
-    // TODO: query criteria
+    final boolean textCriteria = texts != null && !texts.isEmpty();
+    final boolean setNameCriteria = setNames != null && !setNames.isEmpty();
+    final boolean nameCriteria = names != null && !names.isEmpty();
+    final boolean rangeCritera = ranges != null && !ranges.isEmpty();
+    boolean firstCriteria = true;
+
+    if (textCriteria || setNameCriteria || nameCriteria || rangeCritera) {
+      sql.append(" where");
+    }
+    if (textCriteria) {
+      sql.append(" a.text in (");
+      for (Iterator<Text> it = texts.iterator(); it.hasNext(); ) {
+        params.add(((RelationalText)it.next()).getId());
+        sql.append("?").append(it.hasNext() ? ", " : "");
+      }
+      sql.append(")");
+      firstCriteria = false;
+    }
+
+    if (setNameCriteria) {
+      setNames = nameRepository.get(setNames);
+      if (!firstCriteria) {
+        sql.append(" and");
+      }
+      sql.append(" asm.name in (");
+      for (Iterator<QName> it = setNames.iterator(); it.hasNext(); ) {
+        params.add(((RelationalQName)it.next()).getId());
+        sql.append("?").append(it.hasNext() ? ", " : "");
+      }
+      sql.append(")");
+      firstCriteria = false;
+    }
+
+    if (nameCriteria) {
+      names = nameRepository.get(names);
+      if (!firstCriteria) {
+        sql.append(" and");
+      }
+      sql.append(" a.name in (");
+      for (Iterator<QName> it = names.iterator(); it.hasNext(); ) {
+        params.add(((RelationalQName)it.next()).getId());
+        sql.append("?").append(it.hasNext() ? ", " : "");
+      }
+      sql.append(")");
+      firstCriteria = false;
+    }
+
+    if (rangeCritera) {
+      if (!firstCriteria) {
+        sql.append(" and");
+      }
+
+      sql.append("(");
+      for (Iterator<Range> it = ranges.iterator(); it.hasNext(); ) {
+        final Range range = it.next();
+        params.add(range.getEnd());
+        params.add(range.getStart());
+        sql.append(" (a.range_start < ? and a.range_end > ?)");
+        sql.append(it.hasNext() ? " or" : "");
+      }
+      sql.append(")");
+    }
 
     sql.append(" order by as.id, t.id, an.id, a.id");
 
@@ -206,7 +262,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
           currentSet = new RelationalAnnotationSet(annotationSetId, RelationalQNameRepository.mapName(rs, "asn"));
         }
         if (currentText == null || currentText.getId() != textId) {
-          currentText = RelationalTextRepository.mapText(rs, "t_");
+          currentText = RelationalTextRepository.mapText(rs, "t");
         }
         if (currentAnnotationName == null || currentAnnotationName.getId() != annotationNameId) {
           currentAnnotationName = RelationalQNameRepository.mapName(rs, "an");

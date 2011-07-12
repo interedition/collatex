@@ -35,6 +35,7 @@ public class QNameBean implements QName {
     return namespaceURI;
   }
 
+  @JsonProperty("ns")
   public void setNamespaceURI(URI namespaceURI) {
     this.namespaceURI = namespaceURI;
   }
@@ -45,6 +46,7 @@ public class QNameBean implements QName {
     return localName;
   }
 
+  @JsonProperty("n")
   public void setLocalName(String localName) {
     this.localName = localName;
   }
