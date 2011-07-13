@@ -21,7 +21,7 @@
 
 package eu.interedition.text;
 
-import eu.interedition.text.util.QNameImpl;
+import eu.interedition.text.mem.SimpleQName;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,7 @@ public abstract class AbstractDefaultDocumentTest extends AbstractTest {
    * @return
    */
   protected Annotation addTestAnnotation(String name, int start, int end) {
-    return annotationRepository.create(document, new QNameImpl(TEST_NS, name), new Range(start, end));
+    return annotationRepository.create(document, new SimpleQName(TEST_NS, name), new Range(start, end));
   }
 
   /**

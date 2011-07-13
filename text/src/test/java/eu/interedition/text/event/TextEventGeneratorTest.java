@@ -2,7 +2,7 @@ package eu.interedition.text.event;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.text.*;
-import eu.interedition.text.util.QNameImpl;
+import eu.interedition.text.mem.SimpleQName;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,7 +17,7 @@ public class TextEventGeneratorTest extends AbstractXMLTest {
 
   @Test
   public void generateEvents() throws IOException {
-    generator.generate(DEBUG_LISTENER, document(), Collections.<QName>singleton(new QNameImpl("http://www.tei-c.org/ns/1.0", "seg")));
+    generator.generate(DEBUG_LISTENER, document(), Collections.<QName>singleton(new SimpleQName("http://www.tei-c.org/ns/1.0", "seg")));
   }
 
   private final TextEventListener DEBUG_LISTENER = new TextEventListener() {

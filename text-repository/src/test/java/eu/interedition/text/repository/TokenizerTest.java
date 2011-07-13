@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
-import eu.interedition.text.util.QNameImpl;
+import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.xml.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import org.junit.Test;
@@ -44,11 +44,11 @@ public class TokenizerTest extends AbstractTest {
   @Test
   public void tokenize() throws IOException, TransformerException, XMLStreamException {
     final SimpleXMLParserConfiguration parserConfiguration = new SimpleXMLParserConfiguration();
-    parserConfiguration.exclude(new QNameImpl(TEI_NS, "teiHeader"));
-    parserConfiguration.addContainerElement(new QNameImpl(TEI_NS, "subst"));
-    parserConfiguration.addContainerElement(new QNameImpl(TEI_NS, "choice"));
-    parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "lb"));
-    parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "pb"));
+    parserConfiguration.exclude(new SimpleQName(TEI_NS, "teiHeader"));
+    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "subst"));
+    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "choice"));
+    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "lb"));
+    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "pb"));
 
     for (String resource : new String[]{"/igntp/0101.xml", "/igntp/0105.xml", "/igntp/0109.xml"}) {
       LOG.info(Strings.padStart("Tokenizing " + resource, 100, '='));

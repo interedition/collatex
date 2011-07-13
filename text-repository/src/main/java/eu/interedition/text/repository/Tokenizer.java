@@ -1,10 +1,9 @@
 package eu.interedition.text.repository;
 
-import com.google.common.base.Preconditions;
 import eu.interedition.text.*;
 import eu.interedition.text.event.TextEventGenerator;
 import eu.interedition.text.event.TextEventListener;
-import eu.interedition.text.util.QNameImpl;
+import eu.interedition.text.mem.SimpleQName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import java.util.Set;
 @Service
 @Transactional
 public class Tokenizer {
-  public static final QName TOKEN_NAME = new QNameImpl(Annotation.INTEREDITION_NS_URI, "token");
+  public static final QName TOKEN_NAME = new SimpleQName(Annotation.INTEREDITION_NS_URI, "token");
 
   private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 

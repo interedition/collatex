@@ -2,7 +2,6 @@ package eu.interedition.text.rdbms;
 
 import com.google.common.base.Joiner;
 import eu.interedition.text.*;
-import eu.interedition.text.util.QNameImpl;
 import eu.interedition.text.xml.XMLParser;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 

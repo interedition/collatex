@@ -26,6 +26,7 @@ import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
 import eu.interedition.text.Range;
+import eu.interedition.text.util.Annotations;
 
 import java.io.Serializable;
 
@@ -89,17 +90,6 @@ public class RelationalAnnotation implements Annotation {
   }
 
   public int compareTo(Annotation o) {
-    final int rangeComparison = range.compareTo(o.getRange());
-    if (rangeComparison != 0) {
-      return rangeComparison;
-    }
-    final int nameComparison = name.compareTo(o.getName());
-    if (nameComparison != 0) {
-      return nameComparison;
-    }
-    if (o instanceof RelationalAnnotation) {
-      return (id - ((RelationalAnnotation)o).id);
-    }
-    return Ordering.arbitrary().compare(this, o);
+    return Annotations.compare(this, o);
   }
 }

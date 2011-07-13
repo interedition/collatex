@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import eu.interedition.text.*;
-import eu.interedition.text.util.QNameImpl;
+import eu.interedition.text.mem.SimpleQName;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -191,7 +191,7 @@ public abstract class XMLParser {
 
       spacePreservationContext.push(spacePreservationContext.isEmpty() ? false : spacePreservationContext.peek());
       for (Map.Entry<QName, String> attr : attributes.entrySet()) {
-        if (QNameImpl.XML_SPACE.equals(attr.getKey())) {
+        if (SimpleQName.XML_SPACE.equals(attr.getKey())) {
           spacePreservationContext.pop();
           spacePreservationContext.push("preserve".equalsIgnoreCase(attr.getValue()));
         }
@@ -278,7 +278,7 @@ public abstract class XMLParser {
 
     protected void writeText() {
       if (textStartOffset >= 0 && textOffset > textStartOffset) {
-        Annotation text = XMLParser.this.startAnnotation(this, QNameImpl.TEXT_QNAME,
+        Annotation text = XMLParser.this.startAnnotation(this, SimpleQName.TEXT_QNAME,
                 Maps.<QName, String>newHashMap(), textStartOffset);
         XMLParser.this.endAnnotation(text, textOffset);
       }
@@ -318,10 +318,10 @@ public abstract class XMLParser {
                   continue;
                 }
 
-                attributes.put(new QNameImpl(attrQName), reader.getAttributeValue(ac));
+                attributes.put(new SimpleQName(attrQName), reader.getAttributeValue(ac));
               }
 
-              startAnnotation(new QNameImpl(reader.getName()), attributes);
+              startAnnotation(new SimpleQName(reader.getName()), attributes);
               break;
             case XMLStreamConstants.END_ELEMENT:
               writeText();
@@ -332,8 +332,8 @@ public abstract class XMLParser {
               nextSibling();
 
               attributes = Maps.newHashMap();
-              attributes.put(QNameImpl.COMMENT_TEXT_QNAME, reader.getText());
-              startAnnotation(QNameImpl.COMMENT_QNAME, attributes);
+              attributes.put(SimpleQName.COMMENT_TEXT_QNAME, reader.getText());
+              startAnnotation(SimpleQName.COMMENT_QNAME, attributes);
               endAnnotation();
               break;
             case XMLStreamConstants.PROCESSING_INSTRUCTION:
@@ -341,13 +341,13 @@ public abstract class XMLParser {
               nextSibling();
 
               attributes = Maps.newHashMap();
-              attributes.put(QNameImpl.PI_TARGET_QNAME, reader.getPITarget());
+              attributes.put(SimpleQName.PI_TARGET_QNAME, reader.getPITarget());
               final String data = reader.getPIData();
               if (data != null) {
-                attributes.put(QNameImpl.PI_DATA_QNAME, data);
+                attributes.put(SimpleQName.PI_DATA_QNAME, data);
               }
 
-              startAnnotation(QNameImpl.PI_QNAME, attributes);
+              startAnnotation(SimpleQName.PI_QNAME, attributes);
               endAnnotation();
               break;
             case XMLStreamConstants.CHARACTERS:

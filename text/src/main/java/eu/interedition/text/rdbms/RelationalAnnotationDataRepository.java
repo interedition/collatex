@@ -5,7 +5,6 @@ import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
 import eu.interedition.text.QNameRepository;
 import eu.interedition.text.util.AbstractAnnotationDataRepository;
-import eu.interedition.text.util.QNameImpl;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,7 +12,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import javax.sql.DataSource;
-import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;

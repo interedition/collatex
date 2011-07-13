@@ -8,19 +8,17 @@ public interface AnnotationRepository {
 
   Annotation create(Text text, QName name, Range range);
 
-  AnnotationSet createSet(QName name);
+  AnnotationLink createSet(QName name);
 
   void delete(Annotation annotation);
 
-  void delete(AnnotationSet annotationSet);
+  void delete(AnnotationLink annotationLink);
 
-  void add(AnnotationSet to, Set<Annotation> toAdd);
+  void add(AnnotationLink to, Set<Annotation> toAdd);
 
-  void remove(AnnotationSet from, Set<Annotation> toRemove);
+  void remove(AnnotationLink from, Set<Annotation> toRemove);
 
   SortedSet<QName> names(Text text);
-
-  Iterable<Annotation> find(Text text, Set<QName> names, Set<Range> ranges, boolean overlapping);
 
   Iterable<Annotation> find(Text text, Set<QName> names, Set<Range> ranges);
 
@@ -30,5 +28,5 @@ public interface AnnotationRepository {
 
   Iterable<Annotation> find(Text text);
 
-  Map<AnnotationSet, Set<Annotation>> findSets(Set<Text> texts, Set<QName> setNames, Set<QName> names, Set<Range> ranges);
+  Map<AnnotationLink, Set<Annotation>> findLinks(Set<Text> texts, Set<QName> setNames, Set<QName> names, Set<Range> ranges);
 }

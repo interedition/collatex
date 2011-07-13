@@ -11,4 +11,6 @@ public interface Text {
   Date getCreated();
 
   Type getType();
+
+  //String getSigil();
 }

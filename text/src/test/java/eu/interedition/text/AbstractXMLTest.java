@@ -25,8 +25,8 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.rdbms.RelationalQNameRepository;
-import eu.interedition.text.util.QNameImpl;
 import eu.interedition.text.xml.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import org.junit.After;
@@ -73,24 +73,24 @@ public abstract class AbstractXMLTest extends AbstractTest {
 
   @Before
   public void configureXMLParser() {
-    parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "lg"));
-    parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "l"));
-    parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "speaker"));
-    parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "stage"));
-    parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "head"));
-    parserConfiguration.addLineElement(new QNameImpl(TEI_NS, "p"));
+    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "lg"));
+    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "l"));
+    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "speaker"));
+    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "stage"));
+    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "head"));
+    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "p"));
 
-    parserConfiguration.addContainerElement(new QNameImpl(TEI_NS, "text"));
-    parserConfiguration.addContainerElement(new QNameImpl(TEI_NS, "div"));
-    parserConfiguration.addContainerElement(new QNameImpl(TEI_NS, "lg"));
-    parserConfiguration.addContainerElement(new QNameImpl(TEI_NS, "subst"));
-    parserConfiguration.addContainerElement(new QNameImpl(TEI_NS, "choice"));
+    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "text"));
+    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "div"));
+    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "lg"));
+    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "subst"));
+    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "choice"));
 
-    parserConfiguration.exclude(new QNameImpl(TEI_NS, "teiHeader"));
-    parserConfiguration.exclude(new QNameImpl(TEI_NS, "front"));
-    parserConfiguration.exclude(new QNameImpl(TEI_NS, "fw"));
+    parserConfiguration.exclude(new SimpleQName(TEI_NS, "teiHeader"));
+    parserConfiguration.exclude(new SimpleQName(TEI_NS, "front"));
+    parserConfiguration.exclude(new SimpleQName(TEI_NS, "fw"));
 
-    parserConfiguration.addNotableElement(new QNameImpl(TEI_NS, "lb"));
+    parserConfiguration.addNotableElement(new SimpleQName(TEI_NS, "lb"));
   }
 
   @After
