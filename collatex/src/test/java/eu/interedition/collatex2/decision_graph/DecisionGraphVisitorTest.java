@@ -94,6 +94,24 @@ public class DecisionGraphVisitorTest {
     assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
   }
 
+  @Test
+  public void testShortestPathOneOmissionRepetition() {
+    CollateXEngine engine = new CollateXEngine();
+    IWitness a = engine.createWitness("a", "The red cat and the black cat");
+    IWitness b = engine.createWitness("b", "the black cat");
+    IVariantGraph graph = engine.graph(a);
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
+    DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
+    List<DGEdge> edges = visitor.getShortestPath();
+    assertTrue(edges.get(0).getWeight()==1); // The ideal path should start with a gap
+    assertTrue(edges.get(1).getWeight()==0);
+    assertTrue(edges.get(2).getWeight()==0);
+    assertTrue(edges.get(3).getWeight()==0);
+    assertEquals(4, edges.size());
+  }
+  
+  
+  
   // TODO
   // All the witness are equal
   // There should only be one valid path through this decision graph

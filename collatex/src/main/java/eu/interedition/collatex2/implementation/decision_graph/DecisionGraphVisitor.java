@@ -20,8 +20,44 @@ public class DecisionGraphVisitor {
 
   // TODO: implement!
   public List<DGEdge> getShortestPath() {
-    // TODO Auto-generated method stub
-    return null;
+    // now I need to convert this graph to another graph
+    // to determine the shortest path?
+    // for now I just remove all the vertices that have a higher value then the minimum
+    // amount of sequences for the whole graph
+    // this is probably not the end solution
+    Map<DGVertex, Integer> determineMinSequences = determineMinSequences(dGraph);
+    int minSequences = determineMinSequences.get(dGraph.getStartVertex());
+    Set<DGVertex> verticesToKeep = Sets.newLinkedHashSet();
+    for (DGVertex vertex : dGraph.vertexSet()) {
+      int weight = determineMinSequences.get(vertex);
+      if (weight <= minSequences) {
+        verticesToKeep.add(vertex);
+      }
+    }
+    Set<DGEdge> edgeSet = dGraph.edgeSet();
+    Set<DGEdge> newEdges = Sets.newLinkedHashSet();
+    for (DGEdge edge : edgeSet) {
+      if (verticesToKeep.contains(edge.getBeginVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
+        DGEdge newEdge = new DGEdge(edge.getBeginVertex(), edge.getTargetVertex(), edge.getWeight());
+        newEdges.add(newEdge);
+      }
+    }
+    DecisionGraph graphWithSinglePath = new DecisionGraph(dGraph.getStartVertex(), dGraph.getEndVertex());
+    for (DGVertex vertex : verticesToKeep) {
+      graphWithSinglePath.addVertex(vertex);
+    }
+    for (DGEdge edge : newEdges) {
+      graphWithSinglePath.add(edge);
+    }
+    // end of copy
+    DGVertex currentVertex = graphWithSinglePath.getStartVertex();
+    List<DGEdge> shortestPath = Lists.newArrayList();
+    while (graphWithSinglePath.outDegreeOf(currentVertex)==1) {
+      DGEdge edge = graphWithSinglePath.outgoingEdgesOf(currentVertex).iterator().next();
+      shortestPath.add(edge);
+      currentVertex = edge.getTargetVertex();
+    }
+    return shortestPath;
   }
 
   // TODO: remove static!
