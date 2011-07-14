@@ -117,7 +117,7 @@
             <dependency>
                 <groupId>com.tinkerpop.blueprints</groupId>
                 <artifactId>blueprints-graph-jung</artifactId>
-                   <version>0.8</version>
+                <version>0.8</version>
             </dependency>
             <dependency>
                 <groupId>org.jgrapht</groupId>
@@ -199,9 +199,9 @@
     </dependencyManagement>
     <repositories>
         <repository>
-               <id>tinkerpop-repository</id>
-               <name>TinkerPop Maven2 Repository</name>
-               <url>http://tinkerpop.com/maven2</url>
+            <id>tinkerpop-repository</id>
+            <name>TinkerPop Maven2 Repository</name>
+            <url>http://tinkerpop.com/maven2</url>
         </repository>
         <repository>
             <id>maven.restlet.org</id>
@@ -354,6 +354,11 @@
             <name>CollateX Maven Repository</name>
             <url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/maven-repository</url>
         </repository>
+        <snapshotRepository>
+            <id>dh-snapshots</id>
+            <name>Gregor Middell's DH snapshots</name>
+            <url>http://maven.middell.com/nexus/content/repositories/dh-snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
     <issueManagement>
         <system>GitHub</system>

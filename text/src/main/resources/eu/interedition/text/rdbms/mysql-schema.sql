@@ -23,6 +23,20 @@ CREATE TABLE IF NOT EXISTS text_annotation (
   INDEX (range_start, range_end)
 ) ENGINE = INNODB;
 
+CREATE TABLE IF NOT EXISTS text_annotation_link (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name BIGINT NOT NULL,
+  FOREIGN KEY (name) REFERENCES text_qname (id)
+) ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS text_annotation_link_target (
+  link BIGINT NOT NULL,
+  target BIGINT NOT NULL,
+  FOREIGN KEY (link) REFERENCES text_annotation_link (id) ON DELETE CASCADE,
+  FOREIGN KEY (target) REFERENCES text_annotation (id) ON DELETE CASCADE,
+  UNIQUE (link, target)
+) ENGINE = INNODB;
+
 CREATE TABLE IF NOT EXISTS text_annotation_data (
   annotation BIGINT NOT NULL,
   name BIGINT NOT NULL,
@@ -32,16 +46,12 @@ CREATE TABLE IF NOT EXISTS text_annotation_data (
   UNIQUE (annotation, name)
 ) ENGINE = INNODB;
 
-CREATE TABLE IF NOT EXISTS text_annotation_set (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE text_annotation_link_data (
+  link BIGINT NOT NULL,
   name BIGINT NOT NULL,
-  FOREIGN KEY (name) REFERENCES text_qname (id)
-) ENGINE = INNODB;
+  value VARCHAR(255) NOT NULL,
+  FOREIGN KEY (link) REFERENCES text_annotation_link (id) ON DELETE CASCADE,
+  FOREIGN KEY (name) REFERENCES text_qname (id),
+  UNIQUE (link, name)
+);
 
-CREATE TABLE IF NOT EXISTS text_annotation_set_member (
-  annotation_set BIGINT NOT NULL,
-  annotation BIGINT NOT NULL,
-  FOREIGN KEY (annotation_set) REFERENCES text_annotation_set (id) ON DELETE CASCADE,
-  FOREIGN KEY (annotation) REFERENCES text_annotation (id) ON DELETE CASCADE,
-  UNIQUE (annotation_set, annotation)
-) ENGINE = INNODB;

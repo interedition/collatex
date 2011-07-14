@@ -8,7 +8,7 @@ public interface AnnotationRepository {
 
   Annotation create(Text text, QName name, Range range);
 
-  AnnotationLink createSet(QName name);
+  AnnotationLink createLink(QName name);
 
   void delete(Annotation annotation);
 
@@ -28,5 +28,5 @@ public interface AnnotationRepository {
 
   Iterable<Annotation> find(Text text);
 
-  Map<AnnotationLink, Set<Annotation>> findLinks(Set<Text> texts, Set<QName> setNames, Set<QName> names, Set<Range> ranges);
+  Map<AnnotationLink, Set<Annotation>> findLinks(Set<Text> texts, Set<QName> setNames, Set<QName> names, Map<Text, Set<Range>> ranges);
 }

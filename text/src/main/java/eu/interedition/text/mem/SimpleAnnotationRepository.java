@@ -27,7 +27,7 @@ public class SimpleAnnotationRepository extends AbstractAnnotationRepository {
     return annotation;
   }
 
-  public AnnotationLink createSet(QName name) {
+  public AnnotationLink createLink(QName name) {
     return new SimpleAnnotationLink(name);
   }
 
@@ -85,12 +85,12 @@ public class SimpleAnnotationRepository extends AbstractAnnotationRepository {
     return annotations;
   }
 
-  public Map<AnnotationLink, Set<Annotation>> findLinks(Set<Text> texts, final Set<QName> setNames, final Set<QName> names, final Set<Range> ranges) {
+  public Map<AnnotationLink, Set<Annotation>> findLinks(Set<Text> texts, final Set<QName> setNames, final Set<QName> names, final Map<Text, Set<Range>> ranges) {
     Preconditions.checkArgument(texts != null && !texts.isEmpty());
     Iterable<Annotation> annotations = concat(transform(texts, new Function<Text, Iterable<Annotation>>() {
 
       public Iterable<Annotation> apply(Text input) {
-        return find(input, names, ranges);
+        return find(input, names, (ranges == null ? null : ranges.get(input)));
       }
     }));
     if (setNames != null && !setNames.isEmpty()) {

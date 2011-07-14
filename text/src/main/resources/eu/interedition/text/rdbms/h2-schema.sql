@@ -22,6 +22,17 @@ CREATE TABLE text_annotation (
 
 CREATE INDEX text_annotation_ranges ON text_annotation (range_start, range_end);
 
+CREATE TABLE text_annotation_link (
+  id BIGINT IDENTITY,
+  name BIGINT NOT NULL REFERENCES text_qname (id)
+);
+
+CREATE TABLE text_annotation_link_target (
+  link BIGINT NOT NULL REFERENCES text_annotation_link (id) ON DELETE CASCADE,
+  target BIGINT NOT NULL REFERENCES text_annotation (id) ON DELETE CASCADE,
+  UNIQUE (link, target)
+);
+
 CREATE TABLE text_annotation_data (
   annotation BIGINT NOT NULL REFERENCES text_annotation (id) ON DELETE CASCADE,
   name BIGINT NOT NULL REFERENCES text_qname (id),
@@ -29,13 +40,9 @@ CREATE TABLE text_annotation_data (
   UNIQUE (annotation, name)
 );
 
-CREATE TABLE text_annotation_set (
-  id BIGINT IDENTITY,
-  name BIGINT NOT NULL REFERENCES text_qname (id)
-);
-
-CREATE TABLE text_annotation_set_member (
-  annotation_set BIGINT NOT NULL REFERENCES text_annotation_set (id) ON DELETE CASCADE,
-  annotation BIGINT NOT NULL REFERENCES text_annotation (id) ON DELETE CASCADE,
-  UNIQUE (annotation_set, annotation)
+CREATE TABLE text_annotation_link_data (
+  link BIGINT NOT NULL REFERENCES text_annotation_link (id) ON DELETE CASCADE,
+  name BIGINT NOT NULL REFERENCES text_qname (id),
+  value VARCHAR(255) NOT NULL,
+  UNIQUE (link, name)
 );

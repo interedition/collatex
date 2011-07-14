@@ -22,13 +22,20 @@
 package eu.interedition.text.xml;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
+import eu.interedition.text.mem.SimpleQName;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -52,6 +59,14 @@ public class XMLImportHandlerTest extends AbstractXMLTest {
     //final String resource = "homer-iliad-tei.xml";
     final Text source = source(resource);
     final Text document = document(resource);
+
+    final AnnotationLink link = annotationRepository.createLink(new SimpleQName(TEST_NS, "link"));
+    annotationRepository.add(link, Sets.<Annotation>newHashSet(annotationRepository.find(document)));
+
+    final Map<AnnotationLink,Set<Annotation>> links = annotationRepository.findLinks(Collections.singleton(document), null, null, null);
+    Assert.assertEquals(1, links.keySet().size());
+    Assert.assertEquals(link, links.keySet().iterator().next());
+    Assert.assertEquals(Iterables.size(annotationRepository.find(document)), Iterables.size(links.values().iterator().next()));
 
     LOG.info(Joiner.on('\n').join(annotationRepository.names(source)));
 
