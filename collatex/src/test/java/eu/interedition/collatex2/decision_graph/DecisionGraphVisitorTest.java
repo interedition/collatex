@@ -52,7 +52,6 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
-    DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph);
     assertEquals(1, DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 

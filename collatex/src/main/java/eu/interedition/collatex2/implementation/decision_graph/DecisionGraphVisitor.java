@@ -18,47 +18,47 @@ public class DecisionGraphVisitor {
     this.dGraph = dGraph;
   }
 
-  // TODO: implement!
+  // Question: do I need to convert this graph to another graph with
+  // other weights to determine the shortest path with a standard algo?
+  // For now I just remove all the vertices that have a higher value
+  // then the minimum amount of sequences for the whole graph
+  // This is probably not the end solution
   public List<DGEdge> getShortestPath() {
-    // now I need to convert this graph to another graph
-    // to determine the shortest path?
-    // for now I just remove all the vertices that have a higher value then the minimum
-    // amount of sequences for the whole graph
-    // this is probably not the end solution
     Map<DGVertex, Integer> determineMinSequences = determineMinSequences(dGraph);
     int minSequences = determineMinSequences.get(dGraph.getStartVertex());
-    Set<DGVertex> verticesToKeep = Sets.newLinkedHashSet();
-    for (DGVertex vertex : dGraph.vertexSet()) {
-      int weight = determineMinSequences.get(vertex);
-      if (weight <= minSequences) {
-        verticesToKeep.add(vertex);
-      }
-    }
-    Set<DGEdge> edgeSet = dGraph.edgeSet();
-    Set<DGEdge> newEdges = Sets.newLinkedHashSet();
-    for (DGEdge edge : edgeSet) {
-      if (verticesToKeep.contains(edge.getBeginVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
-        DGEdge newEdge = new DGEdge(edge.getBeginVertex(), edge.getTargetVertex(), edge.getWeight());
-        newEdges.add(newEdge);
-      }
-    }
-    DecisionGraph graphWithSinglePath = new DecisionGraph(dGraph.getStartVertex(), dGraph.getEndVertex());
-    for (DGVertex vertex : verticesToKeep) {
-      graphWithSinglePath.addVertex(vertex);
-    }
-    for (DGEdge edge : newEdges) {
-      graphWithSinglePath.add(edge);
-    }
-    // end of copy
+    DecisionGraph graphWithSinglePath = buildNewGraphWithOnlyMinimumWeightVertices(determineMinSequences, minSequences);
     DGVertex currentVertex = graphWithSinglePath.getStartVertex();
     List<DGEdge> shortestPath = Lists.newArrayList();
-    while (graphWithSinglePath.outDegreeOf(currentVertex)==1) {
+    while (graphWithSinglePath.outDegreeOf(currentVertex) == 1) {
       DGEdge edge = graphWithSinglePath.outgoingEdgesOf(currentVertex).iterator().next();
       shortestPath.add(edge);
       currentVertex = edge.getTargetVertex();
     }
     return shortestPath;
   }
+
+  public Map<DGVertex, Integer> determineMinSequences(DecisionGraph graph) {
+    DGVertex endVertex = graph.getEndVertex();
+    Map<DGVertex, Integer> minSeq = Maps.newLinkedHashMap();
+    Map<DGVertex, Integer> gapOrNoGap = Maps.newLinkedHashMap();
+    minSeq.put(endVertex, 1); // TODO: CHECK THIS.. !!
+    gapOrNoGap.put(endVertex, 0); // insert gap in the end //TODO: check this!!
+    // Take topological order of vertices in reserve!
+    List<DGVertex> reverse = Lists.reverse(getVerticesInTopologicalOrder(graph));
+    Iterator<DGVertex> vertexIterator = reverse.iterator();
+    vertexIterator.next(); // NOTE: skip end vertex
+    while (vertexIterator.hasNext()) {
+      DGVertex vertex = vertexIterator.next();
+      Map<DGEdge, Integer> determineMinSequencesProEdge = determineMinSequencesForVertex(graph, minSeq, gapOrNoGap, vertex);
+      Integer min = Collections.min(determineMinSequencesProEdge.values());
+      // System.out.println("Debugging: "+vertex.getToken().toString()+":"+determineMinSequencesProEdge);
+      DGEdge minEdge = findTheMinimumEdge(determineMinSequencesProEdge, min);
+      minSeq.put(vertex, min);
+      gapOrNoGap.put(vertex, minEdge.getWeight());
+    }
+    return minSeq;
+  }
+
 
   // TODO: remove static!
   public static Map<DGVertex, Integer> determineMinWeightForEachVertex(DecisionGraph graph) {
@@ -79,7 +79,7 @@ public class DecisionGraphVisitor {
       Integer min = Collections.min(edgeToTotalWeight.values());
       vertexToMinWeight.put(next, min);
     }
-//    System.out.println(vertexToMinWeight);
+    // System.out.println(vertexToMinWeight);
     return vertexToMinWeight;
   }
 
@@ -93,34 +93,11 @@ public class DecisionGraphVisitor {
     return minGaps;
   }
 
+  //TODO: remove this method?
   public DecisionGraph removeChoicesThatIntroduceGaps() {
     int minGaps = determineMinimumNumberOfGaps(dGraph);
     Map<DGVertex, Integer> minWeightForEachVertex = determineMinWeightForEachVertex(dGraph);
-    Set<DGVertex> verticesToKeep = Sets.newLinkedHashSet();
-    for (DGVertex vertex : dGraph.vertexSet()) {
-      int weight = minWeightForEachVertex.get(vertex);
-      if (weight <= minGaps) {
-        verticesToKeep.add(vertex);
-      }
-    }
-    Set<DGEdge> edgeSet = dGraph.edgeSet();
-    Set<DGEdge> newEdges = Sets.newLinkedHashSet();
-    for (DGEdge edge : edgeSet) {
-      if (verticesToKeep.contains(edge.getBeginVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
-        DGEdge newEdge = new DGEdge(edge.getBeginVertex(), edge.getTargetVertex(), edge.getWeight());
-        newEdges.add(newEdge);
-      }
-    }
-
-    DecisionGraph graph2 = new DecisionGraph(dGraph.getStartVertex(), dGraph.getEndVertex());
-    verticesToKeep.remove(dGraph.getStartVertex());
-    verticesToKeep.remove(dGraph.getEndVertex());
-    for (DGVertex vertex : verticesToKeep) {
-      graph2.addVertex(vertex);
-    }
-    for (DGEdge edge : newEdges) {
-      graph2.add(edge);
-    }
+    DecisionGraph graph2 = buildNewGraphWithOnlyMinimumWeightVertices(minWeightForEachVertex, minGaps);
     return graph2;
   }
 
@@ -133,32 +110,36 @@ public class DecisionGraphVisitor {
     return topoVertices;
   }
 
-  public Map<DGVertex, Integer> determineMinSequences(DecisionGraph graph) {
-    DGVertex endVertex = graph.getEndVertex();
-    Map<DGVertex, Integer> minSeq = Maps.newLinkedHashMap();
-    Map<DGVertex, Integer> gapOrNoGap = Maps.newLinkedHashMap();
-    minSeq.put(endVertex, 1); //TODO: CHECK THIS.. !!
-    gapOrNoGap.put(endVertex, 0); // insert gap in the end //TODO: check this!!
-    // Take topological order of vertices in reserve!
-    List<DGVertex> reverse = Lists.reverse(getVerticesInTopologicalOrder(graph));
-    Iterator<DGVertex> vertexIterator = reverse.iterator();
-    vertexIterator.next(); // NOTE: skip end vertex
-    while(vertexIterator.hasNext()) {
-      DGVertex vertex = vertexIterator.next();
-      Map<DGEdge, Integer> determineMinSequencesProEdge = determineMinSequencesForVertex(graph, minSeq, gapOrNoGap, vertex);
-      Integer min = Collections.min(determineMinSequencesProEdge.values());
-//      System.out.println("Debugging: "+vertex.getToken().toString()+":"+determineMinSequencesProEdge);
-      DGEdge minEdge = findTheMinimumEdge(determineMinSequencesProEdge, min);
-      minSeq.put(vertex, min);
-      gapOrNoGap.put(vertex, minEdge.getWeight());
+  private DecisionGraph buildNewGraphWithOnlyMinimumWeightVertices(Map<DGVertex, Integer> minWeightProVertex, int minWeight) {
+    Set<DGVertex> verticesToKeep = Sets.newLinkedHashSet();
+    for (DGVertex vertex : dGraph.vertexSet()) {
+      int weight = minWeightProVertex.get(vertex);
+      if (weight <= minWeight) {
+        verticesToKeep.add(vertex);
+      }
     }
-    return minSeq;
+    Set<DGEdge> edgeSet = dGraph.edgeSet();
+    Set<DGEdge> newEdges = Sets.newLinkedHashSet();
+    for (DGEdge edge : edgeSet) {
+      if (verticesToKeep.contains(edge.getBeginVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
+        DGEdge newEdge = new DGEdge(edge.getBeginVertex(), edge.getTargetVertex(), edge.getWeight());
+        newEdges.add(newEdge);
+      }
+    }
+    DecisionGraph newGraph = new DecisionGraph(dGraph.getStartVertex(), dGraph.getEndVertex());
+    for (DGVertex vertex : verticesToKeep) {
+      newGraph.addVertex(vertex);
+    }
+    for (DGEdge edge : newEdges) {
+      newGraph.add(edge);
+    }
+    return newGraph;
   }
 
   private DGEdge findTheMinimumEdge(Map<DGEdge, Integer> determineMinSequencesProEdge, Integer min) {
     DGEdge result = null;
-    for (DGEdge edge: determineMinSequencesProEdge.keySet()) {
-      if (determineMinSequencesProEdge.get(edge)==min) {
+    for (DGEdge edge : determineMinSequencesProEdge.keySet()) {
+      if (determineMinSequencesProEdge.get(edge) == min) {
         result = edge;
         break;
       }
@@ -174,19 +155,16 @@ public class DecisionGraphVisitor {
     Map<DGEdge, Integer> edges = Maps.newLinkedHashMap();
     for (DGEdge outgoing : outgoingEdgesOf) {
       DGVertex targetVertex = outgoing.getTargetVertex();
-      //Note: Gaps causes extra sequences.
-      //Note: A sequence at the start vertex does not count, cause
-      //Note: it will be an empty sequence, cause there are no more tokens
-      if (vertex!=graph.getStartVertex()&&gapOrNoGap.get(targetVertex)==0&&outgoing.getWeight()==1) {
-        edges.put(outgoing, 1+minSeq.get(targetVertex));
+      // Note: Gaps causes extra sequences.
+      // Note: A sequence at the start vertex does not count, cause
+      // Note: it will be an empty sequence, cause there are no more tokens
+      if (vertex != graph.getStartVertex() && gapOrNoGap.get(targetVertex) == 0 && outgoing.getWeight() == 1) {
+        edges.put(outgoing, 1 + minSeq.get(targetVertex));
       } else {
         edges.put(outgoing, minSeq.get(targetVertex));
       }
     }
     return edges;
   }
-  
-
-  
 
 }
