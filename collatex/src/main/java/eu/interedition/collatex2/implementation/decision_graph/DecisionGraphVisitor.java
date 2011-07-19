@@ -152,6 +152,9 @@ public class DecisionGraphVisitor {
 
   private Map<DGEdge, Integer> determineMinSequencesForVertex(DecisionGraph graph, Map<DGVertex, Integer> minSeq, Map<DGVertex, Integer> gapOrNoGap, DGVertex vertex) {
     Set<DGEdge> outgoingEdgesOf = graph.outgoingEdgesOf(vertex);
+    if (outgoingEdgesOf.isEmpty()) {
+      throw new RuntimeException("Error: "+vertex.toString()+ " has no outgoing edges!");
+    }
     Map<DGEdge, Integer> edges = Maps.newLinkedHashMap();
     for (DGEdge outgoing : outgoingEdgesOf) {
       DGVertex targetVertex = outgoing.getTargetVertex();

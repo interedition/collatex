@@ -25,22 +25,24 @@ public class DecisionGraphCreator {
     lastConstructedVertices.add(dGraph.getStartVertex());
     for (INormalizedToken wToken : b.getTokens()) {
       List<INormalizedToken> matchingTokens = matches.get(wToken);
-      // Ik moet hier alle aangemaakte vertices in de DGraph opvangen
-      Set<DGVertex> newConstructedVertices = Sets.newLinkedHashSet();
-      for (INormalizedToken match : matchingTokens) {
-        DGVertex dgVertex = new DGVertex(match);
-        dGraph.add(dgVertex);
-        newConstructedVertices.add(dgVertex);
-        // TODO: you don't want to always draw an edge 
-        // TODO: in the case of ngrams in witness and superbase
-        // TODO: less edges are needed
-        for (DGVertex lastVertex : lastConstructedVertices) {
-          INormalizedToken lastToken = lastVertex.getToken();
-          int gap = vGraph.isNear(lastToken, match) ?  0 : 1;
-          dGraph.add(new DGEdge(lastVertex, dgVertex, gap));
+      if (!matchingTokens.isEmpty()) {
+        // Ik moet hier alle aangemaakte vertices in de DGraph opvangen
+        Set<DGVertex> newConstructedVertices = Sets.newLinkedHashSet();
+        for (INormalizedToken match : matchingTokens) {
+          DGVertex dgVertex = new DGVertex(match);
+          dGraph.add(dgVertex);
+          newConstructedVertices.add(dgVertex);
+          // TODO: you don't want to always draw an edge 
+          // TODO: in the case of ngrams in witness and superbase
+          // TODO: less edges are needed
+          for (DGVertex lastVertex : lastConstructedVertices) {
+            INormalizedToken lastToken = lastVertex.getToken();
+            int gap = vGraph.isNear(lastToken, match) ?  0 : 1;
+            dGraph.add(new DGEdge(lastVertex, dgVertex, gap));
+          }
         }
+        lastConstructedVertices = newConstructedVertices;
       }
-      lastConstructedVertices = newConstructedVertices;
     }
     for (DGVertex lastVertex : lastConstructedVertices) {
       INormalizedToken lastToken = lastVertex.getToken();
