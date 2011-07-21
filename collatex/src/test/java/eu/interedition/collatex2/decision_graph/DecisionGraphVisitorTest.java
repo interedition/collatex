@@ -40,7 +40,8 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, vGraph, b);
+    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, vGraph, b);
+    DecisionGraph dGraph = creator.buildDecisionGraph();
     assertEquals(0, DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -54,7 +55,8 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
+    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
+    DecisionGraph dGraph = creator.buildDecisionGraph();
     assertEquals(1, DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -66,7 +68,8 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
+    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
+    DecisionGraph dGraph = creator.buildDecisionGraph();
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
     DecisionGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     // I expect 6 vertices
@@ -84,7 +87,8 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
+    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
+    DecisionGraph dGraph = creator.buildDecisionGraph();
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
     DecisionGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     Map<DGVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
@@ -105,7 +109,8 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
+    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
+    DecisionGraph dGraph = creator.buildDecisionGraph();
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
     List<DGEdge> edges = visitor.getShortestPath();
     assertTrue(edges.get(0).getWeight()==1); // The ideal path should start with a gap
@@ -128,7 +133,8 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, vGraph, b);
+    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, vGraph, b);
+    DecisionGraph dGraph = creator.buildDecisionGraph();
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
 
     List<DGEdge> path = visitor.getShortestPath();

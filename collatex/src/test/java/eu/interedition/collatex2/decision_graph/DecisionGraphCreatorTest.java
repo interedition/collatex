@@ -28,7 +28,8 @@ public class DecisionGraphCreatorTest {
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraph decisionGraph = DecisionGraphCreator.buildDecisionGraph(matcher, vGraph, b);
+    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, vGraph, b);
+    DecisionGraph decisionGraph = creator.buildDecisionGraph();
     assertEquals(13, decisionGraph.vertexSet().size());
 
     // fetch vertices
@@ -91,7 +92,8 @@ public class DecisionGraphCreatorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
+    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
+    DecisionGraph dGraph = creator.buildDecisionGraph();
     Iterator<DGVertex> topologicalOrder = dGraph.iterator();
     DGVertex v1 = topologicalOrder.next();
     DGVertex vThe1 = topologicalOrder.next();

@@ -11,10 +11,20 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DecisionGraphCreator {
+  private final IVariantGraphMatcher matcher;
+  private final IVariantGraph vGraph;
+  private final IWitness b;
 
-  public static DecisionGraph buildDecisionGraph(IVariantGraphMatcher matcher, IVariantGraph vGraph, IWitness b) {
+  //remove second and third parameter or the first one alone!
+  public DecisionGraphCreator(IVariantGraphMatcher matcher, IVariantGraph vGraph, IWitness b) {
+    this.matcher = matcher;
+    this.vGraph = vGraph;
+    this.b = b;
+  }
+
+  public DecisionGraph buildDecisionGraph() {
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(vGraph, b);
-    // build the decision graph from the matches and the vgraph
+    // build the decision graph from the matches and the variant graph
     DecisionGraph dGraph = new DecisionGraph(vGraph.getStartVertex());
     Set<DGVertex> lastConstructedVertices = Sets.newLinkedHashSet();
     lastConstructedVertices.add(dGraph.getStartVertex());
