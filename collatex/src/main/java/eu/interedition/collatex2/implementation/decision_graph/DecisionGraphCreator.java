@@ -6,21 +6,16 @@ import java.util.Set;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.implementation.matching.TokenMatcher;
-import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DecisionGraphCreator {
 
-  public static DecisionGraph buildDecisionGraph(IVariantGraph vGraph, IWitness b) {
+  public static DecisionGraph buildDecisionGraph(IVariantGraphMatcher matcher, IVariantGraph vGraph, IWitness b) {
+    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(vGraph, b);
     // build the decision graph from the matches and the vgraph
     DecisionGraph dGraph = new DecisionGraph(vGraph.getStartVertex());
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(vGraph);
-    TokenMatcher matcher = new TokenMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, b);
     Set<DGVertex> lastConstructedVertices = Sets.newLinkedHashSet();
     lastConstructedVertices.add(dGraph.getStartVertex());
     for (INormalizedToken wToken : b.getTokens()) {
@@ -51,5 +46,4 @@ public class DecisionGraphCreator {
     }
     return dGraph;
   }
-
 }

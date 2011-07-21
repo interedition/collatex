@@ -11,11 +11,14 @@ import eu.interedition.collatex2.implementation.decision_graph.DGEdge;
 import eu.interedition.collatex2.implementation.decision_graph.DGVertex;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraph;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphCreator;
+import eu.interedition.collatex2.implementation.decision_graph.VariantGraphMatcher;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class DecisionGraphCreatorTest {
 
+  //TODO: add a test where there is sometimes no match for a given token
+  
   // All the witness are equal
   // There are choices to be made however, since there is duplication of tokens
   @Test
@@ -24,7 +27,8 @@ public class DecisionGraphCreatorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
-    DecisionGraph decisionGraph = DecisionGraphCreator.buildDecisionGraph(vGraph, b);
+    VariantGraphMatcher matcher = new VariantGraphMatcher();
+    DecisionGraph decisionGraph = DecisionGraphCreator.buildDecisionGraph(matcher, vGraph, b);
     assertEquals(13, decisionGraph.vertexSet().size());
 
     // fetch vertices
@@ -86,7 +90,8 @@ public class DecisionGraphCreatorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
+    VariantGraphMatcher matcher = new VariantGraphMatcher();
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
     Iterator<DGVertex> topologicalOrder = dGraph.iterator();
     DGVertex v1 = topologicalOrder.next();
     DGVertex vThe1 = topologicalOrder.next();

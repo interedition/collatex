@@ -16,6 +16,7 @@ import eu.interedition.collatex2.implementation.decision_graph.DGVertex;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraph;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphCreator;
 import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphVisitor;
+import eu.interedition.collatex2.implementation.decision_graph.VariantGraphMatcher;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -38,7 +39,8 @@ public class DecisionGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(vGraph, b);
+    VariantGraphMatcher matcher = new VariantGraphMatcher();
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, vGraph, b);
     assertEquals(0, DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -51,7 +53,8 @@ public class DecisionGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
+    VariantGraphMatcher matcher = new VariantGraphMatcher();
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
     assertEquals(1, DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -62,7 +65,8 @@ public class DecisionGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
+    VariantGraphMatcher matcher = new VariantGraphMatcher();
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
     DecisionGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     // I expect 6 vertices
@@ -79,7 +83,8 @@ public class DecisionGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
+    VariantGraphMatcher matcher = new VariantGraphMatcher();
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
     DecisionGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     Map<DGVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
@@ -99,7 +104,8 @@ public class DecisionGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(graph, b);
+    VariantGraphMatcher matcher = new VariantGraphMatcher();
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, graph, b);
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
     List<DGEdge> edges = visitor.getShortestPath();
     assertTrue(edges.get(0).getWeight()==1); // The ideal path should start with a gap
@@ -121,7 +127,8 @@ public class DecisionGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
-    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(vGraph, b);
+    VariantGraphMatcher matcher = new VariantGraphMatcher();
+    DecisionGraph dGraph = DecisionGraphCreator.buildDecisionGraph(matcher, vGraph, b);
     DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
 
     List<DGEdge> path = visitor.getShortestPath();
