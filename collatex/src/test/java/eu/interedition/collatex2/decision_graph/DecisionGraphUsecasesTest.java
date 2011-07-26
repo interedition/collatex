@@ -4,12 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.decision_graph.DecisionGraph;
-import eu.interedition.collatex2.implementation.decision_graph.DecisionGraphCreator;
 import eu.interedition.collatex2.implementation.decision_graph.NewLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -24,7 +21,6 @@ public class DecisionGraphUsecasesTest {
 //  <witness>The black not very special cat</witness>
 //</example>
 
-  @Ignore
   @Test
   public void testUsecase1() {
     CollateXEngine engine = new CollateXEngine();
