@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.util.AbstractAnnotationRepository;
+import eu.interedition.text.util.SQL;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -331,7 +332,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   }
 
   static String select(String tableName) {
-    return Util.select(tableName, "id", "range_start", "range_end");
+    return SQL.select(tableName, "id", "range_start", "range_end");
   }
 
 

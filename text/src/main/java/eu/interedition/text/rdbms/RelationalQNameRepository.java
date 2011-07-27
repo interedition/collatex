@@ -6,7 +6,7 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import eu.interedition.text.QName;
 import eu.interedition.text.QNameRepository;
-import org.springframework.beans.factory.InitializingBean;
+import eu.interedition.text.util.SQL;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -133,7 +133,7 @@ public class RelationalQNameRepository implements QNameRepository {
   }
 
   static String select(String tableName) {
-    return Util.select(tableName, "id", "local_name", "namespace");
+    return SQL.select(tableName, "id", "local_name", "namespace");
   }
 
   static RelationalQName mapName(ResultSet rs, String prefix) throws SQLException {

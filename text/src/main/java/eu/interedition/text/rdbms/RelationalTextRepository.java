@@ -9,7 +9,7 @@ import com.google.common.io.Files;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
-import eu.interedition.text.xml.XMLParser;
+import eu.interedition.text.util.SQL;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -172,7 +172,7 @@ public class RelationalTextRepository implements TextRepository {
   }
 
   static String select(String tableName) {
-    return Util.select(tableName, "id", "created", "type");
+    return SQL.select(tableName, "id", "created", "type");
   }
 
   static RelationalText mapText(ResultSet rs, String prefix) throws SQLException {

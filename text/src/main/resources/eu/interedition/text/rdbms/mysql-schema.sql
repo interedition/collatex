@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS text_annotation_data (
   UNIQUE (annotation, name)
 ) ENGINE = INNODB;
 
-CREATE TABLE text_annotation_link_data (
+CREATE TABLE IF NOT EXISTS text_annotation_link_data (
   link BIGINT NOT NULL,
   name BIGINT NOT NULL,
   value VARCHAR(255) NOT NULL,
