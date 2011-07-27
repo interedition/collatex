@@ -9,6 +9,8 @@ public interface TextRepository {
 
   Text create(Text.Type type);
 
+  Text create(Reader content) throws IOException;
+
   void delete(Text text);
 
   int length(Text text) throws IOException;
@@ -18,6 +20,8 @@ public interface TextRepository {
   String read(Text text, Range range) throws IOException;
 
   SortedMap<Range, String> bulkRead(Text text, SortedSet<Range> ranges) throws IOException;
+
+  void write(Text text, Reader contents) throws IOException;
 
   void write(Text text, Reader contents, int contentLength) throws IOException;
 

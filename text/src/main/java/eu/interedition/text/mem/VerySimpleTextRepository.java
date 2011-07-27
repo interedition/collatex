@@ -13,9 +13,13 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class SimpleTextRepository implements TextRepository {
+public class VerySimpleTextRepository implements TextRepository {
   public Text create(Text.Type type) {
     return new SimpleText(type);
+  }
+
+  public Text create(Reader content) throws IOException {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
   }
 
   public void delete(Text text) {
@@ -45,6 +49,10 @@ public class SimpleTextRepository implements TextRepository {
       read.put(r, read(text, r));
     }
     return read;
+  }
+
+  public void write(Text text, Reader contents) throws IOException {
+    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   public void write(Text text, Reader contents, int contentLength) throws IOException {

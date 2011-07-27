@@ -1,8 +1,10 @@
 package eu.interedition.text.xml;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.text.QName;
 
+import java.util.List;
 import java.util.Set;
 
 public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
@@ -14,8 +16,10 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
   protected Set<QName> notableElements = Sets.newHashSet();
   protected char notableCharacter = '\u25CA';
   protected boolean compressingWhitespace = true;
-  protected OffsetDeltaHandler offsetDeltaHandler;
-  protected NodePathHandler nodePathHandler;
+  private int textBufferSize = 102400;
+  private boolean removeLeadingWhitespace = true;
+  protected List<XMLParserModule> modules =//
+          Lists.<XMLParserModule>newArrayList(new LineElementXMLParserModule(), new NotableCharacterXMLParserModule(), new TextXMLParserModule());
 
   public void addLineElement(QName lineElementName) {
     lineElements.add(lineElementName);
@@ -85,19 +89,23 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     this.compressingWhitespace = compressingWhitespace;
   }
 
-  public OffsetDeltaHandler getOffsetDeltaHandler() {
-    return offsetDeltaHandler;
+  public List<XMLParserModule> getModules() {
+    return modules;
   }
 
-  public void setOffsetDeltaHandler(OffsetDeltaHandler offsetDeltaHandler) {
-    this.offsetDeltaHandler = offsetDeltaHandler;
+  public int getTextBufferSize() {
+    return textBufferSize;
   }
 
-  public NodePathHandler getNodePathHandler() {
-    return nodePathHandler;
+  public void setTextBufferSize(int textBufferSize) {
+    this.textBufferSize = textBufferSize;
   }
 
-  public void setNodePathHandler(NodePathHandler nodePathHandler) {
-    this.nodePathHandler = nodePathHandler;
+  public boolean isRemoveLeadingWhitespace() {
+    return removeLeadingWhitespace;
+  }
+
+  public void setRemoveLeadingWhitespace(boolean removeLeadingWhitespace) {
+    this.removeLeadingWhitespace = removeLeadingWhitespace;
   }
 }

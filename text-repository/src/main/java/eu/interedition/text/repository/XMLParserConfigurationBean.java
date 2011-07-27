@@ -4,9 +4,11 @@ import eu.interedition.text.QName;
 import eu.interedition.text.xml.NodePathHandler;
 import eu.interedition.text.xml.OffsetDeltaHandler;
 import eu.interedition.text.xml.SimpleXMLParserConfiguration;
+import eu.interedition.text.xml.XMLParserModule;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -61,13 +63,19 @@ public class XMLParserConfigurationBean extends SimpleXMLParserConfiguration {
 
   @JsonIgnore
   @Override
-  public void setNodePathHandler(NodePathHandler nodePathHandler) {
-    super.setNodePathHandler(nodePathHandler);
+  public List<XMLParserModule> getModules() {
+    return super.getModules();
   }
 
   @JsonIgnore
   @Override
-  public void setOffsetDeltaHandler(OffsetDeltaHandler offsetDeltaHandler) {
-    super.setOffsetDeltaHandler(offsetDeltaHandler);
+  public int getTextBufferSize() {
+    return super.getTextBufferSize();
+  }
+
+  @JsonIgnore
+  @Override
+  public void setTextBufferSize(int textBufferSize) {
+    super.setTextBufferSize(textBufferSize);
   }
 }

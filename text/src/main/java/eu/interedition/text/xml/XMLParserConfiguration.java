@@ -2,6 +2,8 @@ package eu.interedition.text.xml;
 
 import eu.interedition.text.QName;
 
+import java.util.List;
+
 public interface XMLParserConfiguration {
 
   boolean isLineElement(QName name);
@@ -18,8 +20,9 @@ public interface XMLParserConfiguration {
 
   boolean isCompressingWhitespace();
 
-  OffsetDeltaHandler getOffsetDeltaHandler();
+  List<XMLParserModule> getModules();
 
-  NodePathHandler getNodePathHandler();
+  int getTextBufferSize();
 
+  boolean isRemoveLeadingWhitespace();
 }

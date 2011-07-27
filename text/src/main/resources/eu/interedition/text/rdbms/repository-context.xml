@@ -22,12 +22,8 @@
         <property name="nameRepository" ref="nameRepository" />
     </bean>
 
-    <bean id="xmlParser" class="eu.interedition.text.rdbms.RelationalXMLParser">
-        <property name="dataSource" ref="repositoryDataSource" />
+    <bean id="xmlParser" class="eu.interedition.text.xml.XMLParser">
         <property name="textRepository" ref="textRepository" />
-        <property name="nameRepository" ref="nameRepository" />
-        <property name="annotationRepository" ref="annotationRepository" />
-        <property name="annotationDataRepository"  ref="annotationDataRepository" />
     </bean>
 
     <bean id="eventGenerator" class="eu.interedition.text.event.TextEventGenerator">

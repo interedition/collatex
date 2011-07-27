@@ -27,8 +27,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.rdbms.RelationalQNameRepository;
-import eu.interedition.text.xml.SimpleXMLParserConfiguration;
-import eu.interedition.text.xml.XMLParser;
+import eu.interedition.text.xml.*;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +39,7 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.Stack;
 
 /**
  * Base class for tests working with documents generated from XML test resources.
@@ -60,8 +60,6 @@ public abstract class AbstractXMLTest extends AbstractTest {
   private Map<String, Text> sources = Maps.newHashMap();
   private Map<String, Text> documents = Maps.newHashMap();
 
-  private SimpleXMLParserConfiguration parserConfiguration = new SimpleXMLParserConfiguration();
-
   @Autowired
   private TextRepository textRepository;
 
@@ -71,27 +69,11 @@ public abstract class AbstractXMLTest extends AbstractTest {
   @Autowired
   private RelationalQNameRepository nameRepository;
 
-  @Before
-  public void configureXMLParser() {
-    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "lg"));
-    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "l"));
-    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "speaker"));
-    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "stage"));
-    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "head"));
-    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "p"));
+  @Autowired
+  private AnnotationRepository annotationRepository;
 
-    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "text"));
-    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "div"));
-    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "lg"));
-    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "subst"));
-    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "choice"));
-
-    parserConfiguration.exclude(new SimpleQName(TEI_NS, "teiHeader"));
-    parserConfiguration.exclude(new SimpleQName(TEI_NS, "front"));
-    parserConfiguration.exclude(new SimpleQName(TEI_NS, "fw"));
-
-    parserConfiguration.addNotableElement(new SimpleQName(TEI_NS, "lb"));
-  }
+  @Autowired
+  private AnnotationDataRepository annotationDataRepository;
 
   @After
   public void removeDocuments() {
@@ -133,11 +115,55 @@ public abstract class AbstractXMLTest extends AbstractTest {
         final URI uri = AbstractXMLTest.class.getResource("/" + resource).toURI();
         final Text xml = xmlParser.load(new StreamSource(uri.toASCIIString()));
         sources.put(resource, xml);
-        documents.put(resource, xmlParser.parse(xml, parserConfiguration));
+        documents.put(resource, xmlParser.parse(xml, createXMLParserConfiguration()));
       }
     } catch (Exception e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  protected XMLParserConfiguration createXMLParserConfiguration() {
+    SimpleXMLParserConfiguration pc = new SimpleXMLParserConfiguration();
+
+    pc.addLineElement(new SimpleQName(TEI_NS, "lg"));
+    pc.addLineElement(new SimpleQName(TEI_NS, "l"));
+    pc.addLineElement(new SimpleQName(TEI_NS, "speaker"));
+    pc.addLineElement(new SimpleQName(TEI_NS, "stage"));
+    pc.addLineElement(new SimpleQName(TEI_NS, "head"));
+    pc.addLineElement(new SimpleQName(TEI_NS, "p"));
+
+    pc.addContainerElement(new SimpleQName(TEI_NS, "text"));
+    pc.addContainerElement(new SimpleQName(TEI_NS, "div"));
+    pc.addContainerElement(new SimpleQName(TEI_NS, "lg"));
+    pc.addContainerElement(new SimpleQName(TEI_NS, "subst"));
+    pc.addContainerElement(new SimpleQName(TEI_NS, "choice"));
+
+    pc.exclude(new SimpleQName(TEI_NS, "teiHeader"));
+    pc.exclude(new SimpleQName(TEI_NS, "front"));
+    pc.exclude(new SimpleQName(TEI_NS, "fw"));
+
+    pc.addNotableElement(new SimpleQName(TEI_NS, "lb"));
+
+    pc.getModules().add(new XMLParserModuleAdapter() {
+
+      Stack<Integer> startOffsetStack = new Stack<Integer>();
+      Stack<Map<QName, String>> attributeStack = new Stack<Map<QName, String>>();
+
+      @Override
+      public void start(XMLEntity entity, XMLParserState state) {
+        startOffsetStack.push(state.getTextOffset());
+        attributeStack.push(entity.getAttributes());
+      }
+
+      @Override
+      public void end(XMLEntity entity, XMLParserState state) {
+        final Range range = new Range(startOffsetStack.pop(), state.getTextOffset());
+        final Annotation annotation = annotationRepository.create(state.getTarget(), entity.getName(), range);
+        annotationDataRepository.set(annotation, attributeStack.pop());
+      }
+    });
+
+    return pc;
   }
 
   /**

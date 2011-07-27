@@ -4,8 +4,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-import com.google.common.io.FileBackedOutputStream;
-import eu.interedition.text.*;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.QName;
+import eu.interedition.text.Text;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleQName;
 
 import javax.xml.stream.XMLInputFactory;
@@ -15,25 +17,16 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.nio.charset.Charset;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
-public abstract class XMLParser {
-  public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
-
+public class XMLParser {
   private final TransformerFactory transformerFactory;
   private final XMLInputFactory xmlInputFactory;
 
   private TextRepository textRepository;
-
-  private Charset charset = DEFAULT_CHARSET;
-  private boolean removeLeadingWhitespace = true;
-  private int textBufferSize = 100000;
-  private int xmlEventBatchSize = 1000;
 
   public XMLParser() {
     transformerFactory = TransformerFactory.newInstance();
@@ -47,341 +40,98 @@ public abstract class XMLParser {
     this.textRepository = textRepository;
   }
 
-  public Charset getCharset() {
-    return charset;
-  }
-
-  public void setCharset(Charset charset) {
-    this.charset = charset;
-  }
-
-  public void setRemoveLeadingWhitespace(boolean removeLeadingWhitespace) {
-    this.removeLeadingWhitespace = removeLeadingWhitespace;
-  }
-
-  public void setTextBufferSize(int textBufferSize) {
-    this.textBufferSize = textBufferSize;
-  }
-
-  public void setXmlEventBatchSize(int xmlEventBatchSize) {
-    this.xmlEventBatchSize = xmlEventBatchSize;
-  }
-
   public Text load(Source xml) throws IOException, TransformerException {
-    File sourceContents = File.createTempFile(getClass().getName(), ".xml");
-    sourceContents.deleteOnExit();
-
-    Reader sourceContentReader = null;
-
+    final File xmlSource = File.createTempFile(getClass().getName(), ".xml");
+    Reader xmlSourceReader = null;
     try {
+
       final Transformer serializer = transformerFactory.newTransformer();
       serializer.setOutputProperty(OutputKeys.METHOD, "xml");
-      serializer.setOutputProperty(OutputKeys.ENCODING, charset.name());
+      serializer.setOutputProperty(OutputKeys.ENCODING, Text.CHARSET.name());
       serializer.setOutputProperty(OutputKeys.INDENT, "no");
       serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-      serializer.transform(xml, new StreamResult(sourceContents));
-
-      sourceContentReader = new InputStreamReader(new FileInputStream(sourceContents), charset);
-      final int sourceContentLength = contentLength(sourceContentReader);
-      sourceContentReader.close();
+      serializer.transform(xml, new StreamResult(xmlSource));
 
       final Text text = textRepository.create(Text.Type.XML);
-      sourceContentReader = new InputStreamReader(new FileInputStream(sourceContents), charset);
-      updateText(text, sourceContentReader, sourceContentLength);
+      xmlSourceReader = new InputStreamReader(new FileInputStream(xmlSource), Text.CHARSET);
+      textRepository.write(text, xmlSourceReader);
       return text;
     } finally {
-      Closeables.close(sourceContentReader, false);
-      sourceContents.delete();
+      Closeables.close(xmlSourceReader, false);
+      xmlSource.delete();
     }
   }
 
-  public Text parse(Text source, XMLParserConfiguration configuration)
+  public Text parse(Text source, final XMLParserConfiguration configuration)
           throws IOException, XMLStreamException {
-    Session session = null;
+    Preconditions.checkArgument(source.getType() == Text.Type.XML);
+    final Text text = textRepository.create(Text.Type.PLAIN);
+
+    final XMLParserState state = new XMLParserState(source, text, configuration);
     try {
-      Preconditions.checkArgument(source.getType() == Text.Type.XML);
-      final Text target = textRepository.create(Text.Type.PLAIN);
+      textRepository.read(source, new TextRepository.TextReader() {
+        public void read(Reader content, int contentLength) throws IOException {
+          XMLStreamReader reader = null;
+          try {
+            reader = xmlInputFactory.createXMLStreamReader(content);
+            while (reader.hasNext()) {
+              final int event = reader.next();
+              final int sourceOffset = reader.getLocation().getCharacterOffset();
 
-      session = new Session(source, target, configuration);
-      textRepository.read(source, session);
+              switch (event) {
+                case XMLStreamConstants.START_DOCUMENT:
+                  state.start();
+                  break;
+                case XMLStreamConstants.START_ELEMENT:
+                  state.endText();
+                  state.nextSibling();
+                  state.start(XMLEntity.newElement(reader));
+                  break;
+                case XMLStreamConstants.END_ELEMENT:
+                  state.endText();
+                  state.end(new XMLEntity(new SimpleQName(reader.getName())));
+                  break;
+                case XMLStreamConstants.COMMENT:
+                  state.endText();
+                  state.nextSibling();
+                  state.emptyEntity(XMLEntity.newComment(reader));
+                  break;
+                case XMLStreamConstants.PROCESSING_INSTRUCTION:
+                  state.endText();
+                  state.nextSibling();
+                  state.emptyEntity(XMLEntity.newPI(reader));
+                  break;
+                case XMLStreamConstants.CHARACTERS:
+                case XMLStreamConstants.ENTITY_REFERENCE:
+                case XMLStreamConstants.CDATA:
+                  state.newText(reader.getText());
+                  break;
+                case XMLStreamConstants.END_DOCUMENT:
+                  state.end();
+                  break;
+              }
+            }
 
-      return target;
+            state.writeText(textRepository);
+
+          } catch (XMLStreamException e) {
+            throw Throwables.propagate(e);
+          } finally {
+            if (reader != null) {
+              try {
+                reader.close();
+              } catch (XMLStreamException e) {
+              }
+            }
+          }
+        }
+      });
     } catch (Throwable t) {
       Throwables.propagateIfInstanceOf(t, IOException.class);
       Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
       throw Throwables.propagate(t);
-    } finally {
-      if (session != null) {
-        session.dispose();
-      }
-    }
-  }
-
-  protected void updateText(Text text, Reader reader, int contentLength) throws IOException {
-    textRepository.write(text, reader, contentLength);
-  }
-
-  protected abstract Annotation startAnnotation(Session session, QName name, Map<QName, String> attrs, int start);
-
-  protected abstract Annotation endAnnotation(Annotation annotation, int end);
-
-  protected void newXMLEventBatch() {
-  }
-
-  private int contentLength(Reader reader) throws IOException {
-    int contentLength = 0;
-    while (reader.read() >= 0) {
-      contentLength++;
-    }
-    return contentLength;
-  }
-
-  public class Session implements TextRepository.TextReader {
-    public final Text source;
-    public final Text target;
-    public final XMLParserConfiguration configuration;
-
-    protected final Stack<Annotation> elementContext = new Stack<Annotation>();
-    protected final Stack<Boolean> spacePreservationContext = new Stack<Boolean>();
-    protected final Stack<Boolean> inclusionContext = new Stack<Boolean>();
-    protected final Stack<Integer> nodePath = new Stack<Integer>();
-    protected final FileBackedOutputStream textBuffer = new FileBackedOutputStream(textBufferSize);
-
-    protected int textOffset = 0;
-    protected int textStartOffset = -1;
-    protected Range lastDeltaTextRange = Range.NULL;
-    protected Range lastDeltaSourceRange = Range.NULL;
-
-    protected OffsetDeltaHandler offsetDeltaHandler;
-    private NodePathHandler nodePathHandler;
-    protected char notableCharacter;
-    protected char lastChar = (removeLeadingWhitespace ? ' ' : 0);
-    private XMLStreamReader reader;
-
-    protected Session(Text source, Text target, XMLParserConfiguration configuration) {
-      this.source = source;
-      this.target = target;
-      this.configuration = configuration;
-      this.offsetDeltaHandler = configuration.getOffsetDeltaHandler();
-      this.nodePathHandler = configuration.getNodePathHandler();
-      this.notableCharacter = configuration.getNotableCharacter();
-      this.nodePath.push(0);
     }
 
-    protected Annotation startAnnotation(QName name, Map<QName, String> attributes) throws IOException {
-      checkOffsetDelta(lastDeltaSourceRange.getEnd());
-
-      final boolean lineElement = configuration.isLineElement(name);
-      final boolean notable = configuration.isNotable(name);
-      if (lineElement || notable) {
-        if (lineElement && textOffset > 0) {
-          insertSpecialChar('\n');
-        }
-        if (notable) {
-          insertSpecialChar(notableCharacter);
-        }
-      }
-
-      final Annotation annotation = XMLParser.this.startAnnotation(this, name, attributes, textOffset);
-
-      elementContext.push(annotation);
-
-      final boolean parentIncluded = (inclusionContext.isEmpty() ? true : inclusionContext.peek());
-      inclusionContext.push(parentIncluded ? !configuration.excluded(name) : configuration.included(name));
-
-      spacePreservationContext.push(spacePreservationContext.isEmpty() ? false : spacePreservationContext.peek());
-      for (Map.Entry<QName, String> attr : attributes.entrySet()) {
-        if (SimpleQName.XML_SPACE.equals(attr.getKey())) {
-          spacePreservationContext.pop();
-          spacePreservationContext.push("preserve".equalsIgnoreCase(attr.getValue()));
-        }
-      }
-      nodePath.push(0);
-      return annotation;
-    }
-
-    protected void insertSpecialChar(char specialChar) throws IOException {
-      textBuffer.write(Character.toString(lastChar = specialChar).getBytes(charset));
-
-      if (offsetDeltaHandler != null) {
-        final int sourceOffset = lastDeltaSourceRange.getEnd();
-        offsetDeltaHandler.newOffsetDelta(target, source, lastDeltaTextRange = new Range(textOffset, ++textOffset),//
-                lastDeltaSourceRange = new Range(sourceOffset, sourceOffset));
-      }
-    }
-
-    protected void endAnnotation() throws IOException {
-      nodePath.pop();
-      spacePreservationContext.pop();
-      inclusionContext.pop();
-      final Annotation annotation = XMLParser.this.endAnnotation(elementContext.pop(), textOffset);
-      if (nodePathHandler != null) {
-        nodePathHandler.newNodePath(annotation, Collections.unmodifiableList(nodePath));
-      }
-
-    }
-
-    protected void nextSibling() {
-      nodePath.push(nodePath.pop() + 1);
-    }
-
-    protected void text() throws IOException {
-      if (textStartOffset < 0) {
-        nextSibling();
-        textStartOffset = textOffset;
-      }
-
-      if (!inclusionContext.isEmpty() && !inclusionContext.peek()) {
-        return;
-      }
-
-      final boolean preserveSpace = !spacePreservationContext.isEmpty() && spacePreservationContext.peek();
-      if (!preserveSpace && !elementContext.isEmpty()
-              && configuration.isContainerElement(elementContext.peek().getName())) {
-        return;
-      }
-
-      final int sourceOffset = reader.getLocation().getCharacterOffset();
-      checkOffsetDelta(sourceOffset);
-
-      final String text = reader.getText();
-      final int textLength = text.length();
-      for (int cc = 0; cc < textLength; cc++) {
-        char currentChar = text.charAt(cc);
-        if (!preserveSpace && configuration.isCompressingWhitespace()) {
-          if (Character.isWhitespace(lastChar) && Character.isWhitespace(currentChar)) {
-            continue;
-          }
-          if (currentChar == '\n' || currentChar == '\r') {
-            currentChar = ' ';
-          }
-        }
-        textBuffer.write(Character.toString(lastChar = currentChar).getBytes(charset));
-        textOffset++;
-      }
-
-      checkOffsetDelta(sourceOffset + textLength);
-    }
-
-    protected void end() {
-      checkOffsetDelta(reader.getLocation().getCharacterOffset());
-    }
-
-    protected void checkOffsetDelta(int sourceOffset) {
-      if (offsetDeltaHandler != null) {
-        if (lastDeltaSourceRange.getEnd() < sourceOffset || lastDeltaTextRange.getEnd() < textOffset) {
-          offsetDeltaHandler.newOffsetDelta(target, source, lastDeltaTextRange = new Range(lastDeltaTextRange.getEnd(), textOffset),//
-                  lastDeltaSourceRange = new Range(lastDeltaSourceRange.getEnd(), sourceOffset));
-        }
-      }
-    }
-
-    protected void writeText() {
-      if (textStartOffset >= 0 && textOffset > textStartOffset) {
-        Annotation text = XMLParser.this.startAnnotation(this, SimpleQName.TEXT_QNAME,
-                Maps.<QName, String>newHashMap(), textStartOffset);
-        XMLParser.this.endAnnotation(text, textOffset);
-      }
-      textStartOffset = -1;
-    }
-
-    protected Reader read() throws IOException {
-      return new InputStreamReader(textBuffer.getSupplier().getInput(), charset);
-    }
-
-    protected void dispose() throws IOException {
-      textBuffer.reset();
-    }
-
-    public void read(Reader content, int contentLength) throws IOException {
-      reader = null;
-      try {
-        reader = xmlInputFactory.createXMLStreamReader(content);
-        int xmlEvents = 0;
-        Map<QName, String> attributes = null;
-
-        while (reader.hasNext()) {
-          if (xmlEvents++ % xmlEventBatchSize == 0) {
-            newXMLEventBatch();
-          }
-
-          switch (reader.next()) {
-            case XMLStreamConstants.START_ELEMENT:
-              writeText();
-              nextSibling();
-
-              attributes = Maps.newHashMap();
-              final int attributeCount = reader.getAttributeCount();
-              for (int ac = 0; ac < attributeCount; ac++) {
-                final javax.xml.namespace.QName attrQName = reader.getAttributeName(ac);
-                if (XMLNS_ATTRIBUTE_NS_URI.equals(attrQName.getNamespaceURI())) {
-                  continue;
-                }
-
-                attributes.put(new SimpleQName(attrQName), reader.getAttributeValue(ac));
-              }
-
-              startAnnotation(new SimpleQName(reader.getName()), attributes);
-              break;
-            case XMLStreamConstants.END_ELEMENT:
-              writeText();
-              endAnnotation();
-              break;
-            case XMLStreamConstants.COMMENT:
-              writeText();
-              nextSibling();
-
-              attributes = Maps.newHashMap();
-              attributes.put(SimpleQName.COMMENT_TEXT_QNAME, reader.getText());
-              startAnnotation(SimpleQName.COMMENT_QNAME, attributes);
-              endAnnotation();
-              break;
-            case XMLStreamConstants.PROCESSING_INSTRUCTION:
-              writeText();
-              nextSibling();
-
-              attributes = Maps.newHashMap();
-              attributes.put(SimpleQName.PI_TARGET_QNAME, reader.getPITarget());
-              final String data = reader.getPIData();
-              if (data != null) {
-                attributes.put(SimpleQName.PI_DATA_QNAME, data);
-              }
-
-              startAnnotation(SimpleQName.PI_QNAME, attributes);
-              endAnnotation();
-              break;
-            case XMLStreamConstants.CHARACTERS:
-            case XMLStreamConstants.ENTITY_REFERENCE:
-            case XMLStreamConstants.CDATA:
-              text();
-              break;
-            case XMLStreamConstants.END_DOCUMENT:
-              end();
-              break;
-          }
-        }
-
-        Reader textContentReader = null;
-        try {
-          textContentReader = read();
-          final int textContentLength = contentLength(textContentReader);
-          Closeables.close(textContentReader, false);
-
-          textContentReader = read();
-          updateText(target, textContentReader, textContentLength);
-        } finally {
-          Closeables.closeQuietly(textContentReader);
-        }
-      } catch (XMLStreamException e) {
-        throw new RuntimeException(e);
-      } finally {
-        if (reader != null) {
-          try {
-            reader.close();
-          } catch (XMLStreamException e) {
-          }
-        }
-      }
-    }
+    return text;
   }
 }

@@ -56,7 +56,7 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
   protected Text readInternal(Class<? extends Text> clazz, final HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     final MediaType contentType = inputMessage.getHeaders().getContentType();
     final Charset contentTypeCharset = contentType.getCharSet();
-    final Charset charset = (contentTypeCharset == null ? xmlParser.getCharset() : contentTypeCharset);
+    final Charset charset = (contentTypeCharset == null ? Text.CHARSET : contentTypeCharset);
 
     try {
       return new TransactionTemplate(transactionManager).execute(new TransactionCallback<Text>() {
@@ -95,7 +95,7 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
   protected void writeInternal(final Text text, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     final MediaType contentType = outputMessage.getHeaders().getContentType();
     final Charset contentTypeCharset = contentType.getCharSet();
-    final Charset charset = (contentTypeCharset == null ? xmlParser.getCharset() : contentTypeCharset);
+    final Charset charset = (contentTypeCharset == null ? Text.CHARSET : contentTypeCharset);
 
     try {
       final TransactionTemplate tt = new TransactionTemplate(transactionManager);
@@ -161,32 +161,5 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
   @Override
   public void afterPropertiesSet() throws Exception {
     transformerFactory = TransformerFactory.newInstance();
-  }
-
-  private static class CountingWriter extends FilterWriter {
-
-    private int length = 0;
-
-    private CountingWriter(Writer out) {
-      super(out);
-    }
-
-    @Override
-    public void write(int c) throws IOException {
-      super.write(c);
-      length++;
-    }
-
-    @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {
-      super.write(cbuf, off, len);
-      length += len;
-    }
-
-    @Override
-    public void write(String str, int off, int len) throws IOException {
-      super.write(str, off, len);
-      length += len;
-    }
   }
 }

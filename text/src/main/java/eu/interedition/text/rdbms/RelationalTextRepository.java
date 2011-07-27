@@ -58,11 +58,17 @@ public class RelationalTextRepository implements TextRepository {
   }
 
   public Text create(Reader content) throws IOException {
+    final Text text = create(Text.Type.PLAIN);
+    write(text, content);
+    return text;
+  }
+
+  public void write(Text text, Reader content) throws IOException {
     final File tempFile = File.createTempFile(getClass().toString(), ".txt");
     try {
       CountingWriter tempWriter = null;
       try {
-        tempWriter = new CountingWriter(new OutputStreamWriter(new FileOutputStream(tempFile), XMLParser.DEFAULT_CHARSET));
+        tempWriter = new CountingWriter(new OutputStreamWriter(new FileOutputStream(tempFile), Text.CHARSET));
         CharStreams.copy(content, tempWriter);
       } finally {
         Closeables.close(tempWriter, false);
@@ -70,10 +76,8 @@ public class RelationalTextRepository implements TextRepository {
 
       BufferedReader textReader = null;
       try {
-        final Text text = create(Text.Type.PLAIN);
-        textReader = Files.newReader(tempFile, XMLParser.DEFAULT_CHARSET);
+        textReader = Files.newReader(tempFile, Text.CHARSET);
         write(text, textReader, tempWriter.length);
-        return text;
       } finally {
         Closeables.close(textReader, false);
       }
