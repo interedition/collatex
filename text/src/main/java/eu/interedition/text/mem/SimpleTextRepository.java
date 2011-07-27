@@ -13,7 +13,7 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VerySimpleTextRepository implements TextRepository {
+public class SimpleTextRepository implements TextRepository {
   public Text create(Text.Type type) {
     return new SimpleText(type);
   }
