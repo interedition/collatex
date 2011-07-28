@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import eu.interedition.text.QName;
 import eu.interedition.text.mem.SimpleQName;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamReader;
 import java.util.Collections;
 import java.util.Map;
@@ -14,21 +15,27 @@ import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLEntity {
+  private final String prefix;
   private final QName name;
   private final Map<QName, String> attributes;
 
 
-  XMLEntity(QName name) {
-    this(name, Maps.<QName, String>newHashMap());
+  XMLEntity(QName name, String prefix) {
+    this(name, prefix, Maps.<QName, String>newHashMap());
   }
 
-  XMLEntity(QName name, QName attrName, String attrValue) {
-    this(name, Collections.singletonMap(attrName, attrValue));
+  XMLEntity(QName name, String prefix, QName attrName, String attrValue) {
+    this(name, prefix, Collections.singletonMap(attrName, attrValue));
   }
 
-  XMLEntity(QName name, Map<QName, String> attributes) {
+  XMLEntity(QName name, String prefix, Map<QName, String> attributes) {
     this.name = name;
+    this.prefix = prefix;
     this.attributes = attributes;
+  }
+
+  public String getPrefix() {
+    return prefix;
   }
 
   public QName getName() {
@@ -40,7 +47,7 @@ public class XMLEntity {
   }
 
   public static XMLEntity newComment(XMLStreamReader reader) {
-    return new XMLEntity(SimpleQName.COMMENT_QNAME, SimpleQName.COMMENT_TEXT_QNAME, reader.getText());
+    return new XMLEntity(SimpleQName.COMMENT_QNAME, XMLConstants.DEFAULT_NS_PREFIX, SimpleQName.COMMENT_TEXT_QNAME, reader.getText());
   }
 
   public static XMLEntity newPI(XMLStreamReader reader) {
@@ -50,7 +57,7 @@ public class XMLEntity {
     if (data != null) {
       attributes.put(SimpleQName.PI_DATA_QNAME, data);
     }
-    return new XMLEntity(SimpleQName.PI_QNAME, attributes);
+    return new XMLEntity(SimpleQName.PI_QNAME, XMLConstants.DEFAULT_NS_PREFIX, attributes);
   }
 
   public static XMLEntity newElement(XMLStreamReader reader) {
@@ -63,6 +70,6 @@ public class XMLEntity {
       }
       attributes.put(new SimpleQName(attrQName), reader.getAttributeValue(ac));
     }
-    return new XMLEntity(new SimpleQName(reader.getName()), attributes);
+    return new XMLEntity(new SimpleQName(reader.getName()), XMLConstants.DEFAULT_NS_PREFIX, attributes);
   }
 }

@@ -89,7 +89,7 @@ public class XMLParser {
                   break;
                 case XMLStreamConstants.END_ELEMENT:
                   state.endText();
-                  state.end(new XMLEntity(new SimpleQName(reader.getName())));
+                  state.end(new XMLEntity(new SimpleQName(reader.getName()), reader.getName().getPrefix()));
                   break;
                 case XMLStreamConstants.COMMENT:
                   state.endText();

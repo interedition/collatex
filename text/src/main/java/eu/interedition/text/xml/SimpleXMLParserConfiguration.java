@@ -29,8 +29,8 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     return lineElements.remove(lineElementName);
   }
 
-  public boolean isLineElement(QName name) {
-    return lineElements.contains(name);
+  public boolean isLineElement(XMLEntity entity) {
+    return lineElements.contains(entity.getName());
   }
 
   public void addContainerElement(QName containerElementName) {
@@ -41,8 +41,8 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     return containerElements.remove(containerElementName);
   }
 
-  public boolean isContainerElement(QName name) {
-    return containerElements.contains(name);
+  public boolean isContainerElement(XMLEntity entity) {
+    return containerElements.contains(entity.getName());
   }
 
   public void include(QName name) {
@@ -53,12 +53,12 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     excluded.add(name);
   }
 
-  public boolean included(QName name) {
-    return included.contains(name);
+  public boolean included(XMLEntity entity) {
+    return included.contains(entity.getName());
   }
 
-  public boolean excluded(QName name) {
-    return excluded.contains(name);
+  public boolean excluded(XMLEntity entity) {
+    return excluded.contains(entity.getName());
   }
 
   public char getNotableCharacter() {
@@ -77,8 +77,8 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     return notableElements.remove(name);
   }
 
-  public boolean isNotable(QName name) {
-    return notableElements.contains(name);
+  public boolean isNotable(XMLEntity entity) {
+    return notableElements.contains(entity.getName());
   }
 
   public boolean isCompressingWhitespace() {

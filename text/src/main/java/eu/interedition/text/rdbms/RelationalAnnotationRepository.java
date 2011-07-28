@@ -104,7 +104,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
       return;
     }
 
-    final StringBuilder sql = new StringBuilder("delete from text_annotation_link_target where link = ? AND ");
+    final StringBuilder sql = new StringBuilder("delete from text_annotation_link_target where link = ? and ");
 
     final List<Object> params = new ArrayList<Object>(toRemove.size() + 1);
     params.add(((RelationalAnnotationLink) from).getId());
@@ -127,8 +127,8 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     List<Object> parameters = Lists.newArrayList();
 
     final StringBuilder sql = new StringBuilder("select ");
-    sql.append(select("a")).append(", ");
-    sql.append(RelationalQNameRepository.select("n"));
+    sql.append(selectAnnotationFrom("a")).append(", ");
+    sql.append(RelationalQNameRepository.selectNameFrom("n"));
     sql.append(" from text_annotation a join text_qname n on a.name = n.id where a.text = ?");
     parameters.add(((RelationalText) text).getId());
 
@@ -160,9 +160,9 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
 
       public Annotation mapRow(ResultSet rs, int rowNum) throws SQLException {
         if (currentName == null || currentName.getId() != rs.getInt("n_id")) {
-          currentName = RelationalQNameRepository.mapName(rs, "n");
+          currentName = RelationalQNameRepository.mapNameFrom(rs, "n");
         }
-        return mapAnnotation(rs, relationalText, currentName, "a");
+        return mapAnnotationFrom(rs, relationalText, currentName, "a");
       }
     }, parameters.toArray(new Object[parameters.size()])));
   }
@@ -171,10 +171,10 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     final List<Object> params = new ArrayList<Object>();
     final StringBuilder sql = new StringBuilder("select ");
     sql.append("al.id as al_id, ");
-    sql.append(select("a")).append(", ");
-    sql.append(RelationalTextRepository.select("t")).append(", ");
-    sql.append(RelationalQNameRepository.select("aln")).append(", ");
-    sql.append(RelationalQNameRepository.select("an"));
+    sql.append(selectAnnotationFrom("a")).append(", ");
+    sql.append(RelationalTextRepository.selectTextFrom("t")).append(", ");
+    sql.append(RelationalQNameRepository.selectNameFrom("aln")).append(", ");
+    sql.append(RelationalQNameRepository.selectNameFrom("an"));
     sql.append(" from text_annotation_link_target alt");
     sql.append(" join text_annotation_link al on alt.link = al.id");
     sql.append(" join text_qname aln on al.name = aln.id");
@@ -271,20 +271,20 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
         final int annotationNameId = rs.getInt("an_id");
 
         if (currentLink == null || currentLink.getId() != annotationLinkId) {
-          currentLink = new RelationalAnnotationLink(annotationLinkId, RelationalQNameRepository.mapName(rs, "aln"));
+          currentLink = new RelationalAnnotationLink(annotationLinkId, RelationalQNameRepository.mapNameFrom(rs, "aln"));
         }
         if (currentText == null || currentText.getId() != textId) {
-          currentText = RelationalTextRepository.mapText(rs, "t");
+          currentText = RelationalTextRepository.mapTextFrom(rs, "t");
         }
         if (currentAnnotationName == null || currentAnnotationName.getId() != annotationNameId) {
-          currentAnnotationName = RelationalQNameRepository.mapName(rs, "an");
+          currentAnnotationName = RelationalQNameRepository.mapNameFrom(rs, "an");
         }
 
         Set<Annotation> members = annotationLinks.get(currentLink);
         if (members == null) {
           annotationLinks.put(currentLink, members = new TreeSet<Annotation>());
         }
-        members.add(mapAnnotation(rs, currentText, currentAnnotationName, "a"));
+        members.add(mapAnnotationFrom(rs, currentText, currentAnnotationName, "a"));
 
         return null;
       }
@@ -295,10 +295,13 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   }
 
   public SortedSet<QName> names(Text text) {
-    final SortedSet<QName> names = Sets.newTreeSet(jt.query("select distinct n.id as n_id, n.local_name as n_local_name, n.namespace as n_namespace from text_qname n join text_annotation a on a.name = n.id where a.text = ?", new RowMapper<QName>() {
+    final StringBuilder namesSql = new StringBuilder("select distinct ");
+    namesSql.append(RelationalQNameRepository.selectNameFrom("n"));
+    namesSql.append(" from text_qname n join text_annotation a on a.name = n.id where a.text = ?");
+    final SortedSet<QName> names = Sets.newTreeSet(jt.query(namesSql.toString(), new RowMapper<QName>() {
 
       public QName mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return RelationalQNameRepository.mapName(rs, "n");
+        return RelationalQNameRepository.mapNameFrom(rs, "n");
       }
     }, ((RelationalText) text).getId()));
 
@@ -331,12 +334,12 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     return names;
   }
 
-  static String select(String tableName) {
+  public static String selectAnnotationFrom(String tableName) {
     return SQL.select(tableName, "id", "range_start", "range_end");
   }
 
 
-  static RelationalAnnotation mapAnnotation(ResultSet rs, RelationalText text, RelationalQName name, String tableName) throws SQLException {
+  public static RelationalAnnotation mapAnnotationFrom(ResultSet rs, RelationalText text, RelationalQName name, String tableName) throws SQLException {
     final RelationalAnnotation relationalAnnotation = new RelationalAnnotation();
     relationalAnnotation.setId(rs.getInt(tableName + "_id"));
     relationalAnnotation.setName(name);

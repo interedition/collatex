@@ -14,7 +14,7 @@ public class TextXMLParserModule extends XMLParserModuleAdapter {
   @Override
   public void start(XMLEntity entity, XMLParserState state) {
     final boolean parentIncluded = (inclusionContext.isEmpty() ? true : inclusionContext.peek());
-    inclusionContext.push(parentIncluded ? !state.configuration.excluded(entity.getName()) : state.configuration.included(entity.getName()));
+    inclusionContext.push(parentIncluded ? !state.configuration.excluded(entity) : state.configuration.included(entity));
   }
 
   @Override
@@ -29,7 +29,7 @@ public class TextXMLParserModule extends XMLParserModuleAdapter {
     }
 
     final boolean preserveSpace = !state.spacePreservationContext.isEmpty() && state.spacePreservationContext.peek();
-    if (!preserveSpace && !state.elementContext.isEmpty() && state.configuration.isContainerElement(state.elementContext.peek().getName())) {
+    if (!preserveSpace && !state.elementContext.isEmpty() && state.configuration.isContainerElement(state.elementContext.peek())) {
       return;
     }
 

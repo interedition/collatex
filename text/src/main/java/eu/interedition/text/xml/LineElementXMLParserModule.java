@@ -7,7 +7,7 @@ public class LineElementXMLParserModule extends XMLParserModuleAdapter {
 
   @Override
   public void start(XMLEntity entity, XMLParserState state) {
-    final boolean lineElement = state.configuration.isLineElement(entity.getName());
+    final boolean lineElement = state.configuration.isLineElement(entity);
     if (lineElement && state.textOffset > 0) {
       state.insert("\n", false);
     }

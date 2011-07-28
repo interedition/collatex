@@ -164,18 +164,18 @@ public class RelationalTextRepository implements TextRepository {
   }
 
   public Text load(int id) {
-    return DataAccessUtils.requiredUniqueResult(jt.query("select " + select("t") + " from text_content t where t.id = ?", new RowMapper<Text>() {
+    return DataAccessUtils.requiredUniqueResult(jt.query("select " + selectTextFrom("t") + " from text_content t where t.id = ?", new RowMapper<Text>() {
       public Text mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return mapText(rs, "t");
+        return mapTextFrom(rs, "t");
       }
     }, id));
   }
 
-  static String select(String tableName) {
+  public static String selectTextFrom(String tableName) {
     return SQL.select(tableName, "id", "created", "type");
   }
 
-  static RelationalText mapText(ResultSet rs, String prefix) throws SQLException {
+  public static RelationalText mapTextFrom(ResultSet rs, String prefix) throws SQLException {
     final RelationalText relationalText = new RelationalText();
     relationalText.setId(rs.getInt(prefix + "_id"));
     relationalText.setCreated(rs.getDate(prefix + "_created"));

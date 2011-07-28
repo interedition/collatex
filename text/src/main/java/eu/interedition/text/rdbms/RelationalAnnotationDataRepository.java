@@ -6,6 +6,7 @@ import eu.interedition.text.AnnotationLink;
 import eu.interedition.text.QName;
 import eu.interedition.text.QNameRepository;
 import eu.interedition.text.util.AbstractAnnotationDataRepository;
+import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.RowMapper;
@@ -79,12 +80,12 @@ public class RelationalAnnotationDataRepository extends AbstractAnnotationDataRe
   public Map<QName, String> get(Annotation annotation) {
     final Map<QName, String> data = new HashMap<QName, String>();
     final StringBuilder sql = new StringBuilder("select d.value as d_value, ");
-    sql.append(RelationalQNameRepository.select("n"));
+    sql.append(RelationalQNameRepository.selectNameFrom("n"));
     sql.append(" from text_annotation_data d join text_qname n on d.name = n.id where annotation = ?");
     jt.query(sql.toString(), new RowMapper<Void>() {
 
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        data.put(RelationalQNameRepository.mapName(rs, "n"), rs.getString("d_value"));
+        data.put(RelationalQNameRepository.mapNameFrom(rs, "n"), mapDataFrom(rs, "d"));
         return null;
       }
     }, ((RelationalAnnotation) annotation).getId());
@@ -93,13 +94,14 @@ public class RelationalAnnotationDataRepository extends AbstractAnnotationDataRe
 
   public Map<QName, String> get(AnnotationLink link) {
     final Map<QName, String> data = new HashMap<QName, String>();
-    final StringBuilder sql = new StringBuilder("select d.value as d_value, ");
-    sql.append(RelationalQNameRepository.select("n"));
+    final StringBuilder sql = new StringBuilder("select  ");
+    sql.append(selectDataFrom("d")).append(", ");
+    sql.append(RelationalQNameRepository.selectNameFrom("n"));
     sql.append(" from text_annotation_link_data d join text_qname n on d.name = n.id where link = ?");
     jt.query(sql.toString(), new RowMapper<Void>() {
 
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        data.put(RelationalQNameRepository.mapName(rs, "n"), rs.getString("d_value"));
+        data.put(RelationalQNameRepository.mapNameFrom(rs, "n"), mapDataFrom(rs, "d"));
         return null;
       }
     }, ((RelationalAnnotationLink) link).getId());
@@ -138,6 +140,14 @@ public class RelationalAnnotationDataRepository extends AbstractAnnotationDataRe
     }
 
     jt.update(sql.toString(), params.toArray(new Object[params.size()]));
+  }
+
+  public static String selectDataFrom(String tableName) {
+    return SQL.select(tableName, "value");
+  }
+
+  public static String mapDataFrom(ResultSet rs, String prefix) throws SQLException {
+    return rs.getString(prefix + "_value");
   }
 
   public void afterPropertiesSet() throws Exception {

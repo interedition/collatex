@@ -45,7 +45,7 @@ public class RelationalQNameRepository implements QNameRepository {
     }
 
     final List<Integer> ps = Lists.newArrayList(ids);
-    final StringBuilder sql = new StringBuilder("select ").append(select("n")).append(" from text_qname n where n.id in (");
+    final StringBuilder sql = new StringBuilder("select ").append(selectNameFrom("n")).append(" from text_qname n where n.id in (");
     for (int i = 0; i < ps.size(); i++) {
       sql.append(i == 0 ? "" : ", ").append("?");
     }
@@ -72,7 +72,7 @@ public class RelationalQNameRepository implements QNameRepository {
 
     if (!names.isEmpty()) {
       final List<Object> ps = Lists.newArrayList();
-      final StringBuilder sql = new StringBuilder("select ").append(select("n")).append(" from text_qname n where ");
+      final StringBuilder sql = new StringBuilder("select ").append(selectNameFrom("n")).append(" from text_qname n where ");
       for (Iterator<QName> it = names.iterator(); it.hasNext(); ) {
         sql.append("(");
         final QName name = it.next();
@@ -122,7 +122,7 @@ public class RelationalQNameRepository implements QNameRepository {
     nameCache = new MapMaker().maximumSize(cacheSize).makeMap();
     if (jt.queryForInt("select count(*) from text_qname") <= cacheSize) {
       // warm-up cache
-      for (RelationalQName name : jt.query("select " + select("n") + " from text_qname n", ROW_MAPPER)) {
+      for (RelationalQName name : jt.query("select " + selectNameFrom("n") + " from text_qname n", ROW_MAPPER)) {
         nameCache.put(name, name);
       }
     }
@@ -132,11 +132,11 @@ public class RelationalQNameRepository implements QNameRepository {
     nameCache = null;
   }
 
-  static String select(String tableName) {
+  public static String selectNameFrom(String tableName) {
     return SQL.select(tableName, "id", "local_name", "namespace");
   }
 
-  static RelationalQName mapName(ResultSet rs, String prefix) throws SQLException {
+  public static RelationalQName mapNameFrom(ResultSet rs, String prefix) throws SQLException {
     final RelationalQName name = new RelationalQName();
     name.setId(rs.getInt(prefix + "_id"));
     name.setLocalName(rs.getString(prefix + "_local_name"));
@@ -147,7 +147,7 @@ public class RelationalQNameRepository implements QNameRepository {
   private static final RowMapper<RelationalQName> ROW_MAPPER = new RowMapper<RelationalQName>() {
 
     public RelationalQName mapRow(ResultSet rs, int rowNum) throws SQLException {
-      return mapName(rs, "n");
+      return mapNameFrom(rs, "n");
     }
   };
 }

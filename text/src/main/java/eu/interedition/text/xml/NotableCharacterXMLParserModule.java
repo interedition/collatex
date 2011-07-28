@@ -6,7 +6,7 @@ package eu.interedition.text.xml;
 public class NotableCharacterXMLParserModule extends XMLParserModuleAdapter {
   @Override
   public void start(XMLEntity entity, XMLParserState state) {
-    if (state.configuration.isNotable(entity.getName())) {
+    if (state.configuration.isNotable(entity)) {
       state.insert(Character.toString(state.configuration.getNotableCharacter()), false);
     }
   }

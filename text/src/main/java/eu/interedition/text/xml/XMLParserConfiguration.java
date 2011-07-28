@@ -6,17 +6,17 @@ import java.util.List;
 
 public interface XMLParserConfiguration {
 
-  boolean isLineElement(QName name);
+  boolean isLineElement(XMLEntity entity);
 
-  boolean isContainerElement(QName name);
+  boolean isContainerElement(XMLEntity entity);
 
-  boolean included(QName name);
+  boolean included(XMLEntity entity);
 
-  boolean excluded(QName name);
+  boolean excluded(XMLEntity entity);
 
   char getNotableCharacter();
 
-  boolean isNotable(QName name);
+  boolean isNotable(XMLEntity entity);
 
   boolean isCompressingWhitespace();
 
