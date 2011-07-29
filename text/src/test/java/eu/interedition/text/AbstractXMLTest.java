@@ -33,13 +33,11 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import javax.xml.transform.stream.StreamSource;
 import java.net.URI;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Base class for tests working with documents generated from XML test resources.
@@ -110,12 +108,23 @@ public abstract class AbstractXMLTest extends AbstractTest {
   }
 
   protected synchronized void load(String resource) {
+    final StopWatch stopWatch = new StopWatch();
     try {
       if (RESOURCES.contains(resource) && !documents.containsKey(resource)) {
         final URI uri = AbstractXMLTest.class.getResource("/" + resource).toURI();
+
+        stopWatch.start("Load " + uri);
         final Text xml = xmlParser.load(new StreamSource(uri.toASCIIString()));
+        stopWatch.stop();
+
         sources.put(resource, xml);
+        stopWatch.start("Parse " + uri);
         documents.put(resource, xmlParser.parse(xml, createXMLParserConfiguration()));
+        stopWatch.stop();
+
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("\n" + stopWatch.prettyPrint());
+        }
       }
     } catch (Exception e) {
       throw Throwables.propagate(e);
@@ -142,9 +151,13 @@ public abstract class AbstractXMLTest extends AbstractTest {
     pc.exclude(new SimpleQName(TEI_NS, "front"));
     pc.exclude(new SimpleQName(TEI_NS, "fw"));
 
-    pc.addNotableElement(new SimpleQName(TEI_NS, "lb"));
+    pc.getModules().addAll(parserModules());
 
-    pc.getModules().add(new XMLParserModuleAdapter() {
+    return pc;
+  }
+
+  protected List<XMLParserModule> parserModules() {
+    return Lists.<XMLParserModule>newArrayList(new XMLParserModuleAdapter() {
 
       Stack<Integer> startOffsetStack = new Stack<Integer>();
       Stack<Map<QName, String>> attributeStack = new Stack<Map<QName, String>>();
@@ -162,8 +175,6 @@ public abstract class AbstractXMLTest extends AbstractTest {
         annotationDataRepository.set(annotation, attributeStack.pop());
       }
     });
-
-    return pc;
   }
 
   /**

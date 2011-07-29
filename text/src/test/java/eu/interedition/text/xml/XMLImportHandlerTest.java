@@ -23,19 +23,19 @@ package eu.interedition.text.xml;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -52,34 +52,62 @@ public class XMLImportHandlerTest extends AbstractXMLTest {
   @Autowired
   private AnnotationRepository annotationRepository;
 
+  private List<Range> sourceRanges;
+  private List<Range> textRanges;
+
+  @Before
+  public void initRanges() {
+    sourceRanges = Lists.newArrayList();
+    textRanges = Lists.newArrayList();
+  }
+
   @Test
   public void showTextContents() throws IOException {
     //final String resource = "ignt-0101.xml";
-    final String resource = "george-algabal-tei.xml";
     //final String resource = "homer-iliad-tei.xml";
+    //final String resource = "archimedes-palimpsest-tei.xml";
+    final String resource = "george-algabal-tei.xml";
     final Text source = source(resource);
-    final Text document = document(resource);
+    final Text text = document(resource);
 
-    final AnnotationLink link = annotationRepository.createLink(new SimpleQName(TEST_NS, "link"));
-    annotationRepository.add(link, Sets.<Annotation>newHashSet(annotationRepository.find(document)));
-
-    final Map<AnnotationLink,Set<Annotation>> links = annotationRepository.findLinks(Collections.singleton(document), null, null, null);
-    Assert.assertEquals(1, links.keySet().size());
-    Assert.assertEquals(link, links.keySet().iterator().next());
-    Assert.assertEquals(Iterables.size(annotationRepository.find(document)), Iterables.size(links.values().iterator().next()));
-
-    LOG.info(Joiner.on('\n').join(annotationRepository.names(source)));
-
-    final int textLength = textRepository.length(document);
+    final int textLength = textRepository.length(text);
     assertTrue(textLength > 0);
 
     if (LOG.isDebugEnabled()) {
-      textRepository.read(document, new TextRepository.TextReader() {
+      textRepository.read(text, new TextRepository.TextReader() {
 
         public void read(Reader content, int contentLength) throws IOException {
           LOG.debug(CharStreams.toString(content));
         }
       });
     }
+
+    if (LOG.isDebugEnabled()) {
+      final SortedMap<Range, String> sources = textRepository.bulkRead(source, Sets.newTreeSet(sourceRanges));
+      final SortedMap<Range, String> texts = textRepository.bulkRead(text, Sets.newTreeSet(textRanges));
+      final Iterator<Range> sourceRangeIt = sourceRanges.iterator();
+      final Iterator<Range> textRangeIt = textRanges.iterator();
+      while (sourceRangeIt.hasNext() && textRangeIt.hasNext()) {
+        LOG.debug("[" + escapeNewlines(sources.get(sourceRangeIt.next())) +//
+                "] <====> [" + escapeNewlines(texts.get(textRangeIt.next())) + "]");
+      }
+    }
+  }
+
+  @Override
+  protected List<XMLParserModule> parserModules() {
+    final List<XMLParserModule> parserModules = super.parserModules();
+
+    parserModules.add(new XMLParserModuleAdapter() {
+      @Override
+      public void offsetMapping(XMLParserState state, Range textRange, Range sourceRange) {
+        if (LOG.isDebugEnabled()) {
+          sourceRanges.add(sourceRange);
+          textRanges.add(textRange);
+        }
+      }
+    });
+
+    return parserModules;
   }
 }

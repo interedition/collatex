@@ -1,13 +1,16 @@
 package eu.interedition.text.event;
 
 import com.google.common.collect.Iterables;
-import eu.interedition.text.*;
+import com.google.common.collect.Sets;
+import eu.interedition.text.AbstractXMLTest;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.QName;
+import eu.interedition.text.Range;
 import eu.interedition.text.mem.SimpleQName;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
 
 public class TextEventGeneratorTest extends AbstractXMLTest {
@@ -17,7 +20,12 @@ public class TextEventGeneratorTest extends AbstractXMLTest {
 
   @Test
   public void generateEvents() throws IOException {
-    generator.generate(DEBUG_LISTENER, document(), Collections.<QName>singleton(new SimpleQName("http://www.tei-c.org/ns/1.0", "seg")));
+    final Set<QName> nameFilter = Sets.<QName>newHashSet(//
+            new SimpleQName(TEI_NS, "div"),//
+            new SimpleQName(TEI_NS, "lg"),//
+            new SimpleQName(TEI_NS, "l"),//
+            new SimpleQName(TEI_NS, "p"));
+    generator.generate(DEBUG_LISTENER, document("george-algabal-tei.xml"), nameFilter);
   }
 
   private final TextEventListener DEBUG_LISTENER = new TextEventListener() {

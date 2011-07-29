@@ -7,8 +7,9 @@ import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleQName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -20,6 +21,8 @@ import java.util.Stack;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLParserState {
+  private static final Logger LOG = LoggerFactory.getLogger(XMLParserState.class);
+
   public final Text source;
   public final Text target;
   public final XMLParserConfiguration configuration;
@@ -32,13 +35,13 @@ public class XMLParserState {
 
   final FileBackedOutputStream textBuffer;
 
-  int textOffset = 0;
-
   int textStartOffset = -1;
   char lastChar;
 
-  Range lastDeltaTextRange = Range.NULL;
-  Range lastDeltaSourceRange = Range.NULL;
+  int sourceOffset = 0;
+  int textOffset = 0;
+  Range sourceOffsetRange = Range.NULL;
+  Range textOffsetRange = Range.NULL;
 
   XMLParserState(Text source, Text target, XMLParserConfiguration configuration) {
     this.source = source;
@@ -83,18 +86,29 @@ public class XMLParserState {
   }
 
   void start() {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Start of document");
+    }
+
     for (XMLParserModule m : modules) {
       m.start(this);
     }
   }
 
   void end() {
+    emitOffsetMapping();
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("End of document");
+    }
     for (XMLParserModule m : modules) {
       m.end(this);
     }
   }
 
   void start(XMLEntity entity) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Start of " + entity);
+    }
     for (XMLParserModule m : modules) {
       m.start(entity, this);
     }
@@ -111,6 +125,9 @@ public class XMLParserState {
   }
 
   void end(XMLEntity entity) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("End of " + entity);
+    }
     elementContext.pop();
     nodePath.pop();
     spacePreservationContext.pop();
@@ -126,11 +143,18 @@ public class XMLParserState {
   }
 
   void nextSibling() {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Next sibling");
+    }
+
     nodePath.push(nodePath.pop() + 1);
   }
 
   void endText() {
     if (textStartOffset >= 0 && textOffset > textStartOffset) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("End of text node");
+      }
       for (XMLParserModule m : modules) {
         m.endText(this);
       }
@@ -143,17 +167,26 @@ public class XMLParserState {
       nextSibling();
       textStartOffset = textOffset;
 
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Start of text node");
+      }
       for (XMLParserModule m : modules) {
         m.startText(this);
       }
     }
 
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Text: '" + text.replaceAll("[\r\n]+", "\\\\n") + "'");
+    }
     for (XMLParserModule m : modules) {
       m.text(text, this);
     }
   }
 
   void insert(String text, boolean fromSource) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Inserting Text: '" + text.replaceAll("[\r\n]+", "\\\\n") + "' (" + (fromSource ? "from source" : "generated") + ")");
+    }
     try {
       final int textLength = text.length();
       final StringBuilder inserted = new StringBuilder();
@@ -162,7 +195,7 @@ public class XMLParserState {
         for (int cc = 0; cc < textLength; cc++) {
           char currentChar = text.charAt(cc);
           if (!preserveSpace && configuration.isCompressingWhitespace() && Character.isWhitespace(lastChar) && Character.isWhitespace(currentChar)) {
-            // FIXME: does this influence the offset mapping?
+            mapOffsetDelta(0, 1);
             continue;
           }
           if (currentChar == '\n' || currentChar == '\r') {
@@ -170,13 +203,12 @@ public class XMLParserState {
           }
           textBuffer.write(Character.toString(lastChar = currentChar).getBytes(Text.CHARSET));
           inserted.append(lastChar);
-          textOffset++;
+          mapOffsetDelta(1, 1);
         }
       } else {
         textBuffer.write(text.getBytes(Text.CHARSET));
         inserted.append(text);
-        textOffset += textLength;
-        syncOffsetsUpTo(textOffset, lastDeltaSourceRange.getEnd());
+        mapOffsetDelta(inserted.length(), 0);
       }
 
       final String insertedStr = inserted.toString();
@@ -188,16 +220,6 @@ public class XMLParserState {
     }
   }
 
-  protected void syncOffsetsUpTo(int textOffset, int sourceOffset) {
-    if (lastDeltaSourceRange.getEnd() < sourceOffset || lastDeltaTextRange.getEnd() < textOffset) {
-      lastDeltaTextRange = new Range(lastDeltaTextRange.getEnd(), textOffset);
-      lastDeltaSourceRange = new Range(lastDeltaSourceRange.getEnd(), sourceOffset);
-      for (XMLParserModule m : modules) {
-        m.newOffsetDelta(this, lastDeltaTextRange, lastDeltaSourceRange);
-      }
-    }
-  }
-
   void writeText(TextRepository textRepository) throws IOException {
     Reader textBufferReader = null;
     try {
@@ -205,6 +227,48 @@ public class XMLParserState {
     } finally {
       Closeables.close(textBufferReader, false);
       textBuffer.reset();
+    }
+  }
+
+  void mapOffsetDelta(int addToText, int addToSource) {
+    if (addToText == 0 && addToSource == 0) {
+      return;
+    }
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Moving offsets: text += " + addToText + "; source += " + addToSource);
+    }
+
+    final int textOffsetRangeLength = textOffsetRange.length();
+    final int sourceOffsetRangeLength = sourceOffsetRange.length();
+
+    if (addToText == 0 && textOffsetRangeLength == 0) {
+      sourceOffsetRange = new Range(sourceOffsetRange.getStart(), sourceOffsetRange.getEnd() + addToSource);
+    } else if (addToSource == 0 && sourceOffsetRangeLength == 0) {
+      textOffsetRange = new Range(textOffsetRange.getStart(), textOffsetRange.getEnd() + addToText);
+    } else if (textOffsetRangeLength == sourceOffsetRangeLength && addToText == addToSource) {
+      sourceOffsetRange = new Range(sourceOffsetRange.getStart(), sourceOffsetRange.getEnd() + addToSource);
+      textOffsetRange = new Range(textOffsetRange.getStart(), textOffsetRange.getEnd() + addToText);
+    } else {
+      emitOffsetMapping();
+      sourceOffsetRange = new Range(sourceOffsetRange.getEnd(), sourceOffsetRange.getEnd() + addToSource);
+      textOffsetRange = new Range(textOffsetRange.getEnd(), textOffsetRange.getEnd() + addToText);
+    }
+
+    this.textOffset += addToText;
+    this.sourceOffset += addToSource;
+  }
+
+  void emitOffsetMapping() {
+    if (textOffsetRange.length() == 0 && sourceOffsetRange.length() == 0) {
+      return;
+    }
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("New offset mapping: text = " + textOffsetRange + "==> source += " + sourceOffsetRange);
+    }
+    for (XMLParserModule m : modules) {
+      m.offsetMapping(this, textOffsetRange, sourceOffsetRange);
     }
   }
 }

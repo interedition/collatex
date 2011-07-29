@@ -2,10 +2,7 @@ package eu.interedition.text.xml;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-import eu.interedition.text.Annotation;
-import eu.interedition.text.QName;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleQName;
@@ -17,10 +14,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.util.List;
-import java.util.Map;
-
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 public class XMLParser {
   private final TransformerFactory transformerFactory;
@@ -76,7 +69,7 @@ public class XMLParser {
             reader = xmlInputFactory.createXMLStreamReader(content);
             while (reader.hasNext()) {
               final int event = reader.next();
-              final int sourceOffset = reader.getLocation().getCharacterOffset();
+              state.mapOffsetDelta(0, reader.getLocation().getCharacterOffset() - state.sourceOffset);
 
               switch (event) {
                 case XMLStreamConstants.START_DOCUMENT:

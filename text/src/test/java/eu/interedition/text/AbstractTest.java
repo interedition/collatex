@@ -55,4 +55,8 @@ public abstract class AbstractTest {
   protected void printDebugMessage(String msg) {
     LOG.debug(msg);
   }
+
+  protected static String escapeNewlines(String str) {
+    return str.replaceAll("[\n\r]+", "\\\\n");
+  }
 }

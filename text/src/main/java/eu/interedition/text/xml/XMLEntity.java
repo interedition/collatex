@@ -1,5 +1,6 @@
 package eu.interedition.text.xml;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import eu.interedition.text.QName;
 import eu.interedition.text.mem.SimpleQName;
@@ -47,7 +48,7 @@ public class XMLEntity {
   }
 
   public static XMLEntity newComment(XMLStreamReader reader) {
-    return new XMLEntity(SimpleQName.COMMENT_QNAME, XMLConstants.DEFAULT_NS_PREFIX, SimpleQName.COMMENT_TEXT_QNAME, reader.getText());
+    return new XMLEntity(SimpleQName.COMMENT_QNAME, XMLConstants.DEFAULT_NS_PREFIX);
   }
 
   public static XMLEntity newPI(XMLStreamReader reader) {
@@ -71,5 +72,10 @@ public class XMLEntity {
       attributes.put(new SimpleQName(attrQName), reader.getAttributeValue(ac));
     }
     return new XMLEntity(new SimpleQName(reader.getName()), XMLConstants.DEFAULT_NS_PREFIX, attributes);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).addValue(name).toString();
   }
 }

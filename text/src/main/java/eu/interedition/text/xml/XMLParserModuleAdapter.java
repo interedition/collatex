@@ -27,7 +27,7 @@ public class XMLParserModuleAdapter implements XMLParserModule {
   public void end(XMLParserState state) {
   }
 
-  public void newOffsetDelta(XMLParserState state, Range textRange, Range sourceRange) {
+  public void offsetMapping(XMLParserState state, Range textRange, Range sourceRange) {
   }
 
   public void endText(XMLParserState state) {

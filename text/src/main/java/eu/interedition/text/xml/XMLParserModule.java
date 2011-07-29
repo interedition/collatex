@@ -22,5 +22,5 @@ public interface XMLParserModule {
 
   void end(XMLParserState state);
 
-  void newOffsetDelta(XMLParserState state, Range textRange, Range sourceRange);
+  void offsetMapping(XMLParserState state, Range textRange, Range sourceRange);
 }
