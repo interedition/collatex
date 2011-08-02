@@ -4,6 +4,7 @@ import eu.interedition.text.*;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.event.AnnotationEventListener;
 import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.util.SimpleAnnotationPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +37,11 @@ public class Tokenizer {
   }
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
-    for (Annotation token : annotationRepository.find(text, TOKEN_NAME)) {
-      annotationRepository.delete(token);
-    }
-
-    eventSource.listen(new AnnotatingAnnotationEventProcessor(text, settings), text, null, pageSize);
+    annotationRepository.delete(new SimpleAnnotationPredicate(text, TOKEN_NAME));
+    eventSource.listen(new TokenGeneratingListener(text, settings), new SimpleAnnotationPredicate(text), pageSize);
   }
 
-  private class AnnotatingAnnotationEventProcessor implements AnnotationEventListener {
+  private class TokenGeneratingListener implements AnnotationEventListener {
     private final TokenizerSettings settings;
     private final Text text;
 
@@ -52,7 +50,7 @@ public class Tokenizer {
     private int tokenStart = Integer.MAX_VALUE;
     private int tokenCount = 0;
 
-    private AnnotatingAnnotationEventProcessor(Text text, TokenizerSettings settings) {
+    private TokenGeneratingListener(Text text, TokenizerSettings settings) {
       this.settings = settings;
       this.text = text;
     }

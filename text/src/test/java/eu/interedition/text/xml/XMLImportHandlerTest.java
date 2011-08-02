@@ -21,10 +21,12 @@
 
 package eu.interedition.text.xml;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
+import eu.interedition.text.util.SimpleAnnotationPredicate;
 import eu.interedition.text.xml.module.XMLParserModuleAdapter;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,6 +91,10 @@ public class XMLImportHandlerTest extends AbstractXMLTest {
                 "] <====> [" + escapeNewlines(texts.get(textRangeIt.next())) + "]");
       }
     }
+
+    final SimpleAnnotationPredicate textPredicate = new SimpleAnnotationPredicate(text);
+    annotationRepository.delete(textPredicate);
+    assertTrue(Iterables.isEmpty(annotationRepository.find(textPredicate)));
   }
 
   @Override

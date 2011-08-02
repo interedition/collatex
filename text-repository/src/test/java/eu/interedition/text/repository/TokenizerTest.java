@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.util.SimpleAnnotationPredicate;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import org.junit.Test;
@@ -67,7 +68,7 @@ public class TokenizerTest extends AbstractTest {
     int read = 0;
 
     final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
-    for (Annotation token : annotationRepository.find(text, Tokenizer.TOKEN_NAME)) {
+    for (Annotation token : annotationRepository.find(new SimpleAnnotationPredicate(text, Tokenizer.TOKEN_NAME))) {
       final Range range = token.getRange();
       if (read < range.getStart()) {
         ranges.put(new Range(read, range.getStart()), false);

@@ -7,11 +7,14 @@ import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
 import eu.interedition.text.Range;
 import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.util.SimpleAnnotationPredicate;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.Set;
+
+import static java.util.Collections.singleton;
 
 public class AnnotationEventSourceTest extends AbstractXMLTest {
 
@@ -20,12 +23,13 @@ public class AnnotationEventSourceTest extends AbstractXMLTest {
 
   @Test
   public void generateEvents() throws IOException {
-    final Set<QName> nameFilter = Sets.<QName>newHashSet(//
-            new SimpleQName(TEI_NS, "div"),//
-            new SimpleQName(TEI_NS, "lg"),//
-            new SimpleQName(TEI_NS, "l"),//
-            new SimpleQName(TEI_NS, "p"));
-    source.listen(DEBUG_LISTENER, document("george-algabal-tei.xml"), nameFilter);
+    source.listen(DEBUG_LISTENER, new SimpleAnnotationPredicate(null,
+            singleton(document("george-algabal-tei.xml")),
+            Sets.<QName>newHashSet(
+                    new SimpleQName(TEI_NS, "div"),
+                    new SimpleQName(TEI_NS, "lg"),
+                    new SimpleQName(TEI_NS, "l"),
+                    new SimpleQName(TEI_NS, "p")), null));
   }
 
   private final AnnotationEventListener DEBUG_LISTENER = new AnnotationEventListener() {
