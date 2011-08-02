@@ -3,7 +3,9 @@ package eu.interedition.text.mem;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
+import eu.interedition.text.util.AbstractTextRepository;
 
+import javax.xml.transform.TransformerFactory;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -13,13 +15,14 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class SimpleTextRepository implements TextRepository {
+public class SimpleTextRepository extends AbstractTextRepository {
+
   public Text create(Text.Type type) {
     return new SimpleText(type);
   }
 
   public Text create(Reader content) throws IOException {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return new SimpleText(Text.Type.PLAIN, CharStreams.toString(content));
   }
 
   public void delete(Text text) {
@@ -52,10 +55,10 @@ public class SimpleTextRepository implements TextRepository {
   }
 
   public void write(Text text, Reader contents) throws IOException {
-    //To change body of implemented methods use File | Settings | File Templates.
+    ((SimpleText)text).setContent(CharStreams.toString(contents));
   }
 
   public void write(Text text, Reader contents, int contentLength) throws IOException {
-    ((SimpleText)text).setContent(CharStreams.toString(contents));
+    write(text, contents);
   }
 }

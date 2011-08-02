@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.util.Set;
 
-public class TextEventGeneratorTest extends AbstractXMLTest {
+public class AnnotationEventSourceTest extends AbstractXMLTest {
 
   @Autowired
-  private TextEventGenerator generator;
+  private AnnotationEventSource source;
 
   @Test
   public void generateEvents() throws IOException {
@@ -25,10 +25,10 @@ public class TextEventGeneratorTest extends AbstractXMLTest {
             new SimpleQName(TEI_NS, "lg"),//
             new SimpleQName(TEI_NS, "l"),//
             new SimpleQName(TEI_NS, "p"));
-    generator.generate(DEBUG_LISTENER, document("george-algabal-tei.xml"), nameFilter);
+    source.listen(DEBUG_LISTENER, document("george-algabal-tei.xml"), nameFilter);
   }
 
-  private final TextEventListener DEBUG_LISTENER = new TextEventListener() {
+  private final AnnotationEventListener DEBUG_LISTENER = new AnnotationEventListener() {
 
     public void start() {
     }

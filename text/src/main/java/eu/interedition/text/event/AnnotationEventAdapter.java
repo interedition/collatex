@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextEventAdapter implements TextEventListener {
+public class AnnotationEventAdapter implements AnnotationEventListener {
   public void start() {
   }
 

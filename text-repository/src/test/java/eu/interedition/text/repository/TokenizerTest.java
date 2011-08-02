@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.xml.SimpleXMLParserConfiguration;
+import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public class TokenizerTest extends AbstractTest {
     for (String resource : new String[]{"/igntp/0101.xml", "/igntp/0105.xml", "/igntp/0109.xml"}) {
       LOG.info(Strings.padStart("Tokenizing " + resource, 100, '='));
 
-      final Text source = parser.load(new StreamSource(getClass().getResourceAsStream(resource)));
+      final Text source = textRepository.create(new StreamSource(getClass().getResourceAsStream(resource)));
       final Text text = parser.parse(source, parserConfiguration);
 
       tokenizer.tokenize(text, new WhitespaceTokenizerSettings(true));

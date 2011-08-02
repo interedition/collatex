@@ -11,8 +11,7 @@ import java.util.*;
 
 import static java.util.Collections.singleton;
 
-public class TextEventGenerator {
-  private QNameRepository nameRepository;
+public class AnnotationEventSource {
   private AnnotationRepository annotationRepository;
   private TextRepository textRepository;
 
@@ -22,11 +21,7 @@ public class TextEventGenerator {
     }
   };
 
-  public TextEventGenerator() {
-  }
-
-  public void setNameRepository(QNameRepository nameRepository) {
-    this.nameRepository = nameRepository;
+  public AnnotationEventSource() {
   }
 
   public void setAnnotationRepository(AnnotationRepository annotationRepository) {
@@ -37,15 +32,15 @@ public class TextEventGenerator {
     this.textRepository = textRepository;
   }
 
-  public void generate(final TextEventListener listener, final Text text) throws IOException {
-    generate(listener, text, null);
+  public void listen(final AnnotationEventListener listener, final Text text) throws IOException {
+    listen(listener, text, null);
   }
 
-  public void generate(final TextEventListener listener, final Text text, final Set<QName> names) throws IOException {
-    generate(listener, text, names, Integer.MAX_VALUE);
+  public void listen(final AnnotationEventListener listener, final Text text, final Set<QName> names) throws IOException {
+    listen(listener, text, names, Integer.MAX_VALUE);
   }
 
-  public void generate(final TextEventListener listener, final Text text, final Set<QName> names, final int pageSize) throws IOException {
+  public void listen(final AnnotationEventListener listener, final Text text, final Set<QName> names, final int pageSize) throws IOException {
     textRepository.read(text, new TextRepository.TextReader() {
 
       public void read(Reader content, int contentLength) throws IOException {

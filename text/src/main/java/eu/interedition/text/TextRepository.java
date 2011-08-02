@@ -1,5 +1,9 @@
 package eu.interedition.text;
 
+import org.xml.sax.SAXException;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.SortedMap;
@@ -10,6 +14,8 @@ public interface TextRepository {
   Text create(Text.Type type);
 
   Text create(Reader content) throws IOException;
+
+  Text create(Source xml) throws TransformerException, IOException;
 
   void delete(Text text);
 

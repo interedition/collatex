@@ -1,6 +1,7 @@
 package eu.interedition.text.xml;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import eu.interedition.text.Range;
@@ -23,33 +24,33 @@ import java.util.Stack;
 public class XMLParserState {
   private static final Logger LOG = LoggerFactory.getLogger(XMLParserState.class);
 
-  public final Text source;
-  public final Text target;
-  public final XMLParserConfiguration configuration;
+  private final Text source;
+  private final Text target;
+  private final XMLParserConfiguration configuration;
 
-  List<XMLParserModule> modules;
+  private final List<XMLParserModule> modules;
 
-  final Stack<XMLEntity> elementContext = new Stack<XMLEntity>();
-  final Stack<Boolean> spacePreservationContext = new Stack<Boolean>();
-  final Stack<Integer> nodePath = new Stack<Integer>();
+  private final Stack<XMLEntity> elementContext = new Stack<XMLEntity>();
+  private final Stack<Boolean> inclusionContext = new Stack<Boolean>();
+  private final Stack<Boolean> spacePreservationContext = new Stack<Boolean>();
+  private final Stack<Integer> nodePath = new Stack<Integer>();
 
-  final FileBackedOutputStream textBuffer;
+  private final FileBackedOutputStream textBuffer;
 
-  int textStartOffset = -1;
-  char lastChar;
+  private int textStartOffset = -1;
+  private char lastChar;
 
-  int sourceOffset = 0;
-  int textOffset = 0;
-  Range sourceOffsetRange = Range.NULL;
-  Range textOffsetRange = Range.NULL;
+  private int sourceOffset = 0;
+  private int textOffset = 0;
+  private Range sourceOffsetRange = Range.NULL;
+  private Range textOffsetRange = Range.NULL;
 
   XMLParserState(Text source, Text target, XMLParserConfiguration configuration) {
     this.source = source;
     this.target = target;
     this.configuration = configuration;
     this.modules = configuration.getModules();
-    this.nodePath.push(0);
-    this.textBuffer = new FileBackedOutputStream(configuration.getTextBufferSize());
+    this.textBuffer = new FileBackedOutputStream(configuration.getTextBufferSize(), true);
     this.lastChar = (configuration.isRemoveLeadingWhitespace() ? ' ' : 0);
   }
 
@@ -69,6 +70,14 @@ public class XMLParserState {
     return Collections.unmodifiableList(modules);
   }
 
+  public Stack<Boolean> getInclusionContext() {
+    return inclusionContext;
+  }
+
+  public Stack<Boolean> getSpacePreservationContext() {
+    return spacePreservationContext;
+  }
+
   public Stack<XMLEntity> getElementContext() {
     return elementContext;
   }
@@ -81,8 +90,54 @@ public class XMLParserState {
     return textOffset;
   }
 
+  public int getSourceOffset() {
+    return sourceOffset;
+  }
+
   public int getTextStartOffset() {
     return textStartOffset;
+  }
+
+  public void insert(String text, boolean fromSource) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Inserting Text: '" + text.replaceAll("[\r\n]+", "\\\\n") + "' (" + (fromSource ? "from source" : "generated") + ")");
+    }
+    try {
+      final int textLength = text.length();
+      final StringBuilder inserted = new StringBuilder();
+      if (fromSource) {
+        final boolean preserveSpace = !spacePreservationContext.isEmpty() && spacePreservationContext.peek();
+        for (int cc = 0; cc < textLength; cc++) {
+          char currentChar = text.charAt(cc);
+          if (!preserveSpace && configuration.isCompressingWhitespace() && Character.isWhitespace(lastChar) && Character.isWhitespace(currentChar)) {
+            mapOffsetDelta(0, 1);
+            continue;
+          }
+          if (currentChar == '\n' || currentChar == '\r') {
+            currentChar = ' ';
+          }
+          textBuffer.write(Character.toString(lastChar = currentChar).getBytes(Text.CHARSET));
+          inserted.append(lastChar);
+          mapOffsetDelta(1, 1);
+        }
+      } else {
+        textBuffer.write(text.getBytes(Text.CHARSET));
+        inserted.append(text);
+        mapOffsetDelta(inserted.length(), 0);
+      }
+
+      final String insertedStr = inserted.toString();
+      for (XMLParserModule m : configuration.getModules()) {
+        m.insertText(text, insertedStr, this);
+      }
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  public Reader readText() throws IOException {
+    textBuffer.flush();
+    return new InputStreamReader(textBuffer.getSupplier().getInput(), Text.CHARSET);
   }
 
   void start() {
@@ -90,6 +145,7 @@ public class XMLParserState {
       LOG.trace("Start of document");
     }
 
+    this.nodePath.push(0);
     for (XMLParserModule m : modules) {
       m.start(this);
     }
@@ -102,6 +158,11 @@ public class XMLParserState {
     }
     for (XMLParserModule m : modules) {
       m.end(this);
+    }
+    this.nodePath.pop();
+    try {
+      textBuffer.reset();
+    } catch (IOException e) {
     }
   }
 
@@ -180,53 +241,6 @@ public class XMLParserState {
     }
     for (XMLParserModule m : modules) {
       m.text(text, this);
-    }
-  }
-
-  void insert(String text, boolean fromSource) {
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Inserting Text: '" + text.replaceAll("[\r\n]+", "\\\\n") + "' (" + (fromSource ? "from source" : "generated") + ")");
-    }
-    try {
-      final int textLength = text.length();
-      final StringBuilder inserted = new StringBuilder();
-      if (fromSource) {
-        final boolean preserveSpace = !spacePreservationContext.isEmpty() && spacePreservationContext.peek();
-        for (int cc = 0; cc < textLength; cc++) {
-          char currentChar = text.charAt(cc);
-          if (!preserveSpace && configuration.isCompressingWhitespace() && Character.isWhitespace(lastChar) && Character.isWhitespace(currentChar)) {
-            mapOffsetDelta(0, 1);
-            continue;
-          }
-          if (currentChar == '\n' || currentChar == '\r') {
-            currentChar = ' ';
-          }
-          textBuffer.write(Character.toString(lastChar = currentChar).getBytes(Text.CHARSET));
-          inserted.append(lastChar);
-          mapOffsetDelta(1, 1);
-        }
-      } else {
-        textBuffer.write(text.getBytes(Text.CHARSET));
-        inserted.append(text);
-        mapOffsetDelta(inserted.length(), 0);
-      }
-
-      final String insertedStr = inserted.toString();
-      for (XMLParserModule m : configuration.getModules()) {
-        m.insertText(text, insertedStr, this);
-      }
-    } catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
-  void writeText(TextRepository textRepository) throws IOException {
-    Reader textBufferReader = null;
-    try {
-      textRepository.write(target, textBufferReader = new InputStreamReader(textBuffer.getSupplier().getInput(), Text.CHARSET));
-    } finally {
-      Closeables.close(textBufferReader, false);
-      textBuffer.reset();
     }
   }
 

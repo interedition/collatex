@@ -1,8 +1,8 @@
 package eu.interedition.text.repository;
 
 import eu.interedition.text.*;
-import eu.interedition.text.event.TextEventGenerator;
-import eu.interedition.text.event.TextEventListener;
+import eu.interedition.text.event.AnnotationEventSource;
+import eu.interedition.text.event.AnnotationEventListener;
 import eu.interedition.text.mem.SimpleQName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class Tokenizer {
   private AnnotationRepository annotationRepository;
 
   @Autowired
-  private TextEventGenerator eventGenerator;
+  private AnnotationEventSource eventSource;
 
   private int pageSize = 102400;
 
@@ -40,10 +40,10 @@ public class Tokenizer {
       annotationRepository.delete(token);
     }
 
-    eventGenerator.generate(new AnnotatingTextEventProcessor(text, settings), text, null, pageSize);
+    eventSource.listen(new AnnotatingAnnotationEventProcessor(text, settings), text, null, pageSize);
   }
 
-  private class AnnotatingTextEventProcessor implements TextEventListener {
+  private class AnnotatingAnnotationEventProcessor implements AnnotationEventListener {
     private final TokenizerSettings settings;
     private final Text text;
 
@@ -52,7 +52,7 @@ public class Tokenizer {
     private int tokenStart = Integer.MAX_VALUE;
     private int tokenCount = 0;
 
-    private AnnotatingTextEventProcessor(Text text, TokenizerSettings settings) {
+    private AnnotatingAnnotationEventProcessor(Text text, TokenizerSettings settings) {
       this.settings = settings;
       this.text = text;
     }

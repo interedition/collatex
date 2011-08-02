@@ -12,11 +12,16 @@ import java.util.HashSet;
 public class SimpleText extends HashSet<Annotation> implements Text {
   private final Date created;
   private final Type type;
-  private String content = "";
+  private String content;
 
-  public SimpleText(Type type) {
+  public SimpleText(Type type, String content) {
     this.created = new Date();
     this.type = type;
+    this.content = content;
+  }
+
+  public SimpleText(Type type) {
+    this(type, "");
   }
 
   public Date getCreated() {

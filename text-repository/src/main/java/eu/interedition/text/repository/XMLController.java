@@ -1,7 +1,12 @@
 package eu.interedition.text.repository;
 
+import eu.interedition.text.AnnotationDataRepository;
+import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.xml.XMLParser;
+import eu.interedition.text.xml.XMLParserModule;
+import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
+import eu.interedition.text.xml.module.TextXMLParserModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -20,6 +26,12 @@ public class XMLController {
   public static final String URL_PREFIX = "/xml";
 
   @Autowired
+  private AnnotationRepository annotationRepository;
+
+  @Autowired
+  private AnnotationDataRepository annotationDataRepository;
+
+  @Autowired
   private RelationalTextRepository textRepository;
 
   @Autowired
@@ -27,6 +39,10 @@ public class XMLController {
 
   @RequestMapping(value = "/parse/{id}", method = RequestMethod.POST)
   public String parse(@PathVariable("id") int id, @RequestBody XMLParserConfigurationBean pc) throws XMLStreamException, IOException {
+    final List<XMLParserModule> modules = pc.getModules();
+    modules.add(new TextXMLParserModule(textRepository));
+    modules.add(new AnnotationStorageXMLParserModule(annotationRepository, annotationDataRepository));
+
     return TextController.redirectTo(xmlParser.parse(textRepository.load(id), pc));
   }
 }

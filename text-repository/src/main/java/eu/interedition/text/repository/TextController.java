@@ -67,7 +67,7 @@ public class TextController {
         case PLAIN:
           return redirectTo(textRepository.create(new InputStreamReader(fileStream = file.getInputStream(), Charset.forName(charset))));
         case XML:
-          return redirectTo(xmlParser.load(new StreamSource(fileStream = file.getInputStream())));
+          return redirectTo(textRepository.create(new StreamSource(fileStream = file.getInputStream())));
       }
     } finally {
       Closeables.close(fileStream, false);

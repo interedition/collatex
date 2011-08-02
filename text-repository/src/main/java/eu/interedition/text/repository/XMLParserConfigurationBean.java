@@ -1,9 +1,7 @@
 package eu.interedition.text.repository;
 
 import eu.interedition.text.QName;
-import eu.interedition.text.xml.NodePathHandler;
-import eu.interedition.text.xml.OffsetDeltaHandler;
-import eu.interedition.text.xml.SimpleXMLParserConfiguration;
+import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParserModule;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;

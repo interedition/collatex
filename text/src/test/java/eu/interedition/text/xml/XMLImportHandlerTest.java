@@ -21,14 +21,11 @@
 
 package eu.interedition.text.xml;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
-import eu.interedition.text.mem.SimpleQName;
-import org.junit.Assert;
+import eu.interedition.text.xml.module.XMLParserModuleAdapter;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

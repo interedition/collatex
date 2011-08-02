@@ -16,13 +16,11 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 
 public class XMLParser {
-  private final TransformerFactory transformerFactory;
   private final XMLInputFactory xmlInputFactory;
 
   private TextRepository textRepository;
 
   public XMLParser() {
-    transformerFactory = TransformerFactory.newInstance();
     xmlInputFactory = XMLInputFactory.newInstance();
     xmlInputFactory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.FALSE);
     xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
@@ -31,28 +29,6 @@ public class XMLParser {
 
   public void setTextRepository(TextRepository textRepository) {
     this.textRepository = textRepository;
-  }
-
-  public Text load(Source xml) throws IOException, TransformerException {
-    final File xmlSource = File.createTempFile(getClass().getName(), ".xml");
-    Reader xmlSourceReader = null;
-    try {
-
-      final Transformer serializer = transformerFactory.newTransformer();
-      serializer.setOutputProperty(OutputKeys.METHOD, "xml");
-      serializer.setOutputProperty(OutputKeys.ENCODING, Text.CHARSET.name());
-      serializer.setOutputProperty(OutputKeys.INDENT, "no");
-      serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-      serializer.transform(xml, new StreamResult(xmlSource));
-
-      final Text text = textRepository.create(Text.Type.XML);
-      xmlSourceReader = new InputStreamReader(new FileInputStream(xmlSource), Text.CHARSET);
-      textRepository.write(text, xmlSourceReader);
-      return text;
-    } finally {
-      Closeables.close(xmlSourceReader, false);
-      xmlSource.delete();
-    }
   }
 
   public Text parse(Text source, final XMLParserConfiguration configuration)
@@ -67,14 +43,12 @@ public class XMLParser {
           XMLStreamReader reader = null;
           try {
             reader = xmlInputFactory.createXMLStreamReader(content);
+            state.start();
             while (reader.hasNext()) {
               final int event = reader.next();
-              state.mapOffsetDelta(0, reader.getLocation().getCharacterOffset() - state.sourceOffset);
+              state.mapOffsetDelta(0, reader.getLocation().getCharacterOffset() - state.getSourceOffset());
 
               switch (event) {
-                case XMLStreamConstants.START_DOCUMENT:
-                  state.start();
-                  break;
                 case XMLStreamConstants.START_ELEMENT:
                   state.endText();
                   state.nextSibling();
@@ -99,13 +73,9 @@ public class XMLParser {
                 case XMLStreamConstants.CDATA:
                   state.newText(reader.getText());
                   break;
-                case XMLStreamConstants.END_DOCUMENT:
-                  state.end();
-                  break;
               }
             }
-
-            state.writeText(textRepository);
+            state.end();
 
           } catch (XMLStreamException e) {
             throw Throwables.propagate(e);

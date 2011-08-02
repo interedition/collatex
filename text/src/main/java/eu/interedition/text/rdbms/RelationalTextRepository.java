@@ -9,6 +9,7 @@ import com.google.common.io.Files;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
+import eu.interedition.text.util.AbstractTextRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
@@ -18,6 +19,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import javax.sql.DataSource;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
@@ -31,10 +34,11 @@ import java.util.SortedSet;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
 
-public class RelationalTextRepository implements TextRepository {
+public class RelationalTextRepository extends AbstractTextRepository {
 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert textInsert;
+
 
   public void setDataSource(DataSource dataSource) {
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));

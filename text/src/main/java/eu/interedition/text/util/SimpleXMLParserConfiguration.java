@@ -1,8 +1,14 @@
-package eu.interedition.text.xml;
+package eu.interedition.text.util;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.text.QName;
+import eu.interedition.text.xml.XMLEntity;
+import eu.interedition.text.xml.XMLParserConfiguration;
+import eu.interedition.text.xml.XMLParserModule;
+import eu.interedition.text.xml.module.LineElementXMLParserModule;
+import eu.interedition.text.xml.module.NotableCharacterXMLParserModule;
+import eu.interedition.text.xml.module.TextXMLParserModule;
 
 import java.util.List;
 import java.util.Set;
@@ -18,8 +24,7 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
   protected boolean compressingWhitespace = true;
   private int textBufferSize = 102400;
   private boolean removeLeadingWhitespace = true;
-  protected List<XMLParserModule> modules =//
-          Lists.<XMLParserModule>newArrayList(new LineElementXMLParserModule(), new NotableCharacterXMLParserModule(), new TextXMLParserModule());
+  protected List<XMLParserModule> modules = Lists.<XMLParserModule>newArrayList(new LineElementXMLParserModule(), new NotableCharacterXMLParserModule());
 
   public void addLineElement(QName lineElementName) {
     lineElements.add(lineElementName);

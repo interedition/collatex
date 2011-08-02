@@ -27,9 +27,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.rdbms.RelationalQNameRepository;
+import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.*;
+import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
+import eu.interedition.text.xml.module.TextXMLParserModule;
+import eu.interedition.text.xml.module.XMLParserModuleAdapter;
 import org.junit.After;
-import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,7 +117,7 @@ public abstract class AbstractXMLTest extends AbstractTest {
         final URI uri = AbstractXMLTest.class.getResource("/" + resource).toURI();
 
         stopWatch.start("Load " + uri);
-        final Text xml = xmlParser.load(new StreamSource(uri.toASCIIString()));
+        final Text xml = textRepository.create(new StreamSource(uri.toASCIIString()));
         stopWatch.stop();
 
         sources.put(resource, xml);
@@ -151,30 +154,17 @@ public abstract class AbstractXMLTest extends AbstractTest {
     pc.exclude(new SimpleQName(TEI_NS, "front"));
     pc.exclude(new SimpleQName(TEI_NS, "fw"));
 
-    pc.getModules().addAll(parserModules());
+
+    final List<XMLParserModule> parserModules = pc.getModules();
+    parserModules.add(new TextXMLParserModule(textRepository));
+    parserModules.add(new AnnotationStorageXMLParserModule(annotationRepository, annotationDataRepository));
+    parserModules.addAll(parserModules());
 
     return pc;
   }
 
   protected List<XMLParserModule> parserModules() {
-    return Lists.<XMLParserModule>newArrayList(new XMLParserModuleAdapter() {
-
-      Stack<Integer> startOffsetStack = new Stack<Integer>();
-      Stack<Map<QName, String>> attributeStack = new Stack<Map<QName, String>>();
-
-      @Override
-      public void start(XMLEntity entity, XMLParserState state) {
-        startOffsetStack.push(state.getTextOffset());
-        attributeStack.push(entity.getAttributes());
-      }
-
-      @Override
-      public void end(XMLEntity entity, XMLParserState state) {
-        final Range range = new Range(startOffsetStack.pop(), state.getTextOffset());
-        final Annotation annotation = annotationRepository.create(state.getTarget(), entity.getName(), range);
-        annotationDataRepository.set(annotation, attributeStack.pop());
-      }
-    });
+    return Lists.<XMLParserModule>newArrayList(new AnnotationStorageXMLParserModule(annotationRepository, annotationDataRepository));
   }
 
   /**

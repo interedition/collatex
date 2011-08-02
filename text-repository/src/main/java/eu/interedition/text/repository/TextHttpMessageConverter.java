@@ -71,7 +71,7 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
                 Closeables.close(textContent, false);
               }
             } else {
-              return xmlParser.load(new StreamSource(inputMessage.getBody()));
+              return textRepository.create(new StreamSource(inputMessage.getBody()));
             }
           } catch (IOException e) {
             throw Throwables.propagate(e);

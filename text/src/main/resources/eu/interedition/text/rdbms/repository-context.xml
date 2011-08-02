@@ -26,8 +26,7 @@
         <property name="textRepository" ref="textRepository" />
     </bean>
 
-    <bean id="eventGenerator" class="eu.interedition.text.event.TextEventGenerator">
-        <property name="nameRepository" ref="nameRepository" />
+    <bean id="eventSource" class="eu.interedition.text.event.AnnotationEventSource">
         <property name="annotationRepository" ref="annotationRepository" />
         <property name="textRepository" ref="textRepository" />
     </bean>

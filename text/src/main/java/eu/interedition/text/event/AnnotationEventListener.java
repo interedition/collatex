@@ -6,7 +6,7 @@ import eu.interedition.text.Range;
 import java.util.Set;
 
 
-public interface TextEventListener {
+public interface AnnotationEventListener {
 
   void start();
 

@@ -1,6 +1,9 @@
-package eu.interedition.text.xml;
+package eu.interedition.text.xml.module;
 
 import eu.interedition.text.Range;
+import eu.interedition.text.xml.XMLEntity;
+import eu.interedition.text.xml.XMLParserModule;
+import eu.interedition.text.xml.XMLParserState;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
