@@ -4,7 +4,8 @@ import eu.interedition.text.*;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.event.AnnotationEventListener;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.util.SimpleAnnotationPredicate;
+import eu.interedition.text.predicate.TextPredicate;
+import eu.interedition.text.predicate.AnnotationNamePredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,8 @@ public class Tokenizer {
   }
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
-    annotationRepository.delete(new SimpleAnnotationPredicate(text, TOKEN_NAME));
-    eventSource.listen(new TokenGeneratingListener(text, settings), new SimpleAnnotationPredicate(text), pageSize);
+    annotationRepository.delete(new TextPredicate(text), new AnnotationNamePredicate(TOKEN_NAME));
+    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, new TextPredicate(text));
   }
 
   private class TokenGeneratingListener implements AnnotationEventListener {

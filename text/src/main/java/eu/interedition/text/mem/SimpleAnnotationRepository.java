@@ -1,25 +1,20 @@
 package eu.interedition.text.mem;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
+import eu.interedition.text.predicate.*;
+import eu.interedition.text.predicate.Predicate;
+import eu.interedition.text.util.AbstractAnnotationRepository;
 import eu.interedition.text.util.Annotations;
-import eu.interedition.text.util.SimpleAnnotationPredicate;
 
 import java.util.*;
 
 import static com.google.common.collect.Iterables.*;
-import static eu.interedition.text.util.SimpleAnnotationPredicate.isNullOrEmpty;
-import static java.util.Collections.singleton;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class SimpleAnnotationRepository implements AnnotationRepository {
+public class SimpleAnnotationRepository extends AbstractAnnotationRepository {
   private Set<Annotation> annotations = Collections.synchronizedSet(new HashSet<Annotation>());
 
   public Annotation create(Text text, QName name, Range range) {
@@ -33,9 +28,11 @@ public class SimpleAnnotationRepository implements AnnotationRepository {
     return new SimpleAnnotationLink(name);
   }
 
-  public void delete(AnnotationLink annotationLink) {
-    for (Annotation a : ((SimpleAnnotationLink) annotationLink)) {
-      ((SimpleAnnotation) a).getLinks().remove(annotationLink);
+  public void deleteLinks(Iterable<Predicate> predicates) {
+    for (AnnotationLink annotationLink : findLinks(predicates).keySet()) {
+      for (Annotation a : ((SimpleAnnotationLink) annotationLink)) {
+        ((SimpleAnnotation) a).getLinks().remove(annotationLink);
+      }
     }
   }
 
@@ -57,35 +54,43 @@ public class SimpleAnnotationRepository implements AnnotationRepository {
     return Sets.newTreeSet(transform((SimpleText) text, Annotations.NAME));
   }
 
-  public Iterable<Annotation> find(final AnnotationPredicate predicate) {
+  public Iterable<Annotation> find(final Iterable<AnnotationPredicate> predicates) {
     Iterable<Annotation> annotations = Collections.unmodifiableSet(this.annotations);
-    if (!isNullOrEmpty(predicate.annotationEquals())) {
-      annotations = filter(annotations, new Predicate<Annotation>() {
+
+    final Set<Annotation> equals = Sets.newHashSet(transform(filter(predicates, AnnotationIdentityPredicate.class), AnnotationIdentityPredicate.TO_ANNOTATION));
+    if (!equals.isEmpty()) {
+      annotations = filter(annotations, new com.google.common.base.Predicate<Annotation>() {
         public boolean apply(Annotation input) {
-          return predicate.annotationEquals().contains(input);
+          return equals.contains(input);
         }
       });
     }
-    if (!isNullOrEmpty(predicate.annotationAnnotates())) {
-      annotations = filter(annotations, new Predicate<Annotation>() {
+    final Set<Text> texts = Sets.newHashSet(transform(filter(predicates, TextPredicate.class), TextPredicate.TO_TEXT));
+    if (!texts.isEmpty()) {
+      annotations = filter(annotations, new com.google.common.base.Predicate<Annotation>() {
         public boolean apply(Annotation input) {
-          return predicate.annotationAnnotates().contains(((SimpleAnnotation) input).getText());
+          return texts.contains(((SimpleAnnotation) input).getText());
         }
       });
     }
-    if (!isNullOrEmpty(predicate.annotationhasName())) {
-      annotations = filter(annotations, new Predicate<Annotation>() {
+
+    final Set<QName> names = Sets.newHashSet(transform(filter(predicates, AnnotationNamePredicate.class), AnnotationNamePredicate.TO_NAME));
+    if (!names.isEmpty()) {
+      annotations = filter(annotations, new com.google.common.base.Predicate<Annotation>() {
         public boolean apply(Annotation input) {
-          return predicate.annotationhasName().contains(input.getName());
+          return names.contains(input.getName());
         }
       });
     }
-    if (!isNullOrEmpty(predicate.annotationOverlaps())) {
-      annotations = filter(annotations, new Predicate<Annotation>() {
+
+    final Iterable<TextRangePredicate> ranges = filter(predicates, TextRangePredicate.class);
+    if (!isEmpty(ranges)) {
+      annotations = filter(annotations, new com.google.common.base.Predicate<Annotation>() {
         public boolean apply(final Annotation annotation) {
-          return any(predicate.annotationOverlaps(), new Predicate<Range>() {
-            public boolean apply(Range range) {
-              return annotation.getRange().hasOverlapWith(range);
+          return any(ranges, new com.google.common.base.Predicate<TextRangePredicate>() {
+            public boolean apply(TextRangePredicate p) {
+              final Text text = ((SimpleAnnotation) annotation).getText();
+              return text.equals(p.getText()) && annotation.getRange().hasOverlapWith(p.getRange());
             }
           });
         }
@@ -94,7 +99,7 @@ public class SimpleAnnotationRepository implements AnnotationRepository {
     return annotations;
   }
 
-  public void delete(AnnotationPredicate predicate) {
+  public void delete(Iterable<AnnotationPredicate> predicate) {
     for (Annotation a : Sets.newHashSet(find(predicate))) {
       for (AnnotationLink l : ((SimpleAnnotation) a).getLinks()) {
         ((SimpleAnnotationLink) l).remove(a);
@@ -104,12 +109,13 @@ public class SimpleAnnotationRepository implements AnnotationRepository {
     }
   }
 
-  public Map<AnnotationLink, Set<Annotation>> findLinks(Set<Text> texts, final Set<QName> setNames, final Set<QName> names, final Map<Text, Set<Range>> ranges) {
+  public Map<AnnotationLink, Set<Annotation>> findLinks(Iterable<Predicate> predicates) {
+    /*
     Preconditions.checkArgument(texts != null && !texts.isEmpty());
     Iterable<Annotation> annotations = concat(transform(texts, new Function<Text, Iterable<Annotation>>() {
 
       public Iterable<Annotation> apply(Text input) {
-        return find(new SimpleAnnotationPredicate(null, singleton(input), names, ranges == null ? null : ranges.get(input)));
+        return find(new AnnotatedText(input), names, ranges == null ? null : ranges.get(input)));
       }
     }));
     if (setNames != null && !setNames.isEmpty()) {
@@ -126,7 +132,7 @@ public class SimpleAnnotationRepository implements AnnotationRepository {
 
     final Map<AnnotationLink, Set<Annotation>> result = Maps.newHashMap();
     for (Annotation a : annotations) {
-      for (AnnotationLink l : ((SimpleAnnotation)a).getLinks()) {
+      for (AnnotationLink l : ((SimpleAnnotation) a).getLinks()) {
         Set<Annotation> linkedAnnotations = result.get(l);
         if (linkedAnnotations == null) {
           result.put(l, linkedAnnotations = Sets.newHashSet());
@@ -136,5 +142,7 @@ public class SimpleAnnotationRepository implements AnnotationRepository {
     }
 
     return result;
+    */
+    throw new UnsupportedOperationException();
   }
 }

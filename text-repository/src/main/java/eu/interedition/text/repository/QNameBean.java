@@ -1,12 +1,8 @@
 package eu.interedition.text.repository;
 
 import eu.interedition.text.QName;
-import eu.interedition.text.rdbms.RelationalQName;
 import eu.interedition.text.util.QNames;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonValue;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.net.URI;
 

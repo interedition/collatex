@@ -22,18 +22,16 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
 import eu.interedition.text.Range;
+import eu.interedition.text.Text;
 import eu.interedition.text.util.Annotations;
-
-import java.io.Serializable;
 
 public class RelationalAnnotation implements Annotation {
   protected int id;
   protected QName name;
-  protected RelationalText text;
+  protected Text text;
   protected Range range;
 
   public RelationalAnnotation() {
@@ -55,11 +53,11 @@ public class RelationalAnnotation implements Annotation {
     this.name = name;
   }
 
-  public RelationalText getText() {
+  public Text getText() {
     return text;
   }
 
-  public void setText(RelationalText text) {
+  public void setText(Text text) {
     this.text = text;
   }
 

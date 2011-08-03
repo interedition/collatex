@@ -34,6 +34,8 @@ public interface Annotation extends Comparable<Annotation> {
    */
   final URI INTEREDITION_NS_URI = URI.create("http://interedition.eu/ns");
 
+  Text getText();
+
   QName getName();
 
   Range getRange();

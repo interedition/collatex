@@ -28,10 +28,11 @@ import com.google.common.collect.Sets;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.rdbms.RelationalQNameRepository;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
-import eu.interedition.text.xml.*;
+import eu.interedition.text.xml.XMLParser;
+import eu.interedition.text.xml.XMLParserConfiguration;
+import eu.interedition.text.xml.XMLParserModule;
 import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
 import eu.interedition.text.xml.module.TextXMLParserModule;
-import eu.interedition.text.xml.module.XMLParserModuleAdapter;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.AfterTransaction;
@@ -40,7 +41,10 @@ import org.springframework.util.StopWatch;
 
 import javax.xml.transform.stream.StreamSource;
 import java.net.URI;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * Base class for tests working with documents generated from XML test resources.

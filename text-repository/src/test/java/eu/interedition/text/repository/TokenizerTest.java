@@ -5,9 +5,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.util.SimpleAnnotationPredicate;
+import eu.interedition.text.predicate.AnnotationNamePredicate;
+import eu.interedition.text.predicate.TextPredicate;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
+import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
+import eu.interedition.text.xml.module.TextXMLParserModule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,22 +43,31 @@ public class TokenizerTest extends AbstractTest {
   private AnnotationRepository annotationRepository;
 
   @Autowired
+  private AnnotationDataRepository annotationDataRepository;
+
+  @Autowired
   private Tokenizer tokenizer;
 
   @Test
   public void tokenize() throws IOException, TransformerException, XMLStreamException {
-    final SimpleXMLParserConfiguration parserConfiguration = new SimpleXMLParserConfiguration();
-    parserConfiguration.exclude(new SimpleQName(TEI_NS, "teiHeader"));
-    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "subst"));
-    parserConfiguration.addContainerElement(new SimpleQName(TEI_NS, "choice"));
-    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "lb"));
-    parserConfiguration.addLineElement(new SimpleQName(TEI_NS, "pb"));
+    final SimpleXMLParserConfiguration pc = new SimpleXMLParserConfiguration();
+
+    pc.exclude(new SimpleQName(TEI_NS, "teiHeader"));
+
+    pc.addContainerElement(new SimpleQName(TEI_NS, "subst"));
+    pc.addContainerElement(new SimpleQName(TEI_NS, "choice"));
+
+    pc.addLineElement(new SimpleQName(TEI_NS, "lb"));
+    pc.addLineElement(new SimpleQName(TEI_NS, "pb"));
+
+    pc.getModules().add(new TextXMLParserModule(textRepository));
+    pc.getModules().add(new AnnotationStorageXMLParserModule(annotationRepository, annotationDataRepository));
 
     for (String resource : new String[]{"/igntp/0101.xml", "/igntp/0105.xml", "/igntp/0109.xml"}) {
       LOG.info(Strings.padStart("Tokenizing " + resource, 100, '='));
 
       final Text source = textRepository.create(new StreamSource(getClass().getResourceAsStream(resource)));
-      final Text text = parser.parse(source, parserConfiguration);
+      final Text text = parser.parse(source, pc);
 
       tokenizer.tokenize(text, new WhitespaceTokenizerSettings(true));
       printTokenizedWitness(text);
@@ -68,7 +80,7 @@ public class TokenizerTest extends AbstractTest {
     int read = 0;
 
     final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
-    for (Annotation token : annotationRepository.find(new SimpleAnnotationPredicate(text, Tokenizer.TOKEN_NAME))) {
+    for (Annotation token : annotationRepository.find(new TextPredicate(text), new AnnotationNamePredicate(Tokenizer.TOKEN_NAME))) {
       final Range range = token.getRange();
       if (read < range.getStart()) {
         ranges.put(new Range(read, range.getStart()), false);

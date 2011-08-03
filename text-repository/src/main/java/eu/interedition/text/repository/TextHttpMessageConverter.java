@@ -34,9 +34,6 @@ import java.nio.charset.Charset;
 public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text> implements InitializingBean {
 
   @Autowired
-  private XMLParser xmlParser;
-
-  @Autowired
   private RelationalTextRepository textRepository;
 
   @Autowired

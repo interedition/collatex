@@ -1,24 +1,23 @@
 package eu.interedition.text.util;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
+import eu.interedition.text.Text;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Annotations {
   public static int compare(Annotation a, Annotation b) {
-    final int rangeComparison = a.getRange().compareTo(b.getRange());
-    if (rangeComparison != 0) {
-      return rangeComparison;
-    }
-    final int nameComparison = a.getName().compareTo(b.getName());
-    if (nameComparison != 0) {
-      return nameComparison;
-    }
-    return Ordering.arbitrary().compare(a, b);
+    return ComparisonChain.start()
+            .compare(a.getRange(), b.getRange())
+            .compare(a.getName(), b.getName())
+            .compare(a, b, Ordering.arbitrary())
+            .result();
   }
 
   public static final Function<Annotation, QName> NAME = new Function<Annotation, QName>() {

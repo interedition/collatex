@@ -36,9 +36,6 @@ public class TextController {
   protected static final int MAX_TEXT_LENGTH = 102400;
 
   @Autowired
-  private XMLParser xmlParser;
-
-  @Autowired
   private RelationalTextRepository textRepository;
 
   @Autowired

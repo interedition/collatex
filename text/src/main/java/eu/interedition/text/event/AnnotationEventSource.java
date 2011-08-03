@@ -3,17 +3,19 @@ package eu.interedition.text.event;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
-import eu.interedition.text.util.SimpleAnnotationPredicate;
+import eu.interedition.text.predicate.TextPredicate;
+import eu.interedition.text.predicate.AnnotationPredicate;
+import eu.interedition.text.predicate.TextRangePredicate;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Set;
-import java.util.SortedMap;
+import java.util.*;
 
-import static eu.interedition.text.util.SimpleAnnotationPredicate.isNullOrEmpty;
 import static java.util.Collections.singleton;
 
 public class AnnotationEventSource {
@@ -37,18 +39,30 @@ public class AnnotationEventSource {
     this.textRepository = textRepository;
   }
 
-  public void listen(final AnnotationEventListener listener, final AnnotationPredicate predicate) throws IOException {
-    listen(listener, predicate, Integer.MAX_VALUE);
+  public void listen(final AnnotationEventListener listener, final AnnotationPredicate... predicates) throws IOException {
+    listen(listener, Integer.MAX_VALUE, Arrays.asList(predicates));
   }
 
-  public void listen(final AnnotationEventListener listener, final AnnotationPredicate predicate, final int pageSize) throws IOException {
-    Preconditions.checkArgument(isNullOrEmpty(predicate.annotationOverlaps()));
+  public void listen(final AnnotationEventListener listener, final int pageSize, final AnnotationPredicate... predicates) throws IOException {
+    listen(listener, pageSize, Arrays.asList(predicates));
+  }
 
-    if (isNullOrEmpty(predicate.annotationAnnotates())) {
+  public void listen(final AnnotationEventListener listener, final Iterable<AnnotationPredicate> predicates) throws IOException {
+    listen(listener, Integer.MAX_VALUE, predicates);
+  }
+
+  public void listen(final AnnotationEventListener listener, final int pageSize, final Iterable<AnnotationPredicate> predicates) throws IOException {
+    final List<AnnotationPredicate> predicateList = Lists.newArrayList(predicates);
+    Preconditions.checkArgument(Iterables.isEmpty(Iterables.filter(predicateList, TextRangePredicate.class)));
+
+    final List<TextPredicate> textPredicates = Lists.newArrayList(Iterables.filter(predicateList, TextPredicate.class));
+    if (textPredicates.isEmpty()) {
       return;
     }
+    predicateList.removeAll(textPredicates);
 
-    for (final Text text : predicate.annotationAnnotates()) {
+    for (final TextPredicate textPredicate : textPredicates) {
+      final Text text = textPredicate.getText();
       textRepository.read(text, new TextRepository.TextReader() {
 
         public void read(Reader content, int contentLength) throws IOException {
@@ -65,10 +79,7 @@ public class AnnotationEventSource {
             if ((offset % pageSize) == 0) {
               pageEnd = Math.min(offset + pageSize, contentLength);
               final Range pageRange = new Range(offset, pageEnd);
-              for (Annotation a : annotationRepository.find(new SimpleAnnotationPredicate(predicate.annotationEquals(),
-                      singleton(text),
-                      predicate.annotationhasName(),
-                      singleton(pageRange)))) {
+              for (Annotation a : annotationRepository.find(Iterables.<AnnotationPredicate>concat(predicateList, singleton(new TextRangePredicate(text, pageRange))))) {
                 final int start = a.getRange().getStart();
                 final int end = a.getRange().getEnd();
                 if (start >= offset) {
