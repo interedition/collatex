@@ -7,9 +7,13 @@ import com.google.common.collect.Sets;
 import eu.interedition.text.QName;
 import eu.interedition.text.QNameRepository;
 import eu.interedition.text.util.SQL;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 import javax.sql.DataSource;
 import java.net.URI;
@@ -17,22 +21,36 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class RelationalQNameRepository implements QNameRepository {
+public class RelationalQNameRepository implements QNameRepository, InitializingBean {
 
   private DataSource dataSource;
-  private SimpleJdbcTemplate jt;
-
-  private Map<QName, RelationalQName> nameCache;
-
+  private DataFieldMaxValueIncrementerFactory incrementerFactory;
   private int cacheSize = 1000;
 
+  private SimpleJdbcTemplate jt;
+  private SimpleJdbcInsert nameInsert;
+  private DataFieldMaxValueIncrementer nameIdIncrementer;
+
+  private Map<QName, Long> nameCache;
+
+  @Required
   public void setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
-    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+  }
+
+  @Required
+  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
+    this.incrementerFactory = incrementerFactory;
   }
 
   public void setCacheSize(int cacheSize) {
     this.cacheSize = cacheSize;
+  }
+
+  public void afterPropertiesSet() throws Exception {
+    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.nameInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname");
+    this.nameIdIncrementer = this.incrementerFactory.create("text_qname");
   }
 
   public QName get(QName name) {
@@ -63,9 +81,10 @@ public class RelationalQNameRepository implements QNameRepository {
     final Set<QName> foundNames = Sets.newHashSetWithExpectedSize(names.size());
 
     for (Iterator<QName> it = names.iterator(); it.hasNext(); ) {
-      final RelationalQName relationalQName = nameCache.get(it.next());
-      if (relationalQName != null) {
-        foundNames.add(relationalQName);
+      final QName name = it.next();
+      final Long id = nameCache.get(name);
+      if (id != null) {
+        foundNames.add(new RelationalQName(id, name));
         it.remove();
       }
     }
@@ -95,23 +114,28 @@ public class RelationalQNameRepository implements QNameRepository {
       for (RelationalQName name : jt.query(sql.toString(), ROW_MAPPER, ps.toArray(new Object[ps.size()]))) {
         foundNames.add(name);
         names.remove(name);
-        nameCache.put(name, name);
+        nameCache.put(name, name.getId());
       }
 
-      final SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("text_qname").usingGeneratedKeyColumns("id");
+      final List<RelationalQName> created = Lists.newArrayListWithExpectedSize(names.size());
+      final List<MapSqlParameterSource> nameBatch = Lists.newArrayListWithExpectedSize(names.size());
       for (QName name : names) {
+        final long id = nameIdIncrementer.nextLongValue();
         final String localName = name.getLocalName();
         final URI ns = name.getNamespaceURI();
 
-        final Map<String, Object> namePs = new HashMap<String, Object>();
-        namePs.put("local_name", localName);
-        namePs.put("namespace", ns == null ? null : ns.toString());
+        nameBatch.add(new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("local_name", localName)
+                .addValue("namespace",  ns == null ? null : ns.toString()));
 
-        final RelationalQName created = new RelationalQName(ns, localName);
-        created.setId(insert.executeAndReturnKey(namePs).intValue());
+        created.add(new RelationalQName(id, name));
+      }
+      nameInsert.executeBatch(nameBatch.toArray(new MapSqlParameterSource[nameBatch.size()]));
 
-        foundNames.add(created);
-        nameCache.put(created, created);
+      for (RelationalQName n : created) {
+        foundNames.add(n);
+        nameCache.put(n, n.getId());
       }
     }
 
@@ -123,7 +147,7 @@ public class RelationalQNameRepository implements QNameRepository {
     if (jt.queryForInt("select count(*) from text_qname") <= cacheSize) {
       // warm-up cache
       for (RelationalQName name : jt.query("select " + selectNameFrom("n") + " from text_qname n", ROW_MAPPER)) {
-        nameCache.put(name, name);
+        nameCache.put(name, name.getId());
       }
     }
   }

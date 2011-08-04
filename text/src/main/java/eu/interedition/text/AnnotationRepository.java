@@ -11,7 +11,9 @@ public interface AnnotationRepository {
 
   SortedSet<QName> names(Text text);
 
-  Annotation create(Text text, QName name, Range range);
+  Iterable<Annotation> create(Annotation... annotations);
+
+  Iterable<Annotation> create(Iterable<Annotation> annotations);
 
   Iterable<Annotation> find(Iterable<AnnotationPredicate> predicates);
 
@@ -21,7 +23,9 @@ public interface AnnotationRepository {
 
   void delete(AnnotationPredicate... predicates);
 
-  AnnotationLink createLink(QName name);
+  Iterable<AnnotationLink> createLink(QName... names);
+
+  Iterable<AnnotationLink> createLink(Iterable<QName> names);
 
   Map<AnnotationLink, Set<Annotation>> findLinks(Iterable<Predicate> predicates);
 

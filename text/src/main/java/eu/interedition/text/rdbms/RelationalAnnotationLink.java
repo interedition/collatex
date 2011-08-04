@@ -8,15 +8,15 @@ import eu.interedition.text.QName;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class RelationalAnnotationLink implements AnnotationLink {
-  private int id;
+  private long id;
   private QName name;
 
-  public RelationalAnnotationLink(int id, QName name) {
+  public RelationalAnnotationLink(long id, QName name) {
     this.id = id;
     this.name = name;
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 

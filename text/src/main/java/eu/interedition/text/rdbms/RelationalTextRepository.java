@@ -8,19 +8,19 @@ import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextRepository;
 import eu.interedition.text.util.AbstractTextRepository;
 import eu.interedition.text.util.SQL;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 import javax.sql.DataSource;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
@@ -34,29 +34,47 @@ import java.util.SortedSet;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
 
-public class RelationalTextRepository extends AbstractTextRepository {
+public class RelationalTextRepository extends AbstractTextRepository implements InitializingBean {
+
+  private DataSource dataSource;
+  private DataFieldMaxValueIncrementerFactory incrementerFactory;
 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert textInsert;
+  private DataFieldMaxValueIncrementer textIdIncrementer;
 
-
+  @Required
   public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  @Required
+  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
+    this.incrementerFactory = incrementerFactory;
+  }
+
+  public void afterPropertiesSet() throws Exception {
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
-    this.textInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_content").usingGeneratedKeyColumns("id"));
+    this.textInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_content"));
+    this.textIdIncrementer = incrementerFactory.create("text_content");
   }
 
   public Text create(Text.Type type) {
+    final long id = textIdIncrementer.nextLongValue();
     final Date created = new Date();
 
     final Map<String, Object> textData = Maps.newHashMap();
+    textData.put("id", id);
     textData.put("created", created);
     textData.put("type", type.ordinal());
     textData.put("content", "");
 
+    textInsert.execute(textData);
+
     final RelationalText relationalText = new RelationalText();
+    relationalText.setId(id);
     relationalText.setCreated(created);
     relationalText.setType(type);
-    relationalText.setId(textInsert.executeAndReturnKey(textData).intValue());
 
     return relationalText;
   }
@@ -145,7 +163,7 @@ public class RelationalTextRepository extends AbstractTextRepository {
     jt.getJdbcOperations().execute("update text_content set content = ? where id = ?", new PreparedStatementCallback<Void>() {
       public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
         ps.setCharacterStream(1, new BufferedReader(contents), contentLength);
-        ps.setInt(2, ((RelationalText) text).getId());
+        ps.setLong(2, ((RelationalText) text).getId());
         ps.executeUpdate();
         return null;
       }
@@ -159,7 +177,7 @@ public class RelationalTextRepository extends AbstractTextRepository {
 
               public T mapRow(ResultSet rs, int rowNum) throws SQLException {
                 try {
-                  return (callback.result = callback.read(rs.getClob(1)));
+                  return callback.read(rs.getClob(1));
                 } catch (IOException e) {
                   throw new SQLException(e);
                 }
@@ -189,7 +207,6 @@ public class RelationalTextRepository extends AbstractTextRepository {
 
   private abstract class ReaderCallback<T> {
     private final RelationalText text;
-    private T result;
 
     private ReaderCallback(Text text) {
       this.text = (RelationalText) text;

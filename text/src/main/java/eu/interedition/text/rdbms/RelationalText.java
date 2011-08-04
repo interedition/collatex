@@ -9,15 +9,15 @@ import java.util.Date;
 import java.util.Set;
 
 public class RelationalText implements Text {
-  private int id;
+  private long id;
   private Date created;
   private Type type;
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 
@@ -39,7 +39,7 @@ public class RelationalText implements Text {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("id", Integer.toString(id)).toString();
+    return Objects.toStringHelper(this).add("id", Long.toString(id)).toString();
   }
 
   @Override
@@ -52,7 +52,7 @@ public class RelationalText implements Text {
 
   @Override
   public int hashCode() {
-    return (id == 0 ? super.hashCode() : id);
+    return (id == 0 ? super.hashCode() : Objects.hashCode(id));
   }
 
 }

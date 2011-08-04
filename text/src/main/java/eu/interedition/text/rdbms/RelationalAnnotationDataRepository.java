@@ -1,6 +1,8 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.AnnotationLink;
 import eu.interedition.text.QName;
@@ -10,6 +12,8 @@ import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
@@ -39,41 +43,57 @@ public class RelationalAnnotationDataRepository extends AbstractAnnotationDataRe
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
   }
 
-  public void set(Annotation annotation, Map<QName, String> data) {
-    final int annotationId = ((RelationalAnnotation) annotation).getId();
-    final List<Map<String, Object>> batchParams = new ArrayList<Map<String, Object>>(data.size());
-    for (QName name : nameRepository.get(data.keySet())) {
-      final int nameId = ((RelationalQName) name).getId();
-      if (jt.update("update text_annotation_data set value = ? where annotation = ? and name = ?",
-              data.get(name), annotationId, nameId) == 0) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("annotation", annotationId);
-        params.put("name", nameId);
-        params.put("value", data.get(name));
-        batchParams.add(params);
+  public void afterPropertiesSet() throws Exception {
+    annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
+    linkDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link_data");
+  }
+
+  public void set(Map<Annotation, Map<QName, String>> data) {
+    final Set<QName> names = Sets.newHashSet();
+    for (Map<QName, String> annotationData : data.values()) {
+      for (QName n : annotationData.keySet()) {
+        names.add(n);
+      }
+    }
+    final Map<QName, Long> nameIdIndex = Maps.newHashMapWithExpectedSize(names.size());
+    for (QName n : nameRepository.get(names)) {
+      nameIdIndex.put(n, ((RelationalQName) n).getId());
+    }
+
+    final List<SqlParameterSource> batchParams = new ArrayList<SqlParameterSource>(data.size());
+    for (Map.Entry<Annotation, Map<QName, String>> annotationData : data.entrySet()) {
+      final long annotationId = ((RelationalAnnotation) annotationData.getKey()).getId();
+      for (Map.Entry<QName, String> dataEntry : annotationData.getValue().entrySet()) {
+        batchParams.add(new MapSqlParameterSource()
+                .addValue("annotation", annotationId)
+                .addValue("name", nameIdIndex.get(dataEntry.getKey()))
+                .addValue("value", dataEntry.getValue()));
       }
     }
     if (!batchParams.isEmpty()) {
-      annotationDataInsert.executeBatch(batchParams.toArray(new Map[batchParams.size()]));
+      annotationDataInsert.executeBatch(batchParams.toArray(new SqlParameterSource[batchParams.size()]));
     }
   }
 
+  public void set(Annotation annotation, Map<QName, String> data) {
+    set(Collections.singletonMap(annotation, data));
+  }
+
   public void set(AnnotationLink link, Map<QName, String> data) {
-    final int linkId = ((RelationalAnnotationLink) link).getId();
-    final List<Map<String, Object>> batchParams = new ArrayList<Map<String, Object>>(data.size());
+    final long linkId = ((RelationalAnnotationLink) link).getId();
+    final List<SqlParameterSource> batchParams = new ArrayList<SqlParameterSource>(data.size());
     for (QName name : nameRepository.get(data.keySet())) {
-      final int nameId = ((RelationalQName) name).getId();
+      final long nameId = ((RelationalQName) name).getId();
       if (jt.update("update text_annotation_link_data set value = ? where link = ? and name = ?",
               data.get(name), linkId, nameId) == 0) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("link", linkId);
-        params.put("name", nameId);
-        params.put("value", data.get(name));
-        batchParams.add(params);
+        batchParams.add(new MapSqlParameterSource()
+                .addValue("link", linkId)
+                .addValue("name", nameId)
+                .addValue("value", data.get(name)));
       }
     }
     if (!batchParams.isEmpty()) {
-      linkDataInsert.executeBatch(batchParams.toArray(new Map[batchParams.size()]));
+      linkDataInsert.executeBatch(batchParams.toArray(new SqlParameterSource[batchParams.size()]));
     }
   }
 
@@ -148,10 +168,5 @@ public class RelationalAnnotationDataRepository extends AbstractAnnotationDataRe
 
   public static String mapDataFrom(ResultSet rs, String prefix) throws SQLException {
     return rs.getString(prefix + "_value");
-  }
-
-  public void afterPropertiesSet() throws Exception {
-    annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
-    linkDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link_data");
   }
 }

@@ -10,9 +10,14 @@ import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.predicate.*;
 import eu.interedition.text.util.AbstractAnnotationRepository;
 import eu.interedition.text.util.SQL;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -33,28 +38,39 @@ import static eu.interedition.text.rdbms.RelationalQNameRepository.selectNameFro
 import static eu.interedition.text.rdbms.RelationalTextRepository.mapTextFrom;
 import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom;
 
-public class RelationalAnnotationRepository extends AbstractAnnotationRepository {
+public class RelationalAnnotationRepository extends AbstractAnnotationRepository implements InitializingBean {
 
-  private SimpleJdbcTemplate jt;
+  private DataSource dataSource;
+  private DataFieldMaxValueIncrementerFactory incrementerFactory;
   private RelationalQNameRepository nameRepository;
   private RelationalTextRepository textRepository;
+
+  private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert annotationInsert;
-  private SimpleJdbcInsert annotationSetInsert;
+  private SimpleJdbcInsert annotationLinkInsert;
   private SimpleJdbcInsert annotationLinkTargetInsert;
   private SAXParserFactory saxParserFactory;
-  private int batchSize = 10000;
 
+  private int batchSize = 10000;
+  private DataFieldMaxValueIncrementer annotationIdIncrementer;
+  private DataFieldMaxValueIncrementer annotationLinkIdIncrementer;
+
+  @Required
   public void setDataSource(DataSource dataSource) {
-    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
-    this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation").usingGeneratedKeyColumns("id"));
-    this.annotationSetInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link").usingGeneratedKeyColumns("id"));
-    this.annotationLinkTargetInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link_target"));
+    this.dataSource = dataSource;
   }
 
+  @Required
+  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
+    this.incrementerFactory = incrementerFactory;
+  }
+
+  @Required
   public void setNameRepository(RelationalQNameRepository nameRepository) {
     this.nameRepository = nameRepository;
   }
 
+  @Required
   public void setTextRepository(RelationalTextRepository textRepository) {
     this.textRepository = textRepository;
   }
@@ -63,29 +79,78 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     this.batchSize = batchSize;
   }
 
-  public Annotation create(Text text, QName name, Range range) {
-    final RelationalAnnotation created = new RelationalAnnotation();
-    created.setText((RelationalText) text);
-    created.setName(nameRepository.get(name));
-    created.setRange(range == null ? Range.NULL : range);
+  public void afterPropertiesSet() throws Exception {
+    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation"));
+    this.annotationLinkInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link"));
+    this.annotationLinkTargetInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link_target"));
 
-    final HashMap<String, Object> annotationData = Maps.newHashMap();
-    annotationData.put("text", ((RelationalText) text).getId());
-    annotationData.put("name", ((RelationalQName) nameRepository.get(name)).getId());
-    annotationData.put("range_start", range.getStart());
-    annotationData.put("range_end", range.getEnd());
-    created.setId(annotationInsert.executeAndReturnKey(annotationData).intValue());
+    this.saxParserFactory = SAXParserFactory.newInstance();
+    this.saxParserFactory.setNamespaceAware(true);
+    this.saxParserFactory.setValidating(false);
+
+    this.annotationIdIncrementer = incrementerFactory.create("text_annotation");
+    this.annotationLinkIdIncrementer = incrementerFactory.create("text_annotation_link");
+  }
+
+  public Iterable<Annotation> create(Iterable<Annotation> annotations) {
+    final Set<QName> names = Sets.newHashSet();
+    for (Annotation a : annotations) {
+      names.add(a.getName());
+    }
+    final Map<QName, Long> nameIdIndex = Maps.newHashMapWithExpectedSize(names.size());
+    for (QName name : nameRepository.get(names)) {
+      nameIdIndex.put(name, ((RelationalQName) name).getId());
+    }
+
+    final List<Annotation> created = Lists.newArrayList();
+    final List<SqlParameterSource> batchParameters = Lists.newArrayList();
+    for (Annotation a : annotations) {
+      final long id = annotationIdIncrementer.nextLongValue();
+      final Long nameId = nameIdIndex.get(a.getName());
+      final Range range = a.getRange();
+
+      batchParameters.add(new MapSqlParameterSource()
+              .addValue("id", id)
+              .addValue("text", ((RelationalText) a.getText()).getId())
+              .addValue("name", nameId)
+              .addValue("range_start", range.getStart())
+              .addValue("range_end", range.getEnd()));
+
+      final RelationalAnnotation ra = new RelationalAnnotation();
+      ra.setId(id);
+      ra.setText(a.getText());
+      ra.setName(new RelationalQName(nameId, a.getName()));
+      ra.setRange(range);
+      created.add(ra);
+    }
+
+    annotationInsert.executeBatch(batchParameters.toArray(new SqlParameterSource[batchParameters.size()]));
 
     return created;
   }
 
-  public AnnotationLink createLink(QName name) {
-    RelationalQName relationalQName = (RelationalQName) nameRepository.get(name);
+  public Iterable<AnnotationLink> createLink(Iterable<QName> names) {
+    final Map<QName, Long> nameIdIndex = Maps.newHashMap();
+    for (QName n : nameRepository.get(Sets.newHashSet(names))) {
+      nameIdIndex.put(n, ((RelationalQName)n).getId());
+    }
 
-    final Map<String, Object> setData = Maps.newHashMap();
-    setData.put("name", relationalQName.getId());
+    final List<AnnotationLink> created = Lists.newArrayList();
+    final List<SqlParameterSource> batchParameters = Lists.newArrayList();
+    for (QName n : names) {
+      final long id = annotationLinkIdIncrementer.nextLongValue();
+      final Long nameId = nameIdIndex.get(n);
 
-    return new RelationalAnnotationLink(annotationSetInsert.executeAndReturnKey(setData).intValue(), relationalQName);
+      batchParameters.add(new MapSqlParameterSource()
+              .addValue("id", id)
+              .addValue("name", nameId));
+
+      created.add(new RelationalAnnotationLink(id, new RelationalQName(nameId, n)));
+    }
+
+    annotationLinkInsert.executeBatch(batchParameters.toArray(new SqlParameterSource[batchParameters.size()]));
+    return created;
   }
 
   public void delete(Iterable<AnnotationPredicate> predicates) {
@@ -128,11 +193,11 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     if (toAdd == null || toAdd.isEmpty()) {
       return;
     }
-    final int setId = ((RelationalAnnotationLink) to).getId();
+    final long linkId = ((RelationalAnnotationLink) to).getId();
     final List<Map<String, Object>> psList = new ArrayList<Map<String, Object>>(toAdd.size());
     for (RelationalAnnotation annotation : Iterables.filter(toAdd, RelationalAnnotation.class)) {
       final Map<String, Object> ps = new HashMap<String, Object>(2);
-      ps.put("link", setId);
+      ps.put("link", linkId);
       ps.put("target", annotation.getId());
       psList.add(ps);
     }
@@ -373,7 +438,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
               return;
             }
             try {
-              saxParserFactory().newSAXParser().parse(new InputSource(content), new DefaultHandler() {
+              saxParserFactory.newSAXParser().parse(new InputSource(content), new DefaultHandler() {
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                   names.add(new SimpleQName(uri, localName));
@@ -400,20 +465,11 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
 
 
   public static RelationalAnnotation mapAnnotationFrom(ResultSet rs, RelationalText text, RelationalQName name, String tableName) throws SQLException {
-    final RelationalAnnotation relationalAnnotation = new RelationalAnnotation();
-    relationalAnnotation.setId(rs.getInt(tableName + "_id"));
-    relationalAnnotation.setName(name);
-    relationalAnnotation.setText(text);
-    relationalAnnotation.setRange(new Range(rs.getInt(tableName + "_range_start"), rs.getInt(tableName + "_range_end")));
-    return relationalAnnotation;
-  }
-
-  protected SAXParserFactory saxParserFactory() {
-    if (saxParserFactory == null) {
-      saxParserFactory = SAXParserFactory.newInstance();
-      saxParserFactory.setNamespaceAware(true);
-      saxParserFactory.setValidating(false);
-    }
-    return saxParserFactory;
+    final RelationalAnnotation ra = new RelationalAnnotation();
+    ra.setId(rs.getInt(tableName + "_id"));
+    ra.setName(name);
+    ra.setText(text);
+    ra.setRange(new Range(rs.getInt(tableName + "_range_start"), rs.getInt(tableName + "_range_end")));
+    return ra;
   }
 }

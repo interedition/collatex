@@ -1,14 +1,11 @@
 package eu.interedition.text.util;
 
-import com.google.common.collect.Maps;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.AnnotationDataRepository;
 import eu.interedition.text.AnnotationLink;
 import eu.interedition.text.QName;
 
 import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

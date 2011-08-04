@@ -6,7 +6,6 @@ import com.google.common.io.Closeables;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.rdbms.RelationalTextRepository;
-import eu.interedition.text.xml.XMLParser;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpInputMessage;

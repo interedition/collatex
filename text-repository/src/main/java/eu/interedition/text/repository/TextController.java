@@ -7,7 +7,6 @@ import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
-import eu.interedition.text.xml.XMLParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.stereotype.Controller;
@@ -97,6 +96,6 @@ public class TextController {
   }
 
   public static String redirectTo(Text text) {
-    return "redirect:" + URL_PREFIX + "/" + Integer.toString(((RelationalText) text).getId());
+    return "redirect:" + URL_PREFIX + "/" + Long.toString(((RelationalText) text).getId());
   }
 }

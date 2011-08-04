@@ -1,12 +1,9 @@
 package eu.interedition.text.xml;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleQName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

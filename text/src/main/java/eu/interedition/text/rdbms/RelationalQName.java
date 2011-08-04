@@ -31,17 +31,21 @@ public class RelationalQName implements QName {
 
   private static final Pattern STR_REPR = Pattern.compile("^\\{([^\\}]*)\\}(.+)$");
 
-  private int id;
+  private long id;
   private URI namespace;
   private String localName;
 
   public RelationalQName() {
   }
 
-  public RelationalQName(int id, URI namespace, String localName) {
+  public RelationalQName(long id, URI namespace, String localName) {
     this.id = id;
     this.namespace = namespace;
     this.localName = localName;
+  }
+
+  public RelationalQName(long id, QName other) {
+    this(id, other.getNamespaceURI(), other.getLocalName());
   }
 
   public RelationalQName(URI namespace, String localName) {
@@ -59,11 +63,11 @@ public class RelationalQName implements QName {
     }
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 

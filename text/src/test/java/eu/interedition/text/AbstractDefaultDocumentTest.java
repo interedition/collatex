@@ -21,11 +21,14 @@
 
 package eu.interedition.text;
 
+import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleQName;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.google.common.collect.Iterables.getFirst;
 
 /**
  * Base class for tests using an in-memory document model.
@@ -74,7 +77,7 @@ public abstract class AbstractDefaultDocumentTest extends AbstractTest {
    * @return
    */
   protected Annotation addTestAnnotation(String name, int start, int end) {
-    return annotationRepository.create(document, new SimpleQName(TEST_NS, name), new Range(start, end));
+    return getFirst(annotationRepository.create(new SimpleAnnotation(document, new SimpleQName(TEST_NS, name), new Range(start, end))), null);
   }
 
   /**

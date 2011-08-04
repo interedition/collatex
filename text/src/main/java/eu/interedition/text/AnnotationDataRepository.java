@@ -7,6 +7,8 @@ import java.util.Set;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public interface AnnotationDataRepository {
+  void set(Map<Annotation, Map<QName, String>> data);
+
   void set(Annotation annotation, Map<QName, String> data);
 
   void set(AnnotationLink link, Map<QName, String> data);

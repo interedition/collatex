@@ -42,7 +42,7 @@ public class AnnotationController {
         returnValue.setNamespaceURI(input.getNamespaceURI());
         returnValue.setLocalName(input.getLocalName());
         if (input instanceof RelationalQName) {
-          returnValue.setId(Integer.toString(((RelationalQName) input).getId()));
+          returnValue.setId(Long.toString(((RelationalQName) input).getId()));
         }
         return returnValue;
       }

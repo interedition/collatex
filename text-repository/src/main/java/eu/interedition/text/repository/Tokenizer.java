@@ -1,8 +1,10 @@
 package eu.interedition.text.repository;
 
+import com.google.common.collect.Lists;
 import eu.interedition.text.*;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.event.AnnotationEventListener;
+import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.predicate.TextPredicate;
 import eu.interedition.text.predicate.AnnotationNamePredicate;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -33,8 +36,14 @@ public class Tokenizer {
 
   private int pageSize = 102400;
 
+  private int batchSize = 1024;
+
   public void setPageSize(int pageSize) {
     this.pageSize = pageSize;
+  }
+
+  public void setBatchSize(int batchSize) {
+    this.batchSize = batchSize;
   }
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
@@ -46,6 +55,7 @@ public class Tokenizer {
     private final TokenizerSettings settings;
     private final Text text;
 
+    private List<Annotation> batch = Lists.newArrayListWithExpectedSize(batchSize);
     private boolean lastIsTokenBoundary = true;
     private int offset = 0;
     private int tokenStart = Integer.MAX_VALUE;
@@ -104,15 +114,24 @@ public class Tokenizer {
     @Override
     public void end() {
       token();
+      emit();
       LOG.debug(text + " has " + tokenCount + " token(s)");
     }
 
     private void token() {
       if (tokenStart < offset) {
-        annotationRepository.create(text, TOKEN_NAME, new Range(tokenStart, offset));
+        batch.add(new SimpleAnnotation(text, TOKEN_NAME, new Range(tokenStart, offset)));
+        if ((batch.size() % batchSize) == 0) {
+          emit();
+        }
         tokenCount++;
         tokenStart = Integer.MAX_VALUE;
       }
+    }
+
+    private void emit() {
+      annotationRepository.create(batch);
+      batch.clear();
     }
   }
 }

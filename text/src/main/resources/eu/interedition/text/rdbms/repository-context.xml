@@ -3,16 +3,23 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="incrementerFactory" class="eu.interedition.text.rdbms.DataFieldMaxValueIncrementerFactory">
+        <property name="dataSource" ref="repositoryDataSource" />
+    </bean>
+
     <bean id="nameRepository" class="eu.interedition.text.rdbms.RelationalQNameRepository">
         <property name="dataSource" ref="repositoryDataSource" />
+        <property name="incrementerFactory" ref="incrementerFactory"/>
     </bean>
 
     <bean id="textRepository" class="eu.interedition.text.rdbms.RelationalTextRepository">
         <property name="dataSource" ref="repositoryDataSource" />
+        <property name="incrementerFactory" ref="incrementerFactory"/>
     </bean>
 
     <bean id="annotationRepository" class="eu.interedition.text.rdbms.RelationalAnnotationRepository">
         <property name="dataSource" ref="repositoryDataSource" />
+        <property name="incrementerFactory" ref="incrementerFactory"/>
         <property name="nameRepository" ref="nameRepository" />
         <property name="textRepository" ref="textRepository" />
     </bean>

@@ -29,7 +29,7 @@ import eu.interedition.text.Text;
 import eu.interedition.text.util.Annotations;
 
 public class RelationalAnnotation implements Annotation {
-  protected int id;
+  protected long id;
   protected QName name;
   protected Text text;
   protected Range range;
@@ -37,11 +37,11 @@ public class RelationalAnnotation implements Annotation {
   public RelationalAnnotation() {
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 
@@ -84,7 +84,7 @@ public class RelationalAnnotation implements Annotation {
 
   @Override
   public int hashCode() {
-    return (id == 0 ? super.hashCode() : id);
+    return (id == 0 ? super.hashCode() : Objects.hashCode(id));
   }
 
   public int compareTo(Annotation o) {

@@ -8,7 +8,6 @@ import eu.interedition.text.xml.XMLParserConfiguration;
 import eu.interedition.text.xml.XMLParserModule;
 import eu.interedition.text.xml.module.LineElementXMLParserModule;
 import eu.interedition.text.xml.module.NotableCharacterXMLParserModule;
-import eu.interedition.text.xml.module.TextXMLParserModule;
 
 import java.util.List;
 import java.util.Set;
