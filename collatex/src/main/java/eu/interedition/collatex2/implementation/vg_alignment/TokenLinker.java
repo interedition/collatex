@@ -20,11 +20,13 @@ import eu.interedition.collatex2.implementation.matching.IMatchResult;
 import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
 import eu.interedition.collatex2.implementation.matching.TokenMatcher;
 import eu.interedition.collatex2.implementation.vg_analysis.Sequence;
+import eu.interedition.collatex2.interfaces.ILinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class TokenLinker {
+public class TokenLinker implements ILinker {
   static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
   public Map<ITokenSequence, IPhrase> link(IWitness a, IWitness b) {
@@ -280,5 +282,12 @@ public class TokenLinker {
       return matchedBaseTokens;
     } 
     return Collections.emptyList();
+  }
+
+  @Override
+  public Map<INormalizedToken, INormalizedToken> link(IVariantGraph graph, IWitness b) {
+    SuperbaseCreator creator = new SuperbaseCreator();
+    IWitness superbase = creator.create(graph);
+    return link2(superbase, b);
   }
 }

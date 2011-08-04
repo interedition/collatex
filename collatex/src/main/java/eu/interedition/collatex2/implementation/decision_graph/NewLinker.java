@@ -7,11 +7,12 @@ import java.util.Map;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.interfaces.ILinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class NewLinker {
+public class NewLinker implements ILinker {
   
   public Map<INormalizedToken, INormalizedToken> link(IVariantGraph vGraph, IWitness b) {
     VariantGraphMatcher vgmatcher = new VariantGraphMatcher();
@@ -35,5 +36,4 @@ public class NewLinker {
     }
     return linkedTokens;
   }
-
 }

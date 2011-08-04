@@ -16,14 +16,13 @@ import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition2;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection3;
 import eu.interedition.collatex2.interfaces.IAligner;
+import eu.interedition.collatex2.interfaces.ILinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-//TODO: rename to my new variant graph builder
-//TODO: extract the real aligner out of this class
 public class VariantGraphAligner implements IAligner {
   private final IVariantGraph graph;
   private Analysis analysis;
@@ -34,10 +33,13 @@ public class VariantGraphAligner implements IAligner {
 
   public void addWitness(IWitness witness) {
     // 1. Do the matching and linking of tokens
+    //TODO: the TokenLinker class should be replaced by the new linker class
+    //TODO: based on the decision graph
+    TokenLinker tokenLinker = new TokenLinker();
+    Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, tokenLinker);
+    // 2. Determine sequences
     SuperbaseCreator creator = new SuperbaseCreator();
     IWitness superbase = creator.create(graph);
-    Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, superbase);
-    // 2. Determine sequences
     SequenceDetection3 detection = new SequenceDetection3();
     List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
     // 3. Determine transpositions of the sequences
@@ -65,13 +67,12 @@ public class VariantGraphAligner implements IAligner {
   }
 
   private Map<INormalizedToken, INormalizedToken> linkTheTokens(
-      IWitness witness, IWitness superbase) {
+      IWitness witness, ILinker tokenLinker) {
     Map<INormalizedToken, INormalizedToken> linkedTokens;
     if (graph.isEmpty()) {
       linkedTokens = Maps.newLinkedHashMap();
     } 
-    TokenLinker linker = new TokenLinker();
-    linkedTokens = linker.link2(superbase, witness);
+    linkedTokens = tokenLinker.link(graph, witness);
     return linkedTokens;
   }
 

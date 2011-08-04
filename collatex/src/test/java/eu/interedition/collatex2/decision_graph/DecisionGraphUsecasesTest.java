@@ -30,5 +30,7 @@ public class DecisionGraphUsecasesTest {
     NewLinker linker = new NewLinker();
     Map<INormalizedToken, INormalizedToken> link = linker.link(graph, b);
     assertEquals(3, link.size());
+    //TODO: add asserts!
+    //System.out.println(link);
   }
 }
