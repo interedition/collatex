@@ -315,8 +315,8 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     final Iterable<AnnotationLinkNamePredicate> linkNamePredicates = Iterables.filter(predicates, AnnotationLinkNamePredicate.class);
     if (!isEmpty(linkNamePredicates)) {
       final Set<QName> linkNames = Sets.newHashSet(Iterables.transform(linkNamePredicates, AnnotationLinkNamePredicate.TO_NAME));
-      sql.append(" and alt.name in (");
-      for (Iterator<QName> it = linkNames.iterator(); it.hasNext(); ) {
+      sql.append(" and al.name in (");
+      for (Iterator<QName> it = nameRepository.get(linkNames).iterator(); it.hasNext(); ) {
         params.add(((RelationalQName) it.next()).getId());
         sql.append("?").append(it.hasNext() ? ", " : "");
       }
@@ -328,7 +328,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
       final Set<QName> names = Sets.newHashSet(Iterables.transform(namePredicates, AnnotationNamePredicate.TO_NAME));
 
       sql.append(" and a.name in (");
-      for (Iterator<QName> it = names.iterator(); it.hasNext(); ) {
+      for (Iterator<QName> it = nameRepository.get(names).iterator(); it.hasNext(); ) {
         params.add(((RelationalQName) it.next()).getId());
         sql.append("?").append(it.hasNext() ? ", " : "");
       }
