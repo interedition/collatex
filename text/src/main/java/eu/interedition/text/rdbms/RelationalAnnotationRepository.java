@@ -1,7 +1,6 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -212,67 +211,122 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     return names;
   }
 
+  public Map<Annotation, Map<QName, String>> get(Iterable<Annotation> links, Set<QName> names) {
+    final Map<Long, RelationalAnnotation> annotationIds = Maps.newHashMap();
+    for (Annotation link : links) {
+      RelationalAnnotation rl = (RelationalAnnotation)link;
+      annotationIds.put(rl.getId(), rl);
+    }
+
+    if (annotationIds.isEmpty()) {
+      return Collections.emptyMap();
+    }
+
+    final List<Object> ps = Lists.<Object>newArrayList(annotationIds.keySet());
+    final StringBuilder sql = new StringBuilder("select  ");
+    sql.append(selectDataFrom("d")).append(", ");
+    sql.append(RelationalQNameRepository.selectNameFrom("n")).append(", ");
+    sql.append("d.annotation as d_annotation");
+    sql.append(" from text_annotation_data d join text_qname n on d.name = n.id where d.annotation in (");
+    for (Iterator<Long> annotationIdIt = annotationIds.keySet().iterator(); annotationIdIt.hasNext(); ) {
+      sql.append("?").append(annotationIdIt.hasNext() ? ", " : "");
+    }
+    sql.append(")");
+
+    if (!names.isEmpty()) {
+      sql.append(" and d.name in (");
+      for (Iterator<QName> nameIt = nameRepository.get(names).iterator(); nameIt.hasNext(); ) {
+        ps.add(((RelationalQName)nameIt.next()).getId());
+        sql.append("?").append(nameIt.hasNext() ? ", " : "");
+      }
+      sql.append(")");
+    }
+
+    sql.append(" order by d.annotation");
+
+    final Map<Annotation, Map<QName, String>> data = new HashMap<Annotation, Map<QName, String>>();
+    final Map<Long, RelationalQName> nameCache = Maps.newHashMap();
+    jt.query(sql.toString(), new RowMapper<Void>() {
+
+      private RelationalAnnotation annotation;
+      private Map<QName, String> dataMap;
+
+      public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+        final long annotationId = rs.getLong("d_annotation");
+        if (annotation == null || annotation.getId() != annotationId) {
+          annotation = annotationIds.get(annotationId);
+          data.put(annotation, dataMap = Maps.newHashMap());
+        }
+
+        RelationalQName name = RelationalQNameRepository.mapNameFrom(rs, "n");
+        if (nameCache.containsKey(name.getId())) {
+          name = nameCache.get(name.getId());
+        } else {
+          nameCache.put(name.getId(), name);
+        }
+
+        dataMap.put(name, mapDataFrom(rs, "d"));
+
+        return null;
+      }
+    }, ps);
+
+    return data;
+  }
+
   public void set(Map<Annotation, Map<QName, String>> data) {
     final Set<QName> names = Sets.newHashSet();
-    for (Map<QName, String> annotationData : data.values()) {
-      for (QName n : annotationData.keySet()) {
-        names.add(n);
+    for (Map<QName, String> dataEntry : data.values()) {
+      for (QName name : dataEntry.keySet()) {
+        names.add(name);
       }
     }
-    final Map<QName, Long> nameIdIndex = Maps.newHashMapWithExpectedSize(names.size());
-    for (QName n : nameRepository.get(names)) {
-      nameIdIndex.put(n, ((RelationalQName) n).getId());
+    final Map<QName, Long> nameIds = Maps.newHashMap();
+    for (QName name : nameRepository.get(names)) {
+      nameIds.put(name, ((RelationalQName)name).getId());
     }
 
     final List<SqlParameterSource> batchParams = new ArrayList<SqlParameterSource>(data.size());
-    for (Map.Entry<Annotation, Map<QName, String>> annotationData : data.entrySet()) {
-      final long annotationId = ((RelationalAnnotation) annotationData.getKey()).getId();
-      for (Map.Entry<QName, String> dataEntry : annotationData.getValue().entrySet()) {
+    for (Annotation annotation : data.keySet()) {
+      final long annotationId = ((RelationalAnnotation) annotation).getId();
+      final Map<QName, String> annotationData = data.get(annotation);
+      for (Map.Entry<QName, String> dataEntry : annotationData.entrySet()) {
         batchParams.add(new MapSqlParameterSource()
                 .addValue("annotation", annotationId)
-                .addValue("name", nameIdIndex.get(dataEntry.getKey()))
+                .addValue("name", nameIds.get(dataEntry.getKey()))
                 .addValue("value", dataEntry.getValue()));
       }
     }
+
     if (!batchParams.isEmpty()) {
       annotationDataInsert.executeBatch(batchParams.toArray(new SqlParameterSource[batchParams.size()]));
     }
   }
 
-  public void set(Annotation annotation, Map<QName, String> data) {
-    set(Collections.singletonMap(annotation, data));
-  }
-
-  public Map<QName, String> get(Annotation annotation) {
-    final Map<QName, String> data = new HashMap<QName, String>();
-    final StringBuilder sql = new StringBuilder("select d.value as d_value, ");
-    sql.append(RelationalQNameRepository.selectNameFrom("n"));
-    sql.append(" from text_annotation_data d join text_qname n on d.name = n.id where annotation = ?");
-    jt.query(sql.toString(), new RowMapper<Void>() {
-
-      public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        data.put(RelationalQNameRepository.mapNameFrom(rs, "n"), mapDataFrom(rs, "d"));
-        return null;
+  public void unset(Map<Annotation, Iterable<QName>> data) {
+    final Set<QName> names = Sets.newHashSet();
+    for (Iterable<QName> linkNames : data.values()) {
+      for (QName name : linkNames) {
+        names.add(name);
       }
-    }, ((RelationalAnnotation) annotation).getId());
-    return data;
-  }
-
-  public void delete(Annotation annotation, Set<QName> names) {
-    List<Object> params = new ArrayList<Object>(names.size() + 1);
-    StringBuilder sql = new StringBuilder("delete from text_annotation_data where annotation = ?");
-    params.add(((RelationalAnnotation) annotation).getId());
-
-    if (names != null && !names.isEmpty()) {
-      sql.append(" and name in (");
-      for (Iterator<RelationalQName> it = Iterables.filter(nameRepository.get(names), RelationalQName.class).iterator(); it.hasNext(); ) {
-        params.add(it.next().getId());
-        sql.append("?").append(it.hasNext() ? ", " : "");
-      }
-      sql.append(")");
     }
 
-    jt.update(sql.toString(), params.toArray(new Object[params.size()]));
+    final Map<QName, Long> nameIds = Maps.newHashMapWithExpectedSize(names.size());
+    for (QName name : nameRepository.get(names)) {
+      nameIds.put(name, ((RelationalQName)name).getId());
+    }
+
+    List<SqlParameterSource> batchPs = Lists.newArrayList();
+    for (Map.Entry<Annotation, Iterable<QName>> dataEntry : data.entrySet()) {
+      long annotationId = ((RelationalAnnotation) dataEntry.getKey()).getId();
+      for (QName name : dataEntry.getValue()) {
+        batchPs.add(new MapSqlParameterSource()
+        .addValue("annotation", annotationId)
+        .addValue("name", nameIds.get(name)));
+      }
+    }
+
+    jt.batchUpdate("delete from text_annotation_data where annotation = :annotation and name = :name", batchPs.toArray(new SqlParameterSource[batchPs.size()]));
   }
 
   private StringBuilder sql(String select, List<Object> ps, Criterion criterion) {

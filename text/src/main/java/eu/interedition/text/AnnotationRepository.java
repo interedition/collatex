@@ -18,17 +18,9 @@ public interface AnnotationRepository {
 
   void delete(Criterion criterion);
 
+  Map<Annotation, Map<QName, String>> get(Iterable<Annotation> links, Set<QName> names);
+
   void set(Map<Annotation, Map<QName, String>> data);
 
-  void set(Annotation annotation, Map<QName, String> data);
-
-  void set(Annotation annotation, QName name, String value);
-
-  Map<QName, String> get(Annotation annotation);
-
-  String get(Annotation annotation, QName name);
-
-  void delete(Annotation annotation, Set<QName> names);
-
-  void delete(Annotation annotation, QName name);
+  void unset(Map<Annotation, Iterable<QName>> data);
 }

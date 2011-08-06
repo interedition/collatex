@@ -71,7 +71,7 @@ public class AnnotationStorageXMLParserModule extends XMLParserModuleAdapter {
   }
 
   protected void emit(Map<Annotation, Map<QName, String>> batch) {
-    Map<Annotation, Map<QName, String>> created = Maps.newHashMapWithExpectedSize(batchSize);
+    final Map<Annotation, Map<QName, String>> created = Maps.newHashMapWithExpectedSize(batchSize);
     final Iterable<Annotation> createdAnnotations = annotationRepository.create(batch.keySet());
 
     final Iterator<Annotation> annotationIt = createdAnnotations.iterator();
