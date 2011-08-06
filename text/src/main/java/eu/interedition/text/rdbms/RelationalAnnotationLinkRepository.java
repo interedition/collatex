@@ -1,11 +1,14 @@
 package eu.interedition.text.rdbms;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.AnnotationLink;
-import eu.interedition.text.AnnotationLinkRepository;
 import eu.interedition.text.QName;
 import eu.interedition.text.query.Criterion;
+import eu.interedition.text.util.AbstractAnnotationLinkRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -30,7 +33,7 @@ import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RelationalAnnotationLinkRepository implements InitializingBean, AnnotationLinkRepository {
+public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRepository implements InitializingBean {
   private DataSource dataSource;
   private DataFieldMaxValueIncrementerFactory incrementerFactory;
   private RelationalQNameRepository nameRepository;
@@ -50,7 +53,7 @@ public class RelationalAnnotationLinkRepository implements InitializingBean, Ann
       nameIdIndex.put(n, ((RelationalQName) n).getId());
     }
 
-    final Map<AnnotationLink, Set<Annotation>> created = Maps.newHashMap();
+    final Map<AnnotationLink, Set<Annotation>> created = Maps.newLinkedHashMap();
     final List<SqlParameterSource> linkBatch = Lists.newArrayList();
     final List<SqlParameterSource> targetBatch = Lists.newArrayList();
 
@@ -78,6 +81,22 @@ public class RelationalAnnotationLinkRepository implements InitializingBean, Ann
     annotationLinkInsert.executeBatch(linkBatch.toArray(new SqlParameterSource[linkBatch.size()]));
     annotationLinkTargetInsert.executeBatch(targetBatch.toArray(new SqlParameterSource[targetBatch.size()]));
     return created;
+  }
+
+  public void delete(Iterable<AnnotationLink> links) {
+    final List<Long> linkIds = Lists.newArrayList();
+    for (AnnotationLink a : links) {
+      linkIds.add(((RelationalAnnotationLink)a).getId());
+    }
+    if (linkIds.isEmpty()) {
+      return;
+    }
+    final StringBuilder sql = new StringBuilder("delete from text_annotation_link where id in (");
+    for (Iterator<Long> idIt = linkIds.iterator(); idIt.hasNext(); ) {
+      sql.append("?").append(idIt.hasNext() ? ", " : "");
+    }
+    sql.append(")");
+    jt.update(sql.toString(), linkIds.toArray(new Object[linkIds.size()]));
   }
 
   public void delete(Criterion criterion) {
@@ -160,39 +179,6 @@ public class RelationalAnnotationLinkRepository implements InitializingBean, Ann
     return annotationLinks;
   }
 
-  public void add(AnnotationLink to, Set<Annotation> toAdd) {
-    if (toAdd == null || toAdd.isEmpty()) {
-      return;
-    }
-    final long linkId = ((RelationalAnnotationLink) to).getId();
-    final List<SqlParameterSource> psList = new ArrayList<SqlParameterSource>(toAdd.size());
-    for (RelationalAnnotation annotation : Iterables.filter(toAdd, RelationalAnnotation.class)) {
-      psList.add(new MapSqlParameterSource().addValue("link", linkId).addValue("target", annotation.getId()));
-    }
-    annotationLinkTargetInsert.executeBatch(psList.toArray(new SqlParameterSource[psList.size()]));
-  }
-
-  public void remove(AnnotationLink from, Set<Annotation> toRemove) {
-    if (toRemove == null || toRemove.isEmpty()) {
-      return;
-    }
-
-    final StringBuilder sql = new StringBuilder("delete from text_annotation_link_target where link = ? and ");
-
-    final List<Object> params = new ArrayList<Object>(toRemove.size() + 1);
-    params.add(((RelationalAnnotationLink) from).getId());
-
-    final Set<RelationalAnnotation> annotations = Sets.newHashSet(Iterables.filter(toRemove, RelationalAnnotation.class));
-    sql.append("target in (");
-    for (Iterator<RelationalAnnotation> it = annotations.iterator(); it.hasNext(); ) {
-      params.add(it.next().getId());
-      sql.append("?").append(it.hasNext() ? ", " : "");
-    }
-    sql.append(")");
-
-    jt.update(sql.toString(), params.toArray(new Object[params.size()]));
-  }
-
   public Map<AnnotationLink, Map<QName, String>> get(Iterable<AnnotationLink> links, Set<QName> names) {
     final Map<Long, RelationalAnnotationLink> linkIds = Maps.newHashMap();
     for (AnnotationLink link : links) {
@@ -227,6 +213,10 @@ public class RelationalAnnotationLinkRepository implements InitializingBean, Ann
     sql.append(" order by d.link");
 
     final Map<AnnotationLink, Map<QName, String>> data = new HashMap<AnnotationLink, Map<QName, String>>();
+    for (RelationalAnnotationLink link : linkIds.values()) {
+      data.put(link, Maps.<QName, String>newHashMap());
+    }
+
     final Map<Long, RelationalQName> nameCache = Maps.newHashMap();
     jt.query(sql.toString(), new RowMapper<Void>() {
 
@@ -237,7 +227,7 @@ public class RelationalAnnotationLinkRepository implements InitializingBean, Ann
         final long linkId = rs.getLong("d_link");
         if (link == null || link.getId() != linkId) {
           link = linkIds.get(linkId);
-          data.put(link, dataMap = Maps.newHashMap());
+          dataMap = data.get(link);
         }
 
         RelationalQName name = RelationalQNameRepository.mapNameFrom(rs, "n");

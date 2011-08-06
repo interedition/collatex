@@ -52,47 +52,6 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   private int batchSize = 10000;
   private DataFieldMaxValueIncrementer annotationIdIncrementer;
 
-  @Required
-  public void setDataSource(DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
-
-  @Required
-  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
-    this.incrementerFactory = incrementerFactory;
-  }
-
-  @Required
-  public void setNameRepository(RelationalQNameRepository nameRepository) {
-    this.nameRepository = nameRepository;
-  }
-
-  @Required
-  public void setTextRepository(RelationalTextRepository textRepository) {
-    this.textRepository = textRepository;
-  }
-
-  @Required
-  public void setQueryCriteriaTranslator(RelationalQueryCriteriaTranslator queryCriteriaTranslator) {
-    this.queryCriteriaTranslator = queryCriteriaTranslator;
-  }
-
-  public void setBatchSize(int batchSize) {
-    this.batchSize = batchSize;
-  }
-
-  public void afterPropertiesSet() throws Exception {
-    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
-    this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation"));
-    this.annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
-
-    this.saxParserFactory = SAXParserFactory.newInstance();
-    this.saxParserFactory.setNamespaceAware(true);
-    this.saxParserFactory.setValidating(false);
-
-    this.annotationIdIncrementer = incrementerFactory.create("text_annotation");
-  }
-
   public Iterable<Annotation> create(Iterable<Annotation> annotations) {
     final Set<QName> names = Sets.newHashSet();
     for (Annotation a : annotations) {
@@ -130,6 +89,21 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     return created;
   }
 
+  public void delete(Iterable<Annotation> annotations) {
+    final List<Long> annotationIds = Lists.newArrayList();
+    for (Annotation a : annotations) {
+      annotationIds.add(((RelationalAnnotation)a).getId());
+    }
+    if (annotationIds.isEmpty()) {
+      return;
+    }
+    final StringBuilder sql = new StringBuilder("delete from text_annotation where id in (");
+    for (Iterator<Long> idIt = annotationIds.iterator(); idIt.hasNext(); ) {
+      sql.append("?").append(idIt.hasNext() ? ", " : "");
+    }
+    sql.append(")");
+    jt.update(sql.toString(), annotationIds.toArray(new Object[annotationIds.size()]));
+  }
 
   public void delete(Criterion criterion) {
     final ArrayList<Object> parameters = new ArrayList<Object>();
@@ -245,6 +219,10 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     sql.append(" order by d.annotation");
 
     final Map<Annotation, Map<QName, String>> data = new HashMap<Annotation, Map<QName, String>>();
+    for (RelationalAnnotation annotation : annotationIds.values()) {
+      data.put(annotation, Maps.<QName, String>newHashMap());
+    }
+
     final Map<Long, RelationalQName> nameCache = Maps.newHashMap();
     jt.query(sql.toString(), new RowMapper<Void>() {
 
@@ -255,7 +233,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
         final long annotationId = rs.getLong("d_annotation");
         if (annotation == null || annotation.getId() != annotationId) {
           annotation = annotationIds.get(annotationId);
-          data.put(annotation, dataMap = Maps.newHashMap());
+          dataMap = data.get(annotation);
         }
 
         RelationalQName name = RelationalQNameRepository.mapNameFrom(rs, "n");
@@ -327,6 +305,47 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     }
 
     jt.batchUpdate("delete from text_annotation_data where annotation = :annotation and name = :name", batchPs.toArray(new SqlParameterSource[batchPs.size()]));
+  }
+
+  @Required
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  @Required
+  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
+    this.incrementerFactory = incrementerFactory;
+  }
+
+  @Required
+  public void setNameRepository(RelationalQNameRepository nameRepository) {
+    this.nameRepository = nameRepository;
+  }
+
+  @Required
+  public void setTextRepository(RelationalTextRepository textRepository) {
+    this.textRepository = textRepository;
+  }
+
+  @Required
+  public void setQueryCriteriaTranslator(RelationalQueryCriteriaTranslator queryCriteriaTranslator) {
+    this.queryCriteriaTranslator = queryCriteriaTranslator;
+  }
+
+  public void setBatchSize(int batchSize) {
+    this.batchSize = batchSize;
+  }
+
+  public void afterPropertiesSet() throws Exception {
+    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation"));
+    this.annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
+
+    this.saxParserFactory = SAXParserFactory.newInstance();
+    this.saxParserFactory.setNamespaceAware(true);
+    this.saxParserFactory.setValidating(false);
+
+    this.annotationIdIncrementer = incrementerFactory.create("text_annotation");
   }
 
   private StringBuilder sql(String select, List<Object> ps, Criterion criterion) {

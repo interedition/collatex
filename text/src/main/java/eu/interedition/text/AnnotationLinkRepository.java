@@ -14,6 +14,10 @@ public interface AnnotationLinkRepository {
 
   Map<AnnotationLink, Set<Annotation>> find(Criterion criterion);
 
+  void delete(Iterable<AnnotationLink> links);
+
+  void delete(AnnotationLink... links);
+
   void delete(Criterion criterion);
 
   Map<AnnotationLink, Map<QName, String>> get(Iterable<AnnotationLink> links, Set<QName> names);

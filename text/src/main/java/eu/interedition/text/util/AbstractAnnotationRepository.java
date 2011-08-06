@@ -12,4 +12,8 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
   public Iterable<Annotation> create(Annotation... annotations) {
     return create(Arrays.asList(annotations));
   }
+
+  public void delete(Annotation... annotations) {
+    delete(Arrays.asList(annotations));
+  }
 }
