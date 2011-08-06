@@ -17,8 +17,6 @@ public interface TextRepository {
 
   void delete(Text text);
 
-  int length(Text text) throws IOException;
-
   void read(Text text, TextReader reader) throws IOException;
 
   String read(Text text, Range range) throws IOException;

@@ -17,7 +17,6 @@ import java.util.Stack;
 public class AnnotationStorageXMLParserModule extends XMLParserModuleAdapter {
 
   private final AnnotationRepository annotationRepository;
-  private final AnnotationDataRepository annotationDataRepository;
   private final int batchSize;
 
   private final ThreadLocal<Stack<Integer>> startOffsetStack = new ThreadLocal<Stack<Integer>>();
@@ -25,13 +24,12 @@ public class AnnotationStorageXMLParserModule extends XMLParserModuleAdapter {
   private final ThreadLocal<Map<Annotation, Map<QName, String>>> annotationBatch = new ThreadLocal<Map<Annotation, Map<QName, String>>>();
 
 
-  public AnnotationStorageXMLParserModule(AnnotationRepository annotationRepository, AnnotationDataRepository annotationDataRepository) {
-    this(annotationRepository, annotationDataRepository, 10000);
+  public AnnotationStorageXMLParserModule(AnnotationRepository annotationRepository) {
+    this(annotationRepository, 10000);
   }
 
-  public AnnotationStorageXMLParserModule(AnnotationRepository annotationRepository, AnnotationDataRepository annotationDataRepository, int batchSize) {
+  public AnnotationStorageXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     this.annotationRepository = annotationRepository;
-    this.annotationDataRepository = annotationDataRepository;
     this.batchSize = batchSize;
   }
 
@@ -83,7 +81,7 @@ public class AnnotationStorageXMLParserModule extends XMLParserModuleAdapter {
       created.put(annotationIt.next(), attributesIt.next());
     }
 
-    annotationDataRepository.set(created);
+    annotationRepository.set(created);
     batch.clear();
   }
 }

@@ -80,7 +80,7 @@ public class TextController {
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, headers = "accept=text/html")
   public ModelAndView view(@PathVariable("id") int id) throws IOException {
     final Text text = textRepository.load(id);
-    final int length = textRepository.length(text);
+    final int length = text.length();
 
     final ModelAndView mv = new ModelAndView("text");
     mv.addObject("text", text);

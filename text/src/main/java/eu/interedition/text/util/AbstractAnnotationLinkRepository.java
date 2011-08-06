@@ -1,36 +1,26 @@
 package eu.interedition.text.util;
 
-import eu.interedition.text.Annotation;
-import eu.interedition.text.AnnotationDataRepository;
 import eu.interedition.text.AnnotationLink;
+import eu.interedition.text.AnnotationLinkRepository;
 import eu.interedition.text.QName;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public abstract class AbstractAnnotationDataRepository implements AnnotationDataRepository {
-
-
-  public void set(Annotation annotation, QName name, String value) {
-    set(annotation, Collections.singletonMap(name, value));
+public abstract class AbstractAnnotationLinkRepository implements AnnotationLinkRepository {
+  public Iterable<AnnotationLink> create(QName... names) {
+    return create(Arrays.asList(names));
   }
 
   public void set(AnnotationLink link, QName name, String value) {
     set(link, Collections.singletonMap(name, value));
   }
 
-  public String get(Annotation annotation, QName name) {
-    return get(annotation).get(name);
-  }
-
   public String get(AnnotationLink link, QName name) {
     return get(link).get(name);
-  }
-
-  public void delete(Annotation annotation, QName name) {
-    delete(annotation, Collections.singleton(name));
   }
 
   public void delete(AnnotationLink link, QName name) {

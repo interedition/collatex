@@ -77,9 +77,6 @@ public abstract class AbstractXMLTest extends AbstractTest {
   @Autowired
   private AnnotationRepository annotationRepository;
 
-  @Autowired
-  private AnnotationDataRepository annotationDataRepository;
-
   @After
   public void removeDocuments() {
     for (Iterator<Text> documentIt = documents.values().iterator(); documentIt.hasNext(); ) {
@@ -161,14 +158,14 @@ public abstract class AbstractXMLTest extends AbstractTest {
 
     final List<XMLParserModule> parserModules = pc.getModules();
     parserModules.add(new TextXMLParserModule(textRepository));
-    parserModules.add(new AnnotationStorageXMLParserModule(annotationRepository, annotationDataRepository));
+    parserModules.add(new AnnotationStorageXMLParserModule(annotationRepository));
     parserModules.addAll(parserModules());
 
     return pc;
   }
 
   protected List<XMLParserModule> parserModules() {
-    return Lists.<XMLParserModule>newArrayList(new AnnotationStorageXMLParserModule(annotationRepository, annotationDataRepository));
+    return Lists.<XMLParserModule>newArrayList(new AnnotationStorageXMLParserModule(annotationRepository));
   }
 
   /**

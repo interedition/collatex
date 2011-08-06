@@ -9,26 +9,12 @@ import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static javax.xml.XMLConstants.XML_NS_URI;
-
 /**
  * A qualified/ "namespaced" identifier.
  *
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 public class RelationalQName implements QName {
-  public static final QName COMMENT_QNAME = new RelationalQName(URI.create(XML_NS_URI), "comment");
-  public static final QName COMMENT_TEXT_QNAME = new RelationalQName(URI.create(XML_NS_URI), "commentText");
-
-  public static final QName PI_QNAME = new RelationalQName(URI.create(XML_NS_URI), "pi");
-  public static final QName PI_TARGET_QNAME = new RelationalQName(URI.create(XML_NS_URI), "piTarget");
-  public static final QName PI_DATA_QNAME = new RelationalQName(URI.create(XML_NS_URI), "piDarget");
-
-  public static final QName TEXT_QNAME = new RelationalQName(URI.create(XML_NS_URI), "text");
-  public static final QName TEXT_LINE_ATTR_QNAME = new RelationalQName(URI.create(XML_NS_URI), "textLine");
-  public static final QName TEXT_COLUMN_ATTR_QNAME = new RelationalQName(URI.create(XML_NS_URI), "textColumn");
-  public static final QName TEXT_OFFSET_ATTR_QNAME = new RelationalQName(URI.create(XML_NS_URI), "textOffset");
-
   private static final Pattern STR_REPR = Pattern.compile("^\\{([^\\}]*)\\}(.+)$");
 
   private long id;

@@ -71,8 +71,7 @@ public class XMLImportHandlerTest extends AbstractXMLTest {
     final Text source = source(resource);
     final Text text = document(resource);
 
-    final int textLength = textRepository.length(text);
-    assertTrue(textLength > 0);
+    assertTrue(text.length() > 0);
 
     if (LOG.isDebugEnabled()) {
       textRepository.read(text, new TextRepository.TextReader() {

@@ -18,15 +18,17 @@ public interface AnnotationRepository {
 
   void delete(Criterion criterion);
 
-  Iterable<AnnotationLink> createLink(QName... names);
+  void set(Map<Annotation, Map<QName, String>> data);
 
-  Iterable<AnnotationLink> createLink(Iterable<QName> names);
+  void set(Annotation annotation, Map<QName, String> data);
 
-  Map<AnnotationLink, Set<Annotation>> findLinks(Criterion criterion);
+  void set(Annotation annotation, QName name, String value);
 
-  void deleteLinks(Criterion criterion);
+  Map<QName, String> get(Annotation annotation);
 
-  void add(AnnotationLink to, Set<Annotation> toAdd);
+  String get(Annotation annotation, QName name);
 
-  void remove(AnnotationLink from, Set<Annotation> toRemove);
+  void delete(Annotation annotation, Set<QName> names);
+
+  void delete(Annotation annotation, QName name);
 }

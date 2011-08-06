@@ -71,12 +71,13 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
 
     textInsert.execute(textData);
 
-    final RelationalText relationalText = new RelationalText();
-    relationalText.setId(id);
-    relationalText.setCreated(created);
-    relationalText.setType(type);
+    final RelationalText rt = new RelationalText();
+    rt.setId(id);
+    rt.setCreated(created);
+    rt.setType(type);
+    rt.setLength(0);
 
-    return relationalText;
+    return rt;
   }
 
   public Text create(Reader content) throws IOException {
@@ -134,16 +135,6 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     return getOnlyElement(bulkRead(text, Sets.newTreeSet(singleton(range))).values());
   }
 
-  public int length(Text text) throws IOException {
-    return read(new ReaderCallback<Integer>(text) {
-
-      @Override
-      protected Integer read(Clob content) throws SQLException, IOException {
-        return (int) content.length();
-      }
-    });
-  }
-
   public SortedMap<Range, String> bulkRead(Text text, final SortedSet<Range> ranges) throws IOException {
     final SortedMap<Range, String> results = Maps.newTreeMap();
     read(new ReaderCallback<Void>(text) {
@@ -160,14 +151,16 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   public void write(final Text text, final Reader contents, final int contentLength) throws IOException {
+    final RelationalText rt = (RelationalText) text;
     jt.getJdbcOperations().execute("update text_content set content = ? where id = ?", new PreparedStatementCallback<Void>() {
       public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
         ps.setCharacterStream(1, new BufferedReader(contents), contentLength);
-        ps.setLong(2, ((RelationalText) text).getId());
+        ps.setLong(2, rt.getId());
         ps.executeUpdate();
         return null;
       }
     });
+    rt.setLength(contentLength);
   }
 
 
@@ -194,7 +187,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   public static String selectTextFrom(String tableName) {
-    return SQL.select(tableName, "id", "created", "type");
+    return SQL.select(tableName, "id", "created", "type") + ", char_length(" + tableName + ".content) as " + tableName + "_length";
   }
 
   public static RelationalText mapTextFrom(ResultSet rs, String prefix) throws SQLException {
@@ -202,6 +195,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     relationalText.setId(rs.getInt(prefix + "_id"));
     relationalText.setCreated(rs.getDate(prefix + "_created"));
     relationalText.setType(Text.Type.values()[rs.getInt(prefix + "_type")]);
+    relationalText.setLength(rs.getInt(prefix + "_length"));
     return relationalText;
   }
 

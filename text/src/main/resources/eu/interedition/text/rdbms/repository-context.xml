@@ -12,6 +12,10 @@
         <property name="incrementerFactory" ref="incrementerFactory"/>
     </bean>
 
+    <bean id="queryCriteriaTranslator" class="eu.interedition.text.rdbms.RelationalQueryCriteriaTranslator">
+        <property name="nameRepository" ref="nameRepository" />
+    </bean>
+
     <bean id="textRepository" class="eu.interedition.text.rdbms.RelationalTextRepository">
         <property name="dataSource" ref="repositoryDataSource" />
         <property name="incrementerFactory" ref="incrementerFactory"/>
@@ -22,11 +26,14 @@
         <property name="incrementerFactory" ref="incrementerFactory"/>
         <property name="nameRepository" ref="nameRepository" />
         <property name="textRepository" ref="textRepository" />
+        <property name="queryCriteriaTranslator" ref="queryCriteriaTranslator"/>
     </bean>
 
-    <bean id="annotationDataRepository" class="eu.interedition.text.rdbms.RelationalAnnotationDataRepository">
+    <bean id="annotationLinkRepository" class="eu.interedition.text.rdbms.RelationalAnnotationLinkRepository">
         <property name="dataSource" ref="repositoryDataSource" />
+        <property name="incrementerFactory" ref="incrementerFactory"/>
         <property name="nameRepository" ref="nameRepository" />
+        <property name="queryCriteriaTranslator" ref="queryCriteriaTranslator"/>
     </bean>
 
     <bean id="xmlParser" class="eu.interedition.text.xml.XMLParser">

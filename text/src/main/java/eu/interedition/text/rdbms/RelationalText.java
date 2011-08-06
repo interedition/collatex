@@ -9,6 +9,7 @@ public class RelationalText implements Text {
   private long id;
   private Date created;
   private Type type;
+  private int length;
 
   public long getId() {
     return id;
@@ -32,6 +33,14 @@ public class RelationalText implements Text {
 
   public void setType(Type type) {
     this.type = type;
+  }
+
+  public int length() {
+    return length;
+  }
+
+  public void setLength(int length) {
+    this.length = length;
   }
 
   @Override

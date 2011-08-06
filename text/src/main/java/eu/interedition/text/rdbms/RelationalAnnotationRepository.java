@@ -1,6 +1,5 @@
 package eu.interedition.text.rdbms;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -44,16 +43,15 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   private DataFieldMaxValueIncrementerFactory incrementerFactory;
   private RelationalQNameRepository nameRepository;
   private RelationalTextRepository textRepository;
+  private RelationalQueryCriteriaTranslator queryCriteriaTranslator;
 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert annotationInsert;
-  private SimpleJdbcInsert annotationLinkInsert;
-  private SimpleJdbcInsert annotationLinkTargetInsert;
+  private SimpleJdbcInsert annotationDataInsert;
   private SAXParserFactory saxParserFactory;
 
   private int batchSize = 10000;
   private DataFieldMaxValueIncrementer annotationIdIncrementer;
-  private DataFieldMaxValueIncrementer annotationLinkIdIncrementer;
 
   @Required
   public void setDataSource(DataSource dataSource) {
@@ -75,6 +73,11 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     this.textRepository = textRepository;
   }
 
+  @Required
+  public void setQueryCriteriaTranslator(RelationalQueryCriteriaTranslator queryCriteriaTranslator) {
+    this.queryCriteriaTranslator = queryCriteriaTranslator;
+  }
+
   public void setBatchSize(int batchSize) {
     this.batchSize = batchSize;
   }
@@ -82,15 +85,13 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   public void afterPropertiesSet() throws Exception {
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
     this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation"));
-    this.annotationLinkInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link"));
-    this.annotationLinkTargetInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link_target"));
+    this.annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
 
     this.saxParserFactory = SAXParserFactory.newInstance();
     this.saxParserFactory.setNamespaceAware(true);
     this.saxParserFactory.setValidating(false);
 
     this.annotationIdIncrementer = incrementerFactory.create("text_annotation");
-    this.annotationLinkIdIncrementer = incrementerFactory.create("text_annotation_link");
   }
 
   public Iterable<Annotation> create(Iterable<Annotation> annotations) {
@@ -130,34 +131,12 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     return created;
   }
 
-  public Iterable<AnnotationLink> createLink(Iterable<QName> names) {
-    final Map<QName, Long> nameIdIndex = Maps.newHashMap();
-    for (QName n : nameRepository.get(Sets.newHashSet(names))) {
-      nameIdIndex.put(n, ((RelationalQName) n).getId());
-    }
-
-    final List<AnnotationLink> created = Lists.newArrayList();
-    final List<SqlParameterSource> batchParameters = Lists.newArrayList();
-    for (QName n : names) {
-      final long id = annotationLinkIdIncrementer.nextLongValue();
-      final Long nameId = nameIdIndex.get(n);
-
-      batchParameters.add(new MapSqlParameterSource()
-              .addValue("id", id)
-              .addValue("name", nameId));
-
-      created.add(new RelationalAnnotationLink(id, new RelationalQName(nameId, n)));
-    }
-
-    annotationLinkInsert.executeBatch(batchParameters.toArray(new SqlParameterSource[batchParameters.size()]));
-    return created;
-  }
 
   public void delete(Criterion criterion) {
     final ArrayList<Object> parameters = new ArrayList<Object>();
     final List<Object[]> batchParameters = Lists.newArrayListWithCapacity(batchSize);
 
-    jt.query(buildAnnotationFinderSQL("select a.id as a_id", parameters, criterion).toString(), new RowMapper<Void>() {
+    jt.query(sql("select a.id as a_id", parameters, criterion).toString(), new RowMapper<Void>() {
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
         batchParameters.add(new Object[]{rs.getInt("a_id")});
 
@@ -171,64 +150,11 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     }, parameters.toArray(new Object[parameters.size()]));
   }
 
-  public void deleteLinks(Criterion criterion) {
-    final ArrayList<Object> parameters = new ArrayList<Object>();
-    final List<Object[]> batchParameters = Lists.newArrayListWithCapacity(batchSize);
-    jt.query(buildAnnotationLinkFinderSQL("select distinct al.id as al_id", parameters, criterion).toString(), new RowMapper<Void>() {
-      public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        batchParameters.add(new Object[]{rs.getInt("al_id")});
-
-        if (rs.isLast() || (batchParameters.size() % batchSize) == 0) {
-          jt.batchUpdate("delete from text_annotation_link where id = ?", batchParameters);
-          batchParameters.clear();
-        }
-
-        return null;
-      }
-    }, parameters.toArray(new Object[parameters.size()]));
-  }
-
-  @SuppressWarnings("unchecked")
-  public void add(AnnotationLink to, Set<Annotation> toAdd) {
-    if (toAdd == null || toAdd.isEmpty()) {
-      return;
-    }
-    final long linkId = ((RelationalAnnotationLink) to).getId();
-    final List<Map<String, Object>> psList = new ArrayList<Map<String, Object>>(toAdd.size());
-    for (RelationalAnnotation annotation : Iterables.filter(toAdd, RelationalAnnotation.class)) {
-      final Map<String, Object> ps = new HashMap<String, Object>(2);
-      ps.put("link", linkId);
-      ps.put("target", annotation.getId());
-      psList.add(ps);
-    }
-    annotationLinkTargetInsert.executeBatch(psList.toArray(new Map[psList.size()]));
-  }
-
-  public void remove(AnnotationLink from, Set<Annotation> toRemove) {
-    if (toRemove == null || toRemove.isEmpty()) {
-      return;
-    }
-
-    final StringBuilder sql = new StringBuilder("delete from text_annotation_link_target where link = ? and ");
-
-    final List<Object> params = new ArrayList<Object>(toRemove.size() + 1);
-    params.add(((RelationalAnnotationLink) from).getId());
-
-    final Set<RelationalAnnotation> annotations = Sets.newHashSet(Iterables.filter(toRemove, RelationalAnnotation.class));
-    sql.append("target in (");
-    for (Iterator<RelationalAnnotation> it = annotations.iterator(); it.hasNext(); ) {
-      params.add(it.next().getId());
-      sql.append("?").append(it.hasNext() ? ", " : "");
-    }
-    sql.append(")");
-
-    jt.update(sql.toString(), params.toArray(new Object[params.size()]));
-  }
 
   public Iterable<Annotation> find(Criterion criterion) {
     List<Object> parameters = Lists.newArrayList();
 
-    final StringBuilder sql = buildAnnotationFinderSQL(new StringBuilder("select ").
+    final StringBuilder sql = sql(new StringBuilder("select ").
             append(selectAnnotationFrom("a")).append(", ").
             append(selectNameFrom("n")).append(", ").
             append(selectTextFrom("t")).toString(), parameters, criterion);
@@ -244,172 +170,6 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
         return mapAnnotationFrom(rs, mapTextFrom(rs, "t"), currentName, "a");
       }
     }, parameters.toArray(new Object[parameters.size()])));
-  }
-
-  public Map<AnnotationLink, Set<Annotation>> findLinks(Criterion criterion) {
-
-    // FIXME: two-pass query: first select link ids; then fetch complete links
-
-    final List<Object> params = new ArrayList<Object>();
-    final StringBuilder sql = buildAnnotationLinkFinderSQL(new StringBuilder("select ")
-            .append("al.id as al_id, ")
-            .append(selectAnnotationFrom("a")).append(", ")
-            .append(selectTextFrom("t")).append(", ")
-            .append(selectNameFrom("aln")).append(", ")
-            .append(selectNameFrom("an")).toString(), params, criterion);
-    sql.append(" order by al.id, t.id, an.id, a.id");
-
-    final Map<AnnotationLink, Set<Annotation>> annotationLinks = new HashMap<AnnotationLink, Set<Annotation>>();
-
-    jt.query(sql.toString(), new RowMapper<Void>() {
-      private RelationalAnnotationLink currentLink;
-      private RelationalText currentText;
-      private RelationalQName currentAnnotationName;
-
-      public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        final int annotationLinkId = rs.getInt("al_id");
-        final int textId = rs.getInt("t_id");
-        final int annotationNameId = rs.getInt("an_id");
-
-        if (currentLink == null || currentLink.getId() != annotationLinkId) {
-          currentLink = new RelationalAnnotationLink(annotationLinkId, mapNameFrom(rs, "aln"));
-        }
-        if (currentText == null || currentText.getId() != textId) {
-          currentText = RelationalTextRepository.mapTextFrom(rs, "t");
-        }
-        if (currentAnnotationName == null || currentAnnotationName.getId() != annotationNameId) {
-          currentAnnotationName = mapNameFrom(rs, "an");
-        }
-
-        Set<Annotation> members = annotationLinks.get(currentLink);
-        if (members == null) {
-          annotationLinks.put(currentLink, members = new TreeSet<Annotation>());
-        }
-        members.add(mapAnnotationFrom(rs, currentText, currentAnnotationName, "a"));
-
-        return null;
-      }
-
-    }, params.toArray(new Object[params.size()]));
-
-    return annotationLinks;
-  }
-
-  private StringBuilder buildAnnotationFinderSQL(String selectClause, List<Object> parameters, Criterion criterion) {
-    final StringBuilder sql = new StringBuilder(selectClause);
-    sql.append(" from text_annotation a");
-    sql.append(" join text_qname n on a.name = n.id");
-    sql.append(" join text_content t on a.text = t.id");
-    sql.append(" where ");
-
-    toWhereClause(criterion, sql, parameters);
-
-    return sql;
-  }
-
-  private StringBuilder buildAnnotationLinkFinderSQL(String selectClause, List<Object> params, Criterion criterion) {
-    final StringBuilder sql = new StringBuilder(selectClause);
-    sql.append(" from text_annotation_link_target alt");
-    sql.append(" join text_annotation_link al on alt.link = al.id");
-    sql.append(" join text_qname aln on al.name = aln.id");
-    sql.append(" join text_annotation a on alt.target = a.id");
-    sql.append(" join text_qname an on a.name = an.id");
-    sql.append(" join text_content t on a.text = t.id");
-    sql.append(" where ");
-
-    toWhereClause(criterion, sql, params);
-
-    return sql;
-  }
-
-  protected void toSQL(Operator op, StringBuilder sql, Collection<Object> sqlParameters) {
-    final List<Criterion> operands = op.getOperands();
-    if (operands.isEmpty()) {
-      return;
-    }
-    sql.append("(");
-    for (Iterator<Criterion> pIt = operands.iterator(); pIt.hasNext(); ) {
-      toWhereClause(pIt.next(), sql, sqlParameters);
-      if (pIt.hasNext()) {
-        sql.append(" ").append(sqlOperator(op)).append(" ");
-      }
-    }
-    sql.append(")");
-  }
-
-  protected String sqlOperator(Operator op) {
-    if (op instanceof AndOperator) {
-      return "and";
-    } else if (op instanceof OrOperator) {
-      return "or";
-    } else {
-      throw new IllegalArgumentException();
-    }
-  }
-
-  protected void toSQL(NotOperator predicate, StringBuilder sql, Collection<Object> sqlParameters) {
-    sql.append("(NOT ");
-    toWhereClause(predicate.getOperand(), sql, sqlParameters);
-    sql.append(")");
-  }
-
-  protected void toSQL(AnnotationLinkNameCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
-    sql.append("(al.name = ?)");
-    sqlParameters.add(((RelationalQName)nameRepository.get(predicate.getName())).getId());
-  }
-
-  protected void toSQL(AnnotationIdentityCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
-    sql.append("(a.id = ?)");
-    sqlParameters.add(((RelationalAnnotation) predicate.getAnnotation()).getId());
-  }
-
-  protected void toSQL(AnnotationNameCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
-    sql.append("(a.name = ?)");
-    sqlParameters.add(((RelationalQName)nameRepository.get(predicate.getName())).getId());
-  }
-
-  protected void toSQL(TextCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
-    sql.append("(a.text = ?)");
-    sqlParameters.add(((RelationalText) predicate.getText()).getId());
-  }
-
-  protected void toSQL(RangeCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
-    final Range range = predicate.getRange();
-    sql.append("(a.range_start < ? and a.range_end > ?)");
-    sqlParameters.add(range.getEnd());
-    sqlParameters.add(range.getStart());
-  }
-
-  protected void toSQL(AnyCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
-    sql.append("(1 = 1)");
-  }
-
-  protected void toSQL(NoneCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
-    sql.append("(1 <> 1)");
-  }
-
-  protected void toWhereClause(Criterion criterion, StringBuilder sql, Collection<Object> sqlParameters) {
-    if (criterion instanceof Operator) {
-      toSQL((Operator) criterion, sql, sqlParameters);
-    } else if (criterion instanceof AnnotationNameCriterion) {
-      toSQL((AnnotationNameCriterion) criterion, sql, sqlParameters);
-    } else if (criterion instanceof TextCriterion) {
-      toSQL((TextCriterion) criterion, sql, sqlParameters);
-    } else if (criterion instanceof AnnotationLinkNameCriterion) {
-      toSQL((AnnotationLinkNameCriterion) criterion, sql, sqlParameters);
-    } else if (criterion instanceof RangeCriterion) {
-      toSQL((RangeCriterion) criterion, sql, sqlParameters);
-    } else if (criterion instanceof AnnotationIdentityCriterion) {
-      toSQL((AnnotationIdentityCriterion) criterion, sql, sqlParameters);
-    } else if (criterion instanceof NotOperator) {
-      toSQL((NotOperator) criterion, sql, sqlParameters);
-    } else if (criterion instanceof AnyCriterion) {
-      toSQL((AnyCriterion) criterion, sql, sqlParameters);
-    } else if (criterion instanceof NoneCriterion) {
-      toSQL((NoneCriterion) criterion, sql, sqlParameters);
-    } else {
-      throw new IllegalArgumentException(Objects.toStringHelper(criterion).toString());
-    }
   }
 
   public SortedSet<QName> names(Text text) {
@@ -452,6 +212,80 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     return names;
   }
 
+  public void set(Map<Annotation, Map<QName, String>> data) {
+    final Set<QName> names = Sets.newHashSet();
+    for (Map<QName, String> annotationData : data.values()) {
+      for (QName n : annotationData.keySet()) {
+        names.add(n);
+      }
+    }
+    final Map<QName, Long> nameIdIndex = Maps.newHashMapWithExpectedSize(names.size());
+    for (QName n : nameRepository.get(names)) {
+      nameIdIndex.put(n, ((RelationalQName) n).getId());
+    }
+
+    final List<SqlParameterSource> batchParams = new ArrayList<SqlParameterSource>(data.size());
+    for (Map.Entry<Annotation, Map<QName, String>> annotationData : data.entrySet()) {
+      final long annotationId = ((RelationalAnnotation) annotationData.getKey()).getId();
+      for (Map.Entry<QName, String> dataEntry : annotationData.getValue().entrySet()) {
+        batchParams.add(new MapSqlParameterSource()
+                .addValue("annotation", annotationId)
+                .addValue("name", nameIdIndex.get(dataEntry.getKey()))
+                .addValue("value", dataEntry.getValue()));
+      }
+    }
+    if (!batchParams.isEmpty()) {
+      annotationDataInsert.executeBatch(batchParams.toArray(new SqlParameterSource[batchParams.size()]));
+    }
+  }
+
+  public void set(Annotation annotation, Map<QName, String> data) {
+    set(Collections.singletonMap(annotation, data));
+  }
+
+  public Map<QName, String> get(Annotation annotation) {
+    final Map<QName, String> data = new HashMap<QName, String>();
+    final StringBuilder sql = new StringBuilder("select d.value as d_value, ");
+    sql.append(RelationalQNameRepository.selectNameFrom("n"));
+    sql.append(" from text_annotation_data d join text_qname n on d.name = n.id where annotation = ?");
+    jt.query(sql.toString(), new RowMapper<Void>() {
+
+      public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+        data.put(RelationalQNameRepository.mapNameFrom(rs, "n"), mapDataFrom(rs, "d"));
+        return null;
+      }
+    }, ((RelationalAnnotation) annotation).getId());
+    return data;
+  }
+
+  public void delete(Annotation annotation, Set<QName> names) {
+    List<Object> params = new ArrayList<Object>(names.size() + 1);
+    StringBuilder sql = new StringBuilder("delete from text_annotation_data where annotation = ?");
+    params.add(((RelationalAnnotation) annotation).getId());
+
+    if (names != null && !names.isEmpty()) {
+      sql.append(" and name in (");
+      for (Iterator<RelationalQName> it = Iterables.filter(nameRepository.get(names), RelationalQName.class).iterator(); it.hasNext(); ) {
+        params.add(it.next().getId());
+        sql.append("?").append(it.hasNext() ? ", " : "");
+      }
+      sql.append(")");
+    }
+
+    jt.update(sql.toString(), params.toArray(new Object[params.size()]));
+  }
+
+  private StringBuilder sql(String select, List<Object> ps, Criterion criterion) {
+    return queryCriteriaTranslator.where(from(new StringBuilder(select)), criterion, ps);
+  }
+
+  private StringBuilder from(StringBuilder sql) {
+    sql.append(" from text_annotation a");
+    sql.append(" join text_qname n on a.name = n.id");
+    sql.append(" join text_content t on a.text = t.id");
+    return sql;
+  }
+
   public static String selectAnnotationFrom(String tableName) {
     return SQL.select(tableName, "id", "range_start", "range_end");
   }
@@ -464,5 +298,13 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     ra.setText(text);
     ra.setRange(new Range(rs.getInt(tableName + "_range_start"), rs.getInt(tableName + "_range_end")));
     return ra;
+  }
+
+  public static String selectDataFrom(String tableName) {
+    return SQL.select(tableName, "value");
+  }
+
+  public static String mapDataFrom(ResultSet rs, String prefix) throws SQLException {
+    return rs.getString(prefix + "_value");
   }
 }

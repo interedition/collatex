@@ -43,9 +43,6 @@ public class TokenizerTest extends AbstractTest {
   private AnnotationRepository annotationRepository;
 
   @Autowired
-  private AnnotationDataRepository annotationDataRepository;
-
-  @Autowired
   private Tokenizer tokenizer;
 
   @Test
@@ -61,7 +58,7 @@ public class TokenizerTest extends AbstractTest {
     pc.addLineElement(new SimpleQName(TEI_NS, "pb"));
 
     pc.getModules().add(new TextXMLParserModule(textRepository));
-    pc.getModules().add(new AnnotationStorageXMLParserModule(annotationRepository, annotationDataRepository));
+    pc.getModules().add(new AnnotationStorageXMLParserModule(annotationRepository));
 
     for (String resource : new String[]{"/igntp/0101.xml", "/igntp/0105.xml", "/igntp/0109.xml"}) {
       LOG.info(Strings.padStart("Tokenizing " + resource, 100, '='));
@@ -89,7 +86,7 @@ public class TokenizerTest extends AbstractTest {
       read = token.getRange().getEnd();
     }
 
-    final int length = textRepository.length(text);
+    final int length = text.length();
     if (read < length) {
       ranges.put(new Range(read, length), false);
     }
