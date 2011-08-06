@@ -1,7 +1,5 @@
 package eu.interedition.text.xml;
 
-import eu.interedition.text.QName;
-
 import java.util.List;
 
 public interface XMLParserConfiguration {

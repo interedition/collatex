@@ -5,13 +5,14 @@ import eu.interedition.text.AbstractXMLTest;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Range;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.predicate.TextPredicate;
-import eu.interedition.text.predicate.AnnotationNamePredicate;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.Set;
+
+import static eu.interedition.text.query.Criteria.annotationName;
+import static eu.interedition.text.query.Criteria.or;
 
 public class AnnotationEventSourceTest extends AbstractXMLTest {
 
@@ -20,12 +21,13 @@ public class AnnotationEventSourceTest extends AbstractXMLTest {
 
   @Test
   public void generateEvents() throws IOException {
-    source.listen(DEBUG_LISTENER,
-            new TextPredicate(document("george-algabal-tei.xml")),
-            new AnnotationNamePredicate(new SimpleQName(TEI_NS, "div")),
-            new AnnotationNamePredicate(new SimpleQName(TEI_NS, "lg")),
-            new AnnotationNamePredicate(new SimpleQName(TEI_NS, "l")),
-            new AnnotationNamePredicate(new SimpleQName(TEI_NS, "p")));
+    source.listen(DEBUG_LISTENER, document("george-algabal-tei.xml"),
+            or(
+                    annotationName(new SimpleQName(TEI_NS, "div")),
+                    annotationName(new SimpleQName(TEI_NS, "lg")),
+                    annotationName(new SimpleQName(TEI_NS, "l")),
+                    annotationName(new SimpleQName(TEI_NS, "p"))
+            ));
   }
 
   private final AnnotationEventListener DEBUG_LISTENER = new AnnotationEventListener() {

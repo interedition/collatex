@@ -1,9 +1,7 @@
 package eu.interedition.text.rdbms;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.DatabaseMetaDataCallback;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
@@ -12,7 +10,8 @@ import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncremente
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -40,8 +39,11 @@ public class DataFieldMaxValueIncrementerFactory implements InitializingBean {
     final JdbcTemplate jt = new JdbcTemplate(dataSource);
     final String tableName = incrementer.getIncrementerName();
     if (jt.queryForInt("select count(*) from " + tableName) == 0) {
-      jt.update("insert into " + tableName + " value (0)");
+      jt.update("insert into " + tableName + " values ()");
     }
+
+    incrementer.setCacheSize(Short.MAX_VALUE);
+
     return incrementer;
   }
 

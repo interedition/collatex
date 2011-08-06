@@ -1,7 +1,5 @@
 package eu.interedition.text;
 
-import org.xml.sax.SAXException;
-
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;

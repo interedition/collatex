@@ -1,7 +1,6 @@
 package eu.interedition.text;
 
-import eu.interedition.text.predicate.AnnotationPredicate;
-import eu.interedition.text.predicate.Predicate;
+import eu.interedition.text.query.Criterion;
 
 import java.util.Map;
 import java.util.Set;
@@ -15,25 +14,17 @@ public interface AnnotationRepository {
 
   Iterable<Annotation> create(Iterable<Annotation> annotations);
 
-  Iterable<Annotation> find(Iterable<AnnotationPredicate> predicates);
+  Iterable<Annotation> find(Criterion criterion);
 
-  Iterable<Annotation> find(AnnotationPredicate... predicates);
-
-  void delete(Iterable<AnnotationPredicate> predicates);
-
-  void delete(AnnotationPredicate... predicates);
+  void delete(Criterion criterion);
 
   Iterable<AnnotationLink> createLink(QName... names);
 
   Iterable<AnnotationLink> createLink(Iterable<QName> names);
 
-  Map<AnnotationLink, Set<Annotation>> findLinks(Iterable<Predicate> predicates);
+  Map<AnnotationLink, Set<Annotation>> findLinks(Criterion criterion);
 
-  Map<AnnotationLink, Set<Annotation>> findLinks(Predicate... predicates);
-
-  void deleteLinks(Iterable<Predicate> predicates);
-
-  void deleteLinks(Predicate... predicates);
+  void deleteLinks(Criterion criterion);
 
   void add(AnnotationLink to, Set<Annotation> toAdd);
 

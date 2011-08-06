@@ -1,12 +1,10 @@
 package eu.interedition.text.util;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
-import eu.interedition.text.Text;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

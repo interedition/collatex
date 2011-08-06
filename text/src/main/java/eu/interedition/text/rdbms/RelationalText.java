@@ -1,12 +1,9 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
-import eu.interedition.text.Annotation;
 import eu.interedition.text.Text;
 
-import java.sql.Clob;
 import java.util.Date;
-import java.util.Set;
 
 public class RelationalText implements Text {
   private long id;

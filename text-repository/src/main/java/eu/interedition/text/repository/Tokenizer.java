@@ -2,12 +2,10 @@ package eu.interedition.text.repository;
 
 import com.google.common.collect.Lists;
 import eu.interedition.text.*;
-import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.event.AnnotationEventListener;
+import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.predicate.TextPredicate;
-import eu.interedition.text.predicate.AnnotationNamePredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+
+import static eu.interedition.text.query.Criteria.*;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -47,8 +47,8 @@ public class Tokenizer {
   }
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
-    annotationRepository.delete(new TextPredicate(text), new AnnotationNamePredicate(TOKEN_NAME));
-    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, new TextPredicate(text));
+    annotationRepository.delete(and(text(text), annotationName(TOKEN_NAME)));
+    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none());
   }
 
   private class TokenGeneratingListener implements AnnotationEventListener {

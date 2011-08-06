@@ -26,7 +26,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
-import eu.interedition.text.predicate.TextPredicate;
 import eu.interedition.text.xml.module.XMLParserModuleAdapter;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,8 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedMap;
 
+import static eu.interedition.text.query.Criteria.text;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -92,8 +94,8 @@ public class XMLImportHandlerTest extends AbstractXMLTest {
       }
     }
 
-    annotationRepository.delete(new TextPredicate(text));
-    final Iterable<Annotation> remaining = annotationRepository.find(new TextPredicate(text));
+    annotationRepository.delete(text(text));
+    final Iterable<Annotation> remaining = annotationRepository.find(text(text));
     assertTrue(Integer.toString(Iterables.size(remaining)), Iterables.isEmpty(remaining));
   }
 

@@ -13,8 +13,8 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath:/eu/interedition/text/rdbms/repository-context.xml
             classpath:/eu/interedition/text/repository/service-context.xml
+            classpath:/eu/interedition/text/rdbms/repository-context.xml
         </param-value>
     </context-param>
 

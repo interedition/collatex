@@ -1,7 +1,7 @@
-package eu.interedition.text.predicate;
+package eu.interedition.text.query;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public interface Predicate {
+public interface Criterion {
 }

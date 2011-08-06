@@ -5,8 +5,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.predicate.AnnotationNamePredicate;
-import eu.interedition.text.predicate.TextPredicate;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
@@ -23,6 +21,8 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
+
+import static eu.interedition.text.query.Criteria.*;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -80,7 +80,7 @@ public class TokenizerTest extends AbstractTest {
     int read = 0;
 
     final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
-    for (Annotation token : annotationRepository.find(new TextPredicate(text), new AnnotationNamePredicate(Tokenizer.TOKEN_NAME))) {
+    for (Annotation token : annotationRepository.find(and(text(text), annotationName(Tokenizer.TOKEN_NAME)))) {
       final Range range = token.getRange();
       if (read < range.getStart()) {
         ranges.put(new Range(read, range.getStart()), false);

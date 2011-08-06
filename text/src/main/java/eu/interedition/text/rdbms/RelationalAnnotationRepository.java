@@ -1,5 +1,6 @@
 package eu.interedition.text.rdbms;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -7,7 +8,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.predicate.*;
+import eu.interedition.text.query.*;
 import eu.interedition.text.util.AbstractAnnotationRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
@@ -32,7 +33,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import static com.google.common.collect.Iterables.isEmpty;
 import static eu.interedition.text.rdbms.RelationalQNameRepository.mapNameFrom;
 import static eu.interedition.text.rdbms.RelationalQNameRepository.selectNameFrom;
 import static eu.interedition.text.rdbms.RelationalTextRepository.mapTextFrom;
@@ -133,7 +133,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   public Iterable<AnnotationLink> createLink(Iterable<QName> names) {
     final Map<QName, Long> nameIdIndex = Maps.newHashMap();
     for (QName n : nameRepository.get(Sets.newHashSet(names))) {
-      nameIdIndex.put(n, ((RelationalQName)n).getId());
+      nameIdIndex.put(n, ((RelationalQName) n).getId());
     }
 
     final List<AnnotationLink> created = Lists.newArrayList();
@@ -153,11 +153,11 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     return created;
   }
 
-  public void delete(Iterable<AnnotationPredicate> predicates) {
+  public void delete(Criterion criterion) {
     final ArrayList<Object> parameters = new ArrayList<Object>();
     final List<Object[]> batchParameters = Lists.newArrayListWithCapacity(batchSize);
 
-    jt.query(buildAnnotationFinderSQL("select a.id as a_id", parameters, predicates).toString(), new RowMapper<Void>() {
+    jt.query(buildAnnotationFinderSQL("select a.id as a_id", parameters, criterion).toString(), new RowMapper<Void>() {
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
         batchParameters.add(new Object[]{rs.getInt("a_id")});
 
@@ -171,12 +171,12 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     }, parameters.toArray(new Object[parameters.size()]));
   }
 
-  public void deleteLinks(Iterable<Predicate> predicates) {
+  public void deleteLinks(Criterion criterion) {
     final ArrayList<Object> parameters = new ArrayList<Object>();
     final List<Object[]> batchParameters = Lists.newArrayListWithCapacity(batchSize);
-    jt.query(buildAnnotationLinkFinderSQL("select distinct al.id as al_id", parameters, predicates).toString(), new RowMapper<Void>() {
+    jt.query(buildAnnotationLinkFinderSQL("select distinct al.id as al_id", parameters, criterion).toString(), new RowMapper<Void>() {
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        batchParameters.add(new Object[] { rs.getInt("al_id") });
+        batchParameters.add(new Object[]{rs.getInt("al_id")});
 
         if (rs.isLast() || (batchParameters.size() % batchSize) == 0) {
           jt.batchUpdate("delete from text_annotation_link where id = ?", batchParameters);
@@ -225,13 +225,13 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     jt.update(sql.toString(), params.toArray(new Object[params.size()]));
   }
 
-  public Iterable<Annotation> find(Iterable<AnnotationPredicate> predicates) {
+  public Iterable<Annotation> find(Criterion criterion) {
     List<Object> parameters = Lists.newArrayList();
 
     final StringBuilder sql = buildAnnotationFinderSQL(new StringBuilder("select ").
             append(selectAnnotationFrom("a")).append(", ").
             append(selectNameFrom("n")).append(", ").
-            append(selectTextFrom("t")).toString(), parameters, predicates);
+            append(selectTextFrom("t")).toString(), parameters, criterion);
     sql.append(" order by n.id");
 
     return Sets.newTreeSet(jt.query(sql.toString(), new RowMapper<Annotation>() {
@@ -246,14 +246,17 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     }, parameters.toArray(new Object[parameters.size()])));
   }
 
-  public Map<AnnotationLink, Set<Annotation>> findLinks(Iterable<Predicate> predicates) {
+  public Map<AnnotationLink, Set<Annotation>> findLinks(Criterion criterion) {
+
+    // FIXME: two-pass query: first select link ids; then fetch complete links
+
     final List<Object> params = new ArrayList<Object>();
     final StringBuilder sql = buildAnnotationLinkFinderSQL(new StringBuilder("select ")
             .append("al.id as al_id, ")
             .append(selectAnnotationFrom("a")).append(", ")
             .append(selectTextFrom("t")).append(", ")
             .append(selectNameFrom("aln")).append(", ")
-            .append(selectNameFrom("an")).toString(), params, predicates);
+            .append(selectNameFrom("an")).toString(), params, criterion);
     sql.append(" order by al.id, t.id, an.id, a.id");
 
     final Map<AnnotationLink, Set<Annotation>> annotationLinks = new HashMap<AnnotationLink, Set<Annotation>>();
@@ -292,69 +295,19 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     return annotationLinks;
   }
 
-  private StringBuilder buildAnnotationFinderSQL(String selectClause, List<Object> parameters, Iterable<AnnotationPredicate> predicates) {
+  private StringBuilder buildAnnotationFinderSQL(String selectClause, List<Object> parameters, Criterion criterion) {
     final StringBuilder sql = new StringBuilder(selectClause);
     sql.append(" from text_annotation a");
     sql.append(" join text_qname n on a.name = n.id");
     sql.append(" join text_content t on a.text = t.id");
+    sql.append(" where ");
 
-    if (!isEmpty(predicates)) {
-      sql.append(" where 1=1");
-    }
-
-    final Iterable<AnnotationIdentityPredicate> equalsPredicates = Iterables.filter(predicates, AnnotationIdentityPredicate.class);
-    if (!isEmpty(equalsPredicates)) {
-      sql.append(" and a.id in (");
-      for (Iterator<AnnotationIdentityPredicate> it = equalsPredicates.iterator(); it.hasNext(); ) {
-        parameters.add(((RelationalAnnotation) it.next().getAnnotation()).getId());
-        sql.append("?").append(it.hasNext() ? ", " : "");
-      }
-      sql.append(")");
-    }
-
-    final Iterable<TextPredicate> textPredicates = Iterables.filter(predicates, TextPredicate.class);
-    if (!isEmpty(textPredicates)) {
-      sql.append(" and a.text in (");
-      for (Iterator<TextPredicate> it = textPredicates.iterator(); it.hasNext(); ) {
-        parameters.add(((RelationalText) it.next().getText()).getId());
-        sql.append("?").append(it.hasNext() ? ", " : "");
-      }
-      sql.append(")");
-    }
-
-    final Iterable<AnnotationNamePredicate> namePredicates = Iterables.filter(predicates, AnnotationNamePredicate.class);
-    if (!isEmpty(namePredicates)) {
-      final Set<QName> names = Sets.newHashSet(Iterables.transform(namePredicates, AnnotationNamePredicate.TO_NAME));
-
-      sql.append(" and a.name in (");
-      for (Iterator<QName> it = nameRepository.get(names).iterator(); it.hasNext(); ) {
-        parameters.add(((RelationalQName) it.next()).getId());
-        sql.append("?").append(it.hasNext() ? ", " : "");
-      }
-      sql.append(")");
-    }
-
-    final Iterable<TextRangePredicate> rangePredicates = Iterables.filter(predicates, TextRangePredicate.class);
-    if (!isEmpty(rangePredicates)) {
-      sql.append(" and (");
-      for (Iterator<TextRangePredicate> it = rangePredicates.iterator(); it.hasNext(); ) {
-        final TextRangePredicate predicate = it.next();
-
-        sql.append("(a.text = ? and a.range_start < ? and a.range_end > ?)");
-        sql.append(it.hasNext() ? " or " : "");
-
-        final Range range = predicate.getRange();
-        parameters.add(((RelationalText)predicate.getText()).getId());
-        parameters.add(range.getEnd());
-        parameters.add(range.getStart());
-      }
-      sql.append(")");
-    }
+    toWhereClause(criterion, sql, parameters);
 
     return sql;
   }
 
-  private StringBuilder buildAnnotationLinkFinderSQL(String selectClause, List<Object> params, Iterable<Predicate> predicates) {
+  private StringBuilder buildAnnotationLinkFinderSQL(String selectClause, List<Object> params, Criterion criterion) {
     final StringBuilder sql = new StringBuilder(selectClause);
     sql.append(" from text_annotation_link_target alt");
     sql.append(" join text_annotation_link al on alt.link = al.id");
@@ -362,61 +315,101 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     sql.append(" join text_annotation a on alt.target = a.id");
     sql.append(" join text_qname an on a.name = an.id");
     sql.append(" join text_content t on a.text = t.id");
+    sql.append(" where ");
 
-    if (!isEmpty(predicates)) {
-      sql.append(" where 1=1");
-    }
+    toWhereClause(criterion, sql, params);
 
-    final Iterable<TextPredicate> textPredicates = Iterables.filter(predicates, TextPredicate.class);
-    if (!isEmpty(textPredicates)) {
-      sql.append(" and a.text in (");
-      for (Iterator<TextPredicate> it = textPredicates.iterator(); it.hasNext(); ) {
-        params.add(((RelationalText) it.next().getText()).getId());
-        sql.append("?").append(it.hasNext() ? ", " : "");
-      }
-      sql.append(")");
-    }
-
-    final Iterable<AnnotationLinkNamePredicate> linkNamePredicates = Iterables.filter(predicates, AnnotationLinkNamePredicate.class);
-    if (!isEmpty(linkNamePredicates)) {
-      final Set<QName> linkNames = Sets.newHashSet(Iterables.transform(linkNamePredicates, AnnotationLinkNamePredicate.TO_NAME));
-      sql.append(" and al.name in (");
-      for (Iterator<QName> it = nameRepository.get(linkNames).iterator(); it.hasNext(); ) {
-        params.add(((RelationalQName) it.next()).getId());
-        sql.append("?").append(it.hasNext() ? ", " : "");
-      }
-      sql.append(")");
-    }
-
-    final Iterable<AnnotationNamePredicate> namePredicates = Iterables.filter(predicates, AnnotationNamePredicate.class);
-    if (!isEmpty(namePredicates)) {
-      final Set<QName> names = Sets.newHashSet(Iterables.transform(namePredicates, AnnotationNamePredicate.TO_NAME));
-
-      sql.append(" and a.name in (");
-      for (Iterator<QName> it = nameRepository.get(names).iterator(); it.hasNext(); ) {
-        params.add(((RelationalQName) it.next()).getId());
-        sql.append("?").append(it.hasNext() ? ", " : "");
-      }
-      sql.append(")");
-    }
-
-    final Iterable<TextRangePredicate> rangePredicates = Iterables.filter(predicates, TextRangePredicate.class);
-    if (!isEmpty(rangePredicates)) {
-      sql.append(" and (");
-      for (Iterator<TextRangePredicate> it = rangePredicates.iterator(); it.hasNext(); ) {
-        final TextRangePredicate predicate = it.next();
-
-        sql.append("(a.text = ? and a.range_start < ? and a.range_end > ?)");
-        sql.append(it.hasNext() ? " or " : "");
-
-        final Range range = predicate.getRange();
-        params.add(((RelationalText)predicate.getText()).getId());
-        params.add(range.getEnd());
-        params.add(range.getStart());
-      }
-      sql.append(")");
-    }
     return sql;
+  }
+
+  protected void toSQL(Operator op, StringBuilder sql, Collection<Object> sqlParameters) {
+    final List<Criterion> operands = op.getOperands();
+    if (operands.isEmpty()) {
+      return;
+    }
+    sql.append("(");
+    for (Iterator<Criterion> pIt = operands.iterator(); pIt.hasNext(); ) {
+      toWhereClause(pIt.next(), sql, sqlParameters);
+      if (pIt.hasNext()) {
+        sql.append(" ").append(sqlOperator(op)).append(" ");
+      }
+    }
+    sql.append(")");
+  }
+
+  protected String sqlOperator(Operator op) {
+    if (op instanceof AndOperator) {
+      return "and";
+    } else if (op instanceof OrOperator) {
+      return "or";
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  protected void toSQL(NotOperator predicate, StringBuilder sql, Collection<Object> sqlParameters) {
+    sql.append("(NOT ");
+    toWhereClause(predicate.getOperand(), sql, sqlParameters);
+    sql.append(")");
+  }
+
+  protected void toSQL(AnnotationLinkNameCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
+    sql.append("(al.name = ?)");
+    sqlParameters.add(((RelationalQName)nameRepository.get(predicate.getName())).getId());
+  }
+
+  protected void toSQL(AnnotationIdentityCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
+    sql.append("(a.id = ?)");
+    sqlParameters.add(((RelationalAnnotation) predicate.getAnnotation()).getId());
+  }
+
+  protected void toSQL(AnnotationNameCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
+    sql.append("(a.name = ?)");
+    sqlParameters.add(((RelationalQName)nameRepository.get(predicate.getName())).getId());
+  }
+
+  protected void toSQL(TextCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
+    sql.append("(a.text = ?)");
+    sqlParameters.add(((RelationalText) predicate.getText()).getId());
+  }
+
+  protected void toSQL(RangeCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
+    final Range range = predicate.getRange();
+    sql.append("(a.range_start < ? and a.range_end > ?)");
+    sqlParameters.add(range.getEnd());
+    sqlParameters.add(range.getStart());
+  }
+
+  protected void toSQL(AnyCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
+    sql.append("(1 = 1)");
+  }
+
+  protected void toSQL(NoneCriterion predicate, StringBuilder sql, Collection<Object> sqlParameters) {
+    sql.append("(1 <> 1)");
+  }
+
+  protected void toWhereClause(Criterion criterion, StringBuilder sql, Collection<Object> sqlParameters) {
+    if (criterion instanceof Operator) {
+      toSQL((Operator) criterion, sql, sqlParameters);
+    } else if (criterion instanceof AnnotationNameCriterion) {
+      toSQL((AnnotationNameCriterion) criterion, sql, sqlParameters);
+    } else if (criterion instanceof TextCriterion) {
+      toSQL((TextCriterion) criterion, sql, sqlParameters);
+    } else if (criterion instanceof AnnotationLinkNameCriterion) {
+      toSQL((AnnotationLinkNameCriterion) criterion, sql, sqlParameters);
+    } else if (criterion instanceof RangeCriterion) {
+      toSQL((RangeCriterion) criterion, sql, sqlParameters);
+    } else if (criterion instanceof AnnotationIdentityCriterion) {
+      toSQL((AnnotationIdentityCriterion) criterion, sql, sqlParameters);
+    } else if (criterion instanceof NotOperator) {
+      toSQL((NotOperator) criterion, sql, sqlParameters);
+    } else if (criterion instanceof AnyCriterion) {
+      toSQL((AnyCriterion) criterion, sql, sqlParameters);
+    } else if (criterion instanceof NoneCriterion) {
+      toSQL((NoneCriterion) criterion, sql, sqlParameters);
+    } else {
+      throw new IllegalArgumentException(Objects.toStringHelper(criterion).toString());
+    }
   }
 
   public SortedSet<QName> names(Text text) {
