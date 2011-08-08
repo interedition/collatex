@@ -140,6 +140,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
 
     final StringBuilder where = new StringBuilder("al.id in (");
     for (Iterator<Long> linkIdIt = linkIds.iterator(); linkIdIt.hasNext(); ) {
+      linkIdIt.next();
       where.append("?").append(linkIdIt.hasNext() ? ", " : "");
     }
     where.append(")");
