@@ -88,6 +88,6 @@ public class RelationalAnnotation implements Annotation {
   }
 
   public int compareTo(Annotation o) {
-    return Annotations.compare(this, o);
+    return Annotations.compare(this, o).compare(id, ((RelationalAnnotation)o).id).result();
   }
 }

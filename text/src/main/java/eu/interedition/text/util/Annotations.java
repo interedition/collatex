@@ -14,16 +14,14 @@ import java.util.Comparator;
 public class Annotations {
   public static Ordering<Annotation> DEFAULT_ORDERING = Ordering.from(new Comparator<Annotation>() {
     public int compare(Annotation o1, Annotation o2) {
-      return Annotations.compare(o1, o2);
+      return o1.compareTo(o2);
     }
   });
 
-  public static int compare(Annotation a, Annotation b) {
+  public static ComparisonChain compare(Annotation a, Annotation b) {
     return ComparisonChain.start()
             .compare(a.getRange(), b.getRange())
-            .compare(a.getName(), b.getName())
-            .compare(a, b, Ordering.arbitrary())
-            .result();
+            .compare(a.getName(), b.getName());
   }
 
   public static final Function<Annotation, QName> NAME = new Function<Annotation, QName>() {

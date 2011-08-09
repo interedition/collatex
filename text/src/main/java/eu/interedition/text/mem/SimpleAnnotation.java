@@ -39,6 +39,6 @@ public class SimpleAnnotation implements Annotation {
   }
 
   public int compareTo(Annotation o) {
-    return Annotations.compare(this, o);
+    return Annotations.compare(this, o).compare(this, o, Ordering.arbitrary()).result();
   }
 }
