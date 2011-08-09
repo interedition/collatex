@@ -71,7 +71,7 @@ public class RelationalAnnotation implements Annotation {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(getName()).addValue(getRange()).toString();
+    return Objects.toStringHelper(this).addValue(getName()).addValue(getRange()).addValue(getId()).toString();
   }
 
   @Override

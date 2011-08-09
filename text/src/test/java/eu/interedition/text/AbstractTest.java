@@ -21,11 +21,15 @@
 
 package eu.interedition.text;
 
+import eu.interedition.text.rdbms.RelationalQNameRepository;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.AfterTransaction;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 
@@ -36,6 +40,7 @@ import java.net.URI;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/testContext.xml", "classpath:/eu/interedition/text/rdbms/repository-context.xml"})
+@Transactional
 public abstract class AbstractTest {
   /**
    * Test namespace.
@@ -47,16 +52,16 @@ public abstract class AbstractTest {
    */
   protected static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class.getPackage().getName());
 
-  /**
-   * Prints the given message to the log.
-   *
-   * @param msg the debug message
-   */
-  protected void printDebugMessage(String msg) {
-    LOG.debug(msg);
-  }
+  @Autowired
+  protected RelationalQNameRepository nameRepository;
 
   protected static String escapeNewlines(String str) {
     return str.replaceAll("[\n\r]+", "\\\\n");
   }
+
+  @AfterTransaction
+  public void clearNameCache() {
+    nameRepository.clearCache();
+  }
+
 }

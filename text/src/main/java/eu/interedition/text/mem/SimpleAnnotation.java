@@ -1,5 +1,6 @@
 package eu.interedition.text.mem;
 
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.util.Annotations;

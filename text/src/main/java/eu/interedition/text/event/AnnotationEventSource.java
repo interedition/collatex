@@ -1,6 +1,7 @@
 package eu.interedition.text.event;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
@@ -8,8 +9,7 @@ import eu.interedition.text.query.Criterion;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Set;
-import java.util.SortedMap;
+import java.util.*;
 
 import static eu.interedition.text.query.Criteria.*;
 
@@ -51,26 +51,31 @@ public class AnnotationEventSource {
 
         listener.start();
 
+        final Map<Annotation, Map<QName, String>> annotationData = Maps.newHashMap();
         while (true) {
           if ((offset % pageSize) == 0) {
             pageEnd = Math.min(offset + pageSize, contentLength);
             final Range pageRange = new Range(offset, pageEnd);
-            for (Annotation a : annotationRepository.find(and(criterion, text(text), range(pageRange)))) {
+            final Iterable<Annotation> pageAnnotations = annotationRepository.find(and(criterion, text(text), rangeOverlap(pageRange)));
+            final Map<Annotation, Map<QName, String>> pageAnnotationData = annotationRepository.get(pageAnnotations, Collections.<QName>emptySet());
+            for (Annotation a : pageAnnotations) {
               final int start = a.getRange().getStart();
               final int end = a.getRange().getEnd();
               if (start >= offset) {
-                Set<Annotation> annotations = starts.get(start);
-                if (annotations == null) {
-                  starts.put(start, annotations = Sets.newHashSet());
+                Set<Annotation> starting = starts.get(start);
+                if (starting == null) {
+                  starts.put(start, starting = Sets.newHashSet());
                 }
-                annotations.add(a);
+                starting.add(a);
+                annotationData.put(a, pageAnnotationData.get(a));
               }
               if (end <= pageEnd) {
-                Set<Annotation> annotations = ends.get(end);
-                if (annotations == null) {
-                  ends.put(end, annotations = Sets.newHashSet());
+                Set<Annotation> ending = ends.get(end);
+                if (ending == null) {
+                  ends.put(end, ending = Sets.newHashSet());
                 }
-                annotations.add(a);
+                ending.add(a);
+                annotationData.put(a, pageAnnotationData.get(a));
               }
             }
 
@@ -82,13 +87,13 @@ public class AnnotationEventSource {
             final Set<Annotation> endEvents = (!ends.isEmpty() && offset == ends.firstKey() ? ends.remove(ends.firstKey()) : Sets.<Annotation>newHashSet());
 
             final Set<Annotation> terminating = Sets.filter(endEvents, Predicates.not(EMPTY));
-            if (!terminating.isEmpty()) listener.end(offset, terminating);
+            if (!terminating.isEmpty()) listener.end(offset, filter(annotationData, terminating, true));
 
             final Set<Annotation> empty = Sets.filter(startEvents, EMPTY);
-            if (!empty.isEmpty()) listener.empty(offset, empty);
+            if (!empty.isEmpty()) listener.empty(offset, filter(annotationData, empty, true));
 
             final Set<Annotation> starting = Sets.filter(startEvents, Predicates.not(EMPTY));
-            if (!starting.isEmpty()) listener.start(offset, starting);
+            if (!starting.isEmpty()) listener.start(offset, filter(annotationData, starting, false));
 
 
             next = Math.min(starts.isEmpty() ? contentLength : starts.firstKey(), ends.isEmpty() ? contentLength : ends.firstKey());
@@ -112,5 +117,20 @@ public class AnnotationEventSource {
         listener.end();
       }
     });
+  }
+
+  protected static Map<Annotation, Map<QName, String>> filter(Map<Annotation, Map<QName, String>> data, Set<Annotation> keys, boolean remove) {
+    final Map<Annotation, Map<QName, String>> filtered = Maps.newHashMap();
+    for (Iterator<Map.Entry<Annotation, Map<QName, String>>> it = data.entrySet().iterator(); it.hasNext();  ) {
+      final Map.Entry<Annotation, Map<QName, String>> annotationEntry = it.next();
+      final Annotation annotation = annotationEntry.getKey();
+      if (keys.contains(annotation)) {
+        filtered.put(annotation, annotationEntry.getValue());
+        if (remove) {
+          it.remove();
+        }
+      }
+    }
+    return filtered;
   }
 }

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.text.base;
+package eu.interedition.text;
 
 import org.junit.Test;
 

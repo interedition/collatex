@@ -6,11 +6,14 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import eu.interedition.text.QName;
 import eu.interedition.text.QNameRepository;
+import eu.interedition.text.QNameSet;
+import eu.interedition.text.mem.SimpleQNameSet;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -21,6 +24,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static com.google.common.collect.Iterables.getFirst;
+import static java.util.Collections.singleton;
+
 public class RelationalQNameRepository implements QNameRepository, InitializingBean {
 
   private DataSource dataSource;
@@ -29,32 +35,13 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert nameInsert;
+  private SimpleJdbcInsert nameSetInsert;
   private DataFieldMaxValueIncrementer nameIdIncrementer;
 
   private Map<QName, Long> nameCache;
 
-  @Required
-  public void setDataSource(DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
-
-  @Required
-  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
-    this.incrementerFactory = incrementerFactory;
-  }
-
-  public void setCacheSize(int cacheSize) {
-    this.cacheSize = cacheSize;
-  }
-
-  public void afterPropertiesSet() throws Exception {
-    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
-    this.nameInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname");
-    this.nameIdIncrementer = this.incrementerFactory.create("text_qname");
-  }
-
   public QName get(QName name) {
-    return Iterables.getOnlyElement(get(Collections.singleton(name)));
+    return Iterables.getOnlyElement(get(singleton(name)));
   }
 
   public Set<QName> load(Set<Integer> ids) {
@@ -142,6 +129,70 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
     return foundNames;
   }
 
+  public QNameSet getSet(QName name) {
+    final RelationalQName rn = (RelationalQName) get(name);
+
+    final StringBuilder sql = new StringBuilder("select ");
+    sql.append(selectNameFrom("m"));
+    sql.append(" from text_qname_set ns");
+    sql.append(" join text_qname_set m on ns.member = m.id");
+    sql.append(" where ns.name = ?");
+
+    final Set<QName> members = Sets.newHashSet();
+    jt.query(sql.toString(), new RowMapper<Void>() {
+
+      public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+        members.add(mapNameFrom(rs, "m"));
+        return null;
+      }
+    }, rn.getId());
+
+    return new SimpleQNameSet(rn, Sets.newTreeSet(members));
+  }
+
+  public QNameSet putSet(QName name, Set<QName> members) {
+    final RelationalQName rn = (RelationalQName) get(name);
+    final List<SqlParameterSource> batch = Lists.newArrayListWithExpectedSize(members.size());
+    members = get(members);
+    for (QName n : members) {
+      batch.add(new MapSqlParameterSource()
+              .addValue("name", rn.getId())
+              .addValue("member", ((RelationalQName) n).getId()));
+    }
+    nameSetInsert.executeBatch(batch.toArray(new SqlParameterSource[batch.size()]));
+    return new SimpleQNameSet(rn, Sets.newTreeSet(members));
+  }
+
+  public void deleteSet(QName name) {
+    final RelationalQName rn = (RelationalQName) get(name);
+    jt.update("delete from text_qname_set where name = ?", rn.getId());
+  }
+
+  public synchronized void clearCache() {
+    nameCache = null;
+  }
+
+  @Required
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  @Required
+  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
+    this.incrementerFactory = incrementerFactory;
+  }
+
+  public void setCacheSize(int cacheSize) {
+    this.cacheSize = cacheSize;
+  }
+
+  public void afterPropertiesSet() throws Exception {
+    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.nameInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname");
+    this.nameSetInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname_set");
+    this.nameIdIncrementer = this.incrementerFactory.create("text_qname");
+  }
+
   private void initCache() {
     nameCache = new MapMaker().maximumSize(cacheSize).makeMap();
     if (jt.queryForInt("select count(*) from text_qname") <= cacheSize) {
@@ -150,10 +201,6 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
         nameCache.put(name, name.getId());
       }
     }
-  }
-
-  public synchronized void clearCache() {
-    nameCache = null;
   }
 
   public static String selectNameFrom(String tableName) {

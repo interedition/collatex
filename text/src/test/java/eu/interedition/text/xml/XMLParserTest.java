@@ -21,12 +21,12 @@
 
 package eu.interedition.text.xml;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
 import eu.interedition.text.xml.module.XMLParserModuleAdapter;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 
-import static eu.interedition.text.query.Criteria.text;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -45,8 +44,7 @@ import static junit.framework.Assert.assertTrue;
  *
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
-public class XMLImportHandlerTest extends AbstractXMLTest {
-
+public class XMLParserTest extends AbstractTestResourceTest {
   @Autowired
   private TextRepository textRepository;
 
@@ -62,14 +60,16 @@ public class XMLImportHandlerTest extends AbstractXMLTest {
     textRanges = Lists.newArrayList();
   }
 
+  @After
+  public void clearRanges() {
+    sourceRanges = null;
+    textRanges = null;
+  }
+
+
   @Test
-  public void showTextContents() throws IOException {
-    //final String resource = "ignt-0101.xml";
-    //final String resource = "homer-iliad-tei.xml";
-    //final String resource = "archimedes-palimpsest-tei.xml";
-    final String resource = "george-algabal-tei.xml";
-    final Text source = source(resource);
-    final Text text = document(resource);
+  public void textContents() throws Exception {
+    final Text text = text("george-algabal-tei.xml");
 
     assertTrue(text.length() > 0);
 
@@ -81,10 +81,13 @@ public class XMLImportHandlerTest extends AbstractXMLTest {
         }
       });
     }
+  }
 
+  @Test
+  public void offsetMapping() throws IOException {
     if (LOG.isDebugEnabled()) {
-      final SortedMap<Range, String> sources = textRepository.bulkRead(source, Sets.newTreeSet(sourceRanges));
-      final SortedMap<Range, String> texts = textRepository.bulkRead(text, Sets.newTreeSet(textRanges));
+      final SortedMap<Range, String> sources = textRepository.bulkRead(source(), Sets.newTreeSet(sourceRanges));
+      final SortedMap<Range, String> texts = textRepository.bulkRead(text(), Sets.newTreeSet(textRanges));
       final Iterator<Range> sourceRangeIt = sourceRanges.iterator();
       final Iterator<Range> textRangeIt = textRanges.iterator();
       while (sourceRangeIt.hasNext() && textRangeIt.hasNext()) {
@@ -92,10 +95,6 @@ public class XMLImportHandlerTest extends AbstractXMLTest {
                 "] <====> [" + escapeNewlines(texts.get(textRangeIt.next())) + "]");
       }
     }
-
-    annotationRepository.delete(text(text));
-    final Iterable<Annotation> remaining = annotationRepository.find(text(text));
-    assertTrue(Integer.toString(Iterables.size(remaining)), Iterables.isEmpty(remaining));
   }
 
   @Override

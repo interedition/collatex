@@ -21,14 +21,13 @@
 
 package eu.interedition.text;
 
-import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.mem.SimpleQName;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.google.common.collect.Iterables.getFirst;
+import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * Base class for tests using an in-memory document model.
@@ -37,54 +36,37 @@ import static com.google.common.collect.Iterables.getFirst;
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 @Transactional
-public abstract class AbstractDefaultDocumentTest extends AbstractTest {
+public abstract class AbstractTextTest extends AbstractTest {
 
+  public static final String TEST_TEXT = "Hello World";
   @Autowired
-  private TextRepository textRepository;
-
-  @Autowired
-  private AnnotationRepository annotationRepository;
+  protected TextRepository textRepository;
 
   /**
    * The in-memory document model to run tests against.
    */
-  protected Text document;
+  protected Text text;
 
   /**
    * Creates a new document model before every test.
    */
   @Before
-  public void createDocument() {
-    document = textRepository.create(Text.Type.PLAIN);
+  public void createTestText() throws IOException {
+    this.text = textRepository.create(new StringReader(getTestText()));
   }
 
   /**
    * Removes the document model.
    */
   @After
-  public void cleanDocument() {
-    document = null;
+  public void cleanTestText() {
+    if (text != null) {
+      textRepository.delete(text);
+      text = null;
+    }
   }
 
-  /**
-   * Adds a simple {@link Annotation annotation} to the test
-   * document.
-   *
-   * @param name  the local name of the annotation (its namespace will
-   *              be {@link #TEST_NS})
-   * @param start its start offset
-   * @param end   its end offset
-   * @return
-   */
-  protected Annotation addTestAnnotation(String name, int start, int end) {
-    return getFirst(annotationRepository.create(new SimpleAnnotation(document, new SimpleQName(TEST_NS, name), new Range(start, end))), null);
+  protected String getTestText() {
+    return TEST_TEXT;
   }
-
-  /**
-   * Overridden by test classes to provide the textual contents of the
-   * test document.
-   *
-   * @return the textual contents of the test document's annotation
-   */
-  protected abstract String documentText();
 }

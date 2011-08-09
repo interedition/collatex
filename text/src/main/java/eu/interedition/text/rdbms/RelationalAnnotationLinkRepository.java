@@ -57,29 +57,30 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     final List<SqlParameterSource> linkBatch = Lists.newArrayList();
     final List<SqlParameterSource> targetBatch = Lists.newArrayList();
 
-    for (QName n : links.keySet()) {
-      final Long nameId = nameIdIndex.get(n);
+    for (Map.Entry<QName, Set<Annotation>> link : links.entries()) {
+      final QName linkName = link.getKey();
+      final Set<Annotation> targets = link.getValue();
 
+      final Long nameId = nameIdIndex.get(linkName);
+      final long linkId = annotationLinkIdIncrementer.nextLongValue();
 
-      for (Set<Annotation> targets : links.get(n)) {
-        final long linkId = annotationLinkIdIncrementer.nextLongValue();
-        linkBatch.add(new MapSqlParameterSource()
-                .addValue("id", linkId)
-                .addValue("name", nameId));
+      linkBatch.add(new MapSqlParameterSource()
+              .addValue("id", linkId)
+              .addValue("name", nameId));
 
-
-        for (Annotation target : targets) {
+      for (Annotation target : targets) {
           targetBatch.add(new MapSqlParameterSource()
-          .addValue("link", linkId)
-          .addValue("target", ((RelationalAnnotation)target).getId()));
-        }
-        final RelationalAnnotationLink link = new RelationalAnnotationLink(linkId, new RelationalQName(nameId, n));
-        created.put(link, targets);
+                  .addValue("link", linkId)
+                  .addValue("target", ((RelationalAnnotation) target).getId()));
       }
+
+      final RelationalAnnotationLink rt = new RelationalAnnotationLink(linkId, new RelationalQName(nameId, linkName));
+      created.put(rt, targets);
     }
 
     annotationLinkInsert.executeBatch(linkBatch.toArray(new SqlParameterSource[linkBatch.size()]));
     annotationLinkTargetInsert.executeBatch(targetBatch.toArray(new SqlParameterSource[targetBatch.size()]));
+
     return created;
   }
 

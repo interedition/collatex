@@ -7,6 +7,12 @@ CREATE TABLE IF NOT EXISTS text_qname (
 
 CREATE SEQUENCE IF NOT EXISTS text_qname_sequence;
 
+CREATE TABLE IF NOT EXISTS text_qname_set (
+  name BIGINT NOT NULL REFERENCES text_qname (id),
+  member BIGINT NOT NULL REFERENCES text_qname (id),
+  UNIQUE(name, member)
+);
+
 CREATE TABLE IF NOT EXISTS text_content (
   id BIGINT PRIMARY KEY,
   created TIMESTAMP NOT NULL,

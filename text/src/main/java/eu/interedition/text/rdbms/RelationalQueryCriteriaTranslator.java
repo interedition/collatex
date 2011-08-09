@@ -33,8 +33,10 @@ public class RelationalQueryCriteriaTranslator {
       sql(sql, (TextCriterion) criterion, ps);
     } else if (criterion instanceof AnnotationLinkNameCriterion) {
       sql(sql, (AnnotationLinkNameCriterion) criterion, ps);
-    } else if (criterion instanceof RangeCriterion) {
-      sql(sql, (RangeCriterion) criterion, ps);
+    } else if (criterion instanceof RangeOverlapCriterion) {
+      sql(sql, (RangeOverlapCriterion) criterion, ps);
+    } else if (criterion instanceof RangeLengthCriterion) {
+      sql(sql, (RangeLengthCriterion) criterion, ps);
     } else if (criterion instanceof AnnotationIdentityCriterion) {
       sql((AnnotationIdentityCriterion) criterion, ps, sql);
     } else if (criterion instanceof NotOperator) {
@@ -101,11 +103,16 @@ public class RelationalQueryCriteriaTranslator {
     ps.add(((RelationalText) criterion.getText()).getId());
   }
 
-  protected void sql(StringBuilder sql, RangeCriterion criterion, Collection<Object> ps) {
+  protected void sql(StringBuilder sql, RangeOverlapCriterion criterion, Collection<Object> ps) {
     final Range range = criterion.getRange();
     sql.append("(a.range_start < ? and a.range_end > ?)");
     ps.add(range.getEnd());
     ps.add(range.getStart());
+  }
+
+  protected void sql(StringBuilder sql, RangeLengthCriterion criterion, Collection<Object> ps) {
+    sql.append("(a.range_end - a.range_start = ?)");
+    ps.add(criterion.getLength());
   }
 
   protected void sql(StringBuilder sql, AnyCriterion criterion, Collection<Object> ps) {

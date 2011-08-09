@@ -196,13 +196,14 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
       return Collections.emptyMap();
     }
 
-    final List<Object> ps = Lists.<Object>newArrayList(annotationIds.keySet());
+    final List<Long> ps = Lists.newArrayList(annotationIds.keySet());
     final StringBuilder sql = new StringBuilder("select  ");
     sql.append(selectDataFrom("d")).append(", ");
     sql.append(RelationalQNameRepository.selectNameFrom("n")).append(", ");
     sql.append("d.annotation as d_annotation");
     sql.append(" from text_annotation_data d join text_qname n on d.name = n.id where d.annotation in (");
     for (Iterator<Long> annotationIdIt = annotationIds.keySet().iterator(); annotationIdIt.hasNext(); ) {
+      annotationIdIt.next();
       sql.append("?").append(annotationIdIt.hasNext() ? ", " : "");
     }
     sql.append(")");
@@ -247,7 +248,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
 
         return null;
       }
-    }, ps);
+    }, ps.toArray(new Object[ps.size()]));
 
     return data;
   }

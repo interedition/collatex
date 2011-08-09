@@ -32,8 +32,12 @@ public class Criteria {
     return new TextCriterion(text);
   }
 
-  public static Criterion range(Range range) {
-    return new RangeCriterion(range);
+  public static Criterion rangeOverlap(Range range) {
+    return new RangeOverlapCriterion(range);
+  }
+
+  public static Criterion rangeLength(int length) {
+    return new RangeLengthCriterion(length);
   }
 
   public static Operator and(Criterion... criteria) {

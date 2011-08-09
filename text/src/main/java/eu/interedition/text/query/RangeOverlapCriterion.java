@@ -5,10 +5,10 @@ import eu.interedition.text.Range;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeCriterion implements Criterion {
+public class RangeOverlapCriterion implements Criterion {
   private final Range range;
 
-  RangeCriterion(Range range) {
+  RangeOverlapCriterion(Range range) {
     this.range = range;
   }
 

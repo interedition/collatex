@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import static eu.interedition.text.query.Criteria.*;
 
@@ -72,22 +72,22 @@ public class Tokenizer {
     }
 
     @Override
-    public void start(int offset, Set<Annotation> annotations) {
-      if (settings.startingAnnotationsAreBoundary(text, offset, annotations)) {
+    public void start(int offset, Map<Annotation, Map<QName, String>> annotations) {
+      if (settings.startingAnnotationsAreBoundary(text, offset, annotations.keySet())) {
         lastIsTokenBoundary = true;
       }
     }
 
     @Override
-    public void empty(int offset, Set<Annotation> annotations) {
-      if (settings.emptyAnnotationsAreBoundary(text, offset, annotations)) {
+    public void empty(int offset, Map<Annotation, Map<QName, String>> annotations) {
+      if (settings.emptyAnnotationsAreBoundary(text, offset, annotations.keySet())) {
         lastIsTokenBoundary = true;
       }
     }
 
     @Override
-    public void end(int offset, Set<Annotation> annotations) {
-      if (settings.endingAnnotationsAreBoundary(text, offset, annotations)) {
+    public void end(int offset, Map<Annotation, Map<QName, String>> annotations) {
+      if (settings.endingAnnotationsAreBoundary(text, offset, annotations.keySet())) {
         lastIsTokenBoundary = true;
       }
     }

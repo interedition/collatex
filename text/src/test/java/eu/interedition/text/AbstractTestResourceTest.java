@@ -26,7 +26,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.rdbms.RelationalQNameRepository;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserConfiguration;
@@ -35,8 +34,6 @@ import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
 import eu.interedition.text.xml.module.TextXMLParserModule;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 import javax.xml.transform.stream.StreamSource;
@@ -51,43 +48,39 @@ import java.util.SortedSet;
  *
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
-@Transactional
-public abstract class AbstractXMLTest extends AbstractTest {
+public abstract class AbstractTestResourceTest extends AbstractTextTest {
   protected static final URI TEI_NS = URI.create("http://www.tei-c.org/ns/1.0");
 
   /**
    * Names of available XML test resources.
    */
   protected static final SortedSet<String> RESOURCES = Sets.newTreeSet(Lists.newArrayList(//
-          "ignt-0101.xml", "archimedes-palimpsest-tei.xml", "george-algabal-tei.xml", "homer-iliad-tei.xml"));
+          "george-algabal-tei.xml", "ignt-0101.xml", "archimedes-palimpsest-tei.xml", "homer-iliad-tei.xml"));
 
 
   private Map<String, Text> sources = Maps.newHashMap();
-  private Map<String, Text> documents = Maps.newHashMap();
-
-  @Autowired
-  private TextRepository textRepository;
+  private Map<String, Text> texts = Maps.newHashMap();
 
   @Autowired
   private XMLParser xmlParser;
 
   @Autowired
-  private RelationalQNameRepository nameRepository;
-
-  @Autowired
-  private AnnotationRepository annotationRepository;
+  protected AnnotationRepository annotationRepository;
 
   @After
   public void removeDocuments() {
-    for (Iterator<Text> documentIt = documents.values().iterator(); documentIt.hasNext(); ) {
+    for (Iterator<Text> documentIt = texts.values().iterator(); documentIt.hasNext(); ) {
       textRepository.delete(documentIt.next());
       documentIt.remove();
     }
   }
 
-  @AfterTransaction
-  public void clearNameCache() {
-    nameRepository.clearCache();
+  protected Text text() {
+    return text(RESOURCES.first());
+  }
+
+  protected Text source() {
+    return source(RESOURCES.first());
   }
 
   /**
@@ -101,9 +94,9 @@ public abstract class AbstractXMLTest extends AbstractTest {
    * @return the corresponding test document
    * @see #RESOURCES
    */
-  protected synchronized Text document(String resource) {
+  protected synchronized Text text(String resource) {
     load(resource);
-    return documents.get(resource);
+    return texts.get(resource);
   }
 
   protected synchronized Text source(String resource) {
@@ -111,28 +104,8 @@ public abstract class AbstractXMLTest extends AbstractTest {
     return sources.get(resource);
   }
 
-  protected synchronized void load(String resource) {
-    final StopWatch stopWatch = new StopWatch();
-    try {
-      if (RESOURCES.contains(resource) && !documents.containsKey(resource)) {
-        final URI uri = AbstractXMLTest.class.getResource("/" + resource).toURI();
-
-        stopWatch.start("Load " + uri);
-        final Text xml = textRepository.create(new StreamSource(uri.toASCIIString()));
-        stopWatch.stop();
-
-        sources.put(resource, xml);
-        stopWatch.start("Parse " + uri);
-        documents.put(resource, xmlParser.parse(xml, createXMLParserConfiguration()));
-        stopWatch.stop();
-
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("\n" + stopWatch.prettyPrint());
-        }
-      }
-    } catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+  protected List<XMLParserModule> parserModules() {
+    return Lists.<XMLParserModule>newArrayList();
   }
 
   protected XMLParserConfiguration createXMLParserConfiguration() {
@@ -164,16 +137,38 @@ public abstract class AbstractXMLTest extends AbstractTest {
     return pc;
   }
 
-  protected List<XMLParserModule> parserModules() {
-    return Lists.<XMLParserModule>newArrayList(new AnnotationStorageXMLParserModule(annotationRepository));
+  protected synchronized void unload(String resource) {
+    sources.remove(resource);
+    texts.remove(resource);
   }
 
-  /**
-   * Returns a default test document.
-   *
-   * @return the document generated from the first available test resource
-   */
-  protected Text document() {
-    return document(RESOURCES.first());
+  protected void unload() {
+    unload(RESOURCES.first());
   }
+
+  private synchronized void load(String resource) {
+    try {
+      if (RESOURCES.contains(resource) && !texts.containsKey(resource)) {
+        final URI uri = AbstractTestResourceTest.class.getResource("/" + resource).toURI();
+        final StopWatch stopWatch = new StopWatch(uri.toString());
+
+        stopWatch.start("create");
+        final Text xml = textRepository.create(new StreamSource(uri.toASCIIString()));
+        stopWatch.stop();
+
+        sources.put(resource, xml);
+        stopWatch.start("parse");
+        texts.put(resource, xmlParser.parse(xml, createXMLParserConfiguration()));
+        stopWatch.stop();
+
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("\n" + stopWatch.prettyPrint());
+        }
+      }
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+
 }
