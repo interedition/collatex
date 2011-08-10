@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.query.*;
+import eu.interedition.text.query.Criterion;
 import eu.interedition.text.util.AbstractAnnotationRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;

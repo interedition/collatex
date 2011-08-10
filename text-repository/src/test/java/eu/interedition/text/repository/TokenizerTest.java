@@ -7,7 +7,7 @@ import eu.interedition.text.*;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
-import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
+import eu.interedition.text.xml.module.DefaultAnnotationXMLParserModule;
 import eu.interedition.text.xml.module.TextXMLParserModule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class TokenizerTest extends AbstractTest {
     pc.addLineElement(new SimpleQName(TEI_NS, "pb"));
 
     pc.getModules().add(new TextXMLParserModule(textRepository));
-    pc.getModules().add(new AnnotationStorageXMLParserModule(annotationRepository));
+    pc.getModules().add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
 
     for (String resource : new String[]{"/igntp/0101.xml", "/igntp/0105.xml", "/igntp/0109.xml"}) {
       LOG.info(Strings.padStart("Tokenizing " + resource, 100, '='));

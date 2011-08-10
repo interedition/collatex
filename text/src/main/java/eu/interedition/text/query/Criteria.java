@@ -1,6 +1,9 @@
 package eu.interedition.text.query;
 
-import eu.interedition.text.*;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.QName;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
 
 import java.util.Arrays;
 

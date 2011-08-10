@@ -1,6 +1,5 @@
 package eu.interedition.text;
 
-import java.util.Set;
 import java.util.SortedSet;
 
 /**

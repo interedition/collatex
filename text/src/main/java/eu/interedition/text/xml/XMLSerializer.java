@@ -4,12 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.org.apache.bcel.internal.generic.LoadClass;
-import com.sun.xml.internal.fastinfoset.util.LocalNameQualifiedNamesMap;
-import eu.interedition.text.Annotation;
-import eu.interedition.text.QName;
-import eu.interedition.text.Range;
-import eu.interedition.text.Text;
+import eu.interedition.text.*;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.event.ExceptionPropagatingAnnotationEventAdapter;
 import eu.interedition.text.mem.SimpleQName;
@@ -24,9 +19,9 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static eu.interedition.text.util.Annotations.DEFAULT_ORDERING;
 
@@ -34,7 +29,6 @@ import static eu.interedition.text.util.Annotations.DEFAULT_ORDERING;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLSerializer {
-
   private AnnotationEventSource eventSource;
 
   @Required
@@ -55,13 +49,18 @@ public class XMLSerializer {
   private class SerializingListener extends ExceptionPropagatingAnnotationEventAdapter {
     private final ContentHandler xml;
     private final XMLSerializerConfiguration config;
-    private final Map<URI, String> namespaceMappings = Maps.newHashMap();
+    private final Set<QName> hierarchy;
 
-    private boolean mappingsWritten = false;
+    private final Map<URI, String> namespaceMappings = Maps.newHashMap();
+    private final Map<String, Integer> clixIdIncrements = Maps.newHashMap();
+    private final Map<Annotation, String> clixIds = Maps.newHashMap();
+
+    private boolean rootWritten = false;
 
     private SerializingListener(ContentHandler xml, XMLSerializerConfiguration config) {
       this.xml = xml;
       this.config = config;
+      this.hierarchy = (config.getHierarchy() == null ? Collections.<QName>emptySet() : config.getHierarchy());
     }
 
     @Override
@@ -71,6 +70,7 @@ public class XMLSerializer {
       }
       namespaceMappings.put(URI.create(XMLConstants.XML_NS_URI), XMLConstants.XML_NS_PREFIX);
       namespaceMappings.put(URI.create(XMLConstants.XMLNS_ATTRIBUTE_NS_URI), XMLConstants.XMLNS_ATTRIBUTE);
+      namespaceMappings.put(TextConstants.CLIX_NS, TextConstants.CLIX_NS_PREFIX);
 
       xml.startDocument();
 
@@ -83,23 +83,48 @@ public class XMLSerializer {
     @Override
     protected void doStart(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
       for (Annotation a : DEFAULT_ORDERING.immutableSortedCopy(annotations.keySet())) {
-        startElement(a.getName(), annotations.get(a));
+        final QName name = a.getName();
+        Map<QName, String> attributes = annotations.get(a);
+        if (!rootWritten || hierarchy.contains(name)) {
+          startElement(name, attributes);
+        } else {
+          final String localName = name.getLocalName();
+
+          Integer id = clixIdIncrements.get(localName);
+          id = (id == null ? 0 : id + 1);
+          final String clixId = "clix:" + localName + "-" + id;
+
+          attributes = Maps.newHashMap(attributes);
+          attributes.put(TextConstants.CLIX_START_ATTR_NAME, clixId);
+          emptyElement(name, attributes);
+
+          clixIdIncrements.put(localName, id);
+          clixIds.put(a, clixId);
+        }
       }
     }
 
     @Override
     protected void doEmpty(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
       for (Annotation a : DEFAULT_ORDERING.immutableSortedCopy(annotations.keySet())) {
-        final QName name = a.getName();
-        startElement(name, annotations.get(a));
-        endElement(name);
+        emptyElement(a.getName(), annotations.get(a));
       }
     }
 
     @Override
     protected void doEnd(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
       for (Annotation a : Annotations.DEFAULT_ORDERING.reverse().immutableSortedCopy(annotations.keySet())) {
-        endElement(a.getName());
+        final String clixId = clixIds.get(a);
+        if (clixId == null) {
+          endElement(a.getName());
+        } else {
+          final Map<QName, String> attributes = Maps.newHashMap();
+          attributes.put(TextConstants.CLIX_END_ATTR_NAME, clixId);
+          emptyElement(a.getName(), attributes);
+
+          clixIds.remove(a);
+        }
+
       }
     }
 
@@ -118,9 +143,14 @@ public class XMLSerializer {
       xml.endDocument();
     }
 
+    private void emptyElement(QName name, Map<QName, String> attributes) throws SAXException {
+      startElement(name, attributes);
+      endElement(name);
+    }
+
     private void startElement(QName name, Map<QName, String> attributes) throws SAXException {
       final Map<QName, String> nsAttributes = Maps.newHashMap();
-      if (!mappingsWritten) {
+      if (!rootWritten) {
         for (Map.Entry<URI, String> mapping : namespaceMappings.entrySet()) {
           final String prefix = mapping.getValue();
           final String uri = mapping.getKey().toString();
@@ -133,7 +163,7 @@ public class XMLSerializer {
             nsAttributes.put(new SimpleQName(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix), uri);
           }
         }
-        mappingsWritten = true;
+        rootWritten = true;
       }
       for (QName n : Iterables.concat(attributes.keySet(), Collections.singleton(name))) {
         final URI ns = n.getNamespaceURI();

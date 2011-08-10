@@ -21,19 +21,11 @@
 
 package eu.interedition.text;
 
-import java.net.URI;
-
-
 /**
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 public interface Annotation extends Comparable<Annotation> {
-  /**
-   * Namespace, mainly used as a default.
-   */
-  final URI INTEREDITION_NS_URI = URI.create("http://interedition.eu/ns");
-
   Text getText();
 
   QName getName();

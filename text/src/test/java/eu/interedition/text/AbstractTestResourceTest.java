@@ -30,7 +30,8 @@ import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserConfiguration;
 import eu.interedition.text.xml.XMLParserModule;
-import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
+import eu.interedition.text.xml.module.CLIXAnnotationXMLParserModule;
+import eu.interedition.text.xml.module.DefaultAnnotationXMLParserModule;
 import eu.interedition.text.xml.module.TextXMLParserModule;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
    * Names of available XML test resources.
    */
   protected static final SortedSet<String> RESOURCES = Sets.newTreeSet(Lists.newArrayList(//
-          "george-algabal-tei.xml", "ignt-0101.xml", "archimedes-palimpsest-tei.xml", "homer-iliad-tei.xml"));
+          "wp-orpheus1-clix.xml", "george-algabal-tei.xml", "ignt-0101.xml", "archimedes-palimpsest-tei.xml", "homer-iliad-tei.xml"));
 
 
   private Map<String, Text> sources = Maps.newHashMap();
@@ -69,9 +70,13 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
 
   @After
   public void removeDocuments() {
-    for (Iterator<Text> documentIt = texts.values().iterator(); documentIt.hasNext(); ) {
-      textRepository.delete(documentIt.next());
-      documentIt.remove();
+    for (Iterator<Text> textIt = texts.values().iterator(); textIt.hasNext(); ) {
+      textRepository.delete(textIt.next());
+      textIt.remove();
+    }
+    for (Iterator<Text> sourceIt = sources.values().iterator(); sourceIt.hasNext(); ) {
+      textRepository.delete(sourceIt.next());
+      sourceIt.remove();
     }
   }
 
@@ -108,15 +113,14 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     return Lists.<XMLParserModule>newArrayList();
   }
 
-  protected XMLParserConfiguration createXMLParserConfiguration() {
-    SimpleXMLParserConfiguration pc = new SimpleXMLParserConfiguration();
-
+  protected SimpleXMLParserConfiguration configure(SimpleXMLParserConfiguration pc) {
     pc.addLineElement(new SimpleQName(TEI_NS, "lg"));
     pc.addLineElement(new SimpleQName(TEI_NS, "l"));
     pc.addLineElement(new SimpleQName(TEI_NS, "speaker"));
     pc.addLineElement(new SimpleQName(TEI_NS, "stage"));
     pc.addLineElement(new SimpleQName(TEI_NS, "head"));
     pc.addLineElement(new SimpleQName(TEI_NS, "p"));
+    pc.addLineElement(new SimpleQName((URI) null, "line"));
 
     pc.addContainerElement(new SimpleQName(TEI_NS, "text"));
     pc.addContainerElement(new SimpleQName(TEI_NS, "div"));
@@ -128,10 +132,16 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     pc.exclude(new SimpleQName(TEI_NS, "front"));
     pc.exclude(new SimpleQName(TEI_NS, "fw"));
 
+    return pc;
+  }
+
+  protected SimpleXMLParserConfiguration createXMLParserConfiguration() {
+    SimpleXMLParserConfiguration pc = new SimpleXMLParserConfiguration();
 
     final List<XMLParserModule> parserModules = pc.getModules();
     parserModules.add(new TextXMLParserModule(textRepository));
-    parserModules.add(new AnnotationStorageXMLParserModule(annotationRepository));
+    parserModules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
+    parserModules.add(new CLIXAnnotationXMLParserModule(annotationRepository, 1000));
     parserModules.addAll(parserModules());
 
     return pc;
@@ -158,7 +168,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
 
         sources.put(resource, xml);
         stopWatch.start("parse");
-        texts.put(resource, xmlParser.parse(xml, createXMLParserConfiguration()));
+        texts.put(resource, xmlParser.parse(xml, configure(createXMLParserConfiguration())));
         stopWatch.stop();
 
         if (LOG.isDebugEnabled()) {

@@ -24,7 +24,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import static com.google.common.collect.Iterables.getFirst;
 import static java.util.Collections.singleton;
 
 public class RelationalQNameRepository implements QNameRepository, InitializingBean {

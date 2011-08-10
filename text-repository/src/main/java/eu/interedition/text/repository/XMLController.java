@@ -4,7 +4,7 @@ import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserModule;
-import eu.interedition.text.xml.module.AnnotationStorageXMLParserModule;
+import eu.interedition.text.xml.module.DefaultAnnotationXMLParserModule;
 import eu.interedition.text.xml.module.TextXMLParserModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,7 +40,7 @@ public class XMLController {
   public String parse(@PathVariable("id") int id, @RequestBody XMLParserConfigurationBean pc) throws XMLStreamException, IOException {
     final List<XMLParserModule> modules = pc.getModules();
     modules.add(new TextXMLParserModule(textRepository));
-    modules.add(new AnnotationStorageXMLParserModule(annotationRepository));
+    modules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
 
     return TextController.redirectTo(xmlParser.parse(textRepository.load(id), pc));
   }

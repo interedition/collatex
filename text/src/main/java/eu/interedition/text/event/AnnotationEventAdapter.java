@@ -5,7 +5,6 @@ import eu.interedition.text.QName;
 import eu.interedition.text.Range;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

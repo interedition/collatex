@@ -24,7 +24,7 @@ import static eu.interedition.text.query.Criteria.*;
 @Service
 @Transactional
 public class Tokenizer {
-  public static final QName TOKEN_NAME = new SimpleQName(Annotation.INTEREDITION_NS_URI, "token");
+  public static final QName TOKEN_NAME = new SimpleQName(TextConstants.INTEREDITION_NS_URI, "token");
 
   private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
