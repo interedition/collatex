@@ -117,6 +117,26 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     }, parameters.toArray(new Object[parameters.size()]));
   }
 
+  public void cleanup() {
+    StringBuilder sql = new StringBuilder();
+    sql.append("select distinct al.id as link_id");
+    sql.append(" from text_annotation_link al");
+    sql.append(" left join text_annotation_link_target alt on al.id = alt.link");
+    sql.append(" where alt.target is null");
+
+    final List<SqlParameterSource> ids = Lists.newArrayList();
+    jt.query(sql.toString(), new RowMapper<Void>() {
+      public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+        ids.add(new MapSqlParameterSource().addValue("id", rs.getLong("link_id")));
+        return null;
+      }
+    });
+
+    if (!ids.isEmpty()) {
+      jt.batchUpdate("delete from text_annotation_link where id = :id", ids.toArray(new SqlParameterSource[ids.size()]));
+    }
+  }
+
   public Map<AnnotationLink, Set<Annotation>> find(Criterion criterion) {
     final List<Long> linkIds = Lists.newArrayList();
 
