@@ -48,9 +48,6 @@ public class XMLParserTest extends AbstractTestResourceTest {
   @Autowired
   private TextRepository textRepository;
 
-  @Autowired
-  private AnnotationRepository annotationRepository;
-
   private List<Range> sourceRanges;
   private List<Range> textRanges;
 
@@ -69,7 +66,7 @@ public class XMLParserTest extends AbstractTestResourceTest {
 
   @Test
   public void textContents() throws Exception {
-    final Text text = text("wp-orpheus1-clix.xml");
+    final Text text = text("george-algabal-tei.xml");
 
     assertTrue(text.length() > 0);
 
@@ -86,8 +83,8 @@ public class XMLParserTest extends AbstractTestResourceTest {
   @Test
   public void offsetMapping() throws IOException {
     if (LOG.isDebugEnabled()) {
-      final SortedMap<Range, String> sources = textRepository.bulkRead(source("wp-orpheus1-clix.xml"), Sets.newTreeSet(sourceRanges));
-      final SortedMap<Range, String> texts = textRepository.bulkRead(text("wp-orpheus1-clix.xml"), Sets.newTreeSet(textRanges));
+      final SortedMap<Range, String> sources = textRepository.bulkRead(source("george-algabal-tei.xml"), Sets.newTreeSet(sourceRanges));
+      final SortedMap<Range, String> texts = textRepository.bulkRead(text("george-algabal-tei.xml"), Sets.newTreeSet(textRanges));
       final Iterator<Range> sourceRangeIt = sourceRanges.iterator();
       final Iterator<Range> textRangeIt = textRanges.iterator();
       while (sourceRangeIt.hasNext() && textRangeIt.hasNext()) {

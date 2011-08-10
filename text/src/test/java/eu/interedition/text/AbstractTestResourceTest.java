@@ -28,11 +28,8 @@ import com.google.common.collect.Sets;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
-import eu.interedition.text.xml.XMLParserConfiguration;
 import eu.interedition.text.xml.XMLParserModule;
-import eu.interedition.text.xml.module.CLIXAnnotationXMLParserModule;
-import eu.interedition.text.xml.module.DefaultAnnotationXMLParserModule;
-import eu.interedition.text.xml.module.TextXMLParserModule;
+import eu.interedition.text.xml.module.*;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
@@ -44,14 +41,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
+import static eu.interedition.text.TextConstants.TEI_NS;
+
 /**
  * Base class for tests working with documents generated from XML test resources.
  *
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 public abstract class AbstractTestResourceTest extends AbstractTextTest {
-  protected static final URI TEI_NS = URI.create("http://www.tei-c.org/ns/1.0");
-
   /**
    * Names of available XML test resources.
    */
@@ -114,12 +111,11 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected SimpleXMLParserConfiguration configure(SimpleXMLParserConfiguration pc) {
+    pc.addLineElement(new SimpleQName(TEI_NS, "head"));
+    pc.addLineElement(new SimpleQName(TEI_NS, "stage"));
+    pc.addLineElement(new SimpleQName(TEI_NS, "speaker"));
     pc.addLineElement(new SimpleQName(TEI_NS, "lg"));
     pc.addLineElement(new SimpleQName(TEI_NS, "l"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "speaker"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "stage"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "head"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "p"));
     pc.addLineElement(new SimpleQName((URI) null, "line"));
 
     pc.addContainerElement(new SimpleQName(TEI_NS, "text"));
@@ -139,9 +135,12 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     SimpleXMLParserConfiguration pc = new SimpleXMLParserConfiguration();
 
     final List<XMLParserModule> parserModules = pc.getModules();
+    parserModules.add(new LineElementXMLParserModule());
+    parserModules.add(new NotableCharacterXMLParserModule());
     parserModules.add(new TextXMLParserModule(textRepository));
     parserModules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
     parserModules.add(new CLIXAnnotationXMLParserModule(annotationRepository, 1000));
+    parserModules.add(new TEIAwareAnnotationXMLParserModule(annotationRepository, 1000));
     parserModules.addAll(parserModules());
 
     return pc;

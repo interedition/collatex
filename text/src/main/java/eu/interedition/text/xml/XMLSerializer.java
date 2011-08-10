@@ -4,11 +4,11 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import eu.interedition.text.*;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.event.ExceptionPropagatingAnnotationEventAdapter;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.util.Annotations;
 import org.springframework.beans.factory.annotation.Required;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -19,11 +19,9 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import static eu.interedition.text.util.Annotations.DEFAULT_ORDERING;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -49,18 +47,20 @@ public class XMLSerializer {
   private class SerializingListener extends ExceptionPropagatingAnnotationEventAdapter {
     private final ContentHandler xml;
     private final XMLSerializerConfiguration config;
-    private final Set<QName> hierarchy;
+    private final List<QName> hierarchy;
 
     private final Map<URI, String> namespaceMappings = Maps.newHashMap();
     private final Map<String, Integer> clixIdIncrements = Maps.newHashMap();
     private final Map<Annotation, String> clixIds = Maps.newHashMap();
 
     private boolean rootWritten = false;
+    private Ordering<Annotation> annotationOrdering;
 
     private SerializingListener(ContentHandler xml, XMLSerializerConfiguration config) {
       this.xml = xml;
       this.config = config;
-      this.hierarchy = (config.getHierarchy() == null ? Collections.<QName>emptySet() : config.getHierarchy());
+      this.hierarchy = (config.getHierarchy() == null ? Collections.<QName>emptyList() : config.getHierarchy());
+      this.annotationOrdering = Ordering.from(new HierarchyAwareAnnotationComparator(this.hierarchy));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class XMLSerializer {
 
     @Override
     protected void doStart(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
-      for (Annotation a : DEFAULT_ORDERING.immutableSortedCopy(annotations.keySet())) {
+      for (Annotation a : annotationOrdering.immutableSortedCopy(annotations.keySet())) {
         final QName name = a.getName();
         Map<QName, String> attributes = annotations.get(a);
         if (!rootWritten || hierarchy.contains(name)) {
@@ -106,14 +106,14 @@ public class XMLSerializer {
 
     @Override
     protected void doEmpty(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
-      for (Annotation a : DEFAULT_ORDERING.immutableSortedCopy(annotations.keySet())) {
+      for (Annotation a : annotationOrdering.immutableSortedCopy(annotations.keySet())) {
         emptyElement(a.getName(), annotations.get(a));
       }
     }
 
     @Override
     protected void doEnd(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
-      for (Annotation a : Annotations.DEFAULT_ORDERING.reverse().immutableSortedCopy(annotations.keySet())) {
+      for (Annotation a : annotationOrdering.reverse().immutableSortedCopy(annotations.keySet())) {
         final String clixId = clixIds.get(a);
         if (clixId == null) {
           endElement(a.getName());
@@ -269,6 +269,34 @@ public class XMLSerializer {
           return attributes.get(toQName(qName));
         }
       };
+    }
+  }
+
+  private static class HierarchyAwareAnnotationComparator implements Comparator<Annotation> {
+    private Ordering<QName> hierarchyOrdering;
+    private final List<QName> hierarchy;
+
+    private HierarchyAwareAnnotationComparator(List<QName> hierarchy) {
+      this.hierarchy = hierarchy;
+      this.hierarchyOrdering = Ordering.explicit(hierarchy);
+    }
+
+    public int compare(Annotation o1, Annotation o2) {
+      int result = o1.getRange().compareTo(o2.getRange());
+      if (result != 0) {
+        return result;
+      }
+
+      final QName o1Name = o1.getName();
+      final QName o2Name = o2.getName();
+      if (hierarchy.contains(o1Name) && hierarchy.contains(o2Name)) {
+        result = hierarchyOrdering.compare(o1Name, o2Name);
+      }
+      if (result != 0) {
+        return result;
+      }
+
+      return o1.compareTo(o2);
     }
   }
 }

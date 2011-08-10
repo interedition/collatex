@@ -23,7 +23,7 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
   protected boolean compressingWhitespace = true;
   private int textBufferSize = 102400;
   private boolean removeLeadingWhitespace = true;
-  protected List<XMLParserModule> modules = Lists.<XMLParserModule>newArrayList(new LineElementXMLParserModule(), new NotableCharacterXMLParserModule());
+  protected List<XMLParserModule> modules = Lists.<XMLParserModule>newArrayList();
 
   public void addLineElement(QName lineElementName) {
     lineElements.add(lineElementName);
