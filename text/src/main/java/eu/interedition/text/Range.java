@@ -68,12 +68,12 @@ public class Range implements Comparable<Range>, Serializable {
   /**
    * The start offset of the segment (counted from zero, inclusive).
    */
-  private int start;
+  private long start;
 
   /**
    * The end offset of the segment (counted from zero, exclusive).
    */
-  private int end;
+  private long end;
 
   /**
    * Default constructor creating a {@link #NULL} range.
@@ -90,7 +90,7 @@ public class Range implements Comparable<Range>, Serializable {
    * @throws IllegalArgumentException if <code>start</code> or <code>end</code> or lower than zero, or if <code>start</code> is greather than
    *                                  <code>end</code>
    */
-  public Range(int start, int end) {
+  public Range(long start, long end) {
     if (start < 0 || end < 0 || start > end) {
       throw new IllegalArgumentException(toString(start, end));
     }
@@ -107,19 +107,19 @@ public class Range implements Comparable<Range>, Serializable {
     this(b.start, b.end);
   }
 
-  public int getStart() {
+  public long getStart() {
     return start;
   }
 
-  public void setStart(int start) {
+  public void setStart(long start) {
     this.start = start;
   }
 
-  public int getEnd() {
+  public long getEnd() {
     return end;
   }
 
-  public void setEnd(int end) {
+  public void setEnd(long end) {
     this.end = end;
   }
 
@@ -128,19 +128,8 @@ public class Range implements Comparable<Range>, Serializable {
    *
    * @return the length (difference between start and end offset)
    */
-  public int length() {
+  public long length() {
     return end - start;
-  }
-
-  /**
-   * Applies the adress to a string, returning the addressed segment.
-   *
-   * @param text the string, whose segment is addressed
-   * @return the subsequence/segment of the text
-   * @see String#substring(int, int)
-   */
-  public String applyTo(String text) {
-    return text.substring(start, end);
   }
 
   /**
@@ -211,8 +200,8 @@ public class Range implements Comparable<Range>, Serializable {
    * @return length of overlap
    */
   public Range overlap(Range b) {
-    final int start = Math.max(this.start, b.start);
-    final int end = Math.min(this.end, b.end);
+    final long start = Math.max(this.start, b.start);
+    final long end = Math.min(this.end, b.end);
     return ((end - start) >= 0 ? new Range(start, end) : null);
   }
 
@@ -242,7 +231,8 @@ public class Range implements Comparable<Range>, Serializable {
    * @see Comparable#compareTo(Object)
    */
   public int compareTo(Range o) {
-    return (start == o.start ? o.end - end : start - o.start);
+    final long result = (start == o.start ? o.end - end : start - o.start);
+    return (result < 0 ? -1 : (result > 0 ? 1 : 0));
   }
 
   @Override
@@ -267,7 +257,7 @@ public class Range implements Comparable<Range>, Serializable {
    * @param end   end offset
    * @return string representation
    */
-  public static String toString(int start, int end) {
+  public static String toString(long start, long end) {
     return "[" + start + ", " + end + "]";
   }
 
@@ -276,7 +266,7 @@ public class Range implements Comparable<Range>, Serializable {
     return toString(start, end);
   }
 
-  public Range add(int n) {
+  public Range add(long n) {
     return new Range(start + n, end + n);
   }
 

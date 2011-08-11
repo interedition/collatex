@@ -1,12 +1,12 @@
-<#assign title="Text #" + text.id?html maxLength=102400 truncated=(textLength gt maxLength)/>
+<#assign title="Text #" + text.id?html maxLength=102400 truncated=(text.length gt maxLength)/>
 <@ie.page title>
     <h1>${title}</h1>
 
     <div id="text-length" style="text-align: right; font-weight: bold; margin: 1em 0">
         Type: <#if text.type == "PLAIN">Plain Text<#elseif text.type == "XML">XML<#else>n/a</#if>;
-        Length: ${textLength} characters
+        Length: ${text.length} characters
         <#if truncated>(${maxLength} displayed)</#if>
-        <#if text.type == "XML">[<a href="${cp}/xml/parse/${text.id?url}" title="Parse XML">Parse XML</a>]</#if>
+        <#if text.type == "XML">[<a href="${cp}/xml/${text.id?c}/parse" title="Parse XML">Parse XML</a>]</#if>
     </div>
 
     <div class="yui3-g">

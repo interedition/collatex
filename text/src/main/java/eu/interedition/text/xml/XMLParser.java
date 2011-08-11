@@ -37,7 +37,7 @@ public class XMLParser {
     final XMLParserState state = new XMLParserState(source, text, configuration);
     try {
       textRepository.read(source, new TextRepository.TextReader() {
-        public void read(Reader content, int contentLength) throws IOException {
+        public void read(Reader content, long contentLength) throws IOException {
           XMLStreamReader reader = null;
           try {
             reader = xmlInputFactory.createXMLStreamReader(content);

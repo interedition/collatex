@@ -36,7 +36,7 @@ public class SimpleText extends HashSet<Annotation> implements Text {
     return content;
   }
 
-  public int length() {
+  public long getLength() {
     return content.length();
   }
 

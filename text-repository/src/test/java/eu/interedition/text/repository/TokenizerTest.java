@@ -74,7 +74,7 @@ public class TokenizerTest extends AbstractTest {
   private void printTokenizedWitness(Text text) throws IOException {
     System.out.println(Strings.padStart(text.toString(), 80, '='));
 
-    int read = 0;
+    long read = 0;
 
     final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
     for (Annotation token : annotationRepository.find(and(text(text), annotationName(Tokenizer.TOKEN_NAME)))) {
@@ -86,9 +86,9 @@ public class TokenizerTest extends AbstractTest {
       read = token.getRange().getEnd();
     }
 
-    final int length = text.length();
+    final long length = text.getLength();
     if (read < length) {
-      ranges.put(new Range(read, length), false);
+      ranges.put(new Range(read, (int) length), false);
     }
 
     final SortedMap<Range, String> texts = textRepository.bulkRead(text, Sets.newTreeSet(ranges.keySet()));

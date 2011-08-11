@@ -3,18 +3,26 @@ package eu.interedition.text.repository;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import eu.interedition.text.Annotation;
 import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.QName;
+import eu.interedition.text.Range;
+import eu.interedition.text.query.Criteria;
+import eu.interedition.text.query.Operator;
 import eu.interedition.text.rdbms.RelationalQName;
 import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.text.repository.io.AnnotationBean;
+import eu.interedition.text.repository.io.QNameBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.SortedSet;
+
+import static eu.interedition.text.query.Criteria.and;
+import static eu.interedition.text.query.Criteria.rangeOverlap;
+import static eu.interedition.text.query.Criteria.text;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -31,21 +39,21 @@ public class AnnotationController {
   @Autowired
   private RelationalTextRepository textRepository;
 
-  @RequestMapping("/names/{id}")
+  @RequestMapping("/{id}/names")
   @ResponseBody
-  public SortedSet<QName> names(@PathVariable("id") int id) {
-    return Sets.newTreeSet(Iterables.transform(annotationRepository.names(textRepository.load(id)), new Function<QName, QName>() {
+  public SortedSet<QName> names(@PathVariable("id") long id) {
+    final SortedSet<QName> names = annotationRepository.names(textRepository.load(id));
+    return Sets.<QName>newTreeSet(Iterables.transform(names, QNameBean.TO_BEAN));
+  }
 
-      @Override
-      public QName apply(QName input) {
-        final QNameBean returnValue = new QNameBean();
-        returnValue.setNamespaceURI(input.getNamespaceURI());
-        returnValue.setLocalName(input.getLocalName());
-        if (input instanceof RelationalQName) {
-          returnValue.setId(Long.toString(((RelationalQName) input).getId()));
-        }
-        return returnValue;
-      }
-    }));
+  @RequestMapping(value = "/{id}")
+  @ResponseBody
+  public SortedSet<Annotation> get(@PathVariable("id") long id, @RequestParam(value = "r", required = false) Range range) {
+    final Operator criterion = and(text(textRepository.load(id)));
+    if (range != null) {
+      criterion.add(rangeOverlap(range));
+    }
+    final Iterable<Annotation> annotations = annotationRepository.find(criterion);
+    return Sets.<Annotation>newTreeSet(Iterables.transform(annotations, AnnotationBean.TO_BEAN));
   }
 }

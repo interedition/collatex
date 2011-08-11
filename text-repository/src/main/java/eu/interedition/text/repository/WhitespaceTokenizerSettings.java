@@ -21,22 +21,22 @@ public class WhitespaceTokenizerSettings implements TokenizerSettings {
   }
 
   @Override
-  public boolean startingAnnotationsAreBoundary(Text text, int offset, Set<Annotation> annotations) {
+  public boolean startingAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations) {
     return breakOnAnnotationBoundary;
   }
 
   @Override
-  public boolean emptyAnnotationsAreBoundary(Text text, int offset, Set<Annotation> annotations) {
+  public boolean emptyAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations) {
     return breakOnAnnotationBoundary;
   }
 
   @Override
-  public boolean endingAnnotationsAreBoundary(Text text, int offset, Set<Annotation> annotations) {
+  public boolean endingAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations) {
     return breakOnAnnotationBoundary;
   }
 
   @Override
-  public boolean isBoundary(Text text, int offset, char c) {
+  public boolean isBoundary(Text text, long offset, char c) {
     return Character.isWhitespace(c);
   }
 }

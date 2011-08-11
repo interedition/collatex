@@ -72,21 +72,21 @@ public class Tokenizer {
     }
 
     @Override
-    public void start(int offset, Map<Annotation, Map<QName, String>> annotations) {
+    public void start(long offset, Map<Annotation, Map<QName, String>> annotations) {
       if (settings.startingAnnotationsAreBoundary(text, offset, annotations.keySet())) {
         lastIsTokenBoundary = true;
       }
     }
 
     @Override
-    public void empty(int offset, Map<Annotation, Map<QName, String>> annotations) {
+    public void empty(long offset, Map<Annotation, Map<QName, String>> annotations) {
       if (settings.emptyAnnotationsAreBoundary(text, offset, annotations.keySet())) {
         lastIsTokenBoundary = true;
       }
     }
 
     @Override
-    public void end(int offset, Map<Annotation, Map<QName, String>> annotations) {
+    public void end(long offset, Map<Annotation, Map<QName, String>> annotations) {
       if (settings.endingAnnotationsAreBoundary(text, offset, annotations.keySet())) {
         lastIsTokenBoundary = true;
       }

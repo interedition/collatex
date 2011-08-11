@@ -13,13 +13,13 @@ public class AnnotationEventAdapter implements AnnotationEventListener {
   public void start() {
   }
 
-  public void start(int offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void start(long offset, Map<Annotation, Map<QName, String>> annotations) {
   }
 
-  public void empty(int offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void empty(long offset, Map<Annotation, Map<QName, String>> annotations) {
   }
 
-  public void end(int offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void end(long offset, Map<Annotation, Map<QName, String>> annotations) {
   }
 
   public void text(Range r, String text) {

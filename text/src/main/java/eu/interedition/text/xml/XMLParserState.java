@@ -250,8 +250,8 @@ public class XMLParserState {
       LOG.trace("Moving offsets: text += " + addToText + "; source += " + addToSource);
     }
 
-    final int textOffsetRangeLength = textOffsetRange.length();
-    final int sourceOffsetRangeLength = sourceOffsetRange.length();
+    final long textOffsetRangeLength = textOffsetRange.length();
+    final long sourceOffsetRangeLength = sourceOffsetRange.length();
 
     if (addToText == 0 && textOffsetRangeLength == 0) {
       sourceOffsetRange = new Range(sourceOffsetRange.getStart(), sourceOffsetRange.getEnd() + addToSource);

@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS interedition;
+CREATE DATABASE interedition CHARACTER SET=utf8;

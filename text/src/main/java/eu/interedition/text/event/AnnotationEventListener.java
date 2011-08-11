@@ -11,11 +11,11 @@ public interface AnnotationEventListener {
 
   void start();
 
-  void start(int offset, Map<Annotation, Map<QName, String>> annotations);
+  void start(long offset, Map<Annotation, Map<QName, String>> annotations);
 
-  void empty(int offset, Map<Annotation, Map<QName, String>> annotations);
+  void empty(long offset, Map<Annotation, Map<QName, String>> annotations);
 
-  void end(int offset, Map<Annotation, Map<QName, String>> annotations);
+  void end(long offset, Map<Annotation, Map<QName, String>> annotations);
 
   void text(Range r, String text);
 

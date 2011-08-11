@@ -1,14 +1,17 @@
 package eu.interedition.text.repository;
 
 import com.google.common.base.Preconditions;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 
 
@@ -77,15 +78,31 @@ public class TextController {
     return textRepository.load(id);
   }
 
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET, params = "r")
+  public void download(@PathVariable("id") int id, @RequestParam("r") Range range, HttpServletResponse response) throws IOException {
+    final Text text = textRepository.load(id);
+    final int textLength = (int) text.getLength();
+
+    response.setCharacterEncoding(Text.CHARSET.name());
+    response.setContentType(MediaType.TEXT_PLAIN.toString());
+    final PrintWriter responseWriter = response.getWriter();
+
+    range = new Range(Math.min(range.getStart(), textLength), Math.min(range.getEnd(), textLength));
+    textRepository.read(text, range, new TextRepository.TextReader() {
+      @Override
+      public void read(Reader content, long contentLength) throws IOException {
+        CharStreams.copy(content, responseWriter);
+      }
+    });
+  }
+
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, headers = "accept=text/html")
   public ModelAndView view(@PathVariable("id") int id) throws IOException {
     final Text text = textRepository.load(id);
-    final int length = text.length();
 
     final ModelAndView mv = new ModelAndView("text");
     mv.addObject("text", text);
-    mv.addObject("textLength", length);
-    mv.addObject("textContents", textRepository.read(text, new Range(0, Math.min(MAX_TEXT_LENGTH, length))));
+    mv.addObject("textContents", textRepository.read(text, new Range(0, (int) Math.min(MAX_TEXT_LENGTH, text.getLength()))));
     mv.addObject("annotationNames", annotationRepository.names(text));
     return mv;
   }

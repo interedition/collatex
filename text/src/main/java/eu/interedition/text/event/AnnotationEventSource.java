@@ -40,13 +40,13 @@ public class AnnotationEventSource {
   public void listen(final AnnotationEventListener listener, final int pageSize, final Text text, final Criterion criterion) throws IOException {
     textRepository.read(text, new TextRepository.TextReader() {
 
-      public void read(Reader content, int contentLength) throws IOException {
-        final SortedMap<Integer, Set<Annotation>> starts = Maps.newTreeMap();
-        final SortedMap<Integer, Set<Annotation>> ends = Maps.newTreeMap();
+      public void read(Reader content, long contentLength) throws IOException {
+        final SortedMap<Long, Set<Annotation>> starts = Maps.newTreeMap();
+        final SortedMap<Long, Set<Annotation>> ends = Maps.newTreeMap();
 
-        int offset = 0;
-        int next = 0;
-        int pageEnd = 0;
+        long offset = 0;
+        long next = 0;
+        long pageEnd = 0;
 
         listener.start();
 
@@ -58,8 +58,8 @@ public class AnnotationEventSource {
             final Iterable<Annotation> pageAnnotations = annotationRepository.find(and(criterion, text(text), rangeOverlap(pageRange)));
             final Map<Annotation, Map<QName, String>> pageAnnotationData = annotationRepository.get(pageAnnotations, Collections.<QName>emptySet());
             for (Annotation a : pageAnnotations) {
-              final int start = a.getRange().getStart();
-              final int end = a.getRange().getEnd();
+              final long start = a.getRange().getStart();
+              final long end = a.getRange().getEnd();
               if (start >= offset) {
                 Set<Annotation> starting = starts.get(start);
                 if (starting == null) {
@@ -102,9 +102,9 @@ public class AnnotationEventSource {
             break;
           }
 
-          final int readTo = Math.min(pageEnd, next);
+          final long readTo = Math.min(pageEnd, next);
           if (offset < readTo) {
-            final char[] currentText = new char[readTo - offset];
+            final char[] currentText = new char[(int) (readTo - offset)];
             int read = content.read(currentText);
             if (read > 0) {
               listener.text(new Range(offset, offset + read), new String(currentText, 0, read));

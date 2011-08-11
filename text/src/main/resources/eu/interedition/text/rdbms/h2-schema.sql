@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS text_content (
   id BIGINT PRIMARY KEY,
   created TIMESTAMP NOT NULL,
   type SMALLINT NOT NULL,
-  content CLOB NOT NULL
+  content CLOB NOT NULL,
+  content_length BIGINT NOT NULL
 );
 
 CREATE SEQUENCE IF NOT EXISTS text_content_sequence;

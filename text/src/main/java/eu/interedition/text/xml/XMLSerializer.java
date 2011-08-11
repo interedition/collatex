@@ -81,7 +81,7 @@ public class XMLSerializer {
     }
 
     @Override
-    protected void doStart(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+    protected void doStart(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
       for (Annotation a : annotationOrdering.immutableSortedCopy(annotations.keySet())) {
         final QName name = a.getName();
         Map<QName, String> attributes = annotations.get(a);
@@ -105,14 +105,14 @@ public class XMLSerializer {
     }
 
     @Override
-    protected void doEmpty(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+    protected void doEmpty(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
       for (Annotation a : annotationOrdering.immutableSortedCopy(annotations.keySet())) {
         emptyElement(a.getName(), annotations.get(a));
       }
     }
 
     @Override
-    protected void doEnd(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+    protected void doEnd(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
       for (Annotation a : annotationOrdering.reverse().immutableSortedCopy(annotations.keySet())) {
         final String clixId = clixIds.get(a);
         if (clixId == null) {

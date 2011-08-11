@@ -159,7 +159,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     if (names.isEmpty() && text.getType() == Text.Type.XML) {
       try {
         textRepository.read(text, new TextRepository.TextReader() {
-          public void read(Reader content, int contentLength) throws IOException {
+          public void read(Reader content, long contentLength) throws IOException {
             if (contentLength == 0) {
               return;
             }

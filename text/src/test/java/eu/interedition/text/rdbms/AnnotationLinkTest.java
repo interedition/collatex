@@ -11,7 +11,6 @@ import eu.interedition.text.query.Criteria;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import javax.sql.DataSource;
@@ -35,7 +34,7 @@ public class AnnotationLinkTest extends AbstractTestResourceTest {
     Annotation textAnnotation = Iterables.getFirst(annotationRepository.find(Criteria.text(text)), null);
 
     final Text source = source();
-    final Annotation sourceAnnotation = Iterables.getOnlyElement(annotationRepository.create(new SimpleAnnotation(source, new SimpleQName(TEST_NS, "test"), new Range(0, source.length()))));
+    final Annotation sourceAnnotation = Iterables.getOnlyElement(annotationRepository.create(new SimpleAnnotation(source, new SimpleQName(TEST_NS, "test"), new Range(0, (int) source.getLength()))));
 
     final Multimap<QName, Set<Annotation>> createdLinks = ArrayListMultimap.create();
     createdLinks.put(new SimpleQName(TEST_NS, "testLink"), Sets.newHashSet(textAnnotation, sourceAnnotation));

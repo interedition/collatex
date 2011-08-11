@@ -19,7 +19,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void start(int offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void start(long offset, Map<Annotation, Map<QName, String>> annotations) {
     try {
       doStart(offset, annotations);
     } catch (Exception e) {
@@ -27,7 +27,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void empty(int offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void empty(long offset, Map<Annotation, Map<QName, String>> annotations) {
     try {
       doEmpty(offset, annotations);
     } catch (Exception e) {
@@ -35,7 +35,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void end(int offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void end(long offset, Map<Annotation, Map<QName, String>> annotations) {
     try {
       doEnd(offset, annotations);
     } catch (Exception e) {
@@ -62,13 +62,13 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
   protected void doStart() throws Exception {
   }
 
-  protected void doStart(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+  protected void doStart(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
   }
 
-  protected void doEmpty(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+  protected void doEmpty(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
   }
 
-  protected void doEnd(int offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+  protected void doEnd(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
   }
 
   protected void doText(Range r, String text) throws Exception {

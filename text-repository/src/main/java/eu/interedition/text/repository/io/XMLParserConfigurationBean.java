@@ -1,4 +1,4 @@
-package eu.interedition.text.repository;
+package eu.interedition.text.repository.io;
 
 import eu.interedition.text.QName;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
@@ -13,6 +13,24 @@ import java.util.Set;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLParserConfigurationBean extends SimpleXMLParserConfiguration {
+  protected boolean transformTEI = true;
+  protected boolean removeEmpty = false;
+
+  public boolean isTransformTEI() {
+    return transformTEI;
+  }
+
+  public void setTransformTEI(boolean transformTEI) {
+    this.transformTEI = transformTEI;
+  }
+
+  public boolean isRemoveEmpty() {
+    return removeEmpty;
+  }
+
+  public void setRemoveEmpty(boolean removeEmpty) {
+    this.removeEmpty = removeEmpty;
+  }
 
   public Set<QName> getIncluded() {
     return included;

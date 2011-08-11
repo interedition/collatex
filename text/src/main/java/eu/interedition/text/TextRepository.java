@@ -19,15 +19,17 @@ public interface TextRepository {
 
   void read(Text text, TextReader reader) throws IOException;
 
+  void read(Text text, Range range, TextReader reader) throws IOException;
+
   String read(Text text, Range range) throws IOException;
 
   SortedMap<Range, String> bulkRead(Text text, SortedSet<Range> ranges) throws IOException;
 
   void write(Text text, Reader contents) throws IOException;
 
-  void write(Text text, Reader contents, int contentLength) throws IOException;
+  void write(Text text, Reader contents, long contentLength) throws IOException;
 
   interface TextReader {
-    void read(Reader content, int contentLength) throws IOException;
+    void read(Reader content, long contentLength) throws IOException;
   }
 }

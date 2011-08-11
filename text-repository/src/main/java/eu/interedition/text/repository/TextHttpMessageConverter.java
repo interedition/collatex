@@ -102,7 +102,7 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
           try {
             textRepository.read(text, new TextRepository.TextReader() {
               @Override
-              public void read(Reader content, int contentLength) throws IOException {
+              public void read(Reader content, long contentLength) throws IOException {
                 switch (text.getType()) {
                   case PLAIN:
                     OutputStreamWriter bodyWriter = null;

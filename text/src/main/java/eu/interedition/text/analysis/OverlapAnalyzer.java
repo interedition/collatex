@@ -35,12 +35,12 @@ public class OverlapAnalyzer extends AnnotationEventAdapter {
   }
 
   @Override
-  public void start(int offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void start(long offset, Map<Annotation, Map<QName, String>> annotations) {
     started.addAll(annotations.keySet());
   }
 
   @Override
-  public void end(int offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void end(long offset, Map<Annotation, Map<QName, String>> annotations) {
     final Set<Annotation> endings = annotations.keySet();
     started.removeAll(endings);
 

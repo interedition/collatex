@@ -1,6 +1,7 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import eu.interedition.text.QNameRepository;
 import eu.interedition.text.Range;
 import eu.interedition.text.query.*;
@@ -54,9 +55,8 @@ public class RelationalQueryCriteriaTranslator {
 
   protected void sql(StringBuilder sql, Operator op, Collection<Object> ps) {
     final List<Criterion> operands = op.getOperands();
-    if (operands.isEmpty()) {
-      return;
-    }
+    Preconditions.checkArgument(!operands.isEmpty());
+
     sql.append("(");
     for (Iterator<Criterion> pIt = operands.iterator(); pIt.hasNext(); ) {
       sql(sql, pIt.next(), ps);

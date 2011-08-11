@@ -10,14 +10,16 @@ public class Ranges {
   public static final Ordering<Range> START_ORDERING = Ordering.from(new Comparator<Range>() {
 
     public int compare(Range o1, Range o2) {
-      return o1.getStart() - o2.getStart();
+      final long result = o1.getStart() - o2.getStart();
+      return (result < 0 ? -1 : (result > 0 ? 1 : 0));
     }
   });
 
   public static final Ordering<Range> END_ORDERING = Ordering.from(new Comparator<Range>() {
 
     public int compare(Range o1, Range o2) {
-      return o2.getEnd() - o1.getEnd();
+      final long result = o2.getEnd() - o1.getEnd();
+      return (result < 0 ? -1 : (result > 0 ? 1 : 0));
     }
   });
 

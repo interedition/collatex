@@ -1,6 +1,8 @@
-package eu.interedition.text.repository;
+package eu.interedition.text.repository.io;
 
+import com.google.common.base.Function;
 import eu.interedition.text.QName;
+import eu.interedition.text.rdbms.RelationalQName;
 import eu.interedition.text.util.QNames;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -64,4 +66,17 @@ public class QNameBean implements QName {
   public int compareTo(QName o) {
     return QNames.COMPARATOR.compare(this, o);
   }
+
+  public static final Function<QName, QNameBean> TO_BEAN = new Function<QName, QNameBean>() {
+    @Override
+    public QNameBean apply(QName input) {
+      final QNameBean returnValue = new QNameBean();
+        returnValue.setNamespaceURI(input.getNamespaceURI());
+        returnValue.setLocalName(input.getLocalName());
+        if (input instanceof RelationalQName) {
+          returnValue.setId(Long.toString(((RelationalQName) input).getId()));
+        }
+        return returnValue;
+    }
+  };
 }

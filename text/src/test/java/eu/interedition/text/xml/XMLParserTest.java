@@ -68,12 +68,12 @@ public class XMLParserTest extends AbstractTestResourceTest {
   public void textContents() throws Exception {
     final Text text = text("george-algabal-tei.xml");
 
-    assertTrue(text.length() > 0);
+    assertTrue(text.getLength() > 0);
 
     if (LOG.isDebugEnabled()) {
       textRepository.read(text, new TextRepository.TextReader() {
 
-        public void read(Reader content, int contentLength) throws IOException {
+        public void read(Reader content, long contentLength) throws IOException {
           LOG.debug(CharStreams.toString(content));
         }
       });

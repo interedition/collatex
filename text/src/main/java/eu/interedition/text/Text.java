@@ -14,5 +14,5 @@ public interface Text {
 
   Type getType();
 
-  int length();
+  long getLength();
 }

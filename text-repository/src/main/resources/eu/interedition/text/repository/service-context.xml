@@ -27,4 +27,12 @@
     <context:component-scan base-package="eu.interedition.text.repository">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
+
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="eu.interedition.text.repository.RangeConverter"/>
+            </set>
+        </property>
+    </bean>
 </beans>
