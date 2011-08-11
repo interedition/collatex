@@ -18,10 +18,7 @@ import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -50,6 +47,7 @@ public class XMLSerializer {
     private final List<QName> hierarchy;
 
     private final Map<URI, String> namespaceMappings = Maps.newHashMap();
+    private final Stack<Set<URI>> namespaceMappingStack = new Stack<Set<URI>>();
     private final Map<String, Integer> clixIdIncrements = Maps.newHashMap();
     private final Map<Annotation, String> clixIds = Maps.newHashMap();
 
@@ -61,17 +59,12 @@ public class XMLSerializer {
       this.config = config;
       this.hierarchy = (config.getHierarchy() == null ? Collections.<QName>emptyList() : config.getHierarchy());
       this.annotationOrdering = Ordering.from(new HierarchyAwareAnnotationComparator(this.hierarchy));
+      this.namespaceMappings.put(URI.create(XMLConstants.XML_NS_URI), XMLConstants.XML_NS_PREFIX);
+      this.namespaceMappings.put(URI.create(XMLConstants.XMLNS_ATTRIBUTE_NS_URI), XMLConstants.XMLNS_ATTRIBUTE);
     }
 
     @Override
     protected void doStart() throws Exception {
-      for (Map.Entry<String, URI> mapping : config.getNamespaceMappings().entrySet()) {
-        namespaceMappings.put(mapping.getValue(), mapping.getKey());
-      }
-      namespaceMappings.put(URI.create(XMLConstants.XML_NS_URI), XMLConstants.XML_NS_PREFIX);
-      namespaceMappings.put(URI.create(XMLConstants.XMLNS_ATTRIBUTE_NS_URI), XMLConstants.XMLNS_ATTRIBUTE);
-      namespaceMappings.put(TextConstants.CLIX_NS, TextConstants.CLIX_NS_PREFIX);
-
       xml.startDocument();
 
       final QName rootName = config.getRootName();
@@ -149,20 +142,14 @@ public class XMLSerializer {
     }
 
     private void startElement(QName name, Map<QName, String> attributes) throws SAXException {
+      namespaceMappingStack.push(new HashSet<URI>());
+
       final Map<QName, String> nsAttributes = Maps.newHashMap();
       if (!rootWritten) {
-        for (Map.Entry<URI, String> mapping : namespaceMappings.entrySet()) {
-          final String prefix = mapping.getValue();
-          final String uri = mapping.getKey().toString();
-          if (XMLConstants.XML_NS_PREFIX.equals(prefix) || XMLConstants.XMLNS_ATTRIBUTE.equals(prefix)) {
-            continue;
-          }
-          if (prefix.length() == 0) {
-            nsAttributes.put(new SimpleQName((URI) null, XMLConstants.XMLNS_ATTRIBUTE), uri);
-          } else {
-            nsAttributes.put(new SimpleQName(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix), uri);
-          }
+        for (Map.Entry<String, URI> mapping : config.getNamespaceMappings().entrySet()) {
+          mapNamespace(mapping.getValue(), mapping.getKey(), nsAttributes);
         }
+        mapNamespace(TextConstants.CLIX_NS, TextConstants.CLIX_NS_PREFIX, nsAttributes);
         rootWritten = true;
       }
       for (QName n : Iterables.concat(attributes.keySet(), Collections.singleton(name))) {
@@ -178,8 +165,7 @@ public class XMLSerializer {
           }
           newPrefix = "ns" + (++count);
         }
-        namespaceMappings.put(ns, newPrefix);
-        nsAttributes.put(new SimpleQName(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, newPrefix), ns.toString());
+        mapNamespace(ns, newPrefix, nsAttributes);
       }
 
       final Map<QName, String> mergedAttributes = Maps.newLinkedHashMap();
@@ -188,8 +174,24 @@ public class XMLSerializer {
       xml.startElement(toNamespace(name.getNamespaceURI()), name.getLocalName(), toQNameStr(name), toAttributes(mergedAttributes));
     }
 
+    private void mapNamespace(URI namespace, String prefix, Map<QName, String> nsAttributes) throws SAXException {
+      final String uri = namespace.toString();
+      namespaceMappings.put(namespace, prefix);
+      namespaceMappingStack.peek().add(namespace);
+      if (prefix.length() == 0) {
+        nsAttributes.put(new SimpleQName((URI) null, XMLConstants.XMLNS_ATTRIBUTE), uri);
+      } else {
+        nsAttributes.put(new SimpleQName(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix), uri);
+        xml.startPrefixMapping(prefix, uri);
+      }
+    }
+
     private void endElement(QName name) throws SAXException {
       xml.endElement(toNamespace(name.getNamespaceURI()), name.getLocalName(), toQNameStr(name));
+
+      for (URI namespace : namespaceMappingStack.pop()) {
+        xml.endPrefixMapping(namespaceMappings.remove(namespace));
+      }
     }
 
     private String toNamespace(URI uri) {

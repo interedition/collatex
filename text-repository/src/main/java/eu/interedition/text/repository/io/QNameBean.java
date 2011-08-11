@@ -19,6 +19,14 @@ public class QNameBean implements QName {
   public QNameBean() {
   }
 
+  public QNameBean(QName name) {
+    setNamespaceURI(name.getNamespaceURI());
+    setLocalName(name.getLocalName());
+    if (name instanceof RelationalQName) {
+      setId(Long.toString(((RelationalQName) name).getId()));
+    }
+  }
+
   public String getId() {
     return id;
   }
@@ -70,13 +78,7 @@ public class QNameBean implements QName {
   public static final Function<QName, QNameBean> TO_BEAN = new Function<QName, QNameBean>() {
     @Override
     public QNameBean apply(QName input) {
-      final QNameBean returnValue = new QNameBean();
-        returnValue.setNamespaceURI(input.getNamespaceURI());
-        returnValue.setLocalName(input.getLocalName());
-        if (input instanceof RelationalQName) {
-          returnValue.setId(Long.toString(((RelationalQName) input).getId()));
-        }
-        return returnValue;
+      return new QNameBean(input);
     }
   };
 }

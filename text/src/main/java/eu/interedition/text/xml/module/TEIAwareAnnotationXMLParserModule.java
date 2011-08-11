@@ -113,14 +113,16 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
 
   protected void handleSpanningElements(XMLEntity entity, XMLParserState state) {
     final URI entityNs = entity.getName().getNamespaceURI();
-    final Map<QName, String> entityAttributes = entity.getAttributes();
+    final Map<QName, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
     String spanTo = null;
     String refId = null;
-    for (QName attrName : entityAttributes.keySet()) {
+    for (Iterator<QName> it = entityAttributes.keySet().iterator(); it.hasNext(); ) {
+      final QName attrName = it.next();
       if ("spanTo".equals(attrName.getLocalName())) {
         final URI attrNs = attrName.getNamespaceURI();
         if ((attrNs != null && TEI_NS.equals(attrNs)) || (attrNs == null && entityNs != null && TEI_NS.equals(entityNs))) {
           spanTo = entityAttributes.get(attrName).replaceAll("^#", "");
+          it.remove();
         }
       } else if (XML_ID_ATTR_NAME.equals(attrName)) {
         refId = entityAttributes.get(attrName);
