@@ -26,10 +26,13 @@ form table tr td, form table tr th {
     background: #F2F2F2;
 }
 
+.hidden {
+    display: none;
+}
+
 .error {
     color: #FF3366;
 }
-
 
 .left {
     text-align: left;

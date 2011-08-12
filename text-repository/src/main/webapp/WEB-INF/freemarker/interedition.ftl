@@ -11,8 +11,11 @@
     <link rel="stylesheet" type="text/css" href="${cp}/static/yui3/cssgrids/grids-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/yui3/cssbase/base-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css">
-    <script type="text/javascript" src="${cp}/static/yui3/yui/yui-min.js"></script>
+
     <script type="text/javascript">var cp = "${cp?js_string}";</script>
+    <script type="text/javascript" src="${cp}/static/yui3/yui/yui-min.js"></script>
+    <script type="text/javascript" src="${cp}/static/interedition.js"></script>
+
     <title>${title} :: Interedition Text Repository</title>
 </head>
 <body class="yui3-skin-sam">

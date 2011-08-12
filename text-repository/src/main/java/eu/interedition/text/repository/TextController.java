@@ -23,6 +23,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Map;
 
 
 /**
@@ -46,13 +48,18 @@ public class TextController {
     return "text_index";
   }
 
-  @RequestMapping(method = RequestMethod.POST)
-  public String upload(@RequestBody Text text) {
+  @RequestMapping(method = RequestMethod.POST, headers="content-type=text/plain")
+  public String uploadPlainText(@RequestBody Text text) {
     return redirectTo(text);
   }
 
-  @RequestMapping(method = RequestMethod.POST, params = "file")
-  public String upload(@RequestParam("file") MultipartFile file,//
+  @RequestMapping(method = RequestMethod.POST, headers="content-type=application/xml")
+  public String uploadXml(@RequestBody Text text) {
+    return redirectTo(text);
+  }
+
+  @RequestMapping(method = RequestMethod.POST)
+  public String uploadForm(@RequestParam("file") MultipartFile file,//
                        @RequestParam("fileType") Text.Type textType,//
                        @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
           throws IOException, TransformerException {

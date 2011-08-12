@@ -7,34 +7,107 @@
         <#if truncated>(${maxLength} displayed)</#if>
     </div>
 
-    <form method="post">
-        <table style="margin: 0 auto">
-            <#list names?keys as ns>
-                <tr>
-                    <th colspan="6" style="font-size: large; background: inherit" class="right">${ns?html}</th>
-                    <#list names[ns]?chunk(10) as nameChunk>
+    <div class="yui3-g">
+        <div class="yui3-u-1-2">
+            <form method="post" id="parse-form">
+                <p><input type="submit" value="Parse"> <input type="reset" value="Reset"></p>
+                <table>
+                    <tr>
+                        <td colspan="5" class="right"><label for="removeEmpty">Remove empty annotations:</label></td>
+                        <td class="center"><input id="removeEmpty" type="checkbox" checked="checked"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="right"><label for="transformTEI">Transform TEI annotations:</label></td>
+                        <td class="center"><input id="transformTEI" type="checkbox" checked="checked"></td>
+                    </tr>
+                    <#list names?keys as ns>
                         <tr>
-                            <th class="left">Local name</th>
-                            <th>Include</th>
-                            <th>Exclude</th>
-                            <th>Line</th>
-                            <th>Container</th>
-                            <th>Notable</th>
+                            <th colspan="6" style="font-size: large; background: inherit" class="right">${ns?html}</th>
+                            <#list names[ns]?chunk(10) as nameChunk>
+                                <tr>
+                                    <th class="left">Local name</th>
+                                    <th>Include</th>
+                                    <th>Exclude</th>
+                                    <th>Line</th>
+                                    <th>Container</th>
+                                    <th>Notable</th>
+                                </tr>
+                                <#list nameChunk as localName>
+                                    <#assign nameId=("name_" + ns_index + "_" + nameChunk_index + "_" + localName_index)>
+                                    <tr>
+                                        <td id="${nameId}">
+                                            ${localName?html}
+                                            <span class="hidden ns">${ns?html}</span>
+                                            <span class="hidden ln">${localName?html}</span>
+                                        </td>
+                                        <td class="center"><input id="${nameId}_included" type="checkbox"></td>
+                                        <td class="center"><input id="${nameId}_excluded" type="checkbox"></td>
+                                        <td class="center"><input id="${nameId}_lineElements" type="checkbox"></td>
+                                        <td class="center"><input id="${nameId}_containerElements" type="checkbox"></td>
+                                        <td class="center"><input id="${nameId}_notableElements" type="checkbox"></td>
+                                    </tr>
+                                </#list>
+                            </#list>
                         </tr>
-                        <#list nameChunk as localName>
-                            <#assign nameId=(ns_index + "_" + nameChunk_index + "_" + localName_index)>
-                            <tr>
-                                <td>${localName?html}</td>
-                                <td class="center"><input id="${nameId}_included" type="checkbox" checked="checked"></td>
-                                <td class="center"><input id="${nameId}_excluded" type="checkbox"></td>
-                                <td class="center"><input id="${nameId}_line" type="checkbox"></td>
-                                <td class="center"><input id="${nameId}_container" type="checkbox"></td>
-                                <td class="center"><input id="${nameId}_notable" type="checkbox"></td>
-                            </tr>
-                        </#list>
                     </#list>
-                </tr>
-            </#list>
-        </table>
-    </form>
+                </table>
+            </form>
+        </div>
+        <div class="yui3-u-1-2" id="parsed-text">
+            &nbsp;
+        </div>
+    </div>
+    <script type="text/javascript">
+        var text = null;
+        YUI().use("dump", "node", "event", function(Y) {
+            Y.on("domready", function() {
+                Y.all("input[type='checkbox']").each(function(cb) {
+                    var id = cb.get("id");
+                    if (id == "removeEmpty" || id == "transformTEI") return;
+
+                    var splitOn = id.lastIndexOf("_");
+                    var cbName = id.substring(0, splitOn);
+                    var cbType = id.substring(splitOn + 1, id.length);
+                    if (cbType == "excluded" || cbType == "included") {
+                        Y.on("change", function(e) {
+                            var antagonist = Y.one("#" + cbName + "_" + (cbType == "excluded" ? "included" : "excluded"));
+                            if (this.get("checked") && antagonist.get("checked")) {
+                                antagonist.set("checked", false);
+                            }
+                        }, cb);
+                    }
+                });
+                Y.on("submit", function(e) {
+                    e.preventDefault();
+                    var parserConfig = {
+                        transformTEI: Y.one("#transformTEI").get("checked"),
+                        removeEmpty: Y.one("#removeEmpty").get("checked"),
+                        included: [],
+                        excluded: [],
+                        lineElements: [],
+                        containerElements: [],
+                        notableElements: []
+                    };
+                    Y.all("input[type='checkbox']").each(function(cb) {
+                        var id = cb.get("id");
+                        if (id == "removeEmpty" || id == "transformTEI") return;
+
+                        if (this.get("checked")) {
+                            var splitOn = id.lastIndexOf("_");
+                            var cbName = id.substring(0, splitOn);
+                            var cbType = id.substring(splitOn + 1, id.length);
+
+                            var nameCell = Y.one("#" + cbName);
+                            var name = { "ns": nameCell.one(".ns").get("text"), "n": nameCell.one(".ln").get("text") };
+                            parserConfig[cbType].push(name);
+                        }
+                    });
+
+                    post("", parserConfig, function(resp) {
+                        Y.one("#parsed-text").append(Y.dump(resp));
+                    });
+                }, "#parse-form");
+            });
+        })
+    </script>
 </@ie.page>

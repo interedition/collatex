@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
@@ -103,8 +100,9 @@ public class XMLController {
     return new ModelAndView("xml_parse").addObject("text", text).addObject("names", names);
   }
 
-  @RequestMapping(value = "/{id}/parse", method = RequestMethod.POST)
-  public String parse(@PathVariable("id") long id, @RequestBody XMLParserConfigurationImpl pc) throws XMLStreamException, IOException {
+  @RequestMapping(value = "/{id}/parse", method = RequestMethod.POST, headers = "content-type=application/json")
+  @ResponseBody
+  public Text parse(@PathVariable("id") long id, @RequestBody XMLParserConfigurationImpl pc) throws XMLStreamException, IOException {
     final List<XMLParserModule> modules = pc.getModules();
     modules.add(new LineElementXMLParserModule());
     modules.add(new NotableCharacterXMLParserModule());
@@ -119,6 +117,6 @@ public class XMLController {
     if (pc.isRemoveEmpty()) {
       annotationRepository.delete(and(text(parsed), rangeLength(0)));
     }
-    return TextController.redirectTo(parsed);
+    return parsed;
   }
 }
