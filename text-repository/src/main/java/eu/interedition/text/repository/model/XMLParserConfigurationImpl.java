@@ -1,4 +1,4 @@
-package eu.interedition.text.repository.io;
+package eu.interedition.text.repository.model;
 
 import eu.interedition.text.QName;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class XMLParserConfigurationBean extends SimpleXMLParserConfiguration {
+public class XMLParserConfigurationImpl extends SimpleXMLParserConfiguration {
   protected boolean transformTEI = true;
   protected boolean removeEmpty = false;
 
@@ -36,7 +36,7 @@ public class XMLParserConfigurationBean extends SimpleXMLParserConfiguration {
     return included;
   }
 
-  @JsonDeserialize(contentAs = QNameBean.class)
+  @JsonDeserialize(contentAs = QNameImpl.class)
   public void setIncluded(Set<QName> included) {
     this.included = included;
   }
@@ -45,7 +45,7 @@ public class XMLParserConfigurationBean extends SimpleXMLParserConfiguration {
     return excluded;
   }
 
-  @JsonDeserialize(contentAs = QNameBean.class)
+  @JsonDeserialize(contentAs = QNameImpl.class)
   public void setExcluded(Set<QName> excluded) {
     this.excluded = excluded;
   }
@@ -54,7 +54,7 @@ public class XMLParserConfigurationBean extends SimpleXMLParserConfiguration {
     return lineElements;
   }
 
-  @JsonDeserialize(contentAs = QNameBean.class)
+  @JsonDeserialize(contentAs = QNameImpl.class)
   public void setLineElements(Set<QName> lineElements) {
     this.lineElements = lineElements;
   }
@@ -63,7 +63,7 @@ public class XMLParserConfigurationBean extends SimpleXMLParserConfiguration {
     return containerElements;
   }
 
-  @JsonDeserialize(contentAs = QNameBean.class)
+  @JsonDeserialize(contentAs = QNameImpl.class)
   public void setContainerElements(Set<QName> containerElements) {
     this.containerElements = containerElements;
   }
@@ -72,7 +72,7 @@ public class XMLParserConfigurationBean extends SimpleXMLParserConfiguration {
     return notableElements;
   }
 
-  @JsonDeserialize(contentAs = QNameBean.class)
+  @JsonDeserialize(contentAs = QNameImpl.class)
   public void setNotableElements(Set<QName> notableElements) {
     this.notableElements = notableElements;
   }

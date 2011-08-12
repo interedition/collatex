@@ -31,7 +31,7 @@
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
         <property name="converters">
             <set>
-                <bean class="eu.interedition.text.repository.RangeConverter"/>
+                <bean class="eu.interedition.text.repository.conversion.RangeConverter"/>
             </set>
         </property>
     </bean>

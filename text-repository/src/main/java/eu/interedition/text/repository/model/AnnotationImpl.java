@@ -1,10 +1,12 @@
-package eu.interedition.text.repository.io;
+package eu.interedition.text.repository.model;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
+import eu.interedition.text.repository.conversion.RangeDeserializer;
+import eu.interedition.text.repository.conversion.RangeSerializer;
 import eu.interedition.text.util.Annotations;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -14,14 +16,14 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AnnotationBean implements Annotation {
-  private QNameBean name;
+public class AnnotationImpl implements Annotation {
+  private QNameImpl name;
   private Range range;
 
-  public AnnotationBean() {
+  public AnnotationImpl() {
   }
 
-  public AnnotationBean(QNameBean name, Range range) {
+  public AnnotationImpl(QNameImpl name, Range range) {
     this.name = name;
     this.range = range;
   }
@@ -34,12 +36,12 @@ public class AnnotationBean implements Annotation {
   }
 
   @JsonProperty("n")
-  public QNameBean getName() {
+  public QNameImpl getName() {
     return name;
   }
 
   @JsonProperty("n")
-  public void setName(QNameBean name) {
+  public void setName(QNameImpl name) {
     this.name = name;
   }
 
@@ -55,10 +57,10 @@ public class AnnotationBean implements Annotation {
     this.range = range;
   }
 
-  public static final Function<Annotation, AnnotationBean> TO_BEAN = new Function<Annotation, AnnotationBean>() {
+  public static final Function<Annotation, AnnotationImpl> TO_BEAN = new Function<Annotation, AnnotationImpl>() {
     @Override
-    public AnnotationBean apply(Annotation input) {
-      return new AnnotationBean(QNameBean.TO_BEAN.apply(input.getName()), input.getRange());
+    public AnnotationImpl apply(Annotation input) {
+      return new AnnotationImpl(QNameImpl.TO_BEAN.apply(input.getName()), input.getRange());
     }
   };
 

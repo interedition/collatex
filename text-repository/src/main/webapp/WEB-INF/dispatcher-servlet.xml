@@ -19,7 +19,7 @@
 
     <tx:annotation-driven proxy-target-class="true"/>
 
-    <bean id="textHttpMessageConverter" class="eu.interedition.text.repository.TextHttpMessageConverter"/>
+    <bean id="textHttpMessageConverter" class="eu.interedition.text.repository.conversion.TextHttpMessageConverter"/>
     <bean id="mappingJacksonHttpMessageConverter"
           class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
 

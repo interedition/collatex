@@ -41,17 +41,17 @@ public class TextController {
   @Autowired
   private AnnotationRepository annotationRepository;
 
-  @RequestMapping(method = RequestMethod.PUT)
-  public String upload(@RequestBody Text text) {
-    return redirectTo(text);
-  }
-
   @RequestMapping(method = RequestMethod.GET)
   public String uploadForm() {
     return "text_index";
   }
 
   @RequestMapping(method = RequestMethod.POST)
+  public String upload(@RequestBody Text text) {
+    return redirectTo(text);
+  }
+
+  @RequestMapping(method = RequestMethod.POST, params = "file")
   public String upload(@RequestParam("file") MultipartFile file,//
                        @RequestParam("fileType") Text.Type textType,//
                        @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
@@ -70,6 +70,17 @@ public class TextController {
       Closeables.close(fileStream, false);
     }
     throw new IllegalArgumentException(textType.toString());
+  }
+
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET, headers = "accept=text/html")
+  public ModelAndView view(@PathVariable("id") int id) throws IOException {
+    final Text text = textRepository.load(id);
+
+    final ModelAndView mv = new ModelAndView("text");
+    mv.addObject("text", text);
+    mv.addObject("textContents", textRepository.read(text, new Range(0, (int) Math.min(MAX_TEXT_LENGTH, text.getLength()))));
+    mv.addObject("annotationNames", annotationRepository.names(text));
+    return mv;
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -94,17 +105,6 @@ public class TextController {
         CharStreams.copy(content, responseWriter);
       }
     });
-  }
-
-  @RequestMapping(value = "/{id}", method = RequestMethod.GET, headers = "accept=text/html")
-  public ModelAndView view(@PathVariable("id") int id) throws IOException {
-    final Text text = textRepository.load(id);
-
-    final ModelAndView mv = new ModelAndView("text");
-    mv.addObject("text", text);
-    mv.addObject("textContents", textRepository.read(text, new Range(0, (int) Math.min(MAX_TEXT_LENGTH, text.getLength()))));
-    mv.addObject("annotationNames", annotationRepository.names(text));
-    return mv;
   }
 
   @ExceptionHandler(value = DataRetrievalFailureException.class)

@@ -1,4 +1,4 @@
-package eu.interedition.text.repository;
+package eu.interedition.text.repository.conversion;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;

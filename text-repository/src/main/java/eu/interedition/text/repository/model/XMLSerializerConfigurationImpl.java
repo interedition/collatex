@@ -1,4 +1,4 @@
-package eu.interedition.text.repository.io;
+package eu.interedition.text.repository.model;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -11,7 +11,6 @@ import eu.interedition.text.xml.XMLSerializerConfiguration;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.net.URI;
 import java.util.List;
@@ -20,14 +19,14 @@ import java.util.Map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class XMLSerializerConfigurationBean implements XMLSerializerConfiguration {
-  private QNameBean rootName = new QNameBean(new SimpleQName(TextConstants.INTEREDITION_NS_URI, "root"));
+public class XMLSerializerConfigurationImpl implements XMLSerializerConfiguration {
+  private QNameImpl rootName = new QNameImpl(new SimpleQName(TextConstants.INTEREDITION_NS_URI, "root"));
   private Map<String, URI> namespaceMappings = Maps.newHashMap();
   private List<QName> hierarchy = Lists.newArrayList();
   private boolean hierarchyOnly = true;
   private Criterion query = Criteria.any();
 
-  public XMLSerializerConfigurationBean() {
+  public XMLSerializerConfigurationImpl() {
     namespaceMappings.put("tei", TextConstants.TEI_NS);
     namespaceMappings.put("ie", TextConstants.INTEREDITION_NS_URI);
   }
@@ -39,8 +38,8 @@ public class XMLSerializerConfigurationBean implements XMLSerializerConfiguratio
   }
 
   @JsonProperty("root")
-  @JsonDeserialize(as = QNameBean.class)
-  public void setRootName(QNameBean rootName) {
+  @JsonDeserialize(as = QNameImpl.class)
+  public void setRootName(QNameImpl rootName) {
     this.rootName = rootName;
   }
 
@@ -70,7 +69,7 @@ public class XMLSerializerConfigurationBean implements XMLSerializerConfiguratio
   }
 
   @JsonProperty("hierarchy")
-  @JsonDeserialize(contentAs = QNameBean.class)
+  @JsonDeserialize(contentAs = QNameImpl.class)
   public void setHierarchy(List<QName> hierarchy) {
     this.hierarchy = hierarchy;
   }

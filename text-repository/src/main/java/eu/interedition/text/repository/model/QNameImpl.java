@@ -1,4 +1,4 @@
-package eu.interedition.text.repository.io;
+package eu.interedition.text.repository.model;
 
 import com.google.common.base.Function;
 import eu.interedition.text.QName;
@@ -11,15 +11,15 @@ import java.net.URI;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class QNameBean implements QName {
+public class QNameImpl implements QName {
   private String id;
   private URI namespaceURI;
   private String localName;
 
-  public QNameBean() {
+  public QNameImpl() {
   }
 
-  public QNameBean(QName name) {
+  public QNameImpl(QName name) {
     setNamespaceURI(name.getNamespaceURI());
     setLocalName(name.getLocalName());
     if (name instanceof RelationalQName) {
@@ -75,10 +75,10 @@ public class QNameBean implements QName {
     return QNames.COMPARATOR.compare(this, o);
   }
 
-  public static final Function<QName, QNameBean> TO_BEAN = new Function<QName, QNameBean>() {
+  public static final Function<QName, QNameImpl> TO_BEAN = new Function<QName, QNameImpl>() {
     @Override
-    public QNameBean apply(QName input) {
-      return new QNameBean(input);
+    public QNameImpl apply(QName input) {
+      return new QNameImpl(input);
     }
   };
 }

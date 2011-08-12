@@ -1,18 +1,15 @@
 package eu.interedition.text.repository;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.QName;
 import eu.interedition.text.Range;
-import eu.interedition.text.query.Criteria;
 import eu.interedition.text.query.Operator;
-import eu.interedition.text.rdbms.RelationalQName;
 import eu.interedition.text.rdbms.RelationalTextRepository;
-import eu.interedition.text.repository.io.AnnotationBean;
-import eu.interedition.text.repository.io.QNameBean;
+import eu.interedition.text.repository.model.AnnotationImpl;
+import eu.interedition.text.repository.model.QNameImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +40,7 @@ public class AnnotationController {
   @ResponseBody
   public SortedSet<QName> names(@PathVariable("id") long id) {
     final SortedSet<QName> names = annotationRepository.names(textRepository.load(id));
-    return Sets.<QName>newTreeSet(Iterables.transform(names, QNameBean.TO_BEAN));
+    return Sets.<QName>newTreeSet(Iterables.transform(names, QNameImpl.TO_BEAN));
   }
 
   @RequestMapping(value = "/{id}")
@@ -54,6 +51,6 @@ public class AnnotationController {
       criterion.add(rangeOverlap(range));
     }
     final Iterable<Annotation> annotations = annotationRepository.find(criterion);
-    return Sets.<Annotation>newTreeSet(Iterables.transform(annotations, AnnotationBean.TO_BEAN));
+    return Sets.<Annotation>newTreeSet(Iterables.transform(annotations, AnnotationImpl.TO_BEAN));
   }
 }

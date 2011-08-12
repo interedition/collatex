@@ -6,15 +6,13 @@ import com.google.common.collect.Maps;
 import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.QName;
 import eu.interedition.text.Text;
-import eu.interedition.text.query.Criteria;
 import eu.interedition.text.query.Operator;
 import eu.interedition.text.rdbms.RelationalTextRepository;
-import eu.interedition.text.repository.io.XMLParserConfigurationBean;
-import eu.interedition.text.repository.io.XMLSerializerConfigurationBean;
+import eu.interedition.text.repository.model.XMLParserConfigurationImpl;
+import eu.interedition.text.repository.model.XMLSerializerConfigurationImpl;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserModule;
 import eu.interedition.text.xml.XMLSerializer;
-import eu.interedition.text.xml.XMLSerializerConfiguration;
 import eu.interedition.text.xml.module.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -28,15 +26,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import java.awt.*;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -69,11 +63,11 @@ public class XMLController {
 
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public void xml(@PathVariable("id") long id, HttpServletResponse response) throws Exception {
-    xml(id, new XMLSerializerConfigurationBean(), response);
+    xml(id, new XMLSerializerConfigurationImpl(), response);
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-  public void xml(@PathVariable("id") long id, @RequestBody XMLSerializerConfigurationBean sc, HttpServletResponse response) throws Exception {
+  public void xml(@PathVariable("id") long id, @RequestBody XMLSerializerConfigurationImpl sc, HttpServletResponse response) throws Exception {
     final List<QName> hierarchy = sc.getHierarchy();
     if (sc.isHierarchyOnly() && !hierarchy.isEmpty()) {
       final Operator hierarchyDisjunction = or();
@@ -110,7 +104,7 @@ public class XMLController {
   }
 
   @RequestMapping(value = "/{id}/parse", method = RequestMethod.POST)
-  public String parse(@PathVariable("id") long id, @RequestBody XMLParserConfigurationBean pc) throws XMLStreamException, IOException {
+  public String parse(@PathVariable("id") long id, @RequestBody XMLParserConfigurationImpl pc) throws XMLStreamException, IOException {
     final List<XMLParserModule> modules = pc.getModules();
     modules.add(new LineElementXMLParserModule());
     modules.add(new NotableCharacterXMLParserModule());

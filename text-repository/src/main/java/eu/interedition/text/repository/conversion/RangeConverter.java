@@ -1,4 +1,4 @@
-package eu.interedition.text.repository;
+package eu.interedition.text.repository.conversion;
 
 import com.google.common.base.Preconditions;
 import eu.interedition.text.Range;
@@ -10,23 +10,23 @@ import org.springframework.core.convert.converter.Converter;
 public class RangeConverter implements Converter<String, Range>{
   @Override
   public Range convert(String source) {
-    int start = 0;
-    int end = 0;
+    long start = 0;
+    long end = 0;
 
     final String[] components = source.trim().split(",");
     if (components.length > 0) {
-      end = toInt(components[0]);
+      end = toLong(components[0]);
     }
     if (components.length > 1) {
       start = end;
-      end = start + toInt(components[1]);
+      end = start + toLong(components[1]);
     }
 
     return new Range(start, end);
   }
 
-  private static int toInt(String str) {
-    final int value = Integer.valueOf(str);
+  private static long toLong(String str) {
+    final long value = Long.valueOf(str);
     Preconditions.checkArgument(value >= 0);
     return value;
   }
