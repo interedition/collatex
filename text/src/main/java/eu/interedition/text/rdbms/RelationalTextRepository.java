@@ -1,7 +1,8 @@
 package eu.interedition.text.rdbms;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
@@ -11,6 +12,8 @@ import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.util.AbstractTextRepository;
 import eu.interedition.text.util.SQL;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
@@ -23,19 +26,22 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 
 import javax.sql.DataSource;
 import java.io.*;
+import java.nio.CharBuffer;
+import java.nio.charset.CharsetEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.*;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
 
 public class RelationalTextRepository extends AbstractTextRepository implements InitializingBean {
+
+  private static final String NULL_CONTENT_DIGEST = DigestUtils.sha512Hex("");
 
   private DataSource dataSource;
   private DataFieldMaxValueIncrementerFactory incrementerFactory;
@@ -70,6 +76,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     textData.put("type", type.ordinal());
     textData.put("content", "");
     textData.put("content_length", 0);
+    textData.put("content_digest", NULL_CONTENT_DIGEST);
 
     textInsert.execute(textData);
 
@@ -172,9 +179,10 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
 
   public void write(final Text text, final Reader contents, final long contentLength) throws IOException {
     final RelationalText rt = (RelationalText) text;
+    final DigestingFilterReader digestingFilterReader = new DigestingFilterReader(new BufferedReader(contents));
     jt.getJdbcOperations().execute("update text_content set content = ?, content_length = ? where id = ?", new PreparedStatementCallback<Void>() {
       public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
-        ps.setCharacterStream(1, new BufferedReader(contents), contentLength);
+        ps.setCharacterStream(1, digestingFilterReader, contentLength);
         ps.setLong(2, contentLength);
         ps.setLong(3, rt.getId());
         ps.executeUpdate();
@@ -182,6 +190,8 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
       }
     });
     rt.setLength(contentLength);
+    rt.setDigest(digestingFilterReader.digest());
+    jt.update("update text_content set content_digest = ? where id = ?", rt.getDigest(), rt.getId());
   }
 
 
@@ -199,25 +209,45 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
             }, callback.text.getId()));
   }
 
-  public Text load(long id) {
-    return DataAccessUtils.requiredUniqueResult(jt.query("select " + selectTextFrom("t") + " from text_content t where t.id = ?", new RowMapper<Text>() {
+  public List<Text> load(Iterable<Long> ids) {
+    if (Iterables.isEmpty(ids)) {
+      return Collections.emptyList();
+    }
+
+    final List<Long> idList = Lists.newArrayList(ids);
+    final StringBuilder sql = new StringBuilder("select ");
+    sql.append(selectTextFrom("t"));
+    sql.append(" from text_content t where t.id in (");
+    for(Iterator<Long> it = ids.iterator(); it.hasNext(); ) {
+      it.next();
+      sql.append("?").append(it.hasNext() ? ", " : "");
+    }
+    sql.append(")");
+
+    return jt.query(sql.toString(), new RowMapper<Text>() {
+      @Override
       public Text mapRow(ResultSet rs, int rowNum) throws SQLException {
         return mapTextFrom(rs, "t");
       }
-    }, id));
+    }, idList.toArray(new Object[idList.size()]));
+  }
+
+  public Text load(long id) {
+    return DataAccessUtils.requiredUniqueResult(load(Collections.singleton(id)));
   }
 
   public static String selectTextFrom(String tableName) {
-    return SQL.select(tableName, "id", "created", "type", "content_length");
+    return SQL.select(tableName, "id", "created", "type", "content_length", "content_digest");
   }
 
   public static RelationalText mapTextFrom(ResultSet rs, String prefix) throws SQLException {
-    final RelationalText relationalText = new RelationalText();
-    relationalText.setId(rs.getInt(prefix + "_id"));
-    relationalText.setCreated(rs.getDate(prefix + "_created"));
-    relationalText.setType(Text.Type.values()[rs.getInt(prefix + "_type")]);
-    relationalText.setLength(rs.getLong(prefix + "_content_length"));
-    return relationalText;
+    final RelationalText rt = new RelationalText();
+    rt.setId(rs.getInt(prefix + "_id"));
+    rt.setCreated(rs.getDate(prefix + "_created"));
+    rt.setType(Text.Type.values()[rs.getInt(prefix + "_type")]);
+    rt.setLength(rs.getLong(prefix + "_content_length"));
+    rt.setDigest(rs.getString(prefix + "_content_digest"));
+    return rt;
   }
 
   private abstract class ReaderCallback<T> {
@@ -254,6 +284,55 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     public void write(String str, int off, int len) throws IOException {
       super.write(str, off, len);
       length += len;
+    }
+  }
+
+  private static class DigestingFilterReader extends FilterReader {
+
+    private MessageDigest digest;
+    private String result;
+    private CharsetEncoder encoder;
+
+    private DigestingFilterReader(Reader in) {
+      super(in);
+      try {
+        this.digest = MessageDigest.getInstance("SHA-512");
+        this.encoder = Text.CHARSET.newEncoder();
+      } catch (NoSuchAlgorithmException e) {
+        throw Throwables.propagate(e);
+      }
+    }
+
+    @Override
+    public int read() throws IOException {
+      final int read = super.read();
+      if (read >= 0) {
+        digest.update(encoder.encode(CharBuffer.wrap(new char[]{(char) read})));
+      }
+      return read;
+    }
+
+    @Override
+    public int read(char[] cbuf, int off, int len) throws IOException {
+      final int read = super.read(cbuf, off, len);
+      if (read >= 0) {
+        digest.update(encoder.encode(CharBuffer.wrap(cbuf, off, len)));
+      }
+      return read;
+    }
+
+    @Override
+    public void reset() throws IOException {
+      digest.reset();
+      result = null;
+      super.reset();
+    }
+
+    private String digest() {
+      if (result == null) {
+        result = Hex.encodeHexString(digest.digest());
+      }
+      return result;
     }
   }
 }

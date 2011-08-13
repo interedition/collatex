@@ -23,7 +23,7 @@ TextView.NAME = "text-view";
 YUI().use("widget", function(Y) {
     Y.extend(TextView, Y.Widget, {
         renderUI: function() {
-            alert("Text View!");
+            // TODO
         }
     });
 });

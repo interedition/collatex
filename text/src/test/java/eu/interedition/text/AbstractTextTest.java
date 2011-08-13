@@ -24,7 +24,6 @@ package eu.interedition.text;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -35,10 +34,10 @@ import java.io.StringReader;
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
  */
-@Transactional
 public abstract class AbstractTextTest extends AbstractTest {
 
   public static final String TEST_TEXT = "Hello World";
+
   @Autowired
   protected TextRepository textRepository;
 

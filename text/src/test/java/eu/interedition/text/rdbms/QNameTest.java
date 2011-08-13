@@ -1,7 +1,10 @@
-package eu.interedition.text;
+package eu.interedition.text.rdbms;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import eu.interedition.text.AbstractTest;
+import eu.interedition.text.QName;
+import eu.interedition.text.QNameSet;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.rdbms.RelationalQName;
 import org.junit.Assert;

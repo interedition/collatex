@@ -7,7 +7,6 @@ import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.QName;
 import eu.interedition.text.Text;
 import eu.interedition.text.query.Operator;
-import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.repository.model.XMLParserConfigurationImpl;
 import eu.interedition.text.repository.model.XMLSerializerConfigurationImpl;
 import eu.interedition.text.xml.XMLParser;
@@ -47,7 +46,7 @@ public class XMLController {
   private AnnotationRepository annotationRepository;
 
   @Autowired
-  private RelationalTextRepository textRepository;
+  private IndexingTextRepository textRepository;
 
   @Autowired
   private XMLParser xmlParser;
@@ -100,7 +99,7 @@ public class XMLController {
     return new ModelAndView("xml_parse").addObject("text", text).addObject("names", names);
   }
 
-  @RequestMapping(value = "/{id}/parse", method = RequestMethod.POST, headers = "content-type=application/json")
+  @RequestMapping(value = "/{id}/parse", method = RequestMethod.POST)
   @ResponseBody
   public Text parse(@PathVariable("id") long id, @RequestBody XMLParserConfigurationImpl pc) throws XMLStreamException, IOException {
     final List<XMLParserModule> modules = pc.getModules();

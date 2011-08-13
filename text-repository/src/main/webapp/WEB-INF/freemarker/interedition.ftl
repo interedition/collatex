@@ -27,12 +27,38 @@
         </ul>
     </div>
 </div>
+<div style="text-align: right; margin: 1em 0">
+    <form id="quick-search-form" action="${cp}/search/" style="display: inline; margin-right: 2em">
+        <input type="text" name="query" id="query" style="width: 10em" value="${searchQuery!''?html}">
+        <input type="submit" value="Search…">
+    </form>
+    <form id="goto-text-form" style="display: inline">
+        <input type="text" name="text" id="text-id" style="width: 5em" />
+        <input type="submit" value="Go to…">
+    </form>
+</div>
 <#nested />
 <script type="text/javascript">
-    YUI().use("node-menunav", function(Y) {
+    YUI().use("node", "node-menunav", function(Y) {
         Y.on("contentready", function() {
             this.plug(Y.Plugin.NodeMenuNav, { autoSubmenuDisplay: true, mouseOutHideDelay: 0 });
         }, "#main-menu");
+
+        Y.on("domready", function() {
+            Y.one("#query").focus();
+
+            Y.one("#goto-text-form").on("submit", function(e) {
+                e.preventDefault();
+                var textIdInput = Y.one("#text-id");
+
+                var textId = textIdInput.get("value");
+                textIdInput.set("value", "");
+
+                if (/^[0-9]+$/.test(textId)) {
+                    window.location.pathname = (cp + "/text/" + textId);
+                }
+            });
+        });
     });
 </script>
 </body>

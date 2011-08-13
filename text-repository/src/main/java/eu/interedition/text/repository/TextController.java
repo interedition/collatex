@@ -8,23 +8,22 @@ import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.rdbms.RelationalText;
-import eu.interedition.text.rdbms.RelationalTextRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Map;
 
 
 /**
@@ -38,7 +37,7 @@ public class TextController {
   protected static final int MAX_TEXT_LENGTH = 102400;
 
   @Autowired
-  private RelationalTextRepository textRepository;
+  private IndexingTextRepository textRepository;
 
   @Autowired
   private AnnotationRepository annotationRepository;
@@ -49,19 +48,19 @@ public class TextController {
   }
 
   @RequestMapping(method = RequestMethod.POST, headers="content-type=text/plain")
-  public String uploadPlainText(@RequestBody Text text) {
-    return redirectTo(text);
+  public RedirectView uploadPlainText(@RequestBody Text text) {
+    return created(text);
   }
 
   @RequestMapping(method = RequestMethod.POST, headers="content-type=application/xml")
-  public String uploadXml(@RequestBody Text text) {
-    return redirectTo(text);
+  public RedirectView uploadXml(@RequestBody Text text) {
+    return created(text);
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String uploadForm(@RequestParam("file") MultipartFile file,//
-                       @RequestParam("fileType") Text.Type textType,//
-                       @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
+  public RedirectView uploadForm(@RequestParam("file") MultipartFile file,//
+                                 @RequestParam("fileType") Text.Type textType,//
+                                 @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
           throws IOException, TransformerException {
     Preconditions.checkArgument(!file.isEmpty(), "Empty file");
 
@@ -119,7 +118,13 @@ public class TextController {
     response.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 
-  public static String redirectTo(Text text) {
-    return "redirect:" + URL_PREFIX + "/" + Long.toString(((RelationalText) text).getId());
+  public static RedirectView redirectTo(Text text) {
+    return new RedirectView(URL_PREFIX + "/" + Long.toString(((RelationalText) text).getId()), true, false);
+  }
+
+  public static RedirectView created(Text text) {
+    final RedirectView redirectView = redirectTo(text);
+    redirectView.setStatusCode(HttpStatus.CREATED);
+    return redirectView;
   }
 }

@@ -13,6 +13,10 @@
         <property name="password" value="gregor"/>
     </bean>
 
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
     <jdbc:initialize-database data-source="dataSource">
         <jdbc:script location="classpath:/eu/interedition/text/rdbms/mysql-schema.sql"/>
     </jdbc:initialize-database>
@@ -35,4 +39,10 @@
             </set>
         </property>
     </bean>
+
+    <bean id="indexingTextRepository" class="eu.interedition.text.repository.IndexingTextRepository">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="incrementerFactory" ref="incrementerFactory"/>
+    </bean>
+
 </beans>

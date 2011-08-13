@@ -37,7 +37,7 @@ public class TokenizerTest extends AbstractTest {
   private XMLParser parser;
 
   @Autowired
-  private TextRepository textRepository;
+  private IndexingTextRepository textRepository;
 
   @Autowired
   private AnnotationRepository annotationRepository;

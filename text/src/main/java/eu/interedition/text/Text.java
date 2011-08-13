@@ -15,4 +15,6 @@ public interface Text {
   Type getType();
 
   long getLength();
+
+  String getDigest();
 }

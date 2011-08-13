@@ -13,13 +13,14 @@ import eu.interedition.text.repository.model.QNameImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.SortedSet;
 
-import static eu.interedition.text.query.Criteria.and;
-import static eu.interedition.text.query.Criteria.rangeOverlap;
-import static eu.interedition.text.query.Criteria.text;
+import static eu.interedition.text.query.Criteria.*;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -34,7 +35,7 @@ public class AnnotationController {
   private AnnotationRepository annotationRepository;
 
   @Autowired
-  private RelationalTextRepository textRepository;
+  private IndexingTextRepository textRepository;
 
   @RequestMapping("/{id}/names")
   @ResponseBody

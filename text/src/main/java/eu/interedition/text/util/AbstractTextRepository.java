@@ -13,11 +13,7 @@ import java.io.*;
  */
 public abstract class AbstractTextRepository implements TextRepository {
 
-  protected TransformerFactory transformerFactory;
-
-  protected AbstractTextRepository() {
-    this.transformerFactory = TransformerFactory.newInstance();
-  }
+  protected TransformerFactory transformerFactory = TransformerFactory.newInstance();;
 
   public Text create(Source xml) throws IOException, TransformerException {
     final File xmlSource = File.createTempFile(getClass().getName(), ".xml");

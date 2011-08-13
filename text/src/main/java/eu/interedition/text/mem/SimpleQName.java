@@ -10,9 +10,7 @@ import java.net.URI;
 
 import static javax.xml.XMLConstants.XML_NS_URI;
 
-public class SimpleQName implements QName, Serializable {
-  private static final long serialVersionUID = 1L;
-
+public class SimpleQName implements QName {
   public static final QName XML_SPACE = new SimpleQName(XMLConstants.XML_NS_URI, "space");
 
   public static final QName COMMENT_QNAME = new SimpleQName(XML_NS_URI, "comment");

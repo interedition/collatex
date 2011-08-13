@@ -22,7 +22,7 @@ Language: English
 Character set encoding: UTF-8
 -->
 
-<!DOCTYPE TEI.2 SYSTEM "http://www.gutenberg.org/tei/marcello/0.4/dtd/pgtei.dtd">
+<!-- <!DOCTYPE TEI.2 SYSTEM "http://www.gutenberg.org/tei/marcello/0.4/dtd/pgtei.dtd"> -->
 
 <TEI.2 lang="en">
 <teiHeader>

@@ -5,7 +5,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
-import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.text.repository.IndexingTextRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpInputMessage;
@@ -33,7 +33,7 @@ import java.nio.charset.Charset;
 public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text> implements InitializingBean {
 
   @Autowired
-  private RelationalTextRepository textRepository;
+  private IndexingTextRepository textRepository;
 
   @Autowired
   private PlatformTransactionManager transactionManager;

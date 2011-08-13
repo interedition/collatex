@@ -4,6 +4,7 @@
 
     <div id="text-length" style="text-align: right; font-weight: bold; margin: 1em 0">
         Type: <#if text.type == "PLAIN">Plain Text<#elseif text.type == "XML">XML<#else>n/a</#if>;
+        Created: ${text.created?string?html};
         Length: ${text.length} characters
         <#if truncated>(${maxLength} displayed)</#if>
         <#if text.type == "XML">[<a href="${cp}/xml/${text.id?c}/parse" title="Parse XML">Parse XML</a>]</#if>
@@ -34,6 +35,8 @@
             </#if>
         </div>
     </div>
+
+    <p style="font-size: small; color: #dcdcdc;">SHA-512: ${text.digest?html}</p>
 
     <script type="text/javascript">
         YUI().use("node", "event", function(Y) {
