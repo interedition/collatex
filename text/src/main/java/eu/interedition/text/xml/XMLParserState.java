@@ -4,7 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.io.FileBackedOutputStream;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.TextConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,7 +172,7 @@ public class XMLParserState {
     }
 
     spacePreservationContext.push(spacePreservationContext.isEmpty() ? false : spacePreservationContext.peek());
-    final String xmlSpace = entity.getAttributes().get(SimpleQName.XML_SPACE);
+    final String xmlSpace = entity.getAttributes().get(TextConstants.XML_SPACE_ATTR_NAME);
     if (xmlSpace != null) {
       spacePreservationContext.pop();
       spacePreservationContext.push("preserve".equalsIgnoreCase(xmlSpace));

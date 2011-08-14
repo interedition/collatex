@@ -27,6 +27,6 @@ public class SearchController {
 
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView search(@ModelAttribute("query") TextIndexQuery query) throws IOException, ParseException {
-    return new ModelAndView("search", "results", textIndex.query(query));
+    return new ModelAndView("search", "results", textIndex.search(query));
   }
 }

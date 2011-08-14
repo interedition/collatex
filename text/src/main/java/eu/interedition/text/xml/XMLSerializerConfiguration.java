@@ -6,7 +6,6 @@ import eu.interedition.text.query.Criterion;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

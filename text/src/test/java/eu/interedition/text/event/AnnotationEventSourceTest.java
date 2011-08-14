@@ -1,7 +1,10 @@
 package eu.interedition.text.event;
 
 import com.google.common.collect.Iterables;
-import eu.interedition.text.*;
+import eu.interedition.text.AbstractTestResourceTest;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.QName;
+import eu.interedition.text.Range;
 import eu.interedition.text.mem.SimpleQName;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

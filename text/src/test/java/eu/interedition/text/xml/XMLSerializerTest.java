@@ -2,7 +2,6 @@ package eu.interedition.text.xml;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.NullOutputStream;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.QName;
@@ -23,7 +22,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static eu.interedition.text.TextConstants.TEI_NS;
 import static eu.interedition.text.query.Criteria.*;

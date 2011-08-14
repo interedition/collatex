@@ -6,7 +6,6 @@ import eu.interedition.text.AbstractTest;
 import eu.interedition.text.QName;
 import eu.interedition.text.QNameSet;
 import eu.interedition.text.mem.SimpleQName;
-import eu.interedition.text.rdbms.RelationalQName;
 import org.junit.Assert;
 import org.junit.Test;
 

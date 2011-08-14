@@ -7,7 +7,6 @@ import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.QName;
 import eu.interedition.text.Range;
 import eu.interedition.text.query.Operator;
-import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.repository.model.AnnotationImpl;
 import eu.interedition.text.repository.model.QNameImpl;
 import org.springframework.beans.factory.annotation.Autowired;

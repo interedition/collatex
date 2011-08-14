@@ -14,16 +14,16 @@ function post(uri, req, callback) {
     });
 }
 
-function TextView(config) {
-    TextView.superclass.constructor.apply(this, arguments);
+function TextEditor(config) {
+    TextEditor.superclass.constructor.apply(this, arguments);
 }
 
-TextView.NAME = "text-view";
+TextEditor.NAME = "text-editor";
 
-YUI().use("widget", function(Y) {
-    Y.extend(TextView, Y.Widget, {
+YUI().use("editor-base", "widget", function(Y) {
+    Y.extend(TextEditor, Y.Widget, {
         renderUI: function() {
-            // TODO
+
         }
     });
 });

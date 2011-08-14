@@ -11,11 +11,19 @@ import java.util.Collections;
 import java.util.Map;
 
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+import static javax.xml.XMLConstants.XML_NS_URI;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLEntity {
+  public static final QName COMMENT_QNAME = new SimpleQName(XML_NS_URI, "comment");
+
+  public static final QName PI_QNAME = new SimpleQName(XML_NS_URI, "pi");
+  public static final QName PI_TARGET_QNAME = new SimpleQName(XML_NS_URI, "piTarget");
+  public static final QName PI_DATA_QNAME = new SimpleQName(XML_NS_URI, "piDarget");
+
+
   private final String prefix;
   private final QName name;
   private final Map<QName, String> attributes;
@@ -48,17 +56,17 @@ public class XMLEntity {
   }
 
   public static XMLEntity newComment(XMLStreamReader reader) {
-    return new XMLEntity(SimpleQName.COMMENT_QNAME, XMLConstants.DEFAULT_NS_PREFIX);
+    return new XMLEntity(COMMENT_QNAME, XMLConstants.DEFAULT_NS_PREFIX);
   }
 
   public static XMLEntity newPI(XMLStreamReader reader) {
     final Map<QName, String> attributes = Maps.newHashMap();
-    attributes.put(SimpleQName.PI_TARGET_QNAME, reader.getPITarget());
+    attributes.put(PI_TARGET_QNAME, reader.getPITarget());
     final String data = reader.getPIData();
     if (data != null) {
-      attributes.put(SimpleQName.PI_DATA_QNAME, data);
+      attributes.put(PI_DATA_QNAME, data);
     }
-    return new XMLEntity(SimpleQName.PI_QNAME, XMLConstants.DEFAULT_NS_PREFIX, attributes);
+    return new XMLEntity(PI_QNAME, XMLConstants.DEFAULT_NS_PREFIX, attributes);
   }
 
   public static XMLEntity newElement(XMLStreamReader reader) {

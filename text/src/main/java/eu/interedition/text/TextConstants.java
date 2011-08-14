@@ -14,6 +14,7 @@ public interface TextConstants {
   final URI INTEREDITION_NS_URI = URI.create("http://interedition.eu/ns");
 
   final QName XML_ID_ATTR_NAME = new SimpleQName(XML_NS_URI, "id");
+  final QName XML_SPACE_ATTR_NAME = new SimpleQName(XML_NS_URI, "space");
 
   final URI CLIX_NS = URI.create("http://lmnl.net/clix");
   final String CLIX_NS_PREFIX = "c";

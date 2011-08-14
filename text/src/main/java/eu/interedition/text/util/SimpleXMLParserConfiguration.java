@@ -6,8 +6,6 @@ import eu.interedition.text.QName;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserConfiguration;
 import eu.interedition.text.xml.XMLParserModule;
-import eu.interedition.text.xml.module.LineElementXMLParserModule;
-import eu.interedition.text.xml.module.NotableCharacterXMLParserModule;
 
 import java.util.List;
 import java.util.Set;

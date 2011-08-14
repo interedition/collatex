@@ -104,7 +104,7 @@
                     });
 
                     post("", parserConfig, function(resp) {
-                        Y.one("#parsed-text").append(Y.dump(resp));
+                        window.location.pathname = cp + "/text/" + resp.id.toString();
                     });
                 }, "#parse-form");
             });

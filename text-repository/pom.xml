@@ -46,8 +46,8 @@
             <artifactId>lucene-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-highlighter</artifactId>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-spring</artifactId>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>

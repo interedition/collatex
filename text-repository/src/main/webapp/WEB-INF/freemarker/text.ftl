@@ -41,7 +41,6 @@
     <script type="text/javascript">
         YUI().use("node", "event", function(Y) {
             Y.on("domready", function() {
-                (new TextView()).render();
                 Y.all(".font-size").on("click", function(e) {
                     e.preventDefault();
                     Y.one("#text-contents").setStyle("fontSize", e.currentTarget.getStyle("fontSize"));
