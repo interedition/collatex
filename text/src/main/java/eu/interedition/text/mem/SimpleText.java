@@ -4,8 +4,6 @@ import com.google.common.base.Preconditions;
 import eu.interedition.text.Text;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.util.Date;
-
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */

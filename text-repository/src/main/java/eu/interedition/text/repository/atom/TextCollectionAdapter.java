@@ -13,7 +13,6 @@ import org.apache.abdera.protocol.server.context.ResponseContextException;
 import org.apache.abdera.protocol.server.impl.AbstractEntityCollectionAdapter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Node;
@@ -36,9 +35,6 @@ public class TextCollectionAdapter extends AbstractEntityCollectionAdapter<TextI
 
   @Autowired
   private TextService textService;
-
-  @Autowired
-  private JdbcTemplate jt;
 
   @Override
   public TextImpl postEntry(String title, IRI id, String summary, Date updated, List<Person> authors, Content content, RequestContext request) throws ResponseContextException {

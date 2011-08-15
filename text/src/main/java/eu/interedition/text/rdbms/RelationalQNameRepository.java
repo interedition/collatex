@@ -31,7 +31,6 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert nameInsert;
-  private SimpleJdbcInsert nameSetInsert;
   private DataFieldMaxValueIncrementer nameIdIncrementer;
 
   private Map<QName, Long> nameCache;
@@ -146,7 +145,6 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
   public void afterPropertiesSet() throws Exception {
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
     this.nameInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname");
-    this.nameSetInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname_set");
     this.nameIdIncrementer = this.incrementerFactory.create("text_qname");
   }
 

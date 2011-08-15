@@ -1,6 +1,5 @@
 package eu.interedition.text.repository.textindex;
 
-import eu.interedition.text.Text;
 import eu.interedition.text.repository.model.TextImpl;
 
 /**

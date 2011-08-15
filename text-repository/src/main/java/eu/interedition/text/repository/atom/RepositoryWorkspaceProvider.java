@@ -3,7 +3,6 @@ package eu.interedition.text.repository.atom;
 import org.apache.abdera.protocol.server.CollectionAdapter;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.filters.OpenSearchFilter;
 import org.apache.abdera.protocol.server.impl.AbstractWorkspaceProvider;
 import org.apache.abdera.protocol.server.impl.RouteManager;
 import org.apache.abdera.protocol.server.impl.SimpleWorkspaceInfo;
