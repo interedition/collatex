@@ -8,6 +8,7 @@ import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.module.DefaultAnnotationXMLParserModule;
@@ -40,7 +41,7 @@ public class TokenizerTest extends AbstractTest {
   private XMLParser parser;
 
   @Autowired
-  private IndexingTextRepository textRepository;
+  private RelationalTextRepository textRepository;
 
   @Autowired
   private AnnotationRepository annotationRepository;

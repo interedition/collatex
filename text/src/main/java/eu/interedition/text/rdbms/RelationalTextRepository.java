@@ -68,11 +68,9 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
 
   public Text create(Text.Type type) {
     final long id = textIdIncrementer.nextLongValue();
-    final Date created = new Date();
 
     final Map<String, Object> textData = Maps.newHashMap();
     textData.put("id", id);
-    textData.put("created", created);
     textData.put("type", type.ordinal());
     textData.put("content", "");
     textData.put("content_length", 0);
@@ -82,7 +80,6 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
 
     final RelationalText rt = new RelationalText();
     rt.setId(id);
-    rt.setCreated(created);
     rt.setType(type);
     rt.setLength(0);
 
@@ -90,7 +87,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   public Text create(Reader content) throws IOException {
-    final Text text = create(Text.Type.PLAIN);
+    final Text text = create(Text.Type.TXT);
     write(text, content);
     return text;
   }
@@ -237,13 +234,12 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   public static String selectTextFrom(String tableName) {
-    return SQL.select(tableName, "id", "created", "type", "content_length", "content_digest");
+    return SQL.select(tableName, "id", "type", "content_length", "content_digest");
   }
 
   public static RelationalText mapTextFrom(ResultSet rs, String prefix) throws SQLException {
     final RelationalText rt = new RelationalText();
     rt.setId(rs.getInt(prefix + "_id"));
-    rt.setCreated(rs.getDate(prefix + "_created"));
     rt.setType(Text.Type.values()[rs.getInt(prefix + "_type")]);
     rt.setLength(rs.getLong(prefix + "_content_length"));
     rt.setDigest(rs.getString(prefix + "_content_digest"));

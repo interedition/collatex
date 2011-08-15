@@ -10,23 +10,17 @@ import java.util.Date;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class SimpleText implements Text {
-  private final Date created;
   private final Type type;
   private String content;
   private String digest;
 
   public SimpleText(Type type, String content) {
-    this.created = new Date();
     this.type = type;
     setContent(content);
   }
 
   public SimpleText(Type type) {
     this(type, "");
-  }
-
-  public Date getCreated() {
-    return created;
   }
 
   public Type getType() {

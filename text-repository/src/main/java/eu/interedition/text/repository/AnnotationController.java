@@ -34,7 +34,7 @@ public class AnnotationController {
   private AnnotationRepository annotationRepository;
 
   @Autowired
-  private IndexingTextRepository textRepository;
+  private TextService textRepository;
 
   @RequestMapping("/{id}/names")
   @ResponseBody

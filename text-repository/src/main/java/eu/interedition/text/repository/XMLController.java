@@ -7,6 +7,9 @@ import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.QName;
 import eu.interedition.text.Text;
 import eu.interedition.text.query.Operator;
+import eu.interedition.text.rdbms.RelationalText;
+import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.text.repository.model.TextImpl;
 import eu.interedition.text.repository.model.XMLParserConfigurationImpl;
 import eu.interedition.text.repository.model.XMLSerializerConfigurationImpl;
 import eu.interedition.text.xml.XMLParser;
@@ -28,6 +31,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +50,10 @@ public class XMLController {
   private AnnotationRepository annotationRepository;
 
   @Autowired
-  private IndexingTextRepository textRepository;
+  private TextService textService;
+
+  @Autowired
+  private RelationalTextRepository textRepository;
 
   @Autowired
   private XMLParser xmlParser;
@@ -78,12 +85,12 @@ public class XMLController {
 
     final TransformerHandler transformerHandler = transformerFactory.newTransformerHandler();
     transformerHandler.setResult(new StreamResult(response.getWriter()));
-    xmlSerializer.serialize(transformerHandler, textRepository.load(id), sc);
+    xmlSerializer.serialize(transformerHandler, textService.load(id), sc);
   }
 
   @RequestMapping(value = "/{id}/parse", method = RequestMethod.GET)
   public ModelAndView form(@PathVariable("id") long id) {
-    final Text text = textRepository.load(id);
+    final TextImpl text = textService.load(id);
     Preconditions.checkArgument(text.getType() == Text.Type.XML);
 
     Map<String, List<String>> names = Maps.newHashMap();
@@ -112,10 +119,15 @@ public class XMLController {
       modules.add(new TEIAwareAnnotationXMLParserModule(annotationRepository, 1000));
     }
 
-    final Text parsed = xmlParser.parse(textRepository.load(id), pc);
+    final TextImpl source = textService.load(id);
+    final Text parsed = xmlParser.parse(source, pc);
     if (pc.isRemoveEmpty()) {
       annotationRepository.delete(and(text(parsed), rangeLength(0)));
     }
-    return parsed;
+
+    final TextImpl parsedMetadata = new TextImpl(source);
+    parsedMetadata.setCreated(new Date());
+    parsedMetadata.setUpdated(parsedMetadata.getCreated());
+    return textService.create(parsedMetadata, (RelationalText) parsed);
   }
 }

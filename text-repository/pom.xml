@@ -50,6 +50,10 @@
             <artifactId>abdera-spring</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-extensions-main</artifactId>
+        </dependency>
+        <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
         </dependency>

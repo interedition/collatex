@@ -1,5 +1,6 @@
 package eu.interedition.text;
 
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
@@ -16,6 +17,8 @@ public interface TextRepository {
   Text create(Source xml) throws TransformerException, IOException;
 
   void delete(Text text);
+
+  void read(Text text, Result xml) throws IOException, TransformerException;
 
   void read(Text text, TextReader reader) throws IOException;
 

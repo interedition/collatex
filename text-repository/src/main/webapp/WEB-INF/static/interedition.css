@@ -26,6 +26,10 @@ form table tr td, form table tr th {
     background: #F2F2F2;
 }
 
+img.icon {
+    margin: 0 0.25em
+}
+
 .hidden {
     display: none;
 }
@@ -44,4 +48,9 @@ form table tr td, form table tr th {
 
 .center {
     text-align: center;
+}
+
+.search-results li {
+    border-bottom: 1px dashed #F2F2F2;
+    margin-bottom: 2em;
 }

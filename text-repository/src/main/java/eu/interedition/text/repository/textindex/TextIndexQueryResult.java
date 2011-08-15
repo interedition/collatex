@@ -1,14 +1,18 @@
 package eu.interedition.text.repository.textindex;
 
 import eu.interedition.text.Text;
+import eu.interedition.text.repository.model.TextImpl;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextIndexQueryResult {
+public class TextIndexQueryResult extends TextImpl {
   private int score;
-  private Text text;
-  private String textStart;
+
+  public TextIndexQueryResult(TextImpl other, int score) {
+    super(other);
+    this.score = score;
+  }
 
   public int getScore() {
     return score;
@@ -16,21 +20,5 @@ public class TextIndexQueryResult {
 
   public void setScore(int score) {
     this.score = score;
-  }
-
-  public Text getText() {
-    return text;
-  }
-
-  public void setText(Text text) {
-    this.text = text;
-  }
-
-  public String getTextStart() {
-    return textStart;
-  }
-
-  public void setTextStart(String textStart) {
-    this.textStart = textStart;
   }
 }

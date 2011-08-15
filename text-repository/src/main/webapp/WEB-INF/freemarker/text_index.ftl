@@ -6,6 +6,18 @@
 <form id="upload" name="upload" method="post" enctype="multipart/form-data">
     <table style="margin: 0 auto">
         <tr>
+            <th class="right"><label for="title">Title:</label></th>
+            <td><input type="text" name="title" id="title" style="width: 95%"></td>
+        </tr>
+        <tr>
+            <th class="right"><label for="summary">Summary:</label></th>
+            <td><textarea rows="3" name="summary" id="summary" style="width: 95%"></textarea></td>
+        </tr>
+        <tr>
+            <th class="right"><label for="author">Author:</label></th>
+            <td><input type="text" name="author" id="author" style="width: 95%"></td>
+        </tr>
+        <tr>
             <th class="right"><label for="file">File:</label></th>
             <td><input type="file" name="file" id="file"/></td>
         </tr>
@@ -46,7 +58,7 @@
                     fileType.set("value", "XML");
                     fileEncoding.set("disabled", true);
                 } else {
-                    fileType.set("value", "PLAIN");
+                    fileType.set("value", "TXT");
                     fileEncoding.set("disabled", false);
                 }
             }, file);

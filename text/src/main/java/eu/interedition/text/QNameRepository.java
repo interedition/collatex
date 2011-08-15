@@ -9,10 +9,4 @@ public interface QNameRepository {
 
   Set<QName> get(Set<QName> name);
 
-  QNameSet getSet(QName name);
-
-  QNameSet putSet(QName name, Set<QName> members);
-
-  void deleteSet(QName name);
-
 }

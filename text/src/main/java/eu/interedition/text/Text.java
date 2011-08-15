@@ -7,10 +7,8 @@ public interface Text {
   final Charset CHARSET = Charset.forName("UTF-8");
 
   enum Type {
-    PLAIN, XML
+    TXT, XML
   }
-
-  Date getCreated();
 
   Type getType();
 

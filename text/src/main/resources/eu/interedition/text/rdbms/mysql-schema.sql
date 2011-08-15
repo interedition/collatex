@@ -12,17 +12,8 @@ CREATE TABLE IF NOT EXISTS text_qname (
   UNIQUE (local_name, namespace)
 ) ENGINE = INNODB;
 
-CREATE TABLE IF NOT EXISTS text_qname_set (
-  name BIGINT NOT NULL,
-  member BIGINT NOT NULL,
-  FOREIGN KEY (name) REFERENCES text_qname (id),
-  FOREIGN KEY (member) REFERENCES text_qname (id),
-  UNIQUE(name, member)
-);
-
 CREATE TABLE IF NOT EXISTS text_content (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  created TIMESTAMP NOT NULL,
+  id BIGINT PRIMARY KEY,
   type SMALLINT NOT NULL,
   content LONGTEXT NOT NULL,
   content_length BIGINT NOT NULL,

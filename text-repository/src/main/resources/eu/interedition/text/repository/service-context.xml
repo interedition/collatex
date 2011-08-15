@@ -21,6 +21,7 @@
 
     <jdbc:initialize-database data-source="dataSource">
         <jdbc:script location="classpath:/eu/interedition/text/rdbms/mysql-schema.sql"/>
+        <jdbc:script location="classpath:/eu/interedition/text/repository/mysql-schema.sql"/>
     </jdbc:initialize-database>
 
 
@@ -40,11 +41,6 @@
                 <bean class="eu.interedition.text.repository.conversion.RangeConverter"/>
             </set>
         </property>
-    </bean>
-
-    <bean id="indexingTextRepository" class="eu.interedition.text.repository.IndexingTextRepository">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="incrementerFactory" ref="incrementerFactory"/>
     </bean>
 
     <task:scheduler id="taskScheduler"/>

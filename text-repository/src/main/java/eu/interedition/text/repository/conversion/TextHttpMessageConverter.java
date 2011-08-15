@@ -5,7 +5,8 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
-import eu.interedition.text.repository.IndexingTextRepository;
+import eu.interedition.text.repository.TextService;
+import eu.interedition.text.repository.model.TextImpl;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpInputMessage;
@@ -30,10 +31,13 @@ import java.nio.charset.Charset;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text> implements InitializingBean {
+public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextImpl> implements InitializingBean {
 
   @Autowired
-  private IndexingTextRepository textRepository;
+  private TextService textService;
+
+  @Autowired
+  private TextRepository textRepository;
 
   @Autowired
   private PlatformTransactionManager transactionManager;
@@ -45,29 +49,29 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
 
   @Override
   protected boolean supports(Class<?> clazz) {
-    return Text.class.isAssignableFrom(clazz);
+    return TextImpl.class.isAssignableFrom(clazz);
   }
 
   @Override
-  protected Text readInternal(Class<? extends Text> clazz, final HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+  protected TextImpl readInternal(Class<? extends TextImpl> clazz, final HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     final MediaType contentType = inputMessage.getHeaders().getContentType();
     final Charset contentTypeCharset = contentType.getCharSet();
     final Charset charset = (contentTypeCharset == null ? Text.CHARSET : contentTypeCharset);
 
     try {
-      return new TransactionTemplate(transactionManager).execute(new TransactionCallback<Text>() {
+      return new TransactionTemplate(transactionManager).execute(new TransactionCallback<TextImpl>() {
         @Override
-        public Text doInTransaction(TransactionStatus status) {
+        public TextImpl doInTransaction(TransactionStatus status) {
           try {
             if (MediaType.TEXT_PLAIN.isCompatibleWith(contentType)) {
               Reader textContent = null;
               try {
-                return textRepository.create(textContent = new InputStreamReader(inputMessage.getBody(), charset));
+                return textService.create(new TextImpl(), textContent = new InputStreamReader(inputMessage.getBody(), charset));
               } finally {
                 Closeables.close(textContent, false);
               }
             } else {
-              return textRepository.create(new StreamSource(inputMessage.getBody()));
+              return textService.create(new TextImpl(), new StreamSource(inputMessage.getBody()));
             }
           } catch (IOException e) {
             throw Throwables.propagate(e);
@@ -88,7 +92,7 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
   }
 
   @Override
-  protected void writeInternal(final Text text, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+  protected void writeInternal(final TextImpl text, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     final MediaType contentType = outputMessage.getHeaders().getContentType();
     final Charset contentTypeCharset = contentType.getCharSet();
     final Charset charset = (contentTypeCharset == null ? Text.CHARSET : contentTypeCharset);
@@ -104,7 +108,7 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
               @Override
               public void read(Reader content, long contentLength) throws IOException {
                 switch (text.getType()) {
-                  case PLAIN:
+                  case TXT:
                     OutputStreamWriter bodyWriter = null;
                     try {
                       CharStreams.copy(content, bodyWriter = new OutputStreamWriter(outputMessage.getBody(), charset));
@@ -143,9 +147,9 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<Text>
   }
 
   @Override
-  protected MediaType getDefaultContentType(Text text) {
+  protected MediaType getDefaultContentType(TextImpl text) {
     switch (text.getType()) {
-      case PLAIN:
+      case TXT:
         return MediaType.TEXT_PLAIN;
       case XML:
         return MediaType.APPLICATION_XML;

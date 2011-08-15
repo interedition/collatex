@@ -3,14 +3,21 @@ package eu.interedition.text.rdbms;
 import com.google.common.base.Objects;
 import eu.interedition.text.Text;
 
-import java.util.Date;
-
 public class RelationalText implements Text {
   private long id;
-  private Date created;
   private Type type;
   private long length;
   private String digest;
+
+  public RelationalText() {
+  }
+
+  public RelationalText(RelationalText other) {
+    this.id = other.id;
+    this.type = other.type;
+    this.length = other.length;
+    this.digest = other.digest;
+  }
 
   public long getId() {
     return id;
@@ -18,14 +25,6 @@ public class RelationalText implements Text {
 
   public void setId(long id) {
     this.id = id;
-  }
-
-  public Date getCreated() {
-    return created;
-  }
-
-  public void setCreated(Date created) {
-    this.created = created;
   }
 
   public Type getType() {

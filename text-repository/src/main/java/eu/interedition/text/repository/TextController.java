@@ -8,12 +8,16 @@ import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.rdbms.RelationalText;
+import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.text.repository.model.TextImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -33,11 +37,14 @@ import java.nio.charset.Charset;
 @Transactional
 @RequestMapping(TextController.URL_PREFIX)
 public class TextController {
-  protected static final String URL_PREFIX = "/text";
+  public static final String URL_PREFIX = "/text";
   protected static final int MAX_TEXT_LENGTH = 102400;
 
   @Autowired
-  private IndexingTextRepository textRepository;
+  private TextService textService;
+
+  @Autowired
+  private RelationalTextRepository textRepository;
 
   @Autowired
   private AnnotationRepository annotationRepository;
@@ -58,7 +65,7 @@ public class TextController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public RedirectView uploadForm(@RequestParam("file") MultipartFile file,//
+  public RedirectView uploadForm(@ModelAttribute TextImpl text, @RequestParam("file") MultipartFile file,//
                                  @RequestParam("fileType") Text.Type textType,//
                                  @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
           throws IOException, TransformerException {
@@ -67,10 +74,10 @@ public class TextController {
     InputStream fileStream = null;
     try {
       switch (textType) {
-        case PLAIN:
-          return redirectTo(textRepository.create(new InputStreamReader(fileStream = file.getInputStream(), Charset.forName(charset))));
+        case TXT:
+          return redirectTo(textService.create(text, new InputStreamReader(fileStream = file.getInputStream(), Charset.forName(charset))));
         case XML:
-          return redirectTo(textRepository.create(new StreamSource(fileStream = file.getInputStream())));
+          return redirectTo(textService.create(text, new StreamSource(fileStream = file.getInputStream())));
       }
     } finally {
       Closeables.close(fileStream, false);
@@ -80,7 +87,7 @@ public class TextController {
 
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, headers = "accept=text/html")
   public ModelAndView view(@PathVariable("id") int id) throws IOException {
-    final Text text = textRepository.load(id);
+    final TextImpl text = textService.load(id);
 
     final ModelAndView mv = new ModelAndView("text");
     mv.addObject("text", text);
@@ -92,12 +99,12 @@ public class TextController {
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   @ResponseBody
   public Text download(@PathVariable("id") int id) {
-    return textRepository.load(id);
+    return textService.load(id);
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, params = "r")
   public void download(@PathVariable("id") int id, @RequestParam("r") Range range, HttpServletResponse response) throws IOException {
-    final Text text = textRepository.load(id);
+    final TextImpl text = textService.load(id);
     final int textLength = (int) text.getLength();
 
     response.setCharacterEncoding(Text.CHARSET.name());
@@ -126,5 +133,10 @@ public class TextController {
     final RedirectView redirectView = redirectTo(text);
     redirectView.setStatusCode(HttpStatus.CREATED);
     return redirectView;
+  }
+
+  @InitBinder
+  public void initBinder(WebDataBinder binder) {
+    binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
   }
 }
