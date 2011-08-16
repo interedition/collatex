@@ -146,18 +146,6 @@ public class PublicInterface
 		MVD mvd = getFromCache( mvdPath );
 		mvd.setVersionLongName( versionId, longName );
 	}
-	/**
-	 * Set the backup version (or NO_BACKUP) for a given version
-	 * @param mvdPath the path to the mvd
-	 * @param versionId the id of the version affected
-	 * @param backup the new backup version or NO_BACKUP
-	 */
-	public void setVersionBackup( String mvdPath, int versionId, 
-		short backup ) throws Exception
-	{
-		MVD mvd = getFromCache( mvdPath );
-		mvd.setVersionBackup( versionId, backup );
-	}
 
 	/**
 	 * Set a description of an MVD
@@ -384,8 +372,7 @@ public class PublicInterface
 		Chunk[] chunks = new Chunk[1];
 		ChunkState[] cs = new ChunkState[1];
 		cs[0] = ChunkState.none;
-		chunks[0] = new Chunk( mvd.getEncoding(), 
-			0, cs, mvd.getVersion(versionId), (short)0 );
+		chunks[0] = new Chunk( mvd.getEncoding(), 0, cs, mvd.getVersion(versionId) );
 		chunks[0].setVersion( versionId );
 		return chunks;
 	}

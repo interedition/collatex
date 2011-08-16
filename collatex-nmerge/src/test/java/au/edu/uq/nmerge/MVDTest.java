@@ -31,18 +31,20 @@ import org.junit.Test;
  */
 public class MVDTest extends AbstractTest {
 
+  public static final byte[] VERSION_2 = "Hello World! How funny!".getBytes();
+  public static final byte[] VERSION_1 = "Hello funny World!".getBytes();
+
   @Test
   public void simple() throws Exception {
     final MVD mvd = new MVD("Test");
-    final short version1 = (short) mvd.newVersion("test1", "test1", Short.MIN_VALUE, false);
-    mvd.update(version1, "Hello funny World!".getBytes());
+    final short version1 = (short) mvd.newVersion("test1", "test1");
+    mvd.update(version1, VERSION_1);
 
-    final short version2 = (short) mvd.newVersion("test2", "test2", Short.MIN_VALUE, false);
-    mvd.update(version2, "Hello World! How funny!".getBytes());
+    final short version2 = (short) mvd.newVersion("test2", "test2");
+    mvd.update(version2, VERSION_2);
 
-    for (Chunk chunk : mvd.compare(version2, version1, ChunkState.added)) {
-      LOG.debug(chunk.toString());
+    for (Chunk c : mvd.compare(version1, version2, ChunkState.added)) {
+      LOG.debug(c.toString());
     }
-
   }
 }

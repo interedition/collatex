@@ -31,36 +31,23 @@ public class ChunkStateSet
 {
 	/** this is what defines who we are */
 	private ChunkState[] states;
-	/** pass this on to child sets */
-	private short backup;
+
 	/**
 	 * Construct a simple one-state chunk state set
 	 */
 	public ChunkStateSet()
 	{
-		backup = (short)0;
 		add( ChunkState.none );
 	}
 	/**
 	 * Construct a simple one-state chunk state set
-	 * @param backup the backup version
 	 * @param state the chunk state to start with
 	 */
-	public ChunkStateSet( short backup, ChunkState state )
+	public ChunkStateSet( ChunkState state )
 	{
-		this.backup = backup;
 		add( state );
 	}
-	/**
-	 * Create a default empty set with a backup we will pass on to our 
-	 * children
-	 * @param backup the backup version (usually NO_BACKUP)
-	 */
-	public ChunkStateSet( short backup )
-	{
-		this.backup = backup;
-		add( ChunkState.none );
-	}
+
 	/**
 	 * Copy constructor
 	 * @param set a set of states to copy deeply
@@ -70,16 +57,13 @@ public class ChunkStateSet
 		this.states = new ChunkState[set.states.length];
 		for ( int i=0;i<set.states.length;i++ )
 			this.states[i] = set.states[i];
-		this.backup = set.backup;
 	}
 	/**
 	 * Create a new ChunkState set
-	 * @param backup the backup version (usually NO_BACKUP)
 	 * @param states a preconstructed array of chunk states
 	 */
-	public ChunkStateSet( ChunkState[] states, short backup )
+	public ChunkStateSet( ChunkState[] states )
 	{
-		this.backup = backup;
 		this.states = states;
 	}
 	/**
@@ -194,22 +178,14 @@ public class ChunkStateSet
 		{
 			if ( !containsState(state) )
 			{
-				repl = new ChunkStateSet( backup );
+				repl = new ChunkStateSet( );
 				repl.add( state );
 			}
 		}
 		// contains version v
-		else if ( backup != Version.NO_BACKUP )
-		{
-			if ( !isBackup() )
-			{
-				repl = new ChunkStateSet( backup );
-				repl.add( ChunkState.backup );
-			}
-		}
 		else if ( !isMerged() )
 		{
-			repl = new ChunkStateSet( backup );
+			repl = new ChunkStateSet( );
 			repl.add( ChunkState.merged );
 		}
 		return repl;
@@ -259,13 +235,5 @@ public class ChunkStateSet
 		else
 			sb.append("empty");
 		return sb.toString();
-	}
-	/**
-	 * Get the backup version
-	 * @return the backup as a short
-	 */
-	public short getBackup()
-	{
-		return backup;
 	}
 }

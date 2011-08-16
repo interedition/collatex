@@ -116,8 +116,7 @@ public class MVD
 	{
 		if ( version == versions.size()+1 )
 		{
-			Version v = new Version( Version.NO_BACKUP, "Z",
-				UNTITLED_NAME );
+			Version v = new Version(  "Z", UNTITLED_NAME );
 			versions.insertElementAt( v, version-1 );
 		}
 		else
@@ -175,19 +174,7 @@ public class MVD
 	{
 		return pairs.get( pairIndex );
 	}
-	/**
-	 * Make a bitset of all the partial versions for quick lookup
-	 */
-	void initPartialVersions()
-	{
-		partialVersions = new BitSet();
-		for ( int i=1;i<=versions.size();i++ ) 
-		{ 
-			Version v = versions.get( i-1 );
-			if ( v.isPartial() )
-				partialVersions.set( i );
-		}
-	}
+
 	/**
 	 * Compare two versions u and v. If it is in u but not in v 
 	 * then turn that pair and any subsequent pairs with the 
@@ -204,12 +191,11 @@ public class MVD
 		throws MVDException
 	{
 		Vector<Chunk> chunks = new Vector<Chunk>();
-		short backup = versions.get(u-1).getBackup();
-		Chunk current = new Chunk( encoding, backup );
+		Chunk current = new Chunk( encoding );
 		current.setVersion( u );
 		TransposeState oldTS = null;
 		TransposeState ts = new TransposeState();
-		ChunkStateSet cs = new ChunkStateSet( backup );
+		ChunkStateSet cs = new ChunkStateSet();
 		ChunkStateSet oldCS = null;
 		Pair p = null;
 		Chunk.chunkId = 0;
@@ -243,8 +229,7 @@ public class MVD
 				}
 				else
 					newStates = cs.getStates();
-				current = new Chunk( encoding, ts.getId(), 
-					newStates, p.getData(), backup );
+				current = new Chunk( encoding, ts.getId(), newStates, p.getData());
 				current.setVersion( u );
 			}
 			else
@@ -408,34 +393,10 @@ public class MVD
 	 * Create a new empty version.
 	 * @return the id of the new version
 	 */
-	public int newVersion( String shortName, String longName, short backup, boolean partial )
+	public int newVersion( String shortName, String longName)
 	{
-		versions.add( new Version((partial)?backup:Version.NO_BACKUP, shortName, longName) );
-		int vId = versions.size();
-		// now go through the graph, looking for any pair 
-		// containing the backup version and adding to it 
-		// the new version. Q: does that apply also to hints?
-		if ( partial )
-		{
-			for ( int i=0;i<pairs.size();i++ )
-			{
-				Pair p = pairs.get( i );
-				if ( p.versions.nextSetBit(backup)==backup )
-					p.versions.set(vId);
-			}
-		}
-		return vId;
-	}
-
-	/**
-	 * Get the backup for the given version
-	 * @param vId the version to get the backup of
-	 * @return the backup version or 0 for NO_BACKUP
-	 */
-	public short getBackupForVersion( int vId )
-	{
-		Version v = versions.get(vId-1);
-		return v.backup;
+		versions.add( new Version(shortName, longName) );
+		return versions.size();
 	}
 
 	/**
@@ -487,16 +448,6 @@ public class MVD
 	{
 		Version v = versions.get( versionId-1 );
 		v.longName = longName;
-	}
-	/**
-	 * Set the backup version of a given version
-	 * @param versionId the id of the affected version
-	 * @param backup the new backup or NO_BACKUP
-	 */
-	public void setVersionBackup( int versionId, short backup )
-	{
-		Version v = versions.get( versionId-1 );
-		v.backup = backup;
 	}
 
 	/**

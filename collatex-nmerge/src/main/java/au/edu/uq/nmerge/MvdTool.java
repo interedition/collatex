@@ -491,7 +491,7 @@ public class MvdTool
 			if ( t.exists() )
 			{
 				MVD mvd = new MVD( description );;
-					mvd.newVersion( shortName, longName, (short)backup, partial );
+					mvd.newVersion( shortName, longName );
 				FileInputStream fis = new FileInputStream( t );
 				byte[] data = new byte[(int)t.length()];
 				fis.read( data );

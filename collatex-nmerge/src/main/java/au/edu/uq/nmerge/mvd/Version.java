@@ -27,48 +27,20 @@ package au.edu.uq.nmerge.mvd;
  */
 public class Version
 {
-	static final long serialVersionUID = 1;
-
-	/** the backup version is returned whenever this version
-	 * is requested but is not available */
-	public short backup;
-	/** siglum or other short name e.g. A */
+  /** siglum or other short name e.g. A */
 	public String shortName;
+
 	/** full description if desired: e.g. Codex Vaticanus 1234 */
 	public String longName;
-	/** size of version in bytes */
-	int versionSize;
-	public static short NO_BACKUP = 0;
 	/**
 	 * Create an instance of Version
-	 * @param backup the backup version or NO_BACKUP
 	 * @param shortName siglum or other short name
 	 * @param longName longer name if desired
 	 */
-	public Version( short backup, String shortName,
-		String longName )
+	public Version( String shortName, String longName )
 	{
 		this.shortName = shortName;
 		this.longName = longName;
-		this.backup = backup;
-	}
-
-	/**
-	 * Get the backup version whose content is returned whenever  
-	 * this version is not present
-	 * @return the backup version ID or NO_BACKUP
-	 */
-	public short getBackup()
-	{
-		return backup;
-	}
-	/**
-	 * Is this version partial?
-	 * @return true if it is, false otherwise
-	 */
-	public boolean isPartial()
-	{
-		return backup != NO_BACKUP;
 	}
 
 	/**
@@ -82,7 +54,7 @@ public class Version
 		StringBuffer sb = new StringBuffer();
 		for ( int i=0;i<indent;i++ )
 			sb.append( " " );
-		sb.append( "<version id=\""+id+"\" backup=\""+backup
+		sb.append( "<version id=\""+id
 			+"\" shortName=\""
 			+shortName+"\" longName=\""+longName+"\"/>\n" );
 		return sb.toString();
@@ -93,7 +65,6 @@ public class Version
 	 */
 	public String toString()
 	{
-		return "shortName:"+shortName+";longName:"+longName
-			+";backup:"+backup;
+		return "shortName:"+shortName+";longName:"+longName;
 	}
 }

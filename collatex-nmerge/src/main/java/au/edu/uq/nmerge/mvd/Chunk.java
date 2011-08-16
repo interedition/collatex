@@ -40,12 +40,11 @@ public class Chunk extends BracketedData
 	/**
 	 * Basic constructor for a chunk. Add states versions and ids later.
 	 * @param encoding the encoding of the data
-	 * @param backup the backup version or NO_BACKUP
 	 */
-	public Chunk( String encoding, short backup )
+	public Chunk( String encoding )
 	{
 		super( encoding );
-		this.states = new ChunkStateSet( backup );
+		this.states = new ChunkStateSet();
 	}
 	/**
 	 * Create a new Chunk
@@ -53,13 +52,11 @@ public class Chunk extends BracketedData
 	 * @param id the parent or child id or 0
 	 * @param cs an initial set of chunk states
 	 * @param data the data to add
-	 * @param backup the backup version or NO_BACKUP
 	 */
-	public Chunk( String encoding, int id, ChunkState[] cs, 
-		byte[] data, short backup )
+	public Chunk( String encoding, int id, ChunkState[] cs, byte[] data)
 	{
 		super( encoding, data );
-		this.states = new ChunkStateSet( cs, backup );
+		this.states = new ChunkStateSet( cs );
 		this.id = id;
 	}
 	/**
@@ -72,13 +69,12 @@ public class Chunk extends BracketedData
 	 * state and comes after the id.
 	 * @param chunkData should contain escaped ']'s
 	 * @param pos position in the byte array to read from
-	 * @param backup the backup version
 	 */
-	public Chunk( byte[] chunkData, int pos, short backup )
+	public Chunk( byte[] chunkData, int pos )
 	{
 		super( Charset.defaultCharset().toString() );
 		int start = pos;
-		states = new ChunkStateSet( backup );
+		states = new ChunkStateSet( );
 		while ( chunkData[pos] != '[' )
 			pos++;
 		// point to first char after '['
@@ -183,12 +179,9 @@ public class Chunk extends BracketedData
 			second[i] = realData[j];
 		Chunk[] parts = new Chunk[2];
 		// duplicate ids: this doesn't matter for chunks
-		parts[0] = new Chunk( encoding, id, states.getStates(), 
-			first, states.getBackup() );
+		parts[0] = new Chunk( encoding, id, states.getStates(), first);
 		parts[0].version = this.version;
-		parts[1] = new Chunk( encoding, id, 
-			new ChunkStateSet(states).getStates(), 
-			second, states.getBackup() );
+		parts[1] = new Chunk( encoding, id, new ChunkStateSet(states).getStates(), second );
 		parts[1].version = this.version;
 		return parts;
 	}
