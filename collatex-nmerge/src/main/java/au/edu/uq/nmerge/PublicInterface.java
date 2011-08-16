@@ -74,10 +74,10 @@ public class PublicInterface
 			else
 			{
 				Mask mvdMask = Mask.valueOf(mask.toUpperCase());
-				MVD mvd = (description==null||description.length()==0)
-					?new MVD():new MVD(description);
-				mvd.setMask( mvdMask );
-				mvd.setEncoding( encoding );
+				Collation collation = (description==null||description.length()==0)
+					?new Collation():new Collation(description);
+				collation.setMask(mvdMask);
+				collation.setEncoding(encoding);
 			}
 		}
 		catch ( Exception e )
@@ -102,8 +102,8 @@ public class PublicInterface
 	 */
 	public String getDescription( String fileName ) throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
-		return mvd.getDescription();
+		Collation collation = getFromCache( fileName );
+		return collation.getDescription();
 	}
 	/**
 	 * Get an encoding from an MVD
@@ -114,8 +114,8 @@ public class PublicInterface
 	{
 		try
 		{
-			MVD mvd = getFromCache( fileName );
-			return mvd.getEncoding();
+			Collation collation = getFromCache( fileName );
+			return collation.getEncoding();
 		}
 		catch ( Exception e)
 		{
@@ -131,8 +131,8 @@ public class PublicInterface
 	public void setVersionShortName( String mvdPath, int versionId, 
 		String shortName ) throws Exception
 	{
-		MVD mvd = getFromCache( mvdPath );
-		mvd.setVersionShortName( versionId, shortName );
+		Collation collation = getFromCache( mvdPath );
+		collation.setVersionShortName(versionId, shortName);
 	}
 	/**
 	 * Set the long name of a version
@@ -143,8 +143,8 @@ public class PublicInterface
 	public void setVersionLongName( String mvdPath, int versionId, 
 		String longName ) throws Exception
 	{
-		MVD mvd = getFromCache( mvdPath );
-		mvd.setVersionLongName( versionId, longName );
+		Collation collation = getFromCache( mvdPath );
+		collation.setVersionLongName(versionId, longName);
 	}
 
 	/**
@@ -155,8 +155,8 @@ public class PublicInterface
 	public void setDescription( String fileName, String description ) 
 		throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
-		mvd.setDescription( description );
+		Collation collation = getFromCache( fileName );
+		collation.setDescription( description );
 	}
 
 	/**
@@ -167,8 +167,8 @@ public class PublicInterface
 	public String[] getVersionDescriptions( String fileName ) 
 		throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
-		return mvd.getVersionDescriptions();
+		Collation collation = getFromCache( fileName );
+		return collation.getVersionDescriptions();
 	}
 
 
@@ -181,8 +181,8 @@ public class PublicInterface
 	public String getLongName( String fileName, short versionId )
 		throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
-		return mvd.getLongNameForVersion( versionId );
+		Collation collation = getFromCache( fileName );
+		return collation.getLongNameForVersion( versionId );
 	}
 	/**
 	 * Search an MVD for a pattern. Since we can't return more than 
@@ -202,33 +202,33 @@ public class PublicInterface
 		short[] versions, short defaultVersion, boolean multiple ) 
 		throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
+		Collation collation = getFromCache( fileName );
 		updateSavedMatches( versions );
-		Match[] matches = executeSearch( mvd, pattern, versions, 
+		Hit[] hits = executeSearch(collation, pattern, versions,
 			multiple, defaultVersion );
-		return matchesToChunks( fileName, matches, defaultVersion );
+		return matchesToChunks( fileName, hits, defaultVersion );
 	}
 	/**
 	 * Convert an array of matches (or an empty array) to an array of 
 	 * Chunks that cover an entire version, namely that version in which 
 	 * the match occurs.
 	 * @param fileName the mvd file to get the chunks from
-	 * @param matches convert the first match in the array, if present
+	 * @param hits convert the first match in the array, if present
 	 * @param defaultVersion the default version to use if no matches 
 	 * present. In this case retrieve the entire default version and 
 	 * convert that into a chunk.
 	 * @return an array of 1-3 chunks
 	 */
-	private Chunk[] matchesToChunks( String fileName, Match[] matches, 
+	private Chunk[] matchesToChunks( String fileName, Hit[] hits,
 		short defaultVersion ) throws Exception
 	{
 		// simple case first
-		if ( matches.length == 0 )
+		if ( hits.length == 0 )
 			return getVersion( fileName, defaultVersion );
 		else
 		{
-			Chunk[] chunks = getVersion( fileName, matches[0].getVersion() );
-			return Chunk.overlay( matches[0], chunks );
+			Chunk[] chunks = getVersion( fileName, hits[0].getVersion() );
+			return Chunk.overlay( hits[0], chunks );
 		}
 	}
 	/**
@@ -249,7 +249,7 @@ public class PublicInterface
 	/**
 	 * Perform a search and compose the result as an array of chunks, 
 	 * containing at most one match
-	 * @param mvd the mvd to search
+	 * @param collation the mvd to search
 	 * @param pattern the pattern to look for
 	 * @param versions an array of version ids
 	 * @param multiple true if multiple matches are desired
@@ -257,31 +257,31 @@ public class PublicInterface
 	 * @return an array of size 1 or 0 of matches
 	 * @throws Exception if an in/out error occurred
 	 */
-	private Match[] executeSearch( MVD mvd, byte[] pattern, 
+	private Hit[] executeSearch( Collation collation, byte[] pattern,
 		short[] versions, boolean multiple, short defaultVersion ) 
 		throws Exception
 	{
 		BitSet bs = new BitSet();
 		for ( int i=0;i<versions.length;i++ )
 			bs.set( versions[i] );
-		Match[] matches = cache.getNextMatch( pattern );
-		if ( matches.length == 0 )
+		Hit[] hits = cache.getNextMatch( pattern );
+		if ( hits.length == 0 )
 		{
-			matches = mvd.search(pattern,bs,multiple);
+			hits = collation.search(pattern,bs,multiple);
 			// move default version's match if available to the front
-			for ( int j=0,i=0;i<matches.length;i++ )
+			for ( int j=0,i=0;i< hits.length;i++ )
 			{
-				if ( matches[i].getVersion() == defaultVersion )
+				if ( hits[i].getVersion() == defaultVersion )
 				{
-					Match m = matches[j];
-					matches[j++] = matches[i];
-					matches[i] = m;
+					Hit m = hits[j];
+					hits[j++] = hits[i];
+					hits[i] = m;
 				}
 			}
-			cache.saveMatches( matches, pattern );
-			matches = cache.getNextMatch( pattern );
+			cache.saveMatches(hits, pattern );
+			hits = cache.getNextMatch( pattern );
 		}
-		return matches;
+		return hits;
 	}
 	/**
 	 * Compare the two versions of an MVD. Return an array of Chunks 
@@ -296,9 +296,9 @@ public class PublicInterface
 	public Chunk[] compare( String fileName, short u, short v, 
 		boolean markAsDeleted ) throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
-		return mvd.compare( u, v, 
-			(markAsDeleted)?ChunkState.deleted:ChunkState.added );
+		Collation collation = getFromCache( fileName );
+		return collation.compare( u, v,
+			(markAsDeleted)?ChunkState.DELETED :ChunkState.ADDED);
 	}
 	/**
 	 * Search and compare at the same time. This is so we can 
@@ -319,19 +319,19 @@ public class PublicInterface
 		short[] versions, short u, short v, boolean multiple, 
 		boolean markAsDeleted ) throws Exception
 	{
-		MVD mvd = getFromCache( filePath );
+		Collation collation = getFromCache( filePath );
 		updateSavedMatches( versions );
-		Match[] sMatches = executeSearch( mvd, pattern, 
+		Hit[] searchHits = executeSearch(collation, pattern,
 			versions, multiple, u );
 		// sMatches is of length 1 or 0.
 		// we have to reset the u version here (v is unchanged)
 		// because it may have changed during the search
-		if ( sMatches.length == 1 )
-			u = sMatches[0].getVersion();
-		Chunk[] chunks = mvd.compare( u, v, 
-			(markAsDeleted)?ChunkState.deleted:ChunkState.added );
-		if ( sMatches.length == 1 )
-			chunks = Chunk.overlay( sMatches[0], chunks );
+		if ( searchHits.length == 1 )
+			u = searchHits[0].getVersion();
+		Chunk[] chunks = collation.compare( u, v,
+			(markAsDeleted)?ChunkState.DELETED :ChunkState.ADDED);
+		if ( searchHits.length == 1 )
+			chunks = Chunk.overlay( searchHits[0], chunks );
 		return chunks;
 	}
 	/**
@@ -350,8 +350,8 @@ public class PublicInterface
 	String[] getVariantsOf( String fileName, short base, int offset, 
 		int len ) throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
-		Variant[] vars = mvd.getApparatus( base, offset, len );
+		Collation collation = getFromCache( fileName );
+		Variant[] vars = collation.getApparatus( base, offset, len );
 		String[] array = new String[vars.length];
 		for ( int i=0;i<vars.length;i++ )
 			array[i] = vars[i].toString();
@@ -368,11 +368,11 @@ public class PublicInterface
 		throws Exception
 	{
 		// to redo
-		MVD mvd = getFromCache( fileName );
+		Collation collation = getFromCache( fileName );
 		Chunk[] chunks = new Chunk[1];
 		ChunkState[] cs = new ChunkState[1];
-		cs[0] = ChunkState.none;
-		chunks[0] = new Chunk( mvd.getEncoding(), 0, cs, mvd.getVersion(versionId) );
+		cs[0] = ChunkState.NONE;
+		chunks[0] = new Chunk( collation.getEncoding(), 0, cs, collation.getVersion(versionId) );
 		chunks[0].setVersion( versionId );
 		return chunks;
 	}
@@ -385,8 +385,8 @@ public class PublicInterface
 	public String getVersionShortName( String mvdPath, int id ) 
 		throws Exception
 	{
-		MVD mvd = getFromCache( mvdPath );
-		return mvd.getVersionShortName( id );
+		Collation collation = getFromCache( mvdPath );
+		return collation.getVersionShortName( id );
 	}
 	/**
 	 * Merge the given data into the specified MVD
@@ -400,8 +400,8 @@ public class PublicInterface
 	public float update( String fileName, short versionId, 
 		int folderId, byte[] data ) throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
-		return mvd.update( versionId, data );
+		Collation collation = getFromCache( fileName );
+		return collation.update( versionId, data );
 	}
 	/**
 	 * Save the MVD in the cache. If its not in the cache there's 
@@ -422,8 +422,8 @@ public class PublicInterface
 	{
 		try
 		{
-			MVD mvd = getFromCache( fileName );
-			mvd.addVersion( mvd.numVersions()+1 );
+			Collation collation = getFromCache( fileName );
+			collation.addVersion( collation.numVersions()+1 );
 		}
 		catch ( Exception e )
 		{
@@ -439,8 +439,8 @@ public class PublicInterface
 	 */
 	public void deleteVersion( String fileName, int vId ) throws Exception
 	{
-		MVD mvd = getFromCache( fileName );
-		mvd.removeVersion( vId );
+		Collation collation = getFromCache( fileName );
+		collation.removeVersion( vId );
 	}
 	/**
 	 * Delete an entire MVD
@@ -462,18 +462,18 @@ public class PublicInterface
 	 * @return the MVD corresponding to the file or a freshly loaded one
 	 * @throws Exception if the loading failed
 	 */
-	private MVD getFromCache( String fileName ) throws Exception
+	private Collation getFromCache( String fileName ) throws Exception
 	{
-		MVD mvd=null;
+		Collation collation =null;
 		try
 		{
-	    mvd = cache.get( fileName );
+	    collation = cache.get( fileName );
 		}
 		catch ( Exception e )
 		{
 			throw new MVDException( e );
 		}
-		return mvd;
+		return collation;
 	}
 	/**
 	 * Reread the mvd from its source
@@ -492,8 +492,8 @@ public class PublicInterface
 	 */
 	public int numVersions( String mvdPath ) throws Exception
 	{
-		MVD mvd = getFromCache( mvdPath );
-		return mvd.numVersions();
+		Collation collation = getFromCache( mvdPath );
+		return collation.numVersions();
 	}
 
 	/**
@@ -503,13 +503,13 @@ public class PublicInterface
 	 * @return the id of the version (its index+1) as an Integer
 	 * @throws Exception if an I/O error occurred
 	 */
-	public Integer getVersionId( String fileName, Version v ) 
+	public Integer getVersionId( String fileName, Witness v )
 		throws Exception
 	{
 		try
 		{
-			MVD mvd = getFromCache( fileName );
-			return new Integer( mvd.getVersionId(v) );
+			Collation collation = getFromCache( fileName );
+			return new Integer( collation.getVersionId(v) );
 		}
 		catch ( Exception e )
 		{

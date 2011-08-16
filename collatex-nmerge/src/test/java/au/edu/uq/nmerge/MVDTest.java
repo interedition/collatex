@@ -23,7 +23,7 @@ package au.edu.uq.nmerge;
 
 import au.edu.uq.nmerge.mvd.Chunk;
 import au.edu.uq.nmerge.mvd.ChunkState;
-import au.edu.uq.nmerge.mvd.MVD;
+import au.edu.uq.nmerge.mvd.Collation;
 import org.junit.Test;
 
 /**
@@ -36,14 +36,14 @@ public class MVDTest extends AbstractTest {
 
   @Test
   public void simple() throws Exception {
-    final MVD mvd = new MVD("Test");
-    final short version1 = (short) mvd.newVersion("test1", "test1");
-    mvd.update(version1, VERSION_1);
+    final Collation collation = new Collation("Test");
+    final short version1 = (short) collation.newVersion("test1", "test1");
+    collation.update(version1, VERSION_1);
 
-    final short version2 = (short) mvd.newVersion("test2", "test2");
-    mvd.update(version2, VERSION_2);
+    final short version2 = (short) collation.newVersion("test2", "test2");
+    collation.update(version2, VERSION_2);
 
-    for (Chunk c : mvd.compare(version1, version2, ChunkState.added)) {
+    for (Chunk c : collation.compare(version2, version1, ChunkState.ADDED)) {
       LOG.debug(c.toString());
     }
   }

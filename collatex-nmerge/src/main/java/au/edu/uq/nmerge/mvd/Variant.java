@@ -39,7 +39,7 @@ public class Variant implements Comparable<Variant>
 	/** the length of the variant's real data in bytes */
 	int length;
 	/** the mvd it is associated with */
-	MVD mvd;
+	Collation collation;
 	/** the actual data of this variant */
 	byte[] data;
 	/**
@@ -48,15 +48,15 @@ public class Variant implements Comparable<Variant>
 	 * @param startIndex the index within mvd of the first node
 	 * @param length the length of the variant
 	 * @param versions the set of versions over the variant
-	 * @param mvd the mvd it came from
+	 * @param collation the mvd it came from
 	 * @throws MVDException
 	 */
 	public Variant( int startOffset, int startIndex, int endIndex, 
-		int length, BitSet versions, MVD mvd )
+		int length, BitSet versions, Collation collation)
 	{
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
-		this.mvd = mvd;
+		this.collation = collation;
 		this.versions = versions;
 		this.length = length;
 		this.startOffset = startOffset;
@@ -83,7 +83,7 @@ public class Variant implements Comparable<Variant>
 		{ 
 			if ( sb.length()>1 )
 				sb.append(',');
-			sb.append( mvd.getVersionShortName(i) );
+			sb.append( collation.getVersionShortName(i) );
 		} 
 		sb.append(':');
 		return sb.toString();
@@ -97,7 +97,7 @@ public class Variant implements Comparable<Variant>
 		StringBuffer sb = new StringBuffer();
 		try
 		{
-			sb.append( new String(data,mvd.encoding) );
+			sb.append( new String(data, collation.encoding) );
 		}
 		catch ( Exception e )
 		{
@@ -114,7 +114,7 @@ public class Variant implements Comparable<Variant>
 	{
 		try
 		{
-			return this.toString().getBytes(mvd.encoding);
+			return this.toString().getBytes(collation.encoding);
 		}
 		catch ( Exception e )
 		{
@@ -134,7 +134,7 @@ public class Variant implements Comparable<Variant>
 			&& this.startIndex == otherV.startIndex
 			&& this.endIndex == otherV.endIndex
 			&& this.startOffset == otherV.startOffset
-			&& this.mvd == otherV.mvd
+			&& this.collation == otherV.collation
 			&& this.equalsContent(otherV);
 	}
 	/**
@@ -144,7 +144,7 @@ public class Variant implements Comparable<Variant>
 	 */
 	public boolean equalsContent( Variant other )
 	{
-		if ( this.mvd != other.mvd
+		if ( this.collation != other.collation
 			|| this.data.length != other.data.length )
 			return false;
 		else 
@@ -197,16 +197,16 @@ public class Variant implements Comparable<Variant>
 	{
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		int iNode = startIndex;
-		Pair p = mvd.pairs.get( iNode );
+		Match p = collation.matches.get( iNode );
 		int i = startOffset;
 		int totalLen = 0;
 		while ( p.length()==0 || totalLen<this.length )
 		{
 			if ( p.length()==0||i==p.length() )
 			{
-				iNode = mvd.next(iNode+1,(short)
+				iNode = collation.next(iNode+1,(short)
 					versions.nextSetBit(0));
-				p = mvd.pairs.get( iNode );
+				p = collation.matches.get( iNode );
 				i = 0;
 			}
 			else
@@ -254,15 +254,15 @@ public class Variant implements Comparable<Variant>
 				// find the start of this variant in other
 				int offset = other.startOffset;
 				int index = other.startIndex;
-				Pair p = mvd.pairs.get( index );
+				Match p = collation.matches.get( index );
 				int i = 0;
 				short followV = (short) versions.nextSetBit(1);
 				while ( i < other.length )
 				{
 					if ( offset==p.length() )
 					{
-						index = mvd.next( index+1, followV );
-						p = mvd.pairs.get( index );
+						index = collation.next( index+1, followV );
+						p = collation.matches.get( index );
 						offset = 0;
 					}
 					else
@@ -308,8 +308,8 @@ public class Variant implements Comparable<Variant>
 			{
 				try
 				{
-					String thisD = new String( data, mvd.encoding );
-					String thatD = new String( other.data, other.mvd.encoding );
+					String thisD = new String( data, collation.encoding );
+					String thatD = new String( other.data, other.collation.encoding );
 					return thisD.compareTo( thatD );
 				}
 				catch ( Exception e )

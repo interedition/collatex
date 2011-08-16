@@ -22,12 +22,9 @@ package au.edu.uq.nmerge;
 
 import java.io.File;
 import java.io.PrintStream;
-import au.edu.uq.nmerge.mvd.MVD;
-import au.edu.uq.nmerge.mvd.Mask;
-import au.edu.uq.nmerge.mvd.ChunkState;
-import au.edu.uq.nmerge.mvd.Chunk;
-import au.edu.uq.nmerge.mvd.Match;
-import au.edu.uq.nmerge.mvd.Variant;
+
+import au.edu.uq.nmerge.mvd.*;
+import au.edu.uq.nmerge.mvd.Collation;
 import au.edu.uq.nmerge.exception.*;
 import au.edu.uq.nmerge.fastme.FastME;
 import org.slf4j.Logger;
@@ -205,13 +202,13 @@ public class MvdTool
 	{
 		try
 		{
-			MVD mvd = loadMVD();
-			double[][] d = mvd.computeDiffMatrix();
+			Collation collation = loadMVD();
+			double[][] d = collation.computeDiffMatrix();
 			FastME fastME = new FastME();
-			int numVersions = mvd.numVersions();
+			int numVersions = collation.numVersions();
 			String[] shortNames = new String[numVersions];
 			for ( int i=0;i<numVersions;i++ )
-				shortNames[i] = mvd.getVersionShortName( i+1 );
+				shortNames[i] = collation.getVersionShortName( i+1 );
 			fastME.buildTree( d, shortNames );
 			fastME.refineTree();
 			fastME.T.NewickPrintTree( out );
@@ -229,12 +226,12 @@ public class MvdTool
 	{
 		try
 		{
-			MVD mvd = loadMVD();
+			Collation collation = loadMVD();
 			if ( description == null )
-				out.println( mvd.getDescription() );
+				out.println( collation.getDescription() );
 			else
 			{
-				mvd.setDescription(description);
+				collation.setDescription(description);
 			}
 		}
 		catch ( Exception e )
@@ -255,8 +252,8 @@ public class MvdTool
 					"Couldn't delete existing file "+mvdFile);
 			else
 			{
-				MVD mvd = (description==null)?new MVD():new MVD(description);
-				mvd.setMask(mvdMask);
+				Collation collation = (description==null)?new Collation():new Collation(description);
+				collation.setMask(mvdMask);
 			}
 		}
 		catch ( Exception e )
@@ -350,11 +347,11 @@ public class MvdTool
 	{
 		try
 		{
-			MVD mvd = loadMVD();
+			Collation collation = loadMVD();
 			if ( version == 0 || with == 0 )
 				throw new MVDToolException( 
 					"can't compare version="+version+" with version "+with );
-			Chunk[] chunks = mvd.compare( version, with, uniqueState );
+			Chunk[] chunks = collation.compare( version, with, uniqueState );
 			for ( int i=0;i<chunks.length;i++ )
 			{
 				byte[] bytes = chunks[i].getBytes();
@@ -370,9 +367,9 @@ public class MvdTool
 	 * Load an MVD file from the specified path
 	 * @return the MVD, loaded
 	 */
-	static MVD loadMVD() throws Exception
+	static Collation loadMVD() throws Exception
 	{
-		return new MVD();
+		return new Collation();
 	}
 	/**
 	 * Update an MVD by replacing the specified version with the given 
@@ -385,12 +382,12 @@ public class MvdTool
 			File t = new File( textFile );
 			if ( t.exists() )
 			{
-				MVD mvd = loadMVD();
+				Collation collation = loadMVD();
 				//mvd.removeVersion( version );
 				FileInputStream fis = new FileInputStream( t );
 				byte[] data = new byte[(int)t.length()];
 				fis.read(data);
-				mvd.update(version, data);
+				collation.update(version, data);
 			}
 			else
 				throw new MVDToolException( "No text for replacement version");
@@ -408,10 +405,10 @@ public class MvdTool
 	{
 		try
 		{
-			MVD mvd = loadMVD();
+			Collation collation = loadMVD();
 			if ( version == 0 )
 				version = 1;
-			Variant[] variants = mvd.getApparatus( version, fromOffset, 
+			Variant[] variants = collation.getApparatus( version, fromOffset,
 				variantLen );
 			for ( int i=0;i<variants.length;i++ )
 			{
@@ -453,19 +450,19 @@ public class MvdTool
 			byte[] pattern = findString.getBytes();
 			if ( pattern.length > 0 )
 			{
-				MVD mvd = loadMVD();
+				Collation collation = loadMVD();
 				BitSet bs = new BitSet();
 				if ( version == 0 )
 				{
-					for ( int i=1;i<=mvd.numVersions();i++ )
+					for ( int i=1;i<= collation.numVersions();i++ )
 						bs.set( i );
 				}
 				else
 					bs.set( version );
-				Match[] matches = mvd.search( pattern, bs, true ); 
-				for ( int i=0;i<matches.length;i++ )
+				Hit[] hits = collation.search( pattern, bs, true );
+				for ( int i=0;i< hits.length;i++ )
 				{
-					out.print( matches[i] );
+					out.print( hits[i] );
 				}
 				out.print("\n");
 			}
@@ -490,15 +487,15 @@ public class MvdTool
 			File t = new File( textFile );
 			if ( t.exists() )
 			{
-				MVD mvd = new MVD( description );;
-					mvd.newVersion( shortName, longName );
+				Collation collation = new Collation( description );;
+					collation.newVersion( shortName, longName );
 				FileInputStream fis = new FileInputStream( t );
 				byte[] data = new byte[(int)t.length()];
 				fis.read( data );
-				version = (short)(mvd.numVersions());
-				mvd.update( version, data );
-				LOG.info("Unique percentage={}", mvd.getUniquePercentage(version));
-				MvdTool.out.println(mvd.getUniquePercentage(version));
+				version = (short)(collation.numVersions());
+				collation.update( version, data );
+				LOG.info("Unique percentage={}", collation.getUniquePercentage(version));
+				MvdTool.out.println(collation.getUniquePercentage(version));
 			}
 			else
 				throw new FileNotFoundException(
@@ -517,8 +514,8 @@ public class MvdTool
 	{
 		try
 		{
-			MVD mvd = loadMVD();
-			byte[] data = mvd.getVersion( version );
+			Collation collation = loadMVD();
+			byte[] data = collation.getVersion( version );
 			out.write(data, 0, data.length);
 		}
 		catch ( Exception e )
@@ -534,8 +531,8 @@ public class MvdTool
 	{
 		try
 		{
-			MVD mvd = loadMVD();
-			mvd.removeVersion(version);
+			Collation collation = loadMVD();
+			collation.removeVersion(version);
 		}
 		catch ( Exception e )
 		{
@@ -699,7 +696,7 @@ public class MvdTool
 		backup = variantLen = fromOffset = 0;
 		version = 0;
 		mvdMask = Mask.NONE;
-		uniqueState = ChunkState.deleted;
+		uniqueState = ChunkState.DELETED;
 		dbConn = null;
 	}
 	/**

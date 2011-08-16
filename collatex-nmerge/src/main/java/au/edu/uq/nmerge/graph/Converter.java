@@ -28,7 +28,7 @@ import java.util.Vector;
 import java.util.HashMap;
 
 import au.edu.uq.nmerge.exception.*;
-import au.edu.uq.nmerge.mvd.Pair;
+import au.edu.uq.nmerge.mvd.Match;
 
 /**
  * The purpose of this class is to serialise and deserialise 
@@ -55,15 +55,15 @@ public class Converter
 	/** the graph we are building */
 	VariantGraph graph;
 	/** map to help find parents for children */
-	HashMap<VariantGraphArc,Pair> parents;
+	HashMap<VariantGraphArc,Match> parents;
 	/** map to help find children for parents */
-	HashMap<VariantGraphArc,Pair> orphans;
+	HashMap<VariantGraphArc,Match> orphans;
 	/**
 	 * Create a Graph
-	 * @param pairs the list of pairs to build the graph from. 
+	 * @param matches the list of pairs to build the graph from.
 	 * @param numVersions the number of versions to go in the graph
 	 */
-	public VariantGraph create( Vector<Pair> pairs, int numVersions )
+	public VariantGraph create( Vector<Match> matches, int numVersions )
 		throws Exception
 	{
 		unattached = new UnattachedSet();
@@ -72,14 +72,14 @@ public class Converter
 		for ( int i=1;i<=numVersions;i++ )
 			allVersions.set( i );
 		graph = new VariantGraph();
-		origSize = pairs.size();
-		if ( pairs.size() > 0 )
-			deserialise( pairs );
+		origSize = matches.size();
+		if ( matches.size() > 0 )
+			deserialise(matches);
 		// generate the constraint set
 		for ( int i=1;i<=numVersions;i++ )
 			graph.constraint.set( i );
-		parents = new HashMap<VariantGraphArc,Pair>();
-		orphans = new HashMap<VariantGraphArc,Pair>();
+		parents = new HashMap<VariantGraphArc,Match>();
+		orphans = new HashMap<VariantGraphArc,Match>();
 		return graph;
 	}
 	/**
@@ -93,23 +93,23 @@ public class Converter
 	}
 	/**
 	 *	Parse the data to build the graph from the pairs
-	 *	@param pairs a Vector containing the pairs to build 
+	 *	@param matches a Vector containing the pairs to build
 	 *	into a graph
 	 */
-	private void deserialise( Vector<Pair> pairs ) throws Exception
+	private void deserialise( Vector<Match> matches) throws Exception
 	{
 		graph.start = createNode();
 		VariantGraphNode u = graph.start;
-		HashMap<Pair,VariantGraphArc> pnts = new HashMap<Pair,VariantGraphArc>();
-		HashMap<Pair,VariantGraphArc> kids = new HashMap<Pair,VariantGraphArc>();
+		HashMap<Match,VariantGraphArc> pnts = new HashMap<Match,VariantGraphArc>();
+		HashMap<Match,VariantGraphArc> kids = new HashMap<Match,VariantGraphArc>();
 		// go through the pairs and turn them into arcs
-		for ( int i=0;i<pairs.size();i++ )
+		for ( int i=0;i< matches.size();i++ )
 		{
 			VariantGraphNode v;
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			VariantGraphArc a = pairToArc( p, pnts, kids );
 			if ( (i>0 && 
-				a.versions.intersects(pairs.get(i-1).versions))
+				a.versions.intersects(matches.get(i-1).versions))
 				|| a.isHint() )
 				u = v = createNode();
 			else
@@ -151,19 +151,19 @@ public class Converter
 	 * Regenerate the list of pairs by writing out the Graph
 	 * @return a list of pairs with hints where needed
 	 */
-	public Vector<Pair> serialise() throws MVDException
+	public Vector<Match> serialise() throws MVDException
 	{
-		Pair.pairId = 1;
+		Match.pairId = 1;
 		if ( origSize < 15 )
 			origSize = 15;
 		numParents = 0;
-		Vector<Pair> pairs = new Vector<Pair>( origSize );
-		printAcross( pairs, graph.start, allVersions );
+		Vector<Match> matches = new Vector<Match>( origSize );
+		printAcross(matches, graph.start, allVersions );
 		if ( parents.size() != 0 )
 			throw new MVDToolException("Mismatched parent arc");
 		if ( orphans.size() != 0 )
 			throw new MVDToolException("Mismatched child arc");
-		return pairs;
+		return matches;
 	}
 	/**
 	 *	Find the node that should receive an outgoing arc
@@ -208,8 +208,8 @@ public class Converter
 	 * @param kids kids looking for parents
 	 * @return an equivalent Arc we can use in the Graph
 	 */
-	private VariantGraphArc pairToArc( Pair p, HashMap<Pair,VariantGraphArc> pnts,
-		HashMap<Pair,VariantGraphArc> kids )
+	private VariantGraphArc pairToArc( Match p, HashMap<Match,VariantGraphArc> pnts,
+		HashMap<Match,VariantGraphArc> kids )
 	{
 		nArcs++;
 		byte[] pData = (p.isChild()||p.isHint())?null:p.getData();
@@ -217,7 +217,7 @@ public class Converter
 		if ( p.isChild() )
 		{
 			// we're a child - find our parent
-			Pair parent = p.getParent();
+			Match parent = p.getParent();
 			VariantGraphArc b = pnts.get( parent );
 			if ( b != null )
 			{
@@ -231,10 +231,10 @@ public class Converter
 		}
 		else if ( p.isParent() )
 		{
-			ListIterator<Pair> iter = p.getChildIterator();
+			ListIterator<Match> iter = p.getChildIterator();
 			while ( iter.hasNext() )
 			{
-				Pair child = iter.next();
+				Match child = iter.next();
 				VariantGraphArc r = kids.get( child );
 				if ( r != null )
 				{
@@ -265,7 +265,7 @@ public class Converter
 	 *	@param u the node from which to take outgoing arcs
 	 *	@param incoming the versions of the last incoming arc
 	 */
-	private void printAcross( Vector<Pair> pairs, VariantGraphNode u, BitSet incoming )
+	private void printAcross( Vector<Match> matches, VariantGraphNode u, BitSet incoming )
 		throws MVDException
 	{
 		int hint = -1;
@@ -277,20 +277,20 @@ public class Converter
 			BitSet clique = u.getClique(selected);
 			if ( !clique.isEmpty() )
 			{
-				hint = pairs.size(); 
+				hint = matches.size();
 				//System.out.println("creating hint at "+hint);
 				clique.set( 0 );
 				// create a hint
-				Pair h = new Pair(clique,new byte[0]);
-				pairs.add( h );
+				Match h = new Match(clique,new byte[0]);
+				matches.add( h );
 			}
-			hint = printDown( pairs, selected, hint );
+			hint = printDown(matches, selected, hint );
 			ListIterator<VariantGraphArc> iter = u.outgoingArcs();
 			while ( iter.hasNext() )
 			{
 				VariantGraphArc a = iter.next();
 				if ( a != selected )
-					hint = printDown( pairs, a, hint );
+					hint = printDown(matches, a, hint );
 			}
 		} 
 	}
@@ -302,13 +302,13 @@ public class Converter
 	 *	@param hint the previous location of a hint
 	 *	@return the hint or -1 if it was removed
 	 */
-	private int printDown( Vector<Pair> pairs, VariantGraphArc a, int hint )
+	private int printDown( Vector<Match> matches, VariantGraphArc a, int hint )
 		throws MVDException
 	{
 		if ( a.numChildren() > 0 )
 			numParents++;
-		Pair p = a.toPair( parents, orphans );
-		pairs.add( p );
+		Match p = a.toPair( parents, orphans );
+		matches.add( p );
 		a.to.printArc( a );
 		if ( a.to != null )
 		{
@@ -316,8 +316,8 @@ public class Converter
 			if ( u.allPrintedIncoming() )
 			{
 				if ( hint != -1 )
-					hint = reduceHint( pairs, hint );
-				printAcross( pairs, u, a.versions );
+					hint = reduceHint(matches, hint );
+				printAcross(matches, u, a.versions );
 				// next node produced, invalidating hint
 				hint = -1;
 			}
@@ -333,16 +333,16 @@ public class Converter
 	 *	@param pos the offset of the current write position
 	 *	@return the index of the hint or -1 if it was removed
 	 */
-	private int reduceHint( Vector<Pair> pairs, int hint )
+	private int reduceHint( Vector<Match> matches, int hint )
 	{
-		Pair hintPair = pairs.get( hint );
-		for ( int i=hint+2;i<pairs.size();i++ )
+		Match hintMatch = matches.get( hint );
+		for ( int i=hint+2;i< matches.size();i++ )
 		{
-			Pair p = pairs.get( i );
-			hintPair.versions.andNot( p.versions );
-			if ( hintPair.versions.nextSetBit(1)==-1 )
+			au.edu.uq.nmerge.mvd.Match p = matches.get( i );
+			hintMatch.versions.andNot( p.versions );
+			if ( hintMatch.versions.nextSetBit(1)==-1 )
 			{
-				pairs.remove( hint );
+				matches.remove( hint );
 				//System.out.println("removing hint at "+hint);
 				hint = -1;
 				break;

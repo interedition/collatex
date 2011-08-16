@@ -32,33 +32,33 @@ import java.util.*;
  * Represent a multi-version document.
  * @author Desmond Schmidt &copy; 2009
  */
-public class MVD
+public class Collation
 {
   public static String UNTITLED_NAME = "untitled";
 
   Mask mask;
   // new options
 	boolean directAlignOnly;
-	Vector<Version> versions;	// id = position in table+1
-	Vector<Pair> pairs;
+	Vector<Witness> witnesses;	// id = position in table+1
+	Vector<Match> matches;
 	String description;
 	int headerSize,groupTableSize,versionTableSize,pairsTableSize,
 	dataTableSize,versionSetSize;
 	int bestScore;
 	// used for checking
-	HashSet<Pair> parents;
+	HashSet<Match> parents;
 	BitSet partialVersions;
 	String encoding;
 
-	public MVD()
+	public Collation()
 	{
       this.description = "";
-      this.versions = new Vector<Version>();
-      this.pairs = new Vector<Pair>();
+      this.witnesses = new Vector<Witness>();
+      this.matches = new Vector<Match>();
       this.mask = Mask.NONE;
       this.encoding = "UTF-8";
 	}
-	public MVD( String description )
+	public Collation(String description)
 	{
 		this();
 		this.description = description;
@@ -68,7 +68,7 @@ public class MVD
 	 * @param description about this MVD
 	 * @param encoding the encoding of the data in this MVD
 	 */
-	public MVD( String description, String encoding )
+	public Collation(String description, String encoding)
 	{
 		this();
 		this.description = description;
@@ -114,42 +114,25 @@ public class MVD
 	 */
 	public void addVersion( int version ) throws MVDException
 	{
-		if ( version == versions.size()+1 )
+		if ( version == witnesses.size()+1 )
 		{
-			Version v = new Version(  "Z", UNTITLED_NAME );
-			versions.insertElementAt( v, version-1 );
+			Witness v = new Witness(  "Z", UNTITLED_NAME );
+			witnesses.insertElementAt( v, version-1 );
 		}
 		else
 			throw new MVDException("Invalid version "+version+" ignored");
 	}
-	/**
-	 * Add a version to the MVD. 
-	 * @param v the version definition to add
-	 */
-	void addVersion( Version v ) throws MVDException
-	{
-		if ( versions == null )
-			versions = new Vector<Version>();
-		versions.add( v );
-	}
+
 	/**
 	 * Get the number of versions
 	 * @return the number of elements in the versions array
 	 */
 	public int numVersions()
 	{
-		return versions.size();
+		return witnesses.size();
 	}
 
 
-	/**
-	 * Add a pair to the MVD
-	 * @param pair the pair to add
-	 */
-	void addPair( Pair pair ) throws Exception
-	{
-		pairs.add( pair );
-	}
 	/**
 	 * Get the data mask
 	 * @return the kind of mask being applied to all data in the MVD
@@ -162,17 +145,17 @@ public class MVD
 	 * Get the pairs list for converting to a Graph
 	 * @return the pairs - read only!
 	 */
-	public Vector<Pair> getPairs()
+	public Vector<Match> getMatches()
 	{
-		return pairs;
+		return matches;
 	}
 	/**
 	 * Get a pair from the MVD
 	 * @param pairIndex the index of the pair
 	 */
-	Pair getPair( int pairIndex ) throws Exception
+	Match getPair( int pairIndex ) throws Exception
 	{
-		return pairs.get( pairIndex );
+		return matches.get( pairIndex );
 	}
 
 	/**
@@ -197,13 +180,13 @@ public class MVD
 		TransposeState ts = new TransposeState();
 		ChunkStateSet cs = new ChunkStateSet();
 		ChunkStateSet oldCS = null;
-		Pair p = null;
+		Match p = null;
 		Chunk.chunkId = 0;
 		TransposeState.transposeId = Integer.MAX_VALUE;
 		int i = next( 0, u );
-		while ( i < pairs.size() )
+		while ( i < matches.size() )
 		{
-			p = pairs.get( i );
+			p = matches.get( i );
 			oldTS = ts;
 			oldCS = cs;
 			ts = ts.next( p, u, v );
@@ -234,7 +217,7 @@ public class MVD
 			}
 			else
 				current.addData( p.getData() );
-			if ( i < pairs.size()-1 )
+			if ( i < matches.size()-1 )
 				i = next( i+1, u );
 			else
 				break;
@@ -248,16 +231,7 @@ public class MVD
 		chunks.toArray( result );
 		return result;
 	}
-	/**
-	 * Update the chunk's state list given a new pair and the version 
-	 * we are following through
-	 * @param chunk the chunk to update
-	 * @param p the new pair
-	 * @param version
-	 */
-	public void nextChunkState( Chunk chunk, Pair p, short version )
-	{
-	}
+
 	/**
 	 * Get the index of the next pair intersecting with a version
 	 * @param pairIndex the index to start looking from
@@ -267,9 +241,9 @@ public class MVD
 	int next( int pairIndex, short u )
 	{
 		int i=pairIndex;
-		while ( i < pairs.size() )
+		while ( i < matches.size() )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			if ( p.contains(u) )
 				return i;
 			else
@@ -289,7 +263,7 @@ public class MVD
 		int i=pairIndex-1;
 		while ( i > 0 )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			if ( p.contains(u) )
 				return i;
 			else
@@ -305,18 +279,18 @@ public class MVD
 	 * @param multiple if true return all hits; otherwise only the first 
 	 * @return an array of matches
 	 */
-	public Match[] search( byte[] pattern, BitSet bs, boolean multiple ) 
+	public Hit[] search( byte[] pattern, BitSet bs, boolean multiple )
 		throws Exception
 	{
 		KMPSearchState inactive = null;
 		KMPSearchState active = null;
-		Match[] matches = new Match[0];
-		if ( !versions.isEmpty() )
+		Hit[] hits = new Hit[0];
+		if ( !witnesses.isEmpty() )
 		{
 			inactive = new KMPSearchState( pattern, bs );
-			for ( int i=0;i<pairs.size();i++ )
+			for ( int i=0;i< matches.size();i++ )
 			{
-				Pair temp = pairs.get( i );
+				Match temp = matches.get( i );
 				// move all elements from active to inactive
 				if ( inactive == null )
 					inactive = active;
@@ -351,13 +325,13 @@ public class MVD
 						{
 							if ( ss.update(data[j]) )
 							{
-								Match[] m = Match.makeMatches( 
-									pattern.length,ss.v,
-									this,i,j,multiple,ChunkState.found);
-								if ( matches == null )
-									matches = m;
+								Hit[] m = Hit.createHits(
+                                        pattern.length, ss.v,
+                                        this, i, j, multiple, ChunkState.FOUND);
+								if ( hits == null )
+									hits = m;
 								else
-									matches = Match.merge( matches, m );
+									hits = Hit.merge(hits, m);
 								if ( !multiple )
 									break;
 							}
@@ -387,7 +361,7 @@ public class MVD
 				}
 			}
 		}
-		return matches;
+		return hits;
 	}
 	/**
 	 * Create a new empty version.
@@ -395,8 +369,8 @@ public class MVD
 	 */
 	public int newVersion( String shortName, String longName)
 	{
-		versions.add( new Version(shortName, longName) );
-		return versions.size();
+		witnesses.add( new Witness(shortName, longName) );
+		return witnesses.size();
 	}
 
 	/**
@@ -404,9 +378,9 @@ public class MVD
 	 * @param v the version to search for
 	 * @return the index +1 of the version in the versions vector or 0
 	 */
-	public int getVersionId( Version v )
+	public int getVersionId( Witness v )
 	{
-		return versions.indexOf(v) + 1;
+		return witnesses.indexOf(v) + 1;
 	}
 	/**
 	 * Get the id of a version (version index+1) given its short name
@@ -415,8 +389,8 @@ public class MVD
 	 */
 	public int getVersionId( String shortName )
 	{
-		for ( int i=0;i<versions.size();i++ )
-			if ( versions.get(i).shortName.equals(shortName) )
+		for ( int i=0;i< witnesses.size();i++ )
+			if ( witnesses.get(i).shortName.equals(shortName) )
 				return i + 1;
 		return -1;
 	}
@@ -436,7 +410,7 @@ public class MVD
 	 */
 	public void setVersionShortName( int versionId, String shortName )
 	{
-		Version v = versions.get( versionId-1 );
+		Witness v = witnesses.get( versionId-1 );
 		v.shortName = shortName;
 	}
 	/**
@@ -446,7 +420,7 @@ public class MVD
 	 */
 	public void setVersionLongName( int versionId, String longName )
 	{
-		Version v = versions.get( versionId-1 );
+		Witness v = witnesses.get( versionId-1 );
 		v.longName = longName;
 	}
 
@@ -470,7 +444,7 @@ public class MVD
 	{
 		// to do: if version already exists, remove it first
 		Converter con = new Converter();
-		VariantGraph original = con.create( pairs, versions.size() );
+		VariantGraph original = con.create(matches, witnesses.size() );
 		original.removeVersion( version );
 		VariantGraph g = original;
 		VariantGraphSpecialArc special;
@@ -536,7 +510,7 @@ public class MVD
 			}
 		}
 		original.adopt( version );
-		pairs = con.serialise();
+		matches = con.serialise();
 		if ( encoding.toUpperCase().equals("UTF-8") )
 			removeUTF8Splits();
 		if ( numVersions()==1 )
@@ -553,12 +527,12 @@ public class MVD
 	 */
 	private void removeUTF8Splits()
 	{
-		for ( int i=0;i<pairs.size();i++ )
+		for ( int i=0;i< matches.size();i++ )
 		{
-			Pair p = pairs.get(i);
+			Match p = matches.get(i);
 			if ( p.dataSize() > 0 )
 			{
-				byte[] data = pairs.get(i).getData();
+				byte[] data = matches.get(i).getData();
 				int len;
 				/*
 				 * A split utf-8 character's length varies according to 
@@ -576,7 +550,7 @@ public class MVD
 				else
 					len = 0;
 				int j = data.length-len;
-				if ( len > 0 && i < pairs.size()-1 )
+				if ( len > 0 && i < matches.size()-1 )
 				{
 					// preserve the data that stays put
 					byte[] newData = new byte[data.length-len];
@@ -592,9 +566,9 @@ public class MVD
 					BitSet seekSet = new BitSet();
 					seekSet.or( p.versions );
 					int m = i+1;
-					while ( !seekSet.isEmpty() && m < pairs.size() )
+					while ( !seekSet.isEmpty() && m < matches.size() )
 					{
-						Pair q = pairs.get( m );
+						Match q = matches.get( m );
 						if ( !q.isHint() && q.versions.intersects(seekSet) )
 						{
 							// This relies on the closing bytes of all 
@@ -635,9 +609,9 @@ public class MVD
 			return 0.0f;
 		else
 		{
-			for ( int i=0;i<pairs.size();i++ )
+			for ( int i=0;i< matches.size();i++ )
 			{
-				Pair p = pairs.get( i );
+				Match p = matches.get( i );
 				if ( p.versions.nextSetBit(version)==version )
 				{
 					if ( p.versions.size()==1 )
@@ -656,9 +630,9 @@ public class MVD
 	private float getPercentUnique( short version )
 	{
 		float unique=0.0f,shared=0.0f;
-		for ( int i=0;i<pairs.size();i++ )
+		for ( int i=0;i< matches.size();i++ )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			if ( p.versions.nextSetBit(version)==version )
 			{
 				if ( p.versions.size()==1 )
@@ -690,7 +664,7 @@ public class MVD
 	private MaximalUniqueMatch computeBestMUM( VariantGraph g, VariantGraphSpecialArc special )
 		throws MVDException
 	{
-		SuffixTree<Byte> st = makeSuffixTree( special );
+		SuffixTree<Byte> st = makeSuffixTree(special);
 		MaximalUniqueMatch directMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
 		MaximalUniqueMatch best = directMUM;
 		if ( !directAlignOnly )
@@ -794,14 +768,14 @@ public class MVD
 	public void removeVersion( int version ) throws Exception
 	{
 		Converter con = new Converter();
-		VariantGraph original = con.create( pairs, versions.size() );
+		VariantGraph original = con.create(matches, witnesses.size() );
 		original.removeVersion( version );
 		original.verify();
-		versions.remove( version-1 );
-		pairs = con.serialise();
-		for ( int i=0;i<pairs.size();i++ )
+		witnesses.remove( version-1 );
+		matches = con.serialise();
+		for ( int i=0;i< matches.size();i++ )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			p.versions = removeVersion( p.versions, version );
 		}
 	}
@@ -834,7 +808,7 @@ public class MVD
 	 */
 	public String getLongNameForVersion( int versionId )
 	{
-		Version v = versions.get( versionId-1 );
+		Witness v = witnesses.get( versionId-1 );
 		if ( v != null )
 			return v.longName;
 		else
@@ -848,9 +822,9 @@ public class MVD
 	int getVersionByShortName( String shortName )
 	{
 		int version = -1;
-		for ( int i=0;i<versions.size();i++ )
+		for ( int i=0;i< witnesses.size();i++ )
 		{
-			Version v = versions.get( i );
+			Witness v = witnesses.get( i );
 			if ( v.shortName.equals(shortName) )
 			{
 				version = i;
@@ -866,7 +840,7 @@ public class MVD
 	 */
 	int getHighestVersion()
 	{
-		return versions.size();
+		return witnesses.size();
 	}
 
 	/**
@@ -875,10 +849,10 @@ public class MVD
 	 */
 	public String[] getVersionDescriptions()
 	{
-		String[] descriptions = new String[versions.size()];
-		for ( int id=1,i=0;i<versions.size();i++,id++ )
+		String[] descriptions = new String[witnesses.size()];
+		for ( int id=1,i=0;i< witnesses.size();i++,id++ )
 		{
-			Version v = versions.get(i);
+			Witness v = witnesses.get(i);
 			descriptions[i] = v.toString()+";id:"+id;
 		}
 		return descriptions;
@@ -893,9 +867,9 @@ public class MVD
 	{
 		int length = 0;
 		// measure the length
-		for ( int i=0;i<pairs.size();i++ )
+		for ( int i=0;i< matches.size();i++ )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			if ( p.versions.nextSetBit(version)==version )
 			{
 				length += p.length();
@@ -904,9 +878,9 @@ public class MVD
 		byte[] result = new byte[length];
 		// now copy it
 		int k,i;
-		for ( k=0,i=0;i<pairs.size();i++ )
+		for ( k=0,i=0;i< matches.size();i++ )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			if ( p.versions.nextSetBit(version)==version )
 			{
 				for ( int j=0;j<p.length();j++ )
@@ -922,9 +896,9 @@ public class MVD
 	 */
 	public short getVersionByLongName( String longName )
 	{
-		for ( int i=0;i<versions.size();i++ )
+		for ( int i=0;i< witnesses.size();i++ )
 		{
-			Version vi = versions.get( i );
+			Witness vi = witnesses.get( i );
 			if ( longName.equals(vi.longName) )
 				return (short)(i+1);
 		}
@@ -937,7 +911,7 @@ public class MVD
 	 */
 	public String getVersionLongName( int id )
 	{
-		Version v = versions.get( id-1 );
+		Witness v = witnesses.get( id-1 );
 		return v.longName;
 	}
 	/**
@@ -947,7 +921,7 @@ public class MVD
 	 */
 	public String getVersionShortName( int id )
 	{
-		Version v = versions.get( id-1 );
+		Witness v = witnesses.get( id-1 );
 		return v.shortName;
 	}
 	/**
@@ -958,10 +932,10 @@ public class MVD
 	 */
 	int[] getVersionLengths()
 	{
-		int[] lengths = new int[versions.size()];
-		for ( int i=0;i<pairs.size();i++ )
+		int[] lengths = new int[witnesses.size()];
+		for ( int i=0;i< matches.size();i++ )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			BitSet bs = p.versions;
 			for ( int j=bs.nextSetBit(1);j>=0;j=bs.nextSetBit(j+1) ) 
 			{
@@ -1017,14 +991,14 @@ public class MVD
 			// if not saving unattached pairs
 			if ( !pushRight && right.isEmpty() )
 				break;
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			if ( pushRight && p.isHint() )
 				right.push( new WrappedPair(p) );
-			else if ( !right.isEmpty() && right.peek().getPair().isHint() )
+			else if ( !right.isEmpty() && right.peek().getMatch().isHint() )
 			{
 				CompactNode cn = new CompactNode( i );
 				// add hint discretely
-				cn.addOutgoing( right.pop().getPair() );
+				cn.addOutgoing( right.pop().getMatch() );
 				nodes.push( cn );
 				addOutgoing( cn, right.pop(), right );
 				setDefaultNode( cn, right );
@@ -1032,7 +1006,7 @@ public class MVD
 					right.push( new WrappedPair(p) );
 			}
 			else if ( !right.isEmpty()
-				&& right.peek().getPair().versions.intersects(p.versions) )
+				&& right.peek().getMatch().versions.intersects(p.versions) )
 			{
 				CompactNode cn = new CompactNode( i );
 				addOutgoing( cn, right.pop(), right );
@@ -1171,7 +1145,7 @@ public class MVD
 	     	length = 0;
 	     	// get the first outgoing arc containing i
 	     	startIndex = origStart = next( startIndex+1, (short)i );
-	     	Pair p = pairs.get( startIndex );
+	     	Match p = matches.get( startIndex );
 	     	// start HERE: first outgoing arc, offset 0
 	     	int lastStartIndex = startIndex;
 	     	int lastOffset = 0;
@@ -1183,7 +1157,7 @@ public class MVD
 		    		startIndex = previous( startIndex, (short)i );
 		    		if ( startIndex == -1 )
 		    			break;
-		    		p = pairs.get( startIndex );
+		    		p = matches.get( startIndex );
 		    		if ( p.length()==0 )
 		    			offset = -1;
 		    		else
@@ -1213,21 +1187,21 @@ public class MVD
 		    endIndex = origStart;
 		    while ( endIndex <= end )
 		    {
-		    	p = pairs.get( endIndex );
+		    	p = matches.get( endIndex );
 			    length += p.length();
 		    	endIndex = next( endIndex+1, (short)i );
 		    }
 		    // extend to next space after end
-		    p = pairs.get( endIndex );
+		    p = matches.get( endIndex );
 	    	int endOffset = 0;
-		    while ( endIndex < pairs.size() )
+		    while ( endIndex < matches.size() )
 		    {
 		    	if ( endOffset==p.length() )
 		    	{
 		    		endIndex = next( endIndex+1, (short)i );
 		    		if ( endIndex == Integer.MAX_VALUE )
 		    			break;
-		    		p = pairs.get( endIndex );
+		    		p = matches.get( endIndex );
 		    		endOffset = 0;
 		    	}
 		    	else if ( p.getData()[endOffset]!=' ' )
@@ -1240,7 +1214,7 @@ public class MVD
 		    }
 		    // in case we shot off the end
 		    if ( endIndex == Integer.MAX_VALUE )
-		    	endIndex = previous( pairs.size()-1,(short)i );
+		    	endIndex = previous( matches.size()-1,(short)i );
 		    // now build variant
 		    BitSet bs = new BitSet();
 		    bs.set( i );
@@ -1285,14 +1259,14 @@ public class MVD
 	 */
 	void addOutgoing( CompactNode cn, WrappedPair p, LinkedList<WrappedPair> right )
 	{
-		cn.addOutgoing( p.getPair() );
+		cn.addOutgoing( p.getMatch() );
 		BitSet wi = cn.getWantsIncoming();
 		while ( !wi.isEmpty() )
 		{
 			int index = cn.getIndex();
 			for ( int i=index;i>=0;i-- )
 			{
-				Pair q = pairs.get( i );
+				Match q = matches.get( i );
 				if ( q.versions.intersects(wi) )
 				{
 					addIncoming( cn, new WrappedPair(q), right );
@@ -1308,7 +1282,7 @@ public class MVD
 		while ( iter.hasNext() )
 		{
 			q = iter.next();
-			if ( q.getPair().versions.intersects(p.getPair().versions) )
+			if ( q.getMatch().versions.intersects(p.getMatch().versions) )
 				break;
 			else
 				q = null;
@@ -1327,7 +1301,7 @@ public class MVD
 	 */
 	void addIncoming( CompactNode cn, WrappedPair p, LinkedList<WrappedPair> right )
 	{
-		cn.addIncoming( p.getPair() );
+		cn.addIncoming( p.getMatch() );
 		BitSet wo = cn.getWantsOutgoing();
 		while ( !wo.isEmpty() )
 		{
@@ -1336,7 +1310,7 @@ public class MVD
 			while ( iter.hasNext() )		
 			{
 				q = iter.next();
-				if ( q.getPair().versions.intersects(wo) )
+				if ( q.getMatch().versions.intersects(wo) )
 					break;
 				else
 					q = null;
@@ -1369,7 +1343,7 @@ public class MVD
 		// contain the base version, add it to the paths set.
 		for ( int i=from.getIndex()+1;i<=to.getIndex();i++ )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			if ( p.versions.intersects(pathV) )
 			{
 				// get intersection
@@ -1439,9 +1413,9 @@ public class MVD
 	{
 		int pos = 0;
 		int found = -1;
-		for ( int i=0;i<pairs.size();i++ )
+		for ( int i=0;i< matches.size();i++ )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			if ( p.versions.nextSetBit(version)==version )
 			{
 				if ( offset < pos+p.length() )
@@ -1462,8 +1436,8 @@ public class MVD
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append( "; directAlignOnly="+directAlignOnly);
-		sb.append( "; versions.size()="+versions.size() );
-		sb.append( "; pairs.size()="+pairs.size() );
+		sb.append( "; versions.size()="+ witnesses.size() );
+		sb.append( "; pairs.size()="+ matches.size() );
 		sb.append( "; description="+description );
 		sb.append( "; headerSize="+headerSize );
 		sb.append( "; groupTableSize="+groupTableSize );
@@ -1492,7 +1466,7 @@ public class MVD
 	public double[][] computeDiffMatrix( )
 	{
 		// ignore 0th element to simplify indexing
-		int s = versions.size()+1;
+		int s = witnesses.size()+1;
 		// keep track of the length of each version
 		int[] lengths = new int[s];
 		// the length of j last time j and k were joined
@@ -1502,9 +1476,9 @@ public class MVD
 		// the cost is the longest distance between any two 
 		// versions since they were last joined
 		int[][] costs = new int[s][s];
-		for ( int i=0;i<pairs.size();i++ )
+		for ( int i=0;i< matches.size();i++ )
 		{
-			Pair p = pairs.get( i );
+			Match p = matches.get( i );
 			// consider each combination of j and k, including j=k
 			for ( int j=p.versions.nextSetBit(1);j>=1;j=p.versions.nextSetBit(j+1) )
 			{

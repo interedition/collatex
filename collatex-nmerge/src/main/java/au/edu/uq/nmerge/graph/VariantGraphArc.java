@@ -22,7 +22,8 @@ package au.edu.uq.nmerge.graph;
 
 import java.util.BitSet;
 import java.util.HashMap;
-import au.edu.uq.nmerge.mvd.Pair;
+
+import au.edu.uq.nmerge.mvd.Match;
 import au.edu.uq.nmerge.exception.*;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -419,16 +420,16 @@ public class VariantGraphArc
 	 * @param orphans map of available orphans
 	 * @return the pair
 	 */
-	Pair toPair( HashMap<VariantGraphArc,Pair> parents, HashMap<VariantGraphArc,Pair> orphans )
+	Match toPair( HashMap<VariantGraphArc,Match> parents, HashMap<VariantGraphArc,Match> orphans )
 		throws MVDException
 	{
 		if ( versions.nextSetBit(0)==0)
 			throw new MVDException("Ooops! hint detected!");
-		Pair p = new Pair( versions, data );
+		Match p = new Match( versions, data );
 		if ( this.parent != null )
 		{
 			// we're a child - find our parent
-			Pair q = parents.get( parent );
+			Match q = parents.get( parent );
 			if ( q != null )
 			{
 				q.addChild( p );
@@ -445,7 +446,7 @@ public class VariantGraphArc
 			for ( int i=0;i<children.size();i++ )
 			{
 				VariantGraphArc child = children.get( i );
-				Pair r = orphans.get( child );
+				au.edu.uq.nmerge.mvd.Match r = orphans.get( child );
 				if ( r != null )
 				{
 					p.addChild( r );

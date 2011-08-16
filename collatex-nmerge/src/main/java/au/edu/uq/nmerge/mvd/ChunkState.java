@@ -26,21 +26,17 @@ package au.edu.uq.nmerge.mvd;
 public enum ChunkState 
 {
 	/** default state as e.g. background text after find */
-	none,
+	NONE,
 	/** merged state after compare for shared text */
-	merged,
+	MERGED,
 	/** text of first version after compare */
-	deleted,
+	DELETED,
 	/** text of second version after compare */
-	added,
+	ADDED,
 	/** text found by search */
-	found,
-	/** attested partial version text */
-	partial,
-	/** background version for partial version */
-	backup,
+	FOUND,
 	/** parent of transposition */
-	parent,
+	PARENT,
 	/** child of transposition */
-	child;
+	CHILD;
 }

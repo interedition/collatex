@@ -23,19 +23,19 @@ package au.edu.uq.nmerge.mvd;
 
 public class WrappedPair 
 {
-	Pair pair;
+	Match match;
 	CompactNode defaultNode;
-	WrappedPair( Pair pair )
+	WrappedPair( Match match)
 	{
-		this.pair = pair;
+		this.match = match;
 	}
 	CompactNode getDefaultNode()
 	{
 		return defaultNode;
 	}
-	Pair getPair()
+	Match getMatch()
 	{
-		return this.pair;
+		return this.match;
 	}
 	void setDefaultNode( CompactNode cn )
 	{
@@ -44,7 +44,7 @@ public class WrappedPair
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append( "pair: "+pair.toString()+"\n" );
+		sb.append( "pair: "+ match.toString()+"\n" );
 		String defaultNodeString = (defaultNode==null)?"null":defaultNode.toString();
 		sb.append( "defaultNode: "+defaultNodeString );
 		return sb.toString();

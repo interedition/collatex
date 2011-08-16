@@ -37,7 +37,7 @@ public class ChunkStateSet
 	 */
 	public ChunkStateSet()
 	{
-		add( ChunkState.none );
+		add( ChunkState.NONE);
 	}
 	/**
 	 * Construct a simple one-state chunk state set
@@ -77,11 +77,11 @@ public class ChunkStateSet
 		{
 			if ( states == null )
 				states = new ChunkState[1];
-			else if ( containsState(ChunkState.none) )
+			else if ( containsState(ChunkState.NONE) )
 			{
 				for ( int i=0;i<states.length;i++ )
 				{
-					if ( states[i] == ChunkState.none )
+					if ( states[i] == ChunkState.NONE)
 					{
 						states[i] = state;
 						break;
@@ -105,7 +105,7 @@ public class ChunkStateSet
 	 */
 	public boolean isFound()
 	{
-		return containsState( ChunkState.found );
+		return containsState( ChunkState.FOUND);
 	}
 	/**
 	 * Is this chunk the parent of a transposition?
@@ -113,7 +113,7 @@ public class ChunkStateSet
 	 */
 	public boolean isParent()
 	{
-		return containsState( ChunkState.parent );
+		return containsState( ChunkState.PARENT);
 	}
 	/**
 	 * Is this chunk the child of a transposition?
@@ -121,7 +121,7 @@ public class ChunkStateSet
 	 */
 	public boolean isChild()
 	{
-		return containsState( ChunkState.child );
+		return containsState( ChunkState.CHILD);
 	}
 	/**
 	 * Does this chunk state set contain the given state?
@@ -138,21 +138,14 @@ public class ChunkStateSet
 		}
 		return false;
 	}
-	/**
-	 * Is this chunk a backup?
-	 * @return true if it is
-	 */
-	public boolean isBackup()
-	{
-		return containsState( ChunkState.backup );
-	}
+
 	/**
 	 * Is this chunk merged?
 	 * @return true if it is
 	 */
 	public boolean isMerged()
 	{
-		return containsState( ChunkState.merged );
+		return containsState( ChunkState.MERGED);
 	}
 	/**
 	 * Does this set only contain the none state?
@@ -160,7 +153,7 @@ public class ChunkStateSet
 	 */
 	public boolean isEmpty()
 	{
-		return (states==null) || (states.length==1&&states[0]==ChunkState.none);
+		return (states==null) || (states.length==1&&states[0]==ChunkState.NONE);
 	}
 	/**
 	 * Using information contained in a supplied new pair, 
@@ -171,7 +164,7 @@ public class ChunkStateSet
 	 * @param v the second version compared to first
 	 * @return a new Chunkstate or the same one as us no change
 	 */
-	ChunkStateSet next( Pair p, ChunkState state, short v )
+	ChunkStateSet next( Match p, ChunkState state, short v )
 	{
 		ChunkStateSet repl = this;
 		if ( !p.contains(v) )
@@ -186,7 +179,7 @@ public class ChunkStateSet
 		else if ( !isMerged() )
 		{
 			repl = new ChunkStateSet( );
-			repl.add( ChunkState.merged );
+			repl.add( ChunkState.MERGED);
 		}
 		return repl;
 	}

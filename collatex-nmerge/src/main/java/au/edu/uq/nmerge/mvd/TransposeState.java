@@ -34,13 +34,13 @@ public class TransposeState
 	 * don't intrinsically have ids after serialisation from arcs
 	 * @param parent the parent pair
 	 */
-	private void assignId( Pair parent )
+	private void assignId( Match parent )
 	{
 		this.id = parent.id = TransposeState.transposeId--;
-		ListIterator<Pair> iter = parent.getChildIterator();
+		ListIterator<Match> iter = parent.getChildIterator();
 		while ( iter.hasNext() )
 		{
-			Pair child = iter.next();
+			Match child = iter.next();
 			child.id = parent.id;
 		}
 	}
@@ -50,7 +50,7 @@ public class TransposeState
 	 */
 	public TransposeState()
 	{
-		state = ChunkState.none;
+		state = ChunkState.NONE;
 	}
 	/**
 	 * Get the transpose id (parent or child)
@@ -77,11 +77,11 @@ public class TransposeState
 	 * @param v the version we are comparing to
 	 * @return a new TransposeState or ourselves
 	 */
-	TransposeState next( Pair p, short u, short v )
+	TransposeState next( Match p, short u, short v )
 	{
 		TransposeState repl = this;
-		boolean wasTransposed = ( state==ChunkState.parent 
-			|| state==ChunkState.child );
+		boolean wasTransposed = ( state==ChunkState.PARENT
+			|| state==ChunkState.CHILD);
 		if ( p.isChild() && !p.contains(v) 
 			&& p.parent.contains(v) && !p.parent.contains(u) )
 		{
@@ -89,7 +89,7 @@ public class TransposeState
 				assignId( p.parent );
 			repl = new TransposeState();
 			repl.id = p.id;
-			repl.state = ChunkState.child;
+			repl.state = ChunkState.CHILD;
 		}
 		// if it has a child in v, it might be a repetition
 		else if ( p.isParent() && !p.contains(v) 
@@ -99,7 +99,7 @@ public class TransposeState
 				assignId( p );
 			repl = new TransposeState();
 			repl.id = p.id;
-			repl.state = ChunkState.parent;
+			repl.state = ChunkState.PARENT;
 		}
 		// or it was a child or parent but not any more
 		else if ( wasTransposed )
@@ -122,6 +122,6 @@ public class TransposeState
 	 */
 	public boolean isTransposed()
 	{
-		return state != ChunkState.none;
+		return state != ChunkState.NONE;
 	}
 }

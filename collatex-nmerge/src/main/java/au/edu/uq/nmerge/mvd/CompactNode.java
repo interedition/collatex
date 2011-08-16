@@ -86,7 +86,7 @@ public class CompactNode
 	 * Add as incoming a set of versions
 	 * @param versions the versions to add
 	 */
-	void addIncoming( Pair arc )
+	void addIncoming( Match arc )
 	{
 		incoming.or( arc.versions );
 	}
@@ -94,7 +94,7 @@ public class CompactNode
 	 * Add as outgoing a pair
 	 * @param arc the pair from the MVD to add as outgoing
 	 */
-	void addOutgoing( Pair arc )
+	void addOutgoing( Match arc )
 	{
 		outgoing.or( arc.versions );
 	}

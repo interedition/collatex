@@ -24,7 +24,7 @@ package au.edu.uq.nmerge.mvd;
 import java.util.HashMap;
 import java.util.Vector;
 
-public class VMap extends HashMap<Pair, Pair> 
+public class VMap extends HashMap<Match, Match>
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -33,16 +33,16 @@ public class VMap extends HashMap<Pair, Pair>
 	 * @param v the version to test for
 	 * @return a map of pair-pair relations
 	 */
-	VMap( short v, Vector<Pair> pairs )
+	VMap( short v, Vector<Match> matches)
 	{
-		HashMap<Pair,Pair> vMap = new HashMap<Pair,Pair>();
-		if ( pairs.size() > 1 )
+		HashMap<Match,Match> vMap = new HashMap<Match,Match>();
+		if ( matches.size() > 1 )
 		{
-			Pair last = null;
-			for ( int i=0;i<pairs.size();i++ )
+			Match last = null;
+			for ( int i=0;i< matches.size();i++ )
 			{
 				// examine all the v-pairs
-				Pair p = pairs.get( i );
+				Match p = matches.get( i );
 				if ( p.contains(v) )
 				{
 					if ( last == null )
@@ -70,7 +70,7 @@ public class VMap extends HashMap<Pair, Pair>
 	 * @return true if last and p both follow one another in their 
 	 * respective versions
 	 */
-	boolean isContiguous( Pair last, Pair p, short v )
+	boolean isContiguous( Match last, Match p, short v )
 	{
 		if ( last == null )
 			return false;
@@ -83,8 +83,8 @@ public class VMap extends HashMap<Pair, Pair>
 			else
 			{
 				// parents must have contiguous children in v
-				Pair child1 = last.getChildInVersion( v ); 
-				Pair child2 = p.getChildInVersion( v );
+				Match child1 = last.getChildInVersion( v );
+				Match child2 = p.getChildInVersion( v );
 				if ( child1 != null && child2 != null )
 					return get(child1)==child2 
 						|| get(child2)==child1;
@@ -99,8 +99,8 @@ public class VMap extends HashMap<Pair, Pair>
 			else
 			{
 				// children must have contiguous parents in v
-				Pair parent1 = last.getParent();
-				Pair parent2 = p.getParent();
+				Match parent1 = last.getParent();
+				Match parent2 = p.getParent();
 				boolean ans1 = parent1.contains( v ); 
 				boolean ans2 = parent2.contains( v );
 				if ( ans1 && ans2 )

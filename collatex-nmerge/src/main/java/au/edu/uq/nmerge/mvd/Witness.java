@@ -25,7 +25,7 @@ package au.edu.uq.nmerge.mvd;
  * a Pair - that records WHICH versions the pair belongs to. This 
  * class records what a particular Version is.
  */
-public class Version
+public class Witness
 {
   /** siglum or other short name e.g. A */
 	public String shortName;
@@ -37,28 +37,12 @@ public class Version
 	 * @param shortName siglum or other short name
 	 * @param longName longer name if desired
 	 */
-	public Version( String shortName, String longName )
+	public Witness(String shortName, String longName)
 	{
 		this.shortName = shortName;
 		this.longName = longName;
 	}
 
-	/**
-	 * Convert this version to a String
-	 * @param indent the amount to indent the version XML
-	 * @param id the id of the version
-	 * @return the version in an XML format
-	 */
-	String toXML( int indent, int id )
-	{
-		StringBuffer sb = new StringBuffer();
-		for ( int i=0;i<indent;i++ )
-			sb.append( " " );
-		sb.append( "<version id=\""+id
-			+"\" shortName=\""
-			+shortName+"\" longName=\""+longName+"\"/>\n" );
-		return sb.toString();
-	}
 	/**
 	 * Convert a Version to a string for debugging
 	 * @return a human-readable string Version

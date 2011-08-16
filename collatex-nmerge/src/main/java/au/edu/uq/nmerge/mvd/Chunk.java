@@ -89,7 +89,7 @@ public class Chunk extends BracketedData
 	 */
 	public void addState( ChunkState state )
 	{
-		if ( state != ChunkState.none )
+		if ( state != ChunkState.NONE)
 			states.add( state );
 	}
 	/**
@@ -111,15 +111,15 @@ public class Chunk extends BracketedData
 	/**
 	 * Overlay a match onto an array of chunks. Return the modified 
 	 * chunk array.
-	 * @param match the match to overlay
+	 * @param hit the match to overlay
 	 * @param chunks an array of chunks
 	 * @return an array of chunks with the match incorporated
 	 */
-	public static Chunk[] overlay( Match match, Chunk[] chunks )
+	public static Chunk[] overlay( Hit hit, Chunk[] chunks )
 	{
 		int begin = 0;
-		int matchStart = match.offset;
-		int matchEnd = match.offset+match.length;
+		int matchStart = hit.offset;
+		int matchEnd = hit.offset+ hit.length;
 		Vector<Chunk> newChunks = new Vector<Chunk>();
 		for ( int i=0;i<chunks.length;i++ )
 		{
@@ -138,7 +138,7 @@ public class Chunk extends BracketedData
 				&& matchEnd > begin )
 			{
 				Chunk[] parts = current.split( matchEnd-begin );
-				parts[0].addState( match.state );
+				parts[0].addState( hit.state );
 				newChunks.add( parts[0] );
 				begin += parts[0].getLength();
 				current = parts[1];
@@ -147,8 +147,8 @@ public class Chunk extends BracketedData
 			if ( matchStart <= begin && matchEnd 
 				>= begin+current.getLength() )
 			{
-				current.addState( match.state );
-				current.version = match.getVersion();
+				current.addState( hit.state );
+				current.version = hit.getVersion();
 				begin += current.getLength();
 				newChunks.add( current );
 			}
