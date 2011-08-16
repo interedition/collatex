@@ -39,7 +39,7 @@ public class SuffixTreeTest extends AbstractTest {
 
   @Test
   public void simple() {
-    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, CASE_INSENSITIVE_COMPARATOR, "");
+    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, Ordering.<String>natural(), "");
     LOG.debug(st.printTree());
     Assert.assertNotNull(st.findSubstring(TEST_STRING.subList(0, 3)));
   }
@@ -55,11 +55,4 @@ public class SuffixTreeTest extends AbstractTest {
       Assert.assertNotNull("Couldn't find word [" + start + ", " + end + "]", st.findSubstring(TEST_STRING.subList(start, end)));
     }
   }
-
-  private static Comparator<String> CASE_INSENSITIVE_COMPARATOR = new Comparator<String>() {
-    @Override
-    public int compare(String o1, String o2) {
-      return o1.toLowerCase().compareTo(o2.toLowerCase());
-    }
-  };
 }

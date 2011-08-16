@@ -28,7 +28,7 @@ import java.util.HashSet;
 
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import au.edu.uq.nmerge.exception.*;
-import au.edu.uq.nmerge.mvd.MVDFile;
+
 /**
  * Represent the Maximal Unique Match between a new version 
  * and a Variant Graph
@@ -36,43 +36,46 @@ import au.edu.uq.nmerge.mvd.MVDFile;
  */
 public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 {
-	//static int totalHashSize;
+  private static boolean debug;
+
+  //static int totalHashSize;
 	//static int numberOfHashes;
 	//static int maxHashSize;
 	static int PRINTED_HASH_SIZE = 128;
-	/** the arc we are the MUM of */
+  /** the arc we are the MUM of */
 	VariantGraphSpecialArc arc;
-	/** the immediately opposite graph to align with */
+  /** the immediately opposite graph to align with */
 	VariantGraph graph;
-	/** the left hand part of the arc left over after alignment */
+  /** the left hand part of the arc left over after alignment */
 	private VariantGraphSpecialArc leftSubArc;
-	/** the right hand part of the arc left over after alignment */
+  /** the right hand part of the arc left over after alignment */
 	private VariantGraphSpecialArc rightSubArc;
-	/** special arcs on the left that need reMUMing */
+  /** special arcs on the left that need reMUMing */
 	private SimpleQueue<VariantGraphSpecialArc> leftSpecialArcs;
-	/** special arcs on the left that need reMUMing */
+  /** special arcs on the left that need reMUMing */
 	private SimpleQueue<VariantGraphSpecialArc> rightSpecialArcs;
-	/** The left hand subgraph after alignment */
+  /** The left hand subgraph after alignment */
 	VariantGraph leftSubGraph;
-	/** The right hand subgraph after alignment */
+  /** The right hand subgraph after alignment */
 	VariantGraph rightSubGraph;
-	/** The final Match */
+  /** The final Match */
 	Match match;
-	/** the version of the new version */
+  /** the version of the new version */
 	short version;
-	/** store candidate MUMs here */
+  /** store candidate MUMs here */
 	HashMap<Match,Match> table;
-	/** are we transposed? */
+  /** are we transposed? */
 	boolean transposed;
-	/** transposing on the left? */
+  /** transposing on the left? */
 	boolean transposeLeft;
-	/** minimum length of a MUM */
+  /** minimum length of a MUM */
 	static final int MIN_LEN = 2;
-	/** initial length of table */
+  /** initial length of table */
 	static final int INITIAL_QUEUE_LEN = 128;
-	/** golden ratio - used for threshold */
+  /** golden ratio - used for threshold */
 	static final double PHI = 1.61803399d;
-	/**
+
+  /**
 	 * Construct a MUM
 	 * @param arc the current or final arc not included yet in path
 	 * @param graph the graph to direct align to
@@ -231,7 +234,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 	 * @param subGraph the subgraph directly opposite it
 	 * @return the best MUM or null
 	 */
-	public static MaximalUniqueMatch findDirectMUM( VariantGraphSpecialArc special, SuffixTree st,
+	public static MaximalUniqueMatch findDirectMUM( VariantGraphSpecialArc special, SuffixTree<Byte> st,
 		VariantGraph subGraph ) throws MVDException
 	{
 		MaximalUniqueMatch mum = new MaximalUniqueMatch( special, subGraph, false );
@@ -241,7 +244,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 		VariantGraphArc lastArc=null;
 		printedNodes.add( subGraph.start );
 		PrevChar[] prevChars = new PrevChar[0];
-		if ( MVDFile.debug )
+		if ( debug )
 			subGraph.verify();
 		while ( !queue.isEmpty() )
 		{
@@ -356,7 +359,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 	 * @param subGraph the subgraph directly opposite it
 	 * @return the best left transpose MUM or null
 	 */
-	public static MaximalUniqueMatch findLeftTransposeMUM( VariantGraphSpecialArc special, SuffixTree st,
+	public static MaximalUniqueMatch findLeftTransposeMUM( VariantGraphSpecialArc special, SuffixTree<Byte> st,
 		VariantGraph subGraph )
 	{
 		MaximalUniqueMatch mum = new MaximalUniqueMatch( special, subGraph, true );
@@ -389,7 +392,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 	 * @param node node to look backwards from
 	 * @param distance the distance to search left in bytes
 	 */
-	static void findLeftPositions( MaximalUniqueMatch mum, SuffixTree st,
+	static void findLeftPositions( MaximalUniqueMatch mum, SuffixTree<Byte> st,
 		VariantGraphNode node, int distance )
 	{
 		HashSet<VariantGraphNode> printedNodes = new HashSet<VariantGraphNode>(
@@ -491,7 +494,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 	 * @param subGraph the subgraph directly opposite it
 	 * @return the best right transpose MUM or null
 	 */
-	public static MaximalUniqueMatch findRightTransposeMUM( VariantGraphSpecialArc special, SuffixTree st,
+	public static MaximalUniqueMatch findRightTransposeMUM( VariantGraphSpecialArc special, SuffixTree<Byte> st,
 		VariantGraph subGraph )
 	{
 		MaximalUniqueMatch mum = new MaximalUniqueMatch( special, subGraph, true );
@@ -518,7 +521,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 	 * @param node the node to start from
 	 * @param distance the distance to search forwards
 	 */
-	static void findRightPositions( MaximalUniqueMatch mum, SuffixTree st, VariantGraphNode node,
+	static void findRightPositions( MaximalUniqueMatch mum, SuffixTree<Byte> st, VariantGraphNode node,
 		int distance )
 	{
 		SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();

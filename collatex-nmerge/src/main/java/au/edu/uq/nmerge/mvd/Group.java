@@ -20,12 +20,11 @@
  */
 package au.edu.uq.nmerge.mvd;
 import java.io.UnsupportedEncodingException;
-import au.edu.uq.nmerge.exception.*;
 
 /**
  * A Group is a name for a group of Versions or other Groups.
  */
-public class Group extends Serialiser
+public class Group
 {
 	/** required for serializable classes */
 	static final long serialVersionUID = 1;
@@ -62,23 +61,7 @@ public class Group extends Serialiser
 		}
 		return groupSize;
 	}
-	/**
-	 * Write the group in serialised form to data
-	 * @param data the data to write to
-	 * @param p the offset within data to start writing
-	 */
-	void serialise( byte[] data, int p ) throws Exception
-	{
-		if ( data.length > p + groupSize )
-		{
-			writeShort( data, p, parent );
-			p += 2;
-			p += writeUtf8String( data, p, name );
-		}
-		else
-			throw new MVDException( "No room for group "+name
-				+" during serialisation");
-	}
+
 	/**
 	 * Get the parent of this Group. 0 means no parent
 	 * @return the parent

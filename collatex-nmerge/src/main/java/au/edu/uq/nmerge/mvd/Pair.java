@@ -28,7 +28,7 @@ import au.edu.uq.nmerge.exception.*;
  * Represent one Pair in an MVD
  * @author Desmond Schmidt 18/8/07
  */
-public class Pair extends Serialiser
+public class Pair
 {
 	static final long serialVersionUID = 1;
 	static final int PARENT_FLAG = 0x80000000;
@@ -127,24 +127,7 @@ public class Pair extends Serialiser
 		else
 			return data.length;
 	}
-	/**
-	 * Fix a data offset in a pair already serialised
-	 * @param data the data to fix
-	 * @param p the offset into data where the serialised pair starts
-	 * @param dataOffset the new value of dataoffset
-	 * @param vSetSize the number of bytes in the version set
-	 * @param parentId write this out as the third integer
-	 */
-	static void fixDataOffset( byte[] data, int p, int dataOffset, 
-		int vSetSize, int parentId )
-	{
-		// read versions
-		p += vSetSize;
-		Pair dummy = new Pair( null, null );
-		dummy.writeInt( data, p, dataOffset );
-		p += 8;
-		dummy.writeInt( data, p, parentId );
-	}
+
 	/**
 	 * Return the size of the pair itself (minus the data)
 	 * @return versionSetSize the size of a version set in bytes
@@ -157,72 +140,7 @@ public class Pair extends Serialiser
 			pSize += 4;
 		return pSize;
 	}
-	/**
-	 * Write the pair itself in serialised form and also its data.
-	 * Versions get written out LSB first.
-	 * @param bytes the byte array to write to
-	 * @param p the offset within bytes to start writing this pair
-	 * @param setSize the number of bytes in the version info
-	 * @param dataOffset offset reserved in the dataTable for this 
-	 * @param dataTableOffset the start of the data table within data
-	 * pair's data (might be the same as some other pair's)
-	 * @param parentId the id of the parent or NULL_PID if none
-	 * @return the number of bytes written to data
-	 */
-	int serialisePair( byte[] bytes, int p, int setSize, int dataOffset, 
-		int dataTableOffset, int parentId ) throws MVDException
-	{
-		int oldP = p;
-		int flag = 0;
-		if ( parent != null )
-			flag = CHILD_FLAG;
-		else if ( children != null )
-			flag = PARENT_FLAG;
-		if ( bytes.length > p + pairSize(setSize) )
-		{
-			p += serialiseVersions( bytes, p, setSize );
-			// write data offset
-			// can't see the point of this any more
-			//writeInt( bytes, p, (children==null)?dataOffset:-dataOffset );
-			writeInt( bytes, p, dataOffset );
-			p += 4;
-			// write data length ORed with the parent/child flag
-			int dataLength = (data==null)?0:data.length; 
-			dataLength |= flag;
-			writeInt( bytes, p, dataLength );
-			p += 4;
-			if ( parentId != MVD.NULL_PID )
-			{
-				writeInt( bytes, p, parentId );
-				p += 4;
-			}
-			// write actual data
-			if ( parent == null && !isHint() )
-				p += writeData( bytes, dataTableOffset+dataOffset, data );
-		}
-		else
-			throw new MVDException( "No room for pair during serialisation" );
-		return p - oldP;
-	}
-	/**
-	 * Serialise the versions
-	 * @param bytes the byte array to write to
-	 * @param setSize the size of the versions in bytes
-	 * @param p the offset within bytes to start writing the versions
-	 * @return the number of bytes written
-	 */
-	private int serialiseVersions( byte[] bytes, int p, int setSize )
-	{
-		// iterate through the bits
-		for ( int i=versions.nextSetBit(0); i>=0; 
-			i=versions.nextSetBit(i+1) ) 
-		{
-			int index = ((setSize*8-1)-i)/8;
-			assert index >= 0:"serialising versions: byte index < 0";
-			bytes[p+index] |= 1 << (i%8);
-		}
-		return setSize;
-	}
+
 	/**
 	 * Does this pair contain the given version?
 	 * @param version the version to test

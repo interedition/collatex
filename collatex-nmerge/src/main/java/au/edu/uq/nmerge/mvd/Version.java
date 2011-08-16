@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
  * a Pair - that records WHICH versions the pair belongs to. This 
  * class records what a particular Version is.
  */
-public class Version extends Serialiser
+public class Version
 {
 	static final long serialVersionUID = 1;
 	/** parent group in the version hierarchy */
@@ -71,27 +71,8 @@ public class Version extends Serialiser
 		}
 		return versionSize;
 	}
+
 	/**
-	 * Write the version in serialised form to data
-	 * @param data the byte array to write to
-	 * @param p the offset within data to start writing
-	 */
-	void serialise( byte[] data, int p ) throws Exception
-	{
-		if ( data.length > p + versionSize )
-		{
-			writeShort( data, p, group );
-			p += 2;
-			writeShort( data, p, backup );
-			p += 2;
-			p += writeUtf8String( data, p, shortName );
-			writeUtf8String( data, p, longName );
-		}
-		else
-			throw new MVDException( "No room for version "
-				+shortName+" during serialisation");
-	}
-	/** 
 	 * Get the backup version whose content is returned whenever  
 	 * this version is not present
 	 * @return the backup version ID or NO_BACKUP

@@ -24,12 +24,10 @@ import java.io.File;
 import java.io.PrintStream;
 import au.edu.uq.nmerge.mvd.MVD;
 import au.edu.uq.nmerge.mvd.Mask;
-import au.edu.uq.nmerge.mvd.MVDFile;
 import au.edu.uq.nmerge.mvd.ChunkState;
 import au.edu.uq.nmerge.mvd.Chunk;
 import au.edu.uq.nmerge.mvd.Match;
 import au.edu.uq.nmerge.mvd.Variant;
-import au.edu.uq.nmerge.mvd.Version;
 import au.edu.uq.nmerge.exception.*;
 import au.edu.uq.nmerge.fastme.FastME;
 import org.slf4j.Logger;
@@ -37,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -127,7 +124,7 @@ public class MvdTool
 					sb.append(args[i]);
 				sb.append(" ");
 			}
-			LOG.info( sb.toString() );
+			LOG.info(sb.toString());
 			if ( !testJavaVersion() )
 				System.out.println( "Minimum version of java is 1.5.0" );
 			else
@@ -240,9 +237,7 @@ public class MvdTool
 				out.println( mvd.getDescription() );
 			else
 			{
-				mvd.setDescription( description );
-				MVDFile.externalise( mvd, new File(mvdFile), folderId,
-					Utilities.loadDBProperties(dbConn) );
+				mvd.setDescription(description);
 			}
 		}
 		catch ( Exception e )
@@ -264,9 +259,7 @@ public class MvdTool
 			else
 			{
 				MVD mvd = (description==null)?new MVD():new MVD(description);
-				mvd.setMask( mvdMask );
-				MVDFile.externalise( mvd, file, folderId, 
-					Utilities.loadDBProperties(dbConn) );
+				mvd.setMask(mvdMask);
 			}
 		}
 		catch ( Exception e )
@@ -382,22 +375,7 @@ public class MvdTool
 	 */
 	static MVD loadMVD() throws Exception
 	{
-		MVD mvd;
-		// this is silly if it is a urn, but it doesn't fail
-		File m = new File( mvdFile );
-		if ( m.exists() || (dbConn != null && dbConn.length()>0) )
-			mvd = MVDFile.internalise( mvdFile, Utilities.loadDBProperties(dbConn) );
-		else
-			throw new FileNotFoundException( "Couldn't find "+mvdFile );
-		// can happen if version name is invalid
-		if ( version == 0 )
-		{
-			if ( shortName!= null & shortName.length()>0)
-				version = (short)mvd.getVersionId( shortName );
-			else
-				version = 1;
-		}
-		return mvd;
+		return new MVD();
 	}
 	/**
 	 * Update an MVD by replacing the specified version with the given 
@@ -414,10 +392,8 @@ public class MvdTool
 				//mvd.removeVersion( version );
 				FileInputStream fis = new FileInputStream( t );
 				byte[] data = new byte[(int)t.length()];
-				fis.read( data );
-				mvd.update( version, data );
-				MVDFile.externalise( mvd, new File(mvdFile), folderId,
-					Utilities.loadDBProperties(dbConn) );
+				fis.read(data);
+				mvd.update(version, data);
 			}
 			else
 				throw new MVDToolException( "No text for replacement version");
@@ -533,29 +509,14 @@ public class MvdTool
 			File t = new File( textFile );
 			if ( t.exists() )
 			{
-				MVD mvd;
-				if ( mvdFile != null )
-				{
-					mvd = MVDFile.internalise( mvdFile, Utilities.loadDBProperties(dbConn) );
-					mvd.newVersion(shortName, longName, groupName, 
+				MVD mvd = new MVD( description );;
+					mvd.newVersion( shortName, longName, groupName,
 						(short)backup, partial );
-				}
-				else
-				{
-					mvd = new MVD( description );
-					mvd.newVersion( shortName, longName, groupName, 
-						(short)backup, partial );
-				}
 				FileInputStream fis = new FileInputStream( t );
 				byte[] data = new byte[(int)t.length()];
 				fis.read( data );
 				version = (short)(mvd.numVersions());
 				mvd.update( version, data );
-				if ( mvd.getDescription() != null )
-				{
-					MVDFile.externalise( mvd, new File(mvdFile), folderId, 
-						Utilities.loadDBProperties(dbConn) );
-				}
 				LOG.info("Unique percentage={}", mvd.getUniquePercentage(version));
 				MvdTool.out.println(mvd.getUniquePercentage(version));
 			}
@@ -578,7 +539,7 @@ public class MvdTool
 		{
 			MVD mvd = loadMVD();
 			byte[] data = mvd.getVersion( version );
-			out.write( data, 0, data.length );
+			out.write(data, 0, data.length);
 		}
 		catch ( Exception e )
 		{
@@ -594,9 +555,7 @@ public class MvdTool
 		try
 		{
 			MVD mvd = loadMVD();
-			mvd.removeVersion( version );
-			MVDFile.externalise( mvd, new File(mvdFile), 
-				folderId, Utilities.loadDBProperties(dbConn) );
+			mvd.removeVersion(version);
 		}
 		catch ( Exception e )
 		{

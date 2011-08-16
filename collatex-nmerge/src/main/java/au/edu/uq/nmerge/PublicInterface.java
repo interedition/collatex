@@ -79,8 +79,6 @@ public class PublicInterface
 					?new MVD():new MVD(description);
 				mvd.setMask( mvdMask );
 				mvd.setEncoding( encoding );
-				MVDFile.externalise( mvd, mvdFile, folderId, 
-					Utilities.loadDBProperties(cache.getDbConn()) );
 			}
 		}
 		catch ( Exception e )
@@ -504,10 +502,7 @@ public class PublicInterface
 		int folderId, byte[] data ) throws Exception
 	{
 		MVD mvd = getFromCache( fileName );
-		float percentNew = mvd.update( versionId, data );
-		MVDFile.externalise( mvd, new File(fileName), 
-			folderId, Utilities.loadDBProperties(cache.getDbConn()) );
-		return percentNew;
+		return mvd.update( versionId, data );
 	}
 	/**
 	 * Save the MVD in the cache. If its not in the cache there's 
@@ -520,8 +515,6 @@ public class PublicInterface
 		if ( cache.containsKey(fileName) )
 		{
 			MVD mvd = cache.get( fileName );
-			MVDFile.externalise( mvd, new File(fileName), 
-				folderId, Utilities.loadDBProperties(cache.getDbConn()) );
 		}
 	}
 	/**
@@ -624,14 +617,7 @@ public class PublicInterface
 		MVD mvd=null;
 		try
 		{
-			if ( cache.containsKey(fileName) )
-				mvd = cache.get( fileName );
-			else
-			{
-				mvd = MVDFile.internalise( fileName,
-					Utilities.loadDBProperties(cache.getDbConn()) );
-				cache.put( fileName, mvd );
-			}
+	    mvd = cache.get( fileName );
 		}
 		catch ( Exception e )
 		{
@@ -646,9 +632,6 @@ public class PublicInterface
 	 */
 	public void revert( String fileName ) throws Exception
 	{
-		MVD mvd = MVDFile.internalise( fileName, 
-			Utilities.loadDBProperties(cache.getDbConn()) );
-		cache.put( fileName, mvd );
 	}
 	/**
 	 * Find all the groups that belong under the given group
