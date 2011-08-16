@@ -26,28 +26,28 @@ import com.google.common.base.Preconditions;
 /**
  * This structure describes a node and its incoming edge
  */
-public class Node {
+public class SuffixTreeNode {
   /**
    * A linked list of sons of that node
    */
-  Node children;
+  SuffixTreeNode children;
   /**
    * A linked list of right siblings of that node
    */
-  Node rightSibling;
+  SuffixTreeNode rightSibling;
   /**
    * A linked list of left siblings of that node
    */
-  Node leftSibling;
+  SuffixTreeNode leftSibling;
   /**
    * A pointer to that node's father
    */
-  Node parent;
+  SuffixTreeNode parent;
   /**
    * A pointer to the node that represents the largest
    * suffix of the current node
    */
-  Node largestSuffix;
+  SuffixTreeNode largestSuffix;
   /**
    * Index of the start position of the node's path
    */
@@ -61,7 +61,7 @@ public class Node {
    */
   int edgeLabelEnd;
 
-  public Node() {
+  public SuffixTreeNode() {
   }
 
   /**
@@ -72,7 +72,7 @@ public class Node {
    * @param end      the end index of the incoming edge to that node
    * @param position the path starting position of the node.
    */
-  public Node(Node parent, int start, int end, int position) {
+  public SuffixTreeNode(SuffixTreeNode parent, int start, int end, int position) {
     Preconditions.checkArgument(end >= start, "Error: start greater than end");
     this.parent = parent;
     this.pathPosition = position;

@@ -33,6 +33,7 @@ import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import au.edu.uq.nmerge.graph.Converter;
 import au.edu.uq.nmerge.exception.MVDException;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 /**
  * Represent a multi-version document.
@@ -989,7 +990,7 @@ public class MVD extends Serialiser implements Serializable
         treeSource.add(b);
       }
 
-	  return new SuffixTree<Byte>( treeSource, (byte) '$');
+	  return new SuffixTree<Byte>( treeSource, Ordering.<Byte>natural(), (byte) '$');
 	}
 	/**
 	 * Install a subarc into specials

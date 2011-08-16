@@ -23,9 +23,11 @@ package au.edu.uq.nmerge.graph.suffixtree;
 
 import au.edu.uq.nmerge.AbstractTest;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -33,13 +35,13 @@ import java.util.List;
  */
 public class SuffixTreeTest extends AbstractTest {
 
-  private static final List<String> TEST_STRING = Lists.newArrayList("Hello ", "World", "!");
+  private static final List<String> TEST_STRING = Lists.newArrayList("Hello ", "world ", "world ", "World ", "!");
 
   @Test
   public void simple() {
-    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, "");
+    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, CASE_INSENSITIVE_COMPARATOR, "");
     LOG.debug(st.printTree());
-    Assert.assertNotSame(st.errorValue, st.findSubstring(TEST_STRING.subList(0, 3)));
+    Assert.assertNotNull(st.findSubstring(TEST_STRING.subList(0, 3)));
   }
 
   /**
@@ -47,10 +49,17 @@ public class SuffixTreeTest extends AbstractTest {
    */
   @Test
   public void verifyAllSuffixes() {
-    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, "");
+    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, Ordering.<String>natural(), "");
     final int end = TEST_STRING.size();
     for (int start = 0; start < end; start++) {
       Assert.assertNotNull("Couldn't find word [" + start + ", " + end + "]", st.findSubstring(TEST_STRING.subList(start, end)));
     }
   }
+
+  private static Comparator<String> CASE_INSENSITIVE_COMPARATOR = new Comparator<String>() {
+    @Override
+    public int compare(String o1, String o2) {
+      return o1.toLowerCase().compareTo(o2.toLowerCase());
+    }
+  };
 }

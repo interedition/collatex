@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -38,101 +39,34 @@ public class SuffixTree<T> {
   private static final Logger LOG = LoggerFactory.getLogger(SuffixTree.class);
 
   /**
-   * Used in function traceString for skipping (Ukkonen's Skip Trick).
-   */
-  enum SkipType {
-    SKIP,
-    NO_SKIP
-  }
-
-  /**
-   * Used in method applyRule2 - two types of rule 2 - see function
-   * for more details.
-   */
-  enum Rule2Type {
-    NEW_CHILD,
-    SPLIT
-  }
-
-  /**
-   * Signals whether last matching position is the last one of the
-   * current edge
-   */
-  enum LastPosType {
-    lastCharInEdge,
-    otherChar
-  }
-
-  /**
-   * error value calculated in tree init phase
-   */
-  int errorValue;
-
-  /**
-   * Used to mark the node that has no suffix link yet. According to
-   * Ukkonen, it will have one by the end of the current phase.
-   */
-  Node suffixless;
-
-  /**
-   * The virtual end of all leaves
-   */
-  int e;
-
-  /**
    * The one and only real source string of the tree. All edge-labels
    * contain only indices to this string and do not contain the characters
    * themselves
    */
-  T[] source;
+  private T[] source;
+
+  /**
+   * length of {@link #source} minus the '$'
+   */
+  private int length;
 
   /**
    * The node that is the head of all others. It has no siblings nor a
    * father
    */
-  public Node root;
+  private SuffixTreeNode root;
 
   /**
-   * length of treeString minus the '$'
+   * Used to mark the node that has no suffix link yet. According to
+   * Ukkonen, it will have one by the end of the current phase.
    */
-  int length;
+  private SuffixTreeNode suffixless;
 
   /**
-   * needed to store VAR parameters in traceSingleEdge
+   * The virtual end of all leaves
    */
-  class TraceReturnValue {
-    /**
-     * Last matching position in edge
-     */
-    int edgePos;
-    /**
-     * Last matching position in tree source string
-     */
-    int charsFound;
-    /**
-     * true if search is done, false if not
-     */
-    boolean searchDone;
-  }
-
-  /**
-   * required by SPA
-   */
-  class ExtensionParam {
-    /**
-     * The last extension performed in the previous phase
-     */
-    int extension;
-    /**
-     * 1 if the last rule applied is 3
-     */
-    char repeatedExtension;
-  }
-
-  class Path {
-    int begin;
-    int end;
-  }
+  private int virtualEnd;
+  private final Comparator<T> comparator;
 
   /**
    * Starts Ukkonen's construction algorithm by calling SPA n times, where
@@ -144,15 +78,15 @@ public class SuffixTree<T> {
    *            version it is appended at the end of the input string and then never used.
    */
   @SuppressWarnings("unchecked")
-  public SuffixTree(Iterable<T> str, T terminal) {
+  public SuffixTree(Iterable<T> str, Comparator<T> comparator, T terminal) {
+    this.comparator = comparator;
     int phase;
 
     // added to make 1-character suffix trees work
-    this.e = 1;
-    this.length = Iterables.size(str) + 1;
-    errorValue = length + 10;
-    this.source = (T[]) Array.newInstance(terminal.getClass(), length + 1);
+    this.virtualEnd = 1;
 
+    this.length = Iterables.size(str) + 1;
+    this.source = (T[]) Array.newInstance(terminal.getClass(), length + 1);
     int i = 0;
     for (T t : str) {
       this.source[++i] = t;
@@ -160,8 +94,8 @@ public class SuffixTree<T> {
     // the terminal ('$') is never examined but assumed to be there
     this.source[length] = terminal;
 
-    root = new Node(null, 0, 0, 0);
-    root.largestSuffix = null;
+    this.root = new SuffixTreeNode(null, 0, 0, 0);
+    this.root.largestSuffix = null;
 
     // initializing algorithm parameters
     ExtensionParam ep = new ExtensionParam();
@@ -169,11 +103,10 @@ public class SuffixTree<T> {
     ep.repeatedExtension = 0;
     phase = 2;
 
-    // allocating first node, son of the root (phase 0), the longest
+    // allocating first node, child of the root (phase 0), the longest
     // path node
-    root.children = new Node(root, 1, length, 1);
-    suffixless = null;
-    Position position = new Position(root, 0);
+    this.root.children = new SuffixTreeNode(root, 1, length, 1);
+    final SuffixTreePosition position = new SuffixTreePosition(root, 0);
 
     // Ukkonen's algorithm begins here
     for (; phase < length; phase++) {
@@ -189,7 +122,7 @@ public class SuffixTree<T> {
    * @param character the character to be searched for in the sons
    * @return the son found, or null if no such son.
    */
-  Node findChild(Node node, T character) {
+  SuffixTreeNode findChild(SuffixTreeNode node, T character) {
     // point to the first son.
     node = node.children;
     // scan all sons (all right siblings of the first son) for their first
@@ -210,10 +143,10 @@ public class SuffixTree<T> {
    * @return the end index of that node (meaning the end index of the node's
    *         incoming edge).
    */
-  private int getNodeLabelEnd(Node node) {
+  private int getNodeLabelEnd(SuffixTreeNode node) {
     // if it's a leaf - return e
     if (node.children == null)
-      return e;
+      return virtualEnd;
     // if it's not a leaf - return its real end
     return node.edgeLabelEnd;
   }
@@ -225,7 +158,7 @@ public class SuffixTree<T> {
    * @param node the node whose length we need
    * @return the length of that node.
    */
-  int getNodeLabelLength(Node node) {
+  int getNodeLabelLength(SuffixTreeNode node) {
     // calculate and return the length of the node
     return getNodeLabelEnd(node) - node.edgeLabelStart + 1;
   }
@@ -237,7 +170,7 @@ public class SuffixTree<T> {
    * @param edgePos the position in its incoming edge.
    * @return true if edgePos is the last position in node's incoming edge
    */
-  boolean isLastCharInEdge(Node node, int edgePos) {
+  boolean isLastCharInEdge(SuffixTreeNode node, int edgePos) {
     return edgePos == getNodeLabelLength(node) - 1;
   }
 
@@ -247,7 +180,7 @@ public class SuffixTree<T> {
    * @param leftSib  one of two nodes to be connected
    * @param rightSib one of two nodes to be connected
    */
-  void connectSiblings(Node leftSib, Node rightSib) {
+  void connectSiblings(SuffixTreeNode leftSib, SuffixTreeNode rightSib) {
     // connect the right node as the right sibling of the left node
     if (leftSib != null)
       leftSib.rightSibling = rightSib;
@@ -276,16 +209,16 @@ public class SuffixTree<T> {
    *                       performed
    * @return a newly created leaf (newSon case) or internal node (split case).
    */
-  Node applyExtensionRule2(Node node, int edgeLabelBegin, int edgeLabelEnd,
+  SuffixTreeNode applyExtensionRule2(SuffixTreeNode node, int edgeLabelBegin, int edgeLabelEnd,
                            int pathPos, int edgePos, Rule2Type type) {
-    Node newLeaf, newInternal, son;
+    SuffixTreeNode newLeaf, newInternal, son;
     // newSon
     if (type == Rule2Type.NEW_CHILD) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("rule 2: new leaf ({},{})", edgeLabelBegin, edgeLabelEnd);
       }
       // create a new leaf (4) with the characters of the extension
-      newLeaf = new Node(node, edgeLabelBegin, edgeLabelEnd, pathPos);
+      newLeaf = new SuffixTreeNode(node, edgeLabelBegin, edgeLabelEnd, pathPos);
       // connect newLeaf (4) as the new son of node (1)
       son = node.children;
       while (son.rightSibling != null)
@@ -299,13 +232,13 @@ public class SuffixTree<T> {
       LOG.trace("rule 2: split ({}, {})", edgeLabelBegin, edgeLabelEnd);
     }
     // create a new internal node (3) at the split point
-    newInternal = new Node(node.parent, node.edgeLabelStart,
+    newInternal = new SuffixTreeNode(node.parent, node.edgeLabelStart,
             node.edgeLabelStart + edgePos, node.pathPosition);
     // update the node (1) incoming edge starting index (it now starts
     // where node (3) incoming edge ends)
     node.edgeLabelStart += edgePos + 1;
     // create a new leaf (2) with the characters of the extension
-    newLeaf = new Node(newInternal, edgeLabelBegin, edgeLabelEnd, pathPos);
+    newLeaf = new SuffixTreeNode(newInternal, edgeLabelBegin, edgeLabelEnd, pathPos);
     // connect newInternal (3) where node (1) was
     // connect (3) with (1)'s left sibling
     connectSiblings(node.leftSibling, newInternal);
@@ -336,9 +269,9 @@ public class SuffixTree<T> {
    * @param type skip or noSkip
    * @return the node where tracing has stopped
    */
-  private Node traceSingleEdge(Node node, Path str, TraceReturnValue trv,
+  private SuffixTreeNode traceSingleEdge(SuffixTreeNode node, Path str, TraceReturnValue trv,
                                SkipType type) {
-    Node contNode;
+    SuffixTreeNode contNode;
     int length, strLen;
 
     // set default return values
@@ -414,7 +347,7 @@ public class SuffixTree<T> {
    * @param type skip or noSkip
    * @return the node where tracing has stopped
    */
-  private Node traceString(Node node, Path str, TraceReturnValue trv,
+  private SuffixTreeNode traceString(SuffixTreeNode node, Path str, TraceReturnValue trv,
                            SkipType type) {
     Path localStr = new Path();
     localStr.begin = str.begin;
@@ -439,10 +372,10 @@ public class SuffixTree<T> {
    * @param b the first byte from the root whose Pos is desired
    * @return the relevant Pos, null if not present
    */
-  public Position getStartPos(T b) {
-    Node node = findChild(root, b);
+  public SuffixTreePosition getStartPos(T b) {
+    SuffixTreeNode node = findChild(root, b);
     if (node != null) {
-      return new Position(node, node.edgeLabelStart);
+      return new SuffixTreePosition(node, node.edgeLabelStart);
     } else
       return null;
   }
@@ -457,7 +390,7 @@ public class SuffixTree<T> {
    * @param position the position in the tree where we were last time
    * @return true if the advance was successful, false otherwise
    */
-  public boolean advance(Position position, T b) {
+  public boolean advance(SuffixTreePosition position, T b) {
     if (position.node == null) {
       position.node = findChild(root, b);
       if (position.node != null) {
@@ -469,7 +402,7 @@ public class SuffixTree<T> {
       int nodeLabelEnd = getNodeLabelEnd(position.node);
       // already matched that byte ...
       if (position.edgePos == nodeLabelEnd) {
-        Node localNode = findChild(position.node, b);
+        SuffixTreeNode localNode = findChild(position.node, b);
         if (localNode != null) {
           position.edgePos = localNode.edgeLabelStart;
           position.node = localNode;
@@ -477,7 +410,7 @@ public class SuffixTree<T> {
         } else
           return false;
       } else {
-        boolean success = source[position.edgePos + 1].equals(b);
+        boolean success = comparator.compare(source[position.edgePos + 1], b) == 0;
         if (success)
           position.edgePos++;
         return success;
@@ -492,11 +425,11 @@ public class SuffixTree<T> {
    * @param position the end-pos of the string
    * @return the length of the matching string
    */
-  int getMatchLength(Position position) {
+  int getMatchLength(SuffixTreePosition position) {
     if (position.node == null)
       return 0;
     else {
-      Node temp = position.node;
+      SuffixTreeNode temp = position.node;
       int length = position.edgePos - temp.edgeLabelStart;
       temp = temp.parent;
       while (temp != root) {
@@ -518,13 +451,13 @@ public class SuffixTree<T> {
    *
    * @param W the substring to find
    * @return the index of the starting position of the substring in
-   *         the tree source string. If the substring is not found - returns
-   *         stError
+   *         the tree source string. If the substring is not found, returns
+   *         <code>null</code>
    */
-  public int findSubstring(List<T> W) {
+  public Integer findSubstring(List<T> W) {
     // starts with the root's son that has the first character of W
     // as its incoming edge first character
-    Node node = findChild(root, W.get(0));
+    SuffixTreeNode node = findChild(root, W.get(0));
     int k, j = 0, nodeLabelEnd;
 
     // scan nodes down from the root until a leaf is reached or the
@@ -534,7 +467,7 @@ public class SuffixTree<T> {
       nodeLabelEnd = getNodeLabelEnd(node);
       // Scan a single edge - compare each character with the searched
       // string
-      while (j < W.size() && k <= nodeLabelEnd && source[k].equals(W.get(j))) {
+      while (j < W.size() && k <= nodeLabelEnd && comparator.compare(source[k], W.get(j)) == 0) {
         j++;
         k++;
       }
@@ -548,10 +481,10 @@ public class SuffixTree<T> {
         node = findChild(node, W.get(j));
       else {
         // one non-matching symbols is found - W is not a substring
-        return errorValue;
+        return null;
       }
     }
-    return errorValue;
+    return null;
   }
 
   /**
@@ -564,7 +497,7 @@ public class SuffixTree<T> {
    *         of node's path. Example: if node represents the path "abcde" then
    *         it returns the node that represents "bcde"
    */
-  Position followSuffixLink(Position position) {
+  SuffixTreePosition followSuffixLink(SuffixTreePosition position) {
     // gama is the string between node and its father, in case node
     // doesn't have a suffix link
     Path gama = new Path();
@@ -614,7 +547,7 @@ public class SuffixTree<T> {
    * @param node the node to link from
    * @param link the node to link to
    */
-  private void createSuffixLink(Node node, Node link) {
+  private void createSuffixLink(SuffixTreeNode node, SuffixTreeNode link) {
     node.largestSuffix = link;
   }
 
@@ -637,12 +570,12 @@ public class SuffixTree<T> {
    * @return The rule that was applied to that extension. Can be 3 (phase is done)
    *         or 2 (a new leaf was created).
    */
-  int singleExtension(Position position, Path str, char afterRule3, int ruleApplied) {
+  int singleExtension(SuffixTreePosition position, Path str, char afterRule3, int ruleApplied) {
     int charsFound = 0, pathPos = str.begin;
     Path origStr = new Path();
     origStr.begin = str.begin;
     origStr.end = str.end;
-    Node tmp;
+    SuffixTreeNode tmp;
 
     if (LOG.isTraceEnabled()) {
       LOG.trace("\n{}extension: {} phase+1: {} -- {} ({},{} | {})", new Object[]{
@@ -750,7 +683,7 @@ public class SuffixTree<T> {
 
   /**
    * Performs all insertion of a single phase by calling function
-   * {@link #singleExtension(Position, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.Path, char, int)} starting
+   * {@link #singleExtension(SuffixTreePosition, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.Path, char, int)} starting
    * from the first extension that does not already exist in the tree and ending
    * at the first extension that already exists in the tree.
    *
@@ -762,12 +695,12 @@ public class SuffixTree<T> {
    *                 its suffix link would not be followed. Updated: The extension number that
    *                 was last executed on this phase. Next phase will start from it and not from 1
    */
-  void singlePhase(Position position, int phase, ExtensionParam ep) {
+  void singlePhase(SuffixTreePosition position, int phase, ExtensionParam ep) {
     // no such rule (0). Used for entering the loop
     int ruleApplied = 0;
     Path str = new Path();
     // leafs Trick: apply implicit extensions 1 through prevPhase
-    e = phase + 1;
+    virtualEnd = phase + 1;
     // apply explicit extensions until last extension of this phase is reached
     // or extension rule 3 is applied once
     while (ep.extension <= phase + 1) {
@@ -804,7 +737,7 @@ public class SuffixTree<T> {
    *
    * @param node the node that is the root of the subtree to be deleted.
    */
-  void deleteSubTree(Node node) {
+  void deleteSubTree(SuffixTreeNode node) {
     // recursion stopping condition
     if (node != null) {
       // recursive call for right sibling
@@ -836,8 +769,8 @@ public class SuffixTree<T> {
    *              This gives the effect of a tree on screen. In each recursive call, the depth
    *              is increased.
    */
-  void printNode(Node node1, int depth, StringBuilder tree) {
-    Node node2 = node1.children;
+  void printNode(SuffixTreeNode node1, int depth, StringBuilder tree) {
+    SuffixTreeNode node2 = node1.children;
     int d = depth;
     int start = node1.edgeLabelStart;
     int end;
@@ -869,7 +802,7 @@ public class SuffixTree<T> {
    *
    * @param node the node to be printed
    */
-  void printFullNode(Node node) {
+  void printFullNode(SuffixTreeNode node) {
     int start, end;
     if (node != null) {
       // calculating the beginning and ending of the last edge
@@ -885,5 +818,62 @@ public class SuffixTree<T> {
         start++;
       }
     }
+  }
+
+  /**
+   * needed to store VAR parameters in
+   * {@link SuffixTree#traceSingleEdge(SuffixTreeNode, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.Path, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.TraceReturnValue, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.SkipType)}
+   */
+  private static class TraceReturnValue {
+    /**
+     * Last matching position in edge
+     */
+    int edgePos;
+    /**
+     * Last matching position in tree source string
+     */
+    int charsFound;
+    /**
+     * true if search is done, false if not
+     */
+    boolean searchDone;
+  }
+
+  /**
+   * Used in function
+   * {@link SuffixTree#traceString(SuffixTreeNode, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.Path, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.TraceReturnValue, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.SkipType)}
+   * for skipping (Ukkonen's Skip Trick).
+   */
+  private enum SkipType {
+    SKIP,
+    NO_SKIP
+  }
+
+  /**
+   * Used in method applyRule2 - two types of rule 2 - see function
+   * for more details.
+   */
+  private enum Rule2Type {
+    NEW_CHILD,
+    SPLIT
+  }
+
+  /**
+   * required by {@link SuffixTree#singlePhase(SuffixTreePosition, int, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.ExtensionParam)}
+   */
+  private static class ExtensionParam {
+    /**
+     * The last extension performed in the previous phase
+     */
+    int extension;
+    /**
+     * 1 if the last rule applied is 3
+     */
+    char repeatedExtension;
+  }
+
+  private static class Path {
+    int begin;
+    int end;
   }
 }
