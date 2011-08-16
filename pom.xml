@@ -16,6 +16,7 @@
     </organization>
     <modules>
         <module>collatex</module>
+        <module>collatex-nmerge</module>
         <module>collatex-nodeps</module>
         <module>collatex-web</module>
         <!--  <module>collatex-legacy</module>  -->
