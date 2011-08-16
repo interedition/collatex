@@ -24,7 +24,7 @@ import java.util.Vector;
 /**
  *	A Queue of Nodes
  */
-class NodeQueue extends Vector<Node>
+class NodeQueue extends Vector<VariantGraphNode>
 {
 	static final long serialVersionUID = 1;
 	/**
@@ -32,7 +32,7 @@ class NodeQueue extends Vector<Node>
 	 * already be there. Check that, and prevent duplicates.
 	 * @param node the node to push
 	 */
-	void push( Node node )
+	void push( VariantGraphNode node )
 	{
 		for ( int i=size()-1;i>=0;i-- )
 		{
@@ -41,12 +41,12 @@ class NodeQueue extends Vector<Node>
 		}
 		add( node );
 	}
-	Node pop()
+	VariantGraphNode pop()
 	{
-		Node u = null;
+		VariantGraphNode u = null;
 		if ( size() > 0 )
 		{
-			u = (Node) remove( 0 );
+			u = (VariantGraphNode) remove( 0 );
 		}
 		return u;
 	}

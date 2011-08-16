@@ -19,36 +19,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.mvd;
-import java.util.*;
-import java.io.UnsupportedEncodingException;
-import java.io.Serializable;
 
-import au.edu.uq.nmerge.graph.Graph;
-import au.edu.uq.nmerge.graph.MUM;
-import au.edu.uq.nmerge.graph.SimpleQueue;
-import au.edu.uq.nmerge.graph.SpecialArc;
-import au.edu.uq.nmerge.graph.SpecialComparator;
-import au.edu.uq.nmerge.graph.XMLMasker;
-import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
-import au.edu.uq.nmerge.graph.Converter;
 import au.edu.uq.nmerge.exception.MVDException;
+import au.edu.uq.nmerge.graph.*;
+import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 /**
  * Represent a multi-version document.
  * @author Desmond Schmidt &copy; 2009
  */
-public class MVD extends Serialiser implements Serializable
+public class MVD extends Serialiser
 {
-	Mask mask;
-	// new options
-	boolean timing;
+  public static String UNTITLED_NAME = "untitled";
+  static final int DUFF_PID = -1;
+  static final int NULL_PID = 0;
+
+  Mask mask;
+  // new options
 	boolean directAlignOnly;
-	public static final long serialVersionUID = 1;
-	static final int DUFF_PID = -1;
-	static final int NULL_PID = 0;
-	public static String UNTITLED_NAME = "untitled";
 	Vector<Group> groups;		// id = position in table+1
 	Vector<Version> versions;	// id = position in table+1
 	Vector<Pair> pairs;
@@ -56,18 +50,23 @@ public class MVD extends Serialiser implements Serializable
 	int headerSize,groupTableSize,versionTableSize,pairsTableSize,
 	dataTableSize,versionSetSize;
 	int bestScore;
-	long startTime;
 	// used for checking
 	HashSet<Pair> parents;
 	BitSet partialVersions;
 	String encoding;
+
 	public MVD()
 	{
-		setDefaults();
+      this.description = "";
+      this.groups = new Vector<Group>();
+      this.versions = new Vector<Version>();
+      this.pairs = new Vector<Pair>();
+      this.mask = Mask.NONE;
+      this.encoding = "UTF-8";
 	}
 	public MVD( String description )
 	{
-		setDefaults();
+		this();
 		this.description = description;
 	}
 	/**
@@ -77,22 +76,11 @@ public class MVD extends Serialiser implements Serializable
 	 */
 	public MVD( String description, String encoding )
 	{
-		setDefaults();
+		this();
 		this.description = description;
 		this.encoding = encoding;
 	}
-	/**
-	 * Set default values for the MVD
-	 */
-	private void setDefaults()
-	{
-		this.description = "";
-		this.groups = new Vector<Group>();
-		this.versions = new Vector<Version>();
-		this.pairs = new Vector<Pair>();
-		this.mask = Mask.NONE;
-		this.encoding = "UTF-8";
-	}
+
 	/**
 	 * Set the encoding, which defaults to UTF-8
 	 * @param encoding the new encoding
@@ -729,10 +717,10 @@ public class MVD extends Serialiser implements Serializable
 	{
 		// to do: if version already exists, remove it first
 		Converter con = new Converter();
-		Graph original = con.create( pairs, versions.size() );
+		VariantGraph original = con.create( pairs, versions.size() );
 		original.removeVersion( version );
-		Graph g = original;
-		SpecialArc special;
+		VariantGraph g = original;
+		VariantGraphSpecialArc special;
 		if ( mask != Mask.NONE )
 		{
 			byte[] byteMask = XMLMasker.getMask(data, mask==Mask.XML);
@@ -740,22 +728,20 @@ public class MVD extends Serialiser implements Serializable
 		}
 		else
 			special = g.addSpecialArc( data, version, 0 );
-		if ( timing )
-			startTime = System.currentTimeMillis();
 		if ( g.getStart().cardinality() > 1 )
 		{
 			SuffixTree<Byte> st = makeSuffixTree( special );
-			MUM bestMUM = MUM.findDirectMUM( special, st, g );
-			TreeMap<SpecialArc,Graph> specials = 
-				new TreeMap<SpecialArc,Graph>(new SpecialComparator());
+			MaximalUniqueMatch bestMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
+			TreeMap<VariantGraphSpecialArc,VariantGraph> specials =
+				new TreeMap<VariantGraphSpecialArc,VariantGraph>();
 			while ( bestMUM != null )
 			{
 				if ( bestMUM.verify() )
 				{
 					bestMUM.merge();
-					SimpleQueue<SpecialArc> leftSpecials = 
+					SimpleQueue<VariantGraphSpecialArc> leftSpecials =
 						bestMUM.getLeftSpecialArcs();
-					SimpleQueue<SpecialArc> rightSpecials = 
+					SimpleQueue<VariantGraphSpecialArc> rightSpecials =
 						bestMUM.getRightSpecialArcs();
 					while ( leftSpecials != null && !leftSpecials.isEmpty() )
 						installSpecial( specials, leftSpecials.poll(), 
@@ -784,7 +770,7 @@ public class MVD extends Serialiser implements Serializable
 				bestMUM = null;
 				if ( specials.size() > 0 )
 				{
-					SpecialArc key = specials.firstKey();
+					VariantGraphSpecialArc key = specials.firstKey();
 					//assert key.from != null && key.to != null;
 					//System.out.println(key.toString());
 					if ( key != null )
@@ -800,13 +786,6 @@ public class MVD extends Serialiser implements Serializable
 		pairs = con.serialise();
 		if ( encoding.toUpperCase().equals("UTF-8") )
 			removeUTF8Splits();
-		if ( timing )
-		{
-			String finishTime = new Long(System.currentTimeMillis()
-				-startTime).toString();
-			System.out.println( "Time taken to merge version "
-				+version+"="+finishTime );
-		}
 		if ( numVersions()==1 )
 			return 0.0f;
 		else
@@ -942,10 +921,10 @@ public class MVD extends Serialiser implements Serializable
 	 * @param old the old invalid MUM
 	 * @return a new valid MUM or null
 	 */
-	MUM recomputeMUM( MUM old ) throws MVDException
+	MaximalUniqueMatch recomputeMUM( MaximalUniqueMatch old ) throws MVDException
 	{
-		Graph g = old.getGraph();
-		SpecialArc special = old.getArc();
+		VariantGraph g = old.getGraph();
+		VariantGraphSpecialArc special = old.getArc();
 		return computeBestMUM( g, special );
 	}
 	/**
@@ -955,18 +934,18 @@ public class MVD extends Serialiser implements Serializable
 	 * @return the new MUM or null
 	 * @throws MVDException
 	 */
-	private MUM computeBestMUM( Graph g, SpecialArc special ) 
+	private MaximalUniqueMatch computeBestMUM( VariantGraph g, VariantGraphSpecialArc special )
 		throws MVDException
 	{
 		SuffixTree<Byte> st = makeSuffixTree( special );
-		MUM directMUM = MUM.findDirectMUM( special, st, g );
-		MUM best = directMUM;
+		MaximalUniqueMatch directMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
+		MaximalUniqueMatch best = directMUM;
 		if ( !directAlignOnly )
 		{
-			MUM leftTransposeMUM = MUM.findLeftTransposeMUM( 
-				special, st, g );
-			MUM rightTransposeMUM = MUM.findRightTransposeMUM( 
-				special, st, g );
+			MaximalUniqueMatch leftTransposeMUM = MaximalUniqueMatch.findLeftTransposeMUM(
+                    special, st, g);
+			MaximalUniqueMatch rightTransposeMUM = MaximalUniqueMatch.findRightTransposeMUM(
+                    special, st, g);
 			best = getBest( directMUM, leftTransposeMUM, 
 				rightTransposeMUM );
 		}
@@ -981,7 +960,7 @@ public class MVD extends Serialiser implements Serializable
 	 * @return the suffix tree
 	 * @throws MVDException
 	 */
-	private SuffixTree<Byte> makeSuffixTree( SpecialArc special )
+	private SuffixTree<Byte> makeSuffixTree( VariantGraphSpecialArc special )
 		throws MVDException
 	{
       List<Byte> treeSource = Lists.newArrayListWithExpectedSize(special.getData().length);
@@ -1000,8 +979,8 @@ public class MVD extends Serialiser implements Serializable
 	 * @param left true if we are doing the left subarc, otherwise the 
 	 * right
 	 */
-	private void installSpecial( TreeMap<SpecialArc,Graph> specials, 
-		SpecialArc special, Graph subGraph, boolean left ) throws MVDException
+	private void installSpecial( TreeMap<VariantGraphSpecialArc,VariantGraph> specials,
+		VariantGraphSpecialArc special, VariantGraph subGraph, boolean left ) throws MVDException
 	{
 		assert special.getFrom() != null && special.to != null;
 		// this is necessary BEFORE you recalculate the MUM
@@ -1009,7 +988,7 @@ public class MVD extends Serialiser implements Serializable
 		// in the treemap and make it unfindable
 		if ( specials.containsKey(special) )
 			specials.remove( special );
-		MUM best = computeBestMUM( subGraph, special );
+		MaximalUniqueMatch best = computeBestMUM( subGraph, special );
 		if ( best != null )
 			specials.put( special, subGraph );
 	}
@@ -1020,12 +999,12 @@ public class MVD extends Serialiser implements Serializable
 	 * @param rightTransposed the right transpose MUM possibly null
 	 * @return null or the best MUM
 	 */
-	private MUM getBest( MUM direct, MUM leftTransposed, 
-		MUM rightTransposed )
+	private MaximalUniqueMatch getBest( MaximalUniqueMatch direct, MaximalUniqueMatch leftTransposed,
+		MaximalUniqueMatch rightTransposed )
 	{
-		MUM best = null;
+		MaximalUniqueMatch best = null;
 		// decide which transpose MUM to use
-		MUM transposed;
+		MaximalUniqueMatch transposed;
 		if ( leftTransposed == null )
 			transposed = rightTransposed;
 		else if ( rightTransposed == null )
@@ -1062,7 +1041,7 @@ public class MVD extends Serialiser implements Serializable
 	public void removeVersion( int version ) throws Exception
 	{
 		Converter con = new Converter();
-		Graph original = con.create( pairs, versions.size() );
+		VariantGraph original = con.create( pairs, versions.size() );
 		original.removeVersion( version );
 		original.verify();
 		versions.remove( version-1 );
@@ -1382,13 +1361,6 @@ public class MVD extends Serialiser implements Serializable
 		// header
 		headerSize = MVDFile.MVD_MAGIC.length; // magic
 		headerSize += 5 * 4; // table offsets etc
-		/*try
-		{
-			MVDError.log( this.toString() );
-		}
-		catch ( Exception e )
-		{
-		}*/
 		headerSize += measureUtf8String( description );
 		headerSize += measureUtf8String( encoding );
 		groupTableSize = 2; // number of groups
@@ -2114,7 +2086,6 @@ public class MVD extends Serialiser implements Serializable
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append( "timing="+timing );
 		sb.append( "; directAlignOnly="+directAlignOnly);
 		sb.append( "; groups.size()="+groups.size() );
 		sb.append( "; versions.size()="+versions.size() );
@@ -2127,7 +2098,6 @@ public class MVD extends Serialiser implements Serializable
 		sb.append( "; dataTableSize="+dataTableSize );
 		sb.append( "; versionSetSize="+versionSetSize );
 		sb.append( "; bestScore="+bestScore );
-		sb.append( "; startTime="+startTime );
 		sb.append( "; parents.size()="+parents.size() );
 		sb.append( "; partialVersions="+partialVersions );
 		sb.append( "; encoding="+encoding );

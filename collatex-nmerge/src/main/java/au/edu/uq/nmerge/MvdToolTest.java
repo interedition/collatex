@@ -22,7 +22,7 @@
 package au.edu.uq.nmerge;
 
 import au.edu.uq.nmerge.mvd.MVDFile;
-import au.edu.uq.nmerge.mvd.XMLGuideFile;
+
 import au.edu.uq.nmerge.mvd.MVD;
 import au.edu.uq.nmerge.mvd.Chunk;
 import au.edu.uq.nmerge.mvd.Match;
@@ -31,7 +31,7 @@ import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.exception.MVDToolException;
 import au.edu.uq.nmerge.exception.MVDTestException;
 import au.edu.uq.nmerge.graph.Converter;
-import au.edu.uq.nmerge.graph.Graph;
+import au.edu.uq.nmerge.graph.VariantGraph;
 import java.io.PrintStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -99,7 +99,6 @@ public class MvdToolTest
 			doReadTest();
 			doDeleteTest();
 			doDescriptionTest();
-			doArchiveTest();
 			doUnarchiveTest();
 			doImportExportTest();
 			doUpdateTest();
@@ -308,7 +307,7 @@ public class MvdToolTest
 	 * @param src the file to search
 	 * @param pattern the pattern to search for
 	 * @param matches a vector of matches to be updated
-	 * @throws an IOException
+	 * @throws Exception
 	 */
 	private static void findPatternInFile( File src, String pattern, 
 		Vector<Match> matches, MVD mvd ) throws Exception
@@ -484,7 +483,7 @@ public class MvdToolTest
 	 * commandline to the contents of an MVD.
 	 * @param list the list data as a byte array
 	 * @param mvd the mvd it came from
-	 * @throws an exception if the data don't match
+	 * @throws MVDTestException if the data don't match
 	 */
 	private static void compareListToMvd( byte[] list, MVD mvd ) 
 		throws MVDTestException
@@ -496,10 +495,9 @@ public class MvdToolTest
 	}
 	/**
 	 * Read a single line of the version information
-	 * @param list the listed version data as bytes
+	 * @param line the line to read
 	 * @param mvd the mvd to get version info from
-	 * @param pos the position within list to start reading
-	 * @throws MVDTestException if the data didn't match 
+	 * @throws MVDTestException if the data didn't match
 	 * that in the mvd
 	 */
 	private static void readLine( String line, MVD mvd )
@@ -842,61 +840,7 @@ public class MvdToolTest
 			doTestFailed( e );
 		}
 	}
-	/**
-	 * Create an mvd then archive it. Check that the versions in 
-	 * the archive are the same length as those used to build the MVD.
-	 */
-	private static void doArchiveTest()
-	{
-		System.out.print("Testing archive command ");
-		try
-		{
-			// create an MVD from the Renaissance folder
-			File folder = new File( TEST_DATA+File.separator+RENAISSANCE );
-			String mvdName = createTestMVD( folder );
-			MVD mvd = MVDFile.internalise( mvdName, null );
-			String archiveName = TEST_FOLDER+File.separator+RENAISSANCE;
-			String[] args0 = {"-c","archive","-m",mvdName,"-a",archiveName,
-				"-d",mvd.getDescription()};
-			MvdTool.run( args0, out );
-			// the long names of the mvd are the file names
-			File archiveFolder = new File( archiveName );
-			for ( int i=0;i<mvd.numVersions();i++ )
-			{
-				String longName = mvd.getLongNameForVersion(i+1);
-				String shortName = mvd.getVersionShortName(i+1);
-				File archiveFile = new File( archiveFolder, shortName );
-				File originalFile = new File( folder, longName );
-				if ( !archiveFile.exists() )
-					throw new MVDTestException("file "+shortName+" not found");
-				if ( !originalFile.exists() )
-					throw new MVDTestException("file "+longName+" not found");
-				if ( archiveFile.length() != originalFile.length() )
-					throw new MVDTestException("Archived file "+longName
-						+" not same length as original");
-				System.out.print(".");
-			}
-			// check that archived file represents MVD
-			File guideFile = new File( archiveFolder, XMLGuideFile.GUIDE_FILE );
-			if ( !guideFile.exists() )
-				throw new MVDTestException("Guide file missing from archive");
-			XMLGuideFile guide = XMLGuideFile.internalise( guideFile );
-			if ( guide.numVersions() != mvd.numVersions() )
-				throw new MVDTestException(
-					"Number of archived versions not same as in MVD");
-			String mvdDesc = mvd.getDescription();
-			String guideDesc = guide.getDescription();
-			if ( !mvdDesc.equals(guideDesc) )
-				throw new MVDTestException(
-					"Guide and MVD description strings don't match");
-			testsPassed++;
-			System.out.println(" test passed.");
-		}
-		catch ( Exception e )
-		{
-			doTestFailed( e );
-		}
-	}
+
 	/**
 	 * Create an empty MVD, set its description to something then read
 	 * the description to see if it is the same as the new value.
@@ -963,7 +907,7 @@ public class MvdToolTest
 				if ( mvd.numVersions() != versions.length-(i+1) )
 					throw new MVDTestException("Failed to delete version!");
 				Converter conv = new Converter();
-				Graph g = conv.create( mvd.getPairs(), mvd.numVersions() );
+				VariantGraph g = conv.create( mvd.getPairs(), mvd.numVersions() );
 				g.verify();
 				System.out.print(".");
 			}

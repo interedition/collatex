@@ -25,16 +25,15 @@ import java.io.PrintStream;
 import au.edu.uq.nmerge.mvd.MVD;
 import au.edu.uq.nmerge.mvd.Mask;
 import au.edu.uq.nmerge.mvd.MVDFile;
-import au.edu.uq.nmerge.mvd.MVDXMLFile;
 import au.edu.uq.nmerge.mvd.ChunkState;
 import au.edu.uq.nmerge.mvd.Chunk;
-import au.edu.uq.nmerge.mvd.MVDError;
 import au.edu.uq.nmerge.mvd.Match;
 import au.edu.uq.nmerge.mvd.Variant;
-import au.edu.uq.nmerge.mvd.XMLGuideFile;
 import au.edu.uq.nmerge.mvd.Version;
 import au.edu.uq.nmerge.exception.*;
 import au.edu.uq.nmerge.fastme.FastME;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.io.FileInputStream;
@@ -54,6 +53,8 @@ import java.util.Date;
  */
 public class MvdTool 
 {
+  private static final Logger LOG = LoggerFactory.getLogger(MvdTool.class);
+
 	/** version id of backup version */
 	static int backup;
 	/** user issued command */
@@ -126,7 +127,7 @@ public class MvdTool
 					sb.append(args[i]);
 				sb.append(" ");
 			}
-			MVDError.log( sb.toString() );
+			LOG.info( sb.toString() );
 			if ( !testJavaVersion() )
 				System.out.println( "Minimum version of java is 1.5.0" );
 			else
@@ -138,10 +139,7 @@ public class MvdTool
 		}
 		catch ( Exception e )
 		{
-			//usage();
-			e.printStackTrace();
-			System.out.println( "Error: "+e );
-			MVDError.log(e.getMessage());
+			LOG.error(e.getMessage(), e);
 		}
 	}
 	/**
@@ -158,7 +156,6 @@ public class MvdTool
 	}
 	/**
 	 * Execute the arguments
-	 * @param args the commandline arguments
 	 * @throws MVDToolException if something went wrong
 	 */
 	private static void doCommand() throws MVDException
@@ -168,9 +165,6 @@ public class MvdTool
 		{
 			case ADD:
 				doAddVersion();
-				break;
-			case ARCHIVE:
-				doArchive();
 				break;
 			case COMPARE:
 				doCompare();
@@ -184,26 +178,17 @@ public class MvdTool
 			case DESCRIPTION:
 				doDescription();
 				break;
-			case EXPORT:
-				doExportToXML();
-				break;
 			case FIND:
 				doFind();
 				break;
 			case HELP:
 				printExample();
 				break;
-			case IMPORT:
-				doImportFromXML();
-				break;
 			case LIST:
 				doListVersions();
 				break;
 			case READ:
 				doReadVersion();
-				break;
-			case UNARCHIVE:
-				doUnarchive();
 				break;
 			case UPDATE:
 				doUpdateMVD();
@@ -244,7 +229,7 @@ public class MvdTool
 	}
 	/**
 	 * Print or change the MVD description
-	 * @throws an exception if MVD not present etc
+	 * @throws MVDToolException if MVD not present etc
 	 */
 	private static void doDescription() throws MVDToolException
 	{
@@ -571,7 +556,7 @@ public class MvdTool
 					MVDFile.externalise( mvd, new File(mvdFile), folderId, 
 						Utilities.loadDBProperties(dbConn) );
 				}
-				MVDError.log("Unique percentage="+mvd.getUniquePercentage(version));
+				LOG.info("Unique percentage={}", mvd.getUniquePercentage(version));
 				MvdTool.out.println(mvd.getUniquePercentage(version));
 			}
 			else
@@ -582,95 +567,6 @@ public class MvdTool
 		{
 			e.printStackTrace();
 			throw new MVDToolException( e );
-		}
-	}
-	/**
-	 * Write out all the versions as separate files
-	 */
-	private static void doArchive() throws MVDException
-	{
-		try
-		{
-			MVD mvd = loadMVD();
-			File m = new File( mvdFile );
-			File archiveDir;
-			XMLGuideFile guideFile = new XMLGuideFile( mvd );
-			// create default archive name
-			if ( archiveName == null )
-			{
-				archiveName = m.getName();
-				int index = archiveName.lastIndexOf(".");
-				archiveName = archiveName.substring( 0, index );
-				archiveDir = new File( m.getParentFile(), archiveName );
-			}
-			else
-				archiveDir = new File( archiveName );
-			if ( !archiveDir.exists() )
-				archiveDir.mkdir();
-			int nVersions = mvd.numVersions();
-			for ( short i=1;i<=nVersions;i++ )
-			{
-				byte[] data = mvd.getVersion( i );
-				// use the short name as the file name
-				String vName = mvd.getVersionShortName( i );
-				File versionFile = new File( archiveDir, vName );
-				FileOutputStream fos = new FileOutputStream( versionFile );
-				fos.write( data );
-				fos.close();
-				guideFile.setVersionFile( i, vName );
-			}
-			guideFile.externalise( new File(archiveDir,XMLGuideFile.GUIDE_FILE) );
-		}
-		catch ( Exception e )
-		{
-			throw new MVDToolException( e );
-		}
-	}
-	/**
-	 * Read the versions of an archive back in to create an MVD
-	 * in one step.
-	 */
-	private static void doUnarchive() throws MVDException
-	{
-		try
-		{
-			if ( archiveName == null )
-				throw new MVDToolException("No archive folder specified!");
-			File archiveDir = new File( archiveName );
-			File guideFile = new File( archiveDir, XMLGuideFile.GUIDE_FILE );
-			if ( !guideFile.exists() )
-				throw new MVDToolException("No guide file found in "
-						+guideFile.getAbsolutePath());
-			// create empty MVD
-			if ( mvdFile == null )
-				throw new MVDToolException("No MVD file name supplied!");
-			XMLGuideFile guide = XMLGuideFile.internalise( guideFile );
-			MVD mvd = new MVD();
-			mvd.setDescription( guide.getDescription() );
-			// go through the files, adding versions to the MVD
-			String[] files = guide.getVersionFileNames();
-			for ( int i=0;i<files.length;i++ )
-			{
-				short vId = (short)(i+1);
-				File versionFile = new File( archiveDir, files[i] );
-				if ( !versionFile.exists() )
-					throw new MVDToolException("File "+files[i]+" not found!");
-				FileInputStream fis = new FileInputStream( versionFile );
-				byte[] data = new byte[(int)versionFile.length()];
-				fis.read( data );
-				fis.close();
-				XMLGuideFile.VersionInfo vi = guide.getVersionInfo( vId );
-				mvd.newVersion( vi.shortName, vi.longName, 
-					guide.getGroupName(vi.group), 
-					vi.backup, vi.backup!=Version.NO_BACKUP );
-				mvd.update( vId, data );
-			}
-			MVDFile.externalise( mvd, new File(mvdFile), 
-				folderId, Utilities.loadDBProperties(dbConn) );
-		}
-		catch ( Exception e )
-		{
-			throw new MVDException( e );
 		}
 	}
 	/**
@@ -707,47 +603,7 @@ public class MvdTool
 			throw new MVDToolException( e );
 		}
 	}
-	/**
-	 * Read in XML and save it out as MVD.
-	 */
-	private static void doImportFromXML() throws MVDException
-	{
-		try
-		{
-			if ( xmlFile != null && new File(xmlFile).exists()
-				&& textFile == null && !new File(mvdFile).exists() )
-			{
-				// importing from XML to MVD
-				File xml = new File( xmlFile );
-				MVD m = MVDXMLFile.internalise( xml );
-				MVDFile.externalise( m, new File(mvdFile), 
-					folderId, Utilities.loadDBProperties(dbConn) );
-			}
-		}
-		catch ( Exception e )
-		{
-			throw new MVDToolException( e );
-		}
-	}
-	/**
-	 * Read in MVD and save it out as XML.
-	 */
-	private static void doExportToXML() throws MVDException
-	{
-		try
-		{
-			MVD mvd = loadMVD();
-			if ( xmlFile != null )
-				MVDXMLFile.externalise( mvd, new File(xmlFile), 
-					"UTF-8", encoding, true );
-			else
-				throw new MVDToolException("No xml file specified");
-		}
-		catch ( Exception e )
-		{
-			throw new MVDToolException( e );
-		}
-	}
+
 	/**
 	 * Set defaults for unset parameters. 
 	 */
@@ -789,7 +645,7 @@ public class MvdTool
 	/**
 	 * Read in the arguments
 	 * @param args an array of Strings from the command line
-	 * @throws an exception if the arguments are unusable
+	 * @throws MVDToolException if the arguments are unusable
 	 */
 	private static void readArgs( String[] args ) throws MVDToolException
 	{

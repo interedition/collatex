@@ -30,7 +30,7 @@ import au.edu.uq.nmerge.exception.*;
  * Represent a set of unattached arcs during building of the Graph
  * @author Desmond Schmidt
  */
-public class UnattachedSet extends HashSet<Arc>
+public class UnattachedSet extends HashSet<VariantGraphArc>
 {
 	/** required boilerplate */
 	static final long serialVersionUID = 1;
@@ -47,19 +47,19 @@ public class UnattachedSet extends HashSet<Arc>
 	 *	Add all unattached arcs to the given node as incoming
 	 *	@param u the node desiring incoming arcs 
 	 */
-	void addAllAsIncoming( Node u ) throws MVDException
+	void addAllAsIncoming( VariantGraphNode u ) throws MVDException
 	{
-		Iterator<Arc> iter = iterator();
+		Iterator<VariantGraphArc> iter = iterator();
 		while ( iter.hasNext() )
 		{
-			Arc a = iter.next();
+			VariantGraphArc a = iter.next();
 			u.addIncoming( a );
 		}
 		// remove them from the unattached set
-		ListIterator<Arc> iter2 = u.incomingArcs();
+		ListIterator<VariantGraphArc> iter2 = u.incomingArcs();
 		while ( iter2.hasNext() )
 		{
-			Arc a = iter2.next();
+			VariantGraphArc a = iter2.next();
 			remove( a );
 			versions.andNot( a.versions );
 		}
@@ -71,13 +71,13 @@ public class UnattachedSet extends HashSet<Arc>
 	 *	@param is versions of the outgoing arc whose versions 
 	 *	must also be incoming 
 	 */
-	void addAsIncoming( Node u, BitSet is ) throws MVDException
+	void addAsIncoming( VariantGraphNode u, BitSet is ) throws MVDException
 	{
-		Iterator<Arc> iter = iterator();
+		Iterator<VariantGraphArc> iter = iterator();
 		boolean wasAttached = false;
 		while ( iter.hasNext() )
 		{
-			Arc a = (Arc) iter.next();
+			VariantGraphArc a = (VariantGraphArc) iter.next();
 			if ( a.versions.intersects(is) )
 			{
 				u.addIncoming( a );
@@ -88,10 +88,10 @@ public class UnattachedSet extends HashSet<Arc>
 		{
 			// now remove the incoming arcs from the unattached set
 			// because we can't remove while adding
-			ListIterator<Arc> iter2 = u.incomingArcs();
+			ListIterator<VariantGraphArc> iter2 = u.incomingArcs();
 			while ( iter2.hasNext() )
 			{
-				Arc a = iter2.next();
+				VariantGraphArc a = iter2.next();
 				if ( remove(a) )
 					versions.andNot( a.versions );
 			}
@@ -102,7 +102,7 @@ public class UnattachedSet extends HashSet<Arc>
 	 * @param a the arc to add
 	 * @return true if the arc wasn't already there
 	 */
-	public boolean add( Arc a )
+	public boolean add( VariantGraphArc a )
 	{
 		boolean answer = super.add( a );
 		versions.or( a.versions );
@@ -113,12 +113,12 @@ public class UnattachedSet extends HashSet<Arc>
 	 * @param a the arc to get an intersection for
 	 * @return the relevant arc
 	 */
-	Arc getIntersectingArc( Arc a )
+	VariantGraphArc getIntersectingArc( VariantGraphArc a )
 	{
-		Iterator<Arc> iter = iterator();
+		Iterator<VariantGraphArc> iter = iterator();
 		while ( iter.hasNext() )
 		{
-			Arc b = (Arc) iter.next();
+			VariantGraphArc b = (VariantGraphArc) iter.next();
 			if ( b.versions.intersects(a.versions) )
 				return b;
 		}
@@ -130,7 +130,7 @@ public class UnattachedSet extends HashSet<Arc>
 	 * @param set the set of versions to subtract
 	 * @return true if the hint was removed
 	 */
-	boolean removeEmptyArc( Arc a, BitSet set ) throws Exception
+	boolean removeEmptyArc( VariantGraphArc a, BitSet set ) throws Exception
 	{
 		versions.andNot( set );
 		a.versions.andNot( set );
@@ -138,7 +138,7 @@ public class UnattachedSet extends HashSet<Arc>
 		if ( a.versions.nextSetBit(1)==-1 )
 		{
 			remove( a );
-			Node u = a.getFrom();
+			VariantGraphNode u = a.getFrom();
 			u.removeOutgoing( a );
 			return true;
 		}

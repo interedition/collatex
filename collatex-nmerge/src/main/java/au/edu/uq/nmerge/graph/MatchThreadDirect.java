@@ -36,13 +36,13 @@ import java.util.ListIterator;
 public class MatchThreadDirect implements Runnable
 {
 	/** the MUM we need to update */
-	protected MUM mum;
+	protected MaximalUniqueMatch mum;
 	/** the subgraph we are searching through */
-	protected Graph graph;
+	protected VariantGraph graph;
 	/** the Suffix Tree we are matching against */
 	protected SuffixTree st;
 	/** the last node we have seen before the match started */
-	Node start;
+	VariantGraphNode start;
 	/** the start offset from start in bytes */
 	int offset;
 	/** the first offset in the current arc */
@@ -50,7 +50,7 @@ public class MatchThreadDirect implements Runnable
 	/** distance the match is from the special arc (transpose only) */
 	protected int travelled;
 	/** the arc being currently searched */
-	Arc arc;
+	VariantGraphArc arc;
 	/** the current position in the SuffixTree */
 	protected SuffixTreePosition position;
 	/** Versions shared by all arcs in the path */
@@ -64,7 +64,7 @@ public class MatchThreadDirect implements Runnable
 	 * nodes that can be reached from the forbidden node it is 
 	 * impossible to miss it as we come back to the right. It thus 
 	 * acts as a kind of barrier. */
-	Node forbidden;
+	VariantGraphNode forbidden;
 	/** true if a child was extended */
 	boolean extended = false;
 	/**
@@ -84,8 +84,8 @@ public class MatchThreadDirect implements Runnable
 	 * @param prevChars an array of possible bytes that immediately 
 	 * precede this match
 	 */
-	public MatchThreadDirect( MUM mum, Graph graph, SuffixTree st, Arc arc,  
-		Node start, int offset, PrevChar[] prevChars, Node forbidden )
+	public MatchThreadDirect( MaximalUniqueMatch mum, VariantGraph graph, SuffixTree st, VariantGraphArc arc,
+		VariantGraphNode start, int offset, PrevChar[] prevChars, VariantGraphNode forbidden )
 	{
 		this.mum = mum;
 		this.first = offset;
@@ -177,7 +177,7 @@ public class MatchThreadDirect implements Runnable
 	protected void mismatch()
 	{
 		// first test: are we long enough?
-		if ( pathLen >= MUM.MIN_LEN )
+		if ( pathLen >= MaximalUniqueMatch.MIN_LEN )
 		{
 			// second test: are we unique in the suffix tree?
 			if ( position.node.isLeaf() )
@@ -240,10 +240,10 @@ public class MatchThreadDirect implements Runnable
 		addToPath( arc );
 		if ( arc.to != forbidden )
 		{
-			ListIterator<Arc> iter = arc.to.outgoingArcs( graph );
+			ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs( graph );
 			while ( iter.hasNext() )
 			{
-				Arc a = iter.next();
+				VariantGraphArc a = iter.next();
 				if ( a.versions.intersects(versions)&&(!a.isParent()
 					||!a.hasChildInVersion(mum.version)) )
 				{
@@ -272,7 +272,7 @@ public class MatchThreadDirect implements Runnable
 	 * version B, or the AND of all the sets of versions.
 	 * @param arc the arc to add to the current path
 	 */
-	protected void addToPath( Arc arc )
+	protected void addToPath( VariantGraphArc arc )
 	{
 		if ( versions == null )
 		{

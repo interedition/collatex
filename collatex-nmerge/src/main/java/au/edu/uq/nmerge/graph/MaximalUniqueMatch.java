@@ -34,28 +34,28 @@ import au.edu.uq.nmerge.mvd.MVDFile;
  * and a Variant Graph
  * @author Desmond Schmidt 29/10/08
  */
-public class MUM implements Comparable<MUM>
+public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 {
 	//static int totalHashSize;
 	//static int numberOfHashes;
 	//static int maxHashSize;
 	static int PRINTED_HASH_SIZE = 128;
 	/** the arc we are the MUM of */
-	SpecialArc arc;
+	VariantGraphSpecialArc arc;
 	/** the immediately opposite graph to align with */
-	Graph graph;
+	VariantGraph graph;
 	/** the left hand part of the arc left over after alignment */
-	private SpecialArc leftSubArc;
+	private VariantGraphSpecialArc leftSubArc;
 	/** the right hand part of the arc left over after alignment */
-	private SpecialArc rightSubArc;
+	private VariantGraphSpecialArc rightSubArc;
 	/** special arcs on the left that need reMUMing */
-	private SimpleQueue<SpecialArc> leftSpecialArcs;
+	private SimpleQueue<VariantGraphSpecialArc> leftSpecialArcs;
 	/** special arcs on the left that need reMUMing */
-	private SimpleQueue<SpecialArc> rightSpecialArcs;
+	private SimpleQueue<VariantGraphSpecialArc> rightSpecialArcs;
 	/** The left hand subgraph after alignment */
-	Graph leftSubGraph;
+	VariantGraph leftSubGraph;
 	/** The right hand subgraph after alignment */
-	Graph rightSubGraph;
+	VariantGraph rightSubGraph;
 	/** The final Match */
 	Match match;
 	/** the version of the new version */
@@ -78,7 +78,7 @@ public class MUM implements Comparable<MUM>
 	 * @param graph the graph to direct align to
 	 * @param transposed if true we are transposed
 	 */
-	MUM( SpecialArc arc, Graph graph, boolean transposed )
+	MaximalUniqueMatch(VariantGraphSpecialArc arc, VariantGraph graph, boolean transposed)
 	{
 		this.arc = arc;
 		this.version = (short)arc.versions.nextSetBit( 1 );
@@ -95,7 +95,7 @@ public class MUM implements Comparable<MUM>
 	 * @param length the overall path length in bytes
 	 * @param distance the distance between graph end and the match
 	 */
-	void update( Node start, int graphOffset, BitSet matchVersions, 
+	void update( VariantGraphNode start, int graphOffset, BitSet matchVersions,
 		int dataOffset, int length, int distance )
 	{
 		if ( transposed && transposeLeft )
@@ -173,7 +173,7 @@ public class MUM implements Comparable<MUM>
 	 * original graph.
 	 * @return the left subgraph or null if none
 	 */
-	public Graph getLeftSubgraph()
+	public VariantGraph getLeftSubgraph()
 	{
 		return leftSubGraph;
 	}
@@ -182,7 +182,7 @@ public class MUM implements Comparable<MUM>
 	 * Only call after merge.
 	 * @return the right subgraph or null if none
 	 */
-	public Graph getRightSubgraph()
+	public VariantGraph getRightSubgraph()
 	{
 		return rightSubGraph;
 	}
@@ -191,7 +191,7 @@ public class MUM implements Comparable<MUM>
 	 * Only call after merge.
 	 * @return the left-hand part of the arc or null if none
 	 */
-	public SpecialArc getLeftSubarc() throws Exception
+	public VariantGraphSpecialArc getLeftSubarc() throws Exception
 	{
 		return leftSubArc;
 	}
@@ -200,7 +200,7 @@ public class MUM implements Comparable<MUM>
 	 * Only call after merge.
 	 * @return an arc, maybe null
 	 */
-	public SpecialArc getRightSubarc() throws Exception
+	public VariantGraphSpecialArc getRightSubarc() throws Exception
 	{
 		return rightSubArc;
 	}
@@ -231,25 +231,25 @@ public class MUM implements Comparable<MUM>
 	 * @param subGraph the subgraph directly opposite it
 	 * @return the best MUM or null
 	 */
-	public static MUM findDirectMUM( SpecialArc special, SuffixTree st, 
-		Graph subGraph ) throws MVDException
+	public static MaximalUniqueMatch findDirectMUM( VariantGraphSpecialArc special, SuffixTree st,
+		VariantGraph subGraph ) throws MVDException
 	{
-		MUM mum = new MUM( special, subGraph, false );
-		HashSet<Node> printedNodes = new HashSet<Node>( PRINTED_HASH_SIZE );
-		SimpleQueue<Node> queue = new SimpleQueue<Node>();
+		MaximalUniqueMatch mum = new MaximalUniqueMatch( special, subGraph, false );
+		HashSet<VariantGraphNode> printedNodes = new HashSet<VariantGraphNode>( PRINTED_HASH_SIZE );
+		SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
 		queue.add( subGraph.start );
-		Arc lastArc=null;
+		VariantGraphArc lastArc=null;
 		printedNodes.add( subGraph.start );
 		PrevChar[] prevChars = new PrevChar[0];
 		if ( MVDFile.debug )
 			subGraph.verify();
 		while ( !queue.isEmpty() )
 		{
-			Node node = queue.poll();
-			ListIterator<Arc> iter = node.outgoingArcs( subGraph );
+			VariantGraphNode node = queue.poll();
+			ListIterator<VariantGraphArc> iter = node.outgoingArcs( subGraph );
 			while ( iter.hasNext() )
 			{
-				Arc a = iter.next();
+				VariantGraphArc a = iter.next();
 				if ( a.dataLen() > 0 && (!a.isParent()
 					||!a.hasChildInVersion(mum.version)) )
 				{
@@ -315,17 +315,17 @@ public class MUM implements Comparable<MUM>
 	 * @param a the arc to check for cycles
 	 * @param limit number of times to recurse before giving up
 	 */
-	static void checkForCycle( SimpleQueue<Node> list, Arc a, int limit )
+	static void checkForCycle( SimpleQueue<VariantGraphNode> list, VariantGraphArc a, int limit )
 		throws MVDException
 	{
 		if ( list.contains(a.to) )
 			throw new MVDException("Cycle: node"+a.to.nodeId+" already encountered");
 		else if ( limit > 0 )
 		{
-			ListIterator<Arc> iter = a.to.outgoingArcs();
+			ListIterator<VariantGraphArc> iter = a.to.outgoingArcs();
 			while ( iter.hasNext() )
 			{
-				Arc b = iter.next();
+				VariantGraphArc b = iter.next();
 				//System.out.println(b.toString() );
 				list.add( a.to );
 				checkForCycle( list, b, limit-1 );
@@ -356,15 +356,15 @@ public class MUM implements Comparable<MUM>
 	 * @param subGraph the subgraph directly opposite it
 	 * @return the best left transpose MUM or null
 	 */
-	public static MUM findLeftTransposeMUM( SpecialArc special, SuffixTree st, 
-		Graph subGraph )
+	public static MaximalUniqueMatch findLeftTransposeMUM( VariantGraphSpecialArc special, SuffixTree st,
+		VariantGraph subGraph )
 	{
-		MUM mum = new MUM( special, subGraph, true );
+		MaximalUniqueMatch mum = new MaximalUniqueMatch( special, subGraph, true );
 		mum.transposeLeft = true;
 		// 1. calculate number of bytes to go backwards
 		int distance = Math.round((float)Math.pow(special.dataLen(),PHI));
 		// 2. subtract distance between start of special to start of subGraph
-		Arc a = special;
+		VariantGraphArc a = special;
 		int version = special.versions.nextSetBit( 0 );
 		while ( a.from != subGraph.start )
 		{
@@ -389,15 +389,15 @@ public class MUM implements Comparable<MUM>
 	 * @param node node to look backwards from
 	 * @param distance the distance to search left in bytes
 	 */
-	static void findLeftPositions( MUM mum, SuffixTree st, 
-		Node node, int distance )
+	static void findLeftPositions( MaximalUniqueMatch mum, SuffixTree st,
+		VariantGraphNode node, int distance )
 	{
-		HashSet<Node> printedNodes = new HashSet<Node>( 
+		HashSet<VariantGraphNode> printedNodes = new HashSet<VariantGraphNode>(
 			PRINTED_HASH_SIZE );
-		SimpleQueue<Node> queue = new SimpleQueue<Node>();
+		SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
 		int travelled = 0;
 		short mumV = mum.version;
-		Node origin = node;
+		VariantGraphNode origin = node;
 		//BitSet range = new BitSet();
 		queue.add( node );
 		node.setShortestPath( 0 );
@@ -408,10 +408,10 @@ public class MUM implements Comparable<MUM>
 			//range.or( node.getIncomingSet() );
 			// the shortest path to get to this node
 			int shortestPath = node.getShortestPath();
-			ListIterator<Arc> iter = node.incomingArcs();
+			ListIterator<VariantGraphArc> iter = node.incomingArcs();
 			while ( iter.hasNext() )
 			{
-				Arc a = iter.next();
+				VariantGraphArc a = iter.next();
 				if ( a.dataLen() > 0 
 					&& a.versions.nextSetBit(mumV)!=mumV 
 					&& (!a.isParent()||!a.hasChildInVersion(mumV)) )
@@ -470,12 +470,12 @@ public class MUM implements Comparable<MUM>
 	 * in the set
 	 * @param printedNodes a set of nodes with some arcs printed.
 	 */
-	static void clearPrintedArcs( HashSet<Node> printedNodes )
+	static void clearPrintedArcs( HashSet<VariantGraphNode> printedNodes )
 	{
-		Iterator<Node> iter2 = printedNodes.iterator();
+		Iterator<VariantGraphNode> iter2 = printedNodes.iterator();
 		while ( iter2.hasNext() )
 		{
-			Node n = iter2.next();
+			VariantGraphNode n = iter2.next();
 			n.reset();
 		}
 		//totalHashSize += printedNodes.size();
@@ -491,14 +491,14 @@ public class MUM implements Comparable<MUM>
 	 * @param subGraph the subgraph directly opposite it
 	 * @return the best right transpose MUM or null
 	 */
-	public static MUM findRightTransposeMUM( SpecialArc special, SuffixTree st, 
-		Graph subGraph )
+	public static MaximalUniqueMatch findRightTransposeMUM( VariantGraphSpecialArc special, SuffixTree st,
+		VariantGraph subGraph )
 	{
-		MUM mum = new MUM( special, subGraph, true );
+		MaximalUniqueMatch mum = new MaximalUniqueMatch( special, subGraph, true );
 		// 1. calculate number of bytes to go forwards
 		int distance = Math.round((float)Math.pow(special.dataLen(),PHI));
 		// 2. subtract distance between end of special to end of subGraph
-		Arc a = special;
+		VariantGraphArc a = special;
 		int version = special.versions.nextSetBit( 0 );
 		while ( a.to != subGraph.end )
 		{
@@ -518,12 +518,12 @@ public class MUM implements Comparable<MUM>
 	 * @param node the node to start from
 	 * @param distance the distance to search forwards
 	 */
-	static void findRightPositions( MUM mum, SuffixTree st, Node node, 
+	static void findRightPositions( MaximalUniqueMatch mum, SuffixTree st, VariantGraphNode node,
 		int distance )
 	{
-		SimpleQueue<Node> queue = new SimpleQueue<Node>();
-		HashSet<Node> printedNodes = new HashSet<Node>( PRINTED_HASH_SIZE );
-		Node origin = node;
+		SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+		HashSet<VariantGraphNode> printedNodes = new HashSet<VariantGraphNode>( PRINTED_HASH_SIZE );
+		VariantGraphNode origin = node;
 		BitSet range = new BitSet();
 		int travelled = 0;
 		short mumV = mum.version;
@@ -537,10 +537,10 @@ public class MUM implements Comparable<MUM>
 			range.or( node.getOutgoingSet() );
 			// the shortest path to get to this node
 			int shortestPath = node.getShortestPath();
-			ListIterator<Arc> iter = node.outgoingArcs();
+			ListIterator<VariantGraphArc> iter = node.outgoingArcs();
 			while ( iter.hasNext() )
 			{
-				Arc a = iter.next();
+				VariantGraphArc a = iter.next();
 				if ( a.dataLen() > 0 
 					&& a.versions.nextSetBit(mumV)!=mumV 
 					&& (!a.isParent()||!a.hasChildInVersion(mumV)) )
@@ -636,8 +636,8 @@ public class MUM implements Comparable<MUM>
 	{
 		getSpecialArcs();
 		//SetOfVersions before = new SetOfVersions( graph );
-		Node arcFrom = normaliseLeftResidualPath();
-		Node arcTo = normaliseRightResidualPath();
+		VariantGraphNode arcFrom = normaliseLeftResidualPath();
+		VariantGraphNode arcTo = normaliseRightResidualPath();
 		// 3. Actually attach the left and right residual paths 
 		// to their respective subgraphs if required (otherwise OK)
 		if ( arcFrom != graph.start )
@@ -663,16 +663,16 @@ public class MUM implements Comparable<MUM>
 	 */
 	private void addSubArcsToSpecials()
 	{
-		if ( leftSubArc != null && leftSubArc.dataLen() >= MUM.MIN_LEN )
+		if ( leftSubArc != null && leftSubArc.dataLen() >= MaximalUniqueMatch.MIN_LEN )
 		{
 			if ( leftSpecialArcs == null )
-				leftSpecialArcs = new SimpleQueue<SpecialArc>();
+				leftSpecialArcs = new SimpleQueue<VariantGraphSpecialArc>();
 			leftSpecialArcs.add( leftSubArc );
 		}
-		if ( rightSubArc != null && rightSubArc.dataLen() >= MUM.MIN_LEN )
+		if ( rightSubArc != null && rightSubArc.dataLen() >= MaximalUniqueMatch.MIN_LEN )
 		{
 			if ( rightSpecialArcs == null )
-				rightSpecialArcs = new SimpleQueue<SpecialArc>();
+				rightSpecialArcs = new SimpleQueue<VariantGraphSpecialArc>();
 			rightSpecialArcs.add( rightSubArc );
 		}
 	}
@@ -680,7 +680,7 @@ public class MUM implements Comparable<MUM>
 	 * Get the special arcs on the left of the main special arc
 	 * @return a list of left special arcs for reMUMing
 	 */
-	public SimpleQueue<SpecialArc> getLeftSpecialArcs()
+	public SimpleQueue<VariantGraphSpecialArc> getLeftSpecialArcs()
 	{
 		return leftSpecialArcs;
 	}
@@ -688,7 +688,7 @@ public class MUM implements Comparable<MUM>
 	 * Get the special arcs on the right of the main special arc
 	 * @return a list of right special arcs for reMUMing
 	 */
-	public SimpleQueue<SpecialArc> getRightSpecialArcs()
+	public SimpleQueue<VariantGraphSpecialArc> getRightSpecialArcs()
 	{
 		return rightSpecialArcs;
 	}
@@ -697,7 +697,7 @@ public class MUM implements Comparable<MUM>
 	 * be recomputed
 	 * @return the special arc of the new version, unaltered
 	 */
-	public SpecialArc getArc()
+	public VariantGraphSpecialArc getArc()
 	{
 		return arc;
 	}
@@ -706,7 +706,7 @@ public class MUM implements Comparable<MUM>
 	 * be recomputed
 	 * @return the original graph we were aligned to
 	 */
-	public Graph getGraph()
+	public VariantGraph getGraph()
 	{
 		return graph;
 	}
@@ -717,24 +717,24 @@ public class MUM implements Comparable<MUM>
 	 */
 	private void getSpecialArcs()
 	{
-		Node leftFrom = arc.from;
+		VariantGraphNode leftFrom = arc.from;
 		while ( leftFrom != graph.start )
 		{
 			if ( leftSpecialArcs == null )
-				leftSpecialArcs = new SimpleQueue<SpecialArc>();
-			Arc a = leftFrom.pickIncomingArc( version );
-			if ( a instanceof SpecialArc )
-				leftSpecialArcs.add( (SpecialArc)a );
+				leftSpecialArcs = new SimpleQueue<VariantGraphSpecialArc>();
+			VariantGraphArc a = leftFrom.pickIncomingArc( version );
+			if ( a instanceof VariantGraphSpecialArc)
+				leftSpecialArcs.add( (VariantGraphSpecialArc)a );
 			leftFrom = a.from;
 		}
-		Node rightTo = arc.to;
+		VariantGraphNode rightTo = arc.to;
 		while ( rightTo != graph.end )
 		{
 			if ( rightSpecialArcs == null )
-				rightSpecialArcs = new SimpleQueue<SpecialArc>();
-			Arc a = rightTo.pickOutgoingArc( version );
-			if ( a instanceof SpecialArc )
-				rightSpecialArcs.add( (SpecialArc)a );
+				rightSpecialArcs = new SimpleQueue<VariantGraphSpecialArc>();
+			VariantGraphArc a = rightTo.pickOutgoingArc( version );
+			if ( a instanceof VariantGraphSpecialArc)
+				rightSpecialArcs.add( (VariantGraphSpecialArc)a );
 			rightTo = a.to;
 		}
 	}
@@ -746,14 +746,14 @@ public class MUM implements Comparable<MUM>
 	 * @return the node at the end of the left residual path, unattached to 
 	 * anything to the right
 	 */
-	private Node normaliseLeftResidualPath() throws MVDException
+	private VariantGraphNode normaliseLeftResidualPath() throws MVDException
 	{
-		Node arcFrom = arc.from;
+		VariantGraphNode arcFrom = arc.from;
 		arc.from.removeOutgoing( arc );
 		if ( leftSubArc != null )
 		{
 			arcFrom.addOutgoing( leftSubArc );
-			arcFrom = new Node();
+			arcFrom = new VariantGraphNode();
 			arcFrom.addIncoming( leftSubArc );
 		}
 		if ( leftSubGraph == null )
@@ -766,9 +766,9 @@ public class MUM implements Comparable<MUM>
 		{
 			if ( arcFrom == graph.start )
 			{
-				Arc a = createEmptyArc( version );
+				VariantGraphArc a = createEmptyArc( version );
 				arcFrom.addOutgoing( a );
-				arcFrom = new Node();
+				arcFrom = new VariantGraphNode();
 				arcFrom.addIncoming( a );
 			}
 			// else we're good
@@ -783,14 +783,14 @@ public class MUM implements Comparable<MUM>
 	 * @return the node at the start of the right residual path, unattached to 
 	 * anything to the left
 	 */
-	private Node normaliseRightResidualPath() throws MVDException
+	private VariantGraphNode normaliseRightResidualPath() throws MVDException
 	{
-		Node arcTo = arc.to;
+		VariantGraphNode arcTo = arc.to;
 		arc.to.removeIncoming( arc );
 		if ( rightSubArc != null )
 		{
 			arcTo.addIncoming( rightSubArc );
-			arcTo = new Node();
+			arcTo = new VariantGraphNode();
 			arcTo.addOutgoing( rightSubArc );
 		}
 		if ( rightSubGraph == null )
@@ -803,9 +803,9 @@ public class MUM implements Comparable<MUM>
 		{
 			if ( arcTo == graph.end )
 			{
-				Arc a = createEmptyArc( version );
+				VariantGraphArc a = createEmptyArc( version );
 				arcTo.addIncoming( a );
-				arcTo = new Node();
+				arcTo = new VariantGraphNode();
 				arcTo.addOutgoing( a );
 			}
 			// else there's already a residual path
@@ -817,15 +817,15 @@ public class MUM implements Comparable<MUM>
 	 * or residual left path we must create an empty subgraph to span it.
 	 * @return an empty subgraph
 	 */
-	private Graph createEmptyLeftSubgraph() throws MVDException
+	private VariantGraph createEmptyLeftSubgraph() throws MVDException
 	{
-		Node n = new Node();
+		VariantGraphNode n = new VariantGraphNode();
 		// create an empty arc to join n to graph.start
 		BitSet bs = new BitSet();
 		bs.or( graph.start.getVersions() );
 		bs.clear( version );
 		assert !bs.isEmpty();
-		Arc a = graph.start.pickOutgoingArc( version );
+		VariantGraphArc a = graph.start.pickOutgoingArc( version );
 		assert( a!=null&&a.versions.cardinality()==1 );
 		// temporary remove
 		graph.start.removeOutgoing( a );
@@ -833,10 +833,10 @@ public class MUM implements Comparable<MUM>
 		// now put it back
 		graph.start.addOutgoing( a );
 		// create an empty bridge arc 
-		Arc b = new Arc( bs, new byte[0] );
+		VariantGraphArc b = new VariantGraphArc( bs, new byte[0] );
 		graph.start.addOutgoing( b );
 		n.addIncoming( b );
-		Graph g = new Graph( graph.start, n, b.versions, 
+		VariantGraph g = new VariantGraph( graph.start, n, b.versions,
 			graph.position );
 		// debug
 		//g.verify();
@@ -847,15 +847,15 @@ public class MUM implements Comparable<MUM>
 	 * residual right path we must create an empty sub graph to span it.
 	 * @return an empty subgraph
 	 */
-	private Graph createEmptyRightSubgraph() throws MVDException
+	private VariantGraph createEmptyRightSubgraph() throws MVDException
 	{
-		Node n = new Node();
+		VariantGraphNode n = new VariantGraphNode();
 		// create an empty arc to join graph.end to n
 		BitSet bs = new BitSet();
 		bs.or( graph.end.getVersions() );
 		bs.clear( version );
 		assert !bs.isEmpty();
-		Arc a = graph.end.pickIncomingArc( version );
+		VariantGraphArc a = graph.end.pickIncomingArc( version );
 		assert( a!=null&&a.versions.cardinality()==1 );
 		// temporary removal
 		graph.end.removeIncoming( a );
@@ -863,10 +863,10 @@ public class MUM implements Comparable<MUM>
 		// now put it back
 		graph.end.addIncoming( a );
 		// create an empty bridge arc
-		Arc b = new Arc( bs, new byte[0] );
+		VariantGraphArc b = new VariantGraphArc( bs, new byte[0] );
 		graph.end.addIncoming( b );
 		n.addOutgoing( b );
-		Graph g = new Graph( n, graph.end, b.versions, 
+		VariantGraph g = new VariantGraph( n, graph.end, b.versions,
 			arc.position+match.dataOffset+match.length );
 		// debug
 		//g.verify();
@@ -877,11 +877,11 @@ public class MUM implements Comparable<MUM>
 	 * @param from the node from which to remove outgoing arcs
 	 * @param to the node to which to move the outgoing arcs
 	 */
-	private void moveOutgoingArcs( Node from, Node to ) throws MVDException
+	private void moveOutgoingArcs( VariantGraphNode from, VariantGraphNode to ) throws MVDException
 	{
 		while ( !from.isOutgoingEmpty() )
 		{
-			Arc a = from.removeOutgoing( 0 );
+			VariantGraphArc a = from.removeOutgoing( 0 );
 			to.addOutgoing( a );
 		}
 		// check if node is now isolated
@@ -893,11 +893,11 @@ public class MUM implements Comparable<MUM>
 	 * @param from the node from which to remove incoming arcs
 	 * @param to the node to which to move the incoming arcs
 	 */
-	private void moveIncomingArcs( Node from, Node to ) throws MVDException
+	private void moveIncomingArcs( VariantGraphNode from, VariantGraphNode to ) throws MVDException
 	{
 		while ( !from.isIncomingEmpty() )
 		{
-			Arc a = from.removeIncoming( 0 );
+			VariantGraphArc a = from.removeIncoming( 0 );
 			to.addIncoming( a );
 		}
 		// check if node is now isolated
@@ -913,37 +913,37 @@ public class MUM implements Comparable<MUM>
 	private void transposeMerge() throws MVDException
 	{
 		// attach leftSubArc if any
-		Node arcFrom = arc.from;
+		VariantGraphNode arcFrom = arc.from;
 		//System.out.println(arc.toString());
 		arc.from.removeOutgoing( arc );
 		if ( leftSubArc != null )
 		{
 			arcFrom.addOutgoing( leftSubArc );
-			arcFrom = new Node();
+			arcFrom = new VariantGraphNode();
 			arcFrom.addIncoming( leftSubArc );
 		}
 		// attach rightSubArc if any
-		Node arcTo = arc.to;
+		VariantGraphNode arcTo = arc.to;
 		arc.to.removeIncoming( arc );
 		if ( rightSubArc != null )
 		{
 			arcTo.addIncoming( rightSubArc );
-			arcTo = new Node();
+			arcTo = new VariantGraphNode();
 			arcTo.addOutgoing( rightSubArc );
 		}
 		// now for the bit in the middle
-		Arc[] parents = match.getMatchPath();
+		VariantGraphArc[] parents = match.getMatchPath();
 		for ( int i=0;i<parents.length;i++ )
 		{
 			BitSet versions = new BitSet();
 			versions.set( version );
-			Arc child = new Arc( versions, parents[i] );
+			VariantGraphArc child = new VariantGraphArc( versions, parents[i] );
 			arcFrom.addOutgoing( child );
 			if ( parents[i].versions.nextSetBit(version)==version )
 				System.out.println("Ooops!");
 			if ( i < parents.length-1 )
 			{
-				arcFrom = new Node();
+				arcFrom = new VariantGraphNode();
 				arcFrom.addIncoming( child );
 			}
 			else
@@ -956,18 +956,18 @@ public class MUM implements Comparable<MUM>
 	 * @param version the version of the empty arc
 	 * @return the empty unattached arc
 	 */
-	private Arc createEmptyArc( int version )
+	private VariantGraphArc createEmptyArc( int version )
 	{
 		BitSet bs = new BitSet();
 		bs.set( version );
-		return new Arc( bs, new byte[0] );
+		return new VariantGraphArc( bs, new byte[0] );
 	}
 	/**
 	 * The special arc needs to be split on the left
 	 * @return an unaligned fragment of the original special arc 
 	 * not attached to any node
 	 */
-	SpecialArc splitOffLeftArc()
+	VariantGraphSpecialArc splitOffLeftArc()
 	{
 		byte[] leftArcData = new byte[match.dataOffset];
 		byte[] leftMask = null;
@@ -983,14 +983,14 @@ public class MUM implements Comparable<MUM>
 		}
 		BitSet bs = new BitSet();
 		bs.set( version );
-		return new SpecialArc( bs, leftArcData, leftMask, arc.position );
+		return new VariantGraphSpecialArc( bs, leftArcData, leftMask, arc.position );
 	}
 	/**
 	 * The special arc needs to be split on the right
 	 * @return an unaligned fragment of the original special arc
 	 * not attached to any node
 	 */
-	SpecialArc splitOffRightArc()
+	VariantGraphSpecialArc splitOffRightArc()
 	{
 		int len = arc.dataLen()-(match.length+match.dataOffset);
 		byte[] rightArcData = new byte[len];
@@ -1007,7 +1007,7 @@ public class MUM implements Comparable<MUM>
 		}
 		BitSet bs = new BitSet();
 		bs.set( version );
-		return new SpecialArc( bs, rightArcData, rightMask,
+		return new VariantGraphSpecialArc( bs, rightArcData, rightMask,
 			arc.position+match.dataOffset+match.length );
 	}
 	/**
@@ -1017,13 +1017,13 @@ public class MUM implements Comparable<MUM>
 	 */
 	private void createRightSubGraph() throws MVDException
 	{
-		Node right = match.getRightNode();
+		VariantGraphNode right = match.getRightNode();
 		if ( right == graph.end )
 			rightSubGraph = null;
 		else 
 		{
 			BitSet constraint = getConstraint( right, graph.end );
-			rightSubGraph = new Graph( right, graph.end, 
+			rightSubGraph = new VariantGraph( right, graph.end,
 				constraint, arc.position+match.dataOffset+match.length );
 			// debug
 			//rightSubGraph.verify();			
@@ -1035,13 +1035,13 @@ public class MUM implements Comparable<MUM>
 	 */
 	void createLeftSubGraph() throws MVDException
 	{
-		Node left = match.getLeftNode();
+		VariantGraphNode left = match.getLeftNode();
 		if ( left == graph.start )
 			leftSubGraph = null;
 		else 
 		{
 			BitSet constraint = getConstraint( graph.start, left );
-			leftSubGraph = new Graph( graph.start, left, constraint, 
+			leftSubGraph = new VariantGraph( graph.start, left, constraint,
 				arc.position );
 			// debug
 			//leftSubGraph.verify();
@@ -1054,7 +1054,7 @@ public class MUM implements Comparable<MUM>
 	 * @param end the last node of the new subgraph
 	 * @return a set of versions shared by start and end
 	 */
-	BitSet getConstraint( Node start, Node end )
+	BitSet getConstraint( VariantGraphNode start, VariantGraphNode end )
 	{
 		BitSet constraint = new BitSet();
 		constraint.or( start.getVersions() );
@@ -1077,7 +1077,7 @@ public class MUM implements Comparable<MUM>
 	 * @param other the other MUM to compare this to
 	 * @return 0 if equal in length, -1 if we are less than other, 1 if greater
 	 */
-	public int compareTo( MUM other ) 
+	public int compareTo( MaximalUniqueMatch other )
 	{
 		if ( other == null )
 			return 0;	// what else can we do??
@@ -1148,11 +1148,11 @@ public class MUM implements Comparable<MUM>
 	 * @return true if we can reach it
 	 */
 	@SuppressWarnings("unused")
-	private boolean canReachBackwards( Node from, Node to, int version )
+	private boolean canReachBackwards( VariantGraphNode from, VariantGraphNode to, int version )
 	{
 		while ( from != null && from != to )
 		{
-			Arc a = from.pickIncomingArc( version );
+			VariantGraphArc a = from.pickIncomingArc( version );
 			if ( a.versions.cardinality() != 1 )
 				return false;
 			if ( from != null )
@@ -1169,11 +1169,11 @@ public class MUM implements Comparable<MUM>
 	 * @return true if we can reach it
 	 */
 	@SuppressWarnings("unused")
-	private boolean canReachForwards( Node from, Node to, int version )
+	private boolean canReachForwards( VariantGraphNode from, VariantGraphNode to, int version )
 	{
 		while ( from != null && from != to )
 		{
-			Arc a = from.pickOutgoingArc( version );
+			VariantGraphArc a = from.pickOutgoingArc( version );
 			if ( a.versions.cardinality() != 1 )
 				return false;
 			if ( from != null )

@@ -42,8 +42,8 @@ public class MatchThreadTransposeRight extends MatchThreadDirect
 	 * @param travelled the distance from the special arc
 	 * @param forbidden don't travel beyond this node (should be null)
 	 */
-	MatchThreadTransposeRight( MUM mum, SuffixTree st, Arc a, 
-		int first, PrevChar[] prevChars, int travelled, Node forbidden )
+	MatchThreadTransposeRight( MaximalUniqueMatch mum, SuffixTree st, VariantGraphArc a,
+		int first, PrevChar[] prevChars, int travelled, VariantGraphNode forbidden )
 	{
 		super( mum, null, st, a, a.from, first, prevChars, forbidden );
 		this.travelled = travelled;
@@ -65,10 +65,10 @@ public class MatchThreadTransposeRight extends MatchThreadDirect
 		// arc was fully matched - save it
 		addToPath( arc );
 		boolean extended = false;
-		ListIterator<Arc> iter = arc.to.outgoingArcs();
+		ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs();
 		while ( iter.hasNext() )
 		{
-			Arc a = iter.next();
+			VariantGraphArc a = iter.next();
 			if ( a.versions.intersects(versions)
 				&&a.versions.nextSetBit(mum.version)!=mum.version
 				&&(!a.isParent()||!a.hasChildInVersion(mum.version)) )

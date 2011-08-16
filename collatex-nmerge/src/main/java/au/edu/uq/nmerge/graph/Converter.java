@@ -41,7 +41,7 @@ public class Converter
 	/** debug */
 	static int numParents;
 	/** incomplete nodes during build */
-	HashSet<Node> incomplete;
+	HashSet<VariantGraphNode> incomplete;
 	/** unattached arcs during build */
 	UnattachedSet unattached;
 	/** used to optimise the size of the pairs list vector */
@@ -53,43 +53,43 @@ public class Converter
 	/** current number of nodes */
 	int nNodes;
 	/** the graph we are building */
-	Graph graph;
+	VariantGraph graph;
 	/** map to help find parents for children */
-	HashMap<Arc,Pair> parents;
+	HashMap<VariantGraphArc,Pair> parents;
 	/** map to help find children for parents */
-	HashMap<Arc,Pair> orphans;
+	HashMap<VariantGraphArc,Pair> orphans;
 	/**
 	 * Create a Graph
 	 * @param pairs the list of pairs to build the graph from. 
 	 * @param numVersions the number of versions to go in the graph
 	 */
-	public Graph create( Vector<Pair> pairs, int numVersions ) 
+	public VariantGraph create( Vector<Pair> pairs, int numVersions )
 		throws Exception
 	{
 		unattached = new UnattachedSet();
-		incomplete = new HashSet<Node>();
+		incomplete = new HashSet<VariantGraphNode>();
 		allVersions = new BitSet();
 		for ( int i=1;i<=numVersions;i++ )
 			allVersions.set( i );
-		graph = new Graph();
+		graph = new VariantGraph();
 		origSize = pairs.size();
 		if ( pairs.size() > 0 )
 			deserialise( pairs );
 		// generate the constraint set
 		for ( int i=1;i<=numVersions;i++ )
 			graph.constraint.set( i );
-		parents = new HashMap<Arc,Pair>();
-		orphans = new HashMap<Arc,Pair>();
+		parents = new HashMap<VariantGraphArc,Pair>();
+		orphans = new HashMap<VariantGraphArc,Pair>();
 		return graph;
 	}
 	/**
 	 *	Create a Node. 
 	 *	@return the new Node
 	 */
-	private Node createNode()
+	private VariantGraphNode createNode()
 	{
 		nNodes++;
-		return new Node();
+		return new VariantGraphNode();
 	}
 	/**
 	 *	Parse the data to build the graph from the pairs
@@ -99,15 +99,15 @@ public class Converter
 	private void deserialise( Vector<Pair> pairs ) throws Exception
 	{
 		graph.start = createNode();
-		Node u = graph.start;
-		HashMap<Pair,Arc> pnts = new HashMap<Pair,Arc>();
-		HashMap<Pair,Arc> kids = new HashMap<Pair,Arc>();
+		VariantGraphNode u = graph.start;
+		HashMap<Pair,VariantGraphArc> pnts = new HashMap<Pair,VariantGraphArc>();
+		HashMap<Pair,VariantGraphArc> kids = new HashMap<Pair,VariantGraphArc>();
 		// go through the pairs and turn them into arcs
 		for ( int i=0;i<pairs.size();i++ )
 		{
-			Node v;
+			VariantGraphNode v;
 			Pair p = pairs.get( i );
-			Arc a = pairToArc( p, pnts, kids );
+			VariantGraphArc a = pairToArc( p, pnts, kids );
 			if ( (i>0 && 
 				a.versions.intersects(pairs.get(i-1).versions))
 				|| a.isHint() )
@@ -170,10 +170,10 @@ public class Converter
 	 *	@param u the current node
 	 *	@param a the arc for which the from node is needed
 	 */
-	private Node getIntersectingNode( Node u, Arc a ) throws Exception
+	private VariantGraphNode getIntersectingNode( VariantGraphNode u, VariantGraphArc a ) throws Exception
 	{
-		Node v;
-		Arc b = unattached.getIntersectingArc( a );
+		VariantGraphNode v;
+		VariantGraphArc b = unattached.getIntersectingArc( a );
 		if ( b != null )
 		{
 			if ( b.isHint() )
@@ -188,7 +188,7 @@ public class Converter
 		else
 		{
 			v = u;
-			Iterator<Node> iter = incomplete.iterator();
+			Iterator<VariantGraphNode> iter = incomplete.iterator();
 			while ( iter.hasNext() )
 			{
 				v = iter.next();
@@ -208,17 +208,17 @@ public class Converter
 	 * @param kids kids looking for parents
 	 * @return an equivalent Arc we can use in the Graph
 	 */
-	private Arc pairToArc( Pair p, HashMap<Pair,Arc> pnts, 
-		HashMap<Pair,Arc> kids )
+	private VariantGraphArc pairToArc( Pair p, HashMap<Pair,VariantGraphArc> pnts,
+		HashMap<Pair,VariantGraphArc> kids )
 	{
 		nArcs++;
 		byte[] pData = (p.isChild()||p.isHint())?null:p.getData();
-		Arc a = new Arc( cloneVersions(p.versions), pData );
+		VariantGraphArc a = new VariantGraphArc( cloneVersions(p.versions), pData );
 		if ( p.isChild() )
 		{
 			// we're a child - find our parent
 			Pair parent = p.getParent();
-			Arc b = pnts.get( parent );
+			VariantGraphArc b = pnts.get( parent );
 			if ( b != null )
 			{
 				b.addChild( a );
@@ -235,7 +235,7 @@ public class Converter
 			while ( iter.hasNext() )
 			{
 				Pair child = iter.next();
-				Arc r = kids.get( child );
+				VariantGraphArc r = kids.get( child );
 				if ( r != null )
 				{
 					a.addChild( r );
@@ -265,11 +265,11 @@ public class Converter
 	 *	@param u the node from which to take outgoing arcs
 	 *	@param incoming the versions of the last incoming arc
 	 */
-	private void printAcross( Vector<Pair> pairs, Node u, BitSet incoming )
+	private void printAcross( Vector<Pair> pairs, VariantGraphNode u, BitSet incoming )
 		throws MVDException
 	{
 		int hint = -1;
-		Arc selected = u.pickOutgoingArc( incoming );
+		VariantGraphArc selected = u.pickOutgoingArc( incoming );
 		if ( selected != null )
 		{
 			assert !selected.to.isPrintedIncoming( selected.versions );
@@ -285,10 +285,10 @@ public class Converter
 				pairs.add( h );
 			}
 			hint = printDown( pairs, selected, hint );
-			ListIterator<Arc> iter = u.outgoingArcs();
+			ListIterator<VariantGraphArc> iter = u.outgoingArcs();
 			while ( iter.hasNext() )
 			{
-				Arc a = iter.next();
+				VariantGraphArc a = iter.next();
 				if ( a != selected )
 					hint = printDown( pairs, a, hint );
 			}
@@ -302,7 +302,7 @@ public class Converter
 	 *	@param hint the previous location of a hint
 	 *	@return the hint or -1 if it was removed
 	 */
-	private int printDown( Vector<Pair> pairs, Arc a, int hint ) 
+	private int printDown( Vector<Pair> pairs, VariantGraphArc a, int hint )
 		throws MVDException
 	{
 		if ( a.numChildren() > 0 )
@@ -312,7 +312,7 @@ public class Converter
 		a.to.printArc( a );
 		if ( a.to != null )
 		{
-			Node u = a.to;
+			VariantGraphNode u = a.to;
 			if ( u.allPrintedIncoming() )
 			{
 				if ( hint != -1 )
@@ -360,9 +360,9 @@ public class Converter
 	 *	@param other the other Textgraph to compare with this one
 	 *	@return true if they are isomorphic, false otherwise
 	 */
-	public boolean isIsomorphic( Graph other )
+	public boolean isIsomorphic( VariantGraph other )
 	{
-		Node current,otherCurrent;
+		VariantGraphNode current,otherCurrent;
 		NodeQueue q = new NodeQueue();
 		NodeQueue otherQueue = new NodeQueue();
 		q.push( graph.start );
@@ -374,11 +374,11 @@ public class Converter
 		{
 			current = q.pop();
 			otherCurrent = otherQueue.pop();
-			ListIterator<Arc> iter = current.outgoingArcs();
+			ListIterator<VariantGraphArc> iter = current.outgoingArcs();
 			while ( iter.hasNext() )
 			{
-				Arc a = iter.next();
-				Arc b = otherCurrent.pickOutgoingArc(a.versions);
+				VariantGraphArc a = iter.next();
+				VariantGraphArc b = otherCurrent.pickOutgoingArc(a.versions);
 				numArcs++;
 				if ( a == null )
 				{

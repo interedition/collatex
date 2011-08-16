@@ -43,8 +43,8 @@ public class MatchThreadTransposeLeft extends MatchThreadDirect
 	 * @param travelled the distance from the special arc on our right
 	 * @param forbidden the forbidden node we mustn't cross
 	 */
-	MatchThreadTransposeLeft( MUM mum, SuffixTree st, Arc a, 
-		int first, PrevChar[] prevChars, int travelled, Node forbidden )
+	MatchThreadTransposeLeft( MaximalUniqueMatch mum, SuffixTree st, VariantGraphArc a,
+		int first, PrevChar[] prevChars, int travelled, VariantGraphNode forbidden )
 	{
 		super( mum, null, st, a, a.from, first, prevChars, forbidden );
 		this.travelled = travelled;
@@ -69,10 +69,10 @@ public class MatchThreadTransposeLeft extends MatchThreadDirect
 		boolean extended = false;
 		if ( arc.to != forbidden )
 		{
-			ListIterator<Arc> iter = arc.to.outgoingArcs();
+			ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs();
 			while ( iter.hasNext() )
 			{
-				Arc a = iter.next();
+				VariantGraphArc a = iter.next();
 				if ( a.versions.intersects(versions)
 					&&a.to.isPrintedOutgoing(a.versions)
 					&&a.versions.nextSetBit(mum.version)!=mum.version

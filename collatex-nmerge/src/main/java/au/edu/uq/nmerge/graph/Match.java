@@ -45,9 +45,9 @@ public class Match
 	/** the version to follow to locate the match*/
 	short version;
 	/** The Node to start the match from */
-	Node start;
+	VariantGraphNode start;
 	/** the match path as an array of successive arcs */
-	Arc[] path;
+	VariantGraphArc[] path;
 	/** the frequency of the match */
 	int freq;
 	/** the Adler32 modulus */
@@ -62,7 +62,7 @@ public class Match
 	 * @param length the length of the match
 	 * @param data all the data of the special arc
 	 */
-	Match( Node start, int graphOffset, short version, int dataOffset, 
+	Match( VariantGraphNode start, int graphOffset, short version, int dataOffset,
 		int length, byte[] data )
 	{
 		this.graphOffset = graphOffset;
@@ -82,7 +82,7 @@ public class Match
 	 * during alignMerge.
 	 * @param start the new value of start
 	 */
-	public void setStart( Node start )
+	public void setStart( VariantGraphNode start )
 	{
 		this.start = start;
 	}
@@ -112,7 +112,7 @@ public class Match
 	 */
 	void addVersion( int version ) throws MVDException
 	{
-		Arc[] path = getMatchPath();
+		VariantGraphArc[] path = getMatchPath();
 		for ( int i=0;i<path.length;i++ )
 			path[i].addVersion( version );
 	}
@@ -158,13 +158,13 @@ public class Match
 	 * array of arcs we are building.
 	 * @return an array of arcs belonging to the match path
 	 */
-	Arc[] getMatchPath() throws MVDException
+	VariantGraphArc[] getMatchPath() throws MVDException
 	{
 		if ( path == null || !isPathValid() )
 		{
-			Vector<Arc> parents = new Vector<Arc>();
-			Arc[] splits;
-			Arc a = start.pickOutgoingArc( version );
+			Vector<VariantGraphArc> parents = new Vector<VariantGraphArc>();
+			VariantGraphArc[] splits;
+			VariantGraphArc a = start.pickOutgoingArc( version );
 			assert a != null;
 			int distance = 0;
 			int splitStart = 0;
@@ -203,7 +203,7 @@ public class Match
 				{
 					distance += a.dataLen();
 					//parents.add( a );
-					Arc b = a.to.pickOutgoingArc( version );
+					VariantGraphArc b = a.to.pickOutgoingArc( version );
 					if ( b == null )	// if a.to is the end-node
 					{
 						assert a.to.outdegree()==0;
@@ -246,7 +246,7 @@ public class Match
 				a = a.to.pickOutgoingArc( version );
 			}
 			assert distance == length;
-			splits = new Arc[parents.size()];
+			splits = new VariantGraphArc[parents.size()];
 			path = parents.toArray( splits );
 		}
 		return path;
@@ -259,7 +259,7 @@ public class Match
 	 * @param a the arc to search for
 	 * @return -1 if not found, otherwise its index
 	 */
-	int findParentArc( Vector<Arc> parents, Arc a )
+	int findParentArc( Vector<VariantGraphArc> parents, VariantGraphArc a )
 	{
 		int index = -1;
 		for ( int i=0;i<parents.size();i++ )
@@ -300,9 +300,9 @@ public class Match
 	 * @return the node that will become the end of the left 
 	 * subgraph
 	 */
-	Node getLeftNode() throws MVDException
+	VariantGraphNode getLeftNode() throws MVDException
 	{
-		Arc[] path = getMatchPath();
+		VariantGraphArc[] path = getMatchPath();
 		if ( path[0].from== null )
 			System.out.println("null!");
 		return path[0].from;
@@ -312,9 +312,9 @@ public class Match
 	 * @return the node that will become the start of the right 
 	 * subgraph
 	 */
-	Node getRightNode() throws MVDException
+	VariantGraphNode getRightNode() throws MVDException
 	{
-		Arc[] path = getMatchPath();
+		VariantGraphArc[] path = getMatchPath();
 		assert path != null && path[path.length-1] != null;
 		return path[path.length-1].to;
 	}
@@ -322,15 +322,15 @@ public class Match
 	 * Verify that the match is what it is supposed to be
 	 * @param end don't go beyond this node
 	 */
-	void verify( Node end )
+	void verify( VariantGraphNode end )
 	{
-		Node temp = start;
+		VariantGraphNode temp = start;
 		int pos = graphOffset;
 		int compared = 0;
 		while ( temp != null && compared < length )
 		{
 			assert temp != end;
-			Arc a = temp.pickOutgoingArc( version );
+			VariantGraphArc a = temp.pickOutgoingArc( version );
 			if ( a.dataLen() < pos )
 			{
 				pos -= a.dataLen();
@@ -369,7 +369,7 @@ public class Match
 	 */
 	boolean checkPath( short newVersion )
 	{
-		Arc a = start.pickOutgoingArc( version );
+		VariantGraphArc a = start.pickOutgoingArc( version );
 		int posWithinArc = 0;
 		int distTravelled = 0;
 		// advance to graphOffset
@@ -430,8 +430,8 @@ public class Match
 	{
 		if ( version <= 0 )
 			System.out.println("0");
-		Arc aArc = start.pickOutgoingArc( version );
-		Arc bArc = b.start.pickOutgoingArc( b.version );
+		VariantGraphArc aArc = start.pickOutgoingArc( version );
+		VariantGraphArc bArc = b.start.pickOutgoingArc( b.version );
 		int i = 0;
 		int aCurrArcIndex = 0;
 		int bCurrArcIndex = 0;

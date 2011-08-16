@@ -30,7 +30,7 @@ import java.util.ListIterator;
  * An Arc is a fragment of data, a set of versions in a variant graph
  * @author Desmond Schmidt
  */
-public class Arc 
+public class VariantGraphArc
 {
 	/** the Adler32 modulus */
 	static int MOD_ADLER = 65521;
@@ -39,17 +39,17 @@ public class Arc
 	/** the set of versions */
 	public BitSet versions;
 	/** the origin Node */
-	Node from;
+	VariantGraphNode from;
 	/** the destination Node */
-	public Node to;
+	public VariantGraphNode to;
 	/** the data of this Arc */
 	byte[] data;
 	/** the mask for this arc's data or null */
 	byte[] mask;
 	/** usually empty list of transpose children */
-	LinkedList<Arc> children;
+	LinkedList<VariantGraphArc> children;
 	/** parent - can't be set as well as children */
-	Arc parent;
+	VariantGraphArc parent;
 	/** parent id if subject of a transposition */
 	int id;
 	/** id counter: used for parent/child relationships */
@@ -59,13 +59,13 @@ public class Arc
 	 * @param versions the set of versions for the child
 	 * @param parent the parent arc whose data will be copied
 	 */
-	public Arc( BitSet versions, Arc parent )
+	public VariantGraphArc(BitSet versions, VariantGraphArc parent)
 	{
 		this.versions = versions;
 		// may attempt to create child of a child
 		if ( parent != null )
 		{
-			Arc temp = parent;
+			VariantGraphArc temp = parent;
 			while ( temp.parent != null )
 				temp = temp.parent;
 			if ( temp != parent )
@@ -81,7 +81,7 @@ public class Arc
 	 * @return a ListIterator over the arc's children
 	 * @throws MVDException
 	 */
-	ListIterator<Arc> childIterator() throws MVDException
+	ListIterator<VariantGraphArc> childIterator() throws MVDException
 	{
 		if ( children == null )
 			throw new MVDException("no children to arc");
@@ -92,7 +92,7 @@ public class Arc
 	 * @param versions the versions it belongs to
 	 * @param data its data content
 	 */
-	public Arc( BitSet versions, byte[] data, byte[] mask )
+	public VariantGraphArc(BitSet versions, byte[] data, byte[] mask)
 	{
 		this.versions = versions;
 		this.data = data;
@@ -104,7 +104,7 @@ public class Arc
 	 * @param versions the versions it belongs to
 	 * @param data its data content
 	 */
-	public Arc( BitSet versions, byte[] data )
+	public VariantGraphArc(BitSet versions, byte[] data)
 	{
 		this.versions = versions;
 		this.data = data;
@@ -133,7 +133,7 @@ public class Arc
 	 * Set the to node
 	 * @param to the new to node
 	 */
-	public void setTo( Node to )
+	public void setTo( VariantGraphNode to )
 	{
 		this.to = to;
 	}
@@ -141,7 +141,7 @@ public class Arc
 	 * Set the from node
 	 * @param from the new from node
 	 */
-	public void setFrom( Node from )
+	public void setFrom( VariantGraphNode from )
 	{
 		this.from = from;
 	}
@@ -183,12 +183,12 @@ public class Arc
 	 * Add a child to the parent
 	 * @param child the child arc
 	 */
-	public void addChild( Arc child )
+	public void addChild( VariantGraphArc child )
 	{
 		if ( children == null )
 		{
-			children = new LinkedList<Arc>();
-			id = Arc.arcId++;
+			children = new LinkedList<VariantGraphArc>();
+			id = VariantGraphArc.arcId++;
 		}
 		children.add( child );
 		child.parent = this;
@@ -246,13 +246,13 @@ public class Arc
 	 * @param offset the offset into data pointing to the first byte of the rhs
 	 * @return an array of split arcs (or maybe just one)
 	 */
-	Arc[] split( int offset ) throws MVDException
+	VariantGraphArc[] split( int offset ) throws MVDException
 	{
-		Arc[] arcs=null;
+		VariantGraphArc[] arcs=null;
 		// handle simple cases first
 		if ( offset == 0 || offset == dataLen())
 		{
-			arcs = new Arc[1];
+			arcs = new VariantGraphArc[1];
 			arcs[0] = this;
 		}
 		else if ( parent == null )
@@ -271,9 +271,9 @@ public class Arc
 	 * @param offset the offset at which to split
 	 * @return the split child arcs
 	 */
-	private Arc[] splitChild( int offset ) throws MVDException
+	private VariantGraphArc[] splitChild( int offset ) throws MVDException
 	{
-		Arc splitParent = parent;
+		VariantGraphArc splitParent = parent;
 		while ( splitParent.parent != null )
 			splitParent = parent;
 		return splitParent.splitParent( offset, this );
@@ -285,30 +285,30 @@ public class Arc
 	 * child, not of the parent
 	 * @return the split parent or child arc
 	 */
-	private Arc[] splitParent( int offset, Arc desired ) throws MVDException
+	private VariantGraphArc[] splitParent( int offset, VariantGraphArc desired ) throws MVDException
 	{
-		Arc[] arcs = splitDataArc( offset );
+		VariantGraphArc[] arcs = splitDataArc( offset );
 		for ( int i=0;i<children.size();i++ )
 		{
-			Arc child = children.get( i );
+			VariantGraphArc child = children.get( i );
 			BitSet bs1 = new BitSet();
 			bs1.or( child.versions );
 			BitSet bs2 = new BitSet();
 			bs2.or( child.versions );
-			Arc b = new Arc( bs1, arcs[0] );
-			Arc c = new Arc( bs2, arcs[1] );
-			Node childFrom = child.from;
-			Node childTo = child.to;
+			VariantGraphArc b = new VariantGraphArc( bs1, arcs[0] );
+			VariantGraphArc c = new VariantGraphArc( bs2, arcs[1] );
+			VariantGraphNode childFrom = child.from;
+			VariantGraphNode childTo = child.to;
 			childFrom.removeOutgoing( child );
 			childTo.removeIncoming( child );
 			childFrom.addOutgoing( b );
 			childTo.addIncoming( c );
-			Node n = new Node();
+			VariantGraphNode n = new VariantGraphNode();
 			n.addIncoming( b );
 			n.addOutgoing( c );
 			if ( child == desired )
 			{
-				arcs = new Arc[2];
+				arcs = new VariantGraphArc[2];
 				arcs[0] = b;
 				arcs[1] = c;
 			}
@@ -321,9 +321,9 @@ public class Arc
 	 * @param offset point before which to split
 	 * @return an array of two split arcs
 	 */
-	private Arc[] splitDataArc( int offset ) throws MVDException
+	private VariantGraphArc[] splitDataArc( int offset ) throws MVDException
 	{
-		Arc[] arcs = new Arc[2];
+		VariantGraphArc[] arcs = new VariantGraphArc[2];
 		byte[] leftData = new byte[offset];
 		byte[] leftMask = null;
 		if ( hasMask() )
@@ -339,9 +339,9 @@ public class Arc
 				leftMask[i] = mask[i];
 		}
 		if ( leftData != null )
-			arcs[0] = new Arc( leftVersions, leftData, leftMask );
+			arcs[0] = new VariantGraphArc( leftVersions, leftData, leftMask );
 		else
-			arcs[0] = new Arc( leftVersions, leftData );
+			arcs[0] = new VariantGraphArc( leftVersions, leftData );
 		byte[] rightData = new byte[dataLen()-offset];
 		byte[] rightMask = null;
 		if ( hasMask() )
@@ -353,9 +353,9 @@ public class Arc
 				rightMask[j] = mask[i];
 		}
 		if ( rightData != null )
-			arcs[1] = new Arc( rightVersions, rightData, rightMask );
+			arcs[1] = new VariantGraphArc( rightVersions, rightData, rightMask );
 		else
-			arcs[1] = new Arc( rightVersions, rightData );
+			arcs[1] = new VariantGraphArc( rightVersions, rightData );
 		installSplit( arcs );
 		return arcs;
 	}
@@ -363,11 +363,11 @@ public class Arc
 	 * Replace this arc in the graph with two split ones
 	 * @param arcs two arcs to replace this one
 	 */
-	private void installSplit( Arc[] arcs ) throws MVDException
+	private void installSplit( VariantGraphArc[] arcs ) throws MVDException
 	{
 		// now replace the existing arc with the two split ones
 		from.replaceOutgoing( this, arcs[0] );
-		Node inter = new Node();
+		VariantGraphNode inter = new VariantGraphNode();
 		inter.addIncoming( arcs[0] );
 		inter.addOutgoing( arcs[1] );
 		to.replaceIncoming( this, arcs[1] );
@@ -377,7 +377,7 @@ public class Arc
 	 */
 	public boolean equals( Object other )
 	{
-		Arc otherArc = (Arc)other;
+		VariantGraphArc otherArc = (VariantGraphArc)other;
 		return versions.equals(otherArc.versions)
 			&&dataEquals(otherArc)&&from==otherArc.from
 			&&to==otherArc.to;
@@ -387,7 +387,7 @@ public class Arc
 	 * @param otherArc the other arc to compare
 	 * @return true if they two arcs have same data
 	 */
-	private boolean dataEquals( Arc otherArc )
+	private boolean dataEquals( VariantGraphArc otherArc )
 	{
 		byte[] data1 = getData();
 		byte[] data2 = otherArc.getData();
@@ -419,7 +419,7 @@ public class Arc
 	 * @param orphans map of available orphans
 	 * @return the pair
 	 */
-	Pair toPair( HashMap<Arc,Pair> parents, HashMap<Arc,Pair> orphans ) 
+	Pair toPair( HashMap<VariantGraphArc,Pair> parents, HashMap<VariantGraphArc,Pair> orphans )
 		throws MVDException
 	{
 		if ( versions.nextSetBit(0)==0)
@@ -444,7 +444,7 @@ public class Arc
 			// we're a parent
 			for ( int i=0;i<children.size();i++ )
 			{
-				Arc child = children.get( i );
+				VariantGraphArc child = children.get( i );
 				Pair r = orphans.get( child );
 				if ( r != null )
 				{
@@ -478,7 +478,7 @@ public class Arc
 	 * Get the from node
 	 * @return a Node possibly null
 	 */
-	public Node getFrom()
+	public VariantGraphNode getFrom()
 	{
 		return from;
 	}
@@ -486,7 +486,7 @@ public class Arc
 	 * Get the to node
 	 * @return a Node possibly null
 	 */
-	public Node getTo()
+	public VariantGraphNode getTo()
 	{
 		return to;
 	}
@@ -494,7 +494,7 @@ public class Arc
 	 * Remove a child from the parent
 	 * @param child the child arc
 	 */
-	public void removeChild( Arc child )
+	public void removeChild( VariantGraphArc child )
 	{
 		assert children.contains( child ) : 
 			"removeChild: child "+child+" not found!";
@@ -532,13 +532,13 @@ public class Arc
 	 */
 	public void passOnData()
 	{
-		ListIterator<Arc> iter = children.listIterator();
-		Arc newParent = iter.next();
+		ListIterator<VariantGraphArc> iter = children.listIterator();
+		VariantGraphArc newParent = iter.next();
 		newParent.data = this.data;
 		newParent.setParent( null );
 		while ( iter.hasNext() )
 		{
-			Arc a = iter.next();
+			VariantGraphArc a = iter.next();
 			newParent.addChild( a );
 		}
 	}
@@ -546,7 +546,7 @@ public class Arc
 	 * Set the new parent in case of adoption
 	 * @param parent the new parent
 	 */
-	void setParent( Arc parent )
+	void setParent( VariantGraphArc parent )
 	{
 		this.parent = parent;
 	}
@@ -585,10 +585,10 @@ public class Arc
 	{
 		if ( children != null )
 		{
-			ListIterator<Arc> iter = children.listIterator(0);
+			ListIterator<VariantGraphArc> iter = children.listIterator(0);
 			while ( iter.hasNext() )
 			{
-				Arc child = iter.next();
+				VariantGraphArc child = iter.next();
 				if ( child.versions.nextSetBit(version)==version )
 					return true;
 			}
