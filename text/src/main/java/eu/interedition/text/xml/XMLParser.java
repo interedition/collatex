@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Stack;
 
 public class XMLParser {
   private final XMLInputFactory xmlInputFactory;
@@ -39,6 +40,7 @@ public class XMLParser {
       textRepository.read(source, new TextRepository.TextReader() {
         public void read(Reader content, long contentLength) throws IOException {
           XMLStreamReader reader = null;
+          final Stack<XMLEntity> entities = new Stack<XMLEntity>();
           try {
             reader = xmlInputFactory.createXMLStreamReader(content);
             state.start();
@@ -50,11 +52,11 @@ public class XMLParser {
                 case XMLStreamConstants.START_ELEMENT:
                   state.endText();
                   state.nextSibling();
-                  state.start(XMLEntity.newElement(reader));
+                  state.start(entities.push(XMLEntity.newElement(reader)));
                   break;
                 case XMLStreamConstants.END_ELEMENT:
                   state.endText();
-                  state.end(new XMLEntity(new SimpleQName(reader.getName()), reader.getName().getPrefix()));
+                  state.end(entities.pop());
                   break;
                 case XMLStreamConstants.COMMENT:
                   state.endText();

@@ -49,7 +49,7 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
 
     final Map<String, SimpleAnnotation> annotations = this.annotations.get();
     final Map<String, Map<QName, String>> attributes = this.attributes.get();
-    final int textOffset = state.getTextOffset();
+    final long textOffset = state.getTextOffset();
 
     if (startId != null) {
       annotations.put(startId, new SimpleAnnotation(state.getTarget(), entity.getName(), new Range(textOffset, textOffset)));

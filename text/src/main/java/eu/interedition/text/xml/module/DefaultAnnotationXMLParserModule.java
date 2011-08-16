@@ -15,7 +15,7 @@ import java.util.Stack;
  */
 public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
 
-  private final ThreadLocal<Stack<Integer>> startOffsetStack = new ThreadLocal<Stack<Integer>>();
+  private final ThreadLocal<Stack<Long>> startOffsetStack = new ThreadLocal<Stack<Long>>();
   private final ThreadLocal<Stack<Map<QName, String>>> attributeStack = new ThreadLocal<Stack<Map<QName, String>>>();
 
 
@@ -26,7 +26,7 @@ public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParse
   @Override
   public void start(XMLParserState state) {
     super.start(state);
-    startOffsetStack.set(new Stack<Integer>());
+    startOffsetStack.set(new Stack<Long>());
     attributeStack.set(new Stack<Map<QName, String>>());
   }
 

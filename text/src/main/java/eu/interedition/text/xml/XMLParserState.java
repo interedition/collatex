@@ -34,11 +34,11 @@ public class XMLParserState {
 
   private final FileBackedOutputStream textBuffer;
 
-  private int textStartOffset = -1;
+  private long textStartOffset = -1;
   private char lastChar;
 
-  private int sourceOffset = 0;
-  private int textOffset = 0;
+  private long sourceOffset = 0;
+  private long textOffset = 0;
   private Range sourceOffsetRange = Range.NULL;
   private Range textOffsetRange = Range.NULL;
 
@@ -83,15 +83,15 @@ public class XMLParserState {
     return nodePath;
   }
 
-  public int getTextOffset() {
+  public long getTextOffset() {
     return textOffset;
   }
 
-  public int getSourceOffset() {
+  public long getSourceOffset() {
     return sourceOffset;
   }
 
-  public int getTextStartOffset() {
+  public long getTextStartOffset() {
     return textStartOffset;
   }
 
@@ -241,7 +241,7 @@ public class XMLParserState {
     }
   }
 
-  void mapOffsetDelta(int addToText, int addToSource) {
+  void mapOffsetDelta(long addToText, long addToSource) {
     if (addToText == 0 && addToSource == 0) {
       return;
     }

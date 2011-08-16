@@ -53,7 +53,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   public void end(XMLParserState state) {
     final Map<QName, SimpleAnnotation> milestones = this.milestones.get();
     final Map<QName, Map<QName, String>> milestoneAttributes = this.milestoneAttributes.get();
-    final int textOffset = state.getTextOffset();
+    final long textOffset = state.getTextOffset();
     for (QName milestoneUnit : milestones.keySet()) {
       final SimpleAnnotation last = milestones.get(milestoneUnit);
       final Map<QName, String> lastAttrs = milestoneAttributes.get(milestoneUnit);
@@ -99,7 +99,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
 
     final Map<QName, SimpleAnnotation> milestones = this.milestones.get();
     final Map<QName, Map<QName, String>> milestoneAttributes = this.milestoneAttributes.get();
-    final int textOffset = state.getTextOffset();
+    final long textOffset = state.getTextOffset();
 
     final SimpleAnnotation last = milestones.get(milestoneUnit);
     final Map<QName, String> lastAttrs = milestoneAttributes.get(milestoneUnit);
@@ -135,7 +135,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
 
     final Map<String, SimpleAnnotation> spanning = this.spanning.get();
     final Map<String, Map<QName, String>> spanningAttributes = this.spanningAttributes.get();
-    final int textOffset = state.getTextOffset();
+    final long textOffset = state.getTextOffset();
 
     if (spanTo != null) {
       final QName name = entity.getName();
