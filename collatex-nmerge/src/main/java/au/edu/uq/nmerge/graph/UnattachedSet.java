@@ -32,8 +32,7 @@ import au.edu.uq.nmerge.exception.*;
  */
 public class UnattachedSet extends HashSet<VariantGraphArc>
 {
-	/** required boilerplate */
-	static final long serialVersionUID = 1;
+
 	/** the union of all the versions in the unattached set */
 	BitSet versions;   
 	/**

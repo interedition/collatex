@@ -55,36 +55,7 @@ public class PublicInterface
 	{
 		this.cache = cache;
 	}
-	/**
-	 * Create a new MVD and save it
-	 * @param mvdFile the actual file to create
-	 * @param description the MVD description string
-	 * @param encoding the encoding for data of the MVD
-	 * @param mask the mask value NONE, TEXT or XML)
-	 * @throws MVDException
-	 */
-	public void createNewMvd( File mvdFile, String description, 
-		String encoding, int folderId, String mask ) throws MVDException
-	{
-		try
-		{
-			if ( mvdFile.exists() && !mvdFile.delete() )
-				throw new Exception( 
-					"Couldn't delete existing file "+mvdFile);
-			else
-			{
-				Mask mvdMask = Mask.valueOf(mask.toUpperCase());
-				Collation collation = (description==null||description.length()==0)
-					?new Collation():new Collation(description);
-				collation.setMask(mvdMask);
-				collation.setEncoding(encoding);
-			}
-		}
-		catch ( Exception e )
-		{
-			throw new MVDException( e );
-		}
-	}
+
 	/**
 	 * Retrieve the cache so it can be attached to a session object, 
 	 * so it will hang around between invocations.

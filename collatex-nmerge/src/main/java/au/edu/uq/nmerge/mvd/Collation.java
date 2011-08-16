@@ -36,7 +36,6 @@ public class Collation
 {
   public static String UNTITLED_NAME = "untitled";
 
-  Mask mask;
   // new options
 	boolean directAlignOnly;
 	Vector<Witness> witnesses;	// id = position in table+1
@@ -47,7 +46,6 @@ public class Collation
 	int bestScore;
 	// used for checking
 	HashSet<Match> parents;
-	BitSet partialVersions;
 	String encoding;
 
 	public Collation()
@@ -55,7 +53,6 @@ public class Collation
       this.description = "";
       this.witnesses = new Vector<Witness>();
       this.matches = new Vector<Match>();
-      this.mask = Mask.NONE;
       this.encoding = "UTF-8";
 	}
 	public Collation(String description)
@@ -133,14 +130,6 @@ public class Collation
 	}
 
 
-	/**
-	 * Get the data mask
-	 * @return the kind of mask being applied to all data in the MVD
-	 */
-	public Mask getMask()
-	{
-		return mask;
-	}
 	/**
 	 * Get the pairs list for converting to a Graph
 	 * @return the pairs - read only!
@@ -425,15 +414,6 @@ public class Collation
 	}
 
 	/**
-	 * Set the data mask
-	 * @param mask the kind of mask to apply to all data in the MVD
-	 */
-	public void setMask( Mask mask )
-	{
-		this.mask = mask;
-	}
-
-	/**
 	 * Update an existing version or add a new one.
 	 * @param version the id of the version to add. 
 	 * @param data the data to merge
@@ -447,14 +427,7 @@ public class Collation
 		VariantGraph original = con.create(matches, witnesses.size() );
 		original.removeVersion( version );
 		VariantGraph g = original;
-		VariantGraphSpecialArc special;
-		if ( mask != Mask.NONE )
-		{
-			byte[] byteMask = XMLMasker.getMask(data, mask==Mask.XML);
-			special = g.addSpecialArc( data, byteMask, version, 0 );
-		}
-		else
-			special = g.addSpecialArc( data, version, 0 );
+		VariantGraphSpecialArc special = g.addSpecialArc( data, version, 0 );
 		if ( g.getStart().cardinality() > 1 )
 		{
 			SuffixTree<Byte> st = makeSuffixTree( special );
@@ -690,9 +663,8 @@ public class Collation
 	private SuffixTree<Byte> makeSuffixTree( VariantGraphSpecialArc special )
 		throws MVDException
 	{
-      List<Byte> treeSource = Lists.newArrayListWithExpectedSize(special.getData().length);
-      byte[] data = (special.hasMask() ? XMLMasker.maskOut(special.getData(), special.getMask() ) : special.getData());
-      for (byte b : data) {
+      final List<Byte> treeSource = Lists.newArrayListWithExpectedSize(special.getData().length);
+      for (byte b : special.getData()) {
         treeSource.add(b);
       }
 
@@ -1447,7 +1419,6 @@ public class Collation
 		sb.append( "; versionSetSize="+versionSetSize );
 		sb.append( "; bestScore="+bestScore );
 		sb.append( "; parents.size()="+parents.size() );
-		sb.append( "; partialVersions="+partialVersions );
 		sb.append( "; encoding="+encoding );
 		return sb.toString();
 	}

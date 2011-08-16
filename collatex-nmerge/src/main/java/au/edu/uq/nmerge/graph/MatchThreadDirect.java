@@ -139,8 +139,7 @@ public class MatchThreadDirect implements Runnable
 	public void run() 
 	{
 		byte[] data = arc.getData();
-		assert(arc.mask==null||arc.mask[first]==1);
-		while ( first < data.length 
+		while ( first < data.length
 			&& st.advance(position,data[first]) )
 		{
 			first++;
@@ -247,18 +246,14 @@ public class MatchThreadDirect implements Runnable
 				if ( a.versions.intersects(versions)&&(!a.isParent()
 					||!a.hasChildInVersion(mum.version)) )
 				{
-					byte[] mask = a.getMask();
-					if ( mask==null||mask.length==0||mask[0]==1 )
-					{
-						this.arc = a;
-						//this.first = 0;
-						MatchThreadDirect mtd = new MatchThreadDirect( this );
-						mtd.run();
-						// extended is true iff at least one child  
-						// mtd matched at least one character
-						extended |= mtd.extended();
-					}
-				}
+                  this.arc = a;
+                  //this.first = 0;
+                  MatchThreadDirect mtd = new MatchThreadDirect( this );
+                  mtd.run();
+                  // extended is true iff at least one child
+                  // mtd matched at least one character
+                  extended |= mtd.extended();
+                }
 			}
 		}
 		// important! if none of the child incarnations of run

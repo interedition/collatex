@@ -96,9 +96,7 @@ public class MvdTool
 	static byte[] BREAK_AFTER = {'>',' ','\n','\r','\t'};
 	/** Stream to report results to */
 	static PrintStream out;
-	/** mask to apply to mvd data */
-	static Mask mvdMask = Mask.NONE;
-	/** state to label version text not found in with text 
+	/** state to label version text not found in with text
 	 * during compare */
 	static ChunkState uniqueState;
 	/* id of default folder */
@@ -165,9 +163,6 @@ public class MvdTool
 				break;
 			case DELETE:
 				doDeleteVersion();
-				break;
-			case CREATE:
-				doCreate();
 				break;
 			case DESCRIPTION:
 				doDescription();
@@ -239,28 +234,7 @@ public class MvdTool
 			throw new MVDToolException( e );
 		}
 	}
-	/**
-	 * Create a new and empty MVD
-	 */
-	private static void doCreate() throws MVDToolException
-	{
-		try
-		{
-			File file = new File( mvdFile );
-			if ( file.exists() && !file.delete() )
-				throw new MVDToolException( 
-					"Couldn't delete existing file "+mvdFile);
-			else
-			{
-				Collation collation = (description==null)?new Collation():new Collation(description);
-				collation.setMask(mvdMask);
-			}
-		}
-		catch ( Exception e )
-		{
-			throw new MVDToolException( e );
-		}
-	}
+
 	/**
 	 * Print an example for the given helpCommand
 	 */
@@ -655,8 +629,6 @@ public class MvdTool
 						longName = value;
 					else if ( key.equals("m") )
 						mvdFile = value;
-					else if ( key.equals("n") )
-						mvdMask = Mask.valueOf(value.toUpperCase());
 					else if ( key.equals("o") )
 						fromOffset = Integer.parseInt(value);
 					else if ( key.equals("s") )
@@ -695,7 +667,6 @@ public class MvdTool
 		encoding = "UTF-8";
 		backup = variantLen = fromOffset = 0;
 		version = 0;
-		mvdMask = Mask.NONE;
 		uniqueState = ChunkState.DELETED;
 		dbConn = null;
 	}

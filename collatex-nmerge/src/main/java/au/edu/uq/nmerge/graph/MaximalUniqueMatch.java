@@ -259,17 +259,10 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 					// first character
 					MatchThreadDirect mtd;
 					byte[] data = a.getData();
-					byte[] mask = a.getMask();
-					if ( mask==null||mask[0]==1 )
-					{
-						if ( a.from != subGraph.start )
-							prevChars = a.from.getPrevChars(
-								subGraph.constraint,subGraph.start);
-						mtd = new MatchThreadDirect( 
-							mum, subGraph, st, a, a.from, 0, 
-							prevChars, subGraph.end );
-						mtd.run();
-					}
+                    if ( a.from != subGraph.start )
+                        prevChars = a.from.getPrevChars(subGraph.constraint,subGraph.start);
+                    mtd = new MatchThreadDirect(mum, subGraph, st, a, a.from, 0, prevChars, subGraph.end );
+                    mtd.run();
 					if ( data.length > 1 )
 					{
 						prevChars = new PrevChar[1];
@@ -279,19 +272,11 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 						// other (1 to N) characters
 						for ( int i=1;i<data.length;i++ )
 						{
-							if ( mask==null||mask[i]==1 )
-							{
-								if ( mask!=null&&mask[i-1]==0 )
-									prevChars[0] = new PrevChar(
-										prevVersions, (byte)0 );
-								else
-									prevChars[0] = new PrevChar(
-										prevVersions, data[i-1] );
-								mtd = new MatchThreadDirect( 
-									mum, subGraph, st, a, a.from, i, 
-									prevChars, subGraph.end );
-								mtd.run();
-							}
+                            prevChars[0] = new PrevChar(prevVersions, data[i-1] );
+                            mtd = new MatchThreadDirect(
+                                mum, subGraph, st, a, a.from, i,
+                                prevChars, subGraph.end );
+                            mtd.run();
 						}
 					}
 				}
@@ -428,30 +413,21 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 					// distance travelled in the current arc
 					travelled = 0;
 					PrevChar[] prevChars = new PrevChar[1];
-					byte[] mask = a.getMask();
 					for ( int i=a.dataLen()-1;i>=limit;i-- )
 					{
-						if ( mask==null||mask[i]==1 )
-						{
-							// if all previous arcs are valid, so too 
-							// are all previous chars of those arcs
-							if ( i > 0 )
-							{
-								prevChars[0] = new PrevChar( a.versions, 
-									a.getData()[i-1] );
-								// this will force a mismatch
-								if ( mask!=null&&mask[i-1]==0 )
-									prevChars[0] = new PrevChar( 
-										a.versions, (byte)0 );
-							}
-							else
-								prevChars = a.from.getPrevChars();
-							mtt = new MatchThreadTransposeLeft( 
-								mum, st, a, i, prevChars, 
-								shortestPath+travelled, origin );
-							mtt.run();
-						}
-						travelled++;
+                      // if all previous arcs are valid, so too
+                      // are all previous chars of those arcs
+                      if ( i > 0 )
+                      {
+                          prevChars[0] = new PrevChar( a.versions, a.getData()[i-1] );
+                      }
+                      else
+                          prevChars = a.from.getPrevChars();
+                      mtt = new MatchThreadTransposeLeft(
+                          mum, st, a, i, prevChars,
+                          shortestPath+travelled, origin );
+                      mtt.run();
+                      travelled++;
 					}
 				}
 				// finished with this arc: record distance travelled
@@ -550,7 +526,6 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 				{
 					MatchThreadTransposeRight mttr;
 					PrevChar[] prevChars;
-					byte[] mask = a.getMask();
 					// number of bytes to travel in this arc
 					int limit;
 					if ( a.dataLen()+shortestPath<distance )
@@ -560,31 +535,20 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 					// distance travelled in this arc
 					travelled = 0;
 					// the 1st time there are NO prevchars
-					if ( mask==null||mask[0]==1 )
-					{
-						prevChars = (a.from==origin)?
-							new PrevChar[0]:a.from.getPrevChars();
-						// process the first character separately
-						// because it needs different prevChars
-						mttr = new MatchThreadTransposeRight( 
-							mum, st, a, 0, prevChars, shortestPath
-							+travelled,null );
-						mttr.run();
-					}
-					travelled++;
+                  prevChars = (a.from==origin)? new PrevChar[0] : a.from.getPrevChars();
+                  // process the first character separately
+                  // because it needs different prevChars
+                  mttr = new MatchThreadTransposeRight( mum, st, a, 0, prevChars, shortestPath+travelled,null );
+                  mttr.run();
+                  travelled++;
 					prevChars = new PrevChar[1];
 					prevChars[0] = new PrevChar(a.versions,a.getData()[0]);
 					for ( int i=1;i<limit;i++ )
 					{
-						if ( mask==null||mask[i]==1 )
-						{
-							mttr = new MatchThreadTransposeRight( 
-								mum, st, a, i, prevChars, shortestPath
-								+travelled, null );
-							mttr.run();
-							prevChars[0] = new PrevChar(a.versions, a.getData()[i]);
-						}
-						travelled++;
+                      mttr = new MatchThreadTransposeRight( mum, st, a, i, prevChars, shortestPath+travelled, null );
+                      mttr.run();
+                      prevChars[0] = new PrevChar(a.versions, a.getData()[i]);
+                      travelled++;
 					}
 				}
 				// finished with this arc: record distance travelled
@@ -973,20 +937,15 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 	VariantGraphSpecialArc splitOffLeftArc()
 	{
 		byte[] leftArcData = new byte[match.dataOffset];
-		byte[] leftMask = null;
-		if ( arc.hasMask() )
-			leftMask = new byte[match.dataOffset];
 		byte[] arcData = arc.getData();
 		assert arc.parent==null&&arc.children==null;
 		for ( int i=0;i<match.dataOffset;i++ )
 		{
 			leftArcData[i] = arcData[i];
-			if ( leftMask != null )
-				leftMask[i] = arc.getMask()[i];
 		}
 		BitSet bs = new BitSet();
 		bs.set( version );
-		return new VariantGraphSpecialArc( bs, leftArcData, leftMask, arc.position );
+		return new VariantGraphSpecialArc( bs, leftArcData, arc.position );
 	}
 	/**
 	 * The special arc needs to be split on the right
@@ -998,20 +957,14 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch>
 		int len = arc.dataLen()-(match.length+match.dataOffset);
 		byte[] rightArcData = new byte[len];
 		byte[] arcData = arc.getData();
-		byte[] rightMask = null;
-		if ( arc.hasMask() )
-			rightMask = new byte[len];
 		assert arc.parent==null&&arc.children==null;
 		for ( int j=0,i=match.dataOffset+match.length;i<arcData.length;i++,j++ )
 		{
 			rightArcData[j] = arcData[i];
-			if ( rightMask != null )
-				rightMask[j] = arc.getMask()[i];
 		}
 		BitSet bs = new BitSet();
 		bs.set( version );
-		return new VariantGraphSpecialArc( bs, rightArcData, rightMask,
-			arc.position+match.dataOffset+match.length );
+		return new VariantGraphSpecialArc( bs, rightArcData, arc.position+match.dataOffset+match.length );
 	}
 	/**
 	 * Create the right subgraph. This should only be called when 

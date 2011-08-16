@@ -580,16 +580,11 @@ public class VariantGraphNode
 			{
 				if ( a.dataLen() > 0 )
 				{
-					byte[] mask = a.getMask();
-					if ( mask==null||mask[mask.length-1]==1 )
-					{
-						byte[] data = a.getData();
-						BitSet prevVersions = new BitSet();
-						prevVersions.or( a.versions );
-						prevVersions.and( constraint );
-						array.add( new PrevChar(prevVersions, 
-							data[data.length-1]) );
-					}
+                      byte[] data = a.getData();
+                      BitSet prevVersions = new BitSet();
+                      prevVersions.or( a.versions );
+                      prevVersions.and( constraint );
+                      array.add( new PrevChar(prevVersions, data[data.length-1]) );
 				}
 				else if ( a.from != forbidden )
 				{

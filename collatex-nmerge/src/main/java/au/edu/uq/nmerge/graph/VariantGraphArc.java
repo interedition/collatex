@@ -45,8 +45,6 @@ public class VariantGraphArc
 	public VariantGraphNode to;
 	/** the data of this Arc */
 	byte[] data;
-	/** the mask for this arc's data or null */
-	byte[] mask;
 	/** usually empty list of transpose children */
 	LinkedList<VariantGraphArc> children;
 	/** parent - can't be set as well as children */
@@ -88,18 +86,7 @@ public class VariantGraphArc
 			throw new MVDException("no children to arc");
 		return children.listIterator(0);
 	}
-	/**
-	 * Create a vanilla Arc with a mask
-	 * @param versions the versions it belongs to
-	 * @param data its data content
-	 */
-	public VariantGraphArc(BitSet versions, byte[] data, byte[] mask)
-	{
-		this.versions = versions;
-		this.data = data;
-		this.mask = mask;
-		//checkForData("m_s id=\"page");
-	}
+
 	/**
 	 * Create a vanilla Arc
 	 * @param versions the versions it belongs to
@@ -111,25 +98,7 @@ public class VariantGraphArc
 		this.data = data;
 		//checkForData("m_s id=\"page");
 	}
-	/**
-	 * Do we have a mask or are we normal?
-	 * @return true if the data of this arc is masked
-	 */
-	public boolean hasMask()
-	{
-		return getMask() != null;
-	}
-	/**
-	 * Get the mask
-	 * @return the mask
-	 */
-	public byte[] getMask()
-	{
-		if ( parent != null )
-			return parent.mask;
-		else
-			return mask;	
-	}
+
 	/**
 	 * Set the to node
 	 * @param to the new to node
@@ -326,9 +295,6 @@ public class VariantGraphArc
 	{
 		VariantGraphArc[] arcs = new VariantGraphArc[2];
 		byte[] leftData = new byte[offset];
-		byte[] leftMask = null;
-		if ( hasMask() )
-			leftMask = new byte[offset];
 		BitSet leftVersions = new BitSet();
 		BitSet rightVersions = new BitSet();
 		leftVersions.or( versions );
@@ -336,27 +302,14 @@ public class VariantGraphArc
 		for ( int i=0;i<offset;i++ )
 		{
 			leftData[i] = data[i];
-			if ( leftMask != null )
-				leftMask[i] = mask[i];
 		}
-		if ( leftData != null )
-			arcs[0] = new VariantGraphArc( leftVersions, leftData, leftMask );
-		else
-			arcs[0] = new VariantGraphArc( leftVersions, leftData );
+	    arcs[0] = new VariantGraphArc( leftVersions, leftData );
 		byte[] rightData = new byte[dataLen()-offset];
-		byte[] rightMask = null;
-		if ( hasMask() )
-			rightMask = new byte[dataLen()-offset];
 		for ( int i=offset,j=0;i<dataLen();i++,j++ )
 		{
 			rightData[j] = data[i];
-			if ( rightMask != null )
-				rightMask[j] = mask[i];
 		}
-		if ( rightData != null )
-			arcs[1] = new VariantGraphArc( rightVersions, rightData, rightMask );
-		else
-			arcs[1] = new VariantGraphArc( rightVersions, rightData );
+		arcs[1] = new VariantGraphArc( rightVersions, rightData );
 		installSplit( arcs );
 		return arcs;
 	}

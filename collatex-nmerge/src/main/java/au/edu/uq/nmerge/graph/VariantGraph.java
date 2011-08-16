@@ -93,25 +93,7 @@ public class VariantGraph
 		// not part of the constraint set yet
 		return a;
 	}
-	/**
-	 * Add an unaligned arc to the graph, with a mask
-	 * @param data the data of the single version it will hold
-	 * @param mask the mask for the data
-	 * @param version the ID of that version
-	 * @param position the position of the arc
-	 * @return the special, unaligned arc
-	 */
-	public VariantGraphSpecialArc addSpecialArc( byte[] data, byte[] mask, int version,
-		int position ) throws MVDException
-	{
-		BitSet bs = new BitSet();
-		bs.set( version );
-		VariantGraphSpecialArc a = new VariantGraphSpecialArc( bs, data, mask, position );
-		start.addOutgoing( a );
-		end.addIncoming( a );
-		// not part of the constraint set yet
-		return a;
-	}
+
 	/**
 	 * Get the data of the specified version
 	 * @param version the id of the version to read
@@ -236,7 +218,7 @@ public class VariantGraph
 			assert a != null: "Couldn't find outgoing arc for version "+version;
 			if ( a instanceof VariantGraphSpecialArc)
 			{
-				VariantGraphArc b = new VariantGraphArc( a.versions, a.data, a.mask );
+				VariantGraphArc b = new VariantGraphArc( a.versions, a.data );
 				temp.replaceOutgoing( a, b );
 				a.to.replaceIncoming( a, b );
 				temp = b.to;

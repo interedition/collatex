@@ -45,20 +45,7 @@ public class VariantGraphSpecialArc extends VariantGraphArc implements Comparabl
 		this.position = position;
 		// leave best null
 	}
-	/** 
-	 * Override the Arc constructor
-	 * @param versions the versions of the arc
-	 * @param data the data of the special arc
-	 * @param mask the mask for the special arc
-	 * @param position the position of the arc along the new version
-	 */
-	public VariantGraphSpecialArc(BitSet versions, byte[] data, byte[] mask,
-                                  int position)
-	{
-		super( versions, data, mask );
-		this.position = position;
-		// leave best null
-	}
+
 	/**
 	 * Get the best LCS or null
 	 * @return null (and so you must calculate it) or an LCS
@@ -99,17 +86,7 @@ public class VariantGraphSpecialArc extends VariantGraphArc implements Comparabl
 			return result;
 		}
 	}
-	/** debug - print out the special arc using mask */
-	String printout()
-	{
-		StringBuffer sb = new StringBuffer(data.length);
-		for ( int i=0;i<data.length;i++ )
-		{
-			if ( mask==null||mask[i]!=0 )
-				sb.append((char)data[i]);
-		}
-		return sb.toString();
-	}
+
 	public String toString()
 	{
 		String matchStr = (best!=null)?best.getMatch().toString():"";
