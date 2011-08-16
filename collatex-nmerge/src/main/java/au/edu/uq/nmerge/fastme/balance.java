@@ -19,11 +19,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.fastme;
+
 /**
  * Tree balancing type
  */
 public enum balance {
-	OLS,
-	BAL,
-	NONE;
+  OLS,
+  BAL,
+  NONE;
 }

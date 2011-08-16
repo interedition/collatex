@@ -21,34 +21,38 @@
 package au.edu.uq.nmerge.mvd;
 
 /**
- * Definition of a version. This is not the same as the versions of 
- * a Pair - that records WHICH versions the pair belongs to. This 
+ * Definition of a version. This is not the same as the versions of
+ * a Pair - that records WHICH versions the pair belongs to. This
  * class records what a particular Version is.
  */
-public class Witness
-{
-  /** siglum or other short name e.g. A */
-	public String shortName;
+public class Witness {
+  /**
+   * siglum or other short name e.g. A
+   */
+  public String shortName;
 
-	/** full description if desired: e.g. Codex Vaticanus 1234 */
-	public String longName;
-	/**
-	 * Create an instance of Version
-	 * @param shortName siglum or other short name
-	 * @param longName longer name if desired
-	 */
-	public Witness(String shortName, String longName)
-	{
-		this.shortName = shortName;
-		this.longName = longName;
-	}
+  /**
+   * full description if desired: e.g. Codex Vaticanus 1234
+   */
+  public String longName;
 
-	/**
-	 * Convert a Version to a string for debugging
-	 * @return a human-readable string Version
-	 */
-	public String toString()
-	{
-		return "shortName:"+shortName+";longName:"+longName;
-	}
+  /**
+   * Create an instance of Version
+   *
+   * @param shortName siglum or other short name
+   * @param longName  longer name if desired
+   */
+  public Witness(String shortName, String longName) {
+    this.shortName = shortName;
+    this.longName = longName;
+  }
+
+  /**
+   * Convert a Version to a string for debugging
+   *
+   * @return a human-readable string Version
+   */
+  public String toString() {
+    return "shortName:" + shortName + ";longName:" + longName;
+  }
 }

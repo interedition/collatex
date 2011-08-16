@@ -19,28 +19,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.fastme;
+
 /**
  * A linked-list structure to hold nodes.
  * Also adapted from FastME C code.
  */
-class set
-{
-	node node;
-  	set next;
-  	set( node v )
-  	{
-  		this.node = v;
-  		this.next = null;
-  	}
-  	/**
-  	 * Add to the list 
-  	 * @param v the node to add
-  	 */
-  	void addToSet( node v )
-  	{
-  		set current = this;
-  		while ( current.next != null )
-  			current = current.next;
-		current.next = new set( v );
-  	}
+class set {
+  node node;
+  set next;
+
+  set(node v) {
+    this.node = v;
+    this.next = null;
+  }
+
+  /**
+   * Add to the list
+   *
+   * @param v the node to add
+   */
+  void addToSet(node v) {
+    set current = this;
+    while (current.next != null)
+      current = current.next;
+    current.next = new set(v);
+  }
 }

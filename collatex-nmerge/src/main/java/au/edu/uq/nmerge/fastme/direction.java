@@ -19,16 +19,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.fastme;
+
 /**
  * Directions of movement for the fastme algorithm
+ *
  * @author Desmond Schmidt
  */
-public enum direction 
-{
-	NONE,
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	SKEW;
+public enum direction {
+  NONE,
+  UP,
+  DOWN,
+  LEFT,
+  RIGHT,
+  SKEW;
 }

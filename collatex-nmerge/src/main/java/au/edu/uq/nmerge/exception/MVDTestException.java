@@ -22,17 +22,17 @@ package au.edu.uq.nmerge.exception;
 
 /**
  * Something that went wrong during the testing
+ *
  * @author Desmond Schmidt 3/5/09
  */
-public class MVDTestException extends MVDException 
-{
-	static final long serialVersionUID = 1;
-	public MVDTestException( Exception e )
-	{
-		super( e );
-	}
-	public MVDTestException( String message )
-	{
-		super( message );
-	}
+public class MVDTestException extends MVDException {
+  static final long serialVersionUID = 1;
+
+  public MVDTestException(Exception e) {
+    super(e);
+  }
+
+  public MVDTestException(String message) {
+    super(message);
+  }
 }

@@ -22,64 +22,69 @@
 package au.edu.uq.nmerge;
 
 import java.io.OutputStream;
+
 /**
  * This class is used to throw away output from the MvdTool during testing
+ *
  * @author Desmond Schmidt 3/5/09
  */
-public class EmptyOutputStream extends OutputStream 
-{
-	int received;
-	/**
-	 * Find out if we received any data
-	 * @return the number of bytes received since last flush
-	 */
-	public int printedBytes()
-	{
-		return received;
-	}
-	/**
-	 * Does nothing
-	 */
-	public void close()
-	{
-	}
-	/**
-	 * Don't use flush because the system calls it unexpectedly
-	 */
-	public void clear()
-	{
-		received = 0;
-	}
-	/**
-	 * Does nothing
-	 */
-    public void flush()
-    {
-    }
-    /**
-     * Does nothing
-     * @param b the data
-     */
-	public void write( byte[] b )
-	{
-		received += b.length;
-	}
-	/**
-	 * Does nothing
-	 * @param b the data
-	 * @param off the start offset in the data.
-     * @param len the number of bytes to write. 
-	 */
-	public void write( byte[] b, int off, int len )
-	{
-		received += len;
-	}
-	/**
-	 * Does nothing
-	 * @param b a byte of data to write
-	 */
-	public void write( int b )
-	{
-		received++;
-	}
+public class EmptyOutputStream extends OutputStream {
+  int received;
+
+  /**
+   * Find out if we received any data
+   *
+   * @return the number of bytes received since last flush
+   */
+  public int printedBytes() {
+    return received;
+  }
+
+  /**
+   * Does nothing
+   */
+  public void close() {
+  }
+
+  /**
+   * Don't use flush because the system calls it unexpectedly
+   */
+  public void clear() {
+    received = 0;
+  }
+
+  /**
+   * Does nothing
+   */
+  public void flush() {
+  }
+
+  /**
+   * Does nothing
+   *
+   * @param b the data
+   */
+  public void write(byte[] b) {
+    received += b.length;
+  }
+
+  /**
+   * Does nothing
+   *
+   * @param b   the data
+   * @param off the start offset in the data.
+   * @param len the number of bytes to write.
+   */
+  public void write(byte[] b, int off, int len) {
+    received += len;
+  }
+
+  /**
+   * Does nothing
+   *
+   * @param b a byte of data to write
+   */
+  public void write(int b) {
+    received++;
+  }
 }

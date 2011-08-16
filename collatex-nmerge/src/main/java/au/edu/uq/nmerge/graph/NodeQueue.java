@@ -19,35 +19,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.graph;
+
 import java.util.Vector;
 
 /**
- *	A Queue of Nodes
+ * A Queue of Nodes
  */
-class NodeQueue extends Vector<VariantGraphNode>
-{
-	static final long serialVersionUID = 1;
-	/**
-	 * Add a Node to the queue. A bit difficult, since the node may 
-	 * already be there. Check that, and prevent duplicates.
-	 * @param node the node to push
-	 */
-	void push( VariantGraphNode node )
-	{
-		for ( int i=size()-1;i>=0;i-- )
-		{
-			if ( get(i) == node )
-				return;
-		}
-		add( node );
-	}
-	VariantGraphNode pop()
-	{
-		VariantGraphNode u = null;
-		if ( size() > 0 )
-		{
-			u = (VariantGraphNode) remove( 0 );
-		}
-		return u;
-	}
+class NodeQueue extends Vector<VariantGraphNode> {
+  static final long serialVersionUID = 1;
+
+  /**
+   * Add a Node to the queue. A bit difficult, since the node may
+   * already be there. Check that, and prevent duplicates.
+   *
+   * @param node the node to push
+   */
+  void push(VariantGraphNode node) {
+    for (int i = size() - 1; i >= 0; i--) {
+      if (get(i) == node)
+        return;
+    }
+    add(node);
+  }
+
+  VariantGraphNode pop() {
+    VariantGraphNode u = null;
+    if (size() > 0) {
+      u = (VariantGraphNode) remove(0);
+    }
+    return u;
+  }
 }

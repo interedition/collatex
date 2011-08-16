@@ -23,140 +23,136 @@ package au.edu.uq.nmerge.graph;
 import java.util.BitSet;
 
 /**
- * A form of unaligned arc that also stores its position from the start, 
+ * A form of unaligned arc that also stores its position from the start,
  * and its MUM.
+ *
  * @author Desmond Schmidt 12/11/08
  */
-public class VariantGraphSpecialArc extends VariantGraphArc implements Comparable<VariantGraphSpecialArc>
-{
-	/** if previously calculated save best MUM here */
-	MaximalUniqueMatch best;
-	/** position from the start of the new version */
-	int position;
-	/** 
-	 * Override the Arc constructor
-	 * @param versions the versions of the arc
-	 * @param data the data of the special arc
-	 * @param position the position of the arc along the new version
-	 */
-	public VariantGraphSpecialArc(BitSet versions, byte[] data, int position)
-	{
-		super( versions, data );
-		this.position = position;
-		// leave best null
-	}
+public class VariantGraphSpecialArc extends VariantGraphArc implements Comparable<VariantGraphSpecialArc> {
+  /**
+   * if previously calculated save best MUM here
+   */
+  MaximalUniqueMatch best;
+  /**
+   * position from the start of the new version
+   */
+  int position;
 
-	/**
-	 * Get the best LCS or null
-	 * @return null (and so you must calculate it) or an LCS
-	 */
-	public MaximalUniqueMatch getBest()
-	{
-		return best;
-	}
-	/**
-	 * Set the best MUM
-	 * @param best precalculated MUM or this arc
-	 */
-	public void setBest( MaximalUniqueMatch best )
-	{
-		this.best = best;
-	}
-	/**
-	 * Reset best to null so it will be recalculate when required
-	 */
-	public void reset()
-	{
-		best = null;
-	}
-	/**
-	 * Required to equate keys in the treemap: otherwise we 
-	 * get duplicates
-	 */
-	public boolean equals( Object other )
-	{
-		if ( !(other instanceof VariantGraphSpecialArc) )
-			return false;
-			else
-		{
-			VariantGraphSpecialArc otherArc = (VariantGraphSpecialArc)other;
-			boolean result = super.equals(other)&&position==otherArc.position;
-			//if ( result )
-			//	System.out.println("equals!");
-			return result;
-		}
-	}
+  /**
+   * Override the Arc constructor
+   *
+   * @param versions the versions of the arc
+   * @param data     the data of the special arc
+   * @param position the position of the arc along the new version
+   */
+  public VariantGraphSpecialArc(BitSet versions, byte[] data, int position) {
+    super(versions, data);
+    this.position = position;
+    // leave best null
+  }
 
-	public String toString()
-	{
-		String matchStr = (best!=null)?best.getMatch().toString():"";
-		return super.toString()+" Match: "+matchStr;
-	}
+  /**
+   * Get the best LCS or null
+   *
+   * @return null (and so you must calculate it) or an LCS
+   */
+  public MaximalUniqueMatch getBest() {
+    return best;
+  }
+
+  /**
+   * Set the best MUM
+   *
+   * @param best precalculated MUM or this arc
+   */
+  public void setBest(MaximalUniqueMatch best) {
+    this.best = best;
+  }
+
+  /**
+   * Reset best to null so it will be recalculate when required
+   */
+  public void reset() {
+    best = null;
+  }
+
+  /**
+   * Required to equate keys in the treemap: otherwise we
+   * get duplicates
+   */
+  public boolean equals(Object other) {
+    if (!(other instanceof VariantGraphSpecialArc))
+      return false;
+    else {
+      VariantGraphSpecialArc otherArc = (VariantGraphSpecialArc) other;
+      boolean result = super.equals(other) && position == otherArc.position;
+      //if ( result )
+      //	System.out.println("equals!");
+      return result;
+    }
+  }
+
+  public String toString() {
+    String matchStr = (best != null) ? best.getMatch().toString() : "";
+    return super.toString() + " Match: " + matchStr;
+  }
 
   /**
    * This is used in TreeMap to order the keys. We sort first on MUM
    * values and then on alphabetical byte values. Order is reversed so
    * that the longest MUM will be at the top of the queue not the
    * smallest.
+   *
    * @param o the special arc to compare to
    * @return 0 if equal, -1 if we are greater, 1 if less (for reverse
-   * ordering)
+   *         ordering)
    */
   @Override
   public int compareTo(VariantGraphSpecialArc o) {
     int oneLen = this.dataLen();
     int twoLen = o.dataLen();
-    int mumValue = (this.best!=null)?this.best.compareTo(o.best):0;
-    if ( mumValue == 0 )
-    {
-        // MUMs equal: compare the data
-        for ( int i=0;i<oneLen&&i<twoLen;i++ )
-            if ( this.data[i] < o.data[i] )
-                return 1;
-            else if ( this.data[i] > o.data[i] )
-                return -1;
-        if ( oneLen<twoLen )
-            return 1;
-        else if ( oneLen>twoLen )
-            return -1;
-        else if ( this.equals(o) )
-            return 0;
+    int mumValue = (this.best != null) ? this.best.compareTo(o.best) : 0;
+    if (mumValue == 0) {
+      // MUMs equal: compare the data
+      for (int i = 0; i < oneLen && i < twoLen; i++)
+        if (this.data[i] < o.data[i])
+          return 1;
+        else if (this.data[i] > o.data[i])
+          return -1;
+      if (oneLen < twoLen)
+        return 1;
+      else if (oneLen > twoLen)
+        return -1;
+      else if (this.equals(o))
+        return 0;
         // data equal: compare the from nodes and to nodes
-        else if ( this.from != null )
-        {
-            if ( o.from != null )
-            {
-                if ( this.from.nodeId > o.from.nodeId )
-                    return -1;
-                else if ( this.from.nodeId != o.from.nodeId )
-                    return 1;
-                // from nodes equal, try to nodes
-                else if ( this.to != null )
-                {
-                    if ( o.to != null )
-                    {
-                        if ( this.to.nodeId > o.to.nodeId )
-                            return -1;
-                        else if ( this.to.nodeId < o.to.nodeId )
-                            return 1;
-                        else
-                            return 0;
-                    }
-                    else
-                        return -1;
-                }
-                else if ( o.to != null )
-                    return 1;
-                else
-                    return 0;
-            }
-            else
-                return -1;
-        }
-        else if ( o.from != null )
+      else if (this.from != null) {
+        if (o.from != null) {
+          if (this.from.nodeId > o.from.nodeId)
+            return -1;
+          else if (this.from.nodeId != o.from.nodeId)
             return 1;
-        else
+            // from nodes equal, try to nodes
+          else if (this.to != null) {
+            if (o.to != null) {
+              if (this.to.nodeId > o.to.nodeId)
+                return -1;
+              else if (this.to.nodeId < o.to.nodeId)
+                return 1;
+              else
+                return 0;
+            } else
+              return -1;
+          } else if (o.to != null)
+            return 1;
+          else
             return 0;
+        } else
+          return -1;
+      } else if (o.from != null)
+        return 1;
+      else
+        return 0;
     }
     return mumValue;
   }

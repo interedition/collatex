@@ -22,50 +22,52 @@ package au.edu.uq.nmerge.fastme;
 
 /**
  * Represent a node in the tree. Adapted from FastME C code.
+ *
  * @author Desmond Schmidt
  */
-public class node 
-{
-	String label;
-	edge parentEdge;
-	edge leftEdge;
-	edge middleEdge;
-	edge rightEdge;
-	int index;
-	int index2;
-	/**
-	 * Create a node in the graph
-	 * @param label its label
-	 * @param index its index in the matrix
-	 * @param parentEdge edge that leads to it?
-	 */
-	node( String label, edge parentEdge, int index )
-	{
-		this.label = label;
-		this.index = index;
-		this.index2 = -1;
-		this.parentEdge = parentEdge;
-		this.leftEdge = null;
-		this.middleEdge = null;
-		this.rightEdge = null;
-	}
-	/**
-	 * Is this node a leaf?
-	 * @return true if it is
-	 */
-	boolean leaf()
-	{
-		int count = 0;
-		if ( null != parentEdge)
-			count++;
-		if ( null != leftEdge)
-		    count++;
-		if ( null != rightEdge)
-		    count++;
-		if ( null != middleEdge)
-		    count++;
-		if ( count > 1 )
-			return false;
-		return true;
-	}
+public class node {
+  String label;
+  edge parentEdge;
+  edge leftEdge;
+  edge middleEdge;
+  edge rightEdge;
+  int index;
+  int index2;
+
+  /**
+   * Create a node in the graph
+   *
+   * @param label      its label
+   * @param index      its index in the matrix
+   * @param parentEdge edge that leads to it?
+   */
+  node(String label, edge parentEdge, int index) {
+    this.label = label;
+    this.index = index;
+    this.index2 = -1;
+    this.parentEdge = parentEdge;
+    this.leftEdge = null;
+    this.middleEdge = null;
+    this.rightEdge = null;
+  }
+
+  /**
+   * Is this node a leaf?
+   *
+   * @return true if it is
+   */
+  boolean leaf() {
+    int count = 0;
+    if (null != parentEdge)
+      count++;
+    if (null != leftEdge)
+      count++;
+    if (null != rightEdge)
+      count++;
+    if (null != middleEdge)
+      count++;
+    if (count > 1)
+      return false;
+    return true;
+  }
 }

@@ -19,24 +19,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.mvd;
+
 /**
  * The state of Chunks
+ *
  * @author Desmond Schmidt 11/11/07 revised 21/5/09
  */
-public enum ChunkState 
-{
-	/** default state as e.g. background text after find */
-	NONE,
-	/** merged state after compare for shared text */
-	MERGED,
-	/** text of first version after compare */
-	DELETED,
-	/** text of second version after compare */
-	ADDED,
-	/** text found by search */
-	FOUND,
-	/** parent of transposition */
-	PARENT,
-	/** child of transposition */
-	CHILD;
+public enum ChunkState {
+  /**
+   * default state as e.g. background text after find
+   */
+  NONE,
+  /**
+   * merged state after compare for shared text
+   */
+  MERGED,
+  /**
+   * text of first version after compare
+   */
+  DELETED,
+  /**
+   * text of second version after compare
+   */
+  ADDED,
+  /**
+   * text found by search
+   */
+  FOUND,
+  /**
+   * parent of transposition
+   */
+  PARENT,
+  /**
+   * child of transposition
+   */
+  CHILD;
 }

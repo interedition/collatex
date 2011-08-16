@@ -22,54 +22,54 @@
 package au.edu.uq.nmerge;
 
 /**
- * Search a byte array fairly efficiently. 
+ * Search a byte array fairly efficiently.
+ *
  * @author Desmond Schmidt 1/6/09
  */
-public class KMPSearch
-{
-	static int n = 1;
-	/**
-	 * Initialise the next table
-	 * @param pattern the pattern as a byte array in any encoding
-	 * @return an array of next indices
-	 */
-	private static int[] initNext( byte[] pattern ) 
-	{
-		int[] next = new int [pattern.length];
-		int i = 0, j = -1;
-		next[0] = -1;
-		while (i < pattern.length - 1) 
-		{
-			while ( j >= 0 && pattern[i] != pattern[j] )
-				j = next[j];
-			i++; j++;
-			next[i] = j;
-		}
-		return next;
-	}
-	/**
-	 * Perform the search
-	 * @param text the byte array to search in
-	 * @param offset within text from which to search
-	 * @param pattern the byte array of the pattern
-	 * @return the index into text where the pattern occurs or -1
-	 */
-	public static int search( byte[] text, int offset, byte[] pattern ) 
-	{
-		int[] next = initNext( pattern );
-		int i = offset, j = 0;
-		n = 1;
-		while ( i < text.length ) 
-		{
-			while ( j >= 0 && pattern[j] != text[i] ) 
-			{
-				j = next[j];
-			}
-			i++; 
-			j++;
-			if ( j == pattern.length )
-				return i - pattern.length;
-		}
-		return -1;
-	}
+public class KMPSearch {
+  static int n = 1;
+
+  /**
+   * Initialise the next table
+   *
+   * @param pattern the pattern as a byte array in any encoding
+   * @return an array of next indices
+   */
+  private static int[] initNext(byte[] pattern) {
+    int[] next = new int[pattern.length];
+    int i = 0, j = -1;
+    next[0] = -1;
+    while (i < pattern.length - 1) {
+      while (j >= 0 && pattern[i] != pattern[j])
+        j = next[j];
+      i++;
+      j++;
+      next[i] = j;
+    }
+    return next;
+  }
+
+  /**
+   * Perform the search
+   *
+   * @param text    the byte array to search in
+   * @param offset  within text from which to search
+   * @param pattern the byte array of the pattern
+   * @return the index into text where the pattern occurs or -1
+   */
+  public static int search(byte[] text, int offset, byte[] pattern) {
+    int[] next = initNext(pattern);
+    int i = offset, j = 0;
+    n = 1;
+    while (i < text.length) {
+      while (j >= 0 && pattern[j] != text[i]) {
+        j = next[j];
+      }
+      i++;
+      j++;
+      if (j == pattern.length)
+        return i - pattern.length;
+    }
+    return -1;
+  }
 }

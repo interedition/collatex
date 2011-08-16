@@ -24,94 +24,85 @@ package au.edu.uq.nmerge.mvd;
 import java.util.HashMap;
 import java.util.Vector;
 
-public class VMap extends HashMap<Match, Match>
-{
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Generate a map of child or parent pairs that follow 
-	 * one another in the pairs list belonging to version v
-	 * @param v the version to test for
-	 * @return a map of pair-pair relations
-	 */
-	VMap( short v, Vector<Match> matches)
-	{
-		HashMap<Match,Match> vMap = new HashMap<Match,Match>();
-		if ( matches.size() > 1 )
-		{
-			Match last = null;
-			for ( int i=0;i< matches.size();i++ )
-			{
-				// examine all the v-pairs
-				Match p = matches.get( i );
-				if ( p.contains(v) )
-				{
-					if ( last == null )
-						continue;
-					else if ( last.isChild() && p.isChild() )
-						vMap.put( last, p );
-					else if ( last.isParent() && p.isParent() )
-						vMap.put( last, p );
-					last = p;
-				}
-			}
-		}
-	}
-	/**
-	 * Work out if a pair is contiguous as a parent or as a child 
-	 * from the last pair to the current one. We know that p follows
-	 * last in version u. All we need to compute is if their children 
-	 * or parents in version v also follow one another. The vMap 
-	 * stores all the parents or children that follow one another in 
-	 * version v. So we just look in there for the children of the 
-	 * parents in u or the parents of the children in u.
-	 * @param last the previous pair, in version u
-	 * @param p the current pair in version u
-	 * @param v the version we are comparing to
-	 * @return true if last and p both follow one another in their 
-	 * respective versions
-	 */
-	boolean isContiguous( Match last, Match p, short v )
-	{
-		if ( last == null )
-			return false;
-		else if ( last.isParent() )
-		{
-			// simple test: if not both parents 
-			// can't be contiguous
-			if ( !p.isParent() )
-				return false;
-			else
-			{
-				// parents must have contiguous children in v
-				Match child1 = last.getChildInVersion( v );
-				Match child2 = p.getChildInVersion( v );
-				if ( child1 != null && child2 != null )
-					return get(child1)==child2 
-						|| get(child2)==child1;
-				else
-					return false;
-			}
-		}
-		else if ( last.isChild() )
-		{
-			if ( !p.isChild() )
-				return false;
-			else
-			{
-				// children must have contiguous parents in v
-				Match parent1 = last.getParent();
-				Match parent2 = p.getParent();
-				boolean ans1 = parent1.contains( v ); 
-				boolean ans2 = parent2.contains( v );
-				if ( ans1 && ans2 )
-				{
-					return get(parent1)==parent2
-						|| get(parent2)==parent1;
-				}
-				else
-					return false;
-			}
-		}
-		return true;
-	}
+public class VMap extends HashMap<Match, Match> {
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Generate a map of child or parent pairs that follow
+   * one another in the pairs list belonging to version v
+   *
+   * @param v the version to test for
+   * @return a map of pair-pair relations
+   */
+  VMap(short v, Vector<Match> matches) {
+    HashMap<Match, Match> vMap = new HashMap<Match, Match>();
+    if (matches.size() > 1) {
+      Match last = null;
+      for (int i = 0; i < matches.size(); i++) {
+        // examine all the v-pairs
+        Match p = matches.get(i);
+        if (p.contains(v)) {
+          if (last == null)
+            continue;
+          else if (last.isChild() && p.isChild())
+            vMap.put(last, p);
+          else if (last.isParent() && p.isParent())
+            vMap.put(last, p);
+          last = p;
+        }
+      }
+    }
+  }
+
+  /**
+   * Work out if a pair is contiguous as a parent or as a child
+   * from the last pair to the current one. We know that p follows
+   * last in version u. All we need to compute is if their children
+   * or parents in version v also follow one another. The vMap
+   * stores all the parents or children that follow one another in
+   * version v. So we just look in there for the children of the
+   * parents in u or the parents of the children in u.
+   *
+   * @param last the previous pair, in version u
+   * @param p    the current pair in version u
+   * @param v    the version we are comparing to
+   * @return true if last and p both follow one another in their
+   *         respective versions
+   */
+  boolean isContiguous(Match last, Match p, short v) {
+    if (last == null)
+      return false;
+    else if (last.isParent()) {
+      // simple test: if not both parents
+      // can't be contiguous
+      if (!p.isParent())
+        return false;
+      else {
+        // parents must have contiguous children in v
+        Match child1 = last.getChildInVersion(v);
+        Match child2 = p.getChildInVersion(v);
+        if (child1 != null && child2 != null)
+          return get(child1) == child2
+                  || get(child2) == child1;
+        else
+          return false;
+      }
+    } else if (last.isChild()) {
+      if (!p.isChild())
+        return false;
+      else {
+        // children must have contiguous parents in v
+        Match parent1 = last.getParent();
+        Match parent2 = p.getParent();
+        boolean ans1 = parent1.contains(v);
+        boolean ans2 = parent2.contains(v);
+        if (ans1 && ans2) {
+          return get(parent1) == parent2
+                  || get(parent2) == parent1;
+        } else
+          return false;
+      }
+    }
+    return true;
+  }
 }

@@ -21,32 +21,31 @@
 
 package au.edu.uq.nmerge.mvd;
 
-public class WrappedPair 
-{
-	Match match;
-	CompactNode defaultNode;
-	WrappedPair( Match match)
-	{
-		this.match = match;
-	}
-	CompactNode getDefaultNode()
-	{
-		return defaultNode;
-	}
-	Match getMatch()
-	{
-		return this.match;
-	}
-	void setDefaultNode( CompactNode cn )
-	{
-		this.defaultNode = cn;
-	}
-	public String toString()
-	{
-		StringBuffer sb = new StringBuffer();
-		sb.append( "pair: "+ match.toString()+"\n" );
-		String defaultNodeString = (defaultNode==null)?"null":defaultNode.toString();
-		sb.append( "defaultNode: "+defaultNodeString );
-		return sb.toString();
-	}
+public class WrappedPair {
+  Match match;
+  CompactNode defaultNode;
+
+  WrappedPair(Match match) {
+    this.match = match;
+  }
+
+  CompactNode getDefaultNode() {
+    return defaultNode;
+  }
+
+  Match getMatch() {
+    return this.match;
+  }
+
+  void setDefaultNode(CompactNode cn) {
+    this.defaultNode = cn;
+  }
+
+  public String toString() {
+    StringBuffer sb = new StringBuffer();
+    sb.append("pair: " + match.toString() + "\n");
+    String defaultNodeString = (defaultNode == null) ? "null" : defaultNode.toString();
+    sb.append("defaultNode: " + defaultNodeString);
+    return sb.toString();
+  }
 }

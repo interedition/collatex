@@ -24,23 +24,22 @@ package au.edu.uq.nmerge;
 /**
  * Commands the user of MvdTool might issue
  */
-public enum Commands 
-{
-	ADD,
-	ARCHIVE,
-	COMPARE,
-	CREATE,
-	DELETE,
-	DESCRIPTION,
-	EXPORT,
-	FIND,
-	HELP,
-	IMPORT,
-	LIST,
-	READ,
-	UNARCHIVE,
-	UPDATE,
-	USAGE,
-	VARIANTS,
-	TREE;
+public enum Commands {
+  ADD,
+  ARCHIVE,
+  COMPARE,
+  CREATE,
+  DELETE,
+  DESCRIPTION,
+  EXPORT,
+  FIND,
+  HELP,
+  IMPORT,
+  LIST,
+  READ,
+  UNARCHIVE,
+  UPDATE,
+  USAGE,
+  VARIANTS,
+  TREE;
 }

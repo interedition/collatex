@@ -19,19 +19,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.exception;
+
 /**
  * A general MVD exception
+ *
  * @author Desmond Schmidt 3/5/09
  */
-public class MVDException extends Exception
-{
-	static final long serialVersionUID = 1;
-	public MVDException( Exception e )
-	{
-		super( e );
-	}
-	public MVDException( String message )
-	{
-		super( message );
-	}
+public class MVDException extends Exception {
+  static final long serialVersionUID = 1;
+
+  public MVDException(Exception e) {
+    super(e);
+  }
+
+  public MVDException(String message) {
+    super(message);
+  }
 }

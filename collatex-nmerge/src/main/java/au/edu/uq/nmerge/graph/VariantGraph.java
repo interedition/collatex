@@ -19,411 +19,392 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.graph;
-import au.edu.uq.nmerge.exception.*;
-import java.util.BitSet;
-import java.util.ListIterator;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.HashSet;
+
+import au.edu.uq.nmerge.exception.MVDException;
+
+import java.util.*;
 
 /**
  * Simple representation of a variant graph, or subgraph thereof
+ *
  * @author Desmond Schmidt 24/10/08
  */
-public class VariantGraph
-{
-	/** the special start and end nodes that define the graph */
-	VariantGraphNode start,end;
-	/** distance of the (sub)graph from the start of the new version */
-	int position;
-	/** subset of versions applicable to this subgraph */
-	BitSet constraint;
-	/** maximum length of this graph */
-	int maxLen;
-	/** total length of all bytes stored in all arcs */
-	int totalLen;
-	static int MIN_OVERLAP_LEN = 10;
+public class VariantGraph {
+  /**
+   * the special start and end nodes that define the graph
+   */
+  VariantGraphNode start, end;
+  /**
+   * distance of the (sub)graph from the start of the new version
+   */
+  int position;
+  /**
+   * subset of versions applicable to this subgraph
+   */
+  BitSet constraint;
+  /**
+   * maximum length of this graph
+   */
+  int maxLen;
+  /**
+   * total length of all bytes stored in all arcs
+   */
+  int totalLen;
+  static int MIN_OVERLAP_LEN = 10;
 
-	/**
-	 * Basic constructor
-	 */
-	public VariantGraph()
-	{
-		start = new VariantGraphNode();
-		end = new VariantGraphNode();
-		this.constraint = new BitSet();
-		maxLen = -1;
-	}
-	/**
-	 * This constructor makes a sub-graph out of part of a larger graph
-	 * @param start the node which will function as start and 
-	 * may have incoming arcs that will be ignored
-	 * @param end the node which will function as end and 
-	 * which may have outgoing arcs that will be ignored
-	 * @param constraint graph only covers these versions and ignores all others
-	 * @param position the position from the start of the new version
-	 */
-	public VariantGraph(VariantGraphNode start, VariantGraphNode end, BitSet constraint, int position)
-	{
-		this.start = start;
-		this.end = end;
-		this.position = position;
-		this.constraint = new BitSet();
-		this.constraint.or( constraint );
-		this.maxLen = maxLength();
-	}
-	/**
-	 * Add an unaligned arc to the graph, attached to the start and end only
-	 * @param data the data of the single version it will hold
-	 * @param version the ID of that version
-	 * @param position the position of the arc
-	 * @return the special, unaligned arc
-	 */
-	public VariantGraphSpecialArc addSpecialArc( byte[] data, int version, int position )
-		throws MVDException
-	{
-		BitSet bs = new BitSet();
-		bs.set( version );
-		VariantGraphSpecialArc a = new VariantGraphSpecialArc( bs, data, position );
-		start.addOutgoing( a );
-		end.addIncoming( a );
-		// ensure this is clear
-		this.constraint.clear( version );
-		// not part of the constraint set yet
-		return a;
-	}
+  /**
+   * Basic constructor
+   */
+  public VariantGraph() {
+    start = new VariantGraphNode();
+    end = new VariantGraphNode();
+    this.constraint = new BitSet();
+    maxLen = -1;
+  }
 
-	/**
-	 * Get the data of the specified version
-	 * @param version the id of the version to read
-	 * @return the version's data as a byte array
-	 */
-	byte[] getVersion( int version )
-	{
-		VariantGraphNode temp = start;
-		int len=0;
-		while ( temp != null && temp != end )
-		{
-			VariantGraphArc a = temp.pickOutgoingArc( version );
-			len += a.dataLen();
-			temp = a.to;
-		}
-		byte[] versionData = new byte[len];
-		temp = start;
-		int j = 0;
-		while ( temp != null && temp != end )
-		{
-			VariantGraphArc a = temp.pickOutgoingArc( version );
-			byte[] data = a.getData();
-			for ( int i=0;i<data.length;i++ )
-				versionData[j++] = data[i];
-			temp = a.to;
-		}
-		return versionData;
-	}
-	/**
-	 * Find the maximum length of this graph in bytes by following 
-	 * each path and finding the length of the longest one
-	 * @return the maximum length of the graph
-	 */
-	private int maxLength()
-	{
-		HashMap <Integer,Integer> lengths = new HashMap<Integer,Integer>();
-		SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
-		HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
-		queue.add( start );
-		while ( !queue.isEmpty() )
-		{
-			VariantGraphNode node = queue.poll();
-			ListIterator<VariantGraphArc> iter = node.outgoingArcs( this );
-			while ( iter.hasNext() )
-			{
-				VariantGraphArc a = iter.next();
-				byte[] data = a.getData();
-				// calculate total length
-				totalLen += data.length;
-				BitSet bs = a.versions;
-				for ( int i=bs.nextSetBit(0);i>=0;i=bs.nextSetBit(i+1) )
-				{
-					if ( lengths.containsKey(i) )
-					{
-						Integer value = lengths.get( i );
-						lengths.put( i, value.intValue()+data.length );
-					}
-					else
-						lengths.put( i, data.length );
-				}
-				a.to.printArc( a );
-				printed.add( a.to );
-				if ( a.to != end && a.to.allPrintedIncoming(constraint) )
-				{
-					queue.add( a.to );
-					a.to.reset();
-				}
-			}
-		}
-		// clear printed
-		Iterator<VariantGraphNode> iter2 = printed.iterator();
-		while ( iter2.hasNext() )
-		{
-			VariantGraphNode n = iter2.next();
-			n.reset();
-		}
-		/// Find the maximum length version
-		Integer max = new Integer( 0 );
-		Set<Integer> keys = lengths.keySet();
-		Iterator<Integer> iter = keys.iterator();
-		while ( iter.hasNext() )
-		{
-			Integer key = iter.next();
-			Integer value = lengths.get( key );
-			if ( value.intValue() > max.intValue() )
-				max = value;
-		}
-		return max.intValue();
-	}
-	/**
-	 * What is the maximum length of this graph?
-	 * @return the length 
-	 */
-	int length()
-	{
-		if ( maxLen == -1 )
-			maxLen = maxLength();
-		return maxLen;
-	}
-	/**
-	 * Get the total length of all bytes in the graph
-	 * @return the number of bytes in the graph
-	 */
-	int totalLen()
-	{
-		if ( maxLen == - 1 )
-			maxLen = maxLength();
-		return totalLen;
-	}
-	/**
-	 * Add a version to the constraint set, i.e. adopt it. Also turn 
-	 * all special arcs into ordinary arcs.
-	 * @param version the version to adopt
-	 */
-	public void adopt( int version ) throws Exception
-	{
-		constraint.set( version );
-		VariantGraphNode temp = start;
-		while ( temp != end )
-		{
-			VariantGraphArc a = temp.pickOutgoingArc( version );
-			assert a != null: "Couldn't find outgoing arc for version "+version;
-			if ( a instanceof VariantGraphSpecialArc)
-			{
-				VariantGraphArc b = new VariantGraphArc( a.versions, a.data );
-				temp.replaceOutgoing( a, b );
-				a.to.replaceIncoming( a, b );
-				temp = b.to;
-			} 
-			else
-				temp = a.to;
-			assert temp != null;
-		}
-	}
-	/**
-	 * Verify a graph by breadth-first traversal, using exceptions.
-	 */
-	public void verify() throws MVDException
-	{
-		SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
-		HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
-		start.verify();
-		queue.add( start );
-		while ( !queue.isEmpty() )
-		{
-			VariantGraphNode node = queue.poll();
-			node.verify();
-			ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
-			while ( iter.hasNext() )
-			{
-				VariantGraphArc a = iter.next();
-				a.verify();
-				a.to.printArc( a );
-				printed.add( a.to );
-				if ( a.to != end && a.to.allPrintedIncoming(constraint) )
-				{
-					queue.add( a.to );
-				}
-			}
-		}	
-		Iterator<VariantGraphNode> iter2 = printed.iterator();
-		while ( iter2.hasNext() )
-		{
-			VariantGraphNode n = iter2.next();
-			n.reset();
-		}
-		end.verify();
-	}
-	/**
-	 * Print out a graph using breadth-first traversal. Also verify.
-	 * @param message a message to display first
-	 */
-	public void printAndVerify( String message )
-	{
-		System.out.println("-----------------------");
-		System.out.println( message );
-		System.out.println( toString() );
-	}
-	/** 
-	 * Classic override of toString method, but check structure 
-	 * of graph also. Works for subgraphs too.
-	 * @return a String representation of this Graph
-	 */
-	public String toString()
-	{
-		int totalOutdegree = 0;
-		int totalIndegree = 0;
-		int totalNodes = 0;
-		int maxIndegree = 0;
-		int maxOutdegree = 0;
-		StringBuffer sb = new StringBuffer();
-		HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
-		try
-		{
-			SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
-			queue.add( start );
-			while ( !queue.isEmpty() )
-			{
-				VariantGraphNode node = queue.poll();
-				if ( node.indegree() > maxIndegree )
-					maxIndegree = node.indegree();
-				if ( node.outdegree() > maxOutdegree )
-					maxOutdegree = node.outdegree();
-				totalIndegree += node.indegree();
-				totalOutdegree += node.outdegree();
-				totalNodes++;
-				node.verify();
-				ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
-				while ( iter.hasNext() )
-				{
-					VariantGraphArc a = iter.next();
-					sb.append( a.toString()+"\n" );
-					a.to.printArc( a );
-					printed.add( a.to );
-					if ( a.to != end && a.to.allPrintedIncoming(constraint) )
-					{
-						queue.add( a.to );
-					}
-				}
-			}
-			Iterator<VariantGraphNode> iter2 = printed.iterator();
-			while ( iter2.hasNext() )
-			{
-				VariantGraphNode n = iter2.next();
-				n.reset();
-			}
-		}
-		catch ( Exception e )
-		{
-			System.out.println(sb.toString());
-		}
-		float averageOutdegree = (float)totalOutdegree/(float)totalNodes;
-		float averageIndegree = (float)totalIndegree/(float)totalNodes;
-		sb.append("\naverageOutdegree="+averageOutdegree);
-		sb.append("\naverageIndegree="+averageIndegree);
-		sb.append("\nmaxOutdegree="+maxOutdegree);
-		sb.append("\nmaxIndegree="+maxIndegree);
-		return sb.toString(); 
-	}
-	/**
-	 * Clear all the printed arcs. Report any that are already 
-	 * printed but shouldn't be. 
-	 */
-	void clearPrinted()
-	{
-		HashMap<Integer,VariantGraphNode> hash = new HashMap<Integer,VariantGraphNode>(1500);
-		SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
-		queue.add(start);
-		while ( !queue.isEmpty() )
-		{
-			VariantGraphNode node = queue.poll();
-			ListIterator<VariantGraphArc> iter = node.outgoingArcs();
-			while ( iter.hasNext() )
-			{
-				VariantGraphArc a = iter.next();
-				if ( !hash.containsKey(a.to.nodeId) )
-				{
-					queue.add( node );
-					node.reset();
-					hash.put( a.to.nodeId, a.to );
-				}
-			}
-		}
-	}
-	// extra routines for nmerge
-	/**
-	 * Get the start node (read only)
-	 * @return a node
-	 */
-	public VariantGraphNode getStart()
-	{
-		return start;
-	}
-	/**
-	 * Remove the text of a version from the graph. Don't adjust the 
-	 * versions sets but leave a hole.
-	 * @param version the version to remove
-	 */
-	public void removeVersion( int version )
-	{
-		SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
-		queue.add( start );
-		while ( !queue.isEmpty() )
-		{
-			VariantGraphNode node = queue.poll();
-			node.reset();
-			ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
-			VariantGraphArc del = null;
-			while ( iter.hasNext() )
-			{
-				VariantGraphArc a = iter.next();
-				a.to.printArc( a );
-				if ( a.versions.nextSetBit(version)==version )
-				{
-					if ( a.versions.cardinality()==1 )
-						del = a;
-					else
-					{
-						a.versions.clear( version );
-						a.to.removeIncomingVersion( version );
-						a.from.removeOutgoingVersion( version );
-					}
-				}
-				if ( a.to != end && a.to.allPrintedIncoming() )
-				{
-					queue.add( a.to );
-				}
-			}
-			// can't delete arc inside iterator
-			// so we do it outside
-			if ( del != null )
-			{
-				del.from.removeOutgoing( del );
-				del.to.removeIncoming( del );
-				// is it a child arc?
-				if ( del.parent != null )
-					del.parent.removeChild( del );
-				else if ( del.children != null )
-					del.passOnData();
-			}
-			node.reset();
-			try
-			{
-				node.verify();
-			}
-			catch ( Exception e )
-			{
-				System.out.println(e);
-			}
-		}
-		// we removed the version, so clear the constraint
-		this.constraint.clear( version );
-	}}
+  /**
+   * This constructor makes a sub-graph out of part of a larger graph
+   *
+   * @param start      the node which will function as start and
+   *                   may have incoming arcs that will be ignored
+   * @param end        the node which will function as end and
+   *                   which may have outgoing arcs that will be ignored
+   * @param constraint graph only covers these versions and ignores all others
+   * @param position   the position from the start of the new version
+   */
+  public VariantGraph(VariantGraphNode start, VariantGraphNode end, BitSet constraint, int position) {
+    this.start = start;
+    this.end = end;
+    this.position = position;
+    this.constraint = new BitSet();
+    this.constraint.or(constraint);
+    this.maxLen = maxLength();
+  }
+
+  /**
+   * Add an unaligned arc to the graph, attached to the start and end only
+   *
+   * @param data     the data of the single version it will hold
+   * @param version  the ID of that version
+   * @param position the position of the arc
+   * @return the special, unaligned arc
+   */
+  public VariantGraphSpecialArc addSpecialArc(byte[] data, int version, int position)
+          throws MVDException {
+    BitSet bs = new BitSet();
+    bs.set(version);
+    VariantGraphSpecialArc a = new VariantGraphSpecialArc(bs, data, position);
+    start.addOutgoing(a);
+    end.addIncoming(a);
+    // ensure this is clear
+    this.constraint.clear(version);
+    // not part of the constraint set yet
+    return a;
+  }
+
+  /**
+   * Get the data of the specified version
+   *
+   * @param version the id of the version to read
+   * @return the version's data as a byte array
+   */
+  byte[] getVersion(int version) {
+    VariantGraphNode temp = start;
+    int len = 0;
+    while (temp != null && temp != end) {
+      VariantGraphArc a = temp.pickOutgoingArc(version);
+      len += a.dataLen();
+      temp = a.to;
+    }
+    byte[] versionData = new byte[len];
+    temp = start;
+    int j = 0;
+    while (temp != null && temp != end) {
+      VariantGraphArc a = temp.pickOutgoingArc(version);
+      byte[] data = a.getData();
+      for (int i = 0; i < data.length; i++)
+        versionData[j++] = data[i];
+      temp = a.to;
+    }
+    return versionData;
+  }
+
+  /**
+   * Find the maximum length of this graph in bytes by following
+   * each path and finding the length of the longest one
+   *
+   * @return the maximum length of the graph
+   */
+  private int maxLength() {
+    HashMap<Integer, Integer> lengths = new HashMap<Integer, Integer>();
+    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+    HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
+    queue.add(start);
+    while (!queue.isEmpty()) {
+      VariantGraphNode node = queue.poll();
+      ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
+      while (iter.hasNext()) {
+        VariantGraphArc a = iter.next();
+        byte[] data = a.getData();
+        // calculate total length
+        totalLen += data.length;
+        BitSet bs = a.versions;
+        for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i + 1)) {
+          if (lengths.containsKey(i)) {
+            Integer value = lengths.get(i);
+            lengths.put(i, value.intValue() + data.length);
+          } else
+            lengths.put(i, data.length);
+        }
+        a.to.printArc(a);
+        printed.add(a.to);
+        if (a.to != end && a.to.allPrintedIncoming(constraint)) {
+          queue.add(a.to);
+          a.to.reset();
+        }
+      }
+    }
+    // clear printed
+    Iterator<VariantGraphNode> iter2 = printed.iterator();
+    while (iter2.hasNext()) {
+      VariantGraphNode n = iter2.next();
+      n.reset();
+    }
+    /// Find the maximum length version
+    Integer max = new Integer(0);
+    Set<Integer> keys = lengths.keySet();
+    Iterator<Integer> iter = keys.iterator();
+    while (iter.hasNext()) {
+      Integer key = iter.next();
+      Integer value = lengths.get(key);
+      if (value.intValue() > max.intValue())
+        max = value;
+    }
+    return max.intValue();
+  }
+
+  /**
+   * What is the maximum length of this graph?
+   *
+   * @return the length
+   */
+  int length() {
+    if (maxLen == -1)
+      maxLen = maxLength();
+    return maxLen;
+  }
+
+  /**
+   * Get the total length of all bytes in the graph
+   *
+   * @return the number of bytes in the graph
+   */
+  int totalLen() {
+    if (maxLen == -1)
+      maxLen = maxLength();
+    return totalLen;
+  }
+
+  /**
+   * Add a version to the constraint set, i.e. adopt it. Also turn
+   * all special arcs into ordinary arcs.
+   *
+   * @param version the version to adopt
+   */
+  public void adopt(int version) throws Exception {
+    constraint.set(version);
+    VariantGraphNode temp = start;
+    while (temp != end) {
+      VariantGraphArc a = temp.pickOutgoingArc(version);
+      assert a != null : "Couldn't find outgoing arc for version " + version;
+      if (a instanceof VariantGraphSpecialArc) {
+        VariantGraphArc b = new VariantGraphArc(a.versions, a.data);
+        temp.replaceOutgoing(a, b);
+        a.to.replaceIncoming(a, b);
+        temp = b.to;
+      } else
+        temp = a.to;
+      assert temp != null;
+    }
+  }
+
+  /**
+   * Verify a graph by breadth-first traversal, using exceptions.
+   */
+  public void verify() throws MVDException {
+    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+    HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
+    start.verify();
+    queue.add(start);
+    while (!queue.isEmpty()) {
+      VariantGraphNode node = queue.poll();
+      node.verify();
+      ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
+      while (iter.hasNext()) {
+        VariantGraphArc a = iter.next();
+        a.verify();
+        a.to.printArc(a);
+        printed.add(a.to);
+        if (a.to != end && a.to.allPrintedIncoming(constraint)) {
+          queue.add(a.to);
+        }
+      }
+    }
+    Iterator<VariantGraphNode> iter2 = printed.iterator();
+    while (iter2.hasNext()) {
+      VariantGraphNode n = iter2.next();
+      n.reset();
+    }
+    end.verify();
+  }
+
+  /**
+   * Print out a graph using breadth-first traversal. Also verify.
+   *
+   * @param message a message to display first
+   */
+  public void printAndVerify(String message) {
+    System.out.println("-----------------------");
+    System.out.println(message);
+    System.out.println(toString());
+  }
+
+  /**
+   * Classic override of toString method, but check structure
+   * of graph also. Works for subgraphs too.
+   *
+   * @return a String representation of this Graph
+   */
+  public String toString() {
+    int totalOutdegree = 0;
+    int totalIndegree = 0;
+    int totalNodes = 0;
+    int maxIndegree = 0;
+    int maxOutdegree = 0;
+    StringBuffer sb = new StringBuffer();
+    HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
+    try {
+      SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+      queue.add(start);
+      while (!queue.isEmpty()) {
+        VariantGraphNode node = queue.poll();
+        if (node.indegree() > maxIndegree)
+          maxIndegree = node.indegree();
+        if (node.outdegree() > maxOutdegree)
+          maxOutdegree = node.outdegree();
+        totalIndegree += node.indegree();
+        totalOutdegree += node.outdegree();
+        totalNodes++;
+        node.verify();
+        ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
+        while (iter.hasNext()) {
+          VariantGraphArc a = iter.next();
+          sb.append(a.toString() + "\n");
+          a.to.printArc(a);
+          printed.add(a.to);
+          if (a.to != end && a.to.allPrintedIncoming(constraint)) {
+            queue.add(a.to);
+          }
+        }
+      }
+      Iterator<VariantGraphNode> iter2 = printed.iterator();
+      while (iter2.hasNext()) {
+        VariantGraphNode n = iter2.next();
+        n.reset();
+      }
+    } catch (Exception e) {
+      System.out.println(sb.toString());
+    }
+    float averageOutdegree = (float) totalOutdegree / (float) totalNodes;
+    float averageIndegree = (float) totalIndegree / (float) totalNodes;
+    sb.append("\naverageOutdegree=" + averageOutdegree);
+    sb.append("\naverageIndegree=" + averageIndegree);
+    sb.append("\nmaxOutdegree=" + maxOutdegree);
+    sb.append("\nmaxIndegree=" + maxIndegree);
+    return sb.toString();
+  }
+
+  /**
+   * Clear all the printed arcs. Report any that are already
+   * printed but shouldn't be.
+   */
+  void clearPrinted() {
+    HashMap<Integer, VariantGraphNode> hash = new HashMap<Integer, VariantGraphNode>(1500);
+    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+    queue.add(start);
+    while (!queue.isEmpty()) {
+      VariantGraphNode node = queue.poll();
+      ListIterator<VariantGraphArc> iter = node.outgoingArcs();
+      while (iter.hasNext()) {
+        VariantGraphArc a = iter.next();
+        if (!hash.containsKey(a.to.nodeId)) {
+          queue.add(node);
+          node.reset();
+          hash.put(a.to.nodeId, a.to);
+        }
+      }
+    }
+  }
+  // extra routines for nmerge
+
+  /**
+   * Get the start node (read only)
+   *
+   * @return a node
+   */
+  public VariantGraphNode getStart() {
+    return start;
+  }
+
+  /**
+   * Remove the text of a version from the graph. Don't adjust the
+   * versions sets but leave a hole.
+   *
+   * @param version the version to remove
+   */
+  public void removeVersion(int version) {
+    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+    queue.add(start);
+    while (!queue.isEmpty()) {
+      VariantGraphNode node = queue.poll();
+      node.reset();
+      ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
+      VariantGraphArc del = null;
+      while (iter.hasNext()) {
+        VariantGraphArc a = iter.next();
+        a.to.printArc(a);
+        if (a.versions.nextSetBit(version) == version) {
+          if (a.versions.cardinality() == 1)
+            del = a;
+          else {
+            a.versions.clear(version);
+            a.to.removeIncomingVersion(version);
+            a.from.removeOutgoingVersion(version);
+          }
+        }
+        if (a.to != end && a.to.allPrintedIncoming()) {
+          queue.add(a.to);
+        }
+      }
+      // can't delete arc inside iterator
+      // so we do it outside
+      if (del != null) {
+        del.from.removeOutgoing(del);
+        del.to.removeIncoming(del);
+        // is it a child arc?
+        if (del.parent != null)
+          del.parent.removeChild(del);
+        else if (del.children != null)
+          del.passOnData();
+      }
+      node.reset();
+      try {
+        node.verify();
+      } catch (Exception e) {
+        System.out.println(e);
+      }
+    }
+    // we removed the version, so clear the constraint
+    this.constraint.clear(version);
+  }
+}

@@ -22,17 +22,17 @@ package au.edu.uq.nmerge.exception;
 
 /**
  * A syntax or other error in operation of the MVDTool
+ *
  * @author Desmond Schmidt 3/5/09
  */
-public class MVDToolException extends MVDException 
-{
-	static final long serialVersionUID = 1;
-	public MVDToolException( Exception e )
-	{
-		super( e );
-	}
-	public MVDToolException( String message )
-	{
-		super( message );
-	}
+public class MVDToolException extends MVDException {
+  static final long serialVersionUID = 1;
+
+  public MVDToolException(Exception e) {
+    super(e);
+  }
+
+  public MVDToolException(String message) {
+    super(message);
+  }
 }

@@ -210,7 +210,7 @@ public class SuffixTree<T> {
    * @return a newly created leaf (newSon case) or internal node (split case).
    */
   SuffixTreeNode applyExtensionRule2(SuffixTreeNode node, int edgeLabelBegin, int edgeLabelEnd,
-                           int pathPos, int edgePos, Rule2Type type) {
+                                     int pathPos, int edgePos, Rule2Type type) {
     SuffixTreeNode newLeaf, newInternal, son;
     // newSon
     if (type == Rule2Type.NEW_CHILD) {
@@ -270,7 +270,7 @@ public class SuffixTree<T> {
    * @return the node where tracing has stopped
    */
   private SuffixTreeNode traceSingleEdge(SuffixTreeNode node, Path str, TraceReturnValue trv,
-                               SkipType type) {
+                                         SkipType type) {
     SuffixTreeNode contNode;
     int length, strLen;
 
@@ -348,7 +348,7 @@ public class SuffixTree<T> {
    * @return the node where tracing has stopped
    */
   private SuffixTreeNode traceString(SuffixTreeNode node, Path str, TraceReturnValue trv,
-                           SkipType type) {
+                                     SkipType type) {
     Path localStr = new Path();
     localStr.begin = str.begin;
     localStr.end = str.end;

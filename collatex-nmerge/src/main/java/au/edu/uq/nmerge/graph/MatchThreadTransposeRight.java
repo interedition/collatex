@@ -21,66 +21,66 @@
 package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
+
 import java.util.ListIterator;
 
 
 /**
- * This version of MatchThread searches the arcs to the right 
- * of the subgraph using a different technique. We basically 
+ * This version of MatchThread searches the arcs to the right
+ * of the subgraph using a different technique. We basically
  * let matches run on as far as they need to.
+ *
  * @author Desmond Schmidt 31/1/09
  */
-public class MatchThreadTransposeRight extends MatchThreadDirect
-{
-	/**
-	 * Constructor for thread to search for matches
-	 * @param mum the mum we have to update
-	 * @param st the suffix tree representing the new version 
-	 * @param a the arc to start searching from
-	 * @param first the offset into a at which to start
-	 * @param prevChars an array of characters preceding a[first]
-	 * @param travelled the distance from the special arc
-	 * @param forbidden don't travel beyond this node (should be null)
-	 */
-	MatchThreadTransposeRight( MaximalUniqueMatch mum, SuffixTree<Byte> st, VariantGraphArc a,
-		int first, PrevChar[] prevChars, int travelled, VariantGraphNode forbidden )
-	{
-		super( mum, null, st, a, a.from, first, prevChars, forbidden );
-		this.travelled = travelled;
-	}
-	/**
-	 * Copy constructor for recursion
-	 * @param mttr the MatchThreadTransposeLeft object to clone
-	 */
-	protected MatchThreadTransposeRight( MatchThreadTransposeRight mttr )
-	{
-		super( mttr );
-	}
-	/** 
-	 * Move on to the next arc(s) - if you can - by recursion.
-	 * This is an override of the direct method.
-	 */
-	protected void updateArc()
-	{
-		// arc was fully matched - save it
-		addToPath( arc );
-		boolean extended = false;
-		ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs();
-		while ( iter.hasNext() )
-		{
-			VariantGraphArc a = iter.next();
-			if ( a.versions.intersects(versions)
-				&&a.versions.nextSetBit(mum.version)!=mum.version
-				&&(!a.isParent()||!a.hasChildInVersion(mum.version)) )
-			{
-				this.arc = a;
-				this.first = 0;
-				MatchThreadTransposeRight mttr = new MatchThreadTransposeRight( this );
-				mttr.run();
-				extended |= mttr.first > 0;
-			}
-		}
-		if ( !extended )
-			mismatch();
-	}
+public class MatchThreadTransposeRight extends MatchThreadDirect {
+  /**
+   * Constructor for thread to search for matches
+   *
+   * @param mum       the mum we have to update
+   * @param st        the suffix tree representing the new version
+   * @param a         the arc to start searching from
+   * @param first     the offset into a at which to start
+   * @param prevChars an array of characters preceding a[first]
+   * @param travelled the distance from the special arc
+   * @param forbidden don't travel beyond this node (should be null)
+   */
+  MatchThreadTransposeRight(MaximalUniqueMatch mum, SuffixTree<Byte> st, VariantGraphArc a,
+                            int first, PrevChar[] prevChars, int travelled, VariantGraphNode forbidden) {
+    super(mum, null, st, a, a.from, first, prevChars, forbidden);
+    this.travelled = travelled;
+  }
+
+  /**
+   * Copy constructor for recursion
+   *
+   * @param mttr the MatchThreadTransposeLeft object to clone
+   */
+  protected MatchThreadTransposeRight(MatchThreadTransposeRight mttr) {
+    super(mttr);
+  }
+
+  /**
+   * Move on to the next arc(s) - if you can - by recursion.
+   * This is an override of the direct method.
+   */
+  protected void updateArc() {
+    // arc was fully matched - save it
+    addToPath(arc);
+    boolean extended = false;
+    ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs();
+    while (iter.hasNext()) {
+      VariantGraphArc a = iter.next();
+      if (a.versions.intersects(versions)
+              && a.versions.nextSetBit(mum.version) != mum.version
+              && (!a.isParent() || !a.hasChildInVersion(mum.version))) {
+        this.arc = a;
+        this.first = 0;
+        MatchThreadTransposeRight mttr = new MatchThreadTransposeRight(this);
+        mttr.run();
+        extended |= mttr.first > 0;
+      }
+    }
+    if (!extended)
+      mismatch();
+  }
 }
