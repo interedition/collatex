@@ -40,7 +40,7 @@ public class MatchThreadDirect implements Runnable
 	/** the subgraph we are searching through */
 	protected VariantGraph graph;
 	/** the Suffix Tree we are matching against */
-	protected SuffixTree st;
+	protected SuffixTree<Byte> st;
 	/** the last node we have seen before the match started */
 	VariantGraphNode start;
 	/** the start offset from start in bytes */
@@ -84,7 +84,7 @@ public class MatchThreadDirect implements Runnable
 	 * @param prevChars an array of possible bytes that immediately 
 	 * precede this match
 	 */
-	public MatchThreadDirect( MaximalUniqueMatch mum, VariantGraph graph, SuffixTree st, VariantGraphArc arc,
+	public MatchThreadDirect( MaximalUniqueMatch mum, VariantGraph graph, SuffixTree<Byte> st, VariantGraphArc arc,
 		VariantGraphNode start, int offset, PrevChar[] prevChars, VariantGraphNode forbidden )
 	{
 		this.mum = mum;

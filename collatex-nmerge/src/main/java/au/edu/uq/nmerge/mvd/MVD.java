@@ -39,7 +39,6 @@ public class MVD
   Mask mask;
   // new options
 	boolean directAlignOnly;
-	Vector<Group> groups;		// id = position in table+1
 	Vector<Version> versions;	// id = position in table+1
 	Vector<Pair> pairs;
 	String description;
@@ -54,7 +53,6 @@ public class MVD
 	public MVD()
 	{
       this.description = "";
-      this.groups = new Vector<Group>();
       this.versions = new Vector<Version>();
       this.pairs = new Vector<Pair>();
       this.mask = Mask.NONE;
@@ -112,14 +110,13 @@ public class MVD
 	/** 
 	 * Add a version after we've built the MVD. 
 	 * @param version the version to add
-	 * @param group its group id
 	 * @throws MVDException
 	 */
-	public void addVersion( int version, short group ) throws MVDException
+	public void addVersion( int version ) throws MVDException
 	{
 		if ( version == versions.size()+1 )
 		{
-			Version v = new Version( group, Version.NO_BACKUP, "Z", 
+			Version v = new Version( Version.NO_BACKUP, "Z",
 				UNTITLED_NAME );
 			versions.insertElementAt( v, version-1 );
 		}
@@ -134,8 +131,6 @@ public class MVD
 	{
 		if ( versions == null )
 			versions = new Vector<Version>();
-		if ( v.group > groups.size() )
-			throw new MVDException( "invalid group id="+v.group );
 		versions.add( v );
 	}
 	/**
@@ -146,74 +141,8 @@ public class MVD
 	{
 		return versions.size();
 	}
-	/**
-	 * Get the number of groups
-	 * @return the number of elements in the groups array
-	 */
-	public int numGroups()
-	{
-		return groups.size();
-	}
-	/**
-	 * Add an anonymous group to a finished MVD by shifting higher 
-	 * group ids up.
-	 * @param groupId the id of the desired group
-	 * @param parent the id of the parent group or 0 if top level
-	 */
-	public void addGroup( short groupId, short parent )
-	{
-		Group g = new Group( parent, UNTITLED_NAME );
-		groups.insertElementAt( g, groupId-1 );
-		// adjust groups referenced by versions
-		for ( int i=0;i<versions.size();i++ )
-		{
-			Version v = versions.get( i );
-			if ( v.group >= groupId )
-				v.group++;
-		}
-	}
-	/**
-	 * Add a group to the MVD
-	 * @param group the group to add
-	 */
-	void addGroup( Group group )
-	{
-		if ( groups == null )
-			groups = new Vector<Group>();
-		groups.add( group );
-	}
-	/**
-	 * Get any sub-groups of the specified group
-	 * @return an array of sub-groups or an empty array if none
-	 */
-	public String[] getSubGroups( short groupId )
-	{
-		Vector<String> subGroups = new Vector<String>();
-		for ( int id=1,i=0;i<groups.size();i++,id++ )
-		{
-			Group g = groups.get( i );
-			if ( g.getParent() == groupId )
-				subGroups.add( g.toString()+";id:"+id );
-		}
-		String[] array = new String[subGroups.size()];
-		return subGroups.toArray( array );
-	}
-	/**
-	 * Get any immediate (not nested) sub-versions of the specified group
-	 * @return an array of sub-versions or an empty array if none
-	 */
-	public String[] getSubVersions( short groupId )
-	{
-		Vector<String> subVersions = new Vector<String>();
-		for ( int id=1,i=0;i<versions.size();i++,id++ )
-		{
-			Version v = versions.get( i );
-			if ( v.group == groupId )
-				subVersions.add( v.toString()+";id:"+id );
-		}
-		String[] array = new String[subVersions.size()];
-		return subVersions.toArray( array );
-	}
+
+
 	/**
 	 * Add a pair to the MVD
 	 * @param pair the pair to add
@@ -479,18 +408,9 @@ public class MVD
 	 * Create a new empty version.
 	 * @return the id of the new version
 	 */
-	public int newVersion( String shortName, String longName, String group, 
-		short backup, boolean partial ) 
+	public int newVersion( String shortName, String longName, short backup, boolean partial )
 	{
-		short gId = findGroup( group );
-		if ( gId == 0 )
-		{
-			Group g = new Group( (short)0, group );
-			groups.add( g );
-			gId = (short)groups.size();
-		}
-		versions.add( new Version(gId, (partial)?backup:Version.NO_BACKUP, 
-			shortName, longName) );
+		versions.add( new Version((partial)?backup:Version.NO_BACKUP, shortName, longName) );
 		int vId = versions.size();
 		// now go through the graph, looking for any pair 
 		// containing the backup version and adding to it 
@@ -506,45 +426,7 @@ public class MVD
 		}
 		return vId;
 	}
-	/**
-	 * Get the group id corresponding to the name
-	 * @param groupName
-	 * @return the group id
-	 */
-	private short findGroup( String groupName ) 
-	{
-		short id = 0;
-		for ( int i=0;i<groups.size();i++ )
-		{
-			Group g = groups.get( i );
-			if ( g.name.equals(groupName) )
-			{
-				id = (short) (i + 1);
-				break;
-			}
-		}
-		return id;
-	}
-	/**
-	 * Get the group parent id
-	 * @param groupId the group id
-	 * @return the corresponding group name
-	 */
-	public short getGroupParent( short groupId )
-	{
-		Group g = groups.get( groupId-1 );
-		return g.parent;
-	}
-	/**
-	 * Get the group name given its id
-	 * @param groupId the group id
-	 * @return the corresponding group name
-	 */
-	public String getGroupName( short groupId )
-	{
-		Group g = groups.get( groupId-1 );
-		return g.name;
-	}
+
 	/**
 	 * Get the backup for the given version
 	 * @param vId the version to get the backup of
@@ -555,25 +437,7 @@ public class MVD
 		Version v = versions.get(vId-1);
 		return v.backup;
 	}
-	/**
-	 * Get the group id for the given version
-	 * @param vId the version to get the group of
-	 * @return the group id
-	 */
-	public short getGroupForVersion( int vId )
-	{
-		Version v = versions.get(vId-1);
-		return v.group;
-	}
-	/**
-	 * Get the current index of the given group + 1
-	 * @param g the group to search for
-	 * @return the index +1 of the group in the groups vector or 0
-	 */
-	public short getGroupId( Group g )
-	{
-		return (short) (groups.indexOf(g) + 1);
-	}
+
 	/**
 	 * Get the current index of the given version + 1
 	 * @param v the version to search for
@@ -603,32 +467,7 @@ public class MVD
 	{
 		this.description = description;
 	}
-	/**
-	 * Rename a group. If the groupId == 0 do nothing
-	 * @param groupId the id of the group to rename
-	 * @param groupName the new name for the group
-	 */
-	public void setGroupName( short groupId, String groupName )
-	{
-		if ( groupId > 0 )
-		{
-			Group g = groups.get( groupId-1 );
-			g.setName( groupName);
-		}
-	}
-	/**
-	 * Set the parent of the given group
-	 * @param groupId the id of the group to change
-	 * @param parentId the new parent
-	 */
-	public void setGroupParent( short groupId, short parentId )
-	{
-		if ( groupId > 0 )
-		{
-			Group g = groups.get( groupId-1 );
-			g.setParent( parentId );
-		}
-	}
+
 	/**
 	 * Set the short name of a given version
 	 * @param versionId the id of the affected version
@@ -659,16 +498,7 @@ public class MVD
 		Version v = versions.get( versionId-1 );
 		v.backup = backup;
 	}
-	/**
-	 * Set the group membership of a version
-	 * @param versionId id of the affected version 
-	 * @param groupId the new groupId
-	 */
-	public void setVersionGroup( int versionId, short groupId )
-	{
-		Version v = versions.get( versionId-1 );
-		v.group = groupId;
-	}
+
 	/**
 	 * Set the data mask
 	 * @param mask the kind of mask to apply to all data in the MVD
@@ -677,31 +507,7 @@ public class MVD
 	{
 		this.mask = mask;
 	}
-	/**
-	 * Set a group's open status (a transient property)
-	 * @param groupId the group id that is affected by the change
-	 * @param open the new open value
-	 */
-	public void setOpen( short groupId, boolean open )
-	{
-		Group g = groups.get( groupId-1 );
-		g.setOpen( open );
-	}
-	/**
-	 * Get the default group for this MVD
-	 * @return null if no versions or groups defined, otherwise the 
-	 * first group in the list
-	 */
-	public String getDefaultGroup()
-	{
-		String groupName = null;
-		if ( groups.size() > 0 )
-		{
-			Group g = groups.get( 0 );
-			groupName = g.name;
-		}
-		return groupName;
-	}
+
 	/**
 	 * Update an existing version or add a new one.
 	 * @param version the id of the version to add. 
@@ -1069,37 +875,7 @@ public class MVD
 		}
 		return bs;
 	}
-	/**
-	 * Remove a group from the group table. Check that the parent 
-	 * group now has at least one member. If not, remove it also. 
-	 * Update all the group ids in all the versions too. 
-	 * @param group the group id to remove
-	 */
-	public void removeGroup( short group ) throws Exception
-	{
-		// remove the actual group
-		groups.remove( (short)(group-1) );
-		// update all the versions to reflect the change
-		HashSet<Integer> delenda = new HashSet<Integer>();
-		for ( int i=0;i<versions.size();i++ )
-		{
-			Version v = versions.get( i );
-			if ( v.group > group )
-				v.group--;
-			else if ( v.group == group )
-				delenda.add( new Integer(i+1) );
-		}
-		// now remove any child versions of the group 
-		if ( delenda.size() > 0 )
-		{
-			// delete the versions in reverse order
-			Integer[] array = new Integer[delenda.size()];
-			delenda.toArray( array );
-			Arrays.sort( array );
-			for ( int i=array.length-1;i>=0;i-- )
-				removeVersion( array[i].intValue() );
-		}
-	}
+
 	/**
 	 * Get the long name for the given version
 	 * @param versionId the id of the version
@@ -1132,53 +908,7 @@ public class MVD
 		}
 		return version+1;
 	}
-	/**
-	 * Get an array of Version ids of a given group. If request is 
-	 * for a group that contains other groups, get the versions for 
-	 * that group recursively.
-	 * @param group the group or TOP_LEVEL - get all the versions of 
-	 * this group and its descendants
-	 * @return an array of version ids
-	 */
-	public int[] getVersionsForGroup( short group )
-	{
-		HashSet<Short> descendants = new HashSet<Short>();
-		if ( group != Group.TOP_LEVEL )
-			descendants.add( group );
-		getDescendantsOfGroup( group, descendants );
-		Vector<Integer> chosen = new Vector<Integer>();
-		for ( int i=0;i<versions.size();i++ )
-		{
-			Version v = versions.get( i );
-			Short vGroup = new Short( v.group );
-			if ( descendants.contains(vGroup) )
-				chosen.add( i+1 );
-		}
-		int[] selectedVersions = new int[chosen.size()];
-		for ( int i=0;i<chosen.size();i++ )
-			selectedVersions[i] = chosen.get(i).intValue();
-		return selectedVersions;
-	}
-	/**
-	 * Get all the direct descendants of a group 
-	 * @param group the parent group to check for descendants
-	 * @param descendants a set containing the ids of the descendants 
-	 * to be filled in
-	 */
-	private void getDescendantsOfGroup( short group, 
-		HashSet<Short> descendants )
-	{
-		for ( int i=0;i<groups.size();i++ )
-		{
-			Group g = groups.get( i );
-			if ( group == g.parent )
-			{
-				short localGroup = (short)(i+1);
-				descendants.add( localGroup );
-				getDescendantsOfGroup( localGroup, descendants );
-			}
-		}
-	}
+
 	/**
 	 * Get the id of the highest version in the MVD
 	 * @return a version ID
@@ -1187,50 +917,7 @@ public class MVD
 	{
 		return versions.size();
 	}
-	/**
-	 * Return a readable printout of all the versions in the MVD.
-	 * @param indent the amount to indent the outermost group
-	 * @param gId the id of the group whose contents are desired
-	 * @return the contents of the group in XML
-	 * @throws MVDException if the group was not found
-	 */
-	public String getContentsForGroup( int indent, short gId ) 
-		throws MVDException
-	{
-		StringBuffer sb = new StringBuffer();
-		// write group start tag
-		for ( int i=0;i<indent;i++ )
-			sb.append( " " );
-		Group g1 = (gId != 0)?groups.get(gId-1):new Group((short)-1, 
-			"top level" );
-		if ( g1 == null )
-			throw new MVDException("group id "+gId+" not found!");
-		sb.append("<group name=\""+g1.name+"\" id=\""+gId+"\"");
-		if ( gId != 0 )
-			sb.append(" parent=\""+g1.parent+"\"");
-		sb.append( ">\n" );
-		// check for sub-groups
-		for ( short i=0;i<groups.size();i++ )
-		{
-			Group g = groups.get( i );
-			if ( g.parent == gId )
-				sb.append( getContentsForGroup(indent+2,
-					(short)(i+1)) );
-		}
-		// get sub-versions
-		for ( short i=0;i<versions.size();i++ )
-		{
-			Version v = versions.get( i );
-			if ( v.group == gId )
-				sb.append( v.toXML(indent+2,i+1) );
-		}
-		// write group end tag
-		for ( int i=0;i<indent;i++ )
-			sb.append( " " );
-		sb.append("</group>");
-		sb.append("\n");
-		return sb.toString();
-	}
+
 	/**
 	 * Return a printout of all the versions in the MVD.
 	 * @return the descriptions as a String array
@@ -1245,20 +932,7 @@ public class MVD
 		}
 		return descriptions;
 	}
-	/**
-	 * Return a printout of all the groups in the MVD.
-	 * @return the descriptions as a String array
-	 */
-	public String[] getGroupDescriptions()
-	{
-		String[] descriptions = new String[groups.size()];
-		for ( int id=1,i=0;i<groups.size();i++,id++ )
-		{
-			Group g = groups.get(i);
-			descriptions[i] = g.toString()+";id:"+id;
-		}
-		return descriptions;
-	}
+
 	/**
 	 * Retrieve a version, copying it from the MVD
 	 * @param version the version to retrieve
@@ -1837,7 +1511,6 @@ public class MVD
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append( "; directAlignOnly="+directAlignOnly);
-		sb.append( "; groups.size()="+groups.size() );
 		sb.append( "; versions.size()="+versions.size() );
 		sb.append( "; pairs.size()="+pairs.size() );
 		sb.append( "; description="+description );

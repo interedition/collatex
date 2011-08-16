@@ -181,9 +181,6 @@ public class MvdTool
 			case HELP:
 				printExample();
 				break;
-			case LIST:
-				doListVersions();
-				break;
 			case READ:
 				doReadVersion();
 				break;
@@ -480,23 +477,7 @@ public class MvdTool
 			throw new MVDToolException( e );
 		}
 	}
-	/**
-	 * List the versions of an MVD
-	 * @throws MVDToolException
-	 */
-	private static void doListVersions() throws MVDToolException
-	{
-		try
-		{
-			MVD mvd = loadMVD();
-			String versionTable = mvd.getContentsForGroup( 0, (short)0 );
-			out.write( versionTable.getBytes(mvd.getEncoding()) );
-		}
-		catch ( Exception e )
-		{
-			throw new MVDToolException( e );
-		}
-	}
+
 	/**
 	 * Add the specified version to the MVD. Don't replace an existing 
 	 * version, so we reset the supplied version parameter to the number 
@@ -510,8 +491,7 @@ public class MvdTool
 			if ( t.exists() )
 			{
 				MVD mvd = new MVD( description );;
-					mvd.newVersion( shortName, longName, groupName,
-						(short)backup, partial );
+					mvd.newVersion( shortName, longName, (short)backup, partial );
 				FileInputStream fis = new FileInputStream( t );
 				byte[] data = new byte[(int)t.length()];
 				fis.read( data );

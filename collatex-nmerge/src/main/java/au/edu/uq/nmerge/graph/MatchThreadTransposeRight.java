@@ -42,7 +42,7 @@ public class MatchThreadTransposeRight extends MatchThreadDirect
 	 * @param travelled the distance from the special arc
 	 * @param forbidden don't travel beyond this node (should be null)
 	 */
-	MatchThreadTransposeRight( MaximalUniqueMatch mum, SuffixTree st, VariantGraphArc a,
+	MatchThreadTransposeRight( MaximalUniqueMatch mum, SuffixTree<Byte> st, VariantGraphArc a,
 		int first, PrevChar[] prevChars, int travelled, VariantGraphNode forbidden )
 	{
 		super( mum, null, st, a, a.from, first, prevChars, forbidden );

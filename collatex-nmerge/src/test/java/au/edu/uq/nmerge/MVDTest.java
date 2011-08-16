@@ -25,8 +25,6 @@ import au.edu.uq.nmerge.mvd.Chunk;
 import au.edu.uq.nmerge.mvd.ChunkState;
 import au.edu.uq.nmerge.mvd.MVD;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -36,10 +34,10 @@ public class MVDTest extends AbstractTest {
   @Test
   public void simple() throws Exception {
     final MVD mvd = new MVD("Test");
-    final short version1 = (short) mvd.newVersion("test1", "test1", "test", (short) 0, false);
+    final short version1 = (short) mvd.newVersion("test1", "test1", Short.MIN_VALUE, false);
     mvd.update(version1, "Hello funny World!".getBytes());
 
-    final short version2 = (short) mvd.newVersion("test2", "test2", "test", (short) 0, false);
+    final short version2 = (short) mvd.newVersion("test2", "test2", Short.MIN_VALUE, false);
     mvd.update(version2, "Hello World! How funny!".getBytes());
 
     for (Chunk chunk : mvd.compare(version2, version1, ChunkState.added)) {

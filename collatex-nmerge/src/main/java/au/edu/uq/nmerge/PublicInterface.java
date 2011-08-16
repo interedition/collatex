@@ -25,7 +25,6 @@ import java.io.File;
 
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.*;
-import au.edu.uq.nmerge.Utilities;
 
 import java.util.BitSet;
 
@@ -95,16 +94,7 @@ public class PublicInterface
 	{
 		return cache;
 	}
-	/**
-	 * Get the name of the default group of an mvd
-	 * @param fileName the path to the mvd
-	 * @return the name of the default group 0
-	 */
-	public String getDefaultGroup( String fileName ) throws Exception
-	{
-		MVD mvd = getFromCache( fileName );
-		return mvd.getDefaultGroup();
-	}
+
 	/**
 	 * Get a description from an MVD
 	 * @param fileName the name of the file on the file system
@@ -168,18 +158,7 @@ public class PublicInterface
 		MVD mvd = getFromCache( mvdPath );
 		mvd.setVersionBackup( versionId, backup );
 	}
-	/**
-	 * Set the group for a given version
-	 * @param mvdPath the path to the mvd
-	 * @param versionId the id of the version affected
-	 * @param groupId the new group the version is to belong to
-	 */
-	public void setVersionGroup( String mvdPath, int versionId, 
-		short groupId ) throws Exception
-	{
-		MVD mvd = getFromCache( mvdPath );
-		mvd.setVersionGroup( versionId, groupId );
-	}
+
 	/**
 	 * Set a description of an MVD
 	 * @param fileName the name of the file on the file system
@@ -191,42 +170,7 @@ public class PublicInterface
 		MVD mvd = getFromCache( fileName );
 		mvd.setDescription( description );
 	}
-	/**
-	 * Get a group name given its id
-	 * @param mvdPath the path to the relevant mvd
-	 * @param groupId its groupid
-	 * @param groupName the new name for the group
-	 */
-	public void setGroupName( String mvdPath, short groupId, 
-		String groupName ) throws Exception
-	{
-		MVD mvd = getFromCache( mvdPath );
-		mvd.setGroupName( groupId, groupName );
-	}
-	/**
-	 * Get a the group's parent id
-	 * @param mvdPath the path to the relevant mvd
-	 * @param groupId its groupid
-	 * @param parentId the new parent of the group
-	 */
-	public void setGroupParent( String mvdPath, short groupId, 
-		short parentId ) throws Exception
-	{
-		MVD mvd = getFromCache( mvdPath );
-		mvd.setGroupParent( groupId, parentId );
-	}
-	/**
-	 * Set the open status of an MVD's group
-	 * @param mvdPath the name of the file on the file system
-	 * @param groupId the group to open
-	 * @param open the new open status of the group
-	 */
-	public void setOpen( String mvdPath, short groupId, boolean open ) 
-		throws Exception
-	{
-		MVD mvd = getFromCache( mvdPath );
-		mvd.setOpen( groupId, open );
-	}
+
 	/**
 	 * Get an array of version descriptions from an MVD
 	 * @param fileName the name of the file on the file system
@@ -238,40 +182,8 @@ public class PublicInterface
 		MVD mvd = getFromCache( fileName );
 		return mvd.getVersionDescriptions();
 	}
-	/**
-	 * Get an array of version ids for a given group
-	 * @param fileName the name of the file on the file system
-	 * @return an array of version descriptions
-	 */
-	public int[] getGroupVersions( String fileName, short group ) 
-		throws Exception
-	{
-		MVD mvd = getFromCache( fileName );
-		return mvd.getVersionsForGroup( group );
-	}
 
-	/**
-	 * Get group descriptions from an MVD
-	 * @param fileName the name of the file on the file system
-	 * @return an array of group descriptions
-	 */
-	public String[] getGroupDescriptions( String fileName ) throws Exception
-	{
-		MVD mvd = getFromCache( fileName );
-		return mvd.getGroupDescriptions();
-	}
-	/**
-	 * Get a group name given its id
-	 * @param mvdPath the path to the relevant mvd
-	 * @param groupId its groupid
-	 * @return the current name of the group
-	 */
-	public String getGroupName( String mvdPath, short groupId ) 
-		throws Exception
-	{
-		MVD mvd = getFromCache( mvdPath );
-		return mvd.getGroupName( groupId );
-	}
+
 	/**
 	 * Get the long name for a version
 	 * @param fileName the file name of the MVD
@@ -494,7 +406,7 @@ public class PublicInterface
 	 * @param fileName the path to the MVD
 	 * @param versionId the version to update
 	 * @param data the data to use for the merge
-	 * @param id of folder to store it in (default 1)
+	 * @param folderId of folder to store it in (default 1)
 	 * @return percentage of new version that was unique, or 0 
 	 * if this was the first version
 	 */
@@ -508,61 +420,30 @@ public class PublicInterface
 	 * Save the MVD in the cache. If its not in the cache there's 
 	 * nothing to do.
 	 * @param fileName the relative path to the file
-	 * @param id of folder to store it in (default 1)
+	 * @param folderId of folder to store it in (default 1)
 	 */
 	public void save( String fileName, int folderId ) throws Exception
 	{
-		if ( cache.containsKey(fileName) )
-		{
-			MVD mvd = cache.get( fileName );
-		}
 	}
 	/**
 	 * Add a new version to the MVD. 
 	 * @param fileName the relative path to the MVD file
-	 * @param gId the group id
 	 * @throws Exception if there was an error
 	 */
-	public void addVersion( String fileName, short gId ) 
+	public void addVersion( String fileName )
 		throws MVDException
 	{
 		try
 		{
 			MVD mvd = getFromCache( fileName );
-			mvd.addVersion( mvd.numVersions()+1, gId );
+			mvd.addVersion( mvd.numVersions()+1 );
 		}
 		catch ( Exception e )
 		{
 			throw new MVDException( e );
 		}
 	}
-	/**
-	 * Add a new group to the MVD.
-	 * @param fileName the relative path to the MVD
-	 * @param parentId the id of the parent of gId or 0
-	 */
-	public void addGroup( String fileName, short parentId ) 
-		throws Exception
-	{
-		try
-		{
-			MVD mvd = getFromCache( fileName );
-			mvd.addGroup( (short)(mvd.numGroups()+1), parentId );
-		}
-		catch ( Exception e )
-		{
-			throw new MVDException( e );
-		}
-	}
-	/**
-	 * Remove an entire group and its subversions
-	 * @param gId the id of the group to remove
-	 */
-	public void removeGroup( String fileName, short gId ) throws Exception
-	{
-		MVD mvd = getFromCache( fileName );
-		mvd.removeGroup( gId );
-	}
+
 	/**
 	 * Delete the version from the MVD but don't save it
 	 * @param fileName the relative path to the MVD file
@@ -587,30 +468,12 @@ public class PublicInterface
 			if ( !mvdFile.delete() )
 				throw new Exception( "Couldn't delete "+fileName );
 	}
-	/**
-	 * Delete the version from the MVD but don't save it
-	 * @param fileName the relative path to the MVD file
-	 * @param gId the id of the group to delete
-	 * @throws MVDException if there was an error
-	 */
-	public void deleteGroup( String fileName, short gId ) 
-		throws Exception
-	{
-		try
-		{
-			MVD mvd = getFromCache( fileName );
-			mvd.removeGroup( gId );
-		}
-		catch ( Exception e )
-		{
-			throw new MVDException( e );
-		}
-	}
+
 	/**
 	 * Retrieve an MVD from the cache or put it there if it isn't already
 	 * @param fileName path to the MVD file
 	 * @return the MVD corresponding to the file or a freshly loaded one
-	 * @throws an MVDException if the loading failed
+	 * @throws Exception if the loading failed
 	 */
 	private MVD getFromCache( String fileName ) throws Exception
 	{
@@ -628,32 +491,13 @@ public class PublicInterface
 	/**
 	 * Reread the mvd from its source
 	 * @param fileName path to the MVD file
-	 * @throws an Exception if the loading failed
+	 * @throws Exception if the loading failed
 	 */
 	public void revert( String fileName ) throws Exception
 	{
 	}
+
 	/**
-	 * Find all the groups that belong under the given group
-	 * @param fileName the relative path to the mvd
-	 * @param groupId the group's current id
-	 * @return an array of sub-groups as an array of Strings
-	 * @throws Exception if there was an I/O error
-	 */
-	public String[] getSubGroups( String fileName, short groupId ) 
-		throws MVDException
-	{
-		try
-		{
-			MVD mvd = getFromCache( fileName );
-			return mvd.getSubGroups( groupId );
-		}
-		catch ( Exception e )
-		{
-			throw new MVDException( e );
-		}
-	}
-	/** 
 	 * Find the overall number of versions
 	 * @param mvdPath the path to the MVD
 	 * @return the number of versions
@@ -664,58 +508,7 @@ public class PublicInterface
 		MVD mvd = getFromCache( mvdPath );
 		return mvd.numVersions();
 	}
-	/** 
-	 * Find the number of groups currently defined
-	 * @param mvdPath the path to the MVD
-	 * @return the number of groups
-	 * @throws Exception if an I/O error occurred
-	 */
-	public int numGroups( String mvdPath ) throws Exception
-	{
-		MVD mvd = getFromCache( mvdPath );
-		return mvd.numGroups();
-	}
-	/**
-	 * Get the id of a group previously fetched from the mvd
-	 * @param fileName
-	 * @param g the group to look for
-	 * @return the group's id as a Short or 0 if not found
-	 * @throws Exception if an I/O error occurred
-	 */
-	public Short getGroupId( String fileName, Group g ) 
-		throws MVDException
-	{
-		try
-		{
-			MVD mvd = getFromCache( fileName );
-			return new Short( mvd.getGroupId(g) );
-		}
-		catch ( Exception e )
-		{
-			throw new MVDException( e );
-		}
-	}
-	/**
-	 * Get an array of versions that belong as direct children 
-	 * of a given group
-	 * @param fileName the relative path to the mvd
-	 * @param groupId the group's current id (index+1)
-	 * @return the array of versions under groupId
-	 * @throws Exception if an I/O error occurred
-	 */
-	public String[] getSubVersions( String fileName, short groupId ) 
-		throws Exception
-	{
-		try
-		{
-			MVD mvd = getFromCache( fileName );
-			return mvd.getSubVersions( groupId );
-		}
-		catch ( Exception e )
-		{
-			throw new MVDException( e );
-		}
-	}
+
 	/**
 	 * Get the id of the given version previously fetched from 
 	 * the mvd

@@ -19,8 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.mvd;
-import au.edu.uq.nmerge.exception.*;
-import java.io.UnsupportedEncodingException;
+
 /**
  * Definition of a version. This is not the same as the versions of 
  * a Pair - that records WHICH versions the pair belongs to. This 
@@ -29,9 +28,8 @@ import java.io.UnsupportedEncodingException;
 public class Version
 {
 	static final long serialVersionUID = 1;
-	/** parent group in the version hierarchy */
-	public short group;
-	/** the backup version is returned whenever this version 
+
+	/** the backup version is returned whenever this version
 	 * is requested but is not available */
 	public short backup;
 	/** siglum or other short name e.g. A */
@@ -43,33 +41,16 @@ public class Version
 	public static short NO_BACKUP = 0;
 	/**
 	 * Create an instance of Version
-	 * @param group the parent group - can be nested
 	 * @param backup the backup version or NO_BACKUP
 	 * @param shortName siglum or other short name
 	 * @param longName longer name if desired
 	 */
-	public Version( short group, short backup, String shortName, 
+	public Version( short backup, String shortName,
 		String longName )
 	{
 		this.shortName = shortName;
 		this.longName = longName;
-		this.group = group;
 		this.backup = backup;
-	}
-	/**
-	 * Return the size of this Group object
-	 * @return the size in bytes
-	 */
-	int dataSize() throws UnsupportedEncodingException
-	{
-		if ( versionSize == 0 )
-		{
-			byte[] snBytes = shortName.getBytes( "UTF-8" );
-			byte[] lnBytes = longName.getBytes( "UTF-8" );
-			versionSize = 2 + 2 + 2 + 2 + snBytes.length 
-				+ lnBytes.length;
-		}
-		return versionSize;
 	}
 
 	/**
@@ -89,21 +70,7 @@ public class Version
 	{
 		return backup != NO_BACKUP;
 	}
-	/**
-	 * Replace quotation marks with \"
-	 * @param input the input string
-	 * @return the quotation-escaped string
-	 */
-	private String escape( String input )
-	{
-		StringBuffer sb = new StringBuffer();
-		for ( int i=0;i<input.length();i++ )
-			if ( input.charAt(i)=='"' )
-				sb.append( "\"" );
-			else
-				sb.append( input.charAt(i) );
-		return sb.toString();
-	}
+
 	/**
 	 * Convert this version to a String
 	 * @param indent the amount to indent the version XML
@@ -127,6 +94,6 @@ public class Version
 	public String toString()
 	{
 		return "shortName:"+shortName+";longName:"+longName
-			+";group:"+group+";backup:"+backup;
+			+";backup:"+backup;
 	}
 }

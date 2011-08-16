@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
-import eu.interedition.text.mem.SimpleQName;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
