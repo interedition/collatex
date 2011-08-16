@@ -22,7 +22,6 @@
 package au.edu.uq.nmerge.graph.suffixtree;
 
 import au.edu.uq.nmerge.AbstractTest;
-import au.edu.uq.nmerge.exception.MVDException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ public class SuffixTreeTest extends AbstractTest {
   public void simple() {
     final SuffixTree st = new SuffixTree(TEST_STRING.getBytes());
     LOG.debug(st.printTree());
-    Assert.assertNotSame(st.stError, st.findSubstring("d".getBytes()));
+    Assert.assertNotSame(st.errorValue, st.findSubstring("d".getBytes()));
   }
 
   /**
@@ -55,9 +54,9 @@ public class SuffixTreeTest extends AbstractTest {
         int len = k - j + 1;
         byte[] test = new byte[len];
         for (int m = 0; m < len; m++) {
-          test[m] = st.treeString[j + m];
+          test[m] = st.source[j + m];
         }
-        Assert.assertNotSame("in string (" + j + "," + k + ")", st.stError, st.findSubstring(test));
+        Assert.assertNotSame("in string (" + j + "," + k + ")", st.errorValue, st.findSubstring(test));
       }
     }
   }

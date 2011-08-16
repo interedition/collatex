@@ -20,13 +20,12 @@
  */
 package au.edu.uq.nmerge.graph.suffixtree;
 
-public class Pos
-{
-	public Node node;
-    public int edgePos;
-	public Pos( Node node, int edgePos )
-	{
-		this.node = node;
-		this.edgePos = edgePos;
-	}
+public class Position {
+  public Node node;
+  public int edgePos;
+
+  public Position(Node node, int edgePos) {
+    this.node = node;
+    this.edgePos = edgePos;
+  }
 }

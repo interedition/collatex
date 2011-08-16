@@ -21,7 +21,7 @@
 package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
-import au.edu.uq.nmerge.graph.suffixtree.Pos;
+import au.edu.uq.nmerge.graph.suffixtree.Position;
 import java.util.BitSet;
 import java.util.ListIterator;
 
@@ -52,7 +52,7 @@ public class MatchThreadDirect implements Runnable
 	/** the arc being currently searched */
 	Arc arc;
 	/** the current position in the SuffixTree */
-	protected Pos pos;
+	protected Position position;
 	/** Versions shared by all arcs in the path */
 	protected BitSet versions;
 	/** overall length of the path in bytes */
@@ -93,7 +93,7 @@ public class MatchThreadDirect implements Runnable
 		this.arc = arc;
 		this.start = start;
 		this.graph = graph;
-		this.pos = new Pos( null, 0 );
+		this.position = new Position( null, 0 );
 		this.offset = offset;
 		this.prevChars = prevChars;
 		this.forbidden = forbidden;
@@ -115,7 +115,7 @@ public class MatchThreadDirect implements Runnable
 		this.offset = mtd.offset;
 		// don't forget to duplicate this!
 		// or splits will update each other
-		this.pos = new Pos( mtd.pos.node, mtd.pos.edgePos );
+		this.position = new Position( mtd.position.node, mtd.position.edgePos );
 		this.versions = new BitSet();
 		this.versions.or( mtd.versions );
 		this.pathLen = mtd.pathLen;
@@ -141,7 +141,7 @@ public class MatchThreadDirect implements Runnable
 		byte[] data = arc.getData();
 		assert(arc.mask==null||arc.mask[first]==1);
 		while ( first < data.length 
-			&& st.advance(pos,data[first]) )
+			&& st.advance(position,data[first]) )
 		{
 			first++;
 			pathLen++;
@@ -180,7 +180,7 @@ public class MatchThreadDirect implements Runnable
 		if ( pathLen >= MUM.MIN_LEN )
 		{
 			// second test: are we unique in the suffix tree?
-			if ( pos.node.isLeaf() )
+			if ( position.node.isLeaf() )
 			{
 				// third test
 				if ( isMaximal() )		
@@ -188,7 +188,7 @@ public class MatchThreadDirect implements Runnable
 					addToPath( arc );
 					// if we matched at least one byte of the current arc
 					mum.update( start, offset, versions, 
-						pos.edgePos-pathLen, pathLen, travelled );
+						position.edgePos-pathLen, pathLen, travelled );
 				}
 				// else it's a substring of the maximum match
 			}
@@ -204,7 +204,7 @@ public class MatchThreadDirect implements Runnable
 	 */
 	protected boolean isMaximal()
 	{
-		int prevCharIndex = pos.edgePos-(pathLen+1);
+		int prevCharIndex = position.edgePos-(pathLen+1);
 		if ( prevCharIndex >= 0 )
 		{
 			byte dataPrevChar = mum.arc.getData()[prevCharIndex];

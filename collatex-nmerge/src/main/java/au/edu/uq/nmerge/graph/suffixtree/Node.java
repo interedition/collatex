@@ -30,7 +30,7 @@ public class Node {
   /**
    * A linked list of sons of that node
    */
-  Node sons;
+  Node children;
   /**
    * A linked list of right siblings of that node
    */
@@ -42,12 +42,12 @@ public class Node {
   /**
    * A pointer to that node's father
    */
-  Node father;
+  Node parent;
   /**
    * A pointer to the node that represents the largest
    * suffix of the current node
    */
-  Node suffixLink;
+  Node largestSuffix;
   /**
    * Index of the start position of the node's path
    */
@@ -67,14 +67,14 @@ public class Node {
   /**
    * Create a Node
    *
-   * @param father   father of the node
+   * @param parent   father of the node
    * @param start    the starting index of the incoming edge to that node
    * @param end      the end index of the incoming edge to that node
    * @param position the path starting position of the node.
    */
-  public Node(Node father, int start, int end, int position) {
+  public Node(Node parent, int start, int end, int position) {
     Preconditions.checkArgument(end >= start, "Error: start greater than end");
-    this.father = father;
+    this.parent = parent;
     this.pathPosition = position;
     this.edgeLabelStart = start;
     this.edgeLabelEnd = end;
@@ -86,6 +86,6 @@ public class Node {
    * @return true if this node is a leaf
    */
   public boolean isLeaf() {
-    return sons == null;
+    return children == null;
   }
 }
