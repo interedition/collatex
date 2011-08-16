@@ -20,12 +20,11 @@
  */
 package au.edu.uq.nmerge.graph.suffixtree;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -144,16 +143,19 @@ public class SuffixTree<T> {
    *            was a special character. However,http://www.abc.net.au/news/ in Yona's
    *            version it is appended at the end of the input string and then never used.
    */
-  public SuffixTree(List<T> str, T terminal) {
+  @SuppressWarnings("unchecked")
+  public SuffixTree(Iterable<T> str, T terminal) {
     int phase;
 
     // added to make 1-character suffix trees work
     this.e = 1;
-    this.length = str.size() + 1;
+    this.length = Iterables.size(str) + 1;
     errorValue = length + 10;
     this.source = (T[]) Array.newInstance(terminal.getClass(), length + 1);
-    for (int i = 0; i < str.size(); i++) {
-      this.source[i + 1] = str.get(i);
+
+    int i = 0;
+    for (T t : str) {
+      this.source[++i] = t;
     }
     // the terminal ('$') is never examined but assumed to be there
     this.source[length] = terminal;
@@ -178,8 +180,6 @@ public class SuffixTree<T> {
       // perform Single Phase Algorithm
       singlePhase(position, phase, ep);
     }
-
-    verify(str);
   }
 
   /**
@@ -189,7 +189,7 @@ public class SuffixTree<T> {
    * @param character the character to be searched for in the sons
    * @return the son found, or null if no such son.
    */
-  Node findSon(Node node, T character) {
+  Node findChild(Node node, T character) {
     // point to the first son.
     node = node.children;
     // scan all sons (all right siblings of the first son) for their first
@@ -347,7 +347,7 @@ public class SuffixTree<T> {
 
     // search for the first character of the string in the outgoing
     // edge of node
-    contNode = findSon(node, source[str.begin]);
+    contNode = findChild(node, source[str.begin]);
     if (contNode == null) {
       // Search is done, string not found
       trv.edgePos = getNodeLabelLength(node) - 1;
@@ -440,7 +440,7 @@ public class SuffixTree<T> {
    * @return the relevant Pos, null if not present
    */
   public Position getStartPos(T b) {
-    Node node = findSon(root, b);
+    Node node = findChild(root, b);
     if (node != null) {
       return new Position(node, node.edgeLabelStart);
     } else
@@ -459,7 +459,7 @@ public class SuffixTree<T> {
    */
   public boolean advance(Position position, T b) {
     if (position.node == null) {
-      position.node = findSon(root, b);
+      position.node = findChild(root, b);
       if (position.node != null) {
         position.edgePos = position.node.edgeLabelStart;
         return true;
@@ -469,7 +469,7 @@ public class SuffixTree<T> {
       int nodeLabelEnd = getNodeLabelEnd(position.node);
       // already matched that byte ...
       if (position.edgePos == nodeLabelEnd) {
-        Node localNode = findSon(position.node, b);
+        Node localNode = findChild(position.node, b);
         if (localNode != null) {
           position.edgePos = localNode.edgeLabelStart;
           position.node = localNode;
@@ -524,7 +524,7 @@ public class SuffixTree<T> {
   public int findSubstring(List<T> W) {
     // starts with the root's son that has the first character of W
     // as its incoming edge first character
-    Node node = findSon(root, W.get(0));
+    Node node = findChild(root, W.get(0));
     int k, j = 0, nodeLabelEnd;
 
     // scan nodes down from the root until a leaf is reached or the
@@ -545,7 +545,7 @@ public class SuffixTree<T> {
         return node.pathPosition;
       } else if (k > nodeLabelEnd)
         // current edge is found to match, continue to next edge
-        node = findSon(node, W.get(j));
+        node = findChild(node, W.get(j));
       else {
         // one non-matching symbols is found - W is not a substring
         return errorValue;
@@ -672,7 +672,7 @@ public class SuffixTree<T> {
       // 1. last character matched is the last of its edge
       if (isLastCharInEdge(position.node, position.edgePos)) {
         // trace only last symbol of str, search in the  NEXT edge (node)
-        tmp = findSon(position.node, source[str.end]);
+        tmp = findChild(position.node, source[str.end]);
         if (tmp != null) {
           position.node = tmp;
           position.edgePos = 0;
@@ -886,37 +886,4 @@ public class SuffixTree<T> {
       }
     }
   }
-
-  /**
-   * verify that all the words stored in str are findable
-   */
-  void verify(List<T> str) {
-    int start = -1;
-    for (int i = 0; i < str.size(); i++) {
-      if (str.get(i) != null && start == -1)
-        start = i;
-      else if (str.get(i) == null && start != -1) {
-        reportWord(str, start, i);
-        start = -1;
-      }
-    }
-    if (start != -1)
-      reportWord(str, start, str.size());
-  }
-
-  /**
-   * Report a word as found or not
-   *
-   * @param str   the byte array the words are coming from
-   * @param start the start offset of the word to report-
-   * @param end   an index one beyond the end of the word
-   */
-  void reportWord(List<T> str, int start, int end) {
-    if (findSubstring(str.subList(start, end)) == errorValue) {
-      throw new IllegalStateException("Couldn't find word [" + start + ", " + end + "]");
-    }
-
-  }
-
-
 }

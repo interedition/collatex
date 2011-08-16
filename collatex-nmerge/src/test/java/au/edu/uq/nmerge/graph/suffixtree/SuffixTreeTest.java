@@ -41,4 +41,16 @@ public class SuffixTreeTest extends AbstractTest {
     LOG.debug(st.printTree());
     Assert.assertNotSame(st.errorValue, st.findSubstring(TEST_STRING.subList(0, 3)));
   }
+
+  /**
+   * All the words stored in a string are findable
+   */
+  @Test
+  public void verifyAllSuffixes() {
+    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, "");
+    final int end = TEST_STRING.size();
+    for (int start = 0; start < end; start++) {
+      Assert.assertNotNull("Couldn't find word [" + start + ", " + end + "]", st.findSubstring(TEST_STRING.subList(start, end)));
+    }
+  }
 }
