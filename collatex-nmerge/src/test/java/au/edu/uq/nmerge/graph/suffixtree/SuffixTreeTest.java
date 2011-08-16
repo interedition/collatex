@@ -22,42 +22,23 @@
 package au.edu.uq.nmerge.graph.suffixtree;
 
 import au.edu.uq.nmerge.AbstractTest;
+import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class SuffixTreeTest extends AbstractTest {
 
-  private static final String TEST_STRING = "Hello World";
+  private static final List<String> TEST_STRING = Lists.newArrayList("Hello ", "World", "!");
 
   @Test
   public void simple() {
-    final SuffixTree st = new SuffixTree(TEST_STRING.getBytes());
+    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, "");
     LOG.debug(st.printTree());
-    Assert.assertNotSame(st.errorValue, st.findSubstring("d".getBytes()));
-  }
-
-  /**
-   * Self test of the tree: Search for all substrings of the main string
-   */
-  @Test
-  public void selfTestTree() {
-    final SuffixTree st = new SuffixTree(TEST_STRING.getBytes());
-
-    // loop for all the prefixes of the tree source string
-    for (int k = 1; k < st.length; k++) {
-      // loop for each suffix of each prefix
-      for (int j = 1; j <= k; j++) {
-        // search for the current suffix in the tree
-        int len = k - j + 1;
-        byte[] test = new byte[len];
-        for (int m = 0; m < len; m++) {
-          test[m] = st.source[j + m];
-        }
-        Assert.assertNotSame("in string (" + j + "," + k + ")", st.errorValue, st.findSubstring(test));
-      }
-    }
+    Assert.assertNotSame(st.errorValue, st.findSubstring(TEST_STRING.subList(0, 3)));
   }
 }

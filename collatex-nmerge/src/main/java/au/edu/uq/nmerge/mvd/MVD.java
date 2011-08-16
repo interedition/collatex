@@ -19,18 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package au.edu.uq.nmerge.mvd;
-import java.util.HashMap;
-import java.util.TreeSet;
-import java.util.HashSet;
-import java.util.TreeMap;
-import java.util.Vector;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import java.util.ListIterator;
 import java.io.Serializable;
 
 import au.edu.uq.nmerge.graph.Graph;
@@ -42,6 +32,7 @@ import au.edu.uq.nmerge.graph.XMLMasker;
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import au.edu.uq.nmerge.graph.Converter;
 import au.edu.uq.nmerge.exception.MVDException;
+import com.google.common.collect.Lists;
 
 /**
  * Represent a multi-version document.
@@ -752,7 +743,7 @@ public class MVD extends Serialiser implements Serializable
 			startTime = System.currentTimeMillis();
 		if ( g.getStart().cardinality() > 1 )
 		{
-			SuffixTree st = makeSuffixTree( special );
+			SuffixTree<Byte> st = makeSuffixTree( special );
 			MUM bestMUM = MUM.findDirectMUM( special, st, g );
 			TreeMap<SpecialArc,Graph> specials = 
 				new TreeMap<SpecialArc,Graph>(new SpecialComparator());
@@ -961,12 +952,12 @@ public class MVD extends Serialiser implements Serializable
 	 * @param g a graph
 	 * @param special a special arc aligned with g
 	 * @return the new MUM or null
-	 * @throws an MVDException
+	 * @throws MVDException
 	 */
 	private MUM computeBestMUM( Graph g, SpecialArc special ) 
 		throws MVDException
 	{
-		SuffixTree st = makeSuffixTree( special );
+		SuffixTree<Byte> st = makeSuffixTree( special );
 		MUM directMUM = MUM.findDirectMUM( special, st, g );
 		MUM best = directMUM;
 		if ( !directAlignOnly )
@@ -989,16 +980,16 @@ public class MVD extends Serialiser implements Serializable
 	 * @return the suffix tree
 	 * @throws MVDException
 	 */
-	private SuffixTree makeSuffixTree( SpecialArc special ) 
+	private SuffixTree<Byte> makeSuffixTree( SpecialArc special )
 		throws MVDException
 	{
-		byte[] specialData;
-		if ( special.hasMask() )
-			specialData = XMLMasker.maskOut(special.getData(), 
-				special.getMask() );
-		else
-			specialData = special.getData();
-		return new SuffixTree( specialData );
+      List<Byte> treeSource = Lists.newArrayListWithExpectedSize(special.getData().length);
+      byte[] data = (special.hasMask() ? XMLMasker.maskOut(special.getData(), special.getMask() ) : special.getData());
+      for (byte b : data) {
+        treeSource.add(b);
+      }
+
+	  return new SuffixTree<Byte>( treeSource, (byte) '$');
 	}
 	/**
 	 * Install a subarc into specials
@@ -1428,7 +1419,7 @@ public class MVD extends Serialiser implements Serializable
 	 * calculate size of data).
 	 * @param data a byte array of exactly the right size
 	 * @return the number of serialised bytes
-	 * @throws an Exception if data was the wrong size
+	 * @throws Exception if data was the wrong size
 	 */
 	int serialise( byte[] data ) throws Exception
 	{

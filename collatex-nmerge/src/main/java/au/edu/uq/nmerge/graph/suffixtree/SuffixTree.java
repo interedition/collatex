@@ -20,8 +20,13 @@
  */
 package au.edu.uq.nmerge.graph.suffixtree;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is a Java translation of Shlomo Yona's open source
@@ -30,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Desmond Schmidt 25/10/08
  */
-public class SuffixTree {
+public class SuffixTree<T> {
   private static final Logger LOG = LoggerFactory.getLogger(SuffixTree.class);
 
   /**
@@ -80,7 +85,7 @@ public class SuffixTree {
    * contain only indices to this string and do not contain the characters
    * themselves
    */
-  byte[] source;
+  T[] source;
 
   /**
    * The node that is the head of all others. It has no siblings nor a
@@ -139,19 +144,20 @@ public class SuffixTree {
    *            was a special character. However,http://www.abc.net.au/news/ in Yona's
    *            version it is appended at the end of the input string and then never used.
    */
-  public SuffixTree(byte[] str) {
+  public SuffixTree(List<T> str, T terminal) {
     int phase;
 
     // added to make 1-character suffix trees work
     this.e = 1;
-    this.length = str.length + 1;
+    this.length = str.size() + 1;
     errorValue = length + 10;
-    this.source = new byte[length + 1];
-    for (int i = 0; i < str.length; i++)
-      source[i + 1] = str[i];
+    this.source = (T[]) Array.newInstance(terminal.getClass(), length + 1);
+    for (int i = 0; i < str.size(); i++) {
+      this.source[i + 1] = str.get(i);
+    }
+    // the terminal ('$') is never examined but assumed to be there
+    this.source[length] = terminal;
 
-    // the '$' is never examined but assumed to be there
-    source[length] = '$';
     root = new Node(null, 0, 0, 0);
     root.largestSuffix = null;
 
@@ -183,12 +189,12 @@ public class SuffixTree {
    * @param character the character to be searched for in the sons
    * @return the son found, or null if no such son.
    */
-  Node findSon(Node node, byte character) {
+  Node findSon(Node node, T character) {
     // point to the first son.
     node = node.children;
     // scan all sons (all right siblings of the first son) for their first
     // character (it must match the char given as input to this function).
-    while (node != null && source[node.edgeLabelStart] != character) {
+    while (node != null && !source[node.edgeLabelStart].equals(character)) {
       node = node.rightSibling;
     }
     return node;
@@ -376,8 +382,7 @@ public class SuffixTree {
            trv.charsFound++, trv.edgePos++) {
         // compare current characters of the string and the edge.
         // if equal - continue
-        if (source[node.edgeLabelStart + trv.edgePos] !=
-                source[str.begin + trv.edgePos]) {
+        if (!source[node.edgeLabelStart + trv.edgePos].equals(source[str.begin + trv.edgePos])) {
           trv.edgePos--;
           return node;
         }
@@ -434,7 +439,7 @@ public class SuffixTree {
    * @param b the first byte from the root whose Pos is desired
    * @return the relevant Pos, null if not present
    */
-  public Position getStartPos(byte b) {
+  public Position getStartPos(T b) {
     Node node = findSon(root, b);
     if (node != null) {
       return new Position(node, node.edgeLabelStart);
@@ -452,7 +457,7 @@ public class SuffixTree {
    * @param position the position in the tree where we were last time
    * @return true if the advance was successful, false otherwise
    */
-  public boolean advance(Position position, byte b) {
+  public boolean advance(Position position, T b) {
     if (position.node == null) {
       position.node = findSon(root, b);
       if (position.node != null) {
@@ -472,7 +477,7 @@ public class SuffixTree {
         } else
           return false;
       } else {
-        boolean success = source[position.edgePos + 1] == b;
+        boolean success = source[position.edgePos + 1].equals(b);
         if (success)
           position.edgePos++;
         return success;
@@ -516,10 +521,10 @@ public class SuffixTree {
    *         the tree source string. If the substring is not found - returns
    *         stError
    */
-  public int findSubstring(byte[] W) {
+  public int findSubstring(List<T> W) {
     // starts with the root's son that has the first character of W
     // as its incoming edge first character
-    Node node = findSon(root, W[0]);
+    Node node = findSon(root, W.get(0));
     int k, j = 0, nodeLabelEnd;
 
     // scan nodes down from the root until a leaf is reached or the
@@ -529,19 +534,18 @@ public class SuffixTree {
       nodeLabelEnd = getNodeLabelEnd(node);
       // Scan a single edge - compare each character with the searched
       // string
-      while (j < W.length && k <= nodeLabelEnd && source[k]
-              == W[j]) {
+      while (j < W.size() && k <= nodeLabelEnd && source[k].equals(W.get(j))) {
         j++;
         k++;
       }
       // checking which of the stopping conditions are true
-      if (j == W.length) {
+      if (j == W.size()) {
         // W was found - it is a substring. Return its path starting
         // index
         return node.pathPosition;
       } else if (k > nodeLabelEnd)
         // current edge is found to match, continue to next edge
-        node = findSon(node, W[j]);
+        node = findSon(node, W.get(j));
       else {
         // one non-matching symbols is found - W is not a substring
         return errorValue;
@@ -678,7 +682,7 @@ public class SuffixTree {
       // 2. last character matched is NOT the last of its edge
       else {
         // Trace only last symbol of str, search in the CURRENT edge (node)
-        if (source[position.node.edgeLabelStart + position.edgePos + 1] == source[str.end]) {
+        if (source[position.node.edgeLabelStart + position.edgePos + 1].equals(source[str.end])) {
           position.edgePos++;
           charsFound = 1;
         }
@@ -847,7 +851,7 @@ public class SuffixTree {
       tree.append("+");
       // print the node itself
       while (start <= end) {
-        tree.append((char) source[start]);
+        tree.append("[").append(source[start].toString()).append("]");
         start++;
       }
       tree.append(" (").append(node1.edgeLabelStart).append(",").append(end).append(" | ").append(node1.pathPosition).append(")\n");
@@ -877,7 +881,7 @@ public class SuffixTree {
         printFullNode(node.parent);
       // print the last edge
       while (start <= end) {
-        System.out.print(source[start]);
+        System.out.print(source[start].toString());
         start++;
       }
     }
@@ -886,18 +890,18 @@ public class SuffixTree {
   /**
    * verify that all the words stored in str are findable
    */
-  void verify(byte[] str) {
+  void verify(List<T> str) {
     int start = -1;
-    for (int i = 0; i < str.length; i++) {
-      if (str[i] != 0 && start == -1)
+    for (int i = 0; i < str.size(); i++) {
+      if (str.get(i) != null && start == -1)
         start = i;
-      else if (str[i] == 0 && start != -1) {
+      else if (str.get(i) == null && start != -1) {
         reportWord(str, start, i);
         start = -1;
       }
     }
     if (start != -1)
-      reportWord(str, start, str.length);
+      reportWord(str, start, str.size());
   }
 
   /**
@@ -907,14 +911,12 @@ public class SuffixTree {
    * @param start the start offset of the word to report-
    * @param end   an index one beyond the end of the word
    */
-  void reportWord(byte[] str, int start, int end) {
-    byte[] word = new byte[end - start];
-    for (int j = start, i = 0; i < word.length; i++, j++)
-      word[i] = str[j];
-    String temp = new String(word);
-    if (findSubstring(word) == errorValue)
-      //	System.out.println("Found word "+temp);
-      //else
-      System.out.println("Couldn't find word " + temp);
+  void reportWord(List<T> str, int start, int end) {
+    if (findSubstring(str.subList(start, end)) == errorValue) {
+      throw new IllegalStateException("Couldn't find word [" + start + ", " + end + "]");
+    }
+
   }
+
+
 }
