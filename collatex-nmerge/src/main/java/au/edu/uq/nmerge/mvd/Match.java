@@ -20,7 +20,6 @@
  */
 package au.edu.uq.nmerge.mvd;
 
-import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Set;
@@ -193,7 +192,7 @@ public class Match {
           sb.append(",");
       }
     } else if (data != null)
-      sb.append(new String(data));
+      sb.append("'").append(new String(data)).append("'");
     else
       sb.append("null");
     return sb.toString();
