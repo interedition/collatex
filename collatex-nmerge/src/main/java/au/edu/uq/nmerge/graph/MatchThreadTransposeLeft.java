@@ -22,7 +22,10 @@ package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 
+import java.util.Collections;
 import java.util.ListIterator;
+
+import static java.util.Collections.disjoint;
 
 /**
  * This version of MatchThread searches the arcs to the left
@@ -73,9 +76,9 @@ public class MatchThreadTransposeLeft extends MatchThreadDirect {
       ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs();
       while (iter.hasNext()) {
         VariantGraphArc a = iter.next();
-        if (a.versions.intersects(versions)
+        if (!disjoint(a.versions, versions)
                 && a.to.isPrintedOutgoing(a.versions)
-                && a.versions.nextSetBit(mum.version) != mum.version
+                && !a.versions.contains(mum.version)
                 && (!a.isParent() || !a.hasChildInVersion(mum.version))) {
           this.arc = a;
           this.first = 0;

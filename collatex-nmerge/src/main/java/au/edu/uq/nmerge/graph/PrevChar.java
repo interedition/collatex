@@ -21,7 +21,10 @@
 
 package au.edu.uq.nmerge.graph;
 
+import au.edu.uq.nmerge.mvd.Witness;
+
 import java.util.BitSet;
+import java.util.Set;
 
 /**
  * We need to store information about which versions each
@@ -41,7 +44,7 @@ public class PrevChar {
    * set of version that this byte belongs
    * to (the versions of its arc)
    */
-  BitSet versions;
+  Set<Witness> versions;
 
   /**
    * Vanilla constructor
@@ -50,7 +53,7 @@ public class PrevChar {
    *                 belongs to
    * @param previous the previous byte
    */
-  PrevChar(BitSet versions, byte previous) {
+  PrevChar(Set<Witness> versions, byte previous) {
     this.versions = versions;
     this.previous = previous;
   }

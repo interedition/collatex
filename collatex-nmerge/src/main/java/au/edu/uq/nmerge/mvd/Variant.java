@@ -21,9 +21,12 @@
 package au.edu.uq.nmerge.mvd;
 
 import au.edu.uq.nmerge.exception.MVDException;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 
 import java.io.ByteArrayOutputStream;
 import java.util.BitSet;
+import java.util.Set;
 
 /**
  * Represent a variant computed from a range in a base version
@@ -34,7 +37,7 @@ public class Variant implements Comparable<Variant> {
   /**
    * more than one version for a variant is possible
    */
-  BitSet versions;
+  Set<Witness> versions;
   /**
    * the start-index where it occurs within pairs
    */
@@ -71,7 +74,7 @@ public class Variant implements Comparable<Variant> {
    * @throws MVDException
    */
   public Variant(int startOffset, int startIndex, int endIndex,
-                 int length, BitSet versions, Collation collation) {
+                 int length, Set<Witness> versions, Collation collation) {
     this.startIndex = startIndex;
     this.endIndex = endIndex;
     this.collation = collation;
@@ -86,7 +89,7 @@ public class Variant implements Comparable<Variant> {
    *
    * @return a BitSet
    */
-  public BitSet getVersions() {
+  public Set<Witness> getVersions() {
     return versions;
   }
 
@@ -98,12 +101,7 @@ public class Variant implements Comparable<Variant> {
   protected String createHeader() {
     StringBuffer sb = new StringBuffer();
     sb.append('[');
-    for (int i = versions.nextSetBit(1); i >= 1;
-         i = versions.nextSetBit(i + 1)) {
-      if (sb.length() > 1)
-        sb.append(',');
-      sb.append(collation.getVersionShortName(i));
-    }
+    sb.append(Joiner.on(",").join(versions));
     sb.append(':');
     return sb.toString();
   }
@@ -215,8 +213,7 @@ public class Variant implements Comparable<Variant> {
     int totalLen = 0;
     while (p.length() == 0 || totalLen < this.length) {
       if (p.length() == 0 || i == p.length()) {
-        iNode = collation.next(iNode + 1, (short)
-                versions.nextSetBit(0));
+        iNode = collation.next(iNode + 1, Iterables.getFirst(versions, null));
         p = collation.matches.get(iNode);
         i = 0;
       } else {
@@ -233,7 +230,7 @@ public class Variant implements Comparable<Variant> {
    * @param other the other variant to merge with this one.
    */
   public void merge(Variant other) {
-    this.versions.or(other.versions);
+    this.versions.addAll(other.versions);
   }
 
   /**
@@ -265,7 +262,7 @@ public class Variant implements Comparable<Variant> {
         int index = other.startIndex;
         Match p = collation.matches.get(index);
         int i = 0;
-        short followV = (short) versions.nextSetBit(1);
+        Witness followV = Iterables.getFirst(versions, null);
         while (i < other.length) {
           if (offset == p.length()) {
             index = collation.next(index + 1, followV);
@@ -304,8 +301,10 @@ public class Variant implements Comparable<Variant> {
     else if (this.length > other.length)
       return 1;
     else {
-      String thisV = versions.toString();
-      String thatV = other.versions.toString();
+      // FIXME: What is a proper ordering of witness sets?
+      final Joiner joiner = Joiner.on(',');
+      String thisV = joiner.join(versions);
+      String thatV = joiner.join(other.versions);
       int res = thisV.compareTo(thatV);
       if (res != 0)
         return res;

@@ -23,6 +23,7 @@ package au.edu.uq.nmerge.mvd;
 import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Set;
 
 /**
  * Represent one Pair in an MVD
@@ -33,7 +34,7 @@ public class Match {
   Match parent;
   LinkedList<Match> children;
   private byte[] data;
-  public BitSet versions;
+  public Set<Witness> versions;
   public static int pairId = 1;
   /**
    * parent id if subject of a transposition
@@ -46,7 +47,7 @@ public class Match {
    * @param versions its versions
    * @param data     its data
    */
-  public Match(BitSet versions, byte[] data) {
+  public Match(Set<Witness> versions, byte[] data) {
     this.versions = versions;
     this.data = data;
   }
@@ -137,8 +138,8 @@ public class Match {
    * @param version the version to test
    * @return true if version intersects with this pair
    */
-  public boolean contains(short version) {
-    return versions.nextSetBit(version) == version;
+  public boolean contains(Witness version) {
+    return versions.contains(version);
   }
 
   /**
@@ -147,7 +148,7 @@ public class Match {
    * @return true if it is, false otherwise
    */
   public boolean isHint() {
-    return versions.nextSetBit(0) == 0;
+    return versions.isEmpty();
   }
 
   /**
@@ -234,7 +235,7 @@ public class Match {
    * @param v the version to look for a child in
    * @return the relevant pair or null
    */
-  Match getChildInVersion(short v) {
+  Match getChildInVersion(Witness v) {
     Match child = null;
     ListIterator<Match> iter = getChildIterator();
     while (iter.hasNext()) {

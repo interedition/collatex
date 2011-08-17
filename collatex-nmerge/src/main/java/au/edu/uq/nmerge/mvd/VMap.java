@@ -34,7 +34,7 @@ public class VMap extends HashMap<Match, Match> {
    * @param v the version to test for
    * @return a map of pair-pair relations
    */
-  VMap(short v, Vector<Match> matches) {
+  VMap(Witness v, Vector<Match> matches) {
     HashMap<Match, Match> vMap = new HashMap<Match, Match>();
     if (matches.size() > 1) {
       Match last = null;
@@ -69,7 +69,7 @@ public class VMap extends HashMap<Match, Match> {
    * @return true if last and p both follow one another in their
    *         respective versions
    */
-  boolean isContiguous(Match last, Match p, short v) {
+  boolean isContiguous(Match last, Match p, Witness v) {
     if (last == null)
       return false;
     else if (last.isParent()) {

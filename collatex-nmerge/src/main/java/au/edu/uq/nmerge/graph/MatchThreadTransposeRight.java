@@ -22,7 +22,10 @@ package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 
+import java.util.Collections;
 import java.util.ListIterator;
+
+import static java.util.Collections.disjoint;
 
 
 /**
@@ -70,9 +73,7 @@ public class MatchThreadTransposeRight extends MatchThreadDirect {
     ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs();
     while (iter.hasNext()) {
       VariantGraphArc a = iter.next();
-      if (a.versions.intersects(versions)
-              && a.versions.nextSetBit(mum.version) != mum.version
-              && (!a.isParent() || !a.hasChildInVersion(mum.version))) {
+      if (!disjoint(a.versions, versions) && !a.versions.contains(mum.version) && (!a.isParent() || !a.hasChildInVersion(mum.version))) {
         this.arc = a;
         this.first = 0;
         MatchThreadTransposeRight mttr = new MatchThreadTransposeRight(this);

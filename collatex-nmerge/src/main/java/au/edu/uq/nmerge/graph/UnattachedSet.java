@@ -21,11 +21,12 @@
 package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.exception.MVDException;
+import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.collect.Sets;
 
-import java.util.BitSet;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.ListIterator;
+import java.util.*;
+
+import static java.util.Collections.disjoint;
 
 /**
  * Represent a set of unattached arcs during building of the Graph
@@ -37,13 +38,13 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
   /**
    * the union of all the versions in the unattached set
    */
-  BitSet versions;
+  Set<Witness> versions;
 
   /**
    * Create an unattached set
    */
   UnattachedSet() {
-    versions = new BitSet();
+    versions = Sets.newHashSet();
   }
 
   /**
@@ -62,7 +63,7 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
     while (iter2.hasNext()) {
       VariantGraphArc a = iter2.next();
       remove(a);
-      versions.andNot(a.versions);
+      versions.removeAll(a.versions);
     }
   }
 
@@ -74,12 +75,12 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
    * @param is versions of the outgoing arc whose versions
    *           must also be incoming
    */
-  void addAsIncoming(VariantGraphNode u, BitSet is) throws MVDException {
+  void addAsIncoming(VariantGraphNode u, Set<Witness> is) throws MVDException {
     Iterator<VariantGraphArc> iter = iterator();
     boolean wasAttached = false;
     while (iter.hasNext()) {
       VariantGraphArc a = (VariantGraphArc) iter.next();
-      if (a.versions.intersects(is)) {
+      if (!disjoint(a.versions, is)) {
         u.addIncoming(a);
         wasAttached = true;
       }
@@ -91,7 +92,7 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
       while (iter2.hasNext()) {
         VariantGraphArc a = iter2.next();
         if (remove(a))
-          versions.andNot(a.versions);
+          versions.removeAll(a.versions);
       }
     }
   }
@@ -104,7 +105,7 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
    */
   public boolean add(VariantGraphArc a) {
     boolean answer = super.add(a);
-    versions.or(a.versions);
+    versions.addAll(a.versions);
     return answer;
   }
 
@@ -118,7 +119,7 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
     Iterator<VariantGraphArc> iter = iterator();
     while (iter.hasNext()) {
       VariantGraphArc b = (VariantGraphArc) iter.next();
-      if (b.versions.intersects(a.versions))
+      if (!disjoint(b.versions, a.versions))
         return b;
     }
     return null;
@@ -131,11 +132,11 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
    * @param set the set of versions to subtract
    * @return true if the hint was removed
    */
-  boolean removeEmptyArc(VariantGraphArc a, BitSet set) throws Exception {
-    versions.andNot(set);
-    a.versions.andNot(set);
+  boolean removeEmptyArc(VariantGraphArc a, Set<Witness> set) throws Exception {
+    versions.removeAll(set);
+    a.versions.removeAll(set);
     a.getFrom().removeOutgoingVersions(set);
-    if (a.versions.nextSetBit(1) == -1) {
+    if (a.versions.isEmpty()) {
       remove(a);
       VariantGraphNode u = a.getFrom();
       u.removeOutgoing(a);

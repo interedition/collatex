@@ -36,7 +36,7 @@ public class Chunk extends BracketedData {
   /**
    * after search say what version the Chunk belongs to
    */
-  short version;
+  Witness version;
   /**
    * parent, child or merge id or 0, unique for each version
    */
@@ -71,31 +71,6 @@ public class Chunk extends BracketedData {
   }
 
   /**
-   * Create a Chunk from a byte array where the chunks are marked
-   * up using the [statelist:id:version:...] syntax. "statelist" is
-   * a list of comma-separated chunk states and ":id" is used to
-   * link parent and child chunks. Square brackets in the text
-   * (the "..." are escaped using backslashes. Real backslashes are
-   * double-backslashes. version is only used with the found chunk
-   * state and comes after the id.
-   *
-   * @param chunkData should contain escaped ']'s
-   * @param pos       position in the byte array to read from
-   */
-  public Chunk(byte[] chunkData, int pos) {
-    super(Charset.defaultCharset().toString());
-    int start = pos;
-    states = new ChunkStateSet();
-    while (chunkData[pos] != '[')
-      pos++;
-    // point to first char after '['
-    pos++;
-    pos += readHeader(chunkData, pos);
-    pos += readData(chunkData, pos);
-    srcLen = pos - start;
-  }
-
-  /**
    * Add a state to the set
    *
    * @param state the state to add
@@ -119,7 +94,7 @@ public class Chunk extends BracketedData {
    *
    * @param version the version the state belongs to
    */
-  public void setVersion(short version) {
+  public void setVersion(Witness version) {
     this.version = version;
   }
 
@@ -216,96 +191,6 @@ public class Chunk extends BracketedData {
   }
 
   /**
-   * Read the version
-   *
-   * @param chunkData the data to read from
-   * @param pos       the offset to start reading from
-   * @return the number of bytes consumed
-   */
-  private int readVersion(byte[] chunkData, int pos) {
-    int start = pos;
-    while (Character.isDigit((char) chunkData[pos]))
-      pos++;
-    int len = pos - start;
-    version = Short.parseShort(new String(chunkData, start, len));
-    return len;
-  }
-
-  /**
-   * Read the id
-   *
-   * @param chunkData the data to read from
-   * @param pos       the offset to start reading from
-   * @return the number of bytes consumed
-   */
-  private int readId(byte[] chunkData, int pos) {
-    int start = pos;
-    while (Character.isDigit((char) chunkData[pos]))
-      pos++;
-    int len = pos - start;
-    id = Integer.parseInt(new String(chunkData, start, len));
-    return len;
-  }
-
-  /**
-   * Read the chunk header, including the state list, the id and
-   * version if present, saving them as instance vars
-   *
-   * @param chunkData the data to read the states from
-   * @param pos       the first byte pos for the state name
-   * @return the number of bytes read
-   */
-  private int readHeader(byte[] chunkData, int pos) {
-    int start = pos;
-    pos += readStates(chunkData, pos);
-    // read id and version
-    if (chunkData[pos] == ':' && (states.isParent() || states.isChild())) {
-      pos += 1;    // no, ++pos doesn't work
-      pos += readId(chunkData, pos);
-    }
-    if (chunkData[pos] == ':' && states.isFound()) {
-      pos += 1;
-      pos += readVersion(chunkData, pos);
-    }
-    return ++pos - start;
-  }
-
-  /**
-   * Read a chunk's list of states
-   *
-   * @param chunkData the data to parse
-   * @param pos       the starting offset within chunkData
-   * @return the number of bytes of chunkData consumed
-   */
-  private int readStates(byte[] chunkData, int pos) {
-    int start = pos;
-    while (chunkData[pos] != ':') {
-      pos += readState(chunkData, pos);
-      if (chunkData[pos] == ',')
-        pos++;
-    }
-    return pos - start;
-  }
-
-  /**
-   * Read a single chunk state. Leave pos pointing to a : or ,
-   *
-   * @param chunkData the data to parse
-   * @param pos       the starting offset within chunkData
-   * @return the number of bytes of chunkData consumed
-   */
-  private int readState(byte[] chunkData, int pos) {
-    int start = pos;
-    while (chunkData[pos] != ':' && chunkData[pos] != ',')
-      pos++;
-    String stateName = new String(chunkData, start, pos - start);
-    ChunkState state = ChunkState.valueOf(stateName);
-    // install new state in states array
-    addState(state);
-    return pos - start;
-  }
-
-  /**
    * Get the length of the source data used to construct this
    * chunk
    *
@@ -329,7 +214,7 @@ public class Chunk extends BracketedData {
    *
    * @return the version given when the chunk was created
    */
-  public short getVersion() {
+  public Witness getVersion() {
     return version;
   }
 
@@ -373,8 +258,8 @@ public class Chunk extends BracketedData {
       sb.append(states.toString());
     if (id != 0)
       sb.append(":" + Integer.toString(id));
-    if (version != 0)
-      sb.append(":" + Integer.toString(version));
+    if (version != null)
+      sb.append(":" + version);
     sb.append(":");
     return sb.toString();
   }

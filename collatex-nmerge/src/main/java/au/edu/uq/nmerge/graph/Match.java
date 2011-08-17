@@ -21,6 +21,7 @@
 package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.exception.MVDException;
+import au.edu.uq.nmerge.mvd.Witness;
 
 import java.util.Vector;
 
@@ -56,7 +57,7 @@ public class Match {
   /**
    * the version to follow to locate the match
    */
-  short version;
+  Witness version;
   /**
    * The Node to start the match from
    */
@@ -85,12 +86,10 @@ public class Match {
    * @param length      the length of the match
    * @param data        all the data of the special arc
    */
-  Match(VariantGraphNode start, int graphOffset, short version, int dataOffset,
-        int length, byte[] data) {
+  Match(VariantGraphNode start, int graphOffset, Witness version, int dataOffset, int length, byte[] data) {
     this.graphOffset = graphOffset;
     this.dataOffset = dataOffset;
     this.version = version;
-    assert version >= 0;
     this.length = length;
     this.data = new byte[length];
     this.start = start;
@@ -134,7 +133,7 @@ public class Match {
    *
    * @param version the version to OR with the path
    */
-  void addVersion(int version) throws MVDException {
+  void addVersion(Witness version) throws MVDException {
     VariantGraphArc[] path = getMatchPath();
     for (int i = 0; i < path.length; i++)
       path[i].addVersion(version);
@@ -197,7 +196,7 @@ public class Match {
         if (distance + a.dataLen() <= graphOffset) {
           distance += a.dataLen();
           a = a.to.pickOutgoingArc(version);
-          assert a != null && a.versions.nextSetBit(version) == version;
+          assert a != null && a.versions.contains(version);
         } else {
           splitStart = graphOffset - distance;
           distance = graphOffset;
@@ -206,10 +205,10 @@ public class Match {
       }
       // if the split-point is not 0, split
       if (splitStart > 0) {
-        assert a.versions.nextSetBit(version) == version;
+        assert a.versions.contains(version);
         splits = a.split(splitStart);
         a = splits[1];
-        assert a != null && a.versions.nextSetBit(version) == version;
+        assert a != null && a.versions.contains(version);
       }
       // now advance distance to the end of the match
       // a is the first arc of the path
@@ -224,7 +223,7 @@ public class Match {
             assert a.to.outdegree() == 0;
             break;
           } else {
-            assert a.versions.nextSetBit(version) == version;
+            assert a.versions.contains(version);
             a = b;
           }
         } else {
@@ -368,7 +367,7 @@ public class Match {
    * @param newVersion the new version that the arc can't traverse
    * @return true if the conditions hold, false otherwise
    */
-  boolean checkPath(short newVersion) {
+  boolean checkPath(Witness newVersion) {
     VariantGraphArc a = start.pickOutgoingArc(version);
     int posWithinArc = 0;
     int distTravelled = 0;
@@ -384,8 +383,7 @@ public class Match {
       }
     }
     // now traverse the path
-    if (a.versions.nextSetBit(newVersion) == newVersion
-            || (a.isParent() && a.hasChildInVersion(newVersion)))
+    if (a.versions.contains(newVersion) || (a.isParent() && a.hasChildInVersion(newVersion)))
       return false;
     else {
       distTravelled = 0;
@@ -393,8 +391,7 @@ public class Match {
         // move to next arc
         while (posWithinArc == a.dataLen()) {
           a = a.to.pickOutgoingArc(version);
-          if (a.versions.nextSetBit(newVersion) == newVersion
-                  || (a.isParent() && a.hasChildInVersion(newVersion)))
+          if (a.versions.contains(newVersion) || (a.isParent() && a.hasChildInVersion(newVersion)))
             return false;
           posWithinArc = 0;
         }
@@ -423,8 +420,6 @@ public class Match {
    * @return true if the b match uses any arc from our path
    */
   public boolean overlaps(Match b) {
-    if (version <= 0)
-      System.out.println("0");
     VariantGraphArc aArc = start.pickOutgoingArc(version);
     VariantGraphArc bArc = b.start.pickOutgoingArc(b.version);
     int i = 0;

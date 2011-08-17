@@ -23,8 +23,13 @@ package au.edu.uq.nmerge.graph;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.exception.MVDToolException;
 import au.edu.uq.nmerge.mvd.Match;
+import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.collect.Sets;
+import sun.font.StandardTextSource;
 
 import java.util.*;
+
+import static java.util.Collections.disjoint;
 
 /**
  * The purpose of this class is to serialise and deserialise
@@ -53,7 +58,7 @@ public class Converter {
   /**
    * all versions contained in the graph
    */
-  BitSet allVersions;
+  Set<Witness> allVersions;
   /**
    * current number of arcs
    */
@@ -78,23 +83,20 @@ public class Converter {
   /**
    * Create a Graph
    *
-   * @param matches     the list of pairs to build the graph from.
-   * @param numVersions the number of versions to go in the graph
+   * @param matches the list of pairs to build the graph from.
+   * @param versions the versions to go in the graph
    */
-  public VariantGraph create(Vector<Match> matches, int numVersions)
+  public VariantGraph create(Vector<au.edu.uq.nmerge.mvd.Match> matches, Set<Witness> versions)
           throws Exception {
     unattached = new UnattachedSet();
     incomplete = new HashSet<VariantGraphNode>();
-    allVersions = new BitSet();
-    for (int i = 1; i <= numVersions; i++)
-      allVersions.set(i);
+    allVersions = Sets.newHashSet(versions);
     graph = new VariantGraph();
     origSize = matches.size();
     if (matches.size() > 0)
       deserialise(matches);
     // generate the constraint set
-    for (int i = 1; i <= numVersions; i++)
-      graph.constraint.set(i);
+    graph.constraint.addAll(versions);
     parents = new HashMap<VariantGraphArc, Match>();
     orphans = new HashMap<VariantGraphArc, Match>();
     return graph;
@@ -116,7 +118,7 @@ public class Converter {
    * @param matches a Vector containing the pairs to build
    *                into a graph
    */
-  private void deserialise(Vector<Match> matches) throws Exception {
+  private void deserialise(Vector<au.edu.uq.nmerge.mvd.Match> matches) throws Exception {
     graph.start = createNode();
     VariantGraphNode u = graph.start;
     HashMap<Match, VariantGraphArc> pnts = new HashMap<Match, VariantGraphArc>();
@@ -126,19 +128,18 @@ public class Converter {
       VariantGraphNode v;
       Match p = matches.get(i);
       VariantGraphArc a = pairToArc(p, pnts, kids);
-      if ((i > 0 &&
-              a.versions.intersects(matches.get(i - 1).versions))
-              || a.isHint())
+      if ((i > 0 && !disjoint(a.versions, matches.get(i - 1).versions)) || a.isHint())
         u = v = createNode();
       else
         v = getIntersectingNode(u, a);
       v.addOutgoing(a);
-      BitSet bs = a.versions;
+      Set<Witness> bs = a.versions;
       // in case a is itself a hint
       // don't attach incoming arcs that are hints
       if (a.isHint()) {
         bs = cloneVersions(a.versions);
-        bs.clear(0);
+        // FIXME: is a cleared 0-bit used as an indicator for a hint?
+        // bs.clear(0);
       }
       unattached.addAsIncoming(v, bs);
       unattached.add(a);
@@ -257,35 +258,34 @@ public class Converter {
   /**
    * The clone method is not infallible for bitsets
    *
-   * @param bs the bitset to clone
+   * @param versions the bitset to clone
    * @return a cloned bitset
+   * @deprecated Still needed?
    */
-  private BitSet cloneVersions(BitSet bs) {
-    BitSet clone = new BitSet();
-    for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i + 1))
-      clone.set(i);
-    return clone;
+  private Set<Witness> cloneVersions(Set<Witness> versions) {
+    return Sets.newHashSet(versions);
   }
 
   /**
    * Build a bit of the pairs-list starting from a node
    *
-   * @param tuples   the part-built pairs-list
+   * @param matches   the part-built pairs-list
    * @param u        the node from which to take outgoing arcs
    * @param incoming the versions of the last incoming arc
    */
-  private void printAcross(Vector<Match> matches, VariantGraphNode u, BitSet incoming)
+  private void printAcross(Vector<Match> matches, VariantGraphNode u, Set<Witness> incoming)
           throws MVDException {
     int hint = -1;
     VariantGraphArc selected = u.pickOutgoingArc(incoming);
     if (selected != null) {
       assert !selected.to.isPrintedIncoming(selected.versions);
       // add an empty tuple as a hint if required
-      BitSet clique = u.getClique(selected);
+      Set<Witness> clique = u.getClique(selected);
       if (!clique.isEmpty()) {
         hint = matches.size();
         //System.out.println("creating hint at "+hint);
-        clique.set(0);
+        // FIXME: again! 0-bit as indicator of hint!!
+        //clique.set(0);
         // create a hint
         Match h = new Match(clique, new byte[0]);
         matches.add(h);
@@ -304,7 +304,7 @@ public class Converter {
    * Print a single tuple to the list. If this is the last incoming
    * arc, then call printAcross.
    *
-   * @param tuples the part-built tuple-list
+   * @param matches the part-built tuple-list
    * @param a      the arc to print
    * @param hint   the previous location of a hint
    * @return the hint or -1 if it was removed
@@ -334,17 +334,16 @@ public class Converter {
    * shunt all the tuples along from hint to pos. Otherwise
    * just reduce the number of versions at offset hint.
    *
-   * @param tuples the array of tuples to write to
+   * @param matches the array of tuples to write to
    * @param hint   the offset of the hint
-   * @param pos    the offset of the current write position
    * @return the index of the hint or -1 if it was removed
    */
   private int reduceHint(Vector<Match> matches, int hint) {
     Match hintMatch = matches.get(hint);
     for (int i = hint + 2; i < matches.size(); i++) {
       au.edu.uq.nmerge.mvd.Match p = matches.get(i);
-      hintMatch.versions.andNot(p.versions);
-      if (hintMatch.versions.nextSetBit(1) == -1) {
+      hintMatch.versions.removeAll(p.versions);
+      if (hintMatch.versions.isEmpty()) {
         matches.remove(hint);
         //System.out.println("removing hint at "+hint);
         hint = -1;

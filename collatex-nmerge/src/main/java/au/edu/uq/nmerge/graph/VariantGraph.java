@@ -21,6 +21,8 @@
 package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.exception.MVDException;
+import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.collect.Sets;
 
 import java.util.*;
 
@@ -41,7 +43,7 @@ public class VariantGraph {
   /**
    * subset of versions applicable to this subgraph
    */
-  BitSet constraint;
+  Set<Witness> constraint;
   /**
    * maximum length of this graph
    */
@@ -58,7 +60,7 @@ public class VariantGraph {
   public VariantGraph() {
     start = new VariantGraphNode();
     end = new VariantGraphNode();
-    this.constraint = new BitSet();
+    this.constraint = Sets.newHashSet();
     maxLen = -1;
   }
 
@@ -72,12 +74,11 @@ public class VariantGraph {
    * @param constraint graph only covers these versions and ignores all others
    * @param position   the position from the start of the new version
    */
-  public VariantGraph(VariantGraphNode start, VariantGraphNode end, BitSet constraint, int position) {
+  public VariantGraph(VariantGraphNode start, VariantGraphNode end, Set<Witness> constraint, int position) {
     this.start = start;
     this.end = end;
     this.position = position;
-    this.constraint = new BitSet();
-    this.constraint.or(constraint);
+    this.constraint = Sets.newHashSet(constraint);
     this.maxLen = maxLength();
   }
 
@@ -89,15 +90,13 @@ public class VariantGraph {
    * @param position the position of the arc
    * @return the special, unaligned arc
    */
-  public VariantGraphSpecialArc addSpecialArc(byte[] data, int version, int position)
+  public VariantGraphSpecialArc addSpecialArc(byte[] data, Witness version, int position)
           throws MVDException {
-    BitSet bs = new BitSet();
-    bs.set(version);
-    VariantGraphSpecialArc a = new VariantGraphSpecialArc(bs, data, position);
+    VariantGraphSpecialArc a = new VariantGraphSpecialArc(Sets.newHashSet(version), data, position);
     start.addOutgoing(a);
     end.addIncoming(a);
     // ensure this is clear
-    this.constraint.clear(version);
+    this.constraint.remove(version);
     // not part of the constraint set yet
     return a;
   }
@@ -108,7 +107,7 @@ public class VariantGraph {
    * @param version the id of the version to read
    * @return the version's data as a byte array
    */
-  byte[] getVersion(int version) {
+  byte[] getVersion(Witness version) {
     VariantGraphNode temp = start;
     int len = 0;
     while (temp != null && temp != end) {
@@ -136,7 +135,7 @@ public class VariantGraph {
    * @return the maximum length of the graph
    */
   private int maxLength() {
-    HashMap<Integer, Integer> lengths = new HashMap<Integer, Integer>();
+    HashMap<Witness, Integer> lengths = new HashMap<Witness, Integer>();
     SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
     HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
     queue.add(start);
@@ -148,8 +147,7 @@ public class VariantGraph {
         byte[] data = a.getData();
         // calculate total length
         totalLen += data.length;
-        BitSet bs = a.versions;
-        for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i + 1)) {
+        for (Witness i : a.versions) {
           if (lengths.containsKey(i)) {
             Integer value = lengths.get(i);
             lengths.put(i, value.intValue() + data.length);
@@ -172,10 +170,10 @@ public class VariantGraph {
     }
     /// Find the maximum length version
     Integer max = new Integer(0);
-    Set<Integer> keys = lengths.keySet();
-    Iterator<Integer> iter = keys.iterator();
+    Set<Witness> keys = lengths.keySet();
+    Iterator<Witness> iter = keys.iterator();
     while (iter.hasNext()) {
-      Integer key = iter.next();
+      Witness key = iter.next();
       Integer value = lengths.get(key);
       if (value.intValue() > max.intValue())
         max = value;
@@ -211,8 +209,8 @@ public class VariantGraph {
    *
    * @param version the version to adopt
    */
-  public void adopt(int version) throws Exception {
-    constraint.set(version);
+  public void adopt(Witness version) throws Exception {
+    constraint.add(version);
     VariantGraphNode temp = start;
     while (temp != end) {
       VariantGraphArc a = temp.pickOutgoingArc(version);
@@ -362,7 +360,7 @@ public class VariantGraph {
    *
    * @param version the version to remove
    */
-  public void removeVersion(int version) {
+  public void removeVersion(Witness version) {
     SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
     queue.add(start);
     while (!queue.isEmpty()) {
@@ -373,11 +371,11 @@ public class VariantGraph {
       while (iter.hasNext()) {
         VariantGraphArc a = iter.next();
         a.to.printArc(a);
-        if (a.versions.nextSetBit(version) == version) {
-          if (a.versions.cardinality() == 1)
+        if (a.versions.contains(version)) {
+          if (a.versions.size() == 1)
             del = a;
           else {
-            a.versions.clear(version);
+            a.versions.remove(version);
             a.to.removeIncomingVersion(version);
             a.from.removeOutgoingVersion(version);
           }
@@ -405,6 +403,6 @@ public class VariantGraph {
       }
     }
     // we removed the version, so clear the constraint
-    this.constraint.clear(version);
+    this.constraint.remove(version);
   }
 }

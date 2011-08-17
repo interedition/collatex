@@ -21,7 +21,11 @@
 
 package au.edu.uq.nmerge.mvd;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
+
 import java.util.BitSet;
+import java.util.Set;
 
 /**
  * Store Node in when constructing variants
@@ -29,12 +33,13 @@ import java.util.BitSet;
  * @author desmond
  */
 public class CompactNode {
-  BitSet incoming, outgoing;
+  Set<Witness> incoming;
+  Set<Witness> outgoing;
   int index;
 
   CompactNode(int index) {
-    this.incoming = new BitSet();
-    this.outgoing = new BitSet();
+    this.incoming = Sets.newHashSet();
+    this.outgoing = Sets.newHashSet();
     this.index = index;
   }
 
@@ -43,7 +48,7 @@ public class CompactNode {
    *
    * @return a BitSet
    */
-  BitSet getOutgoing() {
+  Set<Witness> getOutgoing() {
     return outgoing;
   }
 
@@ -52,7 +57,7 @@ public class CompactNode {
    *
    * @return a BitSet
    */
-  BitSet getIncoming() {
+  Set<Witness> getIncoming() {
     return incoming;
   }
 
@@ -61,11 +66,8 @@ public class CompactNode {
    *
    * @return the difference outgoing - incoming
    */
-  BitSet getWantsIncoming() {
-    BitSet difference = new BitSet();
-    difference.or(outgoing);
-    difference.andNot(incoming);
-    return difference;
+  Set<Witness> getWantsIncoming() {
+    return Sets.newHashSet(Sets.difference(outgoing, incoming));
   }
 
   /**
@@ -73,11 +75,8 @@ public class CompactNode {
    *
    * @return the difference
    */
-  BitSet getWantsOutgoing() {
-    BitSet difference = new BitSet();
-    difference.or(incoming);
-    difference.andNot(outgoing);
-    return difference;
+  Set<Witness> getWantsOutgoing() {
+    return Sets.newHashSet(Sets.difference(incoming, outgoing));
   }
 
   /**
@@ -96,7 +95,7 @@ public class CompactNode {
    * @param versions the versions to add
    */
   void addIncoming(Match arc) {
-    incoming.or(arc.versions);
+    incoming.addAll(arc.versions);
   }
 
   /**
@@ -105,13 +104,14 @@ public class CompactNode {
    * @param arc the pair from the MVD to add as outgoing
    */
   void addOutgoing(Match arc) {
-    outgoing.or(arc.versions);
+    outgoing.addAll(arc.versions);
   }
 
   public String toString() {
+    final Joiner joiner = Joiner.on(",");
     StringBuffer sb = new StringBuffer();
-    sb.append("incoming: " + incoming.toString() + "\n");
-    sb.append("outgoing: " + outgoing.toString() + "\n");
+    sb.append("incoming: " + joiner.join(incoming) + "\n");
+    sb.append("outgoing: " + joiner.join(outgoing) + "\n");
     sb.append("index: " + index);
     return sb.toString();
   }

@@ -23,6 +23,7 @@ package au.edu.uq.nmerge.mvd;
 
 import java.nio.charset.Charset;
 import java.util.BitSet;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -42,9 +43,9 @@ public class Hit extends BracketedData {
    */
   int length;
   /**
-   * id of the match version
+   * match version
    */
-  short version;
+  Witness version;
   /**
    * used in toString for formatting the match
    */
@@ -65,7 +66,7 @@ public class Hit extends BracketedData {
    * @param shortName short name of the version
    * @param state     the state of the matched text
    */
-  Hit(short version, int offset, int length, String shortName,
+  Hit(Witness version, int offset, int length, String shortName,
       ChunkState state) {
     super(Charset.defaultCharset().toString());
     this.offset = offset;
@@ -84,34 +85,13 @@ public class Hit extends BracketedData {
    * @param version   the version it belongs to
    * @param shortName the short name (siglum) of the version
    */
-  public Hit(int offset, int length, short version,
+  public Hit(int offset, int length, Witness version,
              String shortName) {
     super(Charset.defaultCharset().toString());
     this.length = length;
     this.offset = offset;
     this.version = version;
     this.shortName = shortName;
-    this.state = ChunkState.NONE;
-  }
-
-  /**
-   * Create a Match by parsing its textual representation
-   *
-   * @param matchData the match data for several matches
-   * @param pos       the offset within matchData to start reading
-   */
-  public Hit(byte[] matchData, int pos) {
-    super(Charset.defaultCharset().toString());
-    int start = pos;
-    while (matchData[pos] != '[')
-      pos++;
-    // point to first char after '['
-    pos++;
-    pos += readShortName(matchData, pos);
-    pos += readVersion(matchData, pos);
-    pos += readOffset(matchData, pos);
-    pos += readLength(matchData, pos);
-    srcLen = pos - start;
     this.state = ChunkState.NONE;
   }
 
@@ -173,21 +153,6 @@ public class Hit extends BracketedData {
   }
 
   /**
-   * Read the version
-   *
-   * @param matchData the data from the matches
-   * @param pos       the start position for the version
-   * @return the number of bytes read
-   */
-  private int readVersion(byte[] matchData, int pos) {
-    int start = pos;
-    int begin = readTextLabel(matchData, pos);
-    int len = readDigitData(matchData, begin);
-    version = Short.parseShort(new String(matchData, begin, len));
-    return (begin + len + 1) - start;
-  }
-
-  /**
    * Read and set the short name
    *
    * @param matchData the string representation of the matches
@@ -209,34 +174,31 @@ public class Hit extends BracketedData {
    *
    * @param len      the length of the match
    * @param versions the versions in which to build the match
-   * @param pairs    the Vector of pairs from the MVD
    * @param endPair  the last Pair in which the match occurs
    * @param endIndex the offset within the endPair in which
    *                 the match occurs.
    * @param multiple true if multiple matches are desired
    * @return a list of Match objects
    */
-  static Hit[] createHits(int len, BitSet versions,
+  static Hit[] createHits(int len, Set<Witness> versions,
                           Collation collation, int endPair, int endIndex,
                           boolean multiple, ChunkState state) throws Exception {
-    BitSet bs = versions;
     Vector<Hit> hits = new Vector<Hit>();
-    for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i + 1)) {
+    for (Witness i : versions) {
       // start from one byte after the match
       int offset = endIndex + 1;
       // and add on the length of all relevant
       // pairs up to the first one
       for (int j = endPair - 1; j >= 0; j--) {
         Match p = collation.matches.get(j);
-        if (p.contains((short) i)) {
+        if (p.contains(i)) {
           offset += p.length();
         }
       }
       // now offset is len plus the real offset
       offset -= len;
-      String shortName = collation.getVersionShortName(i);
-      Hit m = new Hit((short) i, offset, len, shortName,
-              state);
+      String shortName = i.shortName;
+      Hit m = new Hit(i, offset, len, shortName, state);
       hits.add(m);
       if (!multiple)
         break;
@@ -258,7 +220,6 @@ public class Hit extends BracketedData {
   /**
    * Get the length of the match in bytes
    *
-   * @param mvd the mvd the match belongs to
    * @return the length of the match
    */
   int getLength() {
@@ -270,7 +231,7 @@ public class Hit extends BracketedData {
    *
    * @return the version id
    */
-  public short getVersion() {
+  public Witness getVersion() {
     return version;
   }
 
@@ -333,10 +294,7 @@ public class Hit extends BracketedData {
   protected String createHeader() {
     StringBuffer sb = new StringBuffer();
     sb.append('[');
-    String actualShortName = (shortName != null && shortName.length() > 0)
-            ? shortName : Short.toString(version);
-    sb.append(actualShortName + ":");
-    sb.append("Version " + Integer.toString(version) + ":");
+    sb.append(version.shortName + ":");
     sb.append("Offset " + Integer.toString(offset) + ":");
     sb.append("Length " + Integer.toString(length) + ":");
     sb.append(state.toString());

@@ -22,8 +22,11 @@
 package au.edu.uq.nmerge.mvd;
 
 import au.edu.uq.nmerge.exception.MVDException;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import java.util.BitSet;
+import java.util.Set;
 
 /**
  * This version of search uses Knuth-Morris-Pratt search
@@ -34,7 +37,7 @@ import java.util.BitSet;
  */
 public class KMPSearchState {
   byte[] pattern;
-  BitSet v;
+  Set<Witness> v;
   KMPSearchState following;
   int[] next;
   /**
@@ -47,7 +50,7 @@ public class KMPSearchState {
    *
    * @param pattern the pattern to search for
    */
-  public KMPSearchState(byte[] pattern, BitSet v) {
+  public KMPSearchState(byte[] pattern, Set<Witness> v) {
     this.v = v;
     this.pattern = pattern;
     next = initNext(pattern);
@@ -59,10 +62,9 @@ public class KMPSearchState {
    *
    * @param ss the SearchState object to clone
    */
-  private KMPSearchState(KMPSearchState ss, BitSet bs) {
+  private KMPSearchState(KMPSearchState ss, Set<Witness> v) {
     this.pattern = ss.pattern;
-    this.v = new BitSet();
-    this.v.or(bs);
+    this.v = Sets.newHashSet(v);
     this.pos = ss.pos;
     next = new int[ss.next.length];
     for (int i = 0; i < ss.next.length; i++)
@@ -116,16 +118,11 @@ public class KMPSearchState {
   /**
    * Are this object's versions a subset of those given?
    *
-   * @param bs the BitSet of which we might be a subset
+   * @param v the witness set of which we might be a subset
    * @return true if we are a subset of bs
    */
-  boolean isSubset(BitSet bs) {
-    int i;
-    for (i = v.nextSetBit(0); i >= 0; i = v.nextSetBit(i + 1)) {
-      if (bs.nextSetBit(i) != i)
-        break;
-    }
-    return i == -1;
+  boolean isSubset(Set<Witness> v) {
+    return v.containsAll(this.v);
   }
 
   /**
@@ -134,7 +131,7 @@ public class KMPSearchState {
    * @param s the search state object to merge with this one
    */
   void merge(KMPSearchState s) {
-    v.or(s.v);
+    this.v.addAll(s.v);
   }
 
   /**
@@ -175,16 +172,10 @@ public class KMPSearchState {
    * @param bs the set which must intersect with our versions.
    * @return a clone of everything we stand for.
    */
-  KMPSearchState split(BitSet bs) {
-    BitSet newBs = new BitSet();
-    for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i + 1)) {
-      if (v.nextSetBit(i) == i) {
-        // move each bit in v & bs to newBs
-        v.clear(i);
-        newBs.set(i);
-      }
-    }
-    return new KMPSearchState(this, newBs);
+  KMPSearchState split(Set<Witness> bs) {
+    final Sets.SetView<Witness> intersection = Sets.intersection(this.v, bs);
+    Preconditions.checkArgument(!intersection.isEmpty());
+    return new KMPSearchState(this, Sets.newHashSet(intersection));
   }
 
   /**

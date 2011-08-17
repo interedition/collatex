@@ -22,11 +22,12 @@ package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Match;
+import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * An Arc is a fragment of data, a set of versions in a variant graph
@@ -43,7 +44,7 @@ public class VariantGraphArc {
   /**
    * the set of versions
    */
-  public BitSet versions;
+  public Set<Witness> versions;
   /**
    * the origin Node
    */
@@ -79,7 +80,7 @@ public class VariantGraphArc {
    * @param versions the set of versions for the child
    * @param parent   the parent arc whose data will be copied
    */
-  public VariantGraphArc(BitSet versions, VariantGraphArc parent) {
+  public VariantGraphArc(Set<Witness> versions, VariantGraphArc parent) {
     this.versions = versions;
     // may attempt to create child of a child
     if (parent != null) {
@@ -113,7 +114,7 @@ public class VariantGraphArc {
    * @param versions the versions it belongs to
    * @param data     its data content
    */
-  public VariantGraphArc(BitSet versions, byte[] data) {
+  public VariantGraphArc(Set<Witness> versions, byte[] data) {
     this.versions = versions;
     this.data = data;
     //checkForData("m_s id=\"page");
@@ -166,8 +167,8 @@ public class VariantGraphArc {
    *
    * @param version the version to add
    */
-  public void addVersion(int version) {
-    versions.set(version);
+  public void addVersion(Witness version) {
+    versions.add(version);
     if (to != null)
       to.addIncomingVersion(version);
     if (from != null)
@@ -202,9 +203,7 @@ public class VariantGraphArc {
         sb.append("(s)");
       else
         sb.append("(" + from.nodeId + ")");
-      for (int i = versions.nextSetBit(1); i >= 1; i = versions.nextSetBit(i + 1)) {
-        sb.append(alphabet.charAt(i - 1));
-      }
+      sb.append(Iterables.toString(versions));
       byte[] realData = getData();
       String dataString = new String(realData);
       dataString = dataString.replace('\r', '/');
@@ -280,12 +279,8 @@ public class VariantGraphArc {
     VariantGraphArc[] arcs = splitDataArc(offset);
     for (int i = 0; i < children.size(); i++) {
       VariantGraphArc child = children.get(i);
-      BitSet bs1 = new BitSet();
-      bs1.or(child.versions);
-      BitSet bs2 = new BitSet();
-      bs2.or(child.versions);
-      VariantGraphArc b = new VariantGraphArc(bs1, arcs[0]);
-      VariantGraphArc c = new VariantGraphArc(bs2, arcs[1]);
+      VariantGraphArc b = new VariantGraphArc(Sets.newHashSet(child.versions), arcs[0]);
+      VariantGraphArc c = new VariantGraphArc(Sets.newHashSet(child.versions), arcs[1]);
       VariantGraphNode childFrom = child.from;
       VariantGraphNode childTo = child.to;
       childFrom.removeOutgoing(child);
@@ -314,19 +309,15 @@ public class VariantGraphArc {
   private VariantGraphArc[] splitDataArc(int offset) throws MVDException {
     VariantGraphArc[] arcs = new VariantGraphArc[2];
     byte[] leftData = new byte[offset];
-    BitSet leftVersions = new BitSet();
-    BitSet rightVersions = new BitSet();
-    leftVersions.or(versions);
-    rightVersions.or(versions);
     for (int i = 0; i < offset; i++) {
       leftData[i] = data[i];
     }
-    arcs[0] = new VariantGraphArc(leftVersions, leftData);
+    arcs[0] = new VariantGraphArc(Sets.newHashSet(versions), leftData);
     byte[] rightData = new byte[dataLen() - offset];
     for (int i = offset, j = 0; i < dataLen(); i++, j++) {
       rightData[j] = data[i];
     }
-    arcs[1] = new VariantGraphArc(rightVersions, rightData);
+    arcs[1] = new VariantGraphArc(Sets.newHashSet(versions), rightData);
     installSplit(arcs);
     return arcs;
   }
@@ -384,7 +375,7 @@ public class VariantGraphArc {
    * @return true if it is a hint
    */
   boolean isHint() {
-    return versions.nextSetBit(0) == 0;
+    return versions.isEmpty();
   }
 
   /**
@@ -396,7 +387,7 @@ public class VariantGraphArc {
    */
   Match toPair(HashMap<VariantGraphArc, Match> parents, HashMap<VariantGraphArc, Match> orphans)
           throws MVDException {
-    if (versions.nextSetBit(0) == 0)
+    if (isHint())
       throw new MVDException("Ooops! hint detected!");
     Match p = new Match(versions, data);
     if (this.parent != null) {
@@ -558,12 +549,12 @@ public class VariantGraphArc {
    * @param version the version to test for
    * @return true if we have children and one of them has the version
    */
-  boolean hasChildInVersion(short version) {
+  boolean hasChildInVersion(Witness version) {
     if (children != null) {
       ListIterator<VariantGraphArc> iter = children.listIterator(0);
       while (iter.hasNext()) {
         VariantGraphArc child = iter.next();
-        if (child.versions.nextSetBit(version) == version)
+        if (child.versions.contains(version))
           return true;
       }
       return false;

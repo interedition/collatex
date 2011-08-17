@@ -20,7 +20,10 @@
  */
 package au.edu.uq.nmerge.graph;
 
+import au.edu.uq.nmerge.mvd.Witness;
+
 import java.util.BitSet;
+import java.util.Set;
 
 /**
  * A form of unaligned arc that also stores its position from the start,
@@ -45,7 +48,7 @@ public class VariantGraphSpecialArc extends VariantGraphArc implements Comparabl
    * @param data     the data of the special arc
    * @param position the position of the arc along the new version
    */
-  public VariantGraphSpecialArc(BitSet versions, byte[] data, int position) {
+  public VariantGraphSpecialArc(Set<Witness> versions, byte[] data, int position) {
     super(versions, data);
     this.position = position;
     // leave best null

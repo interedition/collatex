@@ -78,12 +78,11 @@ public class TransposeState {
    * compute a new transpose state.
    *
    * @param p   the pair to shift states in version u
-   * @param old the old transpose state
    * @param u   the first version, contained in p
    * @param v   the version we are comparing to
    * @return a new TransposeState or ourselves
    */
-  TransposeState next(Match p, short u, short v) {
+  TransposeState next(Match p, Witness u, Witness v) {
     TransposeState repl = this;
     boolean wasTransposed = (state == ChunkState.PARENT
             || state == ChunkState.CHILD);

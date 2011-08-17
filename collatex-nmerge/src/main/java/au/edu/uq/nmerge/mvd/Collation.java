@@ -25,8 +25,11 @@ import au.edu.uq.nmerge.graph.*;
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 
 import java.util.*;
+
+import static java.util.Collections.disjoint;
 
 /**
  * Represent a multi-version document.
@@ -38,11 +41,9 @@ public class Collation {
 
   // new options
   boolean directAlignOnly;
-  Vector<Witness> witnesses;    // id = position in table+1
+  Vector<Witness> witnesses;
   Vector<Match> matches;
   String description;
-  int headerSize, groupTableSize, versionTableSize, pairsTableSize,
-          dataTableSize, versionSetSize;
   int bestScore;
   // used for checking
   HashSet<Match> parents;
@@ -60,34 +61,8 @@ public class Collation {
     this.description = description;
   }
 
-  /**
-   * Create an empty MVD - add versions and data later
-   *
-   * @param description about this MVD
-   * @param encoding    the encoding of the data in this MVD
-   */
-  public Collation(String description, String encoding) {
-    this();
-    this.description = description;
-    this.encoding = encoding;
-  }
-
-  /**
-   * Set the encoding, which defaults to UTF-8
-   *
-   * @param encoding the new encoding
-   */
-  public void setEncoding(String encoding) {
-    this.encoding = encoding;
-  }
-
-  /**
-   * Set the version set size for all version sets
-   *
-   * @param setSize the size of the version set in bytes
-   */
-  void setVersionSetSize(int setSize) {
-    versionSetSize = setSize;
+  public Vector<Witness> getWitnesses() {
+    return witnesses;
   }
 
   /**
@@ -106,20 +81,6 @@ public class Collation {
    */
   public String getEncoding() {
     return encoding;
-  }
-
-  /**
-   * Add a version after we've built the MVD.
-   *
-   * @param version the version to add
-   * @throws MVDException
-   */
-  public void addVersion(int version) throws MVDException {
-    if (version == witnesses.size() + 1) {
-      Witness v = new Witness("Z", UNTITLED_NAME);
-      witnesses.insertElementAt(v, version - 1);
-    } else
-      throw new MVDException("Invalid version " + version + " ignored");
   }
 
   /**
@@ -163,7 +124,7 @@ public class Collation {
    * @param state the state of text belonging only to u
    * @return an array of chunks for special display
    */
-  public Chunk[] compare(short u, short v, ChunkState state)
+  public Chunk[] compare(Witness u, Witness v, ChunkState state)
           throws MVDException {
     Vector<Chunk> chunks = new Vector<Chunk>();
     Chunk current = new Chunk(encoding);
@@ -225,7 +186,7 @@ public class Collation {
    * @param u         the version to look for
    * @return the index of the next pair or Integer.MAX_VALUE if not found
    */
-  int next(int pairIndex, short u) {
+  int next(int pairIndex, Witness u) {
     int i = pairIndex;
     while (i < matches.size()) {
       Match p = matches.get(i);
@@ -245,7 +206,7 @@ public class Collation {
    * @param u         the version to look for
    * @return the index of the previous pair or -1 if not found
    */
-  int previous(int pairIndex, short u) {
+  int previous(int pairIndex, Witness u) {
     int i = pairIndex - 1;
     while (i > 0) {
       Match p = matches.get(i);
@@ -266,7 +227,7 @@ public class Collation {
    * @param multiple if true return all hits; otherwise only the first
    * @return an array of matches
    */
-  public Hit[] search(byte[] pattern, BitSet bs, boolean multiple)
+  public Hit[] search(byte[] pattern, Set<Witness> bs, boolean multiple)
           throws Exception {
     KMPSearchState inactive = null;
     KMPSearchState active = null;
@@ -285,7 +246,7 @@ public class Collation {
         KMPSearchState s = inactive;
         while (s != null) {
           KMPSearchState sequential = s.following;
-          if (s.v.intersects(temp.versions)) {
+          if (!disjoint(s.v, temp.versions)) {
             KMPSearchState child = s.split(temp.versions);
             if (active == null)
               active = child;
@@ -343,32 +304,11 @@ public class Collation {
    *
    * @return the id of the new version
    */
-  public int newVersion(String shortName, String longName) {
-    witnesses.add(new Witness(shortName, longName));
-    return witnesses.size();
-  }
-
-  /**
-   * Get the current index of the given version + 1
-   *
-   * @param v the version to search for
-   * @return the index +1 of the version in the versions vector or 0
-   */
-  public int getVersionId(Witness v) {
-    return witnesses.indexOf(v) + 1;
-  }
-
-  /**
-   * Get the id of a version (version index+1) given its short name
-   *
-   * @param shortName the shortName
-   * @return -1 if not found or the correct id
-   */
-  public int getVersionId(String shortName) {
-    for (int i = 0; i < witnesses.size(); i++)
-      if (witnesses.get(i).shortName.equals(shortName))
-        return i + 1;
-    return -1;
+  public Witness newVersion(String shortName, String longName, byte[] content) throws Exception {
+    final Witness witness = new Witness(shortName, longName);
+    witnesses.add(witness);
+    update(witness, content);
+    return witness;
   }
 
   /**
@@ -381,28 +321,6 @@ public class Collation {
   }
 
   /**
-   * Set the short name of a given version
-   *
-   * @param versionId the id of the affected version
-   * @param shortName the new short name
-   */
-  public void setVersionShortName(int versionId, String shortName) {
-    Witness v = witnesses.get(versionId - 1);
-    v.shortName = shortName;
-  }
-
-  /**
-   * Set the long name of a given version
-   *
-   * @param versionId the id of the affected version
-   * @param longName  the new long name
-   */
-  public void setVersionLongName(int versionId, String longName) {
-    Witness v = witnesses.get(versionId - 1);
-    v.longName = longName;
-  }
-
-  /**
    * Update an existing version or add a new one.
    *
    * @param version the id of the version to add.
@@ -410,10 +328,10 @@ public class Collation {
    * @return percentage of the new version that was unique, or 0
    *         if this was the first version
    */
-  public float update(short version, byte[] data) throws Exception {
+  public float update(Witness version, byte[] data) throws Exception {
     // to do: if version already exists, remove it first
     Converter con = new Converter();
-    VariantGraph original = con.create(matches, witnesses.size());
+    VariantGraph original = con.create(matches, Sets.newHashSet(witnesses));
     original.removeVersion(version);
     VariantGraph g = original;
     VariantGraphSpecialArc special = g.addSpecialArc(data, version, 0);
@@ -516,12 +434,11 @@ public class Collation {
           // find all the subsequent pairs
           // that share a version with this pair
           // and add the prefix onto them
-          BitSet seekSet = new BitSet();
-          seekSet.or(p.versions);
+          Set<Witness> seekSet = Sets.newHashSet(p.versions);
           int m = i + 1;
           while (!seekSet.isEmpty() && m < matches.size()) {
             Match q = matches.get(m);
-            if (!q.isHint() && q.versions.intersects(seekSet)) {
+            if (!q.isHint() && !disjoint(q.versions, seekSet)) {
               // This relies on the closing bytes of all
               // preceding arcs ending in the same way.
               // We don't update children because they
@@ -536,7 +453,7 @@ public class Collation {
                   newQData[k + len] = qData[k];
                 q.setData(newQData);
               }
-              seekSet.andNot(q.versions);
+              seekSet.removeAll(q.versions);
             }
             m++;
           }
@@ -553,7 +470,7 @@ public class Collation {
    * @param version the version to compute uniqueness for
    * @return the percent as a float
    */
-  public float getUniquePercentage(short version) {
+  public float getUniquePercentage(Witness version) {
     int totalLen = 0;
     int uniqueLen = 0;
     if (numVersions() == 1)
@@ -561,7 +478,7 @@ public class Collation {
     else {
       for (int i = 0; i < matches.size(); i++) {
         Match p = matches.get(i);
-        if (p.versions.nextSetBit(version) == version) {
+        if (p.versions.contains(version)) {
           if (p.versions.size() == 1)
             uniqueLen += p.length();
           totalLen += p.length();
@@ -577,11 +494,11 @@ public class Collation {
    * @param version the version to test
    * @return float fraction of version that is unique
    */
-  private float getPercentUnique(short version) {
+  private float getPercentUnique(Witness version) {
     float unique = 0.0f, shared = 0.0f;
     for (int i = 0; i < matches.size(); i++) {
       Match p = matches.get(i);
-      if (p.versions.nextSetBit(version) == version) {
+      if (p.versions.contains(version)) {
         if (p.versions.size() == 1)
           unique += p.length();
         else
@@ -715,93 +632,17 @@ public class Collation {
    *
    * @param version the version to be removed
    */
-  public void removeVersion(int version) throws Exception {
+  public void removeVersion(Witness version) throws Exception {
     Converter con = new Converter();
-    VariantGraph original = con.create(matches, witnesses.size());
+    VariantGraph original = con.create(matches, Sets.newHashSet(witnesses));
     original.removeVersion(version);
     original.verify();
-    witnesses.remove(version - 1);
+    witnesses.remove(version);
     matches = con.serialise();
     for (int i = 0; i < matches.size(); i++) {
       Match p = matches.get(i);
-      p.versions = removeVersion(p.versions, version);
+      p.versions.remove(version);
     }
-  }
-
-  /**
-   * Remove a version from a BitSet and shift all subsequent
-   * versions down by 1
-   *
-   * @param versions the bitset containing the versions
-   * @param version  the version id to remove
-   * @erturn a modified bitset
-   */
-  private BitSet removeVersion(BitSet versions, int version) {
-    BitSet bs = new BitSet();
-    for (int i = versions.nextSetBit(0); i >= 0;
-         i = versions.nextSetBit(i + 1)) {
-      if (i < version)
-        bs.set(i);
-      else if (i > version)
-        bs.set(i - 1);
-      // and if equal we of course skip it
-    }
-    return bs;
-  }
-
-  /**
-   * Get the long name for the given version
-   *
-   * @param versionId the id of the version
-   * @return its long name
-   */
-  public String getLongNameForVersion(int versionId) {
-    Witness v = witnesses.get(versionId - 1);
-    if (v != null)
-      return v.longName;
-    else
-      return "";
-  }
-
-  /**
-   * Get the version contents by its short name
-   *
-   * @param shortName the shortName identifying the version
-   * @return the id of that version
-   */
-  int getVersionByShortName(String shortName) {
-    int version = -1;
-    for (int i = 0; i < witnesses.size(); i++) {
-      Witness v = witnesses.get(i);
-      if (v.shortName.equals(shortName)) {
-        version = i;
-        break;
-      }
-    }
-    return version + 1;
-  }
-
-  /**
-   * Get the id of the highest version in the MVD
-   *
-   * @return a version ID
-   */
-  int getHighestVersion() {
-    return witnesses.size();
-  }
-
-  /**
-   * Return a printout of all the versions in the MVD.
-   *
-   * @return the descriptions as a String array
-   */
-  public String[] getVersionDescriptions() {
-    String[] descriptions = new String[witnesses.size()];
-    for (int id = 1, i = 0; i < witnesses.size(); i++, id++) {
-      Witness v = witnesses.get(i);
-      descriptions[i] = v.toString() + ";id:" + id;
-    }
-    return descriptions;
   }
 
   /**
@@ -810,12 +651,12 @@ public class Collation {
    * @param version the version to retrieve
    * @return a byte array containing all the data of that version
    */
-  public byte[] getVersion(int version) {
+  public byte[] getVersion(Witness version) {
     int length = 0;
     // measure the length
     for (int i = 0; i < matches.size(); i++) {
       Match p = matches.get(i);
-      if (p.versions.nextSetBit(version) == version) {
+      if (p.versions.contains(version)) {
         length += p.length();
       }
     }
@@ -824,69 +665,13 @@ public class Collation {
     int k, i;
     for (k = 0, i = 0; i < matches.size(); i++) {
       Match p = matches.get(i);
-      if (p.versions.nextSetBit(version) == version) {
+      if (p.versions.contains(version)) {
         for (int j = 0; j < p.length(); j++)
           result[k++] = p.getData()[j];
       }
     }
     return result;
   }
-
-  /*
-     * Find out the version id from the version's long name
-     * @param longName the long name of the desired version
-     * @return the version id or -1
-     */
-  public short getVersionByLongName(String longName) {
-    for (int i = 0; i < witnesses.size(); i++) {
-      Witness vi = witnesses.get(i);
-      if (longName.equals(vi.longName))
-        return (short) (i + 1);
-    }
-    return -1;
-  }
-
-  /**
-   * Get a version's long name
-   *
-   * @param id the id of the version
-   * @return the long name of the version
-   */
-  public String getVersionLongName(int id) {
-    Witness v = witnesses.get(id - 1);
-    return v.longName;
-  }
-
-  /**
-   * Get a version's short name
-   *
-   * @param id the id of the version
-   * @return the short name of the version
-   */
-  public String getVersionShortName(int id) {
-    Witness v = witnesses.get(id - 1);
-    return v.shortName;
-  }
-
-  /**
-   * For each version in the MVD calculate its length in bytes
-   *
-   * @return an array of lengths where each index represents
-   *         one version id-1 and the values are the lengths of that
-   *         version
-   */
-  int[] getVersionLengths() {
-    int[] lengths = new int[witnesses.size()];
-    for (int i = 0; i < matches.size(); i++) {
-      Match p = matches.get(i);
-      BitSet bs = p.versions;
-      for (int j = bs.nextSetBit(1); j >= 0; j = bs.nextSetBit(j + 1)) {
-        lengths[j - 1] += p.length();
-      }
-    }
-    return lengths;
-  }
-
 
   /**
    * Get the variants as in an apparatus. The technique is to reconstruct
@@ -899,7 +684,7 @@ public class Collation {
    * @return an array of Variants
    * @throws MVDException
    */
-  public Variant[] getApparatus(short base, int offset, int len)
+  public Variant[] getApparatus(Witness base, int offset, int len)
           throws MVDException {
     int first = getPairIndex(base, offset);
     int last = getPairIndex(base, offset + len);
@@ -943,8 +728,7 @@ public class Collation {
         setDefaultNode(cn, right);
         if (pushRight)
           right.push(new WrappedPair(p));
-      } else if (!right.isEmpty()
-              && right.peek().getMatch().versions.intersects(p.versions)) {
+      } else if (!right.isEmpty() && !disjoint(right.peek().getMatch().versions, p.versions)) {
         CompactNode cn = new CompactNode(i);
         addOutgoing(cn, right.pop(), right);
         nodes.push(cn);
@@ -965,17 +749,16 @@ public class Collation {
    * @param base  the base version of the variants
    * @return and array of Variants
    */
-  Variant[] buildVariants(LinkedList<CompactNode> nodes, short base)
+  Variant[] buildVariants(LinkedList<CompactNode> nodes, Witness base)
           throws MVDException {
     TreeSet<Variant> variants = new TreeSet<Variant>();
     LinkedList<CompactNode> departing = new LinkedList<CompactNode>();
     LinkedList<CompactNode> delenda = new LinkedList<CompactNode>();
     Iterator<CompactNode> iter1 = nodes.iterator();
-    BitSet basePath = new BitSet();
-    basePath.set(base);
+    Set<Witness> basePath = Sets.newHashSet(base);
     while (iter1.hasNext()) {
       CompactNode node = iter1.next();
-      if (node.getIncoming().nextSetBit(base) == base) {
+      if (node.getIncoming().contains(base)) {
         // clear expended nodes from departing
         if (delenda.size() > 0) {
           Iterator<CompactNode> iter3 = delenda.iterator();
@@ -986,22 +769,16 @@ public class Collation {
         Iterator<CompactNode> iter2 = departing.iterator();
         while (iter2.hasNext()) {
           CompactNode upNode = iter2.next();
-          if (upNode.getOutgoing().intersects(node.getIncoming())) {
+          if (!disjoint(upNode.getOutgoing(), node.getIncoming())) {
             // compute intersection
-            BitSet bs = new BitSet();
-            bs.or(upNode.getOutgoing());
-            bs.and(node.getIncoming());
+            Set<Witness> bs = Sets.newHashSet(Sets.intersection(upNode.getOutgoing(), node.getIncoming()));
             if (!bs.isEmpty()) {
-              BitSet[] paths = getUniquePaths(upNode, node, bs, base);
+              List<Set<Witness>> paths = getUniquePaths(upNode, node, bs, base);
               // precompute base variant for later
-              Variant[] w = getWordVariants(
-                      upNode.getIndex(), node.getIndex(),
-                      basePath);
+              Variant[] w = getWordVariants(upNode.getIndex(), node.getIndex(), basePath);
               // create variants
-              for (int i = 0; i < paths.length; i++) {
-                Variant[] v = getWordVariants(
-                        upNode.getIndex(), node.getIndex(),
-                        paths[i]);
+              for (int i = 0; i < paths.size(); i++) {
+                Variant[] v = getWordVariants(upNode.getIndex(), node.getIndex(), paths.get(i));
                 for (int j = 0; j < v.length; j++) {
                   // prune those equal to base content
                   if (w.length == 0 || !w[0].equalsContent(v[j])) {
@@ -1030,10 +807,10 @@ public class Collation {
                 }
               }
               // clear that path so we won't follow it again
-              upNode.getOutgoing().andNot(bs);
+              upNode.getOutgoing().removeAll(bs);
               if (upNode.getOutgoing().isEmpty())
                 delenda.add(upNode);
-              node.getIncoming().andNot(bs);
+              node.getIncoming().removeAll(bs);
             }
           }
         }
@@ -1058,15 +835,15 @@ public class Collation {
    *                 variant(s)
    * @return an array of Variants
    */
-  Variant[] getWordVariants(int start, int end, BitSet versions) {
+  Variant[] getWordVariants(int start, int end, Set<Witness> versions) {
     Vector<Variant> variants = new Vector<Variant>();
     int offset, length;
     int startIndex = start, origStart, endIndex;
-    for (int i = versions.nextSetBit(0); i >= 0; i = versions.nextSetBit(i + 1)) {
+    for (Witness i : versions) {
       offset = -1;
       length = 0;
       // get the first outgoing arc containing i
-      startIndex = origStart = next(startIndex + 1, (short) i);
+      startIndex = origStart = next(startIndex + 1, i);
       Match p = matches.get(startIndex);
       // start HERE: first outgoing arc, offset 0
       int lastStartIndex = startIndex;
@@ -1074,7 +851,7 @@ public class Collation {
       // move start index backwards, computing offset
       while (startIndex >= 0) {
         if (offset < 0) {
-          startIndex = previous(startIndex, (short) i);
+          startIndex = previous(startIndex, i);
           if (startIndex == -1)
             break;
           p = matches.get(startIndex);
@@ -1096,21 +873,21 @@ public class Collation {
       // we may shoot off the start
       if (startIndex == -1) {
         offset = 0;
-        startIndex = next(0, (short) i);
+        startIndex = next(0, i);
       }
       // now advance to end, extending length
       endIndex = origStart;
       while (endIndex <= end) {
         p = matches.get(endIndex);
         length += p.length();
-        endIndex = next(endIndex + 1, (short) i);
+        endIndex = next(endIndex + 1, i);
       }
       // extend to next space after end
       p = matches.get(endIndex);
       int endOffset = 0;
       while (endIndex < matches.size()) {
         if (endOffset == p.length()) {
-          endIndex = next(endIndex + 1, (short) i);
+          endIndex = next(endIndex + 1, i);
           if (endIndex == Integer.MAX_VALUE)
             break;
           p = matches.get(endIndex);
@@ -1123,12 +900,9 @@ public class Collation {
       }
       // in case we shot off the end
       if (endIndex == Integer.MAX_VALUE)
-        endIndex = previous(matches.size() - 1, (short) i);
+        endIndex = previous(matches.size() - 1, i);
       // now build variant
-      BitSet bs = new BitSet();
-      bs.set(i);
-      Variant temp = new Variant(offset, startIndex, endIndex,
-              length, bs, this);
+      Variant temp = new Variant(offset, startIndex, endIndex, length, Sets.newHashSet(i), this);
       int k;
       for (k = 0; k < variants.size(); k++) {
         if (temp.equalsContent(variants.get(k))) {
@@ -1167,12 +941,12 @@ public class Collation {
    */
   void addOutgoing(CompactNode cn, WrappedPair p, LinkedList<WrappedPair> right) {
     cn.addOutgoing(p.getMatch());
-    BitSet wi = cn.getWantsIncoming();
+    Set<Witness> wi = cn.getWantsIncoming();
     while (!wi.isEmpty()) {
       int index = cn.getIndex();
       for (int i = index; i >= 0; i--) {
         Match q = matches.get(i);
-        if (q.versions.intersects(wi)) {
+        if (!disjoint(q.versions, wi)) {
           addIncoming(cn, new WrappedPair(q), right);
           wi = cn.getWantsIncoming();
           break;
@@ -1185,7 +959,7 @@ public class Collation {
     WrappedPair q = null;
     while (iter.hasNext()) {
       q = iter.next();
-      if (q.getMatch().versions.intersects(p.getMatch().versions))
+      if (!disjoint(q.getMatch().versions, p.getMatch().versions))
         break;
       else
         q = null;
@@ -1204,13 +978,13 @@ public class Collation {
    */
   void addIncoming(CompactNode cn, WrappedPair p, LinkedList<WrappedPair> right) {
     cn.addIncoming(p.getMatch());
-    BitSet wo = cn.getWantsOutgoing();
+    Set<Witness> wo = cn.getWantsOutgoing();
     while (!wo.isEmpty()) {
       Iterator<WrappedPair> iter = right.iterator();
       WrappedPair q = null;
       while (iter.hasNext()) {
         q = iter.next();
-        if (q.getMatch().versions.intersects(wo))
+        if (!disjoint(q.getMatch().versions, wo))
           break;
         else
           q = null;
@@ -1228,44 +1002,39 @@ public class Collation {
    * Compute an array of unique paths between two nodes in the graph
    * that don't include the base version
    *
+   *
    * @param from  the node we are travelling from
    * @param to    the node we are travelling to
    * @param pathV the set of versions to try and follow
    * @param base  the base version
    * @return an array of paths unique to that walk
    */
-  BitSet[] getUniquePaths(CompactNode from, CompactNode to,
-                          BitSet pathV, short base) {
-    Vector<BitSet> paths = new Vector<BitSet>();
+  List<Set<Witness>> getUniquePaths(CompactNode from, CompactNode to,
+                       Set<Witness> pathV, Witness base) {
+    List<Set<Witness>> paths = Lists.newArrayList();
     // for each version in pathV follow the path from-to
     // if any such path contains even one pair that doesn't
     // contain the base version, add it to the paths set.
     for (int i = from.getIndex() + 1; i <= to.getIndex(); i++) {
       Match p = matches.get(i);
-      if (p.versions.intersects(pathV)) {
+      if (!disjoint(p.versions, pathV)) {
         // get intersection
-        BitSet bs = new BitSet();
-        bs.or(p.versions);
-        bs.and(pathV);
+        Set<Witness> bs = Sets.newHashSet(Sets.intersection(p.versions, pathV));
         if (!bs.isEmpty()) {
-          LinkedList<BitSet> queue = new LinkedList<BitSet>();
+          LinkedList<Set<Witness>> queue = new LinkedList<Set<Witness>>();
           queue.push(bs);
           while (!queue.isEmpty()) {
-            BitSet b = queue.pop();
+            Set<Witness> b = queue.pop();
             int j = 0;
             int remove = -1;
             for (; j < paths.size(); j++) {
-              BitSet c = paths.get(j);
+              Set<Witness> c = paths.get(j);
               if (b.equals(c))
                 break;
-              else if (b.intersects(c)) {
+              else if (!disjoint(b, c)) {
                 // compute intersection and difference
-                BitSet d = new BitSet();
-                BitSet e = new BitSet();
-                d.or(b);
-                e.or(b);
-                d.and(c);
-                e.andNot(c);
+                Set<Witness> d = Sets.newHashSet(Sets.intersection(b, c));
+                Set<Witness> e = Sets.newHashSet(Sets.difference(b, c));
                 // push them both and start again
                 queue.push(d);
                 queue.push(e);
@@ -1285,13 +1054,12 @@ public class Collation {
     int k = paths.size() - 1;
     // variants containing the base aren't variants
     while (k >= 0) {
-      BitSet b = paths.get(k);
-      if (b.nextSetBit(base) == base)
+      Set<Witness> b = paths.get(k);
+      if (b.contains(base))
         paths.remove(k);
       k--;
     }
-    BitSet[] array = new BitSet[paths.size()];
-    return paths.toArray(array);
+    return paths;
   }
 
   /**
@@ -1302,12 +1070,12 @@ public class Collation {
    * @param offset  the byte-offset within the version
    * @return the relevant pair index of -1 if not found
    */
-  int getPairIndex(short version, int offset) {
+  int getPairIndex(Witness version, int offset) {
     int pos = 0;
     int found = -1;
     for (int i = 0; i < matches.size(); i++) {
       Match p = matches.get(i);
-      if (p.versions.nextSetBit(version) == version) {
+      if (p.versions.contains(version)) {
         if (offset < pos + p.length()) {
           found = i;
           break;
@@ -1327,12 +1095,6 @@ public class Collation {
     sb.append("; versions.size()=" + witnesses.size());
     sb.append("; pairs.size()=" + matches.size());
     sb.append("; description=" + description);
-    sb.append("; headerSize=" + headerSize);
-    sb.append("; groupTableSize=" + groupTableSize);
-    sb.append("; versionTableSize=" + versionTableSize);
-    sb.append("; pairsTableSize=" + pairsTableSize);
-    sb.append("; dataTableSize=" + dataTableSize);
-    sb.append("; versionSetSize=" + versionSetSize);
     sb.append("; bestScore=" + bestScore);
     sb.append("; parents.size()=" + parents.size());
     sb.append("; encoding=" + encoding);
@@ -1352,9 +1114,9 @@ public class Collation {
    *
    * @return a 2-D matrix of differences.
    */
-  public double[][] computeDiffMatrix() {
-    // ignore 0th element to simplify indexing
-    int s = witnesses.size() + 1;
+  public double[][] computeDiffMatrix(Ordering<Witness> witnessOrdering) {
+    List<Witness> ordered = witnessOrdering.immutableSortedCopy(witnesses);
+    int s = witnesses.size();
     // keep track of the length of each version
     int[] lengths = new int[s];
     // the length of j last time j and k were joined
@@ -1367,11 +1129,11 @@ public class Collation {
     for (int i = 0; i < matches.size(); i++) {
       Match p = matches.get(i);
       // consider each combination of j and k, including j=k
-      for (int j = p.versions.nextSetBit(1); j >= 1; j = p.versions.nextSetBit(j + 1)) {
-        for (int k = p.versions.nextSetBit(j); k >= 1; k = p.versions.nextSetBit(k + 1)) {
-          costs[j][k] += Math.max(
-                  lengths[j] - lastJoinJ[j][k],
-                  lengths[k] - lastJoinK[j][k]);
+      for (Witness jw : p.versions) {
+        int j = ordered.indexOf(jw);
+        for (Witness kw : p.versions) {
+          int k = ordered.indexOf(kw);
+          costs[j][k] += Math.max(lengths[j] - lastJoinJ[j][k], lengths[k] - lastJoinK[j][k]);
           costs[k][j] = costs[j][k];
           lastJoinJ[j][k] = lengths[j] + p.length();
           lastJoinK[j][k] = lengths[k] + p.length();
@@ -1379,12 +1141,12 @@ public class Collation {
         lengths[j] += p.length();
       }
     }
-    double[][] diffs = new double[s - 1][s - 1];
-    for (int i = 1; i < s; i++) {
-      for (int j = 1; j < s; j++) {
+    double[][] diffs = new double[s][s];
+    for (int i = 0; i < s; i++) {
+      for (int j = 0; j < s; j++) {
         // normalise by the longer of the two lengths -1
         double denominator = Math.max(lengths[i], lengths[j]) - 1;
-        diffs[i - 1][j - 1] = ((double) costs[i][j]) / denominator;
+        diffs[i][j] = ((double) costs[i][j]) / denominator;
       }
     }
     return diffs;

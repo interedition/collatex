@@ -22,9 +22,13 @@ package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTreePosition;
+import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.collect.Sets;
 
-import java.util.BitSet;
 import java.util.ListIterator;
+import java.util.Set;
+
+import static java.util.Collections.disjoint;
 
 /**
  * A MatchThread examines a run of characters, starting at some
@@ -75,7 +79,7 @@ public class MatchThreadDirect implements Runnable {
   /**
    * Versions shared by all arcs in the path
    */
-  protected BitSet versions;
+  protected Set<Witness> versions;
   /**
    * overall length of the path in bytes
    */
@@ -147,8 +151,7 @@ public class MatchThreadDirect implements Runnable {
     // don't forget to duplicate this!
     // or splits will update each other
     this.position = new SuffixTreePosition(mtd.position.node, mtd.position.edgePos);
-    this.versions = new BitSet();
-    this.versions.or(mtd.versions);
+    this.versions = Sets.newHashSet(mtd.versions);
     this.pathLen = mtd.pathLen;
     this.prevChars = mtd.prevChars;
     this.travelled = mtd.travelled;
@@ -201,7 +204,7 @@ public class MatchThreadDirect implements Runnable {
    * hence is not a MUM.</li></ol> The result of applying these three tests
    * is that around 85% of matches that make it through are actually MUMs. The
    * remainder are filtered out by counting frequencies in the MUM class. See
-   * {@link au.edu.uq.nmerge.mvd.MUM#getMatch() getMatch}.
+   * {@link au.edu.uq.nmerge.graph.MaximalUniqueMatch#getMatch() getMatch}.
    */
   protected void mismatch() {
     // first test: are we long enough?
@@ -234,15 +237,14 @@ public class MatchThreadDirect implements Runnable {
     if (prevCharIndex >= 0) {
       byte dataPrevChar = mum.arc.getData()[prevCharIndex];
       if (prevCharIndex >= 0) {
-        BitSet pathVersions = new BitSet();
+        Set<Witness> pathVersions = Sets.newHashSet();
         if (versions != null)
-          pathVersions.or(versions);
-        pathVersions.and(arc.versions);
+          pathVersions.addAll(versions);
+        pathVersions.retainAll(arc.versions);
         for (int i = 0; i < prevChars.length; i++) {
           if (prevChars[i] == null)
             System.out.println("null");
-          if (prevChars[i].previous == dataPrevChar
-                  && prevChars[i].versions.intersects(pathVersions))
+          if (prevChars[i].previous == dataPrevChar && !disjoint(prevChars[i].versions, pathVersions))
             return false;
         }
       }
@@ -265,8 +267,7 @@ public class MatchThreadDirect implements Runnable {
       ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs(graph);
       while (iter.hasNext()) {
         VariantGraphArc a = iter.next();
-        if (a.versions.intersects(versions) && (!a.isParent()
-                || !a.hasChildInVersion(mum.version))) {
+        if (!disjoint(a.versions, versions) && (!a.isParent() || !a.hasChildInVersion(mum.version))) {
           this.arc = a;
           //this.first = 0;
           MatchThreadDirect mtd = new MatchThreadDirect(this);
@@ -292,11 +293,10 @@ public class MatchThreadDirect implements Runnable {
    */
   protected void addToPath(VariantGraphArc arc) {
     if (versions == null) {
-      versions = new BitSet();
-      versions.or(arc.versions);
+      versions = Sets.newHashSet(arc.versions);
       if (graph != null)
-        versions.and(graph.constraint);
+        versions.retainAll(graph.constraint);
     } else
-      versions.and(arc.versions);
+      versions.retainAll(arc.versions);
   }
 }
