@@ -89,7 +89,7 @@ public class MatchThreadDirect<T> implements Runnable {
   /**
    * array of immediately preceding bytes in the variant graph
    */
-  protected PrevChar<T>[] prevChars;
+  protected List<PrevChar<T>> prevChars;
   /**
    * Don't pass through this node. This is the start node of the
    * directly opposite subgraph. Since we only follow printed
@@ -122,7 +122,7 @@ public class MatchThreadDirect<T> implements Runnable {
    *                  precede this match
    */
   public MatchThreadDirect(MaximalUniqueMatch<T> mum, VariantGraph<T> graph, SuffixTree<T> st, VariantGraphArc<T> arc,
-                           VariantGraphNode<T> start, int offset, PrevChar<T>[] prevChars, VariantGraphNode<T> forbidden) {
+                           VariantGraphNode<T> start, int offset, List<PrevChar<T>> prevChars, VariantGraphNode<T> forbidden) {
     this.mum = mum;
     this.first = offset;
     this.st = st;
@@ -140,7 +140,7 @@ public class MatchThreadDirect<T> implements Runnable {
    *
    * @param mtd the MatchThreadDirect object to clone
    */
-  protected MatchThreadDirect(MatchThreadDirect mtd) {
+  protected MatchThreadDirect(MatchThreadDirect<T> mtd) {
     this.mum = mtd.mum;
     this.graph = mtd.graph;
     this.st = mtd.st;
@@ -242,11 +242,11 @@ public class MatchThreadDirect<T> implements Runnable {
         if (versions != null)
           pathVersions.addAll(versions);
         pathVersions.retainAll(arc.versions);
-        for (int i = 0; i < prevChars.length; i++) {
-          if (prevChars[i] == null)
+        for (PrevChar<T> pc : prevChars) {
+          if (pc == null)
             Errors.LOG.error("null", new Exception());
           // FIXME: introduce token comparator instead of equals()
-          if (prevChars[i].previous.equals(dataPrevChar) && !disjoint(prevChars[i].versions, pathVersions))
+          if (pc.previous.equals(dataPrevChar) && !disjoint(pc.versions, pathVersions))
             return false;
         }
       }
@@ -268,11 +268,11 @@ public class MatchThreadDirect<T> implements Runnable {
     if (arc.to != forbidden) {
       ListIterator<VariantGraphArc<T>> iter = arc.to.outgoingArcs(graph);
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         if (!disjoint(a.versions, versions) && (!a.isParent() || !a.hasChildInVersion(mum.version))) {
           this.arc = a;
           //this.first = 0;
-          MatchThreadDirect mtd = new MatchThreadDirect(this);
+          MatchThreadDirect<T> mtd = new MatchThreadDirect<T>(this);
           mtd.run();
           // extended is true iff at least one child
           // mtd matched at least one character
@@ -293,7 +293,7 @@ public class MatchThreadDirect<T> implements Runnable {
    *
    * @param arc the arc to add to the current path
    */
-  protected void addToPath(VariantGraphArc arc) {
+  protected void addToPath(VariantGraphArc<T> arc) {
     if (versions == null) {
       versions = Sets.newHashSet(arc.versions);
       if (graph != null)

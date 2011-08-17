@@ -49,7 +49,7 @@ public class Converter<T> {
   /**
    * unattached arcs during build
    */
-  UnattachedSet unattached;
+  UnattachedSet<T> unattached;
   /**
    * used to optimise the size of the pairs list vector
    */
@@ -87,7 +87,7 @@ public class Converter<T> {
    */
   public VariantGraph<T> create(List<Match<T>> matches, Set<Witness> versions)
           throws Exception {
-    unattached = new UnattachedSet();
+    unattached = new UnattachedSet<T>();
     incomplete = new HashSet<VariantGraphNode<T>>();
     allVersions = Sets.newHashSet(versions);
     graph = new VariantGraph<T>();
@@ -106,9 +106,9 @@ public class Converter<T> {
    *
    * @return the new Node
    */
-  private VariantGraphNode createNode() {
+  private VariantGraphNode<T> createNode() {
     nNodes++;
-    return new VariantGraphNode();
+    return new VariantGraphNode<T>();
   }
 
   /**
@@ -189,9 +189,9 @@ public class Converter<T> {
    * @param u the current node
    * @param a the arc for which the from node is needed
    */
-  private VariantGraphNode getIntersectingNode(VariantGraphNode u, VariantGraphArc a) throws Exception {
-    VariantGraphNode v;
-    VariantGraphArc b = unattached.getIntersectingArc(a);
+  private VariantGraphNode<T> getIntersectingNode(VariantGraphNode<T> u, VariantGraphArc<T> a) throws Exception {
+    VariantGraphNode<T> v;
+    VariantGraphArc<T> b = unattached.getIntersectingArc(a);
     if (b != null) {
       if (b.isHint()) {
         v = b.from;
@@ -222,8 +222,8 @@ public class Converter<T> {
    * @param children children looking for parents
    * @return an equivalent Arc we can use in the Graph
    */
-  private VariantGraphArc pairToArc(Match<T> p, HashMap<Match<T>, VariantGraphArc<T>> pnts,
-                                    HashMap<Match<T>, VariantGraphArc<T>> children) {
+  private VariantGraphArc<T> pairToArc(Match<T> p, HashMap<Match<T>, VariantGraphArc<T>> pnts,
+                                       HashMap<Match<T>, VariantGraphArc<T>> children) {
     nArcs++;
     List<T> pData = (p.isChild() || p.isHint()) ? null : p.getData();
     VariantGraphArc<T> a = new VariantGraphArc<T>(cloneVersions(p.versions), pData);
@@ -273,7 +273,7 @@ public class Converter<T> {
   private void printAcross(Vector<Match<T>> matches, VariantGraphNode<T> u, Set<Witness> incoming)
           throws MVDException {
     int hint = -1;
-    VariantGraphArc selected = u.pickOutgoingArc(incoming);
+    VariantGraphArc<T> selected = u.pickOutgoingArc(incoming);
     if (selected != null) {
       assert !selected.to.isPrintedIncoming(selected.versions);
       // add an empty tuple as a hint if required
@@ -290,7 +290,7 @@ public class Converter<T> {
       hint = printDown(matches, selected, hint);
       ListIterator<VariantGraphArc<T>> iter = u.outgoingArcs();
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         if (a != selected)
           hint = printDown(matches, a, hint);
       }
@@ -361,10 +361,11 @@ public class Converter<T> {
    * @param other the other Textgraph to compare with this one
    * @return true if they are isomorphic, false otherwise
    */
-  public boolean isIsomorphic(VariantGraph other) {
-    VariantGraphNode current, otherCurrent;
-    NodeQueue q = new NodeQueue();
-    NodeQueue otherQueue = new NodeQueue();
+  public boolean isIsomorphic(VariantGraph<T> other) {
+    VariantGraphNode<T> current;
+    VariantGraphNode<T> otherCurrent;
+    NodeQueue<T> q = new NodeQueue<T>();
+    NodeQueue<T> otherQueue = new NodeQueue<T>();
     q.push(graph.start);
     otherQueue.push(other.start);
     current = graph.start;
@@ -373,10 +374,10 @@ public class Converter<T> {
     while (!q.isEmpty() && !otherQueue.isEmpty()) {
       current = q.pop();
       otherCurrent = otherQueue.pop();
-      ListIterator<VariantGraphArc> iter = current.outgoingArcs();
+      ListIterator<VariantGraphArc<T>> iter = current.outgoingArcs();
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
-        VariantGraphArc b = otherCurrent.pickOutgoingArc(a.versions);
+        VariantGraphArc<T> a = iter.next();
+        VariantGraphArc<T> b = otherCurrent.pickOutgoingArc(a.versions);
         numArcs++;
         if (a == null) {
           graph.clearPrinted();

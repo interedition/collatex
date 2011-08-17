@@ -42,7 +42,7 @@ public class VariantGraphSpecialArc<T> extends VariantGraphArc<T> implements Com
   /**
    * if previously calculated save best MUM here
    */
-  MaximalUniqueMatch best;
+  MaximalUniqueMatch<T> best;
   /**
    * position from the start of the new version
    */
@@ -66,7 +66,7 @@ public class VariantGraphSpecialArc<T> extends VariantGraphArc<T> implements Com
    *
    * @return null (and so you must calculate it) or an LCS
    */
-  public MaximalUniqueMatch getBest() {
+  public MaximalUniqueMatch<T> getBest() {
     return best;
   }
 
@@ -75,7 +75,7 @@ public class VariantGraphSpecialArc<T> extends VariantGraphArc<T> implements Com
    *
    * @param best precalculated MUM or this arc
    */
-  public void setBest(MaximalUniqueMatch best) {
+  public void setBest(MaximalUniqueMatch<T> best) {
     this.best = best;
   }
 
@@ -91,10 +91,10 @@ public class VariantGraphSpecialArc<T> extends VariantGraphArc<T> implements Com
    * get duplicates
    */
   public boolean equals(Object other) {
-    if (!(other instanceof VariantGraphSpecialArc))
+    if (!(other instanceof VariantGraphSpecialArc<?>))
       return false;
     else {
-      VariantGraphSpecialArc otherArc = (VariantGraphSpecialArc) other;
+      VariantGraphSpecialArc<?> otherArc = (VariantGraphSpecialArc<?>) other;
       boolean result = super.equals(other) && position == otherArc.position;
       //if ( result )
       //	System.out.println("equals!");

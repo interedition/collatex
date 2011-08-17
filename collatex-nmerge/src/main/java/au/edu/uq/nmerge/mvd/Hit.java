@@ -21,8 +21,11 @@
 
 package au.edu.uq.nmerge.mvd;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 /**
  * Store and create matches for an MVD. Matches are runs within
@@ -105,10 +108,10 @@ public class Hit<T> extends BracketedData<T> {
    * @param multiple true if multiple matches are desired
    * @return a list of Match objects
    */
-  static <T> Hit<T>[] createHits(int len, Set<Witness> versions,
+  static <T> List<Hit<T>> createHits(int len, Set<Witness> versions,
                           Collation<T> collation, int endPair, int endIndex,
                           boolean multiple, ChunkState state) throws Exception {
-    Vector<Hit<T>> hits = new Vector<Hit<T>>();
+    List<Hit<T>> hits = Lists.newArrayList();
     for (Witness i : versions) {
       // start from one byte after the match
       int offset = endIndex + 1;
@@ -128,9 +131,7 @@ public class Hit<T> extends BracketedData<T> {
       if (!multiple)
         break;
     }
-    Hit<T>[] result = new Hit[hits.size()];
-    hits.toArray(result);
-    return result;
+    return hits;
   }
 
   /**
@@ -167,13 +168,8 @@ public class Hit<T> extends BracketedData<T> {
    * @param second the second array
    * @return the concatenated list
    */
-  static <T> Hit<T>[] merge(Hit<T>[] first, Hit<T>[] second) {
-    Hit<T>[] temp = new Hit[first.length + second.length];
-    for (int i = 0; i < first.length; i++)
-      temp[i] = first[i];
-    for (int i = 0; i < second.length; i++)
-      temp[first.length + i] = second[i];
-    return temp;
+  static <T> List<Hit<T>> merge(List<Hit<T>> first, List<Hit<T>> second) {
+    return Lists.newArrayList(Iterables.concat(first, second));
   }
 
   /**

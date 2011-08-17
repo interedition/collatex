@@ -89,9 +89,9 @@ public class Collation<T> {
    * @param state the state of text belonging only to u
    * @return an array of chunks for special display
    */
-  public Chunk<T>[] compare(Witness u, Witness v, ChunkState state)
+  public List<Chunk<T>> compare(Witness u, Witness v, ChunkState state)
           throws MVDException {
-    Vector<Chunk<T>> chunks = new Vector<Chunk<T>>();
+    List<Chunk<T>> chunks = Lists.newArrayList();
     Chunk<T> current = new Chunk<T>();
     current.setVersion(u);
     TransposeState oldTS = null;
@@ -139,9 +139,7 @@ public class Collation<T> {
       current.setId(++Chunk.chunkId);
     if (chunks.size() == 0 || current != chunks.get(chunks.size() - 1))
       chunks.add(current);
-    Chunk<T>[] result = new Chunk[chunks.size()];
-    chunks.toArray(result);
-    return result;
+    return chunks;
   }
 
   /**
@@ -192,13 +190,13 @@ public class Collation<T> {
    * @param multiple if true return all hits; otherwise only the first
    * @return an array of matches
    */
-  public Hit<T>[] search(List<T> pattern, Set<Witness> bs, boolean multiple)
+  public List<Hit<T>> search(List<T> pattern, Set<Witness> bs, boolean multiple)
           throws Exception {
-    KMPSearchState inactive = null;
-    KMPSearchState active = null;
-    Hit<T>[] hits = new Hit[0];
+    KMPSearchState<T> inactive = null;
+    KMPSearchState<T> active = null;
+    List<Hit<T>> hits = Lists.newArrayList();
     if (!witnesses.isEmpty()) {
-      inactive = new KMPSearchState(tokenOrdering, pattern, bs);
+      inactive = new KMPSearchState<T>(tokenOrdering, pattern, bs);
       for (int i = 0; i < matches.size(); i++) {
         Match<T> temp = matches.get(i);
         // move all elements from active to inactive
@@ -208,11 +206,11 @@ public class Collation<T> {
           inactive.append(active);
         active = null;
         // move matching SearchStates into active
-        KMPSearchState s = inactive;
+        KMPSearchState<T> s = inactive;
         while (s != null) {
-          KMPSearchState sequential = s.following;
+          KMPSearchState<T> sequential = s.following;
           if (!disjoint(s.v, temp.versions)) {
-            KMPSearchState child = s.split(temp.versions);
+            KMPSearchState<T> child = s.split(temp.versions);
             if (active == null)
               active = child;
             else
@@ -226,10 +224,10 @@ public class Collation<T> {
         if (active != null) {
           List<T> data = temp.getData();
           for (int j = 0; j < data.size(); j++) {
-            KMPSearchState ss = active;
+            KMPSearchState<T> ss = active;
             while (ss != null) {
               if (ss.update(data.get(j))) {
-                Hit<T>[] m = Hit.createHits(pattern.size(), ss.v, this, i, j, multiple, ChunkState.FOUND);
+                List<Hit<T>> m = Hit.createHits(pattern.size(), ss.v, this, i, j, multiple, ChunkState.FOUND);
                 if (hits == null)
                   hits = m;
                 else
@@ -240,12 +238,12 @@ public class Collation<T> {
               ss = ss.following;
             }
             // now prune the active list
-            KMPSearchState s1 = active;
+            KMPSearchState<T> s1 = active;
             if (s1.next != null) {
               while (s1 != null) {
-                KMPSearchState s2 = s1.following;
+                KMPSearchState<T> s2 = s1.following;
                 while (s2 != null) {
-                  KMPSearchState sequential = s2.following;
+                  KMPSearchState<T> sequential = s2.following;
                   if (s1.equals(s2)) {
                     s1.merge(s2);
                     active.remove(s2);
@@ -284,23 +282,21 @@ public class Collation<T> {
    */
   public float update(Witness version, List<T> data) throws Exception {
     // to do: if version already exists, remove it first
-    Converter con = new Converter();
+    Converter<T> con = new Converter<T>();
     VariantGraph<T> original = con.create(matches, witnesses);
     original.removeVersion(version);
     VariantGraph<T> g = original;
     VariantGraphSpecialArc<T> special = g.addSpecialArc(data, version, 0);
     if (g.getStart().cardinality() > 1) {
       SuffixTree<T> st = makeSuffixTree(special);
-      MaximalUniqueMatch bestMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
+      MaximalUniqueMatch<T> bestMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
       TreeMap<VariantGraphSpecialArc<T>, VariantGraph<T>> specials =
               new TreeMap<VariantGraphSpecialArc<T>, VariantGraph<T>>();
       while (bestMUM != null) {
         if (bestMUM.verify()) {
           bestMUM.merge();
-          SimpleQueue<VariantGraphSpecialArc> leftSpecials =
-                  bestMUM.getLeftSpecialArcs();
-          SimpleQueue<VariantGraphSpecialArc> rightSpecials =
-                  bestMUM.getRightSpecialArcs();
+          SimpleQueue<VariantGraphSpecialArc<T>> leftSpecials = bestMUM.getLeftSpecialArcs();
+          SimpleQueue<VariantGraphSpecialArc<T>> rightSpecials = bestMUM.getRightSpecialArcs();
           while (leftSpecials != null && !leftSpecials.isEmpty())
             installSpecial(specials, leftSpecials.poll(), bestMUM.getLeftSubgraph(), true);
           while (rightSpecials != null && !rightSpecials.isEmpty())
@@ -324,7 +320,7 @@ public class Collation<T> {
         // POP topmost entry, if possible
         bestMUM = null;
         if (specials.size() > 0) {
-          VariantGraphSpecialArc key = specials.firstKey();
+          VariantGraphSpecialArc<T> key = specials.firstKey();
           //assert key.from != null && key.to != null;
           //System.out.println(key.toString());
           if (key != null) {
@@ -356,7 +352,7 @@ public class Collation<T> {
       return 0.0f;
     else {
       for (int i = 0; i < matches.size(); i++) {
-        Match p = matches.get(i);
+        Match<T> p = matches.get(i);
         if (p.versions.contains(version)) {
           if (p.versions.size() == 1)
             uniqueLen += p.length();
@@ -376,7 +372,7 @@ public class Collation<T> {
   private float getPercentUnique(Witness version) {
     float unique = 0.0f, shared = 0.0f;
     for (int i = 0; i < matches.size(); i++) {
-      Match p = matches.get(i);
+      Match<T> p = matches.get(i);
       if (p.versions.contains(version)) {
         if (p.versions.size() == 1)
           unique += p.length();
@@ -393,7 +389,7 @@ public class Collation<T> {
    * @param old the old invalid MUM
    * @return a new valid MUM or null
    */
-  private MaximalUniqueMatch recomputeMUM(MaximalUniqueMatch old) throws MVDException {
+  private MaximalUniqueMatch<T> recomputeMUM(MaximalUniqueMatch<T> old) throws MVDException {
     return computeBestMUM(old.getGraph(), old.getArc());
   }
 
@@ -405,14 +401,14 @@ public class Collation<T> {
    * @return the new MUM or null
    * @throws MVDException
    */
-  private MaximalUniqueMatch computeBestMUM(VariantGraph g, VariantGraphSpecialArc special)
+  private MaximalUniqueMatch<T> computeBestMUM(VariantGraph<T> g, VariantGraphSpecialArc<T> special)
           throws MVDException {
     SuffixTree<T> st = makeSuffixTree(special);
-    MaximalUniqueMatch directMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
-    MaximalUniqueMatch best = directMUM;
+    MaximalUniqueMatch<T> directMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
+    MaximalUniqueMatch<T> best = directMUM;
     if (!directAlignOnly) {
-      MaximalUniqueMatch leftTransposeMUM = MaximalUniqueMatch.findLeftTransposeMUM(special, st, g);
-      MaximalUniqueMatch rightTransposeMUM = MaximalUniqueMatch.findRightTransposeMUM(special, st, g);
+      MaximalUniqueMatch<T> leftTransposeMUM = MaximalUniqueMatch.findLeftTransposeMUM(special, st, g);
+      MaximalUniqueMatch<T> rightTransposeMUM = MaximalUniqueMatch.findRightTransposeMUM(special, st, g);
       best = getBest(directMUM, leftTransposeMUM, rightTransposeMUM);
     }
     if (best != null)
@@ -449,7 +445,7 @@ public class Collation<T> {
     // in the treemap and make it unfindable
     if (specials.containsKey(special))
       specials.remove(special);
-    MaximalUniqueMatch best = computeBestMUM(subGraph, special);
+    MaximalUniqueMatch<T> best = computeBestMUM(subGraph, special);
     if (best != null)
       specials.put(special, subGraph);
   }
@@ -462,11 +458,11 @@ public class Collation<T> {
    * @param rightTransposed the right transpose MUM possibly null
    * @return null or the best MUM
    */
-  private MaximalUniqueMatch getBest(MaximalUniqueMatch direct, MaximalUniqueMatch leftTransposed,
-                                     MaximalUniqueMatch rightTransposed) {
-    MaximalUniqueMatch best = null;
+  private MaximalUniqueMatch<T> getBest(MaximalUniqueMatch<T> direct, MaximalUniqueMatch<T> leftTransposed,
+                                     MaximalUniqueMatch<T> rightTransposed) {
+    MaximalUniqueMatch<T> best = null;
     // decide which transpose MUM to use
-    MaximalUniqueMatch transposed;
+    MaximalUniqueMatch<T> transposed;
     if (leftTransposed == null)
       transposed = rightTransposed;
     else if (rightTransposed == null)
@@ -501,14 +497,14 @@ public class Collation<T> {
    * @param version the version to be removed
    */
   public void removeVersion(Witness version) throws Exception {
-    Converter con = new Converter();
+    Converter<T> con = new Converter<T>();
     VariantGraph<T> original = con.create(matches, Sets.newHashSet(witnesses));
     original.removeVersion(version);
     original.verify();
     witnesses.remove(version);
     matches = con.serialise();
     for (int i = 0; i < matches.size(); i++) {
-      Match p = matches.get(i);
+      Match<T> p = matches.get(i);
       p.versions.remove(version);
     }
   }
@@ -549,14 +545,13 @@ public class Collation<T> {
    * @return an array of Variants
    * @throws MVDException
    */
-  public Variant[] getApparatus(Witness base, int offset, int len)
+  public SortedSet<Variant<T>> getApparatus(Witness base, int offset, int len)
           throws MVDException {
     int first = getPairIndex(base, offset);
     int last = getPairIndex(base, offset + len);
     /// list of unattached-as-outgoing pairs on the right
-    LinkedList<WrappedPair> right = new LinkedList<WrappedPair>();
-    LinkedList<CompactNode> nodes = buildBasicNodes(first, last,
-            right, true);
+    LinkedList<WrappedPair<T>> right = new LinkedList<WrappedPair<T>>();
+    LinkedList<CompactNode> nodes = buildBasicNodes(first, last, right, true);
     // find the nodes to which any remaining pairs belong
     // there may still be some ambiguous pairs that are outgoing
     // from nodes within the range
@@ -575,15 +570,15 @@ public class Collation<T> {
    * @return a list of nodes
    */
   LinkedList<CompactNode> buildBasicNodes(int first, int last,
-                                          LinkedList<WrappedPair> right, boolean pushRight) {
+                                          LinkedList<WrappedPair<T>> right, boolean pushRight) {
     LinkedList<CompactNode> nodes = new LinkedList<CompactNode>();
     for (int i = last; i >= first; i--) {
       // if not saving unattached pairs
       if (!pushRight && right.isEmpty())
         break;
-      Match p = matches.get(i);
+      Match<T> p = matches.get(i);
       if (pushRight && p.isHint())
-        right.push(new WrappedPair(p));
+        right.push(new WrappedPair<T>(p));
       else if (!right.isEmpty() && right.peek().getMatch().isHint()) {
         CompactNode cn = new CompactNode(i);
         // add hint discretely
@@ -592,16 +587,16 @@ public class Collation<T> {
         addOutgoing(cn, right.pop(), right);
         setDefaultNode(cn, right);
         if (pushRight)
-          right.push(new WrappedPair(p));
+          right.push(new WrappedPair<T>(p));
       } else if (!right.isEmpty() && !disjoint(right.peek().getMatch().versions, p.versions)) {
         CompactNode cn = new CompactNode(i);
         addOutgoing(cn, right.pop(), right);
         nodes.push(cn);
         setDefaultNode(cn, right);
         if (pushRight)
-          right.push(new WrappedPair(p));
+          right.push(new WrappedPair<T>(p));
       } else if (pushRight)
-        right.push(new WrappedPair(p));
+        right.push(new WrappedPair<T>(p));
     }
     return nodes;
   }
@@ -610,13 +605,14 @@ public class Collation<T> {
    * Turn the raw list of nodes and their assigned versions into
    * an array of unique Variants
    *
+   *
    * @param nodes the list of variant nodes computed earlier
    * @param base  the base version of the variants
    * @return and array of Variants
    */
-  Variant[] buildVariants(LinkedList<CompactNode> nodes, Witness base)
+  SortedSet<Variant<T>> buildVariants(LinkedList<CompactNode> nodes, Witness base)
           throws MVDException {
-    TreeSet<Variant> variants = new TreeSet<Variant>();
+    TreeSet<Variant<T>> variants = new TreeSet<Variant<T>>();
     LinkedList<CompactNode> departing = new LinkedList<CompactNode>();
     LinkedList<CompactNode> delenda = new LinkedList<CompactNode>();
     Iterator<CompactNode> iter1 = nodes.iterator();
@@ -640,34 +636,34 @@ public class Collation<T> {
             if (!bs.isEmpty()) {
               List<Set<Witness>> paths = getUniquePaths(upNode, node, bs, base);
               // precompute base variant for later
-              Variant[] w = getWordVariants(upNode.getIndex(), node.getIndex(), basePath);
+              List<Variant<T>> w = getWordVariants(upNode.getIndex(), node.getIndex(), basePath);
               // create variants
               for (int i = 0; i < paths.size(); i++) {
-                Variant[] v = getWordVariants(upNode.getIndex(), node.getIndex(), paths.get(i));
-                for (int j = 0; j < v.length; j++) {
+                List<Variant<T>> v = getWordVariants(upNode.getIndex(), node.getIndex(), paths.get(i));
+                for (int j = 0; j < v.size(); j++) {
                   // prune those equal to base content
-                  if (w.length == 0 || !w[0].equalsContent(v[j])) {
+                  if (w.size() == 0 || !w.get(0).equalsContent(v.get(j))) {
                     if (variants.size() > 0) {
                       // omit variant if it is within an existing one
-                      Variant delendum = null;
-                      Iterator<Variant> iter3 = variants.descendingIterator();
+                      Variant<T> delendum = null;
+                      Iterator<Variant<T>> iter3 = variants.descendingIterator();
                       while (iter3.hasNext()) {
-                        Variant x = iter3.next();
-                        if (x.endIndex < v[j].startIndex) {
-                          variants.add(v[j]);
+                        Variant<T> x = iter3.next();
+                        if (x.endIndex < v.get(j).startIndex) {
+                          variants.add(v.get(j));
                           break;
-                        } else if (v[j].isWithin(x))
+                        } else if (v.get(j).isWithin(x))
                           break;
-                        else if (x.isWithin(v[j])) {
+                        else if (x.isWithin(v.get(j))) {
                           delendum = x;
-                          variants.add(v[j]);
+                          variants.add(v.get(j));
                           break;
                         }
                       }
                       if (delendum != null)
                         variants.remove(delendum);
                     } else
-                      variants.add(v[j]);
+                      variants.add(v.get(j));
                   }
                 }
               }
@@ -682,8 +678,7 @@ public class Collation<T> {
         departing.push(node);
       }
     }
-    Variant[] array = new Variant[variants.size()];
-    return variants.toArray(array);
+    return variants;
   }
 
   /**
@@ -694,6 +689,7 @@ public class Collation<T> {
    * Then test if they are equal. If they are, merge them. Then return
    * an array of the remaining variants.
    *
+   *
    * @param start    index of the start node
    * @param end      index of the end-node
    * @param versions the set of versions to follow through the
@@ -702,8 +698,8 @@ public class Collation<T> {
    *
    * @deprecated only works with whitespace in character tokens
    */
-  Variant[] getWordVariants(int start, int end, Set<Witness> versions) {
-    Vector<Variant> variants = new Vector<Variant>();
+  List<Variant<T>> getWordVariants(int start, int end, Set<Witness> versions) {
+    List<Variant<T>> variants = Lists.newArrayList();
     int offset, length;
     int startIndex = start, origStart, endIndex;
     for (Witness i : versions) {
@@ -711,7 +707,7 @@ public class Collation<T> {
       length = 0;
       // get the first outgoing arc containing i
       startIndex = origStart = next(startIndex + 1, i);
-      Match p = matches.get(startIndex);
+      Match<T> p = matches.get(startIndex);
       // start HERE: first outgoing arc, offset 0
       int lastStartIndex = startIndex;
       int lastOffset = 0;
@@ -769,7 +765,7 @@ public class Collation<T> {
       if (endIndex == Integer.MAX_VALUE)
         endIndex = previous(matches.size() - 1, i);
       // now build variant
-      Variant temp = new Variant(offset, startIndex, endIndex, length, Sets.newHashSet(i), this);
+      Variant<T> temp = new Variant<T>(offset, startIndex, endIndex, length, Sets.newHashSet(i), this);
       int k;
       for (k = 0; k < variants.size(); k++) {
         if (temp.equalsContent(variants.get(k))) {
@@ -780,8 +776,7 @@ public class Collation<T> {
       if (k == variants.size())
         variants.add(temp);
     }
-    Variant[] array = new Variant[variants.size()];
-    return variants.toArray(array);
+    return variants;
   }
 
   /**
@@ -791,10 +786,10 @@ public class Collation<T> {
    * @param cn    the Compact Node to act as default parent
    * @param right the list
    */
-  void setDefaultNode(CompactNode cn, LinkedList<WrappedPair> right) {
-    Iterator<WrappedPair> iter = right.iterator();
+  void setDefaultNode(CompactNode cn, LinkedList<WrappedPair<T>> right) {
+    Iterator<WrappedPair<T>> iter = right.iterator();
     while (iter.hasNext()) {
-      WrappedPair wp = iter.next();
+      WrappedPair<T> wp = iter.next();
       if (wp.getDefaultNode() == null)
         wp.setDefaultNode(cn);
       else
@@ -806,15 +801,15 @@ public class Collation<T> {
    * Add an outgoing arc to a node and look for incoming
    * pairs to the left of the node.
    */
-  void addOutgoing(CompactNode cn, WrappedPair p, LinkedList<WrappedPair> right) {
+  void addOutgoing(CompactNode cn, WrappedPair<T> p, LinkedList<WrappedPair<T>> right) {
     cn.addOutgoing(p.getMatch());
     Set<Witness> wi = cn.getWantsIncoming();
     while (!wi.isEmpty()) {
       int index = cn.getIndex();
       for (int i = index; i >= 0; i--) {
-        Match q = matches.get(i);
+        Match<T> q = matches.get(i);
         if (!disjoint(q.versions, wi)) {
-          addIncoming(cn, new WrappedPair(q), right);
+          addIncoming(cn, new WrappedPair<T>(q), right);
           wi = cn.getWantsIncoming();
           break;
         }
@@ -822,8 +817,8 @@ public class Collation<T> {
     }
     // look through right for arcs that intersect
     // with p and must be attached to their default nodes
-    Iterator<WrappedPair> iter = right.iterator();
-    WrappedPair q = null;
+    Iterator<WrappedPair<T>> iter = right.iterator();
+    WrappedPair<T> q = null;
     while (iter.hasNext()) {
       q = iter.next();
       if (!disjoint(q.getMatch().versions, p.getMatch().versions))
@@ -843,12 +838,12 @@ public class Collation<T> {
    * Add an incoming arc to a node and look for intersecting
    * pairs in the right list.
    */
-  void addIncoming(CompactNode cn, WrappedPair p, LinkedList<WrappedPair> right) {
+  void addIncoming(CompactNode cn, WrappedPair<T> p, LinkedList<WrappedPair<T>> right) {
     cn.addIncoming(p.getMatch());
     Set<Witness> wo = cn.getWantsOutgoing();
     while (!wo.isEmpty()) {
-      Iterator<WrappedPair> iter = right.iterator();
-      WrappedPair q = null;
+      Iterator<WrappedPair<T>> iter = right.iterator();
+      WrappedPair<T> q = null;
       while (iter.hasNext()) {
         q = iter.next();
         if (!disjoint(q.getMatch().versions, wo))
@@ -883,7 +878,7 @@ public class Collation<T> {
     // if any such path contains even one pair that doesn't
     // contain the base version, add it to the paths set.
     for (int i = from.getIndex() + 1; i <= to.getIndex(); i++) {
-      Match p = matches.get(i);
+      Match<T> p = matches.get(i);
       if (!disjoint(p.versions, pathV)) {
         // get intersection
         Set<Witness> bs = Sets.newHashSet(Sets.intersection(p.versions, pathV));
@@ -941,7 +936,7 @@ public class Collation<T> {
     int pos = 0;
     int found = -1;
     for (int i = 0; i < matches.size(); i++) {
-      Match p = matches.get(i);
+      Match<T> p = matches.get(i);
       if (p.versions.contains(version)) {
         if (offset < pos + p.length()) {
           found = i;

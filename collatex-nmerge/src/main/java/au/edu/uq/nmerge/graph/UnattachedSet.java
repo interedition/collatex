@@ -37,6 +37,7 @@ import static java.util.Collections.disjoint;
  * @author Desmond Schmidt
  */
 public class UnattachedSet<T> extends HashSet<VariantGraphArc<T>> {
+  private static final long serialVersionUID = 1L;
 
   /**
    * the union of all the versions in the unattached set
@@ -64,7 +65,7 @@ public class UnattachedSet<T> extends HashSet<VariantGraphArc<T>> {
     // remove them from the unattached set
     ListIterator<VariantGraphArc<T>> iter2 = u.incomingArcs();
     while (iter2.hasNext()) {
-      VariantGraphArc a = iter2.next();
+      VariantGraphArc<T> a = iter2.next();
       remove(a);
       versions.removeAll(a.versions);
     }
@@ -106,7 +107,7 @@ public class UnattachedSet<T> extends HashSet<VariantGraphArc<T>> {
    * @param a the arc to add
    * @return true if the arc wasn't already there
    */
-  public boolean add(VariantGraphArc a) {
+  public boolean add(VariantGraphArc<T> a) {
     boolean answer = super.add(a);
     versions.addAll(a.versions);
     return answer;
@@ -135,13 +136,13 @@ public class UnattachedSet<T> extends HashSet<VariantGraphArc<T>> {
    * @param set the set of versions to subtract
    * @return true if the hint was removed
    */
-  boolean removeEmptyArc(VariantGraphArc a, Set<Witness> set) throws Exception {
+  boolean removeEmptyArc(VariantGraphArc<T> a, Set<Witness> set) throws Exception {
     versions.removeAll(set);
     a.versions.removeAll(set);
     a.getFrom().removeOutgoingVersions(set);
     if (a.versions.isEmpty()) {
       remove(a);
-      VariantGraphNode u = a.getFrom();
+      VariantGraphNode<T> u = a.getFrom();
       u.removeOutgoing(a);
       return true;
     }

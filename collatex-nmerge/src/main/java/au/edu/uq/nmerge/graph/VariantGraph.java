@@ -37,7 +37,7 @@ public class VariantGraph<T> {
   /**
    * the special start and end nodes that define the graph
    */
-  VariantGraphNode start, end;
+  VariantGraphNode<T> start, end;
   /**
    * distance of the (sub)graph from the start of the new version
    */
@@ -60,8 +60,8 @@ public class VariantGraph<T> {
    * Basic constructor
    */
   public VariantGraph() {
-    start = new VariantGraphNode();
-    end = new VariantGraphNode();
+    start = new VariantGraphNode<T>();
+    end = new VariantGraphNode<T>();
     this.constraint = Sets.newHashSet();
     maxLen = -1;
   }
@@ -76,7 +76,7 @@ public class VariantGraph<T> {
    * @param constraint graph only covers these versions and ignores all others
    * @param position   the position from the start of the new version
    */
-  public VariantGraph(VariantGraphNode start, VariantGraphNode end, Set<Witness> constraint, int position) {
+  public VariantGraph(VariantGraphNode<T> start, VariantGraphNode<T> end, Set<Witness> constraint, int position) {
     this.start = start;
     this.end = end;
     this.position = position;
@@ -92,9 +92,9 @@ public class VariantGraph<T> {
    * @param position the position of the arc
    * @return the special, unaligned arc
    */
-  public VariantGraphSpecialArc addSpecialArc(List<T> data, Witness version, int position)
+  public VariantGraphSpecialArc<T> addSpecialArc(List<T> data, Witness version, int position)
           throws MVDException {
-    VariantGraphSpecialArc a = new VariantGraphSpecialArc(Sets.newHashSet(version), data, position);
+    VariantGraphSpecialArc<T> a = new VariantGraphSpecialArc<T>(Sets.newHashSet(version), data, position);
     start.addOutgoing(a);
     end.addIncoming(a);
     // ensure this is clear
@@ -110,17 +110,17 @@ public class VariantGraph<T> {
    * @return the version's data as a byte array
    */
   List<T> getVersion(Witness version) {
-    VariantGraphNode temp = start;
+    VariantGraphNode<T> temp = start;
     int len = 0;
     while (temp != null && !temp.equals(end)) {
-      VariantGraphArc a = temp.pickOutgoingArc(version);
+      VariantGraphArc<T> a = temp.pickOutgoingArc(version);
       len += a.dataLen();
       temp = a.to;
     }
     final List<T> versionData = Lists.newArrayListWithExpectedSize(len);
     temp = start;
     while (temp != null && !temp.equals(end)) {
-      VariantGraphArc a = temp.pickOutgoingArc(version);
+      VariantGraphArc<T> a = temp.pickOutgoingArc(version);
       versionData.addAll(a.getData());
       temp = a.to;
     }
@@ -135,12 +135,12 @@ public class VariantGraph<T> {
    */
   private int maxLength() {
     HashMap<Witness, Integer> lengths = new HashMap<Witness, Integer>();
-    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
-    HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
+    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    HashSet<VariantGraphNode<T>> printed = new HashSet<VariantGraphNode<T>>();
     queue.add(start);
     while (!queue.isEmpty()) {
-      VariantGraphNode node = queue.poll();
-      ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
+      VariantGraphNode<T> node = queue.poll();
+      ListIterator<VariantGraphArc<T>> iter = node.outgoingArcs(this);
       while (iter.hasNext()) {
         VariantGraphArc<T> a = iter.next();
         List<T> data = a.getData();
@@ -162,9 +162,9 @@ public class VariantGraph<T> {
       }
     }
     // clear printed
-    Iterator<VariantGraphNode> iter2 = printed.iterator();
+    Iterator<VariantGraphNode<T>> iter2 = printed.iterator();
     while (iter2.hasNext()) {
-      VariantGraphNode n = iter2.next();
+      VariantGraphNode<T> n = iter2.next();
       n.reset();
     }
     /// Find the maximum length version
@@ -210,12 +210,12 @@ public class VariantGraph<T> {
    */
   public void adopt(Witness version) throws Exception {
     constraint.add(version);
-    VariantGraphNode temp = start;
+    VariantGraphNode<T> temp = start;
     while (temp != end) {
-      VariantGraphArc a = temp.pickOutgoingArc(version);
+      VariantGraphArc<T> a = temp.pickOutgoingArc(version);
       assert a != null : "Couldn't find outgoing arc for version " + version;
-      if (a instanceof VariantGraphSpecialArc) {
-        VariantGraphArc b = new VariantGraphArc(a.versions, a.data);
+      if (a instanceof VariantGraphSpecialArc<?>) {
+        VariantGraphArc<T> b = new VariantGraphArc<T>(a.versions, a.data);
         temp.replaceOutgoing(a, b);
         a.to.replaceIncoming(a, b);
         temp = b.to;
@@ -229,16 +229,16 @@ public class VariantGraph<T> {
    * Verify a graph by breadth-first traversal, using exceptions.
    */
   public void verify() throws MVDException {
-    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
-    HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
+    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    HashSet<VariantGraphNode<T>> printed = new HashSet<VariantGraphNode<T>>();
     start.verify();
     queue.add(start);
     while (!queue.isEmpty()) {
-      VariantGraphNode node = queue.poll();
+      VariantGraphNode<T> node = queue.poll();
       node.verify();
-      ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
+      ListIterator<VariantGraphArc<T>> iter = node.outgoingArcs(this);
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         a.verify();
         a.to.printArc(a);
         printed.add(a.to);
@@ -247,9 +247,9 @@ public class VariantGraph<T> {
         }
       }
     }
-    Iterator<VariantGraphNode> iter2 = printed.iterator();
+    Iterator<VariantGraphNode<T>> iter2 = printed.iterator();
     while (iter2.hasNext()) {
-      VariantGraphNode n = iter2.next();
+      VariantGraphNode<T> n = iter2.next();
       n.reset();
     }
     end.verify();
@@ -268,12 +268,12 @@ public class VariantGraph<T> {
     int maxIndegree = 0;
     int maxOutdegree = 0;
     StringBuffer sb = new StringBuffer();
-    HashSet<VariantGraphNode> printed = new HashSet<VariantGraphNode>();
+    HashSet<VariantGraphNode<T>> printed = new HashSet<VariantGraphNode<T>>();
     try {
-      SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+      SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
       queue.add(start);
       while (!queue.isEmpty()) {
-        VariantGraphNode node = queue.poll();
+        VariantGraphNode<T> node = queue.poll();
         if (node.indegree() > maxIndegree)
           maxIndegree = node.indegree();
         if (node.outdegree() > maxOutdegree)
@@ -282,9 +282,9 @@ public class VariantGraph<T> {
         totalOutdegree += node.outdegree();
         totalNodes++;
         node.verify();
-        ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
+        ListIterator<VariantGraphArc<T>> iter = node.outgoingArcs(this);
         while (iter.hasNext()) {
-          VariantGraphArc a = iter.next();
+          VariantGraphArc<T> a = iter.next();
           sb.append(a.toString() + "\n");
           a.to.printArc(a);
           printed.add(a.to);
@@ -293,9 +293,9 @@ public class VariantGraph<T> {
           }
         }
       }
-      Iterator<VariantGraphNode> iter2 = printed.iterator();
+      Iterator<VariantGraphNode<T>> iter2 = printed.iterator();
       while (iter2.hasNext()) {
-        VariantGraphNode n = iter2.next();
+        VariantGraphNode<T> n = iter2.next();
         n.reset();
       }
     } catch (Exception e) {
@@ -315,14 +315,14 @@ public class VariantGraph<T> {
    * printed but shouldn't be.
    */
   void clearPrinted() {
-    HashMap<Integer, VariantGraphNode> hash = new HashMap<Integer, VariantGraphNode>(1500);
-    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+    HashMap<Integer, VariantGraphNode<T>> hash = new HashMap<Integer, VariantGraphNode<T>>(1500);
+    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
     queue.add(start);
     while (!queue.isEmpty()) {
-      VariantGraphNode node = queue.poll();
-      ListIterator<VariantGraphArc> iter = node.outgoingArcs();
+      VariantGraphNode<T> node = queue.poll();
+      ListIterator<VariantGraphArc<T>> iter = node.outgoingArcs();
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         if (!hash.containsKey(a.to.nodeId)) {
           queue.add(node);
           node.reset();
@@ -338,7 +338,7 @@ public class VariantGraph<T> {
    *
    * @return a node
    */
-  public VariantGraphNode getStart() {
+  public VariantGraphNode<T> getStart() {
     return start;
   }
 
@@ -349,15 +349,15 @@ public class VariantGraph<T> {
    * @param version the version to remove
    */
   public void removeVersion(Witness version) {
-    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
     queue.add(start);
     while (!queue.isEmpty()) {
-      VariantGraphNode node = queue.poll();
+      VariantGraphNode<T> node = queue.poll();
       node.reset();
-      ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
-      VariantGraphArc del = null;
+      ListIterator<VariantGraphArc<T>> iter = node.outgoingArcs(this);
+      VariantGraphArc<T> del = null;
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         a.to.printArc(a);
         if (a.versions.contains(version)) {
           if (a.versions.size() == 1)

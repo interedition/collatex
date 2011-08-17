@@ -19,33 +19,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package au.edu.uq.nmerge.mvd;
+package au.edu.uq.nmerge;
 
-public class WrappedPair<T> {
-  Match<T> match;
-  CompactNode defaultNode;
+/**
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
+public class Tuple<T> {
 
-  WrappedPair(Match<T> match) {
-    this.match = match;
-  }
+  public final T first;
+  public final T second;
 
-  CompactNode getDefaultNode() {
-    return defaultNode;
-  }
-
-  Match<T> getMatch() {
-    return this.match;
-  }
-
-  void setDefaultNode(CompactNode cn) {
-    this.defaultNode = cn;
-  }
-
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append("pair: " + match.toString() + "\n");
-    String defaultNodeString = (defaultNode == null) ? "null" : defaultNode.toString();
-    sb.append("defaultNode: " + defaultNodeString);
-    return sb.toString();
+  public Tuple(T first, T second) {
+    this.first = first;
+    this.second = second;
   }
 }

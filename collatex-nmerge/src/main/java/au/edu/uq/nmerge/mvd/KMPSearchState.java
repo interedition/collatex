@@ -40,7 +40,7 @@ public class KMPSearchState<T> {
   private final Ordering<T> ordering;
   List<T> pattern;
   Set<Witness> v;
-  KMPSearchState following;
+  KMPSearchState<T> following;
   int[] next;
   /**
    * next byte to match
@@ -65,7 +65,7 @@ public class KMPSearchState<T> {
    *
    * @param ss the SearchState object to clone
    */
-  private KMPSearchState(KMPSearchState ss, Set<Witness> v) {
+  private KMPSearchState(KMPSearchState<T> ss, Set<Witness> v) {
     this.ordering = ss.ordering;
     this.pattern = ss.pattern;
     this.v = Sets.newHashSet(v);
@@ -101,8 +101,8 @@ public class KMPSearchState<T> {
    *
    * @param list a list of SearchState objects
    */
-  void append(KMPSearchState list) {
-    KMPSearchState temp = this;
+  void append(KMPSearchState<T> list) {
+    KMPSearchState<T> temp = this;
     while (temp.following != null)
       temp = temp.following;
     temp.following = list;
@@ -116,7 +116,7 @@ public class KMPSearchState<T> {
    *         different sets
    */
   public boolean equals(Object obj) {
-    return ((KMPSearchState) obj).pos == pos;
+    return ((KMPSearchState<?>) obj).pos == pos;
   }
 
   /**
@@ -134,7 +134,7 @@ public class KMPSearchState<T> {
    *
    * @param s the search state object to merge with this one
    */
-  void merge(KMPSearchState s) {
+  void merge(KMPSearchState<T> s) {
     this.v.addAll(s.v);
   }
 
@@ -147,8 +147,8 @@ public class KMPSearchState<T> {
    * @return the list with the item removed (may be null)
    * @throws MVDException
    */
-  KMPSearchState remove(KMPSearchState item) throws MVDException {
-    KMPSearchState previous, list, temp;
+  KMPSearchState<T> remove(KMPSearchState<T> item) throws MVDException {
+    KMPSearchState<T> previous, list, temp;
     previous = temp = list = this;
     while (temp != null && temp != item) {
       previous = temp;
@@ -176,10 +176,10 @@ public class KMPSearchState<T> {
    * @param bs the set which must intersect with our versions.
    * @return a clone of everything we stand for.
    */
-  KMPSearchState split(Set<Witness> bs) {
+  KMPSearchState<T> split(Set<Witness> bs) {
     final Sets.SetView<Witness> intersection = Sets.intersection(this.v, bs);
     Preconditions.checkArgument(!intersection.isEmpty());
-    return new KMPSearchState(this, Sets.newHashSet(intersection));
+    return new KMPSearchState<T>(this, Sets.newHashSet(intersection));
   }
 
   /**

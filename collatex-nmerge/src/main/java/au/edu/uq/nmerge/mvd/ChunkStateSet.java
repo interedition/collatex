@@ -168,7 +168,7 @@ public class ChunkStateSet {
    * @param v     the second version compared to first
    * @return a new Chunkstate or the same one as us no change
    */
-  ChunkStateSet next(Match p, ChunkState state, Witness v) {
+  ChunkStateSet next(Match<?> p, ChunkState state, Witness v) {
     ChunkStateSet repl = this;
     if (!p.contains(v)) {
       if (!containsState(state)) {

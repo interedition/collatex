@@ -25,7 +25,7 @@ import java.util.Vector;
 /**
  * A Queue of Nodes
  */
-class NodeQueue extends Vector<VariantGraphNode> {
+class NodeQueue<T> extends Vector<VariantGraphNode<T>> {
   static final long serialVersionUID = 1;
 
   /**
@@ -34,7 +34,7 @@ class NodeQueue extends Vector<VariantGraphNode> {
    *
    * @param node the node to push
    */
-  void push(VariantGraphNode node) {
+  void push(VariantGraphNode<T> node) {
     for (int i = size() - 1; i >= 0; i--) {
       if (get(i) == node)
         return;
@@ -42,10 +42,10 @@ class NodeQueue extends Vector<VariantGraphNode> {
     add(node);
   }
 
-  VariantGraphNode pop() {
-    VariantGraphNode u = null;
+  VariantGraphNode<T> pop() {
+    VariantGraphNode<T> u = null;
     if (size() > 0) {
-      u = (VariantGraphNode) remove(0);
+      u = remove(0);
     }
     return u;
   }

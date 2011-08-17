@@ -24,7 +24,7 @@ package au.edu.uq.nmerge.mvd;
 import java.util.HashMap;
 import java.util.Vector;
 
-public class VMap extends HashMap<Match, Match> {
+public class VMap<T> extends HashMap<Match<T>, Match<T>> {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -34,13 +34,13 @@ public class VMap extends HashMap<Match, Match> {
    * @param v the version to test for
    * @return a map of pair-pair relations
    */
-  VMap(Witness v, Vector<Match> matches) {
-    HashMap<Match, Match> vMap = new HashMap<Match, Match>();
+  VMap(Witness v, Vector<Match<T>> matches) {
+    HashMap<Match<T>, Match<T>> vMap = new HashMap<Match<T>, Match<T>>();
     if (matches.size() > 1) {
-      Match last = null;
+      Match<T> last = null;
       for (int i = 0; i < matches.size(); i++) {
         // examine all the v-pairs
-        Match p = matches.get(i);
+        Match<T> p = matches.get(i);
         if (p.contains(v)) {
           if (last == null)
             continue;
@@ -69,7 +69,7 @@ public class VMap extends HashMap<Match, Match> {
    * @return true if last and p both follow one another in their
    *         respective versions
    */
-  boolean isContiguous(Match last, Match p, Witness v) {
+  boolean isContiguous(Match<T> last, Match<T> p, Witness v) {
     if (last == null)
       return false;
     else if (last.isParent()) {
@@ -79,8 +79,8 @@ public class VMap extends HashMap<Match, Match> {
         return false;
       else {
         // parents must have contiguous children in v
-        Match child1 = last.getChildInVersion(v);
-        Match child2 = p.getChildInVersion(v);
+        Match<T> child1 = last.getChildInVersion(v);
+        Match<T> child2 = p.getChildInVersion(v);
         if (child1 != null && child2 != null)
           return get(child1) == child2
                   || get(child2) == child1;
@@ -92,8 +92,8 @@ public class VMap extends HashMap<Match, Match> {
         return false;
       else {
         // children must have contiguous parents in v
-        Match parent1 = last.getParent();
-        Match parent2 = p.getParent();
+        Match<T> parent1 = last.getParent();
+        Match<T> parent2 = p.getParent();
         boolean ans1 = parent1.contains(v);
         boolean ans2 = parent2.contains(v);
         if (ans1 && ans2) {

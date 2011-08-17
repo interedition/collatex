@@ -25,7 +25,6 @@ import com.google.common.collect.Lists;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 /**
@@ -41,8 +40,8 @@ public class Match<T> {
    */
   private int id;
 
-  private Match parent;
-  private List<Match> children = Lists.newArrayList();
+  private Match<T> parent;
+  private List<Match<T>> children = Lists.newArrayList();
 
   public Set<Witness> versions;
   private List<T> data;
@@ -67,7 +66,7 @@ public class Match<T> {
   }
 
 
-  public List<Match> getChildren() {
+  public List<Match<T>> getChildren() {
     return Collections.unmodifiableList(children);
   }
 
@@ -86,7 +85,7 @@ public class Match<T> {
    *
    * @param child the child to add
    */
-  public void addChild(Match child) {
+  public void addChild(Match<T> child) {
     children.add(child);
     child.setParent(this);
   }
@@ -97,7 +96,7 @@ public class Match<T> {
    *
    * @param child the child to remove
    */
-  public void removeChild(Match child) {
+  public void removeChild(Match<T> child) {
     children.remove(child);
   }
 
@@ -106,7 +105,7 @@ public class Match<T> {
    *
    * @param parent the parent to be
    */
-  public void setParent(Match parent) {
+  public void setParent(Match<T> parent) {
     this.parent = parent;
   }
 
@@ -185,7 +184,7 @@ public class Match<T> {
    *
    * @return the parent
    */
-  public Match getParent() {
+  public Match<T> getParent() {
     return parent;
   }
 
@@ -216,8 +215,8 @@ public class Match<T> {
    * @param v the version to look for a child in
    * @return the relevant pair or null
    */
-  Match getChildInVersion(Witness v) {
-    for (Match q : children) {
+  Match<T> getChildInVersion(Witness v) {
+    for (Match<T> q : children) {
       if (q.contains(v)) {
         return q;
       }

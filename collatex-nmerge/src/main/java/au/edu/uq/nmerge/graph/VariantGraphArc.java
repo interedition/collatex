@@ -37,12 +37,6 @@ import java.util.*;
  */
 public class VariantGraphArc<T> {
   /**
-   * the Adler32 modulus
-   */
-  static int MOD_ADLER = 65521;
-  static String alphabet = new String(
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-  /**
    * the set of versions
    */
   public Set<Witness> versions;
@@ -85,7 +79,7 @@ public class VariantGraphArc<T> {
     this.versions = versions;
     // may attempt to create child of a child
     if (parent != null) {
-      VariantGraphArc temp = parent;
+      VariantGraphArc<T> temp = parent;
       while (temp.parent != null)
         temp = temp.parent;
       if (temp != parent)
@@ -126,7 +120,7 @@ public class VariantGraphArc<T> {
    *
    * @param to the new to node
    */
-  public void setTo(VariantGraphNode to) {
+  public void setTo(VariantGraphNode<T> to) {
     this.to = to;
   }
 
@@ -135,7 +129,7 @@ public class VariantGraphArc<T> {
    *
    * @param from the new from node
    */
-  public void setFrom(VariantGraphNode from) {
+  public void setFrom(VariantGraphNode<T> from) {
     this.from = from;
   }
 
@@ -235,8 +229,8 @@ public class VariantGraphArc<T> {
    * @param offset the offset into data pointing to the first byte of the rhs
    * @return an array of split arcs (or maybe just one)
    */
-  VariantGraphArc[] split(int offset) throws MVDException {
-    VariantGraphArc[] arcs = null;
+  VariantGraphArc<T>[] split(int offset) throws MVDException {
+    VariantGraphArc<T>[] arcs = null;
     // handle simple cases first
     if (offset == 0 || offset == dataLen()) {
       arcs = new VariantGraphArc[1];
@@ -257,8 +251,8 @@ public class VariantGraphArc<T> {
    * @param offset the offset at which to split
    * @return the split child arcs
    */
-  private VariantGraphArc[] splitChild(int offset) throws MVDException {
-    VariantGraphArc splitParent = parent;
+  private VariantGraphArc<T>[] splitChild(int offset) throws MVDException {
+    VariantGraphArc<T> splitParent = parent;
     while (splitParent.parent != null)
       splitParent = parent;
     return splitParent.splitParent(offset, this);
@@ -272,19 +266,19 @@ public class VariantGraphArc<T> {
    *                child, not of the parent
    * @return the split parent or child arc
    */
-  private VariantGraphArc[] splitParent(int offset, VariantGraphArc desired) throws MVDException {
-    VariantGraphArc[] arcs = splitDataArc(offset);
+  private VariantGraphArc<T>[] splitParent(int offset, VariantGraphArc<T> desired) throws MVDException {
+    VariantGraphArc<T>[] arcs = splitDataArc(offset);
     for (int i = 0; i < children.size(); i++) {
-      VariantGraphArc child = children.get(i);
-      VariantGraphArc b = new VariantGraphArc(Sets.newHashSet(child.versions), arcs[0]);
-      VariantGraphArc c = new VariantGraphArc(Sets.newHashSet(child.versions), arcs[1]);
-      VariantGraphNode childFrom = child.from;
-      VariantGraphNode childTo = child.to;
+      VariantGraphArc<T> child = children.get(i);
+      VariantGraphArc<T> b = new VariantGraphArc<T>(Sets.newHashSet(child.versions), arcs[0]);
+      VariantGraphArc<T> c = new VariantGraphArc<T>(Sets.newHashSet(child.versions), arcs[1]);
+      VariantGraphNode<T> childFrom = child.from;
+      VariantGraphNode<T> childTo = child.to;
       childFrom.removeOutgoing(child);
       childTo.removeIncoming(child);
       childFrom.addOutgoing(b);
       childTo.addIncoming(c);
-      VariantGraphNode n = new VariantGraphNode();
+      VariantGraphNode<T> n = new VariantGraphNode<T>();
       n.addIncoming(b);
       n.addOutgoing(c);
       if (child == desired) {
@@ -303,10 +297,10 @@ public class VariantGraphArc<T> {
    * @param offset point before which to split
    * @return an array of two split arcs
    */
-  private VariantGraphArc[] splitDataArc(int offset) throws MVDException {
-    VariantGraphArc[] arcs = new VariantGraphArc[2];
-    arcs[0] = new VariantGraphArc(Sets.newHashSet(versions), Lists.newArrayList(data.subList(0, offset)));
-    arcs[1] = new VariantGraphArc(Sets.newHashSet(versions), Lists.newArrayList(data.subList(offset, dataLen())));
+  private VariantGraphArc<T>[] splitDataArc(int offset) throws MVDException {
+    VariantGraphArc<T>[] arcs = new VariantGraphArc[2];
+    arcs[0] = new VariantGraphArc<T>(Sets.newHashSet(versions), Lists.newArrayList(data.subList(0, offset)));
+    arcs[1] = new VariantGraphArc<T>(Sets.newHashSet(versions), Lists.newArrayList(data.subList(offset, dataLen())));
     installSplit(arcs);
     return arcs;
   }
@@ -316,10 +310,10 @@ public class VariantGraphArc<T> {
    *
    * @param arcs two arcs to replace this one
    */
-  private void installSplit(VariantGraphArc[] arcs) throws MVDException {
+  private void installSplit(VariantGraphArc<T>[] arcs) throws MVDException {
     // now replace the existing arc with the two split ones
     from.replaceOutgoing(this, arcs[0]);
-    VariantGraphNode inter = new VariantGraphNode();
+    VariantGraphNode<T> inter = new VariantGraphNode<T>();
     inter.addIncoming(arcs[0]);
     inter.addOutgoing(arcs[1]);
     to.replaceIncoming(this, arcs[1]);
@@ -329,10 +323,8 @@ public class VariantGraphArc<T> {
    * Required for membership tests in hashmaps and treemaps
    */
   public boolean equals(Object other) {
-    VariantGraphArc otherArc = (VariantGraphArc) other;
-    return versions.equals(otherArc.versions)
-            && dataEquals(otherArc) && from == otherArc.from
-            && to == otherArc.to;
+    VariantGraphArc<?> otherArc = (VariantGraphArc<?>) other;
+    return versions.equals(otherArc.versions) && dataEquals(otherArc) && from == otherArc.from && to == otherArc.to;
   }
 
   /**
@@ -341,9 +333,9 @@ public class VariantGraphArc<T> {
    * @param otherArc the other arc to compare
    * @return true if they two arcs have same data
    */
-  private boolean dataEquals(VariantGraphArc<T> otherArc) {
+  private boolean dataEquals(VariantGraphArc<?> otherArc) {
     List<T> data1 = getData();
-    List<T> data2 = otherArc.getData();
+    List<?> data2 = otherArc.getData();
     if ((data1 == null && data2 != null) || (data1 != null && data2 == null))
       return false;
     else if (data1 == null && data2 == null)
@@ -424,7 +416,7 @@ public class VariantGraphArc<T> {
    *
    * @return a Node possibly null
    */
-  public VariantGraphNode getFrom() {
+  public VariantGraphNode<T> getFrom() {
     return from;
   }
 
@@ -433,7 +425,7 @@ public class VariantGraphArc<T> {
    *
    * @return a Node possibly null
    */
-  public VariantGraphNode getTo() {
+  public VariantGraphNode<T> getTo() {
     return to;
   }
 
@@ -442,7 +434,7 @@ public class VariantGraphArc<T> {
    *
    * @param child the child arc
    */
-  public void removeChild(VariantGraphArc child) {
+  public void removeChild(VariantGraphArc<T> child) {
     assert children.contains(child) :
             "removeChild: child " + child + " not found!";
     children.remove(child);
@@ -497,7 +489,7 @@ public class VariantGraphArc<T> {
    *
    * @param parent the new parent
    */
-  void setParent(VariantGraphArc parent) {
+  void setParent(VariantGraphArc<T> parent) {
     this.parent = parent;
   }
 

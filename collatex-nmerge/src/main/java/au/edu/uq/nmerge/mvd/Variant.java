@@ -26,7 +26,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Set;
 
@@ -127,7 +126,7 @@ public class Variant<T> implements Comparable<Variant<T>> {
    * @return true if they are the same
    */
   public boolean equals(Object other) {
-    Variant otherV = (Variant) other;
+    Variant<?> otherV = (Variant<?>) other;
     return this.versions.equals(otherV.versions)
             && this.startIndex == otherV.startIndex
             && this.endIndex == otherV.endIndex
@@ -142,7 +141,7 @@ public class Variant<T> implements Comparable<Variant<T>> {
    * @param other the other variant to compare with
    * @return true if they are 'equal'
    */
-  public boolean equalsContent(Variant other) {
+  public boolean equalsContent(Variant<?> other) {
     if (!this.collation.equals(other.collation))
       return false;
     else {
@@ -186,7 +185,7 @@ public class Variant<T> implements Comparable<Variant<T>> {
    *
    * @param other the other variant to merge with this one.
    */
-  public void merge(Variant other) {
+  public void merge(Variant<T> other) {
     this.versions.addAll(other.versions);
   }
 
@@ -200,7 +199,7 @@ public class Variant<T> implements Comparable<Variant<T>> {
    * @param other the other variant to compare it to
    * @return true if we are within other, false otherwise
    */
-  public boolean isWithin(Variant other) {
+  public boolean isWithin(Variant<T> other) {
     // these tests will mostly fail
     // so we can avoid the main computation
     if (length < other.length
@@ -217,7 +216,7 @@ public class Variant<T> implements Comparable<Variant<T>> {
         // find the start of this variant in other
         int offset = other.startOffset;
         int index = other.startIndex;
-        Match p = collation.getMatches().get(index);
+        Match<T> p = collation.getMatches().get(index);
         int i = 0;
         Witness followV = Iterables.getFirst(versions, null);
         while (i < other.length) {
@@ -244,7 +243,7 @@ public class Variant<T> implements Comparable<Variant<T>> {
    *
    * @param other the variant to compare ourselves to
    */
-  public int compareTo(Variant other) {
+  public int compareTo(Variant<T> other) {
     if (this.startIndex < other.startIndex)
       return -1;
     else if (this.startIndex > other.startIndex)

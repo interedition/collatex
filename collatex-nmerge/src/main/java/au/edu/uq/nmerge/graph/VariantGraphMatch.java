@@ -65,11 +65,11 @@ public class VariantGraphMatch<T> {
   /**
    * The Node to start the match from
    */
-  VariantGraphNode start;
+  VariantGraphNode<T> start;
   /**
    * the match path as an array of successive arcs
    */
-  VariantGraphArc[] path;
+  VariantGraphArc<T>[] path;
   /**
    * the frequency of the match
    */
@@ -86,7 +86,7 @@ public class VariantGraphMatch<T> {
    * @param length      the length of the match
    * @param data        all the data of the special arc
    */
-  VariantGraphMatch(VariantGraphNode start, int graphOffset, Witness version, int dataOffset, int length, List<T> data) {
+  VariantGraphMatch(VariantGraphNode<T> start, int graphOffset, Witness version, int dataOffset, int length, List<T> data) {
     this.graphOffset = graphOffset;
     this.dataOffset = dataOffset;
     this.version = version;
@@ -103,7 +103,7 @@ public class VariantGraphMatch<T> {
    *
    * @param start the new value of start
    */
-  public void setStart(VariantGraphNode start) {
+  public void setStart(VariantGraphNode<T> start) {
     this.start = start;
   }
 
@@ -113,10 +113,10 @@ public class VariantGraphMatch<T> {
    * @return true if we do
    */
   public boolean equals(Object other) {
-    VariantGraphMatch m = ((VariantGraphMatch) other);
+    VariantGraphMatch<?> m = ((VariantGraphMatch<?>) other);
     if (m.length == this.length
             && this.data != null
-            && ((VariantGraphMatch) other).data != null) {
+            && ((VariantGraphMatch<?>) other).data != null) {
       for (int i = 0; i < length; i++) {
         if (!m.data.get(i).equals(this.data.get(i)))
           return false;
@@ -132,7 +132,7 @@ public class VariantGraphMatch<T> {
    * @param version the version to OR with the path
    */
   void addVersion(Witness version) throws MVDException {
-    VariantGraphArc[] path = getMatchPath();
+    VariantGraphArc<T>[] path = getMatchPath();
     for (int i = 0; i < path.length; i++)
       path[i].addVersion(version);
   }
@@ -167,11 +167,11 @@ public class VariantGraphMatch<T> {
    *
    * @return an array of arcs belonging to the match path
    */
-  VariantGraphArc[] getMatchPath() throws MVDException {
+  VariantGraphArc<T>[] getMatchPath() throws MVDException {
     if (path == null || !isPathValid()) {
-      Vector<VariantGraphArc> parents = new Vector<VariantGraphArc>();
-      VariantGraphArc[] splits;
-      VariantGraphArc a = start.pickOutgoingArc(version);
+      Vector<VariantGraphArc<T>> parents = new Vector<VariantGraphArc<T>>();
+      VariantGraphArc<T>[] splits;
+      VariantGraphArc<T> a = start.pickOutgoingArc(version);
       assert a != null;
       int distance = 0;
       int splitStart = 0;
@@ -203,7 +203,7 @@ public class VariantGraphMatch<T> {
         if (distance + a.dataLen() <= graphOffset + length) {
           distance += a.dataLen();
           //parents.add( a );
-          VariantGraphArc b = a.to.pickOutgoingArc(version);
+          VariantGraphArc<T> b = a.to.pickOutgoingArc(version);
           if (b == null)    // if a.to is the end-node
           {
             assert a.to.outdegree() == 0;
@@ -254,7 +254,7 @@ public class VariantGraphMatch<T> {
    * @param a       the arc to search for
    * @return -1 if not found, otherwise its index
    */
-  int findParentArc(Vector<VariantGraphArc> parents, VariantGraphArc a) {
+  int findParentArc(Vector<VariantGraphArc<T>> parents, VariantGraphArc<T> a) {
     int index = -1;
     for (int i = 0; i < parents.size(); i++) {
       if (parents.get(i) == a) {
@@ -293,8 +293,8 @@ public class VariantGraphMatch<T> {
    * @return the node that will become the end of the left
    *         subgraph
    */
-  VariantGraphNode getLeftNode() throws MVDException {
-    VariantGraphArc[] path = getMatchPath();
+  VariantGraphNode<T> getLeftNode() throws MVDException {
+    VariantGraphArc<T>[] path = getMatchPath();
     if (path[0].from == null)
       Errors.LOG.error("null!", new Exception());
     return path[0].from;
@@ -306,8 +306,8 @@ public class VariantGraphMatch<T> {
    * @return the node that will become the start of the right
    *         subgraph
    */
-  VariantGraphNode getRightNode() throws MVDException {
-    VariantGraphArc[] path = getMatchPath();
+  VariantGraphNode<T> getRightNode() throws MVDException {
+    VariantGraphArc<T>[] path = getMatchPath();
     assert path != null && path[path.length - 1] != null;
     return path[path.length - 1].to;
   }
@@ -317,13 +317,13 @@ public class VariantGraphMatch<T> {
    *
    * @param end don't go beyond this node
    */
-  void verify(VariantGraphNode end) {
-    VariantGraphNode temp = start;
+  void verify(VariantGraphNode<T> end) {
+    VariantGraphNode<T> temp = start;
     int pos = graphOffset;
     int compared = 0;
     while (temp != null && compared < length) {
       assert temp != end;
-      VariantGraphArc a = temp.pickOutgoingArc(version);
+      VariantGraphArc<T> a = temp.pickOutgoingArc(version);
       if (a.dataLen() < pos) {
         pos -= a.dataLen();
       } else if (a.dataLen() == pos) {
@@ -355,7 +355,7 @@ public class VariantGraphMatch<T> {
    * @return true if the conditions hold, false otherwise
    */
   boolean checkPath(Witness newVersion) {
-    VariantGraphArc a = start.pickOutgoingArc(version);
+    VariantGraphArc<T> a = start.pickOutgoingArc(version);
     int posWithinArc = 0;
     int distTravelled = 0;
     // advance to graphOffset
@@ -406,9 +406,9 @@ public class VariantGraphMatch<T> {
    * @param b the other Match
    * @return true if the b match uses any arc from our path
    */
-  public boolean overlaps(VariantGraphMatch b) {
-    VariantGraphArc aArc = start.pickOutgoingArc(version);
-    VariantGraphArc bArc = b.start.pickOutgoingArc(b.version);
+  public boolean overlaps(VariantGraphMatch<T> b) {
+    VariantGraphArc<T> aArc = start.pickOutgoingArc(version);
+    VariantGraphArc<T> bArc = b.start.pickOutgoingArc(b.version);
     int i = 0;
     int aCurrArcIndex = 0;
     int bCurrArcIndex = 0;

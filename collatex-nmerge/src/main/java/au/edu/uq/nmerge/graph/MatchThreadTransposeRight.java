@@ -22,6 +22,7 @@ package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 
+import java.util.List;
 import java.util.ListIterator;
 
 import static java.util.Collections.disjoint;
@@ -47,7 +48,7 @@ public class MatchThreadTransposeRight<T> extends MatchThreadDirect<T> {
    * @param forbidden don't travel beyond this node (should be null)
    */
   MatchThreadTransposeRight(MaximalUniqueMatch<T> mum, SuffixTree<T> st, VariantGraphArc<T> a,
-                            int first, PrevChar<T>[] prevChars, int travelled, VariantGraphNode<T> forbidden) {
+                            int first, List<PrevChar<T>> prevChars, int travelled, VariantGraphNode<T> forbidden) {
     super(mum, null, st, a, a.from, first, prevChars, forbidden);
     this.travelled = travelled;
   }

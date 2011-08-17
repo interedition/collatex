@@ -21,6 +21,8 @@
 
 package au.edu.uq.nmerge;
 
+import au.edu.uq.nmerge.graph.Converter;
+import au.edu.uq.nmerge.graph.VariantGraph;
 import au.edu.uq.nmerge.mvd.Collation;
 import au.edu.uq.nmerge.mvd.Match;
 import com.google.common.collect.Lists;
@@ -36,12 +38,16 @@ public class MVDTest extends AbstractTest {
   public void simple() throws Exception {
     final Collation<String> collation = new Collation<String>("Test", Ordering.<String>natural(), "");
 
-    collation.newVersion("test1", "test1", Lists.newArrayList("hello", "funny", "world"));
-    collation.newVersion("test2", "test2", Lists.newArrayList("hello", "marvelous", "world", "how", "funny"));
-    collation.newVersion("test3", "test3", Lists.newArrayList("hello", "world", "how", "funny", "marvelous"));
+    collation.newVersion("test1", "test1", Lists.newArrayList("the", "quick", "brown", "fox", "died"));
+    collation.newVersion("test2", "test2", Lists.newArrayList("the", "quick", "red", "fox", "got", "rabies", "and", "died"));
+    collation.newVersion("test3", "test3", Lists.newArrayList("the", "quick", "blue", "fox", "lives"));
 
-    for (Match m : collation.getMatches()) {
+    for (Match<String> m : collation.getMatches()) {
       LOG.debug(m.toString());
     }
+
+    final Converter<String> converter = new Converter<String>();
+    final VariantGraph<String> graph = converter.create(collation.getMatches(), collation.getWitnesses());
+    LOG.debug("\n" + graph.toString());
   }
 }

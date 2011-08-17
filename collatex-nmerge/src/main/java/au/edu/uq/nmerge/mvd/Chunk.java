@@ -20,11 +20,11 @@
  */
 package au.edu.uq.nmerge.mvd;
 
+import au.edu.uq.nmerge.Tuple;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Represent a piece of a version that has some characteristics,
@@ -101,33 +101,34 @@ public class Chunk<T> extends BracketedData<T> {
    * Overlay a match onto an array of chunks. Return the modified
    * chunk array.
    *
+   *
    * @param hit    the match to overlay
    * @param chunks an array of chunks
    * @return an array of chunks with the match incorporated
    */
-  public static Chunk[] overlay(Hit hit, Chunk[] chunks) {
+  public static <T> List<Chunk<T>> overlay(Hit<T> hit, Chunk<T>[] chunks) {
     int begin = 0;
     int matchStart = hit.offset;
     int matchEnd = hit.offset + hit.length;
-    Vector<Chunk> newChunks = new Vector<Chunk>();
+    List<Chunk<T>> newChunks = Lists.newArrayList();
     for (int i = 0; i < chunks.length; i++) {
-      Chunk current = chunks[i];
+      Chunk<T> current = chunks[i];
       // 1. current overlaps match on the left
       if (matchStart < begin + current.getLength()
               && matchStart > begin) {
-        Chunk[] parts = current.split(matchStart - begin);
-        newChunks.add(parts[0]);
-        begin += parts[0].getLength();
-        current = parts[1];
+        Tuple<Chunk<T>> parts = current.split(matchStart - begin);
+        newChunks.add(parts.first);
+        begin += parts.second.getLength();
+        current = parts.second;
       }
       // 2. current overlaps match on the right
       if (matchEnd < begin + current.getLength()
               && matchEnd > begin) {
-        Chunk[] parts = current.split(matchEnd - begin);
-        parts[0].addState(hit.state);
-        newChunks.add(parts[0]);
-        begin += parts[0].getLength();
-        current = parts[1];
+        Tuple<Chunk<T>> parts = current.split(matchEnd - begin);
+        parts.first.addState(hit.state);
+        newChunks.add(parts.first);
+        begin += parts.first.getLength();
+        current = parts.second;
       }
       // 3. match completely overlaps current
       if (matchStart <= begin && matchEnd
@@ -144,8 +145,7 @@ public class Chunk<T> extends BracketedData<T> {
         begin += current.getLength();
       }
     }
-    Chunk[] array = new Chunk[newChunks.size()];
-    return newChunks.toArray(array);
+    return newChunks;
   }
 
   /**
@@ -154,14 +154,15 @@ public class Chunk<T> extends BracketedData<T> {
    * @param offset the point within the chunk to split
    * @return an array of 2 chunks
    */
-  Chunk[] split(int offset) {
-    Chunk[] parts = new Chunk[2];
+  Tuple<Chunk<T>> split(int offset) {
     // duplicate ids: this doesn't matter for chunks
-    parts[0] = new Chunk(id, states.getStates(), Lists.newArrayList(realData.subList(0, offset)));
-    parts[0].version = this.version;
-    parts[1] = new Chunk(id, new ChunkStateSet(states).getStates(), Lists.newArrayList(realData.subList(offset, realData.size())));
-    parts[1].version = this.version;
-    return parts;
+    final Chunk<T> left = new Chunk<T>(id, states.getStates(), Lists.newArrayList(realData.subList(0, offset)));
+    left.version = this.version;
+
+    final Chunk<T> right = new Chunk<T>(id, new ChunkStateSet(states).getStates(), Lists.newArrayList(realData.subList(offset, realData.size())));
+    right.version = this.version;
+
+    return new Tuple<Chunk<T>>(left, right);
   }
 
   /**
