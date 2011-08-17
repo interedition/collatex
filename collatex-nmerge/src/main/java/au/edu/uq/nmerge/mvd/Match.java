@@ -20,9 +20,11 @@
  */
 package au.edu.uq.nmerge.mvd;
 
-import au.edu.uq.nmerge.Errors;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
-import java.util.LinkedList;
+import java.util.Collections;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
@@ -32,15 +34,18 @@ import java.util.Set;
  * @author Desmond Schmidt 18/8/07
  */
 public class Match {
-  Match parent;
-  LinkedList<Match> children;
-  private byte[] data;
-  public Set<Witness> versions;
   public static int pairId = 1;
+
   /**
    * parent id if subject of a transposition
    */
-  int id;
+  private int id;
+
+  private Match parent;
+  private List<Match> children = Lists.newArrayList();
+
+  public Set<Witness> versions;
+  private byte[] data;
 
   /**
    * Create a basic pair
@@ -53,26 +58,26 @@ public class Match {
     this.data = data;
   }
 
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
+
+  public List<Match> getChildren() {
+    return Collections.unmodifiableList(children);
+  }
+
   /**
    * Get the number of children we have
    *
    * @return the current size of the children list
    */
   public int numChildren() {
-    return (children == null) ? 0 : children.size();
-  }
-
-  /**
-   * Get an iterator over all the children of this pair.
-   * The caller should have first tested if there are any
-   * children, of course. This would not be a runtime but
-   * a coding error, hence we just fail here with a
-   * NullPointerException
-   *
-   * @return an iterator
-   */
-  public ListIterator<Match> getChildIterator() {
-    return children.listIterator();
+    return children.size();
   }
 
   /**
@@ -82,8 +87,6 @@ public class Match {
    * @param child the child to add
    */
   public void addChild(Match child) {
-    if (children == null)
-      children = new LinkedList<Match>();
     children.add(child);
     child.setParent(this);
   }
@@ -96,8 +99,6 @@ public class Match {
    */
   public void removeChild(Match child) {
     children.remove(child);
-    if (children.size() == 0)
-      children = null;
   }
 
   /**
@@ -116,21 +117,6 @@ public class Match {
    */
   int length() {
     return (parent != null) ? parent.length() : data.length;
-  }
-
-  /**
-   * Return the size of the data used by this pair
-   *
-   * @return the size of the data only
-   */
-  int dataSize() {
-    if (parent != null || isHint())
-      return 0;
-    else if (data == null) {
-      Errors.LOG.error("null", new Exception());
-      return 0;
-    } else
-      return data.length;
   }
 
   /**
@@ -167,7 +153,7 @@ public class Match {
    * @return true if it is, false otherwise
    */
   public boolean isParent() {
-    return children != null;
+    return !children.isEmpty();
   }
 
   /**
@@ -186,13 +172,7 @@ public class Match {
       sb.append("{" + id + ":");
       sb.append(new String(data));
       sb.append("}");
-      sb.append("; children=");
-      for (int i = 0; i < children.size(); i++) {
-        Match p = children.get(i);
-        sb.append(p.toString());
-        if (i < children.size() - 1)
-          sb.append(",");
-      }
+      sb.append("; children=").append(Iterables.toString(children));
     } else if (data != null)
       sb.append("'").append(new String(data)).append("'");
     else
@@ -237,15 +217,11 @@ public class Match {
    * @return the relevant pair or null
    */
   Match getChildInVersion(Witness v) {
-    Match child = null;
-    ListIterator<Match> iter = getChildIterator();
-    while (iter.hasNext()) {
-      Match q = iter.next();
+    for (Match q : children) {
       if (q.contains(v)) {
-        child = q;
-        break;
+        return q;
       }
     }
-    return child;
+    return null;
   }
 }
