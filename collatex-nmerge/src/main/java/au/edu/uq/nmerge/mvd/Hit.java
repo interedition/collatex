@@ -21,8 +21,6 @@
 
 package au.edu.uq.nmerge.mvd;
 
-import java.nio.charset.Charset;
-import java.util.BitSet;
 import java.util.Set;
 import java.util.Vector;
 
@@ -68,7 +66,7 @@ public class Hit extends BracketedData {
    */
   Hit(Witness version, int offset, int length, String shortName,
       ChunkState state) {
-    super(Charset.defaultCharset().toString());
+    super();
     this.offset = offset;
     this.shortName = shortName;
     this.length = length;
@@ -87,85 +85,12 @@ public class Hit extends BracketedData {
    */
   public Hit(int offset, int length, Witness version,
              String shortName) {
-    super(Charset.defaultCharset().toString());
+    super();
     this.length = length;
     this.offset = offset;
     this.version = version;
     this.shortName = shortName;
     this.state = ChunkState.NONE;
-  }
-
-  /**
-   * Read the length of the match
-   *
-   * @param matchData the data from the matches
-   * @param pos       the start position for the length
-   * @return the number of bytes read
-   */
-  private int readLength(byte[] matchData, int pos) {
-    int start = pos;
-    int begin = readTextLabel(matchData, pos);
-    int len = readDigitData(matchData, begin);
-    length = Integer.parseInt(new String(matchData, begin, len));
-    return (begin + len + 1) - start;
-  }
-
-  /**
-   * Scan over a number
-   *
-   * @param matchData the matchdata to parse
-   * @param pos       starting offset within matchData
-   * @return the number of bytes scanned over
-   */
-  private int readDigitData(byte[] matchData, int pos) {
-    int start = pos;
-    while (Character.isDigit((char) matchData[pos]))
-      pos++;
-    return pos - start;
-  }
-
-  /**
-   * read the text label preceding a number
-   *
-   * @param matchData the matchdata to parse
-   * @param pos       starting offset within matchData
-   * @return the updated offset after the text label
-   */
-  private int readTextLabel(byte[] matchData, int pos) {
-    while (!Character.isDigit((char) matchData[pos]))
-      pos++;
-    return pos;
-  }
-
-  /**
-   * Read the offset
-   *
-   * @param matchData the data from the matches
-   * @param pos       the start position for the offset
-   * @return the number of bytes read
-   */
-  private int readOffset(byte[] matchData, int pos) {
-    int start = pos;
-    int begin = readTextLabel(matchData, pos);
-    int len = readDigitData(matchData, begin);
-    offset = Integer.parseInt(new String(matchData, begin, len));
-    return (begin + len + 1) - start;
-  }
-
-  /**
-   * Read and set the short name
-   *
-   * @param matchData the string representation of the matches
-   * @param pos       the start offset within matchData
-   * @return the number of bytes read in the source data
-   */
-  private int readShortName(byte[] matchData, int pos) {
-    int start = pos;
-    while (matchData[pos] != ':')
-      pos++;
-    int len = pos - start;
-    shortName = new String(matchData, start, len);
-    return len + 1;
   }
 
   /**

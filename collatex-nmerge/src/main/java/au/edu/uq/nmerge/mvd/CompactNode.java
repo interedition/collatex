@@ -24,7 +24,6 @@ package au.edu.uq.nmerge.mvd;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
-import java.util.BitSet;
 import java.util.Set;
 
 /**

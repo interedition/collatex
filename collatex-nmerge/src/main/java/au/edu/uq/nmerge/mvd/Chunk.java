@@ -20,7 +20,6 @@
  */
 package au.edu.uq.nmerge.mvd;
 
-import java.nio.charset.Charset;
 import java.util.Vector;
 
 /**
@@ -48,24 +47,20 @@ public class Chunk extends BracketedData {
 
   /**
    * Basic constructor for a chunk. Add states versions and ids later.
-   *
-   * @param encoding the encoding of the data
    */
-  public Chunk(String encoding) {
-    super(encoding);
+  public Chunk() {
     this.states = new ChunkStateSet();
   }
 
   /**
    * Create a new Chunk
    *
-   * @param encoding the encoding of the data
    * @param id       the parent or child id or 0
    * @param cs       an initial set of chunk states
    * @param data     the data to add
    */
-  public Chunk(String encoding, int id, ChunkState[] cs, byte[] data) {
-    super(encoding, data);
+  public Chunk(int id, ChunkState[] cs, byte[] data) {
+    super(data);
     this.states = new ChunkStateSet(cs);
     this.id = id;
   }
@@ -165,9 +160,9 @@ public class Chunk extends BracketedData {
       second[i] = realData[j];
     Chunk[] parts = new Chunk[2];
     // duplicate ids: this doesn't matter for chunks
-    parts[0] = new Chunk(encoding, id, states.getStates(), first);
+    parts[0] = new Chunk(id, states.getStates(), first);
     parts[0].version = this.version;
-    parts[1] = new Chunk(encoding, id, new ChunkStateSet(states).getStates(), second);
+    parts[1] = new Chunk(id, new ChunkStateSet(states).getStates(), second);
     parts[1].version = this.version;
     return parts;
   }
@@ -237,7 +232,7 @@ public class Chunk extends BracketedData {
     {
       sb.append(createHeader());
       try {
-        sb.append(new String(realData, encoding));
+        sb.append(new String(realData));
       } catch (Exception e) {
         // this won't happen
       }

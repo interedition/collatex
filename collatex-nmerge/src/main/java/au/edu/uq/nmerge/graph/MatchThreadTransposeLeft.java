@@ -22,7 +22,6 @@ package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 
-import java.util.Collections;
 import java.util.ListIterator;
 
 import static java.util.Collections.disjoint;

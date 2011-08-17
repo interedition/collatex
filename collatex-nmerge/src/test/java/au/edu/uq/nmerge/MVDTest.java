@@ -21,7 +21,8 @@
 
 package au.edu.uq.nmerge;
 
-import au.edu.uq.nmerge.mvd.*;
+import au.edu.uq.nmerge.mvd.Collation;
+import au.edu.uq.nmerge.mvd.Match;
 import org.junit.Test;
 
 /**

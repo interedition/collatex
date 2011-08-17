@@ -25,7 +25,6 @@ import au.edu.uq.nmerge.exception.MVDException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-import java.util.BitSet;
 import java.util.Set;
 
 /**

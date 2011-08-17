@@ -24,7 +24,6 @@ import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Match;
 import au.edu.uq.nmerge.mvd.Witness;
 import com.google.common.collect.Sets;
-import sun.font.StandardTextSource;
 
 import java.util.*;
 

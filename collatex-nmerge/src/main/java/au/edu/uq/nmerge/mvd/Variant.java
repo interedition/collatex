@@ -25,7 +25,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
 import java.io.ByteArrayOutputStream;
-import java.util.BitSet;
 import java.util.Set;
 
 /**
@@ -113,25 +112,12 @@ public class Variant implements Comparable<Variant> {
     String header = createHeader();
     StringBuffer sb = new StringBuffer();
     try {
-      sb.append(new String(data, collation.encoding));
+      sb.append(new String(data));
     } catch (Exception e) {
       sb.append(new String(data));
     }
     String dataStr = sb.toString();
     return header + dataStr + "]";
-  }
-
-  /**
-   * Convert this variant to a byte array
-   *
-   * @return a byte array
-   */
-  public byte[] getBytes() {
-    try {
-      return this.toString().getBytes(collation.encoding);
-    } catch (Exception e) {
-      return this.toString().getBytes();
-    }
   }
 
   /**
@@ -310,8 +296,8 @@ public class Variant implements Comparable<Variant> {
         return res;
       else {
         try {
-          String thisD = new String(data, collation.encoding);
-          String thatD = new String(other.data, other.collation.encoding);
+          String thisD = new String(data);
+          String thatD = new String(other.data);
           return thisD.compareTo(thatD);
         } catch (Exception e) {
           String thisD = new String(data);

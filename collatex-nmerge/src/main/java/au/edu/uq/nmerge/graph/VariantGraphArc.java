@@ -24,11 +24,13 @@ import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Match;
 import au.edu.uq.nmerge.mvd.Witness;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Set;
 
 /**
  * An Arc is a fragment of data, a set of versions in a variant graph

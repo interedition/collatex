@@ -24,7 +24,10 @@ import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Witness;
 import com.google.common.collect.Sets;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Set;
+import java.util.Vector;
 
 import static java.util.Collections.disjoint;
 
@@ -567,12 +570,7 @@ public class VariantGraphNode {
    * @throws MVDException if node is invalid
    */
   void verify() throws MVDException {
-    Set<Witness> bs1 = null, bs2 = null;
-    if (incoming.size() > 0)
-      bs1 = checkArcs(incoming.listIterator(), "incoming");
-    if (outgoing.size() > 0)
-      bs2 = checkArcs(outgoing.listIterator(), "outgoing");
-    if (!bs1.equals(bs2))
+    if (!checkArcs(incoming.listIterator(), "incoming").equals(checkArcs(outgoing.listIterator(), "outgoing")))
       throw new MVDException("Incoming and outgoing sets not equal");
   }
 

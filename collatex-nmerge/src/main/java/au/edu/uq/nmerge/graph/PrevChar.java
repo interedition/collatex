@@ -23,7 +23,6 @@ package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.mvd.Witness;
 
-import java.util.BitSet;
 import java.util.Set;
 
 /**

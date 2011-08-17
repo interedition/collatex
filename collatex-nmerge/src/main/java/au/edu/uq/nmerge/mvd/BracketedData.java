@@ -43,66 +43,21 @@ public abstract class BracketedData {
    * length of data parsed to produce this object
    */
   protected int srcLen;
-  /**
-   * encoding of the data
-   */
-  protected String encoding;
 
   /**
    * Create a BracketedData object
-   *
-   * @param encoding the encoding of the data to be parsed
    */
-  public BracketedData(String encoding) {
-    this.encoding = encoding;
+  public BracketedData() {
   }
 
   /**
    * Create a BracketedData object using the data
    *
-   * @param encoding the encoding of the data to be parsed
    * @param data     the original data
    */
-  public BracketedData(String encoding, byte[] data) {
-    this.encoding = encoding;
+  public BracketedData(byte[] data) {
     this.realData = data;
     this.escapedData = escapeData(data);
-  }
-
-  /**
-   * Read the body of the chunk.
-   *
-   * @param chunkData the data to read from, with escaped ]s
-   * @param pos       the start offset in the data
-   * @return the number of bytes consumed
-   */
-  protected int readData(byte[] chunkData, int pos) {
-    int state = 0;
-    int start = pos;
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    while (pos < chunkData.length && state != -1) {
-      switch (state) {
-        case 0:    // reading text
-          if (chunkData[pos] == '\\')
-            state = 1;
-          else if (chunkData[pos] == ']')
-            state = -1;
-          else
-            bos.write(chunkData[pos]);
-          break;
-        case 1:    // reading backslash
-          if (chunkData[pos] == '\\')
-            bos.write('\\');
-          else if (chunkData[pos] == ']')
-            bos.write(']');
-          state = 0;
-          break;
-      }
-      pos++;
-    }
-    realData = bos.toByteArray();
-    escapedData = escapeData(realData);
-    return pos - start;
   }
 
   /**

@@ -37,7 +37,6 @@ import static java.util.Collections.disjoint;
  * @author Desmond Schmidt &copy; 2009
  */
 public class Collation {
-  public static String UNTITLED_NAME = "untitled";
 
   // new options
   boolean directAlignOnly;
@@ -47,13 +46,11 @@ public class Collation {
   int bestScore;
   // used for checking
   HashSet<Match> parents;
-  String encoding;
 
   public Collation() {
     this.description = "";
     this.witnesses = new Vector<Witness>();
     this.matches = new Vector<Match>();
-    this.encoding = "UTF-8";
   }
 
   public Collation(String description) {
@@ -72,15 +69,6 @@ public class Collation {
    */
   public String getDescription() {
     return description;
-  }
-
-  /**
-   * Get the encoding of the data in this MVD
-   *
-   * @return the encoding as a String
-   */
-  public String getEncoding() {
-    return encoding;
   }
 
   /**
@@ -127,7 +115,7 @@ public class Collation {
   public Chunk[] compare(Witness u, Witness v, ChunkState state)
           throws MVDException {
     Vector<Chunk> chunks = new Vector<Chunk>();
-    Chunk current = new Chunk(encoding);
+    Chunk current = new Chunk();
     current.setVersion(u);
     TransposeState oldTS = null;
     TransposeState ts = new TransposeState();
@@ -160,7 +148,7 @@ public class Collation {
           newStates[0] = ts.getChunkState();
         } else
           newStates = cs.getStates();
-        current = new Chunk(encoding, ts.getId(), newStates, p.getData());
+        current = new Chunk(ts.getId(), newStates, p.getData());
         current.setVersion(u);
       } else
         current.addData(p.getData());
@@ -385,83 +373,10 @@ public class Collation {
     }
     original.adopt(version);
     matches = con.serialise();
-    if (encoding.toUpperCase().equals("UTF-8"))
-      removeUTF8Splits();
     if (numVersions() == 1)
       return 0.0f;
     else
       return getPercentUnique(version);
-  }
-
-  /**
-   * Remove split multi-byte UTF-8 characters. A UTF-8 character split
-   * between two pairs will give rise to invalid characters if the mvd
-   * is written out. Correct this by moving any orphaned character-
-   * sequence starts to the start of the following pair. We don't change
-   * the graph structure just its content a little bit.
-   */
-  private void removeUTF8Splits() {
-    for (int i = 0; i < matches.size(); i++) {
-      Match p = matches.get(i);
-      if (p.dataSize() > 0) {
-        byte[] data = matches.get(i).getData();
-        int len;
-        /*
-                   * A split utf-8 character's length varies according to
-                   * the bit combination at the start. Since we only take
-                   * incomplete characters over to the next pair we
-                   * need only examine bytes starting a sequence that cannot
-                   * finish before the end of the pair's data.
-                   */
-        if ( /*data.length>0&&*/(data[data.length - 1] & 0xE0) == 0xC0)
-          len = 1;
-        else if (data.length > 1 && (data[data.length - 2] & 0xF0) == 0xE0)
-          len = 2;
-        else if (data.length > 2 && (data[data.length - 3] & 0xF8) == 0xF0)
-          len = 3;
-        else
-          len = 0;
-        int j = data.length - len;
-        if (len > 0 && i < matches.size() - 1) {
-          // preserve the data that stays put
-          byte[] newData = new byte[data.length - len];
-          byte[] prefix = new byte[len];
-          for (int k = 0; k < j; k++)
-            newData[k] = data[k];
-          // extract the portion to move
-          for (int k = 0; k < len; k++)
-            prefix[k] = data[j + k];
-          // find all the subsequent pairs
-          // that share a version with this pair
-          // and add the prefix onto them
-          Set<Witness> seekSet = Sets.newHashSet(p.versions);
-          int m = i + 1;
-          while (!seekSet.isEmpty() && m < matches.size()) {
-            Match q = matches.get(m);
-            if (!q.isHint() && !disjoint(q.versions, seekSet)) {
-              // This relies on the closing bytes of all
-              // preceding arcs ending in the same way.
-              // We don't update children because they
-              // don't own any data. Their parents will
-              // get updated in exactly the right way.
-              if (!q.isChild()) {
-                byte[] qData = q.getData();
-                byte[] newQData = new byte[qData.length + len];
-                for (int k = 0; k < len; k++)
-                  newQData[k] = prefix[k];
-                for (int k = 0; k < qData.length; k++)
-                  newQData[k + len] = qData[k];
-                q.setData(newQData);
-              }
-              seekSet.removeAll(q.versions);
-            }
-            m++;
-          }
-          if (!p.isChild())
-            p.setData(newData);
-        }
-      }
-    }
   }
 
   /**
@@ -1097,7 +1012,6 @@ public class Collation {
     sb.append("; description=" + description);
     sb.append("; bestScore=" + bestScore);
     sb.append("; parents.size()=" + parents.size());
-    sb.append("; encoding=" + encoding);
     return sb.toString();
   }
 

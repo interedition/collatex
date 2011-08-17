@@ -53,6 +53,6 @@ public class Witness {
    * @return a human-readable string Version
    */
   public String toString() {
-    return "shortName:" + shortName + ";longName:" + longName;
+    return shortName;
   }
 }

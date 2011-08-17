@@ -24,7 +24,10 @@ import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Witness;
 import com.google.common.collect.Sets;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Set;
 
 import static java.util.Collections.disjoint;
 
