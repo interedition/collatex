@@ -194,13 +194,13 @@ public class Variant implements Comparable<Variant> {
   private void findContent() {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     int iNode = startIndex;
-    Match p = collation.matches.get(iNode);
+    Match p = collation.getMatches().get(iNode);
     int i = startOffset;
     int totalLen = 0;
     while (p.length() == 0 || totalLen < this.length) {
       if (p.length() == 0 || i == p.length()) {
         iNode = collation.next(iNode + 1, Iterables.getFirst(versions, null));
-        p = collation.matches.get(iNode);
+        p = collation.getMatches().get(iNode);
         i = 0;
       } else {
         bos.write(p.getData()[i++]);
@@ -246,13 +246,13 @@ public class Variant implements Comparable<Variant> {
         // find the start of this variant in other
         int offset = other.startOffset;
         int index = other.startIndex;
-        Match p = collation.matches.get(index);
+        Match p = collation.getMatches().get(index);
         int i = 0;
         Witness followV = Iterables.getFirst(versions, null);
         while (i < other.length) {
           if (offset == p.length()) {
             index = collation.next(index + 1, followV);
-            p = collation.matches.get(index);
+            p = collation.getMatches().get(index);
             offset = 0;
           } else {
             offset++;

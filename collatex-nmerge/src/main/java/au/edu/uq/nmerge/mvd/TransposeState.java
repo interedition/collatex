@@ -20,8 +20,6 @@
  */
 package au.edu.uq.nmerge.mvd;
 
-import java.util.ListIterator;
-
 /**
  * When building chunks keep track of the state of transpositions
  *
@@ -39,11 +37,10 @@ public class TransposeState {
    * @param parent the parent pair
    */
   private void assignId(Match parent) {
-    this.id = parent.id = TransposeState.transposeId--;
-    ListIterator<Match> iter = parent.getChildIterator();
-    while (iter.hasNext()) {
-      Match child = iter.next();
-      child.id = parent.id;
+    this.id = TransposeState.transposeId--;
+    parent.setId(this.id);
+    for (Match child : parent.getChildren()) {
+      child.setId(parent.getId());
     }
   }
 
@@ -87,20 +84,20 @@ public class TransposeState {
     boolean wasTransposed = (state == ChunkState.PARENT
             || state == ChunkState.CHILD);
     if (p.isChild() && !p.contains(v)
-            && p.parent.contains(v) && !p.parent.contains(u)) {
-      if (p.id == 0)
-        assignId(p.parent);
+            && p.getParent().contains(v) && !p.getParent().contains(u)) {
+      if (p.getId() == 0)
+        assignId(p.getParent());
       repl = new TransposeState();
-      repl.id = p.id;
+      repl.id = p.getId();
       repl.state = ChunkState.CHILD;
     }
     // if it has a child in v, it might be a repetition
     else if (p.isParent() && !p.contains(v)
             && p.getChildInVersion(v) != null) {
-      if (p.id == 0)
+      if (p.getId() == 0)
         assignId(p);
       repl = new TransposeState();
-      repl.id = p.id;
+      repl.id = p.getId();
       repl.state = ChunkState.PARENT;
     }
     // or it was a child or parent but not any more

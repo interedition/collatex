@@ -115,7 +115,7 @@ public class Hit extends BracketedData {
       // and add on the length of all relevant
       // pairs up to the first one
       for (int j = endPair - 1; j >= 0; j--) {
-        Match p = collation.matches.get(j);
+        Match p = collation.getMatches().get(j);
         if (p.contains(i)) {
           offset += p.length();
         }
@@ -212,28 +212,20 @@ public class Hit extends BracketedData {
   }
 
   /**
-   * Create the header of a Match (which is the whole thing)
-   *
-   * @return a String
-   */
-  protected String createHeader() {
-    StringBuffer sb = new StringBuffer();
-    sb.append('[');
-    sb.append(version.shortName + ":");
-    sb.append("Offset " + Integer.toString(offset) + ":");
-    sb.append("Length " + Integer.toString(length) + ":");
-    sb.append(state.toString());
-    return sb.toString();
-  }
-
-  /**
    * Convert to a string in the form that will be parsed by the
    * parsing constructor
    *
    * @return the match expressed as a String
    */
   public String toString() {
-    return createHeader() + "]";
+    StringBuffer sb = new StringBuffer();
+    sb.append('[');
+    sb.append(version.shortName + ":");
+    sb.append("Offset " + Integer.toString(offset) + ":");
+    sb.append("Length " + Integer.toString(length) + ":");
+    sb.append(state.toString());
+    sb.append("]");
+    return sb.toString();
   }
 }
 

@@ -39,27 +39,14 @@ import static java.util.Collections.disjoint;
 public class Collation {
 
   // new options
-  boolean directAlignOnly;
-  Set<Witness> witnesses;
-  List<Match> matches;
-  String description;
-  int bestScore;
-  // used for checking
-  HashSet<Match> parents;
+  private boolean directAlignOnly;
+  private String description;
 
-  public Collation() {
-    this.description = "";
-    this.witnesses = Sets.newHashSet();
-    this.matches = Lists.newArrayList();
-  }
+  private Set<Witness> witnesses = Sets.newHashSet();
+  private List<Match> matches = Lists.newArrayList();
 
   public Collation(String description) {
-    this();
     this.description = description;
-  }
-
-  public Set<Witness> getWitnesses() {
-    return witnesses;
   }
 
   /**
@@ -69,6 +56,10 @@ public class Collation {
    */
   public String getDescription() {
     return description;
+  }
+
+  public Set<Witness> getWitnesses() {
+    return witnesses;
   }
 
   /**
@@ -281,15 +272,6 @@ public class Collation {
   }
 
   /**
-   * Change the description of this MVD
-   *
-   * @param description
-   */
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  /**
    * Update an existing version or add a new one.
    *
    * @param version the id of the version to add.
@@ -410,10 +392,8 @@ public class Collation {
    * @param old the old invalid MUM
    * @return a new valid MUM or null
    */
-  MaximalUniqueMatch recomputeMUM(MaximalUniqueMatch old) throws MVDException {
-    VariantGraph g = old.getGraph();
-    VariantGraphSpecialArc special = old.getArc();
-    return computeBestMUM(g, special);
+  private MaximalUniqueMatch recomputeMUM(MaximalUniqueMatch old) throws MVDException {
+    return computeBestMUM(old.getGraph(), old.getArc());
   }
 
   /**
@@ -430,12 +410,9 @@ public class Collation {
     MaximalUniqueMatch directMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
     MaximalUniqueMatch best = directMUM;
     if (!directAlignOnly) {
-      MaximalUniqueMatch leftTransposeMUM = MaximalUniqueMatch.findLeftTransposeMUM(
-              special, st, g);
-      MaximalUniqueMatch rightTransposeMUM = MaximalUniqueMatch.findRightTransposeMUM(
-              special, st, g);
-      best = getBest(directMUM, leftTransposeMUM,
-              rightTransposeMUM);
+      MaximalUniqueMatch leftTransposeMUM = MaximalUniqueMatch.findLeftTransposeMUM(special, st, g);
+      MaximalUniqueMatch rightTransposeMUM = MaximalUniqueMatch.findRightTransposeMUM(special, st, g);
+      best = getBest(directMUM, leftTransposeMUM, rightTransposeMUM);
     }
     if (best != null)
       special.setBest(best);
@@ -991,8 +968,6 @@ public class Collation {
     sb.append("; versions.size()=" + witnesses.size());
     sb.append("; pairs.size()=" + matches.size());
     sb.append("; description=" + description);
-    sb.append("; bestScore=" + bestScore);
-    sb.append("; parents.size()=" + parents.size());
     return sb.toString();
   }
 

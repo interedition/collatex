@@ -35,10 +35,7 @@ public abstract class BracketedData {
    * the data of the chunk
    */
   protected byte[] realData;
-  /**
-   * the escaped data of the chunk
-   */
-  protected byte[] escapedData;
+
   /**
    * length of data parsed to produce this object
    */
@@ -57,31 +54,6 @@ public abstract class BracketedData {
    */
   public BracketedData(byte[] data) {
     this.realData = data;
-    this.escapedData = escapeData(data);
-  }
-
-  /**
-   * Ensure that any ']'s in the data are escaped so we can use them
-   * to terminate the chunk when parsing it
-   *
-   * @param bytes the array to be escaped
-   * @return the same array of bytes but ']' replaced with '\]' and
-   *         '\' replaced by '\\'
-   */
-  protected byte[] escapeData(byte[] bytes) {
-    ByteArrayOutputStream bos = new ByteArrayOutputStream(
-            bytes.length + 5);
-    for (int i = 0; i < bytes.length; i++) {
-      if (bytes[i] == '\\') {
-        bos.write('\\');
-        bos.write('\\');
-      } else if (bytes[i] == ']') {
-        bos.write('\\');
-        bos.write(']');
-      } else
-        bos.write(bytes[i]);
-    }
-    return bos.toByteArray();
   }
 
   /**
@@ -97,43 +69,7 @@ public abstract class BracketedData {
       for (int j = realData.length, i = 0; i < bytes.length; i++, j++)
         newData[j] = bytes[i];
       realData = newData;
-      escapedData = escapeData(realData);
     }
-  }
-
-  /**
-   * Create the header which is assumed to be convertable
-   * into a string
-   *
-   * @return the header as a String
-   */
-  protected abstract String createHeader();
-
-  /**
-   * Write out the chunk without converting its bytes to characters
-   *
-   * @return a byte array
-   */
-  public byte[] getBytes() {
-    String header = createHeader();
-    byte[] headerBytes = header.getBytes();
-    byte[] totalBytes = new byte[headerBytes.length + escapedData.length + 1];
-    int j = 0;
-    for (int i = 0; i < headerBytes.length; i++)
-      totalBytes[j++] = headerBytes[i];
-    for (int i = 0; i < escapedData.length; i++)
-      totalBytes[j++] = escapedData[i];
-    totalBytes[j] = ']';
-    return totalBytes;
-  }
-
-  /**
-   * Get the length of the source data
-   *
-   * @return the number of bytes parsed to produce this variant
-   */
-  public int getSrcLen() {
-    return srcLen;
   }
 
   /**

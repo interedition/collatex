@@ -218,11 +218,11 @@ public class Converter {
    *
    * @param p    the pair to convert
    * @param pnts potential parents of the new pair
-   * @param kids kids looking for parents
+   * @param children children looking for parents
    * @return an equivalent Arc we can use in the Graph
    */
   private VariantGraphArc pairToArc(Match p, HashMap<Match, VariantGraphArc> pnts,
-                                    HashMap<Match, VariantGraphArc> kids) {
+                                    HashMap<Match, VariantGraphArc> children) {
     nArcs++;
     byte[] pData = (p.isChild() || p.isHint()) ? null : p.getData();
     VariantGraphArc a = new VariantGraphArc(cloneVersions(p.versions), pData);
@@ -236,15 +236,13 @@ public class Converter {
         if (b.numChildren() == parent.numChildren())
           pnts.remove(parent);
       } else    // we're orphaned for now
-        kids.put(p, a);
+        children.put(p, a);
     } else if (p.isParent()) {
-      ListIterator<Match> iter = p.getChildIterator();
-      while (iter.hasNext()) {
-        Match child = iter.next();
-        VariantGraphArc r = kids.get(child);
+      for (Match child : p.getChildren()) {
+        VariantGraphArc r = children.get(child);
         if (r != null) {
           a.addChild(r);
-          kids.remove(child);
+          children.remove(child);
         }
       }
       if (p.numChildren() > a.numChildren())

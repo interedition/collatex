@@ -230,7 +230,14 @@ public class Chunk extends BracketedData {
   public String toString() {
     StringBuffer sb = new StringBuffer();
     {
-      sb.append(createHeader());
+      sb.append("[");
+      if (states != null)
+        sb.append(states.toString());
+      if (id != 0)
+        sb.append(":" + Integer.toString(id));
+      if (version != null)
+        sb.append(":" + version);
+      sb.append(":");
       try {
         sb.append(new String(realData));
       } catch (Exception e) {
@@ -238,24 +245,6 @@ public class Chunk extends BracketedData {
       }
       sb.append("]");
     }
-    return sb.toString();
-  }
-
-  /**
-   * Create a String representing the header part of a chunk
-   *
-   * @return the header as a String including the trailing ':'
-   */
-  protected String createHeader() {
-    StringBuffer sb = new StringBuffer();
-    sb.append("[");
-    if (states != null)
-      sb.append(states.toString());
-    if (id != 0)
-      sb.append(":" + Integer.toString(id));
-    if (version != null)
-      sb.append(":" + version);
-    sb.append(":");
     return sb.toString();
   }
 }
