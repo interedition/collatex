@@ -32,17 +32,19 @@ import org.junit.Test;
  */
 public class MVDTest extends AbstractTest {
 
-  public static final byte[] VERSION_2 = "Hello World! How funny!".getBytes();
   public static final byte[] VERSION_1 = "Hello funny World!".getBytes();
+  public static final byte[] VERSION_2 = "Hello World! How funny!".getBytes();
+  public static final byte[] VERSION_3 = "Hello World! How funny, funny!".getBytes();
 
   @Test
   public void simple() throws Exception {
     final Collation collation = new Collation("Test");
 
-    final Witness version1 = collation.newVersion("test1", "test1", VERSION_1);
+    collation.newVersion("test1", "test1", VERSION_1);
     final Witness version2 = collation.newVersion("test2", "test2", VERSION_2);
+    final Witness version3 = collation.newVersion("test3", "test3", VERSION_3);
 
-    for (Chunk c : collation.compare(version2, version1, ChunkState.ADDED)) {
+    for (Chunk c : collation.compare(version3, version2, ChunkState.ADDED)) {
       LOG.debug(c.toString());
     }
   }
