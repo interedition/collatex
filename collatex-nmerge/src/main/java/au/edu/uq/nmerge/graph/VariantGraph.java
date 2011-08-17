@@ -23,6 +23,7 @@ package au.edu.uq.nmerge.graph;
 import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.util.*;
@@ -32,7 +33,7 @@ import java.util.*;
  *
  * @author Desmond Schmidt 24/10/08
  */
-public class VariantGraph {
+public class VariantGraph<T> {
   /**
    * the special start and end nodes that define the graph
    */
@@ -91,7 +92,7 @@ public class VariantGraph {
    * @param position the position of the arc
    * @return the special, unaligned arc
    */
-  public VariantGraphSpecialArc addSpecialArc(byte[] data, Witness version, int position)
+  public VariantGraphSpecialArc addSpecialArc(List<T> data, Witness version, int position)
           throws MVDException {
     VariantGraphSpecialArc a = new VariantGraphSpecialArc(Sets.newHashSet(version), data, position);
     start.addOutgoing(a);
@@ -108,22 +109,19 @@ public class VariantGraph {
    * @param version the id of the version to read
    * @return the version's data as a byte array
    */
-  byte[] getVersion(Witness version) {
+  List<T> getVersion(Witness version) {
     VariantGraphNode temp = start;
     int len = 0;
-    while (temp != null && temp != end) {
+    while (temp != null && !temp.equals(end)) {
       VariantGraphArc a = temp.pickOutgoingArc(version);
       len += a.dataLen();
       temp = a.to;
     }
-    byte[] versionData = new byte[len];
+    final List<T> versionData = Lists.newArrayListWithExpectedSize(len);
     temp = start;
-    int j = 0;
-    while (temp != null && temp != end) {
+    while (temp != null && !temp.equals(end)) {
       VariantGraphArc a = temp.pickOutgoingArc(version);
-      byte[] data = a.getData();
-      for (int i = 0; i < data.length; i++)
-        versionData[j++] = data[i];
+      versionData.addAll(a.getData());
       temp = a.to;
     }
     return versionData;
@@ -144,16 +142,16 @@ public class VariantGraph {
       VariantGraphNode node = queue.poll();
       ListIterator<VariantGraphArc> iter = node.outgoingArcs(this);
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
-        byte[] data = a.getData();
+        VariantGraphArc<T> a = iter.next();
+        List<T> data = a.getData();
         // calculate total length
-        totalLen += data.length;
+        totalLen += data.size();
         for (Witness i : a.versions) {
           if (lengths.containsKey(i)) {
             Integer value = lengths.get(i);
-            lengths.put(i, value.intValue() + data.length);
+            lengths.put(i, value.intValue() + data.size());
           } else
-            lengths.put(i, data.length);
+            lengths.put(i, data.size());
         }
         a.to.printArc(a);
         printed.add(a.to);

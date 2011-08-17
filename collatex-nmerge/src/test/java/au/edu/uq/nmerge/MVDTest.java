@@ -23,6 +23,8 @@ package au.edu.uq.nmerge;
 
 import au.edu.uq.nmerge.mvd.Collation;
 import au.edu.uq.nmerge.mvd.Match;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import org.junit.Test;
 
 /**
@@ -30,17 +32,13 @@ import org.junit.Test;
  */
 public class MVDTest extends AbstractTest {
 
-  public static final byte[] VERSION_1 = "Hello funny World!".getBytes();
-  public static final byte[] VERSION_2 = "Hello marvelous World! How funny,".getBytes();
-  public static final byte[] VERSION_3 = "Hello World! How funny, marvelous".getBytes();
-
   @Test
   public void simple() throws Exception {
-    final Collation collation = new Collation("Test");
+    final Collation<String> collation = new Collation<String>("Test", Ordering.<String>natural(), "");
 
-    collation.newVersion("test1", "test1", VERSION_1);
-    collation.newVersion("test2", "test2", VERSION_2);
-    collation.newVersion("test3", "test3", VERSION_3);
+    collation.newVersion("test1", "test1", Lists.newArrayList("hello", "funny", "world"));
+    collation.newVersion("test2", "test2", Lists.newArrayList("hello", "marvelous", "world", "how", "funny"));
+    collation.newVersion("test3", "test3", Lists.newArrayList("hello", "world", "how", "funny", "marvelous"));
 
     for (Match m : collation.getMatches()) {
       LOG.debug(m.toString());

@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * @author Desmond Schmidt 18/8/07
  */
-public class Match {
+public class Match<T> {
   public static int pairId = 1;
 
   /**
@@ -45,7 +45,7 @@ public class Match {
   private List<Match> children = Lists.newArrayList();
 
   public Set<Witness> versions;
-  private byte[] data;
+  private List<T> data;
 
   /**
    * Create a basic pair
@@ -53,7 +53,7 @@ public class Match {
    * @param versions its versions
    * @param data     its data
    */
-  public Match(Set<Witness> versions, byte[] data) {
+  public Match(Set<Witness> versions, List<T> data) {
     this.versions = versions;
     this.data = data;
   }
@@ -116,7 +116,7 @@ public class Match {
    * @return the length of the pair in bytes
    */
   int length() {
-    return (parent != null) ? parent.length() : data.length;
+    return (parent != null) ? parent.length() : data.size();
   }
 
   /**
@@ -166,15 +166,15 @@ public class Match {
     sb.append(versions + ": ");
     if (parent != null) {
       sb.append("[" + parent.id + ":");
-      sb.append(new String(parent.data));
+      sb.append(Iterables.toString(parent.data));
       sb.append("]");
     } else if (children != null) {
       sb.append("{" + id + ":");
-      sb.append(new String(data));
+      sb.append(Iterables.toString(data));
       sb.append("}");
       sb.append("; children=").append(Iterables.toString(children));
     } else if (data != null)
-      sb.append("'").append(new String(data)).append("'");
+      sb.append("'").append(Iterables.toString(data)).append("'");
     else
       sb.append("null");
     return sb.toString();
@@ -194,7 +194,7 @@ public class Match {
    *
    * @return this pair's data or that of its parent
    */
-  public byte[] getData() {
+  public List<T> getData() {
     if (parent != null)
       return parent.getData();
     else
@@ -206,7 +206,7 @@ public class Match {
    *
    * @param data the new data for this pair
    */
-  void setData(byte[] data) {
+  void setData(List<T> data) {
     this.data = data;
   }
 

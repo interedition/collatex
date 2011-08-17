@@ -31,7 +31,7 @@ import java.util.Vector;
  * specially, e.g. coloured differently. However, unlike chunks, they
  * don't normally cover the whole version.
  */
-public class Hit extends BracketedData {
+public class Hit<T> extends BracketedData<T> {
   /**
    * offset within the version where the match starts
    */
@@ -105,17 +105,17 @@ public class Hit extends BracketedData {
    * @param multiple true if multiple matches are desired
    * @return a list of Match objects
    */
-  static Hit[] createHits(int len, Set<Witness> versions,
-                          Collation collation, int endPair, int endIndex,
+  static <T> Hit<T>[] createHits(int len, Set<Witness> versions,
+                          Collation<T> collation, int endPair, int endIndex,
                           boolean multiple, ChunkState state) throws Exception {
-    Vector<Hit> hits = new Vector<Hit>();
+    Vector<Hit<T>> hits = new Vector<Hit<T>>();
     for (Witness i : versions) {
       // start from one byte after the match
       int offset = endIndex + 1;
       // and add on the length of all relevant
       // pairs up to the first one
       for (int j = endPair - 1; j >= 0; j--) {
-        Match p = collation.getMatches().get(j);
+        Match<T> p = collation.getMatches().get(j);
         if (p.contains(i)) {
           offset += p.length();
         }
@@ -123,12 +123,12 @@ public class Hit extends BracketedData {
       // now offset is len plus the real offset
       offset -= len;
       String shortName = i.shortName;
-      Hit m = new Hit(i, offset, len, shortName, state);
+      Hit<T> m = new Hit<T>(i, offset, len, shortName, state);
       hits.add(m);
       if (!multiple)
         break;
     }
-    Hit[] result = new Hit[hits.size()];
+    Hit<T>[] result = new Hit[hits.size()];
     hits.toArray(result);
     return result;
   }
@@ -167,8 +167,8 @@ public class Hit extends BracketedData {
    * @param second the second array
    * @return the concatenated list
    */
-  static Hit[] merge(Hit[] first, Hit[] second) {
-    Hit[] temp = new Hit[first.length + second.length];
+  static <T> Hit<T>[] merge(Hit<T>[] first, Hit<T>[] second) {
+    Hit<T>[] temp = new Hit[first.length + second.length];
     for (int i = 0; i < first.length; i++)
       temp[i] = first[i];
     for (int i = 0; i < second.length; i++)
@@ -202,7 +202,7 @@ public class Hit extends BracketedData {
    * @param other the other match to compare with this one
    * @return true if they are
    */
-  public boolean equals(Hit other) {
+  public boolean equals(Hit<T> other) {
     if (this.version != other.version
             || this.length != other.length
             || this.offset != other.offset)

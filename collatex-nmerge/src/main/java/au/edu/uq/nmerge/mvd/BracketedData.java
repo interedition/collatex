@@ -21,7 +21,7 @@
 
 package au.edu.uq.nmerge.mvd;
 
-import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 /**
  * Represent an object output by the MvdTool as data
@@ -30,11 +30,11 @@ import java.io.ByteArrayOutputStream;
  *
  * @author Desmond Schmidt 2/6/09
  */
-public abstract class BracketedData {
+public abstract class BracketedData<T> {
   /**
    * the data of the chunk
    */
-  protected byte[] realData;
+  protected List<T> realData;
 
   /**
    * length of data parsed to produce this object
@@ -52,7 +52,7 @@ public abstract class BracketedData {
    *
    * @param data     the original data
    */
-  public BracketedData(byte[] data) {
+  public BracketedData(List<T> data) {
     this.realData = data;
   }
 
@@ -61,14 +61,9 @@ public abstract class BracketedData {
    *
    * @param bytes the new bytes to add to data
    */
-  public void addData(byte[] bytes) {
-    if (bytes != null && bytes.length > 0) {
-      byte[] newData = new byte[realData.length + bytes.length];
-      for (int i = 0; i < realData.length; i++)
-        newData[i] = realData[i];
-      for (int j = realData.length, i = 0; i < bytes.length; i++, j++)
-        newData[j] = bytes[i];
-      realData = newData;
+  public void addData(List<T> bytes) {
+    if (bytes != null && !bytes.isEmpty()) {
+      realData.addAll(bytes);
     }
   }
 
@@ -77,7 +72,7 @@ public abstract class BracketedData {
    *
    * @return a byte array of raw data
    */
-  public byte[] getData() {
+  public List<T> getData() {
     return realData;
   }
 }

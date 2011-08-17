@@ -36,7 +36,7 @@ import static java.util.Collections.disjoint;
  *
  * @author Desmond Schmidt
  */
-public class UnattachedSet extends HashSet<VariantGraphArc> {
+public class UnattachedSet<T> extends HashSet<VariantGraphArc<T>> {
 
   /**
    * the union of all the versions in the unattached set
@@ -55,14 +55,14 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
    *
    * @param u the node desiring incoming arcs
    */
-  void addAllAsIncoming(VariantGraphNode u) throws MVDException {
-    Iterator<VariantGraphArc> iter = iterator();
+  void addAllAsIncoming(VariantGraphNode<T> u) throws MVDException {
+    Iterator<VariantGraphArc<T>> iter = iterator();
     while (iter.hasNext()) {
-      VariantGraphArc a = iter.next();
+      VariantGraphArc<T> a = iter.next();
       u.addIncoming(a);
     }
     // remove them from the unattached set
-    ListIterator<VariantGraphArc> iter2 = u.incomingArcs();
+    ListIterator<VariantGraphArc<T>> iter2 = u.incomingArcs();
     while (iter2.hasNext()) {
       VariantGraphArc a = iter2.next();
       remove(a);
@@ -78,11 +78,11 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
    * @param is versions of the outgoing arc whose versions
    *           must also be incoming
    */
-  void addAsIncoming(VariantGraphNode u, Set<Witness> is) throws MVDException {
-    Iterator<VariantGraphArc> iter = iterator();
+  void addAsIncoming(VariantGraphNode<T> u, Set<Witness> is) throws MVDException {
+    Iterator<VariantGraphArc<T>> iter = iterator();
     boolean wasAttached = false;
     while (iter.hasNext()) {
-      VariantGraphArc a = (VariantGraphArc) iter.next();
+      VariantGraphArc<T> a = iter.next();
       if (!disjoint(a.versions, is)) {
         u.addIncoming(a);
         wasAttached = true;
@@ -91,9 +91,9 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
     if (wasAttached) {
       // now remove the incoming arcs from the unattached set
       // because we can't remove while adding
-      ListIterator<VariantGraphArc> iter2 = u.incomingArcs();
+      ListIterator<VariantGraphArc<T>> iter2 = u.incomingArcs();
       while (iter2.hasNext()) {
-        VariantGraphArc a = iter2.next();
+        VariantGraphArc<T> a = iter2.next();
         if (remove(a))
           versions.removeAll(a.versions);
       }
@@ -118,10 +118,10 @@ public class UnattachedSet extends HashSet<VariantGraphArc> {
    * @param a the arc to get an intersection for
    * @return the relevant arc
    */
-  VariantGraphArc getIntersectingArc(VariantGraphArc a) {
-    Iterator<VariantGraphArc> iter = iterator();
+  VariantGraphArc<T> getIntersectingArc(VariantGraphArc<T> a) {
+    Iterator<VariantGraphArc<T>> iter = iterator();
     while (iter.hasNext()) {
-      VariantGraphArc b = (VariantGraphArc) iter.next();
+      VariantGraphArc<T> b = iter.next();
       if (!disjoint(b.versions, a.versions))
         return b;
     }

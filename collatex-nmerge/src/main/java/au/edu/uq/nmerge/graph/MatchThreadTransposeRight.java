@@ -34,7 +34,7 @@ import static java.util.Collections.disjoint;
  *
  * @author Desmond Schmidt 31/1/09
  */
-public class MatchThreadTransposeRight extends MatchThreadDirect {
+public class MatchThreadTransposeRight<T> extends MatchThreadDirect<T> {
   /**
    * Constructor for thread to search for matches
    *
@@ -46,8 +46,8 @@ public class MatchThreadTransposeRight extends MatchThreadDirect {
    * @param travelled the distance from the special arc
    * @param forbidden don't travel beyond this node (should be null)
    */
-  MatchThreadTransposeRight(MaximalUniqueMatch mum, SuffixTree<Byte> st, VariantGraphArc a,
-                            int first, PrevChar[] prevChars, int travelled, VariantGraphNode forbidden) {
+  MatchThreadTransposeRight(MaximalUniqueMatch<T> mum, SuffixTree<T> st, VariantGraphArc<T> a,
+                            int first, PrevChar<T>[] prevChars, int travelled, VariantGraphNode<T> forbidden) {
     super(mum, null, st, a, a.from, first, prevChars, forbidden);
     this.travelled = travelled;
   }
@@ -57,7 +57,7 @@ public class MatchThreadTransposeRight extends MatchThreadDirect {
    *
    * @param mttr the MatchThreadTransposeLeft object to clone
    */
-  protected MatchThreadTransposeRight(MatchThreadTransposeRight mttr) {
+  protected MatchThreadTransposeRight(MatchThreadTransposeRight<T> mttr) {
     super(mttr);
   }
 
@@ -69,13 +69,13 @@ public class MatchThreadTransposeRight extends MatchThreadDirect {
     // arc was fully matched - save it
     addToPath(arc);
     boolean extended = false;
-    ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs();
+    ListIterator<VariantGraphArc<T>> iter = arc.to.outgoingArcs();
     while (iter.hasNext()) {
-      VariantGraphArc a = iter.next();
+      VariantGraphArc<T> a = iter.next();
       if (!disjoint(a.versions, versions) && !a.versions.contains(mum.version) && (!a.isParent() || !a.hasChildInVersion(mum.version))) {
         this.arc = a;
         this.first = 0;
-        MatchThreadTransposeRight mttr = new MatchThreadTransposeRight(this);
+        MatchThreadTransposeRight<T> mttr = new MatchThreadTransposeRight<T>(this);
         mttr.run();
         extended |= mttr.first > 0;
       }

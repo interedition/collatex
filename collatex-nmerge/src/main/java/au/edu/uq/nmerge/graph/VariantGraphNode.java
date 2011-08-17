@@ -22,12 +22,10 @@ package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import static java.util.Collections.disjoint;
 
@@ -36,15 +34,15 @@ import static java.util.Collections.disjoint;
  *
  * @author Desmond Schmidt 24/10/08
  */
-public class VariantGraphNode {
+public class VariantGraphNode<T> {
   /**
    * set of incoming arcs, perhaps empty
    */
-  private LinkedList<VariantGraphArc> incoming;
+  private LinkedList<VariantGraphArc<T>> incoming;
   /**
    * set of outgoing arcs, perhaps empty
    */
-  private LinkedList<VariantGraphArc> outgoing;
+  private LinkedList<VariantGraphArc<T>> outgoing;
   /**
    * set of incoming versions
    */
@@ -68,7 +66,7 @@ public class VariantGraphNode {
   /**
    * list of Matches
    */
-  LinkedList<VariantGraphMatch> matches;
+  LinkedList<VariantGraphMatch<T>> matches;
   /**
    * new id counter (static)
    */
@@ -82,8 +80,8 @@ public class VariantGraphNode {
    * Create a Node
    */
   public VariantGraphNode() {
-    incoming = new LinkedList<VariantGraphArc>();
-    outgoing = new LinkedList<VariantGraphArc>();
+    incoming = new LinkedList<VariantGraphArc<T>>();
+    outgoing = new LinkedList<VariantGraphArc<T>>();
     printed = Sets.newHashSet();
     printedOutgoing = Sets.newHashSet();
     incomingSet = Sets.newHashSet();
@@ -101,7 +99,7 @@ public class VariantGraphNode {
   public void addMatch(VariantGraphMatch m) {
     // lazy evaluation - usually matches is null
     if (matches == null)
-      matches = new LinkedList<VariantGraphMatch>();
+      matches = new LinkedList<VariantGraphMatch<T>>();
     matches.add(m);
   }
 
@@ -364,8 +362,8 @@ public class VariantGraphNode {
    *                 subgraph, can be followed.
    * @return an Arc iterator
    */
-  public ListIterator<VariantGraphArc> outgoingArcs(VariantGraph subgraph) {
-    Vector<VariantGraphArc> constrainedArcs = new Vector<VariantGraphArc>();
+  public ListIterator<VariantGraphArc<T>> outgoingArcs(VariantGraph<T> subgraph) {
+    Vector<VariantGraphArc<T>> constrainedArcs = new Vector<VariantGraphArc<T>>();
     if (this != subgraph.end) {
       for (int i = 0; i < outgoing.size(); i++) {
         VariantGraphArc a = outgoing.get(i);
@@ -382,7 +380,7 @@ public class VariantGraphNode {
    *
    * @return an Arc iterator
    */
-  public ListIterator<VariantGraphArc> outgoingArcs() {
+  public ListIterator<VariantGraphArc<T>> outgoingArcs() {
     return outgoing.listIterator();
   }
 
@@ -391,7 +389,7 @@ public class VariantGraphNode {
    *
    * @return an Arc iterator
    */
-  public ListIterator<VariantGraphArc> incomingArcs() {
+  public ListIterator<VariantGraphArc<T>> incomingArcs() {
     return incoming.listIterator();
   }
 
@@ -401,8 +399,8 @@ public class VariantGraphNode {
    * @param version the version for the pick
    * @return an arc or null if not found
    */
-  public VariantGraphArc pickIncomingArc(Witness version) {
-    ListIterator<VariantGraphArc> iter = incoming.listIterator();
+  public VariantGraphArc<T> pickIncomingArc(Witness version) {
+    ListIterator<VariantGraphArc<T>> iter = incoming.listIterator();
     while (iter.hasNext()) {
       VariantGraphArc a = iter.next();
       if (a.versions.contains(version))
@@ -417,8 +415,8 @@ public class VariantGraphNode {
    * @param version the version for the pick
    * @return an arc or null if not found
    */
-  public VariantGraphArc pickOutgoingArc(Witness version) {
-    ListIterator<VariantGraphArc> iter = outgoing.listIterator();
+  public VariantGraphArc<T> pickOutgoingArc(Witness version) {
+    ListIterator<VariantGraphArc<T>> iter = outgoing.listIterator();
     while (iter.hasNext()) {
       VariantGraphArc a = iter.next();
       if (a.versions.contains(version))
@@ -581,11 +579,11 @@ public class VariantGraphNode {
    * @param type a string description of the enumeration type
    * @throws MVDException if they are not mutually exclusive
    */
-  private Set<Witness> checkArcs(ListIterator<VariantGraphArc> iter, String type)
+  private Set<Witness> checkArcs(ListIterator<VariantGraphArc<T>> iter, String type)
           throws MVDException {
     Set<Witness> bs = Sets.newHashSet();
     while (iter.hasNext()) {
-      VariantGraphArc a = iter.next();
+      VariantGraphArc<T> a = iter.next();
       for (Witness i : a.versions) {
         if (bs.contains(i)) {
           throw new MVDException("Version " + i + " present twice in " + type + " set");
@@ -616,20 +614,20 @@ public class VariantGraphNode {
    * @param forbidden  don't recurse backwards beyond this node
    * @return the array of preceding byte objects
    */
-  PrevChar[] getPrevChars(Set<Witness> constraint, VariantGraphNode forbidden) {
-    Vector<PrevChar> array = new Vector<PrevChar>();
-    ListIterator<VariantGraphArc> iter = incomingArcs();
+  PrevChar<T>[] getPrevChars(Set<Witness> constraint, VariantGraphNode<T> forbidden) {
+    Vector<PrevChar<T>> array = new Vector<PrevChar<T>>();
+    ListIterator<VariantGraphArc<T>> iter = incomingArcs();
     while (iter.hasNext()) {
       VariantGraphArc a = iter.next();
       if (!disjoint(a.versions, constraint)) {
         if (a.dataLen() > 0) {
-          byte[] data = a.getData();
+          List<T> data = a.getData();
           Set<Witness> prevVersions = Sets.newHashSet();
           prevVersions.addAll(a.versions);
           prevVersions.retainAll(constraint);
-          array.add(new PrevChar(prevVersions, data[data.length - 1]));
+          array.add(new PrevChar<T>(prevVersions, data.get(data.size() - 1)));
         } else if (!a.from.equals(forbidden)) {
-          PrevChar[] bytes = a.from.getPrevChars(constraint, forbidden);
+          PrevChar<T>[] bytes = a.from.getPrevChars(constraint, forbidden);
           for (int i = 0; i < bytes.length; i++)
             array.add(bytes[i]);
         }
@@ -683,7 +681,7 @@ public class VariantGraphNode {
    * @return the relevant Arc or null if none
    */
   VariantGraphArc pickOutgoingArc(Set<Witness> versions) {
-    ListIterator<VariantGraphArc> iter = outgoing.listIterator();
+    ListIterator<VariantGraphArc<T>> iter = outgoing.listIterator();
     while (iter.hasNext()) {
       VariantGraphArc a = iter.next();
       if (!disjoint(a.versions, versions))
@@ -712,8 +710,8 @@ public class VariantGraphNode {
    */
   Set<Witness> getOverhang() {
     Set<Witness> overhang = Sets.newHashSet();
-    ListIterator<VariantGraphArc> iter1 = incoming.listIterator();
-    ListIterator<VariantGraphArc> iter2 = outgoing.listIterator();
+    ListIterator<VariantGraphArc<T>> iter1 = incoming.listIterator();
+    ListIterator<VariantGraphArc<T>> iter2 = outgoing.listIterator();
     while (iter1.hasNext())
       overhang.addAll(iter1.next().versions);
     while (iter2.hasNext())
@@ -732,7 +730,7 @@ public class VariantGraphNode {
   Set<Witness> getClique(VariantGraphArc selected) {
     Set<Witness> bs = Sets.newHashSet();
     if (incoming.size() > 0) {
-      ListIterator<VariantGraphArc> iter = incoming.listIterator();
+      ListIterator<VariantGraphArc<T>> iter = incoming.listIterator();
       while (iter.hasNext()) {
         VariantGraphArc a = iter.next();
         if (disjoint(a.versions, selected.versions))
@@ -759,10 +757,7 @@ public class VariantGraphNode {
       VariantGraphArc b = outgoing.get(0);
       if (!a.isParent() && !a.isChild()
               && !b.isParent() && !b.isChild()) {
-        byte[] cData = new byte[a.dataLen() + b.dataLen()];
-        Set<Witness> bs = Sets.newHashSet();
-        bs.addAll(a.versions);
-        VariantGraphArc c = new VariantGraphArc(bs, cData);
+        VariantGraphArc<T> c = new VariantGraphArc<T>(Sets.newHashSet(a.versions), Lists.<T>newArrayList());
         a.from.replaceOutgoing(a, c);
         b.to.replaceIncoming(b, c);
         if (unattached.contains(b)) {

@@ -33,12 +33,12 @@ import java.util.Set;
  *
  * @author desmond
  */
-public class PrevChar {
+public class PrevChar<T> {
   /**
    * the previous byte to some starting-point
    * of a match in the graph
    */
-  byte previous;
+  T previous;
   /**
    * set of version that this byte belongs
    * to (the versions of its arc)
@@ -52,7 +52,7 @@ public class PrevChar {
    *                 belongs to
    * @param previous the previous byte
    */
-  PrevChar(Set<Witness> versions, byte previous) {
+  PrevChar(Set<Witness> versions, T previous) {
     this.versions = versions;
     this.previous = previous;
   }

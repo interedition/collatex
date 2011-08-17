@@ -127,7 +127,7 @@ public class SuffixTree<T> {
     node = node.children;
     // scan all sons (all right siblings of the first son) for their first
     // character (it must match the char given as input to this function).
-    while (node != null && !source[node.edgeLabelStart].equals(character)) {
+    while (node != null && comparator.compare(source[node.edgeLabelStart], character) != 0) {
       node = node.rightSibling;
     }
     return node;
@@ -315,7 +315,7 @@ public class SuffixTree<T> {
            trv.charsFound++, trv.edgePos++) {
         // compare current characters of the string and the edge.
         // if equal - continue
-        if (!source[node.edgeLabelStart + trv.edgePos].equals(source[str.begin + trv.edgePos])) {
+        if (comparator.compare(source[node.edgeLabelStart + trv.edgePos], source[str.begin + trv.edgePos]) != 0) {
           trv.edgePos--;
           return node;
         }
@@ -615,7 +615,7 @@ public class SuffixTree<T> {
       // 2. last character matched is NOT the last of its edge
       else {
         // Trace only last symbol of str, search in the CURRENT edge (node)
-        if (source[position.node.edgeLabelStart + position.edgePos + 1].equals(source[str.end])) {
+        if (comparator.compare(source[position.node.edgeLabelStart + position.edgePos + 1], source[str.end]) == 0) {
           position.edgePos++;
           charsFound = 1;
         }

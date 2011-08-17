@@ -23,7 +23,10 @@ package au.edu.uq.nmerge.graph;
 import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -38,7 +41,7 @@ import java.util.Vector;
  *
  * @author Desmond Schmidt 12/1/09
  */
-public class VariantGraphMatch {
+public class VariantGraphMatch<T> {
   /**
    * the start offset in the first element of path
    */
@@ -54,7 +57,7 @@ public class VariantGraphMatch {
   /**
    * the data of the match
    */
-  byte[] data;
+  List<T> data;
   /**
    * the version to follow to locate the match
    */
@@ -71,10 +74,6 @@ public class VariantGraphMatch {
    * the frequency of the match
    */
   int freq;
-  /**
-   * the Adler32 modulus
-   */
-  static int MOD_ADLER = 65521;
 
   /**
    * Construct a Match, which is ignorant about how to interpret this data.
@@ -87,17 +86,15 @@ public class VariantGraphMatch {
    * @param length      the length of the match
    * @param data        all the data of the special arc
    */
-  VariantGraphMatch(VariantGraphNode start, int graphOffset, Witness version, int dataOffset, int length, byte[] data) {
+  VariantGraphMatch(VariantGraphNode start, int graphOffset, Witness version, int dataOffset, int length, List<T> data) {
     this.graphOffset = graphOffset;
     this.dataOffset = dataOffset;
     this.version = version;
     this.length = length;
-    this.data = new byte[length];
+    this.data = Lists.newArrayList(data.subList(dataOffset, dataOffset + length));
     this.start = start;
     this.start.addMatch(this);
     this.freq = 1;
-    for (int i = 0, j = dataOffset; i < length; i++, j++)
-      this.data[i] = data[j];
   }
 
   /**
@@ -121,7 +118,7 @@ public class VariantGraphMatch {
             && this.data != null
             && ((VariantGraphMatch) other).data != null) {
       for (int i = 0; i < length; i++) {
-        if (m.data[i] != this.data[i])
+        if (!m.data.get(i).equals(this.data.get(i)))
           return false;
       }
       return true;
@@ -145,9 +142,8 @@ public class VariantGraphMatch {
    * (different from MergeTester but only used for debugging)
    */
   public String toString() {
-    String dataStr = new String(data);
     int offset = graphOffset + dataOffset;
-    return "Version: " + version + " offset=" + offset + " length=" + length + " data=" + dataStr;
+    return "Version: " + version + " offset=" + offset + " length=" + length + " data=" + Iterables.toString(data);
   }
 
   /**
@@ -157,19 +153,8 @@ public class VariantGraphMatch {
    * @return the hashcode value
    */
   public int hashCode() {
-    int a = 1, b = 0, i = 0;
-    int len = data.length;
-    while (len > 0) {
-      int tlen = len > 5552 ? 5552 : len;
-      len -= tlen;
-      do {
-        a += data[i++];
-        b += a;
-      } while (--tlen > 0);
-      a %= MOD_ADLER;
-      b %= MOD_ADLER;
-    }
-    return (b << 16) | a;
+    // FIXME: Does this hold for arbitrary tokens?
+    return data.hashCode();
   }
 
   /**
@@ -348,9 +333,10 @@ public class VariantGraphMatch {
         temp = a.to;
         continue;
       } else {
-        byte[] arcData = a.getData();
+        List<T> arcData = a.getData();
         while (compared < length && pos < a.dataLen()) {
-          assert arcData[pos++] == data[compared++];
+          // FIXME: increment in assertion!
+          assert arcData.get(pos++).equals(data.get(compared++));
           if (pos == a.dataLen()) {
             pos = 0;
             break;

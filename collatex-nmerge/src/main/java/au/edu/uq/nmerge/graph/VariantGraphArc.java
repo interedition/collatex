@@ -25,19 +25,17 @@ import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Match;
 import au.edu.uq.nmerge.mvd.Witness;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * An Arc is a fragment of data, a set of versions in a variant graph
  *
  * @author Desmond Schmidt
  */
-public class VariantGraphArc {
+public class VariantGraphArc<T> {
   /**
    * the Adler32 modulus
    */
@@ -51,23 +49,23 @@ public class VariantGraphArc {
   /**
    * the origin Node
    */
-  VariantGraphNode from;
+  VariantGraphNode<T> from;
   /**
    * the destination Node
    */
-  public VariantGraphNode to;
+  public VariantGraphNode<T> to;
   /**
    * the data of this Arc
    */
-  byte[] data;
+  List<T> data;
   /**
    * usually empty list of transpose children
    */
-  LinkedList<VariantGraphArc> children;
+  LinkedList<VariantGraphArc<T>> children;
   /**
    * parent - can't be set as well as children
    */
-  VariantGraphArc parent;
+  VariantGraphArc<T> parent;
   /**
    * parent id if subject of a transposition
    */
@@ -83,7 +81,7 @@ public class VariantGraphArc {
    * @param versions the set of versions for the child
    * @param parent   the parent arc whose data will be copied
    */
-  public VariantGraphArc(Set<Witness> versions, VariantGraphArc parent) {
+  public VariantGraphArc(Set<Witness> versions, VariantGraphArc<T> parent) {
     this.versions = versions;
     // may attempt to create child of a child
     if (parent != null) {
@@ -105,7 +103,7 @@ public class VariantGraphArc {
    * @return a ListIterator over the arc's children
    * @throws MVDException
    */
-  ListIterator<VariantGraphArc> childIterator() throws MVDException {
+  ListIterator<VariantGraphArc<T>> childIterator() throws MVDException {
     if (children == null)
       throw new MVDException("no children to arc");
     return children.listIterator(0);
@@ -117,7 +115,7 @@ public class VariantGraphArc {
    * @param versions the versions it belongs to
    * @param data     its data content
    */
-  public VariantGraphArc(Set<Witness> versions, byte[] data) {
+  public VariantGraphArc(Set<Witness> versions, List<T> data) {
     this.versions = versions;
     this.data = data;
     //checkForData("m_s id=\"page");
@@ -146,7 +144,7 @@ public class VariantGraphArc {
    *
    * @return the data as a byte array
    */
-  public byte[] getData() {
+  public List<T> getData() {
     if (parent != null)
       return parent.data;
     else
@@ -160,9 +158,9 @@ public class VariantGraphArc {
    */
   public int dataLen() {
     if (parent != null)
-      return parent.data.length;
+      return parent.data.size();
     else
-      return data.length;
+      return data.size();
   }
 
   /**
@@ -183,9 +181,9 @@ public class VariantGraphArc {
    *
    * @param child the child arc
    */
-  public void addChild(VariantGraphArc child) {
+  public void addChild(VariantGraphArc<T> child) {
     if (children == null) {
-      children = new LinkedList<VariantGraphArc>();
+      children = new LinkedList<VariantGraphArc<T>>();
       id = VariantGraphArc.arcId++;
     }
     children.add(child);
@@ -207,16 +205,12 @@ public class VariantGraphArc {
       else
         sb.append("(" + from.nodeId + ")");
       sb.append(Iterables.toString(versions));
-      byte[] realData = getData();
-      String dataString = new String(realData);
-      dataString = dataString.replace('\r', '/');
-      dataString = dataString.replace('\n', '/');
       sb.append(": ");
       if (parent != null)
         sb.append("[" + parent.id + ":");
       else if (children != null)
         sb.append("{" + id + ":");
-      sb.append("\"" + dataString + "\"");
+      sb.append(Iterables.toString(getData()));
       if (parent != null)
         sb.append("]");
       else if (children != null)
@@ -311,16 +305,8 @@ public class VariantGraphArc {
    */
   private VariantGraphArc[] splitDataArc(int offset) throws MVDException {
     VariantGraphArc[] arcs = new VariantGraphArc[2];
-    byte[] leftData = new byte[offset];
-    for (int i = 0; i < offset; i++) {
-      leftData[i] = data[i];
-    }
-    arcs[0] = new VariantGraphArc(Sets.newHashSet(versions), leftData);
-    byte[] rightData = new byte[dataLen() - offset];
-    for (int i = offset, j = 0; i < dataLen(); i++, j++) {
-      rightData[j] = data[i];
-    }
-    arcs[1] = new VariantGraphArc(Sets.newHashSet(versions), rightData);
+    arcs[0] = new VariantGraphArc(Sets.newHashSet(versions), Lists.newArrayList(data.subList(0, offset)));
+    arcs[1] = new VariantGraphArc(Sets.newHashSet(versions), Lists.newArrayList(data.subList(offset, dataLen())));
     installSplit(arcs);
     return arcs;
   }
@@ -355,21 +341,16 @@ public class VariantGraphArc {
    * @param otherArc the other arc to compare
    * @return true if they two arcs have same data
    */
-  private boolean dataEquals(VariantGraphArc otherArc) {
-    byte[] data1 = getData();
-    byte[] data2 = otherArc.getData();
+  private boolean dataEquals(VariantGraphArc<T> otherArc) {
+    List<T> data1 = getData();
+    List<T> data2 = otherArc.getData();
     if ((data1 == null && data2 != null) || (data1 != null && data2 == null))
       return false;
     else if (data1 == null && data2 == null)
       return true;
-    else if (data1.length != data2.length)
-      return false;
     else {
-      for (int i = 0; i < data1.length; i++)
-        if (data1[i] != data2[i])
-          return false;
+      return data1.equals(data2);
     }
-    return true;
   }
 
   /**
@@ -388,14 +369,14 @@ public class VariantGraphArc {
    * @param orphans map of available orphans
    * @return the pair
    */
-  Match toPair(HashMap<VariantGraphArc, Match> parents, HashMap<VariantGraphArc, Match> orphans)
+  Match<T> toPair(HashMap<VariantGraphArc<T>, Match<T>> parents, HashMap<VariantGraphArc<T>, Match<T>> orphans)
           throws MVDException {
     if (isHint())
       throw new MVDException("Ooops! hint detected!");
-    Match p = new Match(versions, data);
+    Match<T> p = new Match<T>(versions, data);
     if (this.parent != null) {
       // we're a child - find our parent
-      Match q = parents.get(parent);
+      Match<T> q = parents.get(parent);
       if (q != null) {
         q.addChild(p);
         // if this is the last child of the parent remove it
@@ -406,8 +387,8 @@ public class VariantGraphArc {
     } else if (children != null) {
       // we're a parent
       for (int i = 0; i < children.size(); i++) {
-        VariantGraphArc child = children.get(i);
-        au.edu.uq.nmerge.mvd.Match r = orphans.get(child);
+        VariantGraphArc<T> child = children.get(i);
+        Match<T> r = orphans.get(child);
         if (r != null) {
           p.addChild(r);
           orphans.remove(child);
@@ -425,7 +406,7 @@ public class VariantGraphArc {
    * @return true if so
    */
   public boolean isEmpty() {
-    return data.length == 0;
+    return data.isEmpty();
   }
 
   /**
@@ -501,12 +482,12 @@ public class VariantGraphArc {
    * happens if we are being deleted.
    */
   public void passOnData() {
-    ListIterator<VariantGraphArc> iter = children.listIterator();
-    VariantGraphArc newParent = iter.next();
+    ListIterator<VariantGraphArc<T>> iter = children.listIterator();
+    VariantGraphArc<T> newParent = iter.next();
     newParent.data = this.data;
     newParent.setParent(null);
     while (iter.hasNext()) {
-      VariantGraphArc a = iter.next();
+      VariantGraphArc<T> a = iter.next();
       newParent.addChild(a);
     }
   }
@@ -538,9 +519,9 @@ public class VariantGraphArc {
    */
   boolean hasChildInVersion(Witness version) {
     if (children != null) {
-      ListIterator<VariantGraphArc> iter = children.listIterator(0);
+      ListIterator<VariantGraphArc<T>> iter = children.listIterator(0);
       while (iter.hasNext()) {
-        VariantGraphArc child = iter.next();
+        VariantGraphArc<T> child = iter.next();
         if (child.versions.contains(version))
           return true;
       }

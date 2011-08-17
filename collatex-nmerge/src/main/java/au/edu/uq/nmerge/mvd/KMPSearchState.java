@@ -23,8 +23,10 @@ package au.edu.uq.nmerge.mvd;
 
 import au.edu.uq.nmerge.exception.MVDException;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,8 +36,9 @@ import java.util.Set;
  *
  * @author Desmond Schmidt
  */
-public class KMPSearchState {
-  byte[] pattern;
+public class KMPSearchState<T> {
+  private final Ordering<T> ordering;
+  List<T> pattern;
   Set<Witness> v;
   KMPSearchState following;
   int[] next;
@@ -49,10 +52,11 @@ public class KMPSearchState {
    *
    * @param pattern the pattern to search for
    */
-  public KMPSearchState(byte[] pattern, Set<Witness> v) {
+  public KMPSearchState(Ordering<T> ordering, List<T> pattern, Set<Witness> v) {
+    this.ordering = ordering;
     this.v = v;
     this.pattern = pattern;
-    next = initNext(pattern);
+    next = initNext(ordering, pattern);
   }
 
   /**
@@ -62,6 +66,7 @@ public class KMPSearchState {
    * @param ss the SearchState object to clone
    */
   private KMPSearchState(KMPSearchState ss, Set<Witness> v) {
+    this.ordering = ss.ordering;
     this.pattern = ss.pattern;
     this.v = Sets.newHashSet(v);
     this.pos = ss.pos;
@@ -76,12 +81,12 @@ public class KMPSearchState {
    * @param pattern the pattern as a byte array in any encoding
    * @return an array of next indices
    */
-  private static int[] initNext(byte[] pattern) {
-    int[] next = new int[pattern.length];
+  private static <T> int[] initNext(Ordering<T> ordering, List<T> pattern) {
+    int[] next = new int[pattern.size()];
     int i = 0, j = -1;
     next[0] = -1;
-    while (i < pattern.length - 1) {
-      while (j >= 0 && pattern[i] != pattern[j])
+    while (i < pattern.size() - 1) {
+      while (j >= 0 && ordering.compare(pattern.get(i), pattern.get(j)) != 0)
         j = next[j];
       i++;
       j++;
@@ -183,12 +188,12 @@ public class KMPSearchState {
    * @param c the character from the text to update with
    * @return true if a match, false otherwise
    */
-  boolean update(byte c) {
-    if (pattern[pos] == c)
+  boolean update(T c) {
+    if (ordering.compare(pattern.get(pos), c) == 0)
     // we have a match
     {
       pos++;
-      if (pos == pattern.length) {
+      if (pos == pattern.size()) {
         pos = 0;
         return true;
       }

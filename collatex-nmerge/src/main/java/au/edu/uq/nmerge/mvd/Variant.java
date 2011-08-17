@@ -22,9 +22,12 @@ package au.edu.uq.nmerge.mvd;
 
 import au.edu.uq.nmerge.exception.MVDException;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,7 +35,7 @@ import java.util.Set;
  *
  * @author Desmond Schmidt 1/6/09
  */
-public class Variant implements Comparable<Variant> {
+public class Variant<T> implements Comparable<Variant<T>> {
   /**
    * more than one version for a variant is possible
    */
@@ -56,11 +59,11 @@ public class Variant implements Comparable<Variant> {
   /**
    * the mvd it is associated with
    */
-  Collation collation;
+  Collation<T> collation;
   /**
    * the actual data of this variant
    */
-  byte[] data;
+  List<T> data;
 
   /**
    * Construct a variant
@@ -73,7 +76,7 @@ public class Variant implements Comparable<Variant> {
    * @throws MVDException
    */
   public Variant(int startOffset, int startIndex, int endIndex,
-                 int length, Set<Witness> versions, Collation collation) {
+                 int length, Set<Witness> versions, Collation<T> collation) {
     this.startIndex = startIndex;
     this.endIndex = endIndex;
     this.collation = collation;
@@ -111,11 +114,7 @@ public class Variant implements Comparable<Variant> {
   public String toString() {
     String header = createHeader();
     StringBuffer sb = new StringBuffer();
-    try {
-      sb.append(new String(data));
-    } catch (Exception e) {
-      sb.append(new String(data));
-    }
+    sb.append(Iterables.toString(data));
     String dataStr = sb.toString();
     return header + dataStr + "]";
   }
@@ -144,15 +143,10 @@ public class Variant implements Comparable<Variant> {
    * @return true if they are 'equal'
    */
   public boolean equalsContent(Variant other) {
-    if (this.collation != other.collation
-            || this.data.length != other.data.length)
+    if (!this.collation.equals(other.collation))
       return false;
     else {
-      for (int i = 0; i < data.length; i++) {
-        if (this.data[i] != other.data[i])
-          return false;
-      }
-      return true;
+      return this.data.equals(other.data);
     }
   }
 
@@ -162,29 +156,7 @@ public class Variant implements Comparable<Variant> {
    * generated during the getApparatus method that are identical.
    */
   public int hashCode() {
-    final int MOD_ADLER = 65521;
-    int a = 1;
-    int b = 0;
-    String nodeStr = Integer.toString(startIndex);
-    String offsetStr = Integer.toString(startOffset);
-    String vStr = versions.toString();
-    int hDataLen = data.length + nodeStr.length()
-            + offsetStr.length() + vStr.length();
-    byte[] hashData = new byte[hDataLen];
-    int j = 0;
-    for (int i = 0; i < nodeStr.length(); i++)
-      hashData[j++] = (byte) nodeStr.charAt(i);
-    for (int i = 0; i < offsetStr.length(); i++)
-      hashData[j++] = (byte) offsetStr.charAt(i);
-    for (int i = 0; i < vStr.length(); i++)
-      hashData[j++] = (byte) vStr.charAt(i);
-    for (int i = 0; i < data.length; i++)
-      hashData[j++] = data[i];
-    for (int i = 0; i < hashData.length; ++i) {
-      a = (a + hashData[i]) % MOD_ADLER;
-      b = (a + b) % MOD_ADLER;
-    }
-    return (b << 16) | a;
+    return Objects.hashCode(startIndex, startOffset, versions, data);
   }
 
   /**
@@ -192,9 +164,9 @@ public class Variant implements Comparable<Variant> {
    * in the MVD.
    */
   private void findContent() {
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    data = Lists.newArrayList();
     int iNode = startIndex;
-    Match p = collation.getMatches().get(iNode);
+    Match<T> p = collation.getMatches().get(iNode);
     int i = startOffset;
     int totalLen = 0;
     while (p.length() == 0 || totalLen < this.length) {
@@ -203,11 +175,10 @@ public class Variant implements Comparable<Variant> {
         p = collation.getMatches().get(iNode);
         i = 0;
       } else {
-        bos.write(p.getData()[i++]);
-        totalLen++;
+        data.addAll(p.getData());
+        totalLen += p.getData().size();
       }
     }
-    data = bos.toByteArray();
   }
 
   /**
@@ -295,15 +266,8 @@ public class Variant implements Comparable<Variant> {
       if (res != 0)
         return res;
       else {
-        try {
-          String thisD = new String(data);
-          String thatD = new String(other.data);
-          return thisD.compareTo(thatD);
-        } catch (Exception e) {
-          String thisD = new String(data);
-          String thatD = new String(other.data);
-          return thisD.compareTo(thatD);
-        }
+        // FIXME: introduce token comparator to do a proper comparison
+        return Iterables.toString(data).compareTo(Iterables.toString(other.data));
       }
     }
   }

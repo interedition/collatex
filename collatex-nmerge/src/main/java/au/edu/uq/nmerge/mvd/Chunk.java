@@ -20,6 +20,10 @@
  */
 package au.edu.uq.nmerge.mvd;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -30,7 +34,7 @@ import java.util.Vector;
  *
  * @author Desmond Schmidt 19/9/07
  */
-public class Chunk extends BracketedData {
+public class Chunk<T> extends BracketedData<T> {
   ChunkStateSet states;
   /**
    * after search say what version the Chunk belongs to
@@ -59,7 +63,7 @@ public class Chunk extends BracketedData {
    * @param cs       an initial set of chunk states
    * @param data     the data to add
    */
-  public Chunk(int id, ChunkState[] cs, byte[] data) {
+  public Chunk(int id, ChunkState[] cs, List<T> data) {
     super(data);
     this.states = new ChunkStateSet(cs);
     this.id = id;
@@ -151,18 +155,11 @@ public class Chunk extends BracketedData {
    * @return an array of 2 chunks
    */
   Chunk[] split(int offset) {
-    // make the two data arrays
-    byte[] first = new byte[offset];
-    for (int j = 0; j < offset; j++)
-      first[j] = realData[j];
-    byte[] second = new byte[realData.length - offset];
-    for (int i = 0, j = offset; j < realData.length; j++, i++)
-      second[i] = realData[j];
     Chunk[] parts = new Chunk[2];
     // duplicate ids: this doesn't matter for chunks
-    parts[0] = new Chunk(id, states.getStates(), first);
+    parts[0] = new Chunk(id, states.getStates(), Lists.newArrayList(realData.subList(0, offset)));
     parts[0].version = this.version;
-    parts[1] = new Chunk(id, new ChunkStateSet(states).getStates(), second);
+    parts[1] = new Chunk(id, new ChunkStateSet(states).getStates(), Lists.newArrayList(realData.subList(offset, realData.size())));
     parts[1].version = this.version;
     return parts;
   }
@@ -196,15 +193,6 @@ public class Chunk extends BracketedData {
   }
 
   /**
-   * Get the actual data represented by this Chunk
-   *
-   * @return the data
-   */
-  public byte[] getData() {
-    return realData;
-  }
-
-  /**
    * Get the version of this chunk.
    *
    * @return the version given when the chunk was created
@@ -219,7 +207,7 @@ public class Chunk extends BracketedData {
    * @return the chunk's length
    */
   public int getLength() {
-    return (realData == null) ? 0 : realData.length;
+    return (realData == null) ? 0 : realData.size();
   }
 
   /**
@@ -239,7 +227,7 @@ public class Chunk extends BracketedData {
         sb.append(":" + version);
       sb.append(":");
       try {
-        sb.append(new String(realData));
+        sb.append(Iterables.toString(realData));
       } catch (Exception e) {
         // this won't happen
       }

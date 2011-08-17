@@ -26,6 +26,7 @@ import au.edu.uq.nmerge.graph.suffixtree.SuffixTreePosition;
 import au.edu.uq.nmerge.mvd.Witness;
 import com.google.common.collect.Sets;
 
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
@@ -40,23 +41,23 @@ import static java.util.Collections.disjoint;
  * @author Desmond Schmidt 3/11/08 modified to use MUMs 14/1/09
  *         modified for new path specification 21/1/09
  */
-public class MatchThreadDirect implements Runnable {
+public class MatchThreadDirect<T> implements Runnable {
   /**
    * the MUM we need to update
    */
-  protected MaximalUniqueMatch mum;
+  protected MaximalUniqueMatch<T> mum;
   /**
    * the subgraph we are searching through
    */
-  protected VariantGraph graph;
+  protected VariantGraph<T> graph;
   /**
    * the Suffix Tree we are matching against
    */
-  protected SuffixTree<Byte> st;
+  protected SuffixTree<T> st;
   /**
    * the last node we have seen before the match started
    */
-  VariantGraphNode start;
+  VariantGraphNode<T> start;
   /**
    * the start offset from start in bytes
    */
@@ -72,7 +73,7 @@ public class MatchThreadDirect implements Runnable {
   /**
    * the arc being currently searched
    */
-  VariantGraphArc arc;
+  VariantGraphArc<T> arc;
   /**
    * the current position in the SuffixTree
    */
@@ -88,7 +89,7 @@ public class MatchThreadDirect implements Runnable {
   /**
    * array of immediately preceding bytes in the variant graph
    */
-  protected PrevChar[] prevChars;
+  protected PrevChar<T>[] prevChars;
   /**
    * Don't pass through this node. This is the start node of the
    * directly opposite subgraph. Since we only follow printed
@@ -96,7 +97,7 @@ public class MatchThreadDirect implements Runnable {
    * impossible to miss it as we come back to the right. It thus
    * acts as a kind of barrier.
    */
-  VariantGraphNode forbidden;
+  VariantGraphNode<T> forbidden;
   /**
    * true if a child was extended
    */
@@ -120,8 +121,8 @@ public class MatchThreadDirect implements Runnable {
    * @param prevChars an array of possible bytes that immediately
    *                  precede this match
    */
-  public MatchThreadDirect(MaximalUniqueMatch mum, VariantGraph graph, SuffixTree<Byte> st, VariantGraphArc arc,
-                           VariantGraphNode start, int offset, PrevChar[] prevChars, VariantGraphNode forbidden) {
+  public MatchThreadDirect(MaximalUniqueMatch<T> mum, VariantGraph<T> graph, SuffixTree<T> st, VariantGraphArc<T> arc,
+                           VariantGraphNode<T> start, int offset, PrevChar<T>[] prevChars, VariantGraphNode<T> forbidden) {
     this.mum = mum;
     this.first = offset;
     this.st = st;
@@ -174,13 +175,12 @@ public class MatchThreadDirect implements Runnable {
    * have to split at the next node: a loop isn't possible.
    */
   public void run() {
-    byte[] data = arc.getData();
-    while (first < data.length
-            && st.advance(position, data[first])) {
+    List<T> data = arc.getData();
+    while (first < data.size() && st.advance(position, data.get(first))) {
       first++;
       pathLen++;
     }
-    if (first < data.length) {
+    if (first < data.size()) {
       // If we report a mismatch in the first byte then
       // multiple recursions at the end of a fully matched arc
       // might fail and they will all get reported as mismatches
@@ -236,7 +236,7 @@ public class MatchThreadDirect implements Runnable {
   protected boolean isMaximal() {
     int prevCharIndex = position.edgePos - (pathLen + 1);
     if (prevCharIndex >= 0) {
-      byte dataPrevChar = mum.arc.getData()[prevCharIndex];
+      T dataPrevChar = mum.arc.getData().get(prevCharIndex);
       if (prevCharIndex >= 0) {
         Set<Witness> pathVersions = Sets.newHashSet();
         if (versions != null)
@@ -245,7 +245,8 @@ public class MatchThreadDirect implements Runnable {
         for (int i = 0; i < prevChars.length; i++) {
           if (prevChars[i] == null)
             Errors.LOG.error("null", new Exception());
-          if (prevChars[i].previous == dataPrevChar && !disjoint(prevChars[i].versions, pathVersions))
+          // FIXME: introduce token comparator instead of equals()
+          if (prevChars[i].previous.equals(dataPrevChar) && !disjoint(prevChars[i].versions, pathVersions))
             return false;
         }
       }
@@ -265,7 +266,7 @@ public class MatchThreadDirect implements Runnable {
     // arc was fully matched - save it
     addToPath(arc);
     if (arc.to != forbidden) {
-      ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs(graph);
+      ListIterator<VariantGraphArc<T>> iter = arc.to.outgoingArcs(graph);
       while (iter.hasNext()) {
         VariantGraphArc a = iter.next();
         if (!disjoint(a.versions, versions) && (!a.isParent() || !a.hasChildInVersion(mum.version))) {

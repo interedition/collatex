@@ -36,10 +36,10 @@ public class TransposeState {
    *
    * @param parent the parent pair
    */
-  private void assignId(Match parent) {
+  private void assignId(Match<?> parent) {
     this.id = TransposeState.transposeId--;
     parent.setId(this.id);
-    for (Match child : parent.getChildren()) {
+    for (Match<?> child : parent.getChildren()) {
       child.setId(parent.getId());
     }
   }
@@ -79,7 +79,7 @@ public class TransposeState {
    * @param v   the version we are comparing to
    * @return a new TransposeState or ourselves
    */
-  TransposeState next(Match p, Witness u, Witness v) {
+  TransposeState next(Match<?> p, Witness u, Witness v) {
     TransposeState repl = this;
     boolean wasTransposed = (state == ChunkState.PARENT
             || state == ChunkState.CHILD);

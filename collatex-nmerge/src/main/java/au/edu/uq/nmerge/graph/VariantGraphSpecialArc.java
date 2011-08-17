@@ -21,7 +21,9 @@
 package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.mvd.Witness;
+import com.google.common.collect.Ordering;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,7 +32,13 @@ import java.util.Set;
  *
  * @author Desmond Schmidt 12/11/08
  */
-public class VariantGraphSpecialArc extends VariantGraphArc implements Comparable<VariantGraphSpecialArc> {
+public class VariantGraphSpecialArc<T> extends VariantGraphArc<T> implements Comparable<VariantGraphSpecialArc<T>> {
+  /**
+   * FIXME: Introduce token order!
+   *
+   * @deprecated
+   */
+  private static final Ordering<Object> ARBITRARY_TOKEN_ORDERING = Ordering.arbitrary();
   /**
    * if previously calculated save best MUM here
    */
@@ -47,7 +55,7 @@ public class VariantGraphSpecialArc extends VariantGraphArc implements Comparabl
    * @param data     the data of the special arc
    * @param position the position of the arc along the new version
    */
-  public VariantGraphSpecialArc(Set<Witness> versions, byte[] data, int position) {
+  public VariantGraphSpecialArc(Set<Witness> versions, List<T> data, int position) {
     super(versions, data);
     this.position = position;
     // leave best null
@@ -110,17 +118,18 @@ public class VariantGraphSpecialArc extends VariantGraphArc implements Comparabl
    *         ordering)
    */
   @Override
-  public int compareTo(VariantGraphSpecialArc o) {
+  public int compareTo(VariantGraphSpecialArc<T> o) {
     int oneLen = this.dataLen();
     int twoLen = o.dataLen();
     int mumValue = (this.best != null) ? this.best.compareTo(o.best) : 0;
     if (mumValue == 0) {
       // MUMs equal: compare the data
-      for (int i = 0; i < oneLen && i < twoLen; i++)
-        if (this.data[i] < o.data[i])
-          return 1;
-        else if (this.data[i] > o.data[i])
-          return -1;
+      for (int i = 0; i < oneLen && i < twoLen; i++) {
+        final int result = ARBITRARY_TOKEN_ORDERING.compare(this.getData().get(i), o.data.get(i));
+        if (result != 0) {
+          return result;
+        }
+      }
       if (oneLen < twoLen)
         return 1;
       else if (oneLen > twoLen)

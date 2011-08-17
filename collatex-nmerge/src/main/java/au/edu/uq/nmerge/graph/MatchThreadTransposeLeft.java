@@ -35,7 +35,7 @@ import static java.util.Collections.disjoint;
  *
  * @author Desmond Schmidt 31/1/09
  */
-public class MatchThreadTransposeLeft extends MatchThreadDirect {
+public class MatchThreadTransposeLeft<T> extends MatchThreadDirect<T> {
   /**
    * Constructor for thread to search for matches
    *
@@ -47,8 +47,8 @@ public class MatchThreadTransposeLeft extends MatchThreadDirect {
    * @param travelled the distance from the special arc on our right
    * @param forbidden the forbidden node we mustn't cross
    */
-  MatchThreadTransposeLeft(MaximalUniqueMatch mum, SuffixTree<Byte> st, VariantGraphArc a,
-                           int first, PrevChar[] prevChars, int travelled, VariantGraphNode forbidden) {
+  MatchThreadTransposeLeft(MaximalUniqueMatch<T> mum, SuffixTree<T> st, VariantGraphArc<T> a,
+                           int first, PrevChar<T>[] prevChars, int travelled, VariantGraphNode<T> forbidden) {
     super(mum, null, st, a, a.from, first, prevChars, forbidden);
     this.travelled = travelled;
   }
@@ -58,7 +58,7 @@ public class MatchThreadTransposeLeft extends MatchThreadDirect {
    *
    * @param mttl the MatchThreadTransposeLeft object to clone
    */
-  protected MatchThreadTransposeLeft(MatchThreadTransposeLeft mttl) {
+  protected MatchThreadTransposeLeft(MatchThreadTransposeLeft<T> mttl) {
     super(mttl);
     this.forbidden = mttl.forbidden;
   }
@@ -72,17 +72,16 @@ public class MatchThreadTransposeLeft extends MatchThreadDirect {
     addToPath(arc);
     boolean extended = false;
     if (arc.to != forbidden) {
-      ListIterator<VariantGraphArc> iter = arc.to.outgoingArcs();
+      ListIterator<VariantGraphArc<T>> iter = arc.to.outgoingArcs();
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         if (!disjoint(a.versions, versions)
                 && a.to.isPrintedOutgoing(a.versions)
                 && !a.versions.contains(mum.version)
                 && (!a.isParent() || !a.hasChildInVersion(mum.version))) {
           this.arc = a;
           this.first = 0;
-          MatchThreadTransposeLeft mttl =
-                  new MatchThreadTransposeLeft(this);
+          MatchThreadTransposeLeft<T> mttl = new MatchThreadTransposeLeft<T>(this);
           mttl.run();
           extended |= mttl.first > 0;
         }

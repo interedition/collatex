@@ -26,6 +26,7 @@ import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import au.edu.uq.nmerge.mvd.Witness;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.util.*;
@@ -36,7 +37,7 @@ import java.util.*;
  *
  * @author Desmond Schmidt 29/10/08
  */
-public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
+public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> {
   private static boolean debug;
 
   //static int totalHashSize;
@@ -46,39 +47,39 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
   /**
    * the arc we are the MUM of
    */
-  VariantGraphSpecialArc arc;
+  VariantGraphSpecialArc<T> arc;
   /**
    * the immediately opposite graph to align with
    */
-  VariantGraph graph;
+  VariantGraph<T> graph;
   /**
    * the left hand part of the arc left over after alignment
    */
-  private VariantGraphSpecialArc leftSubArc;
+  private VariantGraphSpecialArc<T> leftSubArc;
   /**
    * the right hand part of the arc left over after alignment
    */
-  private VariantGraphSpecialArc rightSubArc;
+  private VariantGraphSpecialArc<T> rightSubArc;
   /**
    * special arcs on the left that need reMUMing
    */
-  private SimpleQueue<VariantGraphSpecialArc> leftSpecialArcs;
+  private SimpleQueue<VariantGraphSpecialArc<T>> leftSpecialArcs;
   /**
    * special arcs on the left that need reMUMing
    */
-  private SimpleQueue<VariantGraphSpecialArc> rightSpecialArcs;
+  private SimpleQueue<VariantGraphSpecialArc<T>> rightSpecialArcs;
   /**
    * The left hand subgraph after alignment
    */
-  VariantGraph leftSubGraph;
+  VariantGraph<T> leftSubGraph;
   /**
    * The right hand subgraph after alignment
    */
-  VariantGraph rightSubGraph;
+  VariantGraph<T> rightSubGraph;
   /**
    * The final Match
    */
-  VariantGraphMatch match;
+  VariantGraphMatch<T> match;
   /**
    * the version of the new version
    */
@@ -86,7 +87,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
   /**
    * store candidate MUMs here
    */
-  HashMap<VariantGraphMatch, VariantGraphMatch> table;
+  HashMap<VariantGraphMatch<T>, VariantGraphMatch<T>> table;
   /**
    * are we transposed?
    */
@@ -115,12 +116,12 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @param graph      the graph to direct align to
    * @param transposed if true we are transposed
    */
-  MaximalUniqueMatch(VariantGraphSpecialArc arc, VariantGraph graph, boolean transposed) {
+  MaximalUniqueMatch(VariantGraphSpecialArc<T> arc, VariantGraph<T> graph, boolean transposed) {
     this.arc = arc;
     this.version = Iterables.getFirst(arc.versions, null);
     this.graph = graph;
     this.transposed = transposed;
-    table = new HashMap<VariantGraphMatch, VariantGraphMatch>(INITIAL_QUEUE_LEN);
+    table = new HashMap<VariantGraphMatch<T>, VariantGraphMatch<T>>(INITIAL_QUEUE_LEN);
   }
 
   /**
@@ -186,12 +187,12 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @return the best match you could find, must be a MUM
    */
   private VariantGraphMatch getBestMatch() {
-    Set<VariantGraphMatch> keys = table.keySet();
-    Iterator<VariantGraphMatch> iter = keys.iterator();
-    VariantGraphMatch biggest = null;
-    VariantGraphMatch other = null;
+    Set<VariantGraphMatch<T>> keys = table.keySet();
+    Iterator<VariantGraphMatch<T>> iter = keys.iterator();
+    VariantGraphMatch<T> biggest = null;
+    VariantGraphMatch<T> other = null;
     while (iter.hasNext()) {
-      VariantGraphMatch m = iter.next();
+      VariantGraphMatch<T> m = iter.next();
       if (m.freq == 1 && (biggest == null || m.length > biggest.length))
         biggest = m;
       else if (m.freq > 1 && (other == null || m.length > other.length))
@@ -272,42 +273,40 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @param subGraph the subgraph directly opposite it
    * @return the best MUM or null
    */
-  public static MaximalUniqueMatch findDirectMUM(VariantGraphSpecialArc special, SuffixTree<Byte> st,
-                                                 VariantGraph subGraph) throws MVDException {
-    MaximalUniqueMatch mum = new MaximalUniqueMatch(special, subGraph, false);
-    HashSet<VariantGraphNode> printedNodes = new HashSet<VariantGraphNode>(PRINTED_HASH_SIZE);
-    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+  public static <T> MaximalUniqueMatch<T> findDirectMUM(VariantGraphSpecialArc<T> special, SuffixTree<T> st,
+                                                 VariantGraph<T> subGraph) throws MVDException {
+    MaximalUniqueMatch<T> mum = new MaximalUniqueMatch<T>(special, subGraph, false);
+    HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);
+    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
     queue.add(subGraph.start);
-    VariantGraphArc lastArc = null;
+    VariantGraphArc<T> lastArc = null;
     printedNodes.add(subGraph.start);
-    PrevChar[] prevChars = new PrevChar[0];
+    PrevChar<T>[] prevChars = new PrevChar[0];
     if (debug)
       subGraph.verify();
     while (!queue.isEmpty()) {
-      VariantGraphNode node = queue.poll();
-      ListIterator<VariantGraphArc> iter = node.outgoingArcs(subGraph);
+      VariantGraphNode<T> node = queue.poll();
+      ListIterator<VariantGraphArc<T>> iter = node.outgoingArcs(subGraph);
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         if (a.dataLen() > 0 && (!a.isParent()
                 || !a.hasChildInVersion(mum.version))) {
           // first character
-          MatchThreadDirect mtd;
-          byte[] data = a.getData();
+          MatchThreadDirect<T> mtd;
+          List<T> data = a.getData();
           if (a.from != subGraph.start)
             prevChars = a.from.getPrevChars(subGraph.constraint, subGraph.start);
           mtd = new MatchThreadDirect(mum, subGraph, st, a, a.from, 0, prevChars, subGraph.end);
           mtd.run();
-          if (data.length > 1) {
+          if (data.size() > 1) {
             prevChars = new PrevChar[1];
             Set<Witness> prevVersions = Sets.newHashSet();
             prevVersions.addAll(a.versions);
             prevVersions.retainAll(subGraph.constraint);
             // other (1 to N) characters
-            for (int i = 1; i < data.length; i++) {
-              prevChars[0] = new PrevChar(prevVersions, data[i - 1]);
-              mtd = new MatchThreadDirect(
-                      mum, subGraph, st, a, a.from, i,
-                      prevChars, subGraph.end);
+            for (int i = 1; i < data.size(); i++) {
+              prevChars[0] = new PrevChar(prevVersions, data.get(i - 1));
+              mtd = new MatchThreadDirect<T>(mum, subGraph, st, a, a.from, i, prevChars, subGraph.end);
               mtd.run();
             }
           }
@@ -377,14 +376,14 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @param subGraph the subgraph directly opposite it
    * @return the best left transpose MUM or null
    */
-  public static MaximalUniqueMatch findLeftTransposeMUM(VariantGraphSpecialArc special, SuffixTree<Byte> st,
-                                                        VariantGraph subGraph) {
-    MaximalUniqueMatch mum = new MaximalUniqueMatch(special, subGraph, true);
+  public static <T> MaximalUniqueMatch<T> findLeftTransposeMUM(VariantGraphSpecialArc<T> special, SuffixTree<T> st,
+                                                        VariantGraph<T> subGraph) {
+    MaximalUniqueMatch<T> mum = new MaximalUniqueMatch<T>(special, subGraph, true);
     mum.transposeLeft = true;
     // 1. calculate number of bytes to go backwards
     int distance = Math.round((float) Math.pow(special.dataLen(), PHI));
     // 2. subtract distance between start of special to start of subGraph
-    VariantGraphArc a = special;
+    VariantGraphArc<T> a = special;
     Witness version = Iterables.getFirst(special.versions, null);
     while (!a.from.equals(subGraph.start)) {
       a = a.from.pickIncomingArc(version);
@@ -410,14 +409,13 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @param node     node to look backwards from
    * @param distance the distance to search left in bytes
    */
-  static void findLeftPositions(MaximalUniqueMatch mum, SuffixTree<Byte> st,
-                                VariantGraphNode node, int distance) {
-    HashSet<VariantGraphNode> printedNodes = new HashSet<VariantGraphNode>(
-            PRINTED_HASH_SIZE);
-    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
+  static <T> void findLeftPositions(MaximalUniqueMatch<T> mum, SuffixTree<T> st,
+                                VariantGraphNode<T> node, int distance) {
+    HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);
+    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
     int travelled = 0;
     Witness mumV = mum.version;
-    VariantGraphNode origin = node;
+    VariantGraphNode<T> origin = node;
     //BitSet range = new BitSet();
     queue.add(node);
     node.setShortestPath(0);
@@ -427,11 +425,11 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
       //range.or( node.getIncomingSet() );
       // the shortest path to get to this node
       int shortestPath = node.getShortestPath();
-      ListIterator<VariantGraphArc> iter = node.incomingArcs();
+      ListIterator<VariantGraphArc<T>> iter = node.incomingArcs();
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         if (a.dataLen() > 0 && !a.versions.contains(mumV) && (!a.isParent() || !a.hasChildInVersion(mumV))) {
-          MatchThreadTransposeLeft mtt;
+          MatchThreadTransposeLeft<T> mtt;
           int limit;
           if (a.dataLen() + shortestPath < distance)
             limit = 0;
@@ -439,17 +437,15 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
             limit = (a.dataLen() + shortestPath) - distance;
           // distance travelled in the current arc
           travelled = 0;
-          PrevChar[] prevChars = new PrevChar[1];
+          PrevChar<T>[] prevChars = new PrevChar[1];
           for (int i = a.dataLen() - 1; i >= limit; i--) {
             // if all previous arcs are valid, so too
             // are all previous chars of those arcs
             if (i > 0) {
-              prevChars[0] = new PrevChar(a.versions, a.getData()[i - 1]);
+              prevChars[0] = new PrevChar<T>(a.versions, a.getData().get(i - 1));
             } else
               prevChars = a.from.getPrevChars();
-            mtt = new MatchThreadTransposeLeft(
-                    mum, st, a, i, prevChars,
-                    shortestPath + travelled, origin);
+            mtt = new MatchThreadTransposeLeft<T>(mum, st, a, i, prevChars, shortestPath + travelled, origin);
             mtt.run();
             travelled++;
           }
@@ -474,10 +470,10 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    *
    * @param printedNodes a set of nodes with some arcs printed.
    */
-  static void clearPrintedArcs(HashSet<VariantGraphNode> printedNodes) {
-    Iterator<VariantGraphNode> iter2 = printedNodes.iterator();
+  static <T> void clearPrintedArcs(HashSet<VariantGraphNode<T>> printedNodes) {
+    Iterator<VariantGraphNode<T>> iter2 = printedNodes.iterator();
     while (iter2.hasNext()) {
-      VariantGraphNode n = iter2.next();
+      VariantGraphNode<T> n = iter2.next();
       n.reset();
     }
     //totalHashSize += printedNodes.size();
@@ -495,13 +491,13 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @param subGraph the subgraph directly opposite it
    * @return the best right transpose MUM or null
    */
-  public static MaximalUniqueMatch findRightTransposeMUM(VariantGraphSpecialArc special, SuffixTree<Byte> st,
-                                                         VariantGraph subGraph) {
-    MaximalUniqueMatch mum = new MaximalUniqueMatch(special, subGraph, true);
+  public static <T> MaximalUniqueMatch<T> findRightTransposeMUM(VariantGraphSpecialArc<T> special, SuffixTree<T> st,
+                                                         VariantGraph<T> subGraph) {
+    MaximalUniqueMatch<T> mum = new MaximalUniqueMatch<T>(special, subGraph, true);
     // 1. calculate number of bytes to go forwards
     int distance = Math.round((float) Math.pow(special.dataLen(), PHI));
     // 2. subtract distance between end of special to end of subGraph
-    VariantGraphArc a = special;
+    VariantGraphArc<T> a = special;
     Witness version = Iterables.getFirst(special.versions, null);
     while (!a.to.equals(subGraph.end)) {
       a = a.to.pickOutgoingArc(version);
@@ -522,11 +518,11 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @param node     the node to start from
    * @param distance the distance to search forwards
    */
-  static void findRightPositions(MaximalUniqueMatch mum, SuffixTree<Byte> st, VariantGraphNode node,
+  static <T> void findRightPositions(MaximalUniqueMatch<T> mum, SuffixTree<T> st, VariantGraphNode<T> node,
                                  int distance) {
-    SimpleQueue<VariantGraphNode> queue = new SimpleQueue<VariantGraphNode>();
-    HashSet<VariantGraphNode> printedNodes = new HashSet<VariantGraphNode>(PRINTED_HASH_SIZE);
-    VariantGraphNode origin = node;
+    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);
+    VariantGraphNode<T> origin = node;
     Set<Witness> range = Sets.newHashSet();
     int travelled = 0;
     Witness mumV = mum.version;
@@ -539,12 +535,12 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
       range.addAll(node.getOutgoingSet());
       // the shortest path to get to this node
       int shortestPath = node.getShortestPath();
-      ListIterator<VariantGraphArc> iter = node.outgoingArcs();
+      ListIterator<VariantGraphArc<T>> iter = node.outgoingArcs();
       while (iter.hasNext()) {
-        VariantGraphArc a = iter.next();
+        VariantGraphArc<T> a = iter.next();
         if (a.dataLen() > 0 && !a.versions.contains(mumV) && (!a.isParent() || !a.hasChildInVersion(mumV))) {
-          MatchThreadTransposeRight mttr;
-          PrevChar[] prevChars;
+          MatchThreadTransposeRight<T> mttr;
+          PrevChar<T>[] prevChars;
           // number of bytes to travel in this arc
           int limit;
           if (a.dataLen() + shortestPath < distance)
@@ -557,15 +553,15 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
           prevChars = (a.from == origin) ? new PrevChar[0] : a.from.getPrevChars();
           // process the first character separately
           // because it needs different prevChars
-          mttr = new MatchThreadTransposeRight(mum, st, a, 0, prevChars, shortestPath + travelled, null);
+          mttr = new MatchThreadTransposeRight<T>(mum, st, a, 0, prevChars, shortestPath + travelled, null);
           mttr.run();
           travelled++;
           prevChars = new PrevChar[1];
-          prevChars[0] = new PrevChar(a.versions, a.getData()[0]);
+          prevChars[0] = new PrevChar<T>(a.versions, a.getData().get(0));
           for (int i = 1; i < limit; i++) {
-            mttr = new MatchThreadTransposeRight(mum, st, a, i, prevChars, shortestPath + travelled, null);
+            mttr = new MatchThreadTransposeRight<T>(mum, st, a, i, prevChars, shortestPath + travelled, null);
             mttr.run();
-            prevChars[0] = new PrevChar(a.versions, a.getData()[i]);
+            prevChars[0] = new PrevChar<T>(a.versions, a.getData().get(i));
             travelled++;
           }
         }
@@ -646,12 +642,12 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
   private void addSubArcsToSpecials() {
     if (leftSubArc != null && leftSubArc.dataLen() >= MaximalUniqueMatch.MIN_LEN) {
       if (leftSpecialArcs == null)
-        leftSpecialArcs = new SimpleQueue<VariantGraphSpecialArc>();
+        leftSpecialArcs = new SimpleQueue<VariantGraphSpecialArc<T>>();
       leftSpecialArcs.add(leftSubArc);
     }
     if (rightSubArc != null && rightSubArc.dataLen() >= MaximalUniqueMatch.MIN_LEN) {
       if (rightSpecialArcs == null)
-        rightSpecialArcs = new SimpleQueue<VariantGraphSpecialArc>();
+        rightSpecialArcs = new SimpleQueue<VariantGraphSpecialArc<T>>();
       rightSpecialArcs.add(rightSubArc);
     }
   }
@@ -661,7 +657,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    *
    * @return a list of left special arcs for reMUMing
    */
-  public SimpleQueue<VariantGraphSpecialArc> getLeftSpecialArcs() {
+  public SimpleQueue<VariantGraphSpecialArc<T>> getLeftSpecialArcs() {
     return leftSpecialArcs;
   }
 
@@ -670,7 +666,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    *
    * @return a list of right special arcs for reMUMing
    */
-  public SimpleQueue<VariantGraphSpecialArc> getRightSpecialArcs() {
+  public SimpleQueue<VariantGraphSpecialArc<T>> getRightSpecialArcs() {
     return rightSpecialArcs;
   }
 
@@ -703,7 +699,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
     VariantGraphNode leftFrom = arc.from;
     while (leftFrom != graph.start) {
       if (leftSpecialArcs == null)
-        leftSpecialArcs = new SimpleQueue<VariantGraphSpecialArc>();
+        leftSpecialArcs = new SimpleQueue<VariantGraphSpecialArc<T>>();
       VariantGraphArc a = leftFrom.pickIncomingArc(version);
       if (a instanceof VariantGraphSpecialArc)
         leftSpecialArcs.add((VariantGraphSpecialArc) a);
@@ -712,7 +708,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
     VariantGraphNode rightTo = arc.to;
     while (rightTo != graph.end) {
       if (rightSpecialArcs == null)
-        rightSpecialArcs = new SimpleQueue<VariantGraphSpecialArc>();
+        rightSpecialArcs = new SimpleQueue<VariantGraphSpecialArc<T>>();
       VariantGraphArc a = rightTo.pickOutgoingArc(version);
       if (a instanceof VariantGraphSpecialArc)
         rightSpecialArcs.add((VariantGraphSpecialArc) a);
@@ -808,11 +804,10 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
     // now put it back
     graph.start.addOutgoing(a);
     // create an empty bridge arc
-    VariantGraphArc b = new VariantGraphArc(bs, new byte[0]);
+    VariantGraphArc b = new VariantGraphArc<T>(bs, Lists.<T>newArrayList());
     graph.start.addOutgoing(b);
     n.addIncoming(b);
-    VariantGraph g = new VariantGraph(graph.start, n, b.versions,
-            graph.position);
+    VariantGraph<T> g = new VariantGraph<T>(graph.start, n, b.versions, graph.position);
     // debug
     //g.verify();
     return g;
@@ -838,11 +833,10 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
     // now put it back
     graph.end.addIncoming(a);
     // create an empty bridge arc
-    VariantGraphArc b = new VariantGraphArc(bs, new byte[0]);
+    VariantGraphArc<T> b = new VariantGraphArc<T>(bs, Lists.<T>newArrayList());
     graph.end.addIncoming(b);
     n.addOutgoing(b);
-    VariantGraph g = new VariantGraph(n, graph.end, b.versions,
-            arc.position + match.dataOffset + match.length);
+    VariantGraph<T> g = new VariantGraph<T>(n, graph.end, b.versions, arc.position + match.dataOffset + match.length);
     // debug
     //g.verify();
     return g;
@@ -927,8 +921,8 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @param version the version of the empty arc
    * @return the empty unattached arc
    */
-  private VariantGraphArc createEmptyArc(Witness version) {
-    return new VariantGraphArc(Sets.newHashSet(version), new byte[0]);
+  private VariantGraphArc<T> createEmptyArc(Witness version) {
+    return new VariantGraphArc<T>(Sets.newHashSet(version), Lists.<T>newArrayList());
   }
 
   /**
@@ -937,13 +931,9 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @return an unaligned fragment of the original special arc
    *         not attached to any node
    */
-  VariantGraphSpecialArc splitOffLeftArc() {
-    byte[] leftArcData = new byte[match.dataOffset];
-    byte[] arcData = arc.getData();
+  VariantGraphSpecialArc<T> splitOffLeftArc() {
     assert arc.parent == null && arc.children == null;
-    for (int i = 0; i < match.dataOffset; i++) {
-      leftArcData[i] = arcData[i];
-    }
+    final List<T> leftArcData = Lists.newArrayList(arc.getData().subList(0, match.dataOffset));
     return new VariantGraphSpecialArc(Sets.newHashSet(version), leftArcData, arc.position);
   }
 
@@ -953,14 +943,9 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    * @return an unaligned fragment of the original special arc
    *         not attached to any node
    */
-  VariantGraphSpecialArc splitOffRightArc() {
-    int len = arc.dataLen() - (match.length + match.dataOffset);
-    byte[] rightArcData = new byte[len];
-    byte[] arcData = arc.getData();
-    assert arc.parent == null && arc.children == null;
-    for (int j = 0, i = match.dataOffset + match.length; i < arcData.length; i++, j++) {
-      rightArcData[j] = arcData[i];
-    }
+  VariantGraphSpecialArc<T> splitOffRightArc() {
+    final List<T> arcData = arc.getData();
+    List<T> rightArcData = Lists.newArrayList(arcData.subList(match.dataOffset + match.length, arcData.size()));
     return new VariantGraphSpecialArc(Sets.newHashSet(version), rightArcData, arc.position + match.dataOffset + match.length);
   }
 
