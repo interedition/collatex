@@ -20,6 +20,7 @@
  */
 package au.edu.uq.nmerge.graph;
 
+import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import au.edu.uq.nmerge.mvd.Witness;
@@ -910,7 +911,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
       VariantGraphArc child = new VariantGraphArc(versions, parents[i]);
       arcFrom.addOutgoing(child);
       if (parents[i].versions.contains(version))
-        System.out.println("Ooops!");
+        Errors.LOG.error("Ooops!", new Exception());
       if (i < parents.length - 1) {
         arcFrom = new VariantGraphNode();
         arcFrom.addIncoming(child);

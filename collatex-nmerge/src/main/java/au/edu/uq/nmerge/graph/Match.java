@@ -20,6 +20,7 @@
  */
 package au.edu.uq.nmerge.graph;
 
+import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Witness;
 
@@ -310,7 +311,7 @@ public class Match {
   VariantGraphNode getLeftNode() throws MVDException {
     VariantGraphArc[] path = getMatchPath();
     if (path[0].from == null)
-      System.out.println("null!");
+      Errors.LOG.error("null!", new Exception());
     return path[0].from;
   }
 

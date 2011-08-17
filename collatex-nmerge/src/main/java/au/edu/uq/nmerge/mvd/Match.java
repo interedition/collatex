@@ -20,6 +20,8 @@
  */
 package au.edu.uq.nmerge.mvd;
 
+import au.edu.uq.nmerge.Errors;
+
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Set;
@@ -125,7 +127,7 @@ public class Match {
     if (parent != null || isHint())
       return 0;
     else if (data == null) {
-      System.out.println("null");
+      Errors.LOG.error("null", new Exception());
       return 0;
     } else
       return data.length;

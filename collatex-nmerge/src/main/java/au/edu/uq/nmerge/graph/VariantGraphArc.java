@@ -20,6 +20,7 @@
  */
 package au.edu.uq.nmerge.graph;
 
+import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Match;
 import au.edu.uq.nmerge.mvd.Witness;
@@ -226,7 +227,7 @@ public class VariantGraphArc {
         sb.append("(" + to.nodeId + ")");
       return sb.toString();
     } catch (Exception e) {
-      System.out.println(e);
+      Errors.LOG.error(e.getMessage(), e);
       return "";
     }
   }
@@ -525,22 +526,6 @@ public class VariantGraphArc {
   void verify() throws MVDException {
     if (data == null && parent == null)
       throw new MVDException("Arc data is null and shouldn't be");
-  }
-
-  /**
-   * Debug routine
-   *
-   * @param d the string to check for when an arc is created
-   */
-  void checkForData(String d) {
-    if (data != null) {
-      byte[] bData = d.getBytes();
-      if (bData.length == data.length) {
-        for (int i = 0; i < bData.length; i++)
-          if (bData[i] == data[i])
-            System.out.println("Match");
-      }
-    }
   }
 
   /**

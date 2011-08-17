@@ -20,6 +20,7 @@
  */
 package au.edu.uq.nmerge.graph;
 
+import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTreePosition;
 import au.edu.uq.nmerge.mvd.Witness;
@@ -243,7 +244,7 @@ public class MatchThreadDirect implements Runnable {
         pathVersions.retainAll(arc.versions);
         for (int i = 0; i < prevChars.length; i++) {
           if (prevChars[i] == null)
-            System.out.println("null");
+            Errors.LOG.error("null", new Exception());
           if (prevChars[i].previous == dataPrevChar && !disjoint(prevChars[i].versions, pathVersions))
             return false;
         }

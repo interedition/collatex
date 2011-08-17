@@ -21,7 +21,6 @@
 package au.edu.uq.nmerge.graph;
 
 import au.edu.uq.nmerge.exception.MVDException;
-import au.edu.uq.nmerge.exception.MVDToolException;
 import au.edu.uq.nmerge.mvd.Match;
 import au.edu.uq.nmerge.mvd.Witness;
 import com.google.common.collect.Sets;
@@ -178,9 +177,9 @@ public class Converter {
     Vector<Match> matches = new Vector<Match>(origSize);
     printAcross(matches, graph.start, allVersions);
     if (parents.size() != 0)
-      throw new MVDToolException("Mismatched parent arc");
+      throw new MVDException("Mismatched parent arc");
     if (orphans.size() != 0)
-      throw new MVDToolException("Mismatched child arc");
+      throw new MVDException("Mismatched child arc");
     return matches;
   }
 
@@ -409,12 +408,5 @@ public class Converter {
     graph.clearPrinted();
     other.clearPrinted();
     return true;
-  }
-
-  /**
-   * Tell us stats about the graph
-   */
-  public void report() {
-    System.out.println("nArcs=" + nArcs + " nNodes=" + nNodes);
   }
 }

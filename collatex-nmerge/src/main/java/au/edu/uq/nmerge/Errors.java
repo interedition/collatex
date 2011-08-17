@@ -18,21 +18,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package au.edu.uq.nmerge.exception;
+
+package au.edu.uq.nmerge;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A syntax or other error in operation of the MVDTool
- *
- * @author Desmond Schmidt 3/5/09
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class MVDToolException extends MVDException {
-  static final long serialVersionUID = 1;
-
-  public MVDToolException(Exception e) {
-    super(e);
-  }
-
-  public MVDToolException(String message) {
-    super(message);
-  }
+public class Errors {
+  public static final Logger LOG = LoggerFactory.getLogger(Errors.class.getPackage().getName());
 }

@@ -797,30 +797,6 @@ public class SuffixTree<T> {
   }
 
   /**
-   * This function prints the full path of a node, starting from the root. It
-   * calls itself recursively and than prints the last edge.
-   *
-   * @param node the node to be printed
-   */
-  void printFullNode(SuffixTreeNode node) {
-    int start, end;
-    if (node != null) {
-      // calculating the beginning and ending of the last edge
-      start = node.edgeLabelStart;
-      end = getNodeLabelEnd(node);
-
-      // stopping condition - the root
-      if (node.parent != root)
-        printFullNode(node.parent);
-      // print the last edge
-      while (start <= end) {
-        System.out.print(source[start].toString());
-        start++;
-      }
-    }
-  }
-
-  /**
    * needed to store VAR parameters in
    * {@link SuffixTree#traceSingleEdge(SuffixTreeNode, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.Path, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.TraceReturnValue, au.edu.uq.nmerge.graph.suffixtree.SuffixTree.SkipType)}
    */

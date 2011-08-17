@@ -20,6 +20,7 @@
  */
 package au.edu.uq.nmerge.graph;
 
+import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.mvd.Witness;
 import com.google.common.collect.Sets;
@@ -257,17 +258,6 @@ public class VariantGraph {
   }
 
   /**
-   * Print out a graph using breadth-first traversal. Also verify.
-   *
-   * @param message a message to display first
-   */
-  public void printAndVerify(String message) {
-    System.out.println("-----------------------");
-    System.out.println(message);
-    System.out.println(toString());
-  }
-
-  /**
    * Classic override of toString method, but check structure
    * of graph also. Works for subgraphs too.
    *
@@ -311,7 +301,7 @@ public class VariantGraph {
         n.reset();
       }
     } catch (Exception e) {
-      System.out.println(sb.toString());
+      Errors.LOG.error(sb.toString(), e);
     }
     float averageOutdegree = (float) totalOutdegree / (float) totalNodes;
     float averageIndegree = (float) totalIndegree / (float) totalNodes;
@@ -399,7 +389,7 @@ public class VariantGraph {
       try {
         node.verify();
       } catch (Exception e) {
-        System.out.println(e);
+        Errors.LOG.error(e.getMessage(), e);
       }
     }
     // we removed the version, so clear the constraint
