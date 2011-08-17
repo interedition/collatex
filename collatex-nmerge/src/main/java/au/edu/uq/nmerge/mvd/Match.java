@@ -132,18 +132,6 @@ public class Match {
   }
 
   /**
-   * Return the size of the pair itself (minus the data)
-   *
-   * @return the size of the pair when serialised
-   */
-  int pairSize(int versionSetSize) {
-    int pSize = versionSetSize + 4 + 4;
-    if (isParent() || isChild())
-      pSize += 4;
-    return pSize;
-  }
-
-  /**
    * Does this pair contain the given version?
    *
    * @param version the version to test
