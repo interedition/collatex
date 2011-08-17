@@ -84,7 +84,7 @@ public class Converter {
    * @param matches the list of pairs to build the graph from.
    * @param versions the versions to go in the graph
    */
-  public VariantGraph create(Vector<au.edu.uq.nmerge.mvd.Match> matches, Set<Witness> versions)
+  public VariantGraph create(List<Match> matches, Set<Witness> versions)
           throws Exception {
     unattached = new UnattachedSet();
     incomplete = new HashSet<VariantGraphNode>();
@@ -116,7 +116,7 @@ public class Converter {
    * @param matches a Vector containing the pairs to build
    *                into a graph
    */
-  private void deserialise(Vector<au.edu.uq.nmerge.mvd.Match> matches) throws Exception {
+  private void deserialise(List<Match> matches) throws Exception {
     graph.start = createNode();
     VariantGraphNode u = graph.start;
     HashMap<Match, VariantGraphArc> pnts = new HashMap<Match, VariantGraphArc>();

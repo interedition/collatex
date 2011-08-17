@@ -38,7 +38,7 @@ import java.util.Vector;
  *
  * @author Desmond Schmidt 12/1/09
  */
-public class Match {
+public class VariantGraphMatch {
   /**
    * the start offset in the first element of path
    */
@@ -87,7 +87,7 @@ public class Match {
    * @param length      the length of the match
    * @param data        all the data of the special arc
    */
-  Match(VariantGraphNode start, int graphOffset, Witness version, int dataOffset, int length, byte[] data) {
+  VariantGraphMatch(VariantGraphNode start, int graphOffset, Witness version, int dataOffset, int length, byte[] data) {
     this.graphOffset = graphOffset;
     this.dataOffset = dataOffset;
     this.version = version;
@@ -116,10 +116,10 @@ public class Match {
    * @return true if we do
    */
   public boolean equals(Object other) {
-    Match m = ((Match) other);
+    VariantGraphMatch m = ((VariantGraphMatch) other);
     if (m.length == this.length
             && this.data != null
-            && ((Match) other).data != null) {
+            && ((VariantGraphMatch) other).data != null) {
       for (int i = 0; i < length; i++) {
         if (m.data[i] != this.data[i])
           return false;
@@ -420,7 +420,7 @@ public class Match {
    * @param b the other Match
    * @return true if the b match uses any arc from our path
    */
-  public boolean overlaps(Match b) {
+  public boolean overlaps(VariantGraphMatch b) {
     VariantGraphArc aArc = start.pickOutgoingArc(version);
     VariantGraphArc bArc = b.start.pickOutgoingArc(b.version);
     int i = 0;

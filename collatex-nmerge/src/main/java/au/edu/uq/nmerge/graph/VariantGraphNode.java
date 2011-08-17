@@ -68,7 +68,7 @@ public class VariantGraphNode {
   /**
    * list of Matches
    */
-  LinkedList<Match> matches;
+  LinkedList<VariantGraphMatch> matches;
   /**
    * new id counter (static)
    */
@@ -98,10 +98,10 @@ public class VariantGraphNode {
    *
    * @param m a match that relies on us
    */
-  public void addMatch(Match m) {
+  public void addMatch(VariantGraphMatch m) {
     // lazy evaluation - usually matches is null
     if (matches == null)
-      matches = new LinkedList<Match>();
+      matches = new LinkedList<VariantGraphMatch>();
     matches.add(m);
   }
 
@@ -297,7 +297,7 @@ public class VariantGraphNode {
    */
   public void moveMatches(VariantGraphNode to) {
     if (matches != null) {
-      Match m = matches.poll();
+      VariantGraphMatch m = matches.poll();
       while (m != null) {
         m.setStart(to);
         to.addMatch(m);

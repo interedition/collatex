@@ -40,8 +40,8 @@ public class Collation {
 
   // new options
   boolean directAlignOnly;
-  Vector<Witness> witnesses;
-  Vector<Match> matches;
+  Set<Witness> witnesses;
+  List<Match> matches;
   String description;
   int bestScore;
   // used for checking
@@ -49,8 +49,8 @@ public class Collation {
 
   public Collation() {
     this.description = "";
-    this.witnesses = new Vector<Witness>();
-    this.matches = new Vector<Match>();
+    this.witnesses = Sets.newHashSet();
+    this.matches = Lists.newArrayList();
   }
 
   public Collation(String description) {
@@ -58,7 +58,7 @@ public class Collation {
     this.description = description;
   }
 
-  public Vector<Witness> getWitnesses() {
+  public Set<Witness> getWitnesses() {
     return witnesses;
   }
 
@@ -72,31 +72,12 @@ public class Collation {
   }
 
   /**
-   * Get the number of versions
-   *
-   * @return the number of elements in the versions array
-   */
-  public int numVersions() {
-    return witnesses.size();
-  }
-
-
-  /**
    * Get the pairs list for converting to a Graph
    *
    * @return the pairs - read only!
    */
-  public Vector<Match> getMatches() {
+  public List<Match> getMatches() {
     return matches;
-  }
-
-  /**
-   * Get a pair from the MVD
-   *
-   * @param pairIndex the index of the pair
-   */
-  Match getPair(int pairIndex) throws Exception {
-    return matches.get(pairIndex);
   }
 
   /**
@@ -319,7 +300,7 @@ public class Collation {
   public float update(Witness version, byte[] data) throws Exception {
     // to do: if version already exists, remove it first
     Converter con = new Converter();
-    VariantGraph original = con.create(matches, Sets.newHashSet(witnesses));
+    VariantGraph original = con.create(matches, witnesses);
     original.removeVersion(version);
     VariantGraph g = original;
     VariantGraphSpecialArc special = g.addSpecialArc(data, version, 0);
@@ -373,7 +354,7 @@ public class Collation {
     }
     original.adopt(version);
     matches = con.serialise();
-    if (numVersions() == 1)
+    if (witnesses.size() == 1)
       return 0.0f;
     else
       return getPercentUnique(version);
@@ -388,7 +369,7 @@ public class Collation {
   public float getUniquePercentage(Witness version) {
     int totalLen = 0;
     int uniqueLen = 0;
-    if (numVersions() == 1)
+    if (witnesses.size() == 1)
       return 0.0f;
     else {
       for (int i = 0; i < matches.size(); i++) {

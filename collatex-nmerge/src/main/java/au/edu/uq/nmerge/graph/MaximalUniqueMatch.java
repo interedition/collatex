@@ -78,7 +78,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
   /**
    * The final Match
    */
-  Match match;
+  VariantGraphMatch match;
   /**
    * the version of the new version
    */
@@ -86,7 +86,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
   /**
    * store candidate MUMs here
    */
-  HashMap<Match, Match> table;
+  HashMap<VariantGraphMatch, VariantGraphMatch> table;
   /**
    * are we transposed?
    */
@@ -120,7 +120,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
     this.version = Iterables.getFirst(arc.versions, null);
     this.graph = graph;
     this.transposed = transposed;
-    table = new HashMap<Match, Match>(INITIAL_QUEUE_LEN);
+    table = new HashMap<VariantGraphMatch, VariantGraphMatch>(INITIAL_QUEUE_LEN);
   }
 
   /**
@@ -145,8 +145,8 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
       if (!transposed)
         bs.retainAll(graph.constraint);
       Witness v = Preconditions.checkNotNull(Iterables.getFirst(bs, null));
-      Match m = new Match(start, graphOffset, v, dataOffset, length, arc.data);
-      Match q = table.get(m);
+      VariantGraphMatch m = new VariantGraphMatch(start, graphOffset, v, dataOffset, length, arc.data);
+      VariantGraphMatch q = table.get(m);
       if (q != null) {
         if (!m.overlaps(q))
           q.freq++;
@@ -173,7 +173,7 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    *
    * @return the bext match
    */
-  public Match getMatch() {
+  public VariantGraphMatch getMatch() {
     if (match == null)
       match = getBestMatch();
     return match;
@@ -185,13 +185,13 @@ public class MaximalUniqueMatch implements Comparable<MaximalUniqueMatch> {
    *
    * @return the best match you could find, must be a MUM
    */
-  private Match getBestMatch() {
-    Set<Match> keys = table.keySet();
-    Iterator<Match> iter = keys.iterator();
-    Match biggest = null;
-    Match other = null;
+  private VariantGraphMatch getBestMatch() {
+    Set<VariantGraphMatch> keys = table.keySet();
+    Iterator<VariantGraphMatch> iter = keys.iterator();
+    VariantGraphMatch biggest = null;
+    VariantGraphMatch other = null;
     while (iter.hasNext()) {
-      Match m = iter.next();
+      VariantGraphMatch m = iter.next();
       if (m.freq == 1 && (biggest == null || m.length > biggest.length))
         biggest = m;
       else if (m.freq > 1 && (other == null || m.length > other.length))
