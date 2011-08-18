@@ -176,6 +176,7 @@ public class MatchThreadDirect<T> implements Runnable {
    */
   public void run() {
     List<T> data = arc.getData();
+    // FIXME: here we would have to match each token of every witness on the arc via SuffixTree#advance()!
     while (first < data.size() && st.advance(position, data.get(first))) {
       first++;
       pathLen++;

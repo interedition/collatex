@@ -29,6 +29,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.junit.Test;
 
+import java.util.Comparator;
+
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
@@ -36,11 +38,11 @@ public class MVDTest extends AbstractTest {
 
   @Test
   public void simple() throws Exception {
-    final Collation<String> collation = new Collation<String>("Test", Ordering.<String>natural(), "");
+    final Collation<String> collation = new Collation<String>("Test", CASE_INSENSITIVE_ORDERING, "");
 
-    collation.newVersion("test1", "test1", Lists.newArrayList("the", "quick", "brown", "fox", "died"));
-    collation.newVersion("test2", "test2", Lists.newArrayList("the", "quick", "red", "fox", "got", "rabies", "and", "died"));
-    collation.newVersion("test3", "test3", Lists.newArrayList("the", "quick", "blue", "fox", "lives"));
+    collation.newVersion("test1", "test1", Lists.newArrayList("The", "quick", "brown", "fox", "died"));
+    collation.newVersion("test2", "test2", Lists.newArrayList("the", "Quick", "red", "fox", "got", "rabies", "and", "died"));
+    collation.newVersion("test3", "test3", Lists.newArrayList("the", "quick", "Blue", "fox", "lives"));
 
     for (Match<String> m : collation.getMatches()) {
       LOG.debug(m.toString());
@@ -50,4 +52,11 @@ public class MVDTest extends AbstractTest {
     final VariantGraph<String> graph = converter.create(collation.getMatches(), collation.getWitnesses());
     LOG.debug("\n" + graph.toString());
   }
+
+  private static final Ordering<String> CASE_INSENSITIVE_ORDERING = Ordering.from(new Comparator<String>() {
+    @Override
+    public int compare(String o1, String o2) {
+      return o1.toLowerCase().compareTo(o2.toLowerCase());
+    }
+  });
 }
