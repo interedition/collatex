@@ -127,7 +127,7 @@ public class Converter<T> {
       VariantGraphNode<T> v;
       Match<T> p = matches.get(i);
       VariantGraphArc<T> a = pairToArc(p, pnts, kids);
-      if ((i > 0 && !disjoint(a.versions, matches.get(i - 1).versions)) || a.isHint())
+      if ((i > 0 && !disjoint(a.versions, matches.get(i - 1).witnesses)) || a.isHint())
         u = v = createNode();
       else
         v = getIntersectingNode(u, a);
@@ -225,8 +225,8 @@ public class Converter<T> {
   private VariantGraphArc<T> pairToArc(Match<T> p, HashMap<Match<T>, VariantGraphArc<T>> pnts,
                                        HashMap<Match<T>, VariantGraphArc<T>> children) {
     nArcs++;
-    List<T> pData = (p.isChild() || p.isHint()) ? null : p.getData();
-    VariantGraphArc<T> a = new VariantGraphArc<T>(cloneVersions(p.versions), pData);
+    List<T> pData = (p.isChild() || p.isHint()) ? null : p.getTokens();
+    VariantGraphArc<T> a = new VariantGraphArc<T>(cloneVersions(p.witnesses), pData);
     if (p.isChild()) {
       // we're a child - find our parent
       Match<T> parent = p.getParent();
@@ -339,8 +339,8 @@ public class Converter<T> {
     Match<T> hintMatch = matches.get(hint);
     for (int i = hint + 2; i < matches.size(); i++) {
       Match<T> p = matches.get(i);
-      hintMatch.versions.removeAll(p.versions);
-      if (hintMatch.versions.isEmpty()) {
+      hintMatch.witnesses.removeAll(p.witnesses);
+      if (hintMatch.witnesses.isEmpty()) {
         matches.remove(hint);
         //System.out.println("removing hint at "+hint);
         hint = -1;

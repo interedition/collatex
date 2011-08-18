@@ -94,7 +94,7 @@ public class CompactNode {
    * @param versions the versions to add
    */
   void addIncoming(Match<?> arc) {
-    incoming.addAll(arc.versions);
+    incoming.addAll(arc.witnesses);
   }
 
   /**
@@ -103,7 +103,7 @@ public class CompactNode {
    * @param arc the pair from the MVD to add as outgoing
    */
   void addOutgoing(Match<?> arc) {
-    outgoing.addAll(arc.versions);
+    outgoing.addAll(arc.witnesses);
   }
 
   public String toString() {

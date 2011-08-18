@@ -20,9 +20,12 @@
  */
 package au.edu.uq.nmerge.mvd;
 
+import au.edu.uq.nmerge.Errors;
 import au.edu.uq.nmerge.exception.MVDException;
 import au.edu.uq.nmerge.graph.*;
 import au.edu.uq.nmerge.graph.suffixtree.SuffixTree;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
@@ -91,55 +94,63 @@ public class Collation<T> {
    */
   public List<Chunk<T>> compare(Witness u, Witness v, ChunkState state)
           throws MVDException {
-    List<Chunk<T>> chunks = Lists.newArrayList();
-    Chunk<T> current = new Chunk<T>();
-    current.setVersion(u);
-    TransposeState oldTS = null;
-    TransposeState ts = new TransposeState();
-    ChunkStateSet cs = new ChunkStateSet();
-    ChunkStateSet oldCS = null;
-    Match<T> p = null;
-    Chunk.chunkId = 0;
+    List<Chunk<T>> result = Lists.newArrayList();
+
+    Chunk<T> currentChunk = new Chunk<T>();
+    currentChunk.setWitness(u);
+
+    TransposeState oldTransposeState = null;
+    ChunkStateSet oldChunkStateSet = null;
+
+    TransposeState transposeState = new TransposeState();
+    ChunkStateSet chunkStateSet = new ChunkStateSet();
+
+    Match<T> match = null;
+
+    int chunkId = 0;
     TransposeState.transposeId = Integer.MAX_VALUE;
+
     int i = next(0, u);
     while (i < matches.size()) {
-      p = matches.get(i);
-      oldTS = ts;
-      oldCS = cs;
-      ts = ts.next(p, u, v);
+      match = matches.get(i);
+
+      oldTransposeState = transposeState;
+      oldChunkStateSet = chunkStateSet;
+
+      transposeState = transposeState.next(match, u, v);
       // transposed is not deleted, inserted or merged
-      if (!ts.isTransposed())
-        cs = cs.next(p, state, v);
-      if (ts != oldTS || cs != oldCS) {
-        // then we have to write out current
-        ChunkStateSet cs1 = current.getStates();
-        if (current.getLength() > 0) {
+      if (!transposeState.isTransposed())
+        chunkStateSet = chunkStateSet.next(match, state, v);
+      if (transposeState != oldTransposeState || chunkStateSet != oldChunkStateSet) {
+        // then we have to write out currentChunk
+        ChunkStateSet cs1 = currentChunk.getStates();
+        if (currentChunk.getLength() > 0) {
           if (cs1.isMerged())
-            current.setId(++Chunk.chunkId);
-          chunks.add(current);
+            currentChunk.setId(++chunkId);
+          result.add(currentChunk);
         }
-        // set up a new current chunk
+        // set up a new currentChunk chunk
         ChunkState[] newStates;
-        if (ts.getId() != 0) {
+        if (transposeState.getId() != 0) {
           newStates = new ChunkState[1];
-          newStates[0] = ts.getChunkState();
+          newStates[0] = transposeState.getChunkState();
         } else
-          newStates = cs.getStates();
-        current = new Chunk<T>(ts.getId(), newStates, p.getData());
-        current.setVersion(u);
+          newStates = chunkStateSet.getStates();
+        currentChunk = new Chunk<T>(transposeState.getId(), newStates, match.getTokens());
+        currentChunk.setWitness(u);
       } else
-        current.addData(p.getData());
+        currentChunk.add(match.getTokens());
       if (i < matches.size() - 1)
         i = next(i + 1, u);
       else
         break;
     }
-    // add any lingering chunks
-    if (current.getStates().isMerged())
-      current.setId(++Chunk.chunkId);
-    if (chunks.size() == 0 || current != chunks.get(chunks.size() - 1))
-      chunks.add(current);
-    return chunks;
+    // add any lingering result
+    if (currentChunk.getStates().isMerged())
+      currentChunk.setId(++chunkId);
+    if (result.size() == 0 || currentChunk != result.get(result.size() - 1))
+      result.add(currentChunk);
+    return result;
   }
 
   /**
@@ -209,8 +220,8 @@ public class Collation<T> {
         KMPSearchState<T> s = inactive;
         while (s != null) {
           KMPSearchState<T> sequential = s.following;
-          if (!disjoint(s.v, temp.versions)) {
-            KMPSearchState<T> child = s.split(temp.versions);
+          if (!disjoint(s.v, temp.witnesses)) {
+            KMPSearchState<T> child = s.split(temp.witnesses);
             if (active == null)
               active = child;
             else
@@ -222,7 +233,7 @@ public class Collation<T> {
         }
         // now process each byte of the pair
         if (active != null) {
-          List<T> data = temp.getData();
+          List<T> data = temp.getTokens();
           for (int j = 0; j < data.size(); j++) {
             KMPSearchState<T> ss = active;
             while (ss != null) {
@@ -265,28 +276,28 @@ public class Collation<T> {
    *
    * @return the id of the new version
    */
-  public Witness newVersion(String shortName, String longName, List<T> data) throws Exception {
-    final Witness witness = new Witness(shortName, longName);
+  public void add(Witness witness, List<T> data) throws Exception {
+    Preconditions.checkArgument(!witnesses.contains(witness));
     witnesses.add(witness);
     update(witness, data);
-    return witness;
   }
 
   /**
-   * Update an existing version or add a new one.
+   * Update an existing witness or add a new one.
    *
-   * @param version the id of the version to add.
+   * @param witness the id of the witness to add.
    * @param data    the data to merge
-   * @return percentage of the new version that was unique, or 0
-   *         if this was the first version
+   * @return percentage of the new witness that was unique, or 0
+   *         if this was the first witness
    */
-  public float update(Witness version, List<T> data) throws Exception {
-    // to do: if version already exists, remove it first
+  public void update(Witness witness, List<T> data) throws Exception {
+    Preconditions.checkArgument(witnesses.contains(witness));
+    // to do: if witness already exists, remove it first
     Converter<T> con = new Converter<T>();
     VariantGraph<T> original = con.create(matches, witnesses);
-    original.removeVersion(version);
+    original.removeVersion(witness);
     VariantGraph<T> g = original;
-    VariantGraphSpecialArc<T> special = g.addSpecialArc(data, version, 0);
+    VariantGraphSpecialArc<T> special = g.addSpecialArc(data, witness, 0);
     if (g.getStart().cardinality() > 1) {
       SuffixTree<T> st = makeSuffixTree(special);
       MaximalUniqueMatch<T> bestMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
@@ -301,22 +312,20 @@ public class Collation<T> {
             installSpecial(specials, leftSpecials.poll(), bestMUM.getLeftSubgraph(), true);
           while (rightSpecials != null && !rightSpecials.isEmpty())
             installSpecial(specials, rightSpecials.poll(), bestMUM.getRightSubgraph(), false);
-        } else // try again
-        {
+        } else {
+           // try again
           bestMUM = recomputeMUM(bestMUM);
           if (bestMUM != null)
             specials.put(bestMUM.getArc(), bestMUM.getGraph());
         }
-        /*// debug
-                  Set<SpecialArc> keys = specials.keySet();
-                  Iterator<SpecialArc> iter = keys.iterator();
-                  while ( iter.hasNext() )
-                  {
-                      SpecialArc s = iter.next();
-                      if ( s.getBest().isTransposition() )
-                          System.out.print("Transposed: ");
-                      System.out.println( s.getBest().getMatch() );
-                  }*/
+        if (Errors.LOG.isTraceEnabled()) {
+          Set<VariantGraphSpecialArc<T>> keys = specials.keySet();
+          for (VariantGraphSpecialArc<T> s : specials.keySet()) {
+            final MaximalUniqueMatch<T> bestMatch = s.getBest();
+            Errors.LOG.trace("{}{}", (bestMatch.isTransposition() ? "Transposed: " : ""), bestMatch.getMatch());
+          }
+        }
+
         // POP topmost entry, if possible
         bestMUM = null;
         if (specials.size() > 0) {
@@ -331,12 +340,13 @@ public class Collation<T> {
         }
       }
     }
-    original.adopt(version);
+    original.adopt(witness);
     matches = con.serialise();
-    if (witnesses.size() == 1)
-      return 0.0f;
-    else
-      return getPercentUnique(version);
+
+    if (Errors.LOG.isDebugEnabled()) {
+      float percentUnique = (witnesses.size() == 1 ? 0.0f : getPercentUnique(witness));
+      Errors.LOG.debug("Updated {} in {}: {} % unique", new Object[] { witness, this, percentUnique});
+    }
   }
 
   /**
@@ -353,8 +363,8 @@ public class Collation<T> {
     else {
       for (int i = 0; i < matches.size(); i++) {
         Match<T> p = matches.get(i);
-        if (p.versions.contains(version)) {
-          if (p.versions.size() == 1)
+        if (p.witnesses.contains(version)) {
+          if (p.witnesses.size() == 1)
             uniqueLen += p.length();
           totalLen += p.length();
         }
@@ -373,8 +383,8 @@ public class Collation<T> {
     float unique = 0.0f, shared = 0.0f;
     for (int i = 0; i < matches.size(); i++) {
       Match<T> p = matches.get(i);
-      if (p.versions.contains(version)) {
-        if (p.versions.size() == 1)
+      if (p.witnesses.contains(version)) {
+        if (p.witnesses.size() == 1)
           unique += p.length();
         else
           shared += p.length();
@@ -505,7 +515,7 @@ public class Collation<T> {
     matches = con.serialise();
     for (int i = 0; i < matches.size(); i++) {
       Match<T> p = matches.get(i);
-      p.versions.remove(version);
+      p.witnesses.remove(version);
     }
   }
 
@@ -520,15 +530,15 @@ public class Collation<T> {
     // measure the length
     for (int i = 0; i < matches.size(); i++) {
       Match<T> p = matches.get(i);
-      if (p.versions.contains(version)) {
+      if (p.witnesses.contains(version)) {
         length += p.length();
       }
     }
     // now copy it
     final List<T> result = Lists.newArrayListWithExpectedSize(length);
     for (Match<T> p : matches) {
-      if (p.versions.contains(version)) {
-        result.addAll(p.getData());
+      if (p.witnesses.contains(version)) {
+        result.addAll(p.getTokens());
       }
     }
     return result;
@@ -588,7 +598,7 @@ public class Collation<T> {
         setDefaultNode(cn, right);
         if (pushRight)
           right.push(new WrappedPair<T>(p));
-      } else if (!right.isEmpty() && !disjoint(right.peek().getMatch().versions, p.versions)) {
+      } else if (!right.isEmpty() && !disjoint(right.peek().getMatch().witnesses, p.witnesses)) {
         CompactNode cn = new CompactNode(i);
         addOutgoing(cn, right.pop(), right);
         nodes.push(cn);
@@ -722,7 +732,7 @@ public class Collation<T> {
             offset = -1;
           else
             offset = p.length() - 1;
-        } else if (!p.getData().get(offset).equals(' ')) {
+        } else if (!p.getTokens().get(offset).equals(' ')) {
           lastStartIndex = startIndex;
           lastOffset = offset;
           offset--;
@@ -755,7 +765,7 @@ public class Collation<T> {
             break;
           p = matches.get(endIndex);
           endOffset = 0;
-        } else if (!p.getData().get(endOffset).equals(' ')) {
+        } else if (!p.getTokens().get(endOffset).equals(' ')) {
           endOffset++;
           length++;
         } else
@@ -808,7 +818,7 @@ public class Collation<T> {
       int index = cn.getIndex();
       for (int i = index; i >= 0; i--) {
         Match<T> q = matches.get(i);
-        if (!disjoint(q.versions, wi)) {
+        if (!disjoint(q.witnesses, wi)) {
           addIncoming(cn, new WrappedPair<T>(q), right);
           wi = cn.getWantsIncoming();
           break;
@@ -821,7 +831,7 @@ public class Collation<T> {
     WrappedPair<T> q = null;
     while (iter.hasNext()) {
       q = iter.next();
-      if (!disjoint(q.getMatch().versions, p.getMatch().versions))
+      if (!disjoint(q.getMatch().witnesses, p.getMatch().witnesses))
         break;
       else
         q = null;
@@ -846,7 +856,7 @@ public class Collation<T> {
       WrappedPair<T> q = null;
       while (iter.hasNext()) {
         q = iter.next();
-        if (!disjoint(q.getMatch().versions, wo))
+        if (!disjoint(q.getMatch().witnesses, wo))
           break;
         else
           q = null;
@@ -879,9 +889,9 @@ public class Collation<T> {
     // contain the base version, add it to the paths set.
     for (int i = from.getIndex() + 1; i <= to.getIndex(); i++) {
       Match<T> p = matches.get(i);
-      if (!disjoint(p.versions, pathV)) {
+      if (!disjoint(p.witnesses, pathV)) {
         // get intersection
-        Set<Witness> bs = Sets.newHashSet(Sets.intersection(p.versions, pathV));
+        Set<Witness> bs = Sets.newHashSet(Sets.intersection(p.witnesses, pathV));
         if (!bs.isEmpty()) {
           LinkedList<Set<Witness>> queue = new LinkedList<Set<Witness>>();
           queue.push(bs);
@@ -937,7 +947,7 @@ public class Collation<T> {
     int found = -1;
     for (int i = 0; i < matches.size(); i++) {
       Match<T> p = matches.get(i);
-      if (p.versions.contains(version)) {
+      if (p.witnesses.contains(version)) {
         if (offset < pos + p.length()) {
           found = i;
           break;
@@ -948,16 +958,13 @@ public class Collation<T> {
     return found;
   }
 
-  /**
-   * Debug tool. Turn all instance vars to a string except content
-   */
+  @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append("; directAlignOnly=" + directAlignOnly);
-    sb.append("; versions.size()=" + witnesses.size());
-    sb.append("; pairs.size()=" + matches.size());
-    sb.append("; description=" + description);
-    return sb.toString();
+    return Objects.toStringHelper(this)
+            .addValue(description)
+            .add("witnesses", witnesses.size())
+            .add("matches", matches.size())
+            .toString();
   }
 
   /**
@@ -973,8 +980,7 @@ public class Collation<T> {
    *
    * @return a 2-D matrix of differences.
    */
-  public double[][] computeDiffMatrix(Ordering<Witness> witnessOrdering) {
-    List<Witness> ordered = witnessOrdering.immutableSortedCopy(witnesses);
+  public double[][] computeDiffMatrix(List<Witness> ordered) {
     int s = witnesses.size();
     // keep track of the length of each version
     int[] lengths = new int[s];
@@ -988,9 +994,9 @@ public class Collation<T> {
     for (int i = 0; i < matches.size(); i++) {
       Match<T> p = matches.get(i);
       // consider each combination of j and k, including j=k
-      for (Witness jw : p.versions) {
+      for (Witness jw : p.witnesses) {
         int j = ordered.indexOf(jw);
-        for (Witness kw : p.versions) {
+        for (Witness kw : p.witnesses) {
           int k = ordered.indexOf(kw);
           costs[j][k] += Math.max(lengths[j] - lastJoinJ[j][k], lengths[k] - lastJoinK[j][k]);
           costs[k][j] = costs[j][k];

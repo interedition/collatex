@@ -29,22 +29,19 @@ public class Witness {
   /**
    * siglum or other short name e.g. A
    */
-  public String shortName;
-
-  /**
-   * full description if desired: e.g. Codex Vaticanus 1234
-   */
-  public String longName;
+  public String siglum;
 
   /**
    * Create an instance of Version
    *
-   * @param shortName siglum or other short name
-   * @param longName  longer name if desired
+   * @param siglum siglum or other short name
    */
-  public Witness(String shortName, String longName) {
-    this.shortName = shortName;
-    this.longName = longName;
+  public Witness(String siglum) {
+    this.siglum = siglum;
+  }
+
+  public String getSiglum() {
+    return siglum;
   }
 
   /**
@@ -53,6 +50,19 @@ public class Witness {
    * @return a human-readable string Version
    */
   public String toString() {
-    return shortName;
+    return siglum;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof Witness) {
+      return siglum.equals(((Witness)obj).siglum);
+    }
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return siglum.hashCode();
   }
 }

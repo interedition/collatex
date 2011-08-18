@@ -23,8 +23,8 @@ package au.edu.uq.nmerge;
 
 import au.edu.uq.nmerge.graph.Converter;
 import au.edu.uq.nmerge.graph.VariantGraph;
-import au.edu.uq.nmerge.mvd.Collation;
-import au.edu.uq.nmerge.mvd.Match;
+import au.edu.uq.nmerge.mvd.*;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.junit.Test;
@@ -38,11 +38,15 @@ public class MVDTest extends AbstractTest {
 
   @Test
   public void simple() throws Exception {
-    final Collation<String> collation = new Collation<String>("Test", CASE_INSENSITIVE_ORDERING, "");
+    final Collation<String> collation = new Collation<String>("Test", Ordering.<String>natural(), "");
 
-    collation.newVersion("test1", "test1", Lists.newArrayList("The", "quick", "brown", "fox", "died"));
-    collation.newVersion("test2", "test2", Lists.newArrayList("the", "Quick", "red", "fox", "got", "rabies", "and", "died"));
-    collation.newVersion("test3", "test3", Lists.newArrayList("the", "quick", "Blue", "fox", "lives"));
+    final Witness a = new Witness("A");
+    final Witness b = new Witness("B");
+    final Witness c = new Witness("C");
+
+    collation.add(a, Lists.newArrayList("the", "quick", "brown", "fox", "has", "died"));
+    collation.add(b, Lists.newArrayList("the", "quick", "fox", "got", "blue", "rabies", "and", "has", "died"));
+    collation.add(c, Lists.newArrayList("the", "quick", "blue", "fox", "got", "lives"));
 
     for (Match<String> m : collation.getMatches()) {
       LOG.debug(m.toString());
@@ -51,12 +55,13 @@ public class MVDTest extends AbstractTest {
     final Converter<String> converter = new Converter<String>();
     final VariantGraph<String> graph = converter.create(collation.getMatches(), collation.getWitnesses());
     LOG.debug("\n" + graph.toString());
-  }
 
-  private static final Ordering<String> CASE_INSENSITIVE_ORDERING = Ordering.from(new Comparator<String>() {
-    @Override
-    public int compare(String o1, String o2) {
-      return o1.toLowerCase().compareTo(o2.toLowerCase());
+    for (Witness w : collation.getWitnesses()) {
+      LOG.debug(Iterables.toString(collation.getVersion(w)));
     }
-  });
+
+    for (Chunk<String> ch : collation.compare(a, b, ChunkState.DELETED)) {
+      LOG.debug(ch.toString());
+    }
+  }
 }

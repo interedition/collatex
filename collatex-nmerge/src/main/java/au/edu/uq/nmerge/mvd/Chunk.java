@@ -21,7 +21,7 @@
 package au.edu.uq.nmerge.mvd;
 
 import au.edu.uq.nmerge.Tuple;
-import com.google.common.collect.Iterables;
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -34,20 +34,24 @@ import java.util.List;
  *
  * @author Desmond Schmidt 19/9/07
  */
-public class Chunk<T> extends BracketedData<T> {
-  ChunkStateSet states;
+public class Chunk<T> {
+  /**
+   * parent, child or merge id or 0, unique for each witness
+   */
+  private int id;
+
   /**
    * after search say what version the Chunk belongs to
    */
-  Witness version;
+  private Witness witness;
+
+  private ChunkStateSet states;
+
   /**
-   * parent, child or merge id or 0, unique for each version
+   * the data of the chunk
    */
-  int id;
-  /**
-   * global chunk id
-   */
-  static int chunkId;
+  private List<T> tokens = Lists.newArrayList();
+
 
   /**
    * Basic constructor for a chunk. Add states versions and ids later.
@@ -61,12 +65,12 @@ public class Chunk<T> extends BracketedData<T> {
    *
    * @param id       the parent or child id or 0
    * @param cs       an initial set of chunk states
-   * @param data     the data to add
+   * @param tokens     the data to add
    */
-  public Chunk(int id, ChunkState[] cs, List<T> data) {
-    super(data);
-    this.states = new ChunkStateSet(cs);
+  public Chunk(int id, ChunkState[] cs, List<T> tokens) {
     this.id = id;
+    this.states = new ChunkStateSet(cs);
+    this.tokens = tokens;
   }
 
   /**
@@ -91,10 +95,10 @@ public class Chunk<T> extends BracketedData<T> {
   /**
    * Set the version. Only valid if it is already a found state.
    *
-   * @param version the version the state belongs to
+   * @param witness the version the state belongs to
    */
-  public void setVersion(Witness version) {
-    this.version = version;
+  public void setWitness(Witness witness) {
+    this.witness = witness;
   }
 
   /**
@@ -134,7 +138,7 @@ public class Chunk<T> extends BracketedData<T> {
       if (matchStart <= begin && matchEnd
               >= begin + current.getLength()) {
         current.addState(hit.state);
-        current.version = hit.getVersion();
+        current.witness = hit.getVersion();
         begin += current.getLength();
         newChunks.add(current);
       }
@@ -156,11 +160,11 @@ public class Chunk<T> extends BracketedData<T> {
    */
   Tuple<Chunk<T>> split(int offset) {
     // duplicate ids: this doesn't matter for chunks
-    final Chunk<T> left = new Chunk<T>(id, states.getStates(), Lists.newArrayList(realData.subList(0, offset)));
-    left.version = this.version;
+    final Chunk<T> left = new Chunk<T>(id, states.getStates(), Lists.newArrayList(tokens.subList(0, offset)));
+    left.witness = this.witness;
 
-    final Chunk<T> right = new Chunk<T>(id, new ChunkStateSet(states).getStates(), Lists.newArrayList(realData.subList(offset, realData.size())));
-    right.version = this.version;
+    final Chunk<T> right = new Chunk<T>(id, new ChunkStateSet(states).getStates(), Lists.newArrayList(tokens.subList(offset, tokens.size())));
+    right.witness = this.witness;
 
     return new Tuple<Chunk<T>>(left, right);
   }
@@ -184,22 +188,12 @@ public class Chunk<T> extends BracketedData<T> {
   }
 
   /**
-   * Get the length of the source data used to construct this
-   * chunk
-   *
-   * @return the src data len in bytes
-   */
-  public int getSrcLen() {
-    return srcLen;
-  }
-
-  /**
    * Get the version of this chunk.
    *
    * @return the version given when the chunk was created
    */
-  public Witness getVersion() {
-    return version;
+  public Witness getWitness() {
+    return witness;
   }
 
   /**
@@ -208,32 +202,20 @@ public class Chunk<T> extends BracketedData<T> {
    * @return the chunk's length
    */
   public int getLength() {
-    return (realData == null) ? 0 : realData.size();
+    return (tokens == null) ? 0 : tokens.size();
   }
 
-  /**
-   * Convert a chunk into a string for debugging
-   *
-   * @return a String representation of the contents plus the state
-   */
+  @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
-    {
-      sb.append("[");
-      if (states != null)
-        sb.append(states.toString());
-      if (id != 0)
-        sb.append(":" + Integer.toString(id));
-      if (version != null)
-        sb.append(":" + version);
-      sb.append(":");
-      try {
-        sb.append(Iterables.toString(realData));
-      } catch (Exception e) {
-        // this won't happen
-      }
-      sb.append("]");
-    }
-    return sb.toString();
+    return Objects.toStringHelper(this)
+            .add("id", id)
+            .add("states", states)
+            .add("witness", witness)
+            .addValue(tokens)
+            .toString();
+  }
+
+  public void add(List<T> tokens) {
+    this.tokens.addAll(tokens);
   }
 }

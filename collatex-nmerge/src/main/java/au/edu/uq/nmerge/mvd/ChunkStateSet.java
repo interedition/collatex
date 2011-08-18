@@ -21,6 +21,10 @@
 
 package au.edu.uq.nmerge.mvd;
 
+import com.google.common.collect.Iterables;
+
+import java.util.Arrays;
+
 /**
  * Keep track of a set of chunk states common to a run of successive
  * pairs belonging to a particular version. Used when generating the
@@ -216,15 +220,6 @@ public class ChunkStateSet {
    * @return the state set as a string
    */
   public String toString() {
-    StringBuffer sb = new StringBuffer();
-    if (states != null) {
-      for (int i = 0; i < states.length; i++) {
-        sb.append(states[i].toString());
-        if (i < states.length - 1)
-          sb.append(",");
-      }
-    } else
-      sb.append("empty");
-    return sb.toString();
+    return (states == null ? "" : Iterables.toString(Arrays.asList(states)));
   }
 }

@@ -174,8 +174,8 @@ public class Variant<T> implements Comparable<Variant<T>> {
         p = collation.getMatches().get(iNode);
         i = 0;
       } else {
-        data.addAll(p.getData());
-        totalLen += p.getData().size();
+        data.addAll(p.getTokens());
+        totalLen += p.getTokens().size();
       }
     }
   }

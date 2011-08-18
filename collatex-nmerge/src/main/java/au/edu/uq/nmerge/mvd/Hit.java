@@ -34,7 +34,12 @@ import java.util.Set;
  * specially, e.g. coloured differently. However, unlike chunks, they
  * don't normally cover the whole version.
  */
-public class Hit<T> extends BracketedData<T> {
+public class Hit<T> {
+  /**
+   * the data of the chunk
+   */
+  protected List<T> realData;
+
   /**
    * offset within the version where the match starts
    */
@@ -125,7 +130,7 @@ public class Hit<T> extends BracketedData<T> {
       }
       // now offset is len plus the real offset
       offset -= len;
-      String shortName = i.shortName;
+      String shortName = i.siglum;
       Hit<T> m = new Hit<T>(i, offset, len, shortName, state);
       hits.add(m);
       if (!multiple)
@@ -216,7 +221,7 @@ public class Hit<T> extends BracketedData<T> {
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append('[');
-    sb.append(version.shortName + ":");
+    sb.append(version.siglum + ":");
     sb.append("Offset " + Integer.toString(offset) + ":");
     sb.append("Length " + Integer.toString(length) + ":");
     sb.append(state.toString());

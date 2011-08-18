@@ -20,6 +20,7 @@
  */
 package au.edu.uq.nmerge.mvd;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -43,18 +44,18 @@ public class Match<T> {
   private Match<T> parent;
   private List<Match<T>> children = Lists.newArrayList();
 
-  public Set<Witness> versions;
-  private List<T> data;
+  public Set<Witness> witnesses;
+  private List<T> tokens;
 
   /**
    * Create a basic pair
    *
-   * @param versions its versions
-   * @param data     its data
+   * @param witnesses its versions
+   * @param tokens     its data
    */
-  public Match(Set<Witness> versions, List<T> data) {
-    this.versions = versions;
-    this.data = data;
+  public Match(Set<Witness> witnesses, List<T> tokens) {
+    this.witnesses = witnesses;
+    this.tokens = tokens;
   }
 
   public int getId() {
@@ -115,7 +116,7 @@ public class Match<T> {
    * @return the length of the pair in bytes
    */
   int length() {
-    return (parent != null) ? parent.length() : data.size();
+    return (parent != null) ? parent.length() : tokens.size();
   }
 
   /**
@@ -125,7 +126,7 @@ public class Match<T> {
    * @return true if version intersects with this pair
    */
   public boolean contains(Witness version) {
-    return versions.contains(version);
+    return witnesses.contains(version);
   }
 
   /**
@@ -134,7 +135,7 @@ public class Match<T> {
    * @return true if it is, false otherwise
    */
   public boolean isHint() {
-    return versions.isEmpty();
+    return witnesses.isEmpty();
   }
 
   /**
@@ -155,28 +156,14 @@ public class Match<T> {
     return !children.isEmpty();
   }
 
-  /**
-   * Convert a pair to a human-readable form
-   *
-   * @return the pair as a String
-   */
+  @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(versions + ": ");
-    if (parent != null) {
-      sb.append("[" + parent.id + ":");
-      sb.append(Iterables.toString(parent.data));
-      sb.append("]");
-    } else if (children != null) {
-      sb.append("{" + id + ":");
-      sb.append(Iterables.toString(data));
-      sb.append("}");
-      sb.append("; children=").append(Iterables.toString(children));
-    } else if (data != null)
-      sb.append("'").append(Iterables.toString(data)).append("'");
-    else
-      sb.append("null");
-    return sb.toString();
+    return Objects.toStringHelper(this)
+            .add("witnesses", witnesses)
+            .add("parent", parent)
+            .add("children", children)
+            .add("tokens", tokens)
+            .toString();
   }
 
   /**
@@ -193,20 +180,20 @@ public class Match<T> {
    *
    * @return this pair's data or that of its parent
    */
-  public List<T> getData() {
+  public List<T> getTokens() {
     if (parent != null)
-      return parent.getData();
+      return parent.getTokens();
     else
-      return data;
+      return tokens;
   }
 
   /**
    * Set the data of this pair. Not to be used publicly!
    *
-   * @param data the new data for this pair
+   * @param tokens the new data for this pair
    */
-  void setData(List<T> data) {
-    this.data = data;
+  void setTokens(List<T> tokens) {
+    this.tokens = tokens;
   }
 
   /**
