@@ -58,20 +58,23 @@ public class edge {
    */
   edge findBottomLeft() {
     edge f = this;
-    while (f.head.leftEdge != null)
+    while (f.head.leftEdge != null) {
       f = f.head.leftEdge;
+    }
     return f;
   }
 
   edge moveUpRight() {
     edge f = this;
-    while ((null != f) && (f.tail.leftEdge != f))
+    while ((null != f) && (f.tail.leftEdge != f)) {
       f = f.tail.parentEdge;
+    }
     //go up the tree until f is a leftEdge
-    if (null == f)
+    if (null == f) {
       return f; //triggered at end of search
-    else
+    } else {
       return (f.tail.rightEdge);
+    }
     //and then go right
   }
 
@@ -80,16 +83,18 @@ public class edge {
     // this step moves from a left-oriented edge
     // to a right-oriented edge
     f = tail.rightEdge;
-    if (null != f)
+    if (null != f) {
       f = f.findBottomLeft();
+    }
     return f;
   }
 
   edge siblingEdge() {
-    if (this == tail.leftEdge)
+    if (this == tail.leftEdge) {
       return tail.rightEdge;
-    else
+    } else {
       return tail.leftEdge;
+    }
   }
 
   void updateSizes(direction d) {
@@ -97,29 +102,33 @@ public class edge {
     switch (d) {
       case UP:
         f = head.leftEdge;
-        if (null != f)
+        if (null != f) {
           f.updateSizes(direction.UP);
+        }
         f = head.rightEdge;
-        if (null != f)
+        if (null != f) {
           f.updateSizes(direction.UP);
+        }
         topsize++;
         break;
       case DOWN:
         f = siblingEdge();
-        if (null != f)
+        if (null != f) {
           f.updateSizes(direction.UP);
+        }
         f = tail.parentEdge;
-        if (null != f)
+        if (null != f) {
           f.updateSizes(direction.DOWN);
+        }
         bottomsize++;
         break;
     }
   }
 
   void assignBottomsize() {
-    if (head.leaf())
+    if (head.leaf()) {
       bottomsize = 1;
-    else {
+    } else {
       head.leftEdge.assignBottomsize();
       head.rightEdge.assignBottomsize();
       bottomsize = head.leftEdge.bottomsize
@@ -185,9 +194,9 @@ public class edge {
    */
   void WFext(double[][] A) {
     edge f, g;
-    if (head.leaf() && tail.leaf())
+    if (head.leaf() && tail.leaf()) {
       distance = A[head.index][head.index];
-    else if (head.leaf()) {
+    } else if (head.leaf()) {
       f = tail.parentEdge;
       g = siblingEdge();
       distance = 0.5 * (A[head.index][g.head.index]
@@ -219,9 +228,9 @@ public class edge {
    */
   void BalWFext(double[][] A) {
     edge f, g;
-    if (head.leaf() && tail.leaf())
+    if (head.leaf() && tail.leaf()) {
       distance = A[head.index][head.index];
-    else if (head.leaf()) {
+    } else if (head.leaf()) {
       f = tail.parentEdge;
       g = siblingEdge();
       distance = 0.5 * (A[head.index][g.head.index]

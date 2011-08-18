@@ -98,8 +98,9 @@ public class VariantGraphNode<T> {
    */
   public void addMatch(VariantGraphMatch<T> m) {
     // lazy evaluation - usually matches is null
-    if (matches == null)
+    if (matches == null) {
       matches = new LinkedList<VariantGraphMatch<T>>();
+    }
     matches.add(m);
   }
 
@@ -127,8 +128,9 @@ public class VariantGraphNode<T> {
    * @param a the Arc to add
    */
   public void addOutgoing(VariantGraphArc<T> a) throws MVDException {
-    if (!disjoint(a.versions, outgoingSet))
+    if (!disjoint(a.versions, outgoingSet)) {
       throw new MVDException("There is already an outgoing arc with that version");
+    }
     outgoing.add(a);
     outgoingSet.addAll(a.versions);
     printedOutgoing.addAll(a.versions);
@@ -151,8 +153,9 @@ public class VariantGraphNode<T> {
    * @param a the Arc to add
    */
   public void addIncoming(VariantGraphArc<T> a) throws MVDException {
-    if (!disjoint(a.versions, incomingSet))
+    if (!disjoint(a.versions, incomingSet)) {
       throw new MVDException("There is already an incoming arc with that version");
+    }
     assert a.from != this;
     incoming.add(a);
     incomingSet.addAll(a.versions);
@@ -205,8 +208,9 @@ public class VariantGraphNode<T> {
    */
   public void printArc(VariantGraphArc<T> a, int parentPathLen) {
     printed.removeAll(a.versions);
-    if (shortestPathToNode == 0 || parentPathLen < shortestPathToNode)
+    if (shortestPathToNode == 0 || parentPathLen < shortestPathToNode) {
       shortestPathToNode = parentPathLen;
+    }
   }
 
   /**
@@ -246,8 +250,9 @@ public class VariantGraphNode<T> {
    */
   public void printOutgoingArc(VariantGraphArc<T> a, int parentPathLen) {
     printedOutgoing.removeAll(a.versions);
-    if (shortestPathToNode == 0 || parentPathLen + a.dataLen() < shortestPathToNode)
+    if (shortestPathToNode == 0 || parentPathLen + a.dataLen() < shortestPathToNode) {
       shortestPathToNode = parentPathLen + a.dataLen();
+    }
   }
 
   /**
@@ -346,10 +351,11 @@ public class VariantGraphNode<T> {
    * this is the start node then return the outgoing set.
    */
   public Set<Witness> getVersions() {
-    if (incoming.size() > 0)
+    if (incoming.size() > 0) {
       return incomingSet;
-    else
+    } else {
       return outgoingSet;
+    }
   }
 
   /**
@@ -367,8 +373,9 @@ public class VariantGraphNode<T> {
     if (this != subgraph.end) {
       for (int i = 0; i < outgoing.size(); i++) {
         VariantGraphArc<T> a = outgoing.get(i);
-        if (!disjoint(a.versions, subgraph.constraint))
+        if (!disjoint(a.versions, subgraph.constraint)) {
           constrainedArcs.add(a);
+        }
       }
     }
     return constrainedArcs.listIterator();
@@ -403,8 +410,9 @@ public class VariantGraphNode<T> {
     ListIterator<VariantGraphArc<T>> iter = incoming.listIterator();
     while (iter.hasNext()) {
       VariantGraphArc<T> a = iter.next();
-      if (a.versions.contains(version))
+      if (a.versions.contains(version)) {
         return a;
+      }
     }
     return null;
   }
@@ -419,8 +427,9 @@ public class VariantGraphNode<T> {
     ListIterator<VariantGraphArc<T>> iter = outgoing.listIterator();
     while (iter.hasNext()) {
       VariantGraphArc<T> a = iter.next();
-      if (a.versions.contains(version))
+      if (a.versions.contains(version)) {
         return a;
+      }
     }
     return null;
   }
@@ -432,10 +441,11 @@ public class VariantGraphNode<T> {
    * @param b the new outgoing arc
    */
   public void replaceOutgoing(VariantGraphArc<T> a, VariantGraphArc<T> b) throws MVDException {
-    if (removeOutgoing(a))
+    if (removeOutgoing(a)) {
       addOutgoing(b);
-    else
+    } else {
       throw new MVDException("Failed to remove arc " + a);
+    }
   }
 
   /**
@@ -556,10 +566,11 @@ public class VariantGraphNode<T> {
    * @param b the new incoming arc
    */
   public void replaceIncoming(VariantGraphArc<T> a, VariantGraphArc<T> b) throws MVDException {
-    if (removeIncoming(a))
+    if (removeIncoming(a)) {
       addIncoming(b);
-    else
+    } else {
       throw new MVDException("Failed to remove arc " + a);
+    }
   }
 
   /**
@@ -572,8 +583,9 @@ public class VariantGraphNode<T> {
       // start- and end-node are okay!
       return;
     }
-    if (!checkArcs(incoming.listIterator(), "incoming").equals(checkArcs(outgoing.listIterator(), "outgoing")))
+    if (!checkArcs(incoming.listIterator(), "incoming").equals(checkArcs(outgoing.listIterator(), "outgoing"))) {
       throw new MVDException("Incoming and outgoing sets not equal");
+    }
   }
 
   /**
@@ -684,8 +696,9 @@ public class VariantGraphNode<T> {
     ListIterator<VariantGraphArc<T>> iter = outgoing.listIterator();
     while (iter.hasNext()) {
       VariantGraphArc<T> a = iter.next();
-      if (!disjoint(a.versions, versions))
+      if (!disjoint(a.versions, versions)) {
         return a;
+      }
     }
     return null;
   }
@@ -712,10 +725,12 @@ public class VariantGraphNode<T> {
     Set<Witness> overhang = Sets.newHashSet();
     ListIterator<VariantGraphArc<T>> iter1 = incoming.listIterator();
     ListIterator<VariantGraphArc<T>> iter2 = outgoing.listIterator();
-    while (iter1.hasNext())
+    while (iter1.hasNext()) {
       overhang.addAll(iter1.next().versions);
-    while (iter2.hasNext())
+    }
+    while (iter2.hasNext()) {
       overhang.removeAll(iter2.next().versions);
+    }
     return overhang;
   }
 
@@ -733,8 +748,9 @@ public class VariantGraphNode<T> {
       ListIterator<VariantGraphArc<T>> iter = incoming.listIterator();
       while (iter.hasNext()) {
         VariantGraphArc<T> a = iter.next();
-        if (disjoint(a.versions, selected.versions))
+        if (disjoint(a.versions, selected.versions)) {
           bs.addAll(a.versions);
+        }
       }
     }
     // else it's the start node and the clique is empty

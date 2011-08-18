@@ -95,8 +95,9 @@ public class UnattachedSet<T> extends HashSet<VariantGraphArc<T>> {
       ListIterator<VariantGraphArc<T>> iter2 = u.incomingArcs();
       while (iter2.hasNext()) {
         VariantGraphArc<T> a = iter2.next();
-        if (remove(a))
+        if (remove(a)) {
           versions.removeAll(a.versions);
+        }
       }
     }
   }
@@ -123,8 +124,9 @@ public class UnattachedSet<T> extends HashSet<VariantGraphArc<T>> {
     Iterator<VariantGraphArc<T>> iter = iterator();
     while (iter.hasNext()) {
       VariantGraphArc<T> b = iter.next();
-      if (!disjoint(b.versions, a.versions))
+      if (!disjoint(b.versions, a.versions)) {
         return b;
+      }
     }
     return null;
   }

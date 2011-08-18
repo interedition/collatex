@@ -59,13 +59,17 @@ public class tree {
    */
   edge topFirstTraverse(edge e) {
     if (e == null)
-      //first Edge searched
+    //first Edge searched
+    {
       return this.root.leftEdge;
-    else if (!e.head.leaf())
-      //down and to the left is preferred
+    } else if (!e.head.leaf())
+    //down and to the left is preferred
+    {
       return e.head.leftEdge;
-    else //e.head is a leaf
+    } else //e.head is a leaf
+    {
       return e.moveUpRight();
+    }
   }
 
   /**
@@ -77,29 +81,33 @@ public class tree {
     edge f;
     if (e == null) {
       f = this.root.leftEdge;
-      if (f != null)
+      if (f != null) {
         f = f.findBottomLeft();
+      }
       //this is the first edge of this search pattern
       return f;
     } else //e is non-null
     {
       if (e.tail.leftEdge == e)
-        // if e is a left-oriented edge, we skip the entire
-        // tree cut below e, and find least edge
+      // if e is a left-oriented edge, we skip the entire
+      // tree cut below e, and find least edge
+      {
         f = e.moveRight();
-      else
-        //if e is a right-oriented edge, we have already looked at its
-        // sibling and everything below e, so we move up
+      } else
+      //if e is a right-oriented edge, we have already looked at its
+      // sibling and everything below e, so we move up
+      {
         f = e.tail.parentEdge;
+      }
     }
     return f;
   }
 
   private void BMEcalcDownAverage(node v, edge e, double[][] D, double[][] A) {
     edge left, right;
-    if (e.head.leaf())
+    if (e.head.leaf()) {
       A[e.head.index][v.index] = D[v.index2][e.head.index2];
-    else {
+    } else {
       left = e.head.leftEdge;
       right = e.head.rightEdge;
       A[e.head.index][v.index] = 0.5 * A[left.head.index][v.index]
@@ -109,11 +117,12 @@ public class tree {
 
   private void BMEcalcUpAverage(node v, edge e, double[][] D, double[][] A) {
     edge up, down;
-    if (this.root == e.tail)
+    if (this.root == e.tail) {
       A[v.index][e.head.index] = D[v.index2][e.tail.index2];
-      // for now, use convention
-      // v.index first => looking up
-      // v.index second => looking down
+    }
+    // for now, use convention
+    // v.index first => looking up
+    // v.index second => looking down
     else {
       up = e.tail.parentEdge;
       down = e.siblingEdge();
@@ -144,9 +153,9 @@ public class tree {
 
   void GMEcalcUpAverage(node v, edge e, double[][] D, double[][] A) {
     edge up, down;
-    if (null == e.tail.parentEdge)
+    if (null == e.tail.parentEdge) {
       A[v.index][e.head.index] = D[v.index2][e.tail.index2];
-    else {
+    } else {
       up = e.tail.parentEdge;
       down = e.siblingEdge();
       A[v.index][e.head.index] =
@@ -159,9 +168,9 @@ public class tree {
   private void GMEcalcDownAverage(node v, edge e, double[][] D,
                                   double[][] A) {
     edge left, right;
-    if (e.head.leaf())
+    if (e.head.leaf()) {
       A[e.head.index][v.index] = D[v.index2][e.head.index2];
-    else {
+    } else {
       left = e.head.leftEdge;
       right = e.head.rightEdge;
       A[e.head.index][v.index] =
@@ -275,15 +284,18 @@ public class tree {
       updateSubTreeAverages(A, sib, v, direction.SKEW); /*updates sib and below*/
     }
     if (null != par) {
-      if (e.tail.leftEdge == e)
+      if (e.tail.leftEdge == e) {
         updateSubTreeAverages(A, par, v, direction.LEFT); /*updates par and above*/
-      else
+      } else {
         updateSubTreeAverages(A, par, v, direction.RIGHT);
+      }
     }
-    if (null != left)
+    if (null != left) {
       updateSubTreeAverages(A, left, v, direction.UP); /*updates left and below*/
-    if (null != right)
+    }
+    if (null != right) {
       updateSubTreeAverages(A, right, v, direction.UP); /*updates right and below*/
+    }
 
     /*1-dist for e.head*/
     A[e.head.index][e.head.index] =
@@ -298,12 +310,15 @@ public class tree {
     A[v.index][e.head.index] = A[e.head.index][v.index];
     /*and distant-3 subtrees*/
     A[e.tail.index][v.index] = A[v.index][e.tail.index];
-    if (null != left)
+    if (null != left) {
       A[v.index][left.head.index] = A[left.head.index][v.index];
-    if (null != right)
+    }
+    if (null != right) {
       A[v.index][right.head.index] = A[right.head.index][v.index];
-    if (null != sib)
+    }
+    if (null != sib) {
       A[v.index][sib.head.index] = A[sib.head.index][v.index];
+    }
 
   }
 
@@ -401,10 +416,11 @@ public class tree {
                   + A[sib.head.index][v.index]) / (left.bottomsize + 1);
         }
         if (null != par) {
-          if (e.tail.leftEdge == e)
+          if (e.tail.leftEdge == e) {
             updateSubTreeAverages(A, par, v, direction.LEFT);
-          else
+          } else {
             updateSubTreeAverages(A, par, v, direction.RIGHT);
+          }
           A[left.head.index][par.head.index]
                   = A[par.head.index][left.head.index]
                   = (left.bottomsize * A[left.head.index][par.head.index]
@@ -434,10 +450,11 @@ public class tree {
                   + A[sib.head.index][v.index]) / (right.bottomsize + 1);
         }
         if (null != par) {
-          if (e.tail.leftEdge == e)
+          if (e.tail.leftEdge == e) {
             updateSubTreeAverages(A, par, v, direction.LEFT);
-          else
+          } else {
             updateSubTreeAverages(A, par, v, direction.RIGHT);
+          }
           A[right.head.index][par.head.index]
                   = A[par.head.index][right.head.index]
                   = (right.bottomsize * A[right.head.index][par.head.index]
@@ -504,12 +521,14 @@ public class tree {
         //this case is called when v has been inserted above
         //or skew to farEdge
         //do recursive calls first!
-        if (null != farEdge.head.leftEdge)
+        if (null != farEdge.head.leftEdge) {
           updatePair(A, nearEdge, farEdge.head.leftEdge, v, root, dcoeff,
                   direction.UP);
-        if (null != farEdge.head.rightEdge)
+        }
+        if (null != farEdge.head.rightEdge) {
           updatePair(A, nearEdge, farEdge.head.rightEdge, v, root,
                   dcoeff, direction.UP);
+        }
         A[farEdge.head.index][nearEdge.head.index] =
                 A[nearEdge.head.index][farEdge.head.index]
                         = A[farEdge.head.index][nearEdge.head.index]
@@ -517,12 +536,14 @@ public class tree {
                         - dcoeff * A[farEdge.head.index][root.index];
         break;
       case DOWN: //called when v has been inserted below farEdge
-        if (null != farEdge.tail.parentEdge)
+        if (null != farEdge.tail.parentEdge) {
           updatePair(A, nearEdge, farEdge.tail.parentEdge, v, root,
                   dcoeff, direction.DOWN);
+        }
         sib = farEdge.siblingEdge();
-        if (null != sib)
+        if (null != sib) {
           updatePair(A, nearEdge, sib, v, root, dcoeff, direction.UP);
+        }
         A[farEdge.head.index][nearEdge.head.index] =
                 A[nearEdge.head.index][farEdge.head.index]
                         = A[farEdge.head.index][nearEdge.head.index]
@@ -540,12 +561,14 @@ public class tree {
         A[newNode.index][nearEdge.head.index] =
                 A[nearEdge.head.index][newNode.index] =
                         A[nearEdge.head.index][root.index];
-        if (null != nearEdge.head.leftEdge)
+        if (null != nearEdge.head.leftEdge) {
           updateSubTree(A, nearEdge.head.leftEdge, v, root, newNode,
                   0.5 * dcoeff, direction.UP);
-        if (null != nearEdge.head.rightEdge)
+        }
+        if (null != nearEdge.head.rightEdge) {
           updateSubTree(A, nearEdge.head.rightEdge, v, root, newNode,
                   0.5 * dcoeff, direction.UP);
+        }
         updatePair(A, nearEdge, nearEdge, v, root, dcoeff, direction.UP);
         break;
       case DOWN: //newNode is below the edge nearEdge
@@ -555,12 +578,14 @@ public class tree {
                         0.5 * (A[nearEdge.head.index][root.index]
                                 + A[v.index][nearEdge.head.index]);
         sib = nearEdge.siblingEdge();
-        if (null != sib)
+        if (null != sib) {
           updateSubTree(A, sib, v, root, newNode, 0.5 * dcoeff,
                   direction.SKEW);
-        if (null != nearEdge.tail.parentEdge)
+        }
+        if (null != nearEdge.tail.parentEdge) {
           updateSubTree(A, nearEdge.tail.parentEdge, v, root,
                   newNode, 0.5 * dcoeff, direction.DOWN);
+        }
         updatePair(A, nearEdge, nearEdge, v, root, dcoeff, direction.DOWN);
         break;
       case SKEW: //newNode is neither above nor below nearEdge
@@ -569,12 +594,14 @@ public class tree {
                 A[nearEdge.head.index][newNode.index] =
                         0.5 * (A[nearEdge.head.index][root.index] +
                                 A[nearEdge.head.index][v.index]);
-        if (null != nearEdge.head.leftEdge)
+        if (null != nearEdge.head.leftEdge) {
           updateSubTree(A, nearEdge.head.leftEdge, v, root,
                   newNode, 0.5 * dcoeff, direction.SKEW);
-        if (null != nearEdge.head.rightEdge)
+        }
+        if (null != nearEdge.head.rightEdge) {
           updateSubTree(A, nearEdge.head.rightEdge, v, root,
                   newNode, 0.5 * dcoeff, direction.SKEW);
+        }
         updatePair(A, nearEdge, nearEdge, v, root, dcoeff, direction.UP);
     }
   }
@@ -592,15 +619,23 @@ public class tree {
     left = e.head.leftEdge;
     right = e.head.rightEdge;
     if (null != left) // updates left and below
+    {
       updateSubTree(A, left, v, e.head, newNode, 0.25, direction.UP);
+    }
     if (null != right) // updates right and below
+    {
       updateSubTree(A, right, v, e.head, newNode, 0.25, direction.UP);
+    }
     sib = e.siblingEdge();
     if (null != sib) // updates sib and below
+    {
       updateSubTree(A, sib, v, e.head, newNode, 0.25, direction.SKEW);
+    }
     par = e.tail.parentEdge;
     if (null != par) // updates par and above
+    {
       updateSubTree(A, par, v, e.head, newNode, 0.25, direction.DOWN);
+    }
     /*must change values A[e.head][*] last, as they are used to update
              the rest of the matrix*/
     A[newNode.index][e.head.index] = A[e.head.index][newNode.index]
@@ -799,11 +834,11 @@ public class tree {
       if (e.head.leaf()) {
         while (null != f) {
           if (exclude != f) {
-            if (f.head.leaf())
+            if (f.head.leaf()) {
               A[e.head.index][f.head.index] =
                       A[f.head.index][e.head.index] =
                               D[e.head.index2][f.head.index2];
-            else {
+            } else {
               g = f.head.leftEdge;
               h = f.head.rightEdge;
               A[e.head.index][f.head.index] =
@@ -813,12 +848,15 @@ public class tree {
                                       / f.bottomsize;
             }
           } else //exclude == f
+          {
             exclude = exclude.tail.parentEdge;
+          }
           f = depthFirstTraverse(f);
         }
       } else
-        //e.head is not a leaf, so we go recursively to
-        //values calculated for the nodes below e
+      //e.head is not a leaf, so we go recursively to
+      //values calculated for the nodes below e
+      {
         while (null != f) {
           if (exclude != f) {
             g = e.head.leftEdge;
@@ -828,18 +866,21 @@ public class tree {
                             (g.bottomsize * A[f.head.index][g.head.index]
                                     + h.bottomsize * A[f.head.index][h.head.index])
                                     / e.bottomsize;
-          } else
+          } else {
             exclude = exclude.tail.parentEdge;
+          }
           f = depthFirstTraverse(f);
         }
+      }
       /*now we move to fill up the rest of the table: we want
              A[e.head.index][f.head.index] for those cases where e is an
              ancestor of f, or vice versa.  We'll do this by choosing e via a
              depth first-search, and the recursing for f up the path to the
              root*/
       f = e.tail.parentEdge;
-      if (null != f)
+      if (null != f) {
         fillTableUp(e, f, A, D);
+      }
       e = depthFirstTraverse(e);
     }
 
@@ -860,11 +901,11 @@ public class tree {
   void fillTableUp(edge e, edge f, double[][] A, double[][] D) {
     edge g, h;
     if (root == f.tail) {
-      if (e.head.leaf())
+      if (e.head.leaf()) {
         A[e.head.index][f.head.index] =
                 A[f.head.index][e.head.index] =
                         D[e.head.index2][f.tail.index2];
-      else {
+      } else {
         g = e.head.leftEdge;
         h = e.head.rightEdge;
         A[e.head.index][f.head.index] =
@@ -948,13 +989,15 @@ public class tree {
     location[e.head.index + 1] =
             NNIEdgeTest(e, avgDistArray, weights, e.head.index + 1);
     if (direction.NONE == location[e.head.index + 1]) {
-      if (direction.NONE != tloc)
+      if (direction.NONE != tloc) {
         p.popHeap(q, weights, possibleSwaps--, q.p[e.head.index + 1]);
+      }
     } else {
-      if (direction.NONE == tloc)
+      if (direction.NONE == tloc) {
         p.pushHeap(q, weights, possibleSwaps++, q.p[e.head.index + 1]);
-      else
+      } else {
         p.reHeapElement(q, weights, possibleSwaps, q.p[e.head.index + 1]);
+      }
     }
     return possibleSwaps;
   }
@@ -966,8 +1009,9 @@ public class tree {
     double D_LR, D_LU, D_LD, D_RD, D_RU, D_DU;
     double w1, w2, w0;
 
-    if (e.tail.leaf() || e.head.leaf())
+    if (e.tail.leaf() || e.head.leaf()) {
       return direction.NONE;
+    }
     lambda = new double[3];
     ;
     a = e.tail.parentEdge.topsize;
@@ -1015,10 +1059,11 @@ public class tree {
     edge par, fixed;
     edge skew, swap;
 
-    if (direction.LEFT == d)
+    if (direction.LEFT == d) {
       swap = e.head.leftEdge;
-    else
+    } else {
       swap = e.head.rightEdge;
+    }
     skew = e.siblingEdge();
     fixed = swap.siblingEdge();
     par = e.tail.parentEdge;
@@ -1027,14 +1072,16 @@ public class tree {
     swap.tail = e.tail;
     skew.tail = e.head;
 
-    if (direction.LEFT == d)
+    if (direction.LEFT == d) {
       e.head.leftEdge = skew;
-    else
+    } else {
       e.head.rightEdge = skew;
-    if (skew == e.tail.rightEdge)
+    }
+    if (skew == e.tail.rightEdge) {
       e.tail.rightEdge = swap;
-    else
+    } else {
       e.tail.leftEdge = swap;
+    }
     //both topsize and bottomsize change for e, but nowhere else
     e.topsize = par.topsize + swap.bottomsize;
     e.bottomsize = fixed.bottomsize + skew.bottomsize;
@@ -1115,10 +1162,11 @@ public class tree {
     edge e;
     e = depthFirstTraverse(null);
     while (null != e) {
-      if (e.head.leaf() || e.tail.leaf())
+      if (e.head.leaf() || e.tail.leaf()) {
         e.OLSext(A);
-      else
+      } else {
         e.OLSint(A);
+      }
       e = depthFirstTraverse(e);
     }
   }
@@ -1130,10 +1178,10 @@ public class tree {
     e = root.leftEdge;
     f = depthFirstTraverse(null);
     while (null != f) {
-      if (f.head.leaf())
+      if (f.head.leaf()) {
         A[e.head.index][f.head.index] = A[f.head.index][e.head.index]
                 = D[e.tail.index2][f.head.index2];
-      else {
+      } else {
         u = f.head.leftEdge.head;
         v = f.head.rightEdge.head;
         A[e.head.index][f.head.index] = A[f.head.index][e.head.index]
@@ -1145,14 +1193,14 @@ public class tree {
     while (root.leftEdge != e) {
       f = exclude = e;
       while (root.leftEdge != f) {
-        if (f == exclude)
+        if (f == exclude) {
           exclude = exclude.tail.parentEdge;
-        else if (e.head.leaf()) {
-          if (f.head.leaf())
+        } else if (e.head.leaf()) {
+          if (f.head.leaf()) {
             A[e.head.index][f.head.index] =
                     A[f.head.index][e.head.index]
                             = D[e.head.index2][f.head.index2];
-          else {
+          } else {
             //since f is chosen using a
             // depth-first search, other values
             // have been calculated
@@ -1258,8 +1306,9 @@ public class tree {
     edge f;
     double D_LR, D_LU, D_LD, D_RD, D_RU, D_DU;
     double w1, w2, w0;
-    if (e.tail.leaf() || e.head.leaf())
+    if (e.tail.leaf() || e.head.leaf()) {
       return direction.NONE;
+    }
     f = e.siblingEdge();
     D_LR = A[e.head.leftEdge.head.index][e.head.rightEdge.head.index];
     D_LU = A[e.head.leftEdge.head.index][e.tail.index];
@@ -1309,10 +1358,11 @@ public class tree {
     }
     swap.tail = u;
     down.tail = v;
-    if (e.tail.leftEdge == e)
+    if (e.tail.leftEdge == e) {
       u.rightEdge = swap;
-    else
+    } else {
       u.leftEdge = swap;
+    }
     bNNIupdateAverages(A, v, e.tail.parentEdge, down, swap, fixed);
   }
 
@@ -1323,13 +1373,15 @@ public class tree {
     location[e.head.index + 1] =
             bNNIEdgeTest(e, avgDistArray, weights, e.head.index + 1);
     if (direction.NONE == location[e.head.index + 1]) {
-      if (direction.NONE != tloc)
+      if (direction.NONE != tloc) {
         p.popHeap(q, weights, possibleSwaps--, q.p[e.head.index + 1]);
+      }
     } else {
-      if (direction.NONE == tloc)
+      if (direction.NONE == tloc) {
         p.pushHeap(q, weights, possibleSwaps++, q.p[e.head.index + 1]);
-      else
+      } else {
         p.reHeapElement(q, weights, possibleSwaps, q.p[e.head.index + 1]);
+      }
     }
     return possibleSwaps;
   }
@@ -1338,10 +1390,11 @@ public class tree {
     edge e;
     e = depthFirstTraverse(null);
     while (null != e) {
-      if (e.head.leaf() || e.tail.leaf())
+      if (e.head.leaf() || e.tail.leaf()) {
         e.WFext(A);
-      else
+      } else {
         e.WFint(A);
+      }
       e = depthFirstTraverse(e);
     }
   }
@@ -1350,10 +1403,11 @@ public class tree {
     edge e;
     e = depthFirstTraverse(null);
     while (null != e) {
-      if (e.head.leaf() || e.tail.leaf())
+      if (e.head.leaf() || e.tail.leaf()) {
         e.BalWFext(A);
-      else
+      } else {
         e.BalWFint(A);
+      }
       e = depthFirstTraverse(e);
     }
   }
@@ -1385,12 +1439,14 @@ public class tree {
     switch (d) {
       case UP: //rootEdge is below the center edge of the NNI
         //recursive calls to subtrees, if necessary
-        if (null != rootEdge.head.leftEdge)
+        if (null != rootEdge.head.leftEdge) {
           updateSubTreeAfterNNI(A, v, rootEdge.head.leftEdge,
                   closer, further, 0.5 * dcoeff, direction.UP);
-        if (null != rootEdge.head.rightEdge)
+        }
+        if (null != rootEdge.head.rightEdge) {
           updateSubTreeAfterNNI(A, v, rootEdge.head.rightEdge,
                   closer, further, 0.5 * dcoeff, direction.UP);
+        }
         updatePair(A, rootEdge, rootEdge, closer, further, dcoeff,
                 direction.UP);
         sib = v.parentEdge.siblingEdge();
@@ -1401,12 +1457,14 @@ public class tree {
         break;
       case DOWN: // rootEdge is above the center edge of the NNI
         sib = rootEdge.siblingEdge();
-        if (null != sib)
+        if (null != sib) {
           updateSubTreeAfterNNI(A, v, sib, closer, further,
                   0.5 * dcoeff, direction.SKEW);
-        if (null != rootEdge.tail.parentEdge)
+        }
+        if (null != rootEdge.tail.parentEdge) {
           updateSubTreeAfterNNI(A, v, rootEdge.tail.parentEdge,
                   closer, further, 0.5 * dcoeff, direction.DOWN);
+        }
         updatePair(A, rootEdge, rootEdge, closer, further, dcoeff,
                 direction.DOWN);
         A[rootEdge.head.index][v.index] =
@@ -1415,12 +1473,14 @@ public class tree {
                                 0.5 * A[rootEdge.head.index][v.rightEdge.head.index];
         break;
       case SKEW: // rootEdge is in subtree skew to v
-        if (null != rootEdge.head.leftEdge)
+        if (null != rootEdge.head.leftEdge) {
           updateSubTreeAfterNNI(A, v, rootEdge.head.leftEdge,
                   closer, further, 0.5 * dcoeff, direction.SKEW);
-        if (null != rootEdge.head.rightEdge)
+        }
+        if (null != rootEdge.head.rightEdge) {
           updateSubTreeAfterNNI(A, v, rootEdge.head.rightEdge,
                   closer, further, 0.5 * dcoeff, direction.SKEW);
+        }
         updatePair(A, rootEdge, rootEdge, closer, further, dcoeff,
                 direction.UP);
         A[rootEdge.head.index][v.index] =
@@ -1444,10 +1504,11 @@ public class tree {
    * @param ofile name of the output file
    */
   public void NewickPrintTree(PrintStream out) throws Exception {
-    if (root.leaf())
+    if (root.leaf()) {
       NewickPrintBinaryTree(out);
-    else
+    } else {
       NewickPrintTrinaryTree(out);
+    }
 
   }
 
@@ -1473,8 +1534,9 @@ public class tree {
     out.write(':');
     out.write(nf.format(e.distance).getBytes());
     out.write(')');
-    if (null != rootchild.label)
+    if (null != rootchild.label) {
       out.write(rootchild.label.getBytes());
+    }
     out.write(';');
     out.write('\n');
   }
@@ -1497,8 +1559,9 @@ public class tree {
       NewickPrintSubtree(f, out);
       out.write(')');
     }
-    if (null != root.label)
+    if (null != root.label) {
       out.write(root.label.getBytes());
+    }
     out.write(';');
     out.write('\n');
   }

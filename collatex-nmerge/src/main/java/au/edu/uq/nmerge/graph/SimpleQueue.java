@@ -50,13 +50,14 @@ public class SimpleQueue<E> {
    * @return the head of the queue
    */
   public E poll() {
-    if (head == null)
+    if (head == null) {
       return null;
-    else {
+    } else {
       Item i = head;
       head = head.next;
-      if (head == null)
+      if (head == null) {
         tail = null;
+      }
       size--;
       return i.item;
     }
@@ -69,9 +70,9 @@ public class SimpleQueue<E> {
    */
   public void add(E item) {
     Item i = new Item(item);
-    if (head == null)
+    if (head == null) {
       head = tail = i;
-    else {
+    } else {
       tail.next = i;
       tail = i;
     }
@@ -96,8 +97,9 @@ public class SimpleQueue<E> {
   public boolean contains(E thing) {
     Item i = head;
     while (i != null) {
-      if (i.item.equals(thing))
+      if (i.item.equals(thing)) {
         return true;
+      }
       i = i.next;
     }
     return false;

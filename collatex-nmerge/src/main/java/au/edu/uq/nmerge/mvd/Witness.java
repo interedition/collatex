@@ -56,7 +56,7 @@ public class Witness {
   @Override
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof Witness) {
-      return siglum.equals(((Witness)obj).siglum);
+      return siglum.equals(((Witness) obj).siglum);
     }
     return super.equals(obj);
   }

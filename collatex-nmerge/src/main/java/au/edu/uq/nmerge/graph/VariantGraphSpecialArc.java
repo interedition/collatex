@@ -91,9 +91,9 @@ public class VariantGraphSpecialArc<T> extends VariantGraphArc<T> implements Com
    * get duplicates
    */
   public boolean equals(Object other) {
-    if (!(other instanceof VariantGraphSpecialArc<?>))
+    if (!(other instanceof VariantGraphSpecialArc<?>)) {
       return false;
-    else {
+    } else {
       VariantGraphSpecialArc<?> otherArc = (VariantGraphSpecialArc<?>) other;
       boolean result = super.equals(other) && position == otherArc.position;
       //if ( result )
@@ -130,40 +130,47 @@ public class VariantGraphSpecialArc<T> extends VariantGraphArc<T> implements Com
           return result;
         }
       }
-      if (oneLen < twoLen)
+      if (oneLen < twoLen) {
         return 1;
-      else if (oneLen > twoLen)
+      } else if (oneLen > twoLen) {
         return -1;
-      else if (this.equals(o))
+      } else if (this.equals(o)) {
         return 0;
-        // data equal: compare the from nodes and to nodes
+      }
+      // data equal: compare the from nodes and to nodes
       else if (this.from != null) {
         if (o.from != null) {
-          if (this.from.nodeId > o.from.nodeId)
+          if (this.from.nodeId > o.from.nodeId) {
             return -1;
-          else if (this.from.nodeId != o.from.nodeId)
+          } else if (this.from.nodeId != o.from.nodeId) {
             return 1;
-            // from nodes equal, try to nodes
+          }
+          // from nodes equal, try to nodes
           else if (this.to != null) {
             if (o.to != null) {
-              if (this.to.nodeId > o.to.nodeId)
+              if (this.to.nodeId > o.to.nodeId) {
                 return -1;
-              else if (this.to.nodeId < o.to.nodeId)
+              } else if (this.to.nodeId < o.to.nodeId) {
                 return 1;
-              else
+              } else {
                 return 0;
-            } else
+              }
+            } else {
               return -1;
-          } else if (o.to != null)
+            }
+          } else if (o.to != null) {
             return 1;
-          else
+          } else {
             return 0;
-        } else
+          }
+        } else {
           return -1;
-      } else if (o.from != null)
+        }
+      } else if (o.from != null) {
         return 1;
-      else
+      } else {
         return 0;
+      }
     }
     return mumValue;
   }

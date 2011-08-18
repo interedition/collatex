@@ -142,9 +142,9 @@ public class Variant<T> implements Comparable<Variant<T>> {
    * @return true if they are 'equal'
    */
   public boolean equalsContent(Variant<?> other) {
-    if (!this.collation.equals(other.collation))
+    if (!this.collation.equals(other.collation)) {
       return false;
-    else {
+    } else {
       return this.data.equals(other.data);
     }
   }
@@ -209,9 +209,9 @@ public class Variant<T> implements Comparable<Variant<T>> {
       // another quick test to shortcut the computation
       if (startIndex == other.startIndex
               && (startOffset < other.startOffset
-              || (startOffset - other.startOffset) + length > other.length))
+              || (startOffset - other.startOffset) + length > other.length)) {
         return false;
-      else {
+      } else {
         // OK, we have some work to do ...
         // find the start of this variant in other
         int offset = other.startOffset;
@@ -229,8 +229,9 @@ public class Variant<T> implements Comparable<Variant<T>> {
             i++;
           }
           // found start?
-          if (index == startIndex && offset == startOffset)
+          if (index == startIndex && offset == startOffset) {
             return other.length - i >= length;
+          }
         }
       }
     }
@@ -244,27 +245,27 @@ public class Variant<T> implements Comparable<Variant<T>> {
    * @param other the variant to compare ourselves to
    */
   public int compareTo(Variant<T> other) {
-    if (this.startIndex < other.startIndex)
+    if (this.startIndex < other.startIndex) {
       return -1;
-    else if (this.startIndex > other.startIndex)
+    } else if (this.startIndex > other.startIndex) {
       return 1;
-    else if (this.startOffset < other.startOffset)
+    } else if (this.startOffset < other.startOffset) {
       return -1;
-    else if (this.startOffset > other.startOffset)
+    } else if (this.startOffset > other.startOffset) {
       return 1;
-    else if (this.length < other.length)
+    } else if (this.length < other.length) {
       return -1;
-    else if (this.length > other.length)
+    } else if (this.length > other.length) {
       return 1;
-    else {
+    } else {
       // FIXME: What is a proper ordering of witness sets?
       final Joiner joiner = Joiner.on(',');
       String thisV = joiner.join(versions);
       String thatV = joiner.join(other.versions);
       int res = thisV.compareTo(thatV);
-      if (res != 0)
+      if (res != 0) {
         return res;
-      else {
+      } else {
         // FIXME: introduce token comparator to do a proper comparison
         return Iterables.toString(data).compareTo(Iterables.toString(other.data));
       }

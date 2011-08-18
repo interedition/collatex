@@ -40,8 +40,9 @@ class set {
    */
   void addToSet(node v) {
     set current = this;
-    while (current.next != null)
+    while (current.next != null) {
       current = current.next;
+    }
     current.next = new set(v);
   }
 }

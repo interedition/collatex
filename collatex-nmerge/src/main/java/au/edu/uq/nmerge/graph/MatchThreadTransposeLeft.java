@@ -88,7 +88,8 @@ public class MatchThreadTransposeLeft<T> extends MatchThreadDirect<T> {
         }
       }
     }
-    if (!extended)
+    if (!extended) {
       mismatch();
+    }
   }
 }

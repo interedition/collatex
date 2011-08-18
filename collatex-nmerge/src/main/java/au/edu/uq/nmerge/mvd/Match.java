@@ -21,7 +21,7 @@
 package au.edu.uq.nmerge.mvd;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Iterables;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 import java.util.Collections;
@@ -51,7 +51,7 @@ public class Match<T> {
    * Create a basic pair
    *
    * @param witnesses its versions
-   * @param tokens     its data
+   * @param tokens    its data
    */
   public Match(Set<Witness> witnesses, List<T> tokens) {
     this.witnesses = witnesses;
@@ -161,7 +161,7 @@ public class Match<T> {
     return Objects.toStringHelper(this)
             .add("witnesses", witnesses)
             .add("parent", parent)
-            .add("children", children)
+            .add("children", children.size())
             .add("tokens", tokens)
             .toString();
   }
@@ -181,10 +181,11 @@ public class Match<T> {
    * @return this pair's data or that of its parent
    */
   public List<T> getTokens() {
-    if (parent != null)
+    if (parent != null) {
       return parent.getTokens();
-    else
+    } else {
       return tokens;
+    }
   }
 
   /**
@@ -209,5 +210,19 @@ public class Match<T> {
       }
     }
     return null;
+  }
+
+  public static class WitnessPredicate implements Predicate<Match> {
+
+    private final Witness witness;
+
+    public WitnessPredicate(Witness witness) {
+      this.witness = witness;
+    }
+
+    @Override
+    public boolean apply(Match input) {
+      return input.witnesses.contains(witness);
+    }
   }
 }

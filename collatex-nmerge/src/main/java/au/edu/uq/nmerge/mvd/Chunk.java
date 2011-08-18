@@ -63,9 +63,9 @@ public class Chunk<T> {
   /**
    * Create a new Chunk
    *
-   * @param id       the parent or child id or 0
-   * @param cs       an initial set of chunk states
-   * @param tokens     the data to add
+   * @param id     the parent or child id or 0
+   * @param cs     an initial set of chunk states
+   * @param tokens the data to add
    */
   public Chunk(int id, ChunkState[] cs, List<T> tokens) {
     this.id = id;
@@ -79,8 +79,9 @@ public class Chunk<T> {
    * @param state the state to add
    */
   public void addState(ChunkState state) {
-    if (state != ChunkState.NONE)
+    if (state != ChunkState.NONE) {
       states.add(state);
+    }
   }
 
   /**
@@ -104,7 +105,6 @@ public class Chunk<T> {
   /**
    * Overlay a match onto an array of chunks. Return the modified
    * chunk array.
-   *
    *
    * @param hit    the match to overlay
    * @param chunks an array of chunks

@@ -190,10 +190,12 @@ public class MatchThreadDirect<T> implements Runnable {
       // at least one character. If we were the first such
       // incarnation of run(), matching 0 characters is in any case
       // uninteresting. See also the updateArc method.
-      if (first > 0)
+      if (first > 0) {
         mismatch();
-    } else
+      }
+    } else {
       updateArc();
+    }
   }
 
   /**
@@ -240,15 +242,18 @@ public class MatchThreadDirect<T> implements Runnable {
       T dataPrevChar = mum.arc.getData().get(prevCharIndex);
       if (prevCharIndex >= 0) {
         Set<Witness> pathVersions = Sets.newHashSet();
-        if (versions != null)
+        if (versions != null) {
           pathVersions.addAll(versions);
+        }
         pathVersions.retainAll(arc.versions);
         for (PrevChar<T> pc : prevChars) {
-          if (pc == null)
+          if (pc == null) {
             Errors.LOG.error("null", new Exception());
+          }
           // FIXME: introduce token comparator instead of equals()
-          if (pc.previous.equals(dataPrevChar) && !disjoint(pc.versions, pathVersions))
+          if (pc.previous.equals(dataPrevChar) && !disjoint(pc.versions, pathVersions)) {
             return false;
+          }
         }
       }
     }
@@ -283,8 +288,9 @@ public class MatchThreadDirect<T> implements Runnable {
     }
     // important! if none of the child incarnations of run
     // matched anything BUT we did, THEN call mismatch
-    if (!extended && first > 0)
+    if (!extended && first > 0) {
       mismatch();
+    }
   }
 
   /**
@@ -297,9 +303,11 @@ public class MatchThreadDirect<T> implements Runnable {
   protected void addToPath(VariantGraphArc<T> arc) {
     if (versions == null) {
       versions = Sets.newHashSet(arc.versions);
-      if (graph != null)
+      if (graph != null) {
         versions.retainAll(graph.constraint);
-    } else
+      }
+    } else {
       versions.retainAll(arc.versions);
+    }
   }
 }

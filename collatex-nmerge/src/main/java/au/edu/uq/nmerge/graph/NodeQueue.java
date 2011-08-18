@@ -36,8 +36,9 @@ class NodeQueue<T> extends Vector<VariantGraphNode<T>> {
    */
   void push(VariantGraphNode<T> node) {
     for (int i = size() - 1; i >= 0; i--) {
-      if (get(i) == node)
+      if (get(i) == node) {
         return;
+      }
     }
     add(node);
   }

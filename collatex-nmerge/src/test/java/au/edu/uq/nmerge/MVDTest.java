@@ -29,7 +29,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.junit.Test;
 
-import java.util.Comparator;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -38,15 +39,30 @@ public class MVDTest extends AbstractTest {
 
   @Test
   public void simple() throws Exception {
+    collate(
+            "the quick brown fox has died",
+            "the quick fox got blue rabies and has died",
+            "the quick blue fox got lives"
+    );
+  }
+
+  @Test
+  public void transposition() throws Exception {
+    collate(
+            "T R A N S A A A B B B",
+            "A A A B B B T R A N S "
+    );
+
+  }
+
+  protected void collate(String... witnessContents) throws Exception {
     final Collation<String> collation = new Collation<String>("Test", Ordering.<String>natural(), "");
 
-    final Witness a = new Witness("A");
-    final Witness b = new Witness("B");
-    final Witness c = new Witness("C");
-
-    collation.add(a, Lists.newArrayList("the", "quick", "brown", "fox", "has", "died"));
-    collation.add(b, Lists.newArrayList("the", "quick", "fox", "got", "blue", "rabies", "and", "has", "died"));
-    collation.add(c, Lists.newArrayList("the", "quick", "blue", "fox", "got", "lives"));
+    final List<Witness> witnesses = Lists.newArrayListWithExpectedSize(witnessContents.length);
+    int sigil = 0;
+    for (String witness : witnessContents) {
+      witnesses.add(collation.add(new Witness("W" + Integer.toString(++sigil)), tokenize(witness)));
+    }
 
     for (Match<String> m : collation.getMatches()) {
       LOG.debug(m.toString());
@@ -57,11 +73,20 @@ public class MVDTest extends AbstractTest {
     LOG.debug("\n" + graph.toString());
 
     for (Witness w : collation.getWitnesses()) {
-      LOG.debug(Iterables.toString(collation.getVersion(w)));
+      LOG.debug("{}: {}", w, Iterables.toString(collation.getVersion(w)));
     }
 
-    for (Chunk<String> ch : collation.compare(a, b, ChunkState.DELETED)) {
+    final Witness base = witnesses.get(0);
+    for (Chunk<String> ch : collation.compare(base, witnesses.get(1), ChunkState.ADDED)) {
       LOG.debug(ch.toString());
     }
+
+    for (Variant<String> v : collation.getApparatus(base, 0, collation.getVersion(base).size())) {
+      LOG.debug(v.toString());
+    }
+  }
+
+  protected List<String> tokenize(String str) {
+    return Arrays.asList(str.split("\\s+"));
   }
 }

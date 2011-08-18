@@ -145,8 +145,9 @@ public class SuffixTree<T> {
    */
   private int getNodeLabelEnd(SuffixTreeNode node) {
     // if it's a leaf - return e
-    if (node.children == null)
+    if (node.children == null) {
       return virtualEnd;
+    }
     // if it's not a leaf - return its real end
     return node.edgeLabelEnd;
   }
@@ -182,11 +183,13 @@ public class SuffixTree<T> {
    */
   void connectSiblings(SuffixTreeNode leftSib, SuffixTreeNode rightSib) {
     // connect the right node as the right sibling of the left node
-    if (leftSib != null)
+    if (leftSib != null) {
       leftSib.rightSibling = rightSib;
+    }
     // connect the left node as the left sibling of the right node
-    if (rightSib != null)
+    if (rightSib != null) {
       rightSib.leftSibling = leftSib;
+    }
   }
 
   /**
@@ -221,8 +224,9 @@ public class SuffixTree<T> {
       newLeaf = new SuffixTreeNode(node, edgeLabelBegin, edgeLabelEnd, pathPos);
       // connect newLeaf (4) as the new son of node (1)
       son = node.children;
-      while (son.rightSibling != null)
+      while (son.rightSibling != null) {
         son = son.rightSibling;
+      }
       connectSiblings(son, newLeaf);
       // return (4)
       return newLeaf;
@@ -246,8 +250,9 @@ public class SuffixTree<T> {
     connectSiblings(newInternal, node.rightSibling);
     node.leftSibling = null;
     // connect (3) with (1)'s father
-    if (newInternal.parent.children == node)
+    if (newInternal.parent.children == node) {
       newInternal.parent.children = newInternal;
+    }
     // connect newLeaf (2) and node (1) as sons of newInternal (3)
     newInternal.children = node;
     node.parent = newInternal;
@@ -299,8 +304,9 @@ public class SuffixTree<T> {
       if (length <= strLen) {
         trv.charsFound = length;
         trv.edgePos = length - 1;
-        if (length < strLen)
+        if (length < strLen) {
           trv.searchDone = false;
+        }
       } else {
         trv.charsFound = strLen;
         trv.edgePos = strLen - 1;
@@ -308,8 +314,9 @@ public class SuffixTree<T> {
       return node;
     } else {
       // find minimum out of edge length and string length, and scan it
-      if (strLen < length)
+      if (strLen < length) {
         length = strLen;
+      }
 
       for (trv.edgePos = 1, trv.charsFound = 1; trv.edgePos < length;
            trv.charsFound++, trv.edgePos++) {
@@ -324,8 +331,10 @@ public class SuffixTree<T> {
     // the loop has advanced edgePos one too much
     trv.edgePos--;
     if ((trv.charsFound) < strLen)
-      // search is not done yet
+    // search is not done yet
+    {
       trv.searchDone = false;
+    }
     return node;
   }
 
@@ -376,8 +385,9 @@ public class SuffixTree<T> {
     SuffixTreeNode node = findChild(root, b);
     if (node != null) {
       return new SuffixTreePosition(node, node.edgeLabelStart);
-    } else
+    } else {
       return null;
+    }
   }
 
   /**
@@ -396,8 +406,9 @@ public class SuffixTree<T> {
       if (position.node != null) {
         position.edgePos = position.node.edgeLabelStart;
         return true;
-      } else
+      } else {
         return false;
+      }
     } else {
       int nodeLabelEnd = getNodeLabelEnd(position.node);
       // already matched that byte ...
@@ -407,12 +418,14 @@ public class SuffixTree<T> {
           position.edgePos = localNode.edgeLabelStart;
           position.node = localNode;
           return true;
-        } else
+        } else {
           return false;
+        }
       } else {
         boolean success = comparator.compare(source[position.edgePos + 1], b) == 0;
-        if (success)
+        if (success) {
           position.edgePos++;
+        }
         return success;
       }
     }
@@ -426,9 +439,9 @@ public class SuffixTree<T> {
    * @return the length of the matching string
    */
   int getMatchLength(SuffixTreePosition position) {
-    if (position.node == null)
+    if (position.node == null) {
       return 0;
-    else {
+    } else {
       SuffixTreeNode temp = position.node;
       int length = position.edgePos - temp.edgeLabelStart;
       temp = temp.parent;
@@ -477,9 +490,10 @@ public class SuffixTree<T> {
         // index
         return node.pathPosition;
       } else if (k > nodeLabelEnd)
-        // current edge is found to match, continue to next edge
+      // current edge is found to match, continue to next edge
+      {
         node = findChild(node, W.get(j));
-      else {
+      } else {
         // one non-matching symbols is found - W is not a substring
         return null;
       }
@@ -504,8 +518,9 @@ public class SuffixTree<T> {
     // dummy argument for trace_string function
     int charsFound = 0;
 
-    if (position.node == root)
+    if (position.node == root) {
       return position;
+    }
     // if node has no suffix link yet or in the middle of an edge - remember the
     // doesn't have edge between the node and its father (gama) and follow its
     // father's suffix link (it must have one by Ukkonen's lemma). After
@@ -586,8 +601,9 @@ public class SuffixTree<T> {
       });
     }
     // follow suffix link only if it's not the first extension after rule 3 was applied
-    if (afterRule3 == 0)
+    if (afterRule3 == 0) {
       followSuffixLink(position);
+    }
     // if node is root - trace whole string starting from the root, else -
     // trace last character only
     if (position.node == root) {
@@ -663,16 +679,19 @@ public class SuffixTree<T> {
       // applyExtensionRule2
       tmp = applyExtensionRule2(position.node, str.begin + charsFound, str.end, pathPos,
               position.edgePos, Rule2Type.SPLIT);
-      if (suffixless != null)
+      if (suffixless != null) {
         createSuffixLink(suffixless, tmp);
+      }
       // link root's sons with a single character to the root
       if (getNodeLabelLength(tmp) == 1 && tmp.parent == root) {
         tmp.largestSuffix = root;
         // marks that no internal node with no suffix link exists
         suffixless = null;
       } else
-        // mark tmp as waiting for a link
+      // mark tmp as waiting for a link
+      {
         suffixless = tmp;
+      }
 
       // prepare pos for the next extension
       position.node = tmp;
@@ -741,11 +760,13 @@ public class SuffixTree<T> {
     // recursion stopping condition
     if (node != null) {
       // recursive call for right sibling
-      if (node.rightSibling != null)
+      if (node.rightSibling != null) {
         deleteSubTree(node.rightSibling);
+      }
       // recursive call for first son
-      if (node.children != null)
+      if (node.children != null) {
         deleteSubTree(node.children);
+      }
       // encourage garbage collection
       node = null;
     }

@@ -61,8 +61,9 @@ public class ChunkStateSet {
    */
   public ChunkStateSet(ChunkStateSet set) {
     this.states = new ChunkState[set.states.length];
-    for (int i = 0; i < set.states.length; i++)
+    for (int i = 0; i < set.states.length; i++) {
       this.states[i] = set.states[i];
+    }
   }
 
   /**
@@ -82,9 +83,9 @@ public class ChunkStateSet {
    */
   public void add(ChunkState state) {
     if (!containsState(state)) {
-      if (states == null)
+      if (states == null) {
         states = new ChunkState[1];
-      else if (containsState(ChunkState.NONE)) {
+      } else if (containsState(ChunkState.NONE)) {
         for (int i = 0; i < states.length; i++) {
           if (states[i] == ChunkState.NONE) {
             states[i] = state;
@@ -94,8 +95,9 @@ public class ChunkStateSet {
       } else {
         // expand
         ChunkState[] newStates = new ChunkState[states.length + 1];
-        for (int i = 0; i < states.length; i++)
+        for (int i = 0; i < states.length; i++) {
           newStates[i] = states[i];
+        }
         states = newStates;
       }
       states[states.length - 1] = state;
@@ -137,9 +139,11 @@ public class ChunkStateSet {
    */
   public boolean containsState(ChunkState state) {
     if (states != null) {
-      for (int i = 0; i < states.length; i++)
-        if (states[i] == state)
+      for (int i = 0; i < states.length; i++) {
+        if (states[i] == state) {
           return true;
+        }
+      }
     }
     return false;
   }
@@ -206,12 +210,15 @@ public class ChunkStateSet {
   public boolean equals(ChunkStateSet other) {
     if (this.states.length == other.states.length) {
       ChunkState[] s = states;
-      for (int i = 0; i < s.length; i++)
-        if (!other.containsState(s[i]))
+      for (int i = 0; i < s.length; i++) {
+        if (!other.containsState(s[i])) {
           return false;
+        }
+      }
       return true;
-    } else
+    } else {
       return false;
+    }
   }
 
   /**

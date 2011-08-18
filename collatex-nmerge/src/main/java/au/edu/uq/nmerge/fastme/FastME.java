@@ -67,10 +67,11 @@ public class FastME {
     StringTokenizer st = new StringTokenizer(row, " ");
     node v = new node(st.nextToken(), null, -1);
     v.index2 = index;
-    if (species == null)
+    if (species == null) {
       species = new set(v);
-    else
+    } else {
       species.addToSet(v);
+    }
     for (int j = 0; j < size; j++) {
       String token = st.nextToken();
       D[index][j] = Double.parseDouble(token);
@@ -85,8 +86,9 @@ public class FastME {
   void initDoubleMatrix(int d) {
     A = new double[d][d];
     for (int i = 0; i < d; i++) {
-      for (int j = 0; j < d; j++)
+      for (int j = 0; j < d; j++) {
         A[i][j] = 0.0;
+      }
     }
   }
 
@@ -103,21 +105,24 @@ public class FastME {
     for (int i = 0; i < taxa.length; i++) {
       node v = new node(taxa[i], null, -1);
       v.index2 = i;
-      if (species == null)
+      if (species == null) {
         species = new set(v);
-      else
+      } else {
         species.addToSet(v);
+      }
     }
     initDoubleMatrix(2 * numSpecies - 2);
     T = new tree();
     switch (btype) {
       case OLS:
-        for (slooper = species; slooper != null; slooper = slooper.next)
+        for (slooper = species; slooper != null; slooper = slooper.next) {
           T.GMEaddSpecies(slooper.node, D, A);
+        }
         break;
       case BAL:
-        for (slooper = species; slooper != null; slooper = slooper.next)
+        for (slooper = species; slooper != null; slooper = slooper.next) {
           T.BMEaddSpecies(slooper.node, D, A);
+        }
         break;
     }
   }
@@ -130,29 +135,33 @@ public class FastME {
     int nniCount = 0;
     switch (ntype) {
       case OLS:
-        if (btype != balance.OLS)
+        if (btype != balance.OLS) {
           T.assignAllSizeFields();
+        }
         T.makeOLSAveragesTable(D, A);
         nniCount = T.NNI(A, nniCount);
         T.assignOLSWeights(A);
         break;
       case BAL:
-        if (btype != balance.BAL)
+        if (btype != balance.BAL) {
           T.makeBMEAveragesTable(D, A);
+        }
         nniCount = T.bNNI(A, nniCount);
         T.assignBMEWeights(A);
         break;
       case NONE:
         switch (wtype) {
           case OLS:    // default
-            if (balance.OLS != btype)
+            if (balance.OLS != btype) {
               T.assignAllSizeFields();
+            }
             T.makeOLSAveragesTable(D, A);
             T.assignOLSWeights(A);
             break;
           case BAL:
-            if (balance.BAL != btype)
+            if (balance.BAL != btype) {
               T.makeBMEAveragesTable(D, A);
+            }
             T.assignBMEWeights(A);
             break;
           default:

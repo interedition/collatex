@@ -34,16 +34,19 @@ public class heap {
 
   heap(int size) {
     p = new int[size];
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++) {
       p[i] = i;
+    }
   }
 
   int makeThreshHeap(heap q, double[] v, int arraySize, double thresh) {
     int heapsize;
     heapsize = 0;
-    for (int i = 1; i < arraySize; i++)
-      if (v[q.p[i]] < thresh)
+    for (int i = 1; i < arraySize; i++) {
+      if (v[q.p[i]] < thresh) {
         pushHeap(q, v, heapsize++, i);
+      }
+    }
     return heapsize;
   }
 
@@ -78,8 +81,9 @@ public class heap {
         here = up;
         up = here / 2;
       }
-    } else
+    } else {
       heapify(q, v, i, length);
+    }
   }
 
   /**
@@ -94,24 +98,28 @@ public class heap {
       int left = 2 * i;
       int right = 2 * i + 1;
       int smallest;
-      if ((left <= n) && (HeapArray[p[left]] < HeapArray[p[i]]))
+      if ((left <= n) && (HeapArray[p[left]] < HeapArray[p[i]])) {
         smallest = left;
-      else
+      } else {
         smallest = i;
-      if ((right <= n) && (HeapArray[p[right]] < HeapArray[p[smallest]]))
+      }
+      if ((right <= n) && (HeapArray[p[right]] < HeapArray[p[smallest]])) {
         smallest = right;
+      }
       if (smallest != i) {
         swap(q, i, smallest);
         // push smallest up the heap
         i = smallest; //check next level down
-      } else
+      } else {
         moreswap = false;
+      }
     } while (moreswap);
   }
 
   void permInverse(heap q, int length) {
-    for (int i = 0; i < length; i++)
+    for (int i = 0; i < length; i++) {
       q.p[p[i]] = i;
+    }
   }
 
   void popHeap(heap q, double[] v, int length, int i) {

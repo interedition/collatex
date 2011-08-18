@@ -58,16 +58,21 @@ public class node {
    */
   boolean leaf() {
     int count = 0;
-    if (null != parentEdge)
+    if (null != parentEdge) {
       count++;
-    if (null != leftEdge)
+    }
+    if (null != leftEdge) {
       count++;
-    if (null != rightEdge)
+    }
+    if (null != rightEdge) {
       count++;
-    if (null != middleEdge)
+    }
+    if (null != middleEdge) {
       count++;
-    if (count > 1)
+    }
+    if (count > 1) {
       return false;
+    }
     return true;
   }
 }

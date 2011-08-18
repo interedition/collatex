@@ -80,10 +80,12 @@ public class VariantGraphArc<T> {
     // may attempt to create child of a child
     if (parent != null) {
       VariantGraphArc<T> temp = parent;
-      while (temp.parent != null)
+      while (temp.parent != null) {
         temp = temp.parent;
-      if (temp != parent)
+      }
+      if (temp != parent) {
         parent = temp;
+      }
       this.parent = temp;
       parent.addChild(this);
     }
@@ -98,8 +100,9 @@ public class VariantGraphArc<T> {
    * @throws MVDException
    */
   ListIterator<VariantGraphArc<T>> childIterator() throws MVDException {
-    if (children == null)
+    if (children == null) {
       throw new MVDException("no children to arc");
+    }
     return children.listIterator(0);
   }
 
@@ -139,10 +142,11 @@ public class VariantGraphArc<T> {
    * @return the data as a byte array
    */
   public List<T> getData() {
-    if (parent != null)
+    if (parent != null) {
       return parent.data;
-    else
+    } else {
       return data;
+    }
   }
 
   /**
@@ -151,10 +155,11 @@ public class VariantGraphArc<T> {
    * @return the length as an int
    */
   public int dataLen() {
-    if (parent != null)
+    if (parent != null) {
       return parent.data.size();
-    else
+    } else {
       return data.size();
+    }
   }
 
   /**
@@ -164,10 +169,12 @@ public class VariantGraphArc<T> {
    */
   public void addVersion(Witness version) {
     versions.add(version);
-    if (to != null)
+    if (to != null) {
       to.addIncomingVersion(version);
-    if (from != null)
+    }
+    if (from != null) {
       from.addOutgoingVersion(version);
+    }
   }
 
   /**
@@ -192,29 +199,33 @@ public class VariantGraphArc<T> {
   public String toString() {
     try {
       StringBuffer sb = new StringBuffer();
-      if (from == null)
+      if (from == null) {
         sb.append("(0)");
-      else if (from.isIncomingEmpty())
+      } else if (from.isIncomingEmpty()) {
         sb.append("(s)");
-      else
+      } else {
         sb.append("(" + from.nodeId + ")");
+      }
       sb.append(Iterables.toString(versions));
       sb.append(": ");
-      if (parent != null)
+      if (parent != null) {
         sb.append("[" + parent.id + ":");
-      else if (children != null)
+      } else if (children != null) {
         sb.append("{" + id + ":");
+      }
       sb.append(Iterables.toString(getData()));
-      if (parent != null)
+      if (parent != null) {
         sb.append("]");
-      else if (children != null)
+      } else if (children != null) {
         sb.append("}");
-      if (to == null)
+      }
+      if (to == null) {
         sb.append("(0)");
-      else if (to.isOutgoingEmpty())
+      } else if (to.isOutgoingEmpty()) {
         sb.append("(e)");
-      else
+      } else {
         sb.append("(" + to.nodeId + ")");
+      }
       return sb.toString();
     } catch (Exception e) {
       Errors.LOG.error(e.getMessage(), e);
@@ -236,12 +247,14 @@ public class VariantGraphArc<T> {
       arcs = new VariantGraphArc[1];
       arcs[0] = this;
     } else if (parent == null) {
-      if (children == null)
+      if (children == null) {
         arcs = splitDataArc(offset);
-      else
+      } else {
         arcs = splitParent(offset, null);
-    } else
+      }
+    } else {
       arcs = splitChild(offset);
+    }
     return arcs;
   }
 
@@ -253,8 +266,9 @@ public class VariantGraphArc<T> {
    */
   private VariantGraphArc<T>[] splitChild(int offset) throws MVDException {
     VariantGraphArc<T> splitParent = parent;
-    while (splitParent.parent != null)
+    while (splitParent.parent != null) {
       splitParent = parent;
+    }
     return splitParent.splitParent(offset, this);
   }
 
@@ -336,11 +350,11 @@ public class VariantGraphArc<T> {
   private boolean dataEquals(VariantGraphArc<?> otherArc) {
     List<T> data1 = getData();
     List<?> data2 = otherArc.getData();
-    if ((data1 == null && data2 != null) || (data1 != null && data2 == null))
+    if ((data1 == null && data2 != null) || (data1 != null && data2 == null)) {
       return false;
-    else if (data1 == null && data2 == null)
+    } else if (data1 == null && data2 == null) {
       return true;
-    else {
+    } else {
       return data1.equals(data2);
     }
   }
@@ -363,8 +377,9 @@ public class VariantGraphArc<T> {
    */
   Match<T> toPair(HashMap<VariantGraphArc<T>, Match<T>> parents, HashMap<VariantGraphArc<T>, Match<T>> orphans)
           throws MVDException {
-    if (isHint())
+    if (isHint()) {
       throw new MVDException("Ooops! hint detected!");
+    }
     Match<T> p = new Match<T>(versions, data);
     if (this.parent != null) {
       // we're a child - find our parent
@@ -372,10 +387,13 @@ public class VariantGraphArc<T> {
       if (q != null) {
         q.addChild(p);
         // if this is the last child of the parent remove it
-        if (parent.numChildren() == q.numChildren())
+        if (parent.numChildren() == q.numChildren()) {
           parents.remove(parent);
+        }
       } else    // we're orphaned for now
+      {
         orphans.put(this, p);
+      }
     } else if (children != null) {
       // we're a parent
       for (int i = 0; i < children.size(); i++) {
@@ -386,8 +404,9 @@ public class VariantGraphArc<T> {
           orphans.remove(child);
         }
       }
-      if (p.numChildren() < this.numChildren())
+      if (p.numChildren() < this.numChildren()) {
         parents.put(this, p);
+      }
     }
     return p;
   }
@@ -438,8 +457,9 @@ public class VariantGraphArc<T> {
     assert children.contains(child) :
             "removeChild: child " + child + " not found!";
     children.remove(child);
-    if (children.size() == 0)
+    if (children.size() == 0) {
       children = null;
+    }
   }
 
   /**
@@ -499,8 +519,9 @@ public class VariantGraphArc<T> {
    * @throws MVDException throw an exception if not
    */
   void verify() throws MVDException {
-    if (data == null && parent == null)
+    if (data == null && parent == null) {
       throw new MVDException("Arc data is null and shouldn't be");
+    }
   }
 
   /**
@@ -514,11 +535,13 @@ public class VariantGraphArc<T> {
       ListIterator<VariantGraphArc<T>> iter = children.listIterator(0);
       while (iter.hasNext()) {
         VariantGraphArc<T> child = iter.next();
-        if (child.versions.contains(version))
+        if (child.versions.contains(version)) {
           return true;
+        }
       }
       return false;
-    } else
+    } else {
       return false;
+    }
   }
 }

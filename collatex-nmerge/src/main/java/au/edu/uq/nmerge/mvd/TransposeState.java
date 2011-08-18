@@ -20,6 +20,8 @@
  */
 package au.edu.uq.nmerge.mvd;
 
+import com.google.common.base.Objects;
+
 /**
  * When building chunks keep track of the state of transpositions
  *
@@ -49,7 +51,12 @@ public class TransposeState {
    * any transpositions
    */
   public TransposeState() {
-    state = ChunkState.NONE;
+    this(0, ChunkState.NONE);
+  }
+
+  public TransposeState(int id, ChunkState state) {
+    this.id = id;
+    this.state = state;
   }
 
   /**
@@ -66,63 +73,50 @@ public class TransposeState {
    *
    * @return ChunkState.parent or ChunkStat.child or ChunkState.none
    */
-  public ChunkState getChunkState() {
+  public ChunkState getState() {
     return state;
+  }
+
+  public boolean isTransposed() {
+    return (state != ChunkState.NONE);
   }
 
   /**
    * Using information contained in a supplied new pair,
    * compute a new transpose state.
    *
-   * @param p   the pair to shift states in version u
-   * @param u   the first version, contained in p
-   * @param v   the version we are comparing to
+   * @param match the pair to shift states in version u
+   * @param u     the first version, contained in match
+   * @param v     the version we are comparing to
    * @return a new TransposeState or ourselves
    */
-  TransposeState next(Match<?> p, Witness u, Witness v) {
-    TransposeState repl = this;
-    boolean wasTransposed = (state == ChunkState.PARENT
-            || state == ChunkState.CHILD);
-    if (p.isChild() && !p.contains(v)
-            && p.getParent().contains(v) && !p.getParent().contains(u)) {
-      if (p.getId() == 0)
-        assignId(p.getParent());
-      repl = new TransposeState();
-      repl.id = p.getId();
-      repl.state = ChunkState.CHILD;
+  TransposeState next(Match<?> match, Witness u, Witness v) {
+    TransposeState next = this;
+
+    if (match.isChild() && !match.contains(v) && match.getParent().contains(v) && !match.getParent().contains(u)) {
+      if (match.getId() == 0) {
+        assignId(match.getParent());
+      }
+      next = new TransposeState(match.getId(), ChunkState.CHILD);
+    } else if (match.isParent() && !match.contains(v) && match.getChildInVersion(v) != null) {
+      // if it has a child in v, it might be a repetition
+      if (match.getId() == 0) {
+        assignId(match);
+      }
+      next = new TransposeState(match.getId(), ChunkState.PARENT);
+    } else if (state == ChunkState.PARENT || state == ChunkState.CHILD) {
+      // or it was a child or parent but not any more
+      next = new TransposeState();
     }
-    // if it has a child in v, it might be a repetition
-    else if (p.isParent() && !p.contains(v)
-            && p.getChildInVersion(v) != null) {
-      if (p.getId() == 0)
-        assignId(p);
-      repl = new TransposeState();
-      repl.id = p.getId();
-      repl.state = ChunkState.PARENT;
-    }
-    // or it was a child or parent but not any more
-    else if (wasTransposed)
-      repl = new TransposeState();
-    return repl;
+
+    return next;
   }
 
-  /**
-   * For debugging
-   *
-   * @return a string representation of this object
-   */
+  @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append("id=" + id + " state=" + state);
-    return sb.toString();
-  }
-
-  /**
-   * Is this a "clean" untransposed state?
-   *
-   * @return true if its chunkstate is none
-   */
-  public boolean isTransposed() {
-    return state != ChunkState.NONE;
+    return Objects.toStringHelper(this)
+            .add("id", id)
+            .add("state", state)
+            .toString();
   }
 }

@@ -118,8 +118,9 @@ public class VariantGraphMatch<T> {
             && this.data != null
             && ((VariantGraphMatch<?>) other).data != null) {
       for (int i = 0; i < length; i++) {
-        if (!m.data.get(i).equals(this.data.get(i)))
+        if (!m.data.get(i).equals(this.data.get(i))) {
           return false;
+        }
       }
       return true;
     }
@@ -133,8 +134,9 @@ public class VariantGraphMatch<T> {
    */
   void addVersion(Witness version) throws MVDException {
     VariantGraphArc<T>[] path = getMatchPath();
-    for (int i = 0; i < path.length; i++)
+    for (int i = 0; i < path.length; i++) {
       path[i].addVersion(version);
+    }
   }
 
   /**
@@ -295,8 +297,9 @@ public class VariantGraphMatch<T> {
    */
   VariantGraphNode<T> getLeftNode() throws MVDException {
     VariantGraphArc<T>[] path = getMatchPath();
-    if (path[0].from == null)
+    if (path[0].from == null) {
       Errors.LOG.error("null!", new Exception());
+    }
     return path[0].from;
   }
 
@@ -370,16 +373,17 @@ public class VariantGraphMatch<T> {
       }
     }
     // now traverse the path
-    if (a.versions.contains(newVersion) || (a.isParent() && a.hasChildInVersion(newVersion)))
+    if (a.versions.contains(newVersion) || (a.isParent() && a.hasChildInVersion(newVersion))) {
       return false;
-    else {
+    } else {
       distTravelled = 0;
       while (distTravelled < length) {
         // move to next arc
         while (posWithinArc == a.dataLen()) {
           a = a.to.pickOutgoingArc(version);
-          if (a.versions.contains(newVersion) || (a.isParent() && a.hasChildInVersion(newVersion)))
+          if (a.versions.contains(newVersion) || (a.isParent() && a.hasChildInVersion(newVersion))) {
             return false;
+          }
           posWithinArc = 0;
         }
         posWithinArc++;
@@ -438,9 +442,9 @@ public class VariantGraphMatch<T> {
     // advance byte by byte to match-end
     i = 0;
     while (i < length) {
-      if (aArc == bArc && aCurrArcIndex == bCurrArcIndex)
+      if (aArc == bArc && aCurrArcIndex == bCurrArcIndex) {
         return true;
-      else {
+      } else {
         // move to next a-arc
         while (aCurrArcIndex == aArc.dataLen()) {
           aArc = aArc.to.pickOutgoingArc(version);

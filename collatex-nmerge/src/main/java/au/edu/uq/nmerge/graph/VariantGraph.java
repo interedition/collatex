@@ -150,8 +150,9 @@ public class VariantGraph<T> {
           if (lengths.containsKey(i)) {
             Integer value = lengths.get(i);
             lengths.put(i, value.intValue() + data.size());
-          } else
+          } else {
             lengths.put(i, data.size());
+          }
         }
         a.to.printArc(a);
         printed.add(a.to);
@@ -174,8 +175,9 @@ public class VariantGraph<T> {
     while (iter.hasNext()) {
       Witness key = iter.next();
       Integer value = lengths.get(key);
-      if (value.intValue() > max.intValue())
+      if (value.intValue() > max.intValue()) {
         max = value;
+      }
     }
     return max.intValue();
   }
@@ -186,8 +188,9 @@ public class VariantGraph<T> {
    * @return the length
    */
   int length() {
-    if (maxLen == -1)
+    if (maxLen == -1) {
       maxLen = maxLength();
+    }
     return maxLen;
   }
 
@@ -197,8 +200,9 @@ public class VariantGraph<T> {
    * @return the number of bytes in the graph
    */
   int totalLen() {
-    if (maxLen == -1)
+    if (maxLen == -1) {
       maxLen = maxLength();
+    }
     return totalLen;
   }
 
@@ -219,8 +223,9 @@ public class VariantGraph<T> {
         temp.replaceOutgoing(a, b);
         a.to.replaceIncoming(a, b);
         temp = b.to;
-      } else
+      } else {
         temp = a.to;
+      }
       assert temp != null;
     }
   }
@@ -274,10 +279,12 @@ public class VariantGraph<T> {
       queue.add(start);
       while (!queue.isEmpty()) {
         VariantGraphNode<T> node = queue.poll();
-        if (node.indegree() > maxIndegree)
+        if (node.indegree() > maxIndegree) {
           maxIndegree = node.indegree();
-        if (node.outdegree() > maxOutdegree)
+        }
+        if (node.outdegree() > maxOutdegree) {
           maxOutdegree = node.outdegree();
+        }
         totalIndegree += node.indegree();
         totalOutdegree += node.outdegree();
         totalNodes++;
@@ -360,9 +367,9 @@ public class VariantGraph<T> {
         VariantGraphArc<T> a = iter.next();
         a.to.printArc(a);
         if (a.versions.contains(version)) {
-          if (a.versions.size() == 1)
+          if (a.versions.size() == 1) {
             del = a;
-          else {
+          } else {
             a.versions.remove(version);
             a.to.removeIncomingVersion(version);
             a.from.removeOutgoingVersion(version);
@@ -378,10 +385,11 @@ public class VariantGraph<T> {
         del.from.removeOutgoing(del);
         del.to.removeIncoming(del);
         // is it a child arc?
-        if (del.parent != null)
+        if (del.parent != null) {
           del.parent.removeChild(del);
-        else if (del.children != null)
+        } else if (del.children != null) {
           del.passOnData();
+        }
       }
       node.reset();
       try {

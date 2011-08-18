@@ -114,8 +114,8 @@ public class Hit<T> {
    * @return a list of Match objects
    */
   static <T> List<Hit<T>> createHits(int len, Set<Witness> versions,
-                          Collation<T> collation, int endPair, int endIndex,
-                          boolean multiple, ChunkState state) throws Exception {
+                                     Collation<T> collation, int endPair, int endIndex,
+                                     boolean multiple, ChunkState state) throws Exception {
     List<Hit<T>> hits = Lists.newArrayList();
     for (Witness i : versions) {
       // start from one byte after the match
@@ -133,8 +133,9 @@ public class Hit<T> {
       String shortName = i.siglum;
       Hit<T> m = new Hit<T>(i, offset, len, shortName, state);
       hits.add(m);
-      if (!multiple)
+      if (!multiple) {
         break;
+      }
     }
     return hits;
   }
@@ -206,10 +207,11 @@ public class Hit<T> {
   public boolean equals(Hit<T> other) {
     if (this.version != other.version
             || this.length != other.length
-            || this.offset != other.offset)
+            || this.offset != other.offset) {
       return false;
-    else
+    } else {
       return true;
+    }
   }
 
   /**

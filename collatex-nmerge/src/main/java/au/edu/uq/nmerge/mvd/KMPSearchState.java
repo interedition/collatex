@@ -71,8 +71,9 @@ public class KMPSearchState<T> {
     this.v = Sets.newHashSet(v);
     this.pos = ss.pos;
     next = new int[ss.next.length];
-    for (int i = 0; i < ss.next.length; i++)
+    for (int i = 0; i < ss.next.length; i++) {
       this.next[i] = ss.next[i];
+    }
   }
 
   /**
@@ -86,8 +87,9 @@ public class KMPSearchState<T> {
     int i = 0, j = -1;
     next[0] = -1;
     while (i < pattern.size() - 1) {
-      while (j >= 0 && ordering.compare(pattern.get(i), pattern.get(j)) != 0)
+      while (j >= 0 && ordering.compare(pattern.get(i), pattern.get(j)) != 0) {
         j = next[j];
+      }
       i++;
       j++;
       next[i] = j;
@@ -103,8 +105,9 @@ public class KMPSearchState<T> {
    */
   void append(KMPSearchState<T> list) {
     KMPSearchState<T> temp = this;
-    while (temp.following != null)
+    while (temp.following != null) {
       temp = temp.following;
+    }
     temp.following = list;
   }
 
@@ -159,8 +162,9 @@ public class KMPSearchState<T> {
       list = temp.following;    // could be null!
       temp.following = null;
     } else if (temp == null)    // it didn't find it!
+    {
       throw new MVDException("List item not found");
-    else                    // temp in the middle of the list
+    } else                    // temp in the middle of the list
     {
       previous.following = temp.following;
       temp.following = null;
@@ -198,9 +202,11 @@ public class KMPSearchState<T> {
         return true;
       }
     } else
-      // we have a mismatch -
-      // use the next array to reset pos
+    // we have a mismatch -
+    // use the next array to reset pos
+    {
       pos = next[pos];
+    }
     return false;
   }
 }

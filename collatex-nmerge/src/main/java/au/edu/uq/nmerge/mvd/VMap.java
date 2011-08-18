@@ -42,12 +42,13 @@ public class VMap<T> extends HashMap<Match<T>, Match<T>> {
         // examine all the v-pairs
         Match<T> p = matches.get(i);
         if (p.contains(v)) {
-          if (last == null)
+          if (last == null) {
             continue;
-          else if (last.isChild() && p.isChild())
+          } else if (last.isChild() && p.isChild()) {
             vMap.put(last, p);
-          else if (last.isParent() && p.isParent())
+          } else if (last.isParent() && p.isParent()) {
             vMap.put(last, p);
+          }
           last = p;
         }
       }
@@ -70,27 +71,28 @@ public class VMap<T> extends HashMap<Match<T>, Match<T>> {
    *         respective versions
    */
   boolean isContiguous(Match<T> last, Match<T> p, Witness v) {
-    if (last == null)
+    if (last == null) {
       return false;
-    else if (last.isParent()) {
+    } else if (last.isParent()) {
       // simple test: if not both parents
       // can't be contiguous
-      if (!p.isParent())
+      if (!p.isParent()) {
         return false;
-      else {
+      } else {
         // parents must have contiguous children in v
         Match<T> child1 = last.getChildInVersion(v);
         Match<T> child2 = p.getChildInVersion(v);
-        if (child1 != null && child2 != null)
+        if (child1 != null && child2 != null) {
           return get(child1) == child2
                   || get(child2) == child1;
-        else
+        } else {
           return false;
+        }
       }
     } else if (last.isChild()) {
-      if (!p.isChild())
+      if (!p.isChild()) {
         return false;
-      else {
+      } else {
         // children must have contiguous parents in v
         Match<T> parent1 = last.getParent();
         Match<T> parent2 = p.getParent();
@@ -99,8 +101,9 @@ public class VMap<T> extends HashMap<Match<T>, Match<T>> {
         if (ans1 && ans2) {
           return get(parent1) == parent2
                   || get(parent2) == parent1;
-        } else
+        } else {
           return false;
+        }
       }
     }
     return true;

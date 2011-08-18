@@ -82,7 +82,7 @@ public class Converter<T> {
   /**
    * Create a Graph
    *
-   * @param matches the list of pairs to build the graph from.
+   * @param matches  the list of pairs to build the graph from.
    * @param versions the versions to go in the graph
    */
   public VariantGraph<T> create(List<Match<T>> matches, Set<Witness> versions)
@@ -92,8 +92,9 @@ public class Converter<T> {
     allVersions = Sets.newHashSet(versions);
     graph = new VariantGraph<T>();
     origSize = matches.size();
-    if (matches.size() > 0)
+    if (matches.size() > 0) {
       deserialise(matches);
+    }
     // generate the constraint set
     graph.constraint.addAll(versions);
     parents = new HashMap<VariantGraphArc<T>, Match<T>>();
@@ -127,10 +128,11 @@ public class Converter<T> {
       VariantGraphNode<T> v;
       Match<T> p = matches.get(i);
       VariantGraphArc<T> a = pairToArc(p, pnts, kids);
-      if ((i > 0 && !disjoint(a.versions, matches.get(i - 1).witnesses)) || a.isHint())
+      if ((i > 0 && !disjoint(a.versions, matches.get(i - 1).witnesses)) || a.isHint()) {
         u = v = createNode();
-      else
+      } else {
         v = getIntersectingNode(u, a);
+      }
       v.addOutgoing(a);
       Set<Witness> bs = a.versions;
       // in case a is itself a hint
@@ -145,9 +147,9 @@ public class Converter<T> {
       // update incomplete set
       boolean x = v.isIncomplete();
       boolean y = incomplete.contains(v);
-      if (x && !y)
+      if (x && !y) {
         incomplete.add(v);
-      else if (!x && y) {
+      } else if (!x && y) {
         incomplete.remove(v);
         v.optimise(unattached);
       }
@@ -156,12 +158,14 @@ public class Converter<T> {
     graph.end = createNode();
     unattached.addAllAsIncoming(graph.end);
     // check that all children found parents and vice versa
-    if (pnts.size() != 0)
+    if (pnts.size() != 0) {
       throw new MVDException(
               "Unmatched parent node(s) after deserialisation");
-    if (kids.size() != 0)
+    }
+    if (kids.size() != 0) {
       throw new MVDException(
               "Unmatched child node(s) after deserialisation");
+    }
   }
 
   /**
@@ -171,15 +175,18 @@ public class Converter<T> {
    */
   public Vector<Match<T>> serialise() throws MVDException {
     Match.pairId = 1;
-    if (origSize < 15)
+    if (origSize < 15) {
       origSize = 15;
+    }
     numParents = 0;
     Vector<Match<T>> matches = new Vector<Match<T>>(origSize);
     printAcross(matches, graph.start, allVersions);
-    if (parents.size() != 0)
+    if (parents.size() != 0) {
       throw new MVDException("Mismatched parent arc");
-    if (orphans.size() != 0)
+    }
+    if (orphans.size() != 0) {
       throw new MVDException("Mismatched child arc");
+    }
     return matches;
   }
 
@@ -195,17 +202,20 @@ public class Converter<T> {
     if (b != null) {
       if (b.isHint()) {
         v = b.from;
-        if (unattached.removeEmptyArc(b, a.versions))
+        if (unattached.removeEmptyArc(b, a.versions)) {
           nArcs--;
-      } else
+        }
+      } else {
         v = u;
+      }
     } else {
       v = u;
       Iterator<VariantGraphNode<T>> iter = incomplete.iterator();
       while (iter.hasNext()) {
         v = iter.next();
-        if (v.wants(a))
+        if (v.wants(a)) {
           break;
+        }
       }
     }
     return v;
@@ -217,8 +227,8 @@ public class Converter<T> {
    * This will only work if an entire pairs list is deserialised
    * into a graph in one go.
    *
-   * @param p    the pair to convert
-   * @param pnts potential parents of the new pair
+   * @param p        the pair to convert
+   * @param pnts     potential parents of the new pair
    * @param children children looking for parents
    * @return an equivalent Arc we can use in the Graph
    */
@@ -234,10 +244,13 @@ public class Converter<T> {
       if (b != null) {
         b.addChild(a);
         // if this is the last child of the parent remove it
-        if (b.numChildren() == parent.numChildren())
+        if (b.numChildren() == parent.numChildren()) {
           pnts.remove(parent);
+        }
       } else    // we're orphaned for now
+      {
         children.put(p, a);
+      }
     } else if (p.isParent()) {
       for (Match<T> child : p.getChildren()) {
         VariantGraphArc<T> r = children.get(child);
@@ -246,8 +259,9 @@ public class Converter<T> {
           children.remove(child);
         }
       }
-      if (p.numChildren() > a.numChildren())
+      if (p.numChildren() > a.numChildren()) {
         pnts.put(p, a);
+      }
     }
     return a;
   }
@@ -266,7 +280,7 @@ public class Converter<T> {
   /**
    * Build a bit of the pairs-list starting from a node
    *
-   * @param matches   the part-built pairs-list
+   * @param matches  the part-built pairs-list
    * @param u        the node from which to take outgoing arcs
    * @param incoming the versions of the last incoming arc
    */
@@ -291,8 +305,9 @@ public class Converter<T> {
       ListIterator<VariantGraphArc<T>> iter = u.outgoingArcs();
       while (iter.hasNext()) {
         VariantGraphArc<T> a = iter.next();
-        if (a != selected)
+        if (a != selected) {
           hint = printDown(matches, a, hint);
+        }
       }
     }
   }
@@ -302,22 +317,24 @@ public class Converter<T> {
    * arc, then call printAcross.
    *
    * @param matches the part-built tuple-list
-   * @param a      the arc to print
-   * @param hint   the previous location of a hint
+   * @param a       the arc to print
+   * @param hint    the previous location of a hint
    * @return the hint or -1 if it was removed
    */
   private int printDown(Vector<Match<T>> matches, VariantGraphArc<T> a, int hint)
           throws MVDException {
-    if (a.numChildren() > 0)
+    if (a.numChildren() > 0) {
       numParents++;
+    }
     Match<T> p = a.toPair(parents, orphans);
     matches.add(p);
     a.to.printArc(a);
     if (a.to != null) {
       VariantGraphNode<T> u = a.to;
       if (u.allPrintedIncoming()) {
-        if (hint != -1)
+        if (hint != -1) {
           hint = reduceHint(matches, hint);
+        }
         printAcross(matches, u, a.versions);
         // next node produced, invalidating hint
         hint = -1;
@@ -332,7 +349,7 @@ public class Converter<T> {
    * just reduce the number of versions at offset hint.
    *
    * @param matches the array of tuples to write to
-   * @param hint   the offset of the hint
+   * @param hint    the offset of the hint
    * @return the index of the hint or -1 if it was removed
    */
   private int reduceHint(Vector<Match<T>> matches, int hint) {
@@ -394,9 +411,9 @@ public class Converter<T> {
         }
         if (a.to.allPrintedIncoming()) {
           q.push(a.to);
-          if (b.to.allPrintedIncoming())
+          if (b.to.allPrintedIncoming()) {
             otherQueue.push(b.to);
-          else {
+          } else {
             graph.clearPrinted();
             other.clearPrinted();
             return false;
