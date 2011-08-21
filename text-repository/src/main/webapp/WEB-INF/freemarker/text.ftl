@@ -18,14 +18,7 @@
     <div class="yui3-u-2-3">
         <h2><img src="${cp}/static/icon/text_${text.type?lower_case}.png" alt="${text.type?html}"> Content</h2>
         <#if text.type == "TXT">
-            <div id="font-settings">
-                <a href="#" class="font-size" style="font-size: 100%">A</a>
-                <a href="#" class="font-size" style="font-size: 125%">A</a>
-                <a href="#" class="font-size" style="font-size: 150%">A</a>
-            </div>
-            <div id="text-contents" style="margin: 1em; padding: 1em">
-            ${textContents?html?replace("\n", "<br>")}<#if truncated><span id="text-truncation" style="color: #cccccc;">[...]</span></#if>
-            </div>
+            <div id="text-contents" style="margin: 1em; padding: 1em; font-size: 125%">&nbsp;</div>
         <#elseif text.type == "XML">
             <textarea style="width: 95%; height: 500px" readonly="readonly">${textContents?html}</textarea>
         </#if>
@@ -44,12 +37,35 @@
 <p style="font-size: small; color: #dcdcdc;">SHA-512: ${text.digest?html}</p>
 
 <script type="text/javascript">
-    YUI().use("node", "event", function(Y) {
+    var textId = ${text.id?c};
+    var textContents = "${textContents?js_string}";
+    var textType = "${text.type?js_string}";
+
+    YUI().use("node", "event", "dump", "escape", "interedition-text-repository", function(Y) {
         Y.on("domready", function() {
-            Y.all(".font-size").on("click", function(e) {
-                e.preventDefault();
-                Y.one("#text-contents").setStyle("fontSize", e.currentTarget.getStyle("fontSize"));
-            });
+            var textEl = Y.one("#text-contents");
+            if (textEl) {
+                function spanClick(e) {
+                    alert(e.target.getAttribute("id"));
+                }
+
+                text = new Y.text.Text();
+                text.set("text", textContents);
+                text.after("annotationsChange", function() {
+                    var textContents = text.get("text");
+                    textEl.setContent("");
+                    Y.each(text.partition(), function(range) {
+                        var start = range.start;
+                        var end = range.end;
+                        var spanId = range.toId();
+                        textEl.append("<span id='" + spanId  + "'>" + Y.Escape.html(textContents.substring(start, end)).replace("\n", "<br>") + "</span>");
+                        Y.on("click", spanClick, "#" + spanId);
+
+                    });
+                });
+
+                Y.textRepository.getAnnotations(textId, text);
+            }
         });
     });
 </script>

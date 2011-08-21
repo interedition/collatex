@@ -58,8 +58,8 @@
         </div>
     </div>
     <script type="text/javascript">
-        var text = null;
-        YUI().use("dump", "node", "event", function(Y) {
+        var textId = ${text.id?c};
+        YUI().use("interedition-text-repository", "dump", "node", "event", function(Y) {
             Y.on("domready", function() {
                 Y.all("input[type='checkbox']").each(function(cb) {
                     var id = cb.get("id");
@@ -103,9 +103,9 @@
                         }
                     });
 
-                    post("", parserConfig, function(resp) {
+                    Y.textRepository.parseXML(textId, parserConfig, function(resp) {
                         window.location.pathname = cp + "/text/" + resp.id.toString();
-                    });
+                    })
                 }, "#parse-form");
             });
         })

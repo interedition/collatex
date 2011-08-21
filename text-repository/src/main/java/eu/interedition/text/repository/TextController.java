@@ -1,14 +1,16 @@
 package eu.interedition.text.repository;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
-import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.Range;
-import eu.interedition.text.Text;
-import eu.interedition.text.TextRepository;
+import eu.interedition.text.*;
+import eu.interedition.text.query.Operator;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.text.repository.model.AnnotationImpl;
+import eu.interedition.text.repository.model.QNameImpl;
 import eu.interedition.text.repository.model.TextImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -28,6 +30,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.SortedSet;
+
+import static eu.interedition.text.query.Criteria.*;
 
 
 /**
@@ -54,12 +59,12 @@ public class TextController {
     return "text_index";
   }
 
-  @RequestMapping(method = RequestMethod.POST, headers="content-type=text/plain")
+  @RequestMapping(method = RequestMethod.POST, headers = "content-type=text/plain")
   public RedirectView uploadPlainText(@RequestBody Text text) {
     return created(text);
   }
 
-  @RequestMapping(method = RequestMethod.POST, headers="content-type=application/xml")
+  @RequestMapping(method = RequestMethod.POST, headers = "content-type=application/xml")
   public RedirectView uploadXml(@RequestBody Text text) {
     return created(text);
   }
@@ -118,6 +123,21 @@ public class TextController {
         CharStreams.copy(content, responseWriter);
       }
     });
+  }
+
+  @RequestMapping("/{id}/names")
+  @ResponseBody
+  public SortedSet<QName> names(@PathVariable("id") long id) {
+    final SortedSet<QName> names = annotationRepository.names(textRepository.load(id));
+    return Sets.<QName>newTreeSet(Iterables.transform(names, QNameImpl.TO_BEAN));
+  }
+
+  @RequestMapping(value = "/{id}/annotations")
+  @ResponseBody
+  public SortedSet<Annotation> get(@PathVariable("id") long id, @RequestParam(value = "r", required = false, defaultValue = "0,102400") Range range) {
+    final Operator criterion = and(text(textRepository.load(id)), rangeOverlap(range));
+    final Iterable<Annotation> annotations = annotationRepository.find(criterion);
+    return Sets.<Annotation>newTreeSet(Iterables.transform(annotations, AnnotationImpl.TO_BEAN));
   }
 
   @ExceptionHandler(value = DataRetrievalFailureException.class)

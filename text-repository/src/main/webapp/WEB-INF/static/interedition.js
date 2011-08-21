@@ -1,29 +1,43 @@
-function post(uri, req, callback) {
-    YUI().use("io", "json", function(Y) {
-        resp = Y.io(uri, {
-            method: "post",
+YUI.add("interedition-text-repository", function(Y) {
+    Y.namespace("textRepository");
+
+    Y.textRepository.getText = function(id, text) {
+        Y.io(cp + "/text/" + id.toString(), {
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
+                    "Accept": "text/plain"
                 },
-            data: Y.JSON.stringify(req),
             on: {
-                success: function(transactionId, resp) { callback(Y.JSON.parse(resp.responseText)); }
+                    success: function(transactionId, resp) { text.set("text", resp.responseText); }
                 }
             });
-    });
-}
+    }
 
-function TextEditor(config) {
-    TextEditor.superclass.constructor.apply(this, arguments);
-}
+    Y.textRepository.getAnnotations = function(id, text) {
+        Y.io(cp + "/text/" + id.toString() + "/annotations", {
+            headers: {
+                    "Accept": "application/json"
+                },
+            on: {
+                    success: function(transactionId, resp) {
+                        text.set("annotations", Y.JSON.parse(resp.responseText));
+                    }
+                }
+            });
+    }
 
-TextEditor.NAME = "text-editor";
-
-YUI().use("editor-base", "widget", function(Y) {
-    Y.extend(TextEditor, Y.Widget, {
-        renderUI: function() {
-
-        }
-    });
+    Y.textRepository.parseXML = function(id, parserConfig, cb) {
+        Y.io(cp + "/xml/" + id.toString() + "/parse", {
+            method: "post",
+            headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+            data: Y.JSON.stringify(parserConfig),
+            on: {
+                    success: function(transactionId, resp) { cb(Y.JSON.parse(resp.responseText)); }
+                }
+            });
+    }
+}, "0", {
+    requires: ["io", "json", "interedition-text"]
 });
