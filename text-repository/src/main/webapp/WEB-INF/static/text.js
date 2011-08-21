@@ -90,7 +90,7 @@ YUI.add("interedition-text", function(Y) {
             Y.error("Invalid QName", str, { throwFail: true });
         }
 
-        return new QName(str.substring(firstBrace + 1, secondBrace), str.substring(secondBrace + 1))
+        return new Y.text.QName(str.substring(firstBrace + 1, secondBrace), str.substring(secondBrace + 1))
     };
 
     Y.text.Range = function(start, end) {
@@ -120,7 +120,10 @@ YUI.add("interedition-text", function(Y) {
     Y.text.Range.prototype.toId = function() {
         return "r" + this.start.toString() + "-" + this.end.toString();
     };
-
+    Y.text.Range.fromId = function(str) {
+        var components = str.replace("r", "").split("-");
+        return new Y.text.Range(parseInt(components[0]), parseInt(components[1]));
+    };
     Y.text.Range.prototype.toString = function() {
         return "[" + this.start + ", " + this.end + "]";
     };
