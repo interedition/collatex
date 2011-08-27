@@ -3,14 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>eu.interedition.collatex</groupId>
-        <artifactId>collatex-project</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <groupId>eu.interedition</groupId>
+        <artifactId>parent</artifactId>
+        <version>1</version>
     </parent>
-    <groupId>eu.interedition</groupId>
     <artifactId>text-repository</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Interedition :: Text repository</name>
+    <name>Interedition: Text repository</name>
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>

@@ -4,12 +4,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>collatex-project</artifactId>
-        <groupId>eu.interedition.collatex</groupId>
-        <version>1.3-SNAPSHOT</version>
+        <groupId>eu.interedition</groupId>
+        <artifactId>parent</artifactId>
+        <version>1</version>
     </parent>
     <artifactId>collatex-cocoon</artifactId>
-    <name>CollateX :: Cocoon block</name>
+    <version>1.3-SNAPSHOT</version>
+    <name>Interedition: CollateX -- Cocoon block</name>
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
