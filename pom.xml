@@ -333,10 +333,36 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.0-beta-3</version>
+                <!--
+                <executions>
+                    <execution>
+                        <id>first</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+                -->
+            </plugin>
+            <!--
+            <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
+                    <aggregate>true</aggregate>
+                    <strictCheck>true</strictCheck>
                     <header>HEADER</header>
                     <encoding>UTF-8</encoding>
                     <excludes>
@@ -359,6 +385,7 @@
                     </properties>
                 </configuration>
             </plugin>
+            -->
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.1.2</version>
@@ -478,5 +505,6 @@
         <spring.version>3.0.5.RELEASE</spring.version>
         <slf4j.version>1.5.11</slf4j.version>
         <restlet.version>2.0-RC2</restlet.version>
+        <license.licenseName>apache_v2</license.licenseName>
     </properties>
 </project>

@@ -17,4 +17,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <properties>
+        <license.licenseName>gpl_v3</license.licenseName>
+    </properties>
 </project>
