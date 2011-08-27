@@ -7,7 +7,9 @@
     <version>1</version>
     <packaging>pom</packaging>
     <name>Interedition</name>
-    <description>A ESF COST Action; our aim is to promote the interoperability of the tools and methodology we use in the field of digital scholarly editing and research.</description>
+    <description>A ESF COST Action; our aim is to promote the interoperability of the tools and methodology we use in
+        the field of digital scholarly editing and research.
+    </description>
     <url>http://www.interedition.eu/</url>
     <organization>
         <name>ESF COST Action “Interedition”</name>
@@ -461,6 +463,11 @@
         <url>https://github.com/gremid/collatex/issues/</url>
     </issueManagement>
     <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
         <license>
             <name>GNU General Public License</name>
             <url>http://www.gnu.org/licenses/gpl.txt</url>

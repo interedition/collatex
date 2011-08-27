@@ -10,4 +10,11 @@
     <artifactId>collatex-nmerge</artifactId>
     <version>1.3-SNAPSHOT</version>
     <name>Interedition: CollateX -- nmerge</name>
+    <licenses>
+        <license>
+            <name>GNU General Public License</name>
+            <url>http://www.gnu.org/licenses/gpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 </project>

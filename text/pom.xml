@@ -10,6 +10,14 @@
 	<artifactId>text</artifactId>
     <version>1.0-SNAPSHOT</version>
 	<name>Interedition: Text model</name>
+    <description>A Java library implementing a text model with support for text-range-based markup via standoff annotations.</description>
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 	<dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
