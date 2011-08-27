@@ -10,6 +10,11 @@
     <artifactId>collatex-nmerge</artifactId>
     <version>1.3-SNAPSHOT</version>
     <name>Interedition: CollateX -- nmerge</name>
+    <description>A Java library for merging multiple versions into multi-version documents (MVDs), and for reading, searching and comparing them.</description>
+    <organization>
+        <name>Desmond Schmidt</name>
+        <url>http://multiversiondocs.blogspot.com/</url>
+    </organization>
     <licenses>
         <license>
             <name>GNU General Public License</name>
