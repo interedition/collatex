@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.web;
+package eu.interedition.collatex.web;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -26,9 +26,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
+import eu.interedition.collatex.web.io.ApiObjectMapper;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
@@ -41,7 +41,6 @@ import eu.interedition.collatex2.interfaces.*;
 import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
 import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
-import eu.interedition.collatex2.web.io.ApiObjectMapper;
 import org.codehaus.jackson.JsonParseException;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
@@ -70,7 +69,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -157,7 +155,7 @@ public class ApiController implements InitializingBean {
   }
 
 
-  @RequestMapping(value = "/api/collate", headers = {"Content-Type=application/json", "Accept=application/xhtml+xml;charset=utf-8"}, method = RequestMethod.POST)
+  @RequestMapping(value = "/api/collate", headers = {"Content-Type=application/json"}, method = RequestMethod.POST)
   public ModelAndView collateToHtml(@RequestBody final ApiInput input) throws Exception {
     return new ModelAndView("api/alignment", "alignment", collate(input));
   }

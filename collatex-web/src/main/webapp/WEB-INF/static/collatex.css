@@ -1,0 +1,51 @@
+body {
+    margin: 1em;
+    font-family: georgia, geneva, sans-serif;
+}
+
+table {
+	margin: 1em;
+}
+
+table.alignment {
+    border-collapse: separate;
+    border-spacing: 0.25em;
+}
+
+table.alignment tr {
+	border: 0;
+}
+
+table.alignment th, table.alignment td {
+	border: 1px solid #d3d3d3;
+	padding: 0.5em;
+}
+
+pre {
+	background: #eee;
+}
+
+#mainmenu {
+	color: #808080;
+	text-align: right;
+}
+
+.none {
+	color: black;
+}
+
+.match {
+	color: red;
+}
+
+.addition {
+	color: orange;
+}
+
+.omission {
+	color: blue;
+}
+
+.replacement {
+	color: purple;
+}

@@ -20,23 +20,27 @@
 
 -->
 
-<#import "/spring.ftl" as spring>
-<#assign xhtmlCompliant = true in spring>
-<#assign ctx = springMacroRequestContext.getContextPath()>
+<#assign cp = springMacroRequestContext.getContextPath()>
 
 <#macro page title>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
 	<title>${title} :: CollateX</title>
-	<link rel="stylesheet" type="text/css" href="${ctx}/css/collatex.css" />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssfonts/fonts-min.css">
+    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssreset/reset-min.css">
+    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssgrids/grids-min.css">
+    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssbase/base-min.css">
+    <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css" />
+	<link rel="stylesheet" type="text/css" href="${cp}/static/collatex.css" />
 </head>
 <body>
 	<div id="mainmenu">
-		<a href="${ctx}/examples/usecases" title="Use Cases">Use cases</a> |
-		<a href="${ctx}/examples/beckett" title="Beckett">Beckett</a> |
-		<a href="${ctx}/examples/darwin" title="Darwin">Darwin</a> |
-		<a href="${ctx}/api/collate" title="REST service">REST service</a>
+		<a href="${cp}/examples/usecases" title="Use Cases">Use cases</a> |
+		<a href="${cp}/examples/beckett" title="Beckett">Beckett</a> |
+		<a href="${cp}/examples/darwin" title="Darwin">Darwin</a> |
+		<a href="${cp}/api/collate" title="REST service">REST service</a>
 	</div>
 	
 	<#nested>
