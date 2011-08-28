@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssgrids/grids-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssbase/base-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css">
+    <link rel="stylesheet" type="text/css" href="${cp}/static/text-repository.css">
 
     <script type="text/javascript">var cp = "${cp?js_string}";</script>
     <script type="text/javascript" src="${cp}/static/yui-3.4.0/yui/yui-min.js"></script>
