@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>collatex</artifactId>
     <version>1.3-SNAPSHOT</version>
-	<name>Interedition: CollateX</name>
+	<name>CollateX</name>
     <description>A Java library for collating textual sources, for example, to produce an apparatus.</description>
     <licenses>
         <license>

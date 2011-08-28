@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>collatex-nodeps</artifactId>
     <version>1.3-SNAPSHOT</version>
-	<name>Interedition: CollateX -- Package</name>
+	<name>CollateX Standalone Package</name>
     <description>An assembly of CollateX resources serving as a self-contained distribution format.</description>
     <licenses>
         <license>

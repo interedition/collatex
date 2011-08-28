@@ -10,7 +10,7 @@
     <artifactId>web-resources</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Interedition: Common web resources</name>
+    <name>Common Web Resources</name>
     <description>Static resources common to Interedition web modules.</description>
     <licenses>
         <license>

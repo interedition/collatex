@@ -9,7 +9,7 @@
     </parent>
     <artifactId>collatex-nmerge</artifactId>
     <version>1.3-SNAPSHOT</version>
-    <name>Interedition: CollateX -- nmerge</name>
+    <name>NMerge</name>
     <description>A Java library for merging multiple versions into multi-version documents (MVDs), and for reading, searching and comparing them.</description>
     <organization>
         <name>Desmond Schmidt</name>

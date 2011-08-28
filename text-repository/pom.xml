@@ -10,8 +10,8 @@
     <artifactId>text-repository</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Interedition: Text repository</name>
-    <description>A JavaEE web application providing a repository for annotated texts based on Interediton's text model.</description>
+    <name>Text Repository</name>
+    <description>Datastore for texts based on Interedition's model.</description>
     <licenses>
         <license>
             <name>Apache 2</name>

@@ -10,7 +10,7 @@
 	<artifactId>collatex-client-jee</artifactId>
     <version>1.3-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>Interedition: CollateX -- JavaEE Client</name>
+	<name>CollateX JavaEE Client</name>
     <description>A JavaEE web application showcasing how to access the CollateX web service.</description>
     <licenses>
         <license>

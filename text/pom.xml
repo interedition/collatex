@@ -9,8 +9,8 @@
 	</parent>
 	<artifactId>text</artifactId>
     <version>1.0-SNAPSHOT</version>
-	<name>Interedition: Text model</name>
-    <description>A Java library implementing a text model with support for text-range-based markup via standoff annotations.</description>
+	<name>Text</name>
+    <description>A text model with range-based markup via standoff annotations.</description>
     <licenses>
         <license>
             <name>Apache 2</name>

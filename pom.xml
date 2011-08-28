@@ -6,15 +6,16 @@
     <artifactId>parent</artifactId>
     <version>1</version>
     <packaging>pom</packaging>
-    <name>Interedition</name>
-    <description>A ESF COST Action; our aim is to promote the interoperability of the tools and methodology we use in
-        the field of digital scholarly editing and research.
+    <name>Interedition Microservices</name>
+    <description>Modules developed by a European-funded development collective whose aim it is to promote the
+        interoperability of the tools and methodology we use in the field of digital scholarly editing and research.
     </description>
     <url>http://www.interedition.eu/</url>
     <organization>
-        <name>ESF COST Action “Interedition”</name>
+        <name>The Interedition Development Group</name>
         <url>http://www.interedition.eu/</url>
     </organization>
+    <inceptionYear>2010</inceptionYear>
     <modules>
         <module>collatex</module>
         <module>collatex-nmerge</module>
@@ -343,6 +344,14 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>1.0-beta-3</version>
+                <configuration>
+                    <projectName>${project.name}: ${project.description}</projectName>
+                    <canUpdateDescription>true</canUpdateDescription>
+                    <roots>
+                        <root>src/main</root>
+                        <root>src/test/java</root>
+                    </roots>
+                </configuration>
                 <!--
                 <executions>
                     <execution>
@@ -509,9 +518,10 @@
         </license>
     </licenses>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <license.licenseName>apache_v2</license.licenseName>
         <spring.version>3.0.5.RELEASE</spring.version>
         <slf4j.version>1.5.11</slf4j.version>
         <restlet.version>2.0-RC2</restlet.version>
-        <license.licenseName>apache_v2</license.licenseName>
     </properties>
 </project>
