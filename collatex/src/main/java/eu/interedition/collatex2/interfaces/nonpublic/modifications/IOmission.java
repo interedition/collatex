@@ -18,32 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_analysis;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
+public interface IOmission extends IModification {
 
+  int getPosition();
 
-public class Transposition implements ITransposition {
-  private final ISequence sequenceA;
-  private final ISequence sequenceB;
-
-  public Transposition(ISequence sequenceA, ISequence sequenceB) {
-    this.sequenceA = sequenceA;
-    this.sequenceB = sequenceB;
-  }
-
-  @Override
-  public ISequence getSequenceA() {
-    return sequenceA;
-  }
-
-  @Override
-  public ISequence getSequenceB() {
-    return sequenceB;
-  }
-  
-  @Override
-  public String toString() {
-    return sequenceA.toString() + " -> "+sequenceB.toString();
-  }
+  IColumns getOmittedColumns();
 
 }

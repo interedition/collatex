@@ -18,38 +18,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
 import java.util.List;
 
-import eu.interedition.collatex2.interfaces.ITokenMatch;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
-public class Alignment implements IAlignment {
+public interface IColumns {
 
-  private final IVariantGraph graph;
-  private final IWitness witness;
-  private final List<ITokenMatch> tokenMatches;
+  void addMatchPhrase(IPhrase phrase);
 
-  public Alignment(IVariantGraph graph, IWitness witness, List<ITokenMatch> tokenMatches) {
-    this.graph = graph;
-    this.witness = witness;
-    this.tokenMatches = tokenMatches;
-  }
+  void addVariantPhrase(IPhrase phrase);
 
-  @Override
-  public IVariantGraph getGraph() {
-    return graph;
-  }
+  int getBeginPosition();
 
-  @Override
-  public IWitness getWitness() {
-    return witness;
-  }
+  int getEndPosition();
 
-  @Override
-  public List<ITokenMatch> getTokenMatches() {
-    return tokenMatches;
-  }
+  IColumn getFirstColumn();
+
+  IColumn getLastColumn();
+
+  boolean isEmpty();
+
+  int size();
+
+  //Note: exposes internal list; implement Collection instead?
+  List<IColumn> getColumns();
+
 }

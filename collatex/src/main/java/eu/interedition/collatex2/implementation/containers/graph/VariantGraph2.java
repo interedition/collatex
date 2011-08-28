@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.implementation.containers.graph;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,33 +46,16 @@ import eu.interedition.collatex2.interfaces.IWitness;
 // The VariantGraph contains a List of witnesses that have
 // been added to the Graph.
 @SuppressWarnings("serial")
-public class VariantGraph extends DirectedAcyclicGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
+public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
   private final IVariantGraphVertex startVertex;
   private final IVariantGraphVertex endVertex;
 
-  private final IVariantGraphListener listener;
-  private final VariantGraphAligner aligner;
-
-  public VariantGraph(IVariantGraphListener listener) {
+  public VariantGraph2() {
     super(IVariantGraphEdge.class);
-
-    this.listener = listener;
-    this.aligner = new VariantGraphAligner(this);
-
-    this.startVertex = new VariantGraphVertex("#", null);
+    startVertex = new VariantGraphVertex("#", null);
     addVertex(startVertex);
-
-    this.endVertex = new VariantGraphVertex("#", null);
+    endVertex = new VariantGraphVertex("#", null);
     addVertex(endVertex);
-  }
-
-  IVariantGraphListener listener() {
-    return listener;
-  }
-
-  public IVariantGraph add(IWitness witness) {
-    aligner.add(witness);
-    return this;
   }
 
   @Override

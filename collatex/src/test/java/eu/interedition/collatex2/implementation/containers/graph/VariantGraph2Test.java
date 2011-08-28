@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.implementation.containers.graph;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,12 +45,13 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphTest {
+public class VariantGraph2Test {
   private static CollateXEngine engine;
 
   @BeforeClass
@@ -60,15 +61,15 @@ public class VariantGraphTest {
 
   @Test
   public void testEmptyGraph() {
-    IVariantGraph graph = engine.graph();
-    Assert.assertEquals(2, graph.vertexSet().size());
+    IVariantGraph graph = new VariantGraph2();
+    assertEquals(2, graph.vertexSet().size());
     IVariantGraphVertex startVertex = graph.getStartVertex();
-    Assert.assertEquals("#", startVertex.getNormalized());
+    assertEquals("#", startVertex.getNormalized());
     IVariantGraphVertex endVertex = graph.getEndVertex();
-    Assert.assertEquals("#", endVertex.getNormalized());
-    Assert.assertEquals(0, graph.edgeSet().size());
-    Assert.assertEquals(0, graph.getWitnesses().size());
-    Assert.assertTrue(graph.isEmpty());
+    assertEquals("#", endVertex.getNormalized());
+    assertEquals(0, graph.edgeSet().size());
+    assertEquals(0, graph.getWitnesses().size());
+    assertTrue(graph.isEmpty());
   }
 
   @Test
@@ -76,29 +77,29 @@ public class VariantGraphTest {
     IWitness a = engine.createWitness("A", "only one witness");
     IVariantGraph graph = engine.graph(a);
     final Set<IVariantGraphVertex> vertices = graph.vertexSet();
-    Assert.assertEquals(5, vertices.size());
+    assertEquals(5, vertices.size());
     Iterator<IVariantGraphVertex> vertexI = graph.iterator();
     final IVariantGraphVertex startVertex = vertexI.next();
     final IVariantGraphVertex firstVertex = vertexI.next();
     final IVariantGraphVertex secondVertex = vertexI.next();
     final IVariantGraphVertex thirdVertex = vertexI.next();
     final IVariantGraphVertex endVertex = vertexI.next();
-    Assert.assertEquals("#", startVertex.getNormalized());
-    Assert.assertEquals("only", firstVertex.getNormalized());
-    Assert.assertEquals("one", secondVertex.getNormalized());
-    Assert.assertEquals("witness", thirdVertex.getNormalized());
-    Assert.assertEquals("#", endVertex.getNormalized());
+    assertEquals("#", startVertex.getNormalized());
+    assertEquals("only", firstVertex.getNormalized());
+    assertEquals("one", secondVertex.getNormalized());
+    assertEquals("witness", thirdVertex.getNormalized());
+    assertEquals("#", endVertex.getNormalized());
     Set<IVariantGraphEdge> edges = graph.edgeSet();
-    Assert.assertEquals(4, edges.size());
+    assertEquals(4, edges.size());
     Iterator<IVariantGraphEdge> edgeI = edges.iterator();
-    Assert.assertTrue(edgeI.next().getWitnesses().contains(a));
-    Assert.assertTrue(edgeI.next().getWitnesses().contains(a));
-    Assert.assertTrue(edgeI.next().getWitnesses().contains(a));
-    Assert.assertTrue(edgeI.next().getWitnesses().contains(a));
-    Assert.assertTrue(graph.containsEdge(startVertex, firstVertex));
-    Assert.assertTrue(graph.containsEdge(firstVertex, secondVertex));
-    Assert.assertTrue(graph.containsEdge(secondVertex, thirdVertex));
-    Assert.assertTrue(graph.containsEdge(thirdVertex, endVertex));
+    assertTrue(edgeI.next().getWitnesses().contains(a));
+    assertTrue(edgeI.next().getWitnesses().contains(a));
+    assertTrue(edgeI.next().getWitnesses().contains(a));
+    assertTrue(edgeI.next().getWitnesses().contains(a));
+    assertTrue(graph.containsEdge(startVertex, firstVertex));
+    assertTrue(graph.containsEdge(firstVertex, secondVertex));
+    assertTrue(graph.containsEdge(secondVertex, thirdVertex));
+    assertTrue(graph.containsEdge(thirdVertex, endVertex));
   }
 
   @Test
@@ -135,21 +136,40 @@ public class VariantGraphTest {
   }
 
   @Test
+  public void testLongestPath() {
+    IWitness w1 = engine.createWitness("A", "a");
+    IWitness w2 = engine.createWitness("B", "b");
+    IWitness w3 = engine.createWitness("C", "a b");
+    VariantGraph2 graph = new VariantGraph2();
+    IAligner aligner = engine.createAligner(graph);
+    aligner.add(w1, w2, w3);
+    assertEquals(4, graph.vertexSet().size());
+    VariantGraphUtil util = new VariantGraphUtil(graph);
+    List<IVariantGraphVertex> longestPath = util.getLongestPath();
+    //    for (CollateXVertex v: longestPath) {
+    //      System.out.println(v.getNormalized());
+    //    }
+    assertEquals("a", longestPath.get(0).getNormalized());
+    assertEquals("b", longestPath.get(1).getNormalized());
+    assertEquals(2, longestPath.size());
+  }
+
+  @Test
   public void testGetPathForWitness() {
     final IWitness w1 = engine.createWitness("V", "a b c d e f ");
     final IWitness w2 = engine.createWitness("W", "x y z d e");
     final IWitness w3 = engine.createWitness("X", "a b x y z");
     IVariantGraph graph = engine.graph(w1, w2, w3);
     List<IVariantGraphEdge> path = graph.getPath(w1);
-    Assert.assertEquals("#", graph.getEdgeSource(path.get(0)).getNormalized());
-    Assert.assertEquals("a", graph.getEdgeTarget(path.get(0)).getNormalized());
-    Assert.assertEquals("b", graph.getEdgeTarget(path.get(1)).getNormalized());
-    Assert.assertEquals("c", graph.getEdgeTarget(path.get(2)).getNormalized());
-    Assert.assertEquals("d", graph.getEdgeTarget(path.get(3)).getNormalized());
-    Assert.assertEquals("e", graph.getEdgeTarget(path.get(4)).getNormalized());
-    Assert.assertEquals("f", graph.getEdgeTarget(path.get(5)).getNormalized());
-    Assert.assertEquals("#", graph.getEdgeTarget(path.get(6)).getNormalized());
-    Assert.assertEquals(7, path.size());
+    assertEquals("#", graph.getEdgeSource(path.get(0)).getNormalized());
+    assertEquals("a", graph.getEdgeTarget(path.get(0)).getNormalized());
+    assertEquals("b", graph.getEdgeTarget(path.get(1)).getNormalized());
+    assertEquals("c", graph.getEdgeTarget(path.get(2)).getNormalized());
+    assertEquals("d", graph.getEdgeTarget(path.get(3)).getNormalized());
+    assertEquals("e", graph.getEdgeTarget(path.get(4)).getNormalized());
+    assertEquals("f", graph.getEdgeTarget(path.get(5)).getNormalized());
+    assertEquals("#", graph.getEdgeTarget(path.get(6)).getNormalized());
+    assertEquals(7, path.size());
   }
   
   @Test
@@ -158,13 +178,13 @@ public class VariantGraphTest {
 	  final IWitness w2 = engine.createWitness("B", "the white and black cat");
 	  IVariantGraph graph = engine.graph(w1, w2);
 	  Map<IVariantGraphVertex, IVariantGraphVertex> transposed = graph.getTransposedTokens();
-	  Assert.assertEquals(2, transposed.size());
+	  assertEquals(2, transposed.size());
 	  final IWitness w3 = engine.createWitness("C", "the black and black cat");
 	  graph = engine.graph(w1, w2, w3);
 	  transposed = graph.getTransposedTokens();
-	  Assert.assertEquals(2, transposed.size());
+	  assertEquals(2, transposed.size());
 	  for ( Entry<IVariantGraphVertex, IVariantGraphVertex> nodePair : transposed.entrySet()) {
-		  Assert.assertEquals(nodePair.getKey().getNormalized(), nodePair.getValue().getNormalized());
+		  assertEquals(nodePair.getKey().getNormalized(), nodePair.getValue().getNormalized());
 	  }
   }
 
@@ -207,6 +227,6 @@ public class VariantGraphTest {
     DOTExporter<IVariantGraphVertex, IVariantGraphEdge> exporter = new DOTExporter<IVariantGraphVertex, IVariantGraphEdge>(vertexIDProvider, vertexLabelProvider, edgeLabelProvider);
     Writer writer = new StringWriter();
     exporter.export(writer, graph);
-    Assert.assertEquals("", writer.toString());
+    assertEquals("", writer.toString());
   }
 }

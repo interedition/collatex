@@ -14,14 +14,17 @@ public class DecisionGraph extends DirectedAcyclicGraph<DGVertex, DGEdge> {
   private final DGVertex end;
 
   public DecisionGraph(IVariantGraphVertex startVertex) {
-    super(DGEdge.class);
-    v1 = new DGVertex(startVertex);
     //TODO: that eight there is not handy!
     //TODO: the end vertex is unique by itself...
     //TODO: override the equals!
-    end = new DGVertex(new EndToken(8));
-    addVertex(v1);
-    addVertex(end);
+    this(new DGVertex(startVertex), new DGVertex(new EndToken(8)));
+  }
+
+  public DecisionGraph(DGVertex startVertex, DGVertex endVertex) {
+	super(DGEdge.class);
+	this.v1 = startVertex;
+	this.end = endVertex;
+	add(startVertex, endVertex);
   }
 
   public void add(DGVertex... vertices) {

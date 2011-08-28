@@ -22,20 +22,26 @@
 
 package eu.interedition.collatex2.implementation;
 
-import eu.interedition.collatex2.implementation.vg_alignment.IVariantGraphListener;
-import eu.interedition.collatex2.implementation.vg_alignment.NoOpVariantGraphListener;
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraph;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
 import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
+import eu.interedition.collatex2.implementation.vg_analysis.Analyzer;
+import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
+import eu.interedition.collatex2.interfaces.IAligner;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IApparatus;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.nonpublic.modifications.IMatch;
 
 /**
  * 
@@ -73,6 +79,16 @@ public class CollateXEngine {
     return builder.build(sigil, text, tokenizer);
   }
 
+  public IAligner createAligner() {
+    VariantGraph2 graph = new VariantGraph2(); 
+    return createAligner(graph);
+  }
+
+  public IAligner createAligner(IVariantGraph graph) {
+    // return new VariantGraphAligner(graph);
+    return new VariantGraphAligner(graph);
+  }
+
   /**
    * align the witnesses
    * 
@@ -84,15 +100,9 @@ public class CollateXEngine {
    * Terminology check
    */
   public IVariantGraph graph(IWitness... witnesses) {
-    return graph(new NoOpVariantGraphListener(), witnesses);
-  }
-
-  public IVariantGraph graph(IVariantGraphListener listener, IWitness... witnesses) {
-    VariantGraph graph = new VariantGraph(listener);
-    for (IWitness witness : witnesses) {
-      graph.add(witness);
-    }
-    return graph;
+    IAligner aligner = createAligner();
+    aligner.add(witnesses);
+    return aligner.getResult();
   }
 
   /**
@@ -106,14 +116,44 @@ public class CollateXEngine {
    * Terminology check
    */
   public IAlignmentTable align(IWitness... witnesses) {
-    return align(graph(witnesses));
+    IVariantGraph vg = graph(witnesses);
+    RankedGraphBasedAlignmentTable table = new RankedGraphBasedAlignmentTable(vg);
+    return table;
   }
 
-  public IAlignmentTable align(IVariantGraph graph) {
-    return new RankedGraphBasedAlignmentTable(graph);
+  public IAlignment2 align(IVariantGraph graph, IWitness witness) {
+    IAligner aligner = createAligner(graph);
+    IAlignment2 alignment = aligner.align(witness);
+    return alignment;
+  }
+
+  public IAnalysis analyse(IVariantGraph graph, IWitness witness) {
+    IAlignment2 alignment = align(graph, witness);
+    Analyzer analyzer = new Analyzer();
+    return analyzer.analyze(alignment);
   }
 
   public IApparatus createApparatus(final IVariantGraph variantGraph) {
     return ParallelSegmentationApparatus.build(variantGraph);
   }
+
+  @Deprecated
+  public IApparatus createApparatus(IAlignmentTable result) {
+    throw new RuntimeException("Not allowed! --> use createApparatus(VG) instead.");
+  }
+
+  @Deprecated
+  public static IMatch createMatch(final INormalizedToken baseWord, final INormalizedToken witnessWord, final float editDistance) {
+    throw new RuntimeException("Near matches are not yet supported!");
+  }
+
+  @Deprecated
+  public static IMatch createMatch(final IPhrase basePhrase, final IPhrase witnessPhrase, final float editDistance) {
+    throw new RuntimeException("Near matches are not yet supported!");
+  }
+
+
+
+  
+
 }

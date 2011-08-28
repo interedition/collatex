@@ -34,7 +34,7 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphAlignerTest {
+public class VariantGraph2AlignerTest {
     private static CollateXEngine engine;
 
     @BeforeClass

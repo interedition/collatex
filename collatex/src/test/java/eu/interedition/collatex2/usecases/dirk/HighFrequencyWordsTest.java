@@ -27,14 +27,16 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.interedition.collatex2.implementation.vg_alignment.MemoryzingVariantGraphListener;
-import eu.interedition.collatex2.interfaces.*;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
 public class HighFrequencyWordsTest {
   private static CollateXEngine factory;
   
@@ -72,9 +74,9 @@ public class HighFrequencyWordsTest {
   public void testGraphAlignment() {
     IWitness witnessA = factory.createWitness("A", "a b c d");
     IWitness witnessB = factory.createWitness("B", "a b d");
-    final MemoryzingVariantGraphListener listener = new MemoryzingVariantGraphListener();
-    IVariantGraph graph = factory.graph(listener, witnessA, witnessB);
-    List<ITokenMatch> tokenMatches = listener.getAlignment().getTokenMatches();
+    IVariantGraph graph = factory.graph(witnessA);
+    IAlignment2 alignment = factory.align(graph, witnessB);
+    List<ITokenMatch> tokenMatches = alignment.getTokenMatches();
     ITokenMatch match1 = tokenMatches.get(0);
     ITokenMatch match2 = tokenMatches.get(1);
     ITokenMatch match3 = tokenMatches.get(2);

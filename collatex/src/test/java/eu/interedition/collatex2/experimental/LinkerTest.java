@@ -2,20 +2,24 @@ package eu.interedition.collatex2.experimental;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import eu.interedition.collatex2.implementation.vg_alignment.*;
-import eu.interedition.collatex2.interfaces.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenMatch;
+import eu.interedition.collatex2.interfaces.ILinker;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenMatch;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 public class LinkerTest {
   private static CollateXEngine engine;
@@ -27,9 +31,7 @@ public class LinkerTest {
 
   //convenience method
   private List<ITokenMatch> createTokenMatches2(final IVariantGraph graph, final IWitness witnessB) {
-    IWitness superbase = new SuperbaseCreator().create(graph);
-    TokenLinker linker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> tokens = linker.link2(superbase, witnessB);
+    Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, witnessB);
     List<ITokenMatch> matches = Lists.newArrayList();
     for (INormalizedToken witnessToken : tokens.keySet()) {
       INormalizedToken baseToken = tokens.get(witnessToken);
@@ -39,64 +41,72 @@ public class LinkerTest {
     return matches;
   }
 
+  //convenience method
+  private Map<INormalizedToken, INormalizedToken> linkTokens(final IVariantGraph graph, final IWitness witnessB) {
+    //TODO: should this test the tokenLinker ?
+    //TODO: I don't think so
+    ILinker linker = new TokenLinker();
+    Map<INormalizedToken, INormalizedToken> tokens = linker.link(graph, witnessB);
+    return tokens;
+  }
+
   @Test
   public void testDirkVincent4() {
     IWitness a = engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    TokenLinker linker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> tokens = linker.link2(a, b);
-    INormalizedToken itsA = a.getTokens().get(0);
+    IVariantGraph graph = engine.graph(a);
+    Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, b);
+    IWitness sb = new SuperbaseCreator().create(graph);
+    INormalizedToken itsSB = sb.getTokens().get(1);
     INormalizedToken itsB = b.getTokens().get(0);
-    assertEquals(itsA, tokens.get(itsB));
-    INormalizedToken lightA = a.getTokens().get(2);
+    assertEquals(itsSB, tokens.get(itsB));
+    INormalizedToken lightSB = sb.getTokens().get(3);
     INormalizedToken lightB = b.getTokens().get(3);
-    assertEquals(lightA, tokens.get(lightB));
-    INormalizedToken light2A = a.getTokens().get(11);
+    assertEquals(lightSB, tokens.get(lightB));
+    INormalizedToken light2SB = sb.getTokens().get(12);
     INormalizedToken light2B = b.getTokens().get(6);
-    assertEquals(light2A, tokens.get(light2B));
+    assertEquals(light2SB, tokens.get(light2B));
   }
   
   @Test
   public void testDirkVincent9() {
-    final MemoryzingVariantGraphListener listener = new MemoryzingVariantGraphListener();
-    IVariantGraph graph = engine.graph(listener);
-
-    graph.add(engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa."));
-    graph.add(engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa."));
-
-    final IWitness c = engine.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
-    graph.add(c);
-
-    final Map<INormalizedToken, INormalizedToken> linkedTokenMap = listener.getLinkedTokenMap();
-    final Set<INormalizedToken> linkedWitnessTokens = linkedTokenMap.keySet();
-    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(1)));
-    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(2)));
-    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(21)));
-    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(22)));
-    assertFalse(linkedWitnessTokens.contains(c.getTokens().get(23)));
+    // lots of setup
+    IWitness a = engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
+    IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+    IVariantGraph graph = engine.graph(a, b);
+    IWitness c = engine.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
+    Map<INormalizedToken, INormalizedToken> link = linkTokens(graph, c);
+    //TODO: isn't this code the same as the other convienance method?
+    List<INormalizedToken> unlinkedTokens = Lists.newArrayList();
+    for (INormalizedToken witnessToken : c.getTokens()) {
+      if (link.get(witnessToken) ==null) {
+        unlinkedTokens.add(witnessToken);
+      }
+    }
+    assertTrue(unlinkedTokens.contains(c.getTokens().get(1)));
+    assertTrue(unlinkedTokens.contains(c.getTokens().get(2)));
+    assertTrue(unlinkedTokens.contains(c.getTokens().get(21)));
+    assertTrue(unlinkedTokens.contains(c.getTokens().get(22)));
+    assertTrue(unlinkedTokens.contains(c.getTokens().get(23)));
+    assertEquals(5, unlinkedTokens.size());
   }
 
   @Test
   public void testLinkingWithStartToken() {
-    final IWitness a = engine.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
-    final IWitness b = engine.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
-
-    final MemoryzingVariantGraphListener listener = new MemoryzingVariantGraphListener();
-    final IVariantGraph graph = engine.graph(listener);
-    graph.add(a);
-    graph.add(b);
-
-    final Map<INormalizedToken, INormalizedToken> link = listener.getLinkedTokenMap();
-    assertFalse(link.containsKey(b.getTokens().get(0)));
-    assertFalse(link.containsKey(b.getTokens().get(1)));
-    assertFalse(link.containsKey(b.getTokens().get(2)));
-    assertFalse(link.containsKey(b.getTokens().get(3)));
-    assertFalse(link.containsKey(b.getTokens().get(4)));
-    assertFalse(link.containsKey(b.getTokens().get(5)));
-    assertFalse(link.containsKey(b.getTokens().get(6)));
-    assertFalse(link.containsKey(b.getTokens().get(7)));
-    assertTrue(link.containsKey(b.getTokens().get(8))); // again
-    assertFalse(link.containsKey(b.getTokens().get(9)));
+    IWitness a = engine.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
+    IWitness b = engine.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
+    IVariantGraph graph = engine.graph(a);
+    Map<INormalizedToken, INormalizedToken> link = linkTokens(graph, b);
+    assertTrue(!link.containsKey(b.getTokens().get(0)));
+    assertTrue(!link.containsKey(b.getTokens().get(1)));
+    assertTrue(!link.containsKey(b.getTokens().get(2)));
+    assertTrue(!link.containsKey(b.getTokens().get(3)));
+    assertTrue(!link.containsKey(b.getTokens().get(4)));
+    assertTrue(!link.containsKey(b.getTokens().get(5)));
+    assertTrue(!link.containsKey(b.getTokens().get(6)));
+    assertTrue(!link.containsKey(b.getTokens().get(7)));
+    assertTrue(link.containsKey(b.getTokens().get(8))); // again 
+    assertTrue(!link.containsKey(b.getTokens().get(9))); 
     assertTrue(link.containsKey(b.getTokens().get(10))); // to
     assertTrue(link.containsKey(b.getTokens().get(11))); // his
   }
@@ -106,10 +116,9 @@ public class LinkerTest {
     IWitness a = engine.createWitness("a","the cat is very happy");
     IWitness b = engine.createWitness("b", "very happy is the cat");
     IVariantGraph graph = engine.graph(a, b);
-    IWitness superbase = new SuperbaseCreator().create(graph);
     IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
-    TokenLinker linker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> tokens = linker.link2(superbase, c);
+    Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, c);
+    IWitness superbase = new SuperbaseCreator().create(graph);
     INormalizedToken verySB = superbase.getTokens().get(3);
     INormalizedToken veryC = c.getTokens().get(0);
     INormalizedToken happySB = superbase.getTokens().get(4);
@@ -130,9 +139,7 @@ public class LinkerTest {
     final IWitness witnessA = engine.createWitness("A", "a");
     final IWitness witnessB = engine.createWitness("B", "a a");
     final IVariantGraph graph = engine.graph(witnessA);
-    IWitness superbase = new SuperbaseCreator().create(graph);
-    TokenLinker linker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> tokens = linker.link2(superbase, witnessB);
+    Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, witnessB);
     assertEquals(1, tokens.size());
     INormalizedToken expectedBaseToken = graph.getTokens(witnessA).get(0);
     INormalizedToken witnessToken = witnessB.getTokens().get(0);

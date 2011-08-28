@@ -25,8 +25,8 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphEdge;
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphVertex;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;

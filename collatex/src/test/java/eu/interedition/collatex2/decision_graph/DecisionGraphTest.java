@@ -1,15 +1,11 @@
 package eu.interedition.collatex2.decision_graph;
 
+import org.junit.Ignore;
 
-import org.junit.Test;
-
+@Ignore
 public class DecisionGraphTest {
 
-
-  @Test
-  public void doNothing() {
-  }
-
+  
   //  the -> The
   //  the -> the
   //  black -> black

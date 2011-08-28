@@ -18,13 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_analysis;
+package eu.interedition.collatex2.interfaces.nonpublic.modifications;
 
+import eu.interedition.collatex2.interfaces.IColumn;
+import eu.interedition.collatex2.interfaces.IPhrase;
 
-public interface ITransposition {
+public interface IReplacement extends IModification {
 
-  ISequence getSequenceA();
+  IColumns getOriginalColumns();
 
-  ISequence getSequenceB();
+  IPhrase getReplacementPhrase();
+
+  IColumn getNextColumn();
+
+  int getPosition();
 
 }

@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex2.Util;
 import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -64,7 +65,7 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
 
   @Override
   public IWitness build(InputStream inputStream) throws SAXException, IOException {
-    String id = generateRandomId();
+    String id = Util.generateRandomId();
     Document doc = getXmlDocument(inputStream);
 
     XPath xpath = factory.newXPath();
