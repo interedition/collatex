@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.web;
+package eu.interedition.collatex.web.model;
 
 import java.util.List;
 
@@ -26,13 +26,12 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class ApiWitness extends Witness {
+public class Witness extends eu.interedition.collatex2.implementation.containers.witness.Witness {
   private String content;
 
-  public ApiWitness() {
+  public Witness() {
     super();
   }
 
@@ -57,14 +56,14 @@ public class ApiWitness extends Witness {
   }
 
   @Override
-  @JsonDeserialize(contentAs = ApiToken.class)
+  @JsonDeserialize(contentAs = Token.class)
   public void setTokens(List<INormalizedToken> tokens) {
     super.setTokens(tokens);
   }
 
   @SuppressWarnings("unchecked")
   @JsonIgnore
-  public List<ApiToken> getApiTokens() {
+  public List<Token> getApiTokens() {
     return (List) getTokens();
   }
 }

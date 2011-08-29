@@ -1,5 +1,6 @@
 body {
-    margin: 1em;
+    width: 900px;
+    margin: 1em auto;
 }
 
 table {
@@ -24,9 +25,15 @@ pre {
 	background: #eee;
 }
 
-#mainmenu {
-	color: #808080;
-	text-align: right;
+#top-bar {
+    margin: 0;
+    width: 100%;
+}
+
+#top-bar td {
+	border: 0;
+    padding: 0;
+    vertical-align: middle;
 }
 
 .none {

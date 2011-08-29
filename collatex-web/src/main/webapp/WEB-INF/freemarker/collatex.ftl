@@ -1,49 +1,45 @@
-<#--
-
-    CollateX - a Java library for collating textual sources,
-    for example, to produce an apparatus.
-
-    Copyright (C) 2010 ESF COST Action "Interedition".
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->
-
 <#assign cp = springMacroRequestContext.getContextPath()>
 
 <#macro page title>
 <!DOCTYPE html>
 <html>
 <head>
-	<title>${title} :: CollateX</title>
+    <title>${title} :: CollateX</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssfonts/fonts-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssreset/reset-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssgrids/grids-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssbase/base-min.css">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css" />
-	<link rel="stylesheet" type="text/css" href="${cp}/static/collatex.css" />
+    <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css"/>
+    <link rel="stylesheet" type="text/css" href="${cp}/static/collatex.css"/>
+    <script type="text/javascript">var cp = "${cp?js_string}";</script>
+    <script type="text/javascript" src="${cp}/static/yui-3.4.0/yui/yui-min.js"></script>
 </head>
-<body>
-	<div id="mainmenu">
-		<a href="${cp}/examples/usecases" title="Use Cases">Use cases</a> |
-		<a href="${cp}/examples/beckett" title="Beckett">Beckett</a> |
-		<a href="${cp}/examples/darwin" title="Darwin">Darwin</a> |
-		<a href="${cp}/api/collate" title="REST service">REST service</a>
-	</div>
-	
-	<#nested>
+<body class="yui3-skin-sam">
+<table id="top-bar">
+    <tr>
+        <td style="width: 60px"><img src="${cp}/static/collatex_logo_small.png" alt="CollateX"></td>
+        <td>
+            <div id="main-menu" class="yui3-menu yui3-menu-horizontal">
+                <div class="yui3-menu-content">
+                    <ul>
+                        <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/">Collate</a></li>
+                        <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/tutorial">Documentation</a></li>
+                        <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/examples/darwin">Darwin</a></li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+    <#nested>
+<script type="text/javascript">
+    YUI().use("node", "node-menunav", function(Y) {
+        Y.on("contentready", function() {
+            this.plug(Y.Plugin.NodeMenuNav, { autoSubmenuDisplay: true, mouseOutHideDelay: 0 });
+        }, "#main-menu");
+    });
+</script>
 </body>
 </html>
 </#macro>

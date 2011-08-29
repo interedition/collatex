@@ -18,23 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.web;
+package eu.interedition.collatex.web.model;
 
-public class ApiException extends Exception {
+import java.util.List;
 
-  public ApiException() {
-    super();
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+
+public class Collation {
+
+  @JsonProperty
+  @JsonDeserialize(contentAs = Witness.class)
+  private List<Witness> witnesses;
+
+  public List<Witness> getWitnesses() {
+    return witnesses;
   }
 
-  public ApiException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public ApiException(String message) {
-    super(message);
-  }
-
-  public ApiException(Throwable cause) {
-    super(cause);
+  public void setWitnesses(List<Witness> witnesses) {
+    this.witnesses = witnesses;
   }
 }

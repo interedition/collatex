@@ -20,22 +20,9 @@
 
 package eu.interedition.collatex.web;
 
-import java.util.List;
+public class CollationException extends Exception {
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-
-public class ApiInput {
-
-  @JsonProperty
-  @JsonDeserialize(contentAs = ApiWitness.class)
-  private List<ApiWitness> witnesses;
-
-  public List<ApiWitness> getWitnesses() {
-    return witnesses;
-  }
-
-  public void setWitnesses(List<ApiWitness> witnesses) {
-    this.witnesses = witnesses;
+  public CollationException(String message) {
+    super(message);
   }
 }

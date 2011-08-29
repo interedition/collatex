@@ -18,14 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.web;
+package eu.interedition.collatex.web.model;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.google.common.base.Function;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.annotate.JsonAnySetter;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -33,19 +31,20 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@JsonSerialize(using = ApiToken.Serializer.class)
+@JsonSerialize(using = Token.Serializer.class)
 @JsonIgnoreProperties( { "position", "sigil" })
-public class ApiToken extends WitnessToken {
+public class Token extends WitnessToken {
   private Map<String, Object> metadata;
 
-  public ApiToken() {
+  public Token() {
     super();
   }
   
-  public ApiToken(INormalizedToken other) {
+  public Token(INormalizedToken other) {
     super(other);
   }
 
@@ -69,10 +68,18 @@ public class ApiToken extends WitnessToken {
     metadata.put(key, value);
   }
 
-  public static class Serializer extends JsonSerializer<ApiToken> {
+  public static final Function<INormalizedToken, Token> TO_TOKEN = new Function<INormalizedToken, Token>() {
 
     @Override
-    public void serialize(ApiToken value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+    public Token apply(INormalizedToken from) {
+      return new Token(from);
+    }
+  };
+
+  public static class Serializer extends JsonSerializer<Token> {
+
+    @Override
+    public void serialize(Token value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
       jgen.writeStartObject();
       jgen.writeStringField("t", value.getContent());
       jgen.writeStringField("n", value.getNormalized());
