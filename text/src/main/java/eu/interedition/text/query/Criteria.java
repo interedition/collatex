@@ -69,8 +69,4 @@ public class Criteria {
   public static Operator or(Criterion... criteria) {
     return new OrOperator(Arrays.asList(criteria));
   }
-
-  public static Criterion not(Criterion criterion) {
-    return new NotOperator(criterion);
-  }
 }

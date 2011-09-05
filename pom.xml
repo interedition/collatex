@@ -289,6 +289,16 @@
                 <artifactId>freemarker</artifactId>
                 <version>2.3.16</version>
             </dependency>
+            <dependency>
+                <groupId>org.neo4j</groupId>
+                <artifactId>neo4j-community</artifactId>
+                <version>1.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sleepycat</groupId>
+                <artifactId>je</artifactId>
+                <version>4.1.10</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <repositories>
@@ -296,6 +306,12 @@
             <id>tinkerpop-repository</id>
             <name>TinkerPop Maven2 Repository</name>
             <url>http://tinkerpop.com/maven2</url>
+        </repository>
+        <repository>
+            <id>oracleReleases</id>
+            <name>Oracle Released Java Packages</name>
+            <url>http://download.oracle.com/maven</url>
+            <layout>default</layout>
         </repository>
         <repository>
             <id>maven.restlet.org</id>

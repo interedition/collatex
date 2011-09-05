@@ -59,8 +59,6 @@ public class RelationalQueryCriteriaTranslator {
       sql(sql, (RangeLengthCriterion) criterion, ps);
     } else if (criterion instanceof AnnotationIdentityCriterion) {
       sql((AnnotationIdentityCriterion) criterion, ps, sql);
-    } else if (criterion instanceof NotOperator) {
-      sql(sql, (NotOperator) criterion, ps);
     } else if (criterion instanceof AnyCriterion) {
       sql(sql, (AnyCriterion) criterion, ps);
     } else if (criterion instanceof NoneCriterion) {
@@ -94,12 +92,6 @@ public class RelationalQueryCriteriaTranslator {
     } else {
       throw new IllegalArgumentException();
     }
-  }
-
-  protected void sql(StringBuilder sql, NotOperator criterion, Collection<Object> ps) {
-    sql.append("(NOT ");
-    where(sql, criterion.getOperand(), ps);
-    sql.append(")");
   }
 
   protected void sql(StringBuilder sql, AnnotationLinkNameCriterion criterion, Collection<Object> ps) {

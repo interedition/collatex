@@ -60,13 +60,11 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   private DataSource dataSource;
   private DataFieldMaxValueIncrementerFactory incrementerFactory;
   private RelationalQNameRepository nameRepository;
-  private RelationalTextRepository textRepository;
   private RelationalQueryCriteriaTranslator queryCriteriaTranslator;
 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert annotationInsert;
   private SimpleJdbcInsert annotationDataInsert;
-  private SAXParserFactory saxParserFactory;
 
   private int batchSize = 10000;
   private DataFieldMaxValueIncrementer annotationIdIncrementer;
@@ -164,44 +162,17 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     }, parameters.toArray(new Object[parameters.size()])));
   }
 
-  public SortedSet<QName> names(Text text) {
+  @Override
+  protected SortedSet<QName> getNames(Text text) {
     final StringBuilder namesSql = new StringBuilder("select distinct ");
     namesSql.append(selectNameFrom("n"));
     namesSql.append(" from text_qname n join text_annotation a on a.name = n.id where a.text = ?");
-    final SortedSet<QName> names = Sets.newTreeSet(jt.query(namesSql.toString(), new RowMapper<QName>() {
+    return Sets.newTreeSet(jt.query(namesSql.toString(), new RowMapper<QName>() {
 
       public QName mapRow(ResultSet rs, int rowNum) throws SQLException {
         return mapNameFrom(rs, "n");
       }
     }, ((RelationalText) text).getId()));
-
-    if (names.isEmpty() && text.getType() == Text.Type.XML) {
-      try {
-        textRepository.read(text, new TextRepository.TextReader() {
-          public void read(Reader content, long contentLength) throws IOException {
-            if (contentLength == 0) {
-              return;
-            }
-            try {
-              saxParserFactory.newSAXParser().parse(new InputSource(content), new DefaultHandler() {
-                @Override
-                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                  names.add(new SimpleQName(uri, localName));
-                }
-              });
-            } catch (SAXException e) {
-              throw Throwables.propagate(e);
-            } catch (ParserConfigurationException e) {
-              throw Throwables.propagate(e);
-            }
-          }
-        });
-      } catch (IOException e) {
-        throw Throwables.propagate(e);
-      }
-    }
-
-    return names;
   }
 
   public Map<Annotation, Map<QName, String>> get(Iterable<Annotation> links, Set<QName> names) {
@@ -343,11 +314,6 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   }
 
   @Required
-  public void setTextRepository(RelationalTextRepository textRepository) {
-    this.textRepository = textRepository;
-  }
-
-  @Required
   public void setQueryCriteriaTranslator(RelationalQueryCriteriaTranslator queryCriteriaTranslator) {
     this.queryCriteriaTranslator = queryCriteriaTranslator;
   }
@@ -357,13 +323,11 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   }
 
   public void afterPropertiesSet() throws Exception {
+    super.afterPropertiesSet();
+
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
     this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation"));
     this.annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
-
-    this.saxParserFactory = SAXParserFactory.newInstance();
-    this.saxParserFactory.setNamespaceAware(true);
-    this.saxParserFactory.setValidating(false);
 
     this.annotationIdIncrementer = incrementerFactory.create("text_annotation");
   }

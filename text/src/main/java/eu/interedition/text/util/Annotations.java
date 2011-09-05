@@ -24,6 +24,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
+import eu.interedition.text.Text;
 
 import java.util.Comparator;
 
@@ -46,6 +47,14 @@ public class Annotations {
   public static final Function<Annotation, QName> NAME = new Function<Annotation, QName>() {
     public QName apply(Annotation input) {
       return input.getName();
+    }
+  };
+
+  public static final Function<Annotation, Text> TEXT = new Function<Annotation, Text>() {
+
+    @Override
+    public Text apply(Annotation input) {
+      return input.getText();
     }
   };
 }

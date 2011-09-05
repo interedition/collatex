@@ -19,6 +19,7 @@
  */
 package eu.interedition.text.util;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import eu.interedition.text.QName;
 
@@ -43,6 +44,13 @@ public class QNames {
       } else {
         return (o1Ns == null ? 1 : -1);
       }
+    }
+  };
+
+  public static final Function<QName,String> TO_STRING = new Function<QName, String>() {
+    @Override
+    public String apply(QName input) {
+      return QNames.toString(input);
     }
   };
 

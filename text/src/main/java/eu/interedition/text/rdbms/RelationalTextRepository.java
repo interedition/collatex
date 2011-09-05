@@ -60,8 +60,6 @@ import static java.util.Collections.singleton;
 
 public class RelationalTextRepository extends AbstractTextRepository implements InitializingBean {
 
-  private static final String NULL_CONTENT_DIGEST = DigestUtils.sha512Hex("");
-
   private DataSource dataSource;
   private DataFieldMaxValueIncrementerFactory incrementerFactory;
 
@@ -103,12 +101,6 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     rt.setLength(0);
 
     return rt;
-  }
-
-  public Text create(Reader content) throws IOException {
-    final Text text = create(Text.Type.TXT);
-    write(text, content);
-    return text;
   }
 
   public void write(Text text, Reader content) throws IOException {
@@ -172,10 +164,6 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
         return null;
       }
     });
-  }
-
-  public String read(Text text, Range range) throws IOException {
-    return getOnlyElement(bulkRead(text, Sets.newTreeSet(singleton(range))).values());
   }
 
   public SortedMap<Range, String> bulkRead(Text text, final SortedSet<Range> ranges) throws IOException {
@@ -273,81 +261,5 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     }
 
     protected abstract T read(Clob content) throws SQLException, IOException;
-  }
-
-  private static class CountingWriter extends FilterWriter {
-
-    private long length = 0;
-
-    private CountingWriter(Writer out) {
-      super(out);
-    }
-
-    @Override
-    public void write(int c) throws IOException {
-      super.write(c);
-      length++;
-    }
-
-    @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {
-      super.write(cbuf, off, len);
-      length += len;
-    }
-
-    @Override
-    public void write(String str, int off, int len) throws IOException {
-      super.write(str, off, len);
-      length += len;
-    }
-  }
-
-  private static class DigestingFilterReader extends FilterReader {
-
-    private MessageDigest digest;
-    private String result;
-    private CharsetEncoder encoder;
-
-    private DigestingFilterReader(Reader in) {
-      super(in);
-      try {
-        this.digest = MessageDigest.getInstance("SHA-512");
-        this.encoder = Text.CHARSET.newEncoder();
-      } catch (NoSuchAlgorithmException e) {
-        throw Throwables.propagate(e);
-      }
-    }
-
-    @Override
-    public int read() throws IOException {
-      final int read = super.read();
-      if (read >= 0) {
-        digest.update(encoder.encode(CharBuffer.wrap(new char[]{(char) read})));
-      }
-      return read;
-    }
-
-    @Override
-    public int read(char[] cbuf, int off, int len) throws IOException {
-      final int read = super.read(cbuf, off, len);
-      if (read >= 0) {
-        digest.update(encoder.encode(CharBuffer.wrap(cbuf, off, len)));
-      }
-      return read;
-    }
-
-    @Override
-    public void reset() throws IOException {
-      digest.reset();
-      result = null;
-      super.reset();
-    }
-
-    private String digest() {
-      if (result == null) {
-        result = Hex.encodeHexString(digest.digest());
-      }
-      return result;
-    }
   }
 }
