@@ -19,14 +19,13 @@
  */
 package eu.interedition.text;
 
-import eu.interedition.text.rdbms.RelationalQNameRepository;
+import eu.interedition.text.graph.GraphQNameRepository;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
@@ -37,9 +36,9 @@ import java.net.URI;
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/testContext.xml", "classpath:/eu/interedition/text/rdbms/repository-context.xml"})
+@ContextConfiguration(locations = {"classpath:/graphTestContext.xml", "classpath:/eu/interedition/text/rdbms/graph-repository-context.xml"})
 @Transactional
-public abstract class AbstractTest {
+public abstract class AbstractGraphTest {
   /**
    * Test namespace.
    */
@@ -48,20 +47,12 @@ public abstract class AbstractTest {
   /**
    * A logger for debug output.
    */
-  protected static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class.getPackage().getName());
+  protected static final Logger LOG = LoggerFactory.getLogger(AbstractGraphTest.class.getPackage().getName());
 
   @Autowired
-  protected QNameRepository nameRepository;
+  protected GraphQNameRepository nameRepository;
 
   protected static String escapeNewlines(String str) {
     return str.replaceAll("[\n\r]+", "\\\\n");
   }
-
-  @AfterTransaction
-  public void clearNameCache() {
-    if (nameRepository instanceof RelationalQNameRepository) {
-      ((RelationalQNameRepository) nameRepository).clearCache();
-    }
-  }
-
 }

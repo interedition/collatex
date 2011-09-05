@@ -1,5 +1,6 @@
 package eu.interedition.text.graph;
 
+import com.google.common.base.Function;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.QName;
 import eu.interedition.text.Range;
@@ -49,6 +50,14 @@ public class GraphAnnotation implements Annotation {
 
   @Override
   public int compareTo(Annotation o) {
-    return Annotations.compare(this, o).compare(node.getId(), ((GraphAnnotation)o).node.getId()).result();
+    return Annotations.compare(this, o).compare(node.getId(), ((GraphAnnotation) o).node.getId()).result();
   }
+
+  public static final Function<Node, Annotation> FROM_NODE = new Function<Node, Annotation>() {
+    @Override
+    public Annotation apply(Node input) {
+      return new GraphAnnotation(input);
+    }
+  };
+
 }

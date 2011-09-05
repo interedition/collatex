@@ -8,13 +8,19 @@ import eu.interedition.text.*;
 import eu.interedition.text.query.Criterion;
 import eu.interedition.text.util.AbstractAnnotationRepository;
 import eu.interedition.text.util.QNames;
+import org.apache.lucene.search.Query;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.index.Index;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.*;
 
+import static com.google.common.collect.Iterables.transform;
+import static eu.interedition.text.graph.GraphAnnotation.FROM_NODE;
 import static eu.interedition.text.graph.TextRelationshipType.ANNOTATES;
 import static eu.interedition.text.graph.TextRelationshipType.NAMES;
 import static org.neo4j.graphdb.Direction.INCOMING;
@@ -24,6 +30,7 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class GraphAnnotationRepository extends AbstractAnnotationRepository {
+  protected static final Logger LOG = LoggerFactory.getLogger(GraphAnnotationRepository.class);
 
   private GraphDatabaseService db;
   private QNameRepository nameRepository;
@@ -43,29 +50,52 @@ public class GraphAnnotationRepository extends AbstractAnnotationRepository {
   @Override
   public Iterable<Annotation> create(Iterable<Annotation> annotations) {
     final List<Annotation> created = Lists.newArrayListWithExpectedSize(Iterables.size(annotations));
+    final Index<Node> index = annotationIndex();
     for (Annotation a : annotations) {
       final Range range = a.getRange();
 
+      final Node textNode = ((GraphText) a.getText()).getNode();
+      final Node nameNode = ((GraphQName) nameRepository.get(a.getName())).getNode();
       final Node annotationNode = db.createNode();
+
       annotationNode.setProperty(GraphAnnotation.PROP_RANGE_START, range.getStart());
       annotationNode.setProperty(GraphAnnotation.PROP_RANGE_END, range.getEnd());
-      annotationNode.createRelationshipTo(((GraphText) a.getText()).getNode(), ANNOTATES);
-      ((GraphQName) nameRepository.get(a.getName())).getNode().createRelationshipTo(annotationNode, NAMES);
+
+      annotationNode.createRelationshipTo(textNode, ANNOTATES);
+      nameNode.createRelationshipTo(annotationNode, NAMES);
+
+      index.add(annotationNode, GraphAnnotation.PROP_ID, annotationNode.getId());
+      index.add(annotationNode, GraphAnnotation.PROP_TEXT, textNode.getId());
+      index.add(annotationNode, GraphAnnotation.PROP_RANGE_START, range.getStart());
+      index.add(annotationNode, GraphAnnotation.PROP_RANGE_END, range.getEnd());
+      index.add(annotationNode, GraphAnnotation.PROP_RANGE_LENGTH, range.length());
+
       created.add(new GraphAnnotation(annotationNode));
     }
     return created;
   }
 
+  protected Index<Node> annotationIndex() {
+    return db.index().forNodes("annotations");
+  }
+
   @Override
   public Iterable<Annotation> find(Criterion criterion) {
-    db.index().forNodes("annotations").query(queryCriteriaTranslator.toQuery(criterion));
-    throw new UnsupportedOperationException();
+    final Query query = queryCriteriaTranslator.toQuery(criterion);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Query annotations with '{}'", query);
+    }
+    return transform(annotationIndex().query(query), FROM_NODE);
   }
 
   @Override
   public void delete(Iterable<Annotation> annotations) {
+    final Index<Node> index = annotationIndex();
     for (GraphAnnotation a : Iterables.filter(annotations, GraphAnnotation.class)) {
       final Node node = a.getNode();
+
+      index.remove(node);
+
       node.getSingleRelationship(ANNOTATES, OUTGOING).delete();
       node.getSingleRelationship(NAMES, INCOMING).delete();
       node.delete();
