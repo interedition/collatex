@@ -42,20 +42,6 @@ public class TextXMLParserModule extends XMLParserModuleAdapter {
   }
 
   @Override
-  public void start(XMLEntity entity, XMLParserState state) {
-    final XMLParserConfiguration configuration = state.getConfiguration();
-    final Stack<Boolean> inclusionContext = state.getInclusionContext();
-
-    final boolean parentIncluded = (inclusionContext.isEmpty() ? true : inclusionContext.peek());
-    inclusionContext.push(parentIncluded ? !configuration.excluded(entity) : configuration.included(entity));
-  }
-
-  @Override
-  public void end(XMLEntity entity, XMLParserState state) {
-    state.getInclusionContext().pop();
-  }
-
-  @Override
   public void text(String text, XMLParserState state) {
     final Stack<Boolean> inclusionContext = state.getInclusionContext();
     if (!inclusionContext.isEmpty() && !inclusionContext.peek()) {

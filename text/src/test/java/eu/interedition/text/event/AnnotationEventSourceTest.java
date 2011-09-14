@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import static eu.interedition.text.TextConstants.TEI_NS;
@@ -48,7 +49,7 @@ public class AnnotationEventSourceTest extends AbstractTestResourceTest {
                     annotationName(new SimpleQName(TEI_NS, "lg")),
                     annotationName(new SimpleQName(TEI_NS, "l")),
                     annotationName(new SimpleQName(TEI_NS, "p"))
-            ));
+            ), Collections.<QName>emptySet());
   }
 
   private final AnnotationEventListener DEBUG_LISTENER = new AnnotationEventListener() {

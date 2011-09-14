@@ -34,8 +34,8 @@ import java.util.Map;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
-  private final ThreadLocal<Map<String, SimpleAnnotation>> annotations = new ThreadLocal<Map<String, SimpleAnnotation>>();
-  private final ThreadLocal<Map<String, Map<QName, String>>> attributes = new ThreadLocal<Map<String, Map<QName, String>>>();
+  private Map<String, SimpleAnnotation> annotations;
+  private Map<String, Map<QName, String>> attributes;
 
   public CLIXAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     super(annotationRepository, batchSize);
@@ -44,14 +44,14 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
   @Override
   public void start(XMLParserState state) {
     super.start(state);
-    annotations.set(Maps.<String, SimpleAnnotation>newHashMap());
-    attributes.set(Maps.<String, Map<QName, String>>newHashMap());
+    annotations = Maps.<String, SimpleAnnotation>newHashMap();
+    attributes = Maps.<String, Map<QName, String>>newHashMap();
   }
 
   @Override
   public void end(XMLParserState state) {
-    attributes.remove();
-    annotations.remove();
+    attributes = null;
+    annotations = null;
     super.end(state);
   }
 
@@ -66,8 +66,6 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
       return;
     }
 
-    final Map<String, SimpleAnnotation> annotations = this.annotations.get();
-    final Map<String, Map<QName, String>> attributes = this.attributes.get();
     final long textOffset = state.getTextOffset();
 
     if (startId != null) {

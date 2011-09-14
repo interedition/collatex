@@ -36,7 +36,7 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
   protected final AnnotationRepository annotationRepository;
   protected final int batchSize;
 
-  private final ThreadLocal<Map<Annotation, Map<QName, String>>> annotationBatch = new ThreadLocal<Map<Annotation, Map<QName, String>>>();
+  private Map<Annotation, Map<QName, String>> annotationBatch;
 
   protected AbstractAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     this.annotationRepository = annotationRepository;
@@ -46,40 +46,38 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
   @Override
   public void start(XMLParserState state) {
     super.start(state);
-    annotationBatch.set(new LinkedHashMap<Annotation, Map<QName, String>>());
+    annotationBatch = new LinkedHashMap<Annotation, Map<QName, String>>();
   }
 
   @Override
   public void end(XMLParserState state) {
-    final Map<Annotation, Map<QName, String>> batch = annotationBatch.get();
-    if (!batch.isEmpty()) {
-      emit(batch);
+    if (!annotationBatch.isEmpty()) {
+      emit();
     }
 
-    annotationBatch.remove();
+    annotationBatch = null;
     super.end(state);
   }
 
   protected void add(Annotation annotation, Map<QName, String> attributes) {
-    final Map<Annotation, Map<QName, String>> batch = annotationBatch.get();
-    batch.put(annotation, attributes);
+    annotationBatch.put(annotation, attributes);
 
-    if ((batch.size() % batchSize) == 0) {
-      emit(batch);
+    if ((annotationBatch.size() % batchSize) == 0) {
+      emit();
     }
   }
 
-  protected void emit(Map<Annotation, Map<QName, String>> batch) {
-    final Iterator<Annotation> annotationIt = annotationRepository.create(batch.keySet()).iterator();
-    final Iterator<Map<QName, String>> attributesIt = batch.values().iterator();
+  protected void emit() {
+    final Iterator<Annotation> annotationIt = annotationRepository.create(annotationBatch.keySet()).iterator();
+    final Iterator<Map<QName, String>> attributesIt = annotationBatch.values().iterator();
 
-    final Map<Annotation, Map<QName, String>> attrBatch = Maps.newHashMapWithExpectedSize(batch.size());
+    final Map<Annotation, Map<QName, String>> attrBatch = Maps.newHashMapWithExpectedSize(annotationBatch.size());
     while (annotationIt.hasNext() && attributesIt.hasNext()) {
       attrBatch.put(annotationIt.next(), attributesIt.next());
     }
     annotationRepository.set(attrBatch);
 
-    batch.clear();
+    annotationBatch.clear();
   }
 
 }

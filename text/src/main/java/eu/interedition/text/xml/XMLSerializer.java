@@ -52,7 +52,7 @@ public class XMLSerializer {
 
   public void serialize(final ContentHandler xml, Text text, final XMLSerializerConfiguration config) throws XMLStreamException, IOException {
     try {
-      eventSource.listen(new SerializingListener(xml, config), text, config.getQuery());
+      eventSource.listen(new SerializingListener(xml, config), text, config.getQuery(), null);
     } catch (Throwable t) {
       Throwables.propagateIfInstanceOf(t, IOException.class);
       Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);

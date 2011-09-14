@@ -21,10 +21,14 @@ package eu.interedition.text.util;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import eu.interedition.text.QName;
+import eu.interedition.text.mem.SimpleQName;
 
 import java.net.URI;
 import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class QNames {
   public static final Comparator<QName> COMPARATOR = new Comparator<QName>() {
@@ -63,10 +67,17 @@ public class QNames {
     return Objects.hashCode(name.getLocalName(), name.getNamespaceURI());
   }
 
+
   public static String toString(QName name) {
     final URI ns = name.getNamespaceURI();
     return "{" + (ns == null ? "" : ns) + "}" + name.getLocalName();
   }
 
+  public static QName fromString(String nameStr) {
+    final Matcher matcher = NAME_PATTERN.matcher(nameStr);
+    Preconditions.checkArgument(matcher.matches(), nameStr);
+    return new SimpleQName(matcher.group(1), matcher.group(2));
+  }
 
+  private static final Pattern NAME_PATTERN = Pattern.compile("^\\{([^\\}]+)\\}(.+)$");
 }

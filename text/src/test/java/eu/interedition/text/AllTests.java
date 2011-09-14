@@ -21,6 +21,7 @@ package eu.interedition.text;
 
 import eu.interedition.text.analysis.OverlapAnalyzerTest;
 import eu.interedition.text.event.AnnotationEventSourceTest;
+import eu.interedition.text.json.JSONSerializerTest;
 import eu.interedition.text.query.RangeQueryTest;
 import eu.interedition.text.rdbms.AnnotationLinkTest;
 import eu.interedition.text.rdbms.AnnotationTest;
@@ -36,6 +37,6 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({RangeQueryTest.class, QNameTest.class, TextTest.class, AnnotationTest.class, AnnotationLinkTest.class,
-        AnnotationEventSourceTest.class, XMLParserTest.class, XMLSerializerTest.class, OverlapAnalyzerTest.class})
+        AnnotationEventSourceTest.class, JSONSerializerTest.class, XMLParserTest.class, XMLSerializerTest.class, OverlapAnalyzerTest.class})
 public class AllTests {
 }

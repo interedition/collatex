@@ -60,7 +60,7 @@
         <property name="annotationRepository" ref="annotationRepository" />
         <property name="textRepository" ref="textRepository" />
     </bean>
-
+    
     <bean id="xmlParser" class="eu.interedition.text.xml.XMLParser">
         <property name="textRepository" ref="textRepository" />
     </bean>

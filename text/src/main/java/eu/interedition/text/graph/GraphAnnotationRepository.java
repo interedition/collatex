@@ -17,7 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.transform;
 import static eu.interedition.text.graph.GraphAnnotation.FROM_NODE;
@@ -108,23 +111,35 @@ public class GraphAnnotationRepository extends AbstractAnnotationRepository {
   }
 
   @Override
-  public Map<Annotation, Map<QName, String>> get(Iterable<Annotation> links, Set<QName> names) {
-    final ArrayList<QName> nameList = Lists.newArrayList(names);
+  public Map<Annotation, Map<QName, String>> find(Criterion criterion, Set<QName> names) {
+    final List<QName> nameList = (names == null ? null : Lists.newArrayList(names));
+    final List<String> attrNames = (names == null ? null : Lists.transform(nameList, QNames.TO_STRING));
 
-    final QName[] attrQNames = nameList.toArray(new QName[nameList.size()]);
-    final String[] attrNames = Lists.transform(nameList, QNames.TO_STRING).toArray(new String[nameList.size()]);
-
+    final Iterable<GraphAnnotation> annotations = Iterables.filter(find(criterion), GraphAnnotation.class);
     final Map<Annotation, Map<QName, String>> result = Maps.newLinkedHashMap();
-    for (GraphAnnotation a : Iterables.filter(links, GraphAnnotation.class)) {
-      final Map<QName, String> attributes = Maps.newLinkedHashMap();
-      final Node node = a.getNode();
-      for (int ac = 0; ac < attrNames.length; ac++) {
-        final String av = (String) node.getProperty(attrNames[ac]);
-        if (av != null) {
-          attributes.put(attrQNames[ac], av);
-        }
+
+    if (names != null && names.isEmpty()) {
+      for (GraphAnnotation a : annotations) {
+        result.put(a, Maps.<QName, String>newHashMap());
       }
-      result.put(a, attributes);
+    } else {
+      for (GraphAnnotation a : annotations) {
+        final Map<QName, String> attributes = Maps.newLinkedHashMap();
+        final Node node = a.getNode();
+        if (attrNames == null) {
+          for (String propertyKey : node.getPropertyKeys()) {
+            try {
+              attributes.put(QNames.fromString(propertyKey), node.getProperty(propertyKey).toString());
+            } catch (IllegalArgumentException e) {
+            }
+          }
+        } else {
+          for (int ac = 0; ac < attrNames.size(); ac++) {
+            attributes.put(nameList.get(ac), node.getProperty(attrNames.get(ac).toString()).toString());
+          }
+        }
+        result.put(a, attributes);
+      }
     }
     return result;
   }

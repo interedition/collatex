@@ -186,15 +186,19 @@ public class XMLParserState {
     if (LOG.isTraceEnabled()) {
       LOG.trace("Start of " + entity);
     }
-    for (XMLParserModule m : modules) {
-      m.start(entity, this);
-    }
+
+    final boolean parentIncluded = (inclusionContext.isEmpty() ? true : inclusionContext.peek());
+    inclusionContext.push(parentIncluded ? !configuration.excluded(entity) : configuration.included(entity));
 
     spacePreservationContext.push(spacePreservationContext.isEmpty() ? false : spacePreservationContext.peek());
     final String xmlSpace = entity.getAttributes().get(TextConstants.XML_SPACE_ATTR_NAME);
     if (xmlSpace != null) {
       spacePreservationContext.pop();
       spacePreservationContext.push("preserve".equalsIgnoreCase(xmlSpace));
+    }
+
+    for (XMLParserModule m : modules) {
+      m.start(entity, this);
     }
 
     nodePath.push(0);
@@ -205,13 +209,15 @@ public class XMLParserState {
     if (LOG.isTraceEnabled()) {
       LOG.trace("End of " + entity);
     }
-    elementContext.pop();
-    nodePath.pop();
-    spacePreservationContext.pop();
 
     for (XMLParserModule m : modules) {
       m.end(entity, this);
     }
+
+    elementContext.pop();
+    nodePath.pop();
+    spacePreservationContext.pop();
+    inclusionContext.pop();
   }
 
   void emptyEntity(XMLEntity entity) {

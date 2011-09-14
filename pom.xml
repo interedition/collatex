@@ -291,8 +291,14 @@
             </dependency>
             <dependency>
                 <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-community</artifactId>
+                <artifactId>neo4j</artifactId>
                 <version>1.4.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.neo4j</groupId>
+                        <artifactId>neo4j-cypher</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.sleepycat</groupId>

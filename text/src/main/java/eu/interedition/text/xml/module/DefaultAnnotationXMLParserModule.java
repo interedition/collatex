@@ -34,8 +34,8 @@ import java.util.Stack;
  */
 public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
 
-  private final ThreadLocal<Stack<Long>> startOffsetStack = new ThreadLocal<Stack<Long>>();
-  private final ThreadLocal<Stack<Map<QName, String>>> attributeStack = new ThreadLocal<Stack<Map<QName, String>>>();
+  private Stack<Long> startOffsetStack;
+  private Stack<Map<QName, String>> attributeStack;
 
 
   public DefaultAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
@@ -45,28 +45,32 @@ public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParse
   @Override
   public void start(XMLParserState state) {
     super.start(state);
-    startOffsetStack.set(new Stack<Long>());
-    attributeStack.set(new Stack<Map<QName, String>>());
+    startOffsetStack = new Stack<Long>();
+    attributeStack = new Stack<Map<QName, String>>();
   }
 
   @Override
   public void end(XMLParserState state) {
-    attributeStack.remove();
-    startOffsetStack.remove();
+    attributeStack = null;
+    startOffsetStack = null;
     super.end(state);
   }
 
   @Override
   public void start(XMLEntity entity, XMLParserState state) {
     super.start(entity, state);
-    startOffsetStack.get().push(state.getTextOffset());
-    attributeStack.get().push(entity.getAttributes());
+    if (state.getInclusionContext().peek()) {
+      startOffsetStack.push(state.getTextOffset());
+      attributeStack.push(entity.getAttributes());
+    }
   }
 
   @Override
   public void end(XMLEntity entity, XMLParserState state) {
-    final Range range = new Range(startOffsetStack.get().pop(), state.getTextOffset());
-    add(new SimpleAnnotation(state.getTarget(), entity.getName(), range), attributeStack.get().pop());
+    if (state.getInclusionContext().peek()) {
+      final Range range = new Range(startOffsetStack.pop(), state.getTextOffset());
+      add(new SimpleAnnotation(state.getTarget(), entity.getName(), range), attributeStack.pop());
+    }
     super.end(entity, state);
   }
 }

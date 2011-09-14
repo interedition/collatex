@@ -30,11 +30,15 @@ import java.io.IOException;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class RangeSerializer extends JsonSerializer<Range> {
+
+  public static final String RANGE_START_FIELD = "s";
+  public static final String RANGE_END_FIELD = "e";
+
   @Override
   public void serialize(Range value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
     jgen.writeStartObject();
-    jgen.writeNumberField("s", value.getStart());
-    jgen.writeNumberField("e", value.getEnd());
+    jgen.writeNumberField(RANGE_START_FIELD, value.getStart());
+    jgen.writeNumberField(RANGE_END_FIELD, value.getEnd());
     jgen.writeEndObject();
   }
 }

@@ -19,7 +19,9 @@
  */
 package eu.interedition.text.xml.module;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.QName;
 import eu.interedition.text.Range;
@@ -50,10 +52,10 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
 
   private static final QName MILESTONE_NAME = new SimpleQName(TEI_NS, "milestone");
 
-  private final ThreadLocal<Map<String, SimpleAnnotation>> spanning = new ThreadLocal<Map<String, SimpleAnnotation>>();
-  private final ThreadLocal<Map<String, Map<QName, String>>> spanningAttributes = new ThreadLocal<Map<String, Map<QName, String>>>();
-  private final ThreadLocal<Map<QName, SimpleAnnotation>> milestones = new ThreadLocal<Map<QName, SimpleAnnotation>>();
-  private final ThreadLocal<Map<QName, Map<QName, String>>> milestoneAttributes = new ThreadLocal<Map<QName, Map<QName, String>>>();
+  private Multimap<String, SimpleAnnotation> spanning;
+  private Multimap<String, Map<QName, String>> spanningAttributes;
+  private Map<QName, SimpleAnnotation> milestones;
+  private Map<QName, Map<QName, String>> milestoneAttributes;
 
   public TEIAwareAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     super(annotationRepository, batchSize);
@@ -62,16 +64,14 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   @Override
   public void start(XMLParserState state) {
     super.start(state);
-    this.spanning.set(Maps.<String, SimpleAnnotation>newHashMap());
-    this.spanningAttributes.set(Maps.<String, Map<QName, String>>newHashMap());
-    this.milestones.set(Maps.<QName, SimpleAnnotation>newHashMap());
-    this.milestoneAttributes.set(Maps.<QName, Map<QName, String>>newHashMap());
+    this.spanning = ArrayListMultimap.create();
+    this.spanningAttributes = ArrayListMultimap.create();
+    this.milestones = Maps.newHashMap();
+    this.milestoneAttributes = Maps.newHashMap();
   }
 
   @Override
   public void end(XMLParserState state) {
-    final Map<QName, SimpleAnnotation> milestones = this.milestones.get();
-    final Map<QName, Map<QName, String>> milestoneAttributes = this.milestoneAttributes.get();
     final long textOffset = state.getTextOffset();
     for (QName milestoneUnit : milestones.keySet()) {
       final SimpleAnnotation last = milestones.get(milestoneUnit);
@@ -79,10 +79,10 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
       add(new SimpleAnnotation(last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset)), lastAttrs);
     }
 
-    this.milestoneAttributes.remove();
-    this.milestones.remove();
-    this.spanningAttributes.remove();
-    this.spanning.remove();
+    this.milestoneAttributes = null;
+    this.milestones = null;
+    this.spanningAttributes = null;
+    this.spanning = null;
 
     super.end(state);
   }
@@ -116,8 +116,6 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
       return;
     }
 
-    final Map<QName, SimpleAnnotation> milestones = this.milestones.get();
-    final Map<QName, Map<QName, String>> milestoneAttributes = this.milestoneAttributes.get();
     final long textOffset = state.getTextOffset();
 
     final SimpleAnnotation last = milestones.get(milestoneUnit);
@@ -139,7 +137,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
       final QName attrName = it.next();
       if ("spanTo".equals(attrName.getLocalName())) {
         final URI attrNs = attrName.getNamespaceURI();
-        if ((attrNs != null && TEI_NS.equals(attrNs)) || (attrNs == null && entityNs != null && TEI_NS.equals(entityNs))) {
+        if (attrNs == null || TEI_NS.equals(attrNs)) {
           spanTo = entityAttributes.get(attrName).replaceAll("^#", "");
           it.remove();
         }
@@ -152,8 +150,6 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
       return;
     }
 
-    final Map<String, SimpleAnnotation> spanning = this.spanning.get();
-    final Map<String, Map<QName, String>> spanningAttributes = this.spanningAttributes.get();
     final long textOffset = state.getTextOffset();
 
     if (spanTo != null) {
@@ -165,10 +161,11 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
       spanningAttributes.put(spanTo, entityAttributes);
     }
     if (refId != null) {
-      final SimpleAnnotation a = spanning.remove(refId);
-      final Map<QName, String> attr = spanningAttributes.remove(refId);
-      if (a != null && attr != null) {
-        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset)), attr);
+      final Iterator<SimpleAnnotation> aIt = spanning.removeAll(refId).iterator();
+      final Iterator<Map<QName, String>> attrIt = spanningAttributes.removeAll(refId).iterator();
+      while (aIt.hasNext() && attrIt.hasNext()) {
+        final SimpleAnnotation a = aIt.next();
+        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset)), attrIt.next());
       }
     }
   }

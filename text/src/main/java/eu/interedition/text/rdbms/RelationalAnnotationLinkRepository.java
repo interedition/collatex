@@ -113,6 +113,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     }
     final StringBuilder sql = new StringBuilder("delete from text_annotation_link where id in (");
     for (Iterator<Long> idIt = linkIds.iterator(); idIt.hasNext(); ) {
+      idIt.next();
       sql.append("?").append(idIt.hasNext() ? ", " : "");
     }
     sql.append(")");

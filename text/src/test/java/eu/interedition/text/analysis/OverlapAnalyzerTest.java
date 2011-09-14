@@ -21,6 +21,7 @@ package eu.interedition.text.analysis;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.text.AbstractTestResourceTest;
+import eu.interedition.text.QName;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.event.AnnotationEventSource;
@@ -32,6 +33,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.Collections;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -63,7 +65,7 @@ public class OverlapAnalyzerTest extends AbstractTestResourceTest {
 
   protected OverlapAnalyzer analyze(Text text) throws IOException {
     final OverlapAnalyzer analyzer = new OverlapAnalyzer();
-    eventSource.listen(analyzer, text, Criteria.any());
+    eventSource.listen(analyzer, text, Criteria.any(), Collections.<QName>emptySet());
     return analyzer;
   }
 }

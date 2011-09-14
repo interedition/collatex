@@ -35,13 +35,13 @@ public interface AnnotationRepository {
 
   Iterable<Annotation> find(Criterion criterion);
 
+  Map<Annotation, Map<QName, String>> find(Criterion criterion, Set<QName> names);
+
   void delete(Iterable<Annotation> annotations);
 
   void delete(Annotation... annotations);
 
   void delete(Criterion criterion);
-
-  Map<Annotation, Map<QName, String>> get(Iterable<Annotation> links, Set<QName> names);
 
   void set(Map<Annotation, Map<QName, String>> data);
 

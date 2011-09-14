@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class Tokenizer {
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
     annotationRepository.delete(and(text(text), annotationName(TOKEN_NAME)));
-    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none());
+    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none(), Collections.<QName>emptySet());
   }
 
   private class TokenGeneratingListener implements AnnotationEventListener {

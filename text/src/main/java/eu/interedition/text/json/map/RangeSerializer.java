@@ -17,36 +17,33 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.repository.conversion;
+package eu.interedition.text.json.map;
 
-import com.google.common.base.Preconditions;
 import eu.interedition.text.Range;
-import org.springframework.core.convert.converter.Converter;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
+
+import java.io.IOException;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeConverter implements Converter<String, Range> {
+public class RangeSerializer extends JsonSerializer<Range> {
+
+  public static final String RANGE_START_FIELD = "s";
+  public static final String RANGE_END_FIELD = "e";
+
   @Override
-  public Range convert(String source) {
-    long start = 0;
-    long end = 0;
-
-    final String[] components = source.trim().split(",");
-    if (components.length > 0) {
-      end = toLong(components[0]);
-    }
-    if (components.length > 1) {
-      start = end;
-      end = start + toLong(components[1]);
-    }
-
-    return new Range(start, end);
+  public Class<Range> handledType() {
+    return Range.class;
   }
 
-  private static long toLong(String str) {
-    final long value = Long.valueOf(str);
-    Preconditions.checkArgument(value >= 0);
-    return value;
+  @Override
+  public void serialize(Range value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    jgen.writeStartObject();
+    jgen.writeNumberField(RANGE_START_FIELD, value.getStart());
+    jgen.writeNumberField(RANGE_END_FIELD, value.getEnd());
+    jgen.writeEndObject();
   }
 }

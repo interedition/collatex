@@ -52,11 +52,11 @@ public class AnnotationEventSource {
     this.textRepository = textRepository;
   }
 
-  public void listen(final AnnotationEventListener listener, final Text text, final Criterion criterion) throws IOException {
-    listen(listener, Integer.MAX_VALUE, text, criterion);
+  public void listen(final AnnotationEventListener listener, final Text text, final Criterion criterion, Set<QName> dataSet) throws IOException {
+    listen(listener, Integer.MAX_VALUE, text, criterion, dataSet);
   }
 
-  public void listen(final AnnotationEventListener listener, final int pageSize, final Text text, final Criterion criterion) throws IOException {
+  public void listen(final AnnotationEventListener listener, final int pageSize, final Text text, final Criterion criterion, final Set<QName> dataSet) throws IOException {
     textRepository.read(text, new TextRepository.TextReader() {
 
       public void read(Reader content, long contentLength) throws IOException {
@@ -74,9 +74,8 @@ public class AnnotationEventSource {
           if ((offset % pageSize) == 0) {
             pageEnd = Math.min(offset + pageSize, contentLength);
             final Range pageRange = new Range(offset, pageEnd);
-            final Iterable<Annotation> pageAnnotations = annotationRepository.find(and(criterion, text(text), rangeOverlap(pageRange)));
-            final Map<Annotation, Map<QName, String>> pageAnnotationData = annotationRepository.get(pageAnnotations, Collections.<QName>emptySet());
-            for (Annotation a : pageAnnotations) {
+            final Map<Annotation, Map<QName, String>> pageAnnotations = annotationRepository.find(and(criterion, text(text), rangeOverlap(pageRange)), dataSet);
+            for (Annotation a : pageAnnotations.keySet()) {
               final long start = a.getRange().getStart();
               final long end = a.getRange().getEnd();
               if (start >= offset) {
@@ -85,7 +84,7 @@ public class AnnotationEventSource {
                   starts.put(start, starting = Sets.newHashSet());
                 }
                 starting.add(a);
-                annotationData.put(a, pageAnnotationData.get(a));
+                annotationData.put(a, pageAnnotations.get(a));
               }
               if (end <= pageEnd) {
                 Set<Annotation> ending = ends.get(end);
@@ -93,7 +92,7 @@ public class AnnotationEventSource {
                   ends.put(end, ending = Sets.newHashSet());
                 }
                 ending.add(a);
-                annotationData.put(a, pageAnnotationData.get(a));
+                annotationData.put(a, pageAnnotations.get(a));
               }
             }
 
