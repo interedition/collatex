@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.repository;
+package eu.interedition.text.token;
 
 import com.google.common.collect.Lists;
 import eu.interedition.text.*;
@@ -27,9 +27,6 @@ import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleQName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -41,22 +38,28 @@ import static eu.interedition.text.query.Criteria.*;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Service
-@Transactional
 public class Tokenizer {
-  public static final QName TOKEN_NAME = new SimpleQName(TextConstants.INTEREDITION_NS_URI, "token");
+  public static final QName DEFAULT_TOKEN_NAME = new SimpleQName(TextConstants.INTEREDITION_NS_URI, "token");
 
   private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
-  @Autowired
   private AnnotationRepository annotationRepository;
-
-  @Autowired
   private AnnotationEventSource eventSource;
-
+  private QName tokenName = DEFAULT_TOKEN_NAME;
   private int pageSize = 102400;
-
   private int batchSize = 1024;
+
+  public void setAnnotationRepository(AnnotationRepository annotationRepository) {
+    this.annotationRepository = annotationRepository;
+  }
+
+  public void setEventSource(AnnotationEventSource eventSource) {
+    this.eventSource = eventSource;
+  }
+
+  public void setTokenName(QName tokenName) {
+    this.tokenName = tokenName;
+  }
 
   public void setPageSize(int pageSize) {
     this.pageSize = pageSize;
@@ -67,7 +70,7 @@ public class Tokenizer {
   }
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
-    annotationRepository.delete(and(text(text), annotationName(TOKEN_NAME)));
+    annotationRepository.delete(and(text(text), annotationName(tokenName)));
     eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none(), Collections.<QName>emptySet());
   }
 
@@ -140,7 +143,7 @@ public class Tokenizer {
 
     private void token() {
       if (tokenStart < offset) {
-        batch.add(new SimpleAnnotation(text, TOKEN_NAME, new Range(tokenStart, offset)));
+        batch.add(new SimpleAnnotation(text, tokenName, new Range(tokenStart, offset)));
         if ((batch.size() % batchSize) == 0) {
           emit();
         }

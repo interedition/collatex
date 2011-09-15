@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.repository;
+package eu.interedition.text.token;
 
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Text;
