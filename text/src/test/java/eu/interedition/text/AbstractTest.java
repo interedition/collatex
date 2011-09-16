@@ -56,12 +56,4 @@ public abstract class AbstractTest {
   protected static String escapeNewlines(String str) {
     return str.replaceAll("[\n\r]+", "\\\\n");
   }
-
-  @AfterTransaction
-  public void clearNameCache() {
-    if (nameRepository instanceof RelationalQNameRepository) {
-      ((RelationalQNameRepository) nameRepository).clearCache();
-    }
-  }
-
 }

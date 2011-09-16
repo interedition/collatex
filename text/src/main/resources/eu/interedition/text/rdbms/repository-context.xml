@@ -29,6 +29,7 @@
 
     <bean id="nameRepository" class="eu.interedition.text.rdbms.RelationalQNameRepository">
         <property name="dataSource" ref="repositoryDataSource" />
+        <property name="transactionManager" ref="repositoryTransactionManager"/>
         <property name="incrementerFactory" ref="incrementerFactory"/>
     </bean>
 

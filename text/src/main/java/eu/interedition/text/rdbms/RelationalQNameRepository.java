@@ -33,6 +33,11 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.net.URI;
@@ -45,6 +50,7 @@ import static java.util.Collections.singleton;
 public class RelationalQNameRepository implements QNameRepository, InitializingBean {
 
   private DataSource dataSource;
+  private PlatformTransactionManager transactionManager;
   private DataFieldMaxValueIncrementerFactory incrementerFactory;
   private int cacheSize = 1000;
 
@@ -53,6 +59,7 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
   private DataFieldMaxValueIncrementer nameIdIncrementer;
 
   private Map<QName, Long> nameCache;
+  private TransactionTemplate tt;
 
   public QName get(QName name) {
     return Iterables.getOnlyElement(get(singleton(name)));
@@ -78,69 +85,76 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
       initCache();
     }
 
-    names = Sets.newHashSet(names);
-    final Set<QName> foundNames = Sets.newHashSetWithExpectedSize(names.size());
+    final Set<QName> requested = Sets.newHashSet(names);
+    final Set<QName> found = Sets.newHashSetWithExpectedSize(requested.size());
 
-    for (Iterator<QName> it = names.iterator(); it.hasNext(); ) {
+    for (Iterator<QName> it = requested.iterator(); it.hasNext(); ) {
       final QName name = it.next();
       final Long id = nameCache.get(name);
       if (id != null) {
-        foundNames.add(new RelationalQName(id, name));
+        found.add(new RelationalQName(id, name));
         it.remove();
       }
     }
 
-    if (!names.isEmpty()) {
-      final List<Object> ps = Lists.newArrayList();
-      final StringBuilder sql = new StringBuilder("select ").append(selectNameFrom("n")).append(" from text_qname n where ");
-      for (Iterator<QName> it = names.iterator(); it.hasNext(); ) {
-        sql.append("(");
-        final QName name = it.next();
-
-        sql.append("n.local_name = ? and ");
-        ps.add(name.getLocalName());
-
-        final URI ns = name.getNamespaceURI();
-        if (ns == null) {
-          sql.append("n.namespace is null");
-        } else {
-          sql.append("n.namespace = ?");
-          ps.add(ns.toString());
-        }
-
-
-        sql.append(")").append(it.hasNext() ? " or " : "");
-      }
-
-      for (RelationalQName name : jt.query(sql.toString(), ROW_MAPPER, ps.toArray(new Object[ps.size()]))) {
-        foundNames.add(name);
-        names.remove(name);
-        nameCache.put(name, name.getId());
-      }
-
-      final List<RelationalQName> created = Lists.newArrayListWithExpectedSize(names.size());
-      final List<MapSqlParameterSource> nameBatch = Lists.newArrayListWithExpectedSize(names.size());
-      for (QName name : names) {
-        final long id = nameIdIncrementer.nextLongValue();
-        final String localName = name.getLocalName();
-        final URI ns = name.getNamespaceURI();
-
-        nameBatch.add(new MapSqlParameterSource()
-                .addValue("id", id)
-                .addValue("local_name", localName)
-                .addValue("namespace",  ns == null ? null : ns.toString()));
-
-        created.add(new RelationalQName(id, name));
-      }
-      nameInsert.executeBatch(nameBatch.toArray(new MapSqlParameterSource[nameBatch.size()]));
-
-      for (RelationalQName n : created) {
-        foundNames.add(n);
-        nameCache.put(n, n.getId());
-      }
+    if (requested.isEmpty()) {
+      return found;
     }
 
-    return foundNames;
+    return tt.execute(new TransactionCallback<Set<QName>>() {
+      @Override
+      public Set<QName> doInTransaction(TransactionStatus status) {
+        final List<Object> ps = Lists.newArrayList();
+        final StringBuilder sql = new StringBuilder("select ").append(selectNameFrom("n")).append(" from text_qname n where ");
+        for (Iterator<QName> it = requested.iterator(); it.hasNext(); ) {
+          sql.append("(");
+          final QName name = it.next();
+
+          sql.append("n.local_name = ? and ");
+          ps.add(name.getLocalName());
+
+          final URI ns = name.getNamespaceURI();
+          if (ns == null) {
+            sql.append("n.namespace is null");
+          } else {
+            sql.append("n.namespace = ?");
+            ps.add(ns.toString());
+          }
+
+
+          sql.append(")").append(it.hasNext() ? " or " : "");
+        }
+
+        for (RelationalQName name : jt.query(sql.toString(), ROW_MAPPER, ps.toArray(new Object[ps.size()]))) {
+          found.add(name);
+          requested.remove(name);
+          nameCache.put(name, name.getId());
+        }
+
+        final List<RelationalQName> created = Lists.newArrayListWithExpectedSize(requested.size());
+        final List<MapSqlParameterSource> nameBatch = Lists.newArrayListWithExpectedSize(requested.size());
+        for (QName name : requested) {
+          final long id = nameIdIncrementer.nextLongValue();
+          final String localName = name.getLocalName();
+          final URI ns = name.getNamespaceURI();
+
+          nameBatch.add(new MapSqlParameterSource()
+                  .addValue("id", id)
+                  .addValue("local_name", localName)
+                  .addValue("namespace", ns == null ? null : ns.toString()));
+
+          created.add(new RelationalQName(id, name));
+        }
+        nameInsert.executeBatch(nameBatch.toArray(new MapSqlParameterSource[nameBatch.size()]));
+
+        for (RelationalQName n : created) {
+          found.add(n);
+          nameCache.put(n, n.getId());
+        }
+
+        return found;
+      }
+    });
   }
 
   public synchronized void clearCache() {
@@ -150,6 +164,11 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
   @Required
   public void setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
+  }
+
+  @Required
+  public void setTransactionManager(PlatformTransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
   }
 
   @Required
@@ -165,6 +184,9 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
     this.nameInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname");
     this.nameIdIncrementer = this.incrementerFactory.create("text_qname");
+
+    this.tt = new TransactionTemplate(transactionManager);
+    this.tt.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
   }
 
   private void initCache() {
