@@ -111,6 +111,16 @@ public class GraphAnnotationRepository extends AbstractAnnotationRepository {
   }
 
   @Override
+  public void adopt(Criterion criterion, Text to) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void shift(Criterion criterion, long delta) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public Map<Annotation, Map<QName, String>> find(Criterion criterion, Set<QName> names) {
     final List<QName> nameList = (names == null ? null : Lists.newArrayList(names));
     final List<String> attrNames = (names == null ? null : Lists.transform(nameList, QNames.TO_STRING));

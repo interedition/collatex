@@ -51,6 +51,12 @@ public interface TextRepository {
 
   void write(Text text, Reader contents, long contentLength) throws IOException;
 
+  Text concat(Iterable<Text> texts) throws IOException;
+
+  Text concat(Text... texts) throws IOException;
+
+  Text duplicate(Text text) throws IOException;
+
   interface TextReader {
     void read(Reader content, long contentLength) throws IOException;
   }

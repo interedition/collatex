@@ -37,6 +37,8 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
@@ -99,6 +101,15 @@ public abstract class AbstractTextRepository implements TextRepository {
     return getOnlyElement(bulkRead(text, Sets.newTreeSet(singleton(range))).values());
   }
 
+  @Override
+  public Text concat(Text... texts) throws IOException {
+    return concat(Arrays.asList(texts));
+  }
+
+  @Override
+  public Text duplicate(Text text) throws IOException {
+    return concat(singleton(text));
+  }
 
   protected Transformer createTransformer() throws TransformerException {
     final Transformer transformer = transformerFactory.newTransformer();

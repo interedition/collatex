@@ -20,7 +20,9 @@
 package eu.interedition.text.rdbms;
 
 import eu.interedition.text.AbstractTextTest;
+import eu.interedition.text.Text;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -29,6 +31,9 @@ import org.junit.Test;
 public class TextTest extends AbstractTextTest {
   @Test
   public void digesting() throws Exception {
-    text.getDigest().equals(DigestUtils.sha512Hex(TEST_TEXT));
+    Assert.assertEquals(DigestUtils.sha512Hex(TEST_TEXT), text.getDigest());
+
+    final Text concat = textRepository.concat(text, text, text);
+    Assert.assertEquals(3 * text.getLength(), concat.getLength());
   }
 }

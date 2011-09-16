@@ -23,16 +23,14 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
+import com.google.common.io.FileBackedOutputStream;
 import com.google.common.io.Files;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.util.AbstractTextRepository;
 import eu.interedition.text.util.SQL;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
@@ -45,18 +43,11 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 
 import javax.sql.DataSource;
 import java.io.*;
-import java.nio.CharBuffer;
-import java.nio.charset.CharsetEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-
-import static com.google.common.collect.Iterables.getOnlyElement;
-import static java.util.Collections.singleton;
 
 public class RelationalTextRepository extends AbstractTextRepository implements InitializingBean {
 
@@ -66,6 +57,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert textInsert;
   private DataFieldMaxValueIncrementer textIdIncrementer;
+  private static final int TEXT_BUFFER_SIZE = 102400;
 
   @Required
   public void setDataSource(DataSource dataSource) {
@@ -198,6 +190,37 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     jt.update("update text_content set content_digest = ? where id = ?", rt.getDigest(), rt.getId());
   }
 
+  @Override
+  public Text concat(Iterable<Text> texts) throws IOException {
+    final FileBackedOutputStream buf = new FileBackedOutputStream(TEXT_BUFFER_SIZE);
+    final OutputStreamWriter bufWriter = new OutputStreamWriter(buf, Text.CHARSET);
+    try {
+      for (Text text : texts) {
+        read(new ReaderCallback<Void>(text) {
+          @Override
+          protected Void read(Clob content) throws SQLException, IOException {
+            Reader reader = null;
+            try {
+              CharStreams.copy(reader = content.getCharacterStream(), bufWriter);
+            } finally {
+              Closeables.close(reader, false);
+            }
+            return null;
+          }
+        });
+      }
+    } finally {
+       Closeables.close(bufWriter, false);
+    }
+
+    Reader reader = null;
+    try {
+      return create(reader = new InputStreamReader(buf.getSupplier().getInput(), Text.CHARSET));
+    } finally {
+      Closeables.closeQuietly(reader);
+      buf.reset();
+    }
+  }
 
   private <T> T read(final ReaderCallback<T> callback) {
     return DataAccessUtils.requiredUniqueResult(jt.query("select content from text_content where id = ?",
@@ -222,7 +245,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     final StringBuilder sql = new StringBuilder("select ");
     sql.append(selectTextFrom("t"));
     sql.append(" from text_content t where t.id in (");
-    for(Iterator<Long> it = ids.iterator(); it.hasNext(); ) {
+    for (Iterator<Long> it = ids.iterator(); it.hasNext(); ) {
       it.next();
       sql.append("?").append(it.hasNext() ? ", " : "");
     }

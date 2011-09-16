@@ -128,4 +128,9 @@ public class GraphTextRepository extends AbstractTextRepository {
   public void write(Text text, Reader contents, long contentLength) throws IOException {
     write(text, contents);
   }
+
+  @Override
+  public Text concat(Iterable<Text> texts) throws IOException {
+    throw new UnsupportedOperationException();
+  }
 }

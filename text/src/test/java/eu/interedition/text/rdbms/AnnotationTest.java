@@ -28,7 +28,12 @@ import eu.interedition.text.query.Criteria;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
+import java.io.StringReader;
+
+import static com.google.common.collect.Iterables.size;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -40,11 +45,28 @@ public class AnnotationTest extends AbstractTestResourceTest {
 
   @Test
   public void deleteAnnotations() {
-    final Text text = text();
+    final Text existing = text();
     try {
-      annotationRepository.delete(Criteria.text(text));
-      final Iterable<Annotation> remaining = annotationRepository.find(Criteria.text(text));
-      assertTrue(Integer.toString(Iterables.size(remaining)), Iterables.isEmpty(remaining));
+      annotationRepository.delete(Criteria.text(existing));
+      final Iterable<Annotation> remaining = annotationRepository.find(Criteria.text(existing));
+      assertTrue(Integer.toString(size(remaining)), Iterables.isEmpty(remaining));
+    } finally {
+      unload();
+    }
+  }
+
+  @Test
+  public void adoptAnnotations() throws IOException {
+    final Text existing = text();
+    try {
+      final int annotations = size(annotationRepository.find(Criteria.text(existing)));
+
+      final Text newText = textRepository.create(new StringReader("Hello Hello!"));
+      annotationRepository.shift(Criteria.text(existing), newText.getLength());
+      annotationRepository.adopt(Criteria.text(existing), newText);
+
+      assertTrue(Iterables.isEmpty(annotationRepository.find(Criteria.text(existing))));
+      assertEquals(annotations, size(annotationRepository.find(Criteria.text(newText))));
     } finally {
       unload();
     }

@@ -19,6 +19,7 @@
  */
 package eu.interedition.text;
 
+import com.google.common.collect.Iterables;
 import eu.interedition.text.query.Criterion;
 
 import java.util.Map;
@@ -42,6 +43,10 @@ public interface AnnotationRepository {
   void delete(Annotation... annotations);
 
   void delete(Criterion criterion);
+
+  void adopt(Criterion criterion, Text to);
+
+  void shift(Criterion criterion, long delta);
 
   void set(Map<Annotation, Map<QName, String>> data);
 

@@ -153,6 +153,58 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   }
 
   @Override
+  public void adopt(Criterion criterion, Text to) {
+    final List<Object> parameters = Lists.<Object>newArrayList(annotations(criterion));
+    if (parameters.isEmpty()) {
+      return;
+    }
+
+    StringBuilder sql = new StringBuilder("update text_annotation set text = ? where id in (");
+    for (Iterator<Object> it = parameters.iterator(); it.hasNext(); ) {
+      it.next();
+      sql.append("?").append(it.hasNext() ? ", " : "");
+    }
+    sql.append(")");
+
+    parameters.add(0, ((RelationalText)to).getId());
+    jt.update(sql.toString(), parameters.toArray(new Object[parameters.size()]));
+  }
+
+  @Override
+  public void shift(Criterion criterion, long delta) {
+    final List<Object> parameters = Lists.<Object>newArrayList(annotations(criterion));
+    if (parameters.isEmpty()) {
+      return;
+    }
+
+    StringBuilder sql = new StringBuilder("update text_annotation");
+    sql.append(" set range_start = range_start + ?, range_end = range_end + ?");
+    sql.append(" where id in (");
+    for (Iterator<Object> it = parameters.iterator(); it.hasNext(); ) {
+      it.next();
+      sql.append("?").append(it.hasNext() ? ", " : "");
+    }
+    sql.append(")");
+
+    parameters.add(0, delta);
+    parameters.add(0, delta);
+    jt.update(sql.toString(), parameters.toArray(new Object[parameters.size()]));
+  }
+
+  protected Set<Long> annotations(Criterion criterion) {
+    final List<Object> parameters = Lists.newArrayList();
+    final Set<Long> annotationIds = Sets.newHashSet();
+    jt.query(sql("select a.id", false, parameters, criterion).toString(), new RowMapper<Object>() {
+      @Override
+      public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+        annotationIds.add(rs.getLong(1));
+        return null;
+      }
+    }, parameters.toArray(new Object[parameters.size()]));
+    return annotationIds;
+  }
+
+  @Override
   protected SortedSet<QName> getNames(Text text) {
     final StringBuilder namesSql = new StringBuilder("select distinct ");
     namesSql.append(selectNameFrom("n"));
