@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS text_annotation_link_target (
 CREATE TABLE IF NOT EXISTS text_annotation_data (
   annotation BIGINT NOT NULL,
   name BIGINT NOT NULL,
-  value VARCHAR(255) NOT NULL,
+  value TEXT NOT NULL,
   FOREIGN KEY (annotation) REFERENCES text_annotation (id) ON DELETE CASCADE,
   FOREIGN KEY (name) REFERENCES text_qname (id),
   UNIQUE (annotation, name)
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS text_annotation_data (
 CREATE TABLE IF NOT EXISTS text_annotation_link_data (
   link BIGINT NOT NULL,
   name BIGINT NOT NULL,
-  value VARCHAR(255) NOT NULL,
+  value TEXT NOT NULL,
   FOREIGN KEY (link) REFERENCES text_annotation_link (id) ON DELETE CASCADE,
   FOREIGN KEY (name) REFERENCES text_qname (id),
   UNIQUE (link, name)

@@ -44,13 +44,13 @@ CREATE TABLE IF NOT EXISTS text_annotation_link_target (
 CREATE TABLE IF NOT EXISTS text_annotation_data (
   annotation BIGINT NOT NULL REFERENCES text_annotation (id) ON DELETE CASCADE,
   name BIGINT NOT NULL REFERENCES text_qname (id),
-  value VARCHAR(255) NOT NULL,
+  value TEXT NOT NULL,
   UNIQUE (annotation, name)
 );
 
 CREATE TABLE IF NOT EXISTS text_annotation_link_data (
   link BIGINT NOT NULL REFERENCES text_annotation_link (id) ON DELETE CASCADE,
   name BIGINT NOT NULL REFERENCES text_qname (id),
-  value VARCHAR(255) NOT NULL,
+  value TEXT NOT NULL,
   UNIQUE (link, name)
 );

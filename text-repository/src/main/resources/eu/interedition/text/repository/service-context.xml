@@ -50,6 +50,7 @@
     </bean>
 
     <alias name="dataSource" alias="repositoryDataSource"/>
+    <alias name="transactionManager" alias="repositoryTransactionManager"/>
 
     <context:component-scan base-package="eu.interedition.text.repository">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
