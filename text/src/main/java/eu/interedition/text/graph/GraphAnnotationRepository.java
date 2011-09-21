@@ -83,12 +83,14 @@ public class GraphAnnotationRepository extends AbstractAnnotationRepository {
   }
 
   @Override
-  public Iterable<Annotation> find(Criterion criterion) {
+  public void scroll(Criterion criterion, AnnotationCallback callback) {
     final Query query = queryCriteriaTranslator.toQuery(criterion);
     if (LOG.isDebugEnabled()) {
       LOG.debug("Query annotations with '{}'", query);
     }
-    return transform(annotationIndex().query(query), FROM_NODE);
+    for (Annotation a : Iterables.transform(annotationIndex().query(query), FROM_NODE)) {
+      callback.annotation(a, null);
+    }
   }
 
   @Override
@@ -111,26 +113,15 @@ public class GraphAnnotationRepository extends AbstractAnnotationRepository {
   }
 
   @Override
-  public void adopt(Criterion criterion, Text to) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void shift(Criterion criterion, long delta) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Map<Annotation, Map<QName, String>> find(Criterion criterion, Set<QName> names) {
+  public void scroll(Criterion criterion, Set<QName> names, AnnotationCallback callback) {
     final List<QName> nameList = (names == null ? null : Lists.newArrayList(names));
     final List<String> attrNames = (names == null ? null : Lists.transform(nameList, QNames.TO_STRING));
 
     final Iterable<GraphAnnotation> annotations = Iterables.filter(find(criterion), GraphAnnotation.class);
-    final Map<Annotation, Map<QName, String>> result = Maps.newLinkedHashMap();
 
     if (names != null && names.isEmpty()) {
       for (GraphAnnotation a : annotations) {
-        result.put(a, Maps.<QName, String>newHashMap());
+        callback.annotation(a, Maps.<QName, String>newHashMap());
       }
     } else {
       for (GraphAnnotation a : annotations) {
@@ -148,10 +139,9 @@ public class GraphAnnotationRepository extends AbstractAnnotationRepository {
             attributes.put(nameList.get(ac), node.getProperty(attrNames.get(ac).toString()).toString());
           }
         }
-        result.put(a, attributes);
+        callback.annotation(a, attributes);
       }
     }
-    return result;
   }
 
   @Override

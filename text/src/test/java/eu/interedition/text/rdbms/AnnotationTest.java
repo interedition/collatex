@@ -19,17 +19,16 @@
  */
 package eu.interedition.text.rdbms;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
-import eu.interedition.text.AbstractTestResourceTest;
-import eu.interedition.text.Annotation;
-import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.Text;
+import eu.interedition.text.*;
 import eu.interedition.text.query.Criteria;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Map;
 
 import static com.google.common.collect.Iterables.size;
 import static junit.framework.Assert.assertTrue;
@@ -44,7 +43,7 @@ public class AnnotationTest extends AbstractTestResourceTest {
   private AnnotationRepository annotationRepository;
 
   @Test
-  public void deleteAnnotations() {
+  public void delete() {
     final Text existing = text();
     try {
       annotationRepository.delete(Criteria.text(existing));
@@ -56,17 +55,24 @@ public class AnnotationTest extends AbstractTestResourceTest {
   }
 
   @Test
-  public void adoptAnnotations() throws IOException {
-    final Text existing = text();
+  public void transform() throws IOException {
+    final Text existing = text("george-algabal-tei.xml");
     try {
-      final int annotations = size(annotationRepository.find(Criteria.text(existing)));
+      if (LOG.isDebugEnabled()) {
+        annotationRepository.scroll(Criteria.text(existing), null, new AnnotationRepository.AnnotationCallback() {
+          @Override
+          public void annotation(Annotation annotation, Map<QName, String> data) {
+            LOG.debug("{}: {}", annotation, Iterables.toString(data.entrySet()));
+          }
+        });
+      }
+
+      final int numAnnotations = size(annotationRepository.find(Criteria.text(existing)));
 
       final Text newText = textRepository.create(new StringReader("Hello Hello!"));
-      annotationRepository.shift(Criteria.text(existing), newText.getLength());
-      annotationRepository.adopt(Criteria.text(existing), newText);
+      annotationRepository.transform(Criteria.text(existing), newText, Functions.<Annotation>identity());
 
-      assertTrue(Iterables.isEmpty(annotationRepository.find(Criteria.text(existing))));
-      assertEquals(annotations, size(annotationRepository.find(Criteria.text(newText))));
+      assertEquals(numAnnotations, size(annotationRepository.find(Criteria.text(newText))));
     } finally {
       unload();
     }

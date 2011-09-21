@@ -19,6 +19,7 @@
  */
 package eu.interedition.text;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import eu.interedition.text.query.Criterion;
 
@@ -34,7 +35,11 @@ public interface AnnotationRepository {
 
   Iterable<Annotation> create(Iterable<Annotation> annotations);
 
+  void scroll(Criterion criterion, AnnotationCallback callback);
+
   Iterable<Annotation> find(Criterion criterion);
+
+  void scroll(Criterion criterion, Set<QName> names, AnnotationCallback callback);
 
   Map<Annotation, Map<QName, String>> find(Criterion criterion, Set<QName> names);
 
@@ -44,11 +49,17 @@ public interface AnnotationRepository {
 
   void delete(Criterion criterion);
 
-  void adopt(Criterion criterion, Text to);
-
-  void shift(Criterion criterion, long delta);
-
   void set(Map<Annotation, Map<QName, String>> data);
 
   void unset(Map<Annotation, Iterable<QName>> data);
+
+  void transform(Criterion criterion, Text to, Function<Annotation, Annotation> transform);
+
+  void transform(Map<Annotation, Map<QName, String>> annotations, Text to, Function<Annotation, Annotation> transform);
+
+  interface AnnotationCallback {
+
+    void annotation(Annotation annotation, Map<QName, String> data);
+
+  }
 }
