@@ -202,7 +202,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
         if (annotation == null || annotation.getId() != annotationId) {
           if (annotation != null) {
             callback.annotation(annotation, data);
-            data.clear();
+            data = Maps.newHashMap();
           }
           final long currentTextId = rs.getLong("t_id");
           RelationalText currentText = textCache.get(currentTextId);

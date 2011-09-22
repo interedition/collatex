@@ -55,6 +55,8 @@ public class RelationalQueryCriteriaTranslator {
       sql(sql, (AnnotationLinkNameCriterion) criterion, ps);
     } else if (criterion instanceof RangeOverlapCriterion) {
       sql(sql, (RangeOverlapCriterion) criterion, ps);
+    } else if (criterion instanceof RangeFitsWithinCriterion) {
+      sql(sql, (RangeFitsWithinCriterion) criterion, ps);
     } else if (criterion instanceof RangeLengthCriterion) {
       sql(sql, (RangeLengthCriterion) criterion, ps);
     } else if (criterion instanceof AnnotationIdentityCriterion) {
@@ -119,6 +121,13 @@ public class RelationalQueryCriteriaTranslator {
     sql.append("(a.range_start < ? and a.range_end > ?)");
     ps.add(range.getEnd());
     ps.add(range.getStart());
+  }
+
+  protected void sql(StringBuilder sql, RangeFitsWithinCriterion criterion, Collection<Object> ps) {
+    final Range range = criterion.getRange();
+    sql.append("(a.range_start >= ? and a.range_end <= ?)");
+    ps.add(range.getStart());
+    ps.add(range.getEnd());
   }
 
   protected void sql(StringBuilder sql, RangeLengthCriterion criterion, Collection<Object> ps) {

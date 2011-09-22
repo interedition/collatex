@@ -27,9 +27,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
-import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.query.Criterion;
+import eu.interedition.text.transform.AnnotationTransformers;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.xml.sax.Attributes;
@@ -141,7 +141,7 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
 
   @Override
   public void transform(Map<Annotation, Map<QName, String>> annotations, Text to, Function<Annotation, Annotation> transform) {
-    transform = Functions.compose(transform, new AdoptFunction(to));
+    transform = Functions.compose(transform, AnnotationTransformers.adopt(to));
 
     final List<Annotation> source = Lists.newArrayList(Iterables.transform(annotations.keySet(), transform));
     final Iterator<Map<QName, String>> sourceData = annotations.values().iterator();
@@ -166,19 +166,5 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
     this.saxParserFactory = SAXParserFactory.newInstance();
     this.saxParserFactory.setNamespaceAware(true);
     this.saxParserFactory.setValidating(false);
-  }
-
-  protected class AdoptFunction implements Function<Annotation, Annotation> {
-
-    private final Text text;
-
-    protected AdoptFunction(Text text) {
-      this.text = text;
-    }
-
-    @Override
-    public Annotation apply(Annotation input) {
-      return new SimpleAnnotation(text, input.getName(), input.getRange());
-    }
   }
 }

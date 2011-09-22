@@ -58,6 +58,10 @@ public class Criteria {
     return new RangeOverlapCriterion(range);
   }
 
+  public static Criterion rangeFitsWithin(Range range) {
+    return new RangeFitsWithinCriterion(range);
+  }
+
   public static Criterion rangeLength(int length) {
     return new RangeLengthCriterion(length);
   }

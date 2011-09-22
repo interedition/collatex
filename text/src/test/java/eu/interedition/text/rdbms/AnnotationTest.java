@@ -23,14 +23,18 @@ import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import eu.interedition.text.*;
 import eu.interedition.text.query.Criteria;
+import eu.interedition.text.transform.AnnotationTransformers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Map;
 
 import static com.google.common.collect.Iterables.size;
+import static eu.interedition.text.query.Criteria.and;
+import static eu.interedition.text.query.Criteria.rangeFitsWithin;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -43,10 +47,10 @@ public class AnnotationTest extends AbstractTestResourceTest {
   private AnnotationRepository annotationRepository;
 
   @Test
-  public void delete() {
+  public void deleteAll() {
     final Text existing = text();
     try {
-      annotationRepository.delete(Criteria.text(existing));
+      annotationRepository.delete(and(Criteria.text(existing), rangeFitsWithin(new Range(0, existing.getLength()))));
       final Iterable<Annotation> remaining = annotationRepository.find(Criteria.text(existing));
       assertTrue(Integer.toString(size(remaining)), Iterables.isEmpty(remaining));
     } finally {
@@ -58,21 +62,30 @@ public class AnnotationTest extends AbstractTestResourceTest {
   public void transform() throws IOException {
     final Text existing = text("george-algabal-tei.xml");
     try {
+      final int numAnnotations = size(annotationRepository.find(Criteria.text(existing)));
+
+      final Text newText = textRepository.create(new StringReader("Hello Hello!"));
+
+      final StopWatch sw = new StopWatch("transform");
+      sw.start("shift");
+      annotationRepository.transform(Criteria.text(existing), newText, AnnotationTransformers.shift(10));
+      sw.stop();
+
+      assertEquals(numAnnotations, size(annotationRepository.find(Criteria.text(newText))));
+
+      sw.start("print");
       if (LOG.isDebugEnabled()) {
-        annotationRepository.scroll(Criteria.text(existing), null, new AnnotationRepository.AnnotationCallback() {
+        annotationRepository.scroll(Criteria.text(newText), null, new AnnotationRepository.AnnotationCallback() {
           @Override
           public void annotation(Annotation annotation, Map<QName, String> data) {
             LOG.debug("{}: {}", annotation, Iterables.toString(data.entrySet()));
           }
         });
       }
+      sw.stop();
 
-      final int numAnnotations = size(annotationRepository.find(Criteria.text(existing)));
+      LOG.debug(sw.prettyPrint());
 
-      final Text newText = textRepository.create(new StringReader("Hello Hello!"));
-      annotationRepository.transform(Criteria.text(existing), newText, Functions.<Annotation>identity());
-
-      assertEquals(numAnnotations, size(annotationRepository.find(Criteria.text(newText))));
     } finally {
       unload();
     }

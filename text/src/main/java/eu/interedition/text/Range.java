@@ -223,6 +223,10 @@ public class Range implements Comparable<Range>, Serializable {
     return (start >= (b.end - 1));
   }
 
+  public Range shift(long delta) {
+    return new Range(start + delta, end + delta);
+  }
+
   /**
    * Orders segments, first by start offset, then by the reverse order of the end offsets.
    *
@@ -262,10 +266,6 @@ public class Range implements Comparable<Range>, Serializable {
   @Override
   public String toString() {
     return toString(start, end);
-  }
-
-  public Range add(long n) {
-    return new Range(start + n, end + n);
   }
 
   public SortedSet<Range> substract(Range subtrahend) {
