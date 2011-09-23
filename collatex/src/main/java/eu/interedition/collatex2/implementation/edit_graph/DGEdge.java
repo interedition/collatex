@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.decision_graph;
+package eu.interedition.collatex2.implementation.edit_graph;
 
 public class DGEdge {
 
