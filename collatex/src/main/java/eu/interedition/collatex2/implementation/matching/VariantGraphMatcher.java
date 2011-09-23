@@ -1,8 +1,7 @@
-package eu.interedition.collatex2.implementation.edit_graph;
+package eu.interedition.collatex2.implementation.matching;
 
 import com.google.common.collect.ListMultimap;
 
-import eu.interedition.collatex2.implementation.matching.TokenMatcher;
 import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;

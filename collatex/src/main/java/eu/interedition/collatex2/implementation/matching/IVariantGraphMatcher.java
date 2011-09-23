@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.edit_graph;
+package eu.interedition.collatex2.implementation.matching;
 
 import com.google.common.collect.ListMultimap;
 

@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.matching.IVariantGraphMatcher;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;

@@ -11,7 +11,7 @@ import eu.interedition.collatex2.implementation.edit_graph.EditGraphEdge;
 import eu.interedition.collatex2.implementation.edit_graph.EditGraphVertex;
 import eu.interedition.collatex2.implementation.edit_graph.EditGraph;
 import eu.interedition.collatex2.implementation.edit_graph.EditGraphCreator;
-import eu.interedition.collatex2.implementation.edit_graph.VariantGraphMatcher;
+import eu.interedition.collatex2.implementation.matching.VariantGraphMatcher;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
