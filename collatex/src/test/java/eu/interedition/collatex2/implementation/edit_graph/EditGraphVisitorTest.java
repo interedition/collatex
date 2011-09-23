@@ -11,19 +11,19 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.edit_graph.DGEdge;
-import eu.interedition.collatex2.implementation.edit_graph.DGVertex;
-import eu.interedition.collatex2.implementation.edit_graph.DecisionGraph;
-import eu.interedition.collatex2.implementation.edit_graph.DecisionGraphCreator;
-import eu.interedition.collatex2.implementation.edit_graph.DecisionGraphVisitor;
+import eu.interedition.collatex2.implementation.edit_graph.EditGraphEdge;
+import eu.interedition.collatex2.implementation.edit_graph.EditGraphVertex;
+import eu.interedition.collatex2.implementation.edit_graph.EditGraph;
+import eu.interedition.collatex2.implementation.edit_graph.EditGraphCreator;
+import eu.interedition.collatex2.implementation.edit_graph.EditGraphVisitor;
 import eu.interedition.collatex2.implementation.edit_graph.VariantGraphMatcher;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class DecisionGraphVisitorTest {
+public class EditGraphVisitorTest {
 
-  public void assertVertices(DecisionGraph dGraph, String... normalized) {
-    Iterator<DGVertex> topologicIterator = dGraph.iterator();
+  public void assertVertices(EditGraph dGraph, String... normalized) {
+    Iterator<EditGraphVertex> topologicIterator = dGraph.iterator();
     for (String expectedNormalized : normalized) {
       assertTrue("not enough vertices!", topologicIterator.hasNext());
       assertEquals(expectedNormalized, topologicIterator.next().getToken().getNormalized());
@@ -40,9 +40,9 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, vGraph, b);
-    DecisionGraph dGraph = creator.buildDecisionGraph();
-    assertEquals(0, DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph));
+    EditGraphCreator creator = new EditGraphCreator(matcher, vGraph, b);
+    EditGraph dGraph = creator.buildDecisionGraph();
+    assertEquals(0, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
   // There is an omission
@@ -55,9 +55,9 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
-    DecisionGraph dGraph = creator.buildDecisionGraph();
-    assertEquals(1, DecisionGraphVisitor.determineMinimumNumberOfGaps(dGraph));
+    EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
+    EditGraph dGraph = creator.buildDecisionGraph();
+    assertEquals(1, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
   // first make a unit test which strips down the decision graph
@@ -68,10 +68,10 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
-    DecisionGraph dGraph = creator.buildDecisionGraph();
-    DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
-    DecisionGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
+    EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
+    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
+    EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     // I expect 6 vertices
     // start, 2 x the, black, cat en end
     assertVertices(dGraph2, "#", "the", "the", "black", "cat", "#");
@@ -87,13 +87,13 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
-    DecisionGraph dGraph = creator.buildDecisionGraph();
-    DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
-    DecisionGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
-    Map<DGVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
+    EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
+    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
+    EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
+    Map<EditGraphVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
     // asserts
-    Iterator<DGVertex> dgVerticesIterator = dGraph2.iterator();
+    Iterator<EditGraphVertex> dgVerticesIterator = dGraph2.iterator();
     assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
     assertEquals(new Integer(2), determineMinSequences.get(dgVerticesIterator.next()));
     assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
@@ -109,10 +109,10 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "the black cat");
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, graph, b);
-    DecisionGraph dGraph = creator.buildDecisionGraph();
-    DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
-    List<DGEdge> edges = visitor.getShortestPath();
+    EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
+    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
+    List<EditGraphEdge> edges = visitor.getShortestPath();
     assertTrue(edges.get(0).getWeight()==1); // The ideal path should start with a gap
     assertTrue(edges.get(1).getWeight()==0);
     assertTrue(edges.get(2).getWeight()==0);
@@ -133,14 +133,14 @@ public class DecisionGraphVisitorTest {
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     IVariantGraph vGraph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
-    DecisionGraphCreator creator = new DecisionGraphCreator(matcher, vGraph, b);
-    DecisionGraph dGraph = creator.buildDecisionGraph();
-    DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
+    EditGraphCreator creator = new EditGraphCreator(matcher, vGraph, b);
+    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
 
-    List<DGEdge> path = visitor.getShortestPath();
+    List<EditGraphEdge> path = visitor.getShortestPath();
     // we expect 8 edges
     // they all should have weight 0
-    Iterator<DGEdge> edges = path.iterator();
+    Iterator<EditGraphEdge> edges = path.iterator();
     assertEquals(new Integer(0), edges.next().getWeight());
   }
 

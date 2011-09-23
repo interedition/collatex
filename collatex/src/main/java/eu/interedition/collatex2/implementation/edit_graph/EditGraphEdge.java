@@ -1,22 +1,22 @@
 package eu.interedition.collatex2.implementation.edit_graph;
 
-public class DGEdge {
+public class EditGraphEdge {
 
-  private final DGVertex v1;
-  private final DGVertex v2;
+  private final EditGraphVertex v1;
+  private final EditGraphVertex v2;
   private final int weight;
 
-  public DGEdge(DGVertex v1, DGVertex v2, int weight) {
+  public EditGraphEdge(EditGraphVertex v1, EditGraphVertex v2, int weight) {
     this.v1 = v1;
     this.v2 = v2;
     this.weight = weight;
   }
 
-  public DGVertex getBeginVertex() {
+  public EditGraphVertex getBeginVertex() {
     return v1;
   }
 
-  public DGVertex getTargetVertex() {
+  public EditGraphVertex getTargetVertex() {
     return v2;
   }
 

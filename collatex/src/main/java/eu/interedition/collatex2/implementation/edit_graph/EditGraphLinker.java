@@ -12,15 +12,15 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class NewLinker implements ILinker {
+public class EditGraphLinker implements ILinker {
   
   public Map<INormalizedToken, INormalizedToken> link(IVariantGraph vGraph, IWitness b) {
     VariantGraphMatcher vgmatcher = new VariantGraphMatcher();
-    DecisionGraphCreator creator2 = new DecisionGraphCreator(vgmatcher, vGraph, b);
-    DecisionGraph dGraph = creator2.buildDecisionGraph();
-    DecisionGraphVisitor visitor = new DecisionGraphVisitor(dGraph);
-    List<DGEdge> shortestPath = visitor.getShortestPath();
-    Iterator<DGEdge> edges = shortestPath.iterator();
+    EditGraphCreator creator2 = new EditGraphCreator(vgmatcher, vGraph, b);
+    EditGraph dGraph = creator2.buildDecisionGraph();
+    EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
+    List<EditGraphEdge> shortestPath = visitor.getShortestPath();
+    Iterator<EditGraphEdge> edges = shortestPath.iterator();
 //    for (DGEdge edge : shortestPath) {
 //      System.out.println(edge.getTargetVertex().toString());
 //    }
@@ -30,7 +30,7 @@ public class NewLinker implements ILinker {
     List<INormalizedToken> tokens = b.getTokens();
     for (INormalizedToken token : tokens) {
       if (matches.containsKey(token)) {
-        DGEdge edge = edges.next();
+        EditGraphEdge edge = edges.next();
         linkedTokens.put(token, edge.getTargetVertex().getToken());
       }
     }

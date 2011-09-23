@@ -8,46 +8,46 @@ import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 // we use a weighted DAG to make alignment decisions
 
 @SuppressWarnings("serial")
-public class DecisionGraph extends DirectedAcyclicGraph<DGVertex, DGEdge> {
+public class EditGraph extends DirectedAcyclicGraph<EditGraphVertex, EditGraphEdge> {
 
-  private final DGVertex v1;
-  private final DGVertex end;
+  private final EditGraphVertex v1;
+  private final EditGraphVertex end;
 
-  public DecisionGraph(IVariantGraphVertex startVertex) {
+  public EditGraph(IVariantGraphVertex startVertex) {
     //TODO: that eight there is not handy!
     //TODO: the end vertex is unique by itself...
     //TODO: override the equals!
-    this(new DGVertex(startVertex), new DGVertex(new EndToken(8)));
+    this(new EditGraphVertex(startVertex), new EditGraphVertex(new EndToken(8)));
   }
 
-  public DecisionGraph(DGVertex startVertex, DGVertex endVertex) {
-	super(DGEdge.class);
+  public EditGraph(EditGraphVertex startVertex, EditGraphVertex endVertex) {
+	super(EditGraphEdge.class);
 	this.v1 = startVertex;
 	this.end = endVertex;
 	add(startVertex, endVertex);
   }
 
-  public void add(DGVertex... vertices) {
-    for (DGVertex v : vertices) {
+  public void add(EditGraphVertex... vertices) {
+    for (EditGraphVertex v : vertices) {
       addVertex(v);
     }
   }
 
-  public void add(DGEdge... edges) {
-    for (DGEdge e : edges) {
+  public void add(EditGraphEdge... edges) {
+    for (EditGraphEdge e : edges) {
       addEdge(e.getBeginVertex(), e.getTargetVertex(), e);
     }
   }
 
-  public DGVertex getStartVertex() {
+  public EditGraphVertex getStartVertex() {
     return v1;
   }
 
-  public DGVertex getEndVertex() {
+  public EditGraphVertex getEndVertex() {
     return end;
   }
 
-  public DGEdge edge(DGVertex source, DGVertex target) {
+  public EditGraphEdge edge(EditGraphVertex source, EditGraphVertex target) {
     if (!this.containsVertex(source)) {
       throw new RuntimeException("Source vertex does not exist in the graph!");
     }

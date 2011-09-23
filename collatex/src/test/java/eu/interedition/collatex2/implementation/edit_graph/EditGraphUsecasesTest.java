@@ -7,12 +7,12 @@ import java.util.Map;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.edit_graph.NewLinker;
+import eu.interedition.collatex2.implementation.edit_graph.EditGraphLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class DecisionGraphUsecasesTest {
+public class EditGraphUsecasesTest {
 //  <example>
 //  <witness>The black cat</witness>
 //  <witness>The black and white cat</witness>
@@ -27,7 +27,7 @@ public class DecisionGraphUsecasesTest {
     IWitness a = engine.createWitness("A", "The black cat");
     IWitness b = engine.createWitness("B", "The black and white cat");
     IVariantGraph graph = engine.graph(a);
-    NewLinker linker = new NewLinker();
+    EditGraphLinker linker = new EditGraphLinker();
     Map<INormalizedToken, INormalizedToken> link = linker.link(graph, b);
     assertEquals(3, link.size());
     //TODO: add asserts!

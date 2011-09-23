@@ -3,7 +3,7 @@ package eu.interedition.collatex2.implementation.edit_graph;
 import org.junit.Ignore;
 
 @Ignore
-public class DecisionGraphTest {
+public class EditGraphTest {
 
   
   //  the -> The

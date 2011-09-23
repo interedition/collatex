@@ -10,49 +10,49 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class DecisionGraphCreator {
+public class EditGraphCreator {
   private final IVariantGraphMatcher matcher;
   private final IVariantGraph vGraph;
   private final IWitness b;
 
   //remove second and third parameter or the first one alone!
-  public DecisionGraphCreator(IVariantGraphMatcher matcher, IVariantGraph vGraph, IWitness b) {
+  public EditGraphCreator(IVariantGraphMatcher matcher, IVariantGraph vGraph, IWitness b) {
     this.matcher = matcher;
     this.vGraph = vGraph;
     this.b = b;
   }
 
-  public DecisionGraph buildDecisionGraph() {
+  public EditGraph buildDecisionGraph() {
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(vGraph, b);
     // build the decision graph from the matches and the variant graph
-    DecisionGraph dGraph = new DecisionGraph(vGraph.getStartVertex());
-    Set<DGVertex> lastConstructedVertices = Sets.newLinkedHashSet();
+    EditGraph dGraph = new EditGraph(vGraph.getStartVertex());
+    Set<EditGraphVertex> lastConstructedVertices = Sets.newLinkedHashSet();
     lastConstructedVertices.add(dGraph.getStartVertex());
     for (INormalizedToken wToken : b.getTokens()) {
       List<INormalizedToken> matchingTokens = matches.get(wToken);
       if (!matchingTokens.isEmpty()) {
         // Ik moet hier alle aangemaakte vertices in de DGraph opvangen
-        Set<DGVertex> newConstructedVertices = Sets.newLinkedHashSet();
+        Set<EditGraphVertex> newConstructedVertices = Sets.newLinkedHashSet();
         for (INormalizedToken match : matchingTokens) {
-          DGVertex dgVertex = new DGVertex(match);
+          EditGraphVertex dgVertex = new EditGraphVertex(match);
           dGraph.add(dgVertex);
           newConstructedVertices.add(dgVertex);
           // TODO: you don't want to always draw an edge 
           // TODO: in the case of ngrams in witness and superbase
           // TODO: less edges are needed
-          for (DGVertex lastVertex : lastConstructedVertices) {
+          for (EditGraphVertex lastVertex : lastConstructedVertices) {
             INormalizedToken lastToken = lastVertex.getToken();
             int gap = vGraph.isNear(lastToken, match) ?  0 : 1;
-            dGraph.add(new DGEdge(lastVertex, dgVertex, gap));
+            dGraph.add(new EditGraphEdge(lastVertex, dgVertex, gap));
           }
         }
         lastConstructedVertices = newConstructedVertices;
       }
     }
-    for (DGVertex lastVertex : lastConstructedVertices) {
+    for (EditGraphVertex lastVertex : lastConstructedVertices) {
       INormalizedToken lastToken = lastVertex.getToken();
       int gap = vGraph.isNear(lastToken, vGraph.getEndVertex()) ?  0 : 1;
-      dGraph.add(new DGEdge(lastVertex, dGraph.getEndVertex(), gap));
+      dGraph.add(new EditGraphEdge(lastVertex, dGraph.getEndVertex(), gap));
     }
     return dGraph;
   }
