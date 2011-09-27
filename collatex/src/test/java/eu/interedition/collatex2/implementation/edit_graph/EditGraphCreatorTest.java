@@ -29,7 +29,7 @@ public class EditGraphCreatorTest {
     IVariantGraph vGraph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
     EditGraphCreator creator = new EditGraphCreator(matcher, vGraph, b);
-    EditGraph decisionGraph = creator.buildDecisionGraph();
+    EditGraph decisionGraph = creator.buildEditGraph();
     assertEquals(13, decisionGraph.vertexSet().size());
 
     // fetch vertices
@@ -93,7 +93,7 @@ public class EditGraphCreatorTest {
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
     EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraph dGraph = creator.buildEditGraph();
     Iterator<EditGraphVertex> topologicalOrder = dGraph.iterator();
     EditGraphVertex v1 = topologicalOrder.next();
     EditGraphVertex vThe1 = topologicalOrder.next();

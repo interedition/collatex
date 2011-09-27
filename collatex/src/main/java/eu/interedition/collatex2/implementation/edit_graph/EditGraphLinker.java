@@ -18,7 +18,7 @@ public class EditGraphLinker implements ILinker {
   public Map<INormalizedToken, INormalizedToken> link(IVariantGraph vGraph, IWitness b) {
     VariantGraphMatcher vgmatcher = new VariantGraphMatcher();
     EditGraphCreator creator2 = new EditGraphCreator(vgmatcher, vGraph, b);
-    EditGraph dGraph = creator2.buildDecisionGraph();
+    EditGraph dGraph = creator2.buildEditGraph();
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     List<EditGraphEdge> shortestPath = visitor.getShortestPath();
     Iterator<EditGraphEdge> edges = shortestPath.iterator();

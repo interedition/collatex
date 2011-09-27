@@ -41,7 +41,7 @@ public class EditGraphVisitorTest {
     IVariantGraph vGraph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
     EditGraphCreator creator = new EditGraphCreator(matcher, vGraph, b);
-    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraph dGraph = creator.buildEditGraph();
     assertEquals(0, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -56,7 +56,7 @@ public class EditGraphVisitorTest {
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
     EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraph dGraph = creator.buildEditGraph();
     assertEquals(1, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -69,7 +69,7 @@ public class EditGraphVisitorTest {
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
     EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraph dGraph = creator.buildEditGraph();
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     // I expect 6 vertices
@@ -88,7 +88,7 @@ public class EditGraphVisitorTest {
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
     EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraph dGraph = creator.buildEditGraph();
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     Map<EditGraphVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
@@ -110,7 +110,7 @@ public class EditGraphVisitorTest {
     IVariantGraph graph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
     EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraph dGraph = creator.buildEditGraph();
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     List<EditGraphEdge> edges = visitor.getShortestPath();
     assertTrue(edges.get(0).getWeight()==1); // The ideal path should start with a gap
@@ -134,7 +134,7 @@ public class EditGraphVisitorTest {
     IVariantGraph vGraph = engine.graph(a);
     VariantGraphMatcher matcher = new VariantGraphMatcher();
     EditGraphCreator creator = new EditGraphCreator(matcher, vGraph, b);
-    EditGraph dGraph = creator.buildDecisionGraph();
+    EditGraph dGraph = creator.buildEditGraph();
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
 
     List<EditGraphEdge> path = visitor.getShortestPath();

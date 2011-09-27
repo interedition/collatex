@@ -34,7 +34,7 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class Witness implements Iterable<INormalizedToken>, IWitness {
   private String sigil;
-  private List<INormalizedToken> tokens;
+  protected List<INormalizedToken> tokens;
 
   public Witness() {}
 
