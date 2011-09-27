@@ -32,7 +32,7 @@ public class EditGraphLinker implements ILinker {
     for (INormalizedToken token : tokens) {
       if (matches.containsKey(token)) {
         EditGraphEdge edge = edges.next();
-        linkedTokens.put(token, edge.getTargetVertex().getToken());
+        linkedTokens.put(token, edge.getTargetVertex().getBaseToken());
       }
     }
     return linkedTokens;

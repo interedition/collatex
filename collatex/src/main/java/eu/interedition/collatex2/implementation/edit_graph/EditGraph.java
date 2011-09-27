@@ -17,7 +17,7 @@ public class EditGraph extends DirectedAcyclicGraph<EditGraphVertex, EditGraphEd
     //TODO: that eight there is not handy!
     //TODO: the end vertex is unique by itself...
     //TODO: override the equals!
-    this(new EditGraphVertex(startVertex), new EditGraphVertex(new EndToken(8)));
+    this(new EditGraphVertex(null, startVertex), new EditGraphVertex(null, new EndToken(8)));
   }
 
   public EditGraph(EditGraphVertex startVertex, EditGraphVertex endVertex) {
@@ -35,7 +35,7 @@ public class EditGraph extends DirectedAcyclicGraph<EditGraphVertex, EditGraphEd
 
   public void add(EditGraphEdge... edges) {
     for (EditGraphEdge e : edges) {
-      addEdge(e.getBeginVertex(), e.getTargetVertex(), e);
+      addEdge(e.getSourceVertex(), e.getTargetVertex(), e);
     }
   }
 

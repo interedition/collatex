@@ -26,7 +26,7 @@ public class EditGraphVisitorTest {
     Iterator<EditGraphVertex> topologicIterator = dGraph.iterator();
     for (String expectedNormalized : normalized) {
       assertTrue("not enough vertices!", topologicIterator.hasNext());
-      assertEquals(expectedNormalized, topologicIterator.next().getToken().getNormalized());
+      assertEquals(expectedNormalized, topologicIterator.next().getBaseToken().getNormalized());
     }
   }
 

@@ -74,7 +74,7 @@ public class EditGraphVisitor {
       // bepaal de nieuwe weight for elk van de incoming edges
       Map<EditGraphEdge, Integer> edgeToTotalWeight = Maps.newLinkedHashMap();
       for (EditGraphEdge incomingEdge : incomingEdgesOf) {
-        edgeToTotalWeight.put(incomingEdge, vertexToMinWeight.get(incomingEdge.getBeginVertex()) + incomingEdge.getWeight());
+        edgeToTotalWeight.put(incomingEdge, vertexToMinWeight.get(incomingEdge.getSourceVertex()) + incomingEdge.getWeight());
       }
       Integer min = Collections.min(edgeToTotalWeight.values());
       vertexToMinWeight.put(next, min);
@@ -121,8 +121,8 @@ public class EditGraphVisitor {
     Set<EditGraphEdge> edgeSet = dGraph.edgeSet();
     Set<EditGraphEdge> newEdges = Sets.newLinkedHashSet();
     for (EditGraphEdge edge : edgeSet) {
-      if (verticesToKeep.contains(edge.getBeginVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
-        EditGraphEdge newEdge = new EditGraphEdge(edge.getBeginVertex(), edge.getTargetVertex(), edge.getWeight());
+      if (verticesToKeep.contains(edge.getSourceVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
+        EditGraphEdge newEdge = new EditGraphEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge.getWeight());
         newEdges.add(newEdge);
       }
     }
