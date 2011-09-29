@@ -32,7 +32,7 @@ public class EditGraphEdge {
 
   @Override
   public String toString() {
-    return "("+sourceVertex+")->("+targetVertex+")";
+    return "("+sourceVertex+")->("+targetVertex+"):"+weight;
   }
   
   @Override

@@ -82,8 +82,16 @@ public class EditGraphCreator {
           EditGraphVertex editGraphVertex = new EditGraphVertex(wToken, match);
           editGraph.add(editGraphVertex);
           newConstructedVertices.add(editGraphVertex);
+          // TODO: you don't want to always draw an edge 
+          // TODO: in the case of ngrams in witness and superbase
+          // TODO: less edges are needed
+          for (EditGraphVertex lastVertex : lastConstructedVertices) {
+            INormalizedToken lastToken = lastVertex.getBaseToken();
+            int gap = base.isNear(lastToken, match) ?  0 : 1;
+            editGraph.add(new EditGraphEdge(lastVertex, editGraphVertex, gap));
+          }
         }
-        //TODO: add edges!
+        //TODO: add edges to end vertex!
         lastConstructedVertices = newConstructedVertices;
       }
     }
