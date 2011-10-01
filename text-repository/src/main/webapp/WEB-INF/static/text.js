@@ -41,7 +41,7 @@ YUI.add("interedition-text", function(Y) {
                 });
                 return annotations;
             }
-        },
+        }
     }
 
     Y.extend(Y.text.Text, Y.Base, {
