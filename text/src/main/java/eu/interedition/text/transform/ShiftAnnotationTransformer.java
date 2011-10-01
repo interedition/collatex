@@ -10,9 +10,9 @@ public class ShiftAnnotationTransformer implements AnnotationTransformer {
   private final long delta;
 
   public ShiftAnnotationTransformer(long delta) {
-
     this.delta = delta;
   }
+
   @Override
   public Annotation apply(Annotation input) {
     return new SimpleAnnotation(input.getText(), input.getName(), input.getRange().shift(delta));
