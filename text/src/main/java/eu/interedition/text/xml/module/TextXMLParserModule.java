@@ -43,16 +43,11 @@ public class TextXMLParserModule extends XMLParserModuleAdapter {
 
   @Override
   public void text(String text, XMLParserState state) {
-    final Stack<Boolean> inclusionContext = state.getInclusionContext();
-    if (!inclusionContext.isEmpty() && !inclusionContext.peek()) {
+    if (!state.isIncluded()) {
       return;
     }
 
-    final Stack<Boolean> spacePreservationContext = state.getSpacePreservationContext();
-    final Stack<XMLEntity> elementContext = state.getElementContext();
-
-    final boolean preserveSpace = !spacePreservationContext.isEmpty() && spacePreservationContext.peek();
-    if (!preserveSpace && !elementContext.isEmpty() && state.getConfiguration().isContainerElement(elementContext.peek())) {
+    if (!state.isSpacePreserved() && state.isContainerElement()) {
       return;
     }
 

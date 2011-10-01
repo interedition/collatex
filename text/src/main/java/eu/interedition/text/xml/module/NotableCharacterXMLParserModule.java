@@ -28,7 +28,7 @@ import eu.interedition.text.xml.XMLParserState;
 public class NotableCharacterXMLParserModule extends XMLParserModuleAdapter {
   @Override
   public void start(XMLEntity entity, XMLParserState state) {
-    if (state.getConfiguration().isNotable(entity)) {
+    if (state.isNotable() && state.isIncluded()) {
       state.insert(Character.toString(state.getConfiguration().getNotableCharacter()), false);
     }
   }

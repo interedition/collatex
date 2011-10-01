@@ -90,12 +90,32 @@ public class XMLParserState {
     return inclusionContext;
   }
 
+  public boolean isIncluded() {
+    return inclusionContext.isEmpty() || inclusionContext.peek();
+  }
+
   public Stack<Boolean> getSpacePreservationContext() {
     return spacePreservationContext;
   }
 
+  public boolean isSpacePreserved() {
+    return !spacePreservationContext.isEmpty() && spacePreservationContext.peek();
+  }
+
   public Stack<XMLEntity> getElementContext() {
     return elementContext;
+  }
+
+  public boolean isContainerElement() {
+    return !elementContext.isEmpty() && configuration.isContainerElement(elementContext.peek());
+  }
+
+  public boolean isLineElement() {
+    return !elementContext.isEmpty() && configuration.isLineElement(elementContext.peek());
+  }
+
+  public boolean isNotable() {
+    return !elementContext.isEmpty() && configuration.isNotable(elementContext.peek());
   }
 
   public Stack<Integer> getNodePath() {
@@ -122,7 +142,7 @@ public class XMLParserState {
       final int textLength = text.length();
       final StringBuilder inserted = new StringBuilder();
       if (fromSource) {
-        final boolean preserveSpace = !spacePreservationContext.isEmpty() && spacePreservationContext.peek();
+        final boolean preserveSpace = isSpacePreserved();
         for (int cc = 0; cc < textLength; cc++) {
           char currentChar = text.charAt(cc);
           if (!preserveSpace && configuration.isCompressingWhitespace() && Character.isWhitespace(lastChar) && Character.isWhitespace(currentChar)) {
@@ -197,12 +217,12 @@ public class XMLParserState {
       spacePreservationContext.push("preserve".equalsIgnoreCase(xmlSpace));
     }
 
+    nodePath.push(0);
+    elementContext.push(entity);
+
     for (XMLParserModule m : modules) {
       m.start(entity, this);
     }
-
-    nodePath.push(0);
-    elementContext.push(entity);
   }
 
   void end(XMLEntity entity) {
