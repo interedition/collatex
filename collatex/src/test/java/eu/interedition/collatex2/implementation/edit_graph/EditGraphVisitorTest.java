@@ -11,13 +11,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphEdge;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphVertex;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraph;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphCreator;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphVisitor;
-import eu.interedition.collatex2.implementation.matching.VariantGraphMatcher;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class EditGraphVisitorTest {
@@ -38,10 +31,8 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
-    IVariantGraph vGraph = engine.graph(a);
-    VariantGraphMatcher matcher = new VariantGraphMatcher();
-    EditGraphCreator creator = new EditGraphCreator(matcher, vGraph, b);
-    EditGraph dGraph = creator.buildEditGraph();
+    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraph dGraph = creator.buildEditGraph(a, b);
     assertEquals(0, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -53,10 +44,8 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
-    IVariantGraph graph = engine.graph(a);
-    VariantGraphMatcher matcher = new VariantGraphMatcher();
-    EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildEditGraph();
+    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraph dGraph = creator.buildEditGraph(a, b);
     assertEquals(1, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -66,10 +55,8 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
-    IVariantGraph graph = engine.graph(a);
-    VariantGraphMatcher matcher = new VariantGraphMatcher();
-    EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildEditGraph();
+    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     // I expect 6 vertices
@@ -85,10 +72,8 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
-    IVariantGraph graph = engine.graph(a);
-    VariantGraphMatcher matcher = new VariantGraphMatcher();
-    EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildEditGraph();
+    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     Map<EditGraphVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
@@ -107,10 +92,8 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
-    IVariantGraph graph = engine.graph(a);
-    VariantGraphMatcher matcher = new VariantGraphMatcher();
-    EditGraphCreator creator = new EditGraphCreator(matcher, graph, b);
-    EditGraph dGraph = creator.buildEditGraph();
+    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     List<EditGraphEdge> edges = visitor.getShortestPath();
     assertTrue(edges.get(0).getWeight()==1); // The ideal path should start with a gap
@@ -131,10 +114,8 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
-    IVariantGraph vGraph = engine.graph(a);
-    VariantGraphMatcher matcher = new VariantGraphMatcher();
-    EditGraphCreator creator = new EditGraphCreator(matcher, vGraph, b);
-    EditGraph dGraph = creator.buildEditGraph();
+    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
 
     List<EditGraphEdge> path = visitor.getShortestPath();
