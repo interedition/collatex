@@ -67,7 +67,6 @@ public class EditGraphCreator {
 
   // proberen we het hier nog eens
   public void buildEditGraph(FakeWitness base, FakeWitness witness) {
-    // we halen hier eerst de matches op
     TokenMatcher matcher = new TokenMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(base, witness);
     // build the decision graph from the matches and the variant graph
@@ -76,7 +75,6 @@ public class EditGraphCreator {
     for (INormalizedToken wToken : witness.getTokens()) {
       List<INormalizedToken> matchingTokens = matches.get(wToken);
       if (!matchingTokens.isEmpty()) {
-        // Ik moet hier alle aangemaakte vertices in de EditGraph opvangen
         Set<EditGraphVertex> newConstructedVertices = Sets.newLinkedHashSet();
         for (INormalizedToken match : matchingTokens) {
           EditGraphVertex editGraphVertex = new EditGraphVertex(wToken, match);
@@ -91,9 +89,15 @@ public class EditGraphCreator {
             editGraph.add(new EditGraphEdge(lastVertex, editGraphVertex, gap));
           }
         }
-        //TODO: add edges to end vertex!
         lastConstructedVertices = newConstructedVertices;
       }
+    }
+    // add edges to end vertex
+    EditGraphVertex endVertex = editGraph.getEndVertex();
+    for (EditGraphVertex lastVertex : lastConstructedVertices) {
+      INormalizedToken lastToken = lastVertex.getBaseToken();
+      int gap = base.isNear(lastToken, endVertex.getBaseToken()) ?  0 : 1;
+      editGraph.add(new EditGraphEdge(lastVertex, endVertex, gap));
     }
   }
 }
