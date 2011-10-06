@@ -31,7 +31,7 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
-    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraphCreator creator = new EditGraphCreator();
     EditGraph dGraph = creator.buildEditGraph(a, b);
     assertEquals(0, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
@@ -44,7 +44,7 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
-    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraphCreator creator = new EditGraphCreator();
     EditGraph dGraph = creator.buildEditGraph(a, b);
     assertEquals(1, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
@@ -55,7 +55,7 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
-    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraphCreator creator = new EditGraphCreator();
     EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
@@ -72,7 +72,7 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
-    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraphCreator creator = new EditGraphCreator();
     EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
@@ -92,7 +92,7 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
-    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraphCreator creator = new EditGraphCreator();
     EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     List<EditGraphEdge> edges = visitor.getShortestPath();
@@ -114,7 +114,7 @@ public class EditGraphVisitorTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
-    EditGraphCreator creator = new EditGraphCreator(null, null, null);
+    EditGraphCreator creator = new EditGraphCreator();
     EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
 

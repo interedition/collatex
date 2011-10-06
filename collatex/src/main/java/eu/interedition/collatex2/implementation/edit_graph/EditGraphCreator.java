@@ -6,35 +6,39 @@ import java.util.Set;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.implementation.matching.IVariantGraphMatcher;
 import eu.interedition.collatex2.implementation.matching.TokenMatcher;
+import eu.interedition.collatex2.implementation.matching.VariantGraphMatcher;
+import eu.interedition.collatex2.implementation.vg_alignment.EndToken;
+import eu.interedition.collatex2.implementation.vg_alignment.StartToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class EditGraphCreator {
-  private final IVariantGraphMatcher matcher;
-  private final IVariantGraph vGraph;
-  private final IWitness b;
   private final EditGraph editGraph;
 
-  public EditGraphCreator(IVariantGraphMatcher matcher, IVariantGraph vGraph, IWitness b) {
-    this(new EditGraph(vGraph.getStartVertex()), matcher, vGraph, b);
+  public EditGraphCreator() {
+    this(new EditGraph());
   }
 
-  //remove second and third parameter or the first one alone!
-  public EditGraphCreator(EditGraph editGraph, IVariantGraphMatcher matcher2, IVariantGraph vGraph2, IWitness b2) {
+  public EditGraphCreator(EditGraph editGraph) {
     this.editGraph = editGraph;
-    this.matcher = matcher2;
-    this.vGraph = vGraph2;
-    this.b = b2;
   }
 
-  public EditGraph buildEditGraph() {
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(vGraph, b);
-    // build the decision graph from the matches and the variant graph
+  //TODO: remove this method in favor of the second one!
+  public EditGraph buildEditGraph(VariantGraphMatcher matcher, IVariantGraph vGraph, IWitness b) {
+    // create start vertex
+    //TODO: that eight there is not handy!
+    //TODO: the end vertex is unique by itself...
+    //TODO: override the equals!
+    editGraph.setEndVertex(new EditGraphVertex(null, new EndToken(8)));
+    editGraph.setStartVertex(new EditGraphVertex(null, vGraph.getStartVertex()));
+    
+
     Set<EditGraphVertex> lastConstructedVertices = Sets.newLinkedHashSet();
     lastConstructedVertices.add(editGraph.getStartVertex());
+    // build the decision graph from the matches and the variant graph
+    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(vGraph, b);
     for (INormalizedToken wToken : b.getTokens()) {
       List<INormalizedToken> matchingTokens = matches.get(wToken);
       if (!matchingTokens.isEmpty()) {
@@ -66,11 +70,15 @@ public class EditGraphCreator {
 
   // proberen we het hier nog eens
   public EditGraph buildEditGraph(IWitness a, IWitness b2) {
+    // create start vertex
+    EditGraphVertex startVertex = new EditGraphVertex(null, new StartToken());
+    editGraph.setStartVertex(startVertex);
+    Set<EditGraphVertex> lastConstructedVertices = Sets.newLinkedHashSet();
+    lastConstructedVertices.add(startVertex);
+    // build the decision graph from the matches and the variant graph
     TokenMatcher matcher = new TokenMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b2);
-    // build the decision graph from the matches and the variant graph
-    Set<EditGraphVertex> lastConstructedVertices = Sets.newLinkedHashSet();
-    lastConstructedVertices.add(editGraph.getStartVertex());
+       // add for vertices for witness tokens that have a matching base token
     for (INormalizedToken wToken : b2.getTokens()) {
       List<INormalizedToken> matchingTokens = matches.get(wToken);
       if (!matchingTokens.isEmpty()) {
@@ -91,8 +99,10 @@ public class EditGraphCreator {
         lastConstructedVertices = newConstructedVertices;
       }
     }
+    // create end vertex
+    EditGraphVertex endVertex = new EditGraphVertex(null, new EndToken(a.size()+1));
+    editGraph.setEndVertex(endVertex);
     // add edges to end vertex
-    EditGraphVertex endVertex = editGraph.getEndVertex();
     for (EditGraphVertex lastVertex : lastConstructedVertices) {
       INormalizedToken lastToken = lastVertex.getBaseToken();
       int gap = a.isNear(lastToken, endVertex.getBaseToken()) ?  0 : 1;

@@ -3,7 +3,6 @@ package eu.interedition.collatex2.implementation.edit_graph;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
@@ -57,16 +56,14 @@ public class EditGraphCreatorTest {
     
     //mock
     EditGraph editGraph = mock(EditGraph.class);
-    when(editGraph.getStartVertex()).thenReturn(startVertex);
-    when(editGraph.getEndVertex()).thenReturn(endVertex);
     
     //run
-    EditGraphCreator creator = new EditGraphCreator(editGraph, null, null, null); // matcher, vGraph, b);
+    EditGraphCreator creator = new EditGraphCreator(editGraph);
     creator.buildEditGraph(base, witness);
     
     //verify vertices
-    verify(editGraph).getStartVertex();
-    verify(editGraph).getEndVertex();
+    verify(editGraph).setStartVertex(startVertex);
+    verify(editGraph).setEndVertex(endVertex);
     verify(editGraph).add(vertex1);
     verify(editGraph).add(vertex2);
     verify(editGraph).add(vertex3);
@@ -130,16 +127,14 @@ public class EditGraphCreatorTest {
     
     //mock
     EditGraph editGraph = mock(EditGraph.class);
-    when(editGraph.getStartVertex()).thenReturn(startVertex);
-    when(editGraph.getEndVertex()).thenReturn(endVertex);
     
     //run
-    EditGraphCreator creator = new EditGraphCreator(editGraph, null, null, null); // matcher, vGraph, b);
+    EditGraphCreator creator = new EditGraphCreator(editGraph);
     creator.buildEditGraph(base, witness);
  
     //verify vertices
-    verify(editGraph).getStartVertex();
-    verify(editGraph).getEndVertex();
+    verify(editGraph).setStartVertex(startVertex);
+    verify(editGraph).setEndVertex(endVertex);
     verify(editGraph).add(vertex1);
     verify(editGraph).add(vertex2);
     verify(editGraph).add(vertex3);

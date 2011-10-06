@@ -126,7 +126,9 @@ public class EditGraphVisitor {
         newEdges.add(newEdge);
       }
     }
-    EditGraph newGraph = new EditGraph(dGraph.getStartVertex(), dGraph.getEndVertex());
+    EditGraph newGraph = new EditGraph();
+    newGraph.setStartVertex(dGraph.getStartVertex());
+    newGraph.setEndVertex(dGraph.getEndVertex());
     for (EditGraphVertex vertex : verticesToKeep) {
       newGraph.addVertex(vertex);
     }
