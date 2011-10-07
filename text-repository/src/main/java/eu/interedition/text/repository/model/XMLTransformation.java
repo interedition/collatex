@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class XMLParserConfigurationImpl extends SimpleXMLParserConfiguration {
+public class XMLTransformation extends SimpleXMLParserConfiguration {
   protected boolean transformTEI = true;
   protected boolean removeEmpty = false;
 

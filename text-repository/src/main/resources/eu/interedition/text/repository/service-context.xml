@@ -30,11 +30,13 @@
 
     <context:property-placeholder location="classpath:/eu/interedition/text/repository/config.properties" system-properties-mode="OVERRIDE" />
 
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.h2.Driver"/>
-        <property name="url" value="jdbc:h2://${interedition.text.home}/text-repository"/>
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="driverClass" value="org.h2.Driver"/>
+        <property name="jdbcUrl" value="jdbc:h2://${interedition.text.home}/text-repository"/>
         <property name="username" value="sa"/>
         <property name="password" value=""/>
+        <property name="minConnectionsPerPartition" value="1" />
+        <property name="maxConnectionsPerPartition" value="20" />
     </bean>
 
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
@@ -69,4 +71,9 @@
     <task:scheduler id="taskScheduler"/>
 
     <task:executor id="taskExecutor"/>
+
+    <bean id="textIndex" class="eu.interedition.text.repository.textindex.TextIndex">
+        <property name="base" value="${interedition.text.home}"/>
+    </bean>
+
 </beans>

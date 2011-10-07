@@ -1,4 +1,4 @@
-<#assign title="Parse XML Text #" + text.id?html maxLength=102400 truncated=(text.length gt maxLength)/>
+<#assign title="Transform XML Text #" + text.id?html maxLength=102400 truncated=(text.length gt maxLength)/>
 <@ie.page title>
     <h1>${title}</h1>
 
@@ -10,7 +10,7 @@
     <div class="yui3-g">
         <div class="yui3-u-1-2">
             <form method="post" id="parse-form">
-                <p><input type="submit" value="Parse"> <input type="reset" value="Reset"></p>
+                <p><input type="submit" value="Transform"> <input type="reset" value="Reset"></p>
                 <table>
                     <tr>
                         <td colspan="5" class="right"><label for="removeEmpty">Remove empty annotations:</label></td>
@@ -79,7 +79,7 @@
                 });
                 Y.on("submit", function(e) {
                     e.preventDefault();
-                    var parserConfig = {
+                    var transformConfig = {
                         transformTEI: Y.one("#transformTEI").get("checked"),
                         removeEmpty: Y.one("#removeEmpty").get("checked"),
                         included: [],
@@ -99,11 +99,11 @@
 
                             var nameCell = Y.one("#" + cbName);
                             var name = { "ns": nameCell.one(".ns").get("text"), "n": nameCell.one(".ln").get("text") };
-                            parserConfig[cbType].push(name);
+                            transformConfig[cbType].push(name);
                         }
                     });
 
-                    Y.textRepository.parseXML(textId, parserConfig, function(resp) {
+                    (new Y.interedition.text.Repository({ base: cp })).transform(textId, transformConfig, function(resp) {
                         window.location.pathname = cp + "/text/" + resp.id.toString();
                     })
                 }, "#parse-form");

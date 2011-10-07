@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><component name="dataSourceStorage">
+  <data-source source="LOCAL" name="Text Repository" product="H2" version="1.3.146 (2010-11-08)" jdbc-version="3.0" driver-version="1.3.146 (2010-11-08)" uuid="152b45cb-81c7-47f6-bc95-c6b571157552">
+    <identifier-quote-string>"</identifier-quote-string>
+    <jdbc-driver>org.h2.Driver</jdbc-driver>
+    <jdbc-url>jdbc:h2:///Users/gregor/text-repository</jdbc-url>
+    <user-name>sa</user-name>
+    <libraries>
+      <library>
+        <url>jar://$MAVEN_REPOSITORY$/com/h2database/h2/1.3.146/h2-1.3.146.jar!/</url>
+      </library>
+    </libraries>
+    <table name="REPOSITORY_TEXT_COLLECTION" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" default="(NEXT VALUE FOR PUBLIC.SYSTEM_SEQUENCE_FEE7F4CE_28FE_487E_A37F_5A5CA923A837)" />
+      <column name="NAME" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CONSTRAINT_1" columns="id" />
+      <index name="CONSTRAINT_INDEX_1" unique="true" columns="NAME" />
+      <index name="PRIMARY_KEY_1" unique="true" columns="ID" />
+    </table>
+    <table name="REPOSITORY_TEXT_METADATA" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="TEXT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CREATED" sqlType="TIMESTAMP" length="23" precision="10" nullable="false" jdbcType="93" />
+      <column name="UPDATED" sqlType="TIMESTAMP" length="23" precision="10" nullable="false" jdbcType="93" />
+      <column name="COLLECTION" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="TITLE" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <column name="SUMMARY" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <column name="AUTHOR" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <foreign-key name="CONSTRAINT_DD5" columns="COLLECTION" ref-table="REPOSITORY_TEXT_COLLECTION" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" cascade-remove="true" />
+      <foreign-key name="CONSTRAINT_DD" columns="TEXT" ref-table="TEXT_CONTENT" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" cascade-remove="true" />
+      <index name="CONSTRAINT_INDEX_DD51" unique="true" columns="TEXT,COLLECTION" />
+      <index name="CONSTRAINT_INDEX_DD" unique="false" columns="TEXT" />
+      <index name="CONSTRAINT_INDEX_DD5" unique="false" columns="COLLECTION" />
+    </table>
+    <table name="TEXT_ANNOTATION" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="TEXT" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="NAME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="RANGE_START" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="RANGE_END" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CONSTRAINT_E" columns="id" />
+      <foreign-key name="CONSTRAINT_E1" columns="TEXT" ref-table="TEXT_CONTENT" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" cascade-remove="true" />
+      <foreign-key name="CONSTRAINT_E13" columns="NAME" ref-table="TEXT_QNAME" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" />
+      <index name="PRIMARY_KEY_E" unique="true" columns="ID" />
+      <index name="CONSTRAINT_INDEX_E" unique="false" columns="TEXT" />
+      <index name="CONSTRAINT_INDEX_E1" unique="false" columns="NAME" />
+      <index name="TEXT_ANNOTATION_RANGES" unique="false" columns="RANGE_START,RANGE_END" />
+    </table>
+    <table name="TEXT_ANNOTATION_DATA" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="ANNOTATION" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="NAME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="VALUE" sqlType="CLOB" length="2147483647" precision="0" nullable="false" jdbcType="2005" />
+      <foreign-key name="CONSTRAINT_E1E" columns="ANNOTATION" ref-table="TEXT_ANNOTATION" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" cascade-remove="true" />
+      <foreign-key name="CONSTRAINT_E1ED" columns="NAME" ref-table="TEXT_QNAME" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" />
+      <index name="CONSTRAINT_INDEX_E1ED8" unique="true" columns="ANNOTATION,NAME" />
+      <index name="CONSTRAINT_INDEX_E1E" unique="false" columns="ANNOTATION" />
+      <index name="CONSTRAINT_INDEX_E1ED" unique="false" columns="NAME" />
+    </table>
+    <table name="TEXT_ANNOTATION_LINK" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="NAME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="CONSTRAINT_E1F" columns="id" />
+      <foreign-key name="CONSTRAINT_E1F1" columns="NAME" ref-table="TEXT_QNAME" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" />
+      <index name="PRIMARY_KEY_E1" unique="true" columns="ID" />
+      <index name="CONSTRAINT_INDEX_E1F" unique="false" columns="NAME" />
+    </table>
+    <table name="TEXT_ANNOTATION_LINK_DATA" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="LINK" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="NAME" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="VALUE" sqlType="CLOB" length="2147483647" precision="0" nullable="false" jdbcType="2005" />
+      <foreign-key name="CONSTRAINT_81" columns="LINK" ref-table="TEXT_ANNOTATION_LINK" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" cascade-remove="true" />
+      <foreign-key name="CONSTRAINT_814" columns="NAME" ref-table="TEXT_QNAME" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" />
+      <index name="CONSTRAINT_INDEX_814F" unique="true" columns="LINK,NAME" />
+      <index name="CONSTRAINT_INDEX_81" unique="false" columns="LINK" />
+      <index name="CONSTRAINT_INDEX_814" unique="false" columns="NAME" />
+    </table>
+    <table name="TEXT_ANNOTATION_LINK_TARGET" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="LINK" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="TARGET" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <foreign-key name="CONSTRAINT_87" columns="TARGET" ref-table="TEXT_ANNOTATION" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" cascade-remove="true" />
+      <foreign-key name="CONSTRAINT_8" columns="LINK" ref-table="TEXT_ANNOTATION_LINK" ref-schema="PUBLIC" ref-catalog="TEXT-REPOSITORY" ref-columns="ID" cascade-remove="true" />
+      <index name="CONSTRAINT_INDEX_870" unique="true" columns="LINK,TARGET" />
+      <index name="CONSTRAINT_INDEX_8" unique="false" columns="LINK" />
+      <index name="CONSTRAINT_INDEX_87" unique="false" columns="TARGET" />
+    </table>
+    <table name="TEXT_CONTENT" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="TYPE" sqlType="SMALLINT" length="5" precision="0" nullable="false" jdbcType="5" />
+      <column name="CONTENT" sqlType="CLOB" length="2147483647" precision="0" nullable="false" jdbcType="2005" />
+      <column name="CONTENT_LENGTH" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="CONTENT_DIGEST" sqlType="VARCHAR" length="128" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="CONSTRAINT_3" columns="id" />
+      <index name="PRIMARY_KEY_3" unique="true" columns="ID" />
+    </table>
+    <table name="TEXT_QNAME" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
+      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="LOCAL_NAME" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="NAMESPACE" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="CONSTRAINT_D" columns="id" />
+      <index name="CONSTRAINT_INDEX_D" unique="true" columns="LOCAL_NAME,NAMESPACE" />
+      <index name="PRIMARY_KEY_D" unique="true" columns="ID" />
+    </table>
+  </data-source>
+</component>

@@ -39,7 +39,17 @@
 
     <tx:annotation-driven proxy-target-class="true"/>
 
-    <bean id="textHttpMessageConverter" class="eu.interedition.text.repository.conversion.TextHttpMessageConverter"/>
+    <bean id="jsonSerializer" class="eu.interedition.text.json.JSONSerializer">
+        <property name="annotationRepository"  ref="annotationRepository"/>
+        <property name="textRepository" ref="textRepository"/>
+    </bean>
+
+    <bean id="jsonSerializationHttpMessageConverter"
+          class="eu.interedition.text.repository.conversion.JSONSerializationHttpMessageConverter"/>
+    <bean id="xmlSerializationHttpMessageConverter"
+          class="eu.interedition.text.repository.conversion.XMLSerializationHttpMessageConverter"/>
+    <bean id="textHttpMessageConverter"
+          class="eu.interedition.text.repository.conversion.TextHttpMessageConverter"/>
     <bean id="mappingJacksonHttpMessageConverter"
           class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
 
@@ -47,6 +57,8 @@
         <property name="order" value="-1"/>
         <property name="messageConverters">
             <list>
+                <ref bean="jsonSerializationHttpMessageConverter"/>
+                <ref bean="xmlSerializationHttpMessageConverter"/>
                 <ref bean="textHttpMessageConverter"/>
                 <ref bean="mappingJacksonHttpMessageConverter"/>
             </list>

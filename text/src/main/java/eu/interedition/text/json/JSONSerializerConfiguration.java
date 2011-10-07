@@ -16,7 +16,7 @@ public interface JSONSerializerConfiguration {
 
   Range getRange();
 
-  BiMap<String, URI> getNamespaceMappings();
+  Map<String, URI> getNamespaceMappings();
 
   Set<QName> getDataSet();
 

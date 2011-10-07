@@ -20,12 +20,24 @@
 package eu.interedition.text.repository.conversion;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
-import eu.interedition.text.Text;
-import eu.interedition.text.TextRepository;
+import eu.interedition.text.*;
+import eu.interedition.text.json.JSONSerializer;
+import eu.interedition.text.json.JSONSerializerConfiguration;
+import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.query.Criteria;
+import eu.interedition.text.query.Criterion;
 import eu.interedition.text.repository.TextService;
 import eu.interedition.text.repository.model.TextImpl;
+import eu.interedition.text.xml.XMLSerializer;
+import eu.interedition.text.xml.XMLSerializerConfiguration;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpInputMessage;
@@ -40,12 +52,18 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -60,15 +78,34 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
 
   @Autowired
   private PlatformTransactionManager transactionManager;
-  private TransformerFactory transformerFactory;
+
+  @Autowired
+  private JSONSerializer jsonSerializer;
+
+  @Autowired
+  private XMLSerializer xmlSerializer;
+
+  @Autowired
+  private ObjectMapper objectMapper;
+
+  private SAXTransformerFactory transformerFactory;
+  private JsonFactory jsonFactory;
+
+  private TransactionTemplate writingTransactionTemplate;
+  private TransactionTemplate readingTransactionTemplate;
 
   public TextHttpMessageConverter() {
-    super(MediaType.TEXT_PLAIN, MediaType.APPLICATION_XML);
+    super(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML);
   }
 
   @Override
   protected boolean supports(Class<?> clazz) {
     return TextImpl.class.isAssignableFrom(clazz);
+  }
+
+  @Override
+  protected boolean canWrite(MediaType mediaType) {
+    return false;
   }
 
   @Override
@@ -78,7 +115,7 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
     final Charset charset = (contentTypeCharset == null ? Text.CHARSET : contentTypeCharset);
 
     try {
-      return new TransactionTemplate(transactionManager).execute(new TransactionCallback<TextImpl>() {
+      return writingTransactionTemplate.execute(new TransactionCallback<TextImpl>() {
         @Override
         public TextImpl doInTransaction(TransactionStatus status) {
           try {
@@ -89,8 +126,10 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
               } finally {
                 Closeables.close(textContent, false);
               }
-            } else {
+            } else if (MediaType.APPLICATION_XML.isCompatibleWith(contentType)) {
               return textService.create(new TextImpl(), new StreamSource(inputMessage.getBody()));
+            } else {
+              throw new HttpMessageNotReadableException("Cannot read text encoded as " + contentType.toString());
             }
           } catch (IOException e) {
             throw Throwables.propagate(e);
@@ -117,40 +156,47 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
     final Charset charset = (contentTypeCharset == null ? Text.CHARSET : contentTypeCharset);
 
     try {
-      final TransactionTemplate tt = new TransactionTemplate(transactionManager);
-      tt.setReadOnly(true);
-      tt.execute(new TransactionCallbackWithoutResult() {
+      readingTransactionTemplate.execute(new TransactionCallbackWithoutResult() {
         @Override
         protected void doInTransactionWithoutResult(TransactionStatus status) {
+          OutputStream bodyStream = null;
           try {
-            textRepository.read(text, new TextRepository.TextReader() {
-              @Override
-              public void read(Reader content, long contentLength) throws IOException {
-                switch (text.getType()) {
-                  case TXT:
-                    OutputStreamWriter bodyWriter = null;
-                    try {
-                      CharStreams.copy(content, bodyWriter = new OutputStreamWriter(outputMessage.getBody(), charset));
-                    } finally {
-                      Closeables.close(bodyWriter, false);
-                    }
-                    break;
-                  case XML:
-                    OutputStream bodyStream = null;
-                    try {
-                      transformerFactory.newTransformer().transform(new StreamSource(content),//
-                              new StreamResult(bodyStream = outputMessage.getBody()));
-                    } catch (TransformerException e) {
-                      throw Throwables.propagate(e);
-                    } finally {
-                      Closeables.close(bodyStream, false);
-                    }
-                    break;
-                }
+            if (MediaType.APPLICATION_JSON.isCompatibleWith(contentType)) {
+              final JsonGenerator jg = jsonFactory.createJsonGenerator(bodyStream = outputMessage.getBody());
+              try {
+                jsonSerializer.serialize(jg, text, JSON_SERIALIZER_CONFIGURATION);
+              } finally {
+                Closeables.close(jg, false);
               }
-            });
+            } else if (MediaType.TEXT_PLAIN.isCompatibleWith(contentType)) {
+              final Writer bodyWriter = new OutputStreamWriter(bodyStream = outputMessage.getBody(), charset);
+              textRepository.read(text, new TextRepository.TextReader() {
+                @Override
+                public void read(Reader content, long contentLength) throws IOException {
+                  CharStreams.copy(content, bodyWriter);
+                  bodyWriter.flush();
+                }
+              });
+            } else if (MediaType.APPLICATION_XML.isCompatibleWith(contentType)) {
+              final StreamResult xml = new StreamResult(bodyStream = outputMessage.getBody());
+              if (text.getType() == Text.Type.XML) {
+                textRepository.read(text, xml);
+              } else {
+                final TransformerHandler th = transformerFactory.newTransformerHandler();
+                th.setResult(xml);
+                xmlSerializer.serialize(th, text, XML_SERIALIZER_CONFIGURATION);
+              }
+            } else {
+              throw new HttpMessageNotWritableException(contentType.toString());
+            }
+          } catch (XMLStreamException e) {
+            throw Throwables.propagate(e);
+          } catch (TransformerException e) {
+            throw Throwables.propagate(e);
           } catch (IOException e) {
             throw Throwables.propagate(e);
+          } finally {
+            Closeables.closeQuietly(bodyStream);
           }
         }
       });
@@ -158,6 +204,9 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
       final Throwable cause = Throwables.getRootCause(t);
       if (cause instanceof TransformerException) {
         throw new HttpMessageNotWritableException(((TransformerException) cause).getMessageAndLocation(), cause);
+      }
+      if (cause instanceof XMLStreamException) {
+        throw new HttpMessageNotWritableException(cause.getMessage(), cause);
       }
       Throwables.propagateIfInstanceOf(cause, IOException.class);
       Throwables.propagateIfInstanceOf(cause, HttpMessageNotWritableException.class);
@@ -179,6 +228,65 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    transformerFactory = TransformerFactory.newInstance();
+    transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+    jsonFactory = objectMapper.getJsonFactory();
+
+    writingTransactionTemplate = new TransactionTemplate(transactionManager);
+
+    readingTransactionTemplate = new TransactionTemplate(transactionManager);
+    readingTransactionTemplate.setReadOnly(true);
+  }
+
+  private static final JSONSerializerConfiguration JSON_SERIALIZER_CONFIGURATION = new JSONSerializerConfiguration() {
+    @Override
+    public Range getRange() {
+      return null;
+    }
+
+    @Override
+    public Map<String, URI> getNamespaceMappings() {
+      return Maps.newHashMap(NAMESPACE_MAP);
+    }
+
+    @Override
+    public Set<QName> getDataSet() {
+      return null;
+    }
+
+    @Override
+    public Criterion getQuery() {
+      return Criteria.any();
+    }
+  };
+
+  private static final XMLSerializerConfiguration XML_SERIALIZER_CONFIGURATION = new XMLSerializerConfiguration() {
+    @Override
+    public QName getRootName() {
+      return new SimpleQName(TextConstants.INTEREDITION_NS_URI, "xml");
+    }
+
+    @Override
+    public Map<String, URI> getNamespaceMappings() {
+      return Maps.newHashMap(NAMESPACE_MAP);
+    }
+
+    @Override
+    public List<QName> getHierarchy() {
+      return null;
+    }
+
+    @Override
+    public Criterion getQuery() {
+      return Criteria.any();
+    }
+  };
+
+  private static final BiMap<String, URI> NAMESPACE_MAP = HashBiMap.create();
+
+  static {
+    NAMESPACE_MAP.put("xml", TextConstants.XML_NS_URI);
+    NAMESPACE_MAP.put("tei", TextConstants.TEI_NS);
+    NAMESPACE_MAP.put("ie", TextConstants.INTEREDITION_NS_URI);
+    NAMESPACE_MAP.put("clix", TextConstants.CLIX_NS);
   }
 }

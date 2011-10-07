@@ -44,6 +44,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -64,13 +66,8 @@ import java.util.Map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Service
 @Transactional
 public class TextIndex implements InitializingBean, DisposableBean {
-
-  @Autowired
-  @Qualifier("dataBaseDirectory")
-  private File base;
 
   @Autowired
   private TextService textService;
@@ -87,6 +84,8 @@ public class TextIndex implements InitializingBean, DisposableBean {
 
   @Autowired
   private JdbcTemplate jt;
+
+  private File base;
 
   private FSDirectory directory;
   private StandardAnalyzer analyzer;
@@ -154,6 +153,11 @@ public class TextIndex implements InitializingBean, DisposableBean {
 
   protected Term idTerm(TextImpl rt) {
     return new Term("id", Long.toString(rt.getId()));
+  }
+
+  @Required
+  public void setBase(File base) {
+    this.base = base;
   }
 
   @Override

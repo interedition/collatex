@@ -22,10 +22,12 @@ package eu.interedition.text.repository.model;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.text.QName;
+import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.mem.SimpleQName;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.query.Criterion;
+import eu.interedition.text.query.Operator;
 import eu.interedition.text.xml.XMLSerializerConfiguration;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -35,17 +37,21 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import static eu.interedition.text.query.Criteria.annotationName;
+import static eu.interedition.text.query.Criteria.or;
+
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class XMLSerializerConfigurationImpl implements XMLSerializerConfiguration {
+public class XMLSerialization implements XMLSerializerConfiguration {
   private QNameImpl rootName = new QNameImpl(new SimpleQName(TextConstants.INTEREDITION_NS_URI, "root"));
   private Map<String, URI> namespaceMappings = Maps.newHashMap();
   private List<QName> hierarchy = Lists.newArrayList();
   private boolean hierarchyOnly = true;
+  private Text text;
   private Criterion query = Criteria.any();
 
-  public XMLSerializerConfigurationImpl() {
+  public XMLSerialization() {
     namespaceMappings.put("tei", TextConstants.TEI_NS);
     namespaceMappings.put("ie", TextConstants.INTEREDITION_NS_URI);
   }
@@ -94,6 +100,16 @@ public class XMLSerializerConfigurationImpl implements XMLSerializerConfiguratio
   }
 
   @JsonIgnore
+  public Text getText() {
+    return text;
+  }
+
+  @JsonIgnore
+  public void setText(Text text) {
+    this.text = text;
+  }
+
+  @JsonIgnore
   @Override
   public Criterion getQuery() {
     return query;
@@ -102,5 +118,15 @@ public class XMLSerializerConfigurationImpl implements XMLSerializerConfiguratio
   @JsonIgnore
   public void setQuery(Criterion query) {
     this.query = query;
+  }
+
+  public void evaluate() {
+    if (hierarchyOnly && !hierarchy.isEmpty()) {
+      final Operator hierarchyDisjunction = or();
+      for (QName name : hierarchy) {
+        hierarchyDisjunction.add(annotationName(name));
+      }
+      setQuery(hierarchyDisjunction);
+    }
   }
 }
