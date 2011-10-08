@@ -208,24 +208,35 @@ public abstract class AbstractTextRepository implements TextRepository {
 
     @Override
     public int read() throws IOException {
-      if (offset >= range.getEnd()) {
-        return -1;
-      }
       while (offset < range.getStart()) {
-        final int read = super.read();
+        final int read = doRead();
         if (read < 0) {
           return read;
         }
-        ++offset;
+      }
+      if (offset >= range.getEnd()) {
+        return -1;
       }
 
-      return super.read();
+      return doRead();
+    }
+
+    protected int doRead() throws IOException {
+      final int read = super.read();
+      if (read >= 0) {
+        ++offset;
+      }
+      return read;
     }
 
     @Override
     public int read(char[] cbuf, int off, int len) throws IOException {
-      // TODO: implement!
-      return super.read(cbuf, off, len);    //To change body of overridden methods use File | Settings | File Templates.
+      int read = 0;
+      int last;
+      while ((read < len) && ((last = read()) >= 0)) {
+        cbuf[off + read++] = (char) last;
+      }
+      return ((len > 0 && read == 0) ? -1 : read);
     }
   }
 }

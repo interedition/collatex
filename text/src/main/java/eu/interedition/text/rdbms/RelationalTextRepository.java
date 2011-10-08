@@ -147,7 +147,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
       protected Void read(Clob content) throws SQLException, IOException {
         Reader contentReader = null;
         try {
-          reader.read(contentReader = content.getCharacterStream(range.getStart() + 1, range.length()), range.length());
+          reader.read(contentReader = new RangeFilteringReader(content.getCharacterStream(), range), range.length());
         } catch (IOException e) {
           Throwables.propagate(e);
         } finally {
