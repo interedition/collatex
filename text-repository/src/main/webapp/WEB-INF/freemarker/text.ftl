@@ -39,7 +39,7 @@
 <script type="text/javascript">
     var textId = ${text.id?c};
 
-    YUI().use("node", "event", "dump", "escape", "interedition-text-repository", "interedition-text-view", function(Y) {
+    YUI().use("node", "event", "dump", "escape", "interedition-text", function(Y) {
         Y.on("domready", function() {
             var textEl = Y.one("#text-contents"), annotationEl = Y.one("#annotations");
             if (textEl == null) return;

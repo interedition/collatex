@@ -16,9 +16,7 @@
     <script type="text/javascript">var cp = "${cp?js_string}";</script>
     <script type="text/javascript" src="${cp}/static/yui-3.4.0/yui/yui-min.js"></script>
     <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.min.js"></script>
-    <script type="text/javascript" src="${cp}/static/text/model.js"></script>
-    <script type="text/javascript" src="${cp}/static/text/repository.js"></script>
-    <script type="text/javascript" src="${cp}/static/text/view.js"></script>
+    <script type="text/javascript" src="${cp}/static/interedition-text/interedition-text-min.js"></script>
 
     <title>${title} :: Interedition Text Repository</title>
 </head>

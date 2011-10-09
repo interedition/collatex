@@ -59,7 +59,7 @@
     </div>
     <script type="text/javascript">
         var textId = ${text.id?c};
-        YUI().use("interedition-text-repository", "dump", "node", "event", function(Y) {
+        YUI().use("interedition-text", "dump", "node", "event", function(Y) {
             Y.on("domready", function() {
                 Y.all("input[type='checkbox']").each(function(cb) {
                     var id = cb.get("id");
