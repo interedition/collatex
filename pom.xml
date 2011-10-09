@@ -26,7 +26,6 @@
         <module>text</module>
         <module>text-repository</module>
         <module>web-resources</module>
-        <module>yui3</module>
     </modules>
     <dependencies>
         <dependency>
