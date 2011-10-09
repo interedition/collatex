@@ -26,8 +26,10 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <include>build</include>
-                            <include>**/build_tmp</include>
+                            <directory>build</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>interedition-text/src/build_tmp</directory>
                         </fileset>
                     </filesets>
                 </configuration>
@@ -40,7 +42,7 @@
                         <phase>compile</phase>
                         <configuration>
                             <target>
-                                <ant antfile="interedition-text/src/build.xml" useNativeBasedir="true" inheritAll="false" />
+                                <ant antfile="interedition-text/src/build.xml" target="all" useNativeBasedir="true" inheritAll="false" />
                             </target>
                         </configuration>
                         <goals>
