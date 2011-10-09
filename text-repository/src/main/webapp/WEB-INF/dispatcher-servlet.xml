@@ -31,6 +31,10 @@
 
     <mvc:view-controller path="/" view-name="index"/>
 
+    <mvc:interceptors>
+        <bean class="eu.interedition.text.repository.CrossOriginResourceSharingInterceptor"/>
+    </mvc:interceptors>
+
     <context:component-scan base-package="eu.interedition.text.repository" use-default-filters="false">
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>

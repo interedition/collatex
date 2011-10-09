@@ -1,0 +1,6 @@
+== Build instructions ==
+
+See https://github.com/yui/builder/tree/master/componentbuild
+
+$ (cd yui3/interedition-text && ant all)
+$ ls yui3/build

@@ -28,6 +28,8 @@ YUI.add("interedition-text-repository", function(Y) {
         "base": {}
     };
 
+    //Y.io.transport({ xdr: { use: "native" }});
+
     Y.extend(NS.Repository, Y.Base, {
         "read": function(id, text) {
             Y.io(this.get("base") + "/text/" + id.toString(), {
