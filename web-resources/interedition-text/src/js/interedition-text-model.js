@@ -1,23 +1,3 @@
-/*
- * #%L
- * Text Repository: Datastore for texts based on Interedition's model.
- * %%
- * Copyright (C) 2010 - 2011 The Interedition Development Group
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
 NS.RANGE_SORT = function(a, b) {
     var ra = a.range, rb = b.range;
     return (ra.start == rb.start ? rb.end - ra.end : ra.start - rb.start);
@@ -81,7 +61,7 @@ NS.Range.prototype.toString = function() {
 NS.Annotation = function(name, range, data) {
     this.name = name;
     this.range = range;
-    this.data = data;
+    this.data = data || [];
 };
 NS.Text = function(data) {
     NS.Text.superclass.constructor.apply(this, arguments);
@@ -89,16 +69,7 @@ NS.Text = function(data) {
 NS.Text.NAME = "interedition-text";
 NS.Text.ATTRS = {
     text : { value: "" },
-    annotations: { value: [] },
-    data: {
-        getter: function() {
-            return [ this.get("text"), this.get("annotations") ];
-        },
-        setter: function(d) {
-            this.set("text", d[0]);
-            this.set("annotations", d[1]);
-        }
-    }
+    annotations: { value: [] }
 };
 Y.extend(NS.Text, Y.Base, {
     partition: function() {

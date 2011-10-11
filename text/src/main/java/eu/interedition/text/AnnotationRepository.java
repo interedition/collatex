@@ -35,6 +35,8 @@ public interface AnnotationRepository {
 
   Iterable<Annotation> create(Iterable<Annotation> annotations);
 
+  Iterable<Annotation> create(Map<Annotation, Map<QName, String>> annotations);
+
   void scroll(Criterion criterion, AnnotationCallback callback);
 
   Iterable<Annotation> find(Criterion criterion);

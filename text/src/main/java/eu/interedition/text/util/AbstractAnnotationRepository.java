@@ -57,6 +57,18 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
     this.batchSize = batchSize;
   }
 
+  public Iterable<Annotation> create(Map<Annotation, Map<QName, String>> annotations) {
+    final Iterator<Annotation> annotationIt = create(annotations.keySet()).iterator();
+    final Iterator<Map<QName, String>> attributesIt = annotations.values().iterator();
+
+    final Map<Annotation, Map<QName, String>> data = Maps.newHashMapWithExpectedSize(annotations.size());
+    while (annotationIt.hasNext() && attributesIt.hasNext()) {
+      data.put(annotationIt.next(), attributesIt.next());
+    }
+    set(data);
+
+    return data.keySet();
+  }
 
   public Iterable<Annotation> create(Annotation... annotations) {
     return create(Arrays.asList(annotations));

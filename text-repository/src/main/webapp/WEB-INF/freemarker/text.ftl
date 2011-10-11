@@ -44,50 +44,51 @@
             var textEl = Y.one("#text-contents"), annotationEl = Y.one("#annotations");
             if (textEl == null) return;
 
-            var text = new Y.interedition.text.Text();
-            var textPanel = new Y.interedition.text.TextPanel({ node: textEl, text: text });
-            var annotationNames = new Y.interedition.text.AnnotationNamesSelectionList({ node: "#annotations", textPanel: textPanel });
-            var annotationGutter = new Y.interedition.text.AnnotationGutter({node: "#annotation-gutter", textPanel: textPanel });
-
-            annotationNames.after("selectedNamesChange", function() {
-                var selectedNames = annotationNames.get("selectedNames");
-                var highlighted = [];
-                Y.each(text.get("annotations"), function(a) {
-                    if (Y.Array.some(selectedNames, function(n) { return a.name.toString() == n; })) highlighted.push(a);
-                });
-
-
-                var colorScale = d3.scale.category10();
-                Y.each(text.partition(), function(p) {
-                    var hc = 0;
-                    highlighted = Y.Array.filter(highlighted, function(h) {
-                        if (p.overlapsWith(h.range)) hc++;
-                        return true; //!(p.precedes(h.range));
-                    });
-                    Y.one("#" + p.toId()).setStyle("color", hc == 0 ? "black" : colorScale(hc));
-                });
-            });
-
-            function partitionInfo(e) {
-                var selectedNames = annotationNames.get("selectedNames");
-                var range = Y.interedition.text.Range.fromId(e.target.getAttribute("id"));
-                var annotations = "";
-                Y.each(text.get("annotations"), function(a) {
-                    if (a.range.overlapsWith(range)) {
-                        if (Y.Array.some(selectedNames, function(n) { return n == a.name.toString(); })) {
-                            annotations += "*";
-                        }
-                        annotations += Y.Lang.sub("<{name}; {range}>\n", a);
-                    }
-                });
-                alert(annotations);
-            }
-            textPanel.after("update", function() {
-                Y.each(textPanel.get("segments"), function(s) { s[1].on("click", partitionInfo); });
-            });
-
             var textRepository = new Y.interedition.text.Repository({ base: cp });
-            textRepository.read(textId, text);
+            textRepository.read(textId, function(text) {
+                var textPanel = new Y.interedition.text.TextPanel({ node: textEl, text: text });
+                textPanel.update();
+
+                var annotationNames = new Y.interedition.text.AnnotationNamesSelectionList({ node: "#annotations", textPanel: textPanel });
+                var annotationGutter = new Y.interedition.text.AnnotationGutter({node: "#annotation-gutter", textPanel: textPanel });
+
+                annotationNames.after("selectedNamesChange", function() {
+                    var selectedNames = annotationNames.get("selectedNames");
+                    var highlighted = [];
+                    Y.each(text.get("annotations"), function(a) {
+                        if (Y.Array.some(selectedNames, function(n) { return a.name.toString() == n; })) highlighted.push(a);
+                    });
+
+
+                    var colorScale = d3.scale.category10();
+                    Y.each(text.partition(), function(p) {
+                        var hc = 0;
+                        highlighted = Y.Array.filter(highlighted, function(h) {
+                            if (p.overlapsWith(h.range)) hc++;
+                            return true; //!(p.precedes(h.range));
+                        });
+                        Y.one("#" + p.toId()).setStyle("color", hc == 0 ? "black" : colorScale(hc));
+                    });
+                });
+
+                function partitionInfo(e) {
+                    var selectedNames = annotationNames.get("selectedNames");
+                    var range = Y.interedition.text.Range.fromId(e.target.getAttribute("id"));
+                    var annotations = "";
+                    Y.each(text.get("annotations"), function(a) {
+                        if (a.range.overlapsWith(range)) {
+                            if (Y.Array.some(selectedNames, function(n) { return n == a.name.toString(); })) {
+                                annotations += "*";
+                            }
+                            annotations += Y.Lang.sub("<{name}; {range}>\n", a);
+                        }
+                    });
+                    alert(annotations);
+                }
+                textPanel.after("update", function() {
+                    Y.each(textPanel.get("segments"), function(s) { s[1].on("click", partitionInfo); });
+                });
+            });
 
             // ======================================== Histogram
             /*
