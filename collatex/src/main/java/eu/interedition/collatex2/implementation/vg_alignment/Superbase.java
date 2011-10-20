@@ -17,8 +17,10 @@ package eu.interedition.collatex2.implementation.vg_alignment;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
+import eu.interedition.collatex2.interfaces.IWitness;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,14 +32,15 @@ import java.util.List;
 // it represents a variant graph as a witness
 // this makes certain alignment steps easier
 // TODO: implement IWitness interface
-class Superbase {
+class Superbase implements IWitness {
     private final IVariantGraph vg;
 
     Superbase(IVariantGraph vg) {
         this.vg = vg;
     }
 
-    List<INormalizedToken> getTokens() {
+    @Override
+    public List<INormalizedToken> getTokens() {
         List<INormalizedToken> tokens = Lists.newArrayList();
         Iterator<IVariantGraphVertex> iterator = vg.iterator();
         while(iterator.hasNext()) {
@@ -46,7 +49,23 @@ class Superbase {
         return tokens;
     }
 
-    boolean isNear(INormalizedToken t1, INormalizedToken t2) {
-        return vg.isNear(t1, t2);
+    @Override
+    public String getSigil() {
+        return "superbase";
+    }
+
+    @Override
+    public int size() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean isNear(IToken a, IToken b) {
+        return vg.isNear(a, b);
+    }
+
+    @Override
+    public Iterator<INormalizedToken> tokenIterator() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
