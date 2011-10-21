@@ -31,11 +31,10 @@ import java.util.List;
 // The superbase class is a wrapper around the variant graph
 // it represents a variant graph as a witness
 // this makes certain alignment steps easier
-// TODO: implement IWitness interface
-class Superbase implements IWitness {
+public class Superbase implements IWitness {
     private final IVariantGraph vg;
 
-    Superbase(IVariantGraph vg) {
+    public Superbase(IVariantGraph vg) {
         this.vg = vg;
     }
 
@@ -56,16 +55,22 @@ class Superbase implements IWitness {
 
     @Override
     public int size() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getTokens().size();
     }
 
     @Override
     public boolean isNear(IToken a, IToken b) {
+        if (a instanceof StartToken) {
+            a = vg.getStartVertex();
+        }
+        if (b instanceof EndToken) {
+            b = vg.getEndVertex();
+        }
         return vg.isNear(a, b);
     }
 
     @Override
     public Iterator<INormalizedToken> tokenIterator() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getTokens().iterator();
     }
 }

@@ -12,7 +12,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
+import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenMatch;
 import eu.interedition.collatex2.interfaces.ILinker;
@@ -56,7 +56,7 @@ public class LinkerTest {
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = engine.graph(a);
     Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, b);
-    IWitness sb = new SuperbaseCreator().create(graph);
+    IWitness sb = new Superbase(graph);
     INormalizedToken itsSB = sb.getTokens().get(1);
     INormalizedToken itsB = b.getTokens().get(0);
     assertEquals(itsSB, tokens.get(itsB));
@@ -118,7 +118,7 @@ public class LinkerTest {
     IVariantGraph graph = engine.graph(a, b);
     IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
     Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, c);
-    IWitness superbase = new SuperbaseCreator().create(graph);
+    IWitness superbase = new Superbase(graph);
     INormalizedToken verySB = superbase.getTokens().get(3);
     INormalizedToken veryC = c.getTokens().get(0);
     INormalizedToken happySB = superbase.getTokens().get(4);
