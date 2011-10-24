@@ -92,16 +92,7 @@ NS.Text = function(data) {
 NS.Text.NAME = "interedition-text";
 NS.Text.ATTRS = {
     text : { value: "" },
-    annotations: { value: [] },
-    data: {
-        getter: function() {
-            return [ this.get("text"), this.get("annotations") ];
-        },
-        setter: function(d) {
-            this.set("text", d[0]);
-            this.set("annotations", d[1]);
-        }
-    }
+    annotations: { value: [] }
 };
 Y.extend(NS.Text, Y.Base, {
     partition: function() {
@@ -182,11 +173,9 @@ NS.Repository.ATTRS = {
     "base": {}
 };
 
-//Y.io.transport({ xdr: { use: "native" }});
-
 Y.extend(NS.Repository, Y.Base, {
-    "read": function(id, text) {
-        Y.io(this.get("base") + "/text/" + id.toString(), {
+    "read": function(id, cb) {
+        Y.io(this.toURI(id), {
             headers: {
                 "Accept": "application/json"
             },
@@ -206,13 +195,55 @@ Y.extend(NS.Repository, Y.Base, {
                         return new NS.Annotation(names[a.n.toString()], new NS.Range(a.r[0], a.r[1]), annotationData);
                     });
 
-                    text.set("data", [ (data.t || ""), annotations ]);
+                    cb(new NS.Text({ text: (data.t || ""), annotations: annotations }));
                 }
             }
         });
     },
+    "write": function(textContents, cb) {
+        Y.io(this.get("base") + "/text", {
+            method: "post",
+            headers: {
+                "Content-Type": "text/plain",
+                "Accept": "application/json"
+
+            },
+            data: textContents,
+            on: {
+                success: function(transactionId, resp) {
+                    cb(Y.JSON.parse(resp.responseText));
+                }
+            }
+        });
+    },
+    "annotate": function(id, annotations, cb) {
+        var nameCount = 0, names = {}, payload = { n: {}, a: [] };
+        var nameRef = function(n) {
+            var nameStr = n.toString();
+            if (nameStr in names) {
+                return names[nameStr];
+            } else {
+                var ref = (nameCount++).toString();
+                payload.n[ref] = [ n.namespace, n.localName ],
+                names[nameStr] = ref;
+                return ref;
+            }
+        };
+
+        Y.each(annotations, function(a) {
+            var annotationData = Y.Array.map(a.data, function(d) {
+                return [ nameRef(d[0]), d[1] ];
+            });
+            payload.a.push({
+                "n": nameRef(a.name),
+                "r": [a.range.start, a.range.end],
+                "d": annotationData
+            });
+        });
+
+    },
     "transform": function(id, transformConfig, cb) {
-        Y.io(this.get("base") + "/text/" + id.toString() + "/transform", {
+        Y.io(this.toURI(id) + "/transform", {
             method: "post",
             headers: {
                 "Content-Type": "application/json",
@@ -225,6 +256,12 @@ Y.extend(NS.Repository, Y.Base, {
                 }
             }
         });
+    },
+    "redirectTo": function(id) {
+        Y.config.win.location = this.toURI(id);
+    },
+    "toURI": function(id) {
+        return (this.get("base") + "/text/" + id.toString());
     }
 });
 NS.TextPanel = function(cfg) {
@@ -249,6 +286,7 @@ NS.TextPanel.ATTRS = {
 };
 Y.extend(NS.TextPanel, Y.Base, {
     initializer: function(cfg) {
+        this.get("text").after("textChange", this.update, this);
         this.get("text").after("dataChange", this.update, this);
     },
     update: function() {

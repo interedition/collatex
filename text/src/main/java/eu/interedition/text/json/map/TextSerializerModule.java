@@ -1,5 +1,7 @@
 package eu.interedition.text.json.map;
 
+import eu.interedition.text.QName;
+import eu.interedition.text.Range;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.module.SimpleModule;
 
@@ -14,6 +16,9 @@ public class TextSerializerModule extends SimpleModule {
     addSerializer(new QNameSerializer());
     addSerializer(new RangeSerializer());
     addSerializer(new AnnotationSerializer());
+
+    addDeserializer(QName.class, new QNameDeserializer());
+    addDeserializer(Range.class, new RangeDeserializer());
   }
 
 }

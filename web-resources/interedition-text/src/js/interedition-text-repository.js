@@ -1,22 +1,3 @@
-/*
- * #%L
- * Text Repository: Datastore for texts based on Interedition's model.
- * %%
- * Copyright (C) 2010 - 2011 The Interedition Development Group
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
 NS.Repository = function(config) {
     NS.Repository.superclass.constructor.apply(this, arguments);
 };
@@ -25,11 +6,9 @@ NS.Repository.ATTRS = {
     "base": {}
 };
 
-//Y.io.transport({ xdr: { use: "native" }});
-
 Y.extend(NS.Repository, Y.Base, {
-    "read": function(id, text) {
-        Y.io(this.get("base") + "/text/" + id.toString(), {
+    "read": function(id, cb) {
+        Y.io(this.toURI(id), {
             headers: {
                 "Accept": "application/json"
             },
@@ -49,13 +28,62 @@ Y.extend(NS.Repository, Y.Base, {
                         return new NS.Annotation(names[a.n.toString()], new NS.Range(a.r[0], a.r[1]), annotationData);
                     });
 
-                    text.set("data", [ (data.t || ""), annotations ]);
+                    cb(new NS.Text({ text: (data.t || ""), annotations: annotations }));
                 }
             }
         });
     },
+    "write": function(textContents, cb) {
+        Y.io(this.get("base") + "/text", {
+            method: "post",
+            headers: {
+                "Content-Type": "text/plain",
+                "Accept": "application/json"
+
+            },
+            data: textContents,
+            on: {
+                success: function(transactionId, resp) {
+                    cb(Y.JSON.parse(resp.responseText));
+                }
+            }
+        });
+    },
+    "annotate": function(id, annotations, cb) {
+        var names = {}, nameCount = 0, nameIndex = {}, nameRef = function(n) {
+            var nameStr = n.toString();
+            if (nameStr in nameIndex) {
+                return nameIndex[nameStr];
+            } else {
+                var ref = (nameCount++).toString();
+                names[ref] = [ n.namespace, n.localName ],
+                nameIndex[nameStr] = ref;
+                return ref;
+            }
+        };
+
+        var annotations = Y.Array.map(annotations, function(a) {
+            var annotationData = Y.Array.map(a.data, function(d) { return [ nameRef(d[0]), d[1] ]; });
+            return { "n": nameRef(a.name), "r": [a.range.start, a.range.end], "d": annotationData };
+        });
+
+        Y.io(this.toURI(id) + "/annotate", {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            data: Y.JSON.stringify([ names, annotations ]),
+            on: {
+                success: function(transactionId, resp) {
+                    cb(Y.JSON.parse(resp.responseText));
+                }
+            }
+        });
+
+    },
     "transform": function(id, transformConfig, cb) {
-        Y.io(this.get("base") + "/text/" + id.toString() + "/transform", {
+        Y.io(this.toURI(id) + "/transform", {
             method: "post",
             headers: {
                 "Content-Type": "application/json",
@@ -68,5 +96,11 @@ Y.extend(NS.Repository, Y.Base, {
                 }
             }
         });
+    },
+    "redirectTo": function(id) {
+        Y.config.win.location = this.toURI(id);
+    },
+    "toURI": function(id) {
+        return (this.get("base") + "/text/" + id.toString());
     }
 });

@@ -104,7 +104,7 @@
                     });
 
                     (new Y.interedition.text.Repository({ base: cp })).transform(textId, transformConfig, function(resp) {
-                        window.location.pathname = cp + "/text/" + resp.id.toString();
+                        Y.config.win.location.pathname = cp + "/text/" + resp.id.toString();
                     })
                 }, "#parse-form");
             });

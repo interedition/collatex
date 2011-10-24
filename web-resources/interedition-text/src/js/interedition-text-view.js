@@ -20,7 +20,9 @@ NS.TextPanel.ATTRS = {
 };
 Y.extend(NS.TextPanel, Y.Base, {
     initializer: function(cfg) {
-        this.get("text").after("dataChange", this.update, this);
+        this.get("text").after("textChange", this.update, this);
+        this.get("text").after("annotationsChange", this.update, this);
+        this.update();
     },
     update: function() {
         var node = this.get("node"), text = this.get("text"), segments = this.get("segments");
@@ -63,6 +65,7 @@ NS.AnnotationNamesSelectionList.ATTRS = {
 Y.extend(NS.AnnotationNamesSelectionList, Y.Base, {
     initializer: function(cfg) {
         this.get("textPanel").on("update", this.update, this);
+        this.update();
     },
     entryChanged: function(e) {
         var names = this.get("names");
@@ -115,6 +118,7 @@ NS.AnnotationGutter.ATTRS = {
 Y.extend(NS.AnnotationGutter, Y.Base, {
     initializer: function(cfg) {
         this.get("textPanel").on("update", this.update, this);
+        this.update();
     },
     update: function() {
         var textPanel = this.get("textPanel"), gutterNode = this.get("node");

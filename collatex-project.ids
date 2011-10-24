@@ -10,7 +10,7 @@
       </library>
     </libraries>
     <table name="REPOSITORY_TEXT_COLLECTION" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
-      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" default="(NEXT VALUE FOR PUBLIC.SYSTEM_SEQUENCE_FEE7F4CE_28FE_487E_A37F_5A5CA923A837)" />
+      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" default="(NEXT VALUE FOR PUBLIC.SYSTEM_SEQUENCE_64D97E51_FE45_446B_AB05_FEF2DF4873A6)" />
       <column name="NAME" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <primary-key name="CONSTRAINT_1" columns="id" />
       <index name="CONSTRAINT_INDEX_1" unique="true" columns="NAME" />

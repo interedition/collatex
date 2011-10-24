@@ -27,12 +27,16 @@ import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.text.*;
+import eu.interedition.text.json.JSONSerializer;
+import eu.interedition.text.query.Criteria;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.repository.model.*;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserModule;
 import eu.interedition.text.xml.module.*;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -82,6 +86,12 @@ public class TextController {
 
   @Autowired
   private XMLParser xmlParser;
+
+  @Autowired
+  private JSONSerializer jsonSerializer;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @RequestMapping(value = "/{id}", headers = "accept=text/html")
   public ModelAndView getTextAsHtml(@PathVariable("id") int id) throws IOException {
@@ -141,6 +151,30 @@ public class TextController {
     return serialization;
   }
 
+  @RequestMapping(value = "/{id}/annotate", method = RequestMethod.PUT, headers = "content-type=application/json")
+  public RedirectView replaceAnnotations(@PathVariable("id") long id, Reader annotations) throws IOException {
+    final TextImpl text = textService.load(id);
+    annotationRepository.delete(Criteria.text(text));
+    addAnnotations(text, annotations);
+    return created(text);
+  }
+
+  @RequestMapping(value = "/{id}/annotate", method = RequestMethod.POST, headers = "content-type=application/json")
+  public RedirectView addAnnotations(@PathVariable("id") long id, Reader annotations) throws IOException {
+    final TextImpl text = textService.load(id);
+    addAnnotations(text, annotations);
+    return redirectTo(text);
+  }
+
+  private void addAnnotations(Text text, @RequestBody Reader annotations) throws IOException {
+    final JsonParser jp = objectMapper.getJsonFactory().createJsonParser(annotations);
+    try {
+      jsonSerializer.unserialize(jp, text);
+    } finally {
+      Closeables.close(jp, false);
+    }
+  }
+
   @RequestMapping("/{id}/names")
   @ResponseBody
   public SortedSet<QName> getNamesOfText(@PathVariable("id") long id) {
@@ -198,16 +232,28 @@ public class TextController {
   }
 
   @RequestMapping(method = RequestMethod.POST, headers = "content-type=text/plain")
-  public RedirectView postTextPlainText(@RequestBody Text text) {
+  public RedirectView postPlainText(@RequestBody TextImpl text) {
     return created(text);
+  }
+
+  @RequestMapping(method = RequestMethod.POST, headers = {"content-type=text/plain", "accept=application/json"})
+  @ResponseBody
+  public Text postAndReturnPlainText(@RequestBody TextImpl text) {
+    return text;
   }
 
   @RequestMapping(method = RequestMethod.POST, headers = "content-type=application/xml")
-  public RedirectView postTextAsXml(@RequestBody Text text) {
+  public RedirectView postTextAsXml(@RequestBody TextImpl text) {
     return created(text);
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @RequestMapping(method = RequestMethod.POST, headers = {"content-type=application/xml", "accept=application/json"})
+  @ResponseBody
+  public Text postAndReturnXml(@RequestBody TextImpl text) {
+    return text;
+  }
+
+  @RequestMapping(method = RequestMethod.POST, params = "file")
   public RedirectView postTextViaForm(@ModelAttribute TextImpl text, @RequestParam("file") MultipartFile file,//
                                  @RequestParam("fileType") Text.Type textType,//
                                  @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
