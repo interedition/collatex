@@ -25,7 +25,7 @@
                                     new Text.Annotation(name1, new Text.Range(2, 4)),
                                     new Text.Annotation(name2, new Text.Range(4, 6))
                             ];
-                    repository.annotate(1, annotations, Y.log);
+                    repository.annotate(created.id, annotations, Y.log);
 
                     var panel = new Text.TextPanel({ text: text, node: "#text-panel"});
                     var nameList = new Text.AnnotationNamesSelectionList({ textPanel: panel, node: "#annotation-names" });
