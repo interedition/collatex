@@ -33,6 +33,9 @@
 
     <mvc:interceptors>
         <bean class="eu.interedition.text.repository.CrossOriginResourceSharingInterceptor"/>
+        <bean class="eu.interedition.text.repository.ConfigurationViewModelProvider">
+                <property name="configuration" ref="configuration"/>
+        </bean>
     </mvc:interceptors>
 
     <context:component-scan base-package="eu.interedition.text.repository" use-default-filters="false">

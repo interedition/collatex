@@ -6,14 +6,14 @@
 <head>
     <title>${title} :: CollateX</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssfonts/fonts-min.css">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssreset/reset-min.css">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssgrids/grids-min.css">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssbase/base-min.css">
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssfonts/fonts-min.css">
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssreset/reset-min.css">
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssgrids/grids-min.css">
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssbase/base-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css"/>
     <link rel="stylesheet" type="text/css" href="${cp}/static/collatex.css"/>
     <script type="text/javascript">var cp = "${cp?js_string}";</script>
-    <script type="text/javascript" src="${cp}/static/yui-3.4.0/yui/yui-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
 </head>
 <body class="yui3-skin-sam">
 <table id="top-bar">

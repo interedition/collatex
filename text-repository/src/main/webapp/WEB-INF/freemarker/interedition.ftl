@@ -6,17 +6,18 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssfonts/fonts-min.css">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssreset/reset-min.css">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssgrids/grids-min.css">
-    <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.0/cssbase/base-min.css">
+    <link rel="stylesheet" type="text/css" href="${config['yui.base']}/cssfonts/fonts-min.css">
+    <link rel="stylesheet" type="text/css" href="${config['yui.base']}/cssreset/reset-min.css">
+    <link rel="stylesheet" type="text/css" href="${config['yui.base']}/cssgrids/grids-min.css">
+    <link rel="stylesheet" type="text/css" href="${config['yui.base']}/cssbase/base-min.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/text-repository.css">
 
-    <script type="text/javascript">var cp = "${cp?js_string}";</script>
-    <script type="text/javascript" src="${cp}/static/yui-3.4.0/yui/yui-min.js"></script>
     <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.min.js"></script>
-    <script type="text/javascript" src="${cp}/static/interedition-text/interedition-text-min.js"></script>
+    <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.behavior.min.js"></script>
+    <script type="text/javascript" src="${config['yui.base']}/yui/yui-min.js"></script>
+    <script type="text/javascript" src="${config['interedition.text.js.base']}/interedition-text-min.js"></script>
+    <script type="text/javascript">var cp = "${cp?js_string}";</script>
 
     <title>${title} :: Interedition Text Repository</title>
 </head>
