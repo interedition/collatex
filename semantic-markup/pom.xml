@@ -41,5 +41,9 @@
             <artifactId>rngom</artifactId>
             <version>20100718</version>
         </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+        </dependency>
     </dependencies>
 </project>

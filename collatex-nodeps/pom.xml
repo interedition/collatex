@@ -21,12 +21,14 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
+                <version>2.5</version>
 				<configuration>
 					<skip>true</skip>
 				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.1</version>
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -37,7 +39,7 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>eu.interedition.collatex</groupId>
+			<groupId>eu.interedition</groupId>
 			<artifactId>collatex</artifactId>
 		</dependency>
 	</dependencies>
