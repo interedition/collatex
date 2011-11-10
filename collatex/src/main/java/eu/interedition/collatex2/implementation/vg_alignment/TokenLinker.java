@@ -286,8 +286,7 @@ public class TokenLinker implements ILinker {
 
   @Override
   public Map<INormalizedToken, INormalizedToken> link(IVariantGraph graph, IWitness b) {
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(graph);
+    IWitness superbase = new Superbase(graph);
     return link2(superbase, b);
   }
 }

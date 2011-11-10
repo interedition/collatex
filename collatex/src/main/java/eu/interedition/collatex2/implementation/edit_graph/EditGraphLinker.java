@@ -8,7 +8,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.matching.VariantGraphMatcher;
-import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
+import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.interfaces.ILinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -16,9 +16,9 @@ import eu.interedition.collatex2.interfaces.IWitness;
 
 public class EditGraphLinker implements ILinker {
   
+  @Override
   public Map<INormalizedToken, INormalizedToken> link(IVariantGraph vGraph, IWitness b) {
-    SuperbaseCreator sbCreator = new SuperbaseCreator();
-    IWitness superbase = sbCreator.create(vGraph);
+    IWitness superbase = new Superbase(vGraph);
     EditGraphCreator egCreator = new EditGraphCreator();
     EditGraph editGraph = egCreator.buildEditGraph(superbase, b);
     EditGraphVisitor visitor = new EditGraphVisitor(editGraph);

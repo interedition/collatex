@@ -18,7 +18,7 @@ import eu.interedition.collatex2.implementation.matching.IMatchResult;
 import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
 import eu.interedition.collatex2.implementation.matching.TokenMatcher;
 import eu.interedition.collatex2.implementation.vg_alignment.BaseAfgeleider;
-import eu.interedition.collatex2.implementation.vg_alignment.SuperbaseCreator;
+import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
@@ -117,8 +117,7 @@ public class DeTestDirkVincent {
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
     aligner.addWitness(a);
     aligner.addWitness(b);
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(graph);
+    IWitness superbase = new Superbase(graph);
     Iterator<INormalizedToken> tokenIterator = superbase.tokenIterator();
     assertEquals("#", tokenIterator.next().getNormalized()); // start vertex
     assertEquals("its", tokenIterator.next().getNormalized());
@@ -146,8 +145,7 @@ public class DeTestDirkVincent {
     VariantGraphAligner aligner = new VariantGraphAligner(graph);
     aligner.addWitness(a);
     aligner.addWitness(b);
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(graph);
+    IWitness superbase = new Superbase(graph);
     IWitness c = factory.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
     IMatchResult result = analyzer.analyze(superbase, c);

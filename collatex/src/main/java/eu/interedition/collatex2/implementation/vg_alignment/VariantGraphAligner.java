@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
+import eu.interedition.collatex2.implementation.edit_graph.EditGraphLinker;
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
@@ -38,8 +39,7 @@ public class VariantGraphAligner implements IAligner {
     TokenLinker tokenLinker = new TokenLinker();
     Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, tokenLinker);
     // 2. Determine sequences
-    SuperbaseCreator creator = new SuperbaseCreator();
-    IWitness superbase = creator.create(graph);
+    IWitness superbase = new Superbase(graph);
     SequenceDetection3 detection = new SequenceDetection3();
     List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
     // 3. Determine transpositions of the sequences
