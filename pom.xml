@@ -25,7 +25,7 @@
         <module>collatex-cocoon</module>
         <module>text</module>
         <module>text-repository</module>
-        <module>web-resources</module>
+        <module>semantic-markup</module>
     </modules>
     <dependencies>
         <dependency>
