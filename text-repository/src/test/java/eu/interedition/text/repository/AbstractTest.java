@@ -19,12 +19,18 @@
  */
 package eu.interedition.text.repository;
 
+import com.google.common.io.Files;
 import eu.interedition.text.rdbms.RelationalQNameRepository;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -32,8 +38,26 @@ import org.springframework.test.context.transaction.AfterTransaction;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/eu/interedition/text/rdbms/repository-context.xml", "classpath:/eu/interedition/text/repository/service-context.xml"})
 public abstract class AbstractTest {
+  public static final String INTEREDITION_TEXT_HOME = "interedition.text.home";
+
   @Autowired
   protected RelationalQNameRepository nameRepository;
+
+  @BeforeClass
+  public static void createTemporaryDataHome() throws IOException {
+    System.setProperty(INTEREDITION_TEXT_HOME, Files.createTempDir().getCanonicalPath());
+  }
+
+  @AfterClass
+  public static void deleteTemporaryDataHome() throws IOException {
+    final String dataHomePath = System.getProperty(INTEREDITION_TEXT_HOME);
+    if (dataHomePath != null) {
+      final File dataHomeFile = new File(dataHomePath);
+      if (dataHomeFile.isDirectory()) {
+        Files.deleteRecursively(dataHomeFile);
+      }
+    }
+  }
 
   @AfterTransaction
   public void clearNameCache() {
