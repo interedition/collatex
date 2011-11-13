@@ -20,6 +20,7 @@
 package eu.interedition.text;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -50,8 +51,13 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   /**
    * Names of available XML test resources.
    */
-  protected static final SortedSet<String> RESOURCES = Sets.newTreeSet(Lists.newArrayList(//
-          "wp-orpheus1-clix.xml", "george-algabal-tei.xml", "ignt-0101.xml", "archimedes-palimpsest-tei.xml", "homer-iliad-tei.xml"));
+  protected static final List<String> RESOURCES = Lists.newArrayList(//
+          "archimedes-palimpsest-tei.xml",//
+          "george-algabal-tei.xml",//
+          "homer-iliad-tei.xml",//
+          "ignt-0101.xml",//
+          "whitman-leaves-facs-tei.xml",
+          "wp-orpheus1-clix.xml");
 
 
   private Map<String, Text> sources = Maps.newHashMap();
@@ -76,11 +82,11 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected Text text() {
-    return text(RESOURCES.first());
+    return text(Iterables.getFirst(RESOURCES, null));
   }
 
   protected Text source() {
-    return source(RESOURCES.first());
+    return source(Iterables.getFirst(RESOURCES, null));
   }
 
   /**
@@ -150,7 +156,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected void unload() {
-    unload(RESOURCES.first());
+    unload(Iterables.getFirst(RESOURCES, null));
   }
 
   private synchronized void load(String resource) {
