@@ -196,10 +196,6 @@ public class XMLParserState {
       m.end(this);
     }
     this.nodePath.pop();
-    try {
-      textBuffer.reset();
-    } catch (IOException e) {
-    }
   }
 
   void start(XMLEntity entity) {

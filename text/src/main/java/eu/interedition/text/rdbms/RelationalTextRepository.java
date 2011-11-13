@@ -32,6 +32,7 @@ import eu.interedition.text.Text;
 import eu.interedition.text.TextConsumer;
 import eu.interedition.text.util.AbstractTextRepository;
 import eu.interedition.text.util.SQL;
+import eu.interedition.text.util.TextDigestingFilterReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
@@ -49,6 +50,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+
+import static eu.interedition.text.util.TextDigestingFilterReader.NULL_DIGEST;
 
 public class RelationalTextRepository extends AbstractTextRepository implements InitializingBean {
 
@@ -84,19 +87,14 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     textData.put("type", type.ordinal());
     textData.put("content", "");
     textData.put("content_length", 0);
-    textData.put("content_digest", NULL_CONTENT_DIGEST);
+    textData.put("content_digest", NULL_DIGEST);
 
     textInsert.execute(textData);
 
-    final RelationalText rt = new RelationalText();
-    rt.setId(id);
-    rt.setType(type);
-    rt.setLength(0);
-
-    return rt;
+    return new RelationalText(type, 0, NULL_DIGEST, id);
   }
 
-  public void write(Text text, Reader content) throws IOException {
+  public Text write(Text text, Reader content) throws IOException {
     final File tempFile = File.createTempFile(getClass().toString(), ".txt");
     try {
       CountingWriter tempWriter = null;
@@ -110,7 +108,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
       BufferedReader textReader = null;
       try {
         textReader = Files.newReader(tempFile, Text.CHARSET);
-        write(text, textReader, tempWriter.length);
+        return write(text, textReader, tempWriter.length);
       } finally {
         Closeables.close(textReader, false);
       }
@@ -130,7 +128,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
       protected Void read(Clob content) throws SQLException, IOException {
         Reader contentReader = null;
         try {
-          consumer.read(contentReader = content.getCharacterStream(), (int) content.length());
+          consumer.read(contentReader = content.getCharacterStream(), content.length());
         } catch (IOException e) {
           Throwables.propagate(e);
         } finally {
@@ -174,21 +172,21 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     return results;
   }
 
-  public void write(final Text text, final Reader contents, final long contentLength) throws IOException {
-    final RelationalText rt = (RelationalText) text;
-    final DigestingFilterReader digestingFilterReader = new DigestingFilterReader(new BufferedReader(contents));
+  public Text write(final Text text, final Reader contents, final long contentLength) throws IOException {
+    final long id = ((RelationalText) text).getId();
+    final TextDigestingFilterReader digestingFilterReader = new TextDigestingFilterReader(new BufferedReader(contents));
     jt.getJdbcOperations().execute("update text_content set content = ?, content_length = ? where id = ?", new PreparedStatementCallback<Void>() {
       public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
         ps.setCharacterStream(1, digestingFilterReader, contentLength);
         ps.setLong(2, contentLength);
-        ps.setLong(3, rt.getId());
+        ps.setLong(3, id);
         ps.executeUpdate();
         return null;
       }
     });
-    rt.setLength(contentLength);
-    rt.setDigest(digestingFilterReader.digest());
-    jt.update("update text_content set content_digest = ? where id = ?", rt.getDigest(), rt.getId());
+    final byte[] digest = digestingFilterReader.digest();
+    jt.update("update text_content set content_digest = ? where id = ?", digest, id);
+    return new RelationalText(text.getType(), contentLength, digest, id);
   }
 
   @Override
@@ -269,12 +267,10 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   public static RelationalText mapTextFrom(ResultSet rs, String prefix) throws SQLException {
-    final RelationalText rt = new RelationalText();
-    rt.setId(rs.getInt(prefix + "_id"));
-    rt.setType(Text.Type.values()[rs.getInt(prefix + "_type")]);
-    rt.setLength(rs.getLong(prefix + "_content_length"));
-    rt.setDigest(rs.getString(prefix + "_content_digest"));
-    return rt;
+    return new RelationalText(Text.Type.values()[rs.getInt(prefix + "_type")],//
+            rs.getLong(prefix + "_content_length"),//
+            rs.getBytes(prefix + "_content_digest"),//
+            rs.getLong(prefix + "_id"));
   }
 
   private abstract class ReaderCallback<T> {

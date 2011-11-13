@@ -47,9 +47,9 @@ public interface TextRepository {
 
   SortedMap<Range, String> bulkRead(Text text, SortedSet<Range> ranges) throws IOException;
 
-  void write(Text text, Reader contents) throws IOException;
+  Text write(Text text, Reader contents) throws IOException;
 
-  void write(Text text, Reader contents, long contentLength) throws IOException;
+  Text write(Text text, Reader contents, long contentLength) throws IOException;
 
   Text concat(Iterable<Text> texts) throws IOException;
 

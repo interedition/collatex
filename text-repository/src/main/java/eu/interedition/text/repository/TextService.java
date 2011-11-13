@@ -135,10 +135,7 @@ public class TextService implements InitializingBean {
   }
 
   protected TextImpl create(TextImpl text, RelationalText model) throws IOException {
-    text.setId(model.getId());
-    text.setType(model.getType());
-    text.setLength(model.getLength());
-    text.setDigest(model.getDigest());
+    text = new TextImpl(model.getType(), model.getLength(), model.getDigest(), model.getId());
 
     if (model.getType() == Text.Type.XML && text.isWithoutMetadata()) {
       extractMetadata(text);

@@ -51,7 +51,7 @@ public class AnnotationTest extends AbstractTestResourceTest {
     try {
       annotationRepository.delete(and(Criteria.text(existing), rangeFitsWithin(new Range(0, existing.getLength()))));
       final Iterable<Annotation> remaining = annotationRepository.find(Criteria.text(existing));
-      assertTrue(Integer.toString(size(remaining)), Iterables.isEmpty(remaining));
+      assertTrue(Integer.toString(size(remaining)) + " in " + existing, Iterables.isEmpty(remaining));
     } finally {
       unload();
     }

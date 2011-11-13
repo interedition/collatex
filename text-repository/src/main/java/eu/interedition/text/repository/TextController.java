@@ -208,7 +208,7 @@ public class TextController {
     final List<XMLParserModule> modules = pc.getModules();
     modules.add(new LineElementXMLParserModule());
     modules.add(new NotableCharacterXMLParserModule());
-    modules.add(new TextXMLParserModule(textRepository));
+    modules.add(new TextXMLParserModule());
     modules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
     modules.add(new CLIXAnnotationXMLParserModule(annotationRepository, 1000));
     if (pc.isTransformTEI()) {

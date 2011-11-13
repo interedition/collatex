@@ -66,7 +66,7 @@ public class XMLParserTest extends AbstractTestResourceTest {
   public void textContents() throws Exception {
     final Text text = text("george-algabal-tei.xml");
 
-    assertTrue(text.getLength() > 0);
+    assertTrue(text.toString(), text.getLength() > 0);
 
     if (LOG.isDebugEnabled()) {
       textRepository.read(text, new TextConsumer() {

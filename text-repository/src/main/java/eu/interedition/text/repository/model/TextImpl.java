@@ -37,8 +37,12 @@ public class TextImpl extends RelationalText {
   private String summary;
   private String author;
 
-  public TextImpl() {
-    super();
+  public TextImpl(Type type) {
+    super(type, "", 0);
+
+  }
+  public TextImpl(Type type, long length, byte[] digest, long id) {
+    super(type, length, digest, id);
     this.created = this.updated = new Date();
   }
 

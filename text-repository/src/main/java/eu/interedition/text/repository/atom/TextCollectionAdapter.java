@@ -19,6 +19,7 @@
  */
 package eu.interedition.text.repository.atom;
 
+import eu.interedition.text.Text;
 import eu.interedition.text.repository.TextController;
 import eu.interedition.text.repository.TextService;
 import eu.interedition.text.repository.model.TextImpl;
@@ -57,21 +58,29 @@ public class TextCollectionAdapter extends AbstractEntityCollectionAdapter<TextI
 
   @Override
   public TextImpl postEntry(String title, IRI id, String summary, Date updated, List<Person> authors, Content content, RequestContext request) throws ResponseContextException {
+    Text.Type textType;
+    switch (content.getContentType()) {
+      case TEXT:
+        textType = Text.Type.TXT;
+        break;
+      case XML:
+        textType = Text.Type.XML;
+        break;
+      default:
+        throw new ResponseContextException(ProviderHelper.notallowed(request));
+    }
 
-    final TextImpl text = new TextImpl();
+    final TextImpl text = new TextImpl(textType);
     text.setTitle(title);
     text.setSummary(summary);
     text.setUpdated(updated);
     text.setAuthor(authors.isEmpty() ? null : authors.get(0).getName());
 
     try {
-      switch (content.getContentType()) {
-        case TEXT:
-          return textService.create(text, new StringReader(content.getValue()));
-        case XML:
-          return textService.create(text, new DOMSource((Node) content.getValueElement()));
-        default:
-          throw new ResponseContextException(ProviderHelper.notallowed(request));
+      if (textType == Text.Type.TXT) {
+        return textService.create(text, new StringReader(content.getValue()));
+      } else {
+        return textService.create(text, new DOMSource((Node) content.getValueElement()));
       }
     } catch (IOException e) {
       throw new ResponseContextException(ProviderHelper.servererror(request, e));

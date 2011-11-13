@@ -21,58 +21,32 @@ package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
 import eu.interedition.text.Text;
+import eu.interedition.text.mem.SimpleText;
 
-public class RelationalText implements Text {
-  private long id;
-  private Type type;
-  private long length;
-  private String digest;
+public class RelationalText extends SimpleText {
+  protected long id;
 
-  public RelationalText() {
+  public RelationalText(Type type, long length, byte[] digest, long id) {
+    super(type, length, digest);
+    this.id = id;
+  }
+
+  public RelationalText(Type type, String content, long id) {
+    super(type, content);
+    this.id = id;
   }
 
   public RelationalText(RelationalText other) {
-    this.id = other.id;
-    this.type = other.type;
-    this.length = other.length;
-    this.digest = other.digest;
+    this(other.type, other.length, other.digest, other.id);
   }
 
   public long getId() {
     return id;
   }
 
-  public void setId(long id) {
-    this.id = id;
-  }
-
-  public Type getType() {
-    return type;
-  }
-
-  public void setType(Type type) {
-    this.type = type;
-  }
-
-  public long getLength() {
-    return length;
-  }
-
-  public void setLength(long length) {
-    this.length = length;
-  }
-
-  public String getDigest() {
-    return digest;
-  }
-
-  public void setDigest(String digest) {
-    this.digest = digest;
-  }
-
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("id", Long.toString(id)).toString();
+    return toStringHelper().add("id", Long.toString(id)).toString();
   }
 
   @Override
