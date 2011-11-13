@@ -26,28 +26,35 @@ import eu.interedition.text.Text;
 import eu.interedition.text.TextConsumer;
 import eu.interedition.text.TextRepository;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Stack;
 
 public class XMLParser {
-  private final XMLInputFactory xmlInputFactory;
+  private final XMLInputFactory xmlInputFactory = createXMLInputFactory();
 
   private TextRepository textRepository;
 
-  public XMLParser() {
-    xmlInputFactory = XMLInputFactory.newInstance();
-    xmlInputFactory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.FALSE);
-    xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-    xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
-  }
-
   public void setTextRepository(TextRepository textRepository) {
     this.textRepository = textRepository;
+  }
+
+  public static XMLInputFactory createXMLInputFactory() {
+    final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.TRUE);
+    xmlInputFactory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.FALSE);
+    xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+    xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
+    xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
+    xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
+    return xmlInputFactory;
+  }
+
+  public static XMLOutputFactory createXMLOutputFactory() {
+    final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
+    xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+    return xmlOutputFactory;
   }
 
   public Text parse(Text source, final XMLParserConfiguration configuration) throws IOException, XMLStreamException {

@@ -23,13 +23,17 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
+import com.google.common.io.FileBackedOutputStream;
+import com.sun.xml.internal.bind.v2.runtime.output.XmlOutput;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConsumer;
 import eu.interedition.text.TextRepository;
+import eu.interedition.text.xml.XMLParser;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import javax.xml.stream.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -47,18 +51,32 @@ import static java.util.Collections.singleton;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public abstract class AbstractTextRepository implements TextRepository {
-  protected TransformerFactory transformerFactory = TransformerFactory.newInstance();
+  protected final XMLInputFactory xmlInputFactory = XMLParser.createXMLInputFactory();
+  protected final XMLOutputFactory xmlOutputFactory = XMLParser.createXMLOutputFactory();
 
-  public Text create(Source xml) throws IOException, TransformerException {
+  private int memoryBufferThreshold = 1001024;
+
+  public void setMemoryBufferThreshold(int memoryBufferThreshold) {
+    this.memoryBufferThreshold = memoryBufferThreshold;
+  }
+
+  public Text create(Source xml) throws IOException, XMLStreamException {
     final File xmlSource = File.createTempFile(getClass().getName(), ".xml");
-    Reader xmlSourceReader = null;
-    try {
-      createTransformer().transform(xml, new StreamResult(xmlSource));
 
-      xmlSourceReader = new InputStreamReader(new FileInputStream(xmlSource), Text.CHARSET);
-      return write(create(Text.Type.XML), xmlSourceReader);
+
+    final FileBackedOutputStream xmBuf = createBuffer();
+    try {
+      copy(xml, new StreamResult(new OutputStreamWriter(xmBuf, Text.CHARSET)));
     } finally {
-      Closeables.close(xmlSourceReader, false);
+      Closeables.close(xmBuf, false);
+    }
+
+    Reader xmlBufReader = null;
+    try {
+      xmlBufReader = new InputStreamReader(xmBuf.getSupplier().getInput(), Text.CHARSET);
+      return write(create(Text.Type.XML), xmlBufReader);
+    } finally {
+      Closeables.close(xmlBufReader, false);
       xmlSource.delete();
     }
   }
@@ -76,8 +94,8 @@ public abstract class AbstractTextRepository implements TextRepository {
         @Override
         public void read(Reader content, long contentLength) throws IOException {
           try {
-            createTransformer().transform(new StreamSource(content), xml);
-          } catch (TransformerException e) {
+            copy(new StreamSource(content), xml);
+          } catch (XMLStreamException e) {
             throw Throwables.propagate(e);
           }
         }
@@ -105,13 +123,25 @@ public abstract class AbstractTextRepository implements TextRepository {
     return concat(singleton(text));
   }
 
-  protected Transformer createTransformer() throws TransformerException {
-    final Transformer transformer = transformerFactory.newTransformer();
-    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-    transformer.setOutputProperty(OutputKeys.ENCODING, Text.CHARSET.name());
-    transformer.setOutputProperty(OutputKeys.INDENT, "no");
-    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-    return transformer;
+  protected FileBackedOutputStream createBuffer() {
+    return new FileBackedOutputStream(memoryBufferThreshold, true);
+  }
+
+  protected void copy(Source source, Result result) throws XMLStreamException {
+    XMLEventReader xmlReader = null;
+    XMLEventWriter xmlWriter = null;
+    try {
+       xmlReader = xmlInputFactory.createXMLEventReader(source);
+       xmlWriter = xmlOutputFactory.createXMLEventWriter(result);
+       xmlWriter.add(xmlReader);
+    } finally {
+      if (xmlWriter != null) {
+        xmlWriter.close();
+      }
+      if (xmlReader != null) {
+        xmlReader.close();
+      }
+    }
   }
 
   public static class CountingWriter extends FilterWriter {

@@ -25,6 +25,7 @@ import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
 import eu.interedition.text.xml.module.XMLParserModuleAdapter;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,16 @@ public class XMLParserTest extends AbstractTestResourceTest {
                 "] <====> [" + escapeNewlines(texts.get(textRangeIt.next())) + "]");
       }
     }
+  }
+
+  @Test
+  public void dtdParsing() {
+    Assert.assertNotNull(text("whitman-leaves-facs-tei.xml"));
+  }
+
+  @Test
+  public void bigFile() {
+    Assert.assertNotNull(text("homer-iliad-tei.xml"));
   }
 
   @Override

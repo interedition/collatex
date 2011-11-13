@@ -19,6 +19,7 @@
  */
 package eu.interedition.text;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -33,7 +34,7 @@ public interface TextRepository {
 
   Text create(Reader content) throws IOException;
 
-  Text create(Source xml) throws TransformerException, IOException;
+  Text create(Source xml) throws IOException, XMLStreamException;
 
   void delete(Text text);
 

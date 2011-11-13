@@ -61,7 +61,6 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert textInsert;
   private DataFieldMaxValueIncrementer textIdIncrementer;
-  private static final int TEXT_BUFFER_SIZE = 102400;
 
   @Required
   public void setDataSource(DataSource dataSource) {
@@ -95,25 +94,19 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   public Text write(Text text, Reader content) throws IOException {
-    final File tempFile = File.createTempFile(getClass().toString(), ".txt");
+    final FileBackedOutputStream buf = createBuffer();
+    CountingWriter tempWriter = null;
     try {
-      CountingWriter tempWriter = null;
-      try {
-        tempWriter = new CountingWriter(new OutputStreamWriter(new FileOutputStream(tempFile), Text.CHARSET));
-        CharStreams.copy(content, tempWriter);
-      } finally {
-        Closeables.close(tempWriter, false);
-      }
-
-      BufferedReader textReader = null;
-      try {
-        textReader = Files.newReader(tempFile, Text.CHARSET);
-        return write(text, textReader, tempWriter.length);
-      } finally {
-        Closeables.close(textReader, false);
-      }
+      CharStreams.copy(content, tempWriter = new CountingWriter(new OutputStreamWriter(buf, Text.CHARSET)));
     } finally {
-      tempFile.delete();
+      Closeables.close(tempWriter, false);
+    }
+
+    Reader bufReader = null;
+    try {
+      return write(text, bufReader = new InputStreamReader(buf.getSupplier().getInput(), Text.CHARSET), tempWriter.length);
+    } finally {
+      Closeables.close(bufReader, false);
     }
   }
 
@@ -191,7 +184,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
 
   @Override
   public Text concat(Iterable<Text> texts) throws IOException {
-    final FileBackedOutputStream buf = new FileBackedOutputStream(TEXT_BUFFER_SIZE);
+    final FileBackedOutputStream buf = createBuffer();
     final OutputStreamWriter bufWriter = new OutputStreamWriter(buf, Text.CHARSET);
     try {
       for (Text text : texts) {
