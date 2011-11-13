@@ -26,8 +26,8 @@ import eu.interedition.text.util.Names;
 import java.net.URI;
 
 public class SimpleName implements Name {
-  private final URI namespace;
-  private final String localName;
+  protected final URI namespace;
+  protected final String localName;
 
   public SimpleName(URI namespace, String localName) {
     this.namespace = namespace;

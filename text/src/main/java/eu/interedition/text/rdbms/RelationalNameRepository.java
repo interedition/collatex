@@ -92,7 +92,7 @@ public class RelationalNameRepository implements NameRepository, InitializingBea
       final Name name = it.next();
       final Long id = nameCache.get(name);
       if (id != null) {
-        found.add(new RelationalName(id, name));
+        found.add(new RelationalName(name, id));
         it.remove();
       }
     }
@@ -143,7 +143,7 @@ public class RelationalNameRepository implements NameRepository, InitializingBea
                   .addValue("local_name", localName)
                   .addValue("namespace", ns == null ? null : ns.toString()));
 
-          created.add(new RelationalName(id, name));
+          created.add(new RelationalName(name, id));
         }
         nameInsert.executeBatch(nameBatch.toArray(new MapSqlParameterSource[nameBatch.size()]));
 
@@ -204,12 +204,10 @@ public class RelationalNameRepository implements NameRepository, InitializingBea
   }
 
   public static RelationalName mapNameFrom(ResultSet rs, String prefix) throws SQLException {
-    final RelationalName name = new RelationalName();
     final String namespaceStr = rs.getString(prefix + "_namespace");
-    name.setNamespaceURI(namespaceStr == null ? null : URI.create(namespaceStr));
-    name.setLocalName(rs.getString(prefix + "_local_name"));
-    name.setId(rs.getInt(prefix + "_id"));
-    return name;
+    return new RelationalName(namespaceStr == null ? null : URI.create(namespaceStr),//
+            rs.getString(prefix + "_local_name"),//
+            rs.getLong(prefix + "_id"));
   }
 
   private static final RowMapper<RelationalName> ROW_MAPPER = new RowMapper<RelationalName>() {

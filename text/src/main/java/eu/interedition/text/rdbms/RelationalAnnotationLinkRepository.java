@@ -93,7 +93,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
                   .addValue("target", ((RelationalAnnotation) target).getId()));
       }
 
-      final RelationalAnnotationLink rt = new RelationalAnnotationLink(linkId, new RelationalName(nameId, linkName));
+      final RelationalAnnotationLink rt = new RelationalAnnotationLink(linkId, new RelationalName(linkName, nameId));
       created.put(rt, targets);
     }
 

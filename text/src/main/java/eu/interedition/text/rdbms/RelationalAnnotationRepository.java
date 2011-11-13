@@ -85,7 +85,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
       final RelationalAnnotation ra = new RelationalAnnotation();
       ra.setId(id);
       ra.setText(a.getText());
-      ra.setName(new RelationalName(nameId, a.getName()));
+      ra.setName(new RelationalName(a.getName(), nameId));
       ra.setRange(range);
       created.add(ra);
     }
