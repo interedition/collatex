@@ -57,16 +57,16 @@ public class AnnotationEventSourceTest extends AbstractTestResourceTest {
     public void start() {
     }
 
-    public void start(long offset, Map<Annotation, Map<Name, String>> annotations) {
-      LOG.debug("START: [" + offset + "] " + Iterables.toString(annotations.keySet()));
+    public void start(long offset, Iterable<Annotation> annotations) {
+      LOG.debug("START: [" + offset + "] " + Iterables.toString(annotations));
     }
 
-    public void empty(long offset, Map<Annotation, Map<Name, String>> annotations) {
-      LOG.debug("EMPTY: [" + offset + "] " + Iterables.toString(annotations.keySet()));
+    public void empty(long offset, Iterable<Annotation> annotations) {
+      LOG.debug("EMPTY: [" + offset + "] " + Iterables.toString(annotations));
     }
 
-    public void end(long offset, Map<Annotation, Map<Name, String>> annotations) {
-      LOG.debug("END: [" + offset + "] " + Iterables.toString(annotations.keySet()));
+    public void end(long offset, Iterable<Annotation> annotations) {
+      LOG.debug("END: [" + offset + "] " + Iterables.toString(annotations));
     }
 
     public void text(Range r, String text) {

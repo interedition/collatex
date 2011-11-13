@@ -40,17 +40,17 @@ public class WhitespaceTokenizerSettings implements TokenizerSettings {
   }
 
   @Override
-  public boolean startingAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations) {
+  public boolean startingAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations) {
     return breakOnAnnotationBoundary;
   }
 
   @Override
-  public boolean emptyAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations) {
+  public boolean emptyAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations) {
     return breakOnAnnotationBoundary;
   }
 
   @Override
-  public boolean endingAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations) {
+  public boolean endingAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations) {
     return breakOnAnnotationBoundary;
   }
 

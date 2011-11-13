@@ -16,6 +16,6 @@ public class AdoptAnnotationTransformer implements AnnotationTransformer {
 
   @Override
   public Annotation apply(Annotation input) {
-    return new SimpleAnnotation(text, input.getName(), input.getRange());
+    return new SimpleAnnotation(text, input.getName(), input.getRange(), input.getData());
   }
 }

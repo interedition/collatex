@@ -19,7 +19,10 @@
  */
 package eu.interedition.text.event;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
@@ -69,13 +72,13 @@ public class AnnotationEventSource {
 
         listener.start();
 
-        final Map<Annotation, Map<Name, String>> annotationData = Maps.newHashMap();
+        final Set<Annotation> annotationData = Sets.newHashSet();
         while (true) {
           if ((offset % pageSize) == 0) {
             pageEnd = Math.min(offset + pageSize, contentLength);
             final Range pageRange = new Range(offset, pageEnd);
-            final Map<Annotation, Map<Name, String>> pageAnnotations = annotationRepository.find(and(criterion, text(text), rangeOverlap(pageRange)), dataSet);
-            for (Annotation a : pageAnnotations.keySet()) {
+            final Iterable<Annotation> pageAnnotations = annotationRepository.find(and(criterion, text(text), rangeOverlap(pageRange)), dataSet);
+            for (Annotation a : pageAnnotations) {
               final long start = a.getRange().getStart();
               final long end = a.getRange().getEnd();
               if (start >= offset) {
@@ -84,7 +87,7 @@ public class AnnotationEventSource {
                   starts.put(start, starting = Sets.newHashSet());
                 }
                 starting.add(a);
-                annotationData.put(a, pageAnnotations.get(a));
+                annotationData.add(a);
               }
               if (end <= pageEnd) {
                 Set<Annotation> ending = ends.get(end);
@@ -92,7 +95,7 @@ public class AnnotationEventSource {
                   ends.put(end, ending = Sets.newHashSet());
                 }
                 ending.add(a);
-                annotationData.put(a, pageAnnotations.get(a));
+                annotationData.add(a);
               }
             }
 
@@ -136,13 +139,12 @@ public class AnnotationEventSource {
     });
   }
 
-  protected static Map<Annotation, Map<Name, String>> filter(Map<Annotation, Map<Name, String>> data, Set<Annotation> keys, boolean remove) {
-    final Map<Annotation, Map<Name, String>> filtered = Maps.newHashMap();
-    for (Iterator<Map.Entry<Annotation, Map<Name, String>>> it = data.entrySet().iterator(); it.hasNext();  ) {
-      final Map.Entry<Annotation, Map<Name, String>> annotationEntry = it.next();
-      final Annotation annotation = annotationEntry.getKey();
+  protected static Iterable<Annotation> filter(Iterable<Annotation> data, Set<Annotation> keys, boolean remove) {
+    final List<Annotation> filtered = Lists.newArrayList();
+    for (Iterator<Annotation> it = data.iterator(); it.hasNext();  ) {
+      final Annotation annotation = it.next();
       if (keys.contains(annotation)) {
-        filtered.put(annotation, annotationEntry.getValue());
+        filtered.add(annotation);
         if (remove) {
           it.remove();
         }

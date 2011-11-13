@@ -32,13 +32,13 @@ public class AnnotationEventAdapter implements AnnotationEventListener {
   public void start() {
   }
 
-  public void start(long offset, Map<Annotation, Map<Name, String>> annotations) {
+  public void start(long offset, Iterable<Annotation> annotations) {
   }
 
-  public void empty(long offset, Map<Annotation, Map<Name, String>> annotations) {
+  public void empty(long offset, Iterable<Annotation> annotations) {
   }
 
-  public void end(long offset, Map<Annotation, Map<Name, String>> annotations) {
+  public void end(long offset, Iterable<Annotation> annotations) {
   }
 
   public void text(Range r, String text) {

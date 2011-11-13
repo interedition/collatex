@@ -95,22 +95,22 @@ public class Tokenizer {
     }
 
     @Override
-    public void start(long offset, Map<Annotation, Map<Name, String>> annotations) {
-      if (settings.startingAnnotationsAreBoundary(text, offset, annotations.keySet())) {
+    public void start(long offset, Iterable<Annotation> annotations) {
+      if (settings.startingAnnotationsAreBoundary(text, offset, annotations)) {
         lastIsTokenBoundary = true;
       }
     }
 
     @Override
-    public void empty(long offset, Map<Annotation, Map<Name, String>> annotations) {
-      if (settings.emptyAnnotationsAreBoundary(text, offset, annotations.keySet())) {
+    public void empty(long offset, Iterable<Annotation> annotations) {
+      if (settings.emptyAnnotationsAreBoundary(text, offset, annotations)) {
         lastIsTokenBoundary = true;
       }
     }
 
     @Override
-    public void end(long offset, Map<Annotation, Map<Name, String>> annotations) {
-      if (settings.endingAnnotationsAreBoundary(text, offset, annotations.keySet())) {
+    public void end(long offset, Iterable<Annotation> annotations) {
+      if (settings.endingAnnotationsAreBoundary(text, offset, annotations)) {
         lastIsTokenBoundary = true;
       }
     }
@@ -143,7 +143,7 @@ public class Tokenizer {
 
     private void token() {
       if (tokenStart < offset) {
-        batch.add(new SimpleAnnotation(text, tokenName, new Range(tokenStart, offset)));
+        batch.add(new SimpleAnnotation(text, tokenName, new Range(tokenStart, offset), null));
         if ((batch.size() % batchSize) == 0) {
           emit();
         }

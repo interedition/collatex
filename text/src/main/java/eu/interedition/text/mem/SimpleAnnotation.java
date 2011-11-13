@@ -25,20 +25,25 @@ import com.google.common.collect.Sets;
 import eu.interedition.text.*;
 import eu.interedition.text.util.Annotations;
 
+import javax.xml.namespace.QName;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class SimpleAnnotation implements Annotation {
-  private final Text text;
-  private final Name name;
-  private final Range range;
+  protected final Text text;
+  protected final Name name;
+  protected final Range range;
+  protected final Map<Name, String> data;
 
-  public SimpleAnnotation(Text text, Name name, Range range) {
+  public SimpleAnnotation(Text text, Name name, Range range, Map<Name, String> data) {
     this.text = text;
     this.name = name;
     this.range = range;
+    this.data = (data == null || data.isEmpty() ? null : Collections.unmodifiableMap(data));
   }
 
   public Text getText() {
@@ -51,6 +56,11 @@ public class SimpleAnnotation implements Annotation {
 
   public Range getRange() {
     return range;
+  }
+
+  @Override
+  public Map<Name, String> getData() {
+    return (data == null ? Collections.<Name, String>emptyMap() : data);
   }
 
   protected Objects.ToStringHelper toStringHelper() {

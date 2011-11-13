@@ -29,7 +29,6 @@ import org.springframework.util.StopWatch;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Map;
 
 import static com.google.common.collect.Iterables.size;
 import static eu.interedition.text.query.Criteria.and;
@@ -74,10 +73,10 @@ public class AnnotationTest extends AbstractTestResourceTest {
 
       sw.start("print");
       if (LOG.isDebugEnabled()) {
-        annotationRepository.scroll(Criteria.text(newText), null, new AnnotationRepository.AnnotationCallback() {
+        annotationRepository.scroll(Criteria.text(newText), null, new AnnotationConsumer() {
           @Override
-          public void annotation(Annotation annotation, Map<Name, String> data) {
-            LOG.debug("{}: {}", annotation, Iterables.toString(data.entrySet()));
+          public void consume(Annotation annotation) {
+            LOG.debug("{}: {}", annotation, Iterables.toString(annotation.getData().entrySet()));
           }
         });
       }

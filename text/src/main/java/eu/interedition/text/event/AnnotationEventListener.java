@@ -30,11 +30,11 @@ public interface AnnotationEventListener {
 
   void start();
 
-  void start(long offset, Map<Annotation, Map<Name, String>> annotations);
+  void start(long offset, Iterable<Annotation> annotations);
 
-  void empty(long offset, Map<Annotation, Map<Name, String>> annotations);
+  void empty(long offset, Iterable<Annotation> annotations);
 
-  void end(long offset, Map<Annotation, Map<Name, String>> annotations);
+  void end(long offset, Iterable<Annotation> annotations);
 
   void text(Range r, String text);
 

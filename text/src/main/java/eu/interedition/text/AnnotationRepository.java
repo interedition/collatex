@@ -22,7 +22,6 @@ package eu.interedition.text;
 import com.google.common.base.Function;
 import eu.interedition.text.query.Criterion;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -34,15 +33,13 @@ public interface AnnotationRepository {
 
   Iterable<Annotation> create(Iterable<Annotation> annotations);
 
-  Iterable<Annotation> create(Map<Annotation, Map<Name, String>> annotations);
+  void scroll(Criterion criterion, AnnotationConsumer consumer);
 
-  void scroll(Criterion criterion, AnnotationCallback callback);
+  void scroll(Criterion criterion, Set<Name> names, AnnotationConsumer consumer);
 
   Iterable<Annotation> find(Criterion criterion);
 
-  void scroll(Criterion criterion, Set<Name> names, AnnotationCallback callback);
-
-  Map<Annotation, Map<Name, String>> find(Criterion criterion, Set<Name> names);
+  Iterable<Annotation> find(Criterion criterion, Set<Name> names);
 
   void delete(Iterable<Annotation> annotations);
 
@@ -50,17 +47,8 @@ public interface AnnotationRepository {
 
   void delete(Criterion criterion);
 
-  void set(Map<Annotation, Map<Name, String>> data);
-
-  void unset(Map<Annotation, Iterable<Name>> data);
-
   void transform(Criterion criterion, Text to, Function<Annotation, Annotation> transform);
 
-  void transform(Map<Annotation, Map<Name, String>> annotations, Text to, Function<Annotation, Annotation> transform);
+  Iterable<Annotation> transform(Iterable<Annotation> annotations, Text to, Function<Annotation, Annotation> transform);
 
-  interface AnnotationCallback {
-
-    void annotation(Annotation annotation, Map<Name, String> data);
-
-  }
 }

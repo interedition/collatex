@@ -27,11 +27,13 @@ import eu.interedition.text.Text;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.util.Annotations;
 
+import java.util.Map;
+
 public class RelationalAnnotation extends SimpleAnnotation {
   protected final long id;
 
-  public RelationalAnnotation(Text text, Name name, Range range, long id) {
-    super(text, name, range);
+  public RelationalAnnotation(Text text, Name name, Range range, Map<Name, String> data, long id) {
+    super(text, name, range, data);
     this.id = id;
   }
 

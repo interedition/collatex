@@ -38,7 +38,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void start(long offset, Map<Annotation, Map<Name, String>> annotations) {
+  public void start(long offset, Iterable<Annotation> annotations) {
     try {
       doStart(offset, annotations);
     } catch (Exception e) {
@@ -46,7 +46,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void empty(long offset, Map<Annotation, Map<Name, String>> annotations) {
+  public void empty(long offset, Iterable<Annotation> annotations) {
     try {
       doEmpty(offset, annotations);
     } catch (Exception e) {
@@ -54,7 +54,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void end(long offset, Map<Annotation, Map<Name, String>> annotations) {
+  public void end(long offset, Iterable<Annotation> annotations) {
     try {
       doEnd(offset, annotations);
     } catch (Exception e) {
@@ -81,13 +81,13 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
   protected void doStart() throws Exception {
   }
 
-  protected void doStart(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
+  protected void doStart(long offset, Iterable<Annotation> annotations) throws Exception {
   }
 
-  protected void doEmpty(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
+  protected void doEmpty(long offset, Iterable<Annotation> annotations) throws Exception {
   }
 
-  protected void doEnd(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
+  protected void doEnd(long offset, Iterable<Annotation> annotations) throws Exception {
   }
 
   protected void doText(Range r, String text) throws Exception {

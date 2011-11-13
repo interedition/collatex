@@ -35,7 +35,6 @@ import java.util.Map;
  */
 public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
   private Map<String, SimpleAnnotation> annotations;
-  private Map<String, Map<Name, String>> attributes;
 
   public CLIXAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     super(annotationRepository, batchSize);
@@ -45,12 +44,10 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
   public void start(XMLParserState state) {
     super.start(state);
     annotations = Maps.<String, SimpleAnnotation>newHashMap();
-    attributes = Maps.<String, Map<Name, String>>newHashMap();
   }
 
   @Override
   public void end(XMLParserState state) {
-    attributes = null;
     annotations = null;
     super.end(state);
   }
@@ -69,14 +66,12 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
     final long textOffset = state.getTextOffset();
 
     if (startId != null) {
-      annotations.put(startId, new SimpleAnnotation(state.getTarget(), entity.getName(), new Range(textOffset, textOffset)));
-      attributes.put(startId, entityAttributes);
+      annotations.put(startId, new SimpleAnnotation(state.getTarget(), entity.getName(), new Range(textOffset, textOffset), entityAttributes));
     }
     if (endId != null) {
       final SimpleAnnotation a = annotations.remove(endId);
-      final Map<Name, String> attr = attributes.remove(endId);
-      if (a != null && attr != null) {
-        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset)), attr);
+      if (a != null) {
+        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData()));
       }
     }
   }

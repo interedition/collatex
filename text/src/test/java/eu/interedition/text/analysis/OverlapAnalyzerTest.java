@@ -54,8 +54,8 @@ public class OverlapAnalyzerTest extends AbstractTestResourceTest {
   public void analyzeSelfOverlap() throws IOException {
     final SimpleName overlap = new SimpleName(TEST_NS, "overlap");
     annotationRepository.create(
-            new SimpleAnnotation(text, overlap, new Range(0, TEST_TEXT.length() - 1)),
-            new SimpleAnnotation(text, overlap, new Range(1, TEST_TEXT.length()))
+            new SimpleAnnotation(text, overlap, new Range(0, TEST_TEXT.length() - 1), null),
+            new SimpleAnnotation(text, overlap, new Range(1, TEST_TEXT.length()), null)
     );
     final OverlapAnalyzer analyzer = analyze(text);
     Assert.assertEquals(0, analyzer.getOverlapping().size());

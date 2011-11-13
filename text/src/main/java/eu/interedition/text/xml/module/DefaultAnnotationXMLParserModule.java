@@ -69,7 +69,7 @@ public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParse
   public void end(XMLEntity entity, XMLParserState state) {
     if (state.getInclusionContext().peek()) {
       final Range range = new Range(startOffsetStack.pop(), state.getTextOffset());
-      add(new SimpleAnnotation(state.getTarget(), entity.getName(), range), attributeStack.pop());
+      add(new SimpleAnnotation(state.getTarget(), entity.getName(), range, attributeStack.pop()));
     }
     super.end(entity, state);
   }

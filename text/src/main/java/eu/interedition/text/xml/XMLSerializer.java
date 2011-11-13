@@ -93,10 +93,10 @@ public class XMLSerializer {
     }
 
     @Override
-    protected void doStart(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
-      for (Annotation a : annotationOrdering.immutableSortedCopy(annotations.keySet())) {
+    protected void doStart(long offset, Iterable<Annotation> annotations) throws Exception {
+      for (Annotation a : annotationOrdering.immutableSortedCopy(annotations)) {
         final Name name = a.getName();
-        Map<Name, String> attributes = annotations.get(a);
+        Map<Name, String> attributes = a.getData();
         if (!rootWritten || hierarchy.contains(name)) {
           startElement(name, attributes);
         } else {
@@ -117,15 +117,15 @@ public class XMLSerializer {
     }
 
     @Override
-    protected void doEmpty(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
-      for (Annotation a : annotationOrdering.immutableSortedCopy(annotations.keySet())) {
-        emptyElement(a.getName(), annotations.get(a));
+    protected void doEmpty(long offset, Iterable<Annotation> annotations) throws Exception {
+      for (Annotation a : annotationOrdering.immutableSortedCopy(annotations)) {
+        emptyElement(a.getName(), a.getData());
       }
     }
 
     @Override
-    protected void doEnd(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
-      for (Annotation a : annotationOrdering.reverse().immutableSortedCopy(annotations.keySet())) {
+    protected void doEnd(long offset, Iterable<Annotation> annotations) throws Exception {
+      for (Annotation a : annotationOrdering.reverse().immutableSortedCopy(annotations)) {
         final String clixId = clixIds.get(a);
         if (clixId == null) {
           endElement(a.getName());

@@ -19,6 +19,8 @@
  */
 package eu.interedition.text.analysis;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
@@ -54,16 +56,17 @@ public class OverlapAnalyzer extends AnnotationEventAdapter {
   }
 
   @Override
-  public void start(long offset, Map<Annotation, Map<Name, String>> annotations) {
-    started.addAll(annotations.keySet());
+  public void start(long offset, Iterable<Annotation> annotations) {
+    Iterables.addAll(started, annotations);
   }
 
   @Override
-  public void end(long offset, Map<Annotation, Map<Name, String>> annotations) {
-    final Set<Annotation> endings = annotations.keySet();
-    started.removeAll(endings);
+  public void end(long offset, Iterable<Annotation> annotations) {
+    for (Annotation ending : annotations) {
+      started.remove(ending);
+    }
 
-    for (Annotation ending : endings) {
+    for (Annotation ending : annotations) {
       final Name endingName = ending.getName();
       for (Annotation started : this.started) {
         final Name startedName = started.getName();
