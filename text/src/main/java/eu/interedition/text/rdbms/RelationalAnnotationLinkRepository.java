@@ -93,8 +93,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
                   .addValue("target", ((RelationalAnnotation) target).getId()));
       }
 
-      final RelationalAnnotationLink rt = new RelationalAnnotationLink(linkId, new RelationalName(linkName, nameId));
-      created.put(rt, targets);
+      created.put(new RelationalAnnotationLink(new RelationalName(linkName, nameId), linkId), targets);
     }
 
     annotationLinkInsert.executeBatch(linkBatch.toArray(new SqlParameterSource[linkBatch.size()]));
@@ -198,7 +197,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
         final int annotationNameId = rs.getInt("an_id");
 
         if (currentLink == null || currentLink.getId() != annotationLinkId) {
-          currentLink = new RelationalAnnotationLink(annotationLinkId, mapNameFrom(rs, "aln"));
+          currentLink = new RelationalAnnotationLink(mapNameFrom(rs, "aln"), annotationLinkId);
         }
         if (currentText == null || currentText.getId() != textId) {
           currentText = RelationalTextRepository.mapTextFrom(rs, "t");

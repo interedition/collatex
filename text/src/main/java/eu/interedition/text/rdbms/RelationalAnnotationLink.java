@@ -22,25 +22,21 @@ package eu.interedition.text.rdbms;
 import com.google.common.base.Objects;
 import eu.interedition.text.AnnotationLink;
 import eu.interedition.text.Name;
+import eu.interedition.text.mem.SimpleAnnotationLink;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RelationalAnnotationLink implements AnnotationLink {
-  private long id;
-  private Name name;
+public class RelationalAnnotationLink extends SimpleAnnotationLink {
+  protected long id;
 
-  public RelationalAnnotationLink(long id, Name name) {
+  public RelationalAnnotationLink(Name name, long id) {
+    super(name);
     this.id = id;
-    this.name = name;
   }
 
   public long getId() {
     return id;
-  }
-
-  public Name getName() {
-    return name;
   }
 
   @Override
@@ -58,6 +54,6 @@ public class RelationalAnnotationLink implements AnnotationLink {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(id).addValue(name).toString();
+    return toStringHelper().addValue(id).toString();
   }
 }
