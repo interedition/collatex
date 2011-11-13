@@ -20,9 +20,9 @@
 package eu.interedition.text.repository.model;
 
 import com.google.common.base.Function;
-import eu.interedition.text.QName;
-import eu.interedition.text.rdbms.RelationalQName;
-import eu.interedition.text.util.QNames;
+import eu.interedition.text.Name;
+import eu.interedition.text.rdbms.RelationalName;
+import eu.interedition.text.util.Names;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.net.URI;
@@ -30,19 +30,19 @@ import java.net.URI;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class QNameImpl implements QName {
+public class NameImpl implements Name {
   private String id;
   private URI namespaceURI;
   private String localName;
 
-  public QNameImpl() {
+  public NameImpl() {
   }
 
-  public QNameImpl(QName name) {
-    setNamespaceURI(name.getNamespaceURI());
+  public NameImpl(Name name) {
+    setNamespaceURI(name.getNamespace());
     setLocalName(name.getLocalName());
-    if (name instanceof RelationalQName) {
-      setId(Long.toString(((RelationalQName) name).getId()));
+    if (name instanceof RelationalName) {
+      setId(Long.toString(((RelationalName) name).getId()));
     }
   }
 
@@ -56,7 +56,7 @@ public class QNameImpl implements QName {
 
   @JsonProperty("ns")
   @Override
-  public URI getNamespaceURI() {
+  public URI getNamespace() {
     return namespaceURI;
   }
 
@@ -78,26 +78,26 @@ public class QNameImpl implements QName {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof QName) {
-      return QNames.equal(this, (QName) obj);
+    if (obj instanceof Name) {
+      return Names.equal(this, (Name) obj);
     }
     return super.equals(obj);
   }
 
   @Override
   public int hashCode() {
-    return QNames.hashCode(this);
+    return Names.hashCode(this);
   }
 
   @Override
-  public int compareTo(QName o) {
-    return QNames.COMPARATOR.compare(this, o);
+  public int compareTo(Name o) {
+    return Names.COMPARATOR.compare(this, o);
   }
 
-  public static final Function<QName, QNameImpl> TO_BEAN = new Function<QName, QNameImpl>() {
+  public static final Function<Name, NameImpl> TO_BEAN = new Function<Name, NameImpl>() {
     @Override
-    public QNameImpl apply(QName input) {
-      return new QNameImpl(input);
+    public NameImpl apply(Name input) {
+      return new NameImpl(input);
     }
   };
 }

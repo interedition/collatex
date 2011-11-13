@@ -23,7 +23,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserModule;
@@ -109,22 +109,22 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected SimpleXMLParserConfiguration configure(SimpleXMLParserConfiguration pc) {
-    pc.addLineElement(new SimpleQName(TEI_NS, "head"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "stage"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "speaker"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "lg"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "l"));
-    pc.addLineElement(new SimpleQName((URI) null, "line"));
+    pc.addLineElement(new SimpleName(TEI_NS, "head"));
+    pc.addLineElement(new SimpleName(TEI_NS, "stage"));
+    pc.addLineElement(new SimpleName(TEI_NS, "speaker"));
+    pc.addLineElement(new SimpleName(TEI_NS, "lg"));
+    pc.addLineElement(new SimpleName(TEI_NS, "l"));
+    pc.addLineElement(new SimpleName((URI) null, "line"));
 
-    pc.addContainerElement(new SimpleQName(TEI_NS, "text"));
-    pc.addContainerElement(new SimpleQName(TEI_NS, "div"));
-    pc.addContainerElement(new SimpleQName(TEI_NS, "lg"));
-    pc.addContainerElement(new SimpleQName(TEI_NS, "subst"));
-    pc.addContainerElement(new SimpleQName(TEI_NS, "choice"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "text"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "div"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "lg"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "subst"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "choice"));
 
-    pc.exclude(new SimpleQName(TEI_NS, "teiHeader"));
-    pc.exclude(new SimpleQName(TEI_NS, "front"));
-    pc.exclude(new SimpleQName(TEI_NS, "fw"));
+    pc.exclude(new SimpleName(TEI_NS, "teiHeader"));
+    pc.exclude(new SimpleName(TEI_NS, "front"));
+    pc.exclude(new SimpleName(TEI_NS, "fw"));
 
     return pc;
   }

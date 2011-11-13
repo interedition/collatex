@@ -23,8 +23,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
-import eu.interedition.text.QName;
-import eu.interedition.text.QNameRepository;
+import eu.interedition.text.Name;
+import eu.interedition.text.NameRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -47,7 +47,7 @@ import java.util.*;
 
 import static java.util.Collections.singleton;
 
-public class RelationalQNameRepository implements QNameRepository, InitializingBean {
+public class RelationalNameRepository implements NameRepository, InitializingBean {
 
   private DataSource dataSource;
   private PlatformTransactionManager transactionManager;
@@ -58,14 +58,14 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
   private SimpleJdbcInsert nameInsert;
   private DataFieldMaxValueIncrementer nameIdIncrementer;
 
-  private Map<QName, Long> nameCache;
+  private Map<Name, Long> nameCache;
   private TransactionTemplate tt;
 
-  public QName get(QName name) {
+  public Name get(Name name) {
     return Iterables.getOnlyElement(get(singleton(name)));
   }
 
-  public Set<QName> load(Set<Integer> ids) {
+  public Set<Name> load(Set<Integer> ids) {
     if (ids == null || ids.isEmpty()) {
       return Sets.newHashSet();
     }
@@ -77,22 +77,22 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
     }
     sql.append(")");
 
-    return new HashSet<QName>(jt.query(sql.toString(), ROW_MAPPER, ps.toArray(new Object[ps.size()])));
+    return new HashSet<Name>(jt.query(sql.toString(), ROW_MAPPER, ps.toArray(new Object[ps.size()])));
   }
 
-  public synchronized Set<QName> get(Set<QName> names) {
+  public synchronized Set<Name> get(Set<Name> names) {
     if (nameCache == null) {
       initCache();
     }
 
-    final Set<QName> requested = Sets.newHashSet(names);
-    final Set<QName> found = Sets.newHashSetWithExpectedSize(requested.size());
+    final Set<Name> requested = Sets.newHashSet(names);
+    final Set<Name> found = Sets.newHashSetWithExpectedSize(requested.size());
 
-    for (Iterator<QName> it = requested.iterator(); it.hasNext(); ) {
-      final QName name = it.next();
+    for (Iterator<Name> it = requested.iterator(); it.hasNext(); ) {
+      final Name name = it.next();
       final Long id = nameCache.get(name);
       if (id != null) {
-        found.add(new RelationalQName(id, name));
+        found.add(new RelationalName(id, name));
         it.remove();
       }
     }
@@ -101,19 +101,19 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
       return found;
     }
 
-    return tt.execute(new TransactionCallback<Set<QName>>() {
+    return tt.execute(new TransactionCallback<Set<Name>>() {
       @Override
-      public Set<QName> doInTransaction(TransactionStatus status) {
+      public Set<Name> doInTransaction(TransactionStatus status) {
         final List<Object> ps = Lists.newArrayList();
         final StringBuilder sql = new StringBuilder("select ").append(selectNameFrom("n")).append(" from text_qname n where ");
-        for (Iterator<QName> it = requested.iterator(); it.hasNext(); ) {
+        for (Iterator<Name> it = requested.iterator(); it.hasNext(); ) {
           sql.append("(");
-          final QName name = it.next();
+          final Name name = it.next();
 
           sql.append("n.local_name = ? and ");
           ps.add(name.getLocalName());
 
-          final URI ns = name.getNamespaceURI();
+          final URI ns = name.getNamespace();
           if (ns == null) {
             sql.append("n.namespace is null");
           } else {
@@ -125,29 +125,29 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
           sql.append(")").append(it.hasNext() ? " or " : "");
         }
 
-        for (RelationalQName name : jt.query(sql.toString(), ROW_MAPPER, ps.toArray(new Object[ps.size()]))) {
+        for (RelationalName name : jt.query(sql.toString(), ROW_MAPPER, ps.toArray(new Object[ps.size()]))) {
           found.add(name);
           requested.remove(name);
           nameCache.put(name, name.getId());
         }
 
-        final List<RelationalQName> created = Lists.newArrayListWithExpectedSize(requested.size());
+        final List<RelationalName> created = Lists.newArrayListWithExpectedSize(requested.size());
         final List<MapSqlParameterSource> nameBatch = Lists.newArrayListWithExpectedSize(requested.size());
-        for (QName name : requested) {
+        for (Name name : requested) {
           final long id = nameIdIncrementer.nextLongValue();
           final String localName = name.getLocalName();
-          final URI ns = name.getNamespaceURI();
+          final URI ns = name.getNamespace();
 
           nameBatch.add(new MapSqlParameterSource()
                   .addValue("id", id)
                   .addValue("local_name", localName)
                   .addValue("namespace", ns == null ? null : ns.toString()));
 
-          created.add(new RelationalQName(id, name));
+          created.add(new RelationalName(id, name));
         }
         nameInsert.executeBatch(nameBatch.toArray(new MapSqlParameterSource[nameBatch.size()]));
 
-        for (RelationalQName n : created) {
+        for (RelationalName n : created) {
           found.add(n);
           nameCache.put(n, n.getId());
         }
@@ -193,7 +193,7 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
     nameCache = new MapMaker().maximumSize(cacheSize).makeMap();
     if (jt.queryForInt("select count(*) from text_qname") <= cacheSize) {
       // warm-up cache
-      for (RelationalQName name : jt.query("select " + selectNameFrom("n") + " from text_qname n", ROW_MAPPER)) {
+      for (RelationalName name : jt.query("select " + selectNameFrom("n") + " from text_qname n", ROW_MAPPER)) {
         nameCache.put(name, name.getId());
       }
     }
@@ -203,17 +203,18 @@ public class RelationalQNameRepository implements QNameRepository, InitializingB
     return SQL.select(tableName, "id", "local_name", "namespace");
   }
 
-  public static RelationalQName mapNameFrom(ResultSet rs, String prefix) throws SQLException {
-    final RelationalQName name = new RelationalQName();
-    name.setId(rs.getInt(prefix + "_id"));
+  public static RelationalName mapNameFrom(ResultSet rs, String prefix) throws SQLException {
+    final RelationalName name = new RelationalName();
+    final String namespaceStr = rs.getString(prefix + "_namespace");
+    name.setNamespaceURI(namespaceStr == null ? null : URI.create(namespaceStr));
     name.setLocalName(rs.getString(prefix + "_local_name"));
-    name.setNamespace(rs.getString(prefix + "_namespace"));
+    name.setId(rs.getInt(prefix + "_id"));
     return name;
   }
 
-  private static final RowMapper<RelationalQName> ROW_MAPPER = new RowMapper<RelationalQName>() {
+  private static final RowMapper<RelationalName> ROW_MAPPER = new RowMapper<RelationalName>() {
 
-    public RelationalQName mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public RelationalName mapRow(ResultSet rs, int rowNum) throws SQLException {
       return mapNameFrom(rs, "n");
     }
   };

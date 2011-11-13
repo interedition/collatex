@@ -29,6 +29,7 @@ import com.google.common.io.FileBackedOutputStream;
 import com.google.common.io.Files;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
+import eu.interedition.text.TextConsumer;
 import eu.interedition.text.util.AbstractTextRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
@@ -122,14 +123,14 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     jt.update("delete from text_content where id = ?", ((RelationalText) text).getId());
   }
 
-  public void read(Text text, final TextReader reader) throws IOException {
+  public void read(Text text, final TextConsumer consumer) throws IOException {
     read(new ReaderCallback<Void>(text) {
 
       @Override
       protected Void read(Clob content) throws SQLException, IOException {
         Reader contentReader = null;
         try {
-          reader.read(contentReader = content.getCharacterStream(), (int) content.length());
+          consumer.read(contentReader = content.getCharacterStream(), (int) content.length());
         } catch (IOException e) {
           Throwables.propagate(e);
         } finally {
@@ -140,14 +141,14 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     });
   }
 
-  public void read(Text text, final Range range, final TextReader reader) throws IOException {
+  public void read(Text text, final Range range, final TextConsumer consumer) throws IOException {
     read(new ReaderCallback<Void>(text) {
 
       @Override
       protected Void read(Clob content) throws SQLException, IOException {
         Reader contentReader = null;
         try {
-          reader.read(contentReader = new RangeFilteringReader(content.getCharacterStream(), range), range.length());
+          consumer.read(contentReader = new RangeFilteringReader(content.getCharacterStream(), range), range.length());
         } catch (IOException e) {
           Throwables.propagate(e);
         } finally {

@@ -21,12 +21,12 @@ package eu.interedition.text.analysis;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.text.AbstractTestResourceTest;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.query.Criteria;
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class OverlapAnalyzerTest extends AbstractTestResourceTest {
 
   @Test
   public void analyzeSelfOverlap() throws IOException {
-    final SimpleQName overlap = new SimpleQName(TEST_NS, "overlap");
+    final SimpleName overlap = new SimpleName(TEST_NS, "overlap");
     annotationRepository.create(
             new SimpleAnnotation(text, overlap, new Range(0, TEST_TEXT.length() - 1)),
             new SimpleAnnotation(text, overlap, new Range(1, TEST_TEXT.length()))
@@ -65,7 +65,7 @@ public class OverlapAnalyzerTest extends AbstractTestResourceTest {
 
   protected OverlapAnalyzer analyze(Text text) throws IOException {
     final OverlapAnalyzer analyzer = new OverlapAnalyzer();
-    eventSource.listen(analyzer, text, Criteria.any(), Collections.<QName>emptySet());
+    eventSource.listen(analyzer, text, Criteria.any(), Collections.<Name>emptySet());
     return analyzer;
   }
 }

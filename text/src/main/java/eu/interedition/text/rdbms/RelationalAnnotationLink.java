@@ -21,16 +21,16 @@ package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
 import eu.interedition.text.AnnotationLink;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class RelationalAnnotationLink implements AnnotationLink {
   private long id;
-  private QName name;
+  private Name name;
 
-  public RelationalAnnotationLink(long id, QName name) {
+  public RelationalAnnotationLink(long id, Name name) {
     this.id = id;
     this.name = name;
   }
@@ -39,7 +39,7 @@ public class RelationalAnnotationLink implements AnnotationLink {
     return id;
   }
 
-  public QName getName() {
+  public Name getName() {
     return name;
   }
 

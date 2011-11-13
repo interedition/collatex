@@ -20,7 +20,7 @@
 package eu.interedition.text.query;
 
 import eu.interedition.text.Annotation;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 
@@ -42,11 +42,11 @@ public class Criteria {
     return new AnnotationIdentityCriterion(annotation);
   }
 
-  public static Criterion annotationName(QName name) {
+  public static Criterion annotationName(Name name) {
     return new AnnotationNameCriterion(name);
   }
 
-  public static Criterion linkName(QName name) {
+  public static Criterion linkName(Name name) {
     return new AnnotationLinkNameCriterion(name);
   }
 

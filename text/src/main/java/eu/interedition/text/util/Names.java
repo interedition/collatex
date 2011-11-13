@@ -22,20 +22,20 @@ package eu.interedition.text.util;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import eu.interedition.text.QName;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.Name;
+import eu.interedition.text.mem.SimpleName;
 
 import java.net.URI;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class QNames {
-  public static final Comparator<QName> COMPARATOR = new Comparator<QName>() {
+public class Names {
+  public static final Comparator<Name> COMPARATOR = new Comparator<Name>() {
 
-    public int compare(QName o1, QName o2) {
-      final URI o1Ns = o1.getNamespaceURI();
-      final URI o2Ns = o2.getNamespaceURI();
+    public int compare(Name o1, Name o2) {
+      final URI o1Ns = o1.getNamespace();
+      final URI o2Ns = o2.getNamespace();
 
       final String o1LocalName = o1.getLocalName();
       final String o2LocalName = o2.getLocalName();
@@ -51,32 +51,32 @@ public class QNames {
     }
   };
 
-  public static final Function<QName,String> TO_STRING = new Function<QName, String>() {
+  public static final Function<Name,String> TO_STRING = new Function<Name, String>() {
     @Override
-    public String apply(QName input) {
-      return QNames.toString(input);
+    public String apply(Name input) {
+      return Names.toString(input);
     }
   };
 
-  public static boolean equal(QName name1, QName name2) {
+  public static boolean equal(Name name1, Name name2) {
     return Objects.equal(name1.getLocalName(), name2.getLocalName())
-            && Objects.equal(name1.getNamespaceURI(), name2.getNamespaceURI());
+            && Objects.equal(name1.getNamespace(), name2.getNamespace());
   }
 
-  public static int hashCode(QName name) {
-    return Objects.hashCode(name.getLocalName(), name.getNamespaceURI());
+  public static int hashCode(Name name) {
+    return Objects.hashCode(name.getLocalName(), name.getNamespace());
   }
 
 
-  public static String toString(QName name) {
-    final URI ns = name.getNamespaceURI();
+  public static String toString(Name name) {
+    final URI ns = name.getNamespace();
     return "{" + (ns == null ? "" : ns) + "}" + name.getLocalName();
   }
 
-  public static QName fromString(String nameStr) {
+  public static Name fromString(String nameStr) {
     final Matcher matcher = NAME_PATTERN.matcher(nameStr);
     Preconditions.checkArgument(matcher.matches(), nameStr);
-    return new SimpleQName(matcher.group(1), matcher.group(2));
+    return new SimpleName(matcher.group(1), matcher.group(2));
   }
 
   private static final Pattern NAME_PATTERN = Pattern.compile("^\\{([^\\}]+)\\}(.+)$");

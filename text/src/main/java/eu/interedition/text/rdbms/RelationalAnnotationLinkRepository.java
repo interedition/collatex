@@ -25,7 +25,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.AnnotationLink;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.query.Criterion;
 import eu.interedition.text.util.AbstractAnnotationLinkRepository;
 import eu.interedition.text.util.SQL;
@@ -45,8 +45,8 @@ import java.util.*;
 
 import static eu.interedition.text.rdbms.RelationalAnnotationRepository.mapAnnotationFrom;
 import static eu.interedition.text.rdbms.RelationalAnnotationRepository.selectAnnotationFrom;
-import static eu.interedition.text.rdbms.RelationalQNameRepository.mapNameFrom;
-import static eu.interedition.text.rdbms.RelationalQNameRepository.selectNameFrom;
+import static eu.interedition.text.rdbms.RelationalNameRepository.mapNameFrom;
+import static eu.interedition.text.rdbms.RelationalNameRepository.selectNameFrom;
 import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom;
 
 /**
@@ -55,7 +55,7 @@ import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom
 public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRepository implements InitializingBean {
   private DataSource dataSource;
   private DataFieldMaxValueIncrementerFactory incrementerFactory;
-  private RelationalQNameRepository nameRepository;
+  private RelationalNameRepository nameRepository;
   private RelationalQueryCriteriaTranslator queryCriteriaTranslator;
 
   private int batchSize = 10000;
@@ -66,18 +66,18 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
   private SimpleJdbcInsert annotationLinkDataInsert;
   private DataFieldMaxValueIncrementer annotationLinkIdIncrementer;
 
-  public Map<AnnotationLink, Set<Annotation>> create(Multimap<QName, Set<Annotation>> links) {
-    final Map<QName, Long> nameIdIndex = Maps.newHashMap();
-    for (QName n : nameRepository.get(links.keySet())) {
-      nameIdIndex.put(n, ((RelationalQName) n).getId());
+  public Map<AnnotationLink, Set<Annotation>> create(Multimap<Name, Set<Annotation>> links) {
+    final Map<Name, Long> nameIdIndex = Maps.newHashMap();
+    for (Name n : nameRepository.get(links.keySet())) {
+      nameIdIndex.put(n, ((RelationalName) n).getId());
     }
 
     final Map<AnnotationLink, Set<Annotation>> created = Maps.newLinkedHashMap();
     final List<SqlParameterSource> linkBatch = Lists.newArrayList();
     final List<SqlParameterSource> targetBatch = Lists.newArrayList();
 
-    for (Map.Entry<QName, Set<Annotation>> link : links.entries()) {
-      final QName linkName = link.getKey();
+    for (Map.Entry<Name, Set<Annotation>> link : links.entries()) {
+      final Name linkName = link.getKey();
       final Set<Annotation> targets = link.getValue();
 
       final Long nameId = nameIdIndex.get(linkName);
@@ -93,7 +93,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
                   .addValue("target", ((RelationalAnnotation) target).getId()));
       }
 
-      final RelationalAnnotationLink rt = new RelationalAnnotationLink(linkId, new RelationalQName(nameId, linkName));
+      final RelationalAnnotationLink rt = new RelationalAnnotationLink(linkId, new RelationalName(nameId, linkName));
       created.put(rt, targets);
     }
 
@@ -190,7 +190,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     jt.query(sql(dataSelect, where.toString()).append(" order by al.id, t.id, an.id, a.id").toString(), new RowMapper<Void>() {
       private RelationalAnnotationLink currentLink;
       private RelationalText currentText;
-      private RelationalQName currentAnnotationName;
+      private RelationalName currentAnnotationName;
 
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
         final int annotationLinkId = rs.getInt("al_id");
@@ -221,7 +221,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     return annotationLinks;
   }
 
-  public Map<AnnotationLink, Map<QName, String>> get(Iterable<AnnotationLink> links, Set<QName> names) {
+  public Map<AnnotationLink, Map<Name, String>> get(Iterable<AnnotationLink> links, Set<Name> names) {
     final Map<Long, RelationalAnnotationLink> linkIds = Maps.newHashMap();
     for (AnnotationLink link : links) {
       RelationalAnnotationLink rl = (RelationalAnnotationLink)link;
@@ -235,7 +235,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     final List<Object> ps = Lists.<Object>newArrayList(linkIds.keySet());
     final StringBuilder sql = new StringBuilder("select  ");
     sql.append(selectDataFrom("d")).append(", ");
-    sql.append(RelationalQNameRepository.selectNameFrom("n")).append(", ");
+    sql.append(RelationalNameRepository.selectNameFrom("n")).append(", ");
     sql.append("d.link as d_link");
     sql.append(" from text_annotation_link_data d join text_qname n on d.name = n.id where d.link in (");
     for (Iterator<Long> linkIdIt = linkIds.keySet().iterator(); linkIdIt.hasNext(); ) {
@@ -245,8 +245,8 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
 
     if (!names.isEmpty()) {
       sql.append(" and d.name in (");
-      for (Iterator<QName> nameIt = nameRepository.get(names).iterator(); nameIt.hasNext(); ) {
-        ps.add(((RelationalQName)nameIt.next()).getId());
+      for (Iterator<Name> nameIt = nameRepository.get(names).iterator(); nameIt.hasNext(); ) {
+        ps.add(((RelationalName)nameIt.next()).getId());
         sql.append("?").append(nameIt.hasNext() ? ", " : "");
       }
       sql.append(")");
@@ -254,16 +254,16 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
 
     sql.append(" order by d.link");
 
-    final Map<AnnotationLink, Map<QName, String>> data = new HashMap<AnnotationLink, Map<QName, String>>();
+    final Map<AnnotationLink, Map<Name, String>> data = new HashMap<AnnotationLink, Map<Name, String>>();
     for (RelationalAnnotationLink link : linkIds.values()) {
-      data.put(link, Maps.<QName, String>newHashMap());
+      data.put(link, Maps.<Name, String>newHashMap());
     }
 
-    final Map<Long, RelationalQName> nameCache = Maps.newHashMap();
+    final Map<Long, RelationalName> nameCache = Maps.newHashMap();
     jt.query(sql.toString(), new RowMapper<Void>() {
 
       private RelationalAnnotationLink link;
-      private Map<QName, String> dataMap;
+      private Map<Name, String> dataMap;
 
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
         final long linkId = rs.getLong("d_link");
@@ -272,7 +272,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
           dataMap = data.get(link);
         }
 
-        RelationalQName name = RelationalQNameRepository.mapNameFrom(rs, "n");
+        RelationalName name = RelationalNameRepository.mapNameFrom(rs, "n");
         if (nameCache.containsKey(name.getId())) {
           name = nameCache.get(name.getId());
         } else {
@@ -288,23 +288,23 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     return data;
   }
 
-  public void set(Map<AnnotationLink, Map<QName, String>> data) {
-    final Set<QName> names = Sets.newHashSet();
-    for (Map<QName, String> dataEntry : data.values()) {
-      for (QName name : dataEntry.keySet()) {
+  public void set(Map<AnnotationLink, Map<Name, String>> data) {
+    final Set<Name> names = Sets.newHashSet();
+    for (Map<Name, String> dataEntry : data.values()) {
+      for (Name name : dataEntry.keySet()) {
         names.add(name);
       }
     }
-    final Map<QName, Long> nameIds = Maps.newHashMap();
-    for (QName name : nameRepository.get(names)) {
-      nameIds.put(name, ((RelationalQName)name).getId());
+    final Map<Name, Long> nameIds = Maps.newHashMap();
+    for (Name name : nameRepository.get(names)) {
+      nameIds.put(name, ((RelationalName)name).getId());
     }
 
     final List<SqlParameterSource> batchParams = new ArrayList<SqlParameterSource>(data.size());
     for (AnnotationLink link : data.keySet()) {
       final long linkId = ((RelationalAnnotationLink) link).getId();
-      final Map<QName, String> linkData = data.get(link);
-      for (Map.Entry<QName, String> dataEntry : linkData.entrySet()) {
+      final Map<Name, String> linkData = data.get(link);
+      for (Map.Entry<Name, String> dataEntry : linkData.entrySet()) {
         batchParams.add(new MapSqlParameterSource()
                 .addValue("link", linkId)
                 .addValue("name", nameIds.get(dataEntry.getKey()))
@@ -317,23 +317,23 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     }
   }
 
-  public void unset(Map<AnnotationLink, Iterable<QName>> data) {
-    final Set<QName> names = Sets.newHashSet();
-    for (Iterable<QName> linkNames : data.values()) {
-      for (QName name : linkNames) {
+  public void unset(Map<AnnotationLink, Iterable<Name>> data) {
+    final Set<Name> names = Sets.newHashSet();
+    for (Iterable<Name> linkNames : data.values()) {
+      for (Name name : linkNames) {
         names.add(name);
       }
     }
 
-    final Map<QName, Long> nameIds = Maps.newHashMapWithExpectedSize(names.size());
-    for (QName name : nameRepository.get(names)) {
-      nameIds.put(name, ((RelationalQName)name).getId());
+    final Map<Name, Long> nameIds = Maps.newHashMapWithExpectedSize(names.size());
+    for (Name name : nameRepository.get(names)) {
+      nameIds.put(name, ((RelationalName)name).getId());
     }
 
     List<SqlParameterSource> batchPs = Lists.newArrayList();
-    for (Map.Entry<AnnotationLink, Iterable<QName>> dataEntry : data.entrySet()) {
+    for (Map.Entry<AnnotationLink, Iterable<Name>> dataEntry : data.entrySet()) {
       long linkId = ((RelationalAnnotationLink) dataEntry.getKey()).getId();
-      for (QName name : dataEntry.getValue()) {
+      for (Name name : dataEntry.getValue()) {
         batchPs.add(new MapSqlParameterSource()
         .addValue("link", linkId)
         .addValue("name", nameIds.get(name)));
@@ -354,7 +354,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
   }
 
   @Required
-  public void setNameRepository(RelationalQNameRepository nameRepository) {
+  public void setNameRepository(RelationalNameRepository nameRepository) {
     this.nameRepository = nameRepository;
   }
 

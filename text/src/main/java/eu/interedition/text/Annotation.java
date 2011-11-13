@@ -26,7 +26,7 @@ package eu.interedition.text;
 public interface Annotation extends Comparable<Annotation> {
   Text getText();
 
-  QName getName();
+  Name getName();
 
   Range getRange();
 }

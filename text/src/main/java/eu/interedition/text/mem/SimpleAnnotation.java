@@ -31,11 +31,10 @@ import java.util.Set;
  */
 public class SimpleAnnotation implements Annotation {
   private final Text text;
-  private final QName name;
+  private final Name name;
   private final Range range;
-  private final Set<AnnotationLink> links = Sets.newHashSet();
 
-  public SimpleAnnotation(Text text, QName name, Range range) {
+  public SimpleAnnotation(Text text, Name name, Range range) {
     this.text = text;
     this.name = name;
     this.range = range;
@@ -45,16 +44,12 @@ public class SimpleAnnotation implements Annotation {
     return text;
   }
 
-  public QName getName() {
+  public Name getName() {
     return name;
   }
 
   public Range getRange() {
     return range;
-  }
-
-  public Set<AnnotationLink> getLinks() {
-    return links;
   }
 
   public int compareTo(Annotation o) {

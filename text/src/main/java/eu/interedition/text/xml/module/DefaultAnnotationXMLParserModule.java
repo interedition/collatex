@@ -20,7 +20,7 @@
 package eu.interedition.text.xml.module;
 
 import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.xml.XMLEntity;
@@ -35,7 +35,7 @@ import java.util.Stack;
 public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
 
   private Stack<Long> startOffsetStack;
-  private Stack<Map<QName, String>> attributeStack;
+  private Stack<Map<Name, String>> attributeStack;
 
 
   public DefaultAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
@@ -46,7 +46,7 @@ public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParse
   public void start(XMLParserState state) {
     super.start(state);
     startOffsetStack = new Stack<Long>();
-    attributeStack = new Stack<Map<QName, String>>();
+    attributeStack = new Stack<Map<Name, String>>();
   }
 
   @Override

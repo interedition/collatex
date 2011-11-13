@@ -39,9 +39,9 @@ public interface TextRepository {
 
   void read(Text text, Result xml) throws IOException, TransformerException;
 
-  void read(Text text, TextReader reader) throws IOException;
+  void read(Text text, TextConsumer consumer) throws IOException;
 
-  void read(Text text, Range range, TextReader reader) throws IOException;
+  void read(Text text, Range range, TextConsumer consumer) throws IOException;
 
   String read(Text text, Range range) throws IOException;
 
@@ -57,7 +57,4 @@ public interface TextRepository {
 
   Text duplicate(Text text) throws IOException;
 
-  interface TextReader {
-    void read(Reader content, long contentLength) throws IOException;
-  }
 }

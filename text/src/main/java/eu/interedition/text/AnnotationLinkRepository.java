@@ -29,7 +29,7 @@ import java.util.Set;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public interface AnnotationLinkRepository {
-  Map<AnnotationLink, Set<Annotation>> create(Multimap<QName, Set<Annotation>> links);
+  Map<AnnotationLink, Set<Annotation>> create(Multimap<Name, Set<Annotation>> links);
 
   Map<AnnotationLink, Set<Annotation>> find(Criterion criterion);
 
@@ -39,9 +39,9 @@ public interface AnnotationLinkRepository {
 
   void delete(Criterion criterion);
 
-  Map<AnnotationLink, Map<QName, String>> get(Iterable<AnnotationLink> links, Set<QName> names);
+  Map<AnnotationLink, Map<Name, String>> get(Iterable<AnnotationLink> links, Set<Name> names);
 
-  void set(Map<AnnotationLink, Map<QName, String>> data);
+  void set(Map<AnnotationLink, Map<Name, String>> data);
 
-  void unset(Map<AnnotationLink, Iterable<QName>> data);
+  void unset(Map<AnnotationLink, Iterable<Name>> data);
 }

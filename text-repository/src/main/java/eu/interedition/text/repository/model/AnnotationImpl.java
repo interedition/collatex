@@ -36,13 +36,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class AnnotationImpl implements Annotation {
-  private QNameImpl name;
+  private NameImpl name;
   private Range range;
 
   public AnnotationImpl() {
   }
 
-  public AnnotationImpl(QNameImpl name, Range range) {
+  public AnnotationImpl(NameImpl name, Range range) {
     this.name = name;
     this.range = range;
   }
@@ -55,12 +55,12 @@ public class AnnotationImpl implements Annotation {
   }
 
   @JsonProperty("n")
-  public QNameImpl getName() {
+  public NameImpl getName() {
     return name;
   }
 
   @JsonProperty("n")
-  public void setName(QNameImpl name) {
+  public void setName(NameImpl name) {
     this.name = name;
   }
 
@@ -79,7 +79,7 @@ public class AnnotationImpl implements Annotation {
   public static final Function<Annotation, AnnotationImpl> TO_BEAN = new Function<Annotation, AnnotationImpl>() {
     @Override
     public AnnotationImpl apply(Annotation input) {
-      return new AnnotationImpl(QNameImpl.TO_BEAN.apply(input.getName()), input.getRange());
+      return new AnnotationImpl(NameImpl.TO_BEAN.apply(input.getName()), input.getRange());
     }
   };
 

@@ -21,7 +21,7 @@ package eu.interedition.text.xml.module;
 
 import com.google.common.collect.Maps;
 import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.mem.SimpleAnnotation;
@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
   private Map<String, SimpleAnnotation> annotations;
-  private Map<String, Map<QName, String>> attributes;
+  private Map<String, Map<Name, String>> attributes;
 
   public CLIXAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     super(annotationRepository, batchSize);
@@ -45,7 +45,7 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
   public void start(XMLParserState state) {
     super.start(state);
     annotations = Maps.<String, SimpleAnnotation>newHashMap();
-    attributes = Maps.<String, Map<QName, String>>newHashMap();
+    attributes = Maps.<String, Map<Name, String>>newHashMap();
   }
 
   @Override
@@ -59,7 +59,7 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
   public void start(XMLEntity entity, XMLParserState state) {
     super.start(entity, state);
 
-    final Map<QName, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
+    final Map<Name, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
     final String startId = entityAttributes.remove(TextConstants.CLIX_START_ATTR_NAME);
     final String endId = entityAttributes.remove(TextConstants.CLIX_END_ATTR_NAME);
     if (startId == null && endId == null) {
@@ -74,7 +74,7 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
     }
     if (endId != null) {
       final SimpleAnnotation a = annotations.remove(endId);
-      final Map<QName, String> attr = attributes.remove(endId);
+      final Map<Name, String> attr = attributes.remove(endId);
       if (a != null && attr != null) {
         add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset)), attr);
       }

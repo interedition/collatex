@@ -20,7 +20,7 @@
 package eu.interedition.text.repository;
 
 import com.google.common.io.Files;
-import eu.interedition.text.rdbms.RelationalQNameRepository;
+import eu.interedition.text.rdbms.RelationalNameRepository;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -41,7 +41,7 @@ public abstract class AbstractTest {
   public static final String INTEREDITION_TEXT_HOME = "interedition.text.home";
 
   @Autowired
-  protected RelationalQNameRepository nameRepository;
+  protected RelationalNameRepository nameRepository;
 
   @BeforeClass
   public static void createTemporaryDataHome() throws IOException {

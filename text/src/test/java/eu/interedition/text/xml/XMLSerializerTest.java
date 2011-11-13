@@ -23,9 +23,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.NullOutputStream;
 import eu.interedition.text.AbstractTestResourceTest;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Text;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.query.Criterion;
 import org.junit.Before;
@@ -69,7 +69,7 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
     annotationRepository.delete(and(Criteria.text(testText), rangeLength(0)));
 
     xmlSerializer.serialize(createOutputHandler(), testText, new XMLSerializerConfiguration() {
-      public QName getRootName() {
+      public Name getRootName() {
         return null;
       }
 
@@ -77,10 +77,10 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
         return Maps.newHashMap();
       }
 
-      public List<QName> getHierarchy() {
-        return Lists.<QName>newArrayList(
-                new SimpleQName((URI) null, "phr"),
-                new SimpleQName((URI) null, "s")
+      public List<Name> getHierarchy() {
+        return Lists.<Name>newArrayList(
+                new SimpleName((URI) null, "phr"),
+                new SimpleName((URI) null, "s")
         );
       }
 
@@ -99,8 +99,8 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
     final Text testText = text("george-algabal-tei.xml");
     annotationRepository.delete(and(Criteria.text(testText), rangeLength(0)));
     xmlSerializer.serialize(createOutputHandler(), testText, new XMLSerializerConfiguration() {
-      public QName getRootName() {
-        return new SimpleQName(TEI_NS, "text");
+      public Name getRootName() {
+        return new SimpleName(TEI_NS, "text");
       }
 
       public Map<String, URI> getNamespaceMappings() {
@@ -109,17 +109,17 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
         return nsMap;
       }
 
-      public List<QName> getHierarchy() {
-        return Lists.<QName>newArrayList(
-                new SimpleQName(TEI_NS, "page"),
-                new SimpleQName(TEI_NS, "line")
+      public List<Name> getHierarchy() {
+        return Lists.<Name>newArrayList(
+                new SimpleName(TEI_NS, "page"),
+                new SimpleName(TEI_NS, "line")
         );
       }
 
       public Criterion getQuery() {
         return or(
-                annotationName(new SimpleQName(TEI_NS, "page")),
-                annotationName(new SimpleQName(TEI_NS, "line"))
+                annotationName(new SimpleName(TEI_NS, "page")),
+                annotationName(new SimpleName(TEI_NS, "line"))
         );
       }
     });

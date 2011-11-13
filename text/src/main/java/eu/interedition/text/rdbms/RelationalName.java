@@ -21,8 +21,8 @@ package eu.interedition.text.rdbms;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import eu.interedition.text.QName;
-import eu.interedition.text.util.QNames;
+import eu.interedition.text.Name;
+import eu.interedition.text.util.Names;
 
 import java.net.URI;
 import java.util.regex.Matcher;
@@ -33,31 +33,31 @@ import java.util.regex.Pattern;
  *
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
-public class RelationalQName implements QName {
+public class RelationalName implements Name {
   private static final Pattern STR_REPR = Pattern.compile("^\\{([^\\}]*)\\}(.+)$");
 
   private long id;
   private URI namespace;
   private String localName;
 
-  public RelationalQName() {
+  public RelationalName() {
   }
 
-  public RelationalQName(long id, URI namespace, String localName) {
+  public RelationalName(long id, URI namespace, String localName) {
     this.id = id;
     this.namespace = namespace;
     this.localName = localName;
   }
 
-  public RelationalQName(long id, QName other) {
-    this(id, other.getNamespaceURI(), other.getLocalName());
+  public RelationalName(long id, Name other) {
+    this(id, other.getNamespace(), other.getLocalName());
   }
 
-  public RelationalQName(URI namespace, String localName) {
+  public RelationalName(URI namespace, String localName) {
     this(0, namespace, localName);
   }
 
-  public RelationalQName(String uri, String localName, String qName) {
+  public RelationalName(String uri, String localName, String qName) {
     this.id = 0;
     if (uri.length() == 0 && localName.length() == 0) {
       this.namespace = null;
@@ -76,20 +76,12 @@ public class RelationalQName implements QName {
     this.id = id;
   }
 
-  public URI getNamespaceURI() {
+  public URI getNamespace() {
     return namespace;
   }
 
   public void setNamespaceURI(URI namespace) {
     this.namespace = namespace;
-  }
-
-  public String getNamespace() {
-    return (this.namespace == null ? null : this.namespace.toString());
-  }
-
-  public void setNamespace(String namespace) {
-    this.namespace = (namespace == null ? null : URI.create(namespace));
   }
 
   public String getLocalName() {
@@ -102,8 +94,8 @@ public class RelationalQName implements QName {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof QName) {
-      return QNames.equal(this, (QName) obj);
+    if (obj != null && obj instanceof Name) {
+      return Names.equal(this, (Name) obj);
     }
 
     return super.equals(obj);
@@ -111,23 +103,23 @@ public class RelationalQName implements QName {
 
   @Override
   public int hashCode() {
-    return QNames.hashCode(this);
+    return Names.hashCode(this);
   }
 
   @Override
   public String toString() {
-    return QNames.toString(this);
+    return Names.toString(this);
   }
 
-  public static QName fromString(String str) {
+  public static Name fromString(String str) {
     final Matcher matcher = STR_REPR.matcher(str);
     Preconditions.checkArgument(matcher.matches());
 
     final String ns = matcher.group(1);
-    return new RelationalQName(Strings.isNullOrEmpty(ns) ? null : URI.create(ns), matcher.group(2));
+    return new RelationalName(Strings.isNullOrEmpty(ns) ? null : URI.create(ns), matcher.group(2));
   }
 
-  public int compareTo(QName o) {
-    return QNames.COMPARATOR.compare(this, o);
+  public int compareTo(Name o) {
+    return Names.COMPARATOR.compare(this, o);
   }
 }

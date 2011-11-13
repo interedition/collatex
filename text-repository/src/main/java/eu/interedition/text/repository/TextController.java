@@ -112,7 +112,7 @@ public class TextController {
     final PrintWriter responseWriter = response.getWriter();
 
     range = (range == null ? new Range(0, text.getLength()) : range);
-    textRepository.read(text, range, new TextRepository.TextReader() {
+    textRepository.read(text, range, new TextConsumer() {
       @Override
       public void read(Reader content, long contentLength) throws IOException {
         CharStreams.copy(content, responseWriter);
@@ -177,8 +177,8 @@ public class TextController {
 
   @RequestMapping("/{id}/names")
   @ResponseBody
-  public SortedSet<QName> getNamesOfText(@PathVariable("id") long id) {
-    return Sets.<QName>newTreeSet(Iterables.transform(annotationRepository.names(textRepository.load(id)), QNameImpl.TO_BEAN));
+  public SortedSet<Name> getNamesOfText(@PathVariable("id") long id) {
+    return Sets.<Name>newTreeSet(Iterables.transform(annotationRepository.names(textRepository.load(id)), NameImpl.TO_BEAN));
   }
 
   @RequestMapping(value = "/{id}/transform", method = RequestMethod.GET)
@@ -187,8 +187,8 @@ public class TextController {
     Preconditions.checkArgument(text.getType() == Text.Type.XML);
 
     Map<String, List<String>> names = Maps.newHashMap();
-    for (QName name : annotationRepository.names(text)) {
-      final URI namespaceURI = name.getNamespaceURI();
+    for (Name name : annotationRepository.names(text)) {
+      final URI namespaceURI = name.getNamespace();
       final String ns = (namespaceURI == null ? "" : namespaceURI.toString());
       List<String> localNames = names.get(ns);
       if (localNames == null) {

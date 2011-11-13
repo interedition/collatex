@@ -52,12 +52,12 @@ public class AnnotationEventSource {
     this.textRepository = textRepository;
   }
 
-  public void listen(final AnnotationEventListener listener, final Text text, final Criterion criterion, Set<QName> dataSet) throws IOException {
+  public void listen(final AnnotationEventListener listener, final Text text, final Criterion criterion, Set<Name> dataSet) throws IOException {
     listen(listener, Integer.MAX_VALUE, text, criterion, dataSet);
   }
 
-  public void listen(final AnnotationEventListener listener, final int pageSize, final Text text, final Criterion criterion, final Set<QName> dataSet) throws IOException {
-    textRepository.read(text, new TextRepository.TextReader() {
+  public void listen(final AnnotationEventListener listener, final int pageSize, final Text text, final Criterion criterion, final Set<Name> dataSet) throws IOException {
+    textRepository.read(text, new TextConsumer() {
 
       public void read(Reader content, long contentLength) throws IOException {
         final SortedMap<Long, Set<Annotation>> starts = Maps.newTreeMap();
@@ -69,12 +69,12 @@ public class AnnotationEventSource {
 
         listener.start();
 
-        final Map<Annotation, Map<QName, String>> annotationData = Maps.newHashMap();
+        final Map<Annotation, Map<Name, String>> annotationData = Maps.newHashMap();
         while (true) {
           if ((offset % pageSize) == 0) {
             pageEnd = Math.min(offset + pageSize, contentLength);
             final Range pageRange = new Range(offset, pageEnd);
-            final Map<Annotation, Map<QName, String>> pageAnnotations = annotationRepository.find(and(criterion, text(text), rangeOverlap(pageRange)), dataSet);
+            final Map<Annotation, Map<Name, String>> pageAnnotations = annotationRepository.find(and(criterion, text(text), rangeOverlap(pageRange)), dataSet);
             for (Annotation a : pageAnnotations.keySet()) {
               final long start = a.getRange().getStart();
               final long end = a.getRange().getEnd();
@@ -136,10 +136,10 @@ public class AnnotationEventSource {
     });
   }
 
-  protected static Map<Annotation, Map<QName, String>> filter(Map<Annotation, Map<QName, String>> data, Set<Annotation> keys, boolean remove) {
-    final Map<Annotation, Map<QName, String>> filtered = Maps.newHashMap();
-    for (Iterator<Map.Entry<Annotation, Map<QName, String>>> it = data.entrySet().iterator(); it.hasNext();  ) {
-      final Map.Entry<Annotation, Map<QName, String>> annotationEntry = it.next();
+  protected static Map<Annotation, Map<Name, String>> filter(Map<Annotation, Map<Name, String>> data, Set<Annotation> keys, boolean remove) {
+    final Map<Annotation, Map<Name, String>> filtered = Maps.newHashMap();
+    for (Iterator<Map.Entry<Annotation, Map<Name, String>>> it = data.entrySet().iterator(); it.hasNext();  ) {
+      final Map.Entry<Annotation, Map<Name, String>> annotationEntry = it.next();
       final Annotation annotation = annotationEntry.getKey();
       if (keys.contains(annotation)) {
         filtered.put(annotation, annotationEntry.getValue());

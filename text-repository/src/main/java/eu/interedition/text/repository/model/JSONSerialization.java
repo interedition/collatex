@@ -1,7 +1,7 @@
 package eu.interedition.text.repository.model;
 
 import com.google.common.collect.Maps;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.json.JSONSerializerConfiguration;
@@ -22,7 +22,7 @@ public class JSONSerialization implements JSONSerializerConfiguration {
   private Text text;
   private Range range;
   private Map<String, URI> namespaceMappings = Maps.newHashMap();
-  private Set<QName> dataSet;
+  private Set<Name> dataSet;
   private Criterion query = Criteria.any();
 
   @JsonIgnore
@@ -56,12 +56,12 @@ public class JSONSerialization implements JSONSerializerConfiguration {
   }
 
   @Override
-  public Set<QName> getDataSet() {
+  public Set<Name> getDataSet() {
     return dataSet;
   }
 
-  @JsonDeserialize(contentAs = QNameImpl.class)
-  public void setDataSet(Set<QName> dataSet) {
+  @JsonDeserialize(contentAs = NameImpl.class)
+  public void setDataSet(Set<Name> dataSet) {
     this.dataSet = dataSet;
   }
 

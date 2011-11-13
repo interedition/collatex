@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.query.Criterion;
 import eu.interedition.text.transform.AnnotationTransformers;
 import org.springframework.beans.factory.InitializingBean;
@@ -57,11 +57,11 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
     this.batchSize = batchSize;
   }
 
-  public Iterable<Annotation> create(Map<Annotation, Map<QName, String>> annotations) {
+  public Iterable<Annotation> create(Map<Annotation, Map<Name, String>> annotations) {
     final Iterator<Annotation> annotationIt = create(annotations.keySet()).iterator();
-    final Iterator<Map<QName, String>> attributesIt = annotations.values().iterator();
+    final Iterator<Map<Name, String>> attributesIt = annotations.values().iterator();
 
-    final Map<Annotation, Map<QName, String>> data = Maps.newHashMapWithExpectedSize(annotations.size());
+    final Map<Annotation, Map<Name, String>> data = Maps.newHashMapWithExpectedSize(annotations.size());
     while (annotationIt.hasNext() && attributesIt.hasNext()) {
       data.put(annotationIt.next(), attributesIt.next());
     }
@@ -83,30 +83,30 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
     final SortedSet<Annotation> result = Sets.newTreeSet();
     scroll(criterion, new AnnotationCallback() {
       @Override
-      public void annotation(Annotation annotation, Map<QName, String> data) {
+      public void annotation(Annotation annotation, Map<Name, String> data) {
         result.add(annotation);
       }
     });
     return result;
   }
 
-  public Map<Annotation, Map<QName, String>> find(Criterion criterion, final Set<QName> names) {
-    final Map<Annotation, Map<QName, String>> result = Maps.newLinkedHashMap();
+  public Map<Annotation, Map<Name, String>> find(Criterion criterion, final Set<Name> names) {
+    final Map<Annotation, Map<Name, String>> result = Maps.newLinkedHashMap();
     scroll(criterion, names, new AnnotationCallback() {
       @Override
-      public void annotation(Annotation annotation, Map<QName, String> data) {
+      public void annotation(Annotation annotation, Map<Name, String> data) {
         result.put(annotation, data);
       }
     });
     return result;
   }
 
-  public SortedSet<QName> names(Text text) {
-    final SortedSet<QName> names = getNames(text);
+  public SortedSet<Name> names(Text text) {
+    final SortedSet<Name> names = getNames(text);
 
     if (names.isEmpty() && text.getType() == Text.Type.XML) {
       try {
-        textRepository.read(text, new TextRepository.TextReader() {
+        textRepository.read(text, new TextConsumer() {
           public void read(Reader content, long contentLength) throws IOException {
             if (contentLength == 0) {
               return;
@@ -115,7 +115,7 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
               saxParserFactory.newSAXParser().parse(new InputSource(content), new DefaultHandler() {
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                  names.add(new SimpleQName(uri, localName));
+                  names.add(new SimpleName(uri, localName));
                 }
               });
             } catch (SAXException e) {
@@ -135,10 +135,10 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
 
   @Override
   public void transform(Criterion criterion, final Text to, final Function<Annotation, Annotation> transform) {
-    final Map<Annotation, Map<QName, String>> batch = Maps.newLinkedHashMap();
+    final Map<Annotation, Map<Name, String>> batch = Maps.newLinkedHashMap();
     scroll(criterion, null, new AnnotationCallback() {
       @Override
-      public void annotation(Annotation annotation, Map<QName, String> data) {
+      public void annotation(Annotation annotation, Map<Name, String> data) {
         batch.put(annotation, data);
         if ((batch.size() % batchSize) == 0) {
           transform(batch, to, transform);
@@ -152,21 +152,21 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
   }
 
   @Override
-  public void transform(Map<Annotation, Map<QName, String>> annotations, Text to, Function<Annotation, Annotation> transform) {
+  public void transform(Map<Annotation, Map<Name, String>> annotations, Text to, Function<Annotation, Annotation> transform) {
     transform = Functions.compose(transform, AnnotationTransformers.adopt(to));
 
     final List<Annotation> source = Lists.newArrayList(Iterables.transform(annotations.keySet(), transform));
-    final Iterator<Map<QName, String>> sourceData = annotations.values().iterator();
+    final Iterator<Map<Name, String>> sourceData = annotations.values().iterator();
 
     final Iterator<Annotation> copied = create(source).iterator();
-    final Map<Annotation, Map<QName, String>> copiedData = Maps.newLinkedHashMap();
+    final Map<Annotation, Map<Name, String>> copiedData = Maps.newLinkedHashMap();
     while (copied.hasNext() && sourceData.hasNext()) {
       copiedData.put(copied.next(), sourceData.next());
     }
     set(copiedData);
   }
 
-  protected abstract SortedSet<QName> getNames(Text text);
+  protected abstract SortedSet<Name> getNames(Text text);
 
   @Required
   public void setTextRepository(TextRepository textRepository) {

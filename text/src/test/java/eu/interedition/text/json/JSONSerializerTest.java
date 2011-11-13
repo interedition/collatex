@@ -1,7 +1,5 @@
 package eu.interedition.text.json;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import eu.interedition.text.*;
 import eu.interedition.text.json.map.TextSerializerModule;
@@ -13,10 +11,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,7 +47,7 @@ public class JSONSerializerTest extends AbstractTestResourceTest {
       }
 
       @Override
-      public Set<QName> getDataSet() {
+      public Set<Name> getDataSet() {
         return null;
       }
 

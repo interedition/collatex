@@ -22,6 +22,7 @@ package eu.interedition.text.xml;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import eu.interedition.text.Text;
+import eu.interedition.text.TextConsumer;
 import eu.interedition.text.TextRepository;
 
 import javax.xml.stream.XMLInputFactory;
@@ -55,7 +56,7 @@ public class XMLParser {
 
     final XMLParserState state = new XMLParserState(source, text, configuration);
     try {
-      textRepository.read(source, new TextRepository.TextReader() {
+      textRepository.read(source, new TextConsumer() {
         public void read(Reader content, long contentLength) throws IOException {
           XMLStreamReader reader = null;
           final Stack<XMLEntity> entities = new Stack<XMLEntity>();

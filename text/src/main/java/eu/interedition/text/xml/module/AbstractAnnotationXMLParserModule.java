@@ -22,7 +22,7 @@ package eu.interedition.text.xml.module;
 import com.google.common.collect.Maps;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.xml.XMLParserState;
 
 import java.util.Iterator;
@@ -36,7 +36,7 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
   protected final AnnotationRepository annotationRepository;
   protected final int batchSize;
 
-  private Map<Annotation, Map<QName, String>> annotationBatch;
+  private Map<Annotation, Map<Name, String>> annotationBatch;
 
   protected AbstractAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     this.annotationRepository = annotationRepository;
@@ -46,7 +46,7 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
   @Override
   public void start(XMLParserState state) {
     super.start(state);
-    annotationBatch = new LinkedHashMap<Annotation, Map<QName, String>>();
+    annotationBatch = new LinkedHashMap<Annotation, Map<Name, String>>();
   }
 
   @Override
@@ -59,7 +59,7 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
     super.end(state);
   }
 
-  protected void add(Annotation annotation, Map<QName, String> attributes) {
+  protected void add(Annotation annotation, Map<Name, String> attributes) {
     annotationBatch.put(annotation, attributes);
 
     if ((annotationBatch.size() % batchSize) == 0) {
@@ -69,9 +69,9 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
 
   protected void emit() {
     final Iterator<Annotation> annotationIt = annotationRepository.create(annotationBatch.keySet()).iterator();
-    final Iterator<Map<QName, String>> attributesIt = annotationBatch.values().iterator();
+    final Iterator<Map<Name, String>> attributesIt = annotationBatch.values().iterator();
 
-    final Map<Annotation, Map<QName, String>> attrBatch = Maps.newHashMapWithExpectedSize(annotationBatch.size());
+    final Map<Annotation, Map<Name, String>> attrBatch = Maps.newHashMapWithExpectedSize(annotationBatch.size());
     while (annotationIt.hasNext() && attributesIt.hasNext()) {
       attrBatch.put(annotationIt.next(), attributesIt.next());
     }

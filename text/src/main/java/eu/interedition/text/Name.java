@@ -19,13 +19,11 @@
  */
 package eu.interedition.text;
 
-import java.util.Set;
+import java.net.URI;
 
+public interface Name extends Comparable<Name> {
 
-public interface QNameRepository {
+  URI getNamespace();
 
-  QName get(QName name);
-
-  Set<QName> get(Set<QName> name);
-
+  String getLocalName();
 }

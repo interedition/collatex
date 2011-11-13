@@ -21,14 +21,14 @@ package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.util.Annotations;
 
 public class RelationalAnnotation implements Annotation {
   protected long id;
-  protected QName name;
+  protected Name name;
   protected Text text;
   protected Range range;
 
@@ -43,11 +43,11 @@ public class RelationalAnnotation implements Annotation {
     this.id = id;
   }
 
-  public QName getName() {
+  public Name getName() {
     return name;
   }
 
-  public void setName(QName name) {
+  public void setName(Name name) {
     this.name = name;
   }
 

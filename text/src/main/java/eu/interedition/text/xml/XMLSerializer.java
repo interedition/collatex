@@ -27,7 +27,7 @@ import com.google.common.collect.Ordering;
 import eu.interedition.text.*;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.event.ExceptionPropagatingAnnotationEventAdapter;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import org.springframework.beans.factory.annotation.Required;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -63,7 +63,7 @@ public class XMLSerializer {
   private class SerializingListener extends ExceptionPropagatingAnnotationEventAdapter {
     private final ContentHandler xml;
     private final XMLSerializerConfiguration config;
-    private final List<QName> hierarchy;
+    private final List<Name> hierarchy;
 
     private final Map<URI, String> namespaceMappings = Maps.newHashMap();
     private final Stack<Set<URI>> namespaceMappingStack = new Stack<Set<URI>>();
@@ -76,7 +76,7 @@ public class XMLSerializer {
     private SerializingListener(ContentHandler xml, XMLSerializerConfiguration config) {
       this.xml = xml;
       this.config = config;
-      this.hierarchy = (config.getHierarchy() == null ? Collections.<QName>emptyList() : config.getHierarchy());
+      this.hierarchy = (config.getHierarchy() == null ? Collections.<Name>emptyList() : config.getHierarchy());
       this.annotationOrdering = Ordering.from(new HierarchyAwareAnnotationComparator(this.hierarchy));
       this.namespaceMappings.put(URI.create(XMLConstants.XML_NS_URI), XMLConstants.XML_NS_PREFIX);
       this.namespaceMappings.put(URI.create(XMLConstants.XMLNS_ATTRIBUTE_NS_URI), XMLConstants.XMLNS_ATTRIBUTE);
@@ -86,17 +86,17 @@ public class XMLSerializer {
     protected void doStart() throws Exception {
       xml.startDocument();
 
-      final QName rootName = config.getRootName();
+      final Name rootName = config.getRootName();
       if (rootName != null) {
-        startElement(rootName, Collections.<QName, String>emptyMap());
+        startElement(rootName, Collections.<Name, String>emptyMap());
       }
     }
 
     @Override
-    protected void doStart(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+    protected void doStart(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
       for (Annotation a : annotationOrdering.immutableSortedCopy(annotations.keySet())) {
-        final QName name = a.getName();
-        Map<QName, String> attributes = annotations.get(a);
+        final Name name = a.getName();
+        Map<Name, String> attributes = annotations.get(a);
         if (!rootWritten || hierarchy.contains(name)) {
           startElement(name, attributes);
         } else {
@@ -117,20 +117,20 @@ public class XMLSerializer {
     }
 
     @Override
-    protected void doEmpty(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+    protected void doEmpty(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
       for (Annotation a : annotationOrdering.immutableSortedCopy(annotations.keySet())) {
         emptyElement(a.getName(), annotations.get(a));
       }
     }
 
     @Override
-    protected void doEnd(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+    protected void doEnd(long offset, Map<Annotation, Map<Name, String>> annotations) throws Exception {
       for (Annotation a : annotationOrdering.reverse().immutableSortedCopy(annotations.keySet())) {
         final String clixId = clixIds.get(a);
         if (clixId == null) {
           endElement(a.getName());
         } else {
-          final Map<QName, String> attributes = Maps.newHashMap();
+          final Map<Name, String> attributes = Maps.newHashMap();
           attributes.put(TextConstants.CLIX_END_ATTR_NAME, clixId);
           emptyElement(a.getName(), attributes);
 
@@ -148,22 +148,22 @@ public class XMLSerializer {
 
     @Override
     protected void doEnd() throws Exception {
-      final QName rootName = config.getRootName();
+      final Name rootName = config.getRootName();
       if (rootName != null) {
         endElement(rootName);
       }
       xml.endDocument();
     }
 
-    private void emptyElement(QName name, Map<QName, String> attributes) throws SAXException {
+    private void emptyElement(Name name, Map<Name, String> attributes) throws SAXException {
       startElement(name, attributes);
       endElement(name);
     }
 
-    private void startElement(QName name, Map<QName, String> attributes) throws SAXException {
+    private void startElement(Name name, Map<Name, String> attributes) throws SAXException {
       namespaceMappingStack.push(new HashSet<URI>());
 
-      final Map<QName, String> nsAttributes = Maps.newHashMap();
+      final Map<Name, String> nsAttributes = Maps.newHashMap();
       if (!rootWritten) {
         for (Map.Entry<String, URI> mapping : config.getNamespaceMappings().entrySet()) {
           mapNamespace(mapping.getValue(), mapping.getKey(), nsAttributes);
@@ -171,8 +171,8 @@ public class XMLSerializer {
         mapNamespace(TextConstants.CLIX_NS, TextConstants.CLIX_NS_PREFIX, nsAttributes);
         rootWritten = true;
       }
-      for (QName n : Iterables.concat(attributes.keySet(), Collections.singleton(name))) {
-        final URI ns = n.getNamespaceURI();
+      for (Name n : Iterables.concat(attributes.keySet(), Collections.singleton(name))) {
+        final URI ns = n.getNamespace();
         if (ns == null || namespaceMappings.containsKey(ns)) {
           continue;
         }
@@ -187,26 +187,26 @@ public class XMLSerializer {
         mapNamespace(ns, newPrefix, nsAttributes);
       }
 
-      final Map<QName, String> mergedAttributes = Maps.newLinkedHashMap();
+      final Map<Name, String> mergedAttributes = Maps.newLinkedHashMap();
       mergedAttributes.putAll(nsAttributes);
       mergedAttributes.putAll(attributes);
-      xml.startElement(toNamespace(name.getNamespaceURI()), name.getLocalName(), toQNameStr(name), toAttributes(mergedAttributes));
+      xml.startElement(toNamespace(name.getNamespace()), name.getLocalName(), toQNameStr(name), toAttributes(mergedAttributes));
     }
 
-    private void mapNamespace(URI namespace, String prefix, Map<QName, String> nsAttributes) throws SAXException {
+    private void mapNamespace(URI namespace, String prefix, Map<Name, String> nsAttributes) throws SAXException {
       final String uri = namespace.toString();
       namespaceMappings.put(namespace, prefix);
       namespaceMappingStack.peek().add(namespace);
       if (prefix.length() == 0) {
-        nsAttributes.put(new SimpleQName((URI) null, XMLConstants.XMLNS_ATTRIBUTE), uri);
+        nsAttributes.put(new SimpleName((URI) null, XMLConstants.XMLNS_ATTRIBUTE), uri);
       } else {
-        nsAttributes.put(new SimpleQName(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix), uri);
+        nsAttributes.put(new SimpleName(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix), uri);
         xml.startPrefixMapping(prefix, uri);
       }
     }
 
-    private void endElement(QName name) throws SAXException {
-      xml.endElement(toNamespace(name.getNamespaceURI()), name.getLocalName(), toQNameStr(name));
+    private void endElement(Name name) throws SAXException {
+      xml.endElement(toNamespace(name.getNamespace()), name.getLocalName(), toQNameStr(name));
 
       for (URI namespace : namespaceMappingStack.pop()) {
         xml.endPrefixMapping(namespaceMappings.remove(namespace));
@@ -217,8 +217,8 @@ public class XMLSerializer {
       return (uri == null ? "" : uri.toString());
     }
 
-    private String toQNameStr(QName name) {
-      final URI ns = name.getNamespaceURI();
+    private String toQNameStr(Name name) {
+      final URI ns = name.getNamespace();
       final String localName = name.getLocalName();
 
       if (ns == null) {
@@ -229,25 +229,25 @@ public class XMLSerializer {
       }
     }
 
-    private QName toQName(String str) {
+    private Name toQName(String str) {
       final int colon = str.indexOf(':');
       return (colon >= 0 ? toQName(str.substring(0, colon), str.substring(colon + 1)) : toQName(null, str));
     }
 
-    private QName toQName(String uri, String localName) {
-      return new SimpleQName(URI.create(uri), localName);
+    private Name toQName(String uri, String localName) {
+      return new SimpleName(URI.create(uri), localName);
     }
 
-    private Attributes toAttributes(final Map<QName, String> attributes) {
+    private Attributes toAttributes(final Map<Name, String> attributes) {
       return new Attributes() {
-        final List<QName> names = Lists.newArrayList(attributes.keySet());
+        final List<Name> names = Lists.newArrayList(attributes.keySet());
 
         public int getLength() {
           return names.size();
         }
 
         public String getURI(int index) {
-          return toNamespace(names.get(index).getNamespaceURI());
+          return toNamespace(names.get(index).getNamespace());
         }
 
         public String getLocalName(int index) {
@@ -294,10 +294,10 @@ public class XMLSerializer {
   }
 
   private static class HierarchyAwareAnnotationComparator implements Comparator<Annotation> {
-    private Ordering<QName> hierarchyOrdering;
-    private final List<QName> hierarchy;
+    private Ordering<Name> hierarchyOrdering;
+    private final List<Name> hierarchy;
 
-    private HierarchyAwareAnnotationComparator(List<QName> hierarchy) {
+    private HierarchyAwareAnnotationComparator(List<Name> hierarchy) {
       this.hierarchy = hierarchy;
       this.hierarchyOrdering = Ordering.explicit(hierarchy);
     }
@@ -308,8 +308,8 @@ public class XMLSerializer {
         return result;
       }
 
-      final QName o1Name = o1.getName();
-      final QName o2Name = o2.getName();
+      final Name o1Name = o1.getName();
+      final Name o2Name = o2.getName();
       if (hierarchy.contains(o1Name) && hierarchy.contains(o2Name)) {
         result = hierarchyOrdering.compare(o1Name, o2Name);
       }

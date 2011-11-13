@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
+import eu.interedition.text.TextConsumer;
 import eu.interedition.text.TextRepository;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -38,7 +39,6 @@ import java.nio.charset.CharsetEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Collections;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.Collections.singleton;
@@ -78,7 +78,7 @@ public abstract class AbstractTextRepository implements TextRepository {
   public void read(Text text, final Result xml) throws IOException, TransformerException {
     try {
       Preconditions.checkArgument(text.getType() == Text.Type.XML);
-      read(text, new TextReader() {
+      read(text, new TextConsumer() {
         @Override
         public void read(Reader content, long contentLength) throws IOException {
           try {

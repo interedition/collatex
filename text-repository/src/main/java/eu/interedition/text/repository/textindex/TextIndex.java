@@ -24,7 +24,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-import eu.interedition.text.TextRepository;
+import eu.interedition.text.TextConsumer;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.repository.TextService;
 import eu.interedition.text.repository.model.TextImpl;
@@ -45,10 +45,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,7 +117,7 @@ public class TextIndex implements InitializingBean, DisposableBean {
   }
 
   public void update(final TextImpl text) throws IOException {
-    textRepository.read(text, new TextRepository.TextReader() {
+    textRepository.read(text, new TextConsumer() {
       @Override
       public void read(Reader content, long contentLength) throws IOException {
         final Document document = new Document();

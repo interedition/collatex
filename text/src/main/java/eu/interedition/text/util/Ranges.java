@@ -54,7 +54,7 @@ public class Ranges {
         current = new Range(range);
       } else {
         if (current.getEnd() == range.getStart()) {
-          current.setEnd(range.getEnd());
+          current = new Range(current.getStart(), range.getEnd());
         } else {
           compressed.add(current);
           current = new Range(range);

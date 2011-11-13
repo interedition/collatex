@@ -20,24 +20,24 @@
 package eu.interedition.text.query;
 
 import com.google.common.base.Function;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class AnnotationLinkNameCriterion implements Criterion {
-  private final QName name;
+  private final Name name;
 
-  AnnotationLinkNameCriterion(QName name) {
+  AnnotationLinkNameCriterion(Name name) {
     this.name = name;
   }
 
-  public QName getName() {
+  public Name getName() {
     return name;
   }
 
-  public static Function<AnnotationLinkNameCriterion, QName> TO_NAME = new Function<AnnotationLinkNameCriterion, QName>() {
-    public QName apply(AnnotationLinkNameCriterion input) {
+  public static Function<AnnotationLinkNameCriterion, Name> TO_NAME = new Function<AnnotationLinkNameCriterion, Name>() {
+    public Name apply(AnnotationLinkNameCriterion input) {
       return input.getName();
     }
   };

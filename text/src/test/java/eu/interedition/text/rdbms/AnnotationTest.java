@@ -19,7 +19,6 @@
  */
 package eu.interedition.text.rdbms;
 
-import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import eu.interedition.text.*;
 import eu.interedition.text.query.Criteria;
@@ -77,7 +76,7 @@ public class AnnotationTest extends AbstractTestResourceTest {
       if (LOG.isDebugEnabled()) {
         annotationRepository.scroll(Criteria.text(newText), null, new AnnotationRepository.AnnotationCallback() {
           @Override
-          public void annotation(Annotation annotation, Map<QName, String> data) {
+          public void annotation(Annotation annotation, Map<Name, String> data) {
             LOG.debug("{}: {}", annotation, Iterables.toString(data.entrySet()));
           }
         });
