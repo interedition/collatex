@@ -24,52 +24,19 @@ import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
+import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.util.Annotations;
 
-public class RelationalAnnotation implements Annotation {
-  protected long id;
-  protected Name name;
-  protected Text text;
-  protected Range range;
+public class RelationalAnnotation extends SimpleAnnotation {
+  protected final long id;
 
-  public RelationalAnnotation() {
+  public RelationalAnnotation(Text text, Name name, Range range, long id) {
+    super(text, name, range);
+    this.id = id;
   }
 
   public long getId() {
     return id;
-  }
-
-  public void setId(long id) {
-    this.id = id;
-  }
-
-  public Name getName() {
-    return name;
-  }
-
-  public void setName(Name name) {
-    this.name = name;
-  }
-
-  public Text getText() {
-    return text;
-  }
-
-  public void setText(Text text) {
-    this.text = text;
-  }
-
-  public Range getRange() {
-    return range;
-  }
-
-  public void setRange(Range range) {
-    this.range = range;
-  }
-
-  @Override
-  public String toString() {
-    return Objects.toStringHelper(this).addValue(getName()).addValue(getRange()).addValue(getId()).toString();
   }
 
   @Override
@@ -83,6 +50,11 @@ public class RelationalAnnotation implements Annotation {
   @Override
   public int hashCode() {
     return (id == 0 ? super.hashCode() : Objects.hashCode(id));
+  }
+
+  @Override
+  public String toString() {
+    return toStringHelper().addValue(getId()).toString();
   }
 
   public int compareTo(Annotation o) {

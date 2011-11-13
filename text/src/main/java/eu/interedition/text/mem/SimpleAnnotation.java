@@ -19,6 +19,7 @@
  */
 package eu.interedition.text.mem;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
@@ -50,6 +51,15 @@ public class SimpleAnnotation implements Annotation {
 
   public Range getRange() {
     return range;
+  }
+
+  protected Objects.ToStringHelper toStringHelper() {
+    return Objects.toStringHelper(this).addValue(text).addValue(getName()).addValue(getRange());
+  }
+
+  @Override
+  public String toString() {
+    return toStringHelper().toString();
   }
 
   public int compareTo(Annotation o) {

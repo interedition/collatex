@@ -81,13 +81,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
               .addValue("name", nameId)
               .addValue("range_start", range.getStart())
               .addValue("range_end", range.getEnd()));
-
-      final RelationalAnnotation ra = new RelationalAnnotation();
-      ra.setId(id);
-      ra.setText(a.getText());
-      ra.setName(new RelationalName(a.getName(), nameId));
-      ra.setRange(range);
-      created.add(ra);
+      created.add(new RelationalAnnotation(a.getText(), new RelationalName(a.getName(), nameId), range, id));
     }
 
     annotationInsert.executeBatch(batchParameters.toArray(new SqlParameterSource[batchParameters.size()]));
@@ -342,12 +336,9 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
 
 
   public static RelationalAnnotation mapAnnotationFrom(ResultSet rs, RelationalText text, RelationalName name, String tableName) throws SQLException {
-    final RelationalAnnotation ra = new RelationalAnnotation();
-    ra.setId(rs.getInt(tableName + "_id"));
-    ra.setName(name);
-    ra.setText(text);
-    ra.setRange(new Range(rs.getInt(tableName + "_range_start"), rs.getInt(tableName + "_range_end")));
-    return ra;
+    return new RelationalAnnotation(text, name,//
+            new Range(rs.getLong(tableName + "_range_start"), rs.getLong(tableName + "_range_end")),//
+            rs.getLong(tableName + "_id"));
   }
 
   public static String selectDataFrom(String tableName) {
