@@ -1,17 +1,20 @@
 package eu.interedition.text.json;
 
 import com.google.common.collect.Maps;
+import com.google.common.io.NullOutputStream;
 import eu.interedition.text.*;
 import eu.interedition.text.json.map.TextSerializerModule;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.query.Criterion;
 import org.codehaus.jackson.JsonEncoding;
+import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -29,10 +32,17 @@ public class JSONSerializerTest extends AbstractTestResourceTest {
     final ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(new TextSerializerModule());
 
-    final JsonGenerator jgen = objectMapper.getJsonFactory().createJsonGenerator(System.out, JsonEncoding.UTF8);
-    jgen.useDefaultPrettyPrinter();
+    final StringWriter json = new StringWriter();
+    final JsonFactory jf = objectMapper.getJsonFactory();
+    final JsonGenerator jg;
+    if (LOG.isDebugEnabled()) {
+      jg = jf.createJsonGenerator(json);
+      jg.useDefaultPrettyPrinter();
+    } else {
+      jg = jf.createJsonGenerator(new NullOutputStream());
+    }
 
-    js.serialize(jgen, text(), new JSONSerializerConfiguration() {
+    js.serialize(jg, text(), new JSONSerializerConfiguration() {
       @Override
       public Range getRange() {
         return null;
@@ -56,6 +66,9 @@ public class JSONSerializerTest extends AbstractTestResourceTest {
         return Criteria.any();
       }
     });
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(json.toString());
+    }
   }
 
 }
