@@ -34,7 +34,7 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class QNameTest extends AbstractTest {
+public class NameTest extends AbstractTest {
   final SortedSet<Name> TEST_NAMES = Sets.<Name>newTreeSet(Sets.newHashSet(
           new SimpleName((URI) null, "noNamespaceName"),
           new SimpleName(TEST_NS, "namespacedName")
