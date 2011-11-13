@@ -74,6 +74,10 @@
             <artifactId>commons-fileupload</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.jolbox</groupId>
             <artifactId>bonecp</artifactId>
         </dependency>
