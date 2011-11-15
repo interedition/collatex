@@ -469,14 +469,12 @@
     </developers>
     <distributionManagement>
         <repository>
-            <id>maven.collatex.sourceforge.net</id>
-            <name>CollateX Maven Repository</name>
-            <url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/maven-repository</url>
+            <id>interedition-releases</id>
+            <url>http://gregor.middell.net/maven/content/repositories/interedition-releases</url>
         </repository>
         <snapshotRepository>
-            <id>dh-snapshots</id>
-            <name>Gregor Middell's DH snapshots</name>
-            <url>http://maven.middell.com/nexus/content/repositories/dh-snapshots</url>
+            <id>interedition-snapshots</id>
+            <url>http://gregor.middell.net/maven/content/repositories/interedition-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
     <issueManagement>
