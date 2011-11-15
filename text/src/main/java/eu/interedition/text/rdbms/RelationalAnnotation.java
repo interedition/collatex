@@ -37,6 +37,11 @@ public class RelationalAnnotation extends SimpleAnnotation {
     this.id = id;
   }
 
+  public RelationalAnnotation(RelationalAnnotation other) {
+    super(other);
+    this.id = other.id;
+  }
+
   public long getId() {
     return id;
   }

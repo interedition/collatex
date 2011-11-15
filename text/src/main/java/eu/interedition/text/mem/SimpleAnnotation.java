@@ -46,6 +46,10 @@ public class SimpleAnnotation implements Annotation {
     this.data = (data == null || data.isEmpty() ? null : Collections.unmodifiableMap(data));
   }
 
+  public SimpleAnnotation(Annotation other) {
+    this(other.getText(), other.getName(), other.getRange(), other.getData());
+  }
+
   public Text getText() {
     return text;
   }
