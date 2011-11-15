@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Node;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class TextCollectionAdapter extends AbstractEntityCollectionAdapter<TextI
       }
     } catch (IOException e) {
       throw new ResponseContextException(ProviderHelper.servererror(request, e));
-    } catch (TransformerException e) {
+    } catch (XMLStreamException e) {
       throw new ResponseContextException(ProviderHelper.servererror(request, e));
     }
   }

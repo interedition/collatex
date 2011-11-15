@@ -48,7 +48,7 @@ import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom
 public class RelationalAnnotationRepository extends AbstractAnnotationRepository implements InitializingBean {
 
   private DataSource dataSource;
-  private DataFieldMaxValueIncrementerFactory incrementerFactory;
+  private RelationalDatabaseKeyFactory keyFactory;
   private RelationalNameRepository nameRepository;
   private RelationalQueryCriteriaTranslator queryCriteriaTranslator;
 
@@ -256,8 +256,8 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   }
 
   @Required
-  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
-    this.incrementerFactory = incrementerFactory;
+  public void setKeyFactory(RelationalDatabaseKeyFactory keyFactory) {
+    this.keyFactory = keyFactory;
   }
 
   @Required
@@ -277,7 +277,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation"));
     this.annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
 
-    this.annotationIdIncrementer = incrementerFactory.create("text_annotation");
+    this.annotationIdIncrementer = keyFactory.create("text_annotation");
   }
 
   private StringBuilder sql(String select, boolean joinData, List<Object> ps, Criterion criterion) {

@@ -34,7 +34,7 @@
     </div>
 </div>
 
-<p style="font-size: small; color: #dcdcdc;">SHA-512: ${text.digest?html}</p>
+<#-- <p style="font-size: small; color: #dcdcdc;">SHA-512: ${text.digest?html}</p> -->
 
 <script type="text/javascript">
     var textId = ${text.id?c};

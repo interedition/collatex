@@ -26,7 +26,6 @@ import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
-import com.google.common.io.Files;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConsumer;
@@ -56,7 +55,7 @@ import static eu.interedition.text.util.TextDigestingFilterReader.NULL_DIGEST;
 public class RelationalTextRepository extends AbstractTextRepository implements InitializingBean {
 
   private DataSource dataSource;
-  private DataFieldMaxValueIncrementerFactory incrementerFactory;
+  private RelationalDatabaseKeyFactory keyFactory;
 
   private SimpleJdbcTemplate jt;
   private SimpleJdbcInsert textInsert;
@@ -68,14 +67,14 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   @Required
-  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
-    this.incrementerFactory = incrementerFactory;
+  public void setKeyFactory(RelationalDatabaseKeyFactory keyFactory) {
+    this.keyFactory = keyFactory;
   }
 
   public void afterPropertiesSet() throws Exception {
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
     this.textInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_content"));
-    this.textIdIncrementer = incrementerFactory.create("text_content");
+    this.textIdIncrementer = keyFactory.create("text_content");
   }
 
   public Text create(Text.Type type) {

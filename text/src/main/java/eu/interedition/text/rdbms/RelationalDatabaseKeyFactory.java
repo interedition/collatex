@@ -20,25 +20,22 @@
 package eu.interedition.text.rdbms;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.DatabaseMetaDataCallback;
-import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 
 import javax.sql.DataSource;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class DataFieldMaxValueIncrementerFactory implements InitializingBean {
+public class RelationalDatabaseKeyFactory implements InitializingBean {
   private DataSource dataSource;
-  private DatabaseType databaseType;
+  private RelationalDatabaseType databaseType;
 
+  @Required
   public void setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
   }
@@ -67,22 +64,7 @@ public class DataFieldMaxValueIncrementerFactory implements InitializingBean {
   }
 
   public void afterPropertiesSet() throws Exception {
-    final String dbProductName = (String) JdbcUtils.extractDatabaseMetaData(dataSource, new DatabaseMetaDataCallback() {
-      public Object processMetaData(DatabaseMetaData dbmd) throws SQLException, MetaDataAccessException {
-        return dbmd.getDatabaseProductName();
-      }
-    });
-
-    if ("h2".equalsIgnoreCase(dbProductName)) {
-      databaseType = DatabaseType.H2;
-    } else if ("mysql".equalsIgnoreCase(dbProductName)) {
-      databaseType = DatabaseType.MYSQL;
-    } else {
-      throw new IllegalArgumentException(dataSource.toString());
-    }
+    databaseType = RelationalDatabaseType.detect(dataSource);
   }
 
-  private enum DatabaseType {
-    H2, MYSQL;
-  }
 }

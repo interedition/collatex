@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class QNameSerializer extends JsonSerializer<Name> {
+public class NameSerializer extends JsonSerializer<Name> {
 
   @Override
   public Class<Name> handledType() {

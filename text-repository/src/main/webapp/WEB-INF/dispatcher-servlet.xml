@@ -33,9 +33,6 @@
 
     <mvc:interceptors>
         <bean class="eu.interedition.text.repository.CrossOriginResourceSharingInterceptor"/>
-        <bean class="eu.interedition.text.repository.ConfigurationViewModelProvider">
-                <property name="configuration" ref="configuration"/>
-        </bean>
     </mvc:interceptors>
 
     <context:component-scan base-package="eu.interedition.text.repository" use-default-filters="false">
@@ -95,6 +92,11 @@
         <property name="contentType" value="text/html;charset=utf-8"/>
         <property name="prefix" value=""/>
         <property name="suffix" value=".ftl"/>
+        <property name="attributesMap">
+            <map>
+                <entry key="config" value-ref="configuration" />
+            </map>
+        </property>
     </bean>
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">

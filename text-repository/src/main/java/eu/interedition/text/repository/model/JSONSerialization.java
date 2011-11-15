@@ -60,7 +60,7 @@ public class JSONSerialization implements JSONSerializerConfiguration {
     return dataSet;
   }
 
-  @JsonDeserialize(contentAs = NameImpl.class)
+  @JsonDeserialize(contentAs = Name.class)
   public void setDataSet(Set<Name> dataSet) {
     this.dataSet = dataSet;
   }

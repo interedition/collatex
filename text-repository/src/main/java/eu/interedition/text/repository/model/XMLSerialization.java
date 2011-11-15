@@ -44,7 +44,7 @@ import static eu.interedition.text.query.Criteria.or;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLSerialization implements XMLSerializerConfiguration {
-  private NameImpl rootName = new NameImpl(new SimpleName(TextConstants.INTEREDITION_NS_URI, "root"));
+  private Name rootName = new SimpleName(TextConstants.INTEREDITION_NS_URI, "root");
   private Map<String, URI> namespaceMappings = Maps.newHashMap();
   private List<Name> hierarchy = Lists.newArrayList();
   private boolean hierarchyOnly = true;
@@ -63,8 +63,7 @@ public class XMLSerialization implements XMLSerializerConfiguration {
   }
 
   @JsonProperty("root")
-  @JsonDeserialize(as = NameImpl.class)
-  public void setRootName(NameImpl rootName) {
+  public void setRootName(Name rootName) {
     this.rootName = rootName;
   }
 
@@ -94,7 +93,7 @@ public class XMLSerialization implements XMLSerializerConfiguration {
   }
 
   @JsonProperty("hierarchy")
-  @JsonDeserialize(contentAs = NameImpl.class)
+  @JsonDeserialize(contentAs = Name.class)
   public void setHierarchy(List<Name> hierarchy) {
     this.hierarchy = hierarchy;
   }

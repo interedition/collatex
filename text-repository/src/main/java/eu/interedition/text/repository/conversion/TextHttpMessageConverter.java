@@ -37,10 +37,15 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.Charset;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.springframework.http.MediaType.TEXT_PLAIN;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -53,10 +58,11 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
   @Autowired
   private PlatformTransactionManager transactionManager;
 
-  private TransactionTemplate transactionTemplate;
+  private TransactionTemplate readingTransactionTemplate;
+  private TransactionTemplate writingTransactionTemplate;
 
   public TextHttpMessageConverter() {
-    super(MediaType.TEXT_PLAIN, MediaType.APPLICATION_XML);
+    super(APPLICATION_JSON, TEXT_PLAIN, APPLICATION_XML);
   }
 
   @Override
@@ -65,8 +71,13 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
   }
 
   @Override
+  protected boolean canRead(MediaType mediaType) {
+    return TEXT_PLAIN.isCompatibleWith(mediaType) || APPLICATION_XML.isCompatibleWith(mediaType);
+  }
+
+  @Override
   protected boolean canWrite(MediaType mediaType) {
-    return false;
+    return APPLICATION_JSON.isCompatibleWith(mediaType);
   }
 
   @Override
@@ -76,25 +87,25 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
     final Charset charset = (contentTypeCharset == null ? Text.CHARSET : contentTypeCharset);
 
     try {
-      return transactionTemplate.execute(new TransactionCallback<TextImpl>() {
+      return writingTransactionTemplate.execute(new TransactionCallback<TextImpl>() {
         @Override
         public TextImpl doInTransaction(TransactionStatus status) {
           try {
-            if (MediaType.TEXT_PLAIN.isCompatibleWith(contentType)) {
+            if (TEXT_PLAIN.isCompatibleWith(contentType)) {
               Reader textContent = null;
               try {
-                return textService.create(new TextImpl(), textContent = new InputStreamReader(inputMessage.getBody(), charset));
+                return textService.create(new TextImpl(Text.Type.TXT), textContent = new InputStreamReader(inputMessage.getBody(), charset));
               } finally {
                 Closeables.close(textContent, false);
               }
-            } else if (MediaType.APPLICATION_XML.isCompatibleWith(contentType)) {
-              return textService.create(new TextImpl(), new StreamSource(inputMessage.getBody()));
+            } else if (APPLICATION_XML.isCompatibleWith(contentType)) {
+              return textService.create(new TextImpl(Text.Type.XML), new StreamSource(inputMessage.getBody()));
             } else {
               throw new HttpMessageNotReadableException("Cannot read text encoded as " + contentType.toString());
             }
           } catch (IOException e) {
             throw Throwables.propagate(e);
-          } catch (TransformerException e) {
+          } catch (XMLStreamException e) {
             throw Throwables.propagate(e);
           }
         }
@@ -119,9 +130,9 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
   protected MediaType getDefaultContentType(TextImpl text) {
     switch (text.getType()) {
       case TXT:
-        return MediaType.TEXT_PLAIN;
+        return TEXT_PLAIN;
       case XML:
-        return MediaType.APPLICATION_XML;
+        return APPLICATION_XML;
     }
 
     throw new IllegalStateException(text.getType().toString());
@@ -129,6 +140,9 @@ public class TextHttpMessageConverter extends AbstractHttpMessageConverter<TextI
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    transactionTemplate = new TransactionTemplate(transactionManager);
+    readingTransactionTemplate = new TransactionTemplate(transactionManager);
+    readingTransactionTemplate.setReadOnly(true);
+
+    writingTransactionTemplate = new TransactionTemplate(transactionManager);
   }
 }

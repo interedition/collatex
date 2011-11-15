@@ -178,7 +178,7 @@ public class TextController {
   @RequestMapping("/{id}/names")
   @ResponseBody
   public SortedSet<Name> getNamesOfText(@PathVariable("id") long id) {
-    return Sets.<Name>newTreeSet(Iterables.transform(annotationRepository.names(textRepository.load(id)), NameImpl.TO_BEAN));
+    return annotationRepository.names(textRepository.load(id));
   }
 
   @RequestMapping(value = "/{id}/transform", method = RequestMethod.GET)
@@ -257,7 +257,7 @@ public class TextController {
   public RedirectView postTextViaForm(@ModelAttribute TextImpl text, @RequestParam("file") MultipartFile file,//
                                  @RequestParam("fileType") Text.Type textType,//
                                  @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
-          throws IOException, TransformerException {
+          throws IOException, XMLStreamException {
     Preconditions.checkArgument(!file.isEmpty(), "Empty file");
 
     InputStream fileStream = null;

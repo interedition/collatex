@@ -55,7 +55,7 @@ public class XMLTransformation extends SimpleXMLParserConfiguration {
     return included;
   }
 
-  @JsonDeserialize(contentAs = NameImpl.class)
+  @JsonDeserialize(contentAs = Name.class)
   public void setIncluded(Set<Name> included) {
     this.included = included;
   }
@@ -64,7 +64,7 @@ public class XMLTransformation extends SimpleXMLParserConfiguration {
     return excluded;
   }
 
-  @JsonDeserialize(contentAs = NameImpl.class)
+  @JsonDeserialize(contentAs = Name.class)
   public void setExcluded(Set<Name> excluded) {
     this.excluded = excluded;
   }
@@ -73,7 +73,7 @@ public class XMLTransformation extends SimpleXMLParserConfiguration {
     return lineElements;
   }
 
-  @JsonDeserialize(contentAs = NameImpl.class)
+  @JsonDeserialize(contentAs = Name.class)
   public void setLineElements(Set<Name> lineElements) {
     this.lineElements = lineElements;
   }
@@ -82,7 +82,7 @@ public class XMLTransformation extends SimpleXMLParserConfiguration {
     return containerElements;
   }
 
-  @JsonDeserialize(contentAs = NameImpl.class)
+  @JsonDeserialize(contentAs = Name.class)
   public void setContainerElements(Set<Name> containerElements) {
     this.containerElements = containerElements;
   }
@@ -91,7 +91,7 @@ public class XMLTransformation extends SimpleXMLParserConfiguration {
     return notableElements;
   }
 
-  @JsonDeserialize(contentAs = NameImpl.class)
+  @JsonDeserialize(contentAs = Name.class)
   public void setNotableElements(Set<Name> notableElements) {
     this.notableElements = notableElements;
   }

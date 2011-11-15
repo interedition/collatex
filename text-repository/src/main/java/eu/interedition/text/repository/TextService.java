@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.sql.DataSource;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
@@ -130,7 +131,7 @@ public class TextService implements InitializingBean {
     return create(text, (RelationalText) textRepository.create(content));
   }
 
-  public TextImpl create(TextImpl text, Source xml) throws IOException, TransformerException {
+  public TextImpl create(TextImpl text, Source xml) throws IOException, XMLStreamException {
     return create(text, (RelationalText) textRepository.create(xml));
   }
 

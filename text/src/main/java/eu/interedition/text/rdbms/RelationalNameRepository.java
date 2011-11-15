@@ -51,7 +51,7 @@ public class RelationalNameRepository implements NameRepository, InitializingBea
 
   private DataSource dataSource;
   private PlatformTransactionManager transactionManager;
-  private DataFieldMaxValueIncrementerFactory incrementerFactory;
+  private RelationalDatabaseKeyFactory keyFactory;
   private int cacheSize = 1000;
 
   private SimpleJdbcTemplate jt;
@@ -172,8 +172,8 @@ public class RelationalNameRepository implements NameRepository, InitializingBea
   }
 
   @Required
-  public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
-    this.incrementerFactory = incrementerFactory;
+  public void setKeyFactory(RelationalDatabaseKeyFactory keyFactory) {
+    this.keyFactory = keyFactory;
   }
 
   public void setCacheSize(int cacheSize) {
@@ -183,7 +183,7 @@ public class RelationalNameRepository implements NameRepository, InitializingBea
   public void afterPropertiesSet() throws Exception {
     this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
     this.nameInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname");
-    this.nameIdIncrementer = this.incrementerFactory.create("text_qname");
+    this.nameIdIncrementer = this.keyFactory.create("text_qname");
 
     this.tt = new TransactionTemplate(transactionManager);
     this.tt.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);

@@ -13,11 +13,11 @@ public class TextSerializerModule extends SimpleModule {
   public TextSerializerModule() {
     super(TextSerializerModule.class.getPackage().getName(), new Version(1, 0, 0, ""));
     addSerializer(new TextSerializer());
-    addSerializer(new QNameSerializer());
+    addSerializer(new NameSerializer());
     addSerializer(new RangeSerializer());
     addSerializer(new AnnotationSerializer());
 
-    addDeserializer(Name.class, new QNameDeserializer());
+    addDeserializer(Name.class, new NameDeserializer());
     addDeserializer(Range.class, new RangeDeserializer());
   }
 
