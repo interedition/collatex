@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import com.google.common.collect.Lists;
@@ -188,4 +190,8 @@ public class VariantGraph extends DirectedAcyclicGraph<IVariantGraphVertex, IVar
 	  return transposedNodes;
   }
 
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).addValue(Iterables.toString(getWitnesses())).toString();
+  }
 }

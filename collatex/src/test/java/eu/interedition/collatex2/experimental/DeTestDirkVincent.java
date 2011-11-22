@@ -83,7 +83,7 @@ public class DeTestDirkVincent {
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IVariantGraph graph = new VariantGraph();
     VariantGraphBuilder builder = new VariantGraphBuilder(graph);
-    builder.addWitness(a);
+    builder.add(a);
     Iterator<IVariantGraphVertex> iterator = graph.iterator();
     assertEquals("#", iterator.next().getNormalized()); // start vertex
     assertEquals("its", iterator.next().getNormalized());
@@ -99,8 +99,8 @@ public class DeTestDirkVincent {
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = new VariantGraph();
     VariantGraphBuilder builder = new VariantGraphBuilder(graph);
-    builder.addWitness(a);
-    builder.addWitness(b);
+    builder.add(a);
+    builder.add(b);
     Iterator<IVariantGraphVertex> iterator = graph.iterator();
     assertEquals("#", iterator.next().getNormalized()); // start vertex
     assertEquals("its", iterator.next().getNormalized());
@@ -115,8 +115,8 @@ public class DeTestDirkVincent {
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = new VariantGraph();
     VariantGraphBuilder builder = new VariantGraphBuilder(graph);
-    builder.addWitness(a);
-    builder.addWitness(b);
+    builder.add(a);
+    builder.add(b);
     IWitness superbase = new Superbase(graph);
     Iterator<INormalizedToken> tokenIterator = superbase.tokenIterator();
     assertEquals("#", tokenIterator.next().getNormalized()); // start vertex
@@ -143,8 +143,8 @@ public class DeTestDirkVincent {
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = new VariantGraph();
     VariantGraphBuilder builder = new VariantGraphBuilder(graph);
-    builder.addWitness(a);
-    builder.addWitness(b);
+    builder.add(a);
+    builder.add(b);
     IWitness superbase = new Superbase(graph);
     IWitness c = factory.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
@@ -222,13 +222,13 @@ public class DeTestDirkVincent {
     builder.add(a, b);
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died", ".");
     IWitness c = factory.createWitness("08-01","The same as when for example McKee once died .");
-    builder.addWitness(c);
+    builder.add(c);
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "once", "died", ".");
     IWitness d = factory.createWitness("08-02", "The same as when among others Darly once died & left him.");
-    builder.addWitness(d);
+    builder.add(d);
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
     IWitness e = factory.createWitness("xxx", "The same as when Darly among others once died and left him.");
-    builder.addWitness(e);
+    builder.add(e);
     IAnalysis analysis = builder.getAnalysis();
     List<ISequence> sequences = analysis.getSequences();
     assertEquals("The same as when", sequences.get(0).getWitnessPhrase().getContent());
