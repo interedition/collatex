@@ -19,7 +19,7 @@ public class TokenMatcher {
     ListMultimap<INormalizedToken, INormalizedToken> matches = ArrayListMultimap.create();
     for (INormalizedToken tokenA : a.getTokens()) {
       for (INormalizedToken tokenB : b.getTokens()) {
-        if (this.tokenComparator.compare(tokenA, tokenB)==1) {
+        if (this.tokenComparator.compare(tokenA, tokenB)== 0) {
           matches.put(tokenB, tokenA);
         }
       }

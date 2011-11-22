@@ -8,10 +8,7 @@ public class EqualsTokenComparator implements Comparator<INormalizedToken> {
 
   @Override
   public int compare(INormalizedToken base, INormalizedToken witness) {
-    if (base.getNormalized().equals(witness.getNormalized())) {
-      return 1;
-    }
-    return -1;
+    return base.getNormalized().compareTo(witness.getNormalized());
   }
 
 }
