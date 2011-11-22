@@ -20,23 +20,18 @@
 
 package eu.interedition.collatex2.usecases.dirk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.vg_alignment.IAlignment;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.ITokenMatch;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IWitness;
 public class HighFrequencyWordsTest {
   private static CollateXEngine factory;
   
@@ -68,23 +63,4 @@ public class HighFrequencyWordsTest {
     assertEquals("a", tokensA.get(0).getNormalized());
     //TODO: etc
   }
-  
-  @Ignore
-  @Test
-  public void testGraphAlignment() {
-    IWitness witnessA = factory.createWitness("A", "a b c d");
-    IWitness witnessB = factory.createWitness("B", "a b d");
-    IVariantGraph graph = factory.graph(witnessA);
-    IAlignment alignment = factory.align(graph, witnessB);
-    List<ITokenMatch> tokenMatches = alignment.getTokenMatches();
-    ITokenMatch match1 = tokenMatches.get(0);
-    ITokenMatch match2 = tokenMatches.get(1);
-    ITokenMatch match3 = tokenMatches.get(2);
-    List<INormalizedToken> tokensA = graph.getTokens(witnessA);
-    assertEquals(tokensA.get(0), match1.getBaseToken());
-    assertEquals(tokensA.get(1), match2.getBaseToken());
-    assertEquals(tokensA.get(3), match3.getBaseToken());
-    assertEquals(3, tokenMatches.size());
-  }
-  
 }
