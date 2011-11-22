@@ -4,10 +4,7 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -16,8 +13,8 @@ public class MatchResultAnalyzer {
 
   public IMatchResult analyze(IWitness superbase, IWitness witness) {
     //Warning: TheAligner does matching also!
-    TokenMatcher matcher = new TokenMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, witness);
+    TokenMatcher matcher = new EqualityTokenComparator();
+    Multimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, witness);
     // unmatched tokens
     Set<INormalizedToken> unmatchedTokens = Sets.newLinkedHashSet();
     for (INormalizedToken token : witness.getTokens()) {

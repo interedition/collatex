@@ -4,10 +4,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex2.implementation.matching.VariantGraphMatcher;
+import com.google.common.collect.Multimap;
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex2.implementation.matching.TokenMatcher;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.interfaces.ITokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -28,8 +29,8 @@ public class EditGraphLinker implements ITokenLinker {
 //      System.out.println(edge.getTargetVertex().toString());
 //    }
     //Note: This is the second time the matcher function is called
-    VariantGraphMatcher vgmatcher = new VariantGraphMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = vgmatcher.match(vGraph, b);
+    TokenMatcher tokenMatcher = new EqualityTokenComparator();
+    Multimap<INormalizedToken, INormalizedToken> matches = tokenMatcher.match(vGraph, b);
     Map<INormalizedToken, INormalizedToken> linkedTokens = Maps.newLinkedHashMap();
     List<INormalizedToken> tokens = b.getTokens();
     for (INormalizedToken token : tokens) {

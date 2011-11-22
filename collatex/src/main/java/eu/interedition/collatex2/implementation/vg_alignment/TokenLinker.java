@@ -1,20 +1,12 @@
 package eu.interedition.collatex2.implementation.vg_alignment;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.*;
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
@@ -33,8 +25,8 @@ public class TokenLinker implements ITokenLinker {
 
   public Map<ITokenSequence, IPhrase> link(IWitness a, IWitness b) {
     // do the matching
-    TokenMatcher matcher = new TokenMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+    TokenMatcher matcher = new EqualityTokenComparator();
+    Multimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     // add start and end tokens as matches
     final INormalizedToken startNullToken = a.getTokens().get(0);
     matches.put(new StartToken(), startNullToken);
@@ -83,8 +75,8 @@ public class TokenLinker implements ITokenLinker {
     List<Sequence> sequences1 = filterAwaySecondChoicesMultipleColumnsOneToken(sequences);
     List<Sequence> sequences2 = filterAwaySecondChoicesMultipleTokensOneColumn(sequences1);
      // do the matching
-    TokenMatcher matcher = new TokenMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+    TokenMatcher matcher = new EqualityTokenComparator();
+    Multimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
     // Calculate MatchResult
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
     IMatchResult matchResult = analyzer.analyze(a, b);
@@ -92,7 +84,7 @@ public class TokenLinker implements ITokenLinker {
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
     // put sure matches in the result map
     for (INormalizedToken token: matchResult.getSureTokens()) {
-      alignedTokens.put(token, matches.get(token).get(0));
+      alignedTokens.put(token, Iterables.getFirst(matches.get(token), null));
     }
     // add matched sequences to the aligned tokens
     for (Sequence sequence : sequences2) {
@@ -220,16 +212,16 @@ public class TokenLinker implements ITokenLinker {
   
   // This method should return the matching base tokens for a given sequence 
   // Note: this method works for sequences that have the fixed token on the left and expand to the right
-  private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheRight(ITokenSequence sequence, ListMultimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
+  private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheRight(ITokenSequence sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
     final INormalizedToken fixedWitnessToken = sequence.getFirstToken();
-    final List<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
+    final Collection<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
     if (matchesForFixedTokenWitness.isEmpty()) {
       throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
     }
     if (matchesForFixedTokenWitness.size()!=1) {
       throw new RuntimeException("Multiple matches found in base for fixed witness token! tokens: "+fixedWitnessToken);
     }
-    INormalizedToken fixedBaseToken = matchesForFixedTokenWitness.get(0);
+    INormalizedToken fixedBaseToken = Iterables.getFirst(matchesForFixedTokenWitness, null);
     // traverse here the rest of the token sequence
     List<INormalizedToken> restTokens = Lists.newArrayList(sequence.getTokens());
     restTokens.remove(fixedWitnessToken);
@@ -238,16 +230,16 @@ public class TokenLinker implements ITokenLinker {
 
   // This method should return the matching base tokens for a given sequence 
   // Note: this method works for sequences that have the fixed token on the right and expand to the left
-  private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheLeft(ITokenSequence sequence, ListMultimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
+  private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheLeft(ITokenSequence sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
     final INormalizedToken fixedWitnessToken = sequence.getLastToken();
-    final List<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
+    final Collection<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
     if (matchesForFixedTokenWitness.isEmpty()) {
       throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
     }
     if (matchesForFixedTokenWitness.size()!=1) {
       throw new RuntimeException("Multiple matches found in base for fixed witness token! tokens: "+fixedWitnessToken);
     }
-    INormalizedToken fixedBaseToken = matchesForFixedTokenWitness.get(0);
+    INormalizedToken fixedBaseToken = Iterables.getFirst(matchesForFixedTokenWitness, null);
     // traverse here the rest of the token sequence
     List<INormalizedToken> restTokens = Lists.newArrayList(sequence.getTokens());
     restTokens.remove(fixedWitnessToken);
@@ -257,13 +249,13 @@ public class TokenLinker implements ITokenLinker {
     return matchedBaseTokens;
   }
 
-  private List<INormalizedToken> tryTheDifferentPossibilities(ListMultimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide, INormalizedToken fixedBaseToken,
+  private List<INormalizedToken> tryTheDifferentPossibilities(Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide, INormalizedToken fixedBaseToken,
       List<INormalizedToken> restTokens, int expectedDirection) {
     boolean validWholeSequence = true;
     List<INormalizedToken> matchedBaseTokens = Lists.newArrayList(fixedBaseToken);
     INormalizedToken lastToken = fixedBaseToken;
     for (INormalizedToken token : restTokens) {
-      List<INormalizedToken> possibilities = matches.get(token);
+      Collection<INormalizedToken> possibilities = matches.get(token);
       boolean valid = false;
       for (INormalizedToken possibility : possibilities) {
         int direction = afgeleide.indexOf(possibility) - afgeleide.indexOf(lastToken);
@@ -291,7 +283,7 @@ public class TokenLinker implements ITokenLinker {
     return link2(superbase, b);
   }
 
-  public static List<INormalizedToken> derive(IWitness a, ListMultimap<INormalizedToken, INormalizedToken> matches) {
+  public static List<INormalizedToken> derive(IWitness a, Multimap<INormalizedToken, INormalizedToken> matches) {
     return Lists.newArrayList(Iterables.filter(a.getTokens(), Predicates.in(matches.values())));
   }
 }
