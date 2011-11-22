@@ -1,14 +1,15 @@
 package eu.interedition.collatex2.experimental;
 
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.implementation.matching.IMatchResult;
 import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
 import eu.interedition.collatex2.implementation.matching.TokenMatcher;
-import eu.interedition.collatex2.implementation.vg_alignment.BaseAfgeleider;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
@@ -63,8 +64,7 @@ public class DeTestDirkVincent {
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     TokenMatcher matcher = new TokenMatcher();
     ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
-    BaseAfgeleider afgeleider = new BaseAfgeleider();
-    List<INormalizedToken> afgeleideWitness = afgeleider.calculateAfgeleide(a, matches);
+    List<INormalizedToken> afgeleideWitness = TokenLinker.derive(a, matches);
     Iterator<INormalizedToken> tokenIterator = afgeleideWitness.iterator();
     assertEquals("Its", tokenIterator.next().getContent());
     assertEquals("soft", tokenIterator.next().getContent());

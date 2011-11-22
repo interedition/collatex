@@ -31,15 +31,8 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 public class Phrase implements IPhrase {
   private final List<INormalizedToken> tokens;
 
-  public static final Comparator<IPhrase> PHRASECOMPARATOR = new Comparator<IPhrase>() {
-    @Override
-    public int compare(final IPhrase p1, final IPhrase p2) {
-      return p1.compareTo(p2);
-    }
-  };
-
-  public Phrase(final List<INormalizedToken> tokens1) {
-    this.tokens = tokens1;
+  public Phrase(final List<INormalizedToken> tokens) {
+    this.tokens = tokens;
   }
 
   //  // TODO rename parameter "remove" to bigram
@@ -143,31 +136,6 @@ public class Phrase implements IPhrase {
 
   @Override
   public int compareTo(final IPhrase other) {
-//    final int beginDelta = getBeginPosition() - other.getBeginPosition();
-//    if (beginDelta != 0) {
-//      return beginDelta;
-//    }
-//    final int endDelta = getEndPosition() - other.getEndPosition();
-//    if (endDelta != 0) {
-//      return endDelta;
-//    }
-    final int sizeDelta = getTokens().size() - other.getTokens().size();
-    return sizeDelta;
+    return getTokens().size() - other.getTokens().size();
   }
-
-  @Override
-  public IPhrase createSubPhrase(final int startIndex, final int endIndex) {
-    return new Phrase(tokens.subList(startIndex - 1, endIndex));
-  }
-
-  @Override
-  public void addTokenToRight(final INormalizedToken token) {
-    tokens.add(token);
-  }
-
-  @Override
-  public void addTokenToLeft(final INormalizedToken token) {
-    tokens.add(0, token);
-  }
-
 }

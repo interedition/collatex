@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +46,8 @@ public class TokenLinker implements ITokenLinker {
     // Calculate witness sequences using indexer
     WitnessIndexer indexer = new WitnessIndexer();
     IWitnessIndex index = indexer.index(b, matchResult);
-    // Calculate 'afgeleide': Ignore non matches from the base
-    BaseAfgeleider afgeleider = new BaseAfgeleider();
-    List<INormalizedToken> afgeleide = afgeleider.calculateAfgeleide(a, matches);
+    // Calculate 'derivation': Ignore non matches from the base
+    List<INormalizedToken> afgeleide = derive(a, matches);
     // try and find matches in the base for each sequence in the witness 
     Map<ITokenSequence, IPhrase> result = Maps.newLinkedHashMap();
     for (ITokenSequence sequence : index.getTokenSequences()) {
@@ -288,5 +289,9 @@ public class TokenLinker implements ITokenLinker {
   public Map<INormalizedToken, INormalizedToken> link(IVariantGraph graph, IWitness b) {
     IWitness superbase = new Superbase(graph);
     return link2(superbase, b);
+  }
+
+  public static List<INormalizedToken> derive(IWitness a, ListMultimap<INormalizedToken, INormalizedToken> matches) {
+    return Lists.newArrayList(Iterables.filter(a.getTokens(), Predicates.in(matches.values())));
   }
 }

@@ -9,16 +9,16 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 public class TokenSequence implements ITokenSequence {
 
   private final INormalizedToken[] tokens;
-  private final boolean gotoleft;
+  private final boolean expandsToTheRight;
   
-  public TokenSequence(boolean gotoleft, INormalizedToken... tokens) {
+  public TokenSequence(boolean expandsToTheRight, INormalizedToken... tokens) {
     this.tokens = tokens;
-    this.gotoleft = gotoleft;
+    this.expandsToTheRight = expandsToTheRight;
   }
 
-  public TokenSequence(List<INormalizedToken> tokens2, boolean gotoleft) {
+  public TokenSequence(List<INormalizedToken> tokens2, boolean expandsToTheRight) {
     this.tokens = tokens2.toArray(new INormalizedToken[tokens2.size()]);
-    this.gotoleft = gotoleft;
+    this.expandsToTheRight = expandsToTheRight;
   }
 
   //NOTE: sloppy implemented!
@@ -76,6 +76,6 @@ public class TokenSequence implements ITokenSequence {
   
   @Override
   public boolean expandsToTheRight() {
-    return gotoleft;
+    return expandsToTheRight;
   }
 }
