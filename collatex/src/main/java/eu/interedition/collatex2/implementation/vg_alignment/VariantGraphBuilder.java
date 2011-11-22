@@ -15,43 +15,57 @@ import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
 import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection;
-import eu.interedition.collatex2.interfaces.ILinker;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VariantGraphBuilder {
+  private static final Logger LOG = LoggerFactory.getLogger(VariantGraphBuilder.class);
+
   private final IVariantGraph graph;
+
+  private ILinker tokenLinker = new TokenLinker();
+
   private Analysis analysis;
 
   public VariantGraphBuilder(IVariantGraph graph) {
     this.graph = graph;
   }
 
-  public void addWitness(IWitness witness) {
-    // 1. Do the matching and linking of tokens
-    //TODO: the TokenLinker class should be replaced by the new linker class
-    //TODO: based on the decision graph
+  public VariantGraphBuilder add(IWitness... witnesses) {
+    for (IWitness witness : witnesses) {
+      merge(witness);
+    }
+    return this;
+  }
+
+  protected void merge(IWitness witness) {
+    LOG.debug("{} + {}: Match and link tokens", graph, witness);
+    //TODO: the TokenLinker class should be replaced by the new linker class based on the decision graph
     //EditGraphLinker tokenLinker = new EditGraphLinker();
-    TokenLinker tokenLinker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, tokenLinker);
-    // 2. Determine sequences
+    Map<INormalizedToken, INormalizedToken> linkedTokens = tokenLinker.link(graph, witness);
+
+    LOG.debug("{} + {}: Determine sequences", graph, witness);
     IWitness superbase = new Superbase(graph);
     SequenceDetection detection = new SequenceDetection();
     List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
-    // 3. Determine transpositions of the sequences
-    Analysis analysis = new Analysis(sequences, superbase); 
+
+
+    LOG.debug("{} + {}: Determine transpositions of sequences", graph, witness);
+    Analysis analysis = new Analysis(sequences, superbase);
     //NOTE: This is not very nice!
     this.analysis = analysis;
     List<ITransposition> transpositions = analysis.getTranspositions();
-    Map<INormalizedToken, INormalizedToken> alignedTokens;
-    alignedTokens = VariantGraphBuilder.determineAlignedTokens(linkedTokens, transpositions, witness);
+
+    LOG.debug("{} + {}: Determine aligned tokens", graph, witness);
+    Map<INormalizedToken, INormalizedToken> alignedTokens = determineAlignedTokens(linkedTokens, transpositions, witness);
+
+    LOG.debug("{} + {}: Merge comparand", graph, witness);
     IVariantGraphVertex previous =  graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
-      // determine whether this token is a match or not
-      // System.out.println(token+":"+linkedTokens.containsKey(token));
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Match for {}: {}", token, linkedTokens.containsKey(token));
+      }
       INormalizedToken vertexKey = linkedTokens.containsKey(token)  ? ((IVariantGraphVertex)linkedTokens.get(token)).getVertexKey() : token;
       IVariantGraphVertex vertex = alignedTokens.containsKey(token) ? (IVariantGraphVertex) linkedTokens.get(token) : addNewVertex(token.getNormalized(), vertexKey);
       IVariantGraphEdge edge = graph.getEdge(previous, vertex);
@@ -63,16 +77,6 @@ public class VariantGraphBuilder {
     IVariantGraphEdge edge = graph.getEdge(previous, graph.getEndVertex());
     if (edge == null) edge = addNewEdge(previous, graph.getEndVertex());
     edge.addWitness(witness);
-  }
-
-  private Map<INormalizedToken, INormalizedToken> linkTheTokens(
-      IWitness witness, ILinker tokenLinker) {
-    Map<INormalizedToken, INormalizedToken> linkedTokens;
-    if (graph.isEmpty()) {
-      linkedTokens = Maps.newLinkedHashMap();
-    } 
-    linkedTokens = tokenLinker.link(graph, witness);
-    return linkedTokens;
   }
 
   //write
@@ -95,13 +99,6 @@ public class VariantGraphBuilder {
     return graph;
   }
 
-  public VariantGraphBuilder add(IWitness... witnesses) {
-    for (IWitness witness : witnesses) {
-      addWitness(witness);
-    }
-    return this;
-  }
-
 
   public IAnalysis getAnalysis() {
     return analysis;
@@ -122,14 +119,14 @@ public class VariantGraphBuilder {
 
   // Note: this only calculates the distance between the tokens in the witness.
   // Note: it does not take into account a possible distance in the vertices in the graph!
-  static boolean transpositionsAreNear(ITransposition top, ITransposition mirrored, IWitness witness) {
+  private boolean transpositionsAreNear(ITransposition top, ITransposition mirrored, IWitness witness) {
     INormalizedToken lastToken = top.getSequenceB().getWitnessPhrase().getLastToken();
     INormalizedToken firstToken = mirrored.getSequenceB().getWitnessPhrase().getFirstToken();
     return witness.isNear(lastToken, firstToken);
   }
 
   // NOTE: this method should not return the original sequence when a mirror exists!
-  static List<ISequence> getSequencesThatAreTransposed(List<ITransposition> transpositions, IWitness witness) {
+  private List<ISequence> getSequencesThatAreTransposed(List<ITransposition> transpositions, IWitness witness) {
     List<ISequence> transposedSequences = Lists.newArrayList();
     final Stack<ITransposition> transToCheck = new Stack<ITransposition>();
     transToCheck.addAll(transpositions);
@@ -139,7 +136,7 @@ public class VariantGraphBuilder {
       // System.out.println("Detected transposition: "+top.getSequenceA().toString());
       final ITransposition mirrored = VariantGraphBuilder.findMirroredTransposition(transToCheck, top);
       // remove mirrored transpositions (a->b, b->a) from transpositions
-      if (mirrored != null && VariantGraphBuilder.transpositionsAreNear(top, mirrored, witness)) {
+      if (mirrored != null && transpositionsAreNear(top, mirrored, witness)) {
         // System.out.println("Detected mirror: "+mirrored.getSequenceA().toString());
         // System.out.println("Keeping: transposition " + top.toString());
         // System.out.println("Removing: transposition " + mirrored.toString());
@@ -152,10 +149,10 @@ public class VariantGraphBuilder {
     return transposedSequences;
   }
 
-  static Map<INormalizedToken, INormalizedToken> determineAlignedTokens(Map<INormalizedToken, INormalizedToken> linkedTokens, List<ITransposition> transpositions, IWitness witness) {
+  private Map<INormalizedToken, INormalizedToken> determineAlignedTokens(Map<INormalizedToken, INormalizedToken> linkedTokens, List<ITransposition> transpositions, IWitness witness) {
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
     alignedTokens.putAll(linkedTokens);
-    List<ISequence> sequencesThatAreTransposed = VariantGraphBuilder.getSequencesThatAreTransposed(transpositions, witness);
+    List<ISequence> sequencesThatAreTransposed = getSequencesThatAreTransposed(transpositions, witness);
     for (ISequence sequenceA : sequencesThatAreTransposed) {
       for (INormalizedToken token : sequenceA.getWitnessPhrase().getTokens()) {
         alignedTokens.remove(token);
