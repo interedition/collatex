@@ -46,11 +46,11 @@ import eu.interedition.collatex2.interfaces.IWitness;
 // The VariantGraph contains a List of witnesses that have
 // been added to the Graph.
 @SuppressWarnings("serial")
-public class VariantGraph2 extends DirectedAcyclicGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
+public class VariantGraph extends DirectedAcyclicGraph<IVariantGraphVertex, IVariantGraphEdge> implements IVariantGraph {
   private final IVariantGraphVertex startVertex;
   private final IVariantGraphVertex endVertex;
 
-  public VariantGraph2() {
+  public VariantGraph() {
     super(IVariantGraphEdge.class);
     startVertex = new VariantGraphVertex("#", null);
     addVertex(startVertex);

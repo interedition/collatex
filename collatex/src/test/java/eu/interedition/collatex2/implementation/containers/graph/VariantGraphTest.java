@@ -51,7 +51,7 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraph2Test {
+public class VariantGraphTest {
   private static CollateXEngine engine;
 
   @BeforeClass
@@ -61,7 +61,7 @@ public class VariantGraph2Test {
 
   @Test
   public void testEmptyGraph() {
-    IVariantGraph graph = new VariantGraph2();
+    IVariantGraph graph = new VariantGraph();
     assertEquals(2, graph.vertexSet().size());
     IVariantGraphVertex startVertex = graph.getStartVertex();
     assertEquals("#", startVertex.getNormalized());
@@ -140,7 +140,7 @@ public class VariantGraph2Test {
     IWitness w1 = engine.createWitness("A", "a");
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
-    VariantGraph2 graph = new VariantGraph2();
+    VariantGraph graph = new VariantGraph();
     IAligner aligner = engine.createAligner(graph);
     aligner.add(w1, w2, w3);
     assertEquals(4, graph.vertexSet().size());

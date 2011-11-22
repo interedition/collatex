@@ -22,7 +22,7 @@
 
 package eu.interedition.collatex2.implementation;
 
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph2;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
@@ -80,7 +80,7 @@ public class CollateXEngine {
   }
 
   public IAligner createAligner() {
-    VariantGraph2 graph = new VariantGraph2(); 
+    VariantGraph graph = new VariantGraph();
     return createAligner(graph);
   }
 
