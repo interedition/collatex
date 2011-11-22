@@ -57,11 +57,13 @@ public class TokenSequence implements ITokenSequence {
     return tokens[tokens.length-1];
   }
   
+  @Override
   public List<INormalizedToken> getTokens() {
     return Lists.newArrayList(tokens);
   }
   
   //Note: just for testing purposes
+  @Override
   public String getNormalized() {
     //hmm: I have written this code before!
     String separator = "";

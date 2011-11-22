@@ -22,7 +22,6 @@ package eu.interedition.collatex2.implementation.output.graphml;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.*;
 import javax.xml.xpath.*;

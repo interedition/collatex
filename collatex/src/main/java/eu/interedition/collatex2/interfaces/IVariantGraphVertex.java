@@ -24,6 +24,7 @@ import java.util.Set;
 
 public interface IVariantGraphVertex extends INormalizedToken {
 
+  @Override
   String getNormalized();
 
   INormalizedToken getToken(IWitness witness);

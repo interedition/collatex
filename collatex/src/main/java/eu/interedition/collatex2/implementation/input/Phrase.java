@@ -88,6 +88,7 @@ public class Phrase implements IPhrase {
   }
 
   //TODO make defensive and add test!
+  @Override
   public INormalizedToken getLastToken() {
     return tokens.get(tokens.size() - 1);
   }

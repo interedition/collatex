@@ -37,6 +37,7 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
     this.columns = Lists.newArrayList();
   }
   
+  @Override
   public final List<IRow> getRows() {
     List<IRow> rows = Lists.newArrayList();
     for (IWitness witness: getWitnesses()) {
@@ -45,6 +46,7 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
     return rows;
   }
 
+  @Override
   public final IRow getRow(IWitness witness) {
     List<ICell> cells = Lists.newArrayList();
     for (IColumn column : columns) {
@@ -54,18 +56,22 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
     return new Row(witness.getSigil(), cells);
   }
 
+  @Override
   public final boolean isEmpty() {
     return size()==0;
   }
 
+  @Override
   public final int size() {
     return getColumns().size();
   }
 
+  @Override
   public final List<IColumn> getColumns() {
     return columns;
   }
 
+  @Override
   public abstract List<IWitness> getWitnesses();
   
   @Override

@@ -20,7 +20,6 @@ import eu.interedition.collatex2.implementation.matching.TokenMatcher;
 import eu.interedition.collatex2.implementation.vg_alignment.BaseAfgeleider;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
-import eu.interedition.collatex2.implementation.vg_analysis.ITranspositionDetector;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
