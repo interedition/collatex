@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.junit.Test;
 
-import eu.interedition.collatex2.implementation.containers.witness.FakeWitness;
 import eu.interedition.collatex2.implementation.vg_alignment.EndToken;
 import eu.interedition.collatex2.implementation.vg_alignment.StartToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
