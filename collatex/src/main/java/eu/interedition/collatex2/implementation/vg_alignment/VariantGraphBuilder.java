@@ -10,23 +10,27 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
-import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
-import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
-import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
-import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
-import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection;
+import eu.interedition.collatex2.implementation.vg_analysis.*;
 import eu.interedition.collatex2.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @todo the TokenLinker class should be replaced by the new linker class based on the decision graph
+ */
 public class VariantGraphBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraphBuilder.class);
 
   private final IVariantGraph graph;
 
-  private ILinker tokenLinker = new TokenLinker();
+  private ITokenLinker tokenLinker = new TokenLinker(); // = new EditGraphLinker();
+  private SequenceDetector sequenceDetector = new SequenceDetector();
+  private TranspositionDetector transpositionDetector = new TranspositionDetector();
 
-  private Analysis analysis;
+  private Map<INormalizedToken,INormalizedToken> linkedTokens;
+  private List<ISequence> sequences;
+  private List<ITransposition> transpositions;
+  private Map<INormalizedToken,INormalizedToken> alignedTokens;
 
   public VariantGraphBuilder(IVariantGraph graph) {
     this.graph = graph;
@@ -39,26 +43,40 @@ public class VariantGraphBuilder {
     return this;
   }
 
+  public IVariantGraph getGraph() {
+    return graph;
+  }
+
+  public Map<INormalizedToken, INormalizedToken> getLinkedTokens() {
+    return linkedTokens;
+  }
+
+  public List<ISequence> getSequences() {
+    return Collections.unmodifiableList(sequences);
+  }
+
+  public List<ITransposition> getTranspositions() {
+    return Collections.unmodifiableList(transpositions);
+  }
+
+  public Map<INormalizedToken, INormalizedToken> getAlignedTokens() {
+    return Collections.unmodifiableMap(alignedTokens);
+  }
+
   protected void merge(IWitness witness) {
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
-    //TODO: the TokenLinker class should be replaced by the new linker class based on the decision graph
-    //EditGraphLinker tokenLinker = new EditGraphLinker();
-    Map<INormalizedToken, INormalizedToken> linkedTokens = tokenLinker.link(graph, witness);
+    linkedTokens = tokenLinker.link(graph, witness);
 
     LOG.debug("{} + {}: Determine sequences", graph, witness);
     IWitness superbase = new Superbase(graph);
-    SequenceDetection detection = new SequenceDetection();
-    List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
+    sequences = sequenceDetector.detect(linkedTokens, superbase, witness);
 
 
     LOG.debug("{} + {}: Determine transpositions of sequences", graph, witness);
-    Analysis analysis = new Analysis(sequences, superbase);
-    //NOTE: This is not very nice!
-    this.analysis = analysis;
-    List<ITransposition> transpositions = analysis.getTranspositions();
+    transpositions = transpositionDetector.detect(sequences, superbase);
 
     LOG.debug("{} + {}: Determine aligned tokens", graph, witness);
-    Map<INormalizedToken, INormalizedToken> alignedTokens = determineAlignedTokens(linkedTokens, transpositions, witness);
+    alignedTokens = determineAlignedTokens(linkedTokens, transpositions, witness);
 
     LOG.debug("{} + {}: Merge comparand", graph, witness);
     IVariantGraphVertex previous =  graph.getStartVertex();
@@ -66,7 +84,7 @@ public class VariantGraphBuilder {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Match for {}: {}", token, linkedTokens.containsKey(token));
       }
-      INormalizedToken vertexKey = linkedTokens.containsKey(token)  ? ((IVariantGraphVertex)linkedTokens.get(token)).getVertexKey() : token;
+      INormalizedToken vertexKey = linkedTokens.containsKey(token)  ? ((IVariantGraphVertex) linkedTokens.get(token)).getVertexKey() : token;
       IVariantGraphVertex vertex = alignedTokens.containsKey(token) ? (IVariantGraphVertex) linkedTokens.get(token) : addNewVertex(token.getNormalized(), vertexKey);
       IVariantGraphEdge edge = graph.getEdge(previous, vertex);
       if (edge == null) edge = addNewEdge(previous, vertex);
@@ -100,8 +118,8 @@ public class VariantGraphBuilder {
   }
 
 
-  public IAnalysis getAnalysis() {
-    return analysis;
+  public ITranspositionDetector getTranspositionDetector() {
+    return transpositionDetector;
   }
 
   //NOTE: It would be better to not use getNormalized here!
