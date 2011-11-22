@@ -71,7 +71,7 @@ public class DotExporter {
   }
 
   // EditGraph
-  static final VertexNameProvider<EditGraphVertex> EG_VERTEX_ID_PROVIDER = new IntegerNameProvider<EditGraphVertex>();// {
+  static final VertexNameProvider<EditGraphVertex> EG_VERTEX_ID_PROVIDER = new IntegerNameProvider<EditGraphVertex>(); // {
   //    @Override
   //    public String getVertexName(final EditGraphVertex v) {
   //      return v.toString().replaceAll("eu.interedition.collatex2.implementation.edit_graph.", "").replace('@', '_');

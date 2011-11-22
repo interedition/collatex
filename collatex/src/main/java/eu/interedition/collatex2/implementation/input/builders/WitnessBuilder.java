@@ -88,7 +88,9 @@ public class WitnessBuilder {
       IToken nextToken = tokenIterator.next();
       if (!nextToken.getContent().equals("")) {
         String normalized = tokenNormalizer.apply(nextToken).getNormalized();
-        tokenList.add(new WitnessToken(nextToken.getContent(), position, normalized));
+        WitnessToken wt = new WitnessToken(nextToken.getContent(), position, normalized);
+        wt.setTrailingWhitespace(nextToken.getTrailingWhitespace());
+        tokenList.add(wt);
         position++;
       }
     }

@@ -61,10 +61,8 @@ public class Phrase implements IPhrase {
   @Override
   public String getNormalized() {
     final StringBuilder normalized = new StringBuilder();
-    String divider = "";
     for (final INormalizedToken token : tokens) {
-      normalized.append(divider).append(token.getNormalized());
-      divider = " ";
+      normalized.append(token.getNormalized()).append(token.getTrailingWhitespace());
     }
     return normalized.toString();
 
@@ -74,10 +72,8 @@ public class Phrase implements IPhrase {
   @Override
   public String getContent() {
     final StringBuilder content = new StringBuilder();
-    String divider = "";
     for (final INormalizedToken token : tokens) {
-      content.append(divider).append(token.getContent());
-      divider = " ";
+      content.append(token.getContent()).append(token.getTrailingWhitespace());
     }
     return content.toString();
   }

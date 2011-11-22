@@ -32,8 +32,8 @@ public class Token implements IToken {
   }
 
   public Token(IToken other) {
-    //TODO: Whitespace is not taken from other Token!
     this(other.getContent());
+    setTrailingWhitespace(other.getTrailingWhitespace());
   }
 
   public Token(final String content) {

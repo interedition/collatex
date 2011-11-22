@@ -52,7 +52,9 @@ public class WhitespaceTokenizer implements ITokenizer {
 
           @Override
           public IToken next() {
-            return new Token(tokenIterator.next());
+            Token token = new Token(tokenIterator.next());
+            token.setTrailingWhitespace(" ");
+            return token;
           }
 
           @Override
