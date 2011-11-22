@@ -8,7 +8,7 @@ import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAnd
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.matching.IMatchResult;
 import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
-import eu.interedition.collatex2.implementation.matching.TokenMatcher;
+import eu.interedition.collatex2.implementation.matching.TokenComparator;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
@@ -49,8 +49,8 @@ public class DeTestDirkVincent {
   public void testDirkVincent() {
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    TokenMatcher matcher = new EqualityTokenComparator();
-    Multimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+    TokenComparator tokenComparator = new EqualityTokenComparator();
+    Multimap<INormalizedToken, INormalizedToken> matches = tokenComparator.match(a, b);
     INormalizedToken its = b.getTokens().get(0);
     INormalizedToken light = b.getTokens().get(3);
     Collection<INormalizedToken> matchedTokens;
@@ -64,8 +64,8 @@ public class DeTestDirkVincent {
   public void testVincentDirk3() {
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    TokenMatcher matcher = new EqualityTokenComparator();
-    Multimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+    TokenComparator tokenComparator = new EqualityTokenComparator();
+    Multimap<INormalizedToken, INormalizedToken> matches = tokenComparator.match(a, b);
     List<INormalizedToken> afgeleideWitness = TokenLinker.derive(a, matches);
     Iterator<INormalizedToken> tokenIterator = afgeleideWitness.iterator();
     assertEquals("Its", tokenIterator.next().getContent());

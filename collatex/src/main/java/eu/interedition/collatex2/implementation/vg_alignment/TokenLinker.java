@@ -12,7 +12,7 @@ import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.matching.IMatchResult;
 import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
-import eu.interedition.collatex2.implementation.matching.TokenMatcher;
+import eu.interedition.collatex2.implementation.matching.TokenComparator;
 import eu.interedition.collatex2.implementation.vg_analysis.Sequence;
 import eu.interedition.collatex2.interfaces.ITokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -21,62 +21,68 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 public class TokenLinker implements ITokenLinker {
-  static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
-  public Map<ITokenSequence, IPhrase> link(IWitness a, IWitness b) {
-    // do the matching
-    TokenMatcher matcher = new EqualityTokenComparator();
-    Multimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+  private TokenComparator tokenComparator = new EqualityTokenComparator();
+
+  @Override
+  public Map<INormalizedToken, INormalizedToken> link(IVariantGraph graph, IWitness b) {
+    final IWitness a = new Superbase(graph);
+
+    LOG.trace("Matching tokens of {} and {}", a, b);
+    Multimap<INormalizedToken, INormalizedToken> matches = tokenComparator.match(a, b);
+
     // add start and end tokens as matches
     final INormalizedToken startNullToken = a.getTokens().get(0);
     matches.put(new StartToken(), startNullToken);
-    final INormalizedToken endNullToken = a.getTokens().get(a.size()-1);
+    final INormalizedToken endNullToken = a.getTokens().get(a.size() - 1);
     matches.put(new EndToken(b.size()), endNullToken);
-     // Calculate MatchResult
-    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
-    IMatchResult matchResult = analyzer.analyze(a, b);
-    // Calculate witness sequences using indexer
+
+    LOG.trace("Matching via Analyzer");
+    MatchResultAnalyzer analyzer1 = new MatchResultAnalyzer();
+    IMatchResult matchResult1 = analyzer1.analyze(a, b);
+
+    LOG.trace("Calculate witness sequences using indexer");
     WitnessIndexer indexer = new WitnessIndexer();
-    IWitnessIndex index = indexer.index(b, matchResult);
-    // Calculate 'derivation': Ignore non matches from the base
-    List<INormalizedToken> afgeleide = derive(a, matches);
-    // try and find matches in the base for each sequence in the witness 
-    Map<ITokenSequence, IPhrase> result = Maps.newLinkedHashMap();
-    for (ITokenSequence sequence : index.getTokenSequences()) {
-      // System.out.println("Trying to find token sequence: "+sequence.getNormalized());
+    IWitnessIndex index = indexer.index(b, matchResult1);
+
+    LOG.trace("Calculate 'derivation': Ignore non matches from the base");
+    List<INormalizedToken> derivation = derive(a, matches);
+
+    // try and find matches in the base for each sequence in the witness
+    Map<ITokenSequence, IPhrase> linkedSequences = Maps.newLinkedHashMap();
+    for (ITokenSequence tokenSequence : index.getTokenSequences()) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Searching for token sequence: {}", tokenSequence.getNormalized());
+      }
       List<INormalizedToken> matchedBaseTokens;
-      if (sequence.expandsToTheRight()) {
-        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheRight(sequence, matches, afgeleide);
+      if (tokenSequence.expandsToTheRight()) {
+        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheRight(tokenSequence, matches, derivation);
       } else {
-        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheLeft(sequence, matches, afgeleide);
+        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheLeft(tokenSequence, matches, derivation);
       }
       if (!matchedBaseTokens.isEmpty()) {
-        // System.out.println("Matched!");
-        result.put(sequence, new Phrase(matchedBaseTokens));
+        final Phrase phrase = new Phrase(matchedBaseTokens);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Matched {} and {}", tokenSequence.getNormalized(), phrase.getNormalized());
+        }
+        linkedSequences.put(tokenSequence, phrase);
       }
     }
-    return result;
-  }
- 
-  //this method is just a bridge between the old and the new situation
-  public Map<INormalizedToken, INormalizedToken> link2(IWitness a, IWitness b) {
-    Map<ITokenSequence, IPhrase> linkedSequences = link(a, b);
+
     // order the sequences here (first the sequences that expand to the left, then all sequences that expand to the right!)
-    List<ITokenSequence> sequences0 = orderSequences(linkedSequences.keySet());
-    // need to convert map<tokenseq, phrase> to List<Sequence> here
+    // and convert map<tokenseq, phrase> to List<Sequence>
     List<Sequence> sequences = Lists.newArrayList();
-    for (ITokenSequence seq : sequences0) {
-      IPhrase basePhrase = linkedSequences.get(seq);
-      IPhrase witnessPhrase = new Phrase(seq.getTokens());
-      Sequence sequence = new Sequence(basePhrase, witnessPhrase);
-      sequences.add(sequence);
+    for (ITokenSequence tokenSequence : orderSequences(linkedSequences.keySet())) {
+      sequences.add(new Sequence(linkedSequences.get(tokenSequence), new Phrase(tokenSequence.getTokens())));
     }
-    // run the old filter method 
-    List<Sequence> sequences1 = filterAwaySecondChoicesMultipleColumnsOneToken(sequences);
-    List<Sequence> sequences2 = filterAwaySecondChoicesMultipleTokensOneColumn(sequences1);
-     // do the matching
-    TokenMatcher matcher = new EqualityTokenComparator();
-    Multimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+    // run the old filter method
+    sequences = filterAwaySecondChoicesMultipleColumnsOneToken(Collections.unmodifiableList(sequences));
+    sequences = filterAwaySecondChoicesMultipleTokensOneColumn(Collections.unmodifiableList(sequences));
+
+    // do the matching
+    matches = tokenComparator.match(a, b);
+
     // Calculate MatchResult
     MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
     IMatchResult matchResult = analyzer.analyze(a, b);
@@ -87,7 +93,7 @@ public class TokenLinker implements ITokenLinker {
       alignedTokens.put(token, Iterables.getFirst(matches.get(token), null));
     }
     // add matched sequences to the aligned tokens
-    for (Sequence sequence : sequences2) {
+    for (Sequence sequence : sequences) {
       IPhrase matchedBasePhrase = sequence.getBasePhrase();
       Iterator<INormalizedToken> iterator = matchedBasePhrase.getTokens().iterator();
       for (INormalizedToken witnessToken : sequence.getWitnessPhrase().getTokens()) {
@@ -95,12 +101,12 @@ public class TokenLinker implements ITokenLinker {
         // skip start and end tokens
         if (!(witnessToken instanceof StartToken || witnessToken instanceof EndToken)) {
           alignedTokens.put(witnessToken, possibility);
-        }  
-      }  
+        }
+      }
     }
     return alignedTokens;
   }
-  
+
   private List<ITokenSequence> orderSequences(Set<ITokenSequence> set) {
     Comparator<ITokenSequence> comp = new Comparator<ITokenSequence>() {
       @Override
@@ -164,6 +170,7 @@ public class TokenLinker implements ITokenLinker {
     return filteredMatches;
   }
 
+
   // check whether this match has an alternative that is equal in weight
   // if so, then skip the alternative!
   // NOTE: multiple columns match with the same token!
@@ -209,8 +216,7 @@ public class TokenLinker implements ITokenLinker {
     return filteredMatches;
   }
 
-  
-  // This method should return the matching base tokens for a given sequence 
+  // This method should return the matching base tokens for a given sequence
   // Note: this method works for sequences that have the fixed token on the left and expand to the right
   private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheRight(ITokenSequence sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
     final INormalizedToken fixedWitnessToken = sequence.getFirstToken();
@@ -228,7 +234,7 @@ public class TokenLinker implements ITokenLinker {
     return tryTheDifferentPossibilities(matches, afgeleide, fixedBaseToken, restTokens, 1);
   }
 
-  // This method should return the matching base tokens for a given sequence 
+  // This method should return the matching base tokens for a given sequence
   // Note: this method works for sequences that have the fixed token on the right and expand to the left
   private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheLeft(ITokenSequence sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
     final INormalizedToken fixedWitnessToken = sequence.getLastToken();
@@ -270,17 +276,11 @@ public class TokenLinker implements ITokenLinker {
       if (!valid) {
         break;
       }
-    }  
+    }
     if (validWholeSequence) {
       return matchedBaseTokens;
-    } 
+    }
     return Collections.emptyList();
-  }
-
-  @Override
-  public Map<INormalizedToken, INormalizedToken> link(IVariantGraph graph, IWitness b) {
-    IWitness superbase = new Superbase(graph);
-    return link2(superbase, b);
   }
 
   public static List<INormalizedToken> derive(IWitness a, Multimap<INormalizedToken, INormalizedToken> matches) {

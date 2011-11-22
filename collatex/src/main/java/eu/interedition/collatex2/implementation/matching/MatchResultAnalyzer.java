@@ -13,8 +13,8 @@ public class MatchResultAnalyzer {
 
   public IMatchResult analyze(IWitness superbase, IWitness witness) {
     //Warning: TheAligner does matching also!
-    TokenMatcher matcher = new EqualityTokenComparator();
-    Multimap<INormalizedToken, INormalizedToken> matches = matcher.match(superbase, witness);
+    TokenComparator tokenComparator = new EqualityTokenComparator();
+    Multimap<INormalizedToken, INormalizedToken> matches = tokenComparator.match(superbase, witness);
     // unmatched tokens
     Set<INormalizedToken> unmatchedTokens = Sets.newLinkedHashSet();
     for (INormalizedToken token : witness.getTokens()) {

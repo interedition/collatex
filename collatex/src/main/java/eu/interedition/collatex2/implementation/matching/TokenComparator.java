@@ -11,7 +11,7 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public abstract class TokenMatcher implements Comparator<INormalizedToken> {
+public abstract class TokenComparator implements Comparator<INormalizedToken> {
 
   public Multimap<INormalizedToken, INormalizedToken> match(ITokenContainer a, ITokenContainer b) {
     final Multimap<INormalizedToken, INormalizedToken> matches = ArrayListMultimap.create();
