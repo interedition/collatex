@@ -16,61 +16,58 @@
 package eu.interedition.collatex2.implementation.vg_alignment;
 
 import com.google.common.collect.Lists;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IToken;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex2.interfaces.*;
+
 import java.util.Iterator;
 import java.util.List;
 
 /**
+ * The superbase class is a wrapper around the variant graph it represents a variant graph as a witness.
+ * <p/>
+ * This makes certain alignment steps easier
  *
  * @author Ronald
  */
-// The superbase class is a wrapper around the variant graph
-// it represents a variant graph as a witness
-// this makes certain alignment steps easier
 public class Superbase implements IWitness {
-    private final IVariantGraph vg;
+  private final IVariantGraph graph;
 
-    public Superbase(IVariantGraph vg) {
-        this.vg = vg;
-    }
+  public Superbase(IVariantGraph graph) {
+    this.graph = graph;
+  }
 
-    @Override
-    public List<INormalizedToken> getTokens() {
-        List<INormalizedToken> tokens = Lists.newArrayList();
-        Iterator<IVariantGraphVertex> iterator = vg.iterator();
-        while(iterator.hasNext()) {
-            tokens.add(iterator.next());
-        }
-        return tokens;
+  @Override
+  public List<INormalizedToken> getTokens() {
+    List<INormalizedToken> tokens = Lists.newArrayList();
+    Iterator<IVariantGraphVertex> iterator = graph.iterator();
+    while (iterator.hasNext()) {
+      tokens.add(iterator.next());
     }
+    return tokens;
+  }
 
-    @Override
-    public String getSigil() {
-        return "superbase";
-    }
+  @Override
+  public String getSigil() {
+    return "superbase";
+  }
 
-    @Override
-    public int size() {
-        return getTokens().size();
-    }
+  @Override
+  public int size() {
+    return getTokens().size();
+  }
 
-    @Override
-    public boolean isNear(IToken a, IToken b) {
-        if (a instanceof StartToken) {
-            a = vg.getStartVertex();
-        }
-        if (b instanceof EndToken) {
-            b = vg.getEndVertex();
-        }
-        return vg.isNear(a, b);
+  @Override
+  public boolean isNear(IToken a, IToken b) {
+    if (a instanceof StartToken) {
+      a = graph.getStartVertex();
     }
+    if (b instanceof EndToken) {
+      b = graph.getEndVertex();
+    }
+    return graph.isNear(a, b);
+  }
 
-    @Override
-    public Iterator<INormalizedToken> tokenIterator() {
-        return getTokens().iterator();
-    }
+  @Override
+  public Iterator<INormalizedToken> tokenIterator() {
+    return getTokens().iterator();
+  }
 }
