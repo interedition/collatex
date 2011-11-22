@@ -21,8 +21,8 @@ package eu.interedition.text.xml;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
-import eu.interedition.text.QName;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.Name;
+import eu.interedition.text.mem.SimpleName;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamReader;
@@ -36,27 +36,27 @@ import static javax.xml.XMLConstants.XML_NS_URI;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLEntity {
-  public static final QName COMMENT_QNAME = new SimpleQName(XML_NS_URI, "comment");
+  public static final Name COMMENT_QNAME = new SimpleName(XML_NS_URI, "comment");
 
-  public static final QName PI_QNAME = new SimpleQName(XML_NS_URI, "pi");
-  public static final QName PI_TARGET_QNAME = new SimpleQName(XML_NS_URI, "piTarget");
-  public static final QName PI_DATA_QNAME = new SimpleQName(XML_NS_URI, "piDarget");
+  public static final Name PI_QNAME = new SimpleName(XML_NS_URI, "pi");
+  public static final Name PI_TARGET_QNAME = new SimpleName(XML_NS_URI, "piTarget");
+  public static final Name PI_DATA_QNAME = new SimpleName(XML_NS_URI, "piDarget");
 
 
   private final String prefix;
-  private final QName name;
-  private final Map<QName, String> attributes;
+  private final Name name;
+  private final Map<Name, String> attributes;
 
 
-  XMLEntity(QName name, String prefix) {
-    this(name, prefix, Maps.<QName, String>newHashMap());
+  XMLEntity(Name name, String prefix) {
+    this(name, prefix, Maps.<Name, String>newHashMap());
   }
 
-  XMLEntity(QName name, String prefix, QName attrName, String attrValue) {
+  XMLEntity(Name name, String prefix, Name attrName, String attrValue) {
     this(name, prefix, Collections.singletonMap(attrName, attrValue));
   }
 
-  XMLEntity(QName name, String prefix, Map<QName, String> attributes) {
+  XMLEntity(Name name, String prefix, Map<Name, String> attributes) {
     this.name = name;
     this.prefix = prefix;
     this.attributes = attributes;
@@ -66,11 +66,11 @@ public class XMLEntity {
     return prefix;
   }
 
-  public QName getName() {
+  public Name getName() {
     return name;
   }
 
-  public Map<QName, String> getAttributes() {
+  public Map<Name, String> getAttributes() {
     return attributes;
   }
 
@@ -79,7 +79,7 @@ public class XMLEntity {
   }
 
   public static XMLEntity newPI(XMLStreamReader reader) {
-    final Map<QName, String> attributes = Maps.newHashMap();
+    final Map<Name, String> attributes = Maps.newHashMap();
     attributes.put(PI_TARGET_QNAME, reader.getPITarget());
     final String data = reader.getPIData();
     if (data != null) {
@@ -90,15 +90,15 @@ public class XMLEntity {
 
   public static XMLEntity newElement(XMLStreamReader reader) {
     final int attributeCount = reader.getAttributeCount();
-    final Map<QName, String> attributes = Maps.newHashMapWithExpectedSize(attributeCount);
+    final Map<Name, String> attributes = Maps.newHashMapWithExpectedSize(attributeCount);
     for (int ac = 0; ac < attributeCount; ac++) {
       final javax.xml.namespace.QName attrQName = reader.getAttributeName(ac);
       if (XMLNS_ATTRIBUTE_NS_URI.equals(attrQName.getNamespaceURI())) {
         continue;
       }
-      attributes.put(new SimpleQName(attrQName), reader.getAttributeValue(ac));
+      attributes.put(new SimpleName(attrQName), reader.getAttributeValue(ac));
     }
-    return new XMLEntity(new SimpleQName(reader.getName()), XMLConstants.DEFAULT_NS_PREFIX, attributes);
+    return new XMLEntity(new SimpleName(reader.getName()), XMLConstants.DEFAULT_NS_PREFIX, attributes);
   }
 
   @Override

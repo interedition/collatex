@@ -67,7 +67,6 @@ public class WitnessBuilderTest {
 
   @BeforeClass
   public static void setUp() {
-    System.out.println("start setUp()");
     try {
       xmlSimpleA = new ByteArrayInputStream(XML_SIMPLE_A.getBytes("utf-8"));
       xmlSimpleB = new ByteArrayInputStream(XML_SIMPLE_B.getBytes("utf-8"));
@@ -94,7 +93,6 @@ public class WitnessBuilderTest {
     }
 
     witnessBuilder = new WitnessBuilder(new DefaultTokenNormalizer());
-    System.out.println("end setUp()");
   }
 
   @AfterClass

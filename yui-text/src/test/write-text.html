@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Write a text to the repository</title>
+    <script type="text/javascript" src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
+    <script type="text/javascript" src="../build_tmp/interedition-text-debug.js"></script>
+</head>
+<body class="yui3-skin-sam">
+    <div class="yui3-g">
+        <div id="annotation-gutter"></div>
+        <div id="text-panel"></div>
+        <div id="annotation-names"></div>
+    </div>
+
+    <script type="text/javascript">
+        YUI().use("interedition-text", "dump", function(Y) {
+            var Text = Y.interedition.text;
+
+            var repository = new Text.Repository({ base: "http://localhost:8080" });
+            repository.write("Hello World!", function(created) {
+                repository.read(created.id, function(text) {
+                    var name1 = new Text.QName(null, "test"), name2 = new Text.QName("http://interedition.eu/ns", "test"),
+                            annotations = [
+                                    new Text.Annotation(name1, new Text.Range(0, 2)),
+                                    new Text.Annotation(name1, new Text.Range(2, 4)),
+                                    new Text.Annotation(name2, new Text.Range(4, 6))
+                            ];
+                    repository.annotate(created.id, annotations, Y.log);
+
+                    var panel = new Text.TextPanel({ text: text, node: "#text-panel"});
+                    var nameList = new Text.AnnotationNamesSelectionList({ textPanel: panel, node: "#annotation-names" });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

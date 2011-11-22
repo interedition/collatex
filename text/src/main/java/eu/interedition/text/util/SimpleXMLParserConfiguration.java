@@ -21,7 +21,7 @@ package eu.interedition.text.util;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserConfiguration;
 import eu.interedition.text.xml.XMLParserModule;
@@ -31,22 +31,22 @@ import java.util.Set;
 
 public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
 
-  protected Set<QName> excluded = Sets.newHashSet();
-  protected Set<QName> included = Sets.newHashSet();
-  protected Set<QName> lineElements = Sets.newHashSet();
-  protected Set<QName> containerElements = Sets.newHashSet();
-  protected Set<QName> notableElements = Sets.newHashSet();
+  protected Set<Name> excluded = Sets.newHashSet();
+  protected Set<Name> included = Sets.newHashSet();
+  protected Set<Name> lineElements = Sets.newHashSet();
+  protected Set<Name> containerElements = Sets.newHashSet();
+  protected Set<Name> notableElements = Sets.newHashSet();
   protected char notableCharacter = '\u25CA';
   protected boolean compressingWhitespace = true;
   private int textBufferSize = 102400;
   private boolean removeLeadingWhitespace = true;
   protected List<XMLParserModule> modules = Lists.<XMLParserModule>newArrayList();
 
-  public void addLineElement(QName lineElementName) {
+  public void addLineElement(Name lineElementName) {
     lineElements.add(lineElementName);
   }
 
-  public boolean removeLineElement(QName lineElementName) {
+  public boolean removeLineElement(Name lineElementName) {
     return lineElements.remove(lineElementName);
   }
 
@@ -54,11 +54,11 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     return lineElements.contains(entity.getName());
   }
 
-  public void addContainerElement(QName containerElementName) {
+  public void addContainerElement(Name containerElementName) {
     containerElements.add(containerElementName);
   }
 
-  public boolean removeContainerElement(QName containerElementName) {
+  public boolean removeContainerElement(Name containerElementName) {
     return containerElements.remove(containerElementName);
   }
 
@@ -66,11 +66,11 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     return containerElements.contains(entity.getName());
   }
 
-  public void include(QName name) {
+  public void include(Name name) {
     included.add(name);
   }
 
-  public void exclude(QName name) {
+  public void exclude(Name name) {
     excluded.add(name);
   }
 
@@ -90,11 +90,11 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     this.notableCharacter = notableCharacter;
   }
 
-  public void addNotableElement(QName name) {
+  public void addNotableElement(Name name) {
     notableElements.add(name);
   }
 
-  public boolean removeNotableElement(QName name) {
+  public boolean removeNotableElement(Name name) {
     return notableElements.remove(name);
   }
 

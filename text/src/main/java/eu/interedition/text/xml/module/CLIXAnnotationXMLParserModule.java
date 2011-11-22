@@ -21,7 +21,7 @@ package eu.interedition.text.xml.module;
 
 import com.google.common.collect.Maps;
 import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.mem.SimpleAnnotation;
@@ -35,7 +35,6 @@ import java.util.Map;
  */
 public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
   private Map<String, SimpleAnnotation> annotations;
-  private Map<String, Map<QName, String>> attributes;
 
   public CLIXAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     super(annotationRepository, batchSize);
@@ -45,12 +44,10 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
   public void start(XMLParserState state) {
     super.start(state);
     annotations = Maps.<String, SimpleAnnotation>newHashMap();
-    attributes = Maps.<String, Map<QName, String>>newHashMap();
   }
 
   @Override
   public void end(XMLParserState state) {
-    attributes = null;
     annotations = null;
     super.end(state);
   }
@@ -59,7 +56,7 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
   public void start(XMLEntity entity, XMLParserState state) {
     super.start(entity, state);
 
-    final Map<QName, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
+    final Map<Name, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
     final String startId = entityAttributes.remove(TextConstants.CLIX_START_ATTR_NAME);
     final String endId = entityAttributes.remove(TextConstants.CLIX_END_ATTR_NAME);
     if (startId == null && endId == null) {
@@ -69,14 +66,12 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
     final long textOffset = state.getTextOffset();
 
     if (startId != null) {
-      annotations.put(startId, new SimpleAnnotation(state.getTarget(), entity.getName(), new Range(textOffset, textOffset)));
-      attributes.put(startId, entityAttributes);
+      annotations.put(startId, new SimpleAnnotation(state.getTarget(), entity.getName(), new Range(textOffset, textOffset), entityAttributes));
     }
     if (endId != null) {
       final SimpleAnnotation a = annotations.remove(endId);
-      final Map<QName, String> attr = attributes.remove(endId);
-      if (a != null && attr != null) {
-        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset)), attr);
+      if (a != null) {
+        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData()));
       }
     }
   }

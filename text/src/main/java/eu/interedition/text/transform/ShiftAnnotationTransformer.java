@@ -15,6 +15,6 @@ public class ShiftAnnotationTransformer implements AnnotationTransformer {
 
   @Override
   public Annotation apply(Annotation input) {
-    return new SimpleAnnotation(input.getText(), input.getName(), input.getRange().shift(delta));
+    return new SimpleAnnotation(input.getText(), input.getName(), input.getRange().shift(delta), input.getData());
   }
 }

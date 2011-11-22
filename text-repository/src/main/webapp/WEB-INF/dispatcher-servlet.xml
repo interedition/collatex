@@ -22,8 +22,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <mvc:annotation-driven conversion-service="conversionService"/>
 
@@ -41,10 +40,8 @@
 
     <context:annotation-config/>
 
-    <tx:annotation-driven proxy-target-class="true"/>
-
     <bean id="jsonSerializer" class="eu.interedition.text.json.JSONSerializer">
-        <property name="annotationRepository"  ref="annotationRepository"/>
+        <property name="annotationRepository" ref="annotationRepository"/>
         <property name="textRepository" ref="textRepository"/>
     </bean>
 
@@ -52,10 +49,10 @@
           class="eu.interedition.text.repository.conversion.JSONSerializationHttpMessageConverter"/>
     <bean id="xmlSerializationHttpMessageConverter"
           class="eu.interedition.text.repository.conversion.XMLSerializationHttpMessageConverter"/>
-    <bean id="textHttpMessageConverter"
-          class="eu.interedition.text.repository.conversion.TextHttpMessageConverter"/>
     <bean id="mappingJacksonHttpMessageConverter"
-          class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
+          class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+        <property name="objectMapper" ref="objectMapper"/>
+    </bean>
 
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="order" value="-1"/>
@@ -63,7 +60,6 @@
             <list>
                 <ref bean="jsonSerializationHttpMessageConverter"/>
                 <ref bean="xmlSerializationHttpMessageConverter"/>
-                <ref bean="textHttpMessageConverter"/>
                 <ref bean="mappingJacksonHttpMessageConverter"/>
             </list>
         </property>
@@ -92,11 +88,16 @@
         <property name="contentType" value="text/html;charset=utf-8"/>
         <property name="prefix" value=""/>
         <property name="suffix" value=".ftl"/>
+        <property name="attributesMap">
+            <map>
+                <entry key="config" value-ref="configuration"/>
+            </map>
+        </property>
     </bean>
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="defaultEncoding" value="UTF-8"/>
         <property name="maxInMemorySize" value="102400"/>
-        <property name="maxUploadSize" value="20971520" />
+        <property name="maxUploadSize" value="20971520"/>
     </bean>
 </beans>

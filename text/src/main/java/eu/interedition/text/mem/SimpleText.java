@@ -19,48 +19,59 @@
  */
 package eu.interedition.text.mem;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.Objects;
 import eu.interedition.text.Text;
-import org.apache.commons.codec.digest.DigestUtils;
+import eu.interedition.text.util.TextDigestingFilterReader;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class SimpleText implements Text {
-  private final Type type;
-  private String content;
-  private String digest;
+  protected final Type type;
+  protected final long length;
+  protected final byte[] digest;
+  protected final String content;
+
+  public SimpleText(Type type, long length, byte[] digest) {
+    this(type, length, digest, null);
+  }
+
+  public SimpleText(Type type, long length, byte[] digest, String content) {
+    this.type = type;
+    this.length = length;
+    this.digest = digest;
+    this.content = content;
+  }
 
   public SimpleText(Type type, String content) {
-    this.type = type;
-    setContent(content);
+    this(type, content.length(), TextDigestingFilterReader.digest(content), content);
   }
 
-  public SimpleText(Type type) {
-    this(type, "");
-  }
-
+  @Override
   public Type getType() {
     return type;
+  }
+
+  @Override
+  public long getLength() {
+    return length;
+  }
+
+  @Override
+  public byte[] getDigest() {
+    return digest;
   }
 
   public String getContent() {
     return content;
   }
 
-  public long getLength() {
-    return content.length();
+  protected Objects.ToStringHelper toStringHelper() {
+    return Objects.toStringHelper(this).addValue(type).add("length", length);
   }
 
   @Override
-  public String getDigest() {
-    return digest;
-  }
-
-
-  public void setContent(String content) {
-    Preconditions.checkArgument(content != null);
-    this.content = content;
-    this.digest = DigestUtils.sha512Hex(content);
+  public String toString() {
+    return toStringHelper().toString();
   }
 }

@@ -24,7 +24,7 @@ import eu.interedition.text.*;
 import eu.interedition.text.event.AnnotationEventListener;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +39,13 @@ import static eu.interedition.text.query.Criteria.*;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Tokenizer {
-  public static final QName DEFAULT_TOKEN_NAME = new SimpleQName(TextConstants.INTEREDITION_NS_URI, "token");
+  public static final Name DEFAULT_TOKEN_NAME = new SimpleName(TextConstants.INTEREDITION_NS_URI, "token");
 
   private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
   private AnnotationRepository annotationRepository;
   private AnnotationEventSource eventSource;
-  private QName tokenName = DEFAULT_TOKEN_NAME;
+  private Name tokenName = DEFAULT_TOKEN_NAME;
   private int pageSize = 102400;
   private int batchSize = 1024;
 
@@ -57,7 +57,7 @@ public class Tokenizer {
     this.eventSource = eventSource;
   }
 
-  public void setTokenName(QName tokenName) {
+  public void setTokenName(Name tokenName) {
     this.tokenName = tokenName;
   }
 
@@ -71,7 +71,7 @@ public class Tokenizer {
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
     annotationRepository.delete(and(text(text), annotationName(tokenName)));
-    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none(), Collections.<QName>emptySet());
+    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none(), Collections.<Name>emptySet());
   }
 
   private class TokenGeneratingListener implements AnnotationEventListener {
@@ -95,22 +95,22 @@ public class Tokenizer {
     }
 
     @Override
-    public void start(long offset, Map<Annotation, Map<QName, String>> annotations) {
-      if (settings.startingAnnotationsAreBoundary(text, offset, annotations.keySet())) {
+    public void start(long offset, Iterable<Annotation> annotations) {
+      if (settings.startingAnnotationsAreBoundary(text, offset, annotations)) {
         lastIsTokenBoundary = true;
       }
     }
 
     @Override
-    public void empty(long offset, Map<Annotation, Map<QName, String>> annotations) {
-      if (settings.emptyAnnotationsAreBoundary(text, offset, annotations.keySet())) {
+    public void empty(long offset, Iterable<Annotation> annotations) {
+      if (settings.emptyAnnotationsAreBoundary(text, offset, annotations)) {
         lastIsTokenBoundary = true;
       }
     }
 
     @Override
-    public void end(long offset, Map<Annotation, Map<QName, String>> annotations) {
-      if (settings.endingAnnotationsAreBoundary(text, offset, annotations.keySet())) {
+    public void end(long offset, Iterable<Annotation> annotations) {
+      if (settings.endingAnnotationsAreBoundary(text, offset, annotations)) {
         lastIsTokenBoundary = true;
       }
     }
@@ -143,7 +143,7 @@ public class Tokenizer {
 
     private void token() {
       if (tokenStart < offset) {
-        batch.add(new SimpleAnnotation(text, tokenName, new Range(tokenStart, offset)));
+        batch.add(new SimpleAnnotation(text, tokenName, new Range(tokenStart, offset), null));
         if ((batch.size() % batchSize) == 0) {
           emit();
         }

@@ -19,9 +19,11 @@
  */
 package eu.interedition.text.analysis;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.event.AnnotationEventAdapter;
 
 import java.util.Map;
@@ -32,17 +34,17 @@ import java.util.SortedSet;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class OverlapAnalyzer extends AnnotationEventAdapter {
-  protected Set<QName> selfOverlapping;
+  protected Set<Name> selfOverlapping;
 
-  protected Set<SortedSet<QName>> overlapping;
+  protected Set<SortedSet<Name>> overlapping;
 
   protected Set<Annotation> started;
 
-  public Set<QName> getSelfOverlapping() {
+  public Set<Name> getSelfOverlapping() {
     return selfOverlapping;
   }
 
-  public Set<SortedSet<QName>> getOverlapping() {
+  public Set<SortedSet<Name>> getOverlapping() {
     return overlapping;
   }
 
@@ -54,19 +56,20 @@ public class OverlapAnalyzer extends AnnotationEventAdapter {
   }
 
   @Override
-  public void start(long offset, Map<Annotation, Map<QName, String>> annotations) {
-    started.addAll(annotations.keySet());
+  public void start(long offset, Iterable<Annotation> annotations) {
+    Iterables.addAll(started, annotations);
   }
 
   @Override
-  public void end(long offset, Map<Annotation, Map<QName, String>> annotations) {
-    final Set<Annotation> endings = annotations.keySet();
-    started.removeAll(endings);
+  public void end(long offset, Iterable<Annotation> annotations) {
+    for (Annotation ending : annotations) {
+      started.remove(ending);
+    }
 
-    for (Annotation ending : endings) {
-      final QName endingName = ending.getName();
+    for (Annotation ending : annotations) {
+      final Name endingName = ending.getName();
       for (Annotation started : this.started) {
-        final QName startedName = started.getName();
+        final Name startedName = started.getName();
         if (!started.getRange().encloses(ending.getRange())) {
           if (startedName.equals(endingName)) {
             selfOverlapping.add(endingName);

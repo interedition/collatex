@@ -1,7 +1,6 @@
 package eu.interedition.text.json;
 
-import com.google.common.collect.BiMap;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.query.Criterion;
 
@@ -18,7 +17,7 @@ public interface JSONSerializerConfiguration {
 
   Map<String, URI> getNamespaceMappings();
 
-  Set<QName> getDataSet();
+  Set<Name> getDataSet();
 
   Criterion getQuery();
 }

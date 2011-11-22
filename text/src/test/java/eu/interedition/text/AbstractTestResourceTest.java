@@ -20,24 +20,29 @@
 package eu.interedition.text;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import eu.interedition.text.mem.SimpleQName;
+import com.google.common.io.Closeables;
+import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
+import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserModule;
 import eu.interedition.text.xml.module.*;
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
 
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
 import static eu.interedition.text.TextConstants.TEI_NS;
 
@@ -50,9 +55,15 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   /**
    * Names of available XML test resources.
    */
-  protected static final SortedSet<String> RESOURCES = Sets.newTreeSet(Lists.newArrayList(//
-          "wp-orpheus1-clix.xml", "george-algabal-tei.xml", "ignt-0101.xml", "archimedes-palimpsest-tei.xml", "homer-iliad-tei.xml"));
+  protected static final List<String> RESOURCES = Lists.newArrayList(//
+          "archimedes-palimpsest-tei.xml",//
+          "george-algabal-tei.xml",//
+          "homer-iliad-tei.xml",//
+          "ignt-0101.xml",//
+          "whitman-leaves-facs-tei.xml",
+          "wp-orpheus1-clix.xml");
 
+  protected static XMLInputFactory xmlInputFactory;
 
   private Map<String, Text> sources = Maps.newHashMap();
   private Map<String, Text> texts = Maps.newHashMap();
@@ -62,6 +73,11 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
 
   @Autowired
   protected AnnotationRepository annotationRepository;
+
+  @BeforeClass
+  public static void initXmlInputFactory() {
+    xmlInputFactory = XML.createXMLInputFactory();
+  }
 
   @After
   public void removeDocuments() {
@@ -76,11 +92,11 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected Text text() {
-    return text(RESOURCES.first());
+    return text(Iterables.getFirst(RESOURCES, null));
   }
 
   protected Text source() {
-    return source(RESOURCES.first());
+    return source(Iterables.getFirst(RESOURCES, null));
   }
 
   /**
@@ -109,22 +125,22 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected SimpleXMLParserConfiguration configure(SimpleXMLParserConfiguration pc) {
-    pc.addLineElement(new SimpleQName(TEI_NS, "head"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "stage"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "speaker"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "lg"));
-    pc.addLineElement(new SimpleQName(TEI_NS, "l"));
-    pc.addLineElement(new SimpleQName((URI) null, "line"));
+    pc.addLineElement(new SimpleName(TEI_NS, "head"));
+    pc.addLineElement(new SimpleName(TEI_NS, "stage"));
+    pc.addLineElement(new SimpleName(TEI_NS, "speaker"));
+    pc.addLineElement(new SimpleName(TEI_NS, "lg"));
+    pc.addLineElement(new SimpleName(TEI_NS, "l"));
+    pc.addLineElement(new SimpleName((URI) null, "line"));
 
-    pc.addContainerElement(new SimpleQName(TEI_NS, "text"));
-    pc.addContainerElement(new SimpleQName(TEI_NS, "div"));
-    pc.addContainerElement(new SimpleQName(TEI_NS, "lg"));
-    pc.addContainerElement(new SimpleQName(TEI_NS, "subst"));
-    pc.addContainerElement(new SimpleQName(TEI_NS, "choice"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "text"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "div"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "lg"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "subst"));
+    pc.addContainerElement(new SimpleName(TEI_NS, "choice"));
 
-    pc.exclude(new SimpleQName(TEI_NS, "teiHeader"));
-    pc.exclude(new SimpleQName(TEI_NS, "front"));
-    pc.exclude(new SimpleQName(TEI_NS, "fw"));
+    pc.exclude(new SimpleName(TEI_NS, "teiHeader"));
+    pc.exclude(new SimpleName(TEI_NS, "front"));
+    pc.exclude(new SimpleName(TEI_NS, "fw"));
 
     return pc;
   }
@@ -135,7 +151,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     final List<XMLParserModule> parserModules = pc.getModules();
     parserModules.add(new LineElementXMLParserModule());
     parserModules.add(new NotableCharacterXMLParserModule());
-    parserModules.add(new TextXMLParserModule(textRepository));
+    parserModules.add(new TextXMLParserModule());
     parserModules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
     parserModules.add(new CLIXAnnotationXMLParserModule(annotationRepository, 1000));
     parserModules.add(new TEIAwareAnnotationXMLParserModule(annotationRepository, 1000));
@@ -150,23 +166,32 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected void unload() {
-    unload(RESOURCES.first());
+    unload(Iterables.getFirst(RESOURCES, null));
   }
 
   private synchronized void load(String resource) {
     try {
       if (RESOURCES.contains(resource) && !texts.containsKey(resource)) {
-        final URI uri = AbstractTestResourceTest.class.getResource("/" + resource).toURI();
+        final URL xmlResource = AbstractTestResourceTest.class.getResource("/" + resource);
+        final URI uri = xmlResource.toURI();
         final StopWatch stopWatch = new StopWatch(uri.toString());
 
-        stopWatch.start("create");
-        final Text xml = textRepository.create(new StreamSource(uri.toASCIIString()));
-        stopWatch.stop();
+        InputStream xmlStream = null;
+        XMLStreamReader xmlReader = null;
+        try {
+          stopWatch.start("create");
+          xmlReader = xmlInputFactory.createXMLStreamReader(xmlStream = xmlResource.openStream());
+          final Text xml = textRepository.create(xmlReader);
+          stopWatch.stop();
 
-        sources.put(resource, xml);
-        stopWatch.start("parse");
-        texts.put(resource, xmlParser.parse(xml, configure(createXMLParserConfiguration())));
-        stopWatch.stop();
+          sources.put(resource, xml);
+          stopWatch.start("parse");
+          texts.put(resource, xmlParser.parse(xml, configure(createXMLParserConfiguration())));
+          stopWatch.stop();
+        } finally {
+          XML.closeQuietly(xmlReader);
+          Closeables.close(xmlStream, false);
+        }
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("\n" + stopWatch.prettyPrint());

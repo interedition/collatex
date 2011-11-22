@@ -28,7 +28,9 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
-    <context:property-placeholder location="classpath:/eu/interedition/text/repository/config.properties" system-properties-mode="OVERRIDE" />
+    <bean id="configuration" class="eu.interedition.text.repository.ConfigurationFactoryBean"/>
+
+    <context:property-placeholder properties-ref="configuration" />
 
     <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
         <property name="driverClass" value="org.h2.Driver"/>
@@ -67,6 +69,8 @@
             </set>
         </property>
     </bean>
+
+    <bean id="objectMapper" class="eu.interedition.text.repository.conversion.CustomizedObjectMapperFactoryBean"/>
 
     <task:scheduler id="taskScheduler"/>
 

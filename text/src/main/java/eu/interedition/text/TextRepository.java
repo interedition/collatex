@@ -19,6 +19,7 @@
  */
 package eu.interedition.text;
 
+import javax.xml.stream.*;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -33,23 +34,23 @@ public interface TextRepository {
 
   Text create(Reader content) throws IOException;
 
-  Text create(Source xml) throws TransformerException, IOException;
+  Text create(XMLStreamReader xml) throws IOException, XMLStreamException;
 
   void delete(Text text);
 
-  void read(Text text, Result xml) throws IOException, TransformerException;
+  void read(Text text, XMLStreamWriter xml) throws IOException, XMLStreamException;
 
-  void read(Text text, TextReader reader) throws IOException;
+  void read(Text text, TextConsumer consumer) throws IOException;
 
-  void read(Text text, Range range, TextReader reader) throws IOException;
+  void read(Text text, Range range, TextConsumer consumer) throws IOException;
 
   String read(Text text, Range range) throws IOException;
 
   SortedMap<Range, String> bulkRead(Text text, SortedSet<Range> ranges) throws IOException;
 
-  void write(Text text, Reader contents) throws IOException;
+  Text write(Text text, Reader contents) throws IOException;
 
-  void write(Text text, Reader contents, long contentLength) throws IOException;
+  Text write(Text text, Reader contents, long contentLength) throws IOException;
 
   Text concat(Iterable<Text> texts) throws IOException;
 
@@ -57,7 +58,4 @@ public interface TextRepository {
 
   Text duplicate(Text text) throws IOException;
 
-  interface TextReader {
-    void read(Reader content, long contentLength) throws IOException;
-  }
 }

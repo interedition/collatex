@@ -1,9 +1,9 @@
-<#assign title="Transform XML Text #" + text.id?html maxLength=102400 truncated=(text.length gt maxLength)/>
+<#assign title="Transform XML Text #" + metadata.text.id?html maxLength=102400 truncated=(metadata.text.length gt maxLength)/>
 <@ie.page title>
     <h1>${title}</h1>
 
     <div id="text-length" style="text-align: right; font-weight: bold; margin: 1em 0">
-        Length: ${text.length} characters
+        Length: ${metadata.text.length} characters
         <#if truncated>(${maxLength} displayed)</#if>
     </div>
 
@@ -58,7 +58,7 @@
         </div>
     </div>
     <script type="text/javascript">
-        var textId = ${text.id?c};
+        var textId = ${metadata.text.id?c};
         YUI().use("interedition-text", "dump", "node", "event", function(Y) {
             Y.on("domready", function() {
                 Y.all("input[type='checkbox']").each(function(cb) {
@@ -98,7 +98,7 @@
                             var cbType = id.substring(splitOn + 1, id.length);
 
                             var nameCell = Y.one("#" + cbName);
-                            var name = { "ns": nameCell.one(".ns").get("text"), "n": nameCell.one(".ln").get("text") };
+                            var name = [ nameCell.one(".ns").get("text"), nameCell.one(".ln").get("text") ];
                             transformConfig[cbType].push(name);
                         }
                     });

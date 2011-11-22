@@ -32,5 +32,5 @@ public interface Text {
 
   long getLength();
 
-  String getDigest();
+  byte[] getDigest();
 }

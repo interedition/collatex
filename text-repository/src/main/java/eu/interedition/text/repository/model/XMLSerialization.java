@@ -21,10 +21,10 @@ package eu.interedition.text.repository.model;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.query.Criterion;
 import eu.interedition.text.query.Operator;
@@ -44,9 +44,9 @@ import static eu.interedition.text.query.Criteria.or;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLSerialization implements XMLSerializerConfiguration {
-  private QNameImpl rootName = new QNameImpl(new SimpleQName(TextConstants.INTEREDITION_NS_URI, "root"));
+  private Name rootName = new SimpleName(TextConstants.INTEREDITION_NS_URI, "root");
   private Map<String, URI> namespaceMappings = Maps.newHashMap();
-  private List<QName> hierarchy = Lists.newArrayList();
+  private List<Name> hierarchy = Lists.newArrayList();
   private boolean hierarchyOnly = true;
   private Text text;
   private Criterion query = Criteria.any();
@@ -58,13 +58,12 @@ public class XMLSerialization implements XMLSerializerConfiguration {
 
   @JsonProperty("root")
   @Override
-  public QName getRootName() {
+  public Name getRootName() {
     return rootName;
   }
 
   @JsonProperty("root")
-  @JsonDeserialize(as = QNameImpl.class)
-  public void setRootName(QNameImpl rootName) {
+  public void setRootName(Name rootName) {
     this.rootName = rootName;
   }
 
@@ -89,13 +88,13 @@ public class XMLSerialization implements XMLSerializerConfiguration {
 
   @JsonProperty("hierarchy")
   @Override
-  public List<QName> getHierarchy() {
+  public List<Name> getHierarchy() {
     return hierarchy;
   }
 
   @JsonProperty("hierarchy")
-  @JsonDeserialize(contentAs = QNameImpl.class)
-  public void setHierarchy(List<QName> hierarchy) {
+  @JsonDeserialize(contentAs = Name.class)
+  public void setHierarchy(List<Name> hierarchy) {
     this.hierarchy = hierarchy;
   }
 
@@ -123,7 +122,7 @@ public class XMLSerialization implements XMLSerializerConfiguration {
   public void evaluate() {
     if (hierarchyOnly && !hierarchy.isEmpty()) {
       final Operator hierarchyDisjunction = or();
-      for (QName name : hierarchy) {
+      for (Name name : hierarchy) {
         hierarchyDisjunction.add(annotationName(name));
       }
       setQuery(hierarchyDisjunction);

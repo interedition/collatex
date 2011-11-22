@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Service
 public class CustomizedObjectMapperFactoryBean extends AbstractFactoryBean<ObjectMapper> {
   @Override
   public Class<?> getObjectType() {

@@ -22,9 +22,9 @@ package eu.interedition.text.event;
 import com.google.common.collect.Iterables;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,11 +45,11 @@ public class AnnotationEventSourceTest extends AbstractTestResourceTest {
   public void generateEvents() throws IOException {
     source.listen(DEBUG_LISTENER, text("george-algabal-tei.xml"),
             or(
-                    annotationName(new SimpleQName(TEI_NS, "div")),
-                    annotationName(new SimpleQName(TEI_NS, "lg")),
-                    annotationName(new SimpleQName(TEI_NS, "l")),
-                    annotationName(new SimpleQName(TEI_NS, "p"))
-            ), Collections.<QName>emptySet());
+                    annotationName(new SimpleName(TEI_NS, "div")),
+                    annotationName(new SimpleName(TEI_NS, "lg")),
+                    annotationName(new SimpleName(TEI_NS, "l")),
+                    annotationName(new SimpleName(TEI_NS, "p"))
+            ), Collections.<Name>emptySet());
   }
 
   private final AnnotationEventListener DEBUG_LISTENER = new AnnotationEventListener() {
@@ -57,16 +57,16 @@ public class AnnotationEventSourceTest extends AbstractTestResourceTest {
     public void start() {
     }
 
-    public void start(long offset, Map<Annotation, Map<QName, String>> annotations) {
-      LOG.debug("START: [" + offset + "] " + Iterables.toString(annotations.keySet()));
+    public void start(long offset, Iterable<Annotation> annotations) {
+      LOG.debug("START: [" + offset + "] " + Iterables.toString(annotations));
     }
 
-    public void empty(long offset, Map<Annotation, Map<QName, String>> annotations) {
-      LOG.debug("EMPTY: [" + offset + "] " + Iterables.toString(annotations.keySet()));
+    public void empty(long offset, Iterable<Annotation> annotations) {
+      LOG.debug("EMPTY: [" + offset + "] " + Iterables.toString(annotations));
     }
 
-    public void end(long offset, Map<Annotation, Map<QName, String>> annotations) {
-      LOG.debug("END: [" + offset + "] " + Iterables.toString(annotations.keySet()));
+    public void end(long offset, Iterable<Annotation> annotations) {
+      LOG.debug("END: [" + offset + "] " + Iterables.toString(annotations));
     }
 
     public void text(Range r, String text) {

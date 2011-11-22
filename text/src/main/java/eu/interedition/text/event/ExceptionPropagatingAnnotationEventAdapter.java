@@ -21,7 +21,7 @@ package eu.interedition.text.event;
 
 import com.google.common.base.Throwables;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 
 import java.util.Map;
@@ -38,7 +38,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void start(long offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void start(long offset, Iterable<Annotation> annotations) {
     try {
       doStart(offset, annotations);
     } catch (Exception e) {
@@ -46,7 +46,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void empty(long offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void empty(long offset, Iterable<Annotation> annotations) {
     try {
       doEmpty(offset, annotations);
     } catch (Exception e) {
@@ -54,7 +54,7 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void end(long offset, Map<Annotation, Map<QName, String>> annotations) {
+  public void end(long offset, Iterable<Annotation> annotations) {
     try {
       doEnd(offset, annotations);
     } catch (Exception e) {
@@ -81,13 +81,13 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
   protected void doStart() throws Exception {
   }
 
-  protected void doStart(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+  protected void doStart(long offset, Iterable<Annotation> annotations) throws Exception {
   }
 
-  protected void doEmpty(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+  protected void doEmpty(long offset, Iterable<Annotation> annotations) throws Exception {
   }
 
-  protected void doEnd(long offset, Map<Annotation, Map<QName, String>> annotations) throws Exception {
+  protected void doEnd(long offset, Iterable<Annotation> annotations) throws Exception {
   }
 
   protected void doText(Range r, String text) throws Exception {

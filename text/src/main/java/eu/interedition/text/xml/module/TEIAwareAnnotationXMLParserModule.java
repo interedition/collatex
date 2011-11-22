@@ -23,10 +23,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.mem.SimpleQName;
+import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserState;
 
@@ -41,21 +41,19 @@ import static eu.interedition.text.TextConstants.XML_ID_ATTR_NAME;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
-  private static final Map<QName, QName> MILESTONE_ELEMENT_UNITS = Maps.newHashMap();
+  private static final Map<Name, Name> MILESTONE_ELEMENT_UNITS = Maps.newHashMap();
 
   static {
-    MILESTONE_ELEMENT_UNITS.put(new SimpleQName(TEI_NS, "pb"), new SimpleQName(TEI_NS, "page"));
-    MILESTONE_ELEMENT_UNITS.put(new SimpleQName(TEI_NS, "lb"), new SimpleQName(TEI_NS, "line"));
-    MILESTONE_ELEMENT_UNITS.put(new SimpleQName(TEI_NS, "cb"), new SimpleQName(TEI_NS, "column"));
-    MILESTONE_ELEMENT_UNITS.put(new SimpleQName(TEI_NS, "gb"), new SimpleQName(TEI_NS, "gathering"));
+    MILESTONE_ELEMENT_UNITS.put(new SimpleName(TEI_NS, "pb"), new SimpleName(TEI_NS, "page"));
+    MILESTONE_ELEMENT_UNITS.put(new SimpleName(TEI_NS, "lb"), new SimpleName(TEI_NS, "line"));
+    MILESTONE_ELEMENT_UNITS.put(new SimpleName(TEI_NS, "cb"), new SimpleName(TEI_NS, "column"));
+    MILESTONE_ELEMENT_UNITS.put(new SimpleName(TEI_NS, "gb"), new SimpleName(TEI_NS, "gathering"));
   }
 
-  private static final QName MILESTONE_NAME = new SimpleQName(TEI_NS, "milestone");
+  private static final Name MILESTONE_NAME = new SimpleName(TEI_NS, "milestone");
 
   private Multimap<String, SimpleAnnotation> spanning;
-  private Multimap<String, Map<QName, String>> spanningAttributes;
-  private Map<QName, SimpleAnnotation> milestones;
-  private Map<QName, Map<QName, String>> milestoneAttributes;
+  private Map<Name, SimpleAnnotation> milestones;
 
   public TEIAwareAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     super(annotationRepository, batchSize);
@@ -65,23 +63,18 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   public void start(XMLParserState state) {
     super.start(state);
     this.spanning = ArrayListMultimap.create();
-    this.spanningAttributes = ArrayListMultimap.create();
     this.milestones = Maps.newHashMap();
-    this.milestoneAttributes = Maps.newHashMap();
   }
 
   @Override
   public void end(XMLParserState state) {
     final long textOffset = state.getTextOffset();
-    for (QName milestoneUnit : milestones.keySet()) {
+    for (Name milestoneUnit : milestones.keySet()) {
       final SimpleAnnotation last = milestones.get(milestoneUnit);
-      final Map<QName, String> lastAttrs = milestoneAttributes.get(milestoneUnit);
-      add(new SimpleAnnotation(last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset)), lastAttrs);
+      add(new SimpleAnnotation(last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData()));
     }
 
-    this.milestoneAttributes = null;
     this.milestones = null;
-    this.spanningAttributes = null;
     this.spanning = null;
 
     super.end(state);
@@ -95,16 +88,16 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   }
 
   protected void handleMilestoneElements(XMLEntity entity, XMLParserState state) {
-    final QName entityName = entity.getName();
-    final Map<QName, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
+    final Name entityName = entity.getName();
+    final Map<Name, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
 
-    QName milestoneUnit = null;
+    Name milestoneUnit = null;
     if (MILESTONE_NAME.equals(entityName)) {
-      for (Iterator<QName> it = entityAttributes.keySet().iterator(); it.hasNext(); ) {
-        final QName attrName = it.next();
-        final URI attrNameNs = attrName.getNamespaceURI();
+      for (Iterator<Name> it = entityAttributes.keySet().iterator(); it.hasNext(); ) {
+        final Name attrName = it.next();
+        final URI attrNameNs = attrName.getNamespace();
         if ("unit".equals(attrName.getLocalName()) && (attrNameNs == null || TEI_NS.equals(attrNameNs))) {
-          milestoneUnit = new SimpleQName(TEI_NS, entityAttributes.get(attrName));
+          milestoneUnit = new SimpleName(TEI_NS, entityAttributes.get(attrName));
           it.remove();
         }
       }
@@ -119,24 +112,22 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
     final long textOffset = state.getTextOffset();
 
     final SimpleAnnotation last = milestones.get(milestoneUnit);
-    final Map<QName, String> lastAttrs = milestoneAttributes.get(milestoneUnit);
-    if (last != null && lastAttrs != null) {
-      add(new SimpleAnnotation(last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset)), lastAttrs);
+    if (last != null) {
+      add(new SimpleAnnotation(last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData()));
     }
 
-    milestones.put(milestoneUnit, new SimpleAnnotation(state.getTarget(), milestoneUnit, new Range(textOffset, textOffset)));
-    milestoneAttributes.put(milestoneUnit, entityAttributes);
+    milestones.put(milestoneUnit, new SimpleAnnotation(state.getTarget(), milestoneUnit, new Range(textOffset, textOffset), entityAttributes));
   }
 
   protected void handleSpanningElements(XMLEntity entity, XMLParserState state) {
-    final URI entityNs = entity.getName().getNamespaceURI();
-    final Map<QName, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
+    final URI entityNs = entity.getName().getNamespace();
+    final Map<Name, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
     String spanTo = null;
     String refId = null;
-    for (Iterator<QName> it = entityAttributes.keySet().iterator(); it.hasNext(); ) {
-      final QName attrName = it.next();
+    for (Iterator<Name> it = entityAttributes.keySet().iterator(); it.hasNext(); ) {
+      final Name attrName = it.next();
       if ("spanTo".equals(attrName.getLocalName())) {
-        final URI attrNs = attrName.getNamespaceURI();
+        final URI attrNs = attrName.getNamespace();
         if (attrNs == null || TEI_NS.equals(attrNs)) {
           spanTo = entityAttributes.get(attrName).replaceAll("^#", "");
           it.remove();
@@ -153,19 +144,18 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
     final long textOffset = state.getTextOffset();
 
     if (spanTo != null) {
-      final QName name = entity.getName();
+      final Name name = entity.getName();
       spanning.put(spanTo, new SimpleAnnotation(
               state.getTarget(),
-              new SimpleQName(name.getNamespaceURI(), name.getLocalName().replaceAll("Span$", "")),
-              new Range(textOffset, textOffset)));
-      spanningAttributes.put(spanTo, entityAttributes);
+              new SimpleName(name.getNamespace(), name.getLocalName().replaceAll("Span$", "")),
+              new Range(textOffset, textOffset),
+              entityAttributes));
     }
     if (refId != null) {
       final Iterator<SimpleAnnotation> aIt = spanning.removeAll(refId).iterator();
-      final Iterator<Map<QName, String>> attrIt = spanningAttributes.removeAll(refId).iterator();
-      while (aIt.hasNext() && attrIt.hasNext()) {
+      while (aIt.hasNext()) {
         final SimpleAnnotation a = aIt.next();
-        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset)), attrIt.next());
+        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData()));
       }
     }
   }

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS text_content (
   type SMALLINT NOT NULL,
   content LONGTEXT NOT NULL,
   content_length BIGINT NOT NULL,
-  content_digest CHAR(128) NOT NULL
+  content_digest BINARY(64) NOT NULL
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS text_annotation (

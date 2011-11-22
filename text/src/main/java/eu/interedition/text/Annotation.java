@@ -19,6 +19,9 @@
  */
 package eu.interedition.text;
 
+import javax.xml.namespace.QName;
+import java.util.Map;
+
 /**
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
@@ -26,7 +29,9 @@ package eu.interedition.text;
 public interface Annotation extends Comparable<Annotation> {
   Text getText();
 
-  QName getName();
+  Name getName();
 
   Range getRange();
+
+  Map<Name, String> getData();
 }

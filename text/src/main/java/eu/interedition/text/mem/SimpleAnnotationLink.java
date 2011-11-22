@@ -19,20 +19,30 @@
  */
 package eu.interedition.text.mem;
 
+import com.google.common.base.Objects;
 import eu.interedition.text.AnnotationLink;
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class SimpleAnnotationLink implements AnnotationLink {
-  private final QName name;
+  protected final Name name;
 
-  public SimpleAnnotationLink(QName name) {
+  public SimpleAnnotationLink(Name name) {
     this.name = name;
   }
 
-  public QName getName() {
+  public Name getName() {
     return name;
+  }
+
+  protected Objects.ToStringHelper toStringHelper() {
+    return Objects.toStringHelper(this).addValue(name);
+  }
+
+  @Override
+  public String toString() {
+    return toStringHelper().toString();
   }
 }

@@ -19,15 +19,15 @@
  */
 package eu.interedition.text.repository.textindex;
 
-import eu.interedition.text.repository.model.TextImpl;
+import eu.interedition.text.repository.model.TextMetadata;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextIndexQueryResult extends TextImpl {
+public class TextIndexQueryResult extends TextMetadata {
   private int score;
 
-  public TextIndexQueryResult(TextImpl other, int score) {
+  public TextIndexQueryResult(TextMetadata other, int score) {
     super(other);
     this.score = score;
   }

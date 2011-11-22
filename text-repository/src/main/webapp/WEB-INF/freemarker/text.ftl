@@ -1,17 +1,17 @@
 <#assign maxLength=102400 truncated=(text.length gt maxLength)/>
-<@ie.page text.description?html>
-<h1>${text.description?html}</h1>
+<@ie.page metadata.description?html>
+<h1>${metadata.description?html}</h1>
 
 <div id="text-length" style="text-align: right; font-weight: bold; margin: 1em 0">
-    Created: ${text.created?string?html}
-    | Updated: ${text.updated?string?html}
+    Created: ${metadata.created?string?html}
+    | Updated: ${metadata.updated?string?html}
     | Length: ${text.length} characters <#if truncated>(${maxLength} displayed)</#if>
     <#if text.type == "XML">| <a href="${cp}/text/${text.id?c}/transform" title="Transform XML">Transform XML</a></#if>
 </div>
 
-    <#if text.summary?has_content>
+    <#if metadata.summary?has_content>
     <h2>Summary</h2>
-    <p>${text.summary?html?replace("\n", "<br>")}</p>
+    <p>${metadata.summary?html?replace("\n", "<br>")}</p>
     </#if>
 
 <div class="yui3-g">
@@ -34,7 +34,7 @@
     </div>
 </div>
 
-<p style="font-size: small; color: #dcdcdc;">SHA-512: ${text.digest?html}</p>
+<#-- <p style="font-size: small; color: #dcdcdc;">SHA-512: ${text.digest?html}</p> -->
 
 <script type="text/javascript">
     var textId = ${text.id?c};

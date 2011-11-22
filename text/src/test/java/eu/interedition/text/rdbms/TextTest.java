@@ -21,9 +21,14 @@ package eu.interedition.text.rdbms;
 
 import eu.interedition.text.AbstractTextTest;
 import eu.interedition.text.Text;
+import eu.interedition.text.util.TextDigestingFilterReader;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static eu.interedition.text.util.TextDigestingFilterReader.digest;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -31,7 +36,7 @@ import org.junit.Test;
 public class TextTest extends AbstractTextTest {
   @Test
   public void digesting() throws Exception {
-    Assert.assertEquals(DigestUtils.sha512Hex(TEST_TEXT), text.getDigest());
+    Assert.assertEquals(encodeHexString(digest(TEST_TEXT)), encodeHexString(text.getDigest()));
 
     final Text concat = textRepository.concat(text, text, text);
     Assert.assertEquals(3 * text.getLength(), concat.getLength());

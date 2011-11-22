@@ -21,98 +21,100 @@ package eu.interedition.text.xml;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.io.Closeables;
 import eu.interedition.text.Text;
+import eu.interedition.text.TextConsumer;
 import eu.interedition.text.TextRepository;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Stack;
 
 public class XMLParser {
-  private final XMLInputFactory xmlInputFactory;
+  private final XMLInputFactory xmlInputFactory = XML.createXMLInputFactory();
 
   private TextRepository textRepository;
-
-  public XMLParser() {
-    xmlInputFactory = XMLInputFactory.newInstance();
-    xmlInputFactory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.FALSE);
-    xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-    xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
-  }
 
   public void setTextRepository(TextRepository textRepository) {
     this.textRepository = textRepository;
   }
 
-  public Text parse(Text source, final XMLParserConfiguration configuration)
-          throws IOException, XMLStreamException {
+  public Text parse(Text source, final XMLParserConfiguration configuration) throws IOException, XMLStreamException {
     Preconditions.checkArgument(source.getType() == Text.Type.XML);
-    final Text text = textRepository.create(Text.Type.TXT);
-
-    final XMLParserState state = new XMLParserState(source, text, configuration);
+    final Text target = textRepository.create(Text.Type.TXT);
+    final XMLParserState state = new XMLParserState(source, target, configuration);
     try {
-      textRepository.read(source, new TextRepository.TextReader() {
-        public void read(Reader content, long contentLength) throws IOException {
-          XMLStreamReader reader = null;
-          final Stack<XMLEntity> entities = new Stack<XMLEntity>();
-          try {
-            reader = xmlInputFactory.createXMLStreamReader(content);
-            state.start();
-            while (reader.hasNext()) {
-              final int event = reader.next();
-              state.mapOffsetDelta(0, reader.getLocation().getCharacterOffset() - state.getSourceOffset());
-
-              switch (event) {
-                case XMLStreamConstants.START_ELEMENT:
-                  state.endText();
-                  state.nextSibling();
-                  state.start(entities.push(XMLEntity.newElement(reader)));
-                  break;
-                case XMLStreamConstants.END_ELEMENT:
-                  state.endText();
-                  state.end(entities.pop());
-                  break;
-                case XMLStreamConstants.COMMENT:
-                  state.endText();
-                  state.nextSibling();
-                  state.emptyEntity(XMLEntity.newComment(reader));
-                  break;
-                case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                  state.endText();
-                  state.nextSibling();
-                  state.emptyEntity(XMLEntity.newPI(reader));
-                  break;
-                case XMLStreamConstants.CHARACTERS:
-                case XMLStreamConstants.ENTITY_REFERENCE:
-                case XMLStreamConstants.CDATA:
-                  state.newText(reader.getText());
-                  break;
-              }
-            }
-            state.end();
-
-          } catch (XMLStreamException e) {
-            throw Throwables.propagate(e);
-          } finally {
-            if (reader != null) {
-              try {
-                reader.close();
-              } catch (XMLStreamException e) {
-              }
-            }
-          }
-        }
-      });
+      textRepository.read(source, new XMLParserTextConsumer(state));
+      Reader textReader = null;
+      try {
+        return textRepository.write(state.getTarget(), textReader = state.readText());
+      } finally {
+        Closeables.close(textReader, false);
+      }
     } catch (Throwable t) {
       Throwables.propagateIfInstanceOf(t, IOException.class);
       Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
       throw Throwables.propagate(t);
     }
+  }
 
-    return text;
+  private class XMLParserTextConsumer implements TextConsumer {
+    private final XMLParserState state;
+
+    public XMLParserTextConsumer(XMLParserState state) {
+      this.state = state;
+    }
+
+    public void read(Reader content, long contentLength) throws IOException {
+      XMLStreamReader reader = null;
+      final Stack<XMLEntity> entities = new Stack<XMLEntity>();
+      try {
+        reader = xmlInputFactory.createXMLStreamReader(content);
+        state.start();
+        while (reader.hasNext()) {
+          final int event = reader.next();
+          state.mapOffsetDelta(0, reader.getLocation().getCharacterOffset() - state.getSourceOffset());
+
+          switch (event) {
+            case XMLStreamConstants.START_ELEMENT:
+              state.endText();
+              state.nextSibling();
+              state.start(entities.push(XMLEntity.newElement(reader)));
+              break;
+            case XMLStreamConstants.END_ELEMENT:
+              state.endText();
+              state.end(entities.pop());
+              break;
+            case XMLStreamConstants.COMMENT:
+              state.endText();
+              state.nextSibling();
+              state.emptyEntity(XMLEntity.newComment(reader));
+              break;
+            case XMLStreamConstants.PROCESSING_INSTRUCTION:
+              state.endText();
+              state.nextSibling();
+              state.emptyEntity(XMLEntity.newPI(reader));
+              break;
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.ENTITY_REFERENCE:
+            case XMLStreamConstants.CDATA:
+              state.newText(reader.getText());
+              break;
+          }
+        }
+
+        state.end();
+      } catch (XMLStreamException e) {
+        throw Throwables.propagate(e);
+      } finally {
+        if (reader != null) {
+          try {
+            reader.close();
+          } catch (XMLStreamException e) {
+          }
+        }
+      }
+    }
   }
 }

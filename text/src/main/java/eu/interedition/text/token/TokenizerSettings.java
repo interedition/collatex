@@ -28,11 +28,11 @@ import java.util.Set;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public interface TokenizerSettings {
-  boolean startingAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations);
+  boolean startingAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations);
 
-  boolean emptyAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations);
+  boolean emptyAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations);
 
-  boolean endingAnnotationsAreBoundary(Text text, long offset, Set<Annotation> annotations);
+  boolean endingAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations);
 
   boolean isBoundary(Text text, long offset, char c);
 }

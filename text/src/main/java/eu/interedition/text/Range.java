@@ -58,27 +58,18 @@ import java.util.SortedSet;
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  * @see CharSequence#subSequence(int, int)
  */
-public class Range implements Comparable<Range>, Serializable {
-  private static final long serialVersionUID = 1L;
-
-  public static final Range NULL = new Range();
+public class Range implements Comparable<Range> {
+  public static final Range NULL = new Range(0, 0);
 
   /**
    * The start offset of the segment (counted from zero, inclusive).
    */
-  private long start;
+  private final long start;
 
   /**
    * The end offset of the segment (counted from zero, exclusive).
    */
-  private long end;
-
-  /**
-   * Default constructor creating a {@link #NULL} range.
-   */
-  public Range() {
-    this(0, 0);
-  }
+  private final long end;
 
   /**
    * Creates a text segment address.
@@ -109,16 +100,8 @@ public class Range implements Comparable<Range>, Serializable {
     return start;
   }
 
-  public void setStart(long start) {
-    this.start = start;
-  }
-
   public long getEnd() {
     return end;
-  }
-
-  public void setEnd(long end) {
-    this.end = end;
   }
 
   /**

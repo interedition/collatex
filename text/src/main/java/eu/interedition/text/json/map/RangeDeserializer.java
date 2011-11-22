@@ -1,16 +1,13 @@
 package eu.interedition.text.json.map;
 
 import eu.interedition.text.Range;
-import eu.interedition.text.mem.SimpleQName;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 
 import java.io.IOException;
-import java.net.URI;
 
 import static org.codehaus.jackson.JsonToken.*;
 

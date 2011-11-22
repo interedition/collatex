@@ -19,7 +19,7 @@
  */
 package eu.interedition.text.xml;
 
-import eu.interedition.text.QName;
+import eu.interedition.text.Name;
 import eu.interedition.text.query.Criterion;
 
 import java.net.URI;
@@ -31,11 +31,11 @@ import java.util.Map;
  */
 public interface XMLSerializerConfiguration {
 
-  QName getRootName();
+  Name getRootName();
 
   Map<String, URI> getNamespaceMappings();
 
-  List<QName> getHierarchy();
+  List<Name> getHierarchy();
 
   Criterion getQuery();
 }

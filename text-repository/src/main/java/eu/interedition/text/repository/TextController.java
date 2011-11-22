@@ -20,10 +20,8 @@
 package eu.interedition.text.repository;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.text.*;
@@ -31,29 +29,35 @@ import eu.interedition.text.json.JSONSerializer;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
-import eu.interedition.text.repository.model.*;
+import eu.interedition.text.repository.model.JSONSerialization;
+import eu.interedition.text.repository.model.TextMetadata;
+import eu.interedition.text.repository.model.XMLSerialization;
+import eu.interedition.text.repository.model.XMLTransformation;
+import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserModule;
 import eu.interedition.text.xml.module.*;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.stax2.XMLInputFactory2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
+import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.stream.XMLStreamReader;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -69,7 +73,6 @@ import static eu.interedition.text.query.Criteria.*;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Controller
-@Transactional
 @RequestMapping(TextController.URL_PREFIX)
 public class TextController {
   public static final String URL_PREFIX = "/text";
@@ -93,26 +96,29 @@ public class TextController {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @RequestMapping(value = "/{id}", headers = "accept=text/html")
-  public ModelAndView getTextAsHtml(@PathVariable("id") int id) throws IOException {
-    final TextImpl text = textService.load(id);
+  private XMLInputFactory2 xmlInputFactory = XML.createXMLInputFactory();
 
-    final ModelAndView mv = new ModelAndView("text");
-    mv.addObject("text", text);
-    mv.addObject("textContents", textRepository.read(text, new Range(0, (int) Math.min(MAX_TEXT_LENGTH, text.getLength()))));
-    return mv;
+  @RequestMapping("/{id}/names")
+  @ResponseBody
+  public SortedSet<Name> readNames(@PathVariable("id") long id) {
+    return annotationRepository.names(textRepository.load(id));
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public String readIndex() {
+    return "text_index";
   }
 
   @RequestMapping(value = "/{id}", headers = "accept=text/plain")
-  public void getTextAsPlainText(@PathVariable("id") int id, @RequestParam(value= "r", required = false) Range range, HttpServletResponse response) throws IOException {
-    final TextImpl text = textService.load(id);
+  public void readText(@PathVariable("id") int id, @RequestParam(value = "r", required = false) Range range, HttpServletResponse response) throws IOException {
+    final Text text = textService.load(id).getText();
 
     response.setCharacterEncoding(Text.CHARSET.name());
     response.setContentType(MediaType.TEXT_PLAIN.toString());
     final PrintWriter responseWriter = response.getWriter();
 
     range = (range == null ? new Range(0, text.getLength()) : range);
-    textRepository.read(text, range, new TextRepository.TextReader() {
+    textRepository.read(text, range, new TextConsumer() {
       @Override
       public void read(Reader content, long contentLength) throws IOException {
         CharStreams.copy(content, responseWriter);
@@ -123,50 +129,137 @@ public class TextController {
 
   @RequestMapping(value = "/{id}", headers = "accept=application/xml")
   @ResponseBody
-  public XMLSerialization getTextAsXml(@PathVariable("id") int id) {
-    return getTextAsXml(id, new XMLSerialization());
+  public XMLSerialization readXML(@PathVariable("id") int id) {
+    return readXML(id, new XMLSerialization());
   }
 
   @RequestMapping(value = "/{id}", headers = {"content-type=application/json", "accept=application/xml"})
   @ResponseBody
-  public XMLSerialization getTextAsXml(@PathVariable("id") int id, @RequestBody XMLSerialization serialization) {
-    serialization.setText(textService.load(id));
+  public XMLSerialization readXML(@PathVariable("id") int id, @RequestBody XMLSerialization serialization) {
+    serialization.setText(textService.load(id).getText());
     serialization.evaluate();
     return serialization;
   }
 
   @RequestMapping(value = "/{id}", headers = "accept=application/json")
   @ResponseBody
-  public JSONSerialization getTextAsJson(@PathVariable("id") int id, @RequestParam(value = "r", required = false) Range rangeParam) {
-    return getTextAsJson(id, new JSONSerialization(), rangeParam);
+  public JSONSerialization readJSON(@PathVariable("id") int id, @RequestParam(value = "r", required = false) Range rangeParam) {
+    return readJSON(id, new JSONSerialization(), rangeParam);
   }
 
-  @RequestMapping(value = "/{id}", headers = {"content-type=application/json","accept=application/json"})
+  @RequestMapping(value = "/{id}", headers = {"content-type=application/json", "accept=application/json"})
   @ResponseBody
-  public JSONSerialization getTextAsJson(@PathVariable("id") int id, @RequestBody JSONSerialization serialization, @RequestParam(value = "r", required = false) Range rangeParam) {
-    serialization.setText(textService.load(id));
+  public JSONSerialization readJSON(@PathVariable("id") int id, @RequestBody JSONSerialization serialization, @RequestParam(value = "r", required = false) Range rangeParam) {
+    serialization.setText(textService.load(id).getText());
     if (rangeParam != null) {
       serialization.setRange(rangeParam);
     }
     return serialization;
   }
 
-  @RequestMapping(value = "/{id}/annotate", method = RequestMethod.PUT, headers = "content-type=application/json")
-  public RedirectView replaceAnnotations(@PathVariable("id") long id, Reader annotations) throws IOException {
-    final TextImpl text = textService.load(id);
-    annotationRepository.delete(Criteria.text(text));
-    addAnnotations(text, annotations);
-    return created(text);
+  @RequestMapping(value = "/{id}", headers = "accept=text/html")
+  public ModelAndView readHTML(@PathVariable("id") int id) throws IOException {
+    final TextMetadata metadata = textService.load(id);
+    final Text text = metadata.getText();
+
+    final ModelAndView mv = new ModelAndView("text");
+    mv.addObject("metadata", metadata);
+    mv.addObject("text", text);
+    mv.addObject("textContents", textRepository.read(text, new Range(0, (int) Math.min(MAX_TEXT_LENGTH, text.getLength()))));
+    return mv;
+  }
+
+  @RequestMapping(method = RequestMethod.POST, headers = {"content-type=text/plain"})
+  public Object writeText(HttpServletRequest request, Reader requestBody) throws IOException, XMLStreamException, SAXException {
+    return respondWith(request, textService.create(new TextMetadata(), requestBody));
+  }
+
+  @RequestMapping(method = RequestMethod.POST, headers = "content-type=application/xml")
+  public Object writeXML(HttpServletRequest request, InputStream requestBody) throws XMLStreamException, IOException, SAXException {
+    XMLStreamReader xmlReader = null;
+    try {
+      return respondWith(request, textService.create(new TextMetadata(), xmlReader = xmlInputFactory.createXMLStreamReader(requestBody)));
+    } finally {
+      XML.closeQuietly(xmlReader);
+    }
+  }
+
+  @RequestMapping(method = RequestMethod.POST, headers = "content-type=multipart/form-data")
+  public RedirectView writeFormData(@ModelAttribute TextMetadata text, @RequestParam("file") MultipartFile file,//
+                                    @RequestParam("fileType") Text.Type textType,//
+                                    @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
+          throws IOException, XMLStreamException, SAXException {
+    Preconditions.checkArgument(!file.isEmpty(), "Empty file");
+
+    InputStream fileStream = null;
+    XMLStreamReader xmlReader = null;
+    try {
+      switch (textType) {
+        case TXT:
+          return redirectTo(textService.create(text, new InputStreamReader(fileStream = file.getInputStream(), Charset.forName(charset))));
+        case XML:
+          return redirectTo(textService.create(text, xmlReader = xmlInputFactory.createXMLStreamReader(fileStream = file.getInputStream())));
+      }
+    } finally {
+      XML.closeQuietly(xmlReader);
+      Closeables.close(fileStream, false);
+    }
+    throw new IllegalArgumentException(textType.toString());
+  }
+
+  @RequestMapping(value = "/{id}/transform", method = RequestMethod.GET)
+  public ModelAndView readTransformationForm(@PathVariable("id") long id) {
+    final TextMetadata metadata = textService.load(id);
+    Preconditions.checkArgument(metadata.getText().getType() == Text.Type.XML);
+
+    Map<String, List<String>> names = Maps.newHashMap();
+    for (Name name : annotationRepository.names(metadata.getText())) {
+      final URI namespaceURI = name.getNamespace();
+      final String ns = (namespaceURI == null ? "" : namespaceURI.toString());
+      List<String> localNames = names.get(ns);
+      if (localNames == null) {
+        names.put(ns, localNames = Lists.newArrayList());
+      }
+      localNames.add(name.getLocalName());
+    }
+    return new ModelAndView("transform").addObject("metadata", metadata).addObject("names", names);
+  }
+
+  @RequestMapping(value = "/{id}/transform", method = RequestMethod.POST)
+  public Object writeTransformation(@PathVariable("id") long id, HttpServletRequest request, @RequestBody XMLTransformation pc) throws XMLStreamException, IOException, SAXException {
+    final TextMetadata source = textService.load(id);
+    Preconditions.checkArgument(source.getText().getType() == Text.Type.XML);
+
+    final List<XMLParserModule> modules = pc.getModules();
+    modules.add(new LineElementXMLParserModule());
+    modules.add(new NotableCharacterXMLParserModule());
+    modules.add(new TextXMLParserModule());
+    modules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
+    modules.add(new CLIXAnnotationXMLParserModule(annotationRepository, 1000));
+    if (pc.isTransformTEI()) {
+      modules.add(new TEIAwareAnnotationXMLParserModule(annotationRepository, 1000));
+    }
+
+    final Text parsed = xmlParser.parse(source.getText(), pc);
+    if (pc.isRemoveEmpty()) {
+      annotationRepository.delete(and(text(parsed), rangeLength(0)));
+    }
+
+    final TextMetadata parsedMetadata = new TextMetadata(source);
+    parsedMetadata.setCreated(new Date());
+    parsedMetadata.setUpdated(parsedMetadata.getCreated());
+    return respondWith(request, textService.create(parsedMetadata, (RelationalText) parsed));
   }
 
   @RequestMapping(value = "/{id}/annotate", method = RequestMethod.POST, headers = "content-type=application/json")
-  public RedirectView addAnnotations(@PathVariable("id") long id, Reader annotations) throws IOException {
-    final TextImpl text = textService.load(id);
-    addAnnotations(text, annotations);
-    return redirectTo(text);
+  public Object writeAnnotations(@PathVariable("id") long id, HttpServletRequest request, @RequestBody Reader annotations) throws IOException {
+    final TextMetadata metadata = textService.load(id);
+
+    writeAnnotations(metadata.getText(), annotations);
+    return respondWith(request, metadata);
   }
 
-  private void addAnnotations(Text text, @RequestBody Reader annotations) throws IOException {
+  protected void writeAnnotations(Text text, Reader annotations) throws IOException {
     final JsonParser jp = objectMapper.getJsonFactory().createJsonParser(annotations);
     try {
       jsonSerializer.unserialize(jp, text);
@@ -175,122 +268,41 @@ public class TextController {
     }
   }
 
-  @RequestMapping("/{id}/names")
-  @ResponseBody
-  public SortedSet<QName> getNamesOfText(@PathVariable("id") long id) {
-    return Sets.<QName>newTreeSet(Iterables.transform(annotationRepository.names(textRepository.load(id)), QNameImpl.TO_BEAN));
+  @RequestMapping(value = "/{id}/annotate", method = RequestMethod.PUT, headers = "content-type=application/json")
+  public Object replaceAnnotations(@PathVariable("id") long id, HttpServletRequest request, @RequestBody Reader annotations) throws IOException {
+    final TextMetadata metadata = textService.load(id);
+    final RelationalText text = metadata.getText();
+
+    annotationRepository.delete(Criteria.text(text));
+    writeAnnotations(text, annotations);
+    return respondWith(request, metadata);
   }
 
-  @RequestMapping(value = "/{id}/transform", method = RequestMethod.GET)
-  public ModelAndView getTransformationForm(@PathVariable("id") long id) {
-    final TextImpl text = textService.load(id);
-    Preconditions.checkArgument(text.getType() == Text.Type.XML);
 
-    Map<String, List<String>> names = Maps.newHashMap();
-    for (QName name : annotationRepository.names(text)) {
-      final URI namespaceURI = name.getNamespaceURI();
-      final String ns = (namespaceURI == null ? "" : namespaceURI.toString());
-      List<String> localNames = names.get(ns);
-      if (localNames == null) {
-        names.put(ns, localNames = Lists.newArrayList());
-      }
-      localNames.add(name.getLocalName());
+  protected static Object respondWith(HttpServletRequest request, TextMetadata metadata) {
+    final List<MediaType> acceptedMediaTypes = MediaType.parseMediaTypes(request.getHeader("Accept"));
+    MediaType.sortByQualityValue(acceptedMediaTypes);
+
+    if (acceptedMediaTypes.isEmpty() || !MediaType.APPLICATION_JSON.isCompatibleWith(acceptedMediaTypes.get(0))) {
+      final RedirectView redirectView = redirectTo(metadata);
+      redirectView.setStatusCode(HttpStatus.CREATED);
+      return redirectView;
+    } else {
+      return new ResponseEntity<Text>(metadata.getText(), HttpStatus.CREATED);
     }
-    return new ModelAndView("transform").addObject("text", text).addObject("names", names);
   }
 
-  @RequestMapping(value = "/{id}/transform", method = RequestMethod.POST)
-  @ResponseBody
-  public Text transform(@PathVariable("id") long id, @RequestBody XMLTransformation pc) throws XMLStreamException, IOException {
-    final TextImpl source = textService.load(id);
-    Preconditions.checkArgument(source.getType() == Text.Type.XML);
-
-    final List<XMLParserModule> modules = pc.getModules();
-    modules.add(new LineElementXMLParserModule());
-    modules.add(new NotableCharacterXMLParserModule());
-    modules.add(new TextXMLParserModule(textRepository));
-    modules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
-    modules.add(new CLIXAnnotationXMLParserModule(annotationRepository, 1000));
-    if (pc.isTransformTEI()) {
-      modules.add(new TEIAwareAnnotationXMLParserModule(annotationRepository, 1000));
-    }
-
-    final Text parsed = xmlParser.parse(source, pc);
-    if (pc.isRemoveEmpty()) {
-      annotationRepository.delete(and(text(parsed), rangeLength(0)));
-    }
-
-    final TextImpl parsedMetadata = new TextImpl(source);
-    parsedMetadata.setCreated(new Date());
-    parsedMetadata.setUpdated(parsedMetadata.getCreated());
-    return textService.create(parsedMetadata, (RelationalText) parsed);
-  }
-
-  @RequestMapping(method = RequestMethod.GET)
-  public String getIndex() {
-    return "text_index";
-  }
-
-  @RequestMapping(method = RequestMethod.POST, headers = "content-type=text/plain")
-  public RedirectView postPlainText(@RequestBody TextImpl text) {
-    return created(text);
-  }
-
-  @RequestMapping(method = RequestMethod.POST, headers = {"content-type=text/plain", "accept=application/json"})
-  @ResponseBody
-  public Text postAndReturnPlainText(@RequestBody TextImpl text) {
-    return text;
-  }
-
-  @RequestMapping(method = RequestMethod.POST, headers = "content-type=application/xml")
-  public RedirectView postTextAsXml(@RequestBody TextImpl text) {
-    return created(text);
-  }
-
-  @RequestMapping(method = RequestMethod.POST, headers = {"content-type=application/xml", "accept=application/json"})
-  @ResponseBody
-  public Text postAndReturnXml(@RequestBody TextImpl text) {
-    return text;
-  }
-
-  @RequestMapping(method = RequestMethod.POST, params = "file")
-  public RedirectView postTextViaForm(@ModelAttribute TextImpl text, @RequestParam("file") MultipartFile file,//
-                                 @RequestParam("fileType") Text.Type textType,//
-                                 @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
-          throws IOException, TransformerException {
-    Preconditions.checkArgument(!file.isEmpty(), "Empty file");
-
-    InputStream fileStream = null;
-    try {
-      switch (textType) {
-        case TXT:
-          return redirectTo(textService.create(text, new InputStreamReader(fileStream = file.getInputStream(), Charset.forName(charset))));
-        case XML:
-          return redirectTo(textService.create(text, new StreamSource(fileStream = file.getInputStream())));
-      }
-    } finally {
-      Closeables.close(fileStream, false);
-    }
-    throw new IllegalArgumentException(textType.toString());
-  }
-
-  @ExceptionHandler(value = DataRetrievalFailureException.class)
-  public void handleNotFound(HttpServletResponse response) throws IOException {
-    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-  }
-
-  public static RedirectView redirectTo(Text text) {
-    return new RedirectView(URL_PREFIX + "/" + Long.toString(((RelationalText) text).getId()), true, false);
-  }
-
-  public static RedirectView created(Text text) {
-    final RedirectView redirectView = redirectTo(text);
-    redirectView.setStatusCode(HttpStatus.CREATED);
-    return redirectView;
+  protected static RedirectView redirectTo(TextMetadata metadata) {
+    return new RedirectView(URL_PREFIX + "/" + Long.toString(metadata.getText().getId()), true, false);
   }
 
   @InitBinder
   public void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+  }
+
+  @ExceptionHandler(value = DataRetrievalFailureException.class)
+  public void handleNotFound(HttpServletResponse response) throws IOException {
+    response.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 }

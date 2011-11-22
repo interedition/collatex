@@ -19,9 +19,11 @@
  */
 package eu.interedition.text.repository.atom;
 
+import eu.interedition.text.Text;
 import eu.interedition.text.repository.TextController;
 import eu.interedition.text.repository.TextService;
-import eu.interedition.text.repository.model.TextImpl;
+import eu.interedition.text.repository.model.TextMetadata;
+import eu.interedition.text.xml.XML;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
@@ -30,13 +32,16 @@ import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.context.ResponseContextException;
 import org.apache.abdera.protocol.server.impl.AbstractEntityCollectionAdapter;
+import org.codehaus.stax2.XMLInputFactory2;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
-import javax.xml.transform.TransformerException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.io.StringReader;
@@ -48,35 +53,51 @@ import java.util.List;
  */
 @Component
 @Transactional
-public class TextCollectionAdapter extends AbstractEntityCollectionAdapter<TextImpl> implements InitializingBean {
+public class TextCollectionAdapter extends AbstractEntityCollectionAdapter<TextMetadata> implements InitializingBean {
   public static final String HREF = "text";
   public static final String TITLE = "Texts";
 
   @Autowired
   private TextService textService;
 
-  @Override
-  public TextImpl postEntry(String title, IRI id, String summary, Date updated, List<Person> authors, Content content, RequestContext request) throws ResponseContextException {
+  private XMLInputFactory2 xmlInputFactory = XML.createXMLInputFactory();
 
-    final TextImpl text = new TextImpl();
+  @Override
+  public TextMetadata postEntry(String title, IRI id, String summary, Date updated, List<Person> authors, Content content, RequestContext request) throws ResponseContextException {
+    Text.Type textType;
+    switch (content.getContentType()) {
+      case TEXT:
+        textType = Text.Type.TXT;
+        break;
+      case XML:
+        textType = Text.Type.XML;
+        break;
+      default:
+        throw new ResponseContextException(ProviderHelper.notallowed(request));
+    }
+
+    final TextMetadata text = new TextMetadata();
     text.setTitle(title);
     text.setSummary(summary);
     text.setUpdated(updated);
     text.setAuthor(authors.isEmpty() ? null : authors.get(0).getName());
 
+    XMLStreamReader xmlReader = null;
     try {
-      switch (content.getContentType()) {
-        case TEXT:
-          return textService.create(text, new StringReader(content.getValue()));
-        case XML:
-          return textService.create(text, new DOMSource((Node) content.getValueElement()));
-        default:
-          throw new ResponseContextException(ProviderHelper.notallowed(request));
+      if (textType == Text.Type.TXT) {
+        return textService.create(text, new StringReader(content.getValue()));
+      } else {
+        xmlReader = xmlInputFactory.createXMLStreamReader(new DOMSource((Node) content.getValueElement()));
+        return textService.create(text, xmlReader);
       }
     } catch (IOException e) {
       throw new ResponseContextException(ProviderHelper.servererror(request, e));
-    } catch (TransformerException e) {
+    } catch (SAXException e) {
       throw new ResponseContextException(ProviderHelper.servererror(request, e));
+    } catch (XMLStreamException e) {
+      throw new ResponseContextException(ProviderHelper.servererror(request, e));
+    } finally {
+      XML.closeQuietly(xmlReader);
     }
   }
 
@@ -86,17 +107,17 @@ public class TextCollectionAdapter extends AbstractEntityCollectionAdapter<TextI
   }
 
   @Override
-  public Object getContent(TextImpl entry, RequestContext request) throws ResponseContextException {
+  public Object getContent(TextMetadata entry, RequestContext request) throws ResponseContextException {
     return null;
   }
 
   @Override
-  public Iterable<TextImpl> getEntries(RequestContext request) throws ResponseContextException {
+  public Iterable<TextMetadata> getEntries(RequestContext request) throws ResponseContextException {
     return textService.list(0, 1000);
   }
 
   @Override
-  public TextImpl getEntry(String resourceName, RequestContext request) throws ResponseContextException {
+  public TextMetadata getEntry(String resourceName, RequestContext request) throws ResponseContextException {
     try {
       return textService.load(Long.parseLong(resourceName));
     } catch (NumberFormatException e) {
@@ -105,27 +126,27 @@ public class TextCollectionAdapter extends AbstractEntityCollectionAdapter<TextI
   }
 
   @Override
-  public String getId(TextImpl entry) throws ResponseContextException {
-    return Long.toString(entry.getId());
+  public String getId(TextMetadata entry) throws ResponseContextException {
+    return Long.toString(entry.getText().getId());
   }
 
   @Override
-  public String getName(TextImpl entry) throws ResponseContextException {
-    return Long.toString(entry.getId());
+  public String getName(TextMetadata entry) throws ResponseContextException {
+    return Long.toString(entry.getText().getId());
   }
 
   @Override
-  public String getTitle(TextImpl entry) throws ResponseContextException {
-    return new StringBuilder("[").append(entry.getType()).append("] ").append(entry.getDescription()).toString();
+  public String getTitle(TextMetadata entry) throws ResponseContextException {
+    return new StringBuilder("[").append(entry.getText().getType()).append("] ").append(entry.getDescription()).toString();
   }
 
   @Override
-  public Date getUpdated(TextImpl entry) throws ResponseContextException {
+  public Date getUpdated(TextMetadata entry) throws ResponseContextException {
     return entry.getUpdated();
   }
 
   @Override
-  public void putEntry(TextImpl entry, String title, Date updated, List<Person> authors, String summary, Content content, RequestContext request) throws ResponseContextException {
+  public void putEntry(TextMetadata entry, String title, Date updated, List<Person> authors, String summary, Content content, RequestContext request) throws ResponseContextException {
     throw new ResponseContextException(ProviderHelper.notallowed(request));
   }
 
@@ -150,11 +171,11 @@ public class TextCollectionAdapter extends AbstractEntityCollectionAdapter<TextI
   }
 
   @Override
-  protected String addEntryDetails(RequestContext request, Entry e, IRI feedIri, TextImpl text) throws ResponseContextException {
-    final String link = super.addEntryDetails(request, e, feedIri, text);
-    e.addLink(request.getContextPath()  + TextController.URL_PREFIX + "/" + Long.toString(text.getId()));
-    if (text.getSummary() != null) {
-      e.setSummary(text.getSummary());
+  protected String addEntryDetails(RequestContext request, Entry e, IRI feedIri, TextMetadata metadata) throws ResponseContextException {
+    final String link = super.addEntryDetails(request, e, feedIri, metadata);
+    e.addLink(request.getContextPath()  + TextController.URL_PREFIX + "/" + Long.toString(metadata.getText().getId()));
+    if (metadata.getSummary() != null) {
+      e.setSummary(metadata.getSummary());
     }
     return link;
   }

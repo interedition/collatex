@@ -19,7 +19,6 @@
  */
 package eu.interedition.text.rdbms;
 
-import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import eu.interedition.text.*;
 import eu.interedition.text.query.Criteria;
@@ -30,7 +29,6 @@ import org.springframework.util.StopWatch;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Map;
 
 import static com.google.common.collect.Iterables.size;
 import static eu.interedition.text.query.Criteria.and;
@@ -52,7 +50,7 @@ public class AnnotationTest extends AbstractTestResourceTest {
     try {
       annotationRepository.delete(and(Criteria.text(existing), rangeFitsWithin(new Range(0, existing.getLength()))));
       final Iterable<Annotation> remaining = annotationRepository.find(Criteria.text(existing));
-      assertTrue(Integer.toString(size(remaining)), Iterables.isEmpty(remaining));
+      assertTrue(Integer.toString(size(remaining)) + " in " + existing, Iterables.isEmpty(remaining));
     } finally {
       unload();
     }
@@ -75,10 +73,10 @@ public class AnnotationTest extends AbstractTestResourceTest {
 
       sw.start("print");
       if (LOG.isDebugEnabled()) {
-        annotationRepository.scroll(Criteria.text(newText), null, new AnnotationRepository.AnnotationCallback() {
+        annotationRepository.scroll(Criteria.text(newText), null, new AnnotationConsumer() {
           @Override
-          public void annotation(Annotation annotation, Map<QName, String> data) {
-            LOG.debug("{}: {}", annotation, Iterables.toString(data.entrySet()));
+          public void consume(Annotation annotation) {
+            LOG.debug("{}: {}", annotation, Iterables.toString(annotation.getData().entrySet()));
           }
         });
       }

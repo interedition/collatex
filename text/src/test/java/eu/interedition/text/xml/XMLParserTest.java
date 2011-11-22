@@ -22,12 +22,10 @@ package eu.interedition.text.xml;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
-import eu.interedition.text.AbstractTestResourceTest;
-import eu.interedition.text.Range;
-import eu.interedition.text.Text;
-import eu.interedition.text.TextRepository;
+import eu.interedition.text.*;
 import eu.interedition.text.xml.module.XMLParserModuleAdapter;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,10 +67,10 @@ public class XMLParserTest extends AbstractTestResourceTest {
   public void textContents() throws Exception {
     final Text text = text("george-algabal-tei.xml");
 
-    assertTrue(text.getLength() > 0);
+    assertTrue(text.toString(), text.getLength() > 0);
 
     if (LOG.isDebugEnabled()) {
-      textRepository.read(text, new TextRepository.TextReader() {
+      textRepository.read(text, new TextConsumer() {
 
         public void read(Reader content, long contentLength) throws IOException {
           LOG.debug(CharStreams.toString(content));
@@ -93,6 +91,16 @@ public class XMLParserTest extends AbstractTestResourceTest {
                 "] <====> [" + escapeNewlines(texts.get(textRangeIt.next())) + "]");
       }
     }
+  }
+
+  @Test
+  public void dtdParsing() {
+    Assert.assertNotNull(text("whitman-leaves-facs-tei.xml"));
+  }
+
+  @Test
+  public void bigFile() {
+    Assert.assertNotNull(text("homer-iliad-tei.xml"));
   }
 
   @Override
