@@ -160,7 +160,7 @@ public class VGAnalysisTest {
     final IWitness b = factory.createWitness("B", "a b d");
     IVariantGraph graph = factory.graph(a);
     IAnalysis analysis = factory.analyse(graph, b);
-    List<ITransposition2> transpositions = analysis.getTranspositions();
+    List<ITransposition> transpositions = analysis.getTranspositions();
     assertEquals(2, transpositions.size());
     assertEquals("a b", transpositions.get(0).getSequenceB().getNormalized());
     assertEquals("d", transpositions.get(0).getSequenceA().getNormalized());
@@ -175,7 +175,7 @@ public class VGAnalysisTest {
     final IWitness b = factory.createWitness("B", "a c b d");
     IVariantGraph graph = factory.graph(a);
     IAnalysis analysis = factory.analyse(graph, b);
-    List<ITransposition2> transpositions = analysis.getTranspositions();
+    List<ITransposition> transpositions = analysis.getTranspositions();
     assertEquals(3, transpositions.size());
     assertEquals("d", transpositions.get(0).getSequenceA().getNormalized());
     assertEquals("a", transpositions.get(0).getSequenceB().getNormalized());
@@ -192,10 +192,10 @@ public class VGAnalysisTest {
     final IWitness b = factory.createWitness("2", "c e y a d b");
     IVariantGraph graph = factory.graph(a);
     IAnalysis analysis = factory.analyse(graph, b);
-    List<ITransposition2> transpositions = analysis.getTranspositions();
-    LOG.debug("transpositions=[" + Joiner.on(", ").join(Iterables.transform(transpositions, new Function<ITransposition2, String>() {
+    List<ITransposition> transpositions = analysis.getTranspositions();
+    LOG.debug("transpositions=[" + Joiner.on(", ").join(Iterables.transform(transpositions, new Function<ITransposition, String>() {
       @Override
-      public String apply(final ITransposition2 from) {
+      public String apply(final ITransposition from) {
         return from.getSequenceA().getNormalized() + "=>" + from.getSequenceB().getNormalized();
       }
     })) + "]");

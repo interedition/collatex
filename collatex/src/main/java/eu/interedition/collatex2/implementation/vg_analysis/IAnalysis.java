@@ -29,6 +29,6 @@ public interface IAnalysis {
   // them together into sequences
   List<ISequence> getSequences();
   
-  List<ITransposition2> getTranspositions();
+  List<ITransposition> getTranspositions();
 
 }

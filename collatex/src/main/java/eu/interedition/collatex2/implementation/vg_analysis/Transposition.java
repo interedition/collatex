@@ -22,11 +22,11 @@ package eu.interedition.collatex2.implementation.vg_analysis;
 
 
 
-public class Transposition2 implements ITransposition2 {
+public class Transposition implements ITransposition {
   private final ISequence sequenceA;
   private final ISequence sequenceB;
 
-  public Transposition2(ISequence sequenceA, ISequence sequenceB) {
+  public Transposition(ISequence sequenceA, ISequence sequenceB) {
     this.sequenceA = sequenceA;
     this.sequenceB = sequenceB;
   }
