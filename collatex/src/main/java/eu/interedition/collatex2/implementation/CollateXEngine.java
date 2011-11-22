@@ -28,7 +28,7 @@ import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenN
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
-import eu.interedition.collatex2.implementation.vg_alignment.IAlignment2;
+import eu.interedition.collatex2.implementation.vg_alignment.IAlignment;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
 import eu.interedition.collatex2.implementation.vg_analysis.Analyzer;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
@@ -121,14 +121,14 @@ public class CollateXEngine {
     return table;
   }
 
-  public IAlignment2 align(IVariantGraph graph, IWitness witness) {
+  public IAlignment align(IVariantGraph graph, IWitness witness) {
     IAligner aligner = createAligner(graph);
-    IAlignment2 alignment = aligner.align(witness);
+    IAlignment alignment = aligner.align(witness);
     return alignment;
   }
 
   public IAnalysis analyse(IVariantGraph graph, IWitness witness) {
-    IAlignment2 alignment = align(graph, witness);
+    IAlignment alignment = align(graph, witness);
     Analyzer analyzer = new Analyzer();
     return analyzer.analyze(alignment);
   }

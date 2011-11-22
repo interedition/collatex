@@ -10,7 +10,6 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphLinker;
 import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
@@ -108,7 +107,7 @@ public class VariantGraphAligner implements IAligner {
 
 
   @Override
-  public IAlignment2 align(IWitness witness) {
+  public IAlignment align(IWitness witness) {
     throw new RuntimeException("NOT YET IMPLEMENTED!");
   }
 

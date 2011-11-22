@@ -26,12 +26,30 @@ import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public interface IAlignment2 {
+public class Alignment implements IAlignment {
 
-  List<ITokenMatch> getTokenMatches();
-  
-  IWitness getWitness();
+  private final IVariantGraph graph;
+  private final IWitness witness;
+  private final List<ITokenMatch> tokenMatches;
 
-  IVariantGraph getGraph();
+  public Alignment(IVariantGraph graph, IWitness witness, List<ITokenMatch> tokenMatches) {
+    this.graph = graph;
+    this.witness = witness;
+    this.tokenMatches = tokenMatches;
+  }
 
+  @Override
+  public IVariantGraph getGraph() {
+    return graph;
+  }
+
+  @Override
+  public IWitness getWitness() {
+    return witness;
+  }
+
+  @Override
+  public List<ITokenMatch> getTokenMatches() {
+    return tokenMatches;
+  }
 }
