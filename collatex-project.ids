@@ -2,7 +2,7 @@
   <data-source source="LOCAL" name="Text Repository" product="H2" version="1.3.146 (2010-11-08)" jdbc-version="3.0" driver-version="1.3.146 (2010-11-08)" uuid="152b45cb-81c7-47f6-bc95-c6b571157552">
     <identifier-quote-string>"</identifier-quote-string>
     <jdbc-driver>org.h2.Driver</jdbc-driver>
-    <jdbc-url>jdbc:h2:///Users/gregor/text-repository</jdbc-url>
+    <jdbc-url>jdbc:h2:///Users/gregor/Documents/Interedition/data/text-repository</jdbc-url>
     <user-name>sa</user-name>
     <libraries>
       <library>
@@ -10,7 +10,7 @@
       </library>
     </libraries>
     <table name="REPOSITORY_TEXT_COLLECTION" schema="PUBLIC" catalog="TEXT-REPOSITORY" type="TABLE">
-      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" default="(NEXT VALUE FOR PUBLIC.SYSTEM_SEQUENCE_64D97E51_FE45_446B_AB05_FEF2DF4873A6)" />
+      <column name="ID" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" default="(NEXT VALUE FOR PUBLIC.SYSTEM_SEQUENCE_FEE7F4CE_28FE_487E_A37F_5A5CA923A837)" />
       <column name="NAME" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <primary-key name="CONSTRAINT_1" columns="id" />
       <index name="CONSTRAINT_INDEX_1" unique="true" columns="NAME" />

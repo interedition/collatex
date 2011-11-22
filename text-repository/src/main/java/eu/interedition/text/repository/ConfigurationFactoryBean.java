@@ -3,6 +3,7 @@ package eu.interedition.text.repository;
 import com.google.common.io.Closeables;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,15 +20,18 @@ import java.util.Properties;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class ConfigurationFactoryBean implements InitializingBean, FactoryBean<Properties> {
+public class ConfigurationFactoryBean extends AbstractFactoryBean<Properties> {
 
   private static final ClassPathResource CONFIG_RESOURCE = new ClassPathResource("config.properties", ConfigurationFactoryBean.class);
 
-  private Properties properties;
+  @Override
+  public Class<?> getObjectType() {
+    return Properties.class;
+  }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
-    properties = new Properties();
+  protected Properties createInstance() throws Exception {
+    Properties properties = new Properties();
     InputStream configStream = null;
     try {
       properties.load(new InputStreamReader(configStream = CONFIG_RESOURCE.getInputStream(), "UTF-8"));
@@ -40,20 +44,6 @@ public class ConfigurationFactoryBean implements InitializingBean, FactoryBean<P
     } finally {
       Closeables.close(configStream, false);
     }
-  }
-
-  @Override
-  public Properties getObject() throws Exception {
     return properties;
-  }
-
-  @Override
-  public Class<?> getObjectType() {
-    return Properties.class;
-  }
-
-  @Override
-  public boolean isSingleton() {
-    return true;
   }
 }

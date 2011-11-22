@@ -8,13 +8,13 @@
         <#list results as r>
             <li>
                 <p>
-                    <img class="icon" src="${cp}/static/icon/text_${r.type?lower_case}.png" alt="${r.type?html}">
-                    <a href="${cp}/text/${r.id?c}" title="Gehe zu Text #${r.id}" style="font-size: large">${r.description?html}</a>
+                    <img class="icon" src="${cp}/static/icon/text_${r.text.type?lower_case}.png" alt="${r.text.type?html}">
+                    <a href="${cp}/text/${r.text.id?c}" title="Gehe zu Text #${r.text.id}" style="font-size: large">${r.description?html}</a>
                 </p>
 
                 <p>
                     <span style="color: #8b0000;">${r.score}%</span>,
-                    Size: ${r.length} character(s)
+                    Size: ${r.text.length} character(s)
                     Created: ${r.created?string?html},
                     Updated: ${r.updated?string?html},
                 </p>

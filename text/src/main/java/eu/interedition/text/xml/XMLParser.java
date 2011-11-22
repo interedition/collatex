@@ -32,29 +32,12 @@ import java.io.Reader;
 import java.util.Stack;
 
 public class XMLParser {
-  private final XMLInputFactory xmlInputFactory = createXMLInputFactory();
+  private final XMLInputFactory xmlInputFactory = XML.createXMLInputFactory();
 
   private TextRepository textRepository;
 
   public void setTextRepository(TextRepository textRepository) {
     this.textRepository = textRepository;
-  }
-
-  public static XMLInputFactory createXMLInputFactory() {
-    final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-    xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.TRUE);
-    xmlInputFactory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.FALSE);
-    xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
-    xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
-    xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-    xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
-    return xmlInputFactory;
-  }
-
-  public static XMLOutputFactory createXMLOutputFactory() {
-    final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
-    xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
-    return xmlOutputFactory;
   }
 
   public Text parse(Text source, final XMLParserConfiguration configuration) throws IOException, XMLStreamException {

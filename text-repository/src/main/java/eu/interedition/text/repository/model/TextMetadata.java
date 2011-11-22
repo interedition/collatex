@@ -22,6 +22,7 @@ package eu.interedition.text.repository.model;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import eu.interedition.text.Text;
 import eu.interedition.text.rdbms.RelationalText;
 
 import java.util.Date;
@@ -29,7 +30,8 @@ import java.util.Date;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextImpl extends RelationalText {
+public class TextMetadata {
+  private RelationalText text;
   private TextCollection collection;
   private Date created;
   private Date updated;
@@ -37,27 +39,25 @@ public class TextImpl extends RelationalText {
   private String summary;
   private String author;
 
-  public TextImpl(Type type) {
-    super(type, "", 0);
-
-  }
-  public TextImpl(Type type, long length, byte[] digest, long id) {
-    super(type, length, digest, id);
-    this.created = this.updated = new Date();
+  public TextMetadata() {
   }
 
-  public TextImpl(RelationalText other) {
-    super(other);
-  }
-
-  public TextImpl(TextImpl other) {
-    super(other);
+  public TextMetadata(TextMetadata other) {
+    this.text = other.text;
     this.collection = other.collection;
     this.created = other.created;
     this.updated = other.updated;
     this.title = other.title;
     this.summary = other.summary;
     this.author = other.author;
+  }
+
+  public RelationalText getText() {
+    return text;
+  }
+
+  public void setText(RelationalText text) {
+    this.text = text;
   }
 
   public Date getCreated() {
@@ -116,12 +116,12 @@ public class TextImpl extends RelationalText {
       }
       desc.append(title);
     } else {
-      desc.append("Text #").append(getId());
+      desc.append("Text #").append(text.getId());
     }
     return desc.toString();
   }
 
-  public boolean isWithoutMetadata() {
+  public boolean isEmpty() {
     return Iterables.all(Lists.newArrayList(title, summary, author), Predicates.isNull());
   }
 }

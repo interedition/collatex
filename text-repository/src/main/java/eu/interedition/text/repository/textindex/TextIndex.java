@@ -25,9 +25,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import eu.interedition.text.TextConsumer;
+import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.repository.TextService;
-import eu.interedition.text.repository.model.TextImpl;
+import eu.interedition.text.repository.model.TextMetadata;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -110,13 +111,14 @@ public class TextIndex implements InitializingBean, DisposableBean {
     }
 
     final List<TextIndexQueryResult> results = Lists.newArrayListWithExpectedSize(scores.size());
-    for (TextImpl text : textService.load(scores.keySet())) {
-      results.add(new TextIndexQueryResult(text, scores.get(text.getId())));
+    for (TextMetadata metadata : textService.load(scores.keySet())) {
+      results.add(new TextIndexQueryResult(metadata, scores.get(metadata.getText().getId())));
     }
     return results;
   }
 
-  public void update(final TextImpl text) throws IOException {
+  public void update(final TextMetadata metadata) throws IOException {
+    final RelationalText text = metadata.getText();
     textRepository.read(text, new TextConsumer() {
       @Override
       public void read(Reader content, long contentLength) throws IOException {
@@ -126,31 +128,31 @@ public class TextIndex implements InitializingBean, DisposableBean {
         document.add(new Field("content_length", Long.toString(text.getLength()), Field.Store.YES, Field.Index.NOT_ANALYZED));
         document.add(new Field("content", content));
 
-        document.add(new Field("created", Long.toString(text.getCreated().getTime()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        document.add(new Field("updated", Long.toString(text.getUpdated().getTime()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        if (text.getTitle() != null) {
-          document.add(new Field("title", text.getTitle(), Field.Store.NO, Field.Index.ANALYZED));
+        document.add(new Field("created", Long.toString(metadata.getCreated().getTime()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        document.add(new Field("updated", Long.toString(metadata.getUpdated().getTime()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        if (metadata.getTitle() != null) {
+          document.add(new Field("title", metadata.getTitle(), Field.Store.NO, Field.Index.ANALYZED));
         }
-        if (text.getSummary() != null) {
-          document.add(new Field("summary", text.getSummary(), Field.Store.NO, Field.Index.ANALYZED));
+        if (metadata.getSummary() != null) {
+          document.add(new Field("summary", metadata.getSummary(), Field.Store.NO, Field.Index.ANALYZED));
         }
-        if (text.getAuthor() != null) {
-          document.add(new Field("author", text.getAuthor(), Field.Store.NO, Field.Index.ANALYZED));
+        if (metadata.getAuthor() != null) {
+          document.add(new Field("author", metadata.getAuthor(), Field.Store.NO, Field.Index.ANALYZED));
         }
 
-        indexWriter.updateDocument(idTerm(text), document);
+        indexWriter.updateDocument(idTerm(metadata), document);
         commit();
       }
     });
   }
 
-  public void delete(TextImpl text) throws IOException {
-    indexWriter.deleteDocuments(new TermQuery(idTerm(text)));
+  public void delete(TextMetadata metadata) throws IOException {
+    indexWriter.deleteDocuments(new TermQuery(idTerm(metadata)));
     commit();
   }
 
-  protected Term idTerm(TextImpl rt) {
-    return new Term("id", Long.toString(rt.getId()));
+  protected Term idTerm(TextMetadata metadata) {
+    return new Term("id", Long.toString(metadata.getText().getId()));
   }
 
   @Required
@@ -216,7 +218,7 @@ public class TextIndex implements InitializingBean, DisposableBean {
 
             textService.scroll(new TextService.TextScroller() {
               @Override
-              public void text(TextImpl text) {
+              public void text(TextMetadata text) {
                 try {
                   update(text);
                 } catch (IOException e) {

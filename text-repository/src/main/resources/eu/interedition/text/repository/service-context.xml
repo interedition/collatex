@@ -70,6 +70,8 @@
         </property>
     </bean>
 
+    <bean id="objectMapper" class="eu.interedition.text.repository.conversion.CustomizedObjectMapperFactoryBean"/>
+
     <task:scheduler id="taskScheduler"/>
 
     <task:executor id="taskExecutor"/>

@@ -23,22 +23,26 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
 import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.util.SimpleXMLParserConfiguration;
+import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserModule;
 import eu.interedition.text.xml.module.*;
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
 
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
 import static eu.interedition.text.TextConstants.TEI_NS;
 
@@ -59,6 +63,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
           "whitman-leaves-facs-tei.xml",
           "wp-orpheus1-clix.xml");
 
+  protected static XMLInputFactory xmlInputFactory;
 
   private Map<String, Text> sources = Maps.newHashMap();
   private Map<String, Text> texts = Maps.newHashMap();
@@ -68,6 +73,11 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
 
   @Autowired
   protected AnnotationRepository annotationRepository;
+
+  @BeforeClass
+  public static void initXmlInputFactory() {
+    xmlInputFactory = XML.createXMLInputFactory();
+  }
 
   @After
   public void removeDocuments() {
@@ -162,17 +172,26 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   private synchronized void load(String resource) {
     try {
       if (RESOURCES.contains(resource) && !texts.containsKey(resource)) {
-        final URI uri = AbstractTestResourceTest.class.getResource("/" + resource).toURI();
+        final URL xmlResource = AbstractTestResourceTest.class.getResource("/" + resource);
+        final URI uri = xmlResource.toURI();
         final StopWatch stopWatch = new StopWatch(uri.toString());
 
-        stopWatch.start("create");
-        final Text xml = textRepository.create(new StreamSource(uri.toASCIIString()));
-        stopWatch.stop();
+        InputStream xmlStream = null;
+        XMLStreamReader xmlReader = null;
+        try {
+          stopWatch.start("create");
+          xmlReader = xmlInputFactory.createXMLStreamReader(xmlStream = xmlResource.openStream());
+          final Text xml = textRepository.create(xmlReader);
+          stopWatch.stop();
 
-        sources.put(resource, xml);
-        stopWatch.start("parse");
-        texts.put(resource, xmlParser.parse(xml, configure(createXMLParserConfiguration())));
-        stopWatch.stop();
+          sources.put(resource, xml);
+          stopWatch.start("parse");
+          texts.put(resource, xmlParser.parse(xml, configure(createXMLParserConfiguration())));
+          stopWatch.stop();
+        } finally {
+          XML.closeQuietly(xmlReader);
+          Closeables.close(xmlStream, false);
+        }
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("\n" + stopWatch.prettyPrint());

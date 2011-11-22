@@ -24,24 +24,16 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
-import com.sun.xml.internal.bind.v2.runtime.output.XmlOutput;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConsumer;
 import eu.interedition.text.TextRepository;
-import eu.interedition.text.xml.XMLParser;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
+import eu.interedition.text.xml.XML;
+import org.codehaus.stax2.XMLInputFactory2;
+import org.codehaus.stax2.XMLOutputFactory2;
 
 import javax.xml.stream.*;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.nio.CharBuffer;
-import java.nio.charset.CharsetEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
@@ -51,8 +43,8 @@ import static java.util.Collections.singleton;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public abstract class AbstractTextRepository implements TextRepository {
-  protected final XMLInputFactory xmlInputFactory = XMLParser.createXMLInputFactory();
-  protected final XMLOutputFactory xmlOutputFactory = XMLParser.createXMLOutputFactory();
+  protected final XMLInputFactory2 xmlInputFactory = XML.createXMLInputFactory();
+  protected final XMLOutputFactory2 xmlOutputFactory = XML.createXMLOutputFactory();
 
   private int memoryBufferThreshold = 1001024;
 
@@ -60,20 +52,26 @@ public abstract class AbstractTextRepository implements TextRepository {
     this.memoryBufferThreshold = memoryBufferThreshold;
   }
 
-  public Text create(Source xml) throws IOException, XMLStreamException {
+  public Text create(XMLStreamReader xml) throws IOException, XMLStreamException {
     final File xmlSource = File.createTempFile(getClass().getName(), ".xml");
 
 
-    final FileBackedOutputStream xmBuf = createBuffer();
+    final FileBackedOutputStream xmlBuf = createBuffer();
+    XMLEventReader xmlEventReader = null;
+    XMLEventWriter xmlEventWriter = null;
     try {
-      copy(xml, new StreamResult(new OutputStreamWriter(xmBuf, Text.CHARSET)));
+      xmlEventReader = xmlInputFactory.createXMLEventReader(xml);
+      xmlEventWriter = xmlOutputFactory.createXMLEventWriter(new OutputStreamWriter(xmlBuf, Text.CHARSET));
+      xmlEventWriter.add(xmlEventReader);
     } finally {
-      Closeables.close(xmBuf, false);
+      XML.closeQuietly(xmlEventWriter);
+      XML.closeQuietly(xmlEventReader);
+      Closeables.close(xmlBuf, false);
     }
 
     Reader xmlBufReader = null;
     try {
-      xmlBufReader = new InputStreamReader(xmBuf.getSupplier().getInput(), Text.CHARSET);
+      xmlBufReader = new InputStreamReader(xmlBuf.getSupplier().getInput(), Text.CHARSET);
       return write(create(Text.Type.XML), xmlBufReader);
     } finally {
       Closeables.close(xmlBufReader, false);
@@ -87,23 +85,30 @@ public abstract class AbstractTextRepository implements TextRepository {
   }
 
   @Override
-  public void read(Text text, final Result xml) throws IOException, TransformerException {
+  public void read(Text text, final XMLStreamWriter xml) throws IOException, XMLStreamException {
     try {
       Preconditions.checkArgument(text.getType() == Text.Type.XML);
       read(text, new TextConsumer() {
         @Override
         public void read(Reader content, long contentLength) throws IOException {
+          XMLEventReader xmlReader = null;
+          XMLEventWriter xmlWriter = null;
           try {
-            copy(new StreamSource(content), xml);
+            xmlReader = xmlInputFactory.createXMLEventReader(content);
+            xmlWriter = xmlOutputFactory.createXMLEventWriter(xml);
+            xmlWriter.add(xmlReader);
           } catch (XMLStreamException e) {
             throw Throwables.propagate(e);
+          } finally {
+            XML.closeQuietly(xmlWriter);
+            XML.closeQuietly(xmlReader);
           }
         }
       });
     } catch (IOException e) {
       throw e;
     } catch (Throwable t) {
-      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), TransformerException.class);
+      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
       throw Throwables.propagate(t);
     }
   }
@@ -125,23 +130,6 @@ public abstract class AbstractTextRepository implements TextRepository {
 
   protected FileBackedOutputStream createBuffer() {
     return new FileBackedOutputStream(memoryBufferThreshold, true);
-  }
-
-  protected void copy(Source source, Result result) throws XMLStreamException {
-    XMLEventReader xmlReader = null;
-    XMLEventWriter xmlWriter = null;
-    try {
-       xmlReader = xmlInputFactory.createXMLEventReader(source);
-       xmlWriter = xmlOutputFactory.createXMLEventWriter(result);
-       xmlWriter.add(xmlReader);
-    } finally {
-      if (xmlWriter != null) {
-        xmlWriter.close();
-      }
-      if (xmlReader != null) {
-        xmlReader.close();
-      }
-    }
   }
 
   public static class CountingWriter extends FilterWriter {
