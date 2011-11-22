@@ -36,6 +36,7 @@ public class VariantGraphAligner implements IAligner {
     // 1. Do the matching and linking of tokens
     //TODO: the TokenLinker class should be replaced by the new linker class
     //TODO: based on the decision graph
+    //EditGraphLinker tokenLinker = new EditGraphLinker();
     TokenLinker tokenLinker = new TokenLinker();
     Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, tokenLinker);
     // 2. Determine sequences

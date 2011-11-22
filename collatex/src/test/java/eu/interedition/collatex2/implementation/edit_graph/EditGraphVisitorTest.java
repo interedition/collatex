@@ -96,10 +96,10 @@ public class EditGraphVisitorTest {
     EditGraph dGraph = creator.buildEditGraph(a, b);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     List<EditGraphEdge> edges = visitor.getShortestPath();
-    assertTrue(edges.get(0).getWeight()==1); // The ideal path should start with a gap
-    assertTrue(edges.get(1).getWeight()==0);
-    assertTrue(edges.get(2).getWeight()==0);
-    assertTrue(edges.get(3).getWeight()==0);
+    assertEquals(EditOperation.GAP, edges.get(0).getEditOperation()); // The ideal path should start with a gap
+    assertEquals(EditOperation.NO_GAP, edges.get(1).getEditOperation());
+    assertEquals(EditOperation.NO_GAP, edges.get(2).getEditOperation());
+    assertEquals(EditOperation.NO_GAP, edges.get(3).getEditOperation());
     assertEquals(4, edges.size());
   }
   
@@ -122,7 +122,7 @@ public class EditGraphVisitorTest {
     // we expect 8 edges
     // they all should have weight 0
     Iterator<EditGraphEdge> edges = path.iterator();
-    assertEquals(new Integer(0), edges.next().getWeight());
+    assertEquals(new Integer(0), edges.next().getEditOperation());
   }
 
 }

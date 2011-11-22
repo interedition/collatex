@@ -10,12 +10,12 @@ public class EditGraphEdge {
 
   private final EditGraphVertex sourceVertex;
   private final EditGraphVertex targetVertex;
-  private final int weight;
+  private final EditOperation operation;
 
-  public EditGraphEdge(EditGraphVertex source, EditGraphVertex target, int weight) {
+  public EditGraphEdge(EditGraphVertex source, EditGraphVertex target, EditOperation operation) {
     this.sourceVertex = source;
     this.targetVertex = target;
-    this.weight = weight;
+    this.operation = operation;
   }
 
   public EditGraphVertex getSourceVertex() {
@@ -26,18 +26,18 @@ public class EditGraphEdge {
     return targetVertex;
   }
 
-  public Integer getWeight() {
-    return weight;
+  public EditOperation getEditOperation() {
+    return operation;
   }
 
   @Override
   public String toString() {
-    return "("+sourceVertex+")->("+targetVertex+"):"+weight;
+    return "("+sourceVertex+")->("+targetVertex+"):"+operation;
   }
   
   @Override
   public int hashCode() {
-    int hc = Objects.hashCode(sourceVertex, targetVertex, weight);
+    int hc = Objects.hashCode(sourceVertex, targetVertex, operation);
 //    System.out.println("hashcode called on: "+this.toString()+":"+hc);
     return hc;
   }
@@ -52,7 +52,7 @@ public class EditGraphEdge {
       final EditGraphEdge edge = (EditGraphEdge) obj;
       boolean result = Objects.equal(sourceVertex, edge.sourceVertex); 
       result = result && Objects.equal(targetVertex, edge.targetVertex);
-      result = result && Objects.equal(weight, edge.weight);
+      result = result && Objects.equal(operation, edge.operation);
       return result;
     }
     return false;
