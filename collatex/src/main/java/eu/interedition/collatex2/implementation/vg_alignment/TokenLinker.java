@@ -20,13 +20,13 @@ import eu.interedition.collatex2.implementation.matching.IMatchResult;
 import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
 import eu.interedition.collatex2.implementation.matching.TokenMatcher;
 import eu.interedition.collatex2.implementation.vg_analysis.Sequence;
-import eu.interedition.collatex2.interfaces.ILinker;
+import eu.interedition.collatex2.interfaces.ITokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class TokenLinker implements ILinker {
+public class TokenLinker implements ITokenLinker {
   static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
   public Map<ITokenSequence, IPhrase> link(IWitness a, IWitness b) {

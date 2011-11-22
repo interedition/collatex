@@ -20,15 +20,16 @@
 
 package eu.interedition.collatex2.implementation.vg_analysis;
 
+import eu.interedition.collatex2.interfaces.ITokenContainer;
+
 import java.util.List;
 
 
-public interface IAnalysis {
+/**
+ * Detect sequences in the token matches and combine them together into sequences
+ */
+public interface ITranspositionDetector {
 
-  // purpose: detect sequences in the token matches and combine
-  // them together into sequences
-  List<ISequence> getSequences();
-  
-  List<ITransposition> getTranspositions();
+  List<ITransposition> detect(List<ISequence> sequences, ITokenContainer base);
 
 }

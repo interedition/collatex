@@ -15,7 +15,7 @@ import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenMatch;
-import eu.interedition.collatex2.interfaces.ILinker;
+import eu.interedition.collatex2.interfaces.ITokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -45,8 +45,8 @@ public class LinkerTest {
   private Map<INormalizedToken, INormalizedToken> linkTokens(final IVariantGraph graph, final IWitness witnessB) {
     //TODO: should this test the tokenLinker ?
     //TODO: I don't think so
-    ILinker linker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> tokens = linker.link(graph, witnessB);
+    ITokenLinker tokenLinker = new TokenLinker();
+    Map<INormalizedToken, INormalizedToken> tokens = tokenLinker.link(graph, witnessB);
     return tokens;
   }
 

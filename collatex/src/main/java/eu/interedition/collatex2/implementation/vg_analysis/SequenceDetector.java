@@ -12,9 +12,9 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class SequenceDetection {
+public class SequenceDetector {
   
-  public List<ISequence> getSequences(Map<INormalizedToken, INormalizedToken> linkedTokens, IWitness superbase, IWitness witness) {
+  public List<ISequence> detect(Map<INormalizedToken, INormalizedToken> linkedTokens, IWitness superbase, IWitness witness) {
     Map<INormalizedToken, IAlignedToken> alignedTokens = createAlignedTokensMap(linkedTokens);
     Map<IAlignedToken, IAlignedToken> previousMapForBase = buildPreviousMap(superbase, alignedTokens);
     Map<IAlignedToken, IAlignedToken> previousMapForWitness = buildPreviousMap(witness, alignedTokens);

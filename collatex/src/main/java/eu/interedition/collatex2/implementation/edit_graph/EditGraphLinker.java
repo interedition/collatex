@@ -9,12 +9,12 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.matching.VariantGraphMatcher;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
-import eu.interedition.collatex2.interfaces.ILinker;
+import eu.interedition.collatex2.interfaces.ITokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class EditGraphLinker implements ILinker {
+public class EditGraphLinker implements ITokenLinker {
   
   @Override
   public Map<INormalizedToken, INormalizedToken> link(IVariantGraph vGraph, IWitness b) {

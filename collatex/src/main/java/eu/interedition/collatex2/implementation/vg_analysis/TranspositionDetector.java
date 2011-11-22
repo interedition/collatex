@@ -31,23 +31,11 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
 
 
-public class Analysis implements IAnalysis {
-  private final List<ISequence> sequences;
-  private final ITokenContainer base;
+public class TranspositionDetector implements ITranspositionDetector {
 
-  public Analysis(List<ISequence> sequences, ITokenContainer base) {
-    this.sequences = sequences;
-    this.base = base;
-  }
-  
   @Override
-  public List<ISequence> getSequences() {
-    return sequences;
-  }
-  
-  @Override
-  public List<ITransposition> getTranspositions() {
-    List<ISequence> sequencesSortedForBase = sortSequencesForBase();
+  public List<ITransposition> detect(List<ISequence> sequences, ITokenContainer base) {
+    List<ISequence> sequencesSortedForBase = sortSequencesForBase(sequences, base);
     if (sequencesSortedForBase.size()!=sequences.size()) {
       throw new RuntimeException("Something went wrong in the linking process!");
     }
@@ -63,7 +51,7 @@ public class Analysis implements IAnalysis {
     return transpositions;
   }
 
-  private List<ISequence> sortSequencesForBase() {
+  private List<ISequence> sortSequencesForBase(List<ISequence> sequences, ITokenContainer base) {
     // prepare map
     Map<INormalizedToken, ISequence> tokenToSequenceMap = Maps.newLinkedHashMap();
     for (ISequence sequence : sequences) {

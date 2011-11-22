@@ -20,7 +20,7 @@ import eu.interedition.collatex2.implementation.matching.TokenMatcher;
 import eu.interedition.collatex2.implementation.vg_alignment.BaseAfgeleider;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
-import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
+import eu.interedition.collatex2.implementation.vg_analysis.ITranspositionDetector;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -229,13 +229,12 @@ public class DeTestDirkVincent {
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
     IWitness e = factory.createWitness("xxx", "The same as when Darly among others once died and left him.");
     builder.add(e);
-    IAnalysis analysis = builder.getAnalysis();
-    List<ISequence> sequences = analysis.getSequences();
+    List<ISequence> sequences = builder.getSequences();
     assertEquals("The same as when", sequences.get(0).getWitnessPhrase().getContent());
     assertEquals("Darly", sequences.get(1).getWitnessPhrase().getContent());
     assertEquals("among others", sequences.get(2).getWitnessPhrase().getContent());
     assertEquals("once died left him .", sequences.get(3).getWitnessPhrase().getContent());
-    List<ITransposition> transpositions = analysis.getTranspositions();
+    List<ITransposition> transpositions = builder.getTranspositions();
     assertEquals("darly", transpositions.get(0).getSequenceB().getNormalized());
     assertEquals("among others", transpositions.get(1).getSequenceB().getNormalized());
   }
