@@ -14,8 +14,7 @@ import eu.interedition.collatex2.implementation.vg_analysis.Analysis;
 import eu.interedition.collatex2.implementation.vg_analysis.IAnalysis;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
-import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection3;
-import eu.interedition.collatex2.interfaces.IAligner;
+import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetection;
 import eu.interedition.collatex2.interfaces.ILinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -23,11 +22,11 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class VariantGraphAligner implements IAligner {
+public class VariantGraphBuilder {
   private final IVariantGraph graph;
   private Analysis analysis;
 
-  public VariantGraphAligner(IVariantGraph graph) {
+  public VariantGraphBuilder(IVariantGraph graph) {
     this.graph = graph;
   }
 
@@ -40,7 +39,7 @@ public class VariantGraphAligner implements IAligner {
     Map<INormalizedToken, INormalizedToken> linkedTokens = linkTheTokens(witness, tokenLinker);
     // 2. Determine sequences
     IWitness superbase = new Superbase(graph);
-    SequenceDetection3 detection = new SequenceDetection3();
+    SequenceDetection detection = new SequenceDetection();
     List<ISequence> sequences = detection.getSequences(linkedTokens, superbase, witness);
     // 3. Determine transpositions of the sequences
     Analysis analysis = new Analysis(sequences, superbase); 
@@ -48,7 +47,7 @@ public class VariantGraphAligner implements IAligner {
     this.analysis = analysis;
     List<ITransposition> transpositions = analysis.getTranspositions();
     Map<INormalizedToken, INormalizedToken> alignedTokens;
-    alignedTokens = VariantGraphAligner.determineAlignedTokens(linkedTokens, transpositions, witness);
+    alignedTokens = VariantGraphBuilder.determineAlignedTokens(linkedTokens, transpositions, witness);
     IVariantGraphVertex previous =  graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
       // determine whether this token is a match or not
@@ -92,24 +91,17 @@ public class VariantGraphAligner implements IAligner {
     return edge;
   }
 
-  @Override
   public IVariantGraph getResult() {
     return graph;
   }
 
-  @Override
-  public IAligner add(IWitness... witnesses) {
+  public VariantGraphBuilder add(IWitness... witnesses) {
     for (IWitness witness : witnesses) {
       addWitness(witness);
     }
     return this;
   }
 
-
-  @Override
-  public IAlignment align(IWitness witness) {
-    throw new RuntimeException("NOT YET IMPLEMENTED!");
-  }
 
   public IAnalysis getAnalysis() {
     return analysis;
@@ -145,9 +137,9 @@ public class VariantGraphAligner implements IAligner {
     while (!transToCheck.isEmpty()) {
       final ITransposition top = transToCheck.pop();
       // System.out.println("Detected transposition: "+top.getSequenceA().toString());
-      final ITransposition mirrored = VariantGraphAligner.findMirroredTransposition(transToCheck, top);
+      final ITransposition mirrored = VariantGraphBuilder.findMirroredTransposition(transToCheck, top);
       // remove mirrored transpositions (a->b, b->a) from transpositions
-      if (mirrored != null && VariantGraphAligner.transpositionsAreNear(top, mirrored, witness)) {
+      if (mirrored != null && VariantGraphBuilder.transpositionsAreNear(top, mirrored, witness)) {
         // System.out.println("Detected mirror: "+mirrored.getSequenceA().toString());
         // System.out.println("Keeping: transposition " + top.toString());
         // System.out.println("Removing: transposition " + mirrored.toString());
@@ -163,7 +155,7 @@ public class VariantGraphAligner implements IAligner {
   static Map<INormalizedToken, INormalizedToken> determineAlignedTokens(Map<INormalizedToken, INormalizedToken> linkedTokens, List<ITransposition> transpositions, IWitness witness) {
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
     alignedTokens.putAll(linkedTokens);
-    List<ISequence> sequencesThatAreTransposed = VariantGraphAligner.getSequencesThatAreTransposed(transpositions, witness);
+    List<ISequence> sequencesThatAreTransposed = VariantGraphBuilder.getSequencesThatAreTransposed(transpositions, witness);
     for (ISequence sequenceA : sequencesThatAreTransposed) {
       for (INormalizedToken token : sequenceA.getWitnessPhrase().getTokens()) {
         alignedTokens.remove(token);

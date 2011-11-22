@@ -28,7 +28,7 @@ import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenN
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphAligner;
+import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
 import eu.interedition.collatex2.interfaces.*;
 
 /**
@@ -67,8 +67,8 @@ public class CollateXEngine {
     return builder.build(sigil, text, tokenizer);
   }
 
-  public IAligner createAligner(IVariantGraph graph) {
-    return new VariantGraphAligner(graph);
+  public VariantGraphBuilder createVariantGraphBuilder(IVariantGraph graph) {
+    return new VariantGraphBuilder(graph);
   }
 
   /**
@@ -82,9 +82,9 @@ public class CollateXEngine {
    * Terminology check
    */
   public IVariantGraph graph(IWitness... witnesses) {
-    IAligner aligner = createAligner(new VariantGraph());
-    aligner.add(witnesses);
-    return aligner.getResult();
+    VariantGraphBuilder builder = createVariantGraphBuilder(new VariantGraph());
+    builder.add(witnesses);
+    return builder.getResult();
   }
 
   /**
