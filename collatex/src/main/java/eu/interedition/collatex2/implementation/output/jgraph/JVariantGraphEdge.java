@@ -24,8 +24,8 @@ import java.util.Set;
 
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
 
 public class JVariantGraphEdge implements IJVariantGraphEdge {
   private final Set<IWitness> witnesses;

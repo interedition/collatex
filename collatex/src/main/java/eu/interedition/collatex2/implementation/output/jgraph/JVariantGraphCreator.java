@@ -23,6 +23,8 @@ package eu.interedition.collatex2.implementation.output.jgraph;
 import java.util.Map;
 import java.util.Set;
 
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +33,6 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
 
 public class JVariantGraphCreator {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreator.class);

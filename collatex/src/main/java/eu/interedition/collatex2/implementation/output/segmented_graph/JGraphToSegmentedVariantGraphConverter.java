@@ -34,9 +34,9 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
 
 public class JGraphToSegmentedVariantGraphConverter {
 

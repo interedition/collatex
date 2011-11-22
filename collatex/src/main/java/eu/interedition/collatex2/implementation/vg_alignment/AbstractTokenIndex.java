@@ -32,7 +32,7 @@ import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.nonpublic.alignment.ITokenIndex;
+import eu.interedition.collatex2.interfaces.nonpublic.ITokenIndex;
 
 //TODO: remove the explicit usage of NullToken in this class and in TokenIndexMatcher class!
 public abstract class AbstractTokenIndex implements ITokenIndex {

@@ -23,6 +23,7 @@ package eu.interedition.collatex2.implementation.output.apparatus;
 import java.util.Iterator;
 import java.util.List;
 
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,6 @@ import eu.interedition.collatex2.interfaces.IApparatus;
 import eu.interedition.collatex2.interfaces.IApparatusEntry;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
 
 public class ParallelSegmentationApparatus implements IApparatus {
   private static Logger logger = LoggerFactory.getLogger(ParallelSegmentationApparatus.class);

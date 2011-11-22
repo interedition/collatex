@@ -37,9 +37,9 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphEdge;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
 
 public class JVariantGraphCreatorTest {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreatorTest.class);

@@ -28,7 +28,7 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.joined_graph.IJVariantGraphVertex;
+import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
 
 public class JVariantGraphVertex implements IJVariantGraphVertex {
   private final StringBuilder normalized;

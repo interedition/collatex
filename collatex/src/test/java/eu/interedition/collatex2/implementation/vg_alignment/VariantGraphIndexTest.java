@@ -27,15 +27,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import eu.interedition.collatex2.interfaces.nonpublic.ITokenIndex;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphIndex;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenIndexUtil;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.alignment.ITokenIndex;
 
 public class VariantGraphIndexTest {
   private static CollateXEngine factory;
