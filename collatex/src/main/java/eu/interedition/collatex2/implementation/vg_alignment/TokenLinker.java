@@ -111,9 +111,9 @@ public class TokenLinker implements ITokenLinker {
       // for each ambiguous token
       if (matches.getAmbiguous().contains(tokens.get(tc))) {
         // find a minimal unique subsequence by walking to the left
-        tokenSequences.add(new TokenSequence(reverse(findMinimalUniquePrefix(reverse(tokens.subList(0, tc + 1)), matches, WitnessToken.START)), true));
+        tokenSequences.add(new TokenSequence(true, reverse(findMinimalUniquePrefix(reverse(tokens.subList(0, tc + 1)), matches, WitnessToken.START))));
         // find a minimal unique subsequence by walking to the right
-        tokenSequences.add(new TokenSequence(findMinimalUniquePrefix(tokens.subList(tc, tokenCount), matches, WitnessToken.END), false));
+        tokenSequences.add(new TokenSequence(false, findMinimalUniquePrefix(tokens.subList(tc, tokenCount), matches, WitnessToken.END)));
       }
     }
 
