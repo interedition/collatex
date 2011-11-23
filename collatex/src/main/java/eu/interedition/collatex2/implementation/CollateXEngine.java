@@ -67,10 +67,6 @@ public class CollateXEngine {
     return builder.build(sigil, text, tokenizer);
   }
 
-  public VariantGraphBuilder createVariantGraphBuilder(IVariantGraph graph) {
-    return new VariantGraphBuilder(graph);
-  }
-
   /**
    * align the witnesses
    * 
@@ -82,9 +78,9 @@ public class CollateXEngine {
    * Terminology check
    */
   public IVariantGraph graph(IWitness... witnesses) {
-    VariantGraphBuilder builder = createVariantGraphBuilder(new VariantGraph());
-    builder.add(witnesses);
-    return builder.getResult();
+    final VariantGraph graph = new VariantGraph();
+    new VariantGraphBuilder(graph).add(witnesses);
+    return graph;
   }
 
   /**
