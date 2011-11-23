@@ -21,27 +21,27 @@
 package eu.interedition.collatex2.implementation.vg_analysis;
 
 
-import eu.interedition.collatex2.implementation.matching.Match;
+import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 import java.util.List;
 
 public class Transposition implements ITransposition {
-  private final Match<List<INormalizedToken>> sequenceA;
-  private final Match<List<INormalizedToken>> sequenceB;
+  private final Tuple<List<INormalizedToken>> sequenceA;
+  private final Tuple<List<INormalizedToken>> sequenceB;
 
-  public Transposition(Match<List<INormalizedToken>> sequenceA, Match<List<INormalizedToken>> sequenceB) {
+  public Transposition(Tuple<List<INormalizedToken>> sequenceA, Tuple<List<INormalizedToken>> sequenceB) {
     this.sequenceA = sequenceA;
     this.sequenceB = sequenceB;
   }
 
   @Override
-  public Match<List<INormalizedToken>> getSequenceA() {
+  public Tuple<List<INormalizedToken>> getSequenceA() {
     return sequenceA;
   }
 
   @Override
-  public Match<List<INormalizedToken>> getSequenceB() {
+  public Tuple<List<INormalizedToken>> getSequenceB() {
     return sequenceB;
   }
   

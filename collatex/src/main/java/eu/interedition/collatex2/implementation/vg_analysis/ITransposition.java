@@ -21,15 +21,15 @@
 package eu.interedition.collatex2.implementation.vg_analysis;
 
 
-import eu.interedition.collatex2.implementation.matching.Match;
+import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 import java.util.List;
 
 public interface ITransposition {
 
-  Match<List<INormalizedToken>> getSequenceA();
+  Tuple<List<INormalizedToken>> getSequenceA();
 
-  Match<List<INormalizedToken>> getSequenceB();
+  Tuple<List<INormalizedToken>> getSequenceB();
 
 }
