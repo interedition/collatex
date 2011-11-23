@@ -11,6 +11,8 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.implementation.vg_analysis.*;
 import eu.interedition.collatex2.interfaces.*;
@@ -32,7 +34,7 @@ public class VariantGraphBuilder {
   private TranspositionDetector transpositionDetector = new TranspositionDetector();
 
   private Map<INormalizedToken,INormalizedToken> linkedTokens;
-  private List<ISequence> sequences;
+  private List<Match<List<INormalizedToken>>> sequences;
   private List<ITransposition> transpositions;
   private Map<INormalizedToken,INormalizedToken> alignedTokens;
 
@@ -55,7 +57,7 @@ public class VariantGraphBuilder {
     return linkedTokens;
   }
 
-  public List<ISequence> getSequences() {
+  public List<Match<List<INormalizedToken>>> getSequences() {
     return Collections.unmodifiableList(sequences);
   }
 
@@ -126,12 +128,10 @@ public class VariantGraphBuilder {
     return transpositionDetector;
   }
 
-  //NOTE: It would be better to not use getNormalized here!
-  //NOTE: This does not work with a custom matching function
   static ITransposition findMirroredTransposition(final Stack<ITransposition> transToCheck, final ITransposition original) {
     for (final ITransposition transposition : transToCheck) {
-      if (transposition.getSequenceA().getNormalized().equals(original.getSequenceB().getNormalized())) {
-        if (transposition.getSequenceB().getNormalized().equals(original.getSequenceA().getNormalized())) {
+      if (equals(transposition.getSequenceA(), original.getSequenceB())) {
+        if (equals(transposition.getSequenceB(), original.getSequenceA())) {
           return transposition;
         }
       }
@@ -139,17 +139,25 @@ public class VariantGraphBuilder {
     return null;
   }
 
+  /**
+   * @deprecated This does not work with a custom matching function.
+   */
+  @Deprecated
+  static boolean equals(Match<List<INormalizedToken>> a, Match<List<INormalizedToken>> b) {
+    return NormalizedToken.toString(a.right).equals(NormalizedToken.toString(b.right));
+  }
+
   // Note: this only calculates the distance between the tokens in the witness.
   // Note: it does not take into account a possible distance in the vertices in the graph!
   private boolean transpositionsAreNear(ITransposition top, ITransposition mirrored, IWitness witness) {
-    INormalizedToken lastToken = Iterables.getLast(top.getSequenceB().getWitnessPhrase());
-    INormalizedToken firstToken = Iterables.getFirst(mirrored.getSequenceB().getWitnessPhrase(), null);
+    INormalizedToken lastToken = Iterables.getLast(top.getSequenceB().right);
+    INormalizedToken firstToken = Iterables.getFirst(mirrored.getSequenceB().right, null);
     return witness.isNear(lastToken, firstToken);
   }
 
   // NOTE: this method should not return the original sequence when a mirror exists!
-  private List<ISequence> getSequencesThatAreTransposed(List<ITransposition> transpositions, IWitness witness) {
-    List<ISequence> transposedSequences = Lists.newArrayList();
+  private List<Match<List<INormalizedToken>>> getSequencesThatAreTransposed(List<ITransposition> transpositions, IWitness witness) {
+    List<Match<List<INormalizedToken>>> transposedSequences = Lists.newArrayList();
     final Stack<ITransposition> transToCheck = new Stack<ITransposition>();
     transToCheck.addAll(transpositions);
     Collections.reverse(transToCheck);
@@ -174,9 +182,9 @@ public class VariantGraphBuilder {
   private Map<INormalizedToken, INormalizedToken> determineAlignedTokens(Map<INormalizedToken, INormalizedToken> linkedTokens, List<ITransposition> transpositions, IWitness witness) {
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
     alignedTokens.putAll(linkedTokens);
-    List<ISequence> sequencesThatAreTransposed = getSequencesThatAreTransposed(transpositions, witness);
-    for (ISequence sequenceA : sequencesThatAreTransposed) {
-      for (INormalizedToken token : sequenceA.getWitnessPhrase()) {
+    List<Match<List<INormalizedToken>>> sequencesThatAreTransposed = getSequencesThatAreTransposed(transpositions, witness);
+    for (Match<List<INormalizedToken>> sequenceA : sequencesThatAreTransposed) {
+      for (INormalizedToken token : sequenceA.right) {
         alignedTokens.remove(token);
       }
     }

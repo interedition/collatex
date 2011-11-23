@@ -20,6 +20,8 @@
 
 package eu.interedition.collatex2.implementation.vg_analysis;
 
+import eu.interedition.collatex2.implementation.matching.Match;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
 
 import java.util.List;
@@ -30,6 +32,6 @@ import java.util.List;
  */
 public interface ITranspositionDetector {
 
-  List<ITransposition> detect(List<ISequence> sequences, ITokenContainer base);
+  List<ITransposition> detect(List<Match<List<INormalizedToken>>> sequences, ITokenContainer base);
 
 }
