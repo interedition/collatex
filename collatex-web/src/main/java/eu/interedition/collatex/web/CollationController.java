@@ -28,7 +28,6 @@ import eu.interedition.collatex.web.model.Collation;
 import eu.interedition.collatex.web.model.Token;
 import eu.interedition.collatex.web.model.Witness;
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.cgraph.CVariantGraphCreator;
@@ -38,9 +37,13 @@ import org.jgrapht.ext.EdgeNameProvider;
 import org.jgrapht.ext.IntegerNameProvider;
 import org.jgrapht.ext.VertexNameProvider;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.*;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.*;
 
 @Controller
@@ -88,9 +91,6 @@ public class CollationController {
   //    }
   //    return rows;
   //  }
-
-  static final Phrase EMPTY_PHRASE = new Phrase(Lists.<INormalizedToken>newArrayList());
-
   //  }
 
   private Map<String, Object> rowMap(String sigil, Collection<String> phrases) {
@@ -119,9 +119,7 @@ public class CollationController {
         witness.setTokens(Lists.<INormalizedToken>newArrayList(Iterables.transform(tokens, Token.TO_TOKEN)));
       }
 
-      int tokenPosition = 0;
       for (Token token : witness.getApiTokens()) {
-        token.setPosition(++tokenPosition);
         if (token.getNormalized() == null || token.getNormalized().trim().length() == 0) {
           token.setNormalized(defaultNormalizer.apply(token).getNormalized());
         }

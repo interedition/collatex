@@ -20,20 +20,20 @@
 
 package eu.interedition.collatex2.implementation.output.segmented_graph;
 
+import com.google.common.collect.Lists;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IWitness;
+
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.Lists;
-
-import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IWitness;
 
 public class SegmentedVariantGraphVertex implements
     ISegmentedVariantGraphVertex {
 
-  private final Map<IWitness, IPhrase> phraseForEachWitness;
+  private final Map<IWitness, List<INormalizedToken>> phraseForEachWitness;
 
-  public SegmentedVariantGraphVertex(Map<IWitness, IPhrase> phraseForEachWitness) {
+  public SegmentedVariantGraphVertex(Map<IWitness, List<INormalizedToken>> phraseForEachWitness) {
     this.phraseForEachWitness = phraseForEachWitness;
   }
 
@@ -42,7 +42,7 @@ public class SegmentedVariantGraphVertex implements
     if (phraseForEachWitness.isEmpty()) {
       return "#";
     }
-    return phraseForEachWitness.values().iterator().next().getNormalized();
+    return NormalizedToken.toString(phraseForEachWitness.values().iterator().next());
   }
 
   //NOTE: should this be a list?
@@ -52,7 +52,7 @@ public class SegmentedVariantGraphVertex implements
   }
 
   @Override
-  public IPhrase getPhrase(IWitness witness) {
+  public List<INormalizedToken> getPhrase(IWitness witness) {
     return phraseForEachWitness.get(witness);
   }
 

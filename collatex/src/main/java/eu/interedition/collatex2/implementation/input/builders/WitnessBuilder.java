@@ -26,18 +26,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.xml.sax.SAXException;
-
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.containers.witness.Witness;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
 import eu.interedition.collatex2.interfaces.ITokenizer;
 import eu.interedition.collatex2.interfaces.IWitness;
+
+import org.xml.sax.SAXException;
 
 public class WitnessBuilder {
 
@@ -71,27 +71,25 @@ public class WitnessBuilder {
       throw new IllegalArgumentException("Given content type is unsupported!");
     }
     switch (contentType) {
-    case TEXT_PLAIN:
-      return new WitnessPlainBuilder(tokenNormalizer).build(inputStream);
-    case TEXT_XML:
-      return new WitnessTeiBuilder(tokenNormalizer).build(inputStream);
-    default:
-      throw new IllegalArgumentException("Given content type is unsupported!");
+      case TEXT_PLAIN:
+        return new WitnessPlainBuilder(tokenNormalizer).build(inputStream);
+      case TEXT_XML:
+        return new WitnessTeiBuilder(tokenNormalizer).build(inputStream);
+      default:
+        throw new IllegalArgumentException("Given content type is unsupported!");
     }
   }
 
   public IWitness build(String witnessId, String text, ITokenizer tokenizer) {
     Iterator<IToken> tokenIterator = tokenizer.tokenize(text).iterator();
     List<INormalizedToken> tokenList = Lists.newArrayList();
-    int position = 1;
     while (tokenIterator.hasNext()) {
       IToken nextToken = tokenIterator.next();
       if (!nextToken.getContent().equals("")) {
         String normalized = tokenNormalizer.apply(nextToken).getNormalized();
-        WitnessToken wt = new WitnessToken(nextToken.getContent(), position, normalized);
+        WitnessToken wt = new WitnessToken(nextToken.getContent(), normalized);
         wt.setTrailingWhitespace(nextToken.getTrailingWhitespace());
         tokenList.add(wt);
-        position++;
       }
     }
     return new Witness(witnessId, tokenList);

@@ -24,8 +24,10 @@ import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 public class WitnessToken extends Token implements INormalizedToken {
+  public static final WitnessToken START = new WitnessToken("", "#");
+  public static final WitnessToken END = new WitnessToken("", "#");
+
   private String normalized;
-  protected int position;
 
   public WitnessToken() {
     super();
@@ -37,10 +39,9 @@ public class WitnessToken extends Token implements INormalizedToken {
     this.normalized = other.getNormalized();
   }
 
-  public WitnessToken(final String content, final int position, final String normalized) {
+  public WitnessToken(final String content, final String normalized) {
     super(content);
     this.normalized = normalized;
-    this.position = position;
   }
 
 
@@ -53,29 +54,8 @@ public class WitnessToken extends Token implements INormalizedToken {
     this.normalized = normalized;
   }
   
-  public void setPosition(int position) {
-    this.position = position;
-  }
-
   @Override
   public String toString() {
-    return getNormalized() + ": "+position;
+    return getNormalized();
   }
-  
-  @Override
-  public boolean equals(final Object obj) {
-    if ((obj != null) && (obj instanceof WitnessToken)) {
-      final WitnessToken token = (WitnessToken) obj;
-      return super.equals(obj) && (position == token.position);
-    }
-    return super.equals(obj);
-  }
-
-  @Override
-  public int hashCode() {
-    int hc = super.hashCode();
-    hc = hc * 59 + position;
-    return hc;
-  }
-
 }

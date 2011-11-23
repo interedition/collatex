@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -55,7 +56,7 @@ public class TranspositionDetector implements ITranspositionDetector {
     // prepare map
     Map<INormalizedToken, ISequence> tokenToSequenceMap = Maps.newLinkedHashMap();
     for (ISequence sequence : sequences) {
-      INormalizedToken firstToken = sequence.getBasePhrase().getFirstToken();
+      INormalizedToken firstToken = Iterables.getFirst(sequence.getBasePhrase(), null);
       tokenToSequenceMap.put(firstToken, sequence);
     }
     // sort sequences

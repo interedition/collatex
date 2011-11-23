@@ -27,7 +27,7 @@ public interface IApparatusEntry {
 
   //Note: an empty cell returns an empty phrase!
   //Note: rename to getReading(witness)?
-  IPhrase getPhrase(IWitness witness);
+  List<INormalizedToken> getPhrase(IWitness witness);
   
   //Note: return true means that a reading is not empty!
   //TODO: rename to isEmptyReading() ? --> switch boolean result then!

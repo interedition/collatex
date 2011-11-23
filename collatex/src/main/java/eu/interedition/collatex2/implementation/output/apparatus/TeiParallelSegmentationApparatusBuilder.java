@@ -21,13 +21,9 @@
 package eu.interedition.collatex2.implementation.output.apparatus;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.Map.Entry;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -37,9 +33,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.interfaces.IApparatus;
 import eu.interedition.collatex2.interfaces.IApparatusEntry;
 import eu.interedition.collatex2.interfaces.IWitness;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * Apparatus element serializing to the output format specified in ticket #6.
@@ -52,12 +53,12 @@ public class TeiParallelSegmentationApparatusBuilder {
   public static void build(IApparatus apparatus, Node parent) {
     Document doc = (parent.getNodeType() == Node.DOCUMENT_NODE ? (Document) parent : parent.getOwnerDocument());
     // FIXME: this should be dealt with on the tokenizer level!
-    //    final String separator = " ";
+//    final String separator = " ";
     for (final IApparatusEntry entry : apparatus.getEntries()) {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
       for (IWitness witness : entry.getWitnesses()) {
-        content2WitMap.put(entry.getPhrase(witness).getContent(), witness.getSigil());
+        content2WitMap.put(Token.toString(entry.getPhrase(witness)), witness.getSigil());
       }
 
       if ((content2WitMap.keySet().size() == 1) && !entry.hasEmptyCells()) {
@@ -89,7 +90,7 @@ public class TeiParallelSegmentationApparatusBuilder {
           }
         }
       }
-      //      parent.appendChild(doc.createTextNode(separator));
+//      parent.appendChild(doc.createTextNode(separator));
     }
     // FIXME: whitespace handling in the tokenizer!
     if (!apparatus.getEntries().isEmpty()) {

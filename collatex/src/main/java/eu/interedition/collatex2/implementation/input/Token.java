@@ -20,12 +20,12 @@
 
 package eu.interedition.collatex2.implementation.input;
 
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 
 public class Token implements IToken {
   private String content;
   private String trailingWhitespace; 
-  // private int characterPosition; // TODO?
 
   public Token() {
     this.trailingWhitespace = "";
@@ -60,23 +60,15 @@ public class Token implements IToken {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if ((obj != null) && (obj instanceof Token)) {
-      final Token token = (Token) obj;
-      return content.equals(token.content);
-    }
-    return super.equals(obj);
-  }
-
-  @Override
-  public int hashCode() {
-    int hc = 17;
-    hc = hc * 59 + content.hashCode();
-    return hc;
-  }
-
-  @Override
   public String toString() {
     return content;
+  }
+
+  public static String toString(Iterable<? extends IToken> tokens) {
+    final StringBuilder content = new StringBuilder();
+    for (final IToken token : tokens) {
+      content.append(token.getContent()).append(" ");
+    }
+    return content.toString().trim();
   }
 }

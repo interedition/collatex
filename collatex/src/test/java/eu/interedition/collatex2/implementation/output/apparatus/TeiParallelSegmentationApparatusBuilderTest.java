@@ -20,14 +20,7 @@
 
 package eu.interedition.collatex2.implementation.output.apparatus;
 
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.containers.witness.Witness;
-import eu.interedition.collatex2.interfaces.IWitness;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,7 +29,16 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
+
+import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.containers.witness.Witness;
+import eu.interedition.collatex2.interfaces.IWitness;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class TeiParallelSegmentationApparatusBuilderTest {
   private static CollateXEngine engine = new CollateXEngine();
@@ -73,7 +75,6 @@ public class TeiParallelSegmentationApparatusBuilderTest {
     Assert.assertEquals(apparatusStr, result);
   }
 
-
   /**
    * The first example from #6
    * (http://arts-itsee.bham.ac.uk/trac/interedition/ticket/6) (without
@@ -85,10 +86,10 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testSimpleSubstitutionOutput() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#W1\">cat</rdg><rdg wit=\"#W2 #W3\">dog</rdg></app> and the black mat",//
-            "the black cat and the black mat",//
-            "the black dog and the black mat",//
-            "the black dog and the black mat");
+        "the black <app><rdg wit=\"#W1\">cat </rdg><rdg wit=\"#W2 #W3\">dog </rdg></app>and the black mat",//
+        "the black cat and the black mat",//
+        "the black dog and the black mat",//
+        "the black dog and the black mat");
   }
 
   /**
@@ -101,57 +102,57 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testSimpleAddDelOutput() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">saw the black</rdg></app> cat on the <app><rdg wit=\"#W1\">white</rdg><rdg wit=\"#W2 #W3\"/></app> table",//
-            "the black cat on the white table",//
-            "the black saw the black cat on the table",//
-            "the black saw the black cat on the table");
+        "the black <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">saw the black</rdg></app> cat on the <app><rdg wit=\"#W1\">white</rdg><rdg wit=\"#W2 #W3\"/></app> table",//
+        "the black cat on the white table",//
+        "the black saw the black cat on the table",//
+        "the black saw the black cat on the table");
   }
 
   @Test
   public void testMultiSubstitutionOutput() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#W1\">black cat</rdg><rdg wit=\"#W2 #W3\">big white dog</rdg></app> and the black mat",//
-            "the black cat and the black mat",//
-            "the big white dog and the black mat",//
-            "the big white dog and the black mat");
+        "the <app><rdg wit=\"#W1\">black cat</rdg><rdg wit=\"#W2 #W3\">big white dog</rdg></app> and the black mat",//
+        "the black cat and the black mat",//
+        "the big white dog and the black mat",//
+        "the big white dog and the black mat");
   }
 
   // Additional unit tests (not present in ticket #6)
   @Test
   public void testAllWitnessesEqual() throws Exception {
     assertApparatusEquals("the black cat",//
-            "the black cat",//
-            "the black cat",//
-            "the black cat");
+        "the black cat",//
+        "the black cat",//
+        "the black cat");
   }
 
   // Note: There are some problems with whitespace here!
   @Test
   public void testAWordMissingAtTheEnd() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#W1 #W2\">cat</rdg><rdg wit=\"#W3\"/></app>",//
-            "the black cat",//
-            "the black cat",//
-            "the black");
+        "the black <app><rdg wit=\"#W1 #W2\">cat</rdg><rdg wit=\"#W3\"/></app>",//
+        "the black cat",//
+        "the black cat",//
+        "the black");
   }
 
   // Note: There might be some problems with whitespace here!
   @Test
   public void testCrossVariation() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">white</rdg></app> <app><rdg wit=\"#W1 #W3\"/><rdg wit=\"#W2\">and</rdg></app> <app><rdg wit=\"#W1 #W2\">black</rdg><rdg wit=\"#W3\"/></app> cat",//
-            "the black cat",//
-            "the white and black cat",//
-            "the white cat");
+        "the <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">white</rdg></app> <app><rdg wit=\"#W1 #W3\"/><rdg wit=\"#W2\">and</rdg></app> <app><rdg wit=\"#W1 #W2\">black</rdg><rdg wit=\"#W3\"/></app> cat",//
+        "the black cat",//
+        "the white and black cat",//
+        "the white cat");
   }
 
   // Note: There might be some problems with whitespace here!
   @Test
   public void testAddition() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#W1\"/><rdg wit=\"#W2\">white and</rdg></app> black cat",//
-            "the black cat",//
-            "the white and black cat");
+        "the <app><rdg wit=\"#W1\"/><rdg wit=\"#W2\">white and</rdg></app> black cat",//
+        "the black cat",//
+        "the white and black cat");
   }
 
   // TODO: re-enable test!

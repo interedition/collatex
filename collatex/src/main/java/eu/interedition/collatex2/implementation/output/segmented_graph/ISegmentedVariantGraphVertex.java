@@ -20,10 +20,10 @@
 
 package eu.interedition.collatex2.implementation.output.segmented_graph;
 
-import java.util.List;
-
-import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
+
+import java.util.List;
 
 
 public interface ISegmentedVariantGraphVertex {
@@ -33,7 +33,7 @@ public interface ISegmentedVariantGraphVertex {
 
   List<IWitness> getWitnesses();
 
-  IPhrase getPhrase(IWitness witness);
+  List<INormalizedToken> getPhrase(IWitness witness);
 
   boolean containsWitness(IWitness witness);
 

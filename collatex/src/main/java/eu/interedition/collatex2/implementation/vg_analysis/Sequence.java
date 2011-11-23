@@ -20,35 +20,38 @@
 
 package eu.interedition.collatex2.implementation.vg_analysis;
 
-import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+
+import java.util.List;
 
 public class Sequence implements ISequence {
 
-  private final IPhrase basePhrase;
-  private final IPhrase witnessPhrase;
+  private final List<INormalizedToken> basePhrase;
+  private final List<INormalizedToken> witnessPhrase;
 
-  public Sequence(IPhrase basePhrase, IPhrase witnessPhrase) {
+  public Sequence(List<INormalizedToken> basePhrase, List<INormalizedToken> witnessPhrase) {
     this.basePhrase = basePhrase;
     this.witnessPhrase = witnessPhrase;
   }
 
   @Override
-  public IPhrase getBasePhrase() {
+  public List<INormalizedToken> getBasePhrase() {
     return basePhrase;
   }
 
   @Override
-  public IPhrase getWitnessPhrase() {
+  public List<INormalizedToken> getWitnessPhrase() {
     return witnessPhrase;
   }
 
   @Override
   public String getNormalized() {
-    return witnessPhrase.getNormalized();
+    return NormalizedToken.toString(witnessPhrase);
   }
 
   @Override
   public String toString() {
-    return basePhrase.getNormalized();
+    return NormalizedToken.toString(basePhrase);
   }
 }

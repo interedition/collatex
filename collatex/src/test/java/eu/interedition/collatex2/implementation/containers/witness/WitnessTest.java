@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.vg_alignment.StartToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -25,6 +24,6 @@ public class WitnessTest {
     tokens.add(token3);
     IWitness w = new Witness("id", tokens);
     assertTrue(w.isNear(token1, token2));
-    assertTrue(w.isNear(new StartToken(), token1));
+    assertTrue(w.isNear(WitnessToken.START, token1));
   }
 }

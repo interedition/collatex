@@ -1,16 +1,13 @@
 package eu.interedition.collatex2.implementation.vg_analysis;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IWitness;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IWitness;
 
 public class SequenceDetector {
   
@@ -44,10 +41,7 @@ public class SequenceDetector {
   private void createAndAddChainedMatch(List<INormalizedToken> tokensBase, List<INormalizedToken> tokensB, List<ISequence> sequences) {
     // save current state if necessary
     if (tokensBase != null && !tokensBase.isEmpty()) {
-      IPhrase phraseBase = new Phrase(tokensBase);
-      IPhrase phraseB = new Phrase(tokensB);
-      ISequence sequence = new Sequence(phraseBase, phraseB);
-      sequences.add(sequence);
+      sequences.add(new Sequence(Lists.<INormalizedToken>newArrayList(tokensBase), Lists.<INormalizedToken>newArrayList(tokensB)));
     }
   }
 

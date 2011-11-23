@@ -19,13 +19,14 @@
 
 package eu.interedition.collatex2.interfaces.nonpublic;
 
-import java.util.Set;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-import eu.interedition.collatex2.interfaces.IPhrase;
+import java.util.List;
+import java.util.Set;
 
 public interface ITokenIndex {
 
-  IPhrase getPhrase(String key);
+  List<INormalizedToken> getPhrase(String key);
 
   boolean contains(String key);
 

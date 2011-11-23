@@ -153,9 +153,9 @@ public class LinkerTest {
     final IVariantGraph graph = engine.graph(witnessA);
     List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
     assertEquals(3, matches.size());
-    assertEquals("everything: 1 -> [everything]", matches.get(0).toString());
-    assertEquals("is: 2 -> [is]", matches.get(1).toString());
-    assertEquals("unique: 3 -> [unique]", matches.get(2).toString());
+    assertEquals("everything -> [everything]", matches.get(0).toString());
+    assertEquals("is -> [is]", matches.get(1).toString());
+    assertEquals("unique -> [unique]", matches.get(2).toString());
   }
 
 
@@ -192,9 +192,9 @@ public class LinkerTest {
     final IVariantGraph graph = engine.graph(witnessA);
     List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
     assertEquals(3, matches.size());
-    assertEquals("the: 1 -> [the]", matches.get(0).toString());
-    assertEquals("big: 2 -> [big]", matches.get(1).toString());
-    assertEquals("black: 3 -> [black]", matches.get(2).toString());
+    assertEquals("the -> [the]", matches.get(0).toString());
+    assertEquals("big -> [big]", matches.get(1).toString());
+    assertEquals("black -> [black]", matches.get(2).toString());
   }
 
   //Note: internally this gives # the big black and the big black cat as matches
@@ -205,10 +205,10 @@ public class LinkerTest {
     final IVariantGraph graph = engine.graph(witnessA);
     List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
     assertEquals(4, matches.size());
-    assertEquals("cat: 4 -> [cat]", matches.get(0).toString());
-    assertEquals("the: 1 -> [the]", matches.get(1).toString());
-    assertEquals("big: 2 -> [big]", matches.get(2).toString());
-    assertEquals("black: 3 -> [black]", matches.get(3).toString());
+    assertEquals("cat -> [cat]", matches.get(0).toString());
+    assertEquals("the -> [the]", matches.get(1).toString());
+    assertEquals("big -> [big]", matches.get(2).toString());
+    assertEquals("black -> [black]", matches.get(3).toString());
   }
 
 
@@ -219,12 +219,12 @@ public class LinkerTest {
     final IVariantGraph graph = engine.graph(witnessA);
     List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
     assertEquals(6, matches.size());
-    assertEquals("and: 4 -> [and]", matches.get(0).toString());
-    assertEquals("mat: 7 -> [mat]", matches.get(1).toString());
-    assertEquals("the: 1 -> [the]", matches.get(2).toString());
-    assertEquals("black: 2 -> [black]", matches.get(3).toString());
-    assertEquals("the: 5 -> [the]", matches.get(4).toString());
-    assertEquals("black: 6 -> [black]", matches.get(5).toString());
+    assertEquals("and -> [and]", matches.get(0).toString());
+    assertEquals("mat -> [mat]", matches.get(1).toString());
+    assertEquals("the -> [the]", matches.get(2).toString());
+    assertEquals("black -> [black]", matches.get(3).toString());
+    assertEquals("the -> [the]", matches.get(4).toString());
+    assertEquals("black -> [black]", matches.get(5).toString());
   }
 
   @Test
@@ -234,9 +234,9 @@ public class LinkerTest {
     final IVariantGraph graph = engine.graph(witnessA);
     List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
     assertEquals(3, matches.size());
-    assertEquals("the: 1 -> [the]", matches.get(0).toString());
-    assertEquals("black: 2 -> [black]", matches.get(1).toString());
-    assertEquals("cat: 5 -> [cat]", matches.get(2).toString());
+    assertEquals("the -> [the]", matches.get(0).toString());
+    assertEquals("black -> [black]", matches.get(1).toString());
+    assertEquals("cat -> [cat]", matches.get(2).toString());
   }
 
   @Test
