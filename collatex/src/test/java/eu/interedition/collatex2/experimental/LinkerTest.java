@@ -1,25 +1,22 @@
 package eu.interedition.collatex2.experimental;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
-import java.util.Map;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenMatch;
-import eu.interedition.collatex2.interfaces.ITokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.ITokenMatch;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LinkerTest {
   private static CollateXEngine engine;
@@ -29,25 +26,8 @@ public class LinkerTest {
     engine = new CollateXEngine();
   }
 
-  //convenience method
-  private List<ITokenMatch> createTokenMatches2(final IVariantGraph graph, final IWitness witnessB) {
-    Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, witnessB);
-    List<ITokenMatch> matches = Lists.newArrayList();
-    for (INormalizedToken witnessToken : tokens.keySet()) {
-      INormalizedToken baseToken = tokens.get(witnessToken);
-      ITokenMatch match = new TokenMatch(baseToken, witnessToken);
-      matches.add(match);
-    }
-    return matches;
-  }
-
-  //convenience method
-  private Map<INormalizedToken, INormalizedToken> linkTokens(final IVariantGraph graph, final IWitness witnessB) {
-    //TODO: should this test the tokenLinker ?
-    //TODO: I don't think so
-    ITokenLinker tokenLinker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> tokens = tokenLinker.link(new Superbase(graph), witnessB);
-    return tokens;
+  private Map<INormalizedToken, INormalizedToken> linkTokens(final IVariantGraph graph, final IWitness witness) {
+    return new TokenLinker().link(new Superbase(graph), witness);
   }
 
   @Test
@@ -151,25 +131,29 @@ public class LinkerTest {
     final IWitness witnessA = engine.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = engine.createWitness("B", "everything is unique");
     final IVariantGraph graph = engine.graph(witnessA);
-    List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
+    Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(graph, witnessB).entrySet();
     assertEquals(3, matches.size());
-    assertEquals("everything -> [everything]", matches.get(0).toString());
-    assertEquals("is -> [is]", matches.get(1).toString());
-    assertEquals("unique -> [unique]", matches.get(2).toString());
+    assertLink("everything", "everything", Iterables.get(matches, 0));
+    assertLink("is", "is", Iterables.get(matches, 1));
+    assertLink("unique", "unique", Iterables.get(matches, 2));
   }
 
 
+  private void assertLink(String left, String right, Map.Entry<INormalizedToken, INormalizedToken> match) {
+    assertEquals(left, match.getKey().getNormalized());
+    assertEquals(right, match.getValue().getNormalized());
+  }
   @Test
   public void testEverythingIsUniqueTwoWitnesses() {
     final IWitness witnessA = engine.createWitness("A", "everything is unique should be no problem");
     final IWitness witnessB = engine.createWitness("B", "this one very different");
     final IWitness witnessC = engine.createWitness("C", "everything is different");
     IVariantGraph graph = engine.graph(witnessA, witnessB);
-    List<ITokenMatch> matches = createTokenMatches2(graph, witnessC);
+    Set<Map.Entry<INormalizedToken,INormalizedToken>> matches = linkTokens(graph, witnessC).entrySet();
     assertEquals(3, matches.size());
-    assertEquals("everything", matches.get(0).getNormalized());
-    assertEquals("is", matches.get(1).getNormalized());
-    assertEquals("different", matches.get(2).getNormalized());
+    assertEquals("everything", Iterables.get(matches, 0).getValue().getNormalized());
+    assertEquals("is", Iterables.get(matches, 1).getValue().getNormalized());
+    assertEquals("different", Iterables.get(matches, 2).getValue().getNormalized());
   }
 
   @Test
@@ -178,11 +162,11 @@ public class LinkerTest {
     final IWitness witnessB = engine.createWitness("B", "this one is different");
     final IWitness witnessC = engine.createWitness("C", "everything is different");
     IVariantGraph graph = engine.graph(witnessA, witnessB);
-    List<ITokenMatch> matches = createTokenMatches2(graph, witnessC);
+    Set<Map.Entry<INormalizedToken,INormalizedToken>> matches = linkTokens(graph, witnessC).entrySet();
     assertEquals(3, matches.size());
-    assertEquals("everything", matches.get(0).getNormalized());
-    assertEquals("is", matches.get(1).getNormalized());
-    assertEquals("different", matches.get(2).getNormalized());
+    assertEquals("everything", Iterables.get(matches, 0).getValue().getNormalized());
+    assertEquals("is", Iterables.get(matches, 1).getValue().getNormalized());
+    assertEquals("different", Iterables.get(matches, 2).getValue().getNormalized());
   }
   
   @Test
@@ -190,11 +174,11 @@ public class LinkerTest {
     final IWitness witnessA = engine.createWitness("A", "The big black cat and the big black rat");
     final IWitness witnessB = engine.createWitness("B", "The big black");
     final IVariantGraph graph = engine.graph(witnessA);
-    List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
+    Set<Map.Entry<INormalizedToken,INormalizedToken>> matches = linkTokens(graph, witnessB).entrySet();
     assertEquals(3, matches.size());
-    assertEquals("the -> [the]", matches.get(0).toString());
-    assertEquals("big -> [big]", matches.get(1).toString());
-    assertEquals("black -> [black]", matches.get(2).toString());
+    assertLink("the", "the", Iterables.get(matches, 0));
+    assertLink("big", "big", Iterables.get(matches, 1));
+    assertLink("black", "black", Iterables.get(matches, 2));
   }
 
   //Note: internally this gives # the big black and the big black cat as matches
@@ -203,12 +187,12 @@ public class LinkerTest {
     final IWitness witnessA = engine.createWitness("A", "the big black cat and the big black rat");
     final IWitness witnessB = engine.createWitness("B", "the big black cat");
     final IVariantGraph graph = engine.graph(witnessA);
-    List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
+    Set<Map.Entry<INormalizedToken,INormalizedToken>> matches = linkTokens(graph, witnessB).entrySet();
     assertEquals(4, matches.size());
-    assertEquals("cat -> [cat]", matches.get(0).toString());
-    assertEquals("the -> [the]", matches.get(1).toString());
-    assertEquals("big -> [big]", matches.get(2).toString());
-    assertEquals("black -> [black]", matches.get(3).toString());
+    assertLink("cat", "cat", Iterables.get(matches, 0));
+    assertLink("the", "the", Iterables.get(matches, 1));
+    assertLink("big", "big", Iterables.get(matches, 2));
+    assertLink("black", "black", Iterables.get(matches, 3));
   }
 
 
@@ -217,14 +201,14 @@ public class LinkerTest {
     final IWitness witnessA = engine.createWitness("A", "the black cat and the black mat");
     final IWitness witnessB = engine.createWitness("B", "the black dog and the black mat");
     final IVariantGraph graph = engine.graph(witnessA);
-    List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
+    Set<Map.Entry<INormalizedToken,INormalizedToken>> matches = linkTokens(graph, witnessB).entrySet();
     assertEquals(6, matches.size());
-    assertEquals("and -> [and]", matches.get(0).toString());
-    assertEquals("mat -> [mat]", matches.get(1).toString());
-    assertEquals("the -> [the]", matches.get(2).toString());
-    assertEquals("black -> [black]", matches.get(3).toString());
-    assertEquals("the -> [the]", matches.get(4).toString());
-    assertEquals("black -> [black]", matches.get(5).toString());
+    assertLink("and", "and", Iterables.get(matches, 0));
+    assertLink("mat", "mat", Iterables.get(matches, 1));
+    assertLink("the", "the", Iterables.get(matches, 2));
+    assertLink("black", "black", Iterables.get(matches, 3));
+    assertLink("the", "the", Iterables.get(matches, 4));
+    assertLink("black", "black", Iterables.get(matches, 5));
   }
 
   @Test
@@ -232,11 +216,11 @@ public class LinkerTest {
     final IWitness witnessA = engine.createWitness("A", "The black cat");
     final IWitness witnessB = engine.createWitness("B", "The black and white cat");
     final IVariantGraph graph = engine.graph(witnessA);
-    List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
+    Set<Map.Entry<INormalizedToken,INormalizedToken>> matches = linkTokens(graph, witnessB).entrySet();
     assertEquals(3, matches.size());
-    assertEquals("the -> [the]", matches.get(0).toString());
-    assertEquals("black -> [black]", matches.get(1).toString());
-    assertEquals("cat -> [cat]", matches.get(2).toString());
+    assertLink("the", "the", Iterables.get(matches, 0));
+    assertLink("black", "black", Iterables.get(matches, 1));
+    assertLink("cat", "cat", Iterables.get(matches, 2));
   }
 
   @Test
@@ -245,10 +229,12 @@ public class LinkerTest {
     final IWitness witnessA = engine.createWitness("A", "a a");
     final IWitness witnessB = engine.createWitness("B", "a");
     final IVariantGraph graph = engine.graph(witnessA);
-    List<ITokenMatch> matches = createTokenMatches2(graph, witnessB);
+
+    final Set<Map.Entry<INormalizedToken,INormalizedToken>> matches = linkTokens(graph, witnessB).entrySet();
     assertEquals(1, matches.size());
-    ITokenMatch match = matches.get(0);
-    assertEquals(graph.getTokens(witnessA).get(0), match.getBaseToken());
-    assertEquals(witnessB.getTokens().get(0), match.getWitnessToken());
+
+    final Map.Entry<INormalizedToken, INormalizedToken> match = Iterables.get(matches, 0);
+    assertEquals(graph.getTokens(witnessA).get(0).getNormalized(), match.getKey());
+    assertEquals(witnessB.getTokens().get(0), match.getValue());
   }
 }
