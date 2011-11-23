@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.matching.IMatchResult;
+import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -15,7 +15,7 @@ public class WitnessIndexer {
     tokenSequences = Lists.newArrayList();
   }
 
-  public IWitnessIndex index(IWitness witness, IMatchResult result) {
+  public IWitnessIndex index(IWitness witness, Matches result) {
     processTokens(witness.getTokens(), result);
 //    // TODO: REMOVE THIS PART! REMOVE THIS PART!
 //    // here we try to do the mapping
@@ -36,7 +36,7 @@ public class WitnessIndexer {
     return new WitnessIndex(tokenSequences);
   }
   
-  protected void processTokens(List<INormalizedToken> tokens, IMatchResult result) {      
+  protected void processTokens(List<INormalizedToken> tokens, Matches result) {
     int position=0; //NOTE: position => index in path
     for (INormalizedToken token : tokens) {
       makeTokenUniqueIfneeded(token, tokens, position, result);
@@ -45,10 +45,10 @@ public class WitnessIndexer {
   }
   
   //NOTE: Remove index parameter?
-  private void makeTokenUniqueIfneeded(INormalizedToken token, List<INormalizedToken> tokens, int position, IMatchResult result) {
+  private void makeTokenUniqueIfneeded(INormalizedToken token, List<INormalizedToken> tokens, int position, Matches result) {
     // System.out.println("Trying "+token.getNormalized());
     // check uniqueness
-    final boolean unique = !result.getUnsureTokens().contains(token);
+    final boolean unique = !result.getAmbiguous().contains(token);
     if (!unique) {
 //      List<INormalizedToken> tempList = Lists.newArrayList(token);
 //      addAll(tempList); //TODO: extract separate add method with single vertex parameter!
@@ -62,13 +62,13 @@ public class WitnessIndexer {
 
   //NOTE: I would rather use an index to move to the left and right here!
   //NOTE: or an iterator!
-  private List<INormalizedToken> findUniqueTokensToTheLeft(List<INormalizedToken> path, IMatchResult result, int position) {
+  private List<INormalizedToken> findUniqueTokensToTheLeft(List<INormalizedToken> path, Matches result, int position) {
     List<INormalizedToken> tokens = Lists.newArrayList();
     boolean found = false; // not nice!
     for (int i = position ; !found && i > -1; i-- ) {
       INormalizedToken leftToken = path.get(i);
-      if (!result.getUnmatchedTokens().contains(leftToken)) {
-        found = !result.getUnsureTokens().contains(leftToken);
+      if (!result.getUnmatched().contains(leftToken)) {
+        found = !result.getAmbiguous().contains(leftToken);
         tokens.add(0, leftToken);
       }
     }
@@ -80,13 +80,13 @@ public class WitnessIndexer {
   
   //NOTE: I would rather use an index to move to the left and right here!
   //NOTE: or an iterator!
-  private List<INormalizedToken> findUniqueTokensToTheRight(List<INormalizedToken> path, IMatchResult result, int position) {
+  private List<INormalizedToken> findUniqueTokensToTheRight(List<INormalizedToken> path, Matches result, int position) {
     List<INormalizedToken> tokens = Lists.newArrayList();
     boolean found = false; // not nice!
     for (int i = position ; !found && i < path.size(); i++ ) {
       INormalizedToken rightToken = path.get(i);
-      if (!result.getUnmatchedTokens().contains(rightToken)) {
-        found = !result.getUnsureTokens().contains(rightToken);
+      if (!result.getUnmatched().contains(rightToken)) {
+        found = !result.getAmbiguous().contains(rightToken);
         tokens.add(rightToken);
       }
     }

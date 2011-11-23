@@ -2,7 +2,9 @@ package eu.interedition.collatex2.implementation.matching;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class EqualityTokenComparator extends TokenComparator {
+import java.util.Comparator;
+
+public class EqualityTokenComparator implements Comparator<INormalizedToken> {
 
   @Override
   public int compare(INormalizedToken base, INormalizedToken witness) {

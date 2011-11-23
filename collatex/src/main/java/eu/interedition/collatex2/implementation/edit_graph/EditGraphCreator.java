@@ -1,17 +1,16 @@
 package eu.interedition.collatex2.implementation.edit_graph;
 
-import java.util.Collection;
-import java.util.Set;
-
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex2.implementation.matching.TokenComparator;
+import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.implementation.vg_alignment.EndToken;
 import eu.interedition.collatex2.implementation.vg_alignment.StartToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
+
+import java.util.Collection;
+import java.util.Set;
 
 public class EditGraphCreator {
   private final EditGraph editGraph;
@@ -31,8 +30,7 @@ public class EditGraphCreator {
     Set<EditGraphVertex> lastConstructedVertices = Sets.newLinkedHashSet();
     lastConstructedVertices.add(startVertex);
     // build the decision graph from the matches and the variant graph
-    TokenComparator tokenComparator = new EqualityTokenComparator();
-    Multimap<INormalizedToken, INormalizedToken> matches = tokenComparator.match(a, b);
+    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
     // add for vertices for witness tokens that have a matching base token
     for (INormalizedToken wToken : b.getTokens()) {
       Collection<INormalizedToken> matchingTokens = matches.get(wToken);

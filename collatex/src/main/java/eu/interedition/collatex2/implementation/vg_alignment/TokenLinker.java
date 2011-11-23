@@ -4,15 +4,12 @@ import java.util.*;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
-import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex2.implementation.matching.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.matching.IMatchResult;
-import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
-import eu.interedition.collatex2.implementation.matching.TokenComparator;
 import eu.interedition.collatex2.implementation.vg_analysis.Sequence;
 import eu.interedition.collatex2.interfaces.ITokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -23,14 +20,12 @@ import eu.interedition.collatex2.interfaces.IWitness;
 public class TokenLinker implements ITokenLinker {
   private static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
-  private TokenComparator tokenComparator = new EqualityTokenComparator();
-
   @Override
   public Map<INormalizedToken, INormalizedToken> link(IVariantGraph graph, IWitness b) {
     final IWitness a = new Superbase(graph);
 
     LOG.trace("Matching tokens of {} and {}", a, b);
-    Multimap<INormalizedToken, INormalizedToken> matches = tokenComparator.match(a, b);
+    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
 
     // add start and end tokens as matches
     final INormalizedToken startNullToken = a.getTokens().get(0);
@@ -39,8 +34,7 @@ public class TokenLinker implements ITokenLinker {
     matches.put(new EndToken(b.size()), endNullToken);
 
     LOG.trace("Matching via Analyzer");
-    MatchResultAnalyzer analyzer1 = new MatchResultAnalyzer();
-    IMatchResult matchResult1 = analyzer1.analyze(a, b);
+    Matches matchResult1 = Matches.between(a, b, new EqualityTokenComparator());
 
     LOG.trace("Calculate witness sequences using indexer");
     WitnessIndexer indexer = new WitnessIndexer();
@@ -81,15 +75,14 @@ public class TokenLinker implements ITokenLinker {
     sequences = filterAwaySecondChoicesMultipleTokensOneColumn(Collections.unmodifiableList(sequences));
 
     // do the matching
-    matches = tokenComparator.match(a, b);
+    matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
 
     // Calculate MatchResult
-    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
-    IMatchResult matchResult = analyzer.analyze(a, b);
+    Matches matchResult = Matches.between(a, b, new EqualityTokenComparator());
     // result map
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
     // put sure matches in the result map
-    for (INormalizedToken token: matchResult.getSureTokens()) {
+    for (INormalizedToken token: matchResult.getUnique()) {
       alignedTokens.put(token, Iterables.getFirst(matches.get(token), null));
     }
     // add matched sequences to the aligned tokens

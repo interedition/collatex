@@ -2,7 +2,9 @@ package eu.interedition.collatex2.implementation.matching;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class EditDistanceTokenComparator extends TokenComparator {
+import java.util.Comparator;
+
+public class EditDistanceTokenComparator implements Comparator<INormalizedToken> {
 
   private final int threshold;
 
