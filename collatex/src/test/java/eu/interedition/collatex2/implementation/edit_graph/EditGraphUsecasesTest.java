@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
+import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -28,7 +29,7 @@ public class EditGraphUsecasesTest {
     IWitness b = engine.createWitness("B", "The black and white cat");
     IVariantGraph graph = engine.graph(a);
     EditGraphLinker linker = new EditGraphLinker();
-    Map<INormalizedToken, INormalizedToken> link = linker.link(graph, b);
+    Map<INormalizedToken, INormalizedToken> link = linker.link(new Superbase(graph), b);
     assertEquals(3, link.size());
     //TODO: add asserts!
     //System.out.println(link);

@@ -12,7 +12,6 @@ import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenLinker;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +24,12 @@ public class TokenLinker implements ITokenLinker {
   private static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
   @Override
-  public Map<INormalizedToken, INormalizedToken> link(IVariantGraph graph, IWitness b) {
-    final IWitness a = new Superbase(graph);
-
+  public Map<INormalizedToken, INormalizedToken> link(IWitness a, IWitness b) {
     LOG.trace("Matching tokens of {} and {}", a, b);
     final Matches matches = Matches.between(a, b, new EqualityTokenComparator());
 
     // add start and end tokens as matches
-    Multimap<INormalizedToken, INormalizedToken> boundedMatches = ArrayListMultimap.create(matches.getAll());
+    final Multimap<INormalizedToken, INormalizedToken> boundedMatches = ArrayListMultimap.create(matches.getAll());
     boundedMatches.put(WitnessToken.START, a.getTokens().get(0));
     boundedMatches.put(WitnessToken.END, a.getTokens().get(a.size() - 1));
 
@@ -144,10 +141,8 @@ public class TokenLinker implements ITokenLinker {
       final Match<List<INormalizedToken>> phraseMatch = phraseMatchIt.next();
 
       final List<Match<INormalizedToken>> tokenMatches = Lists.newArrayList();
-      final List<INormalizedToken> leftPhrase = phraseMatch.left;
-      final List<INormalizedToken> rightPhrase = phraseMatch.right;
-      final Iterator<INormalizedToken> leftIt = leftPhrase.iterator();
-      final Iterator<INormalizedToken> rightIt = rightPhrase.iterator();
+      final Iterator<INormalizedToken> leftIt = phraseMatch.left.iterator();
+      final Iterator<INormalizedToken> rightIt = phraseMatch.right.iterator();
       while (leftIt.hasNext() && rightIt.hasNext()) {
         final INormalizedToken left = leftIt.next();
         final INormalizedToken right = rightIt.next();
@@ -159,11 +154,11 @@ public class TokenLinker implements ITokenLinker {
       }
 
       for (Match<INormalizedToken> tokenMatch : tokenMatches) {
-        final INormalizedToken previousMatch = previousMatches.get(tokenMatch.right);
-        if (previousMatch != null && !previousMatch.equals(tokenMatch.left)) {
+        final INormalizedToken previousMatch = previousMatches.get(tokenMatch.left);
+        if (previousMatch != null && !previousMatch.equals(tokenMatch.right)) {
           foundAlternative = true;
         } else {
-          previousMatches.put(tokenMatch.right, tokenMatch.left);
+          previousMatches.put(tokenMatch.left, tokenMatch.right);
         }
       }
       if (foundAlternative) {
