@@ -4,13 +4,15 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
-import eu.interedition.collatex2.implementation.matching.*;
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex2.implementation.matching.Match;
+import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
-import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
@@ -223,14 +225,14 @@ public class DeTestDirkVincent {
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
     IWitness e = factory.createWitness("xxx", "The same as when Darly among others once died and left him.");
     builder.add(e);
-    List<ISequence> sequences = builder.getSequences();
-    assertEquals("The same as when", Token.toString(sequences.get(0).getWitnessPhrase()));
-    assertEquals("Darly", Token.toString(sequences.get(1).getWitnessPhrase()));
-    assertEquals("among others", Token.toString(sequences.get(2).getWitnessPhrase()));
-    assertEquals("once died left him .", Token.toString(sequences.get(3).getWitnessPhrase()));
+    List<Match<List<INormalizedToken>>> sequences = builder.getSequences();
+    assertEquals("The same as when", Token.toString(sequences.get(0).right));
+    assertEquals("Darly", Token.toString(sequences.get(1).right));
+    assertEquals("among others", Token.toString(sequences.get(2).right));
+    assertEquals("once died left him .", Token.toString(sequences.get(3).right));
     List<ITransposition> transpositions = builder.getTranspositions();
-    assertEquals("darly", transpositions.get(0).getSequenceB().getNormalized());
-    assertEquals("among others", transpositions.get(1).getSequenceB().getNormalized());
+    assertEquals("darly", NormalizedToken.toString(transpositions.get(0).getSequenceB().right));
+    assertEquals("among others", NormalizedToken.toString(transpositions.get(1).getSequenceB().right));
   }
 
   

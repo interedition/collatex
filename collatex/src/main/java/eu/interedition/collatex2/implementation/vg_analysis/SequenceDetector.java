@@ -2,6 +2,7 @@ package eu.interedition.collatex2.implementation.vg_analysis;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -11,14 +12,14 @@ import java.util.Map.Entry;
 
 public class SequenceDetector {
   
-  public List<ISequence> detect(Map<INormalizedToken, INormalizedToken> linkedTokens, IWitness superbase, IWitness witness) {
+  public List<Match<List<INormalizedToken>>> detect(Map<INormalizedToken, INormalizedToken> linkedTokens, IWitness superbase, IWitness witness) {
     Map<INormalizedToken, IAlignedToken> alignedTokens = createAlignedTokensMap(linkedTokens);
     Map<IAlignedToken, IAlignedToken> previousMapForBase = buildPreviousMap(superbase, alignedTokens);
     Map<IAlignedToken, IAlignedToken> previousMapForWitness = buildPreviousMap(witness, alignedTokens);
     // chain token matches
     List<INormalizedToken> tokensBase = Lists.newArrayList();
     List<INormalizedToken> tokensWitness = Lists.newArrayList();
-    List<ISequence> sequences = Lists.newArrayList();
+    List<Match<List<INormalizedToken>>> sequences = Lists.newArrayList();
     for (IAlignedToken tokenMatch : previousMapForWitness.keySet()) {
       IAlignedToken previousBase = previousMapForBase.get(tokenMatch);
       IAlignedToken previousWitness = previousMapForWitness.get(tokenMatch);
@@ -38,10 +39,10 @@ public class SequenceDetector {
     return sequences;
   }
 
-  private void createAndAddChainedMatch(List<INormalizedToken> tokensBase, List<INormalizedToken> tokensB, List<ISequence> sequences) {
+  private void createAndAddChainedMatch(List<INormalizedToken> tokensBase, List<INormalizedToken> tokensB, List<Match<List<INormalizedToken>>> sequences) {
     // save current state if necessary
     if (tokensBase != null && !tokensBase.isEmpty()) {
-      sequences.add(new Sequence(Lists.<INormalizedToken>newArrayList(tokensBase), Lists.<INormalizedToken>newArrayList(tokensB)));
+      sequences.add(new Match<List<INormalizedToken>>(Lists.newArrayList(tokensBase), Lists.newArrayList(tokensB)));
     }
   }
 

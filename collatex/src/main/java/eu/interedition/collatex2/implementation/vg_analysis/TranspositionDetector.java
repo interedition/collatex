@@ -28,6 +28,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
 
@@ -35,15 +36,15 @@ import eu.interedition.collatex2.interfaces.ITokenContainer;
 public class TranspositionDetector implements ITranspositionDetector {
 
   @Override
-  public List<ITransposition> detect(List<ISequence> sequences, ITokenContainer base) {
-    List<ISequence> sequencesSortedForBase = sortSequencesForBase(sequences, base);
+  public List<ITransposition> detect(List<Match<List<INormalizedToken>>> sequences, ITokenContainer base) {
+    List<Match<List<INormalizedToken>>> sequencesSortedForBase = sortSequencesForBase(sequences, base);
     if (sequencesSortedForBase.size()!=sequences.size()) {
       throw new RuntimeException("Something went wrong in the linking process!");
     }
     final List<ITransposition> transpositions = Lists.newArrayList();
     for (int i = 0; i < sequences.size(); i++) {
-      final ISequence sequenceWitness = sequences.get(i);
-      final ISequence sequenceBase = sequencesSortedForBase.get(i);
+      final Match<List<INormalizedToken>> sequenceWitness = sequences.get(i);
+      final Match<List<INormalizedToken>> sequenceBase = sequencesSortedForBase.get(i);
       if (!sequenceWitness.equals(sequenceBase)) {
         // TODO: I have got no idea why have to mirror the sequences here!
         transpositions.add(new Transposition(sequenceBase, sequenceWitness));
@@ -52,20 +53,20 @@ public class TranspositionDetector implements ITranspositionDetector {
     return transpositions;
   }
 
-  private List<ISequence> sortSequencesForBase(List<ISequence> sequences, ITokenContainer base) {
+  private List<Match<List<INormalizedToken>>> sortSequencesForBase(List<Match<List<INormalizedToken>>> sequences, ITokenContainer base) {
     // prepare map
-    Map<INormalizedToken, ISequence> tokenToSequenceMap = Maps.newLinkedHashMap();
-    for (ISequence sequence : sequences) {
-      INormalizedToken firstToken = Iterables.getFirst(sequence.getBasePhrase(), null);
+    Map<INormalizedToken, Match<List<INormalizedToken>>> tokenToSequenceMap = Maps.newLinkedHashMap();
+    for (Match<List<INormalizedToken>> sequence : sequences) {
+      INormalizedToken firstToken = Iterables.getFirst(sequence.left, null);
       tokenToSequenceMap.put(firstToken, sequence);
     }
     // sort sequences
-    List<ISequence> orderedSequences = Lists.newArrayList();
+    List<Match<List<INormalizedToken>>> orderedSequences = Lists.newArrayList();
     Iterator<INormalizedToken> tokenIterator = base.tokenIterator();
     while(tokenIterator.hasNext()) {
       INormalizedToken token = tokenIterator.next();
       if (tokenToSequenceMap.containsKey(token)) {
-        ISequence sequence = tokenToSequenceMap.get(token);
+        Match<List<INormalizedToken>> sequence = tokenToSequenceMap.get(token);
         orderedSequences.add(sequence);
       }
     }
