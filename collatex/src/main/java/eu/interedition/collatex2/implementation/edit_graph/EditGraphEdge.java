@@ -11,11 +11,13 @@ public class EditGraphEdge {
   private final EditGraphVertex sourceVertex;
   private final EditGraphVertex targetVertex;
   private final EditOperation operation;
+  private final int score;
 
-  public EditGraphEdge(EditGraphVertex source, EditGraphVertex target, EditOperation operation) {
+  public EditGraphEdge(EditGraphVertex source, EditGraphVertex target, EditOperation operation, int score) {
     this.sourceVertex = source;
     this.targetVertex = target;
     this.operation = operation;
+    this.score = score;
   }
 
   public EditGraphVertex getSourceVertex() {
@@ -28,6 +30,10 @@ public class EditGraphEdge {
 
   public EditOperation getEditOperation() {
     return operation;
+  }
+
+  Integer getScore() {
+    return score;
   }
 
   @Override
