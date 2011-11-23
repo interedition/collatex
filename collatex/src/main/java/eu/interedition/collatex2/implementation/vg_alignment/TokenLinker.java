@@ -47,7 +47,7 @@ public class TokenLinker implements ITokenLinker {
     Map<ITokenSequence, IPhrase> linkedSequences = Maps.newLinkedHashMap();
     for (ITokenSequence tokenSequence : tokenSequences) {
       if (LOG.isTraceEnabled()) {
-        LOG.trace("Searching for token sequence: {}", tokenSequence.getNormalized());
+        LOG.trace("Searching for token sequence: {}", toString(tokenSequence.getTokens()));
       }
       List<INormalizedToken> matchedBaseTokens;
       if (tokenSequence.expandsToTheRight()) {
@@ -58,7 +58,7 @@ public class TokenLinker implements ITokenLinker {
       if (!matchedBaseTokens.isEmpty()) {
         final Phrase phrase = new Phrase(matchedBaseTokens);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Matched {} and {}", tokenSequence.getNormalized(), phrase.getNormalized());
+            LOG.trace("Matched {} and {}", toString(tokenSequence.getTokens()), phrase.getNormalized());
         }
         linkedSequences.put(tokenSequence, phrase);
       }
@@ -302,5 +302,14 @@ public class TokenLinker implements ITokenLinker {
 
   public static List<INormalizedToken> findMatches(IWitness a, Collection<INormalizedToken> matches) {
     return Lists.newArrayList(Iterables.filter(a.getTokens(), Predicates.in(matches)));
+  }
+
+  public static String toString(List<INormalizedToken> tokens) {
+    final StringBuilder str = new StringBuilder();
+    for (INormalizedToken token : tokens) {
+      str.append(token.getNormalized()).append(" ");
+    }
+    return str.toString().trim();
+
   }
 }

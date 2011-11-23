@@ -10,8 +10,6 @@ public interface ITokenSequence {
 
   INormalizedToken getLastToken();
 
-  String getNormalized();
-
   boolean expandsToTheRight();
 
   List<INormalizedToken> getTokens();

@@ -44,7 +44,7 @@ public class TokenSequence implements ITokenSequence {
   
   @Override
   public String toString() {
-    return getNormalized();
+    return TokenLinker.toString(getTokens());
   }
 
   @Override
@@ -59,19 +59,6 @@ public class TokenSequence implements ITokenSequence {
   
   public List<INormalizedToken> getTokens() {
     return Lists.newArrayList(tokens);
-  }
-  
-  //Note: just for testing purposes
-  public String getNormalized() {
-    //hmm: I have written this code before!
-    String separator = "";
-    StringBuffer buffer = new StringBuffer();
-    for (INormalizedToken token : getTokens()) {
-      buffer.append(separator);
-      buffer.append(token.getNormalized());
-      separator = " ";
-    }
-    return buffer.toString();
   }
   
   @Override
