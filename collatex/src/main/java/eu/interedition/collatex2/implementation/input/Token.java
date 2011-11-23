@@ -25,7 +25,6 @@ import eu.interedition.collatex2.interfaces.IToken;
 public class Token implements IToken {
   private String content;
   private String trailingWhitespace; 
-  // private int characterPosition; // TODO?
 
   public Token() {
     this.trailingWhitespace = "";
@@ -57,22 +56,6 @@ public class Token implements IToken {
 
   public void setTrailingWhitespace(String whitespace) {
     this.trailingWhitespace = whitespace;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if ((obj != null) && (obj instanceof Token)) {
-      final Token token = (Token) obj;
-      return content.equals(token.content);
-    }
-    return super.equals(obj);
-  }
-
-  @Override
-  public int hashCode() {
-    int hc = 17;
-    hc = hc * 59 + content.hashCode();
-    return hc;
   }
 
   @Override

@@ -4,10 +4,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import org.junit.Test;
 
-import eu.interedition.collatex2.implementation.vg_alignment.EndToken;
-import eu.interedition.collatex2.implementation.vg_alignment.StartToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
 //TODO: add a test where there is sometimes no match for a given token
@@ -39,8 +38,8 @@ public class EditGraphCreatorTest {
     INormalizedToken wCat2 = witness.add("cat");
  
     //setup vertices
-    EditGraphVertex startVertex = new EditGraphVertex(null, new StartToken()); // vGraph.getStartVertex());
-    EditGraphVertex endVertex = new EditGraphVertex(null, new EndToken(base.size()+1));
+    EditGraphVertex startVertex = new EditGraphVertex(null, WitnessToken.START); // vGraph.getStartVertex());
+    EditGraphVertex endVertex = new EditGraphVertex(null, WitnessToken.END);
     EditGraphVertex vertex1 = new EditGraphVertex(wThe, bThe);
     EditGraphVertex vertex2 = new EditGraphVertex(wThe, bThe2);
     EditGraphVertex vertex3 = new EditGraphVertex(wRed, bRed);
@@ -116,8 +115,8 @@ public class EditGraphCreatorTest {
     INormalizedToken wCat = witness.add("cat");
 
     //setup vertices
-    EditGraphVertex startVertex = new EditGraphVertex(null, new StartToken()); // vGraph.getStartVertex());
-    EditGraphVertex endVertex = new EditGraphVertex(null, new EndToken(base.size()+1));
+    EditGraphVertex startVertex = new EditGraphVertex(null, WitnessToken.START); // vGraph.getStartVertex());
+    EditGraphVertex endVertex = new EditGraphVertex(null, WitnessToken.END);
     EditGraphVertex vertex1 = new EditGraphVertex(wThe, bThe);
     EditGraphVertex vertex2 = new EditGraphVertex(wThe, bThe2);
     EditGraphVertex vertex3 = new EditGraphVertex(wBlack, bBlack);

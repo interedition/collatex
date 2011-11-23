@@ -16,6 +16,7 @@
 package eu.interedition.collatex2.implementation.vg_alignment;
 
 import com.google.common.collect.Lists;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.interfaces.*;
 
 import java.util.Iterator;
@@ -57,10 +58,10 @@ public class Superbase implements IWitness {
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    if (a instanceof StartToken) {
+    if (WitnessToken.START.equals(a)) {
       a = graph.getStartVertex();
     }
-    if (b instanceof EndToken) {
+    if (WitnessToken.END.equals(b)) {
       b = graph.getEndVertex();
     }
     return graph.isNear(a, b);

@@ -28,8 +28,6 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.vg_alignment.EndToken;
-import eu.interedition.collatex2.implementation.vg_alignment.StartToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IToken;
@@ -54,12 +52,12 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
 
   protected void prepareTokens() {
     relations = Maps.newLinkedHashMap();
-    INormalizedToken previous = new StartToken();
+    INormalizedToken previous = WitnessToken.START;
     for (INormalizedToken token : tokens) {
       relations.put(previous, token);
       previous = token;
     }
-    relations.put(previous, new EndToken(tokens.size()+1));
+    relations.put(previous, WitnessToken.END);
   }
 
   // Note: not pleased with this method! implement Iterable!

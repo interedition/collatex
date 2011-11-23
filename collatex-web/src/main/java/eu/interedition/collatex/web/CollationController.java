@@ -119,9 +119,7 @@ public class CollationController {
         witness.setTokens(Lists.<INormalizedToken>newArrayList(Iterables.transform(tokens, Token.TO_TOKEN)));
       }
 
-      int tokenPosition = 0;
       for (Token token : witness.getApiTokens()) {
-        token.setPosition(++tokenPosition);
         if (token.getNormalized() == null || token.getNormalized().trim().length() == 0) {
           token.setNormalized(defaultNormalizer.apply(token).getNormalized());
         }

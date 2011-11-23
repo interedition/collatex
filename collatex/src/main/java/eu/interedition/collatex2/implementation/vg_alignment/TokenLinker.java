@@ -5,6 +5,7 @@ import java.util.*;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.matching.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,8 @@ public class TokenLinker implements ITokenLinker {
     Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
 
     // add start and end tokens as matches
-    matches.put(new StartToken(), a.getTokens().get(0));
-    matches.put(new EndToken(b.size()), a.getTokens().get(a.size() - 1));
+    matches.put(WitnessToken.START, a.getTokens().get(0));
+    matches.put(WitnessToken.END, a.getTokens().get(a.size() - 1));
 
     LOG.trace("Matching tokens");
     Matches matchResult1 = Matches.between(a, b, new EqualityTokenComparator());
@@ -92,7 +93,7 @@ public class TokenLinker implements ITokenLinker {
       for (INormalizedToken witnessToken : sequence.getWitnessPhrase().getTokens()) {
         INormalizedToken possibility = iterator.next();
         // skip start and end tokens
-        if (!(witnessToken instanceof StartToken || witnessToken instanceof EndToken)) {
+        if (!WitnessToken.START.equals(witnessToken) && !WitnessToken.END.equals(witnessToken)) {
           alignedTokens.put(witnessToken, possibility);
         }
       }
@@ -104,18 +105,15 @@ public class TokenLinker implements ITokenLinker {
     final List<INormalizedToken> tokens = witness.getTokens();
     final int tokenCount = tokens.size();
 
-    final StartToken startStopMarker = new StartToken();
-    final EndToken endStopMarker = new EndToken(tokenCount);
-
     final List<ITokenSequence> tokenSequences =  Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size() * 2);
 
     for (int tc = 0; tc < tokenCount; tc++) {
       // for each ambiguous token
       if (matches.getAmbiguous().contains(tokens.get(tc))) {
         // find a minimal unique subsequence by walking to the left
-        tokenSequences.add(new TokenSequence(reverse(findMinimalUniquePrefix(reverse(tokens.subList(0, tc + 1)), matches, startStopMarker)), true));
+        tokenSequences.add(new TokenSequence(reverse(findMinimalUniquePrefix(reverse(tokens.subList(0, tc + 1)), matches, WitnessToken.START)), true));
         // find a minimal unique subsequence by walking to the right
-        tokenSequences.add(new TokenSequence(findMinimalUniquePrefix(tokens.subList(tc, tokenCount), matches, endStopMarker), false));
+        tokenSequences.add(new TokenSequence(findMinimalUniquePrefix(tokens.subList(tc, tokenCount), matches, WitnessToken.END), false));
       }
     }
 

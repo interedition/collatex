@@ -12,7 +12,7 @@ public class FakeWitness extends Witness {
   
   public INormalizedToken add(String content) {
     String normalized = content.toLowerCase();
-    INormalizedToken token = new WitnessToken(content, tokens.size()+1, normalized);
+    INormalizedToken token = new WitnessToken(content, normalized);
     tokens.add(token);
     prepareTokens();
     return token;

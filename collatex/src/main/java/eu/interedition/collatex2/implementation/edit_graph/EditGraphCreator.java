@@ -2,10 +2,9 @@ package eu.interedition.collatex2.implementation.edit_graph;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.matching.Matches;
-import eu.interedition.collatex2.implementation.vg_alignment.EndToken;
-import eu.interedition.collatex2.implementation.vg_alignment.StartToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -25,7 +24,7 @@ public class EditGraphCreator {
 
   public EditGraph buildEditGraph(IWitness a, IWitness b) {
     // create start vertex
-    EditGraphVertex startVertex = new EditGraphVertex(null, new StartToken());
+    EditGraphVertex startVertex = new EditGraphVertex(null, WitnessToken.START);
     editGraph.setStartVertex(startVertex);
     Set<EditGraphVertex> lastConstructedVertices = Sets.newLinkedHashSet();
     lastConstructedVertices.add(startVertex);
@@ -53,7 +52,7 @@ public class EditGraphCreator {
       }
     }
     // create end vertex
-    EditGraphVertex endVertex = new EditGraphVertex(null, new EndToken(a.size()+1));
+    EditGraphVertex endVertex = new EditGraphVertex(null, WitnessToken.END);
     editGraph.setEndVertex(endVertex);
     // add edges to end vertex
     //TODO: remove duplication!
