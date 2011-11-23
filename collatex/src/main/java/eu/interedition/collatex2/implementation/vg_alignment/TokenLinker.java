@@ -2,6 +2,7 @@ package eu.interedition.collatex2.implementation.vg_alignment;
 
 import java.util.*;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
 import eu.interedition.collatex2.implementation.matching.*;
@@ -33,14 +34,14 @@ public class TokenLinker implements ITokenLinker {
     matches.put(new StartToken(), a.getTokens().get(0));
     matches.put(new EndToken(b.size()), a.getTokens().get(a.size() - 1));
 
-    LOG.trace("Matching via Analyzer");
+    LOG.trace("Matching tokens");
     Matches matchResult1 = Matches.between(a, b, new EqualityTokenComparator());
 
-    LOG.trace("Calculate witness sequences using indexer");
+    LOG.trace("Finding minimal unique token sequences");
     final List<ITokenSequence> tokenSequences = findUniqueTokenSequences(b, matchResult1);
 
-    LOG.trace("Calculate 'derivation': Ignore non matches from the base");
-    List<INormalizedToken> derivation = derive(a, matches);
+    LOG.trace("Calculate 'aMatches': Ignore non matches from the base");
+    List<INormalizedToken> aMatches = findMatches(a, matches.values());
 
     // try and find matches in the base for each sequence in the witness
     Map<ITokenSequence, IPhrase> linkedSequences = Maps.newLinkedHashMap();
@@ -50,9 +51,9 @@ public class TokenLinker implements ITokenLinker {
       }
       List<INormalizedToken> matchedBaseTokens;
       if (tokenSequence.expandsToTheRight()) {
-        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheRight(tokenSequence, matches, derivation);
+        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheRight(tokenSequence, matches, aMatches);
       } else {
-        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheLeft(tokenSequence, matches, derivation);
+        matchedBaseTokens = findMatchingBaseTokensForSequenceToTheLeft(tokenSequence, matches, aMatches);
       }
       if (!matchedBaseTokens.isEmpty()) {
         final Phrase phrase = new Phrase(matchedBaseTokens);
@@ -248,56 +249,42 @@ public class TokenLinker implements ITokenLinker {
 
   // This method should return the matching base tokens for a given sequence
   // Note: this method works for sequences that have the fixed token on the left and expand to the right
-  private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheRight(ITokenSequence sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
-    final INormalizedToken fixedWitnessToken = sequence.getFirstToken();
-    final Collection<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
-    if (matchesForFixedTokenWitness.isEmpty()) {
-      throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
-    }
-    if (matchesForFixedTokenWitness.size()!=1) {
-      throw new RuntimeException("Multiple matches found in base for fixed witness token! tokens: "+fixedWitnessToken);
-    }
-    INormalizedToken fixedBaseToken = Iterables.getFirst(matchesForFixedTokenWitness, null);
-    // traverse here the rest of the token sequence
-    List<INormalizedToken> restTokens = Lists.newArrayList(sequence.getTokens());
-    restTokens.remove(fixedWitnessToken);
-    return tryTheDifferentPossibilities(matches, afgeleide, fixedBaseToken, restTokens, 1);
+  private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheRight(ITokenSequence sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> aMatches) {
+    final INormalizedToken startTokenInB = sequence.getFirstToken();
+    final Collection<INormalizedToken> startMatches = matches.get(startTokenInB);
+
+    Preconditions.checkState(!startMatches.isEmpty(), "No match found in base for fixed witness token");
+    Preconditions.checkState(startMatches.size() == 1, "Multiple matches found in base for fixed witness token");
+
+    final INormalizedToken startTokenInA = Iterables.getFirst(startMatches, null);
+    return tryTheDifferentPossibilities(matches, aMatches, startTokenInA, sequence.getTokens().subList(1, sequence.getTokens().size()), 1);
   }
 
   // This method should return the matching base tokens for a given sequence
   // Note: this method works for sequences that have the fixed token on the right and expand to the left
-  private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheLeft(ITokenSequence sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide) {
-    final INormalizedToken fixedWitnessToken = sequence.getLastToken();
-    final Collection<INormalizedToken> matchesForFixedTokenWitness = matches.get(fixedWitnessToken);
-    if (matchesForFixedTokenWitness.isEmpty()) {
-      throw new RuntimeException("No match found in base for fixed witness token! token: "+fixedWitnessToken);
-    }
-    if (matchesForFixedTokenWitness.size()!=1) {
-      throw new RuntimeException("Multiple matches found in base for fixed witness token! tokens: "+fixedWitnessToken);
-    }
-    INormalizedToken fixedBaseToken = Iterables.getFirst(matchesForFixedTokenWitness, null);
-    // traverse here the rest of the token sequence
-    List<INormalizedToken> restTokens = Lists.newArrayList(sequence.getTokens());
-    restTokens.remove(fixedWitnessToken);
-    Collections.reverse(restTokens);
-    final List<INormalizedToken> matchedBaseTokens = tryTheDifferentPossibilities(matches, afgeleide, fixedBaseToken, restTokens, -1);
-    Collections.reverse(matchedBaseTokens);
-    return matchedBaseTokens;
+  private List<INormalizedToken> findMatchingBaseTokensForSequenceToTheLeft(ITokenSequence sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> aMatches) {
+    final INormalizedToken startTokenInB = sequence.getLastToken();
+    final Collection<INormalizedToken> startMatches = matches.get(startTokenInB);
+
+    Preconditions.checkState(!startMatches.isEmpty(), "No match found in base for fixed witness token");
+    Preconditions.checkState(startMatches.size() == 1, "Multiple matches found in base for fixed witness token");
+
+    INormalizedToken startTokenInA = Iterables.getFirst(startMatches, null);
+    return reverse(tryTheDifferentPossibilities(matches, aMatches, startTokenInA, reverse(sequence.getTokens().subList(0, sequence.getTokens().size() - 1)), -1));
   }
 
-  private List<INormalizedToken> tryTheDifferentPossibilities(Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> afgeleide, INormalizedToken fixedBaseToken,
+  private List<INormalizedToken> tryTheDifferentPossibilities(Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> aMatches, INormalizedToken startTokenInA,
       List<INormalizedToken> restTokens, int expectedDirection) {
     boolean validWholeSequence = true;
-    List<INormalizedToken> matchedBaseTokens = Lists.newArrayList(fixedBaseToken);
-    INormalizedToken lastToken = fixedBaseToken;
+    List<INormalizedToken> matchedBaseTokens = Lists.newArrayList(startTokenInA);
+    INormalizedToken lastToken = startTokenInA;
     for (INormalizedToken token : restTokens) {
-      Collection<INormalizedToken> possibilities = matches.get(token);
       boolean valid = false;
-      for (INormalizedToken possibility : possibilities) {
-        int direction = afgeleide.indexOf(possibility) - afgeleide.indexOf(lastToken);
+      for (INormalizedToken possibleMatch : matches.get(token)) {
+        int direction = aMatches.indexOf(possibleMatch) - aMatches.indexOf(lastToken);
         if (direction == expectedDirection) {
-          matchedBaseTokens.add(possibility);
-          lastToken = possibility;
+          matchedBaseTokens.add(possibleMatch);
+          lastToken = possibleMatch;
           valid = true;
           break;
         }
@@ -313,7 +300,7 @@ public class TokenLinker implements ITokenLinker {
     return Collections.emptyList();
   }
 
-  public static List<INormalizedToken> derive(IWitness a, Multimap<INormalizedToken, INormalizedToken> matches) {
-    return Lists.newArrayList(Iterables.filter(a.getTokens(), Predicates.in(matches.values())));
+  public static List<INormalizedToken> findMatches(IWitness a, Collection<INormalizedToken> matches) {
+    return Lists.newArrayList(Iterables.filter(a.getTokens(), Predicates.in(matches)));
   }
 }

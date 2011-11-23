@@ -61,7 +61,7 @@ public class DeTestDirkVincent {
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
-    List<INormalizedToken> afgeleideWitness = TokenLinker.derive(a, matches);
+    List<INormalizedToken> afgeleideWitness = TokenLinker.findMatches(a, matches.values());
     Iterator<INormalizedToken> tokenIterator = afgeleideWitness.iterator();
     assertEquals("Its", tokenIterator.next().getContent());
     assertEquals("soft", tokenIterator.next().getContent());
