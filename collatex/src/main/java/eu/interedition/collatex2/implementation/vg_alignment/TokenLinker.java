@@ -17,6 +17,8 @@ import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
+import static com.google.common.collect.Lists.reverse;
+
 public class TokenLinker implements ITokenLinker {
   private static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
@@ -28,24 +30,21 @@ public class TokenLinker implements ITokenLinker {
     Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
 
     // add start and end tokens as matches
-    final INormalizedToken startNullToken = a.getTokens().get(0);
-    matches.put(new StartToken(), startNullToken);
-    final INormalizedToken endNullToken = a.getTokens().get(a.size() - 1);
-    matches.put(new EndToken(b.size()), endNullToken);
+    matches.put(new StartToken(), a.getTokens().get(0));
+    matches.put(new EndToken(b.size()), a.getTokens().get(a.size() - 1));
 
     LOG.trace("Matching via Analyzer");
     Matches matchResult1 = Matches.between(a, b, new EqualityTokenComparator());
 
     LOG.trace("Calculate witness sequences using indexer");
-    WitnessIndexer indexer = new WitnessIndexer();
-    IWitnessIndex index = indexer.index(b, matchResult1);
+    final List<ITokenSequence> tokenSequences = findUniqueTokenSequences(b, matchResult1);
 
     LOG.trace("Calculate 'derivation': Ignore non matches from the base");
     List<INormalizedToken> derivation = derive(a, matches);
 
     // try and find matches in the base for each sequence in the witness
     Map<ITokenSequence, IPhrase> linkedSequences = Maps.newLinkedHashMap();
-    for (ITokenSequence tokenSequence : index.getTokenSequences()) {
+    for (ITokenSequence tokenSequence : tokenSequences) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Searching for token sequence: {}", tokenSequence.getNormalized());
       }
@@ -98,6 +97,44 @@ public class TokenLinker implements ITokenLinker {
       }
     }
     return alignedTokens;
+  }
+
+  public static List<ITokenSequence> findUniqueTokenSequences(IWitness witness, Matches matches) {
+    final List<INormalizedToken> tokens = witness.getTokens();
+    final int tokenCount = tokens.size();
+
+    final StartToken startStopMarker = new StartToken();
+    final EndToken endStopMarker = new EndToken(tokenCount);
+
+    final List<ITokenSequence> tokenSequences =  Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size() * 2);
+
+    for (int tc = 0; tc < tokenCount; tc++) {
+      // for each ambiguous token
+      if (matches.getAmbiguous().contains(tokens.get(tc))) {
+        // find a minimal unique subsequence by walking to the left
+        tokenSequences.add(new TokenSequence(reverse(findMinimalUniquePrefix(reverse(tokens.subList(0, tc + 1)), matches, startStopMarker)), true));
+        // find a minimal unique subsequence by walking to the right
+        tokenSequences.add(new TokenSequence(findMinimalUniquePrefix(tokens.subList(tc, tokenCount), matches, endStopMarker), false));
+      }
+    }
+
+    return tokenSequences;
+  }
+
+  public static List<INormalizedToken> findMinimalUniquePrefix(Iterable<INormalizedToken> sequence, Matches matches, INormalizedToken stopMarker) {
+    final List<INormalizedToken> result = Lists.newArrayList();
+
+    for (INormalizedToken token : sequence) {
+      if (!matches.getUnmatched().contains(token)) {
+        result.add(token);
+        if (!matches.getAmbiguous().contains(token)) {
+          return result;
+        }
+      }
+    }
+
+    result.add(stopMarker);
+    return result;
   }
 
   private List<ITokenSequence> orderSequences(Set<ITokenSequence> set) {
