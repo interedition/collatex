@@ -1,24 +1,13 @@
 package eu.interedition.collatex2.experimental;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Test;
-
-import com.google.common.collect.ListMultimap;
-
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
-import eu.interedition.collatex2.implementation.matching.IMatchResult;
-import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
-import eu.interedition.collatex2.implementation.matching.TokenMatcher;
-import eu.interedition.collatex2.implementation.vg_alignment.BaseAfgeleider;
+import eu.interedition.collatex2.implementation.matching.*;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
 import eu.interedition.collatex2.implementation.vg_analysis.ISequence;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
@@ -26,6 +15,15 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
+import org.junit.Test;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DeTestDirkVincent {
 
@@ -48,13 +46,12 @@ public class DeTestDirkVincent {
   public void testDirkVincent() {
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    TokenMatcher matcher = new TokenMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
+    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
     INormalizedToken its = b.getTokens().get(0);
     INormalizedToken light = b.getTokens().get(3);
-    List<INormalizedToken> matchedTokens;
+    Collection<INormalizedToken> matchedTokens;
     matchedTokens = matches.get(its);
-    assertEquals("Its", matchedTokens.get(0).getContent());
+    assertEquals("Its", Iterables.getFirst(matchedTokens, null).getContent());
     matchedTokens = matches.get(light);
     assertEquals(2, matchedTokens.size());
   }
@@ -63,10 +60,8 @@ public class DeTestDirkVincent {
   public void testVincentDirk3() {
     IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    TokenMatcher matcher = new TokenMatcher();
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
-    BaseAfgeleider afgeleider = new BaseAfgeleider();
-    List<INormalizedToken> afgeleideWitness = afgeleider.calculateAfgeleide(a, matches);
+    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
+    List<INormalizedToken> afgeleideWitness = TokenLinker.derive(a, matches);
     Iterator<INormalizedToken> tokenIterator = afgeleideWitness.iterator();
     assertEquals("Its", tokenIterator.next().getContent());
     assertEquals("soft", tokenIterator.next().getContent());
@@ -146,12 +141,11 @@ public class DeTestDirkVincent {
     builder.add(b);
     IWitness superbase = new Superbase(graph);
     IWitness c = factory.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
-    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
-    IMatchResult result = analyzer.analyze(superbase, c);
-    Set<INormalizedToken> unmatchedTokens = result.getUnmatchedTokens();
+    Matches result = Matches.between(superbase, c, new EqualityTokenComparator());
+    Set<INormalizedToken> unmatchedTokens = result.getUnmatched();
     assertTrue(unmatchedTokens.contains(c.getTokens().get(1)));
     assertTrue(unmatchedTokens.contains(c.getTokens().get(2)));
-    Set<INormalizedToken> unsureTokens = result.getUnsureTokens();
+    Set<INormalizedToken> unsureTokens = result.getAmbiguous();
     assertTrue(unsureTokens.contains(c.getTokens().get(3)));
     assertTrue(unsureTokens.contains(c.getTokens().get(6)));
     assertTrue(unsureTokens.contains(c.getTokens().get(13))); // &

@@ -37,12 +37,4 @@ public interface IPhrase extends Comparable<IPhrase> {
   List<INormalizedToken> getTokens();
 
   int size();
-
-  IPhrase createSubPhrase(int startIndex, int endIndex);
-
-  void addTokenToLeft(INormalizedToken leftToken);
-
-  void addTokenToRight(INormalizedToken rightToken);
-
-
 }

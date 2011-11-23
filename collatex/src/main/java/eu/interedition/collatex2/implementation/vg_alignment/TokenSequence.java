@@ -9,16 +9,16 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 public class TokenSequence implements ITokenSequence {
 
   private final INormalizedToken[] tokens;
-  private final boolean gotoleft;
-  
-  public TokenSequence(boolean gotoleft, INormalizedToken... tokens) {
+  private final boolean expandsToTheRight;
+
+  public TokenSequence(boolean expandsToTheRight, INormalizedToken... tokens) {
     this.tokens = tokens;
-    this.gotoleft = gotoleft;
+    this.expandsToTheRight = expandsToTheRight;
   }
 
-  public TokenSequence(List<INormalizedToken> tokens2, boolean gotoleft) {
+  public TokenSequence(List<INormalizedToken> tokens2, boolean expandsToTheRight) {
     this.tokens = tokens2.toArray(new INormalizedToken[tokens2.size()]);
-    this.gotoleft = gotoleft;
+    this.expandsToTheRight = expandsToTheRight;
   }
 
   //NOTE: sloppy implemented!
@@ -29,19 +29,19 @@ public class TokenSequence implements ITokenSequence {
       return false;
     }
     boolean theSame = true;
-    for (int i = 0; i < tokens.length; i++ ) {
+    for (int i = 0; i < tokens.length; i++) {
       INormalizedToken tokenA = tokens[i];
       INormalizedToken tokenB = other.tokens[i];
       theSame = theSame && (tokenA == tokenB);
     }
     return theSame;
   }
-  
+
   @Override
   public int hashCode() {
     return 69 * tokens.length;
   }
-  
+
   @Override
   public String toString() {
     return getNormalized();
@@ -54,14 +54,14 @@ public class TokenSequence implements ITokenSequence {
 
   @Override
   public INormalizedToken getLastToken() {
-    return tokens[tokens.length-1];
+    return tokens[tokens.length - 1];
   }
-  
+
   @Override
   public List<INormalizedToken> getTokens() {
     return Lists.newArrayList(tokens);
   }
-  
+
   //Note: just for testing purposes
   @Override
   public String getNormalized() {
@@ -75,9 +75,9 @@ public class TokenSequence implements ITokenSequence {
     }
     return buffer.toString();
   }
-  
+
   @Override
   public boolean expandsToTheRight() {
-    return gotoleft;
+    return expandsToTheRight;
   }
 }

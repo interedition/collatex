@@ -2,13 +2,13 @@ package eu.interedition.collatex2.experimental.matching;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
+import eu.interedition.collatex2.implementation.matching.Matches;
 import org.junit.Test;
 
-import com.google.common.collect.ListMultimap;
-
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.matching.NearTokenComparator;
-import eu.interedition.collatex2.implementation.matching.TokenMatcher;
+import eu.interedition.collatex2.implementation.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
@@ -19,11 +19,9 @@ public class NearMatcherTest {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("A", "near matching yeah");
     IWitness b = engine.createWitness("B", "nar matching");
-    TokenMatcher matcher = new TokenMatcher();
-    matcher.setTokenComparator(new NearTokenComparator());
-    ListMultimap<INormalizedToken, INormalizedToken> matches = matcher.match(a, b);
-    assertEquals(a.getTokens().get(0), matches.get(b.getTokens().get(0)).get(0));
-    assertEquals(a.getTokens().get(1), matches.get(b.getTokens().get(1)).get(0));
+    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EditDistanceTokenComparator()).getAll();
+    assertEquals(a.getTokens().get(0), Iterables.getFirst(matches.get(b.getTokens().get(0)), null));
+    assertEquals(a.getTokens().get(1), Iterables.getFirst(matches.get(b.getTokens().get(1)), null));
     assertEquals(2, matches.size());
   }
 }

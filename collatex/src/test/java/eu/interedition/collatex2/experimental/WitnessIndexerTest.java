@@ -4,12 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex2.implementation.matching.Matches;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.matching.IMatchResult;
-import eu.interedition.collatex2.implementation.matching.MatchResultAnalyzer;
 import eu.interedition.collatex2.implementation.vg_alignment.ITokenSequence;
 import eu.interedition.collatex2.implementation.vg_alignment.IWitnessIndex;
 import eu.interedition.collatex2.implementation.vg_alignment.WitnessIndexer;
@@ -29,8 +29,7 @@ public class WitnessIndexerTest {
   public void testWitnessIndexingDirkVincent2() {
     IWitness a = engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
-    IMatchResult result = analyzer.analyze(a, b);
+    Matches result = Matches.between(a, b, new EqualityTokenComparator());
     WitnessIndexer indexer = new WitnessIndexer();
     IWitnessIndex index = indexer.index(b, result);
     List<ITokenSequence> sequences = index.getTokenSequences();
@@ -57,8 +56,7 @@ public class WitnessIndexerTest {
     IWitness superbase = engine.createWitness("superbase", "the cat very happy is very happy the cat");
     IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
     //TODO: strange that I don't have to pass the matches to the analyzer here!
-    MatchResultAnalyzer analyzer = new MatchResultAnalyzer();
-    IMatchResult result = analyzer.analyze(superbase, c);
+    Matches result = Matches.between(superbase, c, new EqualityTokenComparator());
     WitnessIndexer indexer = new WitnessIndexer();
     IWitnessIndex index = indexer.index(c, result);
     List<ITokenSequence> sequences = index.getTokenSequences();
