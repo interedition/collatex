@@ -1,18 +1,18 @@
 package eu.interedition.collatex2.experimental;
 
+import static eu.interedition.collatex2.implementation.vg_alignment.TokenLinker.toString;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.matching.Matches;
+import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.vg_alignment.ITokenSequence;
-import eu.interedition.collatex2.implementation.vg_alignment.IWitnessIndex;
-import eu.interedition.collatex2.implementation.vg_alignment.WitnessIndexer;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenSequence;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -30,9 +30,7 @@ public class WitnessIndexerTest {
     IWitness a = engine.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     Matches result = Matches.between(a, b, new EqualityTokenComparator());
-    WitnessIndexer indexer = new WitnessIndexer();
-    IWitnessIndex index = indexer.index(b, result);
-    List<ITokenSequence> sequences = index.getTokenSequences();
+    List<ITokenSequence> sequences = TokenLinker.findUniqueTokenSequences(b, result);
     INormalizedToken soft = b.getTokens().get(1);
     INormalizedToken light = b.getTokens().get(3);
     ITokenSequence expectedSequence = new TokenSequence(true, soft, light);
@@ -57,17 +55,15 @@ public class WitnessIndexerTest {
     IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
     //TODO: strange that I don't have to pass the matches to the analyzer here!
     Matches result = Matches.between(superbase, c, new EqualityTokenComparator());
-    WitnessIndexer indexer = new WitnessIndexer();
-    IWitnessIndex index = indexer.index(c, result);
-    List<ITokenSequence> sequences = index.getTokenSequences();
-    assertEquals("# very", sequences.get(0).getNormalized());
-    assertEquals("very happy is", sequences.get(1).getNormalized());
-    assertEquals("# very happy", sequences.get(2).getNormalized());
-    assertEquals("happy is", sequences.get(3).getNormalized());
-    assertEquals("is the", sequences.get(4).getNormalized());
-    assertEquals("the cat #", sequences.get(5).getNormalized());
-    assertEquals("is the cat", sequences.get(6).getNormalized());
-    assertEquals("cat #", sequences.get(7).getNormalized());
+    List<ITokenSequence> sequences = TokenLinker.findUniqueTokenSequences(c, result);
+    assertEquals("# very", TokenLinker.toString(sequences.get(0).getTokens()));
+    assertEquals("very happy is", TokenLinker.toString(sequences.get(1).getTokens()));
+    assertEquals("# very happy", TokenLinker.toString(sequences.get(2).getTokens()));
+    assertEquals("happy is", TokenLinker.toString(sequences.get(3).getTokens()));
+    assertEquals("is the", TokenLinker.toString(sequences.get(4).getTokens()));
+    assertEquals("the cat #", TokenLinker.toString(sequences.get(5).getTokens()));
+    assertEquals("is the cat", TokenLinker.toString(sequences.get(6).getTokens()));
+    assertEquals("cat #", TokenLinker.toString(sequences.get(7).getTokens()));
   }
 
 

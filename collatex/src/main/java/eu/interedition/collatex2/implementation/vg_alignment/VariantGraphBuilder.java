@@ -10,10 +10,13 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
+import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.implementation.vg_analysis.*;
 import eu.interedition.collatex2.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.collect.Lists.reverse;
 
 /**
  * @todo the TokenLinker class should be replaced by the new linker class based on the decision graph
