@@ -57,7 +57,7 @@ public class EditGraphVisitor {
       // System.out.println("Debugging: "+vertex.getToken().toString()+":"+determineMinSequencesProEdge);
       EditGraphEdge minEdge = findTheMinimumEdge(determineMinSequencesProEdge, min);
       minSeq.put(vertex, min);
-      gapOrNoGap.put(vertex, minEdge.getEditOperation().getScore());
+      gapOrNoGap.put(vertex, minEdge.getScore());
     }
     return minSeq;
   }
@@ -77,7 +77,7 @@ public class EditGraphVisitor {
       // bepaal de nieuwe weight for elk van de incoming edges
       Map<EditGraphEdge, Integer> edgeToTotalWeight = Maps.newLinkedHashMap();
       for (EditGraphEdge incomingEdge : incomingEdgesOf) {
-        edgeToTotalWeight.put(incomingEdge, vertexToMinWeight.get(incomingEdge.getSourceVertex()) + incomingEdge.getEditOperation().getScore());
+        edgeToTotalWeight.put(incomingEdge, vertexToMinWeight.get(incomingEdge.getSourceVertex()) + incomingEdge.getScore());
       }
       Integer min = Collections.min(edgeToTotalWeight.values());
       vertexToMinWeight.put(next, min);
@@ -125,7 +125,7 @@ public class EditGraphVisitor {
     Set<EditGraphEdge> newEdges = Sets.newLinkedHashSet();
     for (EditGraphEdge edge : edgeSet) {
       if (verticesToKeep.contains(edge.getSourceVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
-        EditGraphEdge newEdge = new EditGraphEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge.getEditOperation());
+        EditGraphEdge newEdge = new EditGraphEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge.getEditOperation(), edge.getScore());
         newEdges.add(newEdge);
       }
     }

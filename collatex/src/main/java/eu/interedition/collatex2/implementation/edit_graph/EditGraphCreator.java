@@ -44,8 +44,8 @@ public class EditGraphCreator {
           // TODO: less edges are needed
           for (EditGraphVertex lastVertex : lastConstructedVertices) {
             INormalizedToken lastToken = lastVertex.getBaseToken();
-            EditOperation operation = a.isNear(lastToken, match) ?  EditOperation.NO_GAP : EditOperation.GAP;
-            editGraph.add(new EditGraphEdge(lastVertex, editGraphVertex, operation));
+            EditGraphEdge edge = a.isNear(lastToken, match) ?  new EditGraphEdge(lastVertex, editGraphVertex, EditOperation.NO_GAP, 0) : new EditGraphEdge(lastVertex, editGraphVertex, EditOperation.GAP, 1);
+            editGraph.add(edge);
           }
         }
         lastConstructedVertices = newConstructedVertices;
@@ -58,8 +58,8 @@ public class EditGraphCreator {
     //TODO: remove duplication!
     for (EditGraphVertex lastVertex : lastConstructedVertices) {
       INormalizedToken lastToken = lastVertex.getBaseToken();
-      EditOperation operation = a.isNear(lastToken, endVertex.getBaseToken()) ?  EditOperation.NO_GAP : EditOperation.GAP;
-      editGraph.add(new EditGraphEdge(lastVertex, endVertex, operation));
+      EditGraphEdge edge = a.isNear(lastToken, endVertex.getBaseToken()) ?  new EditGraphEdge(lastVertex, endVertex, EditOperation.NO_GAP, 0) : new EditGraphEdge(lastVertex, endVertex, EditOperation.GAP, 1);
+      editGraph.add(edge);
     }
     return editGraph;
   }

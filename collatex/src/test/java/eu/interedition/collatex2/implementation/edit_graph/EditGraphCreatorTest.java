@@ -75,22 +75,22 @@ public class EditGraphCreatorTest {
     verify(editGraph).add(vertex11);
     
     //verify edges
-    verify(editGraph).add(new EditGraphEdge(startVertex, vertex1, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(startVertex, vertex2, EditOperation.GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex1, vertex3, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex2, vertex3, EditOperation.GAP)); // Transposition!
-    verify(editGraph).add(new EditGraphEdge(vertex3, vertex4, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex3, vertex5, EditOperation.GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex4, vertex6, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex5, vertex6, EditOperation.GAP)); // Transposition!
-    verify(editGraph).add(new EditGraphEdge(vertex6, vertex7, EditOperation.GAP)); // Transposition!
-    verify(editGraph).add(new EditGraphEdge(vertex6, vertex8, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex7, vertex9, EditOperation.GAP)); // Transposition!
-    verify(editGraph).add(new EditGraphEdge(vertex8, vertex9, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex9, vertex10, EditOperation.GAP)); // Transposition!
-    verify(editGraph).add(new EditGraphEdge(vertex9, vertex11, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex10, endVertex, EditOperation.GAP)); // skip
-    verify(editGraph).add(new EditGraphEdge(vertex11, endVertex, EditOperation.NO_GAP));
+    verify(editGraph).add(new EditGraphEdge(startVertex, vertex1, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(startVertex, vertex2, EditOperation.GAP, 1));
+    verify(editGraph).add(new EditGraphEdge(vertex1, vertex3, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(vertex2, vertex3, EditOperation.GAP, 1)); // Transposition!
+    verify(editGraph).add(new EditGraphEdge(vertex3, vertex4, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(vertex3, vertex5, EditOperation.GAP, 1));
+    verify(editGraph).add(new EditGraphEdge(vertex4, vertex6, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(vertex5, vertex6, EditOperation.GAP, 1)); // Transposition!
+    verify(editGraph).add(new EditGraphEdge(vertex6, vertex7, EditOperation.GAP, 1)); // Transposition!
+    verify(editGraph).add(new EditGraphEdge(vertex6, vertex8, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(vertex7, vertex9, EditOperation.GAP, 1)); // Transposition!
+    verify(editGraph).add(new EditGraphEdge(vertex8, vertex9, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(vertex9, vertex10, EditOperation.GAP, 1)); // Transposition!
+    verify(editGraph).add(new EditGraphEdge(vertex9, vertex11, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(vertex10, endVertex, EditOperation.GAP, 1)); // skip
+    verify(editGraph).add(new EditGraphEdge(vertex11, endVertex, EditOperation.NO_GAP, 0));
     
     verifyNoMoreInteractions(editGraph);
   }
@@ -140,14 +140,14 @@ public class EditGraphCreatorTest {
     verify(editGraph).add(vertex5);
  
     //verify edges
-    verify(editGraph).add(new EditGraphEdge(startVertex, vertex1, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(startVertex, vertex2, EditOperation.GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex1, vertex3, EditOperation.GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex2, vertex3, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex3, vertex4, EditOperation.GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex3, vertex5, EditOperation.NO_GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex4, endVertex, EditOperation.GAP));
-    verify(editGraph).add(new EditGraphEdge(vertex5, endVertex, EditOperation.NO_GAP));
+    verify(editGraph).add(new EditGraphEdge(startVertex, vertex1, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(startVertex, vertex2, EditOperation.GAP, 1));
+    verify(editGraph).add(new EditGraphEdge(vertex1, vertex3, EditOperation.GAP, 1));
+    verify(editGraph).add(new EditGraphEdge(vertex2, vertex3, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(vertex3, vertex4, EditOperation.GAP, 1));
+    verify(editGraph).add(new EditGraphEdge(vertex3, vertex5, EditOperation.NO_GAP, 0));
+    verify(editGraph).add(new EditGraphEdge(vertex4, endVertex, EditOperation.GAP, 1));
+    verify(editGraph).add(new EditGraphEdge(vertex5, endVertex, EditOperation.NO_GAP, 0));
     
     verifyNoMoreInteractions(editGraph);
   }

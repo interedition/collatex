@@ -5,10 +5,9 @@ import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
+import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
-import eu.interedition.collatex2.implementation.input.NullToken;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenLinker;
@@ -54,23 +53,23 @@ public class TokenLinker implements ITokenLinker {
     List<INormalizedToken> aMatches = findMatches(a, boundedMatches.values());
 
     // try and find matches in the base for each sequence in the witness
-    List<Match<List<INormalizedToken>>> phraseMatches = Lists.newArrayList();
+    List<Tuple<List<INormalizedToken>>> phraseMatches = Lists.newArrayList();
     for (List<INormalizedToken> phrase : rightExpandingPhrases) {
       List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheRight(phrase, boundedMatches, aMatches);
       if (!matchingPhrase.isEmpty()) {
-        phraseMatches.add(new Match<List<INormalizedToken>>(matchingPhrase, phrase));
+        phraseMatches.add(new Tuple<List<INormalizedToken>>(matchingPhrase, phrase));
       }
     }
     for (List<INormalizedToken> phrase : leftExpandingPhrases) {
       List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheLeft(phrase, boundedMatches, aMatches);
       if (!matchingPhrase.isEmpty()) {
-        phraseMatches.add(new Match<List<INormalizedToken>>(matchingPhrase, phrase));
+        phraseMatches.add(new Tuple<List<INormalizedToken>>(matchingPhrase, phrase));
       }
     }
 
     // run the old filter method
-    filterSecondaryPhraseMatches(phraseMatches, Functions.<Match<INormalizedToken>>identity());
-    filterSecondaryPhraseMatches(phraseMatches, Match.<INormalizedToken>flipFunction());
+    filterSecondaryPhraseMatches(phraseMatches, Functions.<Tuple<INormalizedToken>>identity());
+    filterSecondaryPhraseMatches(phraseMatches, Tuple.<INormalizedToken>flipFunction());
 
     // do the matching
     final Multimap<INormalizedToken, INormalizedToken> allMatches = matches.getAll();
@@ -82,7 +81,7 @@ public class TokenLinker implements ITokenLinker {
       tokenLinks.put(unique, Iterables.getFirst(allMatches.get(unique), null));
     }
     // add matched sequences to the result
-    for (Match<List<INormalizedToken>> phraseMatch : phraseMatches) {
+    for (Tuple<List<INormalizedToken>> phraseMatch : phraseMatches) {
       final Iterator<INormalizedToken> baseIt = phraseMatch.left.iterator();
       final Iterator<INormalizedToken> witnessIt = phraseMatch.right.iterator();
       while (baseIt.hasNext() && witnessIt.hasNext()) {
@@ -134,26 +133,26 @@ public class TokenLinker implements ITokenLinker {
     return result;
   }
 
-  private void filterSecondaryPhraseMatches(List<Match<List<INormalizedToken>>> phraseMatches, Function<Match<INormalizedToken>, Match<INormalizedToken>> tokenMatchTransform) {
+  private void filterSecondaryPhraseMatches(List<Tuple<List<INormalizedToken>>> phraseMatches, Function<Tuple<INormalizedToken>, Tuple<INormalizedToken>> tokenMatchTransform) {
     final Map<INormalizedToken, INormalizedToken> previousMatches = Maps.newLinkedHashMap();
-    for (Iterator<Match<List<INormalizedToken>>> phraseMatchIt = phraseMatches.iterator(); phraseMatchIt.hasNext(); ) {
+    for (Iterator<Tuple<List<INormalizedToken>>> phraseMatchIt = phraseMatches.iterator(); phraseMatchIt.hasNext(); ) {
       boolean foundAlternative = false;
-      final Match<List<INormalizedToken>> phraseMatch = phraseMatchIt.next();
+      final Tuple<List<INormalizedToken>> phraseMatch = phraseMatchIt.next();
 
-      final List<Match<INormalizedToken>> tokenMatches = Lists.newArrayList();
+      final List<Tuple<INormalizedToken>> tokenMatches = Lists.newArrayList();
       final Iterator<INormalizedToken> leftIt = phraseMatch.left.iterator();
       final Iterator<INormalizedToken> rightIt = phraseMatch.right.iterator();
       while (leftIt.hasNext() && rightIt.hasNext()) {
         final INormalizedToken left = leftIt.next();
         final INormalizedToken right = rightIt.next();
-        if (WitnessToken.START.equals(left) || WitnessToken.END.equals(left) || left instanceof NullToken) {
+        if (WitnessToken.START.equals(left) || WitnessToken.END.equals(left)) {
           // skip start and end Token in variant graph
           continue;
         }
-        tokenMatches.add(tokenMatchTransform.apply(new Match<INormalizedToken>(left, right)));
+        tokenMatches.add(tokenMatchTransform.apply(new Tuple<INormalizedToken>(left, right)));
       }
 
-      for (Match<INormalizedToken> tokenMatch : tokenMatches) {
+      for (Tuple<INormalizedToken> tokenMatch : tokenMatches) {
         final INormalizedToken previousMatch = previousMatches.get(tokenMatch.left);
         if (previousMatch != null && !previousMatch.equals(tokenMatch.right)) {
           foundAlternative = true;

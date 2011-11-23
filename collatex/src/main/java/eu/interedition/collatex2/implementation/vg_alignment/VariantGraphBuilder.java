@@ -9,17 +9,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.implementation.input.NormalizedToken;
-import eu.interedition.collatex2.implementation.matching.Match;
-import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.implementation.vg_analysis.*;
 import eu.interedition.collatex2.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.google.common.collect.Lists.reverse;
 
 /**
  * @todo the TokenLinker class should be replaced by the new linker class based on the decision graph
@@ -34,7 +31,7 @@ public class VariantGraphBuilder {
   private TranspositionDetector transpositionDetector = new TranspositionDetector();
 
   private Map<INormalizedToken,INormalizedToken> linkedTokens;
-  private List<Match<List<INormalizedToken>>> sequences;
+  private List<Tuple<List<INormalizedToken>>> sequences;
   private List<ITransposition> transpositions;
   private Map<INormalizedToken,INormalizedToken> alignedTokens;
 
@@ -57,7 +54,7 @@ public class VariantGraphBuilder {
     return linkedTokens;
   }
 
-  public List<Match<List<INormalizedToken>>> getSequences() {
+  public List<Tuple<List<INormalizedToken>>> getSequences() {
     return Collections.unmodifiableList(sequences);
   }
 
@@ -144,7 +141,7 @@ public class VariantGraphBuilder {
    * @deprecated This does not work with a custom matching function.
    */
   @Deprecated
-  static boolean equals(Match<List<INormalizedToken>> a, Match<List<INormalizedToken>> b) {
+  static boolean equals(Tuple<List<INormalizedToken>> a, Tuple<List<INormalizedToken>> b) {
     return NormalizedToken.toString(a.right).equals(NormalizedToken.toString(b.right));
   }
 
@@ -157,8 +154,8 @@ public class VariantGraphBuilder {
   }
 
   // NOTE: this method should not return the original sequence when a mirror exists!
-  private List<Match<List<INormalizedToken>>> getSequencesThatAreTransposed(List<ITransposition> transpositions, IWitness witness) {
-    List<Match<List<INormalizedToken>>> transposedSequences = Lists.newArrayList();
+  private List<Tuple<List<INormalizedToken>>> getSequencesThatAreTransposed(List<ITransposition> transpositions, IWitness witness) {
+    List<Tuple<List<INormalizedToken>>> transposedSequences = Lists.newArrayList();
     final Stack<ITransposition> transToCheck = new Stack<ITransposition>();
     transToCheck.addAll(transpositions);
     Collections.reverse(transToCheck);
@@ -183,8 +180,8 @@ public class VariantGraphBuilder {
   private Map<INormalizedToken, INormalizedToken> determineAlignedTokens(Map<INormalizedToken, INormalizedToken> linkedTokens, List<ITransposition> transpositions, IWitness witness) {
     Map<INormalizedToken, INormalizedToken> alignedTokens = Maps.newLinkedHashMap();
     alignedTokens.putAll(linkedTokens);
-    List<Match<List<INormalizedToken>>> sequencesThatAreTransposed = getSequencesThatAreTransposed(transpositions, witness);
-    for (Match<List<INormalizedToken>> sequenceA : sequencesThatAreTransposed) {
+    List<Tuple<List<INormalizedToken>>> sequencesThatAreTransposed = getSequencesThatAreTransposed(transpositions, witness);
+    for (Tuple<List<INormalizedToken>> sequenceA : sequencesThatAreTransposed) {
       for (INormalizedToken token : sequenceA.right) {
         alignedTokens.remove(token);
       }

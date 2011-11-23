@@ -20,15 +20,6 @@ package eu.interedition.collatex2.implementation.edit_graph;
  * @author Ronald
  */
 public enum EditOperation {
-    GAP(1),
-    NO_GAP(0);
-    private final int score;
-
-    EditOperation(int score) {
-        this.score = score;
-    }
-    
-    Integer getScore() {
-        return score;
-    }
+    GAP,
+    NO_GAP;
 }

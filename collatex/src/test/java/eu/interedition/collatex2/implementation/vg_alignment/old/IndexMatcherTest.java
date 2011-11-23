@@ -25,8 +25,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.input.NormalizedToken;
-import eu.interedition.collatex2.implementation.matching.Match;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -229,14 +229,14 @@ public class IndexMatcherTest {
 	// assertEquals(1, match.getBaseToken().getPosition());
 	// }
 
-	final Function<Match<List<INormalizedToken>>, String> function = new Function<Match<List<INormalizedToken>>, String>() {
+	final Function<Tuple<List<INormalizedToken>>, String> function = new Function<Tuple<List<INormalizedToken>>, String>() {
 		@Override
-		public String apply(final Match<List<INormalizedToken>> match) {
+		public String apply(final Tuple<List<INormalizedToken>> match) {
 			return NormalizedToken.toString(match.right);
 		}
 	};
 
-	private void assertContains(final List<Match<List<INormalizedToken>>> matches,
+	private void assertContains(final List<Tuple<List<INormalizedToken>>> matches,
 			final String string) {
 		final Iterable<String> normalizedMatches = Iterables.transform(matches,
 				function);
