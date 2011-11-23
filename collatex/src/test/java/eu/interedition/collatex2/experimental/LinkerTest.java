@@ -234,7 +234,7 @@ public class LinkerTest {
     assertEquals(1, matches.size());
 
     final Map.Entry<INormalizedToken, INormalizedToken> match = Iterables.get(matches, 0);
-    assertEquals(graph.getTokens(witnessA).get(0).getNormalized(), match.getKey());
-    assertEquals(witnessB.getTokens().get(0), match.getValue());
+    assertEquals(graph.getTokens(witnessA).get(0).getNormalized(), match.getKey().getNormalized());
+    assertEquals(witnessB.getTokens().get(0).getNormalized(), match.getValue().getNormalized());
   }
 }
