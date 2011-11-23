@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import org.junit.Test;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -57,7 +58,7 @@ public class EditGraphCreatorTest {
     
     //run
     EditGraphCreator creator = new EditGraphCreator(editGraph);
-    creator.buildEditGraph(base, witness);
+    creator.buildEditGraph(base, witness, new EqualityTokenComparator());
     
     //verify vertices
     verify(editGraph).setStartVertex(startVertex);
@@ -128,7 +129,7 @@ public class EditGraphCreatorTest {
     
     //run
     EditGraphCreator creator = new EditGraphCreator(editGraph);
-    creator.buildEditGraph(base, witness);
+    creator.buildEditGraph(base, witness, new EqualityTokenComparator());
  
     //verify vertices
     verify(editGraph).setStartVertex(startVertex);

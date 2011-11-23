@@ -1,24 +1,26 @@
 package eu.interedition.collatex2.implementation.vg_alignment;
 
-import java.util.*;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
-import eu.interedition.collatex2.implementation.input.NormalizedToken;
-import eu.interedition.collatex2.implementation.vg_analysis.*;
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
+import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetector;
+import eu.interedition.collatex2.implementation.vg_analysis.TranspositionDetector;
 import eu.interedition.collatex2.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class VariantGraphBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraphBuilder.class);
 
   private final IVariantGraph graph;
+  private final Comparator<INormalizedToken> comparator;
   private final ITokenLinker tokenLinker;
   private final SequenceDetector sequenceDetector;
   private final TranspositionDetector transpositionDetector;
@@ -29,11 +31,12 @@ public class VariantGraphBuilder {
   private Map<INormalizedToken,INormalizedToken> alignments;
 
   public VariantGraphBuilder(IVariantGraph graph) {
-    this(graph, new TokenLinker(), new SequenceDetector(), new TranspositionDetector());
+    this(graph, new EqualityTokenComparator(), new TokenLinker(), new SequenceDetector(), new TranspositionDetector());
   }
 
-  public VariantGraphBuilder(IVariantGraph graph, ITokenLinker tokenLinker, SequenceDetector sequenceDetector, TranspositionDetector transpositionDetector) {
+  public VariantGraphBuilder(IVariantGraph graph, Comparator<INormalizedToken> comparator, ITokenLinker tokenLinker, SequenceDetector sequenceDetector, TranspositionDetector transpositionDetector) {
     this.graph = graph;
+    this.comparator = comparator;
     this.tokenLinker = tokenLinker;
     this.sequenceDetector = sequenceDetector;
     this.transpositionDetector = transpositionDetector;
@@ -66,7 +69,7 @@ public class VariantGraphBuilder {
     final IWitness base = new Superbase(graph);
 
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
-    tokenLinks = tokenLinker.link(base, witness);
+    tokenLinks = tokenLinker.link(base, witness, comparator);
 
     LOG.debug("{} + {}: Detect sequences", graph, witness);
     sequences = sequenceDetector.detect(tokenLinks, base, witness);
@@ -136,12 +139,18 @@ public class VariantGraphBuilder {
     return null;
   }
 
-  /**
-   * @deprecated This does not work with a custom matching function.
-   */
-  @Deprecated
   private boolean equals(Tuple<List<INormalizedToken>> a, Tuple<List<INormalizedToken>> b) {
-    return NormalizedToken.toString(a.right).equals(NormalizedToken.toString(b.right));
+    if (a.right.size() != b.right.size()) {
+      return false;
+    }
+    final Iterator<INormalizedToken> aIt = a.right.iterator();
+    final Iterator<INormalizedToken> bIt = b.right.iterator();
+    while (aIt.hasNext() && bIt.hasNext()) {
+      if (comparator.compare(aIt.next(), bIt.next()) != 0) {
+        return false;
+      }
+    }
+    return true;
   }
 
   // Note: this only calculates the distance between the tokens in the witness.
