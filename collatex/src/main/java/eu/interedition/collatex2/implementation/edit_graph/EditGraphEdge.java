@@ -32,31 +32,31 @@ public class EditGraphEdge {
     return operation;
   }
 
-  Integer getScore() {
+  public Integer getScore() {
     return score;
   }
 
   @Override
   public String toString() {
-    return "("+sourceVertex+")->("+targetVertex+"):"+operation;
+    return "(" + sourceVertex + ")->(" + targetVertex + "):" + operation;
   }
-  
+
   @Override
   public int hashCode() {
     int hc = Objects.hashCode(sourceVertex, targetVertex, operation);
-//    System.out.println("hashcode called on: "+this.toString()+":"+hc);
+    //    System.out.println("hashcode called on: "+this.toString()+":"+hc);
     return hc;
   }
-  
+
   @Override
   public boolean equals(final Object obj) {
     //System.out.println(this.toString()+" comparing with "+obj.toString());
-    if (this==obj) {
+    if (this == obj) {
       return true;
     }
     if (obj instanceof EditGraphEdge) {
       final EditGraphEdge edge = (EditGraphEdge) obj;
-      boolean result = Objects.equal(sourceVertex, edge.sourceVertex); 
+      boolean result = Objects.equal(sourceVertex, edge.sourceVertex);
       result = result && Objects.equal(targetVertex, edge.targetVertex);
       result = result && Objects.equal(operation, edge.operation);
       return result;

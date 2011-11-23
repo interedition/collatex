@@ -9,11 +9,6 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 
-import org.jgrapht.ext.DOTExporter;
-import org.jgrapht.ext.EdgeNameProvider;
-import org.jgrapht.ext.IntegerNameProvider;
-import org.jgrapht.ext.VertexNameProvider;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -24,6 +19,11 @@ import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
+
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.EdgeNameProvider;
+import org.jgrapht.ext.IntegerNameProvider;
+import org.jgrapht.ext.VertexNameProvider;
 
 public class DotExporter {
   private static final String DOT_PATH = "C:\\Program Files\\Graphviz2.26.3\\bin\\dot";
@@ -86,7 +86,7 @@ public class DotExporter {
   static final EdgeNameProvider<EditGraphEdge> EG_EDGE_LABEL_PROVIDER = new EdgeNameProvider<EditGraphEdge>() {
     @Override
     public String getEdgeName(final EditGraphEdge e) {
-      return e.getEditOperation().name();
+      return String.valueOf(e.getScore());
     }
   };
   static final DOTExporter<EditGraphVertex, EditGraphEdge> EG_DOT_EXPORTER = new DOTExporter<EditGraphVertex, EditGraphEdge>(//
