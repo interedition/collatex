@@ -1,5 +1,7 @@
 package eu.interedition.collatex2.implementation.vg_alignment;
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
@@ -70,8 +72,8 @@ public class TokenLinker implements ITokenLinker {
     }
 
     // run the old filter method
-    phraseMatches = filterAwaySecondChoicesMultipleColumnsOneToken(Collections.unmodifiableList(phraseMatches));
-    phraseMatches = filterAwaySecondChoicesMultipleTokensOneColumn(Collections.unmodifiableList(phraseMatches));
+    filterSecondaryPhraseMatches(phraseMatches, Functions.<Match<INormalizedToken>>identity());
+    filterSecondaryPhraseMatches(phraseMatches, Match.<INormalizedToken>flipFunction());
 
     // do the matching
     final Multimap<INormalizedToken, INormalizedToken> allMatches = matches.getAll();
@@ -135,95 +137,39 @@ public class TokenLinker implements ITokenLinker {
     return result;
   }
 
-  // check whether this match has an alternative that is equal in weight
-  // if so, then skip the alternative!
-  // NOTE: multiple witness tokens match with the same table column!
-  //EXPECT GRAPH -> Witness TOKEN HERE
-  private List<Match<List<INormalizedToken>>> filterAwaySecondChoicesMultipleTokensOneColumn(List<Match<List<INormalizedToken>>> sequences) {
-    List<Match<List<INormalizedToken>>> filteredMatches = Lists.newArrayList();
-    final Map<INormalizedToken, INormalizedToken> tableToToken = Maps.newLinkedHashMap();
-    for (final Match<List<INormalizedToken>> sequence : sequences) {
-      // step 1. Gather data
-      List<TokenPair> pairs = Lists.newArrayList();
-      final List<INormalizedToken> tablePhrase = sequence.left;
-      final List<INormalizedToken> witnessPhrase = sequence.right;
-      final Iterator<INormalizedToken> tokens = witnessPhrase.iterator();
-      for (final INormalizedToken tableToken : tablePhrase) {
-        final INormalizedToken token = tokens.next();
-        // skip Start and End Token in variant graph... string equals is not very nice!
-        if (!(tableToken.getNormalized().equals("#"))) {
-          pairs.add(new TokenPair(tableToken, token));
-        }
-      }
-      // step 2. Look for alternative
+  private void filterSecondaryPhraseMatches(List<Match<List<INormalizedToken>>> phraseMatches, Function<Match<INormalizedToken>, Match<INormalizedToken>> tokenMatchTransform) {
+    final Map<INormalizedToken, INormalizedToken> previousMatches = Maps.newLinkedHashMap();
+    for (Iterator<Match<List<INormalizedToken>>> phraseMatchIt = phraseMatches.iterator(); phraseMatchIt.hasNext(); ) {
       boolean foundAlternative = false;
-      for (TokenPair pair : pairs) {
-        // check for alternative here!
-        final INormalizedToken tableToken = pair.tableToken;
-        final INormalizedToken witnessToken = pair.witnessToken;
-        if (tableToToken.containsKey(tableToken)) {
-          INormalizedToken existingWitnessToken = tableToToken.get(tableToken);
-          if (existingWitnessToken != witnessToken) {
-            foundAlternative = true;
-          }
+      final Match<List<INormalizedToken>> phraseMatch = phraseMatchIt.next();
+
+      final List<Match<INormalizedToken>> tokenMatches = Lists.newArrayList();
+      final List<INormalizedToken> leftPhrase = phraseMatch.left;
+      final List<INormalizedToken> rightPhrase = phraseMatch.right;
+      final Iterator<INormalizedToken> leftIt = leftPhrase.iterator();
+      final Iterator<INormalizedToken> rightIt = rightPhrase.iterator();
+      while (leftIt.hasNext() && rightIt.hasNext()) {
+        final INormalizedToken left = leftIt.next();
+        final INormalizedToken right = rightIt.next();
+        if (WitnessToken.START.equals(left) || WitnessToken.END.equals(left) || left instanceof NullToken) {
+          // skip start and end Token in variant graph
+          continue;
+        }
+        tokenMatches.add(tokenMatchTransform.apply(new Match<INormalizedToken>(left, right)));
+      }
+
+      for (Match<INormalizedToken> tokenMatch : tokenMatches) {
+        final INormalizedToken previousMatch = previousMatches.get(tokenMatch.right);
+        if (previousMatch != null && !previousMatch.equals(tokenMatch.left)) {
+          foundAlternative = true;
         } else {
-          tableToToken.put(tableToken, witnessToken);
+          previousMatches.put(tokenMatch.right, tokenMatch.left);
         }
       }
-      // step 3. Decide what to do
-      if (!foundAlternative) {
-        filteredMatches.add(sequence);
-      } else {
-//        LOG.debug("!Phrase '" + witnessPhrase + "' is an alternative! skipping...");
+      if (foundAlternative) {
+        phraseMatchIt.remove();
       }
     }
-    return filteredMatches;
-  }
-
-
-  // check whether this match has an alternative that is equal in weight
-  // if so, then skip the alternative!
-  // NOTE: multiple columns match with the same token!
-  // EXPECT WITNESS TOKEN TO GRAPH TOKEN HERE!
-  private List<Match<List<INormalizedToken>>> filterAwaySecondChoicesMultipleColumnsOneToken(List<Match<List<INormalizedToken>>> sequences) {
-    List<Match<List<INormalizedToken>>> filteredMatches = Lists.newArrayList();
-    final Map<INormalizedToken, INormalizedToken> tokenToTable = Maps.newLinkedHashMap();
-    for (final Match<List<INormalizedToken>> sequence : sequences) {
-      // step 1. Gather data
-      List<TokenPair> pairs = Lists.newArrayList();
-      final List<INormalizedToken> tablePhrase = sequence.left;
-      final List<INormalizedToken> witnessPhrase = sequence.right;
-      final Iterator<INormalizedToken> tokens = witnessPhrase.iterator();
-      for (final INormalizedToken tableToken : tablePhrase) {
-        final INormalizedToken token = tokens.next();
-        // skip NullColumn and NullToken
-        if (!(tableToken instanceof NullToken)) {
-          pairs.add(new TokenPair(tableToken, token));
-        }
-      }
-      // step 2. Look for alternative
-      boolean foundAlternative = false;
-      for (TokenPair pair : pairs) {
-        // check for alternative here!
-        final INormalizedToken tableToken = pair.tableToken;
-        final INormalizedToken token = pair.witnessToken;
-        if (tokenToTable.containsKey(token)) {
-          INormalizedToken existingTable = tokenToTable.get(token);
-          if (existingTable != tableToken) {
-            foundAlternative = true;
-          }
-        } else {
-          tokenToTable.put(token, tableToken);
-        }
-      }
-      // step 3. Decide what to do
-      if (!foundAlternative) {
-        filteredMatches.add(sequence);
-      } else {
-//        LOG.debug("Phrase '" + witnessPhrase + "' is an alternative! skipping...");
-      }
-    }
-    return filteredMatches;
   }
 
   // This method should return the matching base tokens for a given sequence
