@@ -46,7 +46,7 @@ public class LinkerTest {
     //TODO: should this test the tokenLinker ?
     //TODO: I don't think so
     ITokenLinker tokenLinker = new TokenLinker();
-    Map<INormalizedToken, INormalizedToken> tokens = tokenLinker.link(graph, witnessB);
+    Map<INormalizedToken, INormalizedToken> tokens = tokenLinker.link(new Superbase(graph), witnessB);
     return tokens;
   }
 

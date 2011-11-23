@@ -70,16 +70,17 @@ public class VariantGraphBuilder {
   }
 
   protected void merge(IWitness witness) {
+    final IWitness base = new Superbase(graph);
+
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
-    linkedTokens = tokenLinker.link(graph, witness);
+    linkedTokens = tokenLinker.link(base, witness);
 
     LOG.debug("{} + {}: Determine sequences", graph, witness);
-    IWitness superbase = new Superbase(graph);
-    sequences = sequenceDetector.detect(linkedTokens, superbase, witness);
+    sequences = sequenceDetector.detect(linkedTokens, base, witness);
 
 
     LOG.debug("{} + {}: Determine transpositions of sequences", graph, witness);
-    transpositions = transpositionDetector.detect(sequences, superbase);
+    transpositions = transpositionDetector.detect(sequences, base);
 
     LOG.debug("{} + {}: Determine aligned tokens", graph, witness);
     alignedTokens = determineAlignedTokens(linkedTokens, transpositions, witness);

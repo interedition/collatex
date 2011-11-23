@@ -15,6 +15,7 @@
  */
 package eu.interedition.collatex2.implementation.vg_alignment;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.interfaces.*;
@@ -31,18 +32,15 @@ import java.util.List;
  */
 public class Superbase implements IWitness {
   private final IVariantGraph graph;
+  private final List<INormalizedToken> tokens;
 
   public Superbase(IVariantGraph graph) {
     this.graph = graph;
+    this.tokens = Lists.newArrayList(Iterables.filter(graph, INormalizedToken.class));
   }
 
   @Override
   public List<INormalizedToken> getTokens() {
-    List<INormalizedToken> tokens = Lists.newArrayList();
-    Iterator<IVariantGraphVertex> iterator = graph.iterator();
-    while (iterator.hasNext()) {
-      tokens.add(iterator.next());
-    }
     return tokens;
   }
 
@@ -53,7 +51,7 @@ public class Superbase implements IWitness {
 
   @Override
   public int size() {
-    return getTokens().size();
+    return tokens.size();
   }
 
   @Override
@@ -69,6 +67,6 @@ public class Superbase implements IWitness {
 
   @Override
   public Iterator<INormalizedToken> tokenIterator() {
-    return getTokens().iterator();
+    return tokens.iterator();
   }
 }

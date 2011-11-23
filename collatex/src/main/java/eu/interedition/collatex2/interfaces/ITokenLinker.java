@@ -5,6 +5,6 @@ import java.util.Map;
 
 public interface ITokenLinker {
 
-  Map<INormalizedToken, INormalizedToken> link(IVariantGraph graph, IWitness b);
+  Map<INormalizedToken, INormalizedToken> link(IWitness graph, IWitness b);
 
 }

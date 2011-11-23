@@ -17,8 +17,7 @@ import java.util.Map;
 public class EditGraphLinker implements ITokenLinker {
   
   @Override
-  public Map<INormalizedToken, INormalizedToken> link(IVariantGraph vGraph, IWitness b) {
-    IWitness superbase = new Superbase(vGraph);
+  public Map<INormalizedToken, INormalizedToken> link(IWitness superbase, IWitness b) {
     EditGraphCreator egCreator = new EditGraphCreator();
     EditGraph editGraph = egCreator.buildEditGraph(superbase, b);
     EditGraphVisitor visitor = new EditGraphVisitor(editGraph);
@@ -28,7 +27,7 @@ public class EditGraphLinker implements ITokenLinker {
 //      System.out.println(edge.getTargetVertex().toString());
 //    }
     //Note: This is the second time the matcher function is called
-    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(vGraph, b, new EqualityTokenComparator()).getAll();
+    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(superbase, b, new EqualityTokenComparator()).getAll();
     Map<INormalizedToken, INormalizedToken> linkedTokens = Maps.newLinkedHashMap();
     List<INormalizedToken> tokens = b.getTokens();
     for (INormalizedToken token : tokens) {

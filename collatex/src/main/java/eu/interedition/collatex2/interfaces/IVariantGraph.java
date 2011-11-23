@@ -27,7 +27,7 @@ import java.util.Map;
 import org.jgrapht.DirectedGraph;
 
 
-public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge>, ITokenContainer {
+public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge>, ITokenContainer, Iterable<IVariantGraphVertex> {
 
   IVariantGraphVertex getStartVertex();
 
