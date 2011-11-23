@@ -20,18 +20,16 @@
 
 package eu.interedition.collatex2.implementation.output.apparatus;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.collect.Sets;
-
-import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.implementation.output.segmented_graph.ISegmentedVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.ApparatusEntryState;
 import eu.interedition.collatex2.interfaces.IApparatusEntry;
-import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class ApparatusEntry implements IApparatusEntry {
 
@@ -68,8 +66,7 @@ public class ApparatusEntry implements IApparatusEntry {
   
   //Note: an empty cell returns an empty phrase!
   @Override
-  @SuppressWarnings("unchecked")
-  public IPhrase getPhrase(final IWitness witness) {
+  public List<INormalizedToken> getPhrase(final IWitness witness) {
     ISegmentedVariantGraphVertex result = null;
     for (ISegmentedVariantGraphVertex vertex : vertices) {
       if (vertex.containsWitness(witness)) {
@@ -77,10 +74,7 @@ public class ApparatusEntry implements IApparatusEntry {
         break;
       }
     }
-    if (result == null) {
-      return new Phrase(Collections.EMPTY_LIST);
-    }  
-    return result.getPhrase(witness);
+    return (result == null ? Collections.<INormalizedToken>emptyList() : result.getPhrase(witness));
   }
 
   @Override

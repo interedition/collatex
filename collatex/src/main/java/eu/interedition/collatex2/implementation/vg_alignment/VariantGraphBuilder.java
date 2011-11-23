@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -141,8 +142,8 @@ public class VariantGraphBuilder {
   // Note: this only calculates the distance between the tokens in the witness.
   // Note: it does not take into account a possible distance in the vertices in the graph!
   private boolean transpositionsAreNear(ITransposition top, ITransposition mirrored, IWitness witness) {
-    INormalizedToken lastToken = top.getSequenceB().getWitnessPhrase().getLastToken();
-    INormalizedToken firstToken = mirrored.getSequenceB().getWitnessPhrase().getFirstToken();
+    INormalizedToken lastToken = Iterables.getLast(top.getSequenceB().getWitnessPhrase());
+    INormalizedToken firstToken = Iterables.getFirst(mirrored.getSequenceB().getWitnessPhrase(), null);
     return witness.isNear(lastToken, firstToken);
   }
 
@@ -175,7 +176,7 @@ public class VariantGraphBuilder {
     alignedTokens.putAll(linkedTokens);
     List<ISequence> sequencesThatAreTransposed = getSequencesThatAreTransposed(transpositions, witness);
     for (ISequence sequenceA : sequencesThatAreTransposed) {
-      for (INormalizedToken token : sequenceA.getWitnessPhrase().getTokens()) {
+      for (INormalizedToken token : sequenceA.getWitnessPhrase()) {
         alignedTokens.remove(token);
       }
     }

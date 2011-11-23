@@ -25,6 +25,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.Map.Entry;
 
+import eu.interedition.collatex2.implementation.input.Token;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,7 +58,7 @@ public class TeiParallelSegmentationApparatusBuilder {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
       for (IWitness witness : entry.getWitnesses()) {
-        content2WitMap.put(entry.getPhrase(witness).getContent(), witness.getSigil());
+        content2WitMap.put(Token.toString(entry.getPhrase(witness)), witness.getSigil());
       }
 
       if ((content2WitMap.keySet().size() == 1) && !entry.hasEmptyCells()) {

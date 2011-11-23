@@ -1,23 +1,24 @@
 package eu.interedition.collatex2.implementation.vg_alignment;
 
-import java.util.*;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
-import eu.interedition.collatex2.implementation.matching.*;
+import eu.interedition.collatex2.implementation.input.NullToken;
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex2.implementation.matching.Matches;
+import eu.interedition.collatex2.implementation.vg_analysis.Sequence;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.ITokenLinker;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.interedition.collatex2.implementation.input.NullToken;
-import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.implementation.vg_analysis.Sequence;
-import eu.interedition.collatex2.interfaces.ITokenLinker;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IWitness;
+import java.util.*;
 
 import static com.google.common.collect.Lists.reverse;
 
@@ -59,31 +60,17 @@ public class TokenLinker implements ITokenLinker {
     List<INormalizedToken> aMatches = findMatches(a, matches.values());
 
     // try and find matches in the base for each sequence in the witness
-    Map<List<INormalizedToken>, IPhrase> linkedSequences = Maps.newLinkedHashMap();
+    Map<List<INormalizedToken>, List<INormalizedToken>> linkedSequences = Maps.newLinkedHashMap();
     for (List<INormalizedToken> tokenSequence : rightExpandingTokenSequences) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("Searching for token sequence: {}", toString(tokenSequence));
-      }
       List<INormalizedToken> matchedBaseTokens = findMatchingBaseTokensForSequenceToTheRight(tokenSequence, matches, aMatches);
       if (!matchedBaseTokens.isEmpty()) {
-        final Phrase phrase = new Phrase(matchedBaseTokens);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Matched {} and {}", toString(tokenSequence), phrase.getNormalized());
-        }
-        linkedSequences.put(tokenSequence, phrase);
+        linkedSequences.put(tokenSequence, matchedBaseTokens);
       }
     }
     for (List<INormalizedToken> tokenSequence : leftExpandingTokenSequences) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("Searching for token sequence: {}", toString(tokenSequence));
-      }
       List<INormalizedToken> matchedBaseTokens = findMatchingBaseTokensForSequenceToTheLeft(tokenSequence, matches, aMatches);
       if (!matchedBaseTokens.isEmpty()) {
-        final Phrase phrase = new Phrase(matchedBaseTokens);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Matched {} and {}", toString(tokenSequence), phrase.getNormalized());
-        }
-        linkedSequences.put(tokenSequence, phrase);
+        linkedSequences.put(tokenSequence, matchedBaseTokens);
       }
     }
 
@@ -91,7 +78,7 @@ public class TokenLinker implements ITokenLinker {
     // and convert map<tokenseq, phrase> to List<Sequence>
     List<Sequence> sequences = Lists.newArrayList();
     for (List<INormalizedToken> tokenSequence : linkedSequences.keySet()) {
-      sequences.add(new Sequence(linkedSequences.get(tokenSequence), new Phrase(tokenSequence)));
+      sequences.add(new Sequence(linkedSequences.get(tokenSequence), tokenSequence));
     }
     // run the old filter method
     sequences = filterAwaySecondChoicesMultipleColumnsOneToken(Collections.unmodifiableList(sequences));
@@ -110,9 +97,9 @@ public class TokenLinker implements ITokenLinker {
     }
     // add matched sequences to the aligned tokens
     for (Sequence sequence : sequences) {
-      IPhrase matchedBasePhrase = sequence.getBasePhrase();
-      Iterator<INormalizedToken> iterator = matchedBasePhrase.getTokens().iterator();
-      for (INormalizedToken witnessToken : sequence.getWitnessPhrase().getTokens()) {
+      List<INormalizedToken> matchedBasePhrase = sequence.getBasePhrase();
+      Iterator<INormalizedToken> iterator = matchedBasePhrase.iterator();
+      for (INormalizedToken witnessToken : sequence.getWitnessPhrase()) {
         INormalizedToken possibility = iterator.next();
         // skip start and end tokens
         if (!WitnessToken.START.equals(witnessToken) && !WitnessToken.END.equals(witnessToken)) {
@@ -169,10 +156,10 @@ public class TokenLinker implements ITokenLinker {
     for (final Sequence sequence : sequences) {
       // step 1. Gather data
       List<TokenPair> pairs = Lists.newArrayList();
-      final IPhrase tablePhrase = sequence.getBasePhrase();
-      final IPhrase witnessPhrase = sequence.getWitnessPhrase();
-      final Iterator<INormalizedToken> tokens = witnessPhrase.getTokens().iterator();
-      for (final INormalizedToken tableToken : tablePhrase.getTokens()) {
+      final List<INormalizedToken> tablePhrase = sequence.getBasePhrase();
+      final List<INormalizedToken> witnessPhrase = sequence.getWitnessPhrase();
+      final Iterator<INormalizedToken> tokens = witnessPhrase.iterator();
+      for (final INormalizedToken tableToken : tablePhrase) {
         final INormalizedToken token = tokens.next();
         // skip Start and End Token in variant graph... string equals is not very nice!
         if (!(tableToken.getNormalized().equals("#"))) {
@@ -215,10 +202,10 @@ public class TokenLinker implements ITokenLinker {
     for (final Sequence sequence : sequences) {
       // step 1. Gather data
       List<TokenPair> pairs = Lists.newArrayList();
-      final IPhrase tablePhrase = sequence.getBasePhrase();
-      final IPhrase witnessPhrase = sequence.getWitnessPhrase();
-      final Iterator<INormalizedToken> tokens = witnessPhrase.getTokens().iterator();
-      for (final INormalizedToken tableToken : tablePhrase.getTokens()) {
+      final List<INormalizedToken> tablePhrase = sequence.getBasePhrase();
+      final List<INormalizedToken> witnessPhrase = sequence.getWitnessPhrase();
+      final Iterator<INormalizedToken> tokens = witnessPhrase.iterator();
+      for (final INormalizedToken tableToken : tablePhrase) {
         final INormalizedToken token = tokens.next();
         // skip NullColumn and NullToken
         if (!(tableToken instanceof NullToken)) {

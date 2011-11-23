@@ -20,14 +20,16 @@
 
 package eu.interedition.collatex2.implementation.vg_analysis;
 
-import eu.interedition.collatex2.interfaces.IPhrase;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+
+import java.util.List;
 
 public interface ISequence {
 
   String getNormalized();
   
-  IPhrase getBasePhrase();
+  List<INormalizedToken> getBasePhrase();
   
-  IPhrase getWitnessPhrase();
+  List<INormalizedToken> getWitnessPhrase();
 
 }

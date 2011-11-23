@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.*;
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.interfaces.*;
 import org.apache.cocoon.ProcessingException;
@@ -112,7 +113,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
       for (IWitness witness : entry.getWitnesses()) {
-        content2WitMap.put(entry.getPhrase(witness).getContent(), witness.getSigil());
+        content2WitMap.put(Token.toString(entry.getPhrase(witness)), witness.getSigil());
       }
 
       if ((content2WitMap.keySet().size() == 1) && !entry.hasEmptyCells()) {

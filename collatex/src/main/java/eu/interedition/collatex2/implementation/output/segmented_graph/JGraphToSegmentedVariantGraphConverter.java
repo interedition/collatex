@@ -20,23 +20,20 @@
 
 package eu.interedition.collatex2.implementation.output.segmented_graph;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
-import eu.interedition.collatex2.implementation.input.Phrase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IPhrase;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
 import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class JGraphToSegmentedVariantGraphConverter {
 
@@ -76,15 +73,14 @@ public class JGraphToSegmentedVariantGraphConverter {
     for (IJVariantGraphVertex vertex : vertexSet) {
       List<IVariantGraphVertex> vertices = vertex.getVariantGraphVertices();
       Set<IWitness> witnesses = vertex.getWitnesses();
-      Map<IWitness, IPhrase> phraseForEachWitness = Maps.newLinkedHashMap();
+      Map<IWitness, List<INormalizedToken>> phraseForEachWitness = Maps.newLinkedHashMap();
       for (IWitness witness : witnesses) {
         List<INormalizedToken> tokensForThisWitness = Lists.newArrayList();
         for (IVariantGraphVertex vgVertex : vertices) {
           INormalizedToken token = vgVertex.getToken(witness);
           tokensForThisWitness.add(token);
         }
-        Phrase phrase  = new Phrase(tokensForThisWitness);
-        phraseForEachWitness.put(witness, phrase);
+        phraseForEachWitness.put(witness, tokensForThisWitness);
       }
       newVertices.put(vertex, new SegmentedVariantGraphVertex(phraseForEachWitness));
     }

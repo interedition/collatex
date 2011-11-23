@@ -20,6 +20,7 @@
 
 package eu.interedition.collatex2.implementation.input;
 
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 
 public class Token implements IToken {
@@ -61,5 +62,13 @@ public class Token implements IToken {
   @Override
   public String toString() {
     return content;
+  }
+
+  public static String toString(Iterable<? extends IToken> tokens) {
+    final StringBuilder content = new StringBuilder();
+    for (final IToken token : tokens) {
+      content.append(token.getContent()).append(" ");
+    }
+    return content.toString().trim();
   }
 }

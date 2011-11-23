@@ -20,19 +20,16 @@
 
 package eu.interedition.collatex2.implementation.vg_alignment;
 
-import java.util.Collection;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import eu.interedition.collatex2.implementation.input.NullToken;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.nonpublic.ITokenIndex;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import eu.interedition.collatex2.implementation.input.NullToken;
-import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.nonpublic.ITokenIndex;
 
 //TODO: remove the explicit usage of NullToken in this class and in TokenIndexMatcher class!
 public abstract class AbstractTokenIndex implements ITokenIndex {
@@ -57,12 +54,11 @@ public abstract class AbstractTokenIndex implements ITokenIndex {
 
   //TODO: this is workaround! store real phrases instead of token!
   @Override
-  public IPhrase getPhrase(String normalized) {
+  public List<INormalizedToken> getPhrase(String normalized) {
     if (!contains(normalized)) {
       throw new RuntimeException("Item does not exist!");
     }
-    Collection<INormalizedToken> tokens = normalizedToTokens.get(normalized);
-    return new Phrase(Lists.newArrayList(tokens));
+    return Collections.unmodifiableList(normalizedToTokens.get(normalized));
   }
 
   @Override

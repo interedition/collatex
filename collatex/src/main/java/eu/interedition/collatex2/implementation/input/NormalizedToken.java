@@ -39,4 +39,12 @@ public class NormalizedToken extends Token implements INormalizedToken {
   public void setNormalized(String normalized) {
     this.normalized = normalized;
   }
+
+  public static String toString(Iterable<? extends INormalizedToken> tokens) {
+    final StringBuilder normalized = new StringBuilder();
+    for (final INormalizedToken token : tokens) {
+      normalized.append(token.getNormalized()).append(" ");
+    }
+    return normalized.toString().trim();
+  }
 }

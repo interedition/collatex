@@ -20,18 +20,15 @@
 
 package eu.interedition.collatex2.implementation.containers.witness;
 
+import com.google.common.collect.Maps;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex2.interfaces.IToken;
+import eu.interedition.collatex2.interfaces.IWitness;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.Maps;
-
-import eu.interedition.collatex2.implementation.input.Phrase;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IPhrase;
-import eu.interedition.collatex2.interfaces.IToken;
-import eu.interedition.collatex2.interfaces.IWitness;
 
 public class Witness implements Iterable<INormalizedToken>, IWitness {
   private String sigil;
@@ -84,14 +81,6 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
   @Override
   public Iterator<INormalizedToken> iterator() {
     return tokens.iterator();
-  }
-
-  // NOTE: this method is not on the IWitness interface
-  public IPhrase createPhrase(final int startPosition, final int endPosition) {
-    // TODO this problemCase shouldn't occur
-    final boolean problemCase = (startPosition - 1 > endPosition);
-    final List<INormalizedToken> subList = problemCase ? new ArrayList<INormalizedToken>() : tokens.subList(startPosition - 1, endPosition);
-    return new Phrase(subList);
   }
 
   @Override
