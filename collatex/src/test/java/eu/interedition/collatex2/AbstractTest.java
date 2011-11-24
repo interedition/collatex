@@ -15,7 +15,7 @@ import org.junit.Assert;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AbstractTest {
+public abstract class AbstractTest {
 
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
