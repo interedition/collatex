@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_alignment.old;
+package eu.interedition.collatex2.implementation.alignment.old;
 
 import static org.junit.Assert.assertTrue;
 

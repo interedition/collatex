@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.implementation.alignment;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author Ronald
  */
-public class SuperbaseTest {
+public class VariantGraphWitnessAdapterTest {
 
   //NOTE: question make start and end vertices here?
   //NOTE: The fact that you always have give a vertex key is not nice
@@ -48,7 +48,7 @@ public class SuperbaseTest {
     //NOTE: Echt nodig? Maakt het resultaat uit?
     when(vg.iterator()).thenReturn(vertices.iterator());
     // class to test
-    Superbase sb = new Superbase(vg);
+    VariantGraphWitnessAdapter sb = VariantGraphWitnessAdapter.create(vg);
     sb.getTokens();
     // expectations
     verify(vg).iterator();
@@ -67,7 +67,7 @@ public class SuperbaseTest {
     //NOTE: Echt nodig? Maakt het resultaat uit?
     when(vg.iterator()).thenReturn(vertices.iterator());
     // class to test
-    Superbase sb = new Superbase(vg);
+    VariantGraphWitnessAdapter sb = VariantGraphWitnessAdapter.create(vg);
     sb.isNear(a, white);
     // expectations
     verify(vg).isNear(a, white);

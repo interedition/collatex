@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.vg_analysis;
+package eu.interedition.collatex2.implementation.alignment;
 
 import java.util.Iterator;
 import java.util.List;

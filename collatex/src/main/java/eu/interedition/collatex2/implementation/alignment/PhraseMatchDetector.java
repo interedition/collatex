@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.vg_analysis;
+package eu.interedition.collatex2.implementation.alignment;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

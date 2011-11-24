@@ -5,11 +5,10 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
+import eu.interedition.collatex2.implementation.alignment.VariantGraphWitnessAdapter;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -30,7 +29,7 @@ public class EditGraphUsecasesTest {
     IWitness b = engine.createWitness("B", "The black and white cat");
     IVariantGraph graph = engine.graph(a);
     EditGraphLinker linker = new EditGraphLinker();
-    Map<INormalizedToken, INormalizedToken> link = linker.link(new Superbase(graph), b, new EqualityTokenComparator());
+    Map<INormalizedToken, INormalizedToken> link = linker.link(VariantGraphWitnessAdapter.create(graph), b, new EqualityTokenComparator());
     assertEquals(3, link.size());
     //TODO: add asserts!
     //System.out.println(link);

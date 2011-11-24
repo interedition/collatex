@@ -1,6 +1,5 @@
 package eu.interedition.collatex2.experimental;
 
-import static eu.interedition.collatex2.implementation.vg_alignment.TokenLinker.toString;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -8,7 +7,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.matching.Matches;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
+import eu.interedition.collatex2.implementation.alignment.TokenLinker;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

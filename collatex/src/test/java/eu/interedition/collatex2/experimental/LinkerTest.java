@@ -4,8 +4,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
+import eu.interedition.collatex2.implementation.alignment.VariantGraphWitnessAdapter;
+import eu.interedition.collatex2.implementation.alignment.TokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -28,7 +28,7 @@ public class LinkerTest {
   }
 
   private Map<INormalizedToken, INormalizedToken> linkTokens(final IVariantGraph graph, final IWitness witness) {
-    return new TokenLinker().link(new Superbase(graph), witness, new EqualityTokenComparator());
+    return new TokenLinker().link(VariantGraphWitnessAdapter.create(graph), witness, new EqualityTokenComparator());
   }
 
   @Test
@@ -37,7 +37,7 @@ public class LinkerTest {
     IWitness b = engine.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     IVariantGraph graph = engine.graph(a);
     Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, b);
-    IWitness sb = new Superbase(graph);
+    IWitness sb = VariantGraphWitnessAdapter.create(graph);
     INormalizedToken itsSB = sb.getTokens().get(1);
     INormalizedToken itsB = b.getTokens().get(0);
     assertEquals(itsSB, tokens.get(itsB));
@@ -99,7 +99,7 @@ public class LinkerTest {
     IVariantGraph graph = engine.graph(a, b);
     IWitness c = engine.createWitness("C", "very delitied and happy is the cat");
     Map<INormalizedToken, INormalizedToken> tokens = linkTokens(graph, c);
-    IWitness superbase = new Superbase(graph);
+    IWitness superbase = VariantGraphWitnessAdapter.create(graph);
     INormalizedToken verySB = superbase.getTokens().get(3);
     INormalizedToken veryC = c.getTokens().get(0);
     INormalizedToken happySB = superbase.getTokens().get(4);

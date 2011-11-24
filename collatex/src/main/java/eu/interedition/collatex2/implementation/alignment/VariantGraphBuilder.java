@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.implementation.alignment;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -7,8 +7,6 @@ import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex2.implementation.vg_analysis.PhraseMatchDetector;
-import eu.interedition.collatex2.implementation.vg_analysis.TranspositionDetector;
 import eu.interedition.collatex2.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +63,7 @@ public class VariantGraphBuilder {
   }
 
   protected void merge(IWitness witness) {
-    final IWitness base = new Superbase(graph);
+    final IWitness base = VariantGraphWitnessAdapter.create(graph);
 
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
     tokenLinks = tokenLinker.link(base, witness, comparator);
