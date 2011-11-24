@@ -22,7 +22,7 @@ public abstract class AbstractTest {
   protected WitnessBuilder witnessBuilder = new WitnessBuilder(new DefaultTokenNormalizer());
   protected ITokenizer tokenizer = new WhitespaceTokenizer();
 
-  protected IWitness[] createWitnesses(String... contents) {
+  protected IWitness[] createWitnesses(WitnessBuilder witnessBuilder, ITokenizer tokenizer, String... contents) {
     Assert.assertTrue("Not enough sigla", contents.length <= SIGLA.length);
     final IWitness[] witnesses = new IWitness[contents.length];
     for (int wc = 0; wc < contents.length; wc++) {
@@ -31,14 +31,24 @@ public abstract class AbstractTest {
     return witnesses;
   }
 
-  protected IVariantGraph collate(IWitness... witnesses) {
+  protected IWitness[] createWitnesses(String... contents) {
+    return createWitnesses(witnessBuilder, tokenizer, contents);
+  }
+
+  protected VariantGraphBuilder merge(IVariantGraph graph, IWitness... witnesses) {
+    final VariantGraphBuilder builder = new VariantGraphBuilder(graph);
+    builder.add(witnesses);
+    return builder;
+  }
+
+  protected IVariantGraph merge(IWitness... witnesses) {
     final VariantGraph graph = new VariantGraph();
-    new VariantGraphBuilder(graph).add(witnesses);
+    merge(graph, witnesses);
     return graph;
   }
 
-  protected IVariantGraph collate(String... witnesses) {
-    return collate(createWitnesses(witnesses));
+  protected IVariantGraph merge(String... witnesses) {
+    return merge(createWitnesses(witnesses));
   }
 
   protected IAlignmentTable toAlignmentTable(IVariantGraph graph) {
@@ -46,11 +56,11 @@ public abstract class AbstractTest {
   }
 
   protected IAlignmentTable toAlignmentTable(IWitness... witnesses) {
-    return new RankedGraphBasedAlignmentTable(collate(witnesses));
+    return new RankedGraphBasedAlignmentTable(merge(witnesses));
   }
 
   protected IAlignmentTable toAlignmentTable(String... witnesses) {
-    return new RankedGraphBasedAlignmentTable(collate(witnesses));
+    return new RankedGraphBasedAlignmentTable(merge(witnesses));
   }
 
 }

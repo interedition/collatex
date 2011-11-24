@@ -7,7 +7,6 @@ import eu.interedition.collatex2.implementation.alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -28,7 +27,7 @@ public class TokenLinkerTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
-    final IWitness graph = VariantGraphWitnessAdapter.create(collate(w[0]));
+    final IWitness graph = VariantGraphWitnessAdapter.create(merge(w[0]));
     final Map<INormalizedToken, INormalizedToken> links = linkTokens(graph, w[1]);
 
     assertEquals(graph.getTokens().get(1), links.get(w[1].getTokens().get(0))); // 'its'
@@ -37,13 +36,13 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testDirkVincent9() {
+  public void dirkVincent9() {
     final IWitness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
 
-    final Map<INormalizedToken, INormalizedToken> links = linkTokens(collate(w[0], w[1]), w[2]);
+    final Map<INormalizedToken, INormalizedToken> links = linkTokens(merge(w[0], w[1]), w[2]);
 
     final List<INormalizedToken> unlinked = Lists.newArrayList();
     for (INormalizedToken witnessToken : w[2].getTokens()) {
@@ -60,12 +59,12 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testLinkingWithStartToken() {
+  public void linkingWithStartToken() {
     final IWitness[] w = createWitnesses(//
             "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.",//
             "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
 
-    final Map<INormalizedToken, INormalizedToken> links = linkTokens(collate(w[0]), w[1]);
+    final Map<INormalizedToken, INormalizedToken> links = linkTokens(merge(w[0]), w[1]);
     assertTrue(!links.containsKey(w[1].getTokens().get(0)));
     assertTrue(!links.containsKey(w[1].getTokens().get(1)));
     assertTrue(!links.containsKey(w[1].getTokens().get(2)));
@@ -81,10 +80,10 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testLinkingRepetitionCausedByTransposition() {
+  public void linkingRepetitionCausedByTransposition() {
     final IWitness[] w = createWitnesses("the cat is very happy", "very happy is the cat", "very delitied and happy is the cat");
 
-    final IWitness graph = VariantGraphWitnessAdapter.create(collate(w[0], w[1]));
+    final IWitness graph = VariantGraphWitnessAdapter.create(merge(w[0], w[1]));
     final Map<INormalizedToken, INormalizedToken> links = linkTokens(graph, w[2]);
 
     assertEquals(graph.getTokens().get(3), links.get(w[2].getTokens().get(0))); // very
@@ -94,10 +93,10 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testTwoEqualPossibilities1() {
+  public void twoEqualPossibilities1() {
     final IWitness[] w = createWitnesses("a", "a a");
 
-    final IVariantGraph graph = collate(w[0]);
+    final IVariantGraph graph = merge(w[0]);
     final Map<INormalizedToken, INormalizedToken> links = linkTokens(graph, w[1]);
 
     assertEquals(1, links.size());
@@ -106,10 +105,10 @@ public class TokenLinkerTest extends AbstractTest {
 
 
   @Test
-  public void testEverythingIsUnique() {
+  public void everythingIsUnique() {
     final IWitness[] w = createWitnesses("everything is unique should be no problem", "everything is unique");
 
-    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("everything", "everything", Iterables.get(matches, 0));
@@ -118,13 +117,13 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testEverythingIsUniqueTwoWitnesses() {
+  public void everythingIsUniqueTwoWitnesses() {
     final IWitness[] w = createWitnesses(//
             "everything is unique should be no problem",//
             "this one very different",//
             "everything is different");
 
-    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(collate(w[0], w[1]), w[2]).entrySet();
+    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(merge(w[0], w[1]), w[2]).entrySet();
 
     assertEquals(3, matches.size());
     assertEquals("everything", Iterables.get(matches, 0).getValue().getNormalized());
@@ -133,13 +132,13 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testOverlappingMatches() {
+  public void overlappingMatches() {
     final IWitness[] w = createWitnesses(//
             "everything is unique should be no problem",//
             "this one is different",//
             "everything is different");
 
-    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(collate(w[0], w[1]), w[2]).entrySet();
+    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(merge(w[0], w[1]), w[2]).entrySet();
 
     assertEquals(3, matches.size());
     assertEquals("everything", Iterables.get(matches, 0).getValue().getNormalized());
@@ -148,10 +147,10 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testGetMatchesUsingWitnessIndex() {
+  public void getMatchesUsingWitnessIndex() {
     final IWitness[] w = createWitnesses("The big black cat and the big black rat", "The big black");
 
-    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("the", "the", Iterables.get(matches, 0));
@@ -160,10 +159,10 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testGetMatchesUsingWitnessIndexWithOverlapping() {
+  public void getMatchesUsingWitnessIndexWithOverlapping() {
     final IWitness[] w = createWitnesses("the big black cat and the big black rat", "the big black cat");
 
-    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
 
     assertEquals(4, matches.size());
     assertLink("cat", "cat", Iterables.get(matches, 0));
@@ -174,10 +173,10 @@ public class TokenLinkerTest extends AbstractTest {
 
 
   @Test
-  public void testOverlappingMatches2() {
+  public void overlappingMatches2() {
     final IWitness[] w = createWitnesses("the black cat and the black mat", "the black dog and the black mat");
 
-    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
 
     assertEquals(6, matches.size());
     assertLink("and", "and", Iterables.get(matches, 0));
@@ -189,10 +188,10 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testMatchesWithIndex() {
+  public void matchesWithIndex() {
     final IWitness[] w = createWitnesses("The black cat", "The black and white cat");
 
-    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("the", "the", Iterables.get(matches, 0));
@@ -201,10 +200,10 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testTwoEqualPossibilities2() {
+  public void twoEqualPossibilities2() {
     final IWitness[] w = createWitnesses("a a", "a");
 
-    final IVariantGraph graph = collate(w[0]);
+    final IVariantGraph graph = merge(w[0]);
     final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(graph, w[1]).entrySet();
 
     assertEquals(1, matches.size());
@@ -214,7 +213,7 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testWitnessIndexingDirkVincent2() {
+  public void witnessIndexingDirkVincent2() {
     final IWitness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
@@ -236,7 +235,7 @@ public class TokenLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testWitnessIndexingRepetitionCausedByTransposition() {
+  public void witnessIndexingRepetitionCausedByTransposition() {
     final IWitness[] w = createWitnesses(//
             "the cat very happy is very happy the cat",//
             "very delitied and happy is the cat");

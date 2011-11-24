@@ -22,6 +22,7 @@ package eu.interedition.collatex2.implementation.alignment;
 
 import static org.junit.Assert.assertEquals;
 
+import eu.interedition.collatex2.AbstractTest;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
@@ -39,20 +40,17 @@ import eu.interedition.collatex2.interfaces.IWitness;
  * @author Gregor Middell
  * 
  */
-public class SpencerHoweTest {
-  private CollateXEngine engine = new CollateXEngine();
+public class SpencerHoweTest extends AbstractTest {
 
-  //NOTE: Currently the AT visualization aligns variation to the
-  //left of the table: see the 'C' element
   @Test
-  public void testATSpencerHowe() {
-    final IWitness w1 = engine.createWitness("V", "a b c d e f ");
-    final IWitness w2 = engine.createWitness("W", "x y z d e");
-    final IWitness w3 = engine.createWitness("X", "a b x y z");
-    IAlignmentTable table = engine.align(w1, w2, w3);
-    assertEquals("V: |a|b|c| | |d|e|f|", table.getRow(w1).toString());
-    assertEquals("W: | | |x|y|z|d|e| |", table.getRow(w2).toString());
-    assertEquals("X: |a|b|x|y|z| | | |", table.getRow(w3).toString());
+  public void spencerHowe() {
+    final IWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
+    final IAlignmentTable table = toAlignmentTable(w);
+
     assertEquals(3, table.getRows().size());
+    //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element
+    assertEquals("A: |a|b|c| | |d|e|f|", table.getRow(w[0]).toString());
+    assertEquals("B: | | |x|y|z|d|e| |", table.getRow(w[1]).toString());
+    assertEquals("C: |a|b|x|y|z| | | |", table.getRow(w[2]).toString());
   }
 }

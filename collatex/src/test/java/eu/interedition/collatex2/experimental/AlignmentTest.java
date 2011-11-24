@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 
 public class AlignmentTest extends AbstractTest {
   @Test
-  public void testTransposition() {
+  public void transposition() {
     final IWitness[] w = createWitnesses("the cat is black", "black is the cat");
     final IAlignmentTable t = toAlignmentTable(w);
     assertEquals("A: |the|cat|is|black| |", t.getRow(w[0]).toString());
@@ -37,7 +37,7 @@ public class AlignmentTest extends AbstractTest {
   }
 
   @Test
-  public void testDoubleTransposition2() {
+  public void doubleTransposition2() {
     final IWitness[] w = createWitnesses("a b", "b a");
     final IAlignmentTable t = toAlignmentTable(w);
     assertEquals("A: | |a|b|", t.getRow(w[0]).toString());
@@ -45,7 +45,7 @@ public class AlignmentTest extends AbstractTest {
   }
 
   @Test
-  public void testDoubleTransposition3() {
+  public void doubleTransposition3() {
     final IWitness[] w = createWitnesses("a b c", "b a c");
     final IAlignmentTable t = toAlignmentTable(w);
     assertEquals("A: | |a|b|c|", t.getRow(w[0]).toString());
@@ -53,7 +53,7 @@ public class AlignmentTest extends AbstractTest {
   }
 
   @Test
-  public void testAdditionInCombinationWithTransposition() {
+  public void additionInCombinationWithTransposition() {
     final IWitness[] w = createWitnesses(//
             "the cat is very happy",//
             "very happy is the cat",//
@@ -65,7 +65,7 @@ public class AlignmentTest extends AbstractTest {
   }
 
   @Test
-  public void testAdditionInCombinationWithTransposition2() {
+  public void additionInCombinationWithTransposition2() {
     final IWitness[] w = createWitnesses(//
             "the cat is black",//
             "black is the cat",//
@@ -77,7 +77,7 @@ public class AlignmentTest extends AbstractTest {
   }
 
   @Test
-  public void testSimpleTransposition() {
+  public void simpleTransposition() {
     final IWitness[] w = createWitnesses(//
             "A black cat in a white basket",//
             "A white cat in a black basket");

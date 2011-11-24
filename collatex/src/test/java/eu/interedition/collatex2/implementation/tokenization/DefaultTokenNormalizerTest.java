@@ -22,6 +22,7 @@ package eu.interedition.collatex2.implementation.tokenization;
 
 import static org.junit.Assert.assertEquals;
 
+import eu.interedition.collatex2.implementation.input.Token;
 import org.junit.Test;
 
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
@@ -37,7 +38,7 @@ public class DefaultTokenNormalizerTest {
   }
 
   private void testNormalization(String content, String expected) {
-    assertEquals(expected, new DefaultTokenNormalizer().apply(new MockToken(content)).getNormalized());
+    assertEquals(expected, new DefaultTokenNormalizer().apply(new Token(content)).getNormalized());
   }
 
 }

@@ -15,7 +15,7 @@ import eu.interedition.collatex2.interfaces.IToken;
 public class PunctuationTokenizerTest {
   
   @Test
-  public void testTokenizer() {
+  public void tokenizePunctuation() {
     final List<IToken> tokens = Lists.newArrayList(new WhitespaceAndPunctuationTokenizer().tokenize("This is a sentence."));
 
     assertEquals(5, tokens.size());
