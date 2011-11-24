@@ -2,12 +2,9 @@ package eu.interedition.collatex2.implementation.edit_graph;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.matching.Matches;
-import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenLinker;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 import java.util.Comparator;

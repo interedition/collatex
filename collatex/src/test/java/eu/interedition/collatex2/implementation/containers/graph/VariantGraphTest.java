@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
+import eu.interedition.collatex2.implementation.alignment.VariantGraphBuilder;
 import junit.framework.Assert;
 
 import org.jgrapht.ext.DOTExporter;

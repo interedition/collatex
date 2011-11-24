@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.implementation.alignment;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -24,19 +24,23 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The superbase class is a wrapper around the variant graph it represents a variant graph as a witness.
+ * Adapts a variant graph to be treated as a witness with a defined token sequence.
  * <p/>
- * This makes certain alignment steps easier
+ * This makes certain alignment steps easier.
  *
  * @author Ronald
  */
-public class Superbase implements IWitness {
+public class VariantGraphWitnessAdapter implements IWitness {
   private final IVariantGraph graph;
   private final List<INormalizedToken> tokens;
 
-  public Superbase(IVariantGraph graph) {
+  public static VariantGraphWitnessAdapter create(IVariantGraph graph) {
+    return new VariantGraphWitnessAdapter(graph, Lists.newArrayList(Iterables.filter(graph, INormalizedToken.class)));
+  }
+
+  private VariantGraphWitnessAdapter(IVariantGraph graph, List<INormalizedToken> tokens) {
     this.graph = graph;
-    this.tokens = Lists.newArrayList(Iterables.filter(graph, INormalizedToken.class));
+    this.tokens = tokens;
   }
 
   @Override

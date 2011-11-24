@@ -28,7 +28,7 @@ import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenN
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
+import eu.interedition.collatex2.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex2.interfaces.*;
 
 /**

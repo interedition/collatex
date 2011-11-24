@@ -10,10 +10,9 @@ import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.matching.Matches;
-import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
-import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
-import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
-import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
+import eu.interedition.collatex2.implementation.alignment.VariantGraphWitnessAdapter;
+import eu.interedition.collatex2.implementation.alignment.TokenLinker;
+import eu.interedition.collatex2.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -114,7 +113,7 @@ public class DeTestDirkVincent {
     VariantGraphBuilder builder = new VariantGraphBuilder(graph);
     builder.add(a);
     builder.add(b);
-    IWitness superbase = new Superbase(graph);
+    IWitness superbase = VariantGraphWitnessAdapter.create(graph);
     Iterator<INormalizedToken> tokenIterator = superbase.tokenIterator();
     assertEquals("#", tokenIterator.next().getNormalized()); // start vertex
     assertEquals("its", tokenIterator.next().getNormalized());
@@ -142,7 +141,7 @@ public class DeTestDirkVincent {
     VariantGraphBuilder builder = new VariantGraphBuilder(graph);
     builder.add(a);
     builder.add(b);
-    IWitness superbase = new Superbase(graph);
+    IWitness superbase = VariantGraphWitnessAdapter.create(graph);
     IWitness c = factory.createWitness("11", "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
     Matches result = Matches.between(superbase, c, new EqualityTokenComparator());
     Set<INormalizedToken> unmatchedTokens = result.getUnmatched();
@@ -230,9 +229,9 @@ public class DeTestDirkVincent {
     assertEquals("Darly", Token.toString(sequences.get(1).right));
     assertEquals("among others", Token.toString(sequences.get(2).right));
     assertEquals("once died left him .", Token.toString(sequences.get(3).right));
-    List<ITransposition> transpositions = builder.getTranspositions();
-    assertEquals("darly", NormalizedToken.toString(transpositions.get(0).getSequenceB().right));
-    assertEquals("among others", NormalizedToken.toString(transpositions.get(1).getSequenceB().right));
+    List<Tuple<Tuple<List<INormalizedToken>>>> transpositions = builder.getTranspositions();
+    assertEquals("darly", NormalizedToken.toString(transpositions.get(0).right.right));
+    assertEquals("among others", NormalizedToken.toString(transpositions.get(1).right.right));
   }
 
   

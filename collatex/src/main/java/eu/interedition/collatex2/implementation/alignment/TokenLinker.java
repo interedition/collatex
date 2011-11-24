@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.implementation.vg_alignment;
+package eu.interedition.collatex2.implementation.alignment;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -7,7 +7,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.*;
 import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
-import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenLinker;
