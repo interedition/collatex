@@ -25,8 +25,8 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import eu.interedition.collatex2.implementation.input.WhitespaceAndPunctuationTokenizer;
-import eu.interedition.collatex2.implementation.input.WhitespaceTokenizer;
+import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
+import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -42,11 +42,11 @@ import org.w3c.dom.NodeList;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IApparatus;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex.implementation.CollateXEngine;
+import eu.interedition.collatex.interfaces.IAlignmentTable;
+import eu.interedition.collatex.interfaces.IApparatus;
+import eu.interedition.collatex.interfaces.IVariantGraph;
+import eu.interedition.collatex.interfaces.IWitness;
 
 @Controller
 @RequestMapping("/examples/**")

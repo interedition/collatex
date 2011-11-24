@@ -20,9 +20,9 @@
 
 package eu.interedition.collatex.web.io;
 
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
+import eu.interedition.collatex.interfaces.IVariantGraph;
+import eu.interedition.collatex.interfaces.IVariantGraphEdge;
+import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;

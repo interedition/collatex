@@ -21,8 +21,8 @@
 package eu.interedition.collatex.web.model;
 
 import com.google.common.base.Function;
-import eu.interedition.collatex2.implementation.input.NormalizedToken;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
+import eu.interedition.collatex.implementation.input.NormalizedToken;
+import eu.interedition.collatex.interfaces.INormalizedToken;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.annotate.JsonAnySetter;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
