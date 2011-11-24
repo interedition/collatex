@@ -23,8 +23,6 @@ package eu.interedition.collatex2.implementation.output.jgraph;
 import java.util.Map;
 import java.util.Set;
 
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

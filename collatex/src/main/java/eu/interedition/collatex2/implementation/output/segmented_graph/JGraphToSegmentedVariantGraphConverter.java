@@ -27,9 +27,9 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
+import eu.interedition.collatex2.implementation.output.jgraph.IJVariantGraph;
+import eu.interedition.collatex2.implementation.output.jgraph.IJVariantGraphEdge;
+import eu.interedition.collatex2.implementation.output.jgraph.IJVariantGraphVertex;
 
 import java.util.List;
 import java.util.Map;

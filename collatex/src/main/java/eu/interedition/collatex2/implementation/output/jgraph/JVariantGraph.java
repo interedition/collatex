@@ -22,10 +22,6 @@ package eu.interedition.collatex2.implementation.output.jgraph;
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphVertex;
-
 public class JVariantGraph extends DirectedAcyclicGraph<IJVariantGraphVertex, IJVariantGraphEdge> implements IJVariantGraph {
   private static final long serialVersionUID = 1L;
   private IJVariantGraphVertex startVertex;

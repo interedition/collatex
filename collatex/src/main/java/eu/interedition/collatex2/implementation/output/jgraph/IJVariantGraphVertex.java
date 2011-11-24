@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces.nonpublic;
+package eu.interedition.collatex2.implementation.output.jgraph;
 
 import java.util.List;
 import java.util.Set;

@@ -18,14 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.interfaces.nonpublic;
+package eu.interedition.collatex2.implementation.output.jgraph;
 
-import java.util.Set;
+import org.jgrapht.DirectedGraph;
 
-import eu.interedition.collatex2.interfaces.IWitness;
+public interface IJVariantGraph extends DirectedGraph<IJVariantGraphVertex, IJVariantGraphEdge> {
 
-public interface IJVariantGraphEdge {
+  IJVariantGraphVertex getStartVertex();
 
-  Set<IWitness> getWitnesses();
+  void setStartVertex(IJVariantGraphVertex startVertex);
+
+  IJVariantGraphVertex getEndVertex();
+
+  void setEndVertex(IJVariantGraphVertex endVertex);
 
 }

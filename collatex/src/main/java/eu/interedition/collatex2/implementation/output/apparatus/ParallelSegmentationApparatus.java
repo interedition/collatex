@@ -23,7 +23,7 @@ package eu.interedition.collatex2.implementation.output.apparatus;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
+import eu.interedition.collatex2.implementation.output.jgraph.IJVariantGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
