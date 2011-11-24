@@ -225,7 +225,7 @@ public class DeTestDirkVincent {
     checkGraph(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
     IWitness e = factory.createWitness("xxx", "The same as when Darly among others once died and left him.");
     builder.add(e);
-    List<Tuple<List<INormalizedToken>>> sequences = builder.getSequences();
+    List<Tuple<List<INormalizedToken>>> sequences = builder.getPhraseMatches();
     assertEquals("The same as when", Token.toString(sequences.get(0).right));
     assertEquals("Darly", Token.toString(sequences.get(1).right));
     assertEquals("among others", Token.toString(sequences.get(2).right));

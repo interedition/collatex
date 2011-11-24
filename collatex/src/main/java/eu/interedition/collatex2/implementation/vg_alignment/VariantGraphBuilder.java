@@ -8,7 +8,7 @@ import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdg
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
-import eu.interedition.collatex2.implementation.vg_analysis.SequenceDetector;
+import eu.interedition.collatex2.implementation.vg_analysis.PhraseMatchDetector;
 import eu.interedition.collatex2.implementation.vg_analysis.TranspositionDetector;
 import eu.interedition.collatex2.interfaces.*;
 import org.slf4j.Logger;
@@ -22,23 +22,23 @@ public class VariantGraphBuilder {
   private final IVariantGraph graph;
   private final Comparator<INormalizedToken> comparator;
   private final ITokenLinker tokenLinker;
-  private final SequenceDetector sequenceDetector;
+  private final PhraseMatchDetector phraseMatchDetector;
   private final TranspositionDetector transpositionDetector;
 
   private Map<INormalizedToken,INormalizedToken> tokenLinks;
-  private List<Tuple<List<INormalizedToken>>> sequences;
+  private List<Tuple<List<INormalizedToken>>> phraseMatches;
   private List<ITransposition> transpositions;
   private Map<INormalizedToken,INormalizedToken> alignments;
 
   public VariantGraphBuilder(IVariantGraph graph) {
-    this(graph, new EqualityTokenComparator(), new TokenLinker(), new SequenceDetector(), new TranspositionDetector());
+    this(graph, new EqualityTokenComparator(), new TokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
   }
 
-  public VariantGraphBuilder(IVariantGraph graph, Comparator<INormalizedToken> comparator, ITokenLinker tokenLinker, SequenceDetector sequenceDetector, TranspositionDetector transpositionDetector) {
+  public VariantGraphBuilder(IVariantGraph graph, Comparator<INormalizedToken> comparator, ITokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
     this.graph = graph;
     this.comparator = comparator;
     this.tokenLinker = tokenLinker;
-    this.sequenceDetector = sequenceDetector;
+    this.phraseMatchDetector = phraseMatchDetector;
     this.transpositionDetector = transpositionDetector;
   }
 
@@ -53,8 +53,8 @@ public class VariantGraphBuilder {
     return tokenLinks;
   }
 
-  public List<Tuple<List<INormalizedToken>>> getSequences() {
-    return Collections.unmodifiableList(sequences);
+  public List<Tuple<List<INormalizedToken>>> getPhraseMatches() {
+    return Collections.unmodifiableList(phraseMatches);
   }
 
   public List<ITransposition> getTranspositions() {
@@ -71,13 +71,13 @@ public class VariantGraphBuilder {
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
     tokenLinks = tokenLinker.link(base, witness, comparator);
 
-    LOG.debug("{} + {}: Detect sequences", graph, witness);
-    sequences = sequenceDetector.detect(tokenLinks, base, witness);
+    LOG.debug("{} + {}: Detect phrase matches", graph, witness);
+    phraseMatches = phraseMatchDetector.detect(tokenLinks, base, witness);
 
-    LOG.debug("{} + {}: Detect transpositions of sequences", graph, witness);
-    transpositions = transpositionDetector.detect(sequences, base);
+    LOG.debug("{} + {}: Detect transpositions", graph, witness);
+    transpositions = transpositionDetector.detect(phraseMatches, base);
 
-    LOG.debug("{} + {}: Filter aligned tokens", graph, witness);
+    LOG.debug("{} + {}: Determine aligned tokens by filtering transpositions", graph, witness);
     alignments = Maps.newLinkedHashMap(tokenLinks);
     for (Tuple<List<INormalizedToken>> transposedSequence : findTransposedSequences(transpositions, witness)) {
       alignments.keySet().removeAll(transposedSequence.right);
