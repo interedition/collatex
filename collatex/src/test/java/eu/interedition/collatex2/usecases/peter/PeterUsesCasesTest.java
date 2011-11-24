@@ -53,17 +53,17 @@ public class PeterUsesCasesTest {
     ISegmentedVariantGraph segmentedVariantGraph = converter.convertGraph(graph);
     VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
     List<IRankedVariantGraphVertex> vertices = ranker.getRankedVertices();
-    assertEquals("the ", vertices.get(0).getVertex().getNormalized());
+    assertEquals("the", vertices.get(0).getVertex().getNormalized());
     assertEquals(1, vertices.get(0).getRank());
-    assertEquals("black ", vertices.get(1).getVertex().getNormalized());
+    assertEquals("black", vertices.get(1).getVertex().getNormalized());
     assertEquals(2, vertices.get(1).getRank());
-    assertEquals("and ", vertices.get(2).getVertex().getNormalized());
+    assertEquals("and", vertices.get(2).getVertex().getNormalized());
     assertEquals(3, vertices.get(2).getRank());
-    assertEquals("white ", vertices.get(3).getVertex().getNormalized());
+    assertEquals("white", vertices.get(3).getVertex().getNormalized());
     assertEquals(4, vertices.get(3).getRank());
-    assertEquals("green ", vertices.get(4).getVertex().getNormalized());
+    assertEquals("green", vertices.get(4).getVertex().getNormalized());
     assertEquals(4, vertices.get(4).getRank());
-    assertEquals("cat ", vertices.get(5).getVertex().getNormalized());
+    assertEquals("cat", vertices.get(5).getVertex().getNormalized());
     assertEquals(5, vertices.get(5).getRank());
   }
 

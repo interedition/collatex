@@ -29,7 +29,7 @@ import java.util.UUID;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.containers.witness.Witness;
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
@@ -87,7 +87,7 @@ public class WitnessBuilder {
       IToken nextToken = tokenIterator.next();
       if (!nextToken.getContent().equals("")) {
         String normalized = tokenNormalizer.apply(nextToken).getNormalized();
-        WitnessToken wt = new WitnessToken(nextToken.getContent(), normalized);
+        NormalizedToken wt = new NormalizedToken(nextToken.getContent(), normalized);
         wt.setTrailingWhitespace(nextToken.getTrailingWhitespace());
         tokenList.add(wt);
       }

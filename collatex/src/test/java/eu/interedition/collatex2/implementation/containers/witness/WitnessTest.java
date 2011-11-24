@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -24,6 +25,6 @@ public class WitnessTest {
     tokens.add(token3);
     IWitness w = new Witness("id", tokens);
     assertTrue(w.isNear(token1, token2));
-    assertTrue(w.isNear(WitnessToken.START, token1));
+    assertTrue(w.isNear(NormalizedToken.START, token1));
   }
 }

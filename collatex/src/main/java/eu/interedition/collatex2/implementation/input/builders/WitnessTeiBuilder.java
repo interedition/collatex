@@ -34,13 +34,13 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
@@ -86,7 +86,7 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
     } else { // get text from prepared 'w' elements 
       for (int i = 0; i < nodes.getLength(); i++) {
         String value = nodes.item(i).getTextContent();
-        WitnessToken t = new WitnessToken(value, value);
+        NormalizedToken t = new NormalizedToken(value, value);
         t.setNormalized(tokenNormalizer.apply(t).getNormalized());
         tokenList.add(t);
       }

@@ -2,9 +2,14 @@ package eu.interedition.collatex2.implementation.output.dot;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Comparator;
+
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.edit_graph.EditGraph;
 import eu.interedition.collatex2.implementation.edit_graph.EditGraphCreator;
+import eu.interedition.collatex2.implementation.matching.EditDistanceTokenComparator;
+import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 import org.junit.Test;
@@ -16,9 +21,10 @@ public class DotExporterTest {
   public void test() {
     CollateXEngine engine = new CollateXEngine();
     IWitness a = engine.createWitness("a", THE_RED_CAT_AND_THE_BLACK_CAT);
-    IWitness b = engine.createWitness("b", "The BLACK cat and the red cat");
+    IWitness b = engine.createWitness("b", "With the green cat and the red cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b);
+    Comparator<INormalizedToken> comparator = new EditDistanceTokenComparator();
+    EditGraph dGraph = creator.buildEditGraph(a, b, comparator);
     String dot = DotExporter.toDot(dGraph);
     assertNotNull(dot);
     assertTrue(dot.contains("0"));

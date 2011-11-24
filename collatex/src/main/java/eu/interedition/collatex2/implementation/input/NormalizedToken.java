@@ -24,11 +24,28 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 
 public class NormalizedToken extends Token implements INormalizedToken {
-  protected String normalized;
+  public static final NormalizedToken START = new NormalizedToken("", "#");
+  public static final NormalizedToken END = new NormalizedToken("", "#");
 
-  public NormalizedToken(IToken token, String _normalized) {
+  private String normalized;
+
+  public NormalizedToken() {
+    super();
+  }
+
+  public NormalizedToken(INormalizedToken other) {
+    super(other);
+    this.normalized = other.getNormalized();
+  }
+
+  public NormalizedToken(final String content, final String normalized) {
+    super(content);
+    this.normalized = normalized;
+  }
+
+  public NormalizedToken(final IToken token, final String normalized) {
     super(token);
-    this.normalized = _normalized;
+    this.normalized = normalized;
   }
 
   @Override
@@ -36,8 +53,14 @@ public class NormalizedToken extends Token implements INormalizedToken {
     return normalized;
   }
 
+
   public void setNormalized(String normalized) {
     this.normalized = normalized;
+  }
+
+  @Override
+  public String toString() {
+    return getNormalized();
   }
 
   public static String toString(Iterable<? extends INormalizedToken> tokens) {

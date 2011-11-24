@@ -20,12 +20,12 @@
 
 package eu.interedition.collatex2.implementation.input.tokenization;
 
-import java.util.regex.Pattern;
-
 import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.ITokenNormalizer;
+
+import java.util.regex.Pattern;
 
 /**
  * Default implementation of a token normalizer.

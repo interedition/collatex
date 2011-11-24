@@ -21,17 +21,17 @@
 package eu.interedition.collatex2.interfaces;
 
 /**
- * The basic Token interface. The smallest piece of the text to align. It has the minimal number of fields: content 
- * 
+ * The basic Token interface. The smallest piece of the text to align. It has the minimal number of fields: content
  */
 public interface IToken {
 
-/**
- * The content stream token text
- * @return the text of the token.
- */
+  /**
+   * The content stream token text
+   *
+   * @return the text of the token.
+   */
   String getContent();
 
-String getTrailingWhitespace();
+  String getTrailingWhitespace();
 
 }
