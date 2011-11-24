@@ -189,7 +189,7 @@
             <dependency>
                 <groupId>com.tinkerpop.blueprints</groupId>
                 <artifactId>blueprints-graph-jung</artifactId>
-                <version>0.8</version>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jgrapht</groupId>
