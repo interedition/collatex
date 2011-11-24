@@ -20,6 +20,7 @@
 
 package eu.interedition.collatex2.implementation.output.apparatus;
 
+import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -38,39 +39,32 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
-public class TeiParallelSegmentationApparatusBuilderTest {
-  private static CollateXEngine engine = new CollateXEngine();
-  private static DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-  private static TransformerFactory tf = TransformerFactory.newInstance();
+import static org.junit.Assert.assertEquals;
 
+public class TeiParallelSegmentationApparatusBuilderTest extends AbstractTest {
   private DocumentBuilder documentBuilder;
   private Transformer transformer;
 
   @Before
-  public void setUp() throws Exception {
-    documentBuilder = dbf.newDocumentBuilder();
-    transformer = tf.newTransformer();
+  public void initXMLInfrastructure() throws Exception {
+    documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
     transformer.setOutputProperty(OutputKeys.INDENT, "no");
   }
 
   private void assertApparatusEquals(String apparatusStr, String... witnessContents) throws Exception {
-    final IWitness[] witnesses = new Witness[witnessContents.length];
-    for (int wc = 0; wc < witnesses.length; wc++) {
-      witnesses[wc] = engine.createWitness("W" + (wc + 1), witnessContents[wc]);
-    }
+    final IWitness[] witnesses = createWitnesses(witnessContents);
 
-    Document xml = documentBuilder.newDocument();
-    Element root = xml.createElementNS(TeiParallelSegmentationApparatusBuilder.TEI_NS, "text");
+    final Document xml = documentBuilder.newDocument();
+    final Element root = xml.createElementNS(TeiParallelSegmentationApparatusBuilder.TEI_NS, "text");
     xml.appendChild(root);
 
-    TeiParallelSegmentationApparatusBuilder.build(engine.createApparatus(engine.graph(witnesses)), root);
+    TeiParallelSegmentationApparatusBuilder.build(ParallelSegmentationApparatus.build(merge(witnesses)), root);
     StringWriter out = new StringWriter();
     transformer.transform(new DOMSource(xml), new StreamResult(out));
-    String result = out.toString();
-    result = result.substring("<text xmlns=\"http://www.tei-c.org/ns/1.0\">".length());
-    result = result.substring(0, result.length() - "</text>".length());
-    Assert.assertEquals(apparatusStr, result);
+    final String result = out.toString();
+    assertEquals(apparatusStr, result.substring("<text xmlns=\"http://www.tei-c.org/ns/1.0\">".length(), result.length() - "</text>".length()));
   }
 
 
@@ -85,7 +79,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testSimpleSubstitutionOutput() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#W1\">cat</rdg><rdg wit=\"#W2 #W3\">dog</rdg></app> and the black mat",//
+            "the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B #C\">dog</rdg></app> and the black mat",//
             "the black cat and the black mat",//
             "the black dog and the black mat",//
             "the black dog and the black mat");
@@ -101,7 +95,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testSimpleAddDelOutput() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">saw the black</rdg></app> cat on the <app><rdg wit=\"#W1\">white</rdg><rdg wit=\"#W2 #W3\"/></app> table",//
+            "the black <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B #C\"/></app> table",//
             "the black cat on the white table",//
             "the black saw the black cat on the table",//
             "the black saw the black cat on the table");
@@ -110,7 +104,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testMultiSubstitutionOutput() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#W1\">black cat</rdg><rdg wit=\"#W2 #W3\">big white dog</rdg></app> and the black mat",//
+            "the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B #C\">big white dog</rdg></app> and the black mat",//
             "the black cat and the black mat",//
             "the big white dog and the black mat",//
             "the big white dog and the black mat");
@@ -129,7 +123,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testAWordMissingAtTheEnd() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#W1 #W2\">cat</rdg><rdg wit=\"#W3\"/></app>",//
+            "the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app>",//
             "the black cat",//
             "the black cat",//
             "the black");
@@ -139,7 +133,7 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testCrossVariation() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">white</rdg></app> <app><rdg wit=\"#W1 #W3\"/><rdg wit=\"#W2\">and</rdg></app> <app><rdg wit=\"#W1 #W2\">black</rdg><rdg wit=\"#W3\"/></app> cat",//
+            "the <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">white</rdg></app> <app><rdg wit=\"#A #C\"/><rdg wit=\"#B\">and</rdg></app> <app><rdg wit=\"#A #B\">black</rdg><rdg wit=\"#C\"/></app> cat",//
             "the black cat",//
             "the white and black cat",//
             "the white cat");
@@ -149,22 +143,8 @@ public class TeiParallelSegmentationApparatusBuilderTest {
   @Test
   public void testAddition() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#W1\"/><rdg wit=\"#W2\">white and</rdg></app> black cat",//
+            "the <app><rdg wit=\"#A\"/><rdg wit=\"#B\">white and</rdg></app> black cat",//
             "the black cat",//
             "the white and black cat");
   }
-
-  // TODO: re-enable test!
-  // NOTE: Support for near matches is needed for this test to work right!
-  // @Test
-  // public void testNearMatches() {
-  // Witness w1 = builder.build("A", "the black cat");
-  // Witness w2 = builder.build("B", "the blak cat");
-  // Witness w3 = builder.build("C", "the black cat");
-  // WitnessSet set = new WitnessSet(w1, w2, w3);
-  // AlignmentTable2 table = set.createAlignmentTable();
-  // String expected = "<collation>the black cat</collation>";
-  // Assert.assertEquals(expected, table.toXML());
-  // }
-
 }

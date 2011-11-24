@@ -20,104 +20,65 @@
 
 package eu.interedition.collatex2.implementation.output.alignmenttable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.interfaces.ColumnState;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IColumn;
 import eu.interedition.collatex2.interfaces.IWitness;
+import org.junit.Test;
 
-public class ColumnTest {
-  private static CollateXEngine factory;
+import java.util.NoSuchElementException;
 
-  @BeforeClass
-  public static void setup() {
-    factory = new CollateXEngine();
+import static org.junit.Assert.*;
+
+public class ColumnTest extends AbstractTest {
+
+  @Test
+  public void firstToken() {
+    final IWitness witness = createWitnesses("a test string")[0];
+    final IColumn c = align(witness).getColumns().get(0);
+
+    assertTrue(c.containsWitness(witness));
+    assertFalse(c.containsWitness(createWitnesses("")[0]));
+    assertEquals(ColumnState.INVARIANT, c.getState());
   }
 
   @Test
-  public void testFirstToken() {
-    final IWitness witness = factory.createWitness("A", "a test string");
-    final IAlignmentTable table = factory.align(witness);
-    List<IColumn> columns = table.getColumns();
-    IColumn column1 = columns.get(0);
-    assertTrue(column1.containsWitness(witness));
-    assertFalse(column1.containsWitness(factory.createWitness("nonexisting", "")));
-    assertEquals(ColumnState.INVARIANT, column1.getState());
+  public void addVariant() {
+    final IWitness[] w = createWitnesses("first", "second", "third");
+    final IColumn c = align(w).getColumns().get(0);
+
+    assertTrue(c.containsWitness(w[0]));
+    assertTrue(c.containsWitness(w[1]));
+    assertTrue(c.containsWitness(w[2]));
+    assertFalse(c.containsWitness(createWitnesses("")[0]));
+    assertEquals(ColumnState.VARIANT, c.getState());
   }
 
   @Test
-  public void testAddVariant() {
-    final IWitness witness = factory.createWitness("A", "first");
-    final IWitness witnessB = factory.createWitness("B", "second");
-    final IWitness witnessC = factory.createWitness("C", "third");
-    final IAlignmentTable table = factory.align(witness, witnessB, witnessC);
-    List<IColumn> columns = table.getColumns();
-    IColumn column1 = columns.get(0);
-    //NOTE: containsWitness method is only used in tests!
-    assertTrue(column1.containsWitness(witness));
-    assertTrue(column1.containsWitness(witnessB));
-    assertTrue(column1.containsWitness(witnessC));
-    assertFalse(column1.containsWitness(factory.createWitness("nonexisting", "")));
-    assertEquals(ColumnState.VARIANT, column1.getState());
-    //NOTE: getVariants method was only used in this test!
-//  final List<INormalizedToken> variants = column1.getVariants();
-//  assertEquals(3, variants.size());
-//  assertEquals("first", variants.get(0).getNormalized());
-//  assertEquals("second", variants.get(1).getNormalized());
-//  assertEquals("third", variants.get(2).getNormalized());
-  }
+  public void addMatch() {
+    final IWitness[] w = createWitnesses("match", "match");
+    final IColumn c = align(w).getColumns().get(0);
 
-  @Test
-  public void testAddMatch() {
-    final IWitness a = factory.createWitness("A", "match");
-    final IWitness b = factory.createWitness("B", "match");
-    IAlignmentTable table = factory.align(a, b);
-    IColumn column = table.getColumns().get(0);
-    assertTrue(column.containsWitness(a));
-    assertTrue(column.containsWitness(b));
-    assertFalse(column.containsWitness(factory.createWitness("nonexisting", "")));
-    assertEquals(ColumnState.INVARIANT, column.getState());
-//  final List<INormalizedToken> variants = column.getVariants();
-//  assertEquals(1, variants.size());
-//  assertEquals("match", variants.get(0).getNormalized());
+    assertTrue(c.containsWitness(w[0]));
+    assertTrue(c.containsWitness(w[1]));
+    assertFalse(c.containsWitness(createWitnesses("")[0]));
+    assertEquals(ColumnState.INVARIANT, c.getState());
   }
   
   @Test
-  public void testMixedColumn() {
-    final IWitness witness = factory.createWitness("A", "match");
-    final IWitness witnessB = factory.createWitness("B", "match");
-    final IWitness witnessC = factory.createWitness("C", "variant");
-    IAlignmentTable table = factory.align(witness, witnessB, witnessC);
-    IColumn column = table.getColumns().get(0);
-    assertTrue(column.containsWitness(witness));
-    assertTrue(column.containsWitness(witnessB));
-    assertTrue(column.containsWitness(witnessC));
-    assertFalse(column.containsWitness(factory.createWitness("nonexisting", "")));
-    assertEquals(ColumnState.VARIANT, column.getState());
-//  final List<INormalizedToken> variants = column.getVariants();
-//  assertEquals(2, variants.size());
-//  assertEquals("match", variants.get(0).getNormalized());
-//  assertEquals("variant", variants.get(1).getNormalized());
+  public void mixedColumn() {
+    final IWitness[] w = createWitnesses("match", "match", "variant");
+    final IColumn c = align(w).getColumns().get(0);
+
+    assertTrue(c.containsWitness(w[0]));
+    assertTrue(c.containsWitness(w[1]));
+    assertTrue(c.containsWitness(w[2]));
+    assertFalse(c.containsWitness(createWitnesses("")[0]));
+    assertEquals(ColumnState.VARIANT, c.getState());
   }
 
   @Test(expected = NoSuchElementException.class)
-  public void testGetWordNonExistingGivesException() {
-    final IWitness witness = factory.createWitness("A", "a test string");
-    IAlignmentTable table = factory.align(witness);
-    IColumn column = table.getColumns().get(0);
-    column.getToken(factory.createWitness("nonexcisting", ""));
+  public void getNonExistingWordGivesException() {
+    align("a test string").getColumns().get(0).getToken(createWitnesses("")[0]);
   }
-
-
-
 }
