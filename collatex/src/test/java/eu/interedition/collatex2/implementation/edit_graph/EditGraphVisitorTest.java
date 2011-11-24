@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class EditGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b);
+    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
     assertEquals(0, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -45,7 +46,7 @@ public class EditGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b);
+    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
     assertEquals(1, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -56,7 +57,7 @@ public class EditGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b);
+    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     // I expect 6 vertices
@@ -73,7 +74,7 @@ public class EditGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b);
+    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     Map<EditGraphVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
@@ -93,7 +94,7 @@ public class EditGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b);
+    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     List<EditGraphEdge> edges = visitor.getShortestPath();
     assertEquals(EditOperation.GAP, edges.get(0).getEditOperation()); // The ideal path should start with a gap
@@ -115,7 +116,7 @@ public class EditGraphVisitorTest {
     IWitness a = engine.createWitness("a", "The red cat and the black cat");
     IWitness b = engine.createWitness("b", "The red cat and the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b);
+    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
 
     List<EditGraphEdge> path = visitor.getShortestPath();

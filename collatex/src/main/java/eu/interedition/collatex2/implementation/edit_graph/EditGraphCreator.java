@@ -9,6 +9,7 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Set;
 
 public class EditGraphCreator {
@@ -22,14 +23,14 @@ public class EditGraphCreator {
     this.editGraph = editGraph;
   }
 
-  public EditGraph buildEditGraph(IWitness a, IWitness b) {
+  public EditGraph buildEditGraph(IWitness a, IWitness b, Comparator<INormalizedToken> comparator) {
     // create start vertex
     EditGraphVertex startVertex = new EditGraphVertex(null, WitnessToken.START);
     editGraph.setStartVertex(startVertex);
     Set<EditGraphVertex> lastConstructedVertices = Sets.newLinkedHashSet();
     lastConstructedVertices.add(startVertex);
     // build the decision graph from the matches and the variant graph
-    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
+    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, comparator).getAll();
     // add for vertices for witness tokens that have a matching base token
     for (INormalizedToken wToken : b.getTokens()) {
       Collection<INormalizedToken> matchingTokens = matches.get(wToken);

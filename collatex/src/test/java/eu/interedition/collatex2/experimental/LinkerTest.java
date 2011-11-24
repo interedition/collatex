@@ -3,6 +3,7 @@ package eu.interedition.collatex2.experimental;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -27,7 +28,7 @@ public class LinkerTest {
   }
 
   private Map<INormalizedToken, INormalizedToken> linkTokens(final IVariantGraph graph, final IWitness witness) {
-    return new TokenLinker().link(new Superbase(graph), witness);
+    return new TokenLinker().link(new Superbase(graph), witness, new EqualityTokenComparator());
   }
 
   @Test
@@ -234,7 +235,7 @@ public class LinkerTest {
     assertEquals(1, matches.size());
 
     final Map.Entry<INormalizedToken, INormalizedToken> match = Iterables.get(matches, 0);
-    assertEquals(graph.getTokens(witnessA).get(0).getNormalized(), match.getKey());
-    assertEquals(witnessB.getTokens().get(0), match.getValue());
+    assertEquals(graph.getTokens(witnessA).get(0).getNormalized(), match.getKey().getNormalized());
+    assertEquals(witnessB.getTokens().get(0).getNormalized(), match.getValue().getNormalized());
   }
 }

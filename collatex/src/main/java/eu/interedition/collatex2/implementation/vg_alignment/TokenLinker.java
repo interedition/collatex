@@ -23,9 +23,9 @@ public class TokenLinker implements ITokenLinker {
   private static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
   @Override
-  public Map<INormalizedToken, INormalizedToken> link(IWitness a, IWitness b) {
+  public Map<INormalizedToken, INormalizedToken> link(IWitness a, IWitness b, Comparator<INormalizedToken> comparator) {
     LOG.trace("Matching tokens of {} and {}", a, b);
-    final Matches matches = Matches.between(a, b, new EqualityTokenComparator());
+    final Matches matches = Matches.between(a, b, comparator);
 
     // add start and end tokens as matches
     final Multimap<INormalizedToken, INormalizedToken> boundedMatches = ArrayListMultimap.create(matches.getAll());

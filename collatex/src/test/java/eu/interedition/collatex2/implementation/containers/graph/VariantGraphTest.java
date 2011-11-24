@@ -141,7 +141,7 @@ public class VariantGraphTest {
     IWitness w2 = engine.createWitness("B", "b");
     IWitness w3 = engine.createWitness("C", "a b");
     VariantGraph graph = new VariantGraph();
-    VariantGraphBuilder builder = engine.createVariantGraphBuilder(graph);
+    VariantGraphBuilder builder = new VariantGraphBuilder(graph);
     builder.add(w1, w2, w3);
     assertEquals(4, graph.vertexSet().size());
     VariantGraphUtil util = new VariantGraphUtil(graph);
