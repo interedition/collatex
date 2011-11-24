@@ -21,6 +21,7 @@
 package eu.interedition.collatex2.implementation.containers.witness;
 
 import com.google.common.collect.Maps;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IToken;
 import eu.interedition.collatex2.interfaces.IWitness;
@@ -49,12 +50,12 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
 
   protected void prepareTokens() {
     relations = Maps.newLinkedHashMap();
-    INormalizedToken previous = WitnessToken.START;
+    INormalizedToken previous = NormalizedToken.START;
     for (INormalizedToken token : tokens) {
       relations.put(previous, token);
       previous = token;
     }
-    relations.put(previous, WitnessToken.END);
+    relations.put(previous, NormalizedToken.END);
   }
 
   // Note: not pleased with this method! implement Iterable!

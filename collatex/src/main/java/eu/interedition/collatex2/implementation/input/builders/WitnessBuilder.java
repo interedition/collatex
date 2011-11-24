@@ -26,11 +26,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
 import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
@@ -87,7 +87,7 @@ public class WitnessBuilder {
       IToken nextToken = tokenIterator.next();
       if (!nextToken.getContent().equals("")) {
         String normalized = tokenNormalizer.apply(nextToken).getNormalized();
-        tokenList.add(new WitnessToken(nextToken.getContent(), normalized));
+        tokenList.add(new NormalizedToken(nextToken.getContent(), normalized));
       }
     }
     return new Witness(witnessId, tokenList);

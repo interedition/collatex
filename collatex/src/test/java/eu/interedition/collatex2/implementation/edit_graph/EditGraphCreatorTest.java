@@ -4,7 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import org.junit.Test;
 
@@ -39,8 +39,8 @@ public class EditGraphCreatorTest {
     INormalizedToken wCat2 = witness.add("cat");
  
     //setup vertices
-    EditGraphVertex startVertex = new EditGraphVertex(null, WitnessToken.START); // vGraph.getStartVertex());
-    EditGraphVertex endVertex = new EditGraphVertex(null, WitnessToken.END);
+    EditGraphVertex startVertex = new EditGraphVertex(null, NormalizedToken.START); // vGraph.getStartVertex());
+    EditGraphVertex endVertex = new EditGraphVertex(null, NormalizedToken.END);
     EditGraphVertex vertex1 = new EditGraphVertex(wThe, bThe);
     EditGraphVertex vertex2 = new EditGraphVertex(wThe, bThe2);
     EditGraphVertex vertex3 = new EditGraphVertex(wRed, bRed);
@@ -116,8 +116,8 @@ public class EditGraphCreatorTest {
     INormalizedToken wCat = witness.add("cat");
 
     //setup vertices
-    EditGraphVertex startVertex = new EditGraphVertex(null, WitnessToken.START); // vGraph.getStartVertex());
-    EditGraphVertex endVertex = new EditGraphVertex(null, WitnessToken.END);
+    EditGraphVertex startVertex = new EditGraphVertex(null, NormalizedToken.START); // vGraph.getStartVertex());
+    EditGraphVertex endVertex = new EditGraphVertex(null, NormalizedToken.END);
     EditGraphVertex vertex1 = new EditGraphVertex(wThe, bThe);
     EditGraphVertex vertex2 = new EditGraphVertex(wThe, bThe2);
     EditGraphVertex vertex3 = new EditGraphVertex(wBlack, bBlack);

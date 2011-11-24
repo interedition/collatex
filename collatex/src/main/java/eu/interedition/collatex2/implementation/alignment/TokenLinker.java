@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
 import eu.interedition.collatex2.implementation.Tuple;
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenLinker;
@@ -28,8 +28,8 @@ public class TokenLinker implements ITokenLinker {
 
     // add start and end tokens as matches
     final Multimap<INormalizedToken, INormalizedToken> boundedMatches = ArrayListMultimap.create(matches.getAll());
-    boundedMatches.put(WitnessToken.START, a.getTokens().get(0));
-    boundedMatches.put(WitnessToken.END, a.getTokens().get(a.size() - 1));
+    boundedMatches.put(NormalizedToken.START, a.getTokens().get(0));
+    boundedMatches.put(NormalizedToken.END, a.getTokens().get(a.size() - 1));
 
     LOG.trace("Finding minimal unique token sequences");
     final List<INormalizedToken> bTokens = b.getTokens();
@@ -42,9 +42,9 @@ public class TokenLinker implements ITokenLinker {
       // for each ambiguous token
       if (matches.getAmbiguous().contains(bTokens.get(tc))) {
         // find a minimal unique phrase by walking to the left
-        rightExpandingPhrases.add(reverse(findMinimalUniquePrefix(reverse(bTokens.subList(0, tc + 1)), matches.getUnmatched(), matches.getAmbiguous(), WitnessToken.START)));
+        rightExpandingPhrases.add(reverse(findMinimalUniquePrefix(reverse(bTokens.subList(0, tc + 1)), matches.getUnmatched(), matches.getAmbiguous(), NormalizedToken.START)));
         // find a minimal unique phrase by walking to the right
-        leftExpandingPhrases.add(findMinimalUniquePrefix(bTokens.subList(tc, bTokenCount), matches.getUnmatched(), matches.getAmbiguous(), WitnessToken.END));
+        leftExpandingPhrases.add(findMinimalUniquePrefix(bTokens.subList(tc, bTokenCount), matches.getUnmatched(), matches.getAmbiguous(), NormalizedToken.END));
       }
     }
 
@@ -86,7 +86,7 @@ public class TokenLinker implements ITokenLinker {
       while (baseIt.hasNext() && witnessIt.hasNext()) {
         final INormalizedToken baseToken = baseIt.next();
         final INormalizedToken witnessToken = witnessIt.next();
-        if (WitnessToken.START.equals(witnessToken) || WitnessToken.END.equals(witnessToken)) {
+        if (NormalizedToken.START.equals(witnessToken) || NormalizedToken.END.equals(witnessToken)) {
           // skip start and end tokens
           continue;
         }
@@ -107,9 +107,9 @@ public class TokenLinker implements ITokenLinker {
       // for each ambiguous token
       if (matches.getAmbiguous().contains(tokens.get(tc))) {
         // find a minimal unique subsequence by walking to the left
-        tokenSequences.add(reverse(findMinimalUniquePrefix(reverse(tokens.subList(0, tc + 1)), matches.getUnmatched(), matches.getAmbiguous(), WitnessToken.START)));
+        tokenSequences.add(reverse(findMinimalUniquePrefix(reverse(tokens.subList(0, tc + 1)), matches.getUnmatched(), matches.getAmbiguous(), NormalizedToken.START)));
         // find a minimal unique subsequence by walking to the right
-        tokenSequences.add(findMinimalUniquePrefix(tokens.subList(tc, tokenCount), matches.getUnmatched(), matches.getAmbiguous(), WitnessToken.END));
+        tokenSequences.add(findMinimalUniquePrefix(tokens.subList(tc, tokenCount), matches.getUnmatched(), matches.getAmbiguous(), NormalizedToken.END));
       }
     }
 
@@ -144,7 +144,7 @@ public class TokenLinker implements ITokenLinker {
       while (leftIt.hasNext() && rightIt.hasNext()) {
         final INormalizedToken left = leftIt.next();
         final INormalizedToken right = rightIt.next();
-        if (WitnessToken.START.equals(left) || WitnessToken.END.equals(left)) {
+        if (NormalizedToken.START.equals(left) || NormalizedToken.END.equals(left)) {
           // skip start and end Token in variant graph
           continue;
         }

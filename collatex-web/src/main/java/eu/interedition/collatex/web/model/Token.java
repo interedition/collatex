@@ -21,7 +21,7 @@
 package eu.interedition.collatex.web.model;
 
 import com.google.common.base.Function;
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.annotate.JsonAnySetter;
@@ -37,7 +37,7 @@ import java.util.Map;
 
 @JsonSerialize(using = Token.Serializer.class)
 @JsonIgnoreProperties( { "position", "sigil" })
-public class Token extends WitnessToken {
+public class Token extends NormalizedToken {
   private Map<String, Object> metadata;
 
   public Token() {

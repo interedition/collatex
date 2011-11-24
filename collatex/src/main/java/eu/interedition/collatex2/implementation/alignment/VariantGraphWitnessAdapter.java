@@ -17,7 +17,7 @@ package eu.interedition.collatex2.implementation.alignment;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import eu.interedition.collatex2.implementation.containers.witness.WitnessToken;
+import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.interfaces.*;
 
 import java.util.Iterator;
@@ -60,10 +60,10 @@ public class VariantGraphWitnessAdapter implements IWitness {
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    if (WitnessToken.START.equals(a)) {
+    if (NormalizedToken.START.equals(a)) {
       a = graph.getStartVertex();
     }
-    if (WitnessToken.END.equals(b)) {
+    if (NormalizedToken.END.equals(b)) {
       b = graph.getEndVertex();
     }
     return graph.isNear(a, b);
