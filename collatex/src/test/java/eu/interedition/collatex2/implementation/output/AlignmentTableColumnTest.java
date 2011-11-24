@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.output.alignmenttable;
+package eu.interedition.collatex2.implementation.output;
 
 import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.interfaces.ColumnState;
@@ -30,7 +30,7 @@ import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
-public class ColumnTest extends AbstractTest {
+public class AlignmentTableColumnTest extends AbstractTest {
 
   @Test
   public void firstToken() {

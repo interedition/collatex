@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.alignment;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

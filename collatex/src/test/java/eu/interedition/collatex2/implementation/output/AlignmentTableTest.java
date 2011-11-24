@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.output.alignmenttable;
+package eu.interedition.collatex2.implementation.output;
 
 import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;

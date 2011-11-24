@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.output.cgraph;
+package eu.interedition.collatex2.implementation.output;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex2.AbstractTest;
+import eu.interedition.collatex2.implementation.output.cgraph.CVariantGraphCreator;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
 import org.jgrapht.ext.IntegerNameProvider;
@@ -47,8 +48,8 @@ import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class CVariantGraphCreatorTest extends AbstractTest {
-  private static final Logger LOG = LoggerFactory.getLogger(CVariantGraphCreatorTest.class);
+public class CyclicVariantGraphCreatorTest extends AbstractTest {
+  private static final Logger LOG = LoggerFactory.getLogger(CyclicVariantGraphCreatorTest.class);
 
   @Test
   public void basic1() {

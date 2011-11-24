@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.input.builders;
+package eu.interedition.collatex2.implementation.input;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

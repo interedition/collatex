@@ -18,11 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.output.apparatus;
+package eu.interedition.collatex2.implementation.output;
 
 import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.containers.witness.Witness;
+import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
+import eu.interedition.collatex2.implementation.output.apparatus.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex2.interfaces.IWitness;
 import org.junit.Assert;
 import org.junit.Before;

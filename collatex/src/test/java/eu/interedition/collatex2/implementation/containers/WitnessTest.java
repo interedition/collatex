@@ -1,7 +1,8 @@
-package eu.interedition.collatex2.implementation.containers.witness;
+package eu.interedition.collatex2.implementation.containers;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex2.AbstractTest;
+import eu.interedition.collatex2.implementation.containers.witness.Witness;
 import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;

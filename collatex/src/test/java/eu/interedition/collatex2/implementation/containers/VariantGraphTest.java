@@ -18,9 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.containers.graph;
+package eu.interedition.collatex2.implementation.containers;
 
 import eu.interedition.collatex2.AbstractTest;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
+import eu.interedition.collatex2.implementation.containers.graph.VariantGraphUtil;
 import eu.interedition.collatex2.interfaces.*;
 import org.junit.Test;
 

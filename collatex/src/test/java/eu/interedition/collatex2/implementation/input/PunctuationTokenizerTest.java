@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.input;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex2.experimental;
+package eu.interedition.collatex2.implementation.alignment;
 
 import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;

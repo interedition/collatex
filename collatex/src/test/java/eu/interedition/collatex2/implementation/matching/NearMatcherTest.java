@@ -1,10 +1,8 @@
-package eu.interedition.collatex2.experimental.matching;
+package eu.interedition.collatex2.implementation.matching;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.AbstractTest;
-import eu.interedition.collatex2.implementation.matching.EditDistanceTokenComparator;
-import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
 import org.junit.Test;

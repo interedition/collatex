@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex2.implementation.output.jgraph;
+package eu.interedition.collatex2.implementation.output;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,15 +28,13 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex2.AbstractTest;
-import org.junit.BeforeClass;
+import eu.interedition.collatex2.implementation.output.jgraph.JVariantGraphCreator;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraph;
 import eu.interedition.collatex2.interfaces.nonpublic.IJVariantGraphEdge;
