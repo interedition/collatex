@@ -13,7 +13,6 @@ import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.implementation.vg_alignment.Superbase;
 import eu.interedition.collatex2.implementation.vg_alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.vg_alignment.VariantGraphBuilder;
-import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -230,9 +229,9 @@ public class DeTestDirkVincent {
     assertEquals("Darly", Token.toString(sequences.get(1).right));
     assertEquals("among others", Token.toString(sequences.get(2).right));
     assertEquals("once died left him .", Token.toString(sequences.get(3).right));
-    List<ITransposition> transpositions = builder.getTranspositions();
-    assertEquals("darly", NormalizedToken.toString(transpositions.get(0).getSequenceB().right));
-    assertEquals("among others", NormalizedToken.toString(transpositions.get(1).getSequenceB().right));
+    List<Tuple<Tuple<List<INormalizedToken>>>> transpositions = builder.getTranspositions();
+    assertEquals("darly", NormalizedToken.toString(transpositions.get(0).right.right));
+    assertEquals("among others", NormalizedToken.toString(transpositions.get(1).right.right));
   }
 
   

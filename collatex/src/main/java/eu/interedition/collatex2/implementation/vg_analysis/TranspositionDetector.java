@@ -24,7 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Iterables;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -33,43 +34,40 @@ import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.ITokenContainer;
 
 
-public class TranspositionDetector implements ITranspositionDetector {
+public class TranspositionDetector {
 
-  @Override
-  public List<ITransposition> detect(List<Tuple<List<INormalizedToken>>> sequences, ITokenContainer base) {
-    List<Tuple<List<INormalizedToken>>> sequencesSortedForBase = sortSequencesForBase(sequences, base);
-    if (sequencesSortedForBase.size()!=sequences.size()) {
-      throw new RuntimeException("Something went wrong in the linking process!");
-    }
-    final List<ITransposition> transpositions = Lists.newArrayList();
-    for (int i = 0; i < sequences.size(); i++) {
-      final Tuple<List<INormalizedToken>> sequenceWitness = sequences.get(i);
-      final Tuple<List<INormalizedToken>> sequenceBase = sequencesSortedForBase.get(i);
-      if (!sequenceWitness.equals(sequenceBase)) {
-        // TODO: I have got no idea why have to mirror the sequences here!
-        transpositions.add(new Transposition(sequenceBase, sequenceWitness));
+  public List<Tuple<Tuple<List<INormalizedToken>>>> detect(List<Tuple<List<INormalizedToken>>> phraseMatches, ITokenContainer base) {
+    // sort phrase matches by base token order
+    final Map<INormalizedToken, Tuple<List<INormalizedToken>>> tokenIndex = Maps.uniqueIndex(phraseMatches, new Function<Tuple<List<INormalizedToken>>, INormalizedToken>() {
+      @Override
+      public INormalizedToken apply(Tuple<List<INormalizedToken>> input) {
+        return input.left.get(0);
+      }
+    });
+    final List<Tuple<List<INormalizedToken>>> sortedPhraseMatches = Lists.newArrayList();
+    for (Iterator<INormalizedToken> tokenIterator = base.tokenIterator(); tokenIterator.hasNext(); ) {
+      final INormalizedToken token = tokenIterator.next();
+      if (tokenIndex.containsKey(token)) {
+        sortedPhraseMatches.add(tokenIndex.get(token));
       }
     }
+
+    // compare sorted to unsorted phrase matches in order to yield transpositions
+    final List<Tuple<Tuple<List<INormalizedToken>>>> transpositions = Lists.newArrayList();
+
+    Preconditions.checkState(sortedPhraseMatches.size() == phraseMatches.size(), "Something went wrong in the linking process!");
+    final Iterator<Tuple<List<INormalizedToken>>> unsortedIt = phraseMatches.iterator();
+    final Iterator<Tuple<List<INormalizedToken>>> sortedIt = sortedPhraseMatches.iterator();
+    while (unsortedIt.hasNext() && sortedIt.hasNext()) {
+      final Tuple<List<INormalizedToken>> phraseMatchInWitness = unsortedIt.next();
+      final Tuple<List<INormalizedToken>> phraseMatchInBase = sortedIt.next();
+      if (!phraseMatchInWitness.equals(phraseMatchInBase)) {
+        // TODO: I have got no idea why have to mirror the sequences here!
+        transpositions.add(new Tuple<Tuple<List<INormalizedToken>>>(phraseMatchInBase, phraseMatchInWitness));
+      }
+    }
+
     return transpositions;
   }
 
-  private List<Tuple<List<INormalizedToken>>> sortSequencesForBase(List<Tuple<List<INormalizedToken>>> sequences, ITokenContainer base) {
-    // prepare map
-    Map<INormalizedToken, Tuple<List<INormalizedToken>>> tokenToSequenceMap = Maps.newLinkedHashMap();
-    for (Tuple<List<INormalizedToken>> sequence : sequences) {
-      INormalizedToken firstToken = Iterables.getFirst(sequence.left, null);
-      tokenToSequenceMap.put(firstToken, sequence);
-    }
-    // sort sequences
-    List<Tuple<List<INormalizedToken>>> orderedSequences = Lists.newArrayList();
-    Iterator<INormalizedToken> tokenIterator = base.tokenIterator();
-    while(tokenIterator.hasNext()) {
-      INormalizedToken token = tokenIterator.next();
-      if (tokenToSequenceMap.containsKey(token)) {
-        Tuple<List<INormalizedToken>> sequence = tokenToSequenceMap.get(token);
-        orderedSequences.add(sequence);
-      }
-    }
-    return orderedSequences;
-  }
 }

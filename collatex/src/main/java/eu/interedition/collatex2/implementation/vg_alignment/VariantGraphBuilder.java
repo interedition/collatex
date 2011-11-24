@@ -7,7 +7,6 @@ import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphEdge;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraphVertex;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex2.implementation.vg_analysis.ITransposition;
 import eu.interedition.collatex2.implementation.vg_analysis.PhraseMatchDetector;
 import eu.interedition.collatex2.implementation.vg_analysis.TranspositionDetector;
 import eu.interedition.collatex2.interfaces.*;
@@ -27,7 +26,7 @@ public class VariantGraphBuilder {
 
   private Map<INormalizedToken,INormalizedToken> tokenLinks;
   private List<Tuple<List<INormalizedToken>>> phraseMatches;
-  private List<ITransposition> transpositions;
+  private List<Tuple<Tuple<List<INormalizedToken>>>> transpositions;
   private Map<INormalizedToken,INormalizedToken> alignments;
 
   public VariantGraphBuilder(IVariantGraph graph) {
@@ -57,7 +56,7 @@ public class VariantGraphBuilder {
     return Collections.unmodifiableList(phraseMatches);
   }
 
-  public List<ITransposition> getTranspositions() {
+  public List<Tuple<Tuple<List<INormalizedToken>>>> getTranspositions() {
     return Collections.unmodifiableList(transpositions);
   }
 
@@ -112,26 +111,26 @@ public class VariantGraphBuilder {
   }
 
   // NOTE: this method should not return the original sequence when a mirror exists!
-  private List<Tuple<List<INormalizedToken>>> findTransposedSequences(List<ITransposition> transpositions, IWitness witness) {
+  private List<Tuple<List<INormalizedToken>>> findTransposedSequences(List<Tuple<Tuple<List<INormalizedToken>>>> transpositions, IWitness witness) {
     final List<Tuple<List<INormalizedToken>>> transposed = Lists.newArrayList();
-    final Deque<ITransposition> toCheck = new ArrayDeque<ITransposition>(transpositions);
+    final Deque<Tuple<Tuple<List<INormalizedToken>>>> toCheck = new ArrayDeque<Tuple<Tuple<List<INormalizedToken>>>>(transpositions);
     while (!toCheck.isEmpty()) {
-      final ITransposition current = toCheck.pop();
-      final ITransposition mirrored = findMirroredTransposition(toCheck, current);
+      final Tuple<Tuple<List<INormalizedToken>>> current = toCheck.pop();
+      final Tuple<Tuple<List<INormalizedToken>>> mirrored = findMirroredTransposition(toCheck, current);
       if (mirrored != null && transpositionsAreNear(current, mirrored, witness)) {
         toCheck.remove(mirrored);
-        transposed.add(mirrored.getSequenceA());
+        transposed.add(mirrored.left);
       } else {
-        transposed.add(current.getSequenceA());
+        transposed.add(current.left);
       }
     }
     return transposed;
   }
 
-  private ITransposition findMirroredTransposition(final Deque<ITransposition> transToCheck, final ITransposition original) {
-    for (final ITransposition transposition : transToCheck) {
-      if (equals(transposition.getSequenceA(), original.getSequenceB())) {
-        if (equals(transposition.getSequenceB(), original.getSequenceA())) {
+  private Tuple<Tuple<List<INormalizedToken>>> findMirroredTransposition(final Deque<Tuple<Tuple<List<INormalizedToken>>>> transToCheck, final Tuple<Tuple<List<INormalizedToken>>> original) {
+    for (final Tuple<Tuple<List<INormalizedToken>>> transposition : transToCheck) {
+      if (equals(transposition.left, original.right)) {
+        if (equals(transposition.right, original.left)) {
           return transposition;
         }
       }
@@ -155,8 +154,8 @@ public class VariantGraphBuilder {
 
   // Note: this only calculates the distance between the tokens in the witness.
   // Note: it does not take into account a possible distance in the vertices in the graph!
-  private boolean transpositionsAreNear(ITransposition a, ITransposition b, IWitness witness) {
-    return witness.isNear(Iterables.getLast(a.getSequenceB().right), Iterables.get(b.getSequenceB().right, 0));
+  private boolean transpositionsAreNear(Tuple<Tuple<List<INormalizedToken>>> a, Tuple<Tuple<List<INormalizedToken>>> b, IWitness witness) {
+    return witness.isNear(Iterables.getLast(a.right.right), Iterables.get(b.right.right, 0));
   }
 
 }
