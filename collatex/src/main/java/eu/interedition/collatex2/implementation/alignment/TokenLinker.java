@@ -21,10 +21,16 @@ import static com.google.common.collect.Lists.reverse;
 public class TokenLinker implements ITokenLinker {
   private static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
 
+  private Matches matches;
+  private List<List<INormalizedToken>> leftExpandingPhrases;
+  private List<List<INormalizedToken>> rightExpandingPhrases;
+  private List<Tuple<List<INormalizedToken>>> phraseMatches;
+  private Map<INormalizedToken,INormalizedToken> tokenLinks;
+
   @Override
   public Map<INormalizedToken, INormalizedToken> link(IWitness a, IWitness b, Comparator<INormalizedToken> comparator) {
     LOG.trace("Matching tokens of {} and {}", a, b);
-    final Matches matches = Matches.between(a, b, comparator);
+    matches = Matches.between(a, b, comparator);
 
     // add start and end tokens as matches
     final Multimap<INormalizedToken, INormalizedToken> boundedMatches = ArrayListMultimap.create(matches.getAll());
@@ -35,8 +41,8 @@ public class TokenLinker implements ITokenLinker {
     final List<INormalizedToken> bTokens = b.getTokens();
     final int bTokenCount = bTokens.size();
 
-    final List<List<INormalizedToken>> leftExpandingPhrases =  Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size());
-    final List<List<INormalizedToken>> rightExpandingPhrases =  Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size());
+    leftExpandingPhrases = Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size());
+    rightExpandingPhrases = Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size());
 
     for (int tc = 0; tc < bTokenCount; tc++) {
       // for each ambiguous token
@@ -52,7 +58,7 @@ public class TokenLinker implements ITokenLinker {
     List<INormalizedToken> aMatches = findMatches(a, boundedMatches.values());
 
     // try and find matches in the base for each sequence in the witness
-    List<Tuple<List<INormalizedToken>>> phraseMatches = Lists.newArrayList();
+    phraseMatches = Lists.newArrayList();
     for (List<INormalizedToken> phrase : rightExpandingPhrases) {
       List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheRight(phrase, boundedMatches, aMatches);
       if (!matchingPhrase.isEmpty()) {
@@ -73,7 +79,7 @@ public class TokenLinker implements ITokenLinker {
     // do the matching
     final Multimap<INormalizedToken, INormalizedToken> allMatches = matches.getAll();
 
-    final Map<INormalizedToken, INormalizedToken> tokenLinks = Maps.newLinkedHashMap();
+    tokenLinks = Maps.newLinkedHashMap();
 
     for (INormalizedToken unique : matches.getUnique()) {
       // put unique matches in the result
@@ -96,24 +102,24 @@ public class TokenLinker implements ITokenLinker {
     return tokenLinks;
   }
 
-  @Deprecated
-  public static List<List<INormalizedToken>> findUniqueTokenSequences(IWitness witness, Matches matches) {
-    final List<INormalizedToken> tokens = witness.getTokens();
-    final int tokenCount = tokens.size();
+  public Matches getMatches() {
+    return matches;
+  }
 
-    final List<List<INormalizedToken>> tokenSequences =  Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size() * 2);
+  public List<List<INormalizedToken>> getLeftExpandingPhrases() {
+    return leftExpandingPhrases;
+  }
 
-    for (int tc = 0; tc < tokenCount; tc++) {
-      // for each ambiguous token
-      if (matches.getAmbiguous().contains(tokens.get(tc))) {
-        // find a minimal unique subsequence by walking to the left
-        tokenSequences.add(reverse(findMinimalUniquePrefix(reverse(tokens.subList(0, tc + 1)), matches.getUnmatched(), matches.getAmbiguous(), NormalizedToken.START)));
-        // find a minimal unique subsequence by walking to the right
-        tokenSequences.add(findMinimalUniquePrefix(tokens.subList(tc, tokenCount), matches.getUnmatched(), matches.getAmbiguous(), NormalizedToken.END));
-      }
-    }
+  public List<List<INormalizedToken>> getRightExpandingPhrases() {
+    return rightExpandingPhrases;
+  }
 
-    return tokenSequences;
+  public List<Tuple<List<INormalizedToken>>> getPhraseMatches() {
+    return phraseMatches;
+  }
+
+  public Map<INormalizedToken, INormalizedToken> getTokenLinks() {
+    return tokenLinks;
   }
 
   public static List<INormalizedToken> findMinimalUniquePrefix(Iterable<INormalizedToken> sequence, Set<INormalizedToken> unmatched, Set<INormalizedToken> ambiguous, INormalizedToken stopMarker) {
@@ -220,14 +226,5 @@ public class TokenLinker implements ITokenLinker {
 
   public static List<INormalizedToken> findMatches(IWitness a, Collection<INormalizedToken> matches) {
     return Lists.newArrayList(Iterables.filter(a.getTokens(), Predicates.in(matches)));
-  }
-
-  public static String toString(List<INormalizedToken> tokens) {
-    final StringBuilder str = new StringBuilder();
-    for (INormalizedToken token : tokens) {
-      str.append(token.getNormalized()).append(" ");
-    }
-    return str.toString().trim();
-
   }
 }
