@@ -36,7 +36,7 @@ public class VariantGraphWitnessAdapterTest {
   //NOTE: we have te make the edges?
   //NOTE: not really since we fake vg.isNEar!
   @Test
-  public void testSuperbaseIterator() {
+  public void tokenIteration() {
     // setup
     IVariantGraphVertex a = new VariantGraphVertex("a", null);
     IVariantGraphVertex white = new VariantGraphVertex("white", null);
@@ -57,7 +57,7 @@ public class VariantGraphWitnessAdapterTest {
   }
 
   @Test
-  public void testSuperbaseIsNear() {
+  public void isNear() {
     // setup
     IVariantGraphVertex a = new VariantGraphVertex("a", null);
     IVariantGraphVertex white = new VariantGraphVertex("white", null);

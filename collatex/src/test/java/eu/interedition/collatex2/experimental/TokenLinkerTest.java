@@ -2,16 +2,19 @@ package eu.interedition.collatex2.experimental;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.implementation.alignment.TokenLinker;
 import eu.interedition.collatex2.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 import org.junit.Test;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +60,26 @@ public class TokenLinkerTest extends AbstractTest {
     assertTrue(unlinked.contains(w[2].getTokens().get(23)));
     assertEquals(5, unlinked.size());
   }
+
+  @Test
+  public void vincentDirk3() {
+    final IWitness[] w = createWitnesses(//
+            "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
+            "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+
+    final TokenLinker linker = new TokenLinker();
+    linkTokens(linker, w[0], w[1]);
+    final Iterator<INormalizedToken> tokenIterator = linker.getBaseMatches().iterator();
+
+    assertEquals("Its", tokenIterator.next().getContent());
+    assertEquals("soft", tokenIterator.next().getContent());
+    assertEquals("light", tokenIterator.next().getContent());
+    assertEquals("any", tokenIterator.next().getContent());
+    assertEquals("light", tokenIterator.next().getContent());
+    assertEquals("he", tokenIterator.next().getContent());
+    assertEquals("could", tokenIterator.next().getContent());
+  }
+
 
   @Test
   public void linkingWithStartToken() {

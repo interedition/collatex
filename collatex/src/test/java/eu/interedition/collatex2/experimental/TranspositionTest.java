@@ -32,7 +32,7 @@ public class TranspositionTest extends AbstractTest {
     final IWitness[] w = createWitnesses(//
             "the white and black cat", "The black cat",//
             "the black and white cat", "the black and green cat");
-    final IAlignmentTable table = toAlignmentTable(w);
+    final IAlignmentTable table = align(w);
 
     assertEquals("A: |the|white|and|black|cat|", table.getRow(w[0]).toString());
     assertEquals("B: |The| | |black|cat|", table.getRow(w[1]).toString());
@@ -43,7 +43,7 @@ public class TranspositionTest extends AbstractTest {
   @Test
   public void transposition2() {
     final IWitness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
-    final IAlignmentTable table = toAlignmentTable(w);
+    final IAlignmentTable table = align(w);
 
     assertEquals("A: | |He|was|agast,|so|", table.getRow(w[0]).toString());
     assertEquals("B: | |He|was|agast| |", table.getRow(w[1]).toString());
@@ -53,7 +53,7 @@ public class TranspositionTest extends AbstractTest {
   @Test
   public void transposition2Reordered() {
     final IWitness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
-    final IAlignmentTable table = toAlignmentTable(w);
+    final IAlignmentTable table = align(w);
 
     // TODO: it would be nice if He was agast stayed in one place!
     assertEquals("A: | | | |So|he|was|agast|", table.getRow(w[0]).toString());

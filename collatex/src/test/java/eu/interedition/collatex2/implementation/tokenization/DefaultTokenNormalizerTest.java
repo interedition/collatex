@@ -28,17 +28,17 @@ import org.junit.Test;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 
 public class DefaultTokenNormalizerTest {
+
   @Test
-  public void testNormalizer1() {
-    testNormalization("Hello", "hello");
-    testNormalization("Now!", "now");
-    testNormalization("later?", "later");
-    testNormalization("#$@!?", "#$@!?");
-    testNormalization("&", "&");
+  public void normalize() {
+    assertNormalized("Hello", "hello");
+    assertNormalized("Now!", "now");
+    assertNormalized("later?", "later");
+    assertNormalized("#$@!?", "#$@!?");
+    assertNormalized("&", "&");
   }
 
-  private void testNormalization(String content, String expected) {
+  private static void assertNormalized(String content, String expected) {
     assertEquals(expected, new DefaultTokenNormalizer().apply(new Token(content)).getNormalized());
   }
-
 }

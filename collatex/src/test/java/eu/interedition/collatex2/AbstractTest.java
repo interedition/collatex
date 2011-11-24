@@ -51,15 +51,15 @@ public abstract class AbstractTest {
     return merge(createWitnesses(witnesses));
   }
 
-  protected IAlignmentTable toAlignmentTable(IVariantGraph graph) {
+  protected IAlignmentTable align(IVariantGraph graph) {
     return new RankedGraphBasedAlignmentTable(graph);
   }
 
-  protected IAlignmentTable toAlignmentTable(IWitness... witnesses) {
+  protected IAlignmentTable align(IWitness... witnesses) {
     return new RankedGraphBasedAlignmentTable(merge(witnesses));
   }
 
-  protected IAlignmentTable toAlignmentTable(String... witnesses) {
+  protected IAlignmentTable align(String... witnesses) {
     return new RankedGraphBasedAlignmentTable(merge(witnesses));
   }
 

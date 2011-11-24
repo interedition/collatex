@@ -1,17 +1,15 @@
 package eu.interedition.collatex2.experimental.matching;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.AbstractTest;
-import eu.interedition.collatex2.implementation.matching.Matches;
-import org.junit.Test;
-
-import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.matching.EditDistanceTokenComparator;
+import eu.interedition.collatex2.implementation.matching.Matches;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IWitness;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class NearMatcherTest extends AbstractTest {
   

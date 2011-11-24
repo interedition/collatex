@@ -20,32 +20,31 @@
 
 package eu.interedition.collatex2.implementation.alignment;
 
-import static org.junit.Assert.assertEquals;
-
 import eu.interedition.collatex2.AbstractTest;
+import eu.interedition.collatex2.interfaces.*;
 import org.junit.Test;
 
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.interfaces.IAlignmentTable;
-import eu.interedition.collatex2.interfaces.IWitness;
+import java.util.Iterator;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Testing the dependence of the algorithm on the order of witnesses.
- * 
+ * <p/>
  * <p>
  * See Matthew Spencer and Christopher J. Howe
  * "Collating Texts Using Progressive Multiple Alignment".
  * </p>
- * 
+ *
  * @author Gregor Middell
- * 
  */
 public class SpencerHoweTest extends AbstractTest {
 
   @Test
-  public void spencerHowe() {
+  public void alignmentTable() {
     final IWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
-    final IAlignmentTable table = toAlignmentTable(w);
+    final IAlignmentTable table = align(w);
 
     assertEquals(3, table.getRows().size());
     //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element
@@ -53,4 +52,26 @@ public class SpencerHoweTest extends AbstractTest {
     assertEquals("B: | | |x|y|z|d|e| |", table.getRow(w[1]).toString());
     assertEquals("C: |a|b|x|y|z| | | |", table.getRow(w[2]).toString());
   }
+
+  @Test
+  public void graph() {
+    final IVariantGraph graph = merge("a", "b", "a b");
+    assertEquals(4, graph.vertexSet().size());
+
+    final Set<IVariantGraphEdge> edges = graph.edgeSet();
+    assertEquals(5, edges.size());
+
+    final Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+    final IVariantGraphVertex startVertex = vertexI.next();
+    final IVariantGraphVertex aVertex = vertexI.next();
+    final IVariantGraphVertex bVertex = vertexI.next();
+    final IVariantGraphVertex endVertex = vertexI.next();
+
+    assertEquals(": A, C", graph.getEdge(startVertex, aVertex).toString());
+    assertEquals(": A", graph.getEdge(aVertex, endVertex).toString());
+    assertEquals(": B", graph.getEdge(startVertex, bVertex).toString());
+    assertEquals(": B, C", graph.getEdge(bVertex, endVertex).toString());
+    assertEquals(": C", graph.getEdge(aVertex, bVertex).toString());
+  }
+
 }

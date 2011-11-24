@@ -20,12 +20,10 @@
 
 package eu.interedition.collatex2.implementation.alignment;
 
-import eu.interedition.collatex2.implementation.CollateXEngine;
+import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex2.interfaces.IWitness;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Iterator;
@@ -33,30 +31,28 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class VariantGraph2AlignerTest {
-  private static CollateXEngine engine;
-
-  @BeforeClass
-  public static void setup() {
-    engine = new CollateXEngine();
-  }
-
+/**
+ * @todo Add test with an addition or omission in between!
+ */
+public class VariantGraphTest extends AbstractTest {
 
   @Test
-  public void testTwoWitnesses() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IWitness w2 = engine.createWitness("B", "the black cat");
-    IVariantGraph graph = engine.graph(w1, w2);
+  public void twoWitnesses() {
+    final IVariantGraph graph = merge("the black cat", "the black cat");
+
     final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(5, vertices.size());
-    Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+
+    final Iterator<IVariantGraphVertex> vertexI = graph.iterator();
     final IVariantGraphVertex startVertex = vertexI.next();
     final IVariantGraphVertex theVertex = vertexI.next();
     final IVariantGraphVertex blackVertex = vertexI.next();
     final IVariantGraphVertex catVertex = vertexI.next();
     final IVariantGraphVertex endVertex = vertexI.next();
-    Set<IVariantGraphEdge> edges = graph.edgeSet();
+
+    final Set<IVariantGraphEdge> edges = graph.edgeSet();
     assertEquals(4, edges.size());
+
     assertEquals(": A, B", graph.getEdge(startVertex, theVertex).toString());
     assertEquals(": A, B", graph.getEdge(theVertex, blackVertex).toString());
     assertEquals(": A, B", graph.getEdge(blackVertex, catVertex).toString());
@@ -65,13 +61,13 @@ public class VariantGraph2AlignerTest {
 
 
   @Test
-  public void testAddition1() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IWitness w2 = engine.createWitness("B", "the white and black cat");
-    IVariantGraph graph = engine.graph(w1, w2);
+  public void addition1() {
+    final IVariantGraph graph = merge("the black cat", "the white and black cat");
+
     final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(7, vertices.size());
-    Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+
+    final Iterator<IVariantGraphVertex> vertexI = graph.iterator();
     final IVariantGraphVertex startVertex = vertexI.next();
     final IVariantGraphVertex theVertex = vertexI.next();
     final IVariantGraphVertex whiteVertex = vertexI.next();
@@ -79,6 +75,7 @@ public class VariantGraph2AlignerTest {
     final IVariantGraphVertex blackVertex = vertexI.next();
     final IVariantGraphVertex catVertex = vertexI.next();
     final IVariantGraphVertex endVertex = vertexI.next();
+
     assertEquals("#", startVertex.getNormalized());
     assertEquals("the", theVertex.getNormalized());
     assertEquals("white", whiteVertex.getNormalized());
@@ -86,8 +83,10 @@ public class VariantGraph2AlignerTest {
     assertEquals("black", blackVertex.getNormalized());
     assertEquals("cat", catVertex.getNormalized());
     assertEquals("#", endVertex.getNormalized());
-    Set<IVariantGraphEdge> edges = graph.edgeSet();
+
+    final Set<IVariantGraphEdge> edges = graph.edgeSet();
     assertEquals(7, edges.size());
+
     assertEquals(": A, B", graph.getEdge(startVertex, theVertex).toString());
     assertEquals(": A", graph.getEdge(theVertex, blackVertex).toString());
     assertEquals(": A, B", graph.getEdge(blackVertex, catVertex).toString());
@@ -98,16 +97,13 @@ public class VariantGraph2AlignerTest {
   }
 
   @Test
-  public void testVariant() {
-    final IWitness w1 = engine.createWitness("A", "the black cat");
-    final IWitness w2 = engine.createWitness("B", "the white cat");
-    final IWitness w3 = engine.createWitness("C", "the green cat");
-    final IWitness w4 = engine.createWitness("D", "the red cat");
-    final IWitness w5 = engine.createWitness("E", "the yellow cat");
-    IVariantGraph graph = engine.graph(w1, w2, w3, w4, w5);
+  public void variant() {
+    final IVariantGraph graph = merge("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
+
     final Set<IVariantGraphVertex> vertices = graph.vertexSet();
     assertEquals(9, vertices.size());
-    Iterator<IVariantGraphVertex> vertexI = graph.iterator();
+
+    final Iterator<IVariantGraphVertex> vertexI = graph.iterator();
     final IVariantGraphVertex startVertex = vertexI.next();
     final IVariantGraphVertex theVertex = vertexI.next();
     final IVariantGraphVertex blackVertex = vertexI.next();
@@ -117,6 +113,7 @@ public class VariantGraph2AlignerTest {
     final IVariantGraphVertex yellowVertex = vertexI.next();
     final IVariantGraphVertex catVertex = vertexI.next();
     final IVariantGraphVertex endVertex = vertexI.next();
+
     assertEquals("#", startVertex.getNormalized());
     assertEquals("the", theVertex.getNormalized());
     assertEquals("black", blackVertex.getNormalized());
@@ -126,8 +123,10 @@ public class VariantGraph2AlignerTest {
     assertEquals("yellow", yellowVertex.getNormalized());
     assertEquals("cat", catVertex.getNormalized());
     assertEquals("#", endVertex.getNormalized());
-    Set<IVariantGraphEdge> edges = graph.edgeSet();
+
+    final Set<IVariantGraphEdge> edges = graph.edgeSet();
     assertEquals(12, edges.size());
+
     assertEquals(": A, B, C, D, E", graph.getEdge(startVertex, theVertex).toString());
     assertEquals(": A", graph.getEdge(theVertex, blackVertex).toString());
     assertEquals(": A", graph.getEdge(blackVertex, catVertex).toString());
@@ -142,31 +141,24 @@ public class VariantGraph2AlignerTest {
     assertEquals(": E", graph.getEdge(yellowVertex, catVertex).toString());
   }
 
-
-  //NOTE: test taken from AlignmentTableTranspositionTest
   @Test
-  public void testDoubleTransposition2() {
-    IWitness a = engine.createWitness("A", "a b");
-    IWitness b = engine.createWitness("B", "b a");
-    IVariantGraph graph = engine.graph(a, b);
-    Iterator<IVariantGraphVertex> iterator = graph.iterator();
+  public void doubleTransposition2() {
+    final IVariantGraph graph = merge("a b", "b a");
+    assertEquals(5, graph.vertexSet().size());
+
+    final Iterator<IVariantGraphVertex> iterator = graph.iterator();
     assertEquals("#", iterator.next().getNormalized());
     assertEquals("b", iterator.next().getNormalized());
     assertEquals("a", iterator.next().getNormalized());
     assertEquals("b", iterator.next().getNormalized());
     assertEquals("#", iterator.next().getNormalized());
-    assertEquals(5, graph.vertexSet().size());
   }
 
-  //TODO: add test with an addition or omission in between!
-
-  //NOTE: test taken from AlignmentTableTranspositionTest
   @Test
-  public void testMirroredTranspositionsWithMatchInBetween() {
-    final IWitness a = engine.createWitness("A", "the black and white cat");
-    final IWitness b = engine.createWitness("B", "the white and black cat");
-    IVariantGraph graph = engine.graph(a, b);
-    Iterator<IVariantGraphVertex> iterator = graph.iterator();
+  public void mirroredTranspositionsWithMatchInBetween() {
+    final IVariantGraph graph = merge("the black and white cat", "the white and black cat");
+    final Iterator<IVariantGraphVertex> iterator = graph.iterator();
+
     assertEquals("#", iterator.next().getNormalized());
     assertEquals("the", iterator.next().getNormalized());
     assertEquals("black", iterator.next().getNormalized());
@@ -175,10 +167,5 @@ public class VariantGraph2AlignerTest {
     assertEquals("white", iterator.next().getNormalized());
     assertEquals("black", iterator.next().getNormalized());
     assertEquals("cat", iterator.next().getNormalized());
-//       final IAlignmentTable alignmentTable = engine.align(a, b);
-//      String expected = "A: the|black|and|white|cat\n";
-//      expected += "B: the|white|and|black|cat\n";
-//      assertEquals(expected, alignmentTable.toString());
   }
-
 }

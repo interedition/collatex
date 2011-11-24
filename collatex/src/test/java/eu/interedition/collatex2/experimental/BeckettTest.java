@@ -3,16 +3,14 @@ package eu.interedition.collatex2.experimental;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.interedition.collatex2.AbstractTest;
-import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.alignment.VariantGraphBuilder;
+import eu.interedition.collatex2.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex2.implementation.input.NormalizedToken;
 import eu.interedition.collatex2.implementation.input.Token;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.matching.Matches;
-import eu.interedition.collatex2.implementation.alignment.VariantGraphWitnessAdapter;
-import eu.interedition.collatex2.implementation.alignment.TokenLinker;
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
@@ -28,8 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 public class BeckettTest extends AbstractTest {
 
-  private static CollateXEngine factory = new CollateXEngine();
-
   @Test
   public void dirkVincent() {
     final IWitness[] w = createWitnesses(//
@@ -39,22 +35,6 @@ public class BeckettTest extends AbstractTest {
 
     assertEquals("Its", Iterables.get(matches.get(w[1].getTokens().get(0)), 0).getContent());
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'
-  }
-
-  @Test
-  public void vincentDirk3() {
-    IWitness a = factory.createWitness("01b", "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
-    IWitness b = factory.createWitness("10a", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(a, b, new EqualityTokenComparator()).getAll();
-    List<INormalizedToken> afgeleideWitness = TokenLinker.findMatches(a, matches.values());
-    Iterator<INormalizedToken> tokenIterator = afgeleideWitness.iterator();
-    assertEquals("Its", tokenIterator.next().getContent());
-    assertEquals("soft", tokenIterator.next().getContent());
-    assertEquals("light", tokenIterator.next().getContent());
-    assertEquals("any", tokenIterator.next().getContent());
-    assertEquals("light", tokenIterator.next().getContent());
-    assertEquals("he", tokenIterator.next().getContent());
-    assertEquals("could", tokenIterator.next().getContent());
   }
 
   @Test
@@ -155,23 +135,6 @@ public class BeckettTest extends AbstractTest {
     assertEquals("he", iterator.next().getNormalized());
     assertEquals("could", iterator.next().getNormalized());
   }
-
-
-  //TODO: enable test!
-  @Test
-  public void startTokenWitnessIndexing() {
-    IWitness a = factory.createWitness("a", "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.");
-    IWitness b = factory.createWitness("b", "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
-//  assert this some how! (information is contained in the linker!
-    //    MyNewWitnessIndexer indexer = new MyNewWitnessIndexer();
-//    IWitnessIndex index = indexer.index(b, matches, analyze);
-////    for (ITokenSequence seq : index.getTokenSequences()) {
-////      System.out.println(seq.toString());
-////    }
-//    Iterator<ITokenSequence> iterator = index.getTokenSequences().iterator();
-//    assertEquals("TokenSequence: #: 0, he: 3, ", iterator.next().toString());
-  }
-
 
   @Test
   public void sentence42Transposition() {

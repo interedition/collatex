@@ -7,14 +7,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import eu.interedition.collatex2.AbstractTest;
 import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.interfaces.IWitness;
 
-public class EditGraphVisitorTest {
+public class EditGraphVisitorTest extends AbstractTest {
 
   public void assertVertices(EditGraph dGraph, String... normalized) {
     Iterator<EditGraphVertex> topologicIterator = dGraph.iterator();
@@ -29,11 +29,9 @@ public class EditGraphVisitorTest {
   // Optimal alignment has no gaps
   @Test
   public void testGapsEverythingEqual() {
-    CollateXEngine engine = new CollateXEngine();
-    IWitness a = engine.createWitness("a", "The red cat and the black cat");
-    IWitness b = engine.createWitness("b", "The red cat and the black cat");
+    final IWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
     assertEquals(0, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
@@ -42,22 +40,18 @@ public class EditGraphVisitorTest {
   // Note: there are two paths here that contain 1 gap
   @Test
   public void testGapsOmission() {
-    CollateXEngine engine = new CollateXEngine();
-    IWitness a = engine.createWitness("a", "The red cat and the black cat");
-    IWitness b = engine.createWitness("b", "the black cat");
+    final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
     assertEquals(1, EditGraphVisitor.determineMinimumNumberOfGaps(dGraph));
   }
 
   // first make a unit test which strips down the decision graph
   @Test
   public void testRemoveChoicesThatIntroduceGaps() {
-    CollateXEngine engine = new CollateXEngine();
-    IWitness a = engine.createWitness("a", "The red cat and the black cat");
-    IWitness b = engine.createWitness("b", "the black cat");
+    final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     // I expect 6 vertices
@@ -70,11 +64,9 @@ public class EditGraphVisitorTest {
   //do a second pass that tries to find the longest common sequence
   @Test
   public void testTryToFindMinimumAmountOfSequences() {
-    CollateXEngine engine = new CollateXEngine();
-    IWitness a = engine.createWitness("a", "The red cat and the black cat");
-    IWitness b = engine.createWitness("b", "the black cat");
+    final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
     Map<EditGraphVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
@@ -90,11 +82,9 @@ public class EditGraphVisitorTest {
 
   @Test
   public void testShortestPathOneOmissionRepetition() {
-    CollateXEngine engine = new CollateXEngine();
-    IWitness a = engine.createWitness("a", "The red cat and the black cat");
-    IWitness b = engine.createWitness("b", "the black cat");
+    final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     List<EditGraphEdge> edges = visitor.getShortestPath();
     assertEquals(EditOperation.GAP, edges.get(0).getEditOperation()); // The ideal path should start with a gap
@@ -112,11 +102,9 @@ public class EditGraphVisitorTest {
   @Ignore
   @Test
   public void testShortestPathEverythingEqual() {
-    CollateXEngine engine = new CollateXEngine();
-    IWitness a = engine.createWitness("a", "The red cat and the black cat");
-    IWitness b = engine.createWitness("b", "The red cat and the black cat");
+    final IWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(a, b, new EqualityTokenComparator());
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
 
     List<EditGraphEdge> path = visitor.getShortestPath();

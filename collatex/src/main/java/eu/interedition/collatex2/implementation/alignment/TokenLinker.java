@@ -24,49 +24,50 @@ public class TokenLinker implements ITokenLinker {
   private Matches matches;
   private List<List<INormalizedToken>> leftExpandingPhrases;
   private List<List<INormalizedToken>> rightExpandingPhrases;
+  private List<INormalizedToken> baseMatches;
   private List<Tuple<List<INormalizedToken>>> phraseMatches;
   private Map<INormalizedToken,INormalizedToken> tokenLinks;
 
   @Override
-  public Map<INormalizedToken, INormalizedToken> link(IWitness a, IWitness b, Comparator<INormalizedToken> comparator) {
-    LOG.trace("Matching tokens of {} and {}", a, b);
-    matches = Matches.between(a, b, comparator);
+  public Map<INormalizedToken, INormalizedToken> link(IWitness base, IWitness witness, Comparator<INormalizedToken> comparator) {
+    LOG.trace("Matching tokens of {} and {}", base, witness);
+    matches = Matches.between(base, witness, comparator);
 
     // add start and end tokens as matches
     final Multimap<INormalizedToken, INormalizedToken> boundedMatches = ArrayListMultimap.create(matches.getAll());
-    boundedMatches.put(NormalizedToken.START, a.getTokens().get(0));
-    boundedMatches.put(NormalizedToken.END, a.getTokens().get(a.size() - 1));
+    boundedMatches.put(NormalizedToken.START, base.getTokens().get(0));
+    boundedMatches.put(NormalizedToken.END, base.getTokens().get(base.size() - 1));
 
     LOG.trace("Finding minimal unique token sequences");
-    final List<INormalizedToken> bTokens = b.getTokens();
-    final int bTokenCount = bTokens.size();
+    final List<INormalizedToken> witnessTokens = witness.getTokens();
+    final int witnessTokenCount = witnessTokens.size();
 
     leftExpandingPhrases = Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size());
     rightExpandingPhrases = Lists.newArrayListWithExpectedSize(matches.getAmbiguous().size());
 
-    for (int tc = 0; tc < bTokenCount; tc++) {
+    for (int tc = 0; tc < witnessTokenCount; tc++) {
       // for each ambiguous token
-      if (matches.getAmbiguous().contains(bTokens.get(tc))) {
+      if (matches.getAmbiguous().contains(witnessTokens.get(tc))) {
         // find a minimal unique phrase by walking to the left
-        rightExpandingPhrases.add(reverse(findMinimalUniquePrefix(reverse(bTokens.subList(0, tc + 1)), matches.getUnmatched(), matches.getAmbiguous(), NormalizedToken.START)));
+        rightExpandingPhrases.add(reverse(findMinimalUniquePrefix(reverse(witnessTokens.subList(0, tc + 1)), NormalizedToken.START)));
         // find a minimal unique phrase by walking to the right
-        leftExpandingPhrases.add(findMinimalUniquePrefix(bTokens.subList(tc, bTokenCount), matches.getUnmatched(), matches.getAmbiguous(), NormalizedToken.END));
+        leftExpandingPhrases.add(findMinimalUniquePrefix(witnessTokens.subList(tc, witnessTokenCount), NormalizedToken.END));
       }
     }
 
-    LOG.trace("Find matches from the base");
-    List<INormalizedToken> aMatches = findMatches(a, boundedMatches.values());
+    LOG.trace("Find matches in the base");
+    baseMatches = Lists.newArrayList(Iterables.filter(base.getTokens(), Predicates.in(boundedMatches.values())));
 
     // try and find matches in the base for each sequence in the witness
     phraseMatches = Lists.newArrayList();
     for (List<INormalizedToken> phrase : rightExpandingPhrases) {
-      List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheRight(phrase, boundedMatches, aMatches);
+      final List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheRight(phrase, boundedMatches);
       if (!matchingPhrase.isEmpty()) {
         phraseMatches.add(new Tuple<List<INormalizedToken>>(matchingPhrase, phrase));
       }
     }
     for (List<INormalizedToken> phrase : leftExpandingPhrases) {
-      List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheLeft(phrase, boundedMatches, aMatches);
+      final List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheLeft(phrase, boundedMatches);
       if (!matchingPhrase.isEmpty()) {
         phraseMatches.add(new Tuple<List<INormalizedToken>>(matchingPhrase, phrase));
       }
@@ -114,6 +115,10 @@ public class TokenLinker implements ITokenLinker {
     return rightExpandingPhrases;
   }
 
+  public List<INormalizedToken> getBaseMatches() {
+    return baseMatches;
+  }
+
   public List<Tuple<List<INormalizedToken>>> getPhraseMatches() {
     return phraseMatches;
   }
@@ -122,13 +127,13 @@ public class TokenLinker implements ITokenLinker {
     return tokenLinks;
   }
 
-  public static List<INormalizedToken> findMinimalUniquePrefix(Iterable<INormalizedToken> sequence, Set<INormalizedToken> unmatched, Set<INormalizedToken> ambiguous, INormalizedToken stopMarker) {
+  public List<INormalizedToken> findMinimalUniquePrefix(Iterable<INormalizedToken> sequence, INormalizedToken stopMarker) {
     final List<INormalizedToken> result = Lists.newArrayList();
 
     for (INormalizedToken token : sequence) {
-      if (!unmatched.contains(token)) {
+      if (!matches.getUnmatched().contains(token)) {
         result.add(token);
-        if (!ambiguous.contains(token)) {
+        if (!matches.getAmbiguous().contains(token)) {
           return result;
         }
       }
@@ -173,39 +178,38 @@ public class TokenLinker implements ITokenLinker {
 
   // This method should return the matching base tokens for a given sequence
   // Note: this method works for sequences that have the fixed token on the left and expand to the right
-  private List<INormalizedToken> findMatchingPhraseToTheRight(List<INormalizedToken> sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> aMatches) {
-    final INormalizedToken startTokenInB = sequence.get(0);
-    final Collection<INormalizedToken> startMatches = matches.get(startTokenInB);
+  private List<INormalizedToken> findMatchingPhraseToTheRight(List<INormalizedToken> phrase, Multimap<INormalizedToken, INormalizedToken> matches) {
+    final INormalizedToken startTokenInWitness = phrase.get(0);
+    final Collection<INormalizedToken> startMatches = matches.get(startTokenInWitness);
 
     Preconditions.checkState(!startMatches.isEmpty(), "No match found in base for fixed witness token");
     Preconditions.checkState(startMatches.size() == 1, "Multiple matches found in base for fixed witness token");
 
-    final INormalizedToken startTokenInA = Iterables.getFirst(startMatches, null);
-    return tryTheDifferentPossibilities(matches, aMatches, startTokenInA, sequence.subList(1, sequence.size()), 1);
+    final INormalizedToken startTokenInBase = Iterables.getFirst(startMatches, null);
+    return tryTheDifferentPossibilities(matches, startTokenInBase, phrase.subList(1, phrase.size()), 1);
   }
 
   // This method should return the matching base tokens for a given sequence
   // Note: this method works for sequences that have the fixed token on the right and expand to the left
-  private List<INormalizedToken> findMatchingPhraseToTheLeft(List<INormalizedToken> sequence, Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> aMatches) {
-    final INormalizedToken startTokenInB = sequence.get(sequence.size() - 1);
-    final Collection<INormalizedToken> startMatches = matches.get(startTokenInB);
+  private List<INormalizedToken> findMatchingPhraseToTheLeft(List<INormalizedToken> phrase, Multimap<INormalizedToken, INormalizedToken> matches) {
+    final INormalizedToken startTokenInWitness = phrase.get(phrase.size() - 1);
+    final Collection<INormalizedToken> startMatches = matches.get(startTokenInWitness);
 
     Preconditions.checkState(!startMatches.isEmpty(), "No match found in base for fixed witness token");
     Preconditions.checkState(startMatches.size() == 1, "Multiple matches found in base for fixed witness token");
 
-    INormalizedToken startTokenInA = Iterables.getFirst(startMatches, null);
-    return reverse(tryTheDifferentPossibilities(matches, aMatches, startTokenInA, reverse(sequence.subList(0, sequence.size() - 1)), -1));
+    INormalizedToken startTokenInBase = Iterables.getFirst(startMatches, null);
+    return reverse(tryTheDifferentPossibilities(matches, startTokenInBase, reverse(phrase.subList(0, phrase.size() - 1)), -1));
   }
 
-  private List<INormalizedToken> tryTheDifferentPossibilities(Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> aMatches, INormalizedToken startTokenInA,
-      List<INormalizedToken> restTokens, int expectedDirection) {
+  private List<INormalizedToken> tryTheDifferentPossibilities(Multimap<INormalizedToken, INormalizedToken> matches, INormalizedToken startTokenInBase, List<INormalizedToken> restTokens, int expectedDirection) {
     boolean validWholeSequence = true;
-    List<INormalizedToken> matchedBaseTokens = Lists.newArrayList(startTokenInA);
-    INormalizedToken lastToken = startTokenInA;
+    List<INormalizedToken> matchedBaseTokens = Lists.newArrayList(startTokenInBase);
+    INormalizedToken lastToken = startTokenInBase;
     for (INormalizedToken token : restTokens) {
       boolean valid = false;
       for (INormalizedToken possibleMatch : matches.get(token)) {
-        int direction = aMatches.indexOf(possibleMatch) - aMatches.indexOf(lastToken);
+        int direction = baseMatches.indexOf(possibleMatch) - baseMatches.indexOf(lastToken);
         if (direction == expectedDirection) {
           matchedBaseTokens.add(possibleMatch);
           lastToken = possibleMatch;
@@ -224,7 +228,4 @@ public class TokenLinker implements ITokenLinker {
     return Collections.emptyList();
   }
 
-  public static List<INormalizedToken> findMatches(IWitness a, Collection<INormalizedToken> matches) {
-    return Lists.newArrayList(Iterables.filter(a.getTokens(), Predicates.in(matches)));
-  }
 }
