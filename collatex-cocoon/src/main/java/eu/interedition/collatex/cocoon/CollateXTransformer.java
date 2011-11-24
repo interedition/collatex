@@ -5,7 +5,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.*;
 import eu.interedition.collatex2.implementation.CollateXEngine;
 import eu.interedition.collatex2.implementation.input.Token;
-import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
+import eu.interedition.collatex2.implementation.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.interfaces.*;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.transformation.AbstractSAXTransformer;

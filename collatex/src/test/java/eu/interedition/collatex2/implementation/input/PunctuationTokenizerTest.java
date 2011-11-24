@@ -3,13 +3,11 @@ package eu.interedition.collatex2.implementation.input;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
 
-import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex2.interfaces.IToken;
 
 public class PunctuationTokenizerTest {

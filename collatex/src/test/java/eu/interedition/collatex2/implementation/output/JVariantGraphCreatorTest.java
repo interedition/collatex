@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex2.AbstractTest;
-import eu.interedition.collatex2.implementation.output.jgraph.*;
+import eu.interedition.collatex2.implementation.graph.joined.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.interfaces.IWitness;
-import eu.interedition.collatex2.implementation.output.jgraph.IJVariantGraph;
-import eu.interedition.collatex2.implementation.output.jgraph.IJVariantGraphEdge;
-import eu.interedition.collatex2.implementation.output.jgraph.IJVariantGraphVertex;
+import eu.interedition.collatex2.implementation.graph.joined.IJVariantGraph;
+import eu.interedition.collatex2.implementation.graph.joined.IJVariantGraphEdge;
+import eu.interedition.collatex2.implementation.graph.joined.IJVariantGraphVertex;
 
 public class JVariantGraphCreatorTest extends AbstractTest {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreatorTest.class);

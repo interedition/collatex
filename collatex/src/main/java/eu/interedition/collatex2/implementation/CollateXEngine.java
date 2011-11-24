@@ -22,12 +22,12 @@
 
 package eu.interedition.collatex2.implementation;
 
-import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
-import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
-import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
-import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
-import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
-import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
+import eu.interedition.collatex2.implementation.graph.VariantGraph;
+import eu.interedition.collatex2.implementation.input.WitnessBuilder;
+import eu.interedition.collatex2.implementation.input.DefaultTokenNormalizer;
+import eu.interedition.collatex2.implementation.input.WhitespaceTokenizer;
+import eu.interedition.collatex2.implementation.output.ParallelSegmentationApparatus;
+import eu.interedition.collatex2.implementation.output.RankedGraphBasedAlignmentTable;
 import eu.interedition.collatex2.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex2.interfaces.*;
 

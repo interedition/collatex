@@ -21,9 +21,9 @@
 package eu.interedition.collatex2.implementation.alignment;
 
 import eu.interedition.collatex2.AbstractTest;
-import eu.interedition.collatex2.implementation.output.rankedgraph.IRankedVariantGraphVertex;
-import eu.interedition.collatex2.implementation.output.rankedgraph.VariantGraphRanker;
-import eu.interedition.collatex2.implementation.output.segmented_graph.NonSegmentedGraphConverter;
+import eu.interedition.collatex2.implementation.graph.ranked.IRankedVariantGraphVertex;
+import eu.interedition.collatex2.implementation.graph.ranked.VariantGraphRanker;
+import eu.interedition.collatex2.implementation.graph.segmented.NonSegmentedGraphConverter;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import org.junit.Test;
 

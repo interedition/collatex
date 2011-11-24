@@ -25,6 +25,8 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import eu.interedition.collatex2.implementation.input.WhitespaceAndPunctuationTokenizer;
+import eu.interedition.collatex2.implementation.input.WhitespaceTokenizer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -41,8 +43,6 @@ import org.w3c.dom.NodeList;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceAndPunctuationTokenizer;
-import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
 import eu.interedition.collatex2.interfaces.IAlignmentTable;
 import eu.interedition.collatex2.interfaces.IApparatus;
 import eu.interedition.collatex2.interfaces.IVariantGraph;

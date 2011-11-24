@@ -22,10 +22,7 @@ package eu.interedition.collatex2.implementation.input;
 
 import static org.junit.Assert.assertEquals;
 
-import eu.interedition.collatex2.implementation.input.Token;
 import org.junit.Test;
-
-import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 
 public class DefaultTokenNormalizerTest {
 

@@ -21,7 +21,6 @@
 package eu.interedition.collatex2.implementation.output;
 
 import eu.interedition.collatex2.AbstractTest;
-import eu.interedition.collatex2.implementation.output.graphml.GraphMLBuilder;
 import eu.interedition.collatex2.interfaces.IVariantGraph;
 import eu.interedition.collatex2.interfaces.IWitness;
 import org.junit.Before;

@@ -28,7 +28,7 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 import eu.interedition.collatex2.interfaces.INormalizedToken;
 
-public class Witness extends eu.interedition.collatex2.implementation.containers.witness.Witness {
+public class Witness extends eu.interedition.collatex2.implementation.input.Witness {
   private String content;
 
   public Witness() {

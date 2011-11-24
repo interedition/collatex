@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex2.AbstractTest;
-import eu.interedition.collatex2.implementation.output.cgraph.CVariantGraphCreator;
+import eu.interedition.collatex2.implementation.graph.cyclic.CVariantGraphCreator;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
 import org.jgrapht.ext.IntegerNameProvider;

@@ -23,7 +23,7 @@ package eu.interedition.collatex2.implementation.output;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import eu.interedition.collatex2.implementation.output.cgraph.CyclicVariantGraph;
+import eu.interedition.collatex2.implementation.graph.cyclic.CyclicVariantGraph;
 import org.junit.Test;
 
 public class CyclicVariantGraphTest {

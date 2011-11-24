@@ -2,6 +2,7 @@ package eu.interedition.collatex2.implementation.needlemanwunsch;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import eu.interedition.collatex2.implementation.Tuple;
 import eu.interedition.collatex2.implementation.matching.EditDistance;
 
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public class NeedlemanWunschAligner<T> {
             Arrays.asList("Hello mighty World".split("\\s")));
 
     for (Tuple<String> al : alignments) {
-      System.out.printf(Strings.isNullOrEmpty(al.a) ? "---" : al.a).printf("<===>").printf(Strings.isNullOrEmpty(al.b) ? "---" : al.b).println();
+      System.out.printf(Strings.isNullOrEmpty(al.left) ? "---" : al.left).printf("<===>").printf(Strings.isNullOrEmpty(al.right) ? "---" : al.right).println();
     }
   }
 
