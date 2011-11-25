@@ -24,9 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.jgrapht.graph.SimpleDirectedGraph;
-
-import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.implementation.graph.VariantGraphEdge;
 import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
@@ -42,47 +41,60 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
   private final IVariantGraphVertex startVertex;
   private final IVariantGraphVertex endVertex;
 
+  public static IVariantGraph create(IVariantGraph acyclic) {
+    // maps vertex in acyclic graph to vertex in cyclic graph
+    final Map<IVariantGraphVertex, IVariantGraphVertex> vertexMap = Maps.newHashMap();
+    final IVariantGraph cyclic = new CyclicVariantGraph();
+
+    vertexMap.put(acyclic.getStartVertex(), cyclic.getStartVertex());
+    vertexMap.put(acyclic.getEndVertex(), cyclic.getEndVertex());
+
+    final Map<IVariantGraphVertex, IVariantGraphVertex> transposedVertices = acyclic.getTransposedTokens();
+    for (IVariantGraphVertex avgVertex : acyclic.vertexSet()) {
+      if (!vertexMap.containsKey(avgVertex)) {
+        IVariantGraphVertex cvgVertex;
+        if (transposedVertices.containsKey(avgVertex)) {
+        	IVariantGraphVertex txpVertex = transposedVertices.get(avgVertex);
+        	if(vertexMap.containsKey(txpVertex)) {
+        		cvgVertex = vertexMap.get(txpVertex);
+        	} else {
+        		cvgVertex = new VariantGraphVertex(txpVertex.getNormalized(), txpVertex.getVertexKey());
+        		cyclic.addVertex(cvgVertex);
+        	}
+        } else {
+          cvgVertex = new VariantGraphVertex(avgVertex.getNormalized(), avgVertex.getVertexKey());
+          cyclic.addVertex(cvgVertex);
+        }
+        vertexMap.put(avgVertex, cvgVertex);
+      }
+    }
+
+    for (IVariantGraphEdge avgEdge : acyclic.edgeSet()) {
+      IVariantGraphVertex cvgStart = vertexMap.get(acyclic.getEdgeSource(avgEdge));
+      IVariantGraphVertex cvgEnd = vertexMap.get(acyclic.getEdgeTarget(avgEdge));
+      Iterator<IWitness> witnessIterator = avgEdge.getWitnesses().iterator();
+      IVariantGraphEdge cvgEdge;
+      if (cyclic.containsEdge(cvgStart, cvgEnd)) {
+        cvgEdge = cyclic.getEdge(cvgStart, cvgEnd);
+      } else {
+        cvgEdge = new VariantGraphEdge();
+        cvgEdge.addWitness(witnessIterator.next());
+        cyclic.addEdge(cvgStart, cvgEnd, cvgEdge);
+      }
+      while (witnessIterator.hasNext()) {
+        cvgEdge.addWitness(witnessIterator.next());
+      }
+    }
+
+    return cyclic;
+  }
+
   private CyclicVariantGraph() {
     super(IVariantGraphEdge.class);
     startVertex = new VariantGraphVertex("#", null);
     addVertex(startVertex);
     endVertex = new VariantGraphVertex("#", null);
     addVertex(endVertex);
-  }
-
-  public static CyclicVariantGraph create() {
-    return new CyclicVariantGraph();
-  }
-
-  public static CyclicVariantGraph create(IWitness a) {
-    CyclicVariantGraph graph = CyclicVariantGraph.create();
-    List<IVariantGraphVertex> newVertices = Lists.newArrayList();
-    for (INormalizedToken token : a.getTokens()) {
-      final IVariantGraphVertex vertex = graph.addNewVertex(token.getNormalized(), token);
-      vertex.addToken(a, token);
-      newVertices.add(vertex);
-    }
-    IVariantGraphVertex previous = graph.getStartVertex();
-    for (IVariantGraphVertex vertex : newVertices) {
-      graph.addNewEdge(previous, vertex, a);
-      previous = vertex;
-    }
-    graph.addNewEdge(previous, graph.getEndVertex(), a);
-    return graph;
-  }
-
-  //write
-  public IVariantGraphVertex addNewVertex(String normalized, INormalizedToken vertexKey) {
-    final VariantGraphVertex vertex = new VariantGraphVertex(normalized, vertexKey);
-    addVertex(vertex);
-    return vertex;
-  }
-
-  //write
-  public void addNewEdge(IVariantGraphVertex begin, IVariantGraphVertex end, IWitness witness) {
-    IVariantGraphEdge edge = new VariantGraphEdge();
-    edge.addWitness(witness);
-    addEdge(begin, end, edge);
   }
 
   @Override
@@ -97,42 +109,41 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
 
   @Override
   public List<IWitness> getWitnesses() {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean isEmpty() {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public List<IVariantGraphEdge> getPath(IWitness witness) {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public List<INormalizedToken> getTokens(IWitness witness) {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Iterator<INormalizedToken> tokenIterator() {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Iterator<IVariantGraphVertex> iterator() {
-    throw new UnsupportedOperationException("NOT IMPLEMENTED!");
+    throw new UnsupportedOperationException();
   }
   
   @Override
   public Map<IVariantGraphVertex, IVariantGraphVertex> getTransposedTokens() {
 	  throw new UnsupportedOperationException("Cyclic graphs have no transpositions");
   }
-
 }

@@ -24,14 +24,14 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import eu.interedition.collatex.implementation.CollateXEngine;
+import eu.interedition.collatex.implementation.graph.cyclic.CyclicVariantGraph;
+import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
+import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
+import eu.interedition.collatex.interfaces.*;
 import eu.interedition.collatex.web.model.Collation;
 import eu.interedition.collatex.web.model.Token;
 import eu.interedition.collatex.web.model.Witness;
-import eu.interedition.collatex.implementation.CollateXEngine;
-import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
-import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
-import eu.interedition.collatex.implementation.graph.cyclic.CVariantGraphCreator;
-import eu.interedition.collatex.interfaces.*;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
 import org.jgrapht.ext.IntegerNameProvider;
@@ -178,11 +178,9 @@ public class CollationController {
   );
 
   private String ccollate2dot(Collation collation) throws CollationException {
-    IVariantGraph graph = new CollateXEngine().graph(checkAndExtractWitnesses(collation));
-
-    IVariantGraph cgraph = CVariantGraphCreator.getCyclicVariantGraph(graph);
-    Writer writer = new StringWriter();
-    CDOT_EXPORTER.export(writer, cgraph);
+    final IVariantGraph graph = new CollateXEngine().graph(checkAndExtractWitnesses(collation));
+    final Writer writer = new StringWriter();
+    CDOT_EXPORTER.export(writer, CyclicVariantGraph.create(graph));
     return writer.toString();
   }
 }

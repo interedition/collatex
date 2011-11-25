@@ -132,10 +132,11 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void longestPath() {
+    // FIXME: can we do without the cast, e.g. is getLongestPath() a core feature of any variant graph
     final VariantGraph graph = (VariantGraph) merge("a", "b", "a b");
     assertEquals(4, graph.vertexSet().size());
 
-    final List<IVariantGraphVertex> longestPath = new VariantGraphUtil(graph).getLongestPath();
+    final List<IVariantGraphVertex> longestPath = graph.getLongestPath();
     assertEquals(2, longestPath.size());
     assertEquals("a", longestPath.get(0).getNormalized());
     assertEquals("b", longestPath.get(1).getNormalized());
