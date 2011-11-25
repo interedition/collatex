@@ -25,21 +25,18 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.interfaces.IAlignmentTable;
-import eu.interedition.collatex.interfaces.ICell;
-import eu.interedition.collatex.interfaces.IColumn;
-import eu.interedition.collatex.interfaces.IRow;
 import eu.interedition.collatex.interfaces.IWitness;
 
 public abstract class BaseAlignmentTable implements IAlignmentTable {
-  protected final List<IColumn> columns;
+  protected final List<Column> columns;
 
   public BaseAlignmentTable() {
     this.columns = Lists.newArrayList();
   }
 
   @Override
-  public final List<IRow> getRows() {
-    List<IRow> rows = Lists.newArrayList();
+  public final List<Row> getRows() {
+    List<Row> rows = Lists.newArrayList();
     for (IWitness witness : getWitnesses()) {
       rows.add(getRow(witness));
     }
@@ -47,10 +44,10 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
   }
 
   @Override
-  public final IRow getRow(IWitness witness) {
-    List<ICell> cells = Lists.newArrayList();
-    for (IColumn column : columns) {
-      ICell cell = new Cell(column, witness);
+  public final Row getRow(IWitness witness) {
+    List<Cell> cells = Lists.newArrayList();
+    for (Column column : columns) {
+      Cell cell = new Cell(column, witness);
       cells.add(cell);
     }
     return new Row(witness.getSigil(), cells);
@@ -67,7 +64,7 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
   }
 
   @Override
-  public final List<IColumn> getColumns() {
+  public final List<Column> getColumns() {
     return columns;
   }
 
@@ -77,10 +74,10 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
   @Override
   public String toString() {
     final StringBuilder stringBuilder = new StringBuilder();
-    for (final IRow row : getRows()) {
+    for (final Row row : getRows()) {
       stringBuilder.append(row.getSigil()).append(": ");
       String delim = "";
-      for (final ICell cell : row) {
+      for (final Cell cell : row) {
         stringBuilder.append(delim).append(cellToString(cell));
         delim = "|";
       }
@@ -89,7 +86,7 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
     return stringBuilder.toString();
   }
 
-  String cellToString(final ICell cell) {
+  String cellToString(final Cell cell) {
     if (cell.isEmpty()) {
       return " ";
     }

@@ -20,6 +20,9 @@
 
 package eu.interedition.collatex.interfaces;
 
+import eu.interedition.collatex.implementation.output.Column;
+import eu.interedition.collatex.implementation.output.Row;
+
 import java.util.List;
 
 /**
@@ -35,11 +38,11 @@ public interface IAlignmentTable {
    * 
    * @return alignment table rows
    */
-  List<IRow> getRows();
+  List<Row> getRows();
 
-  IRow getRow(IWitness witness);
+  Row getRow(IWitness witness);
   
-  List<IColumn> getColumns();
+  List<Column> getColumns();
 
   List<IWitness> getWitnesses();
 

@@ -20,27 +20,32 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
-
 import eu.interedition.collatex.interfaces.ColumnState;
-import eu.interedition.collatex.interfaces.IColumn;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
-public class VariantGraphBasedColumn implements IColumn {
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+/**
+ *
+ * A row of an alignment table which represents a single witness
+ *
+ *
+ * TODO: consider whether this should be an inner interface since an IRow must exist within the context of an IAlignmentTable so the rows and columns will probably end up in the alignment table.
+ *
+ */
+public class Column {
   private final List<IVariantGraphVertex> vertices;
 
-  public VariantGraphBasedColumn(IVariantGraphVertex vertex) {
+  public Column(IVariantGraphVertex vertex) {
     this.vertices = Lists.newArrayList();
     addVertex(vertex);
   }
 
-  @Override
   public ColumnState getState() {
     if (vertices.size() == 1) {
       return ColumnState.INVARIANT;
@@ -48,7 +53,6 @@ public class VariantGraphBasedColumn implements IColumn {
     return ColumnState.VARIANT;
   }
 
-  @Override
   public INormalizedToken getToken(IWitness witness) {
     IVariantGraphVertex vertex = findVertexForWitness(witness);
     if (vertex == null) {
@@ -58,7 +62,6 @@ public class VariantGraphBasedColumn implements IColumn {
   }
 
   //TODO: add/re-enable test (see parallel segmentation tests)
-  @Override
   public List<IWitness> getWitnesses() {
     List<IWitness> totalWitnesses = Lists.newArrayList();
     for (IVariantGraphVertex vertex : vertices) {
@@ -72,7 +75,6 @@ public class VariantGraphBasedColumn implements IColumn {
     vertices.add(vertex);
   }
 
-  @Override
   public boolean containsWitness(IWitness witness) {
     IVariantGraphVertex findVertexForWitness = findVertexForWitness(witness);
     return findVertexForWitness != null;

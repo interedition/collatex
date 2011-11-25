@@ -1,6 +1,7 @@
 package eu.interedition.collatex.web.io;
 
 import com.google.common.collect.Iterables;
+import eu.interedition.collatex.implementation.output.Column;
 import eu.interedition.collatex.interfaces.*;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
@@ -22,7 +23,7 @@ public class AlignmentTableSerializer extends JsonSerializer<IAlignmentTable> {
   @Override
   public void serialize(IAlignmentTable value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
     final List<IWitness> witnesses = value.getWitnesses();
-    final List<IColumn> columns = value.getColumns();
+    final List<Column> columns = value.getColumns();
 
     jgen.writeStartObject();
 
@@ -37,13 +38,13 @@ public class AlignmentTableSerializer extends JsonSerializer<IAlignmentTable> {
 
 
     jgen.writeArrayFieldStart("variance");
-    for (IColumn column : columns) {
+    for (Column column : columns) {
       jgen.writeNumber(column.getState().ordinal());
     }
     jgen.writeEndArray();
 
     jgen.writeArrayFieldStart("table");
-    for (IColumn column : columns) {
+    for (Column column : columns) {
       jgen.writeStartArray();
       for (IWitness witness : witnesses) {
         if (column.containsWitness(witness)) {
