@@ -10,6 +10,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex2.implementation.output.dot.DotExporter;
+
 public class EditGraphVisitor {
 
   private final EditGraph editGraph;
@@ -24,6 +26,9 @@ public class EditGraphVisitor {
   // then the minimum amount of sequences for the whole graph
   // This is probably not the end solution
   public List<EditGraphEdge> getShortestPath() {
+    String dot = DotExporter.toDot(editGraph);
+    DotExporter.generateSVG("shortestpath_before.svg", dot, "Shortest Path before");
+
     Map<EditGraphVertex, Integer> determineMinSequences = determineMinSequences(editGraph);
     int minSequences = determineMinSequences.get(editGraph.getStartVertex());
     EditGraph graphWithSinglePath = buildNewGraphWithOnlyMinimumWeightVertices(determineMinSequences, minSequences);
@@ -34,8 +39,12 @@ public class EditGraphVisitor {
       shortestPath.add(edge);
       currentVertex = edge.getTargetVertex();
     }
-    if(graphWithSinglePath.outDegreeOf(currentVertex) > 1) {
-        throw new RuntimeException("Vertex "+currentVertex+" has more than one possi!");
+
+    dot = DotExporter.toDot(graphWithSinglePath);
+    DotExporter.generateSVG("shortestpath_after.svg", dot, "Shortest Path after");
+
+    if (graphWithSinglePath.outDegreeOf(currentVertex) > 1) {
+      throw new RuntimeException("Vertex " + currentVertex + " has more than one possi!");
     }
     return shortestPath;
   }
@@ -61,7 +70,6 @@ public class EditGraphVisitor {
     }
     return minSeq;
   }
-
 
   // TODO: remove static!
   public static Map<EditGraphVertex, Integer> determineMinWeightForEachVertex(EditGraph graph) {
@@ -158,7 +166,7 @@ public class EditGraphVisitor {
   private Map<EditGraphEdge, Integer> determineMinSequencesForVertex(EditGraph graph, Map<EditGraphVertex, Integer> minSeq, Map<EditGraphVertex, Integer> gapOrNoGap, EditGraphVertex vertex) {
     Set<EditGraphEdge> outgoingEdgesOf = graph.outgoingEdgesOf(vertex);
     if (outgoingEdgesOf.isEmpty()) {
-      throw new RuntimeException("Error: "+vertex.toString()+ " has no outgoing edges!");
+      throw new RuntimeException("Error: " + vertex.toString() + " has no outgoing edges!");
     }
     Map<EditGraphEdge, Integer> edges = Maps.newLinkedHashMap();
     for (EditGraphEdge outgoing : outgoingEdgesOf) {

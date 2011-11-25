@@ -22,14 +22,24 @@
 
 package eu.interedition.collatex2.implementation;
 
+import eu.interedition.collatex2.implementation.alignment.PhraseMatchDetector;
+import eu.interedition.collatex2.implementation.alignment.TokenLinker;
+import eu.interedition.collatex2.implementation.alignment.TranspositionDetector;
+import eu.interedition.collatex2.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex2.implementation.containers.graph.VariantGraph;
 import eu.interedition.collatex2.implementation.input.builders.WitnessBuilder;
 import eu.interedition.collatex2.implementation.input.tokenization.DefaultTokenNormalizer;
 import eu.interedition.collatex2.implementation.input.tokenization.WhitespaceTokenizer;
+import eu.interedition.collatex2.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex2.implementation.output.apparatus.ParallelSegmentationApparatus;
 import eu.interedition.collatex2.implementation.output.table.RankedGraphBasedAlignmentTable;
-import eu.interedition.collatex2.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex2.interfaces.*;
+import eu.interedition.collatex2.interfaces.IAlignmentTable;
+import eu.interedition.collatex2.interfaces.IApparatus;
+import eu.interedition.collatex2.interfaces.ITokenLinker;
+import eu.interedition.collatex2.interfaces.ITokenNormalizer;
+import eu.interedition.collatex2.interfaces.ITokenizer;
+import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex2.interfaces.IWitness;
 
 /**
  * 
@@ -45,6 +55,11 @@ public class CollateXEngine {
   private ITokenizer tokenizer = new WhitespaceTokenizer();
   // private ITokenizer tokenizer = new WhitespaceAndPunctuationTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
+  private ITokenLinker tokenLinker = new TokenLinker();
+
+  public void setTokenLinker(ITokenLinker tokenLinker) {
+    this.tokenLinker = tokenLinker;
+  }
 
   public void setTokenizer(ITokenizer tokenizer) {
     this.tokenizer = tokenizer;
@@ -53,7 +68,6 @@ public class CollateXEngine {
   public void setTokenNormalizer(ITokenNormalizer tokenNormalizer) {
     this.tokenNormalizer = tokenNormalizer;
   }
-
 
   /**
    * Create an instance of an IWitness object
@@ -79,7 +93,7 @@ public class CollateXEngine {
    */
   public IVariantGraph graph(IWitness... witnesses) {
     final VariantGraph graph = new VariantGraph();
-    new VariantGraphBuilder(graph).add(witnesses);
+    new VariantGraphBuilder(graph, new EqualityTokenComparator(), tokenLinker, new PhraseMatchDetector(), new TranspositionDetector()).add(witnesses);
     return graph;
   }
 
