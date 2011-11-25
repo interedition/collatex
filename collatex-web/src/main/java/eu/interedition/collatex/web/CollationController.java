@@ -25,7 +25,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.implementation.CollateXEngine;
-import eu.interedition.collatex.implementation.graph.cyclic.CyclicVariantGraph;
+import eu.interedition.collatex.implementation.graph.CyclicVariantGraph;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.interfaces.*;

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.graph.joined;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.interfaces.IVariantGraph;

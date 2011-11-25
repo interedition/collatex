@@ -20,10 +20,10 @@
 
 package eu.interedition.collatex.implementation.alignment;
 
+import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.ranked.IRankedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.ranked.VariantGraphRanker;
-import eu.interedition.collatex.implementation.graph.segmented.NonSegmentedGraphConverter;
+import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import org.junit.Test;
 
@@ -36,8 +36,7 @@ public class VariantGraphRankerTest extends AbstractTest {
   @Test
   public void ranking() {
     final IVariantGraph graph = merge("The black cat", "The black and white cat", "The black and green cat");
-    final VariantGraphRanker ranker = new VariantGraphRanker(new NonSegmentedGraphConverter().convertGraph(graph));
-    final List<IRankedVariantGraphVertex> vertices = ranker.getRankedVertices();
+    final List<RankedVariantGraphVertex> vertices = Lists.newArrayList(SegmentedVariantGraph.create(graph).getRankedVertices());
 
     assertEquals("the", vertices.get(0).getVertex().getNormalized());
     assertEquals(1, vertices.get(0).getRank());
@@ -56,8 +55,7 @@ public class VariantGraphRankerTest extends AbstractTest {
   @Test
   public void agastTranspositionHandling() {
     final IVariantGraph graph = merge("He was agast, so", "He was agast", "So he was agast");
-    final VariantGraphRanker ranker = new VariantGraphRanker(new NonSegmentedGraphConverter().convertGraph(graph));
-    final List<IRankedVariantGraphVertex> vertices = ranker.getRankedVertices();
+    final List<RankedVariantGraphVertex> vertices = Lists.newArrayList(SegmentedVariantGraph.create(graph).getRankedVertices());
 
     assertEquals("so", vertices.get(0).getVertex().getNormalized());
     assertEquals(1, vertices.get(0).getRank());

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.graph.segmented;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
@@ -27,38 +27,33 @@ import eu.interedition.collatex.interfaces.IWitness;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class SegmentedVariantGraphVertex implements
-    ISegmentedVariantGraphVertex {
+public class SegmentedVariantGraphVertex {
 
-  private final Map<IWitness, List<INormalizedToken>> phraseForEachWitness;
+  private final Map<IWitness, List<INormalizedToken>> phrases;
 
-  public SegmentedVariantGraphVertex(Map<IWitness, List<INormalizedToken>> phraseForEachWitness) {
-    this.phraseForEachWitness = phraseForEachWitness;
+  public SegmentedVariantGraphVertex(Map<IWitness, List<INormalizedToken>> phrases) {
+    this.phrases = phrases;
   }
 
-  @Override
   public String getNormalized() {
-    if (phraseForEachWitness.isEmpty()) {
+    if (phrases.isEmpty()) {
       return "#";
     }
-    return NormalizedToken.toString(phraseForEachWitness.values().iterator().next());
+    return NormalizedToken.toString(phrases.values().iterator().next());
   }
 
-  //NOTE: should this be a list?
-  @Override
-  public List<IWitness> getWitnesses() {
-    return Lists.newArrayList(phraseForEachWitness.keySet());
+  public Set<IWitness> getWitnesses() {
+    return phrases.keySet();
   }
 
-  @Override
   public List<INormalizedToken> getPhrase(IWitness witness) {
-    return phraseForEachWitness.get(witness);
+    return phrases.get(witness);
   }
 
-  @Override
   public boolean containsWitness(IWitness witness) {
-    return phraseForEachWitness.containsKey(witness);
+    return phrases.containsKey(witness);
   }
  
 }
