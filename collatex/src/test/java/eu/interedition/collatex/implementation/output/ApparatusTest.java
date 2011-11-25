@@ -33,6 +33,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import org.junit.Before;
@@ -40,7 +42,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class TeiParallelSegmentationApparatusBuilderTest extends AbstractTest {
+public class ApparatusTest extends AbstractTest {
   private DocumentBuilder documentBuilder;
   private Transformer transformer;
 
@@ -59,7 +61,7 @@ public class TeiParallelSegmentationApparatusBuilderTest extends AbstractTest {
     final Element root = xml.createElementNS(Apparatus.TEI_NS, "text");
     xml.appendChild(root);
 
-    Apparatus.create(merge(witnesses)).serialize(root);
+    SegmentedVariantGraph.create(JoinedVariantGraph.create(merge(witnesses))).toApparatus().serialize(root);
     StringWriter out = new StringWriter();
     transformer.transform(new DOMSource(xml), new StreamResult(out));
     final String result = out.toString();

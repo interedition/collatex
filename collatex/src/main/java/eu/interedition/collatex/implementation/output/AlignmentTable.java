@@ -29,6 +29,7 @@ import eu.interedition.collatex.interfaces.IWitness;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  *
@@ -75,7 +76,7 @@ public class AlignmentTable {
     return column;
   }
   
-  public final List<IWitness> getWitnesses() {
+  public final SortedSet<IWitness> getWitnesses() {
     return graph.getWitnesses();
   }
 

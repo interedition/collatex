@@ -33,51 +33,52 @@ public class AlignmentTableColumnTest extends AbstractTest {
 
   @Test
   public void firstToken() {
-    final IWitness witness = createWitnesses("a test string")[0];
-    final Column c = align(witness).getColumns().get(0);
+    final IWitness[] w = createWitnesses("a test string", "");
+    final Column c = align(w[0]).getColumns().get(0);
 
-    assertTrue(c.containsWitness(witness));
-    assertFalse(c.containsWitness(createWitnesses("")[0]));
+    assertTrue(c.containsWitness(w[0]));
+    assertFalse(c.containsWitness(w[1]));
     assertEquals(ColumnState.INVARIANT, c.getState());
   }
 
   @Test
   public void addVariant() {
-    final IWitness[] w = createWitnesses("first", "second", "third");
-    final Column c = align(w).getColumns().get(0);
+    final IWitness[] w = createWitnesses("first", "second", "third", "");
+    final Column c = align(w[0], w[1], w[2]).getColumns().get(0);
 
     assertTrue(c.containsWitness(w[0]));
     assertTrue(c.containsWitness(w[1]));
     assertTrue(c.containsWitness(w[2]));
-    assertFalse(c.containsWitness(createWitnesses("")[0]));
+    assertFalse(c.containsWitness(w[3]));
     assertEquals(ColumnState.VARIANT, c.getState());
   }
 
   @Test
   public void addMatch() {
-    final IWitness[] w = createWitnesses("match", "match");
-    final Column c = align(w).getColumns().get(0);
+    final IWitness[] w = createWitnesses("match", "match", "");
+    final Column c = align(w[0], w[1]).getColumns().get(0);
 
     assertTrue(c.containsWitness(w[0]));
     assertTrue(c.containsWitness(w[1]));
-    assertFalse(c.containsWitness(createWitnesses("")[0]));
+    assertFalse(c.containsWitness(w[2]));
     assertEquals(ColumnState.INVARIANT, c.getState());
   }
   
   @Test
   public void mixedColumn() {
-    final IWitness[] w = createWitnesses("match", "match", "variant");
-    final Column c = align(w).getColumns().get(0);
+    final IWitness[] w = createWitnesses("match", "match", "variant", "");
+    final Column c = align(w[0], w[1], w[2]).getColumns().get(0);
 
     assertTrue(c.containsWitness(w[0]));
     assertTrue(c.containsWitness(w[1]));
     assertTrue(c.containsWitness(w[2]));
-    assertFalse(c.containsWitness(createWitnesses("")[0]));
+    assertFalse(c.containsWitness(w[3]));
     assertEquals(ColumnState.VARIANT, c.getState());
   }
 
   @Test(expected = NoSuchElementException.class)
   public void getNonExistingWordGivesException() {
-    align("a test string").getColumns().get(0).getToken(createWitnesses("")[0]);
+    final IWitness[] w = createWitnesses("a test string", "");
+    align(w[0]).getColumns().get(0).getToken(w[1]);
   }
 }

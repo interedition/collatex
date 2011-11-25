@@ -24,6 +24,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.interfaces.*;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
@@ -61,21 +62,13 @@ public class VariantGraph extends DirectedAcyclicGraph<IVariantGraphVertex, IVar
   }
 
   @Override
-  public List<IWitness> getWitnesses() {
+  public SortedSet<IWitness> getWitnesses() {
     Set<IVariantGraphEdge> outgoingEdges = outgoingEdgesOf(startVertex);
-    List<IWitness> totalWitnesses = Lists.newArrayList();
+    SortedSet<IWitness> totalWitnesses = Sets.newTreeSet();
     for (IVariantGraphEdge edge : outgoingEdges) {
       totalWitnesses.addAll(edge.getWitnesses());
     }
-    //NOTE: The set of outgoingEdges is unordered!
-    //NOTE: That is unexpected behavior so the list of witnesses
-    //NOTE: is sorted here! WOULD HAVE: insert order
-    Collections.sort(totalWitnesses, new Comparator<IWitness>() {
-      @Override
-      public int compare(IWitness arg0, IWitness arg1) {
-        return arg0.getSigil().compareTo(arg1.getSigil());
-      } });
-    return Collections.unmodifiableList(totalWitnesses);
+    return Collections.unmodifiableSortedSet(totalWitnesses);
   }
 
   @Override

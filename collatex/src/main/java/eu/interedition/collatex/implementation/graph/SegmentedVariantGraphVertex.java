@@ -21,20 +21,21 @@
 package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SegmentedVariantGraphVertex {
 
+  private final SortedSet<IWitness> witnesses = Sets.newTreeSet();
   private final Map<IWitness, List<INormalizedToken>> phrases;
 
   public SegmentedVariantGraphVertex(Map<IWitness, List<INormalizedToken>> phrases) {
     this.phrases = phrases;
+    this.witnesses.addAll(phrases.keySet());
   }
 
   public String getNormalized() {
@@ -44,8 +45,8 @@ public class SegmentedVariantGraphVertex {
     return NormalizedToken.toString(phrases.values().iterator().next());
   }
 
-  public Set<IWitness> getWitnesses() {
-    return phrases.keySet();
+  public SortedSet<IWitness> getWitnesses() {
+    return Collections.unmodifiableSortedSet(witnesses);
   }
 
   public List<INormalizedToken> getPhrase(IWitness witness) {
@@ -53,7 +54,7 @@ public class SegmentedVariantGraphVertex {
   }
 
   public boolean containsWitness(IWitness witness) {
-    return phrases.containsKey(witness);
+    return witnesses.contains(witness);
   }
  
 }

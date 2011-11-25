@@ -15,6 +15,7 @@
  */
 package eu.interedition.collatex.implementation.alignment;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
@@ -72,5 +73,11 @@ public class VariantGraphWitnessAdapter implements IWitness {
   @Override
   public Iterator<INormalizedToken> tokenIterator() {
     return tokens.iterator();
+  }
+
+  @Override
+  public int compareTo(IWitness o) {
+    Preconditions.checkArgument(!(o instanceof VariantGraphWitnessAdapter));
+    return -1;
   }
 }

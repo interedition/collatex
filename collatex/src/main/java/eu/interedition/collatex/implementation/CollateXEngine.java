@@ -26,6 +26,8 @@ import eu.interedition.collatex.implementation.alignment.PhraseMatchDetector;
 import eu.interedition.collatex.implementation.alignment.TokenLinker;
 import eu.interedition.collatex.implementation.alignment.TranspositionDetector;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
+import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
@@ -112,6 +114,6 @@ public class CollateXEngine {
   }
 
   public Apparatus createApparatus(final IVariantGraph variantGraph) {
-    return Apparatus.create(variantGraph);
+    return SegmentedVariantGraph.create(JoinedVariantGraph.create(variantGraph)).toApparatus();
   }
 }

@@ -31,7 +31,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
 
   private CollateXEngine engine = new CollateXEngine();
   private OutputType outputType = OutputType.ALIGNMENT_TABLE;
-  private List<IWitness> witnesses = Lists.newArrayList();
+  private SortedSet<IWitness> witnesses = Sets.newTreeSet();
   private String sigil;
 
   public CollateXTransformer() {

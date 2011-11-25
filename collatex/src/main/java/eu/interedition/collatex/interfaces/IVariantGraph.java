@@ -23,6 +23,7 @@ package eu.interedition.collatex.interfaces;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import org.jgrapht.DirectedGraph;
 
@@ -36,7 +37,7 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
   @Override
   Iterator<IVariantGraphVertex> iterator();
 
-  List<IWitness> getWitnesses();
+  SortedSet<IWitness> getWitnesses();
 
   boolean isEmpty();
 

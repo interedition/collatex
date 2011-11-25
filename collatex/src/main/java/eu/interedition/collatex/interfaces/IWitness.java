@@ -28,7 +28,7 @@ import java.util.List;
  * Representation of a single textual witness
  *
  */
-public interface IWitness extends ITokenContainer {
+public interface IWitness extends ITokenContainer, Comparable<IWitness> {
 
   String getSigil();
 

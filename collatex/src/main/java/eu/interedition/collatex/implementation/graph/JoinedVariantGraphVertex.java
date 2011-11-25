@@ -22,6 +22,7 @@ package eu.interedition.collatex.implementation.graph;
 
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 import com.google.common.collect.Lists;
 
@@ -30,7 +31,7 @@ import eu.interedition.collatex.interfaces.IWitness;
 
 public class JoinedVariantGraphVertex {
   private final StringBuilder normalized;
-  private final Set<IWitness> witnesses;
+  private final SortedSet<IWitness> witnesses;
   private final List<IVariantGraphVertex> sources;
 
   public JoinedVariantGraphVertex(IVariantGraphVertex source) {
@@ -43,7 +44,7 @@ public class JoinedVariantGraphVertex {
     return normalized.toString();
   }
 
-  public Set<IWitness> getWitnesses() {
+  public SortedSet<IWitness> getWitnesses() {
     return witnesses;
   }
 
