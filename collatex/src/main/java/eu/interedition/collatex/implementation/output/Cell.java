@@ -48,7 +48,7 @@ public class Cell {
    * cells from the same vertex get the same color
    */
   public String getColor() {
-    IVariantGraphVertex vertexForWitness = ((Column) column).findVertexForWitness(witness);
+    IVariantGraphVertex vertexForWitness = column.findVertexForWitness(witness);
     return vertexForWitness == null ? "black" : color(vertexForWitness.getVertexKey().hashCode());
   }
 

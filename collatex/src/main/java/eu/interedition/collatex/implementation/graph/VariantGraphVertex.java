@@ -20,24 +20,24 @@
 
 package eu.interedition.collatex.implementation.graph;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.google.common.collect.Maps;
 
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
 public class VariantGraphVertex implements IVariantGraphVertex {
   private final String normalized;
-  private final Map<IWitness, INormalizedToken> tokenMap;
+  private SortedSet<IWitness> witnesses = Sets.newTreeSet();
+  private final Map<IWitness, INormalizedToken> tokens = Maps.newHashMap();
   private final INormalizedToken vertexKey;
 
   public VariantGraphVertex(String normalized, INormalizedToken vertexKey) {
     this.normalized = normalized;
     this.vertexKey = vertexKey;
-    this.tokenMap = Maps.newLinkedHashMap();
   }
 
   @Override
@@ -47,25 +47,26 @@ public class VariantGraphVertex implements IVariantGraphVertex {
 
   @Override
   public INormalizedToken getToken(IWitness witness) {
-    if (!tokenMap.containsKey(witness)) {
+    if (!tokens.containsKey(witness)) {
       throw new RuntimeException("TOKEN FOR WITNESS " + witness.getSigil() + " NOT FOUND IN VERTEX " + getNormalized() + "!");
     }
-    return tokenMap.get(witness);
+    return tokens.get(witness);
   }
 
   @Override
   public void addToken(IWitness witness, INormalizedToken token) {
-    tokenMap.put(witness, token);
+    witnesses.add(witness);
+    tokens.put(witness, token);
   }
 
   @Override
   public boolean containsWitness(IWitness witness) {
-    return tokenMap.containsKey(witness);
+    return witnesses.contains(witness);
   }
 
   @Override
-  public Set<IWitness> getWitnesses() {
-    return tokenMap.keySet();
+  public SortedSet<IWitness> getWitnesses() {
+    return Collections.unmodifiableSortedSet(witnesses);
   }
 
   @Override

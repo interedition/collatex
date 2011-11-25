@@ -41,9 +41,9 @@ public class Apparatus {
   public static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
   private final List<Entry> entries;
-  private final List<IWitness> witnesses;
+  private final SortedSet<IWitness> witnesses;
 
-  private Apparatus(List<IWitness> witnesses, final List<Entry> entries) {
+  private Apparatus(SortedSet<IWitness> witnesses, final List<Entry> entries) {
     this.witnesses = witnesses;
     this.entries = entries;
   }
@@ -52,7 +52,7 @@ public class Apparatus {
     return entries;
   }
 
-  public List<IWitness> getWitnesses() {
+  public SortedSet<IWitness> getWitnesses() {
     return witnesses;
   }
   
@@ -147,13 +147,13 @@ public class Apparatus {
   public static class Entry {
 
     private final Set<SegmentedVariantGraphVertex> contents = Sets.newLinkedHashSet();
-    private final List<IWitness> witnesses;
+    private final SortedSet<IWitness> witnesses;
 
-    private Entry(List<IWitness> witnesses) {
+    private Entry(SortedSet<IWitness> witnesses) {
       this.witnesses = witnesses;
     }
 
-    public List<IWitness> getWitnesses() {
+    public SortedSet<IWitness> getWitnesses() {
       return witnesses;
     }
 

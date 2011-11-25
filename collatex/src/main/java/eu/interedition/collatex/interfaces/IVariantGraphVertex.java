@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex.interfaces;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 public interface IVariantGraphVertex extends INormalizedToken {
 
@@ -30,7 +30,7 @@ public interface IVariantGraphVertex extends INormalizedToken {
 
   boolean containsWitness(IWitness witness);
 
-  Set<IWitness> getWitnesses();
+  SortedSet<IWitness> getWitnesses();
 
   INormalizedToken getVertexKey();
 

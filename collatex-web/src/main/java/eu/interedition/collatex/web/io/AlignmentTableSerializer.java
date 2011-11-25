@@ -10,6 +10,7 @@ import org.codehaus.jackson.map.SerializerProvider;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -23,7 +24,7 @@ public class AlignmentTableSerializer extends JsonSerializer<AlignmentTable> {
 
   @Override
   public void serialize(AlignmentTable value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-    final List<IWitness> witnesses = value.getWitnesses();
+    final SortedSet<IWitness> witnesses = value.getWitnesses();
     final List<Column> columns = value.getColumns();
 
     jgen.writeStartObject();

@@ -20,12 +20,11 @@
 
 package eu.interedition.collatex.interfaces;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 public interface IVariantGraphEdge {
 
-  // NOTE: unmodifiable set
-  Set<IWitness> getWitnesses();
+  SortedSet<IWitness> getWitnesses();
 
   void addWitness(IWitness witness);
 

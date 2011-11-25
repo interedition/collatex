@@ -23,6 +23,7 @@ package eu.interedition.collatex.implementation.graph;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import com.google.common.collect.Maps;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -106,7 +107,7 @@ public class CyclicVariantGraph extends SimpleDirectedGraph<IVariantGraphVertex,
   }
 
   @Override
-  public List<IWitness> getWitnesses() {
+  public SortedSet<IWitness> getWitnesses() {
     throw new UnsupportedOperationException();
   }
 

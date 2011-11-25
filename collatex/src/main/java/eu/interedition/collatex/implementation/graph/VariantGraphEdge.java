@@ -22,6 +22,7 @@ package eu.interedition.collatex.implementation.graph;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
@@ -32,15 +33,11 @@ import eu.interedition.collatex.interfaces.IWitness;
 
 @SuppressWarnings("serial")
 public class VariantGraphEdge extends DefaultWeightedEdge implements IVariantGraphEdge {
-  private final Set<IWitness> witnesses;
-
-  public VariantGraphEdge() {
-    this.witnesses = Sets.newLinkedHashSet();
-  }
+  private final SortedSet<IWitness> witnesses = Sets.newTreeSet();
 
   @Override
-  public Set<IWitness> getWitnesses() {
-    return Collections.unmodifiableSet(witnesses);
+  public SortedSet<IWitness> getWitnesses() {
+    return Collections.unmodifiableSortedSet(witnesses);
   }
 
   @Override

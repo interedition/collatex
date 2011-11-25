@@ -106,4 +106,9 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
   public Iterator<INormalizedToken> tokenIterator() {
     return iterator();
   }
+
+  @Override
+  public int compareTo(IWitness o) {
+    return sigil.compareTo(o.getSigil());
+  }
 }

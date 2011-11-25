@@ -21,12 +21,13 @@
 package eu.interedition.collatex.implementation.graph;
 
 import java.util.Set;
+import java.util.SortedSet;
 
 import eu.interedition.collatex.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex.interfaces.IWitness;
 
 public class JoinedVariantGraphEdge {
-  private final Set<IWitness> witnesses;
+  private final SortedSet<IWitness> witnesses;
   private final JoinedVariantGraphVertex from;
   private final JoinedVariantGraphVertex to;
 
@@ -36,7 +37,7 @@ public class JoinedVariantGraphEdge {
     this.witnesses = source.getWitnesses();
   }
 
-  public Set<IWitness> getWitnesses() {
+  public SortedSet<IWitness> getWitnesses() {
     return witnesses;
   }
 
