@@ -20,26 +20,16 @@
 
 package eu.interedition.collatex.implementation.graph;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import eu.interedition.collatex.interfaces.*;
+import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
-import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IToken;
-import eu.interedition.collatex.interfaces.IVariantGraph;
-import eu.interedition.collatex.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex.interfaces.IWitness;
+import java.util.*;
+
+import static org.jgrapht.alg.BellmanFordShortestPath.findPathBetween;
 
 // This class implements the IVariantGraph interface.
 // The IVariantGraph interface is an extension of the DiGraph interface
@@ -115,6 +105,26 @@ public class VariantGraph extends DirectedAcyclicGraph<IVariantGraphVertex, IVar
     return path;
   }
 
+  /**
+   * @return
+   * @todo Should getLongestPath() method return IVariantGraphEdges?
+   */
+  public List<IVariantGraphVertex> getLongestPath() {
+    for (IVariantGraphEdge edge : edgeSet()) {
+      // Weights are set to negative value to generate the longest path instead of the shortest path
+      setEdgeWeight(edge, -1);
+    }
+    final IVariantGraphVertex startVertex = getStartVertex();
+    final IVariantGraphVertex endVertex = getEndVertex();
+    final List<IVariantGraphVertex> vertices = Lists.newArrayList();
+    for (IVariantGraphEdge edge : findPathBetween(this, startVertex, endVertex)) {
+      IVariantGraphVertex edgeTarget = getEdgeTarget(edge);
+      if (edgeTarget != endVertex) {
+        vertices.add(edgeTarget);
+      }
+    }
+    return vertices;
+  }
 
 
   @Override
