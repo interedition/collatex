@@ -22,7 +22,6 @@ package eu.interedition.collatex.implementation.output;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.interfaces.ColumnState;
-import eu.interedition.collatex.interfaces.IColumn;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Test;
 
@@ -35,7 +34,7 @@ public class AlignmentTableColumnTest extends AbstractTest {
   @Test
   public void firstToken() {
     final IWitness witness = createWitnesses("a test string")[0];
-    final IColumn c = align(witness).getColumns().get(0);
+    final Column c = align(witness).getColumns().get(0);
 
     assertTrue(c.containsWitness(witness));
     assertFalse(c.containsWitness(createWitnesses("")[0]));
@@ -45,7 +44,7 @@ public class AlignmentTableColumnTest extends AbstractTest {
   @Test
   public void addVariant() {
     final IWitness[] w = createWitnesses("first", "second", "third");
-    final IColumn c = align(w).getColumns().get(0);
+    final Column c = align(w).getColumns().get(0);
 
     assertTrue(c.containsWitness(w[0]));
     assertTrue(c.containsWitness(w[1]));
@@ -57,7 +56,7 @@ public class AlignmentTableColumnTest extends AbstractTest {
   @Test
   public void addMatch() {
     final IWitness[] w = createWitnesses("match", "match");
-    final IColumn c = align(w).getColumns().get(0);
+    final Column c = align(w).getColumns().get(0);
 
     assertTrue(c.containsWitness(w[0]));
     assertTrue(c.containsWitness(w[1]));
@@ -68,7 +67,7 @@ public class AlignmentTableColumnTest extends AbstractTest {
   @Test
   public void mixedColumn() {
     final IWitness[] w = createWitnesses("match", "match", "variant");
-    final IColumn c = align(w).getColumns().get(0);
+    final Column c = align(w).getColumns().get(0);
 
     assertTrue(c.containsWitness(w[0]));
     assertTrue(c.containsWitness(w[1]));

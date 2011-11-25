@@ -22,7 +22,6 @@ package eu.interedition.collatex.implementation.output;
 
 import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
 import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
-import eu.interedition.collatex.interfaces.IColumn;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -59,14 +58,14 @@ public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
       if (rank>columns.size()) {
         addNewColumn(next);
       } else {
-        ((VariantGraphBasedColumn)columns.get(rank-1)).addVertex(next);
+        ((Column)columns.get(rank-1)).addVertex(next);
       }
     }
 //    System.out.println("TOTAL number of columns: "+columns.size());
   }
 
-  private IColumn addNewColumn(IVariantGraphVertex vertex) {
-    final IColumn column = new VariantGraphBasedColumn(vertex);
+  private Column addNewColumn(IVariantGraphVertex vertex) {
+    final Column column = new Column(vertex);
     columns.add(column);
     return column;
   }

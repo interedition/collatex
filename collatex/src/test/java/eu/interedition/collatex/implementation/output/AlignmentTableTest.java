@@ -22,8 +22,6 @@ package eu.interedition.collatex.implementation.output;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.interfaces.IAlignmentTable;
-import eu.interedition.collatex.interfaces.ICell;
-import eu.interedition.collatex.interfaces.IRow;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -147,11 +145,11 @@ public class AlignmentTableTest extends AbstractTest {
     final IWitness[] w = createWitnesses("the black and white cat", "the red cat");
     final IAlignmentTable table = align(w);
 
-    final Iterator<ICell> iteratorA = table.getRow(w[0]).iterator();
+    final Iterator<Cell> iteratorA = table.getRow(w[0]).iterator();
     assertEquals("the", iteratorA.next().getToken().getNormalized());
     assertTrue(!iteratorA.next().isEmpty());
 
-    final Iterator<ICell> iteratorB = table.getRow(w[1]).iterator();
+    final Iterator<Cell> iteratorB = table.getRow(w[1]).iterator();
     assertEquals("the", iteratorB.next().getToken().getNormalized());
     assertEquals("red", iteratorB.next().getToken().getNormalized());
     assertTrue(iteratorB.next().isEmpty());
@@ -162,10 +160,10 @@ public class AlignmentTableTest extends AbstractTest {
   
   @Test
   public void getRows() {
-    final List<IRow> rows = align("the black cat", "and white cat", "the red cat").getRows();
+    final List<Row> rows = align("the black cat", "and white cat", "the red cat").getRows();
     assertEquals(3, rows.size());
 
-    final Iterator<IRow> iterator = rows.iterator();
+    final Iterator<Row> iterator = rows.iterator();
     assertEquals("A", iterator.next().getSigil());
     assertEquals("B", iterator.next().getSigil());
     assertEquals("C", iterator.next().getSigil());

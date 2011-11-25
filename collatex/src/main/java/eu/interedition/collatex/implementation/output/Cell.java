@@ -20,29 +20,35 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import eu.interedition.collatex.interfaces.ICell;
-import eu.interedition.collatex.interfaces.IColumn;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
-public class Cell implements ICell {
-  private final IColumn column;
+/**
+ *
+ * An alignment table cell represents the position of a witness token in alignment position with other witnesses in the table.
+ * Empty cells occur where this witness has nothing to represent at this position in the alignment.
+ *
+ */
+public class Cell {
+  private final Column column;
   private final IWitness witness;
 
-  public Cell(IColumn column, IWitness witness) {
+  public Cell(Column column, IWitness witness) {
     this.column = column;
     this.witness = witness;
   }
 
-  @Override
-  public IColumn getColumn() {
+  public Column getColumn() {
     return column;
   }
 
-  @Override
+  /**
+   * Get a color value for this cell
+   * cells from the same vertex get the same color
+   */
   public String getColor() {
-    IVariantGraphVertex vertexForWitness = ((VariantGraphBasedColumn) column).findVertexForWitness(witness);
+    IVariantGraphVertex vertexForWitness = ((Column) column).findVertexForWitness(witness);
     return vertexForWitness == null ? "black" : color(vertexForWitness.getVertexKey().hashCode());
   }
 
@@ -50,12 +56,19 @@ public class Cell implements ICell {
     return "#" + (Integer.toHexString(hashCode) + "000000").substring(0, 6);
   }
 
-  @Override
+  /**
+   * Retrieve the token for this cell if present
+   * @return the token for this cell
+   */
   public INormalizedToken getToken() {
     return column.getToken(witness);
   }
 
-  @Override
+  /**
+   * It is important to call this method before attempting to call getToken to determine if a token is actually present.
+   * Empty cells occur where this witness has nothing to represent at this position in the alignment.
+   * @return whether or not this cell is empty
+   */
   public boolean isEmpty() {
     return !column.containsWitness(witness);
   }
