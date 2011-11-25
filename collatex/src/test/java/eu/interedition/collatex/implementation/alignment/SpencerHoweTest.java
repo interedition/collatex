@@ -21,6 +21,7 @@
 package eu.interedition.collatex.implementation.alignment;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.interfaces.*;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class SpencerHoweTest extends AbstractTest {
   @Test
   public void alignmentTable() {
     final IWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
-    final IAlignmentTable table = align(w);
+    final AlignmentTable table = align(w);
 
     assertEquals(3, table.getRows().size());
     //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element

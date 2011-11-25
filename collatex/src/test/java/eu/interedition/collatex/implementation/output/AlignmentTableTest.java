@@ -21,7 +21,6 @@
 package eu.interedition.collatex.implementation.output;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.interfaces.IAlignmentTable;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,7 +41,7 @@ public class AlignmentTableTest extends AbstractTest {
   @Test
   public void firstWitness() {
     final IWitness[] w = createWitnesses("the black cat");
-    final IAlignmentTable table = align(w);
+    final AlignmentTable table = align(w);
     assertEquals(1, table.getRows().size());
     assertEquals("A: |the|black|cat|", table.getRow(w[0]).toString());
   }
@@ -50,7 +49,7 @@ public class AlignmentTableTest extends AbstractTest {
   @Test
   public void everythingMatches() {
     final IWitness[] w = createWitnesses("the black cat", "the black cat", "the black cat");
-    final IAlignmentTable table = align(w);
+    final AlignmentTable table = align(w);
     assertEquals(3, table.getRows().size());
     assertEquals("A: |the|black|cat|", table.getRow(w[0]).toString());
     assertEquals("B: |the|black|cat|", table.getRow(w[1]).toString());
@@ -60,7 +59,7 @@ public class AlignmentTableTest extends AbstractTest {
   @Test
   public void variant() {
     final IWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
-    final IAlignmentTable table = align(w);
+    final AlignmentTable table = align(w);
     assertEquals(5, table.getRows().size());
     assertEquals("A: |the|black|cat|", table.getRow(w[0]).toString());
     assertEquals("B: |the|white|cat|", table.getRow(w[1]).toString());
@@ -71,51 +70,51 @@ public class AlignmentTableTest extends AbstractTest {
 
   @Test
   public void omission() {
-    final IAlignmentTable table = align("the black cat", "the cat", "the black cat");
+    final AlignmentTable table = align("the black cat", "the cat", "the black cat");
     assertEquals("A: the|black|cat\nB: the| |cat\nC: the|black|cat\n", table.toString());
   }
 
   @Test
   public void addition1() {
-    final IAlignmentTable table = align("the black cat", "the white and black cat");
+    final AlignmentTable table = align("the black cat", "the white and black cat");
     assertEquals("A: the| | |black|cat\nB: the|white|and|black|cat\n", table.toString());
   }
 
   @Test
   public void addition2() {
-    final IAlignmentTable table = align("the cat", "before the cat", "the black cat", "the cat walks");
+    final AlignmentTable table = align("the cat", "before the cat", "the black cat", "the cat walks");
     assertEquals("A:  |the| |cat| \nB: before|the| |cat| \nC:  |the|black|cat| \nD:  |the| |cat|walks\n", table.toString());
   }
 
   @Test
   public void addition3() {
-    final IAlignmentTable t = align("the cat", "before the cat", "the black cat", "just before midnight the cat walks");
+    final AlignmentTable t = align("the cat", "before the cat", "the black cat", "just before midnight the cat walks");
     assertEquals("A:  | | |the| |cat| \nB:  |before| |the| |cat| \nC:  | | |the|black|cat| \nD: just|before|midnight|the| |cat|walks\n", t.toString());
   }
 
   @Test
   public void transpositionAndReplacement() {
-    final IAlignmentTable t = align("The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog");
+    final AlignmentTable t = align("The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog");
     assertEquals("A: the|black|dog|chases|a|red|cat\nB: a|red|cat|chases|the|black|dog\nC: a|red|cat|chases|the|yellow|dog\n", t.toString());
   }
   
   @Test
   @Ignore("By default we align to the left; right alignment would be nicer in this specific case")
   public void variation() {
-    final IAlignmentTable t = align("the black cat", "the black and white cat", "the black very special cat", "the black not very special cat");
+    final AlignmentTable t = align("the black cat", "the black and white cat", "the black very special cat", "the black not very special cat");
     assertEquals("A: the|black| | | |cat\nB: the|black| |and|white|cat\nC: the|black| |very|special|cat\nD: the|black|not|very|special|cat\n", t.toString());
   }
 
   @Test
   public void witnessReorder() {
-    final IAlignmentTable t = align("the black cat", "the black and white cat", "the black not very special cat", "the black very special cat");
+    final AlignmentTable t = align("the black cat", "the black and white cat", "the black not very special cat", "the black very special cat");
     assertEquals("A: the|black| | | |cat\nB: the|black|and|white| |cat\nC: the|black|not|very|special|cat\nD: the|black| |very|special|cat\n", t.toString());
   }
   
   @Test
   public void testSimpleSpencerHowe() {
     final IWitness[] w = createWitnesses("a", "b", "a b");
-    final IAlignmentTable table = align(w);
+    final AlignmentTable table = align(w);
     assertEquals(3, table.getRows().size());
     assertEquals("A: |a| |", table.getRow(w[0]).toString());
     assertEquals("B: | |b|", table.getRow(w[1]).toString());
@@ -131,7 +130,7 @@ public class AlignmentTableTest extends AbstractTest {
 
   @Test
   public void stringOutputTwoWitnesses() {
-    final IAlignmentTable table = align("the black cat", "the black cat");
+    final AlignmentTable table = align("the black cat", "the black cat");
     assertEquals("A: the|black|cat\nB: the|black|cat\n", table.toString());
   }
 
@@ -143,7 +142,7 @@ public class AlignmentTableTest extends AbstractTest {
   @Test
   public void getRow() {
     final IWitness[] w = createWitnesses("the black and white cat", "the red cat");
-    final IAlignmentTable table = align(w);
+    final AlignmentTable table = align(w);
 
     final Iterator<Cell> iteratorA = table.getRow(w[0]).iterator();
     assertEquals("the", iteratorA.next().getToken().getNormalized());

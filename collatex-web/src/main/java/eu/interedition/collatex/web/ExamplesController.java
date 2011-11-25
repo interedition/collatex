@@ -20,13 +20,14 @@
 
 package eu.interedition.collatex.web;
 
-import java.util.Collections;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import com.google.common.collect.Lists;
+import eu.interedition.collatex.implementation.CollateXEngine;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
+import eu.interedition.collatex.implementation.output.AlignmentTable;
+import eu.interedition.collatex.interfaces.IApparatus;
+import eu.interedition.collatex.interfaces.IVariantGraph;
+import eu.interedition.collatex.interfaces.IWitness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -40,13 +41,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.google.common.collect.Lists;
-
-import eu.interedition.collatex.implementation.CollateXEngine;
-import eu.interedition.collatex.interfaces.IAlignmentTable;
-import eu.interedition.collatex.interfaces.IApparatus;
-import eu.interedition.collatex.interfaces.IVariantGraph;
-import eu.interedition.collatex.interfaces.IWitness;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.Collections;
+import java.util.List;
 
 @Controller
 @RequestMapping("/examples/**")
@@ -62,7 +59,7 @@ public class ExamplesController implements InitializingBean {
   
   @RequestMapping("usecases")
   public ModelAndView collateUseCases() {
-    List<IAlignmentTable> alignments = Lists.newArrayListWithCapacity(usecases.size());
+    List<AlignmentTable> alignments = Lists.newArrayListWithCapacity(usecases.size());
     for (IWitness[] example : usecases) {
       alignments.add(engine.align(example));
     }
@@ -82,7 +79,7 @@ public class ExamplesController implements InitializingBean {
 
   @RequestMapping("beckett")
   public ModelAndView collateBeckettExamples() {
- 	List<IAlignmentTable> alignments = Lists.newArrayListWithCapacity(beckett.size());
+ 	List<AlignmentTable> alignments = Lists.newArrayListWithCapacity(beckett.size());
     for (IWitness[] example : beckett) {
       alignments.add(engine.align(example));
     }

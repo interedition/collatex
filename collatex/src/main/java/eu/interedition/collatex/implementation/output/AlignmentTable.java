@@ -21,18 +21,70 @@
 package eu.interedition.collatex.implementation.output;
 
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.interfaces.IAlignmentTable;
+import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
+import eu.interedition.collatex.interfaces.IVariantGraph;
+import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
+import java.util.Iterator;
 import java.util.List;
 
-public abstract class BaseAlignmentTable implements IAlignmentTable {
-  protected final List<Column> columns;
+/**
+ *
+ * A table consisting of rows as witnesses and columns containing aligned tokens
+ *
+ */
+public class AlignmentTable {
+  private final IVariantGraph graph;
+  protected final List<Column> columns = Lists.newArrayList();
 
-  public BaseAlignmentTable() {
-    this.columns = Lists.newArrayList();
+  public AlignmentTable(IVariantGraph graph) {
+    this.graph = graph;
+    init();
+  }
+
+  private void init() {
+    SegmentedVariantGraph segmentedVariantGraph = SegmentedVariantGraph.create(graph);
+    Iterator<RankedVariantGraphVertex> iterator = segmentedVariantGraph.getRankedVertices().iterator();
+    Iterator<IVariantGraphVertex> vertexIterator = graph.iterator();
+    //skip startVertex
+    vertexIterator.next();
+    while(iterator.hasNext()) {
+      //nextVertex is a IRankedVariantGraphVertex which is not the 
+      //same as a real vertex!
+      RankedVariantGraphVertex nextVertex = iterator.next();
+      IVariantGraphVertex next = vertexIterator.next();
+      if (next.equals(graph.getEndVertex())) {
+        continue;
+      }
+      int rank = nextVertex.getRank();
+//      System.out.println("DEBUG: "+nextVertex.getNormalized()+":"+nextVertex.getRank());
+      if (rank>columns.size()) {
+        addNewColumn(next);
+      } else {
+        ((Column)columns.get(rank-1)).addVertex(next);
+      }
+    }
+//    System.out.println("TOTAL number of columns: "+columns.size());
+  }
+
+  private Column addNewColumn(IVariantGraphVertex vertex) {
+    final Column column = new Column(vertex);
+    columns.add(column);
+    return column;
   }
   
+  public final List<IWitness> getWitnesses() {
+    return graph.getWitnesses();
+  }
+
+  /**
+   * Retrieve the alignment table rows.
+   * Each row represents a single witness.
+   *
+   * @return alignment table rows
+   */
   public final List<Row> getRows() {
     List<Row> rows = Lists.newArrayList();
     for (IWitness witness: getWitnesses()) {
@@ -62,8 +114,6 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
     return columns;
   }
 
-  public abstract List<IWitness> getWitnesses();
-  
   @Override
   public String toString() {
     final StringBuilder stringBuilder = new StringBuilder();
@@ -86,6 +136,4 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
     //TODO should not be getnormalized!
     return cell.getToken().getNormalized().toString();
   }
-
-
 }
