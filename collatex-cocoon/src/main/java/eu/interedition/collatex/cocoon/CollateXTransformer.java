@@ -6,9 +6,7 @@ import com.google.common.collect.*;
 import eu.interedition.collatex.implementation.CollateXEngine;
 import eu.interedition.collatex.implementation.input.Token;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
-import eu.interedition.collatex.implementation.output.AlignmentTable;
-import eu.interedition.collatex.implementation.output.Cell;
-import eu.interedition.collatex.implementation.output.Row;
+import eu.interedition.collatex.implementation.output.*;
 import eu.interedition.collatex.interfaces.*;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.transformation.AbstractSAXTransformer;
@@ -105,18 +103,18 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   }
 
   private void sendTeiApparatus() throws SAXException {
-    final IApparatus apparatus = engine.createApparatus(engine.graph(witnesses.toArray(new IWitness[witnesses.size()])));
+    final Apparatus apparatus = engine.createApparatus(engine.graph(witnesses.toArray(new IWitness[witnesses.size()])));
 
     sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
     startPrefixMapping("tei", TEI_NS);
     // FIXME: this should be dealt with on the tokenizer level!
     final String separator = " ";
-    for (Iterator<IApparatusEntry> entryIt = apparatus.getEntries().iterator(); entryIt.hasNext(); ) {
-      final IApparatusEntry entry = entryIt.next();
+    for (Iterator<Apparatus.Entry> entryIt = apparatus.getEntries().iterator(); entryIt.hasNext(); ) {
+      final Apparatus.Entry entry = entryIt.next();
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
       for (IWitness witness : entry.getWitnesses()) {
-        content2WitMap.put(Token.toString(entry.getPhrase(witness)), witness.getSigil());
+        content2WitMap.put(Token.toString(entry.getReadingOf(witness)), witness.getSigil());
       }
 
       if ((content2WitMap.keySet().size() == 1) && !entry.hasEmptyCells()) {

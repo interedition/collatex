@@ -21,7 +21,7 @@
 				<#list p.entries as e>
 					<tr>
 						<#list p.witnesses as w>
-							<td class="${e.state?lower_case}"><#if e.containsWitness(w)><#list e.getPhrase(w) as t>${t.content?html} </#list><#else>&ndash;</#if></td>
+							<td class="${e.state?lower_case}"><#if e.covers(w)><#list e.getReadingOf(w) as t>${t.content?html} </#list><#else>&ndash;</#if></td>
 						</#list>
 					</tr>
 				</#list>

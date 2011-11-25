@@ -32,8 +32,7 @@ import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
-import eu.interedition.collatex.implementation.output.ParallelSegmentationApparatus;
-import eu.interedition.collatex.interfaces.IApparatus;
+import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.ITokenLinker;
 import eu.interedition.collatex.interfaces.ITokenNormalizer;
 import eu.interedition.collatex.interfaces.ITokenizer;
@@ -112,7 +111,7 @@ public class CollateXEngine {
     return table;
   }
 
-  public IApparatus createApparatus(final IVariantGraph variantGraph) {
-    return ParallelSegmentationApparatus.build(variantGraph);
+  public Apparatus createApparatus(final IVariantGraph variantGraph) {
+    return Apparatus.create(variantGraph);
   }
 }
