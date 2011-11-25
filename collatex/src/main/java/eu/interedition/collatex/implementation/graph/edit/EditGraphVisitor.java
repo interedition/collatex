@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex2.implementation.output.dot.DotExporter;
+import eu.interedition.collatex.implementation.output.DotExporter;
 
 public class EditGraphVisitor {
 
