@@ -18,31 +18,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.graph.joined;
+package eu.interedition.collatex.implementation.graph;
 
+import java.util.List;
 import java.util.Set;
 
-import eu.interedition.collatex.interfaces.IVariantGraphEdge;
+import com.google.common.collect.Lists;
+
+import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
-public class JoinedVariantGraphEdge {
+public class JoinedVariantGraphVertex {
+  private final StringBuilder normalized;
   private final Set<IWitness> witnesses;
-  private final JoinedVariantGraphVertex from;
-  private final JoinedVariantGraphVertex to;
+  private final List<IVariantGraphVertex> sources;
 
-  public JoinedVariantGraphEdge(JoinedVariantGraphVertex from, JoinedVariantGraphVertex to, IVariantGraphEdge source) {
-    this.from = from;
-    this.to = to;
+  public JoinedVariantGraphVertex(IVariantGraphVertex source) {
+    this.normalized = new StringBuilder(source.getNormalized());
     this.witnesses = source.getWitnesses();
+    this.sources = Lists.newArrayList(source);
+  }
+
+  public String getNormalized() {
+    return normalized.toString();
   }
 
   public Set<IWitness> getWitnesses() {
     return witnesses;
   }
 
-  @Override
-  public String toString() {
-    return from + " --{" + witnesses + "}-> " + to;
+  public List<IVariantGraphVertex> getSources() {
+    return sources;
   }
 
+  public void add(IVariantGraphVertex source) {
+    this.sources.add(source);
+    this.normalized.append(" ").append(source.getNormalized());
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder().append("{").append(getNormalized()).append("}").toString();
+  }
 }

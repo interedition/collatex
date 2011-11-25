@@ -21,12 +21,10 @@
 package eu.interedition.collatex.implementation.output;
 
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.implementation.graph.joined.JoinedVariantGraph;
-import eu.interedition.collatex.implementation.graph.ranked.IRankedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.ranked.VariantGraphRanker;
-import eu.interedition.collatex.implementation.graph.segmented.ISegmentedVariantGraph;
-import eu.interedition.collatex.implementation.graph.segmented.ISegmentedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.segmented.JGraphToSegmentedVariantGraphConverter;
+import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
+import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IApparatus;
 import eu.interedition.collatex.interfaces.IApparatusEntry;
 import eu.interedition.collatex.interfaces.IVariantGraph;
@@ -62,23 +60,21 @@ public class ParallelSegmentationApparatus implements IApparatus {
     // we first create a SegmentedVariantGraph from the IVariantGraph
     // therefore create a JoinedGraph first
     JoinedVariantGraph joinedGraph = JoinedVariantGraph.create(graph);
-    JGraphToSegmentedVariantGraphConverter converter = new JGraphToSegmentedVariantGraphConverter();
-    ISegmentedVariantGraph segmentedVariantGraph = converter.convert(joinedGraph);
+    SegmentedVariantGraph segmentedVariantGraph = SegmentedVariantGraph.create(joinedGraph);
     
     // NOTE: forget the normal variant graph after this point; only use the segmented one!
     // TODO: look at the other piece of code also!
-    VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
     List<IApparatusEntry> entries = Lists.newArrayList();
-    Iterator<IRankedVariantGraphVertex> iterator = ranker.iterator();
-    Iterator<ISegmentedVariantGraphVertex> vertexIterator = segmentedVariantGraph.iterator();
+    Iterator<RankedVariantGraphVertex> iterator = segmentedVariantGraph.getRankedVertices().iterator();
+    Iterator<SegmentedVariantGraphVertex> vertexIterator = segmentedVariantGraph.iterator();
     //skip startVertex
     vertexIterator.next();
     while(iterator.hasNext()) {
       //nextVertex is a IRankedVariantGraphVertex which is not the 
       //same as a real vertex!
-      IRankedVariantGraphVertex nextVertex = iterator.next();
-      ISegmentedVariantGraphVertex next = vertexIterator.next();
-      if (next.equals(segmentedVariantGraph.getEndVertex())) {
+      RankedVariantGraphVertex nextVertex = iterator.next();
+      SegmentedVariantGraphVertex next = vertexIterator.next();
+      if (next.equals(segmentedVariantGraph.getEnd())) {
         continue;
       }
       IApparatusEntry apparatusEntry;

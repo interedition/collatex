@@ -20,17 +20,15 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import java.util.Iterator;
-import java.util.List;
-
-import eu.interedition.collatex.implementation.graph.ranked.IRankedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.ranked.VariantGraphRanker;
-import eu.interedition.collatex.implementation.graph.segmented.ISegmentedVariantGraph;
-import eu.interedition.collatex.implementation.graph.segmented.NonSegmentedGraphConverter;
+import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
 import eu.interedition.collatex.interfaces.IColumn;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
+
+import java.util.Iterator;
+import java.util.List;
 
 //TODO: remove explicit dependency on ranked graph implementation classes!
 //TODO: The maximum dependency is implementation classes of the same package!
@@ -43,17 +41,15 @@ public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
   }
 
   private void init() {
-    NonSegmentedGraphConverter converter = new NonSegmentedGraphConverter();
-    ISegmentedVariantGraph segmentedVariantGraph = converter.convertGraph(graph);
-    VariantGraphRanker ranker = new VariantGraphRanker(segmentedVariantGraph);
-    Iterator<IRankedVariantGraphVertex> iterator = ranker.iterator();
+    SegmentedVariantGraph segmentedVariantGraph = SegmentedVariantGraph.create(graph);
+    Iterator<RankedVariantGraphVertex> iterator = segmentedVariantGraph.getRankedVertices().iterator();
     Iterator<IVariantGraphVertex> vertexIterator = graph.iterator();
     //skip startVertex
     vertexIterator.next();
     while(iterator.hasNext()) {
       //nextVertex is a IRankedVariantGraphVertex which is not the 
       //same as a real vertex!
-      IRankedVariantGraphVertex nextVertex = iterator.next();
+      RankedVariantGraphVertex nextVertex = iterator.next();
       IVariantGraphVertex next = vertexIterator.next();
       if (next.equals(graph.getEndVertex())) {
         continue;

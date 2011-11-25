@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.joined.*;
+import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
+import eu.interedition.collatex.implementation.graph.JoinedVariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.JoinedVariantGraphVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

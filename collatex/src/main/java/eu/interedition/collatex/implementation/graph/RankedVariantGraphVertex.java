@@ -18,18 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.graph.segmented;
+package eu.interedition.collatex.implementation.graph;
 
-import java.util.Iterator;
+public class RankedVariantGraphVertex {
 
-import org.jgrapht.DirectedGraph;
+  private final int rank;
+  private final SegmentedVariantGraphVertex vertex;
 
-import eu.interedition.collatex.interfaces.IVariantGraphEdge;
+  public RankedVariantGraphVertex(int rank, SegmentedVariantGraphVertex vertex) {
+    this.rank = rank;
+    this.vertex = vertex;
+  }
 
-public interface ISegmentedVariantGraph extends DirectedGraph<ISegmentedVariantGraphVertex, IVariantGraphEdge> {
+  public int getRank() {
+    return rank;
+  }
 
-  Iterator<ISegmentedVariantGraphVertex> iterator();
-
-  ISegmentedVariantGraphVertex getEndVertex();
+  public SegmentedVariantGraphVertex getVertex() {
+    return vertex;
+  }
 
 }

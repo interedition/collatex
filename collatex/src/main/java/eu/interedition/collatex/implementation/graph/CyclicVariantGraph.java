@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.graph.cyclic;
+package eu.interedition.collatex.implementation.graph;
 
 import java.util.Iterator;
 import java.util.List;
@@ -27,8 +27,6 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import eu.interedition.collatex.implementation.graph.VariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IToken;
 import eu.interedition.collatex.interfaces.IVariantGraph;

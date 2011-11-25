@@ -21,7 +21,7 @@
 package eu.interedition.collatex.implementation.output;
 
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.implementation.graph.segmented.ISegmentedVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraphVertex;
 import eu.interedition.collatex.interfaces.ApparatusEntryState;
 import eu.interedition.collatex.interfaces.IApparatusEntry;
 import eu.interedition.collatex.interfaces.INormalizedToken;
@@ -34,14 +34,14 @@ import java.util.Set;
 public class ApparatusEntry implements IApparatusEntry {
 
   private final List<IWitness> witnesses;
-  private final Set<ISegmentedVariantGraphVertex> vertices;
+  private final Set<SegmentedVariantGraphVertex> vertices;
   
   public ApparatusEntry(List<IWitness> witnesses) {
     this.witnesses = witnesses;
     this.vertices = Sets.newLinkedHashSet();
   }
   
-  public void addVertex(ISegmentedVariantGraphVertex vertex) {
+  public void addVertex(SegmentedVariantGraphVertex vertex) {
     vertices.add(vertex);
   }
 
@@ -54,8 +54,8 @@ public class ApparatusEntry implements IApparatusEntry {
   //TODO: rename!
   @Override
   public boolean containsWitness(IWitness witness) {
-    ISegmentedVariantGraphVertex result = null;
-    for (ISegmentedVariantGraphVertex vertex : vertices) {
+    SegmentedVariantGraphVertex result = null;
+    for (SegmentedVariantGraphVertex vertex : vertices) {
       if (vertex.containsWitness(witness)) {
         result = vertex;
         break;
@@ -67,8 +67,8 @@ public class ApparatusEntry implements IApparatusEntry {
   //Note: an empty cell returns an empty phrase!
   @Override
   public List<INormalizedToken> getPhrase(final IWitness witness) {
-    ISegmentedVariantGraphVertex result = null;
-    for (ISegmentedVariantGraphVertex vertex : vertices) {
+    SegmentedVariantGraphVertex result = null;
+    for (SegmentedVariantGraphVertex vertex : vertices) {
       if (vertex.containsWitness(witness)) {
         result = vertex;
         break;
@@ -80,7 +80,7 @@ public class ApparatusEntry implements IApparatusEntry {
   @Override
   public boolean hasEmptyCells() {
     int nonEmptyWitnessSize = 0;
-    for (ISegmentedVariantGraphVertex vertex : vertices) {
+    for (SegmentedVariantGraphVertex vertex : vertices) {
       nonEmptyWitnessSize += vertex.getWitnesses().size();
     }
     return getWitnesses().size() != nonEmptyWitnessSize;
