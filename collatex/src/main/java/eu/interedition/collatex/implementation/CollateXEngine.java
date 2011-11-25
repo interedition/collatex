@@ -26,7 +26,7 @@ import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
-import eu.interedition.collatex.implementation.output.ParallelSegmentationApparatus;
+import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.interfaces.*;
@@ -99,7 +99,7 @@ public class CollateXEngine {
     return table;
   }
 
-  public IApparatus createApparatus(final IVariantGraph variantGraph) {
-    return ParallelSegmentationApparatus.build(variantGraph);
+  public Apparatus createApparatus(final IVariantGraph variantGraph) {
+    return Apparatus.create(variantGraph);
   }
 }

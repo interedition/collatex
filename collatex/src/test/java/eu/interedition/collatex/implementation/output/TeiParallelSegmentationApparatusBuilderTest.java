@@ -54,10 +54,10 @@ public class TeiParallelSegmentationApparatusBuilderTest extends AbstractTest {
     final IWitness[] witnesses = createWitnesses(witnessContents);
 
     final Document xml = documentBuilder.newDocument();
-    final Element root = xml.createElementNS(TeiParallelSegmentationApparatusBuilder.TEI_NS, "text");
+    final Element root = xml.createElementNS(Apparatus.TEI_NS, "text");
     xml.appendChild(root);
 
-    TeiParallelSegmentationApparatusBuilder.build(ParallelSegmentationApparatus.build(merge(witnesses)), root);
+    Apparatus.create(merge(witnesses)).serialize(root);
     StringWriter out = new StringWriter();
     transformer.transform(new DOMSource(xml), new StreamResult(out));
     final String result = out.toString();

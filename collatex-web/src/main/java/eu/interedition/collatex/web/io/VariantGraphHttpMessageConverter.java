@@ -1,10 +1,9 @@
 package eu.interedition.collatex.web.io;
 
-import eu.interedition.collatex.web.GraphVizService;
 import eu.interedition.collatex.implementation.CollateXEngine;
 import eu.interedition.collatex.implementation.output.GraphMLBuilder;
-import eu.interedition.collatex.implementation.output.TeiParallelSegmentationApparatusBuilder;
 import eu.interedition.collatex.interfaces.IVariantGraph;
+import eu.interedition.collatex.web.GraphVizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -113,7 +112,7 @@ public class VariantGraphHttpMessageConverter extends AbstractHttpMessageConvert
         xml.appendChild(root);
         root.setAttribute("xmlns", TEI_NS);
 
-        TeiParallelSegmentationApparatusBuilder.build(new CollateXEngine().createApparatus(vg), root);
+        new CollateXEngine().createApparatus(vg).serialize(root);
 
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         TransformerUtils.enableIndenting(transformer, 4);

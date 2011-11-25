@@ -25,7 +25,7 @@ import eu.interedition.collatex.implementation.CollateXEngine;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
-import eu.interedition.collatex.interfaces.IApparatus;
+import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.springframework.beans.factory.InitializingBean;
@@ -68,7 +68,7 @@ public class ExamplesController implements InitializingBean {
 
   @RequestMapping("darwin")
   public ModelMap collateDarwin() {
-    List<IApparatus> alignments = Lists.newArrayListWithCapacity(darwin.size());
+    List<Apparatus> alignments = Lists.newArrayListWithCapacity(darwin.size());
     
    for (IWitness[] paragraph : darwin) {
       IVariantGraph graph = engine.graph(paragraph);
