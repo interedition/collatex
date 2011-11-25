@@ -6,9 +6,9 @@ import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.joined.JVariantGraphCreator;
+import eu.interedition.collatex.implementation.graph.joined.JoinedVariantGraph;
+import eu.interedition.collatex.implementation.graph.joined.JoinedVariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.joined.JoinedVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.jgrapht.ext.DOTExporter;
@@ -37,7 +37,7 @@ public class GraphVizService implements InitializingBean {
   }
 
   public void toDot(IVariantGraph vg, Writer out) {
-    JDOT_EXPORTER.export(out, new JVariantGraphCreator().parallelSegmentate(vg));
+    JDOT_EXPORTER.export(out, JoinedVariantGraph.create(vg));
   }
 
   public boolean isSvgAvailable() {
@@ -94,17 +94,17 @@ public class GraphVizService implements InitializingBean {
     this.dotPath = (dotExecutable.canExecute() ? dotExecutable.getCanonicalPath() : null);
   }
 
-  private static final VertexNameProvider<IJVariantGraphVertex> JVERTEX_ID_PROVIDER = new IntegerNameProvider<IJVariantGraphVertex>();
+  private static final VertexNameProvider<JoinedVariantGraphVertex> JVERTEX_ID_PROVIDER = new IntegerNameProvider<JoinedVariantGraphVertex>();
 
-  private static final VertexNameProvider<IJVariantGraphVertex> JVERTEX_LABEL_PROVIDER = new VertexNameProvider<IJVariantGraphVertex>() {
+  private static final VertexNameProvider<JoinedVariantGraphVertex> JVERTEX_LABEL_PROVIDER = new VertexNameProvider<JoinedVariantGraphVertex>() {
     @Override
-    public String getVertexName(IJVariantGraphVertex v) {
+    public String getVertexName(JoinedVariantGraphVertex v) {
       return v.getNormalized();
     }
   };
-  private static final EdgeNameProvider<IJVariantGraphEdge> JEDGE_LABEL_PROVIDER = new EdgeNameProvider<IJVariantGraphEdge>() {
+  private static final EdgeNameProvider<JoinedVariantGraphEdge> JEDGE_LABEL_PROVIDER = new EdgeNameProvider<JoinedVariantGraphEdge>() {
     @Override
-    public String getEdgeName(IJVariantGraphEdge e) {
+    public String getEdgeName(JoinedVariantGraphEdge e) {
       List<String> sigils = Lists.newArrayList();
       for (IWitness witness : e.getWitnesses()) {
         sigils.add(witness.getSigil());
@@ -114,7 +114,7 @@ public class GraphVizService implements InitializingBean {
     }
   };
 
-  private static final DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge> JDOT_EXPORTER = new DOTExporter<IJVariantGraphVertex, IJVariantGraphEdge>(//
+  private static final DOTExporter<JoinedVariantGraphVertex, JoinedVariantGraphEdge> JDOT_EXPORTER = new DOTExporter<JoinedVariantGraphVertex, JoinedVariantGraphEdge>(//
           JVERTEX_ID_PROVIDER, JVERTEX_LABEL_PROVIDER, JEDGE_LABEL_PROVIDER //
   );
 }

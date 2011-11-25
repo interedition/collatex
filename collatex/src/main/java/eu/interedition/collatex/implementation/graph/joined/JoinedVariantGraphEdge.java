@@ -22,10 +22,27 @@ package eu.interedition.collatex.implementation.graph.joined;
 
 import java.util.Set;
 
+import eu.interedition.collatex.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex.interfaces.IWitness;
 
-public interface IJVariantGraphEdge {
+public class JoinedVariantGraphEdge {
+  private final Set<IWitness> witnesses;
+  private final JoinedVariantGraphVertex from;
+  private final JoinedVariantGraphVertex to;
 
-  Set<IWitness> getWitnesses();
+  public JoinedVariantGraphEdge(JoinedVariantGraphVertex from, JoinedVariantGraphVertex to, IVariantGraphEdge source) {
+    this.from = from;
+    this.to = to;
+    this.witnesses = source.getWitnesses();
+  }
+
+  public Set<IWitness> getWitnesses() {
+    return witnesses;
+  }
+
+  @Override
+  public String toString() {
+    return from + " --{" + witnesses + "}-> " + to;
+  }
 
 }
