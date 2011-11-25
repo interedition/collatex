@@ -1,10 +1,10 @@
 package eu.interedition.collatex.web.io;
 
 import eu.interedition.collatex.web.GraphVizService;
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.output.apparatus.TeiParallelSegmentationApparatusBuilder;
-import eu.interedition.collatex2.implementation.output.graphml.GraphMLBuilder;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
+import eu.interedition.collatex.implementation.CollateXEngine;
+import eu.interedition.collatex.implementation.output.GraphMLBuilder;
+import eu.interedition.collatex.implementation.output.TeiParallelSegmentationApparatusBuilder;
+import eu.interedition.collatex.interfaces.IVariantGraph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;

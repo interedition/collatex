@@ -5,12 +5,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Comparator;
 
-import eu.interedition.collatex2.implementation.CollateXEngine;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraph;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphCreator;
-import eu.interedition.collatex2.implementation.matching.EditDistanceTokenComparator;
-import eu.interedition.collatex2.interfaces.INormalizedToken;
-import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex.implementation.CollateXEngine;
+import eu.interedition.collatex.implementation.graph.edit.EditGraph;
+import eu.interedition.collatex.implementation.graph.edit.EditGraphCreator;
+import eu.interedition.collatex.implementation.matching.EditDistanceTokenComparator;
+import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.IWitness;
 
 import org.junit.Test;
 

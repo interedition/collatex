@@ -1,7 +1,7 @@
 package eu.interedition.collatex.web.io;
 
 import com.google.common.collect.Iterables;
-import eu.interedition.collatex2.interfaces.*;
+import eu.interedition.collatex.interfaces.*;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;

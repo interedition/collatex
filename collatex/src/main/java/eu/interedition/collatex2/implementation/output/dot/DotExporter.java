@@ -12,13 +12,13 @@ import java.util.List;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex2.implementation.edit_graph.EditGraph;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphEdge;
-import eu.interedition.collatex2.implementation.edit_graph.EditGraphVertex;
-import eu.interedition.collatex2.interfaces.IVariantGraph;
-import eu.interedition.collatex2.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex2.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex2.interfaces.IWitness;
+import eu.interedition.collatex.implementation.graph.edit.EditGraph;
+import eu.interedition.collatex.implementation.graph.edit.EditGraphEdge;
+import eu.interedition.collatex.implementation.graph.edit.EditGraphVertex;
+import eu.interedition.collatex.interfaces.IVariantGraph;
+import eu.interedition.collatex.interfaces.IVariantGraphEdge;
+import eu.interedition.collatex.interfaces.IVariantGraphVertex;
+import eu.interedition.collatex.interfaces.IWitness;
 
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
