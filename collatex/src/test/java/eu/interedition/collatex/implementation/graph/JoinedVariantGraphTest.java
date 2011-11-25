@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.output;
+package eu.interedition.collatex.implementation.graph;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraphVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +36,8 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.interfaces.IWitness;
 
-public class JVariantGraphCreatorTest extends AbstractTest {
-  private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreatorTest.class);
+public class JoinedVariantGraphTest extends AbstractTest {
+  private static final Logger LOG = LoggerFactory.getLogger(JoinedVariantGraphTest.class);
 
   @Test
   public void joinTwoIdenticalWitnesses() {

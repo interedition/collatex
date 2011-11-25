@@ -23,13 +23,9 @@ package eu.interedition.collatex.implementation.output;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.*;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
-import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
 import eu.interedition.collatex.implementation.graph.SegmentedVariantGraphVertex;
 import eu.interedition.collatex.implementation.input.Token;
 import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,7 +39,7 @@ public class Apparatus {
   private final List<Entry> entries;
   private final SortedSet<IWitness> witnesses;
 
-  private Apparatus(SortedSet<IWitness> witnesses, final List<Entry> entries) {
+  public Apparatus(SortedSet<IWitness> witnesses, final List<Entry> entries) {
     this.witnesses = witnesses;
     this.entries = entries;
   }
@@ -56,46 +52,6 @@ public class Apparatus {
     return witnesses;
   }
   
-  /**
-   * Factory method that builds a ParallelSegmentationApparatus from a VariantGraph
-   * 
-   */
-  public static Apparatus create(IVariantGraph graph) {
-    // we first create a SegmentedVariantGraph from the IVariantGraph
-    // therefore create a JoinedGraph first
-    JoinedVariantGraph joinedGraph = JoinedVariantGraph.create(graph);
-    SegmentedVariantGraph segmentedVariantGraph = SegmentedVariantGraph.create(joinedGraph);
-    
-    // NOTE: forget the normal variant graph after this point; only use the segmented one!
-    // TODO: look at the other piece of code also!
-    List<Entry> entries = Lists.newArrayList();
-    Iterator<RankedVariantGraphVertex> iterator = segmentedVariantGraph.getRankedVertices().iterator();
-    Iterator<SegmentedVariantGraphVertex> vertexIterator = segmentedVariantGraph.iterator();
-    //skip startVertex
-    vertexIterator.next();
-    while(iterator.hasNext()) {
-      //nextVertex is a IRankedVariantGraphVertex which is not the 
-      //same as a real vertex!
-      RankedVariantGraphVertex nextVertex = iterator.next();
-      SegmentedVariantGraphVertex next = vertexIterator.next();
-      if (next.equals(segmentedVariantGraph.getEnd())) {
-        continue;
-      }
-      Entry entry;
-      int rank = nextVertex.getRank();
-      if (rank>entries.size()) {
-        entry = new Entry(graph.getWitnesses());
-        entries.add(entry);
-      } else {
-        entry = entries.get(rank-1);
-      }
-      entry.contents.add(next);
-    }
-    
-    // convert SegmentedVariantGraph to ParallelSegmentationApparatus
-    return new Apparatus(graph.getWitnesses(), entries);
-  }
-
   public void serialize(Node parent) {
     Document doc = (parent.getNodeType() == Node.DOCUMENT_NODE ? (Document) parent : parent.getOwnerDocument());
     // FIXME: this should be dealt with on the tokenizer level!
@@ -149,12 +105,16 @@ public class Apparatus {
     private final Set<SegmentedVariantGraphVertex> contents = Sets.newLinkedHashSet();
     private final SortedSet<IWitness> witnesses;
 
-    private Entry(SortedSet<IWitness> witnesses) {
+    public Entry(SortedSet<IWitness> witnesses) {
       this.witnesses = witnesses;
     }
 
     public SortedSet<IWitness> getWitnesses() {
       return witnesses;
+    }
+
+    public void add(SegmentedVariantGraphVertex content) {
+      this.contents.add(content);
     }
 
     public boolean covers(IWitness witness) {

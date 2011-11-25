@@ -24,12 +24,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.*;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 
 /**
@@ -42,6 +45,7 @@ import java.util.Map;
  */
 @SuppressWarnings("serial")
 public class SegmentedVariantGraph extends DirectedAcyclicGraph<SegmentedVariantGraphVertex, IVariantGraphEdge> {
+  private final SortedSet<IWitness> witnesses = Sets.newTreeSet();
   private SegmentedVariantGraphVertex end;
 
   public static SegmentedVariantGraph create(JoinedVariantGraph joined) {
@@ -65,6 +69,7 @@ public class SegmentedVariantGraph extends DirectedAcyclicGraph<SegmentedVariant
     }
 
     for (JoinedVariantGraphEdge edge : joined.edgeSet()) {
+      segmentedVariantGraph.witnesses.addAll(edge.getWitnesses());
       // FIXME: newEdge is never added to the graph?
       final IVariantGraphEdge newEdge = new VariantGraphEdge();
       for (IWitness witness : edge.getWitnesses()) {
@@ -101,6 +106,39 @@ public class SegmentedVariantGraph extends DirectedAcyclicGraph<SegmentedVariant
     }
     return segmentedGraph;
   }
+
+  /**
+   * Factory method that builds a ParallelSegmentationApparatus from a VariantGraph
+   *
+   */
+  public Apparatus toApparatus() {
+    List<Apparatus.Entry> entries = Lists.newArrayList();
+    Iterator<RankedVariantGraphVertex> iterator = getRankedVertices().iterator();
+    Iterator<SegmentedVariantGraphVertex> vertexIterator = iterator();
+    //skip startVertex
+    vertexIterator.next();
+    while(iterator.hasNext()) {
+      //nextVertex is a IRankedVariantGraphVertex which is not the
+      //same as a real vertex!
+      RankedVariantGraphVertex nextVertex = iterator.next();
+      SegmentedVariantGraphVertex next = vertexIterator.next();
+      if (next.equals(getEnd())) {
+        continue;
+      }
+      Apparatus.Entry entry;
+      int rank = nextVertex.getRank();
+      if (rank>entries.size()) {
+        entry = new Apparatus.Entry(witnesses);
+        entries.add(entry);
+      } else {
+        entry = entries.get(rank-1);
+      }
+      entry.add(next);
+    }
+
+    return new Apparatus(witnesses, entries);
+  }
+
 
   private SegmentedVariantGraph() {
     super(VariantGraphEdge.class);

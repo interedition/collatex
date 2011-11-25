@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.output;
+package eu.interedition.collatex.implementation.graph;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.CyclicVariantGraph;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;

@@ -22,6 +22,8 @@
 
 package eu.interedition.collatex.implementation;
 
+import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
@@ -100,6 +102,6 @@ public class CollateXEngine {
   }
 
   public Apparatus createApparatus(final IVariantGraph variantGraph) {
-    return Apparatus.create(variantGraph);
+    return SegmentedVariantGraph.create(JoinedVariantGraph.create(variantGraph)).toApparatus();
   }
 }
