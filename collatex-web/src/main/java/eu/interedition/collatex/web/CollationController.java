@@ -28,6 +28,7 @@ import eu.interedition.collatex.implementation.CollateXEngine;
 import eu.interedition.collatex.implementation.graph.CyclicVariantGraph;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
+import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.interfaces.*;
 import eu.interedition.collatex.web.model.Collation;
 import eu.interedition.collatex.web.model.Token;
@@ -58,7 +59,7 @@ public class CollationController {
 
   @RequestMapping(value = "/align", method = RequestMethod.POST)
   @ResponseBody
-  public IAlignmentTable align(@RequestBody Collation collation) throws Exception {
+  public AlignmentTable align(@RequestBody Collation collation) throws Exception {
     return new CollateXEngine().align(checkAndExtractWitnesses(collation));
   }
 

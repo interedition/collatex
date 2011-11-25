@@ -6,6 +6,7 @@ import com.google.common.collect.*;
 import eu.interedition.collatex.implementation.CollateXEngine;
 import eu.interedition.collatex.implementation.input.Token;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
+import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.implementation.output.Cell;
 import eu.interedition.collatex.implementation.output.Row;
 import eu.interedition.collatex.interfaces.*;
@@ -82,7 +83,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   private void sendAlignmentTable() throws SAXException {
     sendStartElementEventNS("alignment", EMPTY_ATTRIBUTES);
     if (!witnesses.isEmpty()) {
-      final IAlignmentTable alignmentTable = engine.align(witnesses.toArray(new IWitness[witnesses.size()]));
+      final AlignmentTable alignmentTable = engine.align(witnesses.toArray(new IWitness[witnesses.size()]));
       for (Row row : alignmentTable.getRows()) {
         final AttributesImpl rowAttrs = new AttributesImpl();
         rowAttrs.addAttribute(namespaceURI, "sigil", "sigil", "CDATA", row.getSigil());

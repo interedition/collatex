@@ -20,6 +20,7 @@
 
 package eu.interedition.collatex.implementation.output;
 
+import com.google.common.collect.Lists;
 import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
 import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
 import eu.interedition.collatex.interfaces.IVariantGraph;
@@ -29,12 +30,16 @@ import eu.interedition.collatex.interfaces.IWitness;
 import java.util.Iterator;
 import java.util.List;
 
-//TODO: remove explicit dependency on ranked graph implementation classes!
-//TODO: The maximum dependency is implementation classes of the same package!
-public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
+/**
+ *
+ * A table consisting of rows as witnesses and columns containing aligned tokens
+ *
+ */
+public class AlignmentTable {
   private final IVariantGraph graph;
+  protected final List<Column> columns = Lists.newArrayList();
 
-  public RankedGraphBasedAlignmentTable(IVariantGraph graph) {
+  public AlignmentTable(IVariantGraph graph) {
     this.graph = graph;
     init();
   }
@@ -70,9 +75,65 @@ public class RankedGraphBasedAlignmentTable extends BaseAlignmentTable {
     return column;
   }
   
-  @Override
   public final List<IWitness> getWitnesses() {
     return graph.getWitnesses();
   }
 
+  /**
+   * Retrieve the alignment table rows.
+   * Each row represents a single witness.
+   *
+   * @return alignment table rows
+   */
+  public final List<Row> getRows() {
+    List<Row> rows = Lists.newArrayList();
+    for (IWitness witness: getWitnesses()) {
+      rows.add(getRow(witness));
+    }
+    return rows;
+  }
+
+  public final Row getRow(IWitness witness) {
+    List<Cell> cells = Lists.newArrayList();
+    for (Column column : columns) {
+      Cell cell = new Cell(column, witness);
+      cells.add(cell);
+    }
+    return new Row(witness.getSigil(), cells);
+  }
+
+  public final boolean isEmpty() {
+    return size()==0;
+  }
+
+  public final int size() {
+    return getColumns().size();
+  }
+
+  public final List<Column> getColumns() {
+    return columns;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder stringBuilder = new StringBuilder();
+    for (final Row row : getRows()) {
+      stringBuilder.append(row.getSigil()).append(": ");
+      String delim = "";
+      for (final Cell cell : row) {
+        stringBuilder.append(delim).append(cellToString(cell));
+        delim = "|";
+      }
+      stringBuilder.append("\n");
+    }
+    return stringBuilder.toString();
+  }
+
+  String cellToString(final Cell cell) {
+    if (cell.isEmpty()) {
+      return " ";
+    }
+    //TODO should not be getnormalized!
+    return cell.getToken().getNormalized().toString();
+  }
 }

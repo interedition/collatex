@@ -1,6 +1,7 @@
 package eu.interedition.collatex.web.io;
 
 import com.google.common.collect.Iterables;
+import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.implementation.output.Column;
 import eu.interedition.collatex.interfaces.*;
 import org.codehaus.jackson.JsonGenerator;
@@ -13,15 +14,15 @@ import java.util.List;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AlignmentTableSerializer extends JsonSerializer<IAlignmentTable> {
+public class AlignmentTableSerializer extends JsonSerializer<AlignmentTable> {
 
   @Override
-  public Class<IAlignmentTable> handledType() {
-    return IAlignmentTable.class;
+  public Class<AlignmentTable> handledType() {
+    return AlignmentTable.class;
   }
 
   @Override
-  public void serialize(IAlignmentTable value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+  public void serialize(AlignmentTable value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
     final List<IWitness> witnesses = value.getWitnesses();
     final List<Column> columns = value.getColumns();
 

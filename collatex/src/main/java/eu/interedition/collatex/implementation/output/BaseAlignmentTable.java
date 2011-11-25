@@ -24,17 +24,15 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.interfaces.IAlignmentTable;
 import eu.interedition.collatex.interfaces.IWitness;
 
-public abstract class BaseAlignmentTable implements IAlignmentTable {
+public abstract class BaseAlignmentTable {
   protected final List<Column> columns;
 
   public BaseAlignmentTable() {
     this.columns = Lists.newArrayList();
   }
 
-  @Override
   public final List<Row> getRows() {
     List<Row> rows = Lists.newArrayList();
     for (IWitness witness : getWitnesses()) {
@@ -43,7 +41,6 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
     return rows;
   }
 
-  @Override
   public final Row getRow(IWitness witness) {
     List<Cell> cells = Lists.newArrayList();
     for (Column column : columns) {
@@ -53,22 +50,18 @@ public abstract class BaseAlignmentTable implements IAlignmentTable {
     return new Row(witness.getSigil(), cells);
   }
 
-  @Override
   public final boolean isEmpty() {
     return size() == 0;
   }
 
-  @Override
   public final int size() {
     return getColumns().size();
   }
 
-  @Override
   public final List<Column> getColumns() {
     return columns;
   }
 
-  @Override
   public abstract List<IWitness> getWitnesses();
 
   @Override

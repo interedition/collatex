@@ -31,9 +31,8 @@ import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.implementation.output.ParallelSegmentationApparatus;
-import eu.interedition.collatex.implementation.output.RankedGraphBasedAlignmentTable;
-import eu.interedition.collatex.interfaces.IAlignmentTable;
 import eu.interedition.collatex.interfaces.IApparatus;
 import eu.interedition.collatex.interfaces.ITokenLinker;
 import eu.interedition.collatex.interfaces.ITokenNormalizer;
@@ -107,9 +106,9 @@ public class CollateXEngine {
    * We're not sure what we want to do with the name of this method: alignment vs. collation
    * Terminology check
    */
-  public IAlignmentTable align(IWitness... witnesses) {
+  public AlignmentTable align(IWitness... witnesses) {
     IVariantGraph vg = graph(witnesses);
-    RankedGraphBasedAlignmentTable table = new RankedGraphBasedAlignmentTable(vg);
+    AlignmentTable table = new AlignmentTable(vg);
     return table;
   }
 

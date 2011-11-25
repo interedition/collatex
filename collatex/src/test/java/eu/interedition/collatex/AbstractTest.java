@@ -2,11 +2,10 @@ package eu.interedition.collatex;
 
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
-import eu.interedition.collatex.implementation.input.WitnessBuilder;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
-import eu.interedition.collatex.implementation.output.RankedGraphBasedAlignmentTable;
-import eu.interedition.collatex.interfaces.IAlignmentTable;
+import eu.interedition.collatex.implementation.input.WitnessBuilder;
+import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.interfaces.ITokenizer;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -51,16 +50,16 @@ public abstract class AbstractTest {
     return merge(createWitnesses(witnesses));
   }
 
-  protected IAlignmentTable align(IVariantGraph graph) {
-    return new RankedGraphBasedAlignmentTable(graph);
+  protected AlignmentTable align(IVariantGraph graph) {
+    return new AlignmentTable(graph);
   }
 
-  protected IAlignmentTable align(IWitness... witnesses) {
-    return new RankedGraphBasedAlignmentTable(merge(witnesses));
+  protected AlignmentTable align(IWitness... witnesses) {
+    return new AlignmentTable(merge(witnesses));
   }
 
-  protected IAlignmentTable align(String... witnesses) {
-    return new RankedGraphBasedAlignmentTable(merge(witnesses));
+  protected AlignmentTable align(String... witnesses) {
+    return new AlignmentTable(merge(witnesses));
   }
 
 }
