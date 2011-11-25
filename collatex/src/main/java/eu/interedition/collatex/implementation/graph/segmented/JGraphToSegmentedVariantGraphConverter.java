@@ -23,13 +23,13 @@ package eu.interedition.collatex.implementation.graph.segmented;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.implementation.graph.VariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.joined.JoinedVariantGraph;
+import eu.interedition.collatex.implementation.graph.joined.JoinedVariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.joined.JoinedVariantGraphVertex;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IVariantGraphEdge;
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraph;
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraphVertex;
 
 import java.util.List;
 import java.util.Map;
@@ -37,27 +37,27 @@ import java.util.Set;
 
 public class JGraphToSegmentedVariantGraphConverter {
 
-  public ISegmentedVariantGraph convert(IJVariantGraph joinedVariantGraph) {
-    Set<IJVariantGraphVertex> vertexSet = joinedVariantGraph.vertexSet();
-    Map<IJVariantGraphVertex, ISegmentedVariantGraphVertex> newVertices = createNewVertices(vertexSet);
+  public ISegmentedVariantGraph convert(JoinedVariantGraph joinedVariantGraph) {
+    Set<JoinedVariantGraphVertex> vertexSet = joinedVariantGraph.vertexSet();
+    Map<JoinedVariantGraphVertex, ISegmentedVariantGraphVertex> newVertices = createNewVertices(vertexSet);
     SegmentedVariantGraph segmentedVariantGraph = new SegmentedVariantGraph();
     for (ISegmentedVariantGraphVertex vertex : newVertices.values()) {
       segmentedVariantGraph.addVertex(vertex);
     }
     addEdgesToGraph(joinedVariantGraph, newVertices, segmentedVariantGraph);
     // set new end vertex
-    ISegmentedVariantGraphVertex newEndVertex = newVertices.get(joinedVariantGraph.getEndVertex());
+    ISegmentedVariantGraphVertex newEndVertex = newVertices.get(joinedVariantGraph.getEnd());
     segmentedVariantGraph.setEndVertex(newEndVertex);
     return segmentedVariantGraph;
   }
 
-  private void addEdgesToGraph(IJVariantGraph joinedVariantGraph,
-      Map<IJVariantGraphVertex, ISegmentedVariantGraphVertex> newVertices,
+  private void addEdgesToGraph(JoinedVariantGraph joinedVariantGraph,
+      Map<JoinedVariantGraphVertex, ISegmentedVariantGraphVertex> newVertices,
       ISegmentedVariantGraph segmentedVariantGraph) {
-    Set<IJVariantGraphEdge> edgeSet = joinedVariantGraph.edgeSet();
-    for (IJVariantGraphEdge edge : edgeSet) {
-      IJVariantGraphVertex edgeSource = joinedVariantGraph.getEdgeSource(edge);    
-      IJVariantGraphVertex edgeTarget = joinedVariantGraph.getEdgeTarget(edge);
+    Set<JoinedVariantGraphEdge> edgeSet = joinedVariantGraph.edgeSet();
+    for (JoinedVariantGraphEdge edge : edgeSet) {
+      JoinedVariantGraphVertex edgeSource = joinedVariantGraph.getEdgeSource(edge);
+      JoinedVariantGraphVertex edgeTarget = joinedVariantGraph.getEdgeTarget(edge);
       IVariantGraphEdge newEdge = new VariantGraphEdge();
       for (IWitness witness : edge.getWitnesses()) {
         newEdge.addWitness(witness);
@@ -68,10 +68,10 @@ public class JGraphToSegmentedVariantGraphConverter {
     }
   }
 
-  private Map<IJVariantGraphVertex, ISegmentedVariantGraphVertex> createNewVertices(Set<IJVariantGraphVertex> vertexSet) {
-    Map<IJVariantGraphVertex, ISegmentedVariantGraphVertex> newVertices = Maps.newLinkedHashMap();
-    for (IJVariantGraphVertex vertex : vertexSet) {
-      List<IVariantGraphVertex> vertices = vertex.getVariantGraphVertices();
+  private Map<JoinedVariantGraphVertex, ISegmentedVariantGraphVertex> createNewVertices(Set<JoinedVariantGraphVertex> vertexSet) {
+    Map<JoinedVariantGraphVertex, ISegmentedVariantGraphVertex> newVertices = Maps.newLinkedHashMap();
+    for (JoinedVariantGraphVertex vertex : vertexSet) {
+      List<IVariantGraphVertex> vertices = vertex.getSources();
       Set<IWitness> witnesses = vertex.getWitnesses();
       Map<IWitness, List<INormalizedToken>> phraseForEachWitness = Maps.newLinkedHashMap();
       for (IWitness witness : witnesses) {

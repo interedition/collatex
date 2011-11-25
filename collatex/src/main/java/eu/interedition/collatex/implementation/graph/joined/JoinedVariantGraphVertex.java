@@ -23,15 +23,41 @@ package eu.interedition.collatex.implementation.graph.joined;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
-public interface IJVariantGraphVertex {
-  String getNormalized();
+public class JoinedVariantGraphVertex {
+  private final StringBuilder normalized;
+  private final Set<IWitness> witnesses;
+  private final List<IVariantGraphVertex> sources;
 
-  void addVariantGraphVertex(IVariantGraphVertex nextVertex);
+  public JoinedVariantGraphVertex(IVariantGraphVertex source) {
+    this.normalized = new StringBuilder(source.getNormalized());
+    this.witnesses = source.getWitnesses();
+    this.sources = Lists.newArrayList(source);
+  }
 
-  Set<IWitness> getWitnesses();
+  public String getNormalized() {
+    return normalized.toString();
+  }
 
-  List<IVariantGraphVertex> getVariantGraphVertices();
+  public Set<IWitness> getWitnesses() {
+    return witnesses;
+  }
+
+  public List<IVariantGraphVertex> getSources() {
+    return sources;
+  }
+
+  public void add(IVariantGraphVertex source) {
+    this.sources.add(source);
+    this.normalized.append(" ").append(source.getNormalized());
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder().append("{").append(getNormalized()).append("}").toString();
+  }
 }

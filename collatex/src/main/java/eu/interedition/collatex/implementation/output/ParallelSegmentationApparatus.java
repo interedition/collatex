@@ -20,16 +20,8 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import java.util.Iterator;
-import java.util.List;
-
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
-
-import eu.interedition.collatex.implementation.graph.joined.JVariantGraphCreator;
+import eu.interedition.collatex.implementation.graph.joined.JoinedVariantGraph;
 import eu.interedition.collatex.implementation.graph.ranked.IRankedVariantGraphVertex;
 import eu.interedition.collatex.implementation.graph.ranked.VariantGraphRanker;
 import eu.interedition.collatex.implementation.graph.segmented.ISegmentedVariantGraph;
@@ -39,6 +31,11 @@ import eu.interedition.collatex.interfaces.IApparatus;
 import eu.interedition.collatex.interfaces.IApparatusEntry;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class ParallelSegmentationApparatus implements IApparatus {
   private static Logger logger = LoggerFactory.getLogger(ParallelSegmentationApparatus.class);
@@ -64,8 +61,7 @@ public class ParallelSegmentationApparatus implements IApparatus {
   public static ParallelSegmentationApparatus build(IVariantGraph graph) {
     // we first create a SegmentedVariantGraph from the IVariantGraph
     // therefore create a JoinedGraph first
-    JVariantGraphCreator creator = new JVariantGraphCreator();
-    IJVariantGraph joinedGraph = creator.parallelSegmentate(graph);
+    JoinedVariantGraph joinedGraph = JoinedVariantGraph.create(graph);
     JGraphToSegmentedVariantGraphConverter converter = new JGraphToSegmentedVariantGraphConverter();
     ISegmentedVariantGraph segmentedVariantGraph = converter.convert(joinedGraph);
     

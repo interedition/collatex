@@ -36,9 +36,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.interfaces.IWitness;
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraph;
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.joined.IJVariantGraphVertex;
 
 public class JVariantGraphCreatorTest extends AbstractTest {
   private static final Logger LOG = LoggerFactory.getLogger(JVariantGraphCreatorTest.class);
@@ -46,18 +43,18 @@ public class JVariantGraphCreatorTest extends AbstractTest {
   @Test
   public void joinTwoIdenticalWitnesses() {
     final IWitness[] w = createWitnesses("the black cat", "the black cat");
-    final IJVariantGraph graph = new JVariantGraphCreator().parallelSegmentate(merge(w));
+    final JoinedVariantGraph graph = JoinedVariantGraph.create(merge(w));
     LOG.debug("joinedGraph=" + graph);
 
-    final IJVariantGraphVertex startVertex = graph.getStartVertex();
+    final JoinedVariantGraphVertex startVertex = graph.getStart();
     assertEquals("#", startVertex.getNormalized());
     assertEquals(0, startVertex.getWitnesses().size());
 
-    final Set<IJVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
+    final Set<JoinedVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
     assertEquals(1, outgoingEdges.size());
 
-    final IJVariantGraphEdge edge = outgoingEdges.iterator().next();
-    final IJVariantGraphVertex vertex = graph.getEdgeTarget(edge);
+    final JoinedVariantGraphEdge edge = outgoingEdges.iterator().next();
+    final JoinedVariantGraphVertex vertex = graph.getEdgeTarget(edge);
     assertEquals("the black cat", vertex.getNormalized());
 
     final Set<IWitness> witnesses = edge.getWitnesses();
@@ -74,18 +71,18 @@ public class JVariantGraphCreatorTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnesses() {
     final IWitness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
-    final IJVariantGraph graph = new JVariantGraphCreator().parallelSegmentate(merge(w));
+    final JoinedVariantGraph graph = JoinedVariantGraph.create(merge(w));
     LOG.debug("joinedGraph=" + graph);
 
-    final IJVariantGraphVertex startVertex = graph.getStartVertex();
+    final JoinedVariantGraphVertex startVertex = graph.getStart();
     assertEquals("#", startVertex.getNormalized());
     assertEquals(0, startVertex.getWitnesses().size());
 
-    final Set<IJVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
+    final Set<JoinedVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
     assertEquals(1, outgoingEdges.size());
 
-    final IJVariantGraphEdge edge = outgoingEdges.iterator().next();
-    final IJVariantGraphVertex vertex = graph.getEdgeTarget(edge);
+    final JoinedVariantGraphEdge edge = outgoingEdges.iterator().next();
+    final JoinedVariantGraphVertex vertex = graph.getEdgeTarget(edge);
     assertEquals("the", vertex.getNormalized());
 
     final Set<IWitness> witnesses = edge.getWitnesses();
@@ -109,20 +106,20 @@ public class JVariantGraphCreatorTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnesses2() {
     final IWitness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
-    IJVariantGraph graph = new JVariantGraphCreator().parallelSegmentate(merge(w));
+    final JoinedVariantGraph graph = JoinedVariantGraph.create(merge(w));
     LOG.debug("joinedGraph=" + graph);
 
-    final IJVariantGraphVertex startVertex = graph.getStartVertex();
+    final JoinedVariantGraphVertex startVertex = graph.getStart();
     assertEquals("#", startVertex.getNormalized());
     assertEquals(0, startVertex.getWitnesses().size());
 
-    final Set<IJVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
+    final Set<JoinedVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
     assertEquals(2, outgoingEdges.size());
 
-    final Iterator<IJVariantGraphEdge> iterator = outgoingEdges.iterator();
+    final Iterator<JoinedVariantGraphEdge> iterator = outgoingEdges.iterator();
 
-    IJVariantGraphEdge edge = iterator.next();
-    IJVariantGraphVertex vertex = graph.getEdgeTarget(edge);
+    JoinedVariantGraphEdge edge = iterator.next();
+    JoinedVariantGraphVertex vertex = graph.getEdgeTarget(edge);
     assertEquals("blackie", vertex.getNormalized());
 
     edge = iterator.next();
@@ -144,10 +141,10 @@ public class JVariantGraphCreatorTest extends AbstractTest {
     assertTrue(phrases.contains("cat"));
   }
 
-  private static List<String> extractPhrases(IJVariantGraph joinedGraph) {
-    Set<IJVariantGraphVertex> vertexSet = joinedGraph.vertexSet();
+  private static List<String> extractPhrases(JoinedVariantGraph joinedGraph) {
+    Set<JoinedVariantGraphVertex> vertexSet = joinedGraph.vertexSet();
     List<String> phrases = Lists.newArrayList();
-    for (IJVariantGraphVertex variantGraphVertex : vertexSet) {
+    for (JoinedVariantGraphVertex variantGraphVertex : vertexSet) {
       phrases.add(variantGraphVertex.getNormalized());
     }
     return phrases;
