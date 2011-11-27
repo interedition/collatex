@@ -26,10 +26,10 @@ public class PersistentVariantGraph {
   private final GraphDatabaseService db;
   private final PersistentVariantGraphVertex start;
   private final PersistentVariantGraphVertex end;
-  private final DefaultResolver<IWitness> witnessResolver;
-  private final DefaultResolver<INormalizedToken> tokenResolver;
+  private final Resolver<IWitness> witnessResolver;
+  private final Resolver<INormalizedToken> tokenResolver;
 
-  public PersistentVariantGraph(Node start, Node end, DefaultResolver<IWitness> witnessResolver, DefaultResolver<INormalizedToken> tokenResolver) {
+  public PersistentVariantGraph(Node start, Node end, Resolver<IWitness> witnessResolver, Resolver<INormalizedToken> tokenResolver) {
     this.db = start.getGraphDatabase();
     this.start = new PersistentVariantGraphVertex(this, start);
     this.end = new PersistentVariantGraphVertex(this, end);
@@ -37,11 +37,11 @@ public class PersistentVariantGraph {
     this.tokenResolver = tokenResolver;
   }
 
-  public DefaultResolver<IWitness> getWitnessResolver() {
+  public Resolver<IWitness> getWitnessResolver() {
     return witnessResolver;
   }
 
-  public DefaultResolver<INormalizedToken> getTokenResolver() {
+  public Resolver<INormalizedToken> getTokenResolver() {
     return tokenResolver;
   }
 

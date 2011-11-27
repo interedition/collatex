@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
-import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.PATH;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.START_END;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.VARIANT_GRAPH;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -24,8 +23,8 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 public class VariantGraphFactory {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraphFactory.class);
 
-  private DefaultResolver<IWitness> witnessResolver = new DefaultResolver<IWitness>();
-  private DefaultResolver<INormalizedToken> tokenResolver = new DefaultResolver<INormalizedToken>();
+  private Resolver<IWitness> witnessResolver = new DefaultResolver<IWitness>();
+  private Resolver<INormalizedToken> tokenResolver = new DefaultResolver<INormalizedToken>();
   private EmbeddedGraphDatabase db;
   private Node variantGraphs;
 
@@ -71,11 +70,11 @@ public class VariantGraphFactory {
     }
   }
 
-  public void setWitnessResolver(DefaultResolver<IWitness> witnessResolver) {
+  public void setWitnessResolver(Resolver<IWitness> witnessResolver) {
     this.witnessResolver = witnessResolver;
   }
 
-  public void setTokenResolver(DefaultResolver<INormalizedToken> tokenResolver) {
+  public void setTokenResolver(Resolver<INormalizedToken> tokenResolver) {
     this.tokenResolver = tokenResolver;
   }
 
