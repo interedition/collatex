@@ -86,7 +86,6 @@ public class VariantGraphFactory {
       final Node end = db.createNode();
 
       variantGraphs.createRelationshipTo(start, START_END);
-      start.createRelationshipTo(end, PATH);
       end.createRelationshipTo(variantGraphs, START_END);
 
       tx.success();
