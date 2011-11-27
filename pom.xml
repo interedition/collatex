@@ -18,6 +18,7 @@
     <inceptionYear>2010</inceptionYear>
     <modules>
         <module>collatex</module>
+        <module>collatex-lab</module>
         <module>collatex-nmerge</module>
         <module>collatex-nodeps</module>
         <module>collatex-web</module>
@@ -280,6 +281,16 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>net.sf.jung</groupId>
+                <artifactId>jung-graph-impl</artifactId>
+                <version>${jung.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.jung</groupId>
+                <artifactId>jung-visualization</artifactId>
+                <version>${jung.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.sleepycat</groupId>
                 <artifactId>je</artifactId>
                 <version>4.1.10</version>
@@ -505,5 +516,6 @@
         <slf4j.version>1.5.11</slf4j.version>
         <restlet.version>2.0-RC2</restlet.version>
         <blueprints.version>1.0</blueprints.version>
+        <jung.version>2.0.1</jung.version>
     </properties>
 </project>
