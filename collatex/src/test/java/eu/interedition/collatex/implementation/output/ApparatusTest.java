@@ -95,7 +95,7 @@ public class ApparatusTest extends AbstractTest {
   @Test
   public void testSimpleAddDelOutput() throws Exception {
     assertApparatusEquals(//
-        "the black <app><rdg wit=\"#W1\"/><rdg wit=\"#W2 #W3\">saw the black</rdg></app> cat on the <app><rdg wit=\"#W1\">white</rdg><rdg wit=\"#W2 #W3\"/></app> table",//
+        "the black <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B #C\"/></app> table",//
         "the black cat on the white table",//
         "the black saw the black cat on the table",//
         "the black saw the black cat on the table");
