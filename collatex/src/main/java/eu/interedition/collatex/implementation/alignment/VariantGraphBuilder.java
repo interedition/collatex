@@ -81,7 +81,7 @@ public class VariantGraphBuilder {
     }
 
     LOG.debug("{} + {}: Merge comparand into graph", graph, witness);
-    IVariantGraphVertex last =  graph.getStartVertex();
+    IVariantGraphVertex last = graph.getStartVertex();
     for (INormalizedToken token : witness.getTokens()) {
       final IVariantGraphVertex graphMatch = (IVariantGraphVertex) tokenLinks.get(token);
       final INormalizedToken vertexKey = (graphMatch == null ? token : graphMatch.getVertexKey());
