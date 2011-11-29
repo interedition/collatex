@@ -3,6 +3,7 @@ package eu.interedition.collatex.implementation.matching;
 import java.util.*;
 
 import com.google.common.collect.*;
+import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.ITokenContainer;
 
@@ -73,6 +74,10 @@ public class Matches {
         unique.add(token);
       }
     }
+
+    // add start and end tokens as matches
+    all.put(NormalizedToken.START, Iterables.getFirst(aTokens, null));
+    all.put(NormalizedToken.END, Iterables.getLast(aTokens));
 
     return new Matches(all, unmatched, ambiguous, unique);
   }
