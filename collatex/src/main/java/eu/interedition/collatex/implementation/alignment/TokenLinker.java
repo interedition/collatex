@@ -2,9 +2,12 @@ package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
-import com.google.common.collect.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.matching.Matches;
@@ -14,7 +17,11 @@ import eu.interedition.collatex.interfaces.IWitness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Lists.reverse;
 
@@ -61,21 +68,21 @@ public class TokenLinker implements ITokenLinker {
     // try and find matches in the base for each sequence in the witness
     phraseMatches = Lists.newArrayList();
     for (List<INormalizedToken> phrase : rightExpandingPhrases) {
-      final List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheRight(phrase, boundedMatches);
+      final List<INormalizedToken> matchingPhrase = matchPhrase(boundedMatches, phrase, 1);
       if (!matchingPhrase.isEmpty()) {
         phraseMatches.add(new Tuple<List<INormalizedToken>>(matchingPhrase, phrase));
       }
     }
     for (List<INormalizedToken> phrase : leftExpandingPhrases) {
-      final List<INormalizedToken> matchingPhrase = findMatchingPhraseToTheLeft(phrase, boundedMatches);
+      final List<INormalizedToken> matchingPhrase = reverse(matchPhrase(boundedMatches, reverse(phrase), -1));
       if (!matchingPhrase.isEmpty()) {
         phraseMatches.add(new Tuple<List<INormalizedToken>>(matchingPhrase, phrase));
       }
     }
 
     // run the old filter method
-    filterSecondaryPhraseMatches(phraseMatches, Functions.<Tuple<INormalizedToken>>identity());
-    filterSecondaryPhraseMatches(phraseMatches, Tuple.<INormalizedToken>flipFunction());
+    filterAlternativePhraseMatches(phraseMatches, Functions.<Tuple<INormalizedToken>>identity());
+    filterAlternativePhraseMatches(phraseMatches, Tuple.<INormalizedToken>flipFunction());
 
     // do the matching
     final Multimap<INormalizedToken, INormalizedToken> allMatches = matches.getAll();
@@ -127,10 +134,10 @@ public class TokenLinker implements ITokenLinker {
     return tokenLinks;
   }
 
-  public List<INormalizedToken> findMinimalUniquePrefix(Iterable<INormalizedToken> sequence, INormalizedToken stopMarker) {
+  public List<INormalizedToken> findMinimalUniquePrefix(Iterable<INormalizedToken> phrase, INormalizedToken stopMarker) {
     final List<INormalizedToken> result = Lists.newArrayList();
 
-    for (INormalizedToken token : sequence) {
+    for (INormalizedToken token : phrase) {
       if (!matches.getUnmatched().contains(token)) {
         result.add(token);
         if (!matches.getAmbiguous().contains(token)) {
@@ -143,7 +150,7 @@ public class TokenLinker implements ITokenLinker {
     return result;
   }
 
-  private void filterSecondaryPhraseMatches(List<Tuple<List<INormalizedToken>>> phraseMatches, Function<Tuple<INormalizedToken>, Tuple<INormalizedToken>> tokenMatchTransform) {
+  private void filterAlternativePhraseMatches(List<Tuple<List<INormalizedToken>>> phraseMatches, Function<Tuple<INormalizedToken>, Tuple<INormalizedToken>> tokenMatchTransform) {
     final Map<INormalizedToken, INormalizedToken> previousMatches = Maps.newLinkedHashMap();
     for (Iterator<Tuple<List<INormalizedToken>>> phraseMatchIt = phraseMatches.iterator(); phraseMatchIt.hasNext(); ) {
       boolean foundAlternative = false;
@@ -176,56 +183,35 @@ public class TokenLinker implements ITokenLinker {
     }
   }
 
-  // This method should return the matching base tokens for a given sequence
-  // Note: this method works for sequences that have the fixed token on the left and expand to the right
-  private List<INormalizedToken> findMatchingPhraseToTheRight(List<INormalizedToken> phrase, Multimap<INormalizedToken, INormalizedToken> matches) {
-    final INormalizedToken startTokenInWitness = phrase.get(0);
-    final Collection<INormalizedToken> startMatches = matches.get(startTokenInWitness);
+  private List<INormalizedToken> matchPhrase(Multimap<INormalizedToken, INormalizedToken> matches, List<INormalizedToken> phrase, int expectedDirection) {
+    final List<INormalizedToken> matchedPhrase = Lists.newArrayList();
 
-    Preconditions.checkState(!startMatches.isEmpty(), "No match found in base for fixed witness token");
-    Preconditions.checkState(startMatches.size() == 1, "Multiple matches found in base for fixed witness token");
-
-    final INormalizedToken startTokenInBase = Iterables.getFirst(startMatches, null);
-    return tryTheDifferentPossibilities(matches, startTokenInBase, phrase.subList(1, phrase.size()), 1);
-  }
-
-  // This method should return the matching base tokens for a given sequence
-  // Note: this method works for sequences that have the fixed token on the right and expand to the left
-  private List<INormalizedToken> findMatchingPhraseToTheLeft(List<INormalizedToken> phrase, Multimap<INormalizedToken, INormalizedToken> matches) {
-    final INormalizedToken startTokenInWitness = phrase.get(phrase.size() - 1);
-    final Collection<INormalizedToken> startMatches = matches.get(startTokenInWitness);
-
-    Preconditions.checkState(!startMatches.isEmpty(), "No match found in base for fixed witness token");
-    Preconditions.checkState(startMatches.size() == 1, "Multiple matches found in base for fixed witness token");
-
-    INormalizedToken startTokenInBase = Iterables.getFirst(startMatches, null);
-    return reverse(tryTheDifferentPossibilities(matches, startTokenInBase, reverse(phrase.subList(0, phrase.size() - 1)), -1));
-  }
-
-  private List<INormalizedToken> tryTheDifferentPossibilities(Multimap<INormalizedToken, INormalizedToken> matches, INormalizedToken startTokenInBase, List<INormalizedToken> restTokens, int expectedDirection) {
-    boolean validWholeSequence = true;
-    List<INormalizedToken> matchedBaseTokens = Lists.newArrayList(startTokenInBase);
-    INormalizedToken lastToken = startTokenInBase;
-    for (INormalizedToken token : restTokens) {
-      boolean valid = false;
-      for (INormalizedToken possibleMatch : matches.get(token)) {
-        int direction = baseMatches.indexOf(possibleMatch) - baseMatches.indexOf(lastToken);
+    INormalizedToken lastMatch = null;
+    int lastMatchIndex = 0;
+    for (INormalizedToken token : phrase) {
+      if (lastMatch == null) {
+        lastMatch = Iterables.get(matches.get(token), 0);
+        lastMatchIndex = baseMatches.indexOf(lastMatch);
+        matchedPhrase.add(lastMatch);
+        continue;
+      }
+      boolean tokenMatched = false;
+      for (INormalizedToken match : matches.get(token)) {
+        final int matchIndex = baseMatches.indexOf(match);
+        int direction = matchIndex - lastMatchIndex;
         if (direction == expectedDirection) {
-          matchedBaseTokens.add(possibleMatch);
-          lastToken = possibleMatch;
-          valid = true;
+          lastMatch = match;
+          lastMatchIndex = matchIndex;
+          matchedPhrase.add(match);
+          tokenMatched = true;
           break;
         }
       }
-      validWholeSequence = valid;
-      if (!valid) {
-        break;
+      if (!tokenMatched) {
+        return Collections.emptyList();
       }
     }
-    if (validWholeSequence) {
-      return matchedBaseTokens;
-    }
-    return Collections.emptyList();
+    return matchedPhrase;
   }
 
 }
