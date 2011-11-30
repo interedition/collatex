@@ -11,7 +11,8 @@ import eu.interedition.collatex.interfaces.INormalizedToken;
 public class EditGraphVertex {
   private final INormalizedToken baseToken;
   private final INormalizedToken witnessToken;
-  
+  private int weight = -1;
+
   public EditGraphVertex(INormalizedToken witnessToken, INormalizedToken baseToken) {
     this.baseToken = baseToken;
     this.witnessToken = witnessToken;
@@ -23,31 +24,47 @@ public class EditGraphVertex {
 
   @Override
   public String toString() {
-    if (witnessToken==null||baseToken==null) {
+    if (getWitnessToken() == null || baseToken == null) {
       return "start/end vertex";
     }
-    return witnessToken.toString()+"->"+baseToken.toString();
+    String string = getWitnessToken().toString() + "->" + baseToken.toString();
+    if (weight > 0) {
+      string += " weight:" + String.valueOf(this.weight);
+    }
+    return string;
   }
-  
+
   @Override
   public int hashCode() {
-    int hc = Objects.hashCode(baseToken, witnessToken);
-//    System.out.println("hashcode called on: "+this.toString()+":"+hc);
+    int hc = Objects.hashCode(baseToken, getWitnessToken());
+    //    System.out.println("hashcode called on: "+this.toString()+":"+hc);
     return hc;
   }
-  
+
   @Override
   public boolean equals(final Object obj) {
     //System.out.println(this.toString()+" comparing with "+obj.toString());
-    if (this==obj) {
+    if (this == obj) {
       return true;
     }
     if (obj instanceof EditGraphVertex) {
       final EditGraphVertex vertex = (EditGraphVertex) obj;
       boolean result = Objects.equal(baseToken, vertex.baseToken);
-      result = result && Objects.equal(witnessToken, vertex.witnessToken);
+      result = result && Objects.equal(getWitnessToken(), vertex.getWitnessToken());
       return result;
     }
     return false;
+  }
+
+  public INormalizedToken getWitnessToken() {
+    return witnessToken;
+  }
+
+  public void setWeight(int weight) {
+    this.weight = weight;
+  }
+
+  public int getWeight() {
+    return weight;
   }
 }

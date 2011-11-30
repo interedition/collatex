@@ -9,10 +9,11 @@ import java.util.Map;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
+import eu.interedition.collatex.implementation.matching.Matches;
+import eu.interedition.collatex.interfaces.IWitness;
+
 import org.junit.Ignore;
 import org.junit.Test;
-
-import eu.interedition.collatex.interfaces.IWitness;
 
 public class EditGraphVisitorTest extends AbstractTest {
 
@@ -51,24 +52,27 @@ public class EditGraphVisitorTest extends AbstractTest {
   public void testRemoveChoicesThatIntroduceGaps() {
     final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
+    EqualityTokenComparator comparator = new EqualityTokenComparator();
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], comparator);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
-    EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
+    Matches matches = Matches.between(w[0], w[1], comparator);
+    EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps(matches);
     // I expect 6 vertices
     // start, 2 x the, black, cat en end
     assertVertices(dGraph2, "#", "the", "the", "black", "cat", "#");
   }
-  
-  
+
   //When there are multiple paths with the same minimum number of gaps
   //do a second pass that tries to find the longest common sequence
   @Test
   public void testTryToFindMinimumAmountOfSequences() {
     final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
+    EqualityTokenComparator comparator = new EqualityTokenComparator();
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], comparator);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
-    EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps();
+    Matches matches = Matches.between(w[0], w[1], comparator);
+    EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps(matches);
     Map<EditGraphVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
     // asserts
     Iterator<EditGraphVertex> dgVerticesIterator = dGraph2.iterator();
@@ -84,18 +88,18 @@ public class EditGraphVisitorTest extends AbstractTest {
   public void testShortestPathOneOmissionRepetition() {
     final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
+    EqualityTokenComparator comparator = new EqualityTokenComparator();
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], comparator);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
-    List<EditGraphEdge> edges = visitor.getShortestPath();
+    Matches matches = Matches.between(w[0], w[1], comparator);
+    List<EditGraphEdge> edges = visitor.getShortestPath(matches);
     assertEquals(EditOperation.GAP, edges.get(0).getEditOperation()); // The ideal path should start with a gap
     assertEquals(EditOperation.NO_GAP, edges.get(1).getEditOperation());
     assertEquals(EditOperation.NO_GAP, edges.get(2).getEditOperation());
     assertEquals(EditOperation.NO_GAP, edges.get(3).getEditOperation());
     assertEquals(4, edges.size());
   }
-  
-  
-  
+
   // TODO
   // All the witness are equal
   // There should only be one valid path through this decision graph
@@ -104,10 +108,12 @@ public class EditGraphVisitorTest extends AbstractTest {
   public void testShortestPathEverythingEqual() {
     final IWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
     EditGraphCreator creator = new EditGraphCreator();
-    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], new EqualityTokenComparator());
+    EqualityTokenComparator comparator = new EqualityTokenComparator();
+    EditGraph dGraph = creator.buildEditGraph(w[0], w[1], comparator);
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
 
-    List<EditGraphEdge> path = visitor.getShortestPath();
+    Matches matches = Matches.between(w[0], w[1], comparator);
+    List<EditGraphEdge> path = visitor.getShortestPath(matches);
     // we expect 8 edges
     // they all should have weight 0
     Iterator<EditGraphEdge> edges = path.iterator();

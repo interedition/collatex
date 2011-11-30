@@ -1,15 +1,16 @@
 package eu.interedition.collatex.implementation.graph.edit;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Set;
+
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Set;
 
 public class EditGraphCreator {
   private final EditGraph editGraph;
@@ -44,7 +45,7 @@ public class EditGraphCreator {
           // TODO: less edges are needed
           for (EditGraphVertex lastVertex : lastConstructedVertices) {
             INormalizedToken lastToken = lastVertex.getBaseToken();
-            EditGraphEdge edge = a.isNear(lastToken, match) ?  new EditGraphEdge(lastVertex, editGraphVertex, EditOperation.NO_GAP, 0) : new EditGraphEdge(lastVertex, editGraphVertex, EditOperation.GAP, 1);
+            EditGraphEdge edge = a.isNear(lastToken, match) ? new EditGraphEdge(lastVertex, editGraphVertex, EditOperation.NO_GAP, 0) : new EditGraphEdge(lastVertex, editGraphVertex, EditOperation.GAP, 1);
             editGraph.add(edge);
           }
         }
@@ -58,7 +59,7 @@ public class EditGraphCreator {
     //TODO: remove duplication!
     for (EditGraphVertex lastVertex : lastConstructedVertices) {
       INormalizedToken lastToken = lastVertex.getBaseToken();
-      EditGraphEdge edge = a.isNear(lastToken, endVertex.getBaseToken()) ?  new EditGraphEdge(lastVertex, endVertex, EditOperation.NO_GAP, 0) : new EditGraphEdge(lastVertex, endVertex, EditOperation.GAP, 1);
+      EditGraphEdge edge = a.isNear(lastToken, endVertex.getBaseToken()) ? new EditGraphEdge(lastVertex, endVertex, EditOperation.NO_GAP, 0) : new EditGraphEdge(lastVertex, endVertex, EditOperation.GAP, 1);
       editGraph.add(edge);
     }
     return editGraph;

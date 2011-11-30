@@ -10,7 +10,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.implementation.output.DotExporter;
+import eu.interedition.collatex.interfaces.INormalizedToken;
 
 public class EditGraphVisitor {
 
@@ -25,13 +27,13 @@ public class EditGraphVisitor {
   // For now I just remove all the vertices that have a higher value
   // then the minimum amount of sequences for the whole graph
   // This is probably not the end solution
-  public List<EditGraphEdge> getShortestPath() {
+  public List<EditGraphEdge> getShortestPath(Matches match) {
     String dot = DotExporter.toDot(editGraph);
     DotExporter.generateSVG("shortestpath_before.svg", dot, "Shortest Path before");
 
     Map<EditGraphVertex, Integer> determineMinSequences = determineMinSequences(editGraph);
     int minSequences = determineMinSequences.get(editGraph.getStartVertex());
-    EditGraph graphWithSinglePath = buildNewGraphWithOnlyMinimumWeightVertices(determineMinSequences, minSequences);
+    EditGraph graphWithSinglePath = buildNewGraphWithOnlyMinimumWeightVertices(determineMinSequences, match);
     EditGraphVertex currentVertex = graphWithSinglePath.getStartVertex();
     List<EditGraphEdge> shortestPath = Lists.newArrayList();
     while (graphWithSinglePath.outDegreeOf(currentVertex) == 1) {
@@ -105,10 +107,10 @@ public class EditGraphVisitor {
   }
 
   //TODO: remove this method?
-  public EditGraph removeChoicesThatIntroduceGaps() {
+  public EditGraph removeChoicesThatIntroduceGaps(Matches matches) {
     int minGaps = determineMinimumNumberOfGaps(editGraph);
     Map<EditGraphVertex, Integer> minWeightForEachVertex = determineMinWeightForEachVertex(editGraph);
-    EditGraph graph2 = buildNewGraphWithOnlyMinimumWeightVertices(minWeightForEachVertex, minGaps);
+    EditGraph graph2 = buildNewGraphWithOnlyMinimumWeightVertices(minWeightForEachVertex, matches);
     return graph2;
   }
 
@@ -121,12 +123,33 @@ public class EditGraphVisitor {
     return topoVertices;
   }
 
-  private EditGraph buildNewGraphWithOnlyMinimumWeightVertices(Map<EditGraphVertex, Integer> minWeightProVertex, int minWeight) {
+  private EditGraph buildNewGraphWithOnlyMinimumWeightVertices(Map<EditGraphVertex, Integer> minWeightProVertex, Matches match) {
+    // lokaal minimum ipv globaal minimum
+    //fout
+    // par: Map<EditGraphEdge,Integer> minSequencesForEdge, matches
+    // in reverseTopological order over vertices editgraph heen
+    //   for vertex:
+    // v.gettoken -> in matched.getuniques() -> lokaal minimum
+    // v.token -> in ambiguous() -> 
     Set<EditGraphVertex> verticesToKeep = Sets.newLinkedHashSet();
-    for (EditGraphVertex vertex : editGraph.vertexSet()) {
-      int weight = minWeightProVertex.get(vertex);
-      if (weight <= minWeight) {
+    Set<INormalizedToken> ambiguous = match.getAmbiguous();
+    Set<INormalizedToken> unique = match.getUnique();
+
+    List<EditGraphVertex> verticesInReverseTopologicalOrder = Lists.reverse(getVerticesInTopologicalOrder(editGraph));
+
+    int localminimum = minWeightProVertex.get(editGraph.getEndVertex());
+    for (EditGraphVertex vertex : verticesInReverseTopologicalOrder) {
+      INormalizedToken token = vertex.getWitnessToken();
+      Integer minWeight = minWeightProVertex.get(vertex);
+      if (ambiguous.contains(token)) {
+        if (minWeight <= localminimum) {
+          vertex.setWeight(minWeight);
+          verticesToKeep.add(vertex);
+        }
+      } else {
+        vertex.setWeight(minWeight);
         verticesToKeep.add(vertex);
+        localminimum = minWeight;
       }
     }
     Set<EditGraphEdge> edgeSet = editGraph.edgeSet();
