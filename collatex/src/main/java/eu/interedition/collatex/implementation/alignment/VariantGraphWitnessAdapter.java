@@ -16,8 +16,9 @@
 package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.interfaces.*;
 
@@ -32,16 +33,19 @@ import java.util.List;
  * @author Ronald
  */
 public class VariantGraphWitnessAdapter implements IWitness {
-  private final IVariantGraph graph;
-  private final List<INormalizedToken> tokens;
+  private final PersistentVariantGraph graph;
+  private final List<INormalizedToken> tokens = Lists.newArrayList();
 
-  public static VariantGraphWitnessAdapter create(IVariantGraph graph) {
-    return new VariantGraphWitnessAdapter(graph, Lists.newArrayList(Iterables.filter(graph, INormalizedToken.class)));
+  public static VariantGraphWitnessAdapter create(PersistentVariantGraph graph) {
+    final VariantGraphWitnessAdapter witnessAdapter = new VariantGraphWitnessAdapter(graph);
+    for (PersistentVariantGraphVertex v : graph.traverseVertices(null)) {
+      witnessAdapter.tokens.add(new VariantGraphVertexTokenAdapter(witnessAdapter, v));
+    }
+    return witnessAdapter;
   }
 
-  private VariantGraphWitnessAdapter(IVariantGraph graph, List<INormalizedToken> tokens) {
+  private VariantGraphWitnessAdapter(PersistentVariantGraph graph) {
     this.graph = graph;
-    this.tokens = tokens;
   }
 
   @Override
@@ -61,13 +65,9 @@ public class VariantGraphWitnessAdapter implements IWitness {
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    if (NormalizedToken.START.equals(a)) {
-      a = graph.getStartVertex();
-    }
-    if (NormalizedToken.END.equals(b)) {
-      b = graph.getEndVertex();
-    }
-    return graph.isNear(a, b);
+    final PersistentVariantGraphVertex va = NormalizedToken.START.equals(a) ? graph.getStart() : (PersistentVariantGraphVertex) a;
+    final PersistentVariantGraphVertex vb = NormalizedToken.END.equals(b) ? graph.getEnd() : (PersistentVariantGraphVertex) b;
+    return graph.verticesAreAdjacent(va, vb);
   }
 
   @Override
@@ -79,5 +79,59 @@ public class VariantGraphWitnessAdapter implements IWitness {
   public int compareTo(IWitness o) {
     Preconditions.checkArgument(!(o instanceof VariantGraphWitnessAdapter));
     return -1;
+  }
+
+  /**
+   * FIXME: takes first token as representative for the whole vertex; assumes transitivity of token equality
+   */
+  public static class VariantGraphVertexTokenAdapter implements INormalizedToken {
+    private final VariantGraphWitnessAdapter witnessAdapter;
+    private final PersistentVariantGraphVertex vertex;
+    private INormalizedToken firstToken;
+
+    public VariantGraphVertexTokenAdapter(VariantGraphWitnessAdapter witnessAdapter, PersistentVariantGraphVertex vertex) {
+      this.witnessAdapter = witnessAdapter;
+      this.vertex = vertex;
+
+      final PersistentVariantGraph graph = vertex.getGraph();
+      final PersistentVariantGraphVertex start = graph.getStart();
+      final PersistentVariantGraphVertex end = graph.getEnd();
+      if (start.equals(vertex)) {
+        this.firstToken = NormalizedToken.START;
+      } else if (end.equals(vertex)) {
+        this.firstToken = NormalizedToken.END;
+      } else {
+        this.firstToken = vertex.getTokens(null).first();
+      }
+    }
+
+    public PersistentVariantGraphVertex getVertex() {
+      return vertex;
+    }
+
+    @Override
+    public String getNormalized() {
+      return firstToken.getNormalized();
+    }
+
+    @Override
+    public int compareTo(INormalizedToken o) {
+      return firstToken.compareTo(o);
+    }
+
+    @Override
+    public String getContent() {
+      return firstToken.getContent();
+    }
+
+    @Override
+    public String getTrailingWhitespace() {
+      return firstToken.getTrailingWhitespace();
+    }
+
+    @Override
+    public IWitness getWitness() {
+      return witnessAdapter;
+    }
   }
 }

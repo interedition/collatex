@@ -50,15 +50,17 @@ public class CyclicVariantGraphTest extends AbstractTest {
 
   @Test
   public void emptyGraph() {
-    final IVariantGraph cyclic = CyclicVariantGraph.create(merge(createWitnesses()));
+    //final IVariantGraph cyclic = CyclicVariantGraph.create(merge(createWitnesses()));
+    final IVariantGraph cyclic = null;
     assertTrue(cyclic.edgeSet().isEmpty());
     assertEquals(2, cyclic.vertexSet().size());
   }
 
   @Test
   public void basic1() {
-    final IVariantGraph cgraph = CyclicVariantGraph.create(merge(//
-            "the nice black and white cat", "the friendly white and black cat"));
+    //final IVariantGraph cgraph = CyclicVariantGraph.create(merge(//
+    //        "the nice black and white cat", "the friendly white and black cat"));
+    final IVariantGraph cgraph = null;
 
     final Set<IVariantGraphEdge> edgeSet = cgraph.edgeSet();
     assertNotNull(edgeSet);
@@ -72,7 +74,8 @@ public class CyclicVariantGraphTest extends AbstractTest {
   @Test
   public void basic2() {
     final IWitness[] w = createWitnesses("The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog");
-    final IVariantGraph cgraph = CyclicVariantGraph.create(merge(w));
+    //final IVariantGraph cgraph = CyclicVariantGraph.create(merge(w));
+    final IVariantGraph cgraph = null;
 
     final Set<IVariantGraphEdge> edgeSet = cgraph.edgeSet();
     assertNotNull(edgeSet);

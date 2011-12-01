@@ -14,7 +14,7 @@ public class PunctuationTokenizerTest {
   
   @Test
   public void tokenizePunctuation() {
-    final List<IToken> tokens = Lists.newArrayList(new WhitespaceAndPunctuationTokenizer().tokenize("This is a sentence."));
+    final List<IToken> tokens = Lists.newArrayList(new WhitespaceAndPunctuationTokenizer().tokenize(null, "This is a sentence."));
 
     assertEquals(5, tokens.size());
 

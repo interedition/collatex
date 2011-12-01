@@ -34,4 +34,6 @@ public interface IToken {
 
   String getTrailingWhitespace();
 
+  IWitness getWitness();
+
 }

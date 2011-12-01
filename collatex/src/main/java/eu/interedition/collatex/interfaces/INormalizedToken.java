@@ -23,7 +23,7 @@ package eu.interedition.collatex.interfaces;
 /**
  * The normalized version of the token. 
  */
-public interface INormalizedToken extends IToken {
+public interface INormalizedToken extends IToken, Comparable<INormalizedToken> {
   /**
    * The normalized representation of the content of this token.
    * @return The normalized content.

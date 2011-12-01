@@ -3,6 +3,7 @@ package eu.interedition.collatex.implementation.alignment;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.interfaces.INormalizedToken;
@@ -115,11 +116,11 @@ public class TokenLinkerTest extends AbstractTest {
   public void twoEqualPossibilities1() {
     final IWitness[] w = createWitnesses("a", "a a");
 
-    final IVariantGraph graph = merge(w[0]);
+    final PersistentVariantGraph graph = merge(w[0]);
     final Map<INormalizedToken, INormalizedToken> links = linkTokens(graph, w[1]);
 
     assertEquals(1, links.size());
-    assertEquals(graph.getTokens(w[0]).get(0), links.get(w[1].getTokens().get(0)));
+    assertEquals(getTokens(graph, w[0]).get(0), links.get(w[1].getTokens().get(0)));
   }
 
 
@@ -222,12 +223,12 @@ public class TokenLinkerTest extends AbstractTest {
   public void twoEqualPossibilities2() {
     final IWitness[] w = createWitnesses("a a", "a");
 
-    final IVariantGraph graph = merge(w[0]);
+    final PersistentVariantGraph graph = merge(w[0]);
     final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(graph, w[1]).entrySet();
 
     assertEquals(1, matches.size());
     final Map.Entry<INormalizedToken, INormalizedToken> match = Iterables.get(matches, 0);
-    assertEquals(graph.getTokens(w[0]).get(0).getNormalized(), match.getKey().getNormalized());
+    assertEquals(getTokens(graph, w[0]).get(0).getNormalized(), match.getKey().getNormalized());
     assertEquals(w[1].getTokens().get(0).getNormalized(), match.getValue().getNormalized());
   }
 
@@ -283,7 +284,7 @@ public class TokenLinkerTest extends AbstractTest {
     return linkTokens(new TokenLinker(), base, witness);
   }
 
-  private Map<INormalizedToken, INormalizedToken> linkTokens(IVariantGraph graph, IWitness witness) {
+  private Map<INormalizedToken, INormalizedToken> linkTokens(PersistentVariantGraph graph, IWitness witness) {
     return linkTokens(VariantGraphWitnessAdapter.create(graph), witness);
   }
 

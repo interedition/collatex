@@ -22,6 +22,7 @@ package eu.interedition.collatex.web;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.implementation.CollateXEngine;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
@@ -48,7 +49,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/examples/**")
 public class ExamplesController implements InitializingBean {
-  private CollateXEngine engine = new CollateXEngine();
+  private CollateXEngine engine;
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -71,7 +72,7 @@ public class ExamplesController implements InitializingBean {
     List<Apparatus> alignments = Lists.newArrayListWithCapacity(darwin.size());
     
    for (IWitness[] paragraph : darwin) {
-      IVariantGraph graph = engine.graph(paragraph);
+      PersistentVariantGraph graph = engine.graph(paragraph);
       alignments.add(engine.createApparatus(graph));
    }
     return new ModelMap("paragraphs", alignments);
@@ -88,6 +89,7 @@ public class ExamplesController implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
+    engine = new CollateXEngine();
     usecases = parseWitnesses(applicationContext.getResource("/examples.xml"));
     darwin = parseWitnesses(applicationContext.getResource("/darwin.xml"));
     engine.setTokenizer(new WhitespaceAndPunctuationTokenizer());

@@ -46,6 +46,11 @@ public class VariantGraphVertex implements IVariantGraphVertex {
   }
 
   @Override
+  public IWitness getWitness() {
+    return vertexKey.getWitness();
+  }
+
+  @Override
   public INormalizedToken getToken(IWitness witness) {
     if (!tokens.containsKey(witness)) {
       throw new RuntimeException("TOKEN FOR WITNESS " + witness.getSigil() + " NOT FOUND IN VERTEX " + getNormalized() + "!");
@@ -88,4 +93,8 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     throw new RuntimeException("Do not call this method! Call getToken(IWitness).getTrailingWhitespace() instead.");
   }
 
+  @Override
+  public int compareTo(INormalizedToken o) {
+    throw new UnsupportedOperationException();
+  }
 }

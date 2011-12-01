@@ -42,6 +42,6 @@ public class DefaultTokenNormalizer implements ITokenNormalizer {
     if (normalized == null || normalized.length() == 0) {
       normalized = token.getContent();
     }
-    return new NormalizedToken(token, normalized);
+    return new NormalizedToken((Token) token, normalized);
   }
 }

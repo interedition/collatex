@@ -1,5 +1,7 @@
 package eu.interedition.collatex.implementation.graph.db;
 
+import java.util.Set;
+
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
@@ -7,7 +9,7 @@ public interface Resolver<T> {
 
   int add(T entity);
 
-  T resolve(int ref);
+  Set<T> resolve(int... refs);
 
-  int resolve(T entity);
+  int[] resolve(Set<T> entities);
 }

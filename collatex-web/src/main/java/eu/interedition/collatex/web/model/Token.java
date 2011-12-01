@@ -40,11 +40,7 @@ import java.util.Map;
 public class Token extends NormalizedToken {
   private Map<String, Object> metadata;
 
-  public Token() {
-    super();
-  }
-  
-  public Token(INormalizedToken other) {
+  public Token(NormalizedToken other) {
     super(other);
   }
 
@@ -72,7 +68,7 @@ public class Token extends NormalizedToken {
 
     @Override
     public Token apply(INormalizedToken from) {
-      return new Token(from);
+      return new Token((NormalizedToken) from);
     }
   };
 

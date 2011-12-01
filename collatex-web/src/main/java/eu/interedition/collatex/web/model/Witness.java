@@ -31,8 +31,8 @@ import eu.interedition.collatex.interfaces.INormalizedToken;
 public class Witness extends eu.interedition.collatex.implementation.input.Witness {
   private String content;
 
-  public Witness() {
-    super();
+  public Witness(String sigil) {
+    super(sigil);
   }
 
   @Override
@@ -41,10 +41,9 @@ public class Witness extends eu.interedition.collatex.implementation.input.Witne
     return super.getSigil();
   }
 
-  @Override
   @JsonProperty("id")
   public void setSigil(String sigil) {
-    super.setSigil(sigil);
+    throw new UnsupportedOperationException();
   }
 
   public String getContent() {

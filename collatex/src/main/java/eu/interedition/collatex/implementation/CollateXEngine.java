@@ -25,6 +25,8 @@ package eu.interedition.collatex.implementation;
 import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
 import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
@@ -32,6 +34,8 @@ import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.interfaces.*;
+
+import java.io.IOException;
 
 /**
  * 
@@ -47,6 +51,15 @@ public class CollateXEngine {
   private ITokenizer tokenizer = new WhitespaceTokenizer();
   // private ITokenizer tokenizer = new WhitespaceAndPunctuationTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
+  private final VariantGraphFactory variantGraphFactory;
+
+  public CollateXEngine() throws IOException {
+    this(new VariantGraphFactory());
+  }
+
+  public CollateXEngine(VariantGraphFactory variantGraphFactory) {
+    this.variantGraphFactory = variantGraphFactory;
+  }
 
   public void setTokenizer(ITokenizer tokenizer) {
     this.tokenizer = tokenizer;
@@ -55,7 +68,6 @@ public class CollateXEngine {
   public void setTokenNormalizer(ITokenNormalizer tokenNormalizer) {
     this.tokenNormalizer = tokenNormalizer;
   }
-
 
   /**
    * Create an instance of an IWitness object
@@ -79,8 +91,8 @@ public class CollateXEngine {
    * We're not sure what we want to do with the name of this method: alignment vs. collation
    * Terminology check
    */
-  public IVariantGraph graph(IWitness... witnesses) {
-    final VariantGraph graph = new VariantGraph();
+  public PersistentVariantGraph graph(IWitness... witnesses) {
+    final PersistentVariantGraph graph = variantGraphFactory.create();
     new VariantGraphBuilder(graph).add(witnesses);
     return graph;
   }
@@ -96,12 +108,12 @@ public class CollateXEngine {
    * Terminology check
    */
   public AlignmentTable align(IWitness... witnesses) {
-    IVariantGraph vg = graph(witnesses);
+    PersistentVariantGraph vg = graph(witnesses);
     AlignmentTable table = new AlignmentTable(vg);
     return table;
   }
 
-  public Apparatus createApparatus(final IVariantGraph variantGraph) {
-    return SegmentedVariantGraph.create(JoinedVariantGraph.create(variantGraph)).toApparatus();
+  public Apparatus createApparatus(PersistentVariantGraph graph) {
+    return graph.toApparatus();
   }
 }

@@ -21,10 +21,8 @@
 package eu.interedition.collatex.implementation.output;
 
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
-import eu.interedition.collatex.interfaces.IVariantGraph;
-import eu.interedition.collatex.interfaces.IVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import java.util.Iterator;
@@ -37,40 +35,29 @@ import java.util.SortedSet;
  *
  */
 public class AlignmentTable {
-  private final IVariantGraph graph;
+  private final PersistentVariantGraph graph;
   protected final List<Column> columns = Lists.newArrayList();
 
-  public AlignmentTable(IVariantGraph graph) {
-    this.graph = graph;
-    init();
-  }
-
-  private void init() {
-    SegmentedVariantGraph segmentedVariantGraph = SegmentedVariantGraph.create(graph);
-    Iterator<RankedVariantGraphVertex> iterator = segmentedVariantGraph.getRankedVertices().iterator();
-    Iterator<IVariantGraphVertex> vertexIterator = graph.iterator();
+  public AlignmentTable(PersistentVariantGraph graph) {
+    this.graph = graph.join().rank();
+    final Iterator<PersistentVariantGraphVertex> vertexIterator = graph.traverseVertices(null).iterator();
     //skip startVertex
     vertexIterator.next();
-    while(iterator.hasNext()) {
-      //nextVertex is a IRankedVariantGraphVertex which is not the 
-      //same as a real vertex!
-      RankedVariantGraphVertex nextVertex = iterator.next();
-      IVariantGraphVertex next = vertexIterator.next();
-      if (next.equals(graph.getEndVertex())) {
+    while(vertexIterator.hasNext()) {
+      PersistentVariantGraphVertex next = vertexIterator.next();
+      if (next.equals(graph.getEnd())) {
         continue;
       }
-      int rank = nextVertex.getRank();
-//      System.out.println("DEBUG: "+nextVertex.getNormalized()+":"+nextVertex.getRank());
+      final int rank = next.getRank();
       if (rank>columns.size()) {
         addNewColumn(next);
       } else {
-        ((Column)columns.get(rank-1)).addVertex(next);
+        (columns.get(rank-1)).addVertex(next);
       }
     }
-//    System.out.println("TOTAL number of columns: "+columns.size());
   }
 
-  private Column addNewColumn(IVariantGraphVertex vertex) {
+  private Column addNewColumn(PersistentVariantGraphVertex vertex) {
     final Column column = new Column(vertex);
     columns.add(column);
     return column;

@@ -20,16 +20,19 @@
 
 package eu.interedition.collatex.implementation.alignment;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.interfaces.IVariantGraph;
-import eu.interedition.collatex.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex.interfaces.IVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.interfaces.IWitness;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @todo Add test with an addition or omission in between!
@@ -38,125 +41,97 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void twoWitnesses() {
-    final IVariantGraph graph = merge("the black cat", "the black cat");
+    final IWitness[] w = createWitnesses("the black cat", "the black cat");
+    final PersistentVariantGraph graph = merge(w);
 
-    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
-    assertEquals(5, vertices.size());
+    assertEquals(5, Iterables.size(graph.traverseVertices(null)));
+    assertEquals(4, Iterables.size(graph.traverseEdges(null)));
 
-    final Iterator<IVariantGraphVertex> vertexI = graph.iterator();
-    final IVariantGraphVertex startVertex = vertexI.next();
-    final IVariantGraphVertex theVertex = vertexI.next();
-    final IVariantGraphVertex blackVertex = vertexI.next();
-    final IVariantGraphVertex catVertex = vertexI.next();
-    final IVariantGraphVertex endVertex = vertexI.next();
+    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
 
-    final Set<IVariantGraphEdge> edges = graph.edgeSet();
-    assertEquals(4, edges.size());
-
-    assertEquals(": A, B", graph.getEdge(startVertex, theVertex).toString());
-    assertEquals(": A, B", graph.getEdge(theVertex, blackVertex).toString());
-    assertEquals(": A, B", graph.getEdge(blackVertex, catVertex).toString());
-    assertEquals(": A, B", graph.getEdge(catVertex, endVertex).toString());
+    assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(catVertex, graph.getEnd()), w[0], w[1]);
   }
 
 
   @Test
   public void addition1() {
-    final IVariantGraph graph = merge("the black cat", "the white and black cat");
+    final IWitness[] w = createWitnesses("the black cat", "the white and black cat");
+    final PersistentVariantGraph graph = merge(w);
 
-    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
-    assertEquals(7, vertices.size());
+    assertEquals(7, Lists.newArrayList(graph.traverseVertices(null)).size());
+    assertEquals(7, Iterables.size(graph.traverseEdges(null)));
 
-    final Iterator<IVariantGraphVertex> vertexI = graph.iterator();
-    final IVariantGraphVertex startVertex = vertexI.next();
-    final IVariantGraphVertex theVertex = vertexI.next();
-    final IVariantGraphVertex whiteVertex = vertexI.next();
-    final IVariantGraphVertex andVertex = vertexI.next();
-    final IVariantGraphVertex blackVertex = vertexI.next();
-    final IVariantGraphVertex catVertex = vertexI.next();
-    final IVariantGraphVertex endVertex = vertexI.next();
+    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final PersistentVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final PersistentVariantGraphVertex andVertex = vertexWith(graph, "and", w[1]);
+    final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
 
-    assertEquals("#", startVertex.getNormalized());
-    assertEquals("the", theVertex.getNormalized());
-    assertEquals("white", whiteVertex.getNormalized());
-    assertEquals("and", andVertex.getNormalized());
-    assertEquals("black", blackVertex.getNormalized());
-    assertEquals("cat", catVertex.getNormalized());
-    assertEquals("#", endVertex.getNormalized());
-
-    final Set<IVariantGraphEdge> edges = graph.edgeSet();
-    assertEquals(7, edges.size());
-
-    assertEquals(": A, B", graph.getEdge(startVertex, theVertex).toString());
-    assertEquals(": A", graph.getEdge(theVertex, blackVertex).toString());
-    assertEquals(": A, B", graph.getEdge(blackVertex, catVertex).toString());
-    assertEquals(": A, B", graph.getEdge(catVertex, endVertex).toString());
-    assertEquals(": B", graph.getEdge(theVertex, whiteVertex).toString());
-    assertEquals(": B", graph.getEdge(whiteVertex, andVertex).toString());
-    assertEquals(": B", graph.getEdge(andVertex, blackVertex).toString());
+    assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
+    assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(catVertex, graph.getEnd()), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, whiteVertex), w[1]);
+    assertHasWitnesses(edgeBetween(whiteVertex, graph.getEnd()), w[1]);
+    assertHasWitnesses(edgeBetween(andVertex, blackVertex), w[1]);
   }
 
   @Test
   public void variant() {
-    final IVariantGraph graph = merge("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
+    final IWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
+    final PersistentVariantGraph graph = merge(w);
 
-    final Set<IVariantGraphVertex> vertices = graph.vertexSet();
+    final List<PersistentVariantGraphVertex> vertices = Lists.newArrayList(graph.traverseVertices(null));
     assertEquals(9, vertices.size());
+    assertEquals(12, Iterables.size(graph.traverseEdges(null)));
 
-    final Iterator<IVariantGraphVertex> vertexI = graph.iterator();
-    final IVariantGraphVertex startVertex = vertexI.next();
-    final IVariantGraphVertex theVertex = vertexI.next();
-    final IVariantGraphVertex blackVertex = vertexI.next();
-    final IVariantGraphVertex whiteVertex = vertexI.next();
-    final IVariantGraphVertex greenVertex = vertexI.next();
-    final IVariantGraphVertex redVertex = vertexI.next();
-    final IVariantGraphVertex yellowVertex = vertexI.next();
-    final IVariantGraphVertex catVertex = vertexI.next();
-    final IVariantGraphVertex endVertex = vertexI.next();
+    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final PersistentVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final PersistentVariantGraphVertex greenVertex = vertexWith(graph, "green", w[2]);
+    final PersistentVariantGraphVertex redVertex = vertexWith(graph, "red", w[3]);
+    final PersistentVariantGraphVertex yellowVertex = vertexWith(graph, "yellow", w[4]);
+    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
 
-    assertEquals("#", startVertex.getNormalized());
-    assertEquals("the", theVertex.getNormalized());
-    assertEquals("black", blackVertex.getNormalized());
-    assertEquals("white", whiteVertex.getNormalized());
-    assertEquals("green", greenVertex.getNormalized());
-    assertEquals("red", redVertex.getNormalized());
-    assertEquals("yellow", yellowVertex.getNormalized());
-    assertEquals("cat", catVertex.getNormalized());
-    assertEquals("#", endVertex.getNormalized());
-
-    final Set<IVariantGraphEdge> edges = graph.edgeSet();
-    assertEquals(12, edges.size());
-
-    assertEquals(": A, B, C, D, E", graph.getEdge(startVertex, theVertex).toString());
-    assertEquals(": A", graph.getEdge(theVertex, blackVertex).toString());
-    assertEquals(": A", graph.getEdge(blackVertex, catVertex).toString());
-    assertEquals(": A, B, C, D, E", graph.getEdge(catVertex, endVertex).toString());
-    assertEquals(": B", graph.getEdge(theVertex, whiteVertex).toString());
-    assertEquals(": B", graph.getEdge(whiteVertex, catVertex).toString());
-    assertEquals(": C", graph.getEdge(theVertex, greenVertex).toString());
-    assertEquals(": C", graph.getEdge(greenVertex, catVertex).toString());
-    assertEquals(": D", graph.getEdge(theVertex, redVertex).toString());
-    assertEquals(": D", graph.getEdge(redVertex, catVertex).toString());
-    assertEquals(": E", graph.getEdge(theVertex, yellowVertex).toString());
-    assertEquals(": E", graph.getEdge(yellowVertex, catVertex).toString());
+    assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1], w[2], w[3], w[4]);
+    assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
+    assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0]);
+    assertHasWitnesses(edgeBetween(catVertex, graph.getEnd()), w[0], w[1], w[2], w[3], w[4]);
+    assertHasWitnesses(edgeBetween(theVertex, whiteVertex), w[1]);
+    assertHasWitnesses(edgeBetween(whiteVertex, catVertex), w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, greenVertex), w[2]);
+    assertHasWitnesses(edgeBetween(greenVertex, catVertex), w[2]);
+    assertHasWitnesses(edgeBetween(theVertex, redVertex), w[3]);
+    assertHasWitnesses(edgeBetween(redVertex, catVertex), w[3]);
+    assertHasWitnesses(edgeBetween(theVertex, yellowVertex), w[4]);
+    assertHasWitnesses(edgeBetween(yellowVertex, catVertex), w[4]);
   }
 
   @Test
   public void doubleTransposition2() {
-    final IVariantGraph graph = merge("a b", "b a");
-    assertEquals(5, graph.vertexSet().size());
+    final IWitness[] w = createWitnesses("a b", "b a");
+    final PersistentVariantGraph graph = merge(w);
 
-    final Iterator<IVariantGraphVertex> iterator = graph.iterator();
-    assertEquals("#", iterator.next().getNormalized());
-    assertEquals("b", iterator.next().getNormalized());
-    assertEquals("a", iterator.next().getNormalized());
-    assertEquals("b", iterator.next().getNormalized());
-    assertEquals("#", iterator.next().getNormalized());
+    assertEquals(5, Iterables.size(graph.traverseVertices(null)));
+
+    assertHasWitnesses(edgeBetween(vertexWith(graph, "b", w[1]), vertexWith(graph, "a", w[1])), w[1]);
+    assertHasWitnesses(edgeBetween(vertexWith(graph, "a", w[0]), vertexWith(graph, "b", w[0])), w[0]);
   }
 
   @Test
   public void mirroredTranspositionsWithMatchInBetween() {
-    final IVariantGraph graph = merge("the black and white cat", "the white and black cat");
+    final IWitness[] w = createWitnesses("the black and white cat", "the white and black cat");
+    final PersistentVariantGraph graph = merge(w);
+
+    Assert.assertEquals(9, Iterables.size(graph.traverseVertices(null)));
+
+    // FIXME: find out, how to test this without stable topological order
+    /*
     final Iterator<IVariantGraphVertex> iterator = graph.iterator();
 
     assertEquals("#", iterator.next().getNormalized());
@@ -167,5 +142,6 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals("white", iterator.next().getNormalized());
     assertEquals("black", iterator.next().getNormalized());
     assertEquals("cat", iterator.next().getNormalized());
+    */
   }
 }

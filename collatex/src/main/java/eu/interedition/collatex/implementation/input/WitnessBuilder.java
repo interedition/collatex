@@ -78,16 +78,18 @@ public class WitnessBuilder {
   }
 
   public IWitness build(String witnessId, String text, ITokenizer tokenizer) {
-    Iterator<IToken> tokenIterator = tokenizer.tokenize(text).iterator();
+    final Witness witness = new Witness(witnessId);
+    Iterator<IToken> tokenIterator = tokenizer.tokenize(witness, text).iterator();
     List<INormalizedToken> tokenList = Lists.newArrayList();
     while (tokenIterator.hasNext()) {
       IToken nextToken = tokenIterator.next();
       if (!nextToken.getContent().equals("")) {
         String normalized = tokenNormalizer.apply(nextToken).getNormalized();
-        tokenList.add(new NormalizedToken(nextToken.getContent(), normalized));
+        tokenList.add(new NormalizedToken(witness, tokenList.size(), nextToken.getContent(), normalized));
       }
     }
-    return new Witness(witnessId, tokenList);
+    witness.setTokens(tokenList);
+    return witness;
   }
 
   public IWitness build(String witness) {

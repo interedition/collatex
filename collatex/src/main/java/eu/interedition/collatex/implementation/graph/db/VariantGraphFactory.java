@@ -1,5 +1,6 @@
 package eu.interedition.collatex.implementation.graph.db;
 
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.START_END;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.VARIANT_GRAPH;
@@ -78,6 +80,10 @@ public class VariantGraphFactory {
     this.tokenResolver = tokenResolver;
   }
 
+  public Transaction newTransaction() {
+    return db.beginTx();
+  }
+
   public synchronized PersistentVariantGraph create() {
     final Transaction tx = db.beginTx();
     try {
@@ -87,8 +93,13 @@ public class VariantGraphFactory {
       variantGraphs.createRelationshipTo(start, START_END);
       end.createRelationshipTo(variantGraphs, START_END);
 
+      final PersistentVariantGraph graph = new PersistentVariantGraph(start, end, witnessResolver, tokenResolver);
+      graph.getStart().setTokens(Sets.<INormalizedToken>newTreeSet());
+      graph.getEnd().setTokens(Sets.<INormalizedToken>newTreeSet());
+      graph.createPath(graph.getStart(), graph.getEnd(), Sets.<IWitness>newTreeSet());
+
       tx.success();
-      return new PersistentVariantGraph(start, end, witnessResolver, tokenResolver);
+      return graph;
     } finally {
       tx.finish();
     }

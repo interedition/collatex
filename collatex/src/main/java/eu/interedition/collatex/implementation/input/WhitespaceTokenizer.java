@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import eu.interedition.collatex.interfaces.IToken;
 import eu.interedition.collatex.interfaces.ITokenizer;
+import eu.interedition.collatex.interfaces.IWitness;
 
 /**
  * A very simplistic tokenizer.
@@ -36,13 +37,15 @@ import eu.interedition.collatex.interfaces.ITokenizer;
 public class WhitespaceTokenizer implements ITokenizer {
 
   @Override
-  public Iterable<IToken> tokenize(String content) {
+  public Iterable<IToken> tokenize(final IWitness witness, String content) {
     final Iterator<String> tokenIterator = Arrays.asList(content.split("\\s+")).iterator();
     return new Iterable<IToken>() {
 
       @Override
       public Iterator<IToken> iterator() {
         return new Iterator<IToken>() {
+
+          private int tokenCount = 0;
 
           @Override
           public void remove() {
@@ -51,7 +54,7 @@ public class WhitespaceTokenizer implements ITokenizer {
 
           @Override
           public IToken next() {
-            return new Token(tokenIterator.next());
+            return new Token(witness, tokenCount++, tokenIterator.next());
           }
 
           @Override

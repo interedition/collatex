@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import com.google.common.collect.HashBiMap;

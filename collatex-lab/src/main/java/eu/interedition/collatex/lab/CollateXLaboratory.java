@@ -20,7 +20,7 @@ public class CollateXLaboratory extends JFrame {
 
     final VariantGraph g = new VariantGraph();
 
-    final VariantGraphVertex hello = new VariantGraphVertex(Collections.<INormalizedToken>singletonList(new NormalizedToken("Hello World", "hello world")));
+    final VariantGraphVertex hello = new VariantGraphVertex(Collections.<INormalizedToken>singletonList(new NormalizedToken(null, 0, "Hello World", "hello world")));
     g.addVertex(hello);
 
     final Witness w = new Witness("A");

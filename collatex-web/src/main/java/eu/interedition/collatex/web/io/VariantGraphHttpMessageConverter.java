@@ -112,7 +112,7 @@ public class VariantGraphHttpMessageConverter extends AbstractHttpMessageConvert
         xml.appendChild(root);
         root.setAttribute("xmlns", TEI_NS);
 
-        new CollateXEngine().createApparatus(vg).serialize(root);
+        // FIXME: new CollateXEngine().createApparatus(vg).serialize(root);
 
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         TransformerUtils.enableIndenting(transformer, 4);

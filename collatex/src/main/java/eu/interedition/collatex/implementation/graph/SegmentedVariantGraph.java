@@ -107,39 +107,6 @@ public class SegmentedVariantGraph extends DirectedAcyclicGraph<SegmentedVariant
     return segmentedGraph;
   }
 
-  /**
-   * Factory method that builds a ParallelSegmentationApparatus from a VariantGraph
-   *
-   */
-  public Apparatus toApparatus() {
-    List<Apparatus.Entry> entries = Lists.newArrayList();
-    Iterator<RankedVariantGraphVertex> iterator = getRankedVertices().iterator();
-    Iterator<SegmentedVariantGraphVertex> vertexIterator = iterator();
-    //skip startVertex
-    vertexIterator.next();
-    while(iterator.hasNext()) {
-      //nextVertex is a IRankedVariantGraphVertex which is not the
-      //same as a real vertex!
-      RankedVariantGraphVertex nextVertex = iterator.next();
-      SegmentedVariantGraphVertex next = vertexIterator.next();
-      if (next.equals(getEnd())) {
-        continue;
-      }
-      Apparatus.Entry entry;
-      int rank = nextVertex.getRank();
-      if (rank>entries.size()) {
-        entry = new Apparatus.Entry(witnesses);
-        entries.add(entry);
-      } else {
-        entry = entries.get(rank-1);
-      }
-      entry.add(next);
-    }
-
-    return new Apparatus(witnesses, entries);
-  }
-
-
   private SegmentedVariantGraph() {
     super(VariantGraphEdge.class);
   }

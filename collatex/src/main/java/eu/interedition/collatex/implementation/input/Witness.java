@@ -31,24 +31,16 @@ import java.util.List;
 import java.util.Map;
 
 public class Witness implements Iterable<INormalizedToken>, IWitness {
-  private String sigil;
-  protected List<INormalizedToken> tokens;
-  private Map<INormalizedToken, INormalizedToken> relations;
-
-  public Witness() {}
+  private final String sigil;
+  protected List<INormalizedToken> tokens = new ArrayList<INormalizedToken>();
+  private final Map<INormalizedToken, INormalizedToken> relations = Maps.newLinkedHashMap();
 
   public Witness(final String sigil) {
-    this(sigil, new ArrayList<INormalizedToken>());
-  }
-
-  public Witness(final String sigil, final List<INormalizedToken> tokens) {
     this.sigil = sigil;
-    this.tokens = tokens;
-    prepareTokens();
   }
 
   protected void prepareTokens() {
-    relations = Maps.newLinkedHashMap();
+    relations.clear();
     INormalizedToken previous = NormalizedToken.START;
     for (INormalizedToken token : tokens) {
       relations.put(previous, token);
@@ -71,10 +63,6 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
   @Override
   public String getSigil() {
     return sigil;
-  }
-
-  public void setSigil(String sigil) {
-    this.sigil = sigil;
   }
 
   // TODO check whether iterator.remove() throws exception!

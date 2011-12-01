@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.implementation.CollateXEngine;
 import eu.interedition.collatex.implementation.graph.CyclicVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
@@ -66,7 +68,7 @@ public class CollationController {
 
   @RequestMapping(value = "/graph", method = RequestMethod.POST)
   @ResponseBody
-  public IVariantGraph graph(@RequestBody Collation collation) throws Exception {
+  public PersistentVariantGraph graph(@RequestBody Collation collation) throws Exception {
     return new CollateXEngine().graph(checkAndExtractWitnesses(collation));
   }
 
@@ -116,7 +118,7 @@ public class CollationController {
       sigle.add(sigil);
 
       if ((witness.getTokens() == null) && (witness.getContent() != null)) {
-        Iterable<INormalizedToken> tokens = Iterables.transform(defaultTokenizer.tokenize(witness.getContent()), defaultNormalizer);
+        Iterable<INormalizedToken> tokens = Iterables.transform(defaultTokenizer.tokenize(witness, witness.getContent()), defaultNormalizer);
         witness.setTokens(Lists.<INormalizedToken>newArrayList(Iterables.transform(tokens, Token.TO_TOKEN)));
       }
 
@@ -129,8 +131,9 @@ public class CollationController {
 
     return witnesses.toArray(new Witness[witnesses.size()]);
   }
-  private String collate2dot(Collation collation) throws CollationException {
-    IVariantGraph graph = new CollateXEngine().graph(checkAndExtractWitnesses(collation));
+  private String collate2dot(Collation collation) throws CollationException, IOException {
+    // FIXME: reimplement dot creation based on persistent graph
+    IVariantGraph graph = (IVariantGraph) new CollateXEngine().graph(checkAndExtractWitnesses(collation));
     VertexNameProvider<IVariantGraphVertex> vertexIDProvider = new IntegerNameProvider<IVariantGraphVertex>();
     VertexNameProvider<IVariantGraphVertex> vertexLabelProvider = new VertexNameProvider<IVariantGraphVertex>() {
       @Override
@@ -178,8 +181,9 @@ public class CollationController {
           VERTEX_ID_PROVIDER, VERTEX_LABEL_PROVIDER, EDGE_LABEL_PROVIDER //
   );
 
-  private String ccollate2dot(Collation collation) throws CollationException {
-    final IVariantGraph graph = new CollateXEngine().graph(checkAndExtractWitnesses(collation));
+  private String ccollate2dot(Collation collation) throws CollationException, IOException {
+    // FIXME: re-implement based on persistent graph
+    final IVariantGraph graph = (IVariantGraph) new CollateXEngine().graph(checkAndExtractWitnesses(collation));
     final Writer writer = new StringWriter();
     CDOT_EXPORTER.export(writer, CyclicVariantGraph.create(graph));
     return writer.toString();

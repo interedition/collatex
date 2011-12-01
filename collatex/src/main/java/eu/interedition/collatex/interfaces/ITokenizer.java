@@ -22,5 +22,5 @@ package eu.interedition.collatex.interfaces;
 
 public interface ITokenizer {
 
-  Iterable<IToken> tokenize(String content);
+  Iterable<IToken> tokenize(IWitness witness, String content);
 }

@@ -63,7 +63,7 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
 
   @Override
   public IWitness build(InputStream inputStream) throws SAXException, IOException {
-    String id = UUID.randomUUID().toString();
+    Witness witness = new Witness(UUID.randomUUID().toString());
     Document doc = getXmlDocument(inputStream);
 
     XPath xpath = factory.newXPath();
@@ -84,12 +84,13 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
     } else { // get text from prepared 'w' elements 
       for (int i = 0; i < nodes.getLength(); i++) {
         String value = nodes.item(i).getTextContent();
-        NormalizedToken t = new NormalizedToken(value, value);
+        NormalizedToken t = new NormalizedToken(witness, tokenList.size(), value, value);
         t.setNormalized(tokenNormalizer.apply(t).getNormalized());
         tokenList.add(t);
       }
     }
-    return new Witness(id, tokenList);
+    witness.setTokens(tokenList);
+    return witness;
   }
 
   private Object evaluate(XPath xpath, Document doc, String exprression) {

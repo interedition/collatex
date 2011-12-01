@@ -56,7 +56,8 @@ public class SpencerHoweTest extends AbstractTest {
 
   @Test
   public void graph() {
-    final IVariantGraph graph = merge("a", "b", "a b");
+    //final IVariantGraph graph = merge("a", "b", "a b");
+    final IVariantGraph graph = null;
     assertEquals(4, graph.vertexSet().size());
 
     final Set<IVariantGraphEdge> edges = graph.edgeSet();

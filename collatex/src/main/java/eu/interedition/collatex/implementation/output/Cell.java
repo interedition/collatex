@@ -20,6 +20,7 @@
 
 package eu.interedition.collatex.implementation.output;
 
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -41,15 +42,6 @@ public class Cell {
 
   public Column getColumn() {
     return column;
-  }
-
-  /**
-   * Get a color value for this cell
-   * cells from the same vertex get the same color
-   */
-  public String getColor() {
-    IVariantGraphVertex vertexForWitness = column.findVertexForWitness(witness);
-    return vertexForWitness == null ? "black" : color(vertexForWitness.getVertexKey().hashCode());
   }
 
   private String color(int hashCode) {

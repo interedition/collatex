@@ -21,29 +21,25 @@
 package eu.interedition.collatex.implementation.input;
 
 import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IToken;
+import eu.interedition.collatex.interfaces.IWitness;
 
 public class NormalizedToken extends Token implements INormalizedToken {
-  public static final NormalizedToken START = new NormalizedToken("", "#");
-  public static final NormalizedToken END = new NormalizedToken("", "#");
+  public static final NormalizedToken START = new NormalizedToken(null, -1, "", "#");
+  public static final NormalizedToken END = new NormalizedToken(null, Integer.MAX_VALUE, "", "#");
 
   private String normalized;
 
-  public NormalizedToken() {
-    super();
-  }
-
-  public NormalizedToken(INormalizedToken other) {
+  public NormalizedToken(NormalizedToken other) {
     super(other);
     this.normalized = other.getNormalized();
   }
 
-  public NormalizedToken(final String content, final String normalized) {
-    super(content);
+  public NormalizedToken(IWitness witness, int index, String content, String normalized) {
+    super(witness, index, content);
     this.normalized = normalized;
   }
 
-  public NormalizedToken(final IToken token, final String normalized) {
+  public NormalizedToken(Token token, String normalized) {
     super(token);
     this.normalized = normalized;
   }
@@ -69,5 +65,14 @@ public class NormalizedToken extends Token implements INormalizedToken {
       normalized.append(token.getNormalized()).append(" ");
     }
     return normalized.toString().trim();
+  }
+
+  @Override
+  public int compareTo(INormalizedToken o) {
+    final int witnessComparison = getWitness().compareTo(o.getWitness());
+    if (witnessComparison != 0) {
+      return witnessComparison;
+    }
+    return (getIndex() - ((Token) o).getIndex());
   }
 }

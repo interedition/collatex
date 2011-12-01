@@ -21,28 +21,28 @@
 package eu.interedition.collatex.implementation.output;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.interfaces.ColumnState;
 import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
- *
  * A row of an alignment table which represents a single witness
- *
- *
+ * <p/>
+ * <p/>
  * TODO: consider whether this should be an inner interface since an IRow must exist within the context of an IAlignmentTable so the rows and columns will probably end up in the alignment table.
- *
  */
 public class Column {
-  private final List<IVariantGraphVertex> vertices;
+  private final List<PersistentVariantGraphVertex> vertices = Lists.newArrayList();
 
-  public Column(IVariantGraphVertex vertex) {
-    this.vertices = Lists.newArrayList();
+  public Column(PersistentVariantGraphVertex vertex) {
     addVertex(vertex);
   }
 
@@ -54,41 +54,43 @@ public class Column {
   }
 
   public INormalizedToken getToken(IWitness witness) {
-    IVariantGraphVertex vertex = findVertexForWitness(witness);
-    if (vertex == null) {
-      throw new NoSuchElementException("Witness " + witness.getSigil() + " is not present in this column");
+    final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
+    for (PersistentVariantGraphVertex vertex : vertices) {
+      for (INormalizedToken token : vertex.getTokens(witnessSet)) {
+        // FIXME: just picks the first of possibly several tokens per vertex
+        return token;
+      }
     }
-    return vertex.getToken(witness);
+    throw new NoSuchElementException("Witness " + witness.getSigil() + " is not present in this column");
   }
 
   //TODO: add/re-enable test (see parallel segmentation tests)
   public List<IWitness> getWitnesses() {
     List<IWitness> totalWitnesses = Lists.newArrayList();
-    for (IVariantGraphVertex vertex : vertices) {
+    for (PersistentVariantGraphVertex vertex : vertices) {
       Set<IWitness> witnesses = vertex.getWitnesses();
       totalWitnesses.addAll(witnesses);
     }
     return totalWitnesses;
   }
 
-  protected void addVertex(IVariantGraphVertex vertex) {
+  protected void addVertex(PersistentVariantGraphVertex vertex) {
     vertices.add(vertex);
   }
 
   public boolean containsWitness(IWitness witness) {
-    IVariantGraphVertex findVertexForWitness = findVertexForWitness(witness);
+    PersistentVariantGraphVertex findVertexForWitness = findVertexForWitness(witness);
     return findVertexForWitness != null;
   }
 
 
-  // should maybe be a map?
-  protected IVariantGraphVertex findVertexForWitness(IWitness witness) {
-    for (IVariantGraphVertex vertex : vertices) {
-      if (vertex.containsWitness(witness)) {
+  protected PersistentVariantGraphVertex findVertexForWitness(IWitness witness) {
+    // FIXME: should maybe be a map?
+    for (PersistentVariantGraphVertex vertex : vertices) {
+      if (vertex.getWitnesses().contains(witness)) {
         return vertex;
       }
     }
     return null;
   }
-
 }

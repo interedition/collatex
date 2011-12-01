@@ -2,6 +2,7 @@ package eu.interedition.collatex.cocoon;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
 import com.google.common.collect.*;
 import eu.interedition.collatex.implementation.CollateXEngine;
 import eu.interedition.collatex.implementation.input.Token;
@@ -29,15 +30,20 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     ALIGNMENT_TABLE, TEI_APPARATUS
   }
 
-  private CollateXEngine engine = new CollateXEngine();
+  private CollateXEngine engine;
   private OutputType outputType = OutputType.ALIGNMENT_TABLE;
   private SortedSet<IWitness> witnesses = Sets.newTreeSet();
   private String sigil;
 
   public CollateXTransformer() {
     super();
-    this.defaultNamespaceURI = COLLATEX_NS;
-    engine.setTokenizer(new WhitespaceAndPunctuationTokenizer());
+    try {
+      this.defaultNamespaceURI = COLLATEX_NS;
+      engine = new CollateXEngine();
+      engine.setTokenizer(new WhitespaceAndPunctuationTokenizer());
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   public void startTransformingElement(String uri, String name, String raw, Attributes attr) throws ProcessingException,

@@ -21,26 +21,31 @@
 package eu.interedition.collatex.implementation.input;
 
 import eu.interedition.collatex.interfaces.IToken;
+import eu.interedition.collatex.interfaces.IWitness;
 
 public class Token implements IToken {
+  private IWitness witness;
+  private int index;
   private String content;
   private String trailingWhitespace;
 
-  public Token() {
-    this(null, "");
-  }
-
-  public Token(String content, String trailingWhitespace) {
+  public Token(IWitness witness, int index, String content, String trailingWhitespace) {
+    this.witness = witness;
+    this.index = index;
     this.content = content;
     this.trailingWhitespace = trailingWhitespace;
   }
 
-  public Token(IToken other) {
-    this(other.getContent(), other.getTrailingWhitespace());
+  public Token(Token other) {
+    this(other.getWitness(), other.getIndex(), other.getContent(), other.getTrailingWhitespace());
   }
 
-  public Token(final String content) {
-    this(content, "");
+  public Token(IWitness witness, int index, String content) {
+    this(witness, index, content, "");
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   @Override
@@ -50,6 +55,11 @@ public class Token implements IToken {
 
   public void setContent(String content) {
     this.content = content;
+  }
+
+  @Override
+  public IWitness getWitness() {
+    return witness;
   }
 
   @Override

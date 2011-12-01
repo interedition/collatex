@@ -8,11 +8,12 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.interfaces.IToken;
 import eu.interedition.collatex.interfaces.ITokenizer;
+import eu.interedition.collatex.interfaces.IWitness;
 
 public class WhitespaceAndPunctuationTokenizer implements ITokenizer {
 
   @Override
-  public Iterable<IToken> tokenize(String content) {
+  public Iterable<IToken> tokenize(IWitness witness, String content) {
     List<IToken> tokens = Lists.newArrayList(); 
     StringTokenizer tokenizer = new StringTokenizer(content, " ,.-()?;:\n", true);
     Token previous = null;
@@ -20,7 +21,7 @@ public class WhitespaceAndPunctuationTokenizer implements ITokenizer {
       String trail = tokenizer.nextToken();
       //check whether token is whitespace or punctuation or actual content;
       if (!trail.trim().isEmpty()) {
-        final Token token = new Token(trail);
+        final Token token = new Token(witness, tokens.size(), trail);
         tokens.add(token);
         previous = token;
       } else {

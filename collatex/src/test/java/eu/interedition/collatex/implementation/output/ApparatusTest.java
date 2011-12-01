@@ -59,7 +59,7 @@ public class ApparatusTest extends AbstractTest {
     final Element root = xml.createElementNS(Apparatus.TEI_NS, "text");
     xml.appendChild(root);
 
-    SegmentedVariantGraph.create(JoinedVariantGraph.create(merge(witnesses))).toApparatus().serialize(root);
+    merge(witnesses).toApparatus().serialize(root);
     StringWriter out = new StringWriter();
     transformer.transform(new DOMSource(xml), new StreamResult(out));
     final String result = out.toString();

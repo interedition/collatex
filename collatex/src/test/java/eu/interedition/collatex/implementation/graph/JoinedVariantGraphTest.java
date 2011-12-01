@@ -23,16 +23,13 @@ package eu.interedition.collatex.implementation.graph;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.interfaces.IWitness;
 
@@ -42,110 +39,62 @@ public class JoinedVariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoIdenticalWitnesses() {
     final IWitness[] w = createWitnesses("the black cat", "the black cat");
-    final JoinedVariantGraph graph = JoinedVariantGraph.create(merge(w));
-    LOG.debug("joinedGraph=" + graph);
+    final PersistentVariantGraph graph = merge(w).join();
 
-    final JoinedVariantGraphVertex startVertex = graph.getStart();
-    assertEquals("#", startVertex.getNormalized());
-    assertEquals(0, startVertex.getWitnesses().size());
+    assertEquals(3, Iterables.size(graph.traverseVertices(null)));
+    assertEquals(2, Iterables.size(graph.traverseEdges(null)));
 
-    final Set<JoinedVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
-    assertEquals(1, outgoingEdges.size());
+    final PersistentVariantGraphVertex joinedVertex = vertexWith(graph, "the black cat", w[0]);
 
-    final JoinedVariantGraphEdge edge = outgoingEdges.iterator().next();
-    final JoinedVariantGraphVertex vertex = graph.getEdgeTarget(edge);
-    assertEquals("the black cat", vertex.getNormalized());
-
-    final Set<IWitness> witnesses = edge.getWitnesses();
-    assertEquals(2, witnesses.size());
-    assertTrue(witnesses.contains(w[0]));
-    assertTrue(witnesses.contains(w[1]));
-
-    final List<String> phrases = extractPhrases(graph);
-    assertEquals(phrases.toString(), 3, phrases.size());
-    assertTrue(phrases.contains("#"));
-    assertTrue(phrases.contains("the black cat"));
+    assertHasWitnesses(edgeBetween(graph.getStart(), joinedVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(graph.getEnd(), joinedVertex), w[0], w[1]);
   }
 
   @Test
   public void joinTwoDifferentWitnesses() {
     final IWitness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
-    final JoinedVariantGraph graph = JoinedVariantGraph.create(merge(w));
-    LOG.debug("joinedGraph=" + graph);
+    final PersistentVariantGraph graph = merge(w).join();
 
-    final JoinedVariantGraphVertex startVertex = graph.getStart();
-    assertEquals("#", startVertex.getNormalized());
-    assertEquals(0, startVertex.getWitnesses().size());
+    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final PersistentVariantGraphVertex niceBlackVertex = vertexWith(graph, "nice black", w[0]);
+    final PersistentVariantGraphVertex badWhiteVertex = vertexWith(graph, "bad white", w[0]);
+    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final PersistentVariantGraphVertex sharedVertex = vertexWith(graph, "shared", w[0]);
+    final PersistentVariantGraphVertex spilledVertex = vertexWith(graph, "spilled", w[1]);
+    final PersistentVariantGraphVertex hisFoodVertex = vertexWith(graph, "his food", w[0]);
+    final PersistentVariantGraphVertex againVertex = vertexWith(graph, "again", w[1]);
 
-    final Set<JoinedVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
-    assertEquals(1, outgoingEdges.size());
-
-    final JoinedVariantGraphEdge edge = outgoingEdges.iterator().next();
-    final JoinedVariantGraphVertex vertex = graph.getEdgeTarget(edge);
-    assertEquals("the", vertex.getNormalized());
-
-    final Set<IWitness> witnesses = edge.getWitnesses();
-    assertEquals(2, witnesses.size());
-    assertTrue(witnesses.contains(w[0]));
-    assertTrue(witnesses.contains(w[1]));
-
-    final List<String> phrases = extractPhrases(graph);
-    assertEquals(phrases.toString(), 10, phrases.size());
-    assertTrue(phrases.contains("#"));
-    assertTrue(phrases.contains("the"));
-    assertTrue(phrases.contains("nice black"));
-    assertTrue(phrases.contains("bad white"));
-    assertTrue(phrases.contains("cat"));
-    assertTrue(phrases.contains("shared"));
-    assertTrue(phrases.contains("spilled"));
-    assertTrue(phrases.contains("his food"));
-    assertTrue(phrases.contains("again"));
+    assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, niceBlackVertex), w[0]);
+    assertHasWitnesses(edgeBetween(niceBlackVertex, catVertex), w[0]);
+    assertHasWitnesses(edgeBetween(theVertex, badWhiteVertex), w[1]);
+    assertHasWitnesses(edgeBetween(badWhiteVertex, catVertex), w[0]);
+    assertHasWitnesses(edgeBetween(catVertex, sharedVertex), w[0]);
+    assertHasWitnesses(edgeBetween(sharedVertex, hisFoodVertex), w[0]);
+    assertHasWitnesses(edgeBetween(catVertex, spilledVertex), w[1]);
+    assertHasWitnesses(edgeBetween(spilledVertex, hisFoodVertex), w[1]);
+    assertHasWitnesses(edgeBetween(hisFoodVertex, againVertex), w[1]);
   }
 
   @Test
   public void joinTwoDifferentWitnesses2() {
     final IWitness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
-    final JoinedVariantGraph graph = JoinedVariantGraph.create(merge(w));
-    LOG.debug("joinedGraph=" + graph);
+    final PersistentVariantGraph graph = merge(w).join();
 
-    final JoinedVariantGraphVertex startVertex = graph.getStart();
-    assertEquals("#", startVertex.getNormalized());
-    assertEquals(0, startVertex.getWitnesses().size());
+    final PersistentVariantGraphVertex blackieVertex = vertexWith(graph, "blackie", w[0]);
+    final PersistentVariantGraphVertex whitneyVertex = vertexWith(graph, "whitney", w[0]);
+    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final PersistentVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
 
-    final Set<JoinedVariantGraphEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
-    assertEquals(2, outgoingEdges.size());
-
-    final Iterator<JoinedVariantGraphEdge> iterator = outgoingEdges.iterator();
-
-    JoinedVariantGraphEdge edge = iterator.next();
-    JoinedVariantGraphVertex vertex = graph.getEdgeTarget(edge);
-    assertEquals("blackie", vertex.getNormalized());
-
-    edge = iterator.next();
-    vertex = graph.getEdgeTarget(edge);
-    assertEquals("whitney", vertex.getNormalized());
-
-    final Set<IWitness> witnesses = edge.getWitnesses();
-    assertEquals(1, witnesses.size());
-    assertTrue(witnesses.contains(w[1]));
-
-    final List<String> phrases = extractPhrases(graph);
-    assertEquals(phrases.toString(), 8, phrases.size());
-    assertTrue(phrases.contains("#"));
-    assertTrue(phrases.contains("blackie"));
-    assertTrue(phrases.contains("whitney"));
-    assertTrue(phrases.contains("the"));
-    assertTrue(phrases.contains("black"));
-    assertTrue(phrases.contains("white"));
-    assertTrue(phrases.contains("cat"));
-  }
-
-  private static List<String> extractPhrases(JoinedVariantGraph joinedGraph) {
-    Set<JoinedVariantGraphVertex> vertexSet = joinedGraph.vertexSet();
-    List<String> phrases = Lists.newArrayList();
-    for (JoinedVariantGraphVertex variantGraphVertex : vertexSet) {
-      phrases.add(variantGraphVertex.getNormalized());
-    }
-    return phrases;
+    assertHasWitnesses(edgeBetween(graph.getStart(), blackieVertex), w[0]);
+    assertHasWitnesses(edgeBetween(blackieVertex, theVertex), w[0]);
+    assertHasWitnesses(edgeBetween(graph.getStart(), whitneyVertex), w[1]);
+    assertHasWitnesses(edgeBetween(whitneyVertex, theVertex), w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
+    assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0]);
+    assertHasWitnesses(edgeBetween(theVertex, whiteVertex), w[1]);
+    assertHasWitnesses(edgeBetween(whiteVertex, catVertex), w[1]);
   }
 }

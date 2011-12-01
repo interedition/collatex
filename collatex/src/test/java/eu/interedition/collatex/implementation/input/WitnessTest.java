@@ -20,7 +20,8 @@ public class WitnessTest extends AbstractTest {
     final INormalizedToken token2 = mock(INormalizedToken.class);
     final INormalizedToken token3 = mock(INormalizedToken.class);
 
-    final IWitness w = new Witness("id", Lists.newArrayList(token1, token2, token3));
+    final Witness w = new Witness("id");
+    w.setTokens(Lists.newArrayList(token1, token2, token3));
     assertTrue(w.isNear(token1, token2));
     assertTrue(w.isNear(NormalizedToken.START, token1));
   }
