@@ -18,8 +18,12 @@ import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.implementation.output.DotExporter;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class EditGraphVisitor {
 
+  private static final Logger LOG = LoggerFactory.getLogger(EditGraphVisitor.class);
   private final EditGraph editGraph;
 
   public EditGraphVisitor(EditGraph editGraph) {
@@ -33,7 +37,7 @@ public class EditGraphVisitor {
   // This is probably not the end solution
   public List<EditGraphEdge> getShortestPath(Matches match) {
     String dot = DotExporter.toDot(editGraph);
-    DotExporter.generateSVG("shortestpath_before.svg", dot, "Shortest Path before");
+    DotExporter.generateSVG("site/collation/shortestpath_before.svg", dot, "Shortest Path before");
 
     Map<EditGraphVertex, Integer> determineMinSequences = determineMinSequences(editGraph);
     int minSequences = determineMinSequences.get(editGraph.getStartVertex());
@@ -50,7 +54,7 @@ public class EditGraphVisitor {
     }
 
     dot = DotExporter.toDot(graphWithSinglePath);
-    DotExporter.generateSVG("shortestpath_after.svg", dot, "Shortest Path after");
+    DotExporter.generateSVG("site/collation/shortestpath_after.svg", dot, "Shortest Path after");
 
     if (graphWithSinglePath.outDegreeOf(currentVertex) > 1) {
       throw new RuntimeException("Vertex " + currentVertex + " has more than one possi!");
@@ -137,10 +141,10 @@ public class EditGraphVisitor {
   }
 
   private LinkedHashSet<EditGraphEdge> getMinimumScoreEdges() {
-    LinkedHashSet<EditGraphEdge> edgeSet = Sets.newLinkedHashSet();
-    List<EditGraphVertex> verticesToCheck = Lists.newArrayList();
-    verticesToCheck.add(editGraph.getStartVertex());
+    LinkedHashSet<EditGraphEdge> edgeSet1 = Sets.newLinkedHashSet();
+    List<EditGraphVertex> verticesToCheck = Lists.newArrayList(editGraph.getStartVertex());
     //    while (!vertex.equals(editGraph.getEndVertex())) {
+    boolean onePath = true;
     while (!verticesToCheck.isEmpty()) {
       EditGraphVertex vertex = verticesToCheck.remove(0);
       Set<EditGraphEdge> outgoingEdges = editGraph.outgoingEdgesOf(vertex);
@@ -151,13 +155,38 @@ public class EditGraphVisitor {
         }
         Integer minScore = Collections.min(edgesForScore.keySet());
         Collection<EditGraphEdge> edges = edgesForScore.get(minScore);
-        edgeSet.addAll(edges);
+        onePath = onePath && (edges.size() == 1);
+        edgeSet1.addAll(edges);
         for (EditGraphEdge editGraphEdge : edges) {
           verticesToCheck.add(editGraphEdge.getTargetVertex());
         }
       }
     }
-    return edgeSet;
+
+    if (!onePath) {
+      LOG.info("try reverse");
+      LinkedHashSet<EditGraphEdge> edgeSet2 = Sets.newLinkedHashSet();
+      verticesToCheck = Lists.newArrayList(editGraph.getEndVertex());
+      while (!verticesToCheck.isEmpty()) {
+        EditGraphVertex vertex = verticesToCheck.remove(0);
+        Set<EditGraphEdge> incomingEdges = editGraph.incomingEdgesOf(vertex);
+        if (!incomingEdges.isEmpty()) {
+          Multimap<Integer, EditGraphEdge> edgesForScore = ArrayListMultimap.create();
+          for (EditGraphEdge editGraphEdge : incomingEdges) {
+            edgesForScore.put(editGraphEdge.getScore(), editGraphEdge);
+          }
+          Integer minScore = Collections.min(edgesForScore.keySet());
+          Collection<EditGraphEdge> edges = edgesForScore.get(minScore);
+          edgeSet2.addAll(edges);
+          for (EditGraphEdge editGraphEdge : edges) {
+            verticesToCheck.add(editGraphEdge.getSourceVertex());
+          }
+        }
+      }
+      return Sets.newLinkedHashSet(Sets.intersection(edgeSet1, edgeSet2));
+    }
+
+    return edgeSet1;
   }
 
   private Set<EditGraphVertex> getVertices(Set<EditGraphEdge> minimumScoreEdges) {
