@@ -1,8 +1,17 @@
 package eu.interedition.collatex.implementation.matching;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Sets;
+
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.ITokenContainer;
 
@@ -30,7 +39,7 @@ public class Matches {
     final ListMultimap<INormalizedToken, INormalizedToken> all = ArrayListMultimap.create();
     for (INormalizedToken tokenA : aTokens) {
       for (INormalizedToken tokenB : bTokens) {
-        if (comparator.compare(tokenA, tokenB)== 0) {
+        if (comparator.compare(tokenA, tokenB) == 0) {
           all.put(tokenB, tokenA);
         }
       }
@@ -52,7 +61,7 @@ public class Matches {
       }
     }
     Multiset<INormalizedToken> bag = ImmutableMultiset.copyOf(all.values());
-    Set<INormalizedToken> unsureBaseTokens =  Sets.newLinkedHashSet();
+    Set<INormalizedToken> unsureBaseTokens = Sets.newLinkedHashSet();
     for (INormalizedToken token : aTokens) {
       int count = bag.count(token);
       if (count > 1) {
@@ -68,8 +77,8 @@ public class Matches {
     // sure tokens
     // have to check unsure tokens because of (base -> witness && witness -> base)
     Set<INormalizedToken> unique = Sets.newLinkedHashSet();
-    for (INormalizedToken token: bTokens) {
-      if (all.keys().count(token)==1&&!ambiguous.contains(token)) {
+    for (INormalizedToken token : bTokens) {
+      if (all.keys().count(token) == 1 && !ambiguous.contains(token)) {
         unique.add(token);
       }
     }

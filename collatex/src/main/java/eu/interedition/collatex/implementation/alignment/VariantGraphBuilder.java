@@ -1,17 +1,30 @@
 package eu.interedition.collatex.implementation.alignment;
 
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.implementation.graph.VariantGraphEdge;
 import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex.interfaces.*;
+import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.ITokenLinker;
+import eu.interedition.collatex.interfaces.IVariantGraph;
+import eu.interedition.collatex.interfaces.IVariantGraphEdge;
+import eu.interedition.collatex.interfaces.IVariantGraphVertex;
+import eu.interedition.collatex.interfaces.IWitness;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 public class VariantGraphBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraphBuilder.class);
@@ -22,10 +35,10 @@ public class VariantGraphBuilder {
   private final PhraseMatchDetector phraseMatchDetector;
   private final TranspositionDetector transpositionDetector;
 
-  private Map<INormalizedToken,INormalizedToken> tokenLinks;
+  private Map<INormalizedToken, INormalizedToken> tokenLinks;
   private List<Tuple<List<INormalizedToken>>> phraseMatches;
   private List<Tuple<Tuple<List<INormalizedToken>>>> transpositions;
-  private Map<INormalizedToken,INormalizedToken> alignments;
+  private Map<INormalizedToken, INormalizedToken> alignments;
 
   public VariantGraphBuilder(IVariantGraph graph) {
     this(graph, new EqualityTokenComparator(), new TokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());

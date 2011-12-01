@@ -33,7 +33,7 @@ public class EditGraphVisitor {
   // Question: do I need to convert this graph to another graph with
   // other weights to determine the shortest path with a standard algo?
   // For now I just remove all the vertices that have a higher value
-  // then the minimum amount of sequences for the whole graph
+  // than the minimum amount of sequences for the whole graph
   // This is probably not the end solution
   public List<EditGraphEdge> getShortestPath(Matches match) {
     String dot = DotExporter.toDot(editGraph);
@@ -57,7 +57,7 @@ public class EditGraphVisitor {
     DotExporter.generateSVG("site/collation/shortestpath_after.svg", dot, "Shortest Path after");
 
     if (graphWithSinglePath.outDegreeOf(currentVertex) > 1) {
-      throw new RuntimeException("Vertex " + currentVertex + " has more than one possi!");
+      throw new RuntimeException("Vertex " + currentVertex + " has more than one possible outgoing edge!");
     }
     return shortestPath;
   }
@@ -135,15 +135,15 @@ public class EditGraphVisitor {
   }
 
   private EditGraph buildNewGraphWithOnlyMinimumScoreEdges(Matches matches) {
-    Set<EditGraphEdge> minimumScoreEdges = getMinimumScoreEdges();
+    Set<EditGraphEdge> minimumScoreEdges = getMinimumScoreEdges(matches);
     Set<EditGraphVertex> vertices = getVertices(minimumScoreEdges);
     return newEditGraph(minimumScoreEdges, vertices);
   }
 
-  private LinkedHashSet<EditGraphEdge> getMinimumScoreEdges() {
+  private LinkedHashSet<EditGraphEdge> getMinimumScoreEdges(Matches matches) {
+    Set<INormalizedToken> ambiguous = matches.getAmbiguous();
     LinkedHashSet<EditGraphEdge> edgeSet1 = Sets.newLinkedHashSet();
     List<EditGraphVertex> verticesToCheck = Lists.newArrayList(editGraph.getStartVertex());
-    //    while (!vertex.equals(editGraph.getEndVertex())) {
     boolean onePath = true;
     while (!verticesToCheck.isEmpty()) {
       EditGraphVertex vertex = verticesToCheck.remove(0);
@@ -208,7 +208,7 @@ public class EditGraphVisitor {
 
   private Set<EditGraphEdge> getEdges(Set<EditGraphVertex> verticesToKeep) {
     Set<EditGraphEdge> edgeSet = editGraph.edgeSet();
-    Set<EditGraphEdge> newEdges = getMinimumScoreEdges();
+    Set<EditGraphEdge> newEdges = Sets.newLinkedHashSet();
     for (EditGraphEdge edge : edgeSet) {
       if (verticesToKeep.contains(edge.getSourceVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
         EditGraphEdge newEdge = new EditGraphEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge.getEditOperation(), edge.getScore());
