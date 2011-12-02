@@ -16,10 +16,12 @@
 package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
+import eu.interedition.collatex.implementation.input.Witness;
 import eu.interedition.collatex.interfaces.*;
 
 import java.util.Iterator;
@@ -55,7 +57,7 @@ public class VariantGraphWitnessAdapter implements IWitness {
 
   @Override
   public String getSigil() {
-    return "superbase";
+    return Witness.SUPERBASE.getSigil();
   }
 
   @Override
@@ -65,8 +67,8 @@ public class VariantGraphWitnessAdapter implements IWitness {
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    final PersistentVariantGraphVertex va = NormalizedToken.START.equals(a) ? graph.getStart() : (PersistentVariantGraphVertex) a;
-    final PersistentVariantGraphVertex vb = NormalizedToken.END.equals(b) ? graph.getEnd() : (PersistentVariantGraphVertex) b;
+    final PersistentVariantGraphVertex va = NormalizedToken.START.equals(a) ? graph.getStart() : ((VariantGraphVertexTokenAdapter) a).getVertex();
+    final PersistentVariantGraphVertex vb = NormalizedToken.END.equals(b) ? graph.getEnd() : ((VariantGraphVertexTokenAdapter) b).getVertex();
     return graph.verticesAreAdjacent(va, vb);
   }
 
@@ -79,6 +81,11 @@ public class VariantGraphWitnessAdapter implements IWitness {
   public int compareTo(IWitness o) {
     Preconditions.checkArgument(!(o instanceof VariantGraphWitnessAdapter));
     return -1;
+  }
+
+  @Override
+  public String toString() {
+    return getSigil();
   }
 
   /**
@@ -132,6 +139,11 @@ public class VariantGraphWitnessAdapter implements IWitness {
     @Override
     public IWitness getWitness() {
       return witnessAdapter;
+    }
+
+    @Override
+    public String toString() {
+      return vertex.toString();
     }
   }
 }

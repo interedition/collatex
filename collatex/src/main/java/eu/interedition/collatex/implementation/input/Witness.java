@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Witness implements Iterable<INormalizedToken>, IWitness {
+  public static final Witness SUPERBASE = new Witness("");
+
   private final String sigil;
   protected List<INormalizedToken> tokens = new ArrayList<INormalizedToken>();
   private final Map<INormalizedToken, INormalizedToken> relations = Maps.newLinkedHashMap();

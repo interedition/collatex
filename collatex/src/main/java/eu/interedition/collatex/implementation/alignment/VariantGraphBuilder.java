@@ -66,19 +66,43 @@ public class VariantGraphBuilder {
   protected void merge(IWitness witness) {
     final IWitness base = VariantGraphWitnessAdapter.create(graph);
 
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("{} + {}: {} vs. {}", new Object[] { graph, witness, base.getTokens(), witness.getTokens() });
+    }
+
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
     tokenLinks = tokenLinker.link(base, witness, comparator);
+    if (LOG.isTraceEnabled()) {
+      for (Map.Entry<INormalizedToken, INormalizedToken> tokenLink : tokenLinks.entrySet()) {
+        LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
+      }
+    }
 
     LOG.debug("{} + {}: Detect phrase matches", graph, witness);
     phraseMatches = phraseMatchDetector.detect(tokenLinks, base, witness);
+    if (LOG.isTraceEnabled()) {
+      for (Tuple<List<INormalizedToken>> phraseMatch : phraseMatches) {
+        LOG.trace("{} + {}: Phrase match: {} = {}", new Object[] { graph, witness, Iterables.toString(phraseMatch.left), Iterables.toString(phraseMatch.right) });
+      }
+    }
 
     LOG.debug("{} + {}: Detect transpositions", graph, witness);
     transpositions = filterMirrored(transpositionDetector.detect(phraseMatches, base), witness);
+    if (LOG.isTraceEnabled()) {
+      for (Tuple<List<INormalizedToken>> transposition : transpositions) {
+        LOG.trace("{} + {}: Transposition: {} = {}", new Object[] { graph, witness, Iterables.toString(transposition.left), Iterables.toString(transposition.right) });
+      }
+    }
 
     LOG.debug("{} + {}: Determine aligned tokens by filtering transpositions", graph, witness);
     alignments = Maps.newLinkedHashMap(tokenLinks);
     for (Tuple<List<INormalizedToken>> transposedPhrase : transpositions) {
       alignments.keySet().removeAll(transposedPhrase.right);
+    }
+    if (LOG.isTraceEnabled()) {
+      for (Map.Entry<INormalizedToken, INormalizedToken> alignment : alignments.entrySet()) {
+        LOG.trace("{} + {}: Alignment: {} = {}", new Object[] { graph, witness, alignment.getValue(), alignment.getKey() });
+      }
     }
 
     LOG.debug("{} + {}: Merge comparand into graph", graph, witness);
@@ -98,6 +122,10 @@ public class VariantGraphBuilder {
     graph.createPath(last, graph.getEnd(), witnessSet);
 
     // FIXME: register transpositions in graph!
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("{}: {}", graph, Iterables.toString(graph.traverseVertices(null)));
+    }
   }
 
   // NOTE: this method should not return the original sequence when a mirror exists!

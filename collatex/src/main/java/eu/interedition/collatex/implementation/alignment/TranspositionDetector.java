@@ -26,15 +26,19 @@ import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.ITokenContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class TranspositionDetector {
+  private static final Logger LOG = LoggerFactory.getLogger(TranspositionDetector.class);
 
   public List<Tuple<Tuple<List<INormalizedToken>>>> detect(List<Tuple<List<INormalizedToken>>> phraseMatches, ITokenContainer base) {
     // sort phrase matches by base token order
@@ -67,7 +71,16 @@ public class TranspositionDetector {
       }
     }
 
+    if (LOG.isTraceEnabled()) {
+      for (Tuple<Tuple<List<INormalizedToken>>> transposition : transpositions) {
+        LOG.trace("Detected transposition: {} <==> {}", phraseMatchToString(transposition.left), phraseMatchToString(transposition.right));
+      }
+    }
     return transpositions;
+  }
+
+  private Object phraseMatchToString(Tuple<List<INormalizedToken>> phraseMatch) {
+    return new StringBuilder("{").append(Iterables.toString(phraseMatch.left)).append(" = ").append(Iterables.toString(phraseMatch.right)).append("}").toString();
   }
 
 }

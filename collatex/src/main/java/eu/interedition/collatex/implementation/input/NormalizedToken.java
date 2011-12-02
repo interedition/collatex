@@ -24,8 +24,8 @@ import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 
 public class NormalizedToken extends Token implements INormalizedToken {
-  public static final NormalizedToken START = new NormalizedToken(null, -1, "", "#");
-  public static final NormalizedToken END = new NormalizedToken(null, Integer.MAX_VALUE, "", "#");
+  public static final NormalizedToken START = new NormalizedToken(Witness.SUPERBASE, -1, "", "#");
+  public static final NormalizedToken END = new NormalizedToken(Witness.SUPERBASE, Integer.MAX_VALUE, "", "#");
 
   private String normalized;
 
@@ -56,7 +56,7 @@ public class NormalizedToken extends Token implements INormalizedToken {
 
   @Override
   public String toString() {
-    return getNormalized();
+    return new StringBuilder(getWitness().toString()).append(":'").append(getNormalized()).append("'").toString();
   }
 
   public static String toString(Iterable<? extends INormalizedToken> tokens) {

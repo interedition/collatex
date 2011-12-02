@@ -112,36 +112,18 @@ public class CollateXLaboratory extends JFrame {
         final PersistentVariantGraph pvg = variantGraphFactory.create();
         new VariantGraphBuilder(pvg).add(witnesses.toArray(new IWitness[witnesses.size()]));
 
+        variantGraph.update(pvg.join());
 
-        for (VariantGraphEdge edge : Lists.newArrayList(variantGraph.getEdges())) {
-          variantGraph.removeEdge(edge);
-        }
-        for (VariantGraphVertex vertex : Lists.newArrayList(variantGraph.getVertices())) {
-          variantGraph.removeVertex(vertex);
-        }
-
-        final Map<PersistentVariantGraphVertex, VariantGraphVertex> vertexMap = Maps.newHashMap();
-        for (PersistentVariantGraphVertex pv : pvg.traverseVertices(null)) {
-          final VariantGraphVertex v = new VariantGraphVertex(pv.getTokens(null));
-          variantGraph.addVertex(v);
-          vertexMap.put(pv, v);
-          if (pvg.getStart().equals(pv)) {
-            variantGraph.setStart(v);
-          } else if (pvg.getEnd().equals(pv)) {
-            variantGraph.setEnd(v);
-          }
-        }
-        for (PersistentVariantGraphEdge pe : pvg.traverseEdges(null)) {
-          variantGraph.addEdge(new VariantGraphEdge(pe.getWitnesses()), vertexMap.get(pe.getStart()), vertexMap.get(pe.getEnd()));
-        }
-
-        variantGraphPanel.setGraphLayout(new FRLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph));
         transaction.success();
       } finally {
         transaction.finish();
       }
 
       LOG.debug("Collated {}", Iterables.toString(witnesses));
+
+      final DAGLayout<VariantGraphVertex, VariantGraphEdge> layout = new DAGLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph);
+      layout.setRoot(variantGraph.getEnd());
+      variantGraphPanel.setGraphLayout(layout);
     }
   }
 }

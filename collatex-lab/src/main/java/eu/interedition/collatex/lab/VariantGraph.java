@@ -1,9 +1,15 @@
 package eu.interedition.collatex.lab;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -27,5 +33,29 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, Varian
 
   public void setEnd(VariantGraphVertex end) {
     this.end = end;
+  }
+
+  public void update(PersistentVariantGraph pvg) {
+    for (VariantGraphEdge edge : Lists.newArrayList(getEdges())) {
+      removeEdge(edge);
+    }
+    for (VariantGraphVertex vertex : Lists.newArrayList(getVertices())) {
+      removeVertex(vertex);
+    }
+
+    final Map<PersistentVariantGraphVertex, VariantGraphVertex> vertexMap = Maps.newHashMap();
+    for (PersistentVariantGraphVertex pv : pvg.traverseVertices(null)) {
+      final VariantGraphVertex v = new VariantGraphVertex(pv.getTokens(null));
+      addVertex(v);
+      vertexMap.put(pv, v);
+      if (pvg.getStart().equals(pv)) {
+        setStart(v);
+      } else if (pvg.getEnd().equals(pv)) {
+        setEnd(v);
+      }
+    }
+    for (PersistentVariantGraphEdge pe : pvg.traverseEdges(null)) {
+      addEdge(new VariantGraphEdge(pe.getWitnesses()), vertexMap.get(pe.getStart()), vertexMap.get(pe.getEnd()));
+    }
   }
 }

@@ -1,24 +1,18 @@
 package eu.interedition.collatex.implementation.graph.db;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
+import static eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge.createTraversableFilter;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.PATH;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -73,12 +67,12 @@ public class PersistentVariantGraphVertex {
     setTokenReferences(graph.getTokenResolver().resolve(tokens));
   }
 
-  public Iterable<PersistentVariantGraphEdge> getIncomingPaths() {
-    return transform(node.getRelationships(PATH, INCOMING), graph.getEdgeWrapper());
+  public Iterable<PersistentVariantGraphEdge> getIncomingPaths(SortedSet<IWitness> witnesses) {
+    return filter(transform(node.getRelationships(PATH, INCOMING), graph.getEdgeWrapper()), createTraversableFilter(witnesses));
   }
 
-  public Iterable<PersistentVariantGraphEdge> getOutgoingPaths() {
-    return transform(node.getRelationships(PATH, OUTGOING), graph.getEdgeWrapper());
+  public Iterable<PersistentVariantGraphEdge> getOutgoingPaths(SortedSet<IWitness> witnesses) {
+    return filter(transform(node.getRelationships(PATH, OUTGOING), graph.getEdgeWrapper()), createTraversableFilter(witnesses));
   }
 
   public int getRank() {
@@ -120,6 +114,11 @@ public class PersistentVariantGraphVertex {
       return node.equals(((PersistentVariantGraphVertex)obj).node);
     }
     return super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return Iterables.toString(getTokens(null));
   }
 
   public static Function<Node, PersistentVariantGraphVertex> createWrapper(final PersistentVariantGraph in) {

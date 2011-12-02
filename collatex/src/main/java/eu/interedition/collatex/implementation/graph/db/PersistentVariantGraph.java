@@ -2,6 +2,7 @@ package eu.interedition.collatex.implementation.graph.db;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -36,6 +37,7 @@ import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.all;
 import static com.google.common.collect.Iterables.transform;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.PATH;
+import static java.util.Collections.singleton;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -43,8 +45,6 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class PersistentVariantGraph {
-  private static final Logger LOG = LoggerFactory.getLogger(PersistentVariantGraph.class);
-
   private final GraphDatabaseService db;
   private final PersistentVariantGraphVertex start;
   private final PersistentVariantGraphVertex end;
@@ -96,16 +96,64 @@ public class PersistentVariantGraph {
     throw new UnsupportedOperationException();
   }
 
-  public Iterable<PersistentVariantGraphVertex> traverseVertices(SortedSet<IWitness> witnesses) {
-    return transform(createTopologicalTraversal(witnesses, true).traverse(start.getNode()).nodes(), vertexWrapper);
+  public Iterable<PersistentVariantGraphVertex> traverseVertices(final SortedSet<IWitness> witnesses) {
+    return new Iterable<PersistentVariantGraphVertex>() {
+      @Override
+      public Iterator<PersistentVariantGraphVertex> iterator() {
+        return new AbstractIterator<PersistentVariantGraphVertex>() {
+          private Map<PersistentVariantGraphVertex, Integer> encountered = Maps.newHashMap();
+          private Queue<PersistentVariantGraphVertex> queue = new ArrayDeque<PersistentVariantGraphVertex>(singleton(getStart()));
+
+          @Override
+          protected PersistentVariantGraphVertex computeNext() {
+            if (queue.isEmpty()) {
+              return endOfData();
+            }
+            final PersistentVariantGraphVertex next = queue.remove();
+            for (PersistentVariantGraphEdge edge : next.getOutgoingPaths(witnesses)) {
+              final PersistentVariantGraphVertex end = edge.getEnd();
+              final int endIncoming = Iterables.size(end.getIncomingPaths(witnesses));
+              if (endIncoming == 1) {
+                queue.add(end);
+              } else if (encountered.containsKey(end)) {
+                final int endEncountered = encountered.remove(end);
+                if ((endIncoming - endEncountered) == 1) {
+                  queue.add(end);
+                } else {
+                  encountered.put(end, endEncountered + 1);
+                }
+              } else {
+                encountered.put(end, 1);
+              }
+            }
+            return next;
+          }
+        };
+      }
+    };
   }
 
-  public Iterable<PersistentVariantGraphEdge> traverseEdges(SortedSet<IWitness> witnesses) {
-    return transform(createTopologicalTraversal(witnesses, false).traverse(start.getNode()).relationships(), edgeWrapper);
+  public Iterable<PersistentVariantGraphEdge> traverseEdges(final SortedSet<IWitness> witnesses) {
+    return transform(Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
+
+      @Override
+      public Evaluation evaluate(Path path) {
+        if (witnesses != null && !witnesses.isEmpty()) {
+          final Relationship lastRel = path.lastRelationship();
+          if (lastRel != null) {
+            if (!new PersistentVariantGraphEdge(PersistentVariantGraph.this, lastRel).canBeTraversed(witnesses)) {
+              return Evaluation.EXCLUDE_AND_PRUNE;
+            }
+          }
+        }
+
+        return Evaluation.INCLUDE_AND_CONTINUE;
+      }
+    }).traverse(start.getNode()).relationships(), edgeWrapper);
   }
 
   public PersistentVariantGraphVertex addVertex(INormalizedToken token) {
-    return new PersistentVariantGraphVertex(this, Sets.newTreeSet(Collections.singleton(token)));
+    return new PersistentVariantGraphVertex(this, Sets.newTreeSet(singleton(token)));
   }
 
   public PersistentVariantGraphEdge createPath(PersistentVariantGraphVertex from, PersistentVariantGraphVertex to, SortedSet<IWitness> witnesses) {
@@ -118,7 +166,7 @@ public class PersistentVariantGraph {
       }
     }
 
-    for (PersistentVariantGraphEdge e : from.getOutgoingPaths()) {
+    for (PersistentVariantGraphEdge e : from.getOutgoingPaths(null)) {
       if (to.equals(e.getEnd())) {
         return e.add(witnesses);
       }
@@ -143,7 +191,7 @@ public class PersistentVariantGraph {
 
   public SortedSet<IWitness> getWitnesses() {
     final SortedSet<IWitness> witnesses = Sets.newTreeSet();
-    for (PersistentVariantGraphEdge e : start.getOutgoingPaths()) {
+    for (PersistentVariantGraphEdge e : start.getOutgoingPaths(null)) {
       witnesses.addAll(e.getWitnesses());
     }
     return witnesses;
@@ -151,24 +199,25 @@ public class PersistentVariantGraph {
 
   public PersistentVariantGraph join() {
     final Queue<PersistentVariantGraphVertex> queue = new ArrayDeque<PersistentVariantGraphVertex>();
-    for (PersistentVariantGraphEdge e : start.getOutgoingPaths()) {
+    for (PersistentVariantGraphEdge e : start.getOutgoingPaths(null)) {
       queue.offer(e.getEnd());
     }
 
     while (!queue.isEmpty()) {
       final PersistentVariantGraphVertex vertex = queue.poll();
-      final List<PersistentVariantGraphEdge> outgoing = Lists.newArrayList(vertex.getOutgoingPaths());
+      final List<PersistentVariantGraphEdge> outgoing = Lists.newArrayList(vertex.getOutgoingPaths(null));
       if (outgoing.size() == 1) {
         final PersistentVariantGraphEdge joinCandidateSingleIncoming = outgoing.get(0);
         final PersistentVariantGraphVertex joinCandidate = joinCandidateSingleIncoming.getEnd();
-        if (Iterables.size(joinCandidate.getIncomingPaths()) == 1) {
-          final List<PersistentVariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.getOutgoingPaths());
+        if (Iterables.size(joinCandidate.getIncomingPaths(null)) == 1) {
+          final List<PersistentVariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.getOutgoingPaths(null));
           if (joinCandidateOutgoing.size() == 1) {
             final PersistentVariantGraphEdge joinCandidateSingleOutgoing = joinCandidateOutgoing.get(0);
             final SortedSet<IWitness> witnesses = joinCandidateSingleIncoming.getWitnesses();
             if (witnesses.equals(joinCandidateSingleOutgoing.getWitnesses())) {
               vertex.add(joinCandidate.getTokens(null));
               createPath(vertex, joinCandidateSingleOutgoing.getEnd(), witnesses);
+
               joinCandidateSingleIncoming.delete();
               joinCandidateSingleOutgoing.delete();
               joinCandidate.delete();
@@ -188,7 +237,7 @@ public class PersistentVariantGraph {
   public PersistentVariantGraph rank() {
     for (PersistentVariantGraphVertex v : traverseVertices(null)) {
       int rank = -1;
-      for (PersistentVariantGraphEdge e : v.getIncomingPaths()) {
+      for (PersistentVariantGraphEdge e : v.getIncomingPaths(null)) {
         rank = Math.max(rank, e.getStart().getRank());
       }
       v.setRank(rank + 1);
@@ -225,65 +274,6 @@ public class PersistentVariantGraph {
 
   public Iterable<PersistentVariantGraphVertex> findLongestPath() {
     throw new UnsupportedOperationException();
-  }
-
-  private TraversalDescription createTopologicalTraversal(final SortedSet<IWitness> witnesses, final boolean topological) {
-    return Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
-      private Map<Long, Integer> inDegrees = Maps.newHashMap();
-
-      @Override
-      public Evaluation evaluate(Path path) {
-        if (witnesses != null && !witnesses.isEmpty()) {
-          final Relationship lastRel = path.lastRelationship();
-          if (lastRel != null) {
-            final PersistentVariantGraphEdge edge = new PersistentVariantGraphEdge(PersistentVariantGraph.this, lastRel);
-            if (all(edge.getWitnesses(), not(in(witnesses)))) {
-              if (LOG.isTraceEnabled()) {
-                LOG.trace("Excluding {} because of witness selection: {}", path, Iterables.toString(witnesses));
-              }
-              return Evaluation.EXCLUDE_AND_PRUNE;
-            }
-          }
-        }
-
-        if (!topological) {
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("Including {} because of non-topological traversal", path);
-          }
-          return Evaluation.INCLUDE_AND_CONTINUE;
-        }
-
-        final Node node = path.endNode();
-        final int numOtherIncoming = Iterables.size(node.getRelationships(PATH, INCOMING)) - 1;
-        if (numOtherIncoming <= 0) {
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("Including {} because of singular in-paths", path);
-          }
-          return Evaluation.INCLUDE_AND_CONTINUE;
-        }
-
-        final long nodeId = node.getId();
-        final Integer countDown = inDegrees.remove(nodeId);
-        if (countDown == null) {
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("Excluding {} because of unencountered node {} with {} remaining in-paths", new Object[] { path, nodeId, numOtherIncoming });
-          }
-          inDegrees.put(nodeId, numOtherIncoming);
-          return Evaluation.EXCLUDE_AND_CONTINUE;
-        } else if (countDown == 1) {
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("Including {} because last in-path of {} encountered", path, nodeId);
-          }
-          return Evaluation.INCLUDE_AND_CONTINUE;
-        } else {
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("Excluding {} and counting down in-path of {} to {}", new Object[] { path, nodeId, countDown - 1 });
-          }
-          inDegrees.put(nodeId, countDown - 1);
-          return Evaluation.EXCLUDE_AND_CONTINUE;
-        }
-      }
-    });
   }
 
   @Override

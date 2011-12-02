@@ -1,6 +1,9 @@
 package eu.interedition.collatex.implementation.graph.db;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Relationship;
@@ -35,6 +38,10 @@ public class PersistentVariantGraphEdge {
 
   public PersistentVariantGraphVertex getEnd() {
     return graph.getVertexWrapper().apply(relationship.getEndNode());
+  }
+
+  public boolean canBeTraversed(SortedSet<IWitness> witnesses) {
+    return witnesses == null || witnesses.isEmpty() || Iterables.any(getWitnesses(), Predicates.in(witnesses));
   }
 
   public PersistentVariantGraphEdge add(SortedSet<IWitness> witnesses) {
@@ -83,6 +90,15 @@ public class PersistentVariantGraphEdge {
       @Override
       public PersistentVariantGraphEdge apply(Relationship input) {
         return new PersistentVariantGraphEdge(in, input);
+      }
+    };
+  }
+
+  public static Predicate<PersistentVariantGraphEdge> createTraversableFilter(final SortedSet<IWitness> witnesses) {
+    return new Predicate<PersistentVariantGraphEdge>() {
+      @Override
+      public boolean apply(PersistentVariantGraphEdge input) {
+        return input.canBeTraversed(witnesses);
       }
     };
   }
