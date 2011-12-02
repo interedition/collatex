@@ -8,7 +8,7 @@ import java.util.SortedSet;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class VariantGraphEdge {
-  private SortedSet<IWitness> witnesses;
+  private final SortedSet<IWitness> witnesses;
 
   public VariantGraphEdge(SortedSet<IWitness> witnesses) {
     this.witnesses = witnesses;
@@ -17,4 +17,5 @@ public class VariantGraphEdge {
   public SortedSet<IWitness> getWitnesses() {
     return witnesses;
   }
+
 }

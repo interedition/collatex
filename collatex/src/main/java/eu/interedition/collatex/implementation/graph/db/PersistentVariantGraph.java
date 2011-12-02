@@ -7,8 +7,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.implementation.graph.RankedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.SegmentedVariantGraphVertex;
 import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -18,27 +16,19 @@ import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
-import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.Traversal;
 import org.neo4j.kernel.Uniqueness;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.SortedSet;
 
-import static com.google.common.base.Predicates.in;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.Iterables.all;
 import static com.google.common.collect.Iterables.transform;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.PATH;
 import static java.util.Collections.singleton;
-import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 /**
@@ -199,8 +189,8 @@ public class PersistentVariantGraph {
 
   public PersistentVariantGraph join() {
     final Queue<PersistentVariantGraphVertex> queue = new ArrayDeque<PersistentVariantGraphVertex>();
-    for (PersistentVariantGraphEdge e : start.getOutgoingPaths(null)) {
-      queue.offer(e.getEnd());
+    for (PersistentVariantGraphEdge startingEdges : start.getOutgoingPaths(null)) {
+      queue.offer(startingEdges.getEnd());
     }
 
     while (!queue.isEmpty()) {
@@ -222,6 +212,7 @@ public class PersistentVariantGraph {
               joinCandidateSingleOutgoing.delete();
               joinCandidate.delete();
               outgoing.remove(joinCandidateSingleIncoming);
+              queue.add(vertex);
             }
           }
         }

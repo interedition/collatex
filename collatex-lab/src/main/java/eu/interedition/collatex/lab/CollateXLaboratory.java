@@ -112,7 +112,7 @@ public class CollateXLaboratory extends JFrame {
         final PersistentVariantGraph pvg = variantGraphFactory.create();
         new VariantGraphBuilder(pvg).add(witnesses.toArray(new IWitness[witnesses.size()]));
 
-        variantGraph.update(pvg.join());
+        variantGraph.update(pvg.join().rank());
 
         transaction.success();
       } finally {

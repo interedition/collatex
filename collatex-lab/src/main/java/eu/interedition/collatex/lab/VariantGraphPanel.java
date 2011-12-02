@@ -48,7 +48,7 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, V
           public String apply(INormalizedToken input) {
             return input.getWitness().getSigil() + ":'" + input.getNormalized() + "'";
           }
-        }));
+        })) + " (" + variantGraphVertex.getRank() + ")";
       }
     });
     rc.setVertexFillPaintTransformer(new Transformer<VariantGraphVertex, Paint>() {

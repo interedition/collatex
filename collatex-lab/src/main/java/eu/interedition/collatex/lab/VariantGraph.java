@@ -45,7 +45,7 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, Varian
 
     final Map<PersistentVariantGraphVertex, VariantGraphVertex> vertexMap = Maps.newHashMap();
     for (PersistentVariantGraphVertex pv : pvg.traverseVertices(null)) {
-      final VariantGraphVertex v = new VariantGraphVertex(pv.getTokens(null));
+      final VariantGraphVertex v = new VariantGraphVertex(pv.getTokens(null), pv.getRank());
       addVertex(v);
       vertexMap.put(pv, v);
       if (pvg.getStart().equals(pv)) {

@@ -44,7 +44,7 @@ public class SpencerHoweTest extends AbstractTest {
 
   @Test
   public void alignmentTable() {
-    final IWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
+    final IWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
     final AlignmentTable table = align(w);
 
     assertEquals(3, table.getRows().size());
