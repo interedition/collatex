@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import static com.google.common.collect.Iterables.transform;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.PATH;
 import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -77,7 +78,7 @@ public class PersistentVariantGraphVertex {
   }
 
   public Iterable<PersistentVariantGraphEdge> getOutgoingPaths() {
-    return transform(node.getRelationships(PATH, INCOMING), graph.getEdgeWrapper());
+    return transform(node.getRelationships(PATH, OUTGOING), graph.getEdgeWrapper());
   }
 
   public int getRank() {

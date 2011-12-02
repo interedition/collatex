@@ -1,39 +1,147 @@
 package eu.interedition.collatex.lab;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.algorithms.layout.DAGLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.input.Witness;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
+import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import java.awt.BorderLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class CollateXLaboratory extends JFrame {
+  private static final Logger LOG = LoggerFactory.getLogger(CollateXLaboratory.class);
 
-  public CollateXLaboratory() {
+  private final VariantGraphFactory variantGraphFactory;
+  private final WitnessPanel witnessPanel = new WitnessPanel();
+  private final VariantGraph variantGraph = new VariantGraph();
+  private final VariantGraphPanel variantGraphPanel;
+
+  public CollateXLaboratory(VariantGraphFactory variantGraphFactory) {
     super("CollateX Laboratory");
+    this.variantGraphFactory = variantGraphFactory;
 
-    final VariantGraph g = new VariantGraph();
+    final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    splitPane.setContinuousLayout(true);
+    splitPane.setLeftComponent(witnessPanel);
+    splitPane.setRightComponent(variantGraphPanel = new VariantGraphPanel(variantGraph));
+    add(splitPane, BorderLayout.CENTER);
 
-    final VariantGraphVertex hello = new VariantGraphVertex(Collections.<INormalizedToken>singletonList(new NormalizedToken(null, 0, "Hello World", "hello world")));
-    g.addVertex(hello);
-
-    final Witness w = new Witness("A");
-    g.addEdge(new VariantGraphEdge(Sets.<IWitness>newTreeSet(Collections.singleton(w))), g.getStart(), hello);
-    g.addEdge(new VariantGraphEdge(Sets.<IWitness>newTreeSet(Collections.singleton(w))), hello, g.getEnd());
-    add(new VariantGraphPanel(g));
+    final JToolBar toolBar = new JToolBar();
+    toolBar.setBorderPainted(true);
+    toolBar.add(new AddWitnessAction());
+    toolBar.add(new RemoveWitnessesAction());
+    toolBar.add(new CollateAction());
+    add(toolBar, BorderLayout.NORTH);
 
     setDefaultCloseOperation(EXIT_ON_CLOSE);
-    pack();
+    setSize(800, 600);
   }
 
-  public static void main(String[] args) {
-    final CollateXLaboratory lab = new CollateXLaboratory();
-    lab.setVisible(true);
+  public static void main(String[] args) throws Exception {
+    new CollateXLaboratory(new VariantGraphFactory(new File("/Users/gregor/collatex-graph"))).setVisible(true);
+  }
+
+  private class AddWitnessAction extends AbstractAction {
+
+    private AddWitnessAction() {
+      super("Add");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      witnessPanel.newWitness();
+    }
+  }
+
+  private class RemoveWitnessesAction extends AbstractAction {
+
+    private RemoveWitnessesAction() {
+      super("Remove");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      witnessPanel.removeEmptyWitnesses();
+    }
+  }
+
+  private class CollateAction extends AbstractAction {
+
+    private CollateAction() {
+      super("Collate");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      final List<IWitness> witnesses = witnessPanel.getWitnesses();
+
+      LOG.debug("Collating {}", Iterables.toString(witnesses));
+
+      final Transaction transaction = variantGraphFactory.newTransaction();
+      try {
+        final PersistentVariantGraph pvg = variantGraphFactory.create();
+        new VariantGraphBuilder(pvg).add(witnesses.toArray(new IWitness[witnesses.size()]));
+
+
+        for (VariantGraphEdge edge : Lists.newArrayList(variantGraph.getEdges())) {
+          variantGraph.removeEdge(edge);
+        }
+        for (VariantGraphVertex vertex : Lists.newArrayList(variantGraph.getVertices())) {
+          variantGraph.removeVertex(vertex);
+        }
+
+        final Map<PersistentVariantGraphVertex, VariantGraphVertex> vertexMap = Maps.newHashMap();
+        for (PersistentVariantGraphVertex pv : pvg.traverseVertices(null)) {
+          final VariantGraphVertex v = new VariantGraphVertex(pv.getTokens(null));
+          variantGraph.addVertex(v);
+          vertexMap.put(pv, v);
+          if (pvg.getStart().equals(pv)) {
+            variantGraph.setStart(v);
+          } else if (pvg.getEnd().equals(pv)) {
+            variantGraph.setEnd(v);
+          }
+        }
+        for (PersistentVariantGraphEdge pe : pvg.traverseEdges(null)) {
+          variantGraph.addEdge(new VariantGraphEdge(pe.getWitnesses()), vertexMap.get(pe.getStart()), vertexMap.get(pe.getEnd()));
+        }
+
+        variantGraphPanel.setGraphLayout(new FRLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph));
+        transaction.success();
+      } finally {
+        transaction.finish();
+      }
+
+      LOG.debug("Collated {}", Iterables.toString(witnesses));
+    }
   }
 }

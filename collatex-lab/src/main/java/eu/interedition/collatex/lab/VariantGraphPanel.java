@@ -42,11 +42,11 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, V
     rc.setVertexLabelTransformer(new Transformer<VariantGraphVertex, String>() {
       @Override
       public String transform(VariantGraphVertex variantGraphVertex) {
-        return Joiner.on(" ").join(Iterables.transform(variantGraphVertex.getTokens(), new Function<INormalizedToken, String>() {
+        return Joiner.on(", ").join(Iterables.transform(variantGraphVertex.getTokens(), new Function<INormalizedToken, String>() {
 
           @Override
           public String apply(INormalizedToken input) {
-            return input.getNormalized();
+            return input.getWitness().getSigil() + ":'" + input.getNormalized() + "'";
           }
         }));
       }

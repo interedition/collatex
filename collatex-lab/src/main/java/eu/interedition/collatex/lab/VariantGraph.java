@@ -10,19 +10,22 @@ import java.util.Collections;
  */
 public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, VariantGraphEdge> {
 
-  private final VariantGraphVertex start;
-  private final VariantGraphVertex end;
-
-  public VariantGraph() {
-    addVertex(start = new VariantGraphVertex(Collections.<INormalizedToken>emptyList()));
-    addVertex(end = new VariantGraphVertex(Collections.<INormalizedToken>emptyList()));
-  }
+  private VariantGraphVertex start;
+  private VariantGraphVertex end;
 
   public VariantGraphVertex getStart() {
     return start;
   }
 
+  public void setStart(VariantGraphVertex start) {
+    this.start = start;
+  }
+
   public VariantGraphVertex getEnd() {
     return end;
+  }
+
+  public void setEnd(VariantGraphVertex end) {
+    this.end = end;
   }
 }

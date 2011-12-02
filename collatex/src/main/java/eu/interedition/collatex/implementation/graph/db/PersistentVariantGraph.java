@@ -19,6 +19,9 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.Traversal;
+import org.neo4j.kernel.Uniqueness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -40,6 +43,7 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class PersistentVariantGraph {
+  private static final Logger LOG = LoggerFactory.getLogger(PersistentVariantGraph.class);
 
   private final GraphDatabaseService db;
   private final PersistentVariantGraphVertex start;
@@ -93,11 +97,11 @@ public class PersistentVariantGraph {
   }
 
   public Iterable<PersistentVariantGraphVertex> traverseVertices(SortedSet<IWitness> witnesses) {
-    return transform(createTopologicalTraversal(witnesses).traverse(start.getNode()).nodes(), vertexWrapper);
+    return transform(createTopologicalTraversal(witnesses, true).traverse(start.getNode()).nodes(), vertexWrapper);
   }
 
   public Iterable<PersistentVariantGraphEdge> traverseEdges(SortedSet<IWitness> witnesses) {
-    return transform(createTopologicalTraversal(witnesses).traverse(start.getNode()).relationships(), edgeWrapper);
+    return transform(createTopologicalTraversal(witnesses, false).traverse(start.getNode()).relationships(), edgeWrapper);
   }
 
   public PersistentVariantGraphVertex addVertex(INormalizedToken token) {
@@ -223,8 +227,8 @@ public class PersistentVariantGraph {
     throw new UnsupportedOperationException();
   }
 
-  private TraversalDescription createTopologicalTraversal(final SortedSet<IWitness> witnesses) {
-    return Traversal.description().relationships(PATH, OUTGOING).breadthFirst().evaluator(new Evaluator() {
+  private TraversalDescription createTopologicalTraversal(final SortedSet<IWitness> witnesses, final boolean topological) {
+    return Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
       private Map<Long, Integer> inDegrees = Maps.newHashMap();
 
       @Override
@@ -234,27 +238,49 @@ public class PersistentVariantGraph {
           if (lastRel != null) {
             final PersistentVariantGraphEdge edge = new PersistentVariantGraphEdge(PersistentVariantGraph.this, lastRel);
             if (all(edge.getWitnesses(), not(in(witnesses)))) {
+              if (LOG.isTraceEnabled()) {
+                LOG.trace("Excluding {} because of witness selection: {}", path, Iterables.toString(witnesses));
+              }
               return Evaluation.EXCLUDE_AND_PRUNE;
             }
           }
         }
 
+        if (!topological) {
+          if (LOG.isTraceEnabled()) {
+            LOG.trace("Including {} because of non-topological traversal", path);
+          }
+          return Evaluation.INCLUDE_AND_CONTINUE;
+        }
+
         final Node node = path.endNode();
         final int numOtherIncoming = Iterables.size(node.getRelationships(PATH, INCOMING)) - 1;
         if (numOtherIncoming <= 0) {
+          if (LOG.isTraceEnabled()) {
+            LOG.trace("Including {} because of singular in-paths", path);
+          }
           return Evaluation.INCLUDE_AND_CONTINUE;
         }
 
         final long nodeId = node.getId();
         final Integer countDown = inDegrees.remove(nodeId);
         if (countDown == null) {
+          if (LOG.isTraceEnabled()) {
+            LOG.trace("Excluding {} because of unencountered node {} with {} remaining in-paths", new Object[] { path, nodeId, numOtherIncoming });
+          }
           inDegrees.put(nodeId, numOtherIncoming);
-          return Evaluation.EXCLUDE_AND_PRUNE;
-        } else if (countDown == 0) {
+          return Evaluation.EXCLUDE_AND_CONTINUE;
+        } else if (countDown == 1) {
+          if (LOG.isTraceEnabled()) {
+            LOG.trace("Including {} because last in-path of {} encountered", path, nodeId);
+          }
           return Evaluation.INCLUDE_AND_CONTINUE;
         } else {
+          if (LOG.isTraceEnabled()) {
+            LOG.trace("Excluding {} and counting down in-path of {} to {}", new Object[] { path, nodeId, countDown - 1 });
+          }
           inDegrees.put(nodeId, countDown - 1);
-          return Evaluation.EXCLUDE_AND_PRUNE;
+          return Evaluation.EXCLUDE_AND_CONTINUE;
         }
       }
     });
@@ -271,5 +297,10 @@ public class PersistentVariantGraph {
       return start.equals(((PersistentVariantGraph) obj).start);
     }
     return super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return Iterables.toString(getWitnesses());
   }
 }

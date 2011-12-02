@@ -65,6 +65,19 @@ public class PersistentVariantGraphEdge {
     relationship.delete();
   }
 
+  @Override
+  public int hashCode() {
+    return relationship.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof PersistentVariantGraphEdge) {
+      return relationship.equals(((PersistentVariantGraphEdge) obj).relationship);
+    }
+    return super.equals(obj);
+  }
+
   public static Function<Relationship, PersistentVariantGraphEdge> createWrapper(final PersistentVariantGraph in) {
     return new Function<Relationship, PersistentVariantGraphEdge>() {
       @Override
