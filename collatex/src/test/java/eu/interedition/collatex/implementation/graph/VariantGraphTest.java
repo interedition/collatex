@@ -25,8 +25,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphTransposition;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
-import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.interfaces.*;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
 import static junit.framework.Assert.assertFalse;
@@ -119,13 +119,10 @@ public class VariantGraphTest extends AbstractTest {
     final IWitness[] w = createWitnesses("the black and white cat", "the white and black cat", "the black and black cat");
     final PersistentVariantGraph graph = merge(w[0], w[1]);
 
-    assertEquals(2, graph.getTransposedTokens(new EqualityTokenComparator()).size());
+    assertEquals(2, graph.getTranspositions().size());
 
     merge(graph, w[2]);
-    final Map<INormalizedToken, INormalizedToken> transposed = graph.getTransposedTokens(new EqualityTokenComparator());
+    final Set<PersistentVariantGraphTransposition> transposed = graph.getTranspositions();
     assertEquals(2, transposed.size());
-    for (Map.Entry<INormalizedToken, INormalizedToken> tokenPair : transposed.entrySet()) {
-      assertEquals(tokenPair.getKey().getNormalized(), tokenPair.getValue().getNormalized());
-    }
   }
 }

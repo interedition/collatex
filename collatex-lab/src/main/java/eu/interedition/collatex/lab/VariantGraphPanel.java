@@ -3,7 +3,7 @@ package eu.interedition.collatex.lab;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
-import edu.uci.ics.jung.algorithms.layout.DAGLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
@@ -11,8 +11,7 @@ import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.apache.commons.collections15.Transformer;
 
-import java.awt.Color;
-import java.awt.Paint;
+import java.awt.*;
 
 
 /**
@@ -20,8 +19,11 @@ import java.awt.Paint;
  */
 public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, VariantGraphEdge> {
 
+  public static final BasicStroke TRANSPOSITION_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 10.0f }, 0.0f);
+  public static final BasicStroke PATH_STROKE = new BasicStroke();
+
   public VariantGraphPanel(VariantGraph g) {
-    super(new DAGLayout<VariantGraphVertex, VariantGraphEdge>(g));
+    super(new FRLayout<VariantGraphVertex, VariantGraphEdge>(g));
 
     setBackground(Color.WHITE);
     setGraphMouse(new DefaultModalGraphMouse<String, Integer>());
@@ -49,6 +51,12 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, V
             return input.getWitness().getSigil() + ":'" + input.getNormalized() + "'";
           }
         })) + " (" + variantGraphVertex.getRank() + ")";
+      }
+    });
+    rc.setEdgeStrokeTransformer(new Transformer<VariantGraphEdge, Stroke>() {
+      @Override
+      public Stroke transform(VariantGraphEdge variantGraphEdge) {
+        return variantGraphEdge.getWitnesses().isEmpty() ? TRANSPOSITION_STROKE : PATH_STROKE;
       }
     });
     rc.setVertexFillPaintTransformer(new Transformer<VariantGraphVertex, Paint>() {

@@ -22,7 +22,6 @@ package eu.interedition.collatex.implementation.output;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +49,7 @@ public class GraphMLOutputTest extends AbstractTest {
     witnesses = createWitnesses("the black cat", "the black and white cat", "the white and black cat");
     graph = merge(witnesses);
     graphXML = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    // FIXME: GraphMLBuilder.build(graph, graphXML);
+    GraphMLBuilder.build(graph, graphXML);
   }
 
   @Test

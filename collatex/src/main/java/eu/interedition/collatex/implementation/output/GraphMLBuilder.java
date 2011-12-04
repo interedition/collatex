@@ -20,22 +20,23 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Joiner;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.interfaces.IWitness;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import com.google.common.collect.HashBiMap;
 
-import eu.interedition.collatex.interfaces.IVariantGraph;
-import eu.interedition.collatex.interfaces.IVariantGraphEdge;
-import eu.interedition.collatex.interfaces.IVariantGraphVertex;
-import eu.interedition.collatex.interfaces.IWitness;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.singleton;
 
 
 public class GraphMLBuilder {
@@ -106,7 +107,7 @@ public class GraphMLBuilder {
 		}
 	}
 
-	public static void build(IVariantGraph variantGraph, Document graphXML) {
+	public static void build(PersistentVariantGraph variantGraph, Document graphXML) {
 
 		// add root element
 		Element rootElement = createRootElement(graphXML);
@@ -139,21 +140,18 @@ public class GraphMLBuilder {
 		List<Element> edges = new ArrayList<Element>();
 
 		// TODO is it possible to improve the performance by not using this map?
-		HashBiMap<IVariantGraphVertex, String> vertexToId = HashBiMap.create();
-		Map<IVariantGraphVertex, IVariantGraphVertex> transpositions = variantGraph.getTransposedTokens();
-		
-		Iterator<IVariantGraphVertex> vertexIterator = variantGraph.iterator();
+		HashBiMap<PersistentVariantGraphVertex, String> vertexToId = HashBiMap.create();
 		int vertexNumber = 0;
-		while (vertexIterator.hasNext()) {
+    for (PersistentVariantGraphVertex vertex : variantGraph.traverseVertices(null)) {
 			String vertexNodeID = "n" + vertexNumber;
-			IVariantGraphVertex vertex = vertexIterator.next();
-			String token = vertex.getNormalized();
-			nodes.add(createNodeElement(vertexNodeID, token, graphXML));
+      if (vertex.equals(variantGraph.getStart()) || vertex.equals(variantGraph.getEnd())) {
+        nodes.add(createNodeElement(vertexNodeID, "", graphXML));
+      } else {
+        nodes.add(createNodeElement(vertexNodeID, Joiner.on(" ").join(vertex.getTokens(Sets.newTreeSet(singleton(vertex.getWitnesses().first())))), graphXML));
+      }
 			vertexToId.put(vertex, vertexNodeID);
 			// Do we need to keep track of a transposed node to add later?
-			edges.addAll(createEdgeElements(
-					variantGraph.incomingEdgesOf(vertex), vertexToId,
-					sigilToId, variantGraph, graphXML, edges.size()));
+			edges.addAll(createEdgeElements(vertex.getIncomingPaths(null), vertexToId, sigilToId, variantGraph, graphXML, edges.size()));
 			vertexNumber++;
 		}
 		
@@ -161,11 +159,15 @@ public class GraphMLBuilder {
 		for (Element n : nodes) {
 			// See if we need to add an 'identical' tag for a transposition.
 			// This is best done here, after all the nodes have been created.
+
+      // FIXME: add transpositions
+      /*
 			IVariantGraphVertex vertex = vertexToId.inverse().get(n.getAttribute(ID_ATT));
 			if(transpositions.containsKey(vertex)) {
 				String txpID = vertexToId.get(transpositions.get(vertex));
 				n.appendChild(Keys.NODE_IDENTICAL.getDataElement(txpID, graphXML));
 			}
+			*/
 			// Now append the element to the XML graph.
 			graph.appendChild(n);
 		}
@@ -210,26 +212,23 @@ public class GraphMLBuilder {
 	}
 
 	private static List<? extends Element> createEdgeElements(
-			Set<IVariantGraphEdge> incomingEdges,
-			HashBiMap<IVariantGraphVertex, String> vertexToID,
-			Map<String, Integer> witnessToNumber, IVariantGraph variantGraph,
+			Iterable<PersistentVariantGraphEdge> incomingEdges,
+			HashBiMap<PersistentVariantGraphVertex, String> vertexToID,
+			Map<String, Integer> witnessToNumber, PersistentVariantGraph variantGraph,
 			Document graphXML, Integer nextEdgeNumber) {
 
 		List<Element> edges = new ArrayList<Element>();
 
 		int counter = nextEdgeNumber;
-		for (IVariantGraphEdge edge : incomingEdges) {
-			IVariantGraphVertex source = variantGraph.getEdgeSource(edge);
-			IVariantGraphVertex target = variantGraph.getEdgeTarget(edge);
+		for (PersistentVariantGraphEdge edge : incomingEdges) {
+			PersistentVariantGraphVertex source = edge.getStart();
+			PersistentVariantGraphVertex target = edge.getEnd();
 
-			Element edgeElement = createEdgeElement(source, target,
-					vertexToID, graphXML, counter++);
+			Element edgeElement = createEdgeElement(source, target, vertexToID, graphXML, counter++);
 
 			// append information about witnesses to the edge
 			for (IWitness w : edge.getWitnesses()) {
-				edgeElement.appendChild(createDataElement(w.getSigil(),
-						WITNESS_ID_PREFIX + witnessToNumber.get(w.getSigil()),
-						graphXML));
+				edgeElement.appendChild(createDataElement(w.getSigil(), WITNESS_ID_PREFIX + witnessToNumber.get(w.getSigil()), graphXML));
 			}
 
 			edges.add(edgeElement);
@@ -245,9 +244,9 @@ public class GraphMLBuilder {
 		return dataElement;
 	}
 
-	private static Element createEdgeElement(IVariantGraphVertex source,
-			IVariantGraphVertex target,
-			HashBiMap<IVariantGraphVertex, String> vertexToID, Document doc,
+	private static Element createEdgeElement(PersistentVariantGraphVertex source,
+			PersistentVariantGraphVertex target,
+			HashBiMap<PersistentVariantGraphVertex, String> vertexToID, Document doc,
 			Integer edgeNumber) {
 
 		Element edge = doc.createElement(EDGE_TAG);

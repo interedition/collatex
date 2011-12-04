@@ -2,13 +2,14 @@ package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphTransposition;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.IWitness;
 
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -56,6 +57,10 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, Varian
     }
     for (PersistentVariantGraphEdge pe : pvg.traverseEdges(null)) {
       addEdge(new VariantGraphEdge(pe.getWitnesses()), vertexMap.get(pe.getStart()), vertexMap.get(pe.getEnd()));
+    }
+    
+    for (PersistentVariantGraphTransposition t : pvg.getTranspositions()) {
+      addEdge(new VariantGraphEdge(Sets.<IWitness>newTreeSet()), vertexMap.get(t.getStart()), vertexMap.get(t.getEnd()));
     }
   }
 }

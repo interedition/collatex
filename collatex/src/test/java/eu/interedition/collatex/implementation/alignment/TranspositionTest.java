@@ -2,8 +2,6 @@ package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Test;
@@ -18,18 +16,18 @@ import static org.junit.Assert.assertEquals;
 public class TranspositionTest extends AbstractTest {
   @Test
   public void noTransposition() {
-    assertEquals(0, merge("no transposition", "no transposition").getTransposedTokens(new EqualityTokenComparator()).size());
-    assertEquals(0, merge("a b", "c a").getTransposedTokens(new EqualityTokenComparator()).size());
+    assertEquals(0, merge("no transposition", "no transposition").getTranspositions().size());
+    assertEquals(0, merge("a b", "c a").getTranspositions().size());
   }
 
   @Test
   public void oneTransposition() {
-    assertEquals(1, merge("a b", "b a").getTransposedTokens(new EqualityTokenComparator()).size());
+    assertEquals(1, merge("a b", "b a").getTranspositions().size());
   }
 
   @Test
   public void multipleTranspositions() {
-    assertEquals(2, merge("a b c", "b c a").getTransposedTokens(new EqualityTokenComparator()).size());
+    assertEquals(2, merge("a b c", "b c a").getTranspositions().size());
   }
 
   @Test

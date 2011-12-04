@@ -107,7 +107,8 @@ public class VariantGraphBuilder {
 
     LOG.debug("{} + {}: Merge comparand into graph", graph, witness);
     PersistentVariantGraphVertex last = graph.getStart();
-    final TreeSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
+    final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
+    final Map<INormalizedToken, PersistentVariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
     for (INormalizedToken token : witness.getTokens()) {
       final VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter matchingAdapter = (VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter)alignments.get(token);
       PersistentVariantGraphVertex matchingVertex = (matchingAdapter == null ? null : matchingAdapter.getVertex());
@@ -116,12 +117,24 @@ public class VariantGraphBuilder {
       } else {
         matchingVertex.add(Collections.singleton(token));
       }
+      witnessTokenVertices.put(token, matchingVertex);
+
       graph.createPath(last, matchingVertex, witnessSet);
       last = matchingVertex;
     }
     graph.createPath(last, graph.getEnd(), witnessSet);
 
-    // FIXME: register transpositions in graph!
+    LOG.debug("{}: Registering transpositions", graph);
+    for (Tuple<List<INormalizedToken>> transposedPhrase : transpositions) {
+      final Iterator<INormalizedToken> basePhraseIt = transposedPhrase.left.iterator();
+      final Iterator<INormalizedToken> witnessPhraseIt = transposedPhrase.right.iterator();
+
+      while(basePhraseIt.hasNext() && witnessPhraseIt.hasNext()) {
+        final PersistentVariantGraphVertex baseVertex = ((VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter)basePhraseIt.next()).getVertex();
+        final PersistentVariantGraphVertex witnessVertex = witnessTokenVertices.get(witnessPhraseIt.next());
+        graph.createTransposition(baseVertex, witnessVertex);
+      }
+    }
 
     if (LOG.isTraceEnabled()) {
       LOG.trace("{}: {}", graph, Iterables.toString(graph.traverseVertices(null)));

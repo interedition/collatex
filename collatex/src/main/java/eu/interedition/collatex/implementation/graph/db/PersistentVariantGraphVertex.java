@@ -14,6 +14,7 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 import static eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge.createTraversableFilter;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.PATH;
+import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.TRANSPOSITION;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -73,6 +74,10 @@ public class PersistentVariantGraphVertex {
 
   public Iterable<PersistentVariantGraphEdge> getOutgoingPaths(SortedSet<IWitness> witnesses) {
     return filter(transform(node.getRelationships(PATH, OUTGOING), graph.getEdgeWrapper()), createTraversableFilter(witnesses));
+  }
+
+  public Iterable<PersistentVariantGraphTransposition> getTranspositions() {
+    return transform(node.getRelationships(TRANSPOSITION), graph.getTranspositionWrapper());
   }
 
   public int getRank() {

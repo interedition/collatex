@@ -22,12 +22,11 @@ import org.neo4j.kernel.Traversal;
 import org.neo4j.kernel.Uniqueness;
 
 import java.util.ArrayDeque;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.SortedMap;
+import java.util.Set;
 import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.transform;
@@ -46,6 +45,7 @@ public class PersistentVariantGraph {
   private final Resolver<INormalizedToken> tokenResolver;
   private Function<Node, PersistentVariantGraphVertex> vertexWrapper;
   private Function<Relationship, PersistentVariantGraphEdge> edgeWrapper;
+  private Function<Relationship, PersistentVariantGraphTransposition> transpositionWrapper;
 
   public PersistentVariantGraph(Node start, Node end, Resolver<IWitness> witnessResolver, Resolver<INormalizedToken> tokenResolver) {
     this.db = start.getGraphDatabase();
@@ -55,6 +55,7 @@ public class PersistentVariantGraph {
     this.tokenResolver = tokenResolver;
     this.vertexWrapper = PersistentVariantGraphVertex.createWrapper(this);
     this.edgeWrapper = PersistentVariantGraphEdge.createWrapper(this);
+    this.transpositionWrapper = PersistentVariantGraphTransposition.createWrapper(this);
 
   }
 
@@ -86,23 +87,16 @@ public class PersistentVariantGraph {
     return edgeWrapper;
   }
 
-  public Map<INormalizedToken, INormalizedToken> getTransposedTokens(Comparator<INormalizedToken> tokenComparator) {
-    final SortedMap<INormalizedToken, INormalizedToken> encountered = Maps.newTreeMap(tokenComparator);
-    final Map<INormalizedToken, INormalizedToken> transposed = Maps.newHashMap();
-    for (PersistentVariantGraphVertex vertex : traverseVertices(null)) {
-      final SortedSet<INormalizedToken> notTransposed = Sets.newTreeSet(tokenComparator);
-      for (INormalizedToken token : vertex.getTokens(null)) {
-        if (encountered.containsKey(token)) {
-          transposed.put(token, encountered.get(token));
-        } else {
-          notTransposed.add(token);
-        }
-      }
-      for (INormalizedToken remaining : notTransposed) {
-        encountered.put(remaining, remaining);
-      }
+  public Function<Relationship, PersistentVariantGraphTransposition> getTranspositionWrapper() {
+    return transpositionWrapper;
+  }
+
+  public Set<PersistentVariantGraphTransposition> getTranspositions() {
+    final Set<PersistentVariantGraphTransposition> transpositions = Sets.newHashSet();
+    for (PersistentVariantGraphVertex v : traverseVertices(null)) {
+      Iterables.addAll(transpositions, v.getTranspositions());
     }
-    return transposed;
+    return transpositions;
   }
 
   public Iterable<PersistentVariantGraphVertex> traverseVertices(final SortedSet<IWitness> witnesses) {
@@ -183,6 +177,20 @@ public class PersistentVariantGraph {
     return new PersistentVariantGraphEdge(this, from, to, witnesses);
   }
 
+  public PersistentVariantGraphTransposition createTransposition(PersistentVariantGraphVertex from, PersistentVariantGraphVertex to) {
+    Preconditions.checkArgument(!from.equals(to));
+    Preconditions.checkArgument(!from.getTokens(null).isEmpty());
+    Preconditions.checkArgument(!to.getTokens(null).isEmpty());
+
+    for (PersistentVariantGraphTransposition t : from.getTranspositions()) {
+      if (t.getOther(from).equals(to)) {
+        return t;
+      }
+    }
+    
+    return new PersistentVariantGraphTransposition(this, from, to);
+  }
+
   public boolean verticesAreAdjacent(PersistentVariantGraphVertex a, PersistentVariantGraphVertex b) {
     return (edgeBetween(a, b) != null);
   }
@@ -227,10 +235,13 @@ public class PersistentVariantGraph {
           }
           if (incomingWitnesses.equals(outgoingWitnesses)) {
             vertex.add(joinCandidate.getTokens(null));
+            for (PersistentVariantGraphTransposition t : joinCandidate.getTranspositions()) {
+              createTransposition(vertex, t.getOther(joinCandidate));
+              t.delete();
+            }
             for (PersistentVariantGraphEdge e : joinCandidateOutgoing) {
               createPath(vertex, e.getEnd(), e.getWitnesses());
               e.delete();
-
             }
             joinCandidateSingleIncoming.delete();
             joinCandidate.delete();

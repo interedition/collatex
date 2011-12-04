@@ -68,7 +68,7 @@ public class CollateXLaboratory extends JFrame {
   }
 
   public static void main(String[] args) throws Exception {
-    new CollateXLaboratory(new VariantGraphFactory(new File("/Users/gregor/collatex-graph"))).setVisible(true);
+    new CollateXLaboratory(new VariantGraphFactory()).setVisible(true);
   }
 
   private class AddWitnessAction extends AbstractAction {
@@ -121,9 +121,7 @@ public class CollateXLaboratory extends JFrame {
 
       LOG.debug("Collated {}", Iterables.toString(witnesses));
 
-      final DAGLayout<VariantGraphVertex, VariantGraphEdge> layout = new DAGLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph);
-      layout.setRoot(variantGraph.getEnd());
-      variantGraphPanel.setGraphLayout(layout);
+      variantGraphPanel.setGraphLayout(new FRLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph));
     }
   }
 }
