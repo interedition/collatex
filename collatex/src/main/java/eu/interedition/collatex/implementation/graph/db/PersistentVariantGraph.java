@@ -2,7 +2,13 @@ package eu.interedition.collatex.implementation.graph.db;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.RowSortedTable;
+import com.google.common.collect.Sets;
+import com.google.common.collect.TreeBasedTable;
 import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -16,10 +22,12 @@ import org.neo4j.kernel.Traversal;
 import org.neo4j.kernel.Uniqueness;
 
 import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.SortedMap;
 import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.transform;
@@ -78,8 +86,23 @@ public class PersistentVariantGraph {
     return edgeWrapper;
   }
 
-  public Map<PersistentVariantGraphVertex, PersistentVariantGraphVertex> getTransposedTokens() {
-    throw new UnsupportedOperationException();
+  public Map<INormalizedToken, INormalizedToken> getTransposedTokens(Comparator<INormalizedToken> tokenComparator) {
+    final SortedMap<INormalizedToken, INormalizedToken> encountered = Maps.newTreeMap(tokenComparator);
+    final Map<INormalizedToken, INormalizedToken> transposed = Maps.newHashMap();
+    for (PersistentVariantGraphVertex vertex : traverseVertices(null)) {
+      final SortedSet<INormalizedToken> notTransposed = Sets.newTreeSet(tokenComparator);
+      for (INormalizedToken token : vertex.getTokens(null)) {
+        if (encountered.containsKey(token)) {
+          transposed.put(token, encountered.get(token));
+        } else {
+          notTransposed.add(token);
+        }
+      }
+      for (INormalizedToken remaining : notTransposed) {
+        encountered.put(remaining, remaining);
+      }
+    }
+    return transposed;
   }
 
   public Iterable<PersistentVariantGraphVertex> traverseVertices(final SortedSet<IWitness> witnesses) {

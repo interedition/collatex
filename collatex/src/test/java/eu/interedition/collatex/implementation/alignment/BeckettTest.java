@@ -79,23 +79,12 @@ public class BeckettTest extends AbstractTest {
     final PersistentVariantGraph graph = merge(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final List<INormalizedToken> tokenIterator = VariantGraphWitnessAdapter.create(graph).getTokens();
+    final StringBuilder graphTokens = new StringBuilder();
+    for (INormalizedToken token : VariantGraphWitnessAdapter.create(graph).getTokens()) {
+      graphTokens.append(" ").append(token.getNormalized());
+    }
 
-    assertEquals(graph.getStart(), tokenIterator.get(0));
-    assertEquals("its", tokenIterator.get(1).getNormalized());
-    assertEquals("soft", tokenIterator.get(2).getNormalized());
-    assertEquals("changeless", tokenIterator.get(3).getNormalized());
-    assertEquals("light", tokenIterator.get(4).getNormalized());
-    assertEquals("neither", tokenIterator.get(5).getNormalized());
-    assertEquals("daylight", tokenIterator.get(6).getNormalized());
-    assertEquals("nor", tokenIterator.get(7).getNormalized());
-    assertEquals("moonlight", tokenIterator.get(8).getNormalized());
-    assertEquals("nor", tokenIterator.get(9).getNormalized());
-    assertEquals("starlight", tokenIterator.get(10).getNormalized());
-    assertEquals("nor", tokenIterator.get(11).getNormalized());
-    assertEquals("unlike", tokenIterator.get(12).getNormalized());
-    assertEquals("any", tokenIterator.get(13).getNormalized());
-    assertEquals("light", tokenIterator.get(14).getNormalized());
+    assertEquals("# its soft changeless light neither daylight nor moonlight nor starlight nor unlike any light he could remember from the days & and nights when day followed hard on night & and vice versa #", graphTokens.toString().trim());
   }
 
   @Test
