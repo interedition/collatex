@@ -120,7 +120,7 @@ public class TokenLinkerTest extends AbstractTest {
     final Map<INormalizedToken, INormalizedToken> links = linkTokens(graph, w[1]);
 
     assertEquals(1, links.size());
-    assertEquals(getTokens(graph, w[0]).get(0), links.get(w[1].getTokens().get(0)));
+    assertEquals(getTokens(graph, w[0]).get(0).getNormalized(), links.get(w[1].getTokens().get(0)).getNormalized());
   }
 
 

@@ -57,7 +57,7 @@ public class JoinedVariantGraphTest extends AbstractTest {
 
     final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
     final PersistentVariantGraphVertex niceBlackVertex = vertexWith(graph, "nice black", w[0]);
-    final PersistentVariantGraphVertex badWhiteVertex = vertexWith(graph, "bad white", w[0]);
+    final PersistentVariantGraphVertex badWhiteVertex = vertexWith(graph, "bad white", w[1]);
     final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
     final PersistentVariantGraphVertex sharedVertex = vertexWith(graph, "shared", w[0]);
     final PersistentVariantGraphVertex spilledVertex = vertexWith(graph, "spilled", w[1]);
@@ -68,7 +68,7 @@ public class JoinedVariantGraphTest extends AbstractTest {
     assertHasWitnesses(edgeBetween(theVertex, niceBlackVertex), w[0]);
     assertHasWitnesses(edgeBetween(niceBlackVertex, catVertex), w[0]);
     assertHasWitnesses(edgeBetween(theVertex, badWhiteVertex), w[1]);
-    assertHasWitnesses(edgeBetween(badWhiteVertex, catVertex), w[0]);
+    assertHasWitnesses(edgeBetween(badWhiteVertex, catVertex), w[1]);
     assertHasWitnesses(edgeBetween(catVertex, sharedVertex), w[0]);
     assertHasWitnesses(edgeBetween(sharedVertex, hisFoodVertex), w[0]);
     assertHasWitnesses(edgeBetween(catVertex, spilledVertex), w[1]);
@@ -82,7 +82,7 @@ public class JoinedVariantGraphTest extends AbstractTest {
     final PersistentVariantGraph graph = merge(w).join();
 
     final PersistentVariantGraphVertex blackieVertex = vertexWith(graph, "blackie", w[0]);
-    final PersistentVariantGraphVertex whitneyVertex = vertexWith(graph, "whitney", w[0]);
+    final PersistentVariantGraphVertex whitneyVertex = vertexWith(graph, "whitney", w[1]);
     final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
     final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
     final PersistentVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);

@@ -34,37 +34,37 @@ public class VariantGraphRankerTest extends AbstractTest {
 
   @Test
   public void ranking() {
-    final PersistentVariantGraph graph = merge("The black cat", "The black and white cat", "The black and green cat").join().rank();
+    final PersistentVariantGraph graph = merge("The black cat", "The black and white cat", "The black and green cat").rank();
     final List<PersistentVariantGraphVertex> vertices = Lists.newArrayList(graph.traverseVertices(null));
 
-    assertEquals("the", vertices.get(0).getTokens(null).first().getNormalized());
-    assertEquals(1, vertices.get(0).getRank());
-    assertEquals("black", vertices.get(1).getTokens(null).first().getNormalized());
-    assertEquals(2, vertices.get(1).getRank());
-    assertEquals("and", vertices.get(2).getTokens(null).first().getNormalized());
-    assertEquals(3, vertices.get(2).getRank());
-    assertEquals("white", vertices.get(3).getTokens(null).first().getNormalized());
-    assertEquals(4, vertices.get(3).getRank());
-    assertEquals("green", vertices.get(4).getTokens(null).first().getNormalized());
+    assertEquals("the", vertices.get(1).getTokens(null).first().getNormalized());
+    assertEquals(1, vertices.get(1).getRank());
+    assertEquals("black", vertices.get(2).getTokens(null).first().getNormalized());
+    assertEquals(2, vertices.get(2).getRank());
+    assertEquals("and", vertices.get(3).getTokens(null).first().getNormalized());
+    assertEquals(3, vertices.get(3).getRank());
+    assertEquals("white", vertices.get(4).getTokens(null).first().getNormalized());
     assertEquals(4, vertices.get(4).getRank());
-    assertEquals("cat", vertices.get(5).getTokens(null).first().getNormalized());
-    assertEquals(5, vertices.get(5).getRank());
+    assertEquals("green", vertices.get(5).getTokens(null).first().getNormalized());
+    assertEquals(4, vertices.get(5).getRank());
+    assertEquals("cat", vertices.get(6).getTokens(null).first().getNormalized());
+    assertEquals(5, vertices.get(6).getRank());
   }
 
   @Test
   public void agastTranspositionHandling() {
-    final PersistentVariantGraph graph = merge("He was agast, so", "He was agast", "So he was agast").join().rank();
+    final PersistentVariantGraph graph = merge("He was agast, so", "He was agast", "So he was agast").rank();
     final List<PersistentVariantGraphVertex> vertices = Lists.newArrayList(graph.traverseVertices(null));
 
-    assertEquals("so", vertices.get(0).getTokens(null).first().getNormalized());
-    assertEquals(1, vertices.get(0).getRank());
-    assertEquals("he", vertices.get(1).getTokens(null).first().getNormalized());
-    assertEquals(2, vertices.get(1).getRank());
-    assertEquals("was", vertices.get(2).getTokens(null).first().getNormalized());
-    assertEquals(3, vertices.get(2).getRank());
-    assertEquals("agast", vertices.get(3).getTokens(null).first().getNormalized());
-    assertEquals(4, vertices.get(3).getRank());
-    assertEquals("so", vertices.get(4).getTokens(null).first().getNormalized());
-    assertEquals(5, vertices.get(4).getRank());
+    assertEquals("so", vertices.get(1).getTokens(null).first().getNormalized());
+    assertEquals(1, vertices.get(1).getRank());
+    assertEquals("he", vertices.get(2).getTokens(null).first().getNormalized());
+    assertEquals(2, vertices.get(2).getRank());
+    assertEquals("was", vertices.get(3).getTokens(null).first().getNormalized());
+    assertEquals(3, vertices.get(3).getRank());
+    assertEquals("agast", vertices.get(4).getTokens(null).first().getNormalized());
+    assertEquals(4, vertices.get(4).getRank());
+    assertEquals("so", vertices.get(5).getTokens(null).first().getNormalized());
+    assertEquals(5, vertices.get(5).getRank());
   }
 }

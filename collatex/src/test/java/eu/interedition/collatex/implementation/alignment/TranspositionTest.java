@@ -1,9 +1,13 @@
 package eu.interedition.collatex.implementation.alignment;
 
+import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
+import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Test;
+
+import java.util.SortedSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,32 +36,32 @@ public class TranspositionTest extends AbstractTest {
     final IWitness[] w = createWitnesses(//
             "the white and black cat", "The black cat",//
             "the black and white cat", "the black and green cat");
-    final AlignmentTable table = align(w);
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = merge(w).toTable();
 
-    assertEquals("A: |the|white|and|black|cat|", table.getRow(w[0]).toString());
-    assertEquals("B: |The| | |black|cat|", table.getRow(w[1]).toString());
-    assertEquals("C: |the|black|and|white|cat|", table.getRow(w[2]).toString());
-    assertEquals("D: |the|black|and|green|cat|", table.getRow(w[3]).toString());
+    assertEquals("|the|white|and|black|cat|", toString(table, w[0]));
+    assertEquals("|The| | |black|cat|", toString(table, w[1]));
+    assertEquals("|the|black|and|white|cat|", toString(table, w[2]));
+    assertEquals("|the|black|and|green|cat|", toString(table, w[3]));
   }
 
   @Test
   public void transposition2() {
     final IWitness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
-    final AlignmentTable table = align(w);
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = merge(w).toTable();
 
-    assertEquals("A: | |He|was|agast,|so|", table.getRow(w[0]).toString());
-    assertEquals("B: | |He|was|agast| |", table.getRow(w[1]).toString());
-    assertEquals("C: |So|he|was|agast| |", table.getRow(w[2]).toString());
+    assertEquals("| |He|was|agast,|so|", toString(table, w[0]));
+    assertEquals("| |He|was|agast| |", toString(table, w[1]));
+    assertEquals("|So|he|was|agast| |", toString(table, w[2]));
   }
 
   @Test
   public void transposition2Reordered() {
     final IWitness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
-    final AlignmentTable table = align(w);
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = merge(w).toTable();
 
     // TODO: it would be nice if He was agast stayed in one place!
-    assertEquals("A: | | | |So|he|was|agast|", table.getRow(w[0]).toString());
-    assertEquals("B: | | | | |He|was|agast|", table.getRow(w[1]).toString());
-    assertEquals("C: |He|was|agast,|so| | | |", table.getRow(w[2]).toString());
+    assertEquals("| | | |So|he|was|agast|", toString(table, w[0]));
+    assertEquals("| | | | |He|was|agast|", toString(table, w[1]));
+    assertEquals("|He|was|agast,|so| | | |", toString(table, w[2]));
   }
 }

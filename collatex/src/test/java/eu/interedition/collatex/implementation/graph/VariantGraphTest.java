@@ -52,7 +52,7 @@ public class VariantGraphTest extends AbstractTest {
     final PersistentVariantGraph graph = merge(createWitnesses());
     assertEquals(0, graph.getWitnesses().size());
     assertEquals(2, Iterables.size(graph.traverseVertices(null)));
-    assertEquals(0, Iterables.size(graph.traverseEdges(null)));
+    assertEquals(1, Iterables.size(graph.traverseEdges(null)));
   }
 
   @Test

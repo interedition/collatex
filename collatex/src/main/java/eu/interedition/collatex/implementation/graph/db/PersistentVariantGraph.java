@@ -2,11 +2,7 @@ package eu.interedition.collatex.implementation.graph.db;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -190,30 +186,34 @@ public class PersistentVariantGraph {
   public PersistentVariantGraph join() {
     final Queue<PersistentVariantGraphVertex> queue = new ArrayDeque<PersistentVariantGraphVertex>();
     for (PersistentVariantGraphEdge startingEdges : start.getOutgoingPaths(null)) {
-      queue.offer(startingEdges.getEnd());
+      queue.add(startingEdges.getEnd());
     }
 
     while (!queue.isEmpty()) {
-      final PersistentVariantGraphVertex vertex = queue.poll();
+      final PersistentVariantGraphVertex vertex = queue.remove();
       final List<PersistentVariantGraphEdge> outgoing = Lists.newArrayList(vertex.getOutgoingPaths(null));
       if (outgoing.size() == 1) {
         final PersistentVariantGraphEdge joinCandidateSingleIncoming = outgoing.get(0);
         final PersistentVariantGraphVertex joinCandidate = joinCandidateSingleIncoming.getEnd();
         if (Iterables.size(joinCandidate.getIncomingPaths(null)) == 1) {
+          final SortedSet<IWitness> incomingWitnesses = joinCandidateSingleIncoming.getWitnesses();
+          final SortedSet<IWitness> outgoingWitnesses = Sets.newTreeSet();
           final List<PersistentVariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.getOutgoingPaths(null));
-          if (joinCandidateOutgoing.size() == 1) {
-            final PersistentVariantGraphEdge joinCandidateSingleOutgoing = joinCandidateOutgoing.get(0);
-            final SortedSet<IWitness> witnesses = joinCandidateSingleIncoming.getWitnesses();
-            if (witnesses.equals(joinCandidateSingleOutgoing.getWitnesses())) {
-              vertex.add(joinCandidate.getTokens(null));
-              createPath(vertex, joinCandidateSingleOutgoing.getEnd(), witnesses);
+          for (PersistentVariantGraphEdge e : joinCandidateOutgoing) {
+            outgoingWitnesses.addAll(e.getWitnesses());
+          }
+          if (incomingWitnesses.equals(outgoingWitnesses)) {
+            vertex.add(joinCandidate.getTokens(null));
+            for (PersistentVariantGraphEdge e : joinCandidateOutgoing) {
+              createPath(vertex, e.getEnd(), e.getWitnesses());
+              e.delete();
 
-              joinCandidateSingleIncoming.delete();
-              joinCandidateSingleOutgoing.delete();
-              joinCandidate.delete();
-              outgoing.remove(joinCandidateSingleIncoming);
-              queue.add(vertex);
             }
+            joinCandidateSingleIncoming.delete();
+            joinCandidate.delete();
+
+            outgoing.remove(joinCandidateSingleIncoming);
+            queue.add(vertex);
           }
         }
       }
@@ -261,6 +261,23 @@ public class PersistentVariantGraph {
     }
 
     return new Apparatus(getWitnesses(), entries);
+  }
+
+  public RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> toTable() {
+    final TreeBasedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = TreeBasedTable.create();
+    for (PersistentVariantGraphVertex v : rank().traverseVertices(null)) {
+      for (INormalizedToken token : v.getTokens(null)) {
+        final int row = v.getRank();
+        final IWitness column = token.getWitness();
+
+        SortedSet<INormalizedToken> cell = table.get(row, column);
+        if (cell == null) {
+          table.put(row, column, cell = Sets.newTreeSet());
+        }
+        cell.add(token);
+      }
+    }
+    return table;
   }
 
   public Iterable<PersistentVariantGraphVertex> findLongestPath() {

@@ -1,8 +1,9 @@
 package eu.interedition.collatex;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.base.Objects;
+import com.google.common.collect.*;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 
 import static org.junit.Assert.assertEquals;
@@ -88,18 +90,6 @@ public abstract class AbstractTest {
     return merge(createWitnesses(witnesses));
   }
 
-  protected AlignmentTable align(PersistentVariantGraph graph) {
-    return new AlignmentTable(graph);
-  }
-
-  protected AlignmentTable align(IWitness... witnesses) {
-    return new AlignmentTable(merge(witnesses));
-  }
-
-  protected AlignmentTable align(String... witnesses) {
-    return new AlignmentTable(merge(witnesses));
-  }
-
   protected static SortedSet<String> extractPhrases(PersistentVariantGraph graph, IWitness witness) {
     return extractPhrases(Sets.<String>newTreeSet(), graph, witness);
   }
@@ -138,6 +128,28 @@ public abstract class AbstractTest {
     }
     fail(String.format("No vertex with content '%s' in witness %s", content, in));
     return null;
+  }
+
+  protected static String toString(RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table) {
+    final StringBuilder tableStr = new StringBuilder();
+    for (IWitness witness : table.columnKeySet()) {
+      tableStr.append(witness.getSigil()).append(": ").append(toString(table, witness)).append("\n");
+    }
+    return tableStr.toString();
+  }
+
+  protected static String toString(RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table, IWitness witness) {
+    final StringBuilder tableRowStr = new StringBuilder("|");
+    for (Integer row : table.rowKeySet()) {
+      final SortedSet<INormalizedToken> tokens = table.get(row, witness);
+      tableRowStr.append(tokens == null ? ' ' : Joiner.on(" ").join(Iterables.transform(tokens, new Function<INormalizedToken, String>() {
+        @Override
+        public String apply(INormalizedToken input) {
+          return input.getContent();
+        }
+      }))).append("|");
+    }
+    return tableRowStr.toString();
   }
 
   @Deprecated

@@ -20,13 +20,18 @@
 
 package eu.interedition.collatex.implementation.alignment;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.interfaces.*;
 import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,35 +50,32 @@ public class SpencerHoweTest extends AbstractTest {
   @Test
   public void alignmentTable() {
     final IWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
-    final AlignmentTable table = align(w);
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = merge(w).toTable();
 
-    assertEquals(3, table.getRows().size());
+    assertEquals(3, table.columnKeySet().size());
     //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element
-    assertEquals("A: |a|b|c| | |d|e|f|", table.getRow(w[0]).toString());
-    assertEquals("B: | | |x|y|z|d|e| |", table.getRow(w[1]).toString());
-    assertEquals("C: |a|b|x|y|z| | | |", table.getRow(w[2]).toString());
+    assertEquals("|a|b|c| | |d|e|f|", toString(table, w[0]));
+    assertEquals("| | |x|y|z|d|e| |", toString(table, w[1]));
+    assertEquals("|a|b|x|y|z| | | |", toString(table, w[2]));
   }
 
   @Test
   public void graph() {
-    //final IVariantGraph graph = merge("a", "b", "a b");
-    final IVariantGraph graph = null;
-    assertEquals(4, graph.vertexSet().size());
+    final IWitness[] w = createWitnesses("a", "b", "a b");
+    final PersistentVariantGraph graph = merge(w);
+    assertEquals(4, Iterables.size(graph.traverseVertices(null)));
+    assertEquals(5, Iterables.size(graph.traverseEdges(null)));
 
-    final Set<IVariantGraphEdge> edges = graph.edgeSet();
-    assertEquals(5, edges.size());
+    final PersistentVariantGraphVertex startVertex = graph.getStart();
+    final PersistentVariantGraphVertex aVertex = vertexWith(graph, "a", w[0]);
+    final PersistentVariantGraphVertex bVertex = vertexWith(graph, "b", w[1]);
+    final PersistentVariantGraphVertex endVertex = graph.getEnd();
 
-    final Iterator<IVariantGraphVertex> vertexI = graph.iterator();
-    final IVariantGraphVertex startVertex = vertexI.next();
-    final IVariantGraphVertex aVertex = vertexI.next();
-    final IVariantGraphVertex bVertex = vertexI.next();
-    final IVariantGraphVertex endVertex = vertexI.next();
-
-    assertEquals(": A, C", graph.getEdge(startVertex, aVertex).toString());
-    assertEquals(": A", graph.getEdge(aVertex, endVertex).toString());
-    assertEquals(": B", graph.getEdge(startVertex, bVertex).toString());
-    assertEquals(": B, C", graph.getEdge(bVertex, endVertex).toString());
-    assertEquals(": C", graph.getEdge(aVertex, bVertex).toString());
+    assertHasWitnesses(edgeBetween(startVertex, aVertex), w[0], w[2]);
+    assertHasWitnesses(edgeBetween(aVertex, endVertex), w[0]);
+    assertHasWitnesses(edgeBetween(startVertex, bVertex), w[1]);
+    assertHasWitnesses(edgeBetween(bVertex, endVertex), w[1], w[2]);
+    assertHasWitnesses(edgeBetween(aVertex, bVertex), w[2]);
   }
 
 }

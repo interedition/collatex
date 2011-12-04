@@ -39,7 +39,7 @@ public class AlignmentTable {
   protected final List<Column> columns = Lists.newArrayList();
 
   public AlignmentTable(PersistentVariantGraph graph) {
-    this.graph = graph.join().rank();
+    this.graph = graph.rank();
     final Iterator<PersistentVariantGraphVertex> vertexIterator = graph.traverseVertices(null).iterator();
     //skip startVertex
     vertexIterator.next();

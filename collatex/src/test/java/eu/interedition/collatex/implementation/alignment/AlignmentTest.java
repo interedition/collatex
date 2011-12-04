@@ -20,10 +20,14 @@
 
 package eu.interedition.collatex.implementation.alignment;
 
+import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
+import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Test;
+
+import java.util.SortedSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,25 +35,25 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void transposition() {
     final IWitness[] w = createWitnesses("the cat is black", "black is the cat");
-    final AlignmentTable t = align(w);
-    assertEquals("A: |the|cat|is|black| |", t.getRow(w[0]).toString());
-    assertEquals("B: |black| |is|the|cat|", t.getRow(w[1]).toString());
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> t = merge(w).toTable();
+    assertEquals("|the|cat|is|black| |", toString(t, w[0]));
+    assertEquals("|black| |is|the|cat|", toString(t, w[1]));
   }
 
   @Test
   public void doubleTransposition2() {
     final IWitness[] w = createWitnesses("a b", "b a");
-    final AlignmentTable t = align(w);
-    assertEquals("A: | |a|b|", t.getRow(w[0]).toString());
-    assertEquals("B: |b|a| |", t.getRow(w[1]).toString());
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> t = merge(w).toTable();
+    assertEquals("| |a|b|", toString(t, w[0]));
+    assertEquals("|b|a| |", toString(t, w[1]));
   }
 
   @Test
   public void doubleTransposition3() {
     final IWitness[] w = createWitnesses("a b c", "b a c");
-    final AlignmentTable t = align(w);
-    assertEquals("A: | |a|b|c|", t.getRow(w[0]).toString());
-    assertEquals("B: |b|a| |c|", t.getRow(w[1]).toString());
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> t = merge(w).toTable();
+    assertEquals("| |a|b|c|", toString(t, w[0]));
+    assertEquals("|b|a| |c|", toString(t, w[1]));
   }
 
   @Test
@@ -58,10 +62,10 @@ public class AlignmentTest extends AbstractTest {
             "the cat is very happy",//
             "very happy is the cat",//
             "very delitied and happy is the cat");
-    final AlignmentTable t = align(w);
-    assertEquals("A: |the|cat| | |is|very|happy|", t.getRow(w[0]).toString());
-    assertEquals("B: |very| | |happy|is|the|cat|", t.getRow(w[1]).toString());
-    assertEquals("C: |very|delitied|and|happy|is|the|cat|", t.getRow(w[2]).toString());
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> t = merge(w).toTable();
+    assertEquals("|the|cat| | |is|very|happy|", toString(t, w[0]));
+    assertEquals("|very| | |happy|is|the|cat|", toString(t, w[1]));
+    assertEquals("|very|delitied|and|happy|is|the|cat|", toString(t, w[2]));
   }
 
   @Test
@@ -70,10 +74,10 @@ public class AlignmentTest extends AbstractTest {
             "the cat is black",//
             "black is the cat",//
             "black and white is the cat");
-    final AlignmentTable t = align(w);
-    assertEquals("A: |the|cat| |is|black| |", t.getRow(w[0]).toString());
-    assertEquals("B: |black| | |is|the|cat|", t.getRow(w[1]).toString());
-    assertEquals("C: |black|and|white|is|the|cat|", t.getRow(w[2]).toString());
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> t = merge(w).toTable();
+    assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
+    assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
+    assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));
   }
 
   @Test
@@ -81,26 +85,26 @@ public class AlignmentTest extends AbstractTest {
     final IWitness[] w = createWitnesses(//
             "A black cat in a white basket",//
             "A white cat in a black basket");
-    final AlignmentTable t = align(w);
-    assertEquals("A: |A|black|cat|in|a|white|basket|", t.getRow(w[0]).toString());
-    assertEquals("B: |A|white|cat|in|a|black|basket|", t.getRow(w[1]).toString());
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> t = merge(w).toTable();
+    assertEquals("|A|black|cat|in|a|white|basket|", toString(t, w[0]));
+    assertEquals("|A|white|cat|in|a|black|basket|", toString(t, w[1]));
   }
 
   @Test
   public void transposeInOnePair() {
     final IWitness[] w = createWitnesses("y", "x y z", "z y");
-    final AlignmentTable t = align(w);
-    assertEquals("A: | |y| |", t.getRow(w[0]).toString());
-    assertEquals("B: |x|y|z|", t.getRow(w[1]).toString());
-    assertEquals("C: |z|y| |", t.getRow(w[2]).toString());
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> t = merge(w).toTable();
+    assertEquals("| |y| |", toString(t, w[0]));
+    assertEquals("|x|y|z|", toString(t, w[1]));
+    assertEquals("|z|y| |", toString(t, w[2]));
   }
 
   @Test
   public void transposeInTwoPairs() {
     final IWitness[] w = createWitnesses("y x", "x y z", "z y");
-    final AlignmentTable t = align(w);
-    assertEquals("A: | |y|x|", t.getRow(w[0]).toString());
-    assertEquals("B: |x|y|z|", t.getRow(w[1]).toString());
-    assertEquals("C: |z|y| |", t.getRow(w[2]).toString());
+    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> t = merge(w).toTable();
+    assertEquals("| |y|x|", toString(t, w[0]));
+    assertEquals("|x|y|z|", toString(t, w[1]));
+    assertEquals("|z|y| |", toString(t, w[2]));
   }
 }

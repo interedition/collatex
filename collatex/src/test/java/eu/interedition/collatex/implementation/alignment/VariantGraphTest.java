@@ -77,7 +77,7 @@ public class VariantGraphTest extends AbstractTest {
     assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(catVertex, graph.getEnd()), w[0], w[1]);
     assertHasWitnesses(edgeBetween(theVertex, whiteVertex), w[1]);
-    assertHasWitnesses(edgeBetween(whiteVertex, graph.getEnd()), w[1]);
+    assertHasWitnesses(edgeBetween(whiteVertex, andVertex), w[1]);
     assertHasWitnesses(edgeBetween(andVertex, blackVertex), w[1]);
   }
 
