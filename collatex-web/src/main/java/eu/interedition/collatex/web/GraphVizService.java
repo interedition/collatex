@@ -1,16 +1,25 @@
 package eu.interedition.collatex.web;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
 import eu.interedition.collatex.implementation.graph.JoinedVariantGraphEdge;
 import eu.interedition.collatex.implementation.graph.JoinedVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphTransposition;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
 import org.jgrapht.ext.IntegerNameProvider;
@@ -22,6 +31,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -36,22 +46,67 @@ public class GraphVizService implements InitializingBean {
     return configuredDotPath;
   }
 
-  public void toDot(IVariantGraph vg, Writer out) {
-    JDOT_EXPORTER.export(out, JoinedVariantGraph.create(vg));
+  public void toDot(PersistentVariantGraph graph, Writer writer, boolean transpositions) {
+    final PrintWriter out = new PrintWriter(writer);
+    final String indent = "  ";
+    final String connector = (transpositions ? " -- " : " -> ");
+
+    out.println((transpositions ? "graph" : "digraph") + " G {");
+
+    for (PersistentVariantGraphVertex v : graph.traverseVertices(null)) {
+      out.print(indent + "v" + v.getNode().getId());
+      out.print(" [label = \"" + toLabel(v) + "\"]");
+      out.println(";");
+    }
+
+    for (PersistentVariantGraphEdge e : graph.traverseEdges(null)) {
+      out.print(indent + "v" + e.getStart().getNode().getId() + connector + "v" + e.getEnd().getNode().getId());
+      out.print(" [label = \"" + toLabel(e) + "\"]");
+      out.println(";");
+    }
+
+    if (transpositions) {
+      for (PersistentVariantGraphTransposition t : graph.getTranspositions()) {
+        out.println(indent + "v" + t.getStart().getNode().getId() + connector + "v" + t.getEnd().getNode().getId() + ";");
+      }
+    }
+
+    out.println("}");
+
+    out.flush();
+
+  }
+
+  private String toLabel(PersistentVariantGraphEdge e) {
+    return Joiner.on(", ").join(e.getWitnesses()).replaceAll("\"", "\\\"");
+  }
+
+  private String toLabel(PersistentVariantGraphVertex v) {
+    final SortedSet<IWitness> witnesses = v.getWitnesses();
+    if (witnesses.isEmpty()) {
+      return "";
+    }
+    final SortedSet<INormalizedToken> tokens = v.getTokens(Sets.newTreeSet(Collections.singleton(witnesses.first())));
+    return Joiner.on(" ").join(Iterables.transform(tokens, new Function<INormalizedToken, String>() {
+      @Override
+      public String apply(INormalizedToken input) {
+        return input.getContent();
+      }
+    })).replaceAll("\"", "\\\"");
   }
 
   public boolean isSvgAvailable() {
     return (dotPath != null);
   }
 
-  public void toSvg(IVariantGraph vg, OutputStream out) throws IOException {
+  public void toSvg(PersistentVariantGraph vg, OutputStream out, boolean transpositions) throws IOException {
     Preconditions.checkState(isSvgAvailable());
 
     final FileBackedOutputStream dotBuf = new FileBackedOutputStream(102400);
 
     Writer dotWriter = null;
     try {
-      toDot(vg, dotWriter = new OutputStreamWriter(dotBuf, Charset.defaultCharset()));
+      toDot(vg, dotWriter = new OutputStreamWriter(dotBuf, Charset.defaultCharset()), transpositions);
     } finally {
       Closeables.close(dotWriter, false);
     }
@@ -93,28 +148,4 @@ public class GraphVizService implements InitializingBean {
     final File dotExecutable = new File(configuredDotPath);
     this.dotPath = (dotExecutable.canExecute() ? dotExecutable.getCanonicalPath() : null);
   }
-
-  private static final VertexNameProvider<JoinedVariantGraphVertex> JVERTEX_ID_PROVIDER = new IntegerNameProvider<JoinedVariantGraphVertex>();
-
-  private static final VertexNameProvider<JoinedVariantGraphVertex> JVERTEX_LABEL_PROVIDER = new VertexNameProvider<JoinedVariantGraphVertex>() {
-    @Override
-    public String getVertexName(JoinedVariantGraphVertex v) {
-      return v.getNormalized();
-    }
-  };
-  private static final EdgeNameProvider<JoinedVariantGraphEdge> JEDGE_LABEL_PROVIDER = new EdgeNameProvider<JoinedVariantGraphEdge>() {
-    @Override
-    public String getEdgeName(JoinedVariantGraphEdge e) {
-      List<String> sigils = Lists.newArrayList();
-      for (IWitness witness : e.getWitnesses()) {
-        sigils.add(witness.getSigil());
-      }
-      Collections.sort(sigils);
-      return Joiner.on(",").join(sigils);
-    }
-  };
-
-  private static final DOTExporter<JoinedVariantGraphVertex, JoinedVariantGraphEdge> JDOT_EXPORTER = new DOTExporter<JoinedVariantGraphVertex, JoinedVariantGraphEdge>(//
-          JVERTEX_ID_PROVIDER, JVERTEX_LABEL_PROVIDER, JEDGE_LABEL_PROVIDER //
-  );
 }
