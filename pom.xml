@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.interedition</groupId>
     <artifactId>parent</artifactId>
-    <version>2</version>
+    <version>3</version>
     <packaging>pom</packaging>
     <name>Interedition Microservices</name>
     <description>Modules developed by a European-funded development collective whose aim it is to promote the
@@ -188,16 +188,6 @@
                 <version>1.1.2</version>
             </dependency>
             <dependency>
-                <groupId>com.tinkerpop.blueprints</groupId>
-                <artifactId>blueprints-core</artifactId>
-                <version>${blueprints.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.tinkerpop.blueprints</groupId>
-                <artifactId>blueprints-graph-jung</artifactId>
-                <version>${blueprints.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jgrapht</groupId>
                 <artifactId>jgrapht-jdk1.5</artifactId>
                 <version>0.7.3</version>
@@ -290,11 +280,6 @@
                 <artifactId>jung-visualization</artifactId>
                 <version>${jung.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.sleepycat</groupId>
-                <artifactId>je</artifactId>
-                <version>4.1.10</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
     <repositories>
@@ -302,17 +287,6 @@
             <id>spring-maven-milestone</id>
             <name>Springframework Maven Repository</name>
             <url>http://maven.springframework.org/milestone</url>
-        </repository>
-        <repository>
-            <id>oracle-releases</id>
-            <name>Oracle Released Java Packages</name>
-            <url>http://download.oracle.com/maven</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>http://tinkerpop.com/maven2</url>
         </repository>
     </repositories>
     <build>
@@ -515,7 +489,6 @@
         <spring.version>3.0.6.RELEASE</spring.version>
         <slf4j.version>1.5.11</slf4j.version>
         <restlet.version>2.0-RC2</restlet.version>
-        <blueprints.version>1.0</blueprints.version>
         <jung.version>2.0.1</jung.version>
     </properties>
 </project>
