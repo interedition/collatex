@@ -20,18 +20,20 @@
 
 package eu.interedition.collatex.implementation.output;
 
+import java.util.*;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.*;
+
 import eu.interedition.collatex.implementation.graph.SegmentedVariantGraphVertex;
 import eu.interedition.collatex.implementation.input.Token;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.util.*;
 
 public class Apparatus {
   public static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
@@ -51,7 +53,7 @@ public class Apparatus {
   public SortedSet<IWitness> getWitnesses() {
     return witnesses;
   }
-  
+
   public void serialize(Node parent) {
     Document doc = (parent.getNodeType() == Node.DOCUMENT_NODE ? (Document) parent : parent.getOwnerDocument());
     // FIXME: this should be dealt with on the tokenizer level!

@@ -1,18 +1,8 @@
 package eu.interedition.collatex.implementation.graph.edit;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.implementation.output.DotExporter;
@@ -36,8 +26,7 @@ public class EditGraphVisitor {
   // than the minimum amount of sequences for the whole graph
   // This is probably not the end solution
   public List<EditGraphEdge> getShortestPath(Matches match) {
-    String dot = DotExporter.toDot(editGraph);
-    DotExporter.generateSVG("site/collation/shortestpath_before.svg", dot, "Shortest Path before");
+    exportGraphBefore();
 
     Map<EditGraphVertex, Integer> determineMinSequences = determineMinSequences(editGraph);
     int minSequences = determineMinSequences.get(editGraph.getStartVertex());
@@ -53,13 +42,20 @@ public class EditGraphVisitor {
       currentVertex = edge.getTargetVertex();
     }
 
-    dot = DotExporter.toDot(graphWithSinglePath);
-    DotExporter.generateSVG("site/collation/shortestpath_after.svg", dot, "Shortest Path after");
+    exportGraphAfter(graphWithSinglePath);
 
     if (graphWithSinglePath.outDegreeOf(currentVertex) > 1) {
       throw new RuntimeException("Vertex " + currentVertex + " has more than one possible outgoing edge!");
     }
     return shortestPath;
+  }
+
+  private void exportGraphAfter(EditGraph graphWithSinglePath) {
+    DotExporter.generateSVG("site/collation/shortestpath_after.svg", DotExporter.toDot(graphWithSinglePath), "Shortest Path after");
+  }
+
+  private void exportGraphBefore() {
+    DotExporter.generateSVG("site/collation/shortestpath_before.svg", DotExporter.toDot(editGraph), "Shortest Path before");
   }
 
   public Map<EditGraphVertex, Integer> determineMinSequences(EditGraph graph) {
@@ -137,7 +133,37 @@ public class EditGraphVisitor {
   private EditGraph buildNewGraphWithOnlyMinimumScoreEdges(Matches matches) {
     Set<EditGraphEdge> minimumScoreEdges = getMinimumScoreEdges(matches);
     Set<EditGraphVertex> vertices = getVertices(minimumScoreEdges);
-    return newEditGraph(minimumScoreEdges, vertices);
+    EditGraph newEditGraph = newEditGraph(minimumScoreEdges, vertices);
+
+    List<EditGraphVertex> verticesToRemove = Lists.newArrayList();
+    List<EditGraphEdge> edgesToRemove = Lists.newArrayList();
+    List<EditGraphEdge> edgesToAdd = Lists.newArrayList();
+    Iterator<EditGraphVertex> iterator = newEditGraph.iterator();
+    while (iterator.hasNext()) {
+      EditGraphVertex editGraphVertex = iterator.next();
+      INormalizedToken witnessToken = editGraphVertex.getWitnessToken();
+      LOG.info("witnessToken={}", witnessToken);
+      if (witnessToken != null && witnessToken.getContent().equals("")) {
+        LOG.info("skipVertex!");
+        // skipvertex, remove
+        verticesToRemove.add(editGraphVertex);
+        Set<EditGraphEdge> incomingEdges = newEditGraph.incomingEdgesOf(editGraphVertex);
+        Set<EditGraphEdge> outgoingEdges = newEditGraph.outgoingEdgesOf(editGraphVertex);
+        for (EditGraphEdge incomingEdge : incomingEdges) {
+          for (EditGraphEdge outgoingEdge : outgoingEdges) {
+            edgesToAdd.add(new EditGraphEdge(incomingEdge.getSourceVertex(), outgoingEdge.getTargetVertex(), EditOperation.GAP, incomingEdge.getScore() + outgoingEdge.getScore()));
+          }
+        }
+        edgesToRemove.addAll(incomingEdges);
+        edgesToRemove.addAll(outgoingEdges);
+      }
+    }
+    for (EditGraphEdge editGraphEdge : edgesToAdd) {
+      newEditGraph.add(editGraphEdge);
+    }
+    newEditGraph.removeAllEdges(edgesToRemove);
+    newEditGraph.removeAllVertices(verticesToRemove);
+    return newEditGraph;
   }
 
   private LinkedHashSet<EditGraphEdge> getMinimumScoreEdges(Matches matches) {
