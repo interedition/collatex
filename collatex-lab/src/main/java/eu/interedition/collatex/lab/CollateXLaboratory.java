@@ -107,7 +107,7 @@ public class CollateXLaboratory extends JFrame {
 
       LOG.debug("Collating {}", Iterables.toString(witnesses));
 
-      final Transaction transaction = variantGraphFactory.newTransaction();
+      final Transaction transaction = variantGraphFactory.getDb().beginTx();
       try {
         final PersistentVariantGraph pvg = variantGraphFactory.create();
         new VariantGraphBuilder(pvg).add(witnesses.toArray(new IWitness[witnesses.size()]));

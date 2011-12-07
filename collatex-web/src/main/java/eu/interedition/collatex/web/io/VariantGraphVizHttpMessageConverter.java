@@ -1,5 +1,6 @@
 package eu.interedition.collatex.web.io;
 
+import com.google.common.io.Closeables;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.web.GraphVizService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,15 +52,18 @@ public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConv
   protected void writeInternal(PersistentVariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     final MediaType contentType = outputMessage.getHeaders().getContentType();
     if (contentType != null && contentType.isCompatibleWith(IMAGE_SVG_XML) && !graphVizService.isSvgAvailable()) {
-      throw new HttpMessageNotWritableException("SVG generation via GraphViz' dot not available on this server");
+      throw new HttpMessageNotWritableException("SVG generation via GraphViz' \"dot\" not available on this server");
     }
 
     final OutputStream body = outputMessage.getBody();
-    if (contentType != null && contentType.isCompatibleWith(IMAGE_SVG_XML)) {
-      graphVizService.toSvg(graph, body, false);
-    } else {
-      graphVizService.toDot(graph, new OutputStreamWriter(body), false);
+    try {
+      if (contentType != null && contentType.isCompatibleWith(IMAGE_SVG_XML)) {
+        graphVizService.toSvg(graph, body, false);
+      } else {
+        graphVizService.toDot(graph, new OutputStreamWriter(body), false);
+      }
+    } finally {
+      Closeables.closeQuietly(body);
     }
-    body.flush();
   }
 }

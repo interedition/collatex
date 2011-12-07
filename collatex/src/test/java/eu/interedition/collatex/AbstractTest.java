@@ -51,7 +51,7 @@ public abstract class AbstractTest {
 
   @Before
   public void startGraphTransaction() {
-    transaction = variantGraphFactory.newTransaction();
+    transaction = variantGraphFactory.getDb().beginTx();
   }
 
   @After

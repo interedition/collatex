@@ -20,9 +20,20 @@
 
 package eu.interedition.collatex.web;
 
-public class CollationException extends Exception {
+import eu.interedition.collatex.implementation.input.NormalizedToken;
+import eu.interedition.collatex.interfaces.IWitness;
+import org.codehaus.jackson.JsonNode;
 
-  public CollationException(String message) {
-    super(message);
+public class WebToken extends NormalizedToken {
+
+  private final JsonNode jsonNode;
+
+  public WebToken(IWitness witness, int index, String content, String normalized, JsonNode jsonNode) {
+    super(witness, index, content, normalized);
+    this.jsonNode = jsonNode;
+  }
+
+  public JsonNode getJsonNode() {
+    return jsonNode;
   }
 }

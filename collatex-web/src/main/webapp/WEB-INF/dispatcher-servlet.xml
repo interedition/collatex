@@ -8,11 +8,11 @@
 		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
 
-    <mvc:annotation-driven />
+    <mvc:annotation-driven/>
 
     <mvc:resources location="/WEB-INF/static/" mapping="/static/**"/>
 
-    <mvc:view-controller path="/tutorial" view-name="tutorial" />
+    <mvc:view-controller path="/tutorial" view-name="tutorial"/>
 
     <context:component-scan base-package="eu.interedition.collatex.web" use-default-filters="false">
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
@@ -22,43 +22,21 @@
         <property name="order" value="-1"/>
         <property name="messageConverters">
             <list>
-                <bean class="eu.interedition.collatex.web.io.VariantGraphHttpMessageConverter"/>
-                <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
-                    <property name="objectMapper" ref="objectMapper"/>
-                </bean>
+                <bean class="eu.interedition.collatex.web.io.CollationHttpMessageConverter"/>
+                <bean class="eu.interedition.collatex.web.io.VariantGraphTEIHttpMessageConverter"/>
+                <bean class="eu.interedition.collatex.web.io.VariantGraphMLHttpMessageConverter"/>
+                <bean class="eu.interedition.collatex.web.io.VariantGraphVizHttpMessageConverter"/>
+                <bean class="eu.interedition.collatex.web.io.VariantGraphJSONSerializer"/>
             </list>
         </property>
     </bean>
 
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver"/>
 
-    <bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-        <property name="defaultContentType" value="text/html;charset=utf-8"/>
-        <property name="favorPathExtension" value="false"/>
-        <property name="favorParameter" value="true"/>
-        <property name="mediaTypes">
-            <map>
-                <entry key="html" value="text/html;charset=utf-8"/>
-                <entry key="json" value="application/json"/>
-                <entry key="svg" value="image/svg+xml"/>
-            </map>
-        </property>
-        <property name="viewResolvers">
-            <list>
-                <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-                    <property name="contentType" value="text/html;charset=utf-8"/>
-                    <property name="prefix" value=""/>
-                    <property name="suffix" value=".ftl"/>
-                </bean>
-            </list>
-        </property>
-        <property name="defaultViews">
-            <list>
-                <bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
-                    <property name="objectMapper" ref="objectMapper"/>
-                </bean>
-            </list>
-        </property>
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="contentType" value="text/html;charset=utf-8"/>
+        <property name="prefix" value=""/>
+        <property name="suffix" value=".ftl"/>
     </bean>
 
     <bean id="freemarkerConfigurer" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">

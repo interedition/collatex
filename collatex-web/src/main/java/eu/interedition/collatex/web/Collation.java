@@ -18,24 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.web.model;
+package eu.interedition.collatex.web;
 
-import java.util.List;
+import eu.interedition.collatex.interfaces.IWitness;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import java.util.SortedSet;
 
 public class Collation {
 
-  @JsonProperty
-  @JsonDeserialize(contentAs = Witness.class)
-  private List<Witness> witnesses;
+  private final SortedSet<IWitness> witnesses;
 
-  public List<Witness> getWitnesses() {
-    return witnesses;
+  public Collation(SortedSet<IWitness> witnesses) {
+    this.witnesses = witnesses;
   }
 
-  public void setWitnesses(List<Witness> witnesses) {
-    this.witnesses = witnesses;
+  public SortedSet<IWitness> getWitnesses() {
+    return witnesses;
   }
 }

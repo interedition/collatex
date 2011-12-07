@@ -55,11 +55,11 @@ YUI().use("io", "json", "dump", "event", "node", "escape", function(Y) {
             Y.each(witnesses, function(w, i) {
                 collation.witnesses.push({ id: "W" + (i + 1).toString(), content: witnesses[i] });
             });
-            Y.io(cp + "/align", {
+            Y.io(cp + "/", {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json",
-                    "Accept": "application/json"
+                    "Accept": "application/collatex.table+json"
                 },
                 data: Y.JSON.stringify(collation),
                 on: {

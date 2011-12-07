@@ -1,12 +1,14 @@
 package eu.interedition.collatex.implementation.graph.db;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Node;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.SortedSet;
 
@@ -134,4 +136,19 @@ public class PersistentVariantGraphVertex {
       }
     };
   }
+
+  public static final Function<PersistentVariantGraphVertex, String> TO_CONTENTS = new Function<PersistentVariantGraphVertex, String>() {
+    @Override
+    public String apply(PersistentVariantGraphVertex input) {
+      final SortedSet<IWitness> witnesses = input.getWitnesses();
+      if (witnesses.isEmpty()) {
+        return "";
+      }
+      final StringBuilder contents = new StringBuilder();
+      for (INormalizedToken token : input.getTokens(Sets.newTreeSet(Collections.singleton(witnesses.first())))) {
+        contents.append(token.getContent()).append(" ");
+      }
+      return contents.toString().trim();
+    }
+  };
 }

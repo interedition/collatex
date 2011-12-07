@@ -1,37 +1,27 @@
 package eu.interedition.collatex.web;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraphVertex;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphTransposition;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
-import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IVariantGraph;
-import eu.interedition.collatex.interfaces.IWitness;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.ext.DOTExporter;
-import org.jgrapht.ext.EdgeNameProvider;
-import org.jgrapht.ext.IntegerNameProvider;
-import org.jgrapht.ext.VertexNameProvider;
+import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.List;
-import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -47,52 +37,47 @@ public class GraphVizService implements InitializingBean {
   }
 
   public void toDot(PersistentVariantGraph graph, Writer writer, boolean transpositions) {
-    final PrintWriter out = new PrintWriter(writer);
-    final String indent = "  ";
-    final String connector = (transpositions ? " -- " : " -> ");
+    final Transaction tx = graph.newTransaction();
+    try {
+      final PrintWriter out = new PrintWriter(writer);
+      final String indent = "  ";
+      final String connector = (transpositions ? " -- " : " -> ");
 
-    out.println((transpositions ? "graph" : "digraph") + " G {");
+      out.println((transpositions ? "graph" : "digraph") + " G {");
 
-    for (PersistentVariantGraphVertex v : graph.traverseVertices(null)) {
-      out.print(indent + "v" + v.getNode().getId());
-      out.print(" [label = \"" + toLabel(v) + "\"]");
-      out.println(";");
-    }
-
-    for (PersistentVariantGraphEdge e : graph.traverseEdges(null)) {
-      out.print(indent + "v" + e.getStart().getNode().getId() + connector + "v" + e.getEnd().getNode().getId());
-      out.print(" [label = \"" + toLabel(e) + "\"]");
-      out.println(";");
-    }
-
-    if (transpositions) {
-      for (PersistentVariantGraphTransposition t : graph.getTranspositions()) {
-        out.println(indent + "v" + t.getStart().getNode().getId() + connector + "v" + t.getEnd().getNode().getId() + ";");
+      for (PersistentVariantGraphVertex v : graph.traverseVertices(null)) {
+        out.print(indent + "v" + v.getNode().getId());
+        out.print(" [label = \"" + toLabel(v) + "\"]");
+        out.println(";");
       }
+
+      for (PersistentVariantGraphEdge e : graph.traverseEdges(null)) {
+        out.print(indent + "v" + e.getStart().getNode().getId() + connector + "v" + e.getEnd().getNode().getId());
+        out.print(" [label = \"" + toLabel(e) + "\"]");
+        out.println(";");
+      }
+
+      if (transpositions) {
+        for (PersistentVariantGraphTransposition t : graph.getTranspositions()) {
+          out.println(indent + "v" + t.getStart().getNode().getId() + connector + "v" + t.getEnd().getNode().getId() + ";");
+        }
+      }
+
+      out.println("}");
+
+      out.flush();
+      tx.success();
+    } finally {
+      tx.finish();
     }
-
-    out.println("}");
-
-    out.flush();
-
   }
 
   private String toLabel(PersistentVariantGraphEdge e) {
-    return Joiner.on(", ").join(e.getWitnesses()).replaceAll("\"", "\\\"");
+    return PersistentVariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
   }
 
   private String toLabel(PersistentVariantGraphVertex v) {
-    final SortedSet<IWitness> witnesses = v.getWitnesses();
-    if (witnesses.isEmpty()) {
-      return "";
-    }
-    final SortedSet<INormalizedToken> tokens = v.getTokens(Sets.newTreeSet(Collections.singleton(witnesses.first())));
-    return Joiner.on(" ").join(Iterables.transform(tokens, new Function<INormalizedToken, String>() {
-      @Override
-      public String apply(INormalizedToken input) {
-        return input.getContent();
-      }
-    })).replaceAll("\"", "\\\"");
+    return PersistentVariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
   }
 
   public boolean isSvgAvailable() {

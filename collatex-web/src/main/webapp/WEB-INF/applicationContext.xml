@@ -5,4 +5,6 @@
     <context:component-scan base-package="eu.interedition.collatex.web">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
+    
+    <bean id="variantGraphFactory" class="eu.interedition.collatex.implementation.graph.db.VariantGraphFactory"/>
 </beans>

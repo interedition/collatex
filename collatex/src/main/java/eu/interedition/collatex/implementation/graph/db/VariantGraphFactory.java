@@ -72,16 +72,16 @@ public class VariantGraphFactory {
     }
   }
 
+  public EmbeddedGraphDatabase getDb() {
+    return db;
+  }
+
   public void setWitnessResolver(Resolver<IWitness> witnessResolver) {
     this.witnessResolver = witnessResolver;
   }
 
   public void setTokenResolver(Resolver<INormalizedToken> tokenResolver) {
     this.tokenResolver = tokenResolver;
-  }
-
-  public Transaction newTransaction() {
-    return db.beginTx();
   }
 
   public synchronized PersistentVariantGraph create() {

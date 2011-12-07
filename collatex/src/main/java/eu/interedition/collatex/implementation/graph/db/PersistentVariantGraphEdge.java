@@ -1,6 +1,7 @@
 package eu.interedition.collatex.implementation.graph.db;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -102,4 +103,11 @@ public class PersistentVariantGraphEdge {
       }
     };
   }
+
+  public static final Function<PersistentVariantGraphEdge, String> TO_CONTENTS = new Function<PersistentVariantGraphEdge, String>() {
+    @Override
+    public String apply(PersistentVariantGraphEdge input) {
+      return Joiner.on(", ").join(input.getWitnesses());
+    }
+  };
 }
