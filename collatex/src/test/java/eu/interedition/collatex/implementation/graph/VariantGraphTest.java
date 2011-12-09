@@ -25,6 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphTransposition;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.interfaces.*;
@@ -124,5 +125,86 @@ public class VariantGraphTest extends AbstractTest {
     merge(graph, w[2]);
     final Set<PersistentVariantGraphTransposition> transposed = graph.getTranspositions();
     assertEquals(2, transposed.size());
+  }
+
+  @Test
+  public void transpositions1() {
+    final PersistentVariantGraph graph = merge("the nice black and white cat", "the friendly white and black cat");
+    assertEquals(12, Iterables.size(graph.traverseEdges(null)));
+    assertEquals(12, Iterables.size(graph.traverseEdges(null)));
+  }
+
+  @Test
+  public void transpositions2() {
+    final IWitness[] w = createWitnesses("The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog");
+    final PersistentVariantGraph graph = merge(w);
+
+    final PersistentVariantGraphEdge edge = edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0]));
+    assertHasWitnesses(edge, w[0], w[1], w[2]);
+
+    assertEquals(14, Iterables.size(graph.traverseVertices(null)));
+    assertEquals(10, Iterables.size(graph.traverseEdges(null)));
+  }
+
+  @Test
+  public void joinTwoIdenticalWitnesses() {
+    final IWitness[] w = createWitnesses("the black cat", "the black cat");
+    final PersistentVariantGraph graph = merge(w).join();
+
+    assertEquals(3, Iterables.size(graph.traverseVertices(null)));
+    assertEquals(2, Iterables.size(graph.traverseEdges(null)));
+
+    final PersistentVariantGraphVertex joinedVertex = vertexWith(graph, "the black cat", w[0]);
+
+    assertHasWitnesses(edgeBetween(graph.getStart(), joinedVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(graph.getEnd(), joinedVertex), w[0], w[1]);
+  }
+
+  @Test
+  public void joinTwoDifferentWitnesses() {
+    final IWitness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
+    final PersistentVariantGraph graph = merge(w).join();
+
+    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final PersistentVariantGraphVertex niceBlackVertex = vertexWith(graph, "nice black", w[0]);
+    final PersistentVariantGraphVertex badWhiteVertex = vertexWith(graph, "bad white", w[1]);
+    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final PersistentVariantGraphVertex sharedVertex = vertexWith(graph, "shared", w[0]);
+    final PersistentVariantGraphVertex spilledVertex = vertexWith(graph, "spilled", w[1]);
+    final PersistentVariantGraphVertex hisFoodVertex = vertexWith(graph, "his food", w[0]);
+    final PersistentVariantGraphVertex againVertex = vertexWith(graph, "again", w[1]);
+
+    assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, niceBlackVertex), w[0]);
+    assertHasWitnesses(edgeBetween(niceBlackVertex, catVertex), w[0]);
+    assertHasWitnesses(edgeBetween(theVertex, badWhiteVertex), w[1]);
+    assertHasWitnesses(edgeBetween(badWhiteVertex, catVertex), w[1]);
+    assertHasWitnesses(edgeBetween(catVertex, sharedVertex), w[0]);
+    assertHasWitnesses(edgeBetween(sharedVertex, hisFoodVertex), w[0]);
+    assertHasWitnesses(edgeBetween(catVertex, spilledVertex), w[1]);
+    assertHasWitnesses(edgeBetween(spilledVertex, hisFoodVertex), w[1]);
+    assertHasWitnesses(edgeBetween(hisFoodVertex, againVertex), w[1]);
+  }
+
+  @Test
+  public void joinTwoDifferentWitnesses2() {
+    final IWitness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
+    final PersistentVariantGraph graph = merge(w).join();
+
+    final PersistentVariantGraphVertex blackieVertex = vertexWith(graph, "blackie", w[0]);
+    final PersistentVariantGraphVertex whitneyVertex = vertexWith(graph, "whitney", w[1]);
+    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final PersistentVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+
+    assertHasWitnesses(edgeBetween(graph.getStart(), blackieVertex), w[0]);
+    assertHasWitnesses(edgeBetween(blackieVertex, theVertex), w[0]);
+    assertHasWitnesses(edgeBetween(graph.getStart(), whitneyVertex), w[1]);
+    assertHasWitnesses(edgeBetween(whitneyVertex, theVertex), w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
+    assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0]);
+    assertHasWitnesses(edgeBetween(theVertex, whiteVertex), w[1]);
+    assertHasWitnesses(edgeBetween(whiteVertex, catVertex), w[1]);
   }
 }
