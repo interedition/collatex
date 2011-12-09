@@ -29,7 +29,7 @@ public class EditGraphVertex {
     }
     String string = getWitnessToken().toString() + "->" + baseToken.toString();
     if (weight > 0) {
-      string += " weight:" + String.valueOf(this.weight);
+      string += " (weight:" + String.valueOf(this.weight) + ")";
     }
     return string;
   }

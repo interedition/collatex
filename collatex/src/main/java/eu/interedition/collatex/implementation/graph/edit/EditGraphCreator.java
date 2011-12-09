@@ -1,8 +1,10 @@
 package eu.interedition.collatex.implementation.graph.edit;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
@@ -81,14 +83,14 @@ public class EditGraphCreator {
       editGraph.add(edge);
     }
 
-    addSkipVertices(ambiguousNormalized);
+    //    addSkipVertices(ambiguousNormalized);
 
     return editGraph;
   }
 
   private void addSkipVertices(Set<String> ambiguousNormalized) {
-    List<EditGraphVertex> vertices = Lists.newArrayList();
-    List<EditGraphEdge> edges = Lists.newArrayList();
+    Set<EditGraphVertex> vertices = Sets.newLinkedHashSet();
+    Set<EditGraphEdge> edges = Sets.newLinkedHashSet();
     Iterator<EditGraphVertex> iterator = editGraph.iterator();
     while (iterator.hasNext()) {
       EditGraphVertex vertex = iterator.next();

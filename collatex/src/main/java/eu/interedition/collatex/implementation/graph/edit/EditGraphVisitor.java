@@ -50,12 +50,14 @@ public class EditGraphVisitor {
     return shortestPath;
   }
 
-  private void exportGraphAfter(EditGraph graphWithSinglePath) {
-    DotExporter.generateSVG("site/collation/shortestpath_after.svg", DotExporter.toDot(graphWithSinglePath), "Shortest Path after");
+  private void exportGraphBefore() {
+    LOG.info("generating shortestpath_before.svg");
+    DotExporter.generateSVG("site/collation/shortestpath_before.svg", DotExporter.toDot(editGraph), "Shortest Path before");
   }
 
-  private void exportGraphBefore() {
-    DotExporter.generateSVG("site/collation/shortestpath_before.svg", DotExporter.toDot(editGraph), "Shortest Path before");
+  private void exportGraphAfter(EditGraph graphWithSinglePath) {
+    LOG.info("generating shortestpath_after.svg");
+    DotExporter.generateSVG("site/collation/shortestpath_after.svg", DotExporter.toDot(graphWithSinglePath), "Shortest Path after");
   }
 
   public Map<EditGraphVertex, Integer> determineMinSequences(EditGraph graph) {

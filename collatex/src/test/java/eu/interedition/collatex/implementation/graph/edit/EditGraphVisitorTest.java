@@ -1,7 +1,6 @@
 package eu.interedition.collatex.implementation.graph.edit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +9,7 @@ import java.util.Map;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.matching.Matches;
+import eu.interedition.collatex.implementation.output.DotExporter;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import org.junit.Ignore;
@@ -57,6 +57,7 @@ public class EditGraphVisitorTest extends AbstractTest {
     EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
     Matches matches = Matches.between(w[0], w[1], comparator);
     EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps(matches);
+    DotExporter.generateSVG("test.svg", DotExporter.toDot(dGraph2), "The red cat and the black cat");
     // I expect 6 vertices
     // start, 2 x the, black, cat en end
     assertVertices(dGraph2, "#", "the", "the", "black", "cat", "#");
