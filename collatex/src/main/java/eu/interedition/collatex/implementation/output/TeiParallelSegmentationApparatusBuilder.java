@@ -20,47 +20,39 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.implementation.graph.SegmentedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.implementation.input.Token;
-import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public class Apparatus {
+/**
+ * Apparatus element serializing to the output format specified in ticket #6.
+ * 
+ */
+
+public class TeiParallelSegmentationApparatusBuilder {
   public static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
-  private final List<Entry> entries;
-  private final SortedSet<IWitness> witnesses;
-
-  public Apparatus(SortedSet<IWitness> witnesses, final List<Entry> entries) {
-    this.witnesses = witnesses;
-    this.entries = entries;
-  }
-
-  public List<Entry> getEntries() {
-    return entries;
-  }
-
-  public SortedSet<IWitness> getWitnesses() {
-    return witnesses;
-  }
-
-  public void serialize(Node parent) {
+  public static void build(Apparatus apparatus, Node parent) {
     Document doc = (parent.getNodeType() == Node.DOCUMENT_NODE ? (Document) parent : parent.getOwnerDocument());
     // FIXME: this should be dealt with on the tokenizer level!
-    final String separator = " ";
-    for (final Apparatus.Entry entry : entries) {
+    //    final String separator = " ";
+    for (eu.interedition.collatex.implementation.output.Apparatus.Entry entry : apparatus.getEntries()) {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
       for (IWitness witness : entry.getWitnesses()) {
@@ -80,13 +72,13 @@ public class Apparatus {
         }
 
         SortedMap<String, String> readingMap = Maps.newTreeMap();
-        for (Map.Entry<String, SortedSet<String>> reading : readings.entrySet()) {
+        for (Entry<String, SortedSet<String>> reading : readings.entrySet()) {
           readingMap.put(Joiner.on(" ").join(Iterables.transform(reading.getValue(), WIT_TO_XML_ID)), reading.getKey());
         }
 
         Element app = doc.createElementNS(TEI_NS, "app");
         parent.appendChild(app);
-        for (Map.Entry<String, String> reading : readingMap.entrySet()) {
+        for (Entry<String, String> reading : readingMap.entrySet()) {
           Element rdg = doc.createElementNS(TEI_NS, "rdg");
           app.appendChild(rdg);
           rdg.setAttribute("wit", reading.getKey());
@@ -96,78 +88,12 @@ public class Apparatus {
           }
         }
       }
-      parent.appendChild(doc.createTextNode(separator));
+      //      parent.appendChild(doc.createTextNode(separator));
     }
     // FIXME: whitespace handling in the tokenizer!
-    if (!entries.isEmpty()) {
+    if (!apparatus.getEntries().isEmpty()) {
       parent.removeChild(parent.getLastChild());
     }
-  }
-
-  public static class Entry {
-
-    private final Set<PersistentVariantGraphVertex> contents = Sets.newLinkedHashSet();
-    private final SortedSet<IWitness> witnesses;
-
-    public Entry(SortedSet<IWitness> witnesses) {
-      this.witnesses = witnesses;
-    }
-
-    public SortedSet<IWitness> getWitnesses() {
-      return witnesses;
-    }
-
-    public void add(PersistentVariantGraphVertex content) {
-      this.contents.add(content);
-    }
-
-    public boolean covers(IWitness witness) {
-      final TreeSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
-      for (PersistentVariantGraphVertex vertex : contents) {
-        if (!vertex.getTokens(witnessSet).isEmpty()) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
-    * An empty entry returns an empty reading!
-    */
-    public SortedSet<INormalizedToken> getReadingOf(final IWitness witness) {
-      final TreeSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
-      for (PersistentVariantGraphVertex vertex : contents) {
-        final SortedSet<INormalizedToken> tokens = vertex.getTokens(witnessSet);
-        if (!tokens.isEmpty()) {
-          return tokens;
-        }
-      }
-      return Sets.newTreeSet();
-    }
-
-    public boolean hasEmptyCells() {
-      int nonEmptyWitnessSize = 0;
-      for (PersistentVariantGraphVertex vertex : contents) {
-        nonEmptyWitnessSize += vertex.getWitnesses().size();
-      }
-      return getWitnesses().size() != nonEmptyWitnessSize;
-    }
-
-    public EntryState getState() {
-      int size = contents.size();
-      if (size == 1) {
-        boolean emptyCells = hasEmptyCells();
-        if (!emptyCells) {
-          return EntryState.INVARIANT;
-        }
-        return EntryState.SEMI_INVARIANT;
-      }
-      return EntryState.VARIANT;
-    }
-  }
-
-  public static enum EntryState {
-    INVARIANT, SEMI_INVARIANT, VARIANT;
   }
 
   private static final Function<String, String> WIT_TO_XML_ID = new Function<String, String>() {

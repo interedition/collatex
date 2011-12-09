@@ -24,6 +24,7 @@ import java.util.SortedSet;
 
 public interface IVariantGraphVertex extends INormalizedToken {
 
+  @Override
   String getNormalized();
 
   INormalizedToken getToken(IWitness witness);

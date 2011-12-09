@@ -84,6 +84,7 @@ public class VariantGraphVertex implements IVariantGraphVertex {
     throw new RuntimeException("Do not call this method! Call getToken(IWitness).getContent() instead.");
   }
 
+  @Override
   public INormalizedToken getVertexKey() {
     return vertexKey;
   }

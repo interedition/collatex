@@ -15,6 +15,7 @@ public class DefaultResolver<T> implements Resolver<T> {
 
   private final BiMap<T, Integer> entities = HashBiMap.create();
 
+  @Override
   public int add(T entity) {
     if (entities.containsKey(entity)) {
       return entities.get(entity);

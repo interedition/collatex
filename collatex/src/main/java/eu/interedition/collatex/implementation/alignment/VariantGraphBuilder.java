@@ -23,7 +23,7 @@ public class VariantGraphBuilder {
   private final PhraseMatchDetector phraseMatchDetector;
   private final TranspositionDetector transpositionDetector;
 
-  private Map<INormalizedToken,INormalizedToken> tokenLinks;
+  private Map<INormalizedToken, INormalizedToken> tokenLinks;
   private List<Tuple<List<INormalizedToken>>> phraseMatches;
   private List<Tuple<List<INormalizedToken>>> transpositions;
   private Map<INormalizedToken,INormalizedToken> alignments;

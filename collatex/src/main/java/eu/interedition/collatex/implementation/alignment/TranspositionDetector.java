@@ -36,9 +36,50 @@ import eu.interedition.collatex.interfaces.ITokenContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class TranspositionDetector {
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionDetector.class);
+
+  //  public List<Tuple<Tuple<List<INormalizedToken>>>> detect(List<Tuple<List<INormalizedToken>>> phraseMatches, ITokenContainer base) {
+  //
+  //    //    INormalizedToken currentBaseToken = NormalizedToken.START;
+  //    List<Tuple<List<INormalizedToken>>> copy = Lists.newArrayList(phraseMatches);
+  //
+  //    List<Tuple<List<INormalizedToken>>> sortedPhraseMatches = Lists.newArrayList(); // sequences ordered by base
+  //    Iterator<INormalizedToken> baseIterator = base.tokenIterator();
+  //    while (baseIterator.hasNext()) {
+  //      INormalizedToken baseToken = baseIterator.next();
+  //
+  //      Iterator<Tuple<List<INormalizedToken>>> iterator = copy.iterator();
+  //      while (iterator.hasNext()) {
+  //        Tuple<java.util.List<eu.interedition.collatex.interfaces.INormalizedToken>> tuple = iterator.next();
+  //        List<INormalizedToken> left = tuple.left;
+  //        INormalizedToken startToken = left.get(0);
+  //        if (base.isNear(baseToken, startToken)) {
+  //          sortedPhraseMatches.add(tuple);
+  //          copy.remove(tuple);
+  //          //          currentBaseToken = left.get(left.size() - 1);
+  //          break;
+  //        }
+  //      }
+  //    }
+  //    if (!copy.isEmpty()) {
+  //      throw new RuntimeException("copy should be empty!");
+  //    }
+  //
+  //    final List<Tuple<Tuple<List<INormalizedToken>>>> transpositions = Lists.newArrayList();
+  //    Preconditions.checkState(sortedPhraseMatches.size() == phraseMatches.size(), "Something went wrong in the linking process!");
+  //    final Iterator<Tuple<List<INormalizedToken>>> unsortedIt = phraseMatches.iterator();
+  //    final Iterator<Tuple<List<INormalizedToken>>> sortedIt = sortedPhraseMatches.iterator();
+  //    while (unsortedIt.hasNext() && sortedIt.hasNext()) {
+  //      final Tuple<List<INormalizedToken>> phraseMatchInWitness = unsortedIt.next();
+  //      final Tuple<List<INormalizedToken>> phraseMatchInBase = sortedIt.next();
+  //      if (!phraseMatchInWitness.equals(phraseMatchInBase)) {
+  //        // TODO: I have got no idea why we have to mirror the sequences here!
+  //        transpositions.add(new Tuple<Tuple<List<INormalizedToken>>>(phraseMatchInBase, phraseMatchInWitness));
+  //      }
+  //    }
+  //    return transpositions;
+  //  }
 
   public List<Tuple<Tuple<List<INormalizedToken>>>> detect(List<Tuple<List<INormalizedToken>>> phraseMatches, ITokenContainer base) {
     // sort phrase matches by base token order
@@ -49,7 +90,7 @@ public class TranspositionDetector {
       }
     });
     final List<Tuple<List<INormalizedToken>>> sortedPhraseMatches = Lists.newArrayList();
-    for (Iterator<INormalizedToken> tokenIterator = base.tokenIterator(); tokenIterator.hasNext(); ) {
+    for (Iterator<INormalizedToken> tokenIterator = base.tokenIterator(); tokenIterator.hasNext();) {
       final INormalizedToken token = tokenIterator.next();
       if (tokenIndex.containsKey(token)) {
         sortedPhraseMatches.add(tokenIndex.get(token));
@@ -66,7 +107,7 @@ public class TranspositionDetector {
       final Tuple<List<INormalizedToken>> phraseMatchInWitness = unsortedIt.next();
       final Tuple<List<INormalizedToken>> phraseMatchInBase = sortedIt.next();
       if (!phraseMatchInWitness.equals(phraseMatchInBase)) {
-        // TODO: I have got no idea why have to mirror the sequences here!
+        // TODO: I have got no idea why we have to mirror the sequences here!
         transpositions.add(new Tuple<Tuple<List<INormalizedToken>>>(phraseMatchInBase, phraseMatchInWitness));
       }
     }

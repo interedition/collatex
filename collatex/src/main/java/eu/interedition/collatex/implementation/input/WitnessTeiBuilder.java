@@ -28,15 +28,7 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import javax.xml.xpath.*;
 
 import com.google.common.collect.Lists;
 
@@ -44,14 +36,18 @@ import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.ITokenNormalizer;
 import eu.interedition.collatex.interfaces.IWitness;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 public class WitnessTeiBuilder extends WitnessStreamBuilder {
   DocumentBuilder builder = null;
   XPathFactory factory;
   private final ITokenNormalizer tokenNormalizer;
 
-  public WitnessTeiBuilder(ITokenNormalizer tokenNormalizer) {
-    super(tokenNormalizer);
-    this.tokenNormalizer = tokenNormalizer;
+  public WitnessTeiBuilder(ITokenNormalizer tokenNormalizer1) {
+    super(tokenNormalizer1);
+    this.tokenNormalizer = tokenNormalizer1;
     DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
     try {
       builder = domFactory.newDocumentBuilder();

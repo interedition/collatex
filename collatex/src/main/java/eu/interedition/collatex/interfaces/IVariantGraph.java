@@ -27,7 +27,6 @@ import java.util.SortedSet;
 
 import org.jgrapht.DirectedGraph;
 
-
 public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVariantGraphEdge>, ITokenContainer, Iterable<IVariantGraphVertex> {
 
   IVariantGraphVertex getStartVertex();
@@ -35,6 +34,7 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
   IVariantGraphVertex getEndVertex();
 
   // Iterates over vertices in topological order
+  @Override
   Iterator<IVariantGraphVertex> iterator();
 
   SortedSet<IWitness> getWitnesses();
@@ -44,7 +44,7 @@ public interface IVariantGraph extends DirectedGraph<IVariantGraphVertex, IVaria
   List<INormalizedToken> getTokens(IWitness witness);
 
   List<IVariantGraphEdge> getPath(IWitness witness);
-  
+
   Map<IVariantGraphVertex, IVariantGraphVertex> getTransposedTokens();
 
 }

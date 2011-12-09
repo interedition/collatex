@@ -2,8 +2,10 @@ package eu.interedition.collatex;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.RowSortedTable;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
@@ -12,7 +14,6 @@ import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
-import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.ITokenizer;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -21,12 +22,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +38,7 @@ import static org.junit.Assert.fail;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public abstract class AbstractTest {
-
+  protected final Logger LOG = LoggerFactory.getLogger(getClass());
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
   protected WitnessBuilder witnessBuilder = new WitnessBuilder(new DefaultTokenNormalizer());

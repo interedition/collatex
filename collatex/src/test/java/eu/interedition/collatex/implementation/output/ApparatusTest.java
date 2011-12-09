@@ -20,14 +20,9 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
-import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
-import eu.interedition.collatex.interfaces.IWitness;
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import static org.junit.Assert.assertEquals;
+
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,9 +31,16 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
 
-import static org.junit.Assert.assertEquals;
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
+import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
+import eu.interedition.collatex.interfaces.IWitness;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class ApparatusTest extends AbstractTest {
   private DocumentBuilder documentBuilder;
@@ -66,7 +68,6 @@ public class ApparatusTest extends AbstractTest {
     assertEquals(apparatusStr, result.substring("<text xmlns=\"http://www.tei-c.org/ns/1.0\">".length(), result.length() - "</text>".length()));
   }
 
-
   /**
    * The first example from #6
    * (http://arts-itsee.bham.ac.uk/trac/interedition/ticket/6) (without
@@ -78,10 +79,10 @@ public class ApparatusTest extends AbstractTest {
   @Test
   public void testSimpleSubstitutionOutput() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B #C\">dog</rdg></app> and the black mat",//
-            "the black cat and the black mat",//
-            "the black dog and the black mat",//
-            "the black dog and the black mat");
+        "the black <app><rdg wit=\"#A\">cat</rdg><rdg wit=\"#B #C\">dog</rdg></app> and the black mat",//
+        "the black cat and the black mat",//
+        "the black dog and the black mat",//
+        "the black dog and the black mat");
   }
 
   /**
@@ -94,56 +95,56 @@ public class ApparatusTest extends AbstractTest {
   @Test
   public void testSimpleAddDelOutput() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B #C\"/></app> table",//
-            "the black cat on the white table",//
-            "the black saw the black cat on the table",//
-            "the black saw the black cat on the table");
+        "the black <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">saw the black</rdg></app> cat on the <app><rdg wit=\"#A\">white</rdg><rdg wit=\"#B #C\"/></app> table",//
+        "the black cat on the white table",//
+        "the black saw the black cat on the table",//
+        "the black saw the black cat on the table");
   }
 
   @Test
   public void testMultiSubstitutionOutput() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B #C\">big white dog</rdg></app> and the black mat",//
-            "the black cat and the black mat",//
-            "the big white dog and the black mat",//
-            "the big white dog and the black mat");
+        "the <app><rdg wit=\"#A\">black cat</rdg><rdg wit=\"#B #C\">big white dog</rdg></app> and the black mat",//
+        "the black cat and the black mat",//
+        "the big white dog and the black mat",//
+        "the big white dog and the black mat");
   }
 
   // Additional unit tests (not present in ticket #6)
   @Test
   public void testAllWitnessesEqual() throws Exception {
     assertApparatusEquals("the black cat",//
-            "the black cat",//
-            "the black cat",//
-            "the black cat");
+        "the black cat",//
+        "the black cat",//
+        "the black cat");
   }
 
   // Note: There are some problems with whitespace here!
   @Test
   public void testAWordMissingAtTheEnd() throws Exception {
     assertApparatusEquals(//
-            "the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app>",//
-            "the black cat",//
-            "the black cat",//
-            "the black");
+        "the black <app><rdg wit=\"#A #B\">cat</rdg><rdg wit=\"#C\"/></app>",//
+        "the black cat",//
+        "the black cat",//
+        "the black");
   }
 
   // Note: There might be some problems with whitespace here!
   @Test
   public void testCrossVariation() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">white</rdg></app> <app><rdg wit=\"#A #C\"/><rdg wit=\"#B\">and</rdg></app> <app><rdg wit=\"#A #B\">black</rdg><rdg wit=\"#C\"/></app> cat",//
-            "the black cat",//
-            "the white and black cat",//
-            "the white cat");
+        "the <app><rdg wit=\"#A\"/><rdg wit=\"#B #C\">white</rdg></app> <app><rdg wit=\"#A #C\"/><rdg wit=\"#B\">and</rdg></app> <app><rdg wit=\"#A #B\">black</rdg><rdg wit=\"#C\"/></app> cat",//
+        "the black cat",//
+        "the white and black cat",//
+        "the white cat");
   }
 
   // Note: There might be some problems with whitespace here!
   @Test
   public void testAddition() throws Exception {
     assertApparatusEquals(//
-            "the <app><rdg wit=\"#A\"/><rdg wit=\"#B\">white and</rdg></app> black cat",//
-            "the black cat",//
-            "the white and black cat");
+        "the <app><rdg wit=\"#A\"/><rdg wit=\"#B\">white and</rdg></app> black cat",//
+        "the black cat",//
+        "the white and black cat");
   }
 }

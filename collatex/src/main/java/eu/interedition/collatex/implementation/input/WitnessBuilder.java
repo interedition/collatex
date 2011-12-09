@@ -26,8 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.xml.sax.SAXException;
-
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.interfaces.INormalizedToken;
@@ -35,6 +33,8 @@ import eu.interedition.collatex.interfaces.IToken;
 import eu.interedition.collatex.interfaces.ITokenNormalizer;
 import eu.interedition.collatex.interfaces.ITokenizer;
 import eu.interedition.collatex.interfaces.IWitness;
+
+import org.xml.sax.SAXException;
 
 public class WitnessBuilder {
 
@@ -68,12 +68,12 @@ public class WitnessBuilder {
       throw new IllegalArgumentException("Given content type is unsupported!");
     }
     switch (contentType) {
-    case TEXT_PLAIN:
-      return new WitnessPlainBuilder(tokenNormalizer).build(inputStream);
-    case TEXT_XML:
-      return new WitnessTeiBuilder(tokenNormalizer).build(inputStream);
-    default:
-      throw new IllegalArgumentException("Given content type is unsupported!");
+      case TEXT_PLAIN:
+        return new WitnessPlainBuilder(tokenNormalizer).build(inputStream);
+      case TEXT_XML:
+        return new WitnessTeiBuilder(tokenNormalizer).build(inputStream);
+      default:
+        throw new IllegalArgumentException("Given content type is unsupported!");
     }
   }
 
