@@ -1,5 +1,7 @@
 package eu.interedition.collatex.implementation.matching;
 
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.interfaces.Token;
 
 import java.util.Comparator;
@@ -17,7 +19,9 @@ public class EditDistanceTokenComparator implements Comparator<Token> {
   }
 
   @Override
-  public int compare(Token o1, Token o2) {
-    return (EditDistance.compute(o1.getNormalized(), o2.getNormalized()) <= threshold) ? 0 : -1;
+  public int compare(Token base, Token witness) {
+    final String baseContent = (base instanceof SimpleToken ? ((SimpleToken) base).getNormalized() : ((VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter) base).getNormalized());
+    final String witnessContent = (witness instanceof SimpleToken ? ((SimpleToken) witness).getNormalized() : ((VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter) witness).getNormalized());
+    return (EditDistance.compute(baseContent, witnessContent) <= threshold) ? 0 : -1;
   }
 }

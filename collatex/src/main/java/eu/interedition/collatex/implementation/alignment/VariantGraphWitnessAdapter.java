@@ -105,11 +105,6 @@ public class VariantGraphWitnessAdapter implements IWitness {
     }
 
     @Override
-    public String getNormalized() {
-      return firstToken.getNormalized();
-    }
-
-    @Override
     public int compareTo(Token o) {
       return firstToken.compareTo(o);
     }
@@ -119,9 +114,9 @@ public class VariantGraphWitnessAdapter implements IWitness {
       return firstToken.getContent();
     }
 
-    @Override
-    public String getTrailingWhitespace() {
-      return firstToken.getTrailingWhitespace();
+    @Deprecated
+    public String getNormalized() {
+      return ((SimpleToken) firstToken).getNormalized();
     }
 
     @Override

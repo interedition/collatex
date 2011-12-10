@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.implementation.output.DotExporter;
@@ -21,7 +23,7 @@ public class EditGraphVisitorTest extends AbstractTest {
     Iterator<EditGraphVertex> topologicIterator = dGraph.iterator();
     for (String expectedNormalized : normalized) {
       assertTrue("not enough vertices!", topologicIterator.hasNext());
-      assertEquals(expectedNormalized, topologicIterator.next().getBaseToken().getNormalized());
+      assertEquals(expectedNormalized, ((SimpleToken) topologicIterator.next().getBaseToken()).getNormalized());
     }
   }
 

@@ -2,6 +2,7 @@ package eu.interedition.collatex.implementation.graph.edit;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.interfaces.Token;
@@ -93,7 +94,7 @@ public class EditGraphCreator {
       EditGraphVertex vertex = iterator.next();
       Token witnessToken = vertex.getWitnessToken();
       if (witnessToken != null) {
-        String normalized = witnessToken.getNormalized();
+        String normalized = ((SimpleToken) witnessToken).getNormalized();
         if (ambiguousNormalized.contains(normalized)) {
           Set<EditGraphEdge> incomingEdges = editGraph.incomingEdgesOf(vertex);
           Set<EditGraphEdge> outgoingEdges = editGraph.outgoingEdgesOf(vertex);
@@ -128,7 +129,7 @@ public class EditGraphCreator {
     Set<Token> ambiguousMatches = m.getAmbiguous();
     Set<String> ambiguousNormalized = Sets.newHashSet();
     for (Token token : ambiguousMatches) {
-      ambiguousNormalized.add(token.getNormalized());
+      ambiguousNormalized.add(((SimpleToken) token).getNormalized());
     }
     return ambiguousNormalized;
   }

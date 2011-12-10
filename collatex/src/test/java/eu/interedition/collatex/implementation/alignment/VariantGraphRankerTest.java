@@ -37,17 +37,17 @@ public class VariantGraphRankerTest extends AbstractTest {
     final VariantGraph graph = merge("The black cat", "The black and white cat", "The black and green cat").rank();
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
 
-    assertEquals("the", vertices.get(1).tokens().first().getNormalized());
+    assertVertexEquals("the", vertices.get(1));
     assertEquals(1, vertices.get(1).getRank());
-    assertEquals("black", vertices.get(2).tokens().first().getNormalized());
+    assertVertexEquals("black", vertices.get(2));
     assertEquals(2, vertices.get(2).getRank());
-    assertEquals("and", vertices.get(3).tokens().first().getNormalized());
+    assertVertexEquals("and", vertices.get(3));
     assertEquals(3, vertices.get(3).getRank());
-    assertEquals("white", vertices.get(4).tokens().first().getNormalized());
+    assertVertexEquals("white", vertices.get(4));
     assertEquals(4, vertices.get(4).getRank());
-    assertEquals("green", vertices.get(5).tokens().first().getNormalized());
+    assertVertexEquals("green", vertices.get(5));
     assertEquals(4, vertices.get(5).getRank());
-    assertEquals("cat", vertices.get(6).tokens().first().getNormalized());
+    assertVertexEquals("cat", vertices.get(6));
     assertEquals(5, vertices.get(6).getRank());
   }
 
@@ -56,15 +56,15 @@ public class VariantGraphRankerTest extends AbstractTest {
     final VariantGraph graph = merge("He was agast, so", "He was agast", "So he was agast").rank();
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
 
-    assertEquals("so", vertices.get(1).tokens().first().getNormalized());
+    assertVertexEquals("so", vertices.get(1));
     assertEquals(1, vertices.get(1).getRank());
-    assertEquals("he", vertices.get(2).tokens().first().getNormalized());
+    assertVertexEquals("he", vertices.get(2));
     assertEquals(2, vertices.get(2).getRank());
-    assertEquals("was", vertices.get(3).tokens().first().getNormalized());
+    assertVertexEquals("was", vertices.get(3));
     assertEquals(3, vertices.get(3).getRank());
-    assertEquals("agast", vertices.get(4).tokens().first().getNormalized());
+    assertVertexEquals("agast", vertices.get(4));
     assertEquals(4, vertices.get(4).getRank());
-    assertEquals("so", vertices.get(5).tokens().first().getNormalized());
+    assertVertexEquals("so", vertices.get(5));
     assertEquals(5, vertices.get(5).getRank());
   }
 }

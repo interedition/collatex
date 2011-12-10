@@ -75,7 +75,7 @@ public class BeckettTest extends AbstractTest {
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final StringBuilder graphTokens = new StringBuilder();
     for (Token token : VariantGraphWitnessAdapter.create(graph).getTokens()) {
-      graphTokens.append(" ").append(token.getNormalized());
+      graphTokens.append(" ").append(((SimpleToken) token).getNormalized());
     }
 
     assertEquals("# its soft changeless light neither daylight nor moonlight nor starlight nor unlike any light he could remember from the days & and nights when day followed hard on night & and vice versa #", graphTokens.toString().trim());

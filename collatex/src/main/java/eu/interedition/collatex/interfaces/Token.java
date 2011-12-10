@@ -31,14 +31,5 @@ public interface Token extends Comparable<Token> {
    */
   String getContent();
 
-  String getTrailingWhitespace();
-
   IWitness getWitness();
-
-  /**
-   * The normalized representation of the content of this token.
-   * @return The normalized content.
-   */
-  String getNormalized();
-
 }

@@ -7,6 +7,8 @@ import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.apache.commons.collections15.Transformer;
@@ -48,7 +50,7 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, V
 
           @Override
           public String apply(Token input) {
-            return input.getWitness().getSigil() + ":'" + input.getNormalized() + "'";
+            return input.getWitness().getSigil() + ":'" + ((SimpleToken) input).getNormalized() + "'";
           }
         })) + " (" + variantGraphVertex.getRank() + ")";
       }

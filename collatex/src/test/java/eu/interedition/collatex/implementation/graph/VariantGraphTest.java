@@ -58,10 +58,10 @@ public class VariantGraphTest extends AbstractTest {
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newTreeSet(Arrays.asList(w))));
     assertEquals(6, vertices.size());
     assertEquals(graph.getStart(), vertices.get(0));
-    assertEquals("a", vertices.get(1).tokens().first().getNormalized());
-    assertEquals("b", vertices.get(2).tokens().first().getNormalized());
-    assertEquals("c", vertices.get(3).tokens().first().getNormalized());
-    assertEquals("d", vertices.get(4).tokens().first().getNormalized());
+    assertVertexEquals("a", vertices.get(1));
+    assertVertexEquals("b", vertices.get(2));
+    assertVertexEquals("c", vertices.get(3));
+    assertVertexEquals("d", vertices.get(4));
     assertEquals(graph.getEnd(), vertices.get(5));
   }
 
@@ -92,12 +92,12 @@ public class VariantGraphTest extends AbstractTest {
 
     assertEquals(8, path.size());
     assertEquals(graph.getStart(), path.get(0));
-    assertEquals("a", path.get(1).tokens(witnessSet).first().getNormalized());
-    assertEquals("b", path.get(2).tokens(witnessSet).first().getNormalized());
-    assertEquals("c", path.get(3).tokens(witnessSet).first().getNormalized());
-    assertEquals("d", path.get(4).tokens(witnessSet).first().getNormalized());
-    assertEquals("e", path.get(5).tokens(witnessSet).first().getNormalized());
-    assertEquals("f", path.get(6).tokens(witnessSet).first().getNormalized());
+    assertVertexEquals("a", path.get(1));
+    assertVertexEquals("b", path.get(2));
+    assertVertexEquals("c", path.get(3));
+    assertVertexEquals("d", path.get(4));
+    assertVertexEquals("e", path.get(5));
+    assertVertexEquals("f", path.get(6));
     assertEquals(graph.getEnd(), path.get(7));
   }
 

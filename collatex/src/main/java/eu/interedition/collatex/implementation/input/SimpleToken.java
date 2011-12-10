@@ -21,6 +21,7 @@
 package eu.interedition.collatex.implementation.input;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 
@@ -56,7 +57,6 @@ public class SimpleToken implements Token {
     return witness;
   }
 
-  @Override
   public String getTrailingWhitespace() {
     return trailingWhitespace;
   }
@@ -66,11 +66,9 @@ public class SimpleToken implements Token {
   }
 
 
-  @Override
   public String getNormalized() {
     return normalized;
   }
-
 
   @Override
   public String toString() {
@@ -79,7 +77,7 @@ public class SimpleToken implements Token {
 
   public static String toString(Iterable<? extends Token> tokens) {
     final StringBuilder normalized = new StringBuilder();
-    for (final Token token : tokens) {
+    for (SimpleToken token : Iterables.filter(tokens, SimpleToken.class)) {
       normalized.append(token.getNormalized()).append(" ");
     }
     return normalized.toString().trim();

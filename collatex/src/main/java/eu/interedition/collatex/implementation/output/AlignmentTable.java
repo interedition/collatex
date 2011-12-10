@@ -21,8 +21,10 @@
 package eu.interedition.collatex.implementation.output;
 
 import com.google.common.collect.Lists;
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import java.util.Iterator;
@@ -122,6 +124,6 @@ public class AlignmentTable {
       return " ";
     }
     //TODO should not be getnormalized!
-    return cell.getToken().getNormalized().toString();
+    return ((SimpleToken) cell.getToken()).getNormalized().toString();
   }
 }

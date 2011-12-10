@@ -16,14 +16,14 @@ public class PunctuationTokenizerTest {
     assertEquals(5, tokens.size());
 
     assertEquals("This", tokens.get(0).getContent());
-    assertEquals(" ", tokens.get(0).getTrailingWhitespace());
+    assertEquals(" ", ((SimpleToken) tokens.get(0)).getTrailingWhitespace());
     assertEquals("is", tokens.get(1).getContent());
-    assertEquals(" ", tokens.get(1).getTrailingWhitespace());
+    assertEquals(" ", ((SimpleToken) tokens.get(1)).getTrailingWhitespace());
     assertEquals("a", tokens.get(2).getContent());
-    assertEquals(" ", tokens.get(2).getTrailingWhitespace());
+    assertEquals(" ", ((SimpleToken) tokens.get(2)).getTrailingWhitespace());
     assertEquals("sentence", tokens.get(3).getContent());
-    assertEquals("", tokens.get(3).getTrailingWhitespace());
+    assertEquals("", ((SimpleToken) tokens.get(3)).getTrailingWhitespace());
     assertEquals(".", tokens.get(4).getContent());
-    assertEquals("", tokens.get(4).getTrailingWhitespace());
+    assertEquals("", ((SimpleToken) tokens.get(4)).getTrailingWhitespace());
   }
 }

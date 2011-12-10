@@ -8,6 +8,8 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.ITokenLinker;
@@ -43,7 +45,7 @@ public class EditGraphLinker implements ITokenLinker {
     for (EditGraphEdge editGraphEdge : shortestPath) {
       EditGraphVertex sourceVertex = editGraphEdge.getSourceVertex();
       Token token = sourceVertex.getBaseToken();
-      if (!token.getNormalized().equals("#")) {
+      if (!((SimpleToken) token).getNormalized().equals("#")) {
         Token baseToken = editGraphEdge.getTargetVertex().getBaseToken();
         linkedTokens.put(token, baseToken);
       }

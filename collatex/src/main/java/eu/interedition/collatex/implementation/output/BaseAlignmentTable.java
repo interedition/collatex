@@ -24,6 +24,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.interfaces.IWitness;
 
 public abstract class BaseAlignmentTable {
@@ -84,7 +86,7 @@ public abstract class BaseAlignmentTable {
       return " ";
     }
     //TODO should not be getnormalized!
-    return cell.getToken().getNormalized().toString();
+    return ((SimpleToken) cell.getToken()).getNormalized().toString();
   }
 
 }

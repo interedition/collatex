@@ -7,11 +7,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphEdge;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
 import eu.interedition.collatex.interfaces.Token;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
@@ -107,7 +110,7 @@ public abstract class AbstractTest {
     final SortedSet<Token> tokens = vertex.tokens(Sets.newTreeSet(Arrays.asList(witnesses)));
     List<String> tokenContents = Lists.newArrayListWithExpectedSize(tokens.size());
     for (Token token : tokens) {
-      tokenContents.add(token.getNormalized());
+      tokenContents.add(((SimpleToken) token).getNormalized());
     }
     return Joiner.on(' ').join(tokenContents);
   }
@@ -120,6 +123,10 @@ public abstract class AbstractTest {
     final VariantGraphEdge edge = start.getGraph().edgeBetween(start, end);
     Assert.assertNotNull(String.format("No edge between %s and %s", start, end), edge);
     return edge;
+  }
+
+  protected static void assertVertexEquals(String expected, VariantGraphVertex vertex) {
+    assertEquals(expected, ((SimpleToken) vertex.tokens().first()).getNormalized());
   }
 
   protected static VariantGraphVertex vertexWith(VariantGraph graph, String content, IWitness in) {
@@ -155,11 +162,11 @@ public abstract class AbstractTest {
   }
 
   @Deprecated
-  protected List<Token> getTokens(VariantGraph graph, IWitness... witnesses) {
+  protected List<SimpleToken> getTokens(VariantGraph graph, IWitness... witnesses) {
     final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Arrays.asList(witnesses));
-    final List<Token> tokens = Lists.newArrayList();
+    final List<SimpleToken> tokens = Lists.newArrayList();
     for (VariantGraphVertex v : graph.vertices(witnessSet)) {
-      tokens.addAll(v.tokens(witnessSet));
+      Iterables.addAll(tokens, Iterables.filter(v.tokens(witnessSet), SimpleToken.class));
     }
     return tokens;
   }
