@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.common.collect.ListMultimap;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import org.junit.Test;
@@ -37,16 +37,16 @@ public class MatchesTest extends AbstractTest {
   }
 
   private void assertMatches(final Matches matches, int expected_unmatched, int expected_unique, int expected_ambiguous) {
-    Set<INormalizedToken> unmatched = matches.getUnmatched();
+    Set<Token> unmatched = matches.getUnmatched();
     LOG.info("unmatched: {}", unmatched);
 
-    Set<INormalizedToken> unique = matches.getUnique();
+    Set<Token> unique = matches.getUnique();
     LOG.info("unique: {}", unique);
 
-    Set<INormalizedToken> ambiguous = matches.getAmbiguous();
+    Set<Token> ambiguous = matches.getAmbiguous();
     LOG.info("ambiguous: {}", ambiguous);
 
-    ListMultimap<INormalizedToken, INormalizedToken> all = matches.getAll();
+    ListMultimap<Token, Token> all = matches.getAll();
     LOG.info("all: {}", all);
 
     assertEquals(expected_unmatched, unmatched.size());

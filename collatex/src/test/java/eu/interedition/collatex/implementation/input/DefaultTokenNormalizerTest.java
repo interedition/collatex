@@ -36,6 +36,6 @@ public class DefaultTokenNormalizerTest {
   }
 
   private static void assertNormalized(String content, String expected) {
-    assertEquals(expected, new DefaultTokenNormalizer().apply(new Token(null, 0, content)).getNormalized());
+    assertEquals(expected, new DefaultTokenNormalizer().apply(content));
   }
 }

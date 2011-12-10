@@ -23,7 +23,18 @@ package eu.interedition.collatex.interfaces;
 /**
  * The normalized version of the token. 
  */
-public interface INormalizedToken extends IToken, Comparable<INormalizedToken> {
+public interface Token extends Comparable<Token> {
+  /**
+   * The content stream token text
+   *
+   * @return the text of the token.
+   */
+  String getContent();
+
+  String getTrailingWhitespace();
+
+  IWitness getWitness();
+
   /**
    * The normalized representation of the content of this token.
    * @return The normalized content.

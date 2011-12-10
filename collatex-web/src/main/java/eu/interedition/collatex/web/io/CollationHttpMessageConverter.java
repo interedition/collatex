@@ -1,13 +1,11 @@
 package eu.interedition.collatex.web.io;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
-import eu.interedition.collatex.implementation.input.Token;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.input.Witness;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.ITokenNormalizer;
 import eu.interedition.collatex.interfaces.ITokenizer;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -84,7 +82,7 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
         throw new HttpMessageNotReadableException(String.format("Expected either 'tokens' or 'content' field in witness \"%s\"", witness));
       }
       
-      List<INormalizedToken> tokens = null;
+      List<Token> tokens = null;
       if (!tokensNode.isMissingNode()) {
         if (!tokensNode.isArray()) {
           throw new HttpMessageNotReadableException(String.format("Expected 'tokens' array in witness \"%s\"", witness));
@@ -99,11 +97,10 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
             throw new HttpMessageNotReadableException(String.format("Expected textual token content field 't' in witness \"%s\"", witness));
           }
           final String tokenContent = tokenContentNode.getTextValue();
-          String normalizedTokenContent = null;
+          String normalizedTokenContent;
           final JsonNode normalizedTokenContentNode = tokenNode.path("n");
           if (normalizedTokenContentNode.isMissingNode()) {
-            // FIXME: get rid of this by merging INormalizedToken and IToken
-            normalizedTokenContent = tokenNormalizer.apply(new Token(witness, 0, tokenContent)).getNormalized();
+            normalizedTokenContent = tokenNormalizer.apply(tokenContent);
           } else {
             if (!normalizedTokenContentNode.isTextual()) {
               throw new HttpMessageNotReadableException(String.format("Expected textual normalized token content in witness \"%s\"", witness));
@@ -121,7 +118,7 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
         if (!contentNode.isTextual()) {
           throw new HttpMessageNotReadableException(String.format("Expected 'content' text field in witness \"%s\"", witness));
         }
-        tokens = Lists.newArrayList(Iterables.transform(tokenizer.tokenize(witness, contentNode.getTextValue()), tokenNormalizer));
+        tokens = tokenizer.tokenize(witness, contentNode.getTextValue());
       }
       
       if (tokens.isEmpty()) {

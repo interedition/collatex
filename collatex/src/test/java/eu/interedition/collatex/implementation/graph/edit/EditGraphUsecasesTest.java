@@ -4,7 +4,7 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import org.junit.Test;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ public class EditGraphUsecasesTest extends AbstractTest {
     //</example>
     final VariantGraph graph = merge("The black cat");
     EditGraphLinker linker = new EditGraphLinker();
-    Map<INormalizedToken, INormalizedToken> link = linker.link(VariantGraphWitnessAdapter.create(graph), createWitnesses("The black and white cat")[0], new EqualityTokenComparator());
+    Map<Token, Token> link = linker.link(VariantGraphWitnessAdapter.create(graph), createWitnesses("The black and white cat")[0], new EqualityTokenComparator());
     assertEquals(3, link.size());
     //TODO: add asserts!
     //System.out.println(link);

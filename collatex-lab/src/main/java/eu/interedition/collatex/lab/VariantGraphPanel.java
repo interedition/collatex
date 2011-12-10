@@ -7,7 +7,7 @@ import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.apache.commons.collections15.Transformer;
 
@@ -44,10 +44,10 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, V
     rc.setVertexLabelTransformer(new Transformer<VariantGraphVertex, String>() {
       @Override
       public String transform(VariantGraphVertex variantGraphVertex) {
-        return Joiner.on(", ").join(Iterables.transform(variantGraphVertex.getTokens(), new Function<INormalizedToken, String>() {
+        return Joiner.on(", ").join(Iterables.transform(variantGraphVertex.getTokens(), new Function<Token, String>() {
 
           @Override
-          public String apply(INormalizedToken input) {
+          public String apply(Token input) {
             return input.getWitness().getSigil() + ":'" + input.getNormalized() + "'";
           }
         })) + " (" + variantGraphVertex.getRank() + ")";

@@ -18,21 +18,21 @@ public class VariantGraphBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraphBuilder.class);
 
   private final VariantGraph graph;
-  private final Comparator<INormalizedToken> comparator;
+  private final Comparator<Token> comparator;
   private final ITokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;
   private final TranspositionDetector transpositionDetector;
 
-  private Map<INormalizedToken, INormalizedToken> tokenLinks;
-  private List<Tuple<List<INormalizedToken>>> phraseMatches;
-  private List<Tuple<List<INormalizedToken>>> transpositions;
-  private Map<INormalizedToken,INormalizedToken> alignments;
+  private Map<Token, Token> tokenLinks;
+  private List<Tuple<List<Token>>> phraseMatches;
+  private List<Tuple<List<Token>>> transpositions;
+  private Map<Token,Token> alignments;
 
   public VariantGraphBuilder(VariantGraph graph) {
     this(graph, new EqualityTokenComparator(), new TokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
   }
 
-  public VariantGraphBuilder(VariantGraph graph, Comparator<INormalizedToken> comparator, ITokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
+  public VariantGraphBuilder(VariantGraph graph, Comparator<Token> comparator, ITokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
     this.graph = graph;
     this.comparator = comparator;
     this.tokenLinker = tokenLinker;
@@ -47,19 +47,19 @@ public class VariantGraphBuilder {
     return this;
   }
 
-  public Map<INormalizedToken, INormalizedToken> getTokenLinks() {
+  public Map<Token, Token> getTokenLinks() {
     return tokenLinks;
   }
 
-  public List<Tuple<List<INormalizedToken>>> getPhraseMatches() {
+  public List<Tuple<List<Token>>> getPhraseMatches() {
     return Collections.unmodifiableList(phraseMatches);
   }
 
-  public List<Tuple<List<INormalizedToken>>> getTranspositions() {
+  public List<Tuple<List<Token>>> getTranspositions() {
     return Collections.unmodifiableList(transpositions);
   }
 
-  public Map<INormalizedToken, INormalizedToken> getAlignments() {
+  public Map<Token, Token> getAlignments() {
     return Collections.unmodifiableMap(alignments);
   }
 
@@ -73,7 +73,7 @@ public class VariantGraphBuilder {
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
     tokenLinks = tokenLinker.link(base, witness, comparator);
     if (LOG.isTraceEnabled()) {
-      for (Map.Entry<INormalizedToken, INormalizedToken> tokenLink : tokenLinks.entrySet()) {
+      for (Map.Entry<Token, Token> tokenLink : tokenLinks.entrySet()) {
         LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
       }
     }
@@ -81,7 +81,7 @@ public class VariantGraphBuilder {
     LOG.debug("{} + {}: Detect phrase matches", graph, witness);
     phraseMatches = phraseMatchDetector.detect(tokenLinks, base, witness);
     if (LOG.isTraceEnabled()) {
-      for (Tuple<List<INormalizedToken>> phraseMatch : phraseMatches) {
+      for (Tuple<List<Token>> phraseMatch : phraseMatches) {
         LOG.trace("{} + {}: Phrase match: {} = {}", new Object[] { graph, witness, Iterables.toString(phraseMatch.left), Iterables.toString(phraseMatch.right) });
       }
     }
@@ -89,18 +89,18 @@ public class VariantGraphBuilder {
     LOG.debug("{} + {}: Detect transpositions", graph, witness);
     transpositions = filterMirrored(transpositionDetector.detect(phraseMatches, base), witness);
     if (LOG.isTraceEnabled()) {
-      for (Tuple<List<INormalizedToken>> transposition : transpositions) {
+      for (Tuple<List<Token>> transposition : transpositions) {
         LOG.trace("{} + {}: Transposition: {} = {}", new Object[] { graph, witness, Iterables.toString(transposition.left), Iterables.toString(transposition.right) });
       }
     }
 
     LOG.debug("{} + {}: Determine aligned tokens by filtering transpositions", graph, witness);
     alignments = Maps.newLinkedHashMap(tokenLinks);
-    for (Tuple<List<INormalizedToken>> transposedPhrase : transpositions) {
+    for (Tuple<List<Token>> transposedPhrase : transpositions) {
       alignments.keySet().removeAll(transposedPhrase.right);
     }
     if (LOG.isTraceEnabled()) {
-      for (Map.Entry<INormalizedToken, INormalizedToken> alignment : alignments.entrySet()) {
+      for (Map.Entry<Token, Token> alignment : alignments.entrySet()) {
         LOG.trace("{} + {}: Alignment: {} = {}", new Object[] { graph, witness, alignment.getValue(), alignment.getKey() });
       }
     }
@@ -108,8 +108,8 @@ public class VariantGraphBuilder {
     LOG.debug("{} + {}: Merge comparand into graph", graph, witness);
     VariantGraphVertex last = graph.getStart();
     final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
-    final Map<INormalizedToken, VariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
-    for (INormalizedToken token : witness.getTokens()) {
+    final Map<Token, VariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
+    for (Token token : witness.getTokens()) {
       final VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter matchingAdapter = (VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter)alignments.get(token);
       VariantGraphVertex matchingVertex = (matchingAdapter == null ? null : matchingAdapter.getVertex());
       if (matchingVertex == null) {
@@ -125,9 +125,9 @@ public class VariantGraphBuilder {
     graph.connect(last, graph.getEnd(), witnessSet);
 
     LOG.debug("{}: Registering transpositions", graph);
-    for (Tuple<List<INormalizedToken>> transposedPhrase : transpositions) {
-      final Iterator<INormalizedToken> basePhraseIt = transposedPhrase.left.iterator();
-      final Iterator<INormalizedToken> witnessPhraseIt = transposedPhrase.right.iterator();
+    for (Tuple<List<Token>> transposedPhrase : transpositions) {
+      final Iterator<Token> basePhraseIt = transposedPhrase.left.iterator();
+      final Iterator<Token> witnessPhraseIt = transposedPhrase.right.iterator();
 
       while(basePhraseIt.hasNext() && witnessPhraseIt.hasNext()) {
         final VariantGraphVertex baseVertex = ((VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter)basePhraseIt.next()).getVertex();
@@ -142,12 +142,12 @@ public class VariantGraphBuilder {
   }
 
   // NOTE: this method should not return the original sequence when a mirror exists!
-  private List<Tuple<List<INormalizedToken>>> filterMirrored(List<Tuple<Tuple<List<INormalizedToken>>>> transpositions, IWitness witness) {
-    final List<Tuple<List<INormalizedToken>>> transposed = Lists.newArrayList();
-    final Deque<Tuple<Tuple<List<INormalizedToken>>>> toCheck = new ArrayDeque<Tuple<Tuple<List<INormalizedToken>>>>(transpositions);
+  private List<Tuple<List<Token>>> filterMirrored(List<Tuple<Tuple<List<Token>>>> transpositions, IWitness witness) {
+    final List<Tuple<List<Token>>> transposed = Lists.newArrayList();
+    final Deque<Tuple<Tuple<List<Token>>>> toCheck = new ArrayDeque<Tuple<Tuple<List<Token>>>>(transpositions);
     while (!toCheck.isEmpty()) {
-      final Tuple<Tuple<List<INormalizedToken>>> current = toCheck.pop();
-      final Tuple<Tuple<List<INormalizedToken>>> mirrored = findMirroredTransposition(toCheck, current);
+      final Tuple<Tuple<List<Token>>> current = toCheck.pop();
+      final Tuple<Tuple<List<Token>>> mirrored = findMirroredTransposition(toCheck, current);
       if (mirrored != null && transpositionsAreNear(current, mirrored, witness)) {
         toCheck.remove(mirrored);
         transposed.add(mirrored.left);
@@ -158,8 +158,8 @@ public class VariantGraphBuilder {
     return transposed;
   }
 
-  private Tuple<Tuple<List<INormalizedToken>>> findMirroredTransposition(final Deque<Tuple<Tuple<List<INormalizedToken>>>> transToCheck, final Tuple<Tuple<List<INormalizedToken>>> original) {
-    for (final Tuple<Tuple<List<INormalizedToken>>> transposition : transToCheck) {
+  private Tuple<Tuple<List<Token>>> findMirroredTransposition(final Deque<Tuple<Tuple<List<Token>>>> transToCheck, final Tuple<Tuple<List<Token>>> original) {
+    for (final Tuple<Tuple<List<Token>>> transposition : transToCheck) {
       if (equals(transposition.left, original.right)) {
         if (equals(transposition.right, original.left)) {
           return transposition;
@@ -169,12 +169,12 @@ public class VariantGraphBuilder {
     return null;
   }
 
-  private boolean equals(Tuple<List<INormalizedToken>> a, Tuple<List<INormalizedToken>> b) {
+  private boolean equals(Tuple<List<Token>> a, Tuple<List<Token>> b) {
     if (a.right.size() != b.right.size()) {
       return false;
     }
-    final Iterator<INormalizedToken> aIt = a.right.iterator();
-    final Iterator<INormalizedToken> bIt = b.right.iterator();
+    final Iterator<Token> aIt = a.right.iterator();
+    final Iterator<Token> bIt = b.right.iterator();
     while (aIt.hasNext() && bIt.hasNext()) {
       if (comparator.compare(aIt.next(), bIt.next()) != 0) {
         return false;
@@ -185,7 +185,7 @@ public class VariantGraphBuilder {
 
   // Note: this only calculates the distance between the tokens in the witness.
   // Note: it does not take into account a possible distance in the vertices in the graph!
-  private boolean transpositionsAreNear(Tuple<Tuple<List<INormalizedToken>>> a, Tuple<Tuple<List<INormalizedToken>>> b, IWitness witness) {
+  private boolean transpositionsAreNear(Tuple<Tuple<List<Token>>> a, Tuple<Tuple<List<Token>>> b, IWitness witness) {
     return witness.isNear(Iterables.getLast(a.right.right), Iterables.get(b.right.right, 0));
   }
 

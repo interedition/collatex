@@ -20,7 +20,9 @@
 
 package eu.interedition.collatex.interfaces;
 
+import java.util.List;
+
 public interface ITokenizer {
 
-  Iterable<IToken> tokenize(IWitness witness, String content);
+  List<Token> tokenize(IWitness witness, String content);
 }

@@ -21,8 +21,7 @@
 package eu.interedition.collatex.implementation.input;
 
 import com.google.common.collect.Maps;
-import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import java.util.ArrayList;
@@ -30,12 +29,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class Witness implements Iterable<INormalizedToken>, IWitness {
+public class Witness implements Iterable<Token>, IWitness {
   public static final Witness SUPERBASE = new Witness("");
 
   private final String sigil;
-  protected List<INormalizedToken> tokens = new ArrayList<INormalizedToken>();
-  private final Map<INormalizedToken, INormalizedToken> relations = Maps.newLinkedHashMap();
+  protected List<Token> tokens = new ArrayList<Token>();
+  private final Map<Token, Token> relations = Maps.newLinkedHashMap();
 
   public Witness(final String sigil) {
     this.sigil = sigil;
@@ -43,21 +42,21 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
 
   protected void prepareTokens() {
     relations.clear();
-    INormalizedToken previous = NormalizedToken.START;
-    for (INormalizedToken token : tokens) {
+    Token previous = SimpleToken.START;
+    for (Token token : tokens) {
       relations.put(previous, token);
       previous = token;
     }
-    relations.put(previous, NormalizedToken.END);
+    relations.put(previous, SimpleToken.END);
   }
 
   // Note: not pleased with this method! implement Iterable!
   @Override
-  public List<INormalizedToken> getTokens() {
+  public List<Token> getTokens() {
     return tokens;
   }
 
-  public void setTokens(List<INormalizedToken> tokens) {
+  public void setTokens(List<Token> tokens) {
     this.tokens = tokens;
     prepareTokens();
   }
@@ -69,7 +68,7 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
 
   // TODO check whether iterator.remove() throws exception!
   @Override
-  public Iterator<INormalizedToken> iterator() {
+  public Iterator<Token> iterator() {
     return tokens.iterator();
   }
 
@@ -79,11 +78,11 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
   }
 
   @Override
-  public boolean isNear(IToken a, IToken b) {
+  public boolean isNear(Token a, Token b) {
     if (!relations.containsKey(a)) {
       throw new RuntimeException("Error; "+a+" is an unknown token! "+a.getClass());
     }
-    INormalizedToken other = relations.get(a);
+    Token other = relations.get(a);
     return other.equals(b);
   }
 

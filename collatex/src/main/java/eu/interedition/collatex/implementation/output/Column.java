@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.ColumnState;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import java.util.Collections;
@@ -53,10 +53,10 @@ public class Column {
     return ColumnState.VARIANT;
   }
 
-  public INormalizedToken getToken(IWitness witness) {
+  public Token getToken(IWitness witness) {
     final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
     for (VariantGraphVertex vertex : vertices) {
-      for (INormalizedToken token : vertex.tokens(witnessSet)) {
+      for (Token token : vertex.tokens(witnessSet)) {
         // FIXME: just picks the first of possibly several tokens per vertex
         return token;
       }

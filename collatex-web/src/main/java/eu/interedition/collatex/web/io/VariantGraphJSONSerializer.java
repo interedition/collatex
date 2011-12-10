@@ -6,7 +6,7 @@ import com.google.common.io.Closeables;
 import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphEdge;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.web.WebToken;
 import org.codehaus.jackson.JsonFactory;
@@ -97,7 +97,7 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
         jgen.writeEndArray();
       } else {
         final SortedSet<IWitness> witnesses = graph.witnesses();
-        final RowSortedTable<Integer,IWitness,SortedSet<INormalizedToken>> table = graph.toTable();
+        final RowSortedTable<Integer,IWitness,SortedSet<Token>> table = graph.toTable();
 
         jgen.writeStartObject();
 
@@ -113,15 +113,15 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
 
         jgen.writeArrayFieldStart("table");
         for (Integer row : table.rowKeySet()) {
-          final Map<IWitness,SortedSet<INormalizedToken>> cells = table.row(row);
+          final Map<IWitness,SortedSet<Token>> cells = table.row(row);
           jgen.writeStartArray();
           for (IWitness witness : witnesses) {
-            final SortedSet<INormalizedToken> cell = cells.get(witness);
+            final SortedSet<Token> cell = cells.get(witness);
             if (cell == null) {
               jgen.writeNull();
             } else {
               jgen.writeStartArray();
-              for (INormalizedToken token : cell) {
+              for (Token token : cell) {
                 if (token instanceof WebToken) {
                   jgen.writeTree(((WebToken) token).getJsonNode());
                 } else {

@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
-import eu.interedition.collatex.implementation.input.NormalizedToken;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.input.Witness;
 import eu.interedition.collatex.interfaces.*;
 
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class VariantGraphWitnessAdapter implements IWitness {
   private final VariantGraph graph;
-  private final List<INormalizedToken> tokens = Lists.newArrayList();
+  private final List<Token> tokens = Lists.newArrayList();
 
   public static VariantGraphWitnessAdapter create(VariantGraph graph) {
     final VariantGraphWitnessAdapter witnessAdapter = new VariantGraphWitnessAdapter(graph);
@@ -49,7 +49,7 @@ public class VariantGraphWitnessAdapter implements IWitness {
   }
 
   @Override
-  public List<INormalizedToken> getTokens() {
+  public List<Token> getTokens() {
     return tokens;
   }
 
@@ -59,9 +59,9 @@ public class VariantGraphWitnessAdapter implements IWitness {
   }
 
   @Override
-  public boolean isNear(IToken a, IToken b) {
-    final VariantGraphVertex va = NormalizedToken.START.equals(a) ? graph.getStart() : ((VariantGraphVertexTokenAdapter) a).getVertex();
-    final VariantGraphVertex vb = NormalizedToken.END.equals(b) ? graph.getEnd() : ((VariantGraphVertexTokenAdapter) b).getVertex();
+  public boolean isNear(Token a, Token b) {
+    final VariantGraphVertex va = SimpleToken.START.equals(a) ? graph.getStart() : ((VariantGraphVertexTokenAdapter) a).getVertex();
+    final VariantGraphVertex vb = SimpleToken.END.equals(b) ? graph.getEnd() : ((VariantGraphVertexTokenAdapter) b).getVertex();
     return graph.verticesAreAdjacent(va, vb);
   }
 
@@ -79,10 +79,10 @@ public class VariantGraphWitnessAdapter implements IWitness {
   /**
    * FIXME: takes first token as representative for the whole vertex; assumes transitivity of token equality
    */
-  public static class VariantGraphVertexTokenAdapter implements INormalizedToken {
+  public static class VariantGraphVertexTokenAdapter implements Token {
     private final VariantGraphWitnessAdapter witnessAdapter;
     private final VariantGraphVertex vertex;
-    private INormalizedToken firstToken;
+    private Token firstToken;
 
     public VariantGraphVertexTokenAdapter(VariantGraphWitnessAdapter witnessAdapter, VariantGraphVertex vertex) {
       this.witnessAdapter = witnessAdapter;
@@ -92,9 +92,9 @@ public class VariantGraphWitnessAdapter implements IWitness {
       final VariantGraphVertex start = graph.getStart();
       final VariantGraphVertex end = graph.getEnd();
       if (start.equals(vertex)) {
-        this.firstToken = NormalizedToken.START;
+        this.firstToken = SimpleToken.START;
       } else if (end.equals(vertex)) {
-        this.firstToken = NormalizedToken.END;
+        this.firstToken = SimpleToken.END;
       } else {
         this.firstToken = vertex.tokens().first();
       }
@@ -110,7 +110,7 @@ public class VariantGraphWitnessAdapter implements IWitness {
     }
 
     @Override
-    public int compareTo(INormalizedToken o) {
+    public int compareTo(Token o) {
       return firstToken.compareTo(o);
     }
 

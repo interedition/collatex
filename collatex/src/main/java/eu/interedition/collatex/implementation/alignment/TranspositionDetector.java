@@ -26,7 +26,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.implementation.Tuple;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,45 +80,45 @@ public class TranspositionDetector {
   //    return transpositions;
   //  }
 
-  public List<Tuple<Tuple<List<INormalizedToken>>>> detect(List<Tuple<List<INormalizedToken>>> phraseMatches, IWitness base) {
+  public List<Tuple<Tuple<List<Token>>>> detect(List<Tuple<List<Token>>> phraseMatches, IWitness base) {
     // sort phrase matches by base token order
-    final Map<INormalizedToken, Tuple<List<INormalizedToken>>> tokenIndex = Maps.uniqueIndex(phraseMatches, new Function<Tuple<List<INormalizedToken>>, INormalizedToken>() {
+    final Map<Token, Tuple<List<Token>>> tokenIndex = Maps.uniqueIndex(phraseMatches, new Function<Tuple<List<Token>>, Token>() {
       @Override
-      public INormalizedToken apply(Tuple<List<INormalizedToken>> input) {
+      public Token apply(Tuple<List<Token>> input) {
         return input.left.get(0);
       }
     });
-    final List<Tuple<List<INormalizedToken>>> sortedPhraseMatches = Lists.newArrayList();
-    for (INormalizedToken token : base.getTokens()) {
+    final List<Tuple<List<Token>>> sortedPhraseMatches = Lists.newArrayList();
+    for (Token token : base.getTokens()) {
       if (tokenIndex.containsKey(token)) {
         sortedPhraseMatches.add(tokenIndex.get(token));
       }
     }
 
     // compare sorted to unsorted phrase matches in order to yield transpositions
-    final List<Tuple<Tuple<List<INormalizedToken>>>> transpositions = Lists.newArrayList();
+    final List<Tuple<Tuple<List<Token>>>> transpositions = Lists.newArrayList();
 
     Preconditions.checkState(sortedPhraseMatches.size() == phraseMatches.size(), "Something went wrong in the linking process!");
-    final Iterator<Tuple<List<INormalizedToken>>> unsortedIt = phraseMatches.iterator();
-    final Iterator<Tuple<List<INormalizedToken>>> sortedIt = sortedPhraseMatches.iterator();
+    final Iterator<Tuple<List<Token>>> unsortedIt = phraseMatches.iterator();
+    final Iterator<Tuple<List<Token>>> sortedIt = sortedPhraseMatches.iterator();
     while (unsortedIt.hasNext() && sortedIt.hasNext()) {
-      final Tuple<List<INormalizedToken>> phraseMatchInWitness = unsortedIt.next();
-      final Tuple<List<INormalizedToken>> phraseMatchInBase = sortedIt.next();
+      final Tuple<List<Token>> phraseMatchInWitness = unsortedIt.next();
+      final Tuple<List<Token>> phraseMatchInBase = sortedIt.next();
       if (!phraseMatchInWitness.equals(phraseMatchInBase)) {
         // TODO: I have got no idea why we have to mirror the sequences here!
-        transpositions.add(new Tuple<Tuple<List<INormalizedToken>>>(phraseMatchInBase, phraseMatchInWitness));
+        transpositions.add(new Tuple<Tuple<List<Token>>>(phraseMatchInBase, phraseMatchInWitness));
       }
     }
 
     if (LOG.isTraceEnabled()) {
-      for (Tuple<Tuple<List<INormalizedToken>>> transposition : transpositions) {
+      for (Tuple<Tuple<List<Token>>> transposition : transpositions) {
         LOG.trace("Detected transposition: {} <==> {}", phraseMatchToString(transposition.left), phraseMatchToString(transposition.right));
       }
     }
     return transpositions;
   }
 
-  private Object phraseMatchToString(Tuple<List<INormalizedToken>> phraseMatch) {
+  private Object phraseMatchToString(Tuple<List<Token>> phraseMatch) {
     return new StringBuilder("{").append(Iterables.toString(phraseMatch.left)).append(" = ").append(Iterables.toString(phraseMatch.right)).append("}").toString();
   }
 

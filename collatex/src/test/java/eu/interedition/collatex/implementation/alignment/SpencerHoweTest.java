@@ -47,7 +47,7 @@ public class SpencerHoweTest extends AbstractTest {
   @Test
   public void alignmentTable() {
     final IWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
-    final RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = merge(w).toTable();
+    final RowSortedTable<Integer, IWitness, SortedSet<Token>> table = merge(w).toTable();
 
     assertEquals(3, table.columnKeySet().size());
     //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element

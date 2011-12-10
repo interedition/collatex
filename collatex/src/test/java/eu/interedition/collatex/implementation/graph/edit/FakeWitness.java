@@ -1,8 +1,8 @@
 package eu.interedition.collatex.implementation.graph.edit;
 
 import eu.interedition.collatex.implementation.input.Witness;
-import eu.interedition.collatex.implementation.input.NormalizedToken;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.implementation.input.SimpleToken;
+import eu.interedition.collatex.interfaces.Token;
 
 public class FakeWitness extends Witness {
   
@@ -10,9 +10,9 @@ public class FakeWitness extends Witness {
     super("fake");
   }
   
-  public INormalizedToken add(String content) {
-    tokens.add(new NormalizedToken(this, tokens.size(), content, content.toLowerCase()));
+  public Token add(String content) {
+    tokens.add(new SimpleToken(this, tokens.size(), content, content.toLowerCase()));
     prepareTokens();
-    return new NormalizedToken(this, tokens.size() - 1, content, content.toLowerCase());
+    return new SimpleToken(this, tokens.size() - 1, content, content.toLowerCase());
   }
 }

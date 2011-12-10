@@ -20,12 +20,16 @@
 
 package eu.interedition.collatex.implementation.input;
 
-import java.util.Arrays;
-import java.util.Iterator;
-
-import eu.interedition.collatex.interfaces.IToken;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import eu.interedition.collatex.interfaces.Token;
+import eu.interedition.collatex.interfaces.ITokenNormalizer;
 import eu.interedition.collatex.interfaces.ITokenizer;
 import eu.interedition.collatex.interfaces.IWitness;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A very simplistic tokenizer.
@@ -35,34 +39,17 @@ import eu.interedition.collatex.interfaces.IWitness;
  * </p>
  */
 public class WhitespaceTokenizer implements ITokenizer {
+  private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
 
   @Override
-  public Iterable<IToken> tokenize(final IWitness witness, String content) {
-    final Iterator<String> tokenIterator = Arrays.asList(content.split("\\s+")).iterator();
-    return new Iterable<IToken>() {
+  public List<Token> tokenize(final IWitness witness, String content) {
+    return Lists.newArrayList(Iterables.transform(Arrays.asList(content.split("\\s+")), new Function<String, Token>() {
+      private int tokenCount = 0;
 
       @Override
-      public Iterator<IToken> iterator() {
-        return new Iterator<IToken>() {
-
-          private int tokenCount = 0;
-
-          @Override
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-
-          @Override
-          public IToken next() {
-            return new Token(witness, tokenCount++, tokenIterator.next());
-          }
-
-          @Override
-          public boolean hasNext() {
-            return tokenIterator.hasNext();
-          }
-        };
+      public Token apply(String input) {
+        return new SimpleToken(witness, tokenCount++, input, tokenNormalizer.apply(input.trim()));
       }
-    };
+    }));
   }
 }

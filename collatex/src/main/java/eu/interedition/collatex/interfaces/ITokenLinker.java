@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface ITokenLinker {
 
-  Map<INormalizedToken, INormalizedToken> link(IWitness graph, IWitness b, Comparator<INormalizedToken> comparator);
+  Map<Token, Token> link(IWitness graph, IWitness b, Comparator<Token> comparator);
 
 }

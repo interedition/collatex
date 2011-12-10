@@ -20,21 +20,14 @@
 
 package eu.interedition.collatex.implementation.input;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
-import com.google.common.collect.Lists;
-
-import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IToken;
 import eu.interedition.collatex.interfaces.ITokenNormalizer;
 import eu.interedition.collatex.interfaces.ITokenizer;
 import eu.interedition.collatex.interfaces.IWitness;
-
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
 
 public class WitnessBuilder {
 
@@ -79,16 +72,7 @@ public class WitnessBuilder {
 
   public IWitness build(String witnessId, String text, ITokenizer tokenizer) {
     final Witness witness = new Witness(witnessId);
-    Iterator<IToken> tokenIterator = tokenizer.tokenize(witness, text).iterator();
-    List<INormalizedToken> tokenList = Lists.newArrayList();
-    while (tokenIterator.hasNext()) {
-      IToken nextToken = tokenIterator.next();
-      if (!nextToken.getContent().equals("")) {
-        String normalized = tokenNormalizer.apply(nextToken).getNormalized();
-        tokenList.add(new NormalizedToken(witness, tokenList.size(), nextToken.getContent(), normalized));
-      }
-    }
-    witness.setTokens(tokenList);
+    witness.setTokens(tokenizer.tokenize(witness, text));
     return witness;
   }
 

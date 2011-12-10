@@ -28,8 +28,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
-import eu.interedition.collatex.implementation.input.Token;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.implementation.input.SimpleToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -70,7 +70,7 @@ public class Apparatus {
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
       for (IWitness witness : entry.getWitnesses()) {
-        content2WitMap.put(Token.toString(entry.getReadingOf(witness)), witness.getSigil());
+        content2WitMap.put(SimpleToken.toString(entry.getReadingOf(witness)), witness.getSigil());
       }
 
       if ((content2WitMap.keySet().size() == 1) && !entry.hasEmptyCells()) {
@@ -140,10 +140,10 @@ public class Apparatus {
     /**
     * An empty entry returns an empty reading!
     */
-    public SortedSet<INormalizedToken> getReadingOf(final IWitness witness) {
+    public SortedSet<Token> getReadingOf(final IWitness witness) {
       final TreeSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
       for (VariantGraphVertex vertex : contents) {
-        final SortedSet<INormalizedToken> tokens = vertex.tokens(witnessSet);
+        final SortedSet<Token> tokens = vertex.tokens(witnessSet);
         if (!tokens.isEmpty()) {
           return tokens;
         }

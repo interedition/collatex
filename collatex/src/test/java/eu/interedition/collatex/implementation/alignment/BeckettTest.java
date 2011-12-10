@@ -7,12 +7,11 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
-import eu.interedition.collatex.implementation.input.NormalizedToken;
-import eu.interedition.collatex.implementation.input.Token;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.matching.Matches;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class BeckettTest extends AbstractTest {
     final IWitness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final Multimap<INormalizedToken, INormalizedToken> matches = Matches.between(w[0], w[1], new EqualityTokenComparator()).getAll();
+    final Multimap<Token, Token> matches = Matches.between(w[0], w[1], new EqualityTokenComparator()).getAll();
 
     assertEquals("Its", Iterables.get(matches.get(w[1].getTokens().get(0)), 0).getContent());
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'
@@ -75,7 +74,7 @@ public class BeckettTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final StringBuilder graphTokens = new StringBuilder();
-    for (INormalizedToken token : VariantGraphWitnessAdapter.create(graph).getTokens()) {
+    for (Token token : VariantGraphWitnessAdapter.create(graph).getTokens()) {
       graphTokens.append(" ").append(token.getNormalized());
     }
 
@@ -90,9 +89,9 @@ public class BeckettTest extends AbstractTest {
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
     final Matches matches = Matches.between(VariantGraphWitnessAdapter.create(merge(w[0], w[1])), w[2], new EqualityTokenComparator());
 
-    final Set<INormalizedToken> unmatchedTokens = matches.getUnmatched();
-    final Set<INormalizedToken> unsureTokens = matches.getAmbiguous();
-    final List<INormalizedToken> w2Tokens = w[2].getTokens();
+    final Set<Token> unmatchedTokens = matches.getUnmatched();
+    final Set<Token> unsureTokens = matches.getAmbiguous();
+    final List<Token> w2Tokens = w[2].getTokens();
 
     assertTrue(unmatchedTokens.contains(w2Tokens.get(1)));
     assertTrue(unmatchedTokens.contains(w2Tokens.get(2)));
@@ -166,14 +165,14 @@ public class BeckettTest extends AbstractTest {
 
     // transpositions should be handled correctly for this test to succeed
     final VariantGraphBuilder builder = merge(graph, w[4]);
-    final List<Tuple<List<INormalizedToken>>> phraseMatches = builder.getPhraseMatches();
-    final List<Tuple<List<INormalizedToken>>> transpositions = builder.getTranspositions();
-    assertEquals("The same as when", Token.toString(phraseMatches.get(0).right));
-    assertEquals("Darly", Token.toString(phraseMatches.get(1).right));
-    assertEquals("among others", Token.toString(phraseMatches.get(2).right));
-    assertEquals("once died left him .", Token.toString(phraseMatches.get(3).right));
-    assertEquals("darly", NormalizedToken.toString(transpositions.get(0).right));
-    assertEquals("among others", NormalizedToken.toString(transpositions.get(1).right));
+    final List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
+    final List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
+    assertEquals("The same as when", SimpleToken.toString(phraseMatches.get(0).right));
+    assertEquals("Darly", SimpleToken.toString(phraseMatches.get(1).right));
+    assertEquals("among others", SimpleToken.toString(phraseMatches.get(2).right));
+    assertEquals("once died left him .", SimpleToken.toString(phraseMatches.get(3).right));
+    assertEquals("darly", SimpleToken.toString(transpositions.get(0).right));
+    assertEquals("among others", SimpleToken.toString(transpositions.get(1).right));
   }
 
 

@@ -3,7 +3,7 @@ package eu.interedition.collatex.implementation.graph.db;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Node;
 
@@ -33,7 +33,7 @@ public class VariantGraphVertex {
     this.node = node;
   }
 
-  public VariantGraphVertex(VariantGraph graph, SortedSet<INormalizedToken> tokens) {
+  public VariantGraphVertex(VariantGraph graph, SortedSet<Token> tokens) {
     this(graph, graph.getDb().createNode());
     setTokens(tokens);
   }
@@ -66,15 +66,15 @@ public class VariantGraphVertex {
     return transform(node.getRelationships(TRANSPOSITION), graph.getTranspositionWrapper());
   }
 
-  public SortedSet<INormalizedToken> tokens() {
+  public SortedSet<Token> tokens() {
     return tokens(null);
   }
 
-  public SortedSet<INormalizedToken> tokens(SortedSet<IWitness> witnesses) {
-    final SortedSet<INormalizedToken> tokens = Sets.newTreeSet(graph.getTokenResolver().resolve(getTokenReferences()));
+  public SortedSet<Token> tokens(SortedSet<IWitness> witnesses) {
+    final SortedSet<Token> tokens = Sets.newTreeSet(graph.getTokenResolver().resolve(getTokenReferences()));
     if (witnesses != null && !witnesses.isEmpty()) {
-      for (Iterator<INormalizedToken> tokenIt = tokens.iterator(); tokenIt.hasNext(); ) {
-        final INormalizedToken token = tokenIt.next();
+      for (Iterator<Token> tokenIt = tokens.iterator(); tokenIt.hasNext(); ) {
+        final Token token = tokenIt.next();
         if (!witnesses.contains(token.getWitness())) {
           tokenIt.remove();
         }
@@ -85,19 +85,19 @@ public class VariantGraphVertex {
 
   public SortedSet<IWitness> witnesses() {
     final SortedSet<IWitness> witnesses = Sets.newTreeSet();
-    for (INormalizedToken token : tokens()) {
+    for (Token token : tokens()) {
       witnesses.add(token.getWitness());
     }
     return witnesses;
   }
 
-  public void add(Iterable<INormalizedToken> tokens) {
-    final SortedSet<INormalizedToken> tokenSet = Sets.newTreeSet(tokens());
+  public void add(Iterable<Token> tokens) {
+    final SortedSet<Token> tokenSet = Sets.newTreeSet(tokens());
     Iterables.addAll(tokenSet, tokens);
     setTokens(tokenSet);
   }
 
-  public void setTokens(SortedSet<INormalizedToken> tokens) {
+  public void setTokens(SortedSet<Token> tokens) {
     setTokenReferences(graph.getTokenResolver().resolve(tokens));
   }
 
@@ -156,7 +156,7 @@ public class VariantGraphVertex {
         return "";
       }
       final StringBuilder contents = new StringBuilder();
-      for (INormalizedToken token : input.tokens(Sets.newTreeSet(Collections.singleton(witnesses.first())))) {
+      for (Token token : input.tokens(Sets.newTreeSet(Collections.singleton(witnesses.first())))) {
         contents.append(token.getContent()).append(" ");
       }
       return contents.toString().trim();

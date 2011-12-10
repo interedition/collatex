@@ -10,7 +10,7 @@ import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeBasedTable;
 import eu.interedition.collatex.implementation.output.Apparatus;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -43,12 +43,12 @@ public class VariantGraph {
   private final VariantGraphVertex start;
   private final VariantGraphVertex end;
   private final Resolver<IWitness> witnessResolver;
-  private final Resolver<INormalizedToken> tokenResolver;
+  private final Resolver<Token> tokenResolver;
   private Function<Node, VariantGraphVertex> vertexWrapper;
   private Function<Relationship, VariantGraphEdge> edgeWrapper;
   private Function<Relationship, VariantGraphTransposition> transpositionWrapper;
 
-  public VariantGraph(Node start, Node end, Resolver<IWitness> witnessResolver, Resolver<INormalizedToken> tokenResolver) {
+  public VariantGraph(Node start, Node end, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
     this.db = start.getGraphDatabase();
     this.start = new VariantGraphVertex(this, start);
     this.end = new VariantGraphVertex(this, end);
@@ -80,7 +80,7 @@ public class VariantGraph {
     return witnessResolver;
   }
 
-  public Resolver<INormalizedToken> getTokenResolver() {
+  public Resolver<Token> getTokenResolver() {
     return tokenResolver;
   }
 
@@ -168,7 +168,7 @@ public class VariantGraph {
     }).traverse(start.getNode()).relationships(), edgeWrapper);
   }
 
-  public VariantGraphVertex add(INormalizedToken token) {
+  public VariantGraphVertex add(Token token) {
     return new VariantGraphVertex(this, Sets.newTreeSet(singleton(token)));
   }
 
@@ -310,14 +310,14 @@ public class VariantGraph {
     return new Apparatus(witnesses(), entries);
   }
 
-  public RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> toTable() {
-    final TreeBasedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = TreeBasedTable.create();
+  public RowSortedTable<Integer, IWitness, SortedSet<Token>> toTable() {
+    final TreeBasedTable<Integer, IWitness, SortedSet<Token>> table = TreeBasedTable.create();
     for (VariantGraphVertex v : rank().vertices()) {
-      for (INormalizedToken token : v.tokens()) {
+      for (Token token : v.tokens()) {
         final int row = v.getRank();
         final IWitness column = token.getWitness();
 
-        SortedSet<INormalizedToken> cell = table.get(row, column);
+        SortedSet<Token> cell = table.get(row, column);
         if (cell == null) {
           table.put(row, column, cell = Sets.newTreeSet());
         }

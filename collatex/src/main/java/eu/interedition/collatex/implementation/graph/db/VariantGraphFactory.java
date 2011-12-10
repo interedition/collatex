@@ -2,7 +2,7 @@ package eu.interedition.collatex.implementation.graph.db;
 
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -25,7 +25,7 @@ public class VariantGraphFactory {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraphFactory.class);
 
   private Resolver<IWitness> witnessResolver = new DefaultResolver<IWitness>();
-  private Resolver<INormalizedToken> tokenResolver = new DefaultResolver<INormalizedToken>();
+  private Resolver<Token> tokenResolver = new DefaultResolver<Token>();
   private EmbeddedGraphDatabase db;
   private Node variantGraphs;
 
@@ -79,7 +79,7 @@ public class VariantGraphFactory {
     this.witnessResolver = witnessResolver;
   }
 
-  public void setTokenResolver(Resolver<INormalizedToken> tokenResolver) {
+  public void setTokenResolver(Resolver<Token> tokenResolver) {
     this.tokenResolver = tokenResolver;
   }
 
@@ -93,8 +93,8 @@ public class VariantGraphFactory {
       end.createRelationshipTo(variantGraphs, START_END);
 
       final VariantGraph graph = new VariantGraph(start, end, witnessResolver, tokenResolver);
-      graph.getStart().setTokens(Sets.<INormalizedToken>newTreeSet());
-      graph.getEnd().setTokens(Sets.<INormalizedToken>newTreeSet());
+      graph.getStart().setTokens(Sets.<Token>newTreeSet());
+      graph.getEnd().setTokens(Sets.<Token>newTreeSet());
       graph.connect(graph.getStart(), graph.getEnd(), Sets.<IWitness>newTreeSet());
 
       tx.success();

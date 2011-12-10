@@ -14,7 +14,7 @@ import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.ITokenizer;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.After;
@@ -104,9 +104,9 @@ public abstract class AbstractTest {
   }
 
   protected static String toString(VariantGraphVertex vertex, IWitness... witnesses) {
-    final SortedSet<INormalizedToken> tokens = vertex.tokens(Sets.newTreeSet(Arrays.asList(witnesses)));
+    final SortedSet<Token> tokens = vertex.tokens(Sets.newTreeSet(Arrays.asList(witnesses)));
     List<String> tokenContents = Lists.newArrayListWithExpectedSize(tokens.size());
-    for (INormalizedToken token : tokens) {
+    for (Token token : tokens) {
       tokenContents.add(token.getNormalized());
     }
     return Joiner.on(' ').join(tokenContents);
@@ -132,7 +132,7 @@ public abstract class AbstractTest {
     return null;
   }
 
-  protected static String toString(RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table) {
+  protected static String toString(RowSortedTable<Integer, IWitness, SortedSet<Token>> table) {
     final StringBuilder tableStr = new StringBuilder();
     for (IWitness witness : table.columnKeySet()) {
       tableStr.append(witness.getSigil()).append(": ").append(toString(table, witness)).append("\n");
@@ -140,13 +140,13 @@ public abstract class AbstractTest {
     return tableStr.toString();
   }
 
-  protected static String toString(RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> table, IWitness witness) {
+  protected static String toString(RowSortedTable<Integer, IWitness, SortedSet<Token>> table, IWitness witness) {
     final StringBuilder tableRowStr = new StringBuilder("|");
     for (Integer row : table.rowKeySet()) {
-      final SortedSet<INormalizedToken> tokens = table.get(row, witness);
-      tableRowStr.append(tokens == null ? ' ' : Joiner.on(" ").join(Iterables.transform(tokens, new Function<INormalizedToken, String>() {
+      final SortedSet<Token> tokens = table.get(row, witness);
+      tableRowStr.append(tokens == null ? ' ' : Joiner.on(" ").join(Iterables.transform(tokens, new Function<Token, String>() {
         @Override
-        public String apply(INormalizedToken input) {
+        public String apply(Token input) {
           return input.getContent();
         }
       }))).append("|");
@@ -155,9 +155,9 @@ public abstract class AbstractTest {
   }
 
   @Deprecated
-  protected List<INormalizedToken> getTokens(VariantGraph graph, IWitness... witnesses) {
+  protected List<Token> getTokens(VariantGraph graph, IWitness... witnesses) {
     final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Arrays.asList(witnesses));
-    final List<INormalizedToken> tokens = Lists.newArrayList();
+    final List<Token> tokens = Lists.newArrayList();
     for (VariantGraphVertex v : graph.vertices(witnessSet)) {
       tokens.addAll(v.tokens(witnessSet));
     }

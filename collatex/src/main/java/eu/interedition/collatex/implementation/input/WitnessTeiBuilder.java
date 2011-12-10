@@ -32,7 +32,7 @@ import javax.xml.xpath.*;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.ITokenNormalizer;
 import eu.interedition.collatex.interfaces.IWitness;
 
@@ -66,7 +66,7 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
     Object result;
     result = evaluate(xpath, doc, "/TEI/text/body//w");
     NodeList nodes = (NodeList) result;
-    List<INormalizedToken> tokenList = Lists.newArrayList();
+    List<Token> tokenList = Lists.newArrayList();
     if (nodes == null || nodes.getLength() == 0) {//get text from 'p' elements
       result = evaluate(xpath, doc, "/TEI/text/body//p");
       nodes = (NodeList) result;
@@ -80,9 +80,7 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
     } else { // get text from prepared 'w' elements 
       for (int i = 0; i < nodes.getLength(); i++) {
         String value = nodes.item(i).getTextContent();
-        NormalizedToken t = new NormalizedToken(witness, tokenList.size(), value, value);
-        t.setNormalized(tokenNormalizer.apply(t).getNormalized());
-        tokenList.add(t);
+        tokenList.add(new SimpleToken(witness, tokenList.size(), value, tokenNormalizer.apply(value)));
       }
     }
     witness.setTokens(tokenList);

@@ -1,13 +1,13 @@
 package eu.interedition.collatex.implementation.matching;
 
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 
 import java.util.Comparator;
 
-public class EqualityTokenComparator implements Comparator<INormalizedToken> {
+public class EqualityTokenComparator implements Comparator<Token> {
 
   @Override
-  public int compare(INormalizedToken base, INormalizedToken witness) {
+  public int compare(Token base, Token witness) {
     return base.getNormalized().compareTo(witness.getNormalized());
   }
 

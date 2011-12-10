@@ -4,11 +4,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import eu.interedition.collatex.implementation.input.NormalizedToken;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import org.junit.Test;
 
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 
 //TODO: add a test where there is sometimes no match for a given token
 public class EditGraphCreatorTest {
@@ -21,26 +21,26 @@ public class EditGraphCreatorTest {
   public void testBuildingEditGraphEverythingEqual() {
     //setup witnesses
     FakeWitness base = new FakeWitness();
-    INormalizedToken bThe = base.add("The");
-    INormalizedToken bRed = base.add("red");
-    INormalizedToken bCat = base.add("cat");
-    INormalizedToken bAnd = base.add("and");
-    INormalizedToken bThe2 = base.add("the");
-    INormalizedToken bBlack = base.add("black");
-    INormalizedToken bCat2 = base.add("cat");
+    Token bThe = base.add("The");
+    Token bRed = base.add("red");
+    Token bCat = base.add("cat");
+    Token bAnd = base.add("and");
+    Token bThe2 = base.add("the");
+    Token bBlack = base.add("black");
+    Token bCat2 = base.add("cat");
     
     FakeWitness witness = new FakeWitness();
-    INormalizedToken wThe = witness.add("The");
-    INormalizedToken wRed = witness.add("red");
-    INormalizedToken wCat = witness.add("cat");
-    INormalizedToken wAnd = witness.add("and");
-    INormalizedToken wThe2 = witness.add("the");
-    INormalizedToken wBlack = witness.add("black");
-    INormalizedToken wCat2 = witness.add("cat");
+    Token wThe = witness.add("The");
+    Token wRed = witness.add("red");
+    Token wCat = witness.add("cat");
+    Token wAnd = witness.add("and");
+    Token wThe2 = witness.add("the");
+    Token wBlack = witness.add("black");
+    Token wCat2 = witness.add("cat");
  
     //setup vertices
-    EditGraphVertex startVertex = new EditGraphVertex(null, NormalizedToken.START); // vGraph.getStartVertex());
-    EditGraphVertex endVertex = new EditGraphVertex(null, NormalizedToken.END);
+    EditGraphVertex startVertex = new EditGraphVertex(null, SimpleToken.START); // vGraph.getStartVertex());
+    EditGraphVertex endVertex = new EditGraphVertex(null, SimpleToken.END);
     EditGraphVertex vertex1 = new EditGraphVertex(wThe, bThe);
     EditGraphVertex vertex2 = new EditGraphVertex(wThe, bThe2);
     EditGraphVertex vertex3 = new EditGraphVertex(wRed, bRed);
@@ -102,22 +102,22 @@ public class EditGraphCreatorTest {
   public void testBuildingEditGraphOmission() {
     //setup witnesses
     FakeWitness base = new FakeWitness();
-    INormalizedToken bThe = base.add("The");
+    Token bThe = base.add("The");
     /*INormalizedToken bRed =*/ base.add("red");
-    INormalizedToken bCat = base.add("cat");
+    Token bCat = base.add("cat");
     /*INormalizedToken bAnd =*/ base.add("and");
-    INormalizedToken bThe2 = base.add("the");
-    INormalizedToken bBlack = base.add("black");
-    INormalizedToken bCat2 = base.add("cat");
+    Token bThe2 = base.add("the");
+    Token bBlack = base.add("black");
+    Token bCat2 = base.add("cat");
     
     FakeWitness witness = new FakeWitness();
-    INormalizedToken wThe = witness.add("the");
-    INormalizedToken wBlack = witness.add("black");
-    INormalizedToken wCat = witness.add("cat");
+    Token wThe = witness.add("the");
+    Token wBlack = witness.add("black");
+    Token wCat = witness.add("cat");
 
     //setup vertices
-    EditGraphVertex startVertex = new EditGraphVertex(null, NormalizedToken.START); // vGraph.getStartVertex());
-    EditGraphVertex endVertex = new EditGraphVertex(null, NormalizedToken.END);
+    EditGraphVertex startVertex = new EditGraphVertex(null, SimpleToken.START); // vGraph.getStartVertex());
+    EditGraphVertex endVertex = new EditGraphVertex(null, SimpleToken.END);
     EditGraphVertex vertex1 = new EditGraphVertex(wThe, bThe);
     EditGraphVertex vertex2 = new EditGraphVertex(wThe, bThe2);
     EditGraphVertex vertex3 = new EditGraphVertex(wBlack, bBlack);

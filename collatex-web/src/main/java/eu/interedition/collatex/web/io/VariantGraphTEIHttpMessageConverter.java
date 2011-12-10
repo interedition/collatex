@@ -8,7 +8,7 @@ import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.implementation.graph.db.VariantGraph;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.http.HttpInputMessage;
@@ -69,7 +69,7 @@ public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConv
     XMLStreamWriter xml = null;
     try {
       final SortedSet<IWitness> allWitnesses = graph.witnesses();
-      final RowSortedTable<Integer,IWitness,SortedSet<INormalizedToken>> table = graph.toTable();
+      final RowSortedTable<Integer,IWitness,SortedSet<Token>> table = graph.toTable();
 
       xml = xmlOutputFactory.createXMLStreamWriter(body);
       xml.writeStartDocument();
@@ -78,11 +78,11 @@ public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConv
       xml.writeNamespace("", TEI_NS);
       
       for (Iterator<Integer> rowIt = table.rowKeySet().iterator(); rowIt.hasNext(); ) {
-        final Map<IWitness, String> cellContents = Maps.transformValues(table.row(rowIt.next()), new Function<SortedSet<INormalizedToken>, String>() {
+        final Map<IWitness, String> cellContents = Maps.transformValues(table.row(rowIt.next()), new Function<SortedSet<Token>, String>() {
           @Override
-          public String apply(SortedSet<INormalizedToken> input) {
+          public String apply(SortedSet<Token> input) {
             final StringBuilder cellContent = new StringBuilder();
-            for (INormalizedToken token : input) {
+            for (Token token : input) {
               cellContent.append(token.getContent()).append(" ");
             }
             return cellContent.toString().trim();

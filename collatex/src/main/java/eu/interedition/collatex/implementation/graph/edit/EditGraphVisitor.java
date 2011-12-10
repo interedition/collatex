@@ -6,7 +6,7 @@ import com.google.common.collect.*;
 
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.implementation.output.DotExporter;
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,7 +143,7 @@ public class EditGraphVisitor {
     Iterator<EditGraphVertex> iterator = newEditGraph.iterator();
     while (iterator.hasNext()) {
       EditGraphVertex editGraphVertex = iterator.next();
-      INormalizedToken witnessToken = editGraphVertex.getWitnessToken();
+      Token witnessToken = editGraphVertex.getWitnessToken();
       LOG.info("witnessToken={}", witnessToken);
       if (witnessToken != null && witnessToken.getContent().equals("")) {
         LOG.info("skipVertex!");
@@ -169,7 +169,7 @@ public class EditGraphVisitor {
   }
 
   private LinkedHashSet<EditGraphEdge> getMinimumScoreEdges(Matches matches) {
-    Set<INormalizedToken> ambiguous = matches.getAmbiguous();
+    Set<Token> ambiguous = matches.getAmbiguous();
     LinkedHashSet<EditGraphEdge> edgeSet1 = Sets.newLinkedHashSet();
     List<EditGraphVertex> verticesToCheck = Lists.newArrayList(editGraph.getStartVertex());
     boolean onePath = true;
@@ -248,14 +248,14 @@ public class EditGraphVisitor {
 
   private Set<EditGraphVertex> getMinimumWeightVertices(Map<EditGraphVertex, Integer> minWeightProVertex, Matches match) {
     Set<EditGraphVertex> verticesToKeep = Sets.newLinkedHashSet();
-    Set<INormalizedToken> ambiguous = match.getAmbiguous();
+    Set<Token> ambiguous = match.getAmbiguous();
     //    Set<INormalizedToken> unique = match.getUnique();
 
     List<EditGraphVertex> verticesInReverseTopologicalOrder = Lists.reverse(getVerticesInTopologicalOrder(editGraph));
 
     int localminimum = minWeightProVertex.get(editGraph.getEndVertex());
     for (EditGraphVertex vertex : verticesInReverseTopologicalOrder) {
-      INormalizedToken token = vertex.getWitnessToken();
+      Token token = vertex.getWitnessToken();
       Integer minWeight = minWeightProVertex.get(vertex);
       if (ambiguous.contains(token)) {
         if (minWeight <= localminimum) {

@@ -20,11 +20,11 @@
 
 package eu.interedition.collatex.web;
 
-import eu.interedition.collatex.implementation.input.NormalizedToken;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.codehaus.jackson.JsonNode;
 
-public class WebToken extends NormalizedToken {
+public class WebToken extends SimpleToken {
 
   private final JsonNode jsonNode;
 

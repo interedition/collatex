@@ -2,23 +2,23 @@ package eu.interedition.collatex.implementation.graph.edit;
 
 import com.google.common.base.Objects;
 
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 
 // This class represents vertices in the EditGraph
 // This class is implemented as an immutable value object
 // private fields are final
 // toString(), hashCode() and equals methods are overridden
 public class EditGraphVertex {
-  private final INormalizedToken baseToken;
-  private final INormalizedToken witnessToken;
+  private final Token baseToken;
+  private final Token witnessToken;
   private int weight = -1;
 
-  public EditGraphVertex(INormalizedToken witnessToken, INormalizedToken baseToken) {
+  public EditGraphVertex(Token witnessToken, Token baseToken) {
     this.baseToken = baseToken;
     this.witnessToken = witnessToken;
   }
 
-  public INormalizedToken getBaseToken() {
+  public Token getBaseToken() {
     return baseToken;
   }
 
@@ -56,7 +56,7 @@ public class EditGraphVertex {
     return false;
   }
 
-  public INormalizedToken getWitnessToken() {
+  public Token getWitnessToken() {
     return witnessToken;
   }
 

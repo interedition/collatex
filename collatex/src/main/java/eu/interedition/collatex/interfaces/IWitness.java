@@ -20,7 +20,6 @@
 
 package eu.interedition.collatex.interfaces;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -34,7 +33,7 @@ public interface IWitness extends Comparable<IWitness> {
   String getSigil();
 
   // Note: This should return a non-modifiable container
-  List<INormalizedToken> getTokens();
+  List<Token> getTokens();
 
-  boolean isNear(IToken a, IToken b);
+  boolean isNear(Token a, Token b);
 }

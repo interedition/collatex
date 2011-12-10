@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import eu.interedition.collatex.interfaces.INormalizedToken;
+import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 
 /**
@@ -50,7 +50,7 @@ public class Cell {
    * Retrieve the token for this cell if present
    * @return the token for this cell
    */
-  public INormalizedToken getToken() {
+  public Token getToken() {
     return column.getToken(witness);
   }
 
