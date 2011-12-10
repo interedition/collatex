@@ -58,10 +58,10 @@ public class VariantGraphTest extends AbstractTest {
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newTreeSet(Arrays.asList(w))));
     assertEquals(6, vertices.size());
     assertEquals(graph.getStart(), vertices.get(0));
-    assertEquals("a", vertices.get(1).tokens(null).first().getNormalized());
-    assertEquals("b", vertices.get(2).tokens(null).first().getNormalized());
-    assertEquals("c", vertices.get(3).tokens(null).first().getNormalized());
-    assertEquals("d", vertices.get(4).tokens(null).first().getNormalized());
+    assertEquals("a", vertices.get(1).tokens().first().getNormalized());
+    assertEquals("b", vertices.get(2).tokens().first().getNormalized());
+    assertEquals("c", vertices.get(3).tokens().first().getNormalized());
+    assertEquals("d", vertices.get(4).tokens().first().getNormalized());
     assertEquals(graph.getEnd(), vertices.get(5));
   }
 

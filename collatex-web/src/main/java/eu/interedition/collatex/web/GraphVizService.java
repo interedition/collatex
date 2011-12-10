@@ -59,7 +59,7 @@ public class GraphVizService implements InitializingBean {
 
       if (transpositions) {
         for (VariantGraphTransposition t : graph.transpositions()) {
-          out.println(indent + "v" + t.getStart().getNode().getId() + connector + "v" + t.getEnd().getNode().getId() + ";");
+          out.println(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId() + ";");
         }
       }
 

@@ -100,8 +100,8 @@ public class VariantGraphMLHttpMessageConverter extends AbstractHttpMessageConve
       for (VariantGraphTransposition transposition : graph.transpositions()) {
         xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
         xml.writeAttribute(ID_ATT, "e" + edgeNumber);
-        xml.writeAttribute(SOURCE_ATT, vertexToId.get(transposition.getStart()));
-        xml.writeAttribute(TARGET_ATT, vertexToId.get(transposition.getEnd()));
+        xml.writeAttribute(SOURCE_ATT, vertexToId.get(transposition.from()));
+        xml.writeAttribute(TARGET_ATT, vertexToId.get(transposition.to()));
         Property.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
         Property.EDGE_TYPE.write(EDGE_TYPE_TRANSPOSITION, xml);
         xml.writeEndElement();

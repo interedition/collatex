@@ -66,6 +66,10 @@ public class VariantGraphVertex {
     return transform(node.getRelationships(TRANSPOSITION), graph.getTranspositionWrapper());
   }
 
+  public SortedSet<INormalizedToken> tokens() {
+    return tokens(null);
+  }
+
   public SortedSet<INormalizedToken> tokens(SortedSet<IWitness> witnesses) {
     final SortedSet<INormalizedToken> tokens = Sets.newTreeSet(graph.getTokenResolver().resolve(getTokenReferences()));
     if (witnesses != null && !witnesses.isEmpty()) {
@@ -81,14 +85,14 @@ public class VariantGraphVertex {
 
   public SortedSet<IWitness> witnesses() {
     final SortedSet<IWitness> witnesses = Sets.newTreeSet();
-    for (INormalizedToken token : tokens(null)) {
+    for (INormalizedToken token : tokens()) {
       witnesses.add(token.getWitness());
     }
     return witnesses;
   }
 
   public void add(Iterable<INormalizedToken> tokens) {
-    final SortedSet<INormalizedToken> tokenSet = Sets.newTreeSet(tokens(null));
+    final SortedSet<INormalizedToken> tokenSet = Sets.newTreeSet(tokens());
     Iterables.addAll(tokenSet, tokens);
     setTokens(tokenSet);
   }
@@ -132,7 +136,7 @@ public class VariantGraphVertex {
 
   @Override
   public String toString() {
-    return Iterables.toString(tokens(null));
+    return Iterables.toString(tokens());
   }
 
   public static Function<Node, VariantGraphVertex> createWrapper(final VariantGraph in) {

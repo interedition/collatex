@@ -21,15 +21,15 @@ public class VariantGraphTransposition {
     this(graph, from.getNode().createRelationshipTo(to.getNode(), VariantGraphRelationshipType.TRANSPOSITION));
   }
 
-  public VariantGraphVertex getStart() {
+  public VariantGraphVertex from() {
     return new VariantGraphVertex(graph, relationship.getStartNode());
   }
 
-  public VariantGraphVertex getEnd() {
+  public VariantGraphVertex to() {
     return new VariantGraphVertex(graph, relationship.getEndNode());
   }
 
-  public VariantGraphVertex getOther(VariantGraphVertex vertex) {
+  public VariantGraphVertex other(VariantGraphVertex vertex) {
     return new VariantGraphVertex(graph, relationship.getOtherNode(vertex.getNode()));
   }
 
@@ -52,7 +52,7 @@ public class VariantGraphTransposition {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(getStart()).addValue(getEnd()).toString();
+    return Objects.toStringHelper(this).addValue(from()).addValue(to()).toString();
   }
 
   public static Function<Relationship, VariantGraphTransposition> createWrapper(final VariantGraph in) {

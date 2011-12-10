@@ -192,11 +192,11 @@ public class VariantGraph {
 
   public VariantGraphTransposition transpose(VariantGraphVertex from, VariantGraphVertex to) {
     Preconditions.checkArgument(!from.equals(to));
-    Preconditions.checkArgument(!from.tokens(null).isEmpty());
-    Preconditions.checkArgument(!to.tokens(null).isEmpty());
+    Preconditions.checkArgument(!from.tokens().isEmpty());
+    Preconditions.checkArgument(!to.tokens().isEmpty());
 
     for (VariantGraphTransposition t : from.transpositions()) {
-      if (t.getOther(from).equals(to)) {
+      if (t.other(from).equals(to)) {
         return t;
       }
     }
@@ -247,9 +247,9 @@ public class VariantGraph {
             outgoingWitnesses.addAll(e.getWitnesses());
           }
           if (incomingWitnesses.equals(outgoingWitnesses)) {
-            vertex.add(joinCandidate.tokens(null));
+            vertex.add(joinCandidate.tokens());
             for (VariantGraphTransposition t : joinCandidate.transpositions()) {
-              transpose(vertex, t.getOther(joinCandidate));
+              transpose(vertex, t.other(joinCandidate));
               t.delete();
             }
             for (VariantGraphEdge e : joinCandidateOutgoing) {
@@ -313,7 +313,7 @@ public class VariantGraph {
   public RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> toTable() {
     final TreeBasedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = TreeBasedTable.create();
     for (VariantGraphVertex v : rank().vertices()) {
-      for (INormalizedToken token : v.tokens(null)) {
+      for (INormalizedToken token : v.tokens()) {
         final int row = v.getRank();
         final IWitness column = token.getWitness();
 

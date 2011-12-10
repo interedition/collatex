@@ -96,7 +96,7 @@ public class VariantGraphWitnessAdapter implements IWitness {
       } else if (end.equals(vertex)) {
         this.firstToken = NormalizedToken.END;
       } else {
-        this.firstToken = vertex.tokens(null).first();
+        this.firstToken = vertex.tokens().first();
       }
     }
 

@@ -42,7 +42,7 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, Varian
 
     final Map<eu.interedition.collatex.implementation.graph.db.VariantGraphVertex, VariantGraphVertex> vertexMap = Maps.newHashMap();
     for (eu.interedition.collatex.implementation.graph.db.VariantGraphVertex pv : pvg.vertices()) {
-      final VariantGraphVertex v = new VariantGraphVertex(pv.tokens(null), pv.getRank());
+      final VariantGraphVertex v = new VariantGraphVertex(pv.tokens(), pv.getRank());
       addVertex(v);
       vertexMap.put(pv, v);
       if (pvg.getStart().equals(pv)) {
@@ -56,7 +56,7 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, Varian
     }
     
     for (eu.interedition.collatex.implementation.graph.db.VariantGraphTransposition t : pvg.transpositions()) {
-      addEdge(new VariantGraphEdge(Sets.<IWitness>newTreeSet()), vertexMap.get(t.getStart()), vertexMap.get(t.getEnd()));
+      addEdge(new VariantGraphEdge(Sets.<IWitness>newTreeSet()), vertexMap.get(t.from()), vertexMap.get(t.to()));
     }
   }
 }
