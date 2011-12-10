@@ -20,9 +20,7 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
 /**

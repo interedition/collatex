@@ -20,22 +20,28 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import java.util.*;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.*;
-
-import eu.interedition.collatex.implementation.graph.SegmentedVariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.implementation.input.Token;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class Apparatus {
   public static final String TEI_NS = "http://www.tei-c.org/ns/1.0";

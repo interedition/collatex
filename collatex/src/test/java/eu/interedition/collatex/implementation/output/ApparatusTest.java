@@ -20,9 +20,12 @@
 
 package eu.interedition.collatex.implementation.output;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.StringWriter;
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.interfaces.IWitness;
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,16 +34,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
 
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
-import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
-import eu.interedition.collatex.interfaces.IWitness;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import static org.junit.Assert.assertEquals;
 
 public class ApparatusTest extends AbstractTest {
   private DocumentBuilder documentBuilder;

@@ -20,21 +20,20 @@
 
 package eu.interedition.collatex.implementation.alignment;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.ITokenContainer;
+import eu.interedition.collatex.interfaces.IWitness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class TranspositionDetector {
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionDetector.class);
@@ -81,7 +80,7 @@ public class TranspositionDetector {
   //    return transpositions;
   //  }
 
-  public List<Tuple<Tuple<List<INormalizedToken>>>> detect(List<Tuple<List<INormalizedToken>>> phraseMatches, ITokenContainer base) {
+  public List<Tuple<Tuple<List<INormalizedToken>>>> detect(List<Tuple<List<INormalizedToken>>> phraseMatches, IWitness base) {
     // sort phrase matches by base token order
     final Map<INormalizedToken, Tuple<List<INormalizedToken>>> tokenIndex = Maps.uniqueIndex(phraseMatches, new Function<Tuple<List<INormalizedToken>>, INormalizedToken>() {
       @Override
@@ -90,8 +89,7 @@ public class TranspositionDetector {
       }
     });
     final List<Tuple<List<INormalizedToken>>> sortedPhraseMatches = Lists.newArrayList();
-    for (Iterator<INormalizedToken> tokenIterator = base.tokenIterator(); tokenIterator.hasNext();) {
-      final INormalizedToken token = tokenIterator.next();
+    for (INormalizedToken token : base.getTokens()) {
       if (tokenIndex.containsKey(token)) {
         sortedPhraseMatches.add(tokenIndex.get(token));
       }

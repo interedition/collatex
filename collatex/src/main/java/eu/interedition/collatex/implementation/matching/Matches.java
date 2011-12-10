@@ -1,11 +1,20 @@
 package eu.interedition.collatex.implementation.matching;
 
-import java.util.*;
-
-import com.google.common.collect.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.ITokenContainer;
+import eu.interedition.collatex.interfaces.IWitness;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class Matches {
 
@@ -14,19 +23,9 @@ public class Matches {
   private final Set<INormalizedToken> ambiguous;
   private final Set<INormalizedToken> unique;
 
-  public static Matches between(final ITokenContainer a, final ITokenContainer b, Comparator<INormalizedToken> comparator) {
-    final Iterable<INormalizedToken> aTokens = new Iterable<INormalizedToken>() {
-      @Override
-      public Iterator<INormalizedToken> iterator() {
-        return a.tokenIterator();
-      }
-    };
-    final Iterable<INormalizedToken> bTokens = new Iterable<INormalizedToken>() {
-      @Override
-      public Iterator<INormalizedToken> iterator() {
-        return b.tokenIterator();
-      }
-    };
+  public static Matches between(final IWitness a, final IWitness b, Comparator<INormalizedToken> comparator) {
+    final Iterable<INormalizedToken> aTokens = a.getTokens();
+    final Iterable<INormalizedToken> bTokens = b.getTokens();
 
     final ListMultimap<INormalizedToken, INormalizedToken> all = ArrayListMultimap.create();
     for (INormalizedToken tokenA : aTokens) {

@@ -20,6 +20,7 @@
 
 package eu.interedition.collatex.interfaces;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -28,13 +29,12 @@ import java.util.List;
  * Representation of a single textual witness
  *
  */
-public interface IWitness extends ITokenContainer, Comparable<IWitness> {
+public interface IWitness extends Comparable<IWitness> {
 
   String getSigil();
 
   // Note: This should return a non-modifiable container
   List<INormalizedToken> getTokens();
 
-  int size();
-
+  boolean isNear(IToken a, IToken b);
 }

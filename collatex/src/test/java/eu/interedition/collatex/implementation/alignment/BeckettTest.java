@@ -1,8 +1,6 @@
 package eu.interedition.collatex.implementation.alignment;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
@@ -15,14 +13,11 @@ import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTok
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IVariantGraph;
-import eu.interedition.collatex.interfaces.IVariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;

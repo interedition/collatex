@@ -22,25 +22,18 @@
 
 package eu.interedition.collatex.implementation;
 
-import eu.interedition.collatex.implementation.alignment.PhraseMatchDetector;
 import eu.interedition.collatex.implementation.alignment.TokenLinker;
-import eu.interedition.collatex.implementation.alignment.TranspositionDetector;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.graph.JoinedVariantGraph;
-import eu.interedition.collatex.implementation.graph.SegmentedVariantGraph;
-import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
-import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.ITokenLinker;
 import eu.interedition.collatex.interfaces.ITokenNormalizer;
 import eu.interedition.collatex.interfaces.ITokenizer;
-import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import java.io.IOException;

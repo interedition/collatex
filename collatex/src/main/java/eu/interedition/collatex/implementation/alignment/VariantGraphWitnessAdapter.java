@@ -61,20 +61,10 @@ public class VariantGraphWitnessAdapter implements IWitness {
   }
 
   @Override
-  public int size() {
-    return tokens.size();
-  }
-
-  @Override
   public boolean isNear(IToken a, IToken b) {
     final PersistentVariantGraphVertex va = NormalizedToken.START.equals(a) ? graph.getStart() : ((VariantGraphVertexTokenAdapter) a).getVertex();
     final PersistentVariantGraphVertex vb = NormalizedToken.END.equals(b) ? graph.getEnd() : ((VariantGraphVertexTokenAdapter) b).getVertex();
     return graph.verticesAreAdjacent(va, vb);
-  }
-
-  @Override
-  public Iterator<INormalizedToken> tokenIterator() {
-    return tokens.iterator();
   }
 
   @Override

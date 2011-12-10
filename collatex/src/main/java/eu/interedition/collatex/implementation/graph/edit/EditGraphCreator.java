@@ -1,21 +1,18 @@
 package eu.interedition.collatex.implementation.graph.edit;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Set;
-
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-
-import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Set;
 
 public class EditGraphCreator {
   Logger LOG = LoggerFactory.getLogger(EditGraphCreator.class);
@@ -106,7 +103,7 @@ public class EditGraphCreator {
           //          edges.add(new EditGraphEdge(incomingEdge.getSourceVertex(), outgoingEdge.getTargetVertex(), EditOperation.GAP, score));
           //        }
           //      }
-          EditGraphVertex skipVertex = new EditGraphVertex(new NormalizedToken(null, 0, "", ""), new VariantGraphVertex("", new NormalizedToken(null, 0, "", "")));
+          EditGraphVertex skipVertex = null; // FIXME: new EditGraphVertex(new NormalizedToken(null, 0, "", ""), new VariantGraphVertex("", new NormalizedToken(null, 0, "", "")));
           vertices.add(skipVertex);
           for (EditGraphEdge incomingEdge : incomingEdges) {
             int score = 3;

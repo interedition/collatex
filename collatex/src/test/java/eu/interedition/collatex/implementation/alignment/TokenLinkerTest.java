@@ -7,7 +7,6 @@ import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.interfaces.INormalizedToken;
-import eu.interedition.collatex.interfaces.IVariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Test;
 

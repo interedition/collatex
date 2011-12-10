@@ -74,11 +74,6 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
   }
 
   @Override
-  public int size() {
-    return tokens.size();
-  }
-
-  @Override
   public String toString() {
     return getSigil();
   }
@@ -90,11 +85,6 @@ public class Witness implements Iterable<INormalizedToken>, IWitness {
     }
     INormalizedToken other = relations.get(a);
     return other.equals(b);
-  }
-
-  @Override
-  public Iterator<INormalizedToken> tokenIterator() {
-    return iterator();
   }
 
   @Override
