@@ -5,8 +5,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.Tuple;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.interfaces.*;
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import java.util.*;
 public class VariantGraphBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraphBuilder.class);
 
-  private final PersistentVariantGraph graph;
+  private final VariantGraph graph;
   private final Comparator<INormalizedToken> comparator;
   private final ITokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;
@@ -28,11 +28,11 @@ public class VariantGraphBuilder {
   private List<Tuple<List<INormalizedToken>>> transpositions;
   private Map<INormalizedToken,INormalizedToken> alignments;
 
-  public VariantGraphBuilder(PersistentVariantGraph graph) {
+  public VariantGraphBuilder(VariantGraph graph) {
     this(graph, new EqualityTokenComparator(), new TokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
   }
 
-  public VariantGraphBuilder(PersistentVariantGraph graph, Comparator<INormalizedToken> comparator, ITokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
+  public VariantGraphBuilder(VariantGraph graph, Comparator<INormalizedToken> comparator, ITokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
     this.graph = graph;
     this.comparator = comparator;
     this.tokenLinker = tokenLinker;
@@ -106,23 +106,23 @@ public class VariantGraphBuilder {
     }
 
     LOG.debug("{} + {}: Merge comparand into graph", graph, witness);
-    PersistentVariantGraphVertex last = graph.getStart();
+    VariantGraphVertex last = graph.getStart();
     final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
-    final Map<INormalizedToken, PersistentVariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
+    final Map<INormalizedToken, VariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
     for (INormalizedToken token : witness.getTokens()) {
       final VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter matchingAdapter = (VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter)alignments.get(token);
-      PersistentVariantGraphVertex matchingVertex = (matchingAdapter == null ? null : matchingAdapter.getVertex());
+      VariantGraphVertex matchingVertex = (matchingAdapter == null ? null : matchingAdapter.getVertex());
       if (matchingVertex == null) {
-        matchingVertex = graph.addVertex(token);
+        matchingVertex = graph.add(token);
       } else {
         matchingVertex.add(Collections.singleton(token));
       }
       witnessTokenVertices.put(token, matchingVertex);
 
-      graph.createPath(last, matchingVertex, witnessSet);
+      graph.connect(last, matchingVertex, witnessSet);
       last = matchingVertex;
     }
-    graph.createPath(last, graph.getEnd(), witnessSet);
+    graph.connect(last, graph.getEnd(), witnessSet);
 
     LOG.debug("{}: Registering transpositions", graph);
     for (Tuple<List<INormalizedToken>> transposedPhrase : transpositions) {
@@ -130,14 +130,14 @@ public class VariantGraphBuilder {
       final Iterator<INormalizedToken> witnessPhraseIt = transposedPhrase.right.iterator();
 
       while(basePhraseIt.hasNext() && witnessPhraseIt.hasNext()) {
-        final PersistentVariantGraphVertex baseVertex = ((VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter)basePhraseIt.next()).getVertex();
-        final PersistentVariantGraphVertex witnessVertex = witnessTokenVertices.get(witnessPhraseIt.next());
-        graph.createTransposition(baseVertex, witnessVertex);
+        final VariantGraphVertex baseVertex = ((VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter)basePhraseIt.next()).getVertex();
+        final VariantGraphVertex witnessVertex = witnessTokenVertices.get(witnessPhraseIt.next());
+        graph.transpose(baseVertex, witnessVertex);
       }
     }
 
     if (LOG.isTraceEnabled()) {
-      LOG.trace("{}: {}", graph, Iterables.toString(graph.traverseVertices(null)));
+      LOG.trace("{}: {}", graph, Iterables.toString(graph.vertices()));
     }
   }
 

@@ -5,8 +5,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.Tuple;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.input.Token;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
@@ -41,7 +41,7 @@ public class BeckettTest extends AbstractTest {
   @Test
   public void dirkVincent5() {
     final IWitness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
-    final PersistentVariantGraph graph = merge(w);
+    final VariantGraph graph = merge(w);
 
     vertexWith(graph, "its", w[0]);
     vertexWith(graph, "soft", w[0]);
@@ -55,12 +55,12 @@ public class BeckettTest extends AbstractTest {
     final IWitness[] w = createWitnesses(
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final PersistentVariantGraph graph = merge(w);
+    final VariantGraph graph = merge(w);
 
-    final PersistentVariantGraphVertex itsVertex = vertexWith(graph, "its", w[0]);
-    final PersistentVariantGraphVertex softVertex = vertexWith(graph, "soft", w[0]);
-    final PersistentVariantGraphVertex changelessVertex = vertexWith(graph, "changeless", w[1]);
-    final PersistentVariantGraphVertex lightVertex = vertexWith(graph, "light", w[0]);
+    final VariantGraphVertex itsVertex = vertexWith(graph, "its", w[0]);
+    final VariantGraphVertex softVertex = vertexWith(graph, "soft", w[0]);
+    final VariantGraphVertex changelessVertex = vertexWith(graph, "changeless", w[1]);
+    final VariantGraphVertex lightVertex = vertexWith(graph, "light", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), itsVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(itsVertex, softVertex), w[0], w[1]);
@@ -71,7 +71,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void testDirkVincent7() {
-    final PersistentVariantGraph graph = merge(//
+    final VariantGraph graph = merge(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final StringBuilder graphTokens = new StringBuilder();
@@ -108,7 +108,7 @@ public class BeckettTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
-    final PersistentVariantGraph graph = merge(w);
+    final VariantGraph graph = merge(w);
 
     vertexWith(graph, "its", w[0]);
     vertexWith(graph, "soft", w[0]);
@@ -155,7 +155,7 @@ public class BeckettTest extends AbstractTest {
             "The same as when among others Darly once died & left him.",//
             "The same as when Darly among others once died and left him.");
 
-    final PersistentVariantGraph graph = merge(w[0], w[1]);
+    final VariantGraph graph = merge(w[0], w[1]);
     assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died", ".");
 
     merge(graph, w[2]);
@@ -178,9 +178,9 @@ public class BeckettTest extends AbstractTest {
 
 
 
-  private static void assertGraphContains(PersistentVariantGraph graph, String... expected) {
+  private static void assertGraphContains(VariantGraph graph, String... expected) {
     SortedSet<String> contents = Sets.newTreeSet();
-    for (IWitness witness : graph.getWitnesses()) {
+    for (IWitness witness : graph.witnesses()) {
       extractPhrases(contents, graph, witness);
     }
     Assert.assertTrue(contents.containsAll(Arrays.asList(expected)));

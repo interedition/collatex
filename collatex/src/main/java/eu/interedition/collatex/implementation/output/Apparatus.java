@@ -27,7 +27,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.implementation.input.Token;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -112,7 +112,7 @@ public class Apparatus {
 
   public static class Entry {
 
-    private final Set<PersistentVariantGraphVertex> contents = Sets.newLinkedHashSet();
+    private final Set<VariantGraphVertex> contents = Sets.newLinkedHashSet();
     private final SortedSet<IWitness> witnesses;
 
     public Entry(SortedSet<IWitness> witnesses) {
@@ -123,14 +123,14 @@ public class Apparatus {
       return witnesses;
     }
 
-    public void add(PersistentVariantGraphVertex content) {
+    public void add(VariantGraphVertex content) {
       this.contents.add(content);
     }
 
     public boolean covers(IWitness witness) {
       final TreeSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
-      for (PersistentVariantGraphVertex vertex : contents) {
-        if (!vertex.getTokens(witnessSet).isEmpty()) {
+      for (VariantGraphVertex vertex : contents) {
+        if (!vertex.tokens(witnessSet).isEmpty()) {
           return true;
         }
       }
@@ -142,8 +142,8 @@ public class Apparatus {
     */
     public SortedSet<INormalizedToken> getReadingOf(final IWitness witness) {
       final TreeSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
-      for (PersistentVariantGraphVertex vertex : contents) {
-        final SortedSet<INormalizedToken> tokens = vertex.getTokens(witnessSet);
+      for (VariantGraphVertex vertex : contents) {
+        final SortedSet<INormalizedToken> tokens = vertex.tokens(witnessSet);
         if (!tokens.isEmpty()) {
           return tokens;
         }
@@ -153,8 +153,8 @@ public class Apparatus {
 
     public boolean hasEmptyCells() {
       int nonEmptyWitnessSize = 0;
-      for (PersistentVariantGraphVertex vertex : contents) {
-        nonEmptyWitnessSize += vertex.getWitnesses().size();
+      for (VariantGraphVertex vertex : contents) {
+        nonEmptyWitnessSize += vertex.witnesses().size();
       }
       return getWitnesses().size() != nonEmptyWitnessSize;
     }

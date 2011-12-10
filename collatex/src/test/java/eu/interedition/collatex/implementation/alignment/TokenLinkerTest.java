@@ -3,7 +3,7 @@ package eu.interedition.collatex.implementation.alignment;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.interfaces.INormalizedToken;
@@ -115,7 +115,7 @@ public class TokenLinkerTest extends AbstractTest {
   public void twoEqualPossibilities1() {
     final IWitness[] w = createWitnesses("a", "a a");
 
-    final PersistentVariantGraph graph = merge(w[0]);
+    final VariantGraph graph = merge(w[0]);
     final Map<INormalizedToken, INormalizedToken> links = linkTokens(graph, w[1]);
 
     assertEquals(1, links.size());
@@ -222,7 +222,7 @@ public class TokenLinkerTest extends AbstractTest {
   public void twoEqualPossibilities2() {
     final IWitness[] w = createWitnesses("a a", "a");
 
-    final PersistentVariantGraph graph = merge(w[0]);
+    final VariantGraph graph = merge(w[0]);
     final Set<Map.Entry<INormalizedToken, INormalizedToken>> matches = linkTokens(graph, w[1]).entrySet();
 
     assertEquals(1, matches.size());
@@ -283,7 +283,7 @@ public class TokenLinkerTest extends AbstractTest {
     return linkTokens(new TokenLinker(), base, witness);
   }
 
-  private Map<INormalizedToken, INormalizedToken> linkTokens(PersistentVariantGraph graph, IWitness witness) {
+  private Map<INormalizedToken, INormalizedToken> linkTokens(VariantGraph graph, IWitness witness) {
     return linkTokens(VariantGraphWitnessAdapter.create(graph), witness);
   }
 

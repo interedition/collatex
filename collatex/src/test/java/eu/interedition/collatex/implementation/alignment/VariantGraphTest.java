@@ -23,8 +23,8 @@ package eu.interedition.collatex.implementation.alignment;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,14 +42,14 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void twoWitnesses() {
     final IWitness[] w = createWitnesses("the black cat", "the black cat");
-    final PersistentVariantGraph graph = merge(w);
+    final VariantGraph graph = merge(w);
 
-    assertEquals(5, Iterables.size(graph.traverseVertices(null)));
-    assertEquals(4, Iterables.size(graph.traverseEdges(null)));
+    assertEquals(5, Iterables.size(graph.vertices()));
+    assertEquals(4, Iterables.size(graph.edges()));
 
-    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
-    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final VariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0], w[1]);
@@ -61,16 +61,16 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void addition1() {
     final IWitness[] w = createWitnesses("the black cat", "the white and black cat");
-    final PersistentVariantGraph graph = merge(w);
+    final VariantGraph graph = merge(w);
 
-    assertEquals(7, Lists.newArrayList(graph.traverseVertices(null)).size());
-    assertEquals(7, Iterables.size(graph.traverseEdges(null)));
+    assertEquals(7, Lists.newArrayList(graph.vertices()).size());
+    assertEquals(7, Iterables.size(graph.edges()));
 
-    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final PersistentVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
-    final PersistentVariantGraphVertex andVertex = vertexWith(graph, "and", w[1]);
-    final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
-    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final VariantGraphVertex andVertex = vertexWith(graph, "and", w[1]);
+    final VariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final VariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
@@ -84,19 +84,19 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void variant() {
     final IWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
-    final PersistentVariantGraph graph = merge(w);
+    final VariantGraph graph = merge(w);
 
-    final List<PersistentVariantGraphVertex> vertices = Lists.newArrayList(graph.traverseVertices(null));
+    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
     assertEquals(9, vertices.size());
-    assertEquals(12, Iterables.size(graph.traverseEdges(null)));
+    assertEquals(12, Iterables.size(graph.edges()));
 
-    final PersistentVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final PersistentVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
-    final PersistentVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
-    final PersistentVariantGraphVertex greenVertex = vertexWith(graph, "green", w[2]);
-    final PersistentVariantGraphVertex redVertex = vertexWith(graph, "red", w[3]);
-    final PersistentVariantGraphVertex yellowVertex = vertexWith(graph, "yellow", w[4]);
-    final PersistentVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final VariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final VariantGraphVertex greenVertex = vertexWith(graph, "green", w[2]);
+    final VariantGraphVertex redVertex = vertexWith(graph, "red", w[3]);
+    final VariantGraphVertex yellowVertex = vertexWith(graph, "yellow", w[4]);
+    final VariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1], w[2], w[3], w[4]);
     assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
@@ -115,9 +115,9 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void doubleTransposition2() {
     final IWitness[] w = createWitnesses("a b", "b a");
-    final PersistentVariantGraph graph = merge(w);
+    final VariantGraph graph = merge(w);
 
-    assertEquals(5, Iterables.size(graph.traverseVertices(null)));
+    assertEquals(5, Iterables.size(graph.vertices()));
 
     assertHasWitnesses(edgeBetween(vertexWith(graph, "b", w[1]), vertexWith(graph, "a", w[1])), w[1]);
     assertHasWitnesses(edgeBetween(vertexWith(graph, "a", w[0]), vertexWith(graph, "b", w[0])), w[0]);
@@ -126,9 +126,9 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void mirroredTranspositionsWithMatchInBetween() {
     final IWitness[] w = createWitnesses("the black and white cat", "the white and black cat");
-    final PersistentVariantGraph graph = merge(w);
+    final VariantGraph graph = merge(w);
 
-    Assert.assertEquals(9, Iterables.size(graph.traverseVertices(null)));
+    Assert.assertEquals(9, Iterables.size(graph.vertices()));
 
     // FIXME: find out, how to test this without stable topological order
     /*

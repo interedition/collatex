@@ -3,12 +3,11 @@ package eu.interedition.collatex.web.io;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
@@ -31,7 +30,7 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConverter<PersistentVariantGraph> {
+public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConverter<VariantGraph> {
 
   /**
    * TEI MIME type.
@@ -55,21 +54,21 @@ public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConv
 
   @Override
   protected boolean supports(Class<?> clazz) {
-    return PersistentVariantGraph.class.isAssignableFrom(clazz);
+    return VariantGraph.class.isAssignableFrom(clazz);
   }
 
   @Override
-  protected PersistentVariantGraph readInternal(Class<? extends PersistentVariantGraph> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+  protected VariantGraph readInternal(Class<? extends VariantGraph> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     throw new HttpMessageNotReadableException(clazz.toString());
   }
 
   @Override
-  protected void writeInternal(PersistentVariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+  protected void writeInternal(VariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     final Transaction tx = graph.newTransaction();
     final OutputStream body = outputMessage.getBody();
     XMLStreamWriter xml = null;
     try {
-      final SortedSet<IWitness> allWitnesses = graph.getWitnesses();
+      final SortedSet<IWitness> allWitnesses = graph.witnesses();
       final RowSortedTable<Integer,IWitness,SortedSet<INormalizedToken>> table = graph.toTable();
 
       xml = xmlOutputFactory.createXMLStreamWriter(body);

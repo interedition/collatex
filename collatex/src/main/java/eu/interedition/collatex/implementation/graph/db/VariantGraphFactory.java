@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.START_END;
 import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.VARIANT_GRAPH;
@@ -84,7 +83,7 @@ public class VariantGraphFactory {
     this.tokenResolver = tokenResolver;
   }
 
-  public synchronized PersistentVariantGraph create() {
+  public synchronized VariantGraph create() {
     final Transaction tx = db.beginTx();
     try {
       final Node start = db.createNode();
@@ -93,10 +92,10 @@ public class VariantGraphFactory {
       variantGraphs.createRelationshipTo(start, START_END);
       end.createRelationshipTo(variantGraphs, START_END);
 
-      final PersistentVariantGraph graph = new PersistentVariantGraph(start, end, witnessResolver, tokenResolver);
+      final VariantGraph graph = new VariantGraph(start, end, witnessResolver, tokenResolver);
       graph.getStart().setTokens(Sets.<INormalizedToken>newTreeSet());
       graph.getEnd().setTokens(Sets.<INormalizedToken>newTreeSet());
-      graph.createPath(graph.getStart(), graph.getEnd(), Sets.<IWitness>newTreeSet());
+      graph.connect(graph.getStart(), graph.getEnd(), Sets.<IWitness>newTreeSet());
 
       tx.success();
       return graph;

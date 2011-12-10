@@ -21,8 +21,8 @@
 package eu.interedition.collatex.implementation.output;
 
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import java.util.Iterator;
@@ -35,16 +35,16 @@ import java.util.SortedSet;
  *
  */
 public class AlignmentTable {
-  private final PersistentVariantGraph graph;
+  private final VariantGraph graph;
   protected final List<Column> columns = Lists.newArrayList();
 
-  public AlignmentTable(PersistentVariantGraph graph) {
+  public AlignmentTable(VariantGraph graph) {
     this.graph = graph.rank();
-    final Iterator<PersistentVariantGraphVertex> vertexIterator = graph.traverseVertices(null).iterator();
+    final Iterator<VariantGraphVertex> vertexIterator = graph.vertices().iterator();
     //skip startVertex
     vertexIterator.next();
     while(vertexIterator.hasNext()) {
-      PersistentVariantGraphVertex next = vertexIterator.next();
+      VariantGraphVertex next = vertexIterator.next();
       if (next.equals(graph.getEnd())) {
         continue;
       }
@@ -57,14 +57,14 @@ public class AlignmentTable {
     }
   }
 
-  private Column addNewColumn(PersistentVariantGraphVertex vertex) {
+  private Column addNewColumn(VariantGraphVertex vertex) {
     final Column column = new Column(vertex);
     columns.add(column);
     return column;
   }
   
   public final SortedSet<IWitness> getWitnesses() {
-    return graph.getWitnesses();
+    return graph.witnesses();
   }
 
   /**

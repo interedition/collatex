@@ -16,15 +16,13 @@
 package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.implementation.input.NormalizedToken;
 import eu.interedition.collatex.implementation.input.Witness;
 import eu.interedition.collatex.interfaces.*;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -35,18 +33,18 @@ import java.util.List;
  * @author Ronald
  */
 public class VariantGraphWitnessAdapter implements IWitness {
-  private final PersistentVariantGraph graph;
+  private final VariantGraph graph;
   private final List<INormalizedToken> tokens = Lists.newArrayList();
 
-  public static VariantGraphWitnessAdapter create(PersistentVariantGraph graph) {
+  public static VariantGraphWitnessAdapter create(VariantGraph graph) {
     final VariantGraphWitnessAdapter witnessAdapter = new VariantGraphWitnessAdapter(graph);
-    for (PersistentVariantGraphVertex v : graph.traverseVertices(null)) {
+    for (VariantGraphVertex v : graph.vertices()) {
       witnessAdapter.tokens.add(new VariantGraphVertexTokenAdapter(witnessAdapter, v));
     }
     return witnessAdapter;
   }
 
-  private VariantGraphWitnessAdapter(PersistentVariantGraph graph) {
+  private VariantGraphWitnessAdapter(VariantGraph graph) {
     this.graph = graph;
   }
 
@@ -62,8 +60,8 @@ public class VariantGraphWitnessAdapter implements IWitness {
 
   @Override
   public boolean isNear(IToken a, IToken b) {
-    final PersistentVariantGraphVertex va = NormalizedToken.START.equals(a) ? graph.getStart() : ((VariantGraphVertexTokenAdapter) a).getVertex();
-    final PersistentVariantGraphVertex vb = NormalizedToken.END.equals(b) ? graph.getEnd() : ((VariantGraphVertexTokenAdapter) b).getVertex();
+    final VariantGraphVertex va = NormalizedToken.START.equals(a) ? graph.getStart() : ((VariantGraphVertexTokenAdapter) a).getVertex();
+    final VariantGraphVertex vb = NormalizedToken.END.equals(b) ? graph.getEnd() : ((VariantGraphVertexTokenAdapter) b).getVertex();
     return graph.verticesAreAdjacent(va, vb);
   }
 
@@ -83,26 +81,26 @@ public class VariantGraphWitnessAdapter implements IWitness {
    */
   public static class VariantGraphVertexTokenAdapter implements INormalizedToken {
     private final VariantGraphWitnessAdapter witnessAdapter;
-    private final PersistentVariantGraphVertex vertex;
+    private final VariantGraphVertex vertex;
     private INormalizedToken firstToken;
 
-    public VariantGraphVertexTokenAdapter(VariantGraphWitnessAdapter witnessAdapter, PersistentVariantGraphVertex vertex) {
+    public VariantGraphVertexTokenAdapter(VariantGraphWitnessAdapter witnessAdapter, VariantGraphVertex vertex) {
       this.witnessAdapter = witnessAdapter;
       this.vertex = vertex;
 
-      final PersistentVariantGraph graph = vertex.getGraph();
-      final PersistentVariantGraphVertex start = graph.getStart();
-      final PersistentVariantGraphVertex end = graph.getEnd();
+      final VariantGraph graph = vertex.getGraph();
+      final VariantGraphVertex start = graph.getStart();
+      final VariantGraphVertex end = graph.getEnd();
       if (start.equals(vertex)) {
         this.firstToken = NormalizedToken.START;
       } else if (end.equals(vertex)) {
         this.firstToken = NormalizedToken.END;
       } else {
-        this.firstToken = vertex.getTokens(null).first();
+        this.firstToken = vertex.tokens(null).first();
       }
     }
 
-    public PersistentVariantGraphVertex getVertex() {
+    public VariantGraphVertex getVertex() {
       return vertex;
     }
 

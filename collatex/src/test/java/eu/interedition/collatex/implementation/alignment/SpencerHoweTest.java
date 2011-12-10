@@ -23,14 +23,11 @@ package eu.interedition.collatex.implementation.alignment;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
-import eu.interedition.collatex.implementation.output.AlignmentTable;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.*;
 import org.junit.Test;
 
-import java.util.Iterator;
-import java.util.Set;
 import java.util.SortedSet;
 
 import static org.junit.Assert.assertEquals;
@@ -62,14 +59,14 @@ public class SpencerHoweTest extends AbstractTest {
   @Test
   public void graph() {
     final IWitness[] w = createWitnesses("a", "b", "a b");
-    final PersistentVariantGraph graph = merge(w);
-    assertEquals(4, Iterables.size(graph.traverseVertices(null)));
-    assertEquals(5, Iterables.size(graph.traverseEdges(null)));
+    final VariantGraph graph = merge(w);
+    assertEquals(4, Iterables.size(graph.vertices()));
+    assertEquals(5, Iterables.size(graph.edges()));
 
-    final PersistentVariantGraphVertex startVertex = graph.getStart();
-    final PersistentVariantGraphVertex aVertex = vertexWith(graph, "a", w[0]);
-    final PersistentVariantGraphVertex bVertex = vertexWith(graph, "b", w[1]);
-    final PersistentVariantGraphVertex endVertex = graph.getEnd();
+    final VariantGraphVertex startVertex = graph.getStart();
+    final VariantGraphVertex aVertex = vertexWith(graph, "a", w[0]);
+    final VariantGraphVertex bVertex = vertexWith(graph, "b", w[1]);
+    final VariantGraphVertex endVertex = graph.getEnd();
 
     assertHasWitnesses(edgeBetween(startVertex, aVertex), w[0], w[2]);
     assertHasWitnesses(edgeBetween(aVertex, endVertex), w[0]);

@@ -4,10 +4,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphTransposition;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphTransposition;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class GraphVizService implements InitializingBean {
     return configuredDotPath;
   }
 
-  public void toDot(PersistentVariantGraph graph, Writer writer, boolean transpositions) {
+  public void toDot(VariantGraph graph, Writer writer, boolean transpositions) {
     final Transaction tx = graph.newTransaction();
     try {
       final PrintWriter out = new PrintWriter(writer);
@@ -45,20 +45,20 @@ public class GraphVizService implements InitializingBean {
 
       out.println((transpositions ? "graph" : "digraph") + " G {");
 
-      for (PersistentVariantGraphVertex v : graph.traverseVertices(null)) {
+      for (VariantGraphVertex v : graph.vertices()) {
         out.print(indent + "v" + v.getNode().getId());
         out.print(" [label = \"" + toLabel(v) + "\"]");
         out.println(";");
       }
 
-      for (PersistentVariantGraphEdge e : graph.traverseEdges(null)) {
-        out.print(indent + "v" + e.getStart().getNode().getId() + connector + "v" + e.getEnd().getNode().getId());
+      for (VariantGraphEdge e : graph.edges()) {
+        out.print(indent + "v" + e.from().getNode().getId() + connector + "v" + e.to().getNode().getId());
         out.print(" [label = \"" + toLabel(e) + "\"]");
         out.println(";");
       }
 
       if (transpositions) {
-        for (PersistentVariantGraphTransposition t : graph.getTranspositions()) {
+        for (VariantGraphTransposition t : graph.transpositions()) {
           out.println(indent + "v" + t.getStart().getNode().getId() + connector + "v" + t.getEnd().getNode().getId() + ";");
         }
       }
@@ -72,19 +72,19 @@ public class GraphVizService implements InitializingBean {
     }
   }
 
-  private String toLabel(PersistentVariantGraphEdge e) {
-    return PersistentVariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
+  private String toLabel(VariantGraphEdge e) {
+    return VariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
   }
 
-  private String toLabel(PersistentVariantGraphVertex v) {
-    return PersistentVariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
+  private String toLabel(VariantGraphVertex v) {
+    return VariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
   }
 
   public boolean isSvgAvailable() {
     return (dotPath != null);
   }
 
-  public void toSvg(PersistentVariantGraph vg, OutputStream out, boolean transpositions) throws IOException {
+  public void toSvg(VariantGraph vg, OutputStream out, boolean transpositions) throws IOException {
     Preconditions.checkState(isSvgAvailable());
 
     final FileBackedOutputStream dotBuf = new FileBackedOutputStream(102400);

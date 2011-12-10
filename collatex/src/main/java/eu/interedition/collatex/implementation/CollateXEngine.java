@@ -24,7 +24,7 @@ package eu.interedition.collatex.implementation;
 
 import eu.interedition.collatex.implementation.alignment.TokenLinker;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
@@ -98,8 +98,8 @@ public class CollateXEngine {
    * We're not sure what we want to do with the name of this method: alignment vs. collation
    * Terminology check
    */
-  public PersistentVariantGraph graph(IWitness... witnesses) {
-    final PersistentVariantGraph graph = variantGraphFactory.create();
+  public VariantGraph graph(IWitness... witnesses) {
+    final VariantGraph graph = variantGraphFactory.create();
     new VariantGraphBuilder(graph).add(witnesses);
     return graph;
   }
@@ -115,12 +115,12 @@ public class CollateXEngine {
    * Terminology check
    */
   public AlignmentTable align(IWitness... witnesses) {
-    PersistentVariantGraph vg = graph(witnesses);
+    VariantGraph vg = graph(witnesses);
     AlignmentTable table = new AlignmentTable(vg);
     return table;
   }
 
-  public Apparatus createApparatus(PersistentVariantGraph graph) {
+  public Apparatus createApparatus(VariantGraph graph) {
     return graph.toApparatus();
   }
 }

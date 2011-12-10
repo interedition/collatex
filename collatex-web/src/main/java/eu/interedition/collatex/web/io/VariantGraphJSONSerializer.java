@@ -3,9 +3,9 @@ package eu.interedition.collatex.web.io;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.web.WebToken;
@@ -27,7 +27,7 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<PersistentVariantGraph> {
+public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<VariantGraph> {
 
   protected static final MediaType APPLICATION_VARIANTGRAPH_JSON = new MediaType("application", "collatex.graph+json");
 
@@ -41,7 +41,7 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Per
 
   @Override
   protected boolean supports(Class<?> clazz) {
-    return PersistentVariantGraph.class.isAssignableFrom(clazz);
+    return VariantGraph.class.isAssignableFrom(clazz);
   }
 
   @Override
@@ -50,12 +50,12 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Per
   }
 
   @Override
-  protected PersistentVariantGraph readInternal(Class<? extends PersistentVariantGraph> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+  protected VariantGraph readInternal(Class<? extends VariantGraph> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     throw new HttpMessageNotReadableException(clazz.toString());
   }
 
   @Override
-  protected void writeInternal(PersistentVariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+  protected void writeInternal(VariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     final OutputStream body = outputMessage.getBody();
     final JsonGenerator jgen = jsonFactory.createJsonGenerator(body);
     final Transaction tx = graph.newTransaction();
@@ -63,12 +63,12 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Per
       final MediaType contentType = outputMessage.getHeaders().getContentType();
       if (contentType != null && contentType.isCompatibleWith(APPLICATION_VARIANTGRAPH_JSON)) {
         jgen.writeStartArray();
-        for (PersistentVariantGraphVertex vertex : graph.traverseVertices(null)) {
+        for (VariantGraphVertex vertex : graph.vertices()) {
           final String vertexId = toId(vertex);
 
           jgen.writeStartObject();
           jgen.writeStringField("id", vertexId);
-          jgen.writeStringField("name", PersistentVariantGraphVertex.TO_CONTENTS.apply(vertex));
+          jgen.writeStringField("name", VariantGraphVertex.TO_CONTENTS.apply(vertex));
 
           jgen.writeObjectFieldStart("data");
           jgen.writeStringField("$color", color(vertex));
@@ -77,10 +77,10 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Per
           jgen.writeEndObject();
 
           jgen.writeArrayFieldStart("adjacencies");
-          for (PersistentVariantGraphEdge edge : vertex.getOutgoingPaths(null)) {
+          for (VariantGraphEdge edge : vertex.outgoing()) {
             jgen.writeStartObject();
             jgen.writeStringField("nodeFrom", vertexId);
-            jgen.writeStringField("nodeTo", toId(edge.getEnd()));
+            jgen.writeStringField("nodeTo", toId(edge.to()));
 
             jgen.writeObjectFieldStart("data");
             jgen.writeStringField("$color", "grey");
@@ -96,7 +96,7 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Per
 
         jgen.writeEndArray();
       } else {
-        final SortedSet<IWitness> witnesses = graph.getWitnesses();
+        final SortedSet<IWitness> witnesses = graph.witnesses();
         final RowSortedTable<Integer,IWitness,SortedSet<INormalizedToken>> table = graph.toTable();
 
         jgen.writeStartObject();
@@ -148,23 +148,23 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Per
     }
   }
 
-  private static String toId(PersistentVariantGraphVertex vertex) {
+  private static String toId(VariantGraphVertex vertex) {
     return Long.toString(vertex.getNode().getId());
   }
 
-  private static String type(PersistentVariantGraphVertex vertex) {
-    final PersistentVariantGraph graph = vertex.getGraph();
+  private static String type(VariantGraphVertex vertex) {
+    final VariantGraph graph = vertex.getGraph();
     if (graph.getStart().equals(vertex) || graph.getEnd().equals(vertex)) {
       return "star";
-    } else if (Iterables.size(vertex.getIncomingPaths(null)) == 1 && Iterables.size(vertex.getOutgoingPaths(null)) == 1) {
+    } else if (Iterables.size(vertex.incoming()) == 1 && Iterables.size(vertex.outgoing()) == 1) {
       return "circle";
     } else {
       return "triangle";
     }
   }
 
-  private static String color(PersistentVariantGraphVertex vertex) {
-    if (vertex.getWitnesses().size() == 0) {
+  private static String color(VariantGraphVertex vertex) {
+    if (vertex.witnesses().size() == 0) {
       return COLORS[0];
     }
     final int rank = vertex.getRank();

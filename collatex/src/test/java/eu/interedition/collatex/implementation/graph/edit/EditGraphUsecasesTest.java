@@ -2,7 +2,7 @@ package eu.interedition.collatex.implementation.graph.edit;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class EditGraphUsecasesTest extends AbstractTest {
     //  <witness>The black very special cat</witness>
     //  <witness>The black not very special cat</witness>
     //</example>
-    final PersistentVariantGraph graph = merge("The black cat");
+    final VariantGraph graph = merge("The black cat");
     EditGraphLinker linker = new EditGraphLinker();
     Map<INormalizedToken, INormalizedToken> link = linker.link(VariantGraphWitnessAdapter.create(graph), createWitnesses("The black and white cat")[0], new EqualityTokenComparator());
     assertEquals(3, link.size());

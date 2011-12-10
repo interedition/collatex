@@ -1,7 +1,7 @@
 package eu.interedition.collatex.web.io;
 
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.web.GraphVizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpInputMessage;
@@ -18,7 +18,7 @@ import java.io.OutputStreamWriter;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConverter<PersistentVariantGraph> {
+public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConverter<VariantGraph> {
   /**
    * The SVG MIME type.
    */
@@ -35,7 +35,7 @@ public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConv
 
   @Override
   protected boolean supports(Class<?> clazz) {
-    return PersistentVariantGraph.class.isAssignableFrom(clazz);
+    return VariantGraph.class.isAssignableFrom(clazz);
   }
 
   @Override
@@ -44,12 +44,12 @@ public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConv
   }
 
   @Override
-  protected PersistentVariantGraph readInternal(Class<? extends PersistentVariantGraph> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+  protected VariantGraph readInternal(Class<? extends VariantGraph> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     throw new HttpMessageNotReadableException(clazz.toString());
   }
 
   @Override
-  protected void writeInternal(PersistentVariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+  protected void writeInternal(VariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     final MediaType contentType = outputMessage.getHeaders().getContentType();
     if (contentType != null && contentType.isCompatibleWith(IMAGE_SVG_XML) && !graphVizService.isSvgAvailable()) {
       throw new HttpMessageNotWritableException("SVG generation via GraphViz' \"dot\" not available on this server");

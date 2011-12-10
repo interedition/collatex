@@ -16,18 +16,18 @@ import static org.junit.Assert.assertEquals;
 public class TranspositionTest extends AbstractTest {
   @Test
   public void noTransposition() {
-    assertEquals(0, merge("no transposition", "no transposition").getTranspositions().size());
-    assertEquals(0, merge("a b", "c a").getTranspositions().size());
+    assertEquals(0, merge("no transposition", "no transposition").transpositions().size());
+    assertEquals(0, merge("a b", "c a").transpositions().size());
   }
 
   @Test
   public void oneTransposition() {
-    assertEquals(1, merge("a b", "b a").getTranspositions().size());
+    assertEquals(1, merge("a b", "b a").transpositions().size());
   }
 
   @Test
   public void multipleTranspositions() {
-    assertEquals(2, merge("a b c", "b c a").getTranspositions().size());
+    assertEquals(2, merge("a b c", "b c a").transpositions().size());
   }
 
   @Test

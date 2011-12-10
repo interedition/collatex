@@ -2,10 +2,10 @@ package eu.interedition.collatex.web.io;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphTransposition;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphTransposition;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphMLHttpMessageConverter extends AbstractHttpMessageConverter<PersistentVariantGraph> {
+public class VariantGraphMLHttpMessageConverter extends AbstractHttpMessageConverter<VariantGraph> {
   /**
    * The GraphML MIME type.
    */
@@ -37,7 +37,7 @@ public class VariantGraphMLHttpMessageConverter extends AbstractHttpMessageConve
 
   @Override
   protected boolean supports(Class<?> clazz) {
-    return PersistentVariantGraph.class.isAssignableFrom(clazz);
+    return VariantGraph.class.isAssignableFrom(clazz);
   }
 
   @Override
@@ -46,12 +46,12 @@ public class VariantGraphMLHttpMessageConverter extends AbstractHttpMessageConve
   }
 
   @Override
-  protected PersistentVariantGraph readInternal(Class<? extends PersistentVariantGraph> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+  protected VariantGraph readInternal(Class<? extends VariantGraph> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     throw new HttpMessageNotReadableException(clazz.toString());
   }
 
   @Override
-  protected void writeInternal(PersistentVariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+  protected void writeInternal(VariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     final OutputStream body = outputMessage.getBody();
     XMLStreamWriter xml = null;
     try {
@@ -74,30 +74,30 @@ public class VariantGraphMLHttpMessageConverter extends AbstractHttpMessageConve
       xml.writeAttribute(PARSEEDGEIDS_ATT, PARSEEDGEIDS_DEFAULT_VALUE);
       xml.writeAttribute(PARSEORDER_ATT, PARSEORDER_DEFAULT_VALUE);
 
-      final Map<PersistentVariantGraphVertex, String> vertexToId = Maps.newHashMap();
+      final Map<VariantGraphVertex, String> vertexToId = Maps.newHashMap();
       int vertexNumber = 0;
-      for (PersistentVariantGraphVertex vertex : graph.traverseVertices(null)) {
+      for (VariantGraphVertex vertex : graph.vertices()) {
         final String vertexNodeID = "n" + vertexNumber;
         xml.writeStartElement(GRAPHML_NS, NODE_TAG);
         xml.writeAttribute(ID_ATT, vertexNodeID);
         Property.NODE_NUMBER.write(Integer.toString(vertexNumber++), xml);
-        Property.NODE_TOKEN.write(PersistentVariantGraphVertex.TO_CONTENTS.apply(vertex), xml);
+        Property.NODE_TOKEN.write(VariantGraphVertex.TO_CONTENTS.apply(vertex), xml);
         xml.writeEndElement();
         vertexToId.put(vertex, vertexNodeID);
       }
 
       int edgeNumber = 0;
-      for (PersistentVariantGraphEdge edge : graph.traverseEdges(null)) {
+      for (VariantGraphEdge edge : graph.edges()) {
         xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
         xml.writeAttribute(ID_ATT, "e" + edgeNumber);
-        xml.writeAttribute(SOURCE_ATT, vertexToId.get(edge.getStart()));
-        xml.writeAttribute(TARGET_ATT, vertexToId.get(edge.getEnd()));
+        xml.writeAttribute(SOURCE_ATT, vertexToId.get(edge.from()));
+        xml.writeAttribute(TARGET_ATT, vertexToId.get(edge.to()));
         Property.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
         Property.EDGE_TYPE.write(EDGE_TYPE_PATH, xml);
-        Property.EDGE_WITNESSES.write(PersistentVariantGraphEdge.TO_CONTENTS.apply(edge), xml);
+        Property.EDGE_WITNESSES.write(VariantGraphEdge.TO_CONTENTS.apply(edge), xml);
         xml.writeEndElement();
       }
-      for (PersistentVariantGraphTransposition transposition : graph.getTranspositions()) {
+      for (VariantGraphTransposition transposition : graph.transpositions()) {
         xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
         xml.writeAttribute(ID_ATT, "e" + edgeNumber);
         xml.writeAttribute(SOURCE_ATT, vertexToId.get(transposition.getStart()));

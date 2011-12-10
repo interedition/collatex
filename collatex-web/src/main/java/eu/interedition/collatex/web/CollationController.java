@@ -21,7 +21,7 @@
 package eu.interedition.collatex.web;
 
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
@@ -43,13 +43,13 @@ public class CollationController {
 
   @RequestMapping(method = RequestMethod.POST)
   @ResponseBody
-  public PersistentVariantGraph graph(@RequestBody Collation collation) throws Exception {
+  public VariantGraph graph(@RequestBody Collation collation) throws Exception {
     final SortedSet<IWitness> witnesses = collation.getWitnesses();
 
     final Transaction tx = variantGraphFactory.getDb().beginTx();
     try {
       // create
-      final PersistentVariantGraph graph = variantGraphFactory.create();
+      final VariantGraph graph = variantGraphFactory.create();
 
       // merge
       new VariantGraphBuilder(graph).add(witnesses.toArray(new IWitness[witnesses.size()]));

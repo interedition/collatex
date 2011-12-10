@@ -38,25 +38,25 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class PersistentVariantGraph {
+public class VariantGraph {
   private final GraphDatabaseService db;
-  private final PersistentVariantGraphVertex start;
-  private final PersistentVariantGraphVertex end;
+  private final VariantGraphVertex start;
+  private final VariantGraphVertex end;
   private final Resolver<IWitness> witnessResolver;
   private final Resolver<INormalizedToken> tokenResolver;
-  private Function<Node, PersistentVariantGraphVertex> vertexWrapper;
-  private Function<Relationship, PersistentVariantGraphEdge> edgeWrapper;
-  private Function<Relationship, PersistentVariantGraphTransposition> transpositionWrapper;
+  private Function<Node, VariantGraphVertex> vertexWrapper;
+  private Function<Relationship, VariantGraphEdge> edgeWrapper;
+  private Function<Relationship, VariantGraphTransposition> transpositionWrapper;
 
-  public PersistentVariantGraph(Node start, Node end, Resolver<IWitness> witnessResolver, Resolver<INormalizedToken> tokenResolver) {
+  public VariantGraph(Node start, Node end, Resolver<IWitness> witnessResolver, Resolver<INormalizedToken> tokenResolver) {
     this.db = start.getGraphDatabase();
-    this.start = new PersistentVariantGraphVertex(this, start);
-    this.end = new PersistentVariantGraphVertex(this, end);
+    this.start = new VariantGraphVertex(this, start);
+    this.end = new VariantGraphVertex(this, end);
     this.witnessResolver = witnessResolver;
     this.tokenResolver = tokenResolver;
-    this.vertexWrapper = PersistentVariantGraphVertex.createWrapper(this);
-    this.edgeWrapper = PersistentVariantGraphEdge.createWrapper(this);
-    this.transpositionWrapper = PersistentVariantGraphTransposition.createWrapper(this);
+    this.vertexWrapper = VariantGraphVertex.createWrapper(this);
+    this.edgeWrapper = VariantGraphEdge.createWrapper(this);
+    this.transpositionWrapper = VariantGraphTransposition.createWrapper(this);
 
   }
 
@@ -68,11 +68,11 @@ public class PersistentVariantGraph {
     return db;
   }
 
-  public PersistentVariantGraphVertex getStart() {
+  public VariantGraphVertex getStart() {
     return start;
   }
 
-  public PersistentVariantGraphVertex getEnd() {
+  public VariantGraphVertex getEnd() {
     return end;
   }
 
@@ -84,43 +84,47 @@ public class PersistentVariantGraph {
     return tokenResolver;
   }
 
-  public Function<Node, PersistentVariantGraphVertex> getVertexWrapper() {
+  public Function<Node, VariantGraphVertex> getVertexWrapper() {
     return vertexWrapper;
   }
 
-  public Function<Relationship, PersistentVariantGraphEdge> getEdgeWrapper() {
+  public Function<Relationship, VariantGraphEdge> getEdgeWrapper() {
     return edgeWrapper;
   }
 
-  public Function<Relationship, PersistentVariantGraphTransposition> getTranspositionWrapper() {
+  public Function<Relationship, VariantGraphTransposition> getTranspositionWrapper() {
     return transpositionWrapper;
   }
 
-  public Set<PersistentVariantGraphTransposition> getTranspositions() {
-    final Set<PersistentVariantGraphTransposition> transpositions = Sets.newHashSet();
-    for (PersistentVariantGraphVertex v : traverseVertices(null)) {
-      Iterables.addAll(transpositions, v.getTranspositions());
+  public Set<VariantGraphTransposition> transpositions() {
+    final Set<VariantGraphTransposition> transpositions = Sets.newHashSet();
+    for (VariantGraphVertex v : vertices()) {
+      Iterables.addAll(transpositions, v.transpositions());
     }
     return transpositions;
   }
 
-  public Iterable<PersistentVariantGraphVertex> traverseVertices(final SortedSet<IWitness> witnesses) {
-    return new Iterable<PersistentVariantGraphVertex>() {
+  public Iterable<VariantGraphVertex> vertices() {
+    return vertices(null);
+  }
+
+  public Iterable<VariantGraphVertex> vertices(final SortedSet<IWitness> witnesses) {
+    return new Iterable<VariantGraphVertex>() {
       @Override
-      public Iterator<PersistentVariantGraphVertex> iterator() {
-        return new AbstractIterator<PersistentVariantGraphVertex>() {
-          private Map<PersistentVariantGraphVertex, Integer> encountered = Maps.newHashMap();
-          private Queue<PersistentVariantGraphVertex> queue = new ArrayDeque<PersistentVariantGraphVertex>(singleton(getStart()));
+      public Iterator<VariantGraphVertex> iterator() {
+        return new AbstractIterator<VariantGraphVertex>() {
+          private Map<VariantGraphVertex, Integer> encountered = Maps.newHashMap();
+          private Queue<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>(singleton(getStart()));
 
           @Override
-          protected PersistentVariantGraphVertex computeNext() {
+          protected VariantGraphVertex computeNext() {
             if (queue.isEmpty()) {
               return endOfData();
             }
-            final PersistentVariantGraphVertex next = queue.remove();
-            for (PersistentVariantGraphEdge edge : next.getOutgoingPaths(witnesses)) {
-              final PersistentVariantGraphVertex end = edge.getEnd();
-              final int endIncoming = Iterables.size(end.getIncomingPaths(witnesses));
+            final VariantGraphVertex next = queue.remove();
+            for (VariantGraphEdge edge : next.outgoing(witnesses)) {
+              final VariantGraphVertex end = edge.to();
+              final int endIncoming = Iterables.size(end.incoming(witnesses));
               if (endIncoming == 1) {
                 queue.add(end);
               } else if (encountered.containsKey(end)) {
@@ -141,7 +145,11 @@ public class PersistentVariantGraph {
     };
   }
 
-  public Iterable<PersistentVariantGraphEdge> traverseEdges(final SortedSet<IWitness> witnesses) {
+  public Iterable<VariantGraphEdge> edges() {
+    return edges(null);
+  }
+
+  public Iterable<VariantGraphEdge> edges(final SortedSet<IWitness> witnesses) {
     return transform(Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
 
       @Override
@@ -149,7 +157,7 @@ public class PersistentVariantGraph {
         if (witnesses != null && !witnesses.isEmpty()) {
           final Relationship lastRel = path.lastRelationship();
           if (lastRel != null) {
-            if (!new PersistentVariantGraphEdge(PersistentVariantGraph.this, lastRel).canBeTraversed(witnesses)) {
+            if (!new VariantGraphEdge(VariantGraph.this, lastRel).traversableWith(witnesses)) {
               return Evaluation.EXCLUDE_AND_PRUNE;
             }
           }
@@ -160,92 +168,92 @@ public class PersistentVariantGraph {
     }).traverse(start.getNode()).relationships(), edgeWrapper);
   }
 
-  public PersistentVariantGraphVertex addVertex(INormalizedToken token) {
-    return new PersistentVariantGraphVertex(this, Sets.newTreeSet(singleton(token)));
+  public VariantGraphVertex add(INormalizedToken token) {
+    return new VariantGraphVertex(this, Sets.newTreeSet(singleton(token)));
   }
 
-  public PersistentVariantGraphEdge createPath(PersistentVariantGraphVertex from, PersistentVariantGraphVertex to, SortedSet<IWitness> witnesses) {
+  public VariantGraphEdge connect(VariantGraphVertex from, VariantGraphVertex to, SortedSet<IWitness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
 
     if (from.equals(start)) {
-      final PersistentVariantGraphEdge startEndEdge = edgeBetween(start, end);
+      final VariantGraphEdge startEndEdge = edgeBetween(start, end);
       if (startEndEdge != null) {
         startEndEdge.delete();
       }
     }
 
-    for (PersistentVariantGraphEdge e : from.getOutgoingPaths(null)) {
-      if (to.equals(e.getEnd())) {
+    for (VariantGraphEdge e : from.outgoing()) {
+      if (to.equals(e.to())) {
         return e.add(witnesses);
       }
     }
-    return new PersistentVariantGraphEdge(this, from, to, witnesses);
+    return new VariantGraphEdge(this, from, to, witnesses);
   }
 
-  public PersistentVariantGraphTransposition createTransposition(PersistentVariantGraphVertex from, PersistentVariantGraphVertex to) {
+  public VariantGraphTransposition transpose(VariantGraphVertex from, VariantGraphVertex to) {
     Preconditions.checkArgument(!from.equals(to));
-    Preconditions.checkArgument(!from.getTokens(null).isEmpty());
-    Preconditions.checkArgument(!to.getTokens(null).isEmpty());
+    Preconditions.checkArgument(!from.tokens(null).isEmpty());
+    Preconditions.checkArgument(!to.tokens(null).isEmpty());
 
-    for (PersistentVariantGraphTransposition t : from.getTranspositions()) {
+    for (VariantGraphTransposition t : from.transpositions()) {
       if (t.getOther(from).equals(to)) {
         return t;
       }
     }
     
-    return new PersistentVariantGraphTransposition(this, from, to);
+    return new VariantGraphTransposition(this, from, to);
   }
 
-  public boolean verticesAreAdjacent(PersistentVariantGraphVertex a, PersistentVariantGraphVertex b) {
+  public boolean verticesAreAdjacent(VariantGraphVertex a, VariantGraphVertex b) {
     return (edgeBetween(a, b) != null);
   }
 
-  public PersistentVariantGraphEdge edgeBetween(PersistentVariantGraphVertex a, PersistentVariantGraphVertex b) {
+  public VariantGraphEdge edgeBetween(VariantGraphVertex a, VariantGraphVertex b) {
     final Node aNode = a.getNode();
     final Node bNode = b.getNode();
     for (Relationship r : aNode.getRelationships(PATH)) {
       if (r.getOtherNode(aNode).equals(bNode)) {
-        return new PersistentVariantGraphEdge(this, r);
+        return new VariantGraphEdge(this, r);
       }
     }
     return null;
   }
 
-  public SortedSet<IWitness> getWitnesses() {
+  public SortedSet<IWitness> witnesses() {
     final SortedSet<IWitness> witnesses = Sets.newTreeSet();
-    for (PersistentVariantGraphEdge e : start.getOutgoingPaths(null)) {
+    for (VariantGraphEdge e : start.outgoing()) {
       witnesses.addAll(e.getWitnesses());
     }
     return witnesses;
   }
 
-  public PersistentVariantGraph join() {
-    final Queue<PersistentVariantGraphVertex> queue = new ArrayDeque<PersistentVariantGraphVertex>();
-    for (PersistentVariantGraphEdge startingEdges : start.getOutgoingPaths(null)) {
-      queue.add(startingEdges.getEnd());
+  public VariantGraph join() {
+    final Queue<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>();
+    for (VariantGraphEdge startingEdges : start.outgoing()) {
+      queue.add(startingEdges.to());
     }
 
     while (!queue.isEmpty()) {
-      final PersistentVariantGraphVertex vertex = queue.remove();
-      final List<PersistentVariantGraphEdge> outgoing = Lists.newArrayList(vertex.getOutgoingPaths(null));
+      final VariantGraphVertex vertex = queue.remove();
+      final List<VariantGraphEdge> outgoing = Lists.newArrayList(vertex.outgoing());
       if (outgoing.size() == 1) {
-        final PersistentVariantGraphEdge joinCandidateSingleIncoming = outgoing.get(0);
-        final PersistentVariantGraphVertex joinCandidate = joinCandidateSingleIncoming.getEnd();
-        if (Iterables.size(joinCandidate.getIncomingPaths(null)) == 1) {
+        final VariantGraphEdge joinCandidateSingleIncoming = outgoing.get(0);
+        final VariantGraphVertex joinCandidate = joinCandidateSingleIncoming.to();
+        if (Iterables.size(joinCandidate.incoming()) == 1) {
           final SortedSet<IWitness> incomingWitnesses = joinCandidateSingleIncoming.getWitnesses();
           final SortedSet<IWitness> outgoingWitnesses = Sets.newTreeSet();
-          final List<PersistentVariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.getOutgoingPaths(null));
-          for (PersistentVariantGraphEdge e : joinCandidateOutgoing) {
+          final List<VariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.outgoing());
+          for (VariantGraphEdge e : joinCandidateOutgoing) {
             outgoingWitnesses.addAll(e.getWitnesses());
           }
           if (incomingWitnesses.equals(outgoingWitnesses)) {
-            vertex.add(joinCandidate.getTokens(null));
-            for (PersistentVariantGraphTransposition t : joinCandidate.getTranspositions()) {
-              createTransposition(vertex, t.getOther(joinCandidate));
+            vertex.add(joinCandidate.tokens(null));
+            for (VariantGraphTransposition t : joinCandidate.transpositions()) {
+              transpose(vertex, t.getOther(joinCandidate));
               t.delete();
             }
-            for (PersistentVariantGraphEdge e : joinCandidateOutgoing) {
-              createPath(vertex, e.getEnd(), e.getWitnesses());
+            for (VariantGraphEdge e : joinCandidateOutgoing) {
+              connect(vertex, e.to(), e.getWitnesses());
               e.delete();
             }
             joinCandidateSingleIncoming.delete();
@@ -256,19 +264,19 @@ public class PersistentVariantGraph {
           }
         }
       }
-      for (PersistentVariantGraphEdge e : outgoing) {
-        queue.offer(e.getEnd());
+      for (VariantGraphEdge e : outgoing) {
+        queue.offer(e.to());
       }
     }
 
     return this;
   }
 
-  public PersistentVariantGraph rank() {
-    for (PersistentVariantGraphVertex v : traverseVertices(null)) {
+  public VariantGraph rank() {
+    for (VariantGraphVertex v : vertices()) {
       int rank = -1;
-      for (PersistentVariantGraphEdge e : v.getIncomingPaths(null)) {
-        rank = Math.max(rank, e.getStart().getRank());
+      for (VariantGraphEdge e : v.incoming()) {
+        rank = Math.max(rank, e.from().getRank());
       }
       v.setRank(rank + 1);
     }
@@ -284,14 +292,14 @@ public class PersistentVariantGraph {
     rank();
 
     List<Apparatus.Entry> entries = Lists.newArrayList();
-    for (PersistentVariantGraphVertex v : traverseVertices(null)) {
+    for (VariantGraphVertex v : vertices()) {
       if (v.equals(getStart()) || v.equals(getEnd())) {
         continue;
       }
       Apparatus.Entry entry;
       int rank = v.getRank();
       if (rank > entries.size()) {
-        entry = new Apparatus.Entry(getWitnesses());
+        entry = new Apparatus.Entry(witnesses());
         entries.add(entry);
       } else {
         entry = entries.get(rank - 1);
@@ -299,13 +307,13 @@ public class PersistentVariantGraph {
       entry.add(v);
     }
 
-    return new Apparatus(getWitnesses(), entries);
+    return new Apparatus(witnesses(), entries);
   }
 
   public RowSortedTable<Integer, IWitness, SortedSet<INormalizedToken>> toTable() {
     final TreeBasedTable<Integer, IWitness, SortedSet<INormalizedToken>> table = TreeBasedTable.create();
-    for (PersistentVariantGraphVertex v : rank().traverseVertices(null)) {
-      for (INormalizedToken token : v.getTokens(null)) {
+    for (VariantGraphVertex v : rank().vertices()) {
+      for (INormalizedToken token : v.tokens(null)) {
         final int row = v.getRank();
         final IWitness column = token.getWitness();
 
@@ -319,10 +327,6 @@ public class PersistentVariantGraph {
     return table;
   }
 
-  public Iterable<PersistentVariantGraphVertex> findLongestPath() {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public int hashCode() {
     return start.hashCode();
@@ -330,14 +334,14 @@ public class PersistentVariantGraph {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof PersistentVariantGraph) {
-      return start.equals(((PersistentVariantGraph) obj).start);
+    if (obj != null && obj instanceof VariantGraph) {
+      return start.equals(((VariantGraph) obj).start);
     }
     return super.equals(obj);
   }
 
   @Override
   public String toString() {
-    return Iterables.toString(getWitnesses());
+    return Iterables.toString(witnesses());
   }
 }

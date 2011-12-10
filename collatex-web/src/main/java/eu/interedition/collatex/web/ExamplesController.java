@@ -22,7 +22,7 @@ package eu.interedition.collatex.web;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.implementation.CollateXEngine;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.output.AlignmentTable;
@@ -71,7 +71,7 @@ public class ExamplesController implements InitializingBean {
     List<Apparatus> alignments = Lists.newArrayListWithCapacity(darwin.size());
     
    for (IWitness[] paragraph : darwin) {
-      PersistentVariantGraph graph = engine.graph(paragraph);
+      VariantGraph graph = engine.graph(paragraph);
       alignments.add(engine.createApparatus(graph));
    }
     return new ModelMap("paragraphs", alignments);

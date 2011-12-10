@@ -1,39 +1,18 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import edu.uci.ics.jung.algorithms.layout.DAGLayout;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraph;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
 import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
-import eu.interedition.collatex.implementation.input.NormalizedToken;
-import eu.interedition.collatex.implementation.input.Witness;
-import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import java.awt.BorderLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -109,7 +88,7 @@ public class CollateXLaboratory extends JFrame {
 
       final Transaction transaction = variantGraphFactory.getDb().beginTx();
       try {
-        final PersistentVariantGraph pvg = variantGraphFactory.create();
+        final eu.interedition.collatex.implementation.graph.db.VariantGraph pvg = variantGraphFactory.create();
         new VariantGraphBuilder(pvg).add(witnesses.toArray(new IWitness[witnesses.size()]));
 
         variantGraph.update(pvg.join().rank());

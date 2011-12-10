@@ -22,7 +22,7 @@ package eu.interedition.collatex.implementation.output;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.implementation.graph.db.PersistentVariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.ColumnState;
 import eu.interedition.collatex.interfaces.INormalizedToken;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -40,9 +40,9 @@ import java.util.SortedSet;
  * TODO: consider whether this should be an inner interface since an IRow must exist within the context of an IAlignmentTable so the rows and columns will probably end up in the alignment table.
  */
 public class Column {
-  private final List<PersistentVariantGraphVertex> vertices = Lists.newArrayList();
+  private final List<VariantGraphVertex> vertices = Lists.newArrayList();
 
-  public Column(PersistentVariantGraphVertex vertex) {
+  public Column(VariantGraphVertex vertex) {
     addVertex(vertex);
   }
 
@@ -55,8 +55,8 @@ public class Column {
 
   public INormalizedToken getToken(IWitness witness) {
     final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
-    for (PersistentVariantGraphVertex vertex : vertices) {
-      for (INormalizedToken token : vertex.getTokens(witnessSet)) {
+    for (VariantGraphVertex vertex : vertices) {
+      for (INormalizedToken token : vertex.tokens(witnessSet)) {
         // FIXME: just picks the first of possibly several tokens per vertex
         return token;
       }
@@ -67,27 +67,27 @@ public class Column {
   //TODO: add/re-enable test (see parallel segmentation tests)
   public List<IWitness> getWitnesses() {
     List<IWitness> totalWitnesses = Lists.newArrayList();
-    for (PersistentVariantGraphVertex vertex : vertices) {
-      Set<IWitness> witnesses = vertex.getWitnesses();
+    for (VariantGraphVertex vertex : vertices) {
+      Set<IWitness> witnesses = vertex.witnesses();
       totalWitnesses.addAll(witnesses);
     }
     return totalWitnesses;
   }
 
-  protected void addVertex(PersistentVariantGraphVertex vertex) {
+  protected void addVertex(VariantGraphVertex vertex) {
     vertices.add(vertex);
   }
 
   public boolean containsWitness(IWitness witness) {
-    PersistentVariantGraphVertex findVertexForWitness = findVertexForWitness(witness);
+    VariantGraphVertex findVertexForWitness = findVertexForWitness(witness);
     return findVertexForWitness != null;
   }
 
 
-  protected PersistentVariantGraphVertex findVertexForWitness(IWitness witness) {
+  protected VariantGraphVertex findVertexForWitness(IWitness witness) {
     // FIXME: should maybe be a map?
-    for (PersistentVariantGraphVertex vertex : vertices) {
-      if (vertex.getWitnesses().contains(witness)) {
+    for (VariantGraphVertex vertex : vertices) {
+      if (vertex.witnesses().contains(witness)) {
         return vertex;
       }
     }
