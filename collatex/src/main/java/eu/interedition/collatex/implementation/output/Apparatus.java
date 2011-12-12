@@ -62,54 +62,6 @@ public class Apparatus {
     return witnesses;
   }
 
-  public void serialize(Node parent) {
-    Document doc = (parent.getNodeType() == Node.DOCUMENT_NODE ? (Document) parent : parent.getOwnerDocument());
-    // FIXME: this should be dealt with on the tokenizer level!
-    final String separator = " ";
-    for (final Apparatus.Entry entry : entries) {
-      // group together similar phrases
-      final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
-      for (IWitness witness : entry.getWitnesses()) {
-        content2WitMap.put(SimpleToken.toString(entry.getReadingOf(witness)), witness.getSigil());
-      }
-
-      if ((content2WitMap.keySet().size() == 1) && !entry.hasEmptyCells()) {
-        // common content, there is no apparatus tag needed, just output the
-        // segment
-        parent.appendChild(doc.createTextNode(content2WitMap.keys().iterator().next()));
-      } else {
-        // convert the multimap to a normal map indexed by segment content and
-        // containing a sorted set of witness identifiers
-        Map<String, SortedSet<String>> readings = Maps.newHashMap();
-        for (final String content : content2WitMap.keySet()) {
-          readings.put(content, Sets.newTreeSet(content2WitMap.get(content)));
-        }
-
-        SortedMap<String, String> readingMap = Maps.newTreeMap();
-        for (Map.Entry<String, SortedSet<String>> reading : readings.entrySet()) {
-          readingMap.put(Joiner.on(" ").join(Iterables.transform(reading.getValue(), WIT_TO_XML_ID)), reading.getKey());
-        }
-
-        Element app = doc.createElementNS(TEI_NS, "app");
-        parent.appendChild(app);
-        for (Map.Entry<String, String> reading : readingMap.entrySet()) {
-          Element rdg = doc.createElementNS(TEI_NS, "rdg");
-          app.appendChild(rdg);
-          rdg.setAttribute("wit", reading.getKey());
-          String content = reading.getValue();
-          if (!content.isEmpty()) {
-            rdg.setTextContent(content);
-          }
-        }
-      }
-      parent.appendChild(doc.createTextNode(separator));
-    }
-    // FIXME: whitespace handling in the tokenizer!
-    if (!entries.isEmpty()) {
-      parent.removeChild(parent.getLastChild());
-    }
-  }
-
   public static class Entry {
 
     private final Set<VariantGraphVertex> contents = Sets.newLinkedHashSet();

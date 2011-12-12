@@ -92,6 +92,7 @@ public class CollateXLaboratory extends JFrame {
         new VariantGraphBuilder(pvg).add(witnesses.toArray(new IWitness[witnesses.size()]));
 
         variantGraph.update(pvg.join().rank());
+        //variantGraph.update(pvg.rank());
 
         transaction.success();
       } finally {
@@ -100,7 +101,7 @@ public class CollateXLaboratory extends JFrame {
 
       LOG.debug("Collated {}", Iterables.toString(witnesses));
 
-      variantGraphPanel.setGraphLayout(new FRLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph));
+      variantGraphPanel.setGraphLayout(new SugiyamaLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph));
     }
   }
 }

@@ -1,13 +1,17 @@
 package eu.interedition.collatex.web.io;
 
 import com.google.common.base.Function;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
@@ -25,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
 /**
@@ -69,7 +74,6 @@ public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConv
     XMLStreamWriter xml = null;
     try {
       final SortedSet<IWitness> allWitnesses = graph.witnesses();
-      final RowSortedTable<Integer,IWitness,SortedSet<Token>> table = graph.toTable();
 
       xml = xmlOutputFactory.createXMLStreamWriter(body);
       xml.writeStartDocument();
@@ -77,17 +81,24 @@ public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConv
       xml.writeNamespace("cx", COLLATEX_NS);
       xml.writeNamespace("", TEI_NS);
       
-      for (Iterator<Integer> rowIt = table.rowKeySet().iterator(); rowIt.hasNext(); ) {
-        final Map<IWitness, String> cellContents = Maps.transformValues(table.row(rowIt.next()), new Function<SortedSet<Token>, String>() {
-          @Override
-          public String apply(SortedSet<Token> input) {
-            final StringBuilder cellContent = new StringBuilder();
-            for (Token token : input) {
-              cellContent.append(token.getContent()).append(" ");
-            }
-            return cellContent.toString().trim();
+      for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext(); ) {
+        final Set<VariantGraphVertex> row = rowIt.next();
+
+        final SortedSetMultimap<IWitness, Token> tokenIndex = TreeMultimap.create();
+        for (VariantGraphVertex v : row) {
+          for (Token token : v.tokens()) {
+            tokenIndex.put(token.getWitness(), token);
           }
-        });
+        }
+
+        final Map<IWitness, String> cellContents = Maps.newHashMap();
+        for (IWitness witness : tokenIndex.keySet()) {
+          final StringBuilder cellContent = new StringBuilder();
+          for (Token token : tokenIndex.get(witness)) {
+            cellContent.append(token.getContent()).append(" ");
+          }
+          cellContents.put(witness, cellContent.toString().trim());
+        }
 
         final SortedSetMultimap<String, IWitness> segments = TreeMultimap.create();
         for (Map.Entry<IWitness, String> cell : cellContents.entrySet()) {

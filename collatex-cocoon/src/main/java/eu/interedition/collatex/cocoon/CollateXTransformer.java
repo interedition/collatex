@@ -3,12 +3,19 @@ package eu.interedition.collatex.cocoon;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
-import com.google.common.collect.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.RowSortedTable;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.CollateXEngine;
+import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
-import eu.interedition.collatex.implementation.output.*;
-import eu.interedition.collatex.interfaces.*;
+import eu.interedition.collatex.implementation.output.Apparatus;
+import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.Token;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.transformation.AbstractSAXTransformer;
 import org.apache.cocoon.xml.AttributesImpl;
@@ -16,7 +23,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -87,17 +97,18 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   private void sendAlignmentTable() throws SAXException {
     sendStartElementEventNS("alignment", EMPTY_ATTRIBUTES);
     if (!witnesses.isEmpty()) {
-      final AlignmentTable alignmentTable = engine.align(witnesses.toArray(new IWitness[witnesses.size()]));
-      for (Row row : alignmentTable.getRows()) {
-        final AttributesImpl rowAttrs = new AttributesImpl();
-        rowAttrs.addAttribute(namespaceURI, "sigil", "sigil", "CDATA", row.getSigil());
-        sendStartElementEventNS("row", rowAttrs);
-        for (Cell cell : row) {
+      final VariantGraph graph = engine.graph(witnesses.toArray(new IWitness[witnesses.size()]));
+      final SortedSet<IWitness> witnesses = graph.witnesses();
+      final RowSortedTable<Integer, IWitness, SortedSet<Token>> table = graph.toTable();
+      for (Integer rowIndex : table.rowKeySet()) {
+        final Map<IWitness, SortedSet<Token>> row = table.row(rowIndex);
+        sendStartElementEventNS("row", EMPTY_ATTRIBUTES);
+        for (IWitness witness : witnesses) {
           final AttributesImpl cellAttrs = new AttributesImpl();
-          cellAttrs.addCDATAAttribute(namespaceURI, "state", cell.getColumn().getState().toString().toLowerCase());
+          cellAttrs.addCDATAAttribute(namespaceURI, "sigil", "sigil", witness.getSigil());
           sendStartElementEventNS("cell", cellAttrs);
-          if (!cell.isEmpty()) {
-            sendTextEvent(cell.getToken().getContent());
+          if (!row.containsKey(witness)) {
+            sendTextEvent(SimpleToken.toString(row.get(witness)));
           }
           sendEndElementEventNS("cell");
 

@@ -21,13 +21,13 @@
 package eu.interedition.collatex.web;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.implementation.CollateXEngine;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
-import eu.interedition.collatex.implementation.output.AlignmentTable;
 import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.Token;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -44,6 +44,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedSet;
 
 @Controller
 @RequestMapping("/examples/**")
@@ -59,9 +60,9 @@ public class ExamplesController implements InitializingBean {
   
   @RequestMapping("usecases")
   public ModelAndView collateUseCases() {
-    List<AlignmentTable> alignments = Lists.newArrayListWithCapacity(usecases.size());
+    List<RowSortedTable<Integer, IWitness, SortedSet<Token>>> alignments = Lists.newArrayListWithCapacity(usecases.size());
     for (IWitness[] example : usecases) {
-      alignments.add(engine.align(example));
+      alignments.add(engine.graph(example).toTable());
     }
     return new ModelAndView("examples/usecases", "examples", alignments);
   }
@@ -71,17 +72,16 @@ public class ExamplesController implements InitializingBean {
     List<Apparatus> alignments = Lists.newArrayListWithCapacity(darwin.size());
     
    for (IWitness[] paragraph : darwin) {
-      VariantGraph graph = engine.graph(paragraph);
-      alignments.add(engine.createApparatus(graph));
+     alignments.add(engine.graph(paragraph).toApparatus());
    }
     return new ModelMap("paragraphs", alignments);
   }
 
   @RequestMapping("beckett")
   public ModelAndView collateBeckettExamples() {
- 	List<AlignmentTable> alignments = Lists.newArrayListWithCapacity(beckett.size());
+ 	List<RowSortedTable<Integer, IWitness, SortedSet<Token>>> alignments = Lists.newArrayListWithCapacity(beckett.size());
     for (IWitness[] example : beckett) {
-      alignments.add(engine.align(example));
+      alignments.add(engine.graph(example).toTable());
     }
     return new ModelAndView("examples/usecases", "examples", alignments);
   }

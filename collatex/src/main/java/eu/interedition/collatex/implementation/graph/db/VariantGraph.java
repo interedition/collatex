@@ -23,11 +23,13 @@ import org.neo4j.kernel.Traversal;
 import org.neo4j.kernel.Uniqueness;
 
 import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.transform;
@@ -282,6 +284,51 @@ public class VariantGraph {
     }
 
     return this;
+  }
+
+  public Iterable<Set<VariantGraphVertex>> ranks() {
+    return ranks(null);
+  }
+
+  public Iterable<Set<VariantGraphVertex>> ranks(final SortedSet<IWitness> witnesses) {
+    return new Iterable<Set<VariantGraphVertex>>() {
+      @Override
+      public Iterator<Set<VariantGraphVertex>> iterator() {
+        return new AbstractIterator<Set<VariantGraphVertex>>() {
+          private Iterator<VariantGraphVertex> vertices = vertices(witnesses).iterator();
+          private VariantGraphVertex last;
+          
+          @Override
+          protected Set<VariantGraphVertex> computeNext() {
+            if (last == null) {
+              Preconditions.checkState(vertices.hasNext());
+              vertices.next(); // skip start vertex
+              Preconditions.checkState(vertices.hasNext());
+              last = vertices.next();
+            }
+
+            if (last.equals(end)) {
+              return endOfData();
+            }
+
+            final Set<VariantGraphVertex> next = Sets.newHashSet();
+            next.add(last);
+
+            while (vertices.hasNext()) {
+              final VariantGraphVertex vertex = vertices.next();
+              if (vertex.getRank() == last.getRank()) {
+                next.add(last = vertex);
+              } else {
+                last = vertex;
+                break;
+              }
+            }
+
+            return next;
+          }
+        };
+      }
+    };
   }
 
   /**
