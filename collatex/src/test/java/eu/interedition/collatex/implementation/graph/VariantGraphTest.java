@@ -24,10 +24,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphTransposition;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.*;
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.graph.db;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -23,75 +23,37 @@ import org.neo4j.kernel.Traversal;
 import org.neo4j.kernel.Uniqueness;
 
 import java.util.ArrayDeque;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.transform;
-import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.PATH;
+import static eu.interedition.collatex.implementation.graph.GraphRelationshipType.PATH;
+import static eu.interedition.collatex.implementation.graph.GraphRelationshipType.START_END;
 import static java.util.Collections.singleton;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraph {
-  private final GraphDatabaseService db;
-  private final VariantGraphVertex start;
-  private final VariantGraphVertex end;
-  private final Resolver<IWitness> witnessResolver;
-  private final Resolver<Token> tokenResolver;
-  private Function<Node, VariantGraphVertex> vertexWrapper;
-  private Function<Relationship, VariantGraphEdge> edgeWrapper;
+public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   private Function<Relationship, VariantGraphTransposition> transpositionWrapper;
 
-  public VariantGraph(Node start, Node end, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
-    this.db = start.getGraphDatabase();
-    this.start = new VariantGraphVertex(this, start);
-    this.end = new VariantGraphVertex(this, end);
-    this.witnessResolver = witnessResolver;
-    this.tokenResolver = tokenResolver;
-    this.vertexWrapper = VariantGraphVertex.createWrapper(this);
-    this.edgeWrapper = VariantGraphEdge.createWrapper(this);
+  public VariantGraph(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
+    super(database, witnessResolver, tokenResolver);
+  }
+
+  @Override
+  public void init(Function<Node, VariantGraphVertex> vertexWrapper, Function<Relationship, VariantGraphEdge> edgeWrapper, Node start, Node end) {
+    super.init(vertexWrapper, edgeWrapper, start, end);
     this.transpositionWrapper = VariantGraphTransposition.createWrapper(this);
 
-  }
-
-  public Transaction newTransaction() {
-    return db.beginTx();
-  }
-
-  public GraphDatabaseService getDb() {
-    return db;
-  }
-
-  public VariantGraphVertex getStart() {
-    return start;
-  }
-
-  public VariantGraphVertex getEnd() {
-    return end;
-  }
-
-  public Resolver<IWitness> getWitnessResolver() {
-    return witnessResolver;
-  }
-
-  public Resolver<Token> getTokenResolver() {
-    return tokenResolver;
-  }
-
-  public Function<Node, VariantGraphVertex> getVertexWrapper() {
-    return vertexWrapper;
-  }
-
-  public Function<Relationship, VariantGraphEdge> getEdgeWrapper() {
-    return edgeWrapper;
+    this.start.setTokens(Sets.<Token>newTreeSet());
+    this.end.setTokens(Sets.<Token>newTreeSet());
+    connect(this.start, this.end, Sets.<IWitness>newTreeSet());
   }
 
   public Function<Relationship, VariantGraphTransposition> getTranspositionWrapper() {
@@ -360,8 +322,8 @@ public class VariantGraph {
   public RowSortedTable<Integer, IWitness, SortedSet<Token>> toTable() {
     final TreeBasedTable<Integer, IWitness, SortedSet<Token>> table = TreeBasedTable.create();
     for (VariantGraphVertex v : rank().vertices()) {
+      final int row = v.getRank();
       for (Token token : v.tokens()) {
-        final int row = v.getRank();
         final IWitness column = token.getWitness();
 
         SortedSet<Token> cell = table.get(row, column);
@@ -372,19 +334,6 @@ public class VariantGraph {
       }
     }
     return table;
-  }
-
-  @Override
-  public int hashCode() {
-    return start.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VariantGraph) {
-      return start.equals(((VariantGraph) obj).start);
-    }
-    return super.equals(obj);
   }
 
   @Override

@@ -1,9 +1,8 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
+import eu.interedition.collatex.implementation.graph.GraphFactory;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
@@ -20,16 +19,16 @@ import java.util.List;
 public class CollateXLaboratory extends JFrame {
   private static final Logger LOG = LoggerFactory.getLogger(CollateXLaboratory.class);
 
-  private final VariantGraphFactory variantGraphFactory;
+  private final GraphFactory graphFactory;
   private final WitnessPanel witnessPanel = new WitnessPanel();
   private final VariantGraph variantGraph = new VariantGraph();
   private final VariantGraphPanel variantGraphPanel;
 
-  public CollateXLaboratory(VariantGraphFactory variantGraphFactory) {
+  public CollateXLaboratory(GraphFactory graphFactory) {
     super("CollateX Laboratory");
-    this.variantGraphFactory = variantGraphFactory;
+    this.graphFactory = graphFactory;
 
-    final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     splitPane.setContinuousLayout(true);
     splitPane.setLeftComponent(witnessPanel);
     splitPane.setRightComponent(variantGraphPanel = new VariantGraphPanel(variantGraph));
@@ -47,7 +46,7 @@ public class CollateXLaboratory extends JFrame {
   }
 
   public static void main(String[] args) throws Exception {
-    new CollateXLaboratory(new VariantGraphFactory()).setVisible(true);
+    new CollateXLaboratory(new GraphFactory()).setVisible(true);
   }
 
   private class AddWitnessAction extends AbstractAction {
@@ -86,13 +85,12 @@ public class CollateXLaboratory extends JFrame {
 
       LOG.debug("Collating {}", Iterables.toString(witnesses));
 
-      final Transaction transaction = variantGraphFactory.getDb().beginTx();
+      final Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
-        final eu.interedition.collatex.implementation.graph.db.VariantGraph pvg = variantGraphFactory.create();
+        final eu.interedition.collatex.implementation.graph.VariantGraph pvg = graphFactory.newVariantGraph();
         new VariantGraphBuilder(pvg).add(witnesses.toArray(new IWitness[witnesses.size()]));
 
         variantGraph.update(pvg.join().rank());
-        //variantGraph.update(pvg.rank());
 
         transaction.success();
       } finally {
@@ -101,7 +99,7 @@ public class CollateXLaboratory extends JFrame {
 
       LOG.debug("Collated {}", Iterables.toString(witnesses));
 
-      variantGraphPanel.setGraphLayout(new SugiyamaLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph));
+      variantGraphPanel.getModel().setGraphLayout(new SugiyamaLayout<VariantGraphVertex, VariantGraphEdge>(variantGraph));
     }
   }
 }

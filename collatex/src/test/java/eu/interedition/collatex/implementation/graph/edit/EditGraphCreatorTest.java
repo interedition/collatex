@@ -4,6 +4,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import eu.interedition.collatex.implementation.graph.EditGraph;
+import eu.interedition.collatex.implementation.graph.EditGraphCreator;
+import eu.interedition.collatex.implementation.graph.EditGraphEdge;
+import eu.interedition.collatex.implementation.graph.EditGraphVertex;
+import eu.interedition.collatex.implementation.graph.EditOperation;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import org.junit.Test;

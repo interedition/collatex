@@ -1,11 +1,9 @@
-package eu.interedition.collatex.implementation.graph.db;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 /**

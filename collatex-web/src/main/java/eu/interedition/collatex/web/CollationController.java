@@ -21,8 +21,8 @@
 package eu.interedition.collatex.web;
 
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
+import eu.interedition.collatex.implementation.graph.GraphFactory;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,17 +39,17 @@ import java.util.SortedSet;
 public class CollationController {
 
   @Autowired
-  private VariantGraphFactory variantGraphFactory;
+  private GraphFactory graphFactory;
 
   @RequestMapping(method = RequestMethod.POST)
   @ResponseBody
   public VariantGraph graph(@RequestBody Collation collation) throws Exception {
     final SortedSet<IWitness> witnesses = collation.getWitnesses();
 
-    final Transaction tx = variantGraphFactory.getDb().beginTx();
+    final Transaction tx = graphFactory.getDatabase().beginTx();
     try {
       // create
-      final VariantGraph graph = variantGraphFactory.create();
+      final VariantGraph graph = graphFactory.newVariantGraph();
 
       // merge
       new VariantGraphBuilder(graph).add(witnesses.toArray(new IWitness[witnesses.size()]));

@@ -2,7 +2,8 @@ package eu.interedition.collatex.implementation.graph.edit;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
+import eu.interedition.collatex.implementation.graph.EditGraphLinker;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.interfaces.Token;
 import org.junit.Test;

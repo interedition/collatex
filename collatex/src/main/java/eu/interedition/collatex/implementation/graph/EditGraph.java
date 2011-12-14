@@ -1,13 +1,12 @@
-package eu.interedition.collatex.implementation.graph.edit;
+package eu.interedition.collatex.implementation.graph;
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 
-// This class is the container class for the Edit Graph
-// This is a mutable class that is constructed by an external
-// class, since the construction process is an elaborate one.
-// This class is implemented in a defensive style
-// We use a weighted DAG to make alignment decisions
-
+/**
+ * This class is the container class for the Edit Graph.
+ * <p/>
+ * This is a mutable class that is constructed by an external class, since the construction process is an elaborate one. This class is implemented in a defensive style. We use a weighted DAG to make alignment decisions.
+ */
 @SuppressWarnings("serial")
 public class EditGraph extends DirectedAcyclicGraph<EditGraphVertex, EditGraphEdge> {
   private EditGraphVertex start;
@@ -30,14 +29,14 @@ public class EditGraph extends DirectedAcyclicGraph<EditGraphVertex, EditGraphEd
   }
 
   public EditGraphVertex getStartVertex() {
-    if (start==null) {
+    if (start == null) {
       throw new RuntimeException("Start vertex of Edit Graph is not set!");
     }
     return start;
   }
 
   public EditGraphVertex getEndVertex() {
-    if (end==null) {
+    if (end == null) {
       throw new RuntimeException("End vertex of Edit Graph is not set!");
     }
     return end;
@@ -55,7 +54,7 @@ public class EditGraph extends DirectedAcyclicGraph<EditGraphVertex, EditGraphEd
     }
     return this.getEdge(source, target);
   }
-  
+
   public void setStartVertex(EditGraphVertex startVertex) {
     this.start = startVertex;
     addVertex(startVertex);

@@ -36,8 +36,8 @@ public class WitnessPanel extends JPanel {
 
   public WitnessPanel() {
     super();
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    setMinimumSize(new Dimension(300, 100));
+    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+    setMinimumSize(new Dimension(400, 200));
     createWitness();
     createWitness();
   }
@@ -95,7 +95,8 @@ public class WitnessPanel extends JPanel {
       setLineWrap(true);
       setWrapStyleWord(true);
       setOpaque(false);
-      setMinimumSize(new Dimension(300, 100));
+      setMinimumSize(new Dimension(100, 100));
+      setPreferredSize(new Dimension(200, 100));
       setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
       addKeyListener(new KeyAdapter() {
 

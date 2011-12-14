@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.graph.db;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -13,37 +13,23 @@ import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
-import static eu.interedition.collatex.implementation.graph.db.VariantGraphEdge.createTraversableFilter;
-import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.PATH;
-import static eu.interedition.collatex.implementation.graph.db.VariantGraphRelationshipType.TRANSPOSITION;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphVertex {
-  private final VariantGraph graph;
-  private final Node node;
+public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   private static final String TOKEN_REFERENCE_KEY = "tokenReferences";
   private static final String RANK_KEY = "rank";
 
   public VariantGraphVertex(VariantGraph graph, Node node) {
-    this.graph = graph;
-    this.node = node;
+    super(graph, node);
   }
 
   public VariantGraphVertex(VariantGraph graph, SortedSet<Token> tokens) {
-    this(graph, graph.getDb().createNode());
+    this(graph, graph.getDatabase().createNode());
     setTokens(tokens);
-  }
-
-  public VariantGraph getGraph() {
-    return graph;
-  }
-
-  public Node getNode() {
-    return node;
   }
 
   public Iterable<VariantGraphEdge> incoming() {
@@ -51,7 +37,7 @@ public class VariantGraphVertex {
   }
 
   public Iterable<VariantGraphEdge> incoming(SortedSet<IWitness> witnesses) {
-    return filter(transform(node.getRelationships(PATH, INCOMING), graph.getEdgeWrapper()), createTraversableFilter(witnesses));
+    return Iterables.filter(transform(node.getRelationships(GraphRelationshipType.PATH, INCOMING), graph.getEdgeWrapper()), VariantGraphEdge.createTraversableFilter(witnesses));
   }
 
   public Iterable<VariantGraphEdge> outgoing() {
@@ -59,11 +45,11 @@ public class VariantGraphVertex {
   }
 
   public Iterable<VariantGraphEdge> outgoing(SortedSet<IWitness> witnesses) {
-    return filter(transform(node.getRelationships(PATH, OUTGOING), graph.getEdgeWrapper()), createTraversableFilter(witnesses));
+    return Iterables.filter(transform(node.getRelationships(GraphRelationshipType.PATH, OUTGOING), graph.getEdgeWrapper()), VariantGraphEdge.createTraversableFilter(witnesses));
   }
 
   public Iterable<VariantGraphTransposition> transpositions() {
-    return transform(node.getRelationships(TRANSPOSITION), graph.getTranspositionWrapper());
+    return transform(node.getRelationships(GraphRelationshipType.TRANSPOSITION), graph.getTranspositionWrapper());
   }
 
   public SortedSet<Token> tokens() {
@@ -115,23 +101,6 @@ public class VariantGraphVertex {
 
   public void setTokenReferences(int... references) {
     node.setProperty(TOKEN_REFERENCE_KEY, references);
-  }
-
-  public void delete() {
-    node.delete();
-  }
-
-  @Override
-  public int hashCode() {
-    return node.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VariantGraphVertex) {
-      return node.equals(((VariantGraphVertex)obj).node);
-    }
-    return super.equals(obj);
   }
 
   @Override

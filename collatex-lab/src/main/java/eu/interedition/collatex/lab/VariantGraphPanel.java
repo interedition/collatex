@@ -7,6 +7,8 @@ import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
 import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.interfaces.Token;
@@ -25,24 +27,12 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, V
   public static final BasicStroke PATH_STROKE = new BasicStroke();
 
   public VariantGraphPanel(VariantGraph g) {
-    super(new FRLayout<VariantGraphVertex, VariantGraphEdge>(g));
+    super(new SugiyamaLayout<VariantGraphVertex, VariantGraphEdge>(g));
 
     setBackground(Color.WHITE);
     setGraphMouse(new DefaultModalGraphMouse<String, Integer>());
 
     final RenderContext<VariantGraphVertex, VariantGraphEdge> rc = getRenderContext();
-    rc.setEdgeLabelTransformer(new Transformer<VariantGraphEdge, String>() {
-      @Override
-      public String transform(VariantGraphEdge variantGraphEdge) {
-        return Joiner.on(", ").join(Iterables.transform(variantGraphEdge.getWitnesses(), new Function<IWitness, String>() {
-
-          @Override
-          public String apply(IWitness input) {
-            return input.getSigil();
-          }
-        }));
-      }
-    });
     rc.setVertexLabelTransformer(new Transformer<VariantGraphVertex, String>() {
       @Override
       public String transform(VariantGraphVertex variantGraphVertex) {
@@ -55,16 +45,28 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, V
         })) + " (" + variantGraphVertex.getRank() + ")";
       }
     });
-    rc.setEdgeStrokeTransformer(new Transformer<VariantGraphEdge, Stroke>() {
+    rc.setEdgeLabelTransformer(new Transformer<VariantGraphEdge, String>() {
       @Override
-      public Stroke transform(VariantGraphEdge variantGraphEdge) {
-        return variantGraphEdge.getWitnesses().isEmpty() ? TRANSPOSITION_STROKE : PATH_STROKE;
+      public String transform(VariantGraphEdge variantGraphEdge) {
+        return Joiner.on(", ").join(Iterables.transform(variantGraphEdge.getWitnesses(), new Function<IWitness, String>() {
+
+          @Override
+          public String apply(IWitness input) {
+            return input.getSigil();
+          }
+        }));
       }
     });
     rc.setVertexFillPaintTransformer(new Transformer<VariantGraphVertex, Paint>() {
       @Override
       public Paint transform(VariantGraphVertex v) {
         return v.getTokens().isEmpty() ? Color.BLACK : Color.WHITE;
+      }
+    });
+    rc.setEdgeStrokeTransformer(new Transformer<VariantGraphEdge, Stroke>() {
+      @Override
+      public Stroke transform(VariantGraphEdge variantGraphEdge) {
+        return variantGraphEdge.getWitnesses().isEmpty() ? TRANSPOSITION_STROKE : PATH_STROKE;
       }
     });
   }

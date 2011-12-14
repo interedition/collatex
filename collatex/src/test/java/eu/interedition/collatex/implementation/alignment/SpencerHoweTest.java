@@ -23,8 +23,8 @@ package eu.interedition.collatex.implementation.alignment;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.*;
 import org.junit.Test;
 

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import eu.interedition.collatex.implementation.graph.VariantGraphTransposition;
 import eu.interedition.collatex.interfaces.IWitness;
 
 import java.util.Map;
@@ -32,7 +33,7 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, Varian
     this.end = end;
   }
 
-  public void update(eu.interedition.collatex.implementation.graph.db.VariantGraph pvg) {
+  public void update(eu.interedition.collatex.implementation.graph.VariantGraph pvg) {
     for (VariantGraphEdge edge : Lists.newArrayList(getEdges())) {
       removeEdge(edge);
     }
@@ -40,8 +41,8 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, Varian
       removeVertex(vertex);
     }
 
-    final Map<eu.interedition.collatex.implementation.graph.db.VariantGraphVertex, VariantGraphVertex> vertexMap = Maps.newHashMap();
-    for (eu.interedition.collatex.implementation.graph.db.VariantGraphVertex pv : pvg.vertices()) {
+    final Map<eu.interedition.collatex.implementation.graph.VariantGraphVertex, VariantGraphVertex> vertexMap = Maps.newHashMap();
+    for (eu.interedition.collatex.implementation.graph.VariantGraphVertex pv : pvg.vertices()) {
       final VariantGraphVertex v = new VariantGraphVertex(pv.tokens(), pv.getRank());
       addVertex(v);
       vertexMap.put(pv, v);
@@ -51,11 +52,11 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraphVertex, Varian
         setEnd(v);
       }
     }
-    for (eu.interedition.collatex.implementation.graph.db.VariantGraphEdge pe : pvg.edges()) {
+    for (eu.interedition.collatex.implementation.graph.VariantGraphEdge pe : pvg.edges()) {
       addEdge(new VariantGraphEdge(pe.getWitnesses()), vertexMap.get(pe.from()), vertexMap.get(pe.to()));
     }
     
-    for (eu.interedition.collatex.implementation.graph.db.VariantGraphTransposition t : pvg.transpositions()) {
+    for (VariantGraphTransposition t : pvg.transpositions()) {
       addEdge(new VariantGraphEdge(Sets.<IWitness>newTreeSet()), vertexMap.get(t.from()), vertexMap.get(t.to()));
     }
   }

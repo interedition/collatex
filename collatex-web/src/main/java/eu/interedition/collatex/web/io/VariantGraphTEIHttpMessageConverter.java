@@ -1,17 +1,12 @@
 package eu.interedition.collatex.web.io;
 
-import com.google.common.base.Function;
-import com.google.common.collect.BiMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;

@@ -24,8 +24,8 @@ package eu.interedition.collatex.implementation;
 
 import eu.interedition.collatex.implementation.alignment.TokenLinker;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
+import eu.interedition.collatex.implementation.graph.GraphFactory;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
 import eu.interedition.collatex.implementation.input.WitnessBuilder;
@@ -53,14 +53,14 @@ public class CollateXEngine {
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
   private ITokenLinker tokenLinker = new TokenLinker();
 
-  private final VariantGraphFactory variantGraphFactory;
+  private final GraphFactory graphFactory;
 
   public CollateXEngine() throws IOException {
-    this(new VariantGraphFactory());
+    this(new GraphFactory());
   }
 
-  public CollateXEngine(VariantGraphFactory variantGraphFactory) {
-    this.variantGraphFactory = variantGraphFactory;
+  public CollateXEngine(GraphFactory graphFactory) {
+    this.graphFactory = graphFactory;
   }
   
   public void setTokenLinker(ITokenLinker tokenLinker) {
@@ -98,7 +98,7 @@ public class CollateXEngine {
    * Terminology check
    */
   public VariantGraph graph(IWitness... witnesses) {
-    final VariantGraph graph = variantGraphFactory.create();
+    final VariantGraph graph = graphFactory.newVariantGraph();
     new VariantGraphBuilder(graph).add(witnesses);
     return graph;
   }

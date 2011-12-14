@@ -1,8 +1,7 @@
-package eu.interedition.collatex.implementation.graph.edit;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.interfaces.Token;

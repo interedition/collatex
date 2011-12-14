@@ -14,11 +14,11 @@ public class VariantGraphFactoryTest extends AbstractTest {
 
   @Test
   public void distinctGraphsCreated() throws IOException {
-    Assert.assertFalse(variantGraphFactory.create().equals(variantGraphFactory.create()));
+    Assert.assertFalse(graphFactory.newVariantGraph().equals(graphFactory.newVariantGraph()));
   }
 
   @Test
   public void emptyGraphCanBeTraversed() {
-    Assert.assertEquals(2, Iterables.size(variantGraphFactory.create().vertices()));
+    Assert.assertEquals(2, Iterables.size(graphFactory.newVariantGraph().vertices()));
   }
 }

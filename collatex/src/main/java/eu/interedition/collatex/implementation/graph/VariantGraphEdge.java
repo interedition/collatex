@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.graph.db;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -14,27 +14,16 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphEdge {
-  private final VariantGraph graph;
-  private final Relationship relationship;
+public class VariantGraphEdge extends GraphEdge<VariantGraph, VariantGraphVertex> {
   private static final String WITNESS_REFERENCE_KEY = "witnessReferences";
 
   public VariantGraphEdge(VariantGraph graph, Relationship relationship) {
-    this.graph = graph;
-    this.relationship = relationship;
+    super(graph, relationship);
   }
 
   public VariantGraphEdge(VariantGraph graph, VariantGraphVertex from, VariantGraphVertex to, SortedSet<IWitness> witnesses) {
-    this(graph, from.getNode().createRelationshipTo(to.getNode(), VariantGraphRelationshipType.PATH));
+    this(graph, from.getNode().createRelationshipTo(to.getNode(), GraphRelationshipType.PATH));
     setWitnesses(witnesses);
-  }
-
-  public VariantGraphVertex from() {
-    return graph.getVertexWrapper().apply(relationship.getStartNode());
-  }
-
-  public VariantGraphVertex to() {
-    return graph.getVertexWrapper().apply(relationship.getEndNode());
   }
 
   public boolean traversableWith(SortedSet<IWitness> witnesses) {
@@ -46,10 +35,6 @@ public class VariantGraphEdge {
     registered.addAll(witnesses);
     setWitnesses(registered);
     return this;
-  }
-
-  public VariantGraph getGraph() {
-    return graph;
   }
 
   public SortedSet<IWitness> getWitnesses() {
@@ -68,23 +53,6 @@ public class VariantGraphEdge {
     relationship.setProperty(WITNESS_REFERENCE_KEY, references);
   }
 
-
-  public void delete() {
-    relationship.delete();
-  }
-
-  @Override
-  public int hashCode() {
-    return relationship.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VariantGraphEdge) {
-      return relationship.equals(((VariantGraphEdge) obj).relationship);
-    }
-    return super.equals(obj);
-  }
 
   public static Function<Relationship, VariantGraphEdge> createWrapper(final VariantGraph in) {
     return new Function<Relationship, VariantGraphEdge>() {

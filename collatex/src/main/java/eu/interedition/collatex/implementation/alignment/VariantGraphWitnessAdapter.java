@@ -16,9 +16,10 @@
 package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.input.Witness;
 import eu.interedition.collatex.interfaces.*;
@@ -62,7 +63,7 @@ public class VariantGraphWitnessAdapter implements IWitness {
   public boolean isNear(Token a, Token b) {
     final VariantGraphVertex va = SimpleToken.START.equals(a) ? graph.getStart() : ((VariantGraphVertexTokenAdapter) a).getVertex();
     final VariantGraphVertex vb = SimpleToken.END.equals(b) ? graph.getEnd() : ((VariantGraphVertexTokenAdapter) b).getVertex();
-    return graph.verticesAreAdjacent(va, vb);
+    return graph.verticesAreAdjacent(va, vb) && (Iterables.size(va.outgoing()) == 1 || Iterables.size(vb.incoming()) == 1);
   }
 
   @Override

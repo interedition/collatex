@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.graph.db;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -18,7 +18,7 @@ public class VariantGraphTransposition {
   }
 
   public VariantGraphTransposition(VariantGraph graph, VariantGraphVertex from, VariantGraphVertex to) {
-    this(graph, from.getNode().createRelationshipTo(to.getNode(), VariantGraphRelationshipType.TRANSPOSITION));
+    this(graph, from.getNode().createRelationshipTo(to.getNode(), GraphRelationshipType.TRANSPOSITION));
   }
 
   public VariantGraphVertex from() {

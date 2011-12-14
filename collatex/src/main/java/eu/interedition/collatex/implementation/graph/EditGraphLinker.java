@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.graph.edit;
+package eu.interedition.collatex.implementation.graph;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -8,7 +8,6 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
-import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.interfaces.Token;

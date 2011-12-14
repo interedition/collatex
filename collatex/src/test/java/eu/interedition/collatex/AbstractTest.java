@@ -7,11 +7,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
-import eu.interedition.collatex.implementation.graph.db.VariantGraph;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphVertex;
-import eu.interedition.collatex.implementation.graph.db.VariantGraphFactory;
+import eu.interedition.collatex.implementation.graph.GraphFactory;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.graph.VariantGraphEdge;
+import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
@@ -29,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
@@ -46,17 +44,17 @@ public abstract class AbstractTest {
 
   protected WitnessBuilder witnessBuilder = new WitnessBuilder(new DefaultTokenNormalizer());
   protected ITokenizer tokenizer = new WhitespaceTokenizer();
-  protected static VariantGraphFactory variantGraphFactory;
+  protected static GraphFactory graphFactory;
   private Transaction transaction;
 
   @BeforeClass
   public static void createVariantGraphFactory() throws IOException {
-    variantGraphFactory = new VariantGraphFactory();
+    graphFactory = new GraphFactory();
   }
 
   @Before
   public void startGraphTransaction() {
-    transaction = variantGraphFactory.getDb().beginTx();
+    transaction = graphFactory.getDatabase().beginTx();
   }
 
   @After
@@ -86,7 +84,7 @@ public abstract class AbstractTest {
   }
 
   protected VariantGraph merge(IWitness... witnesses) {
-    final VariantGraph graph = variantGraphFactory.create();
+    final VariantGraph graph = graphFactory.newVariantGraph();
     merge(graph, witnesses);
     return graph;
   }

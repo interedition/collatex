@@ -1,8 +1,8 @@
 package eu.interedition.collatex.implementation.output;
 
-import eu.interedition.collatex.implementation.graph.edit.EditGraph;
-import eu.interedition.collatex.implementation.graph.edit.EditGraphEdge;
-import eu.interedition.collatex.implementation.graph.edit.EditGraphVertex;
+import eu.interedition.collatex.implementation.graph.EditGraph;
+import eu.interedition.collatex.implementation.graph.EditGraphEdge;
+import eu.interedition.collatex.implementation.graph.EditGraphVertex;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
 import org.jgrapht.ext.IntegerNameProvider;

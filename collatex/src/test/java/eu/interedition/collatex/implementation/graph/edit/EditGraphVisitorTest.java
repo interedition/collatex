@@ -7,7 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
+import eu.interedition.collatex.implementation.graph.EditGraph;
+import eu.interedition.collatex.implementation.graph.EditGraphCreator;
+import eu.interedition.collatex.implementation.graph.EditGraphEdge;
+import eu.interedition.collatex.implementation.graph.EditGraphVertex;
+import eu.interedition.collatex.implementation.graph.EditGraphVisitor;
+import eu.interedition.collatex.implementation.graph.EditOperation;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.matching.Matches;

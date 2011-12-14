@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.graph.edit;
+package eu.interedition.collatex.implementation.graph;
 
 import java.util.*;
 

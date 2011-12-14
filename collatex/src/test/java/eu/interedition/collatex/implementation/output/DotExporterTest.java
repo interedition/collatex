@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.Comparator;
 
 import eu.interedition.collatex.implementation.CollateXEngine;
-import eu.interedition.collatex.implementation.graph.edit.EditGraph;
-import eu.interedition.collatex.implementation.graph.edit.EditGraphCreator;
+import eu.interedition.collatex.implementation.graph.EditGraph;
+import eu.interedition.collatex.implementation.graph.EditGraphCreator;
 import eu.interedition.collatex.implementation.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
