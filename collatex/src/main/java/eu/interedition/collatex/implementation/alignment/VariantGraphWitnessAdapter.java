@@ -58,6 +58,10 @@ public class VariantGraphWitnessAdapter implements IWitness {
   public String getSigil() {
     return Witness.SUPERBASE.getSigil();
   }
+  
+  public VariantGraph getGraph() {
+    return graph;
+  }
 
   @Override
   public boolean isNear(Token a, Token b) {
