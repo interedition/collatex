@@ -121,4 +121,26 @@ public class AlignmentTest extends AbstractTest {
     List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
     assertEquals(0, transpositions.size());
   } 
+  
+  @Test
+  public void testPhraseMatchingShouldIgnoreDeletions() {
+    IWitness[] w = createWitnesses("Hello cruel world", "Hello world");
+    VariantGraph graph = merge(w[0]);
+    VariantGraphBuilder builder = merge(graph, w[1]);
+    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
+    assertEquals("hello world", SimpleToken.toString(phraseMatches.get(0).right));
+    List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
+    assertEquals(0, transpositions.size());
+  }
+  
+  @Test
+  public void testPhraseMatchingShouldIgnoreAdditions() {
+    IWitness[] w = createWitnesses("Hello world", "Hello cruel world");
+    VariantGraph graph = merge(w[0]);
+    VariantGraphBuilder builder = merge(graph, w[1]);
+    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
+    assertEquals("hello world", SimpleToken.toString(phraseMatches.get(0).right));
+    List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
+    assertEquals(0, transpositions.size());
+  }   
 }
