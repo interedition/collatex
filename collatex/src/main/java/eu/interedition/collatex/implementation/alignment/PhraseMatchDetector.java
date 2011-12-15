@@ -50,7 +50,8 @@ public class PhraseMatchDetector {
       VariantGraphVertexTokenAdapter a = (VariantGraphVertexTokenAdapter) baseToken;
       int rank = a.getVertex().getRank();
       //see todo above: difference will not always be 0 or 1!
-      if ((rank - previousRank) != (0 | 1)) {
+      int difference = rank - previousRank;
+      if (difference != 0 && difference != 1) {
         if (!basePhrase.isEmpty()) {
           // start a new sequence
           phraseMatches.add(new Tuple<List<Token>>(Lists.newArrayList(basePhrase), Lists.newArrayList(witnessPhrase)));

@@ -20,6 +20,10 @@
 
 package eu.interedition.collatex.implementation.alignment;
 
+import eu.interedition.collatex.implementation.Tuple;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.input.SimpleToken;
+import java.util.List;
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.interfaces.Token;
@@ -106,4 +110,15 @@ public class AlignmentTest extends AbstractTest {
     assertEquals("|x|y|z|", toString(t, w[1]));
     assertEquals("|z|y| |", toString(t, w[2]));
   }
+  
+  @Test
+  public void testOrderIndependence() {
+    IWitness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
+    VariantGraph graph = merge(w[0], w[1]);
+    VariantGraphBuilder builder = merge(graph, w[2]);
+    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
+    assertEquals("hello nice cruel world", SimpleToken.toString(phraseMatches.get(0).right));
+    List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
+    assertEquals(0, transpositions.size());
+  } 
 }

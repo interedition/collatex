@@ -168,8 +168,8 @@ public class BeckettTest extends AbstractTest {
     final VariantGraphBuilder builder = merge(graph, w[4]);
     final List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
     final List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
-    assertEquals("The same as when", SimpleToken.toString(phraseMatches.get(0).right));
-    assertEquals("Darly", SimpleToken.toString(phraseMatches.get(1).right));
+    assertEquals("the same as when", SimpleToken.toString(phraseMatches.get(0).right));
+    assertEquals("darly", SimpleToken.toString(phraseMatches.get(1).right));
     assertEquals("among others", SimpleToken.toString(phraseMatches.get(2).right));
     assertEquals("once died left him .", SimpleToken.toString(phraseMatches.get(3).right));
     assertEquals("darly", SimpleToken.toString(transpositions.get(0).right));
