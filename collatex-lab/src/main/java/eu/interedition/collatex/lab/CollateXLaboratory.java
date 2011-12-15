@@ -65,6 +65,7 @@ public class CollateXLaboratory extends JFrame {
   }
 
   public static void main(String[] args) throws Exception {
+    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
     new CollateXLaboratory(new GraphFactory()).setVisible(true);
   }
 
