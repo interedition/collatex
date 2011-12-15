@@ -16,12 +16,14 @@
 package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.Token;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -34,23 +36,36 @@ public class PhraseMatchDetector {
     VariantGraphWitnessAdapter adapter = (VariantGraphWitnessAdapter) base;
     adapter.getGraph().rank();
     
-    final List<Tuple<List<Token>>> phraseMatches = Lists.newArrayList();
+    List<Tuple<List<Token>>> phraseMatches = Lists.newArrayList();
+
+    // gather matched ranks into a set ordered by their natural order
+    Set<Integer> rankSet = Sets.newTreeSet();
+    for (Token baseToken: linkedTokens.values()) {
+      VariantGraphVertexTokenAdapter a = (VariantGraphVertexTokenAdapter) baseToken;
+      int rank = a.getVertex().getRank();
+      rankSet.add(rank);
+    }
+ 
+    //Turn it into a List so that distance between matched ranks can be called
+    //Note that omitted vertices are not in the list, so they don't cause an extra phrasematch
+    List<Integer> ranks = Lists.newArrayList(rankSet);
 
     // chain token matches
-    final List<Token> basePhrase = Lists.newArrayList();
-    final List<Token> witnessPhrase = Lists.newArrayList();
+    List<Token> basePhrase = Lists.newArrayList();
+    List<Token> witnessPhrase = Lists.newArrayList();
     int previousRank = 1;
 
-    //TODO: previous rank should be influenced by ommissions!
     for (Token token : witness.getTokens()) {
+      //Note: this if skips added tokens so they don't cause an extra phrasematch
       if (!linkedTokens.containsKey(token)) {
         continue;
       }
       Token baseToken = linkedTokens.get(token);
       VariantGraphVertexTokenAdapter a = (VariantGraphVertexTokenAdapter) baseToken;
       int rank = a.getVertex().getRank();
-      //see todo above: difference will not always be 0 or 1!
-      int difference = rank - previousRank;
+      int indexOfRank = ranks.indexOf(rank);
+      int indexOfPreviousRank = ranks.indexOf(previousRank);
+      int difference = indexOfRank - indexOfPreviousRank;
       if (difference != 0 && difference != 1) {
         if (!basePhrase.isEmpty()) {
           // start a new sequence
