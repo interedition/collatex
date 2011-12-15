@@ -43,7 +43,7 @@ public class DotExporter {
 
   public static String toDot(final EditGraph graph) {
     final Writer writer = new StringWriter();
-    EG_DOT_EXPORTER.export(writer, graph);
+    //EG_DOT_EXPORTER.export(writer, graph);
     final String string = writer.toString();
     return string;
   }

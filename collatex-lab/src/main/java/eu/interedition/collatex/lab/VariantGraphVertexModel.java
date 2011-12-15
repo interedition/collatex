@@ -7,11 +7,11 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphVertex {
+public class VariantGraphVertexModel {
   private final SortedSet<Token> tokens;
   private final int rank;
 
-  public VariantGraphVertex(SortedSet<Token> tokens, int rank) {
+  public VariantGraphVertexModel(SortedSet<Token> tokens, int rank) {
     this.tokens = tokens;
     this.rank = rank;
   }

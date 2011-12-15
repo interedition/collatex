@@ -22,40 +22,40 @@ public class Matches {
   private final Set<Token> ambiguous;
   private final Set<Token> unique;
 
-  public static Matches between(final IWitness a, final IWitness b, Comparator<Token> comparator) {
-    final Iterable<Token> aTokens = a.getTokens();
-    final Iterable<Token> bTokens = b.getTokens();
+  public static Matches between(final IWitness base, final IWitness witness, Comparator<Token> comparator) {
+    final Iterable<Token> baseTokens = base.getTokens();
+    final Iterable<Token> witnessTokens = witness.getTokens();
 
     final ListMultimap<Token, Token> all = ArrayListMultimap.create();
-    for (Token tokenA : aTokens) {
-      for (Token tokenB : bTokens) {
-        if (comparator.compare(tokenA, tokenB) == 0) {
-          all.put(tokenB, tokenA);
+    for (Token baseToken : baseTokens) {
+      for (Token witnessToken : witnessTokens) {
+        if (comparator.compare(baseToken, witnessToken) == 0) {
+          all.put(witnessToken, baseToken);
         }
       }
     }
 
     // unmatched tokens
     Set<Token> unmatched = Sets.newLinkedHashSet();
-    for (Token token : bTokens) {
-      if (!all.containsKey(token)) {
-        unmatched.add(token);
+    for (Token witnessToken : witnessTokens) {
+      if (!all.containsKey(witnessToken)) {
+        unmatched.add(witnessToken);
       }
     }
     // unsure tokens (have to check: base -> witness, and witness -> base)
     Set<Token> ambiguous = Sets.newLinkedHashSet();
-    for (Token token : bTokens) {
-      int count = all.keys().count(token);
+    for (Token witnessToken : witnessTokens) {
+      int count = all.keys().count(witnessToken);
       if (count > 1) {
-        ambiguous.add(token);
+        ambiguous.add(witnessToken);
       }
     }
     Multiset<Token> bag = ImmutableMultiset.copyOf(all.values());
     Set<Token> unsureBaseTokens = Sets.newLinkedHashSet();
-    for (Token token : aTokens) {
-      int count = bag.count(token);
+    for (Token baseToken : baseTokens) {
+      int count = bag.count(baseToken);
       if (count > 1) {
-        unsureBaseTokens.add(token);
+        unsureBaseTokens.add(baseToken);
       }
     }
     Collection<Map.Entry<Token, Token>> entries = all.entries();
@@ -67,15 +67,15 @@ public class Matches {
     // sure tokens
     // have to check unsure tokens because of (base -> witness && witness -> base)
     Set<Token> unique = Sets.newLinkedHashSet();
-    for (Token token : bTokens) {
-      if (all.keys().count(token) == 1 && !ambiguous.contains(token)) {
-        unique.add(token);
+    for (Token witnessToken : witnessTokens) {
+      if (all.keys().count(witnessToken) == 1 && !ambiguous.contains(witnessToken)) {
+        unique.add(witnessToken);
       }
     }
 
     // add start and end tokens as matches
-    all.put(SimpleToken.START, Iterables.getFirst(aTokens, null));
-    all.put(SimpleToken.END, Iterables.getLast(aTokens));
+    all.put(SimpleToken.START, Iterables.getFirst(baseTokens, null));
+    all.put(SimpleToken.END, Iterables.getLast(baseTokens));
 
     return new Matches(all, unmatched, ambiguous, unique);
   }

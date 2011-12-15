@@ -29,22 +29,22 @@ public class EditGraphVisitor {
     exportGraphBefore();
 
     Map<EditGraphVertex, Integer> determineMinSequences = determineMinSequences(editGraph);
-    int minSequences = determineMinSequences.get(editGraph.getStartVertex());
+    int minSequences = determineMinSequences.get(editGraph.getStart());
 
     //    EditGraph graphWithSinglePath = buildNewGraphWithOnlyMinimumWeightVertices(determineMinSequences, match);
     EditGraph graphWithSinglePath = buildNewGraphWithOnlyMinimumScoreEdges(match);
 
-    EditGraphVertex currentVertex = graphWithSinglePath.getStartVertex();
+    EditGraphVertex currentVertex = graphWithSinglePath.getStart();
     List<EditGraphEdge> shortestPath = Lists.newArrayList();
-    while (graphWithSinglePath.outDegreeOf(currentVertex) == 1) {
-      EditGraphEdge edge = graphWithSinglePath.outgoingEdgesOf(currentVertex).iterator().next();
+    while (Iterables.size(currentVertex.outgoing()) == 1) {
+      EditGraphEdge edge = Iterables.getFirst(currentVertex.outgoing(), null);
       shortestPath.add(edge);
-      currentVertex = edge.getTargetVertex();
+      currentVertex = edge.to();
     }
 
     exportGraphAfter(graphWithSinglePath);
 
-    if (graphWithSinglePath.outDegreeOf(currentVertex) > 1) {
+    if (Iterables.size(currentVertex.outgoing()) > 1) {
       throw new RuntimeException("Vertex " + currentVertex + " has more than one possible outgoing edge!");
     }
     return shortestPath;
@@ -61,7 +61,7 @@ public class EditGraphVisitor {
   }
 
   public Map<EditGraphVertex, Integer> determineMinSequences(EditGraph graph) {
-    EditGraphVertex endVertex = graph.getEndVertex();
+    EditGraphVertex endVertex = graph.getEnd();
     Map<EditGraphVertex, Integer> minSeq = Maps.newLinkedHashMap();
     Map<EditGraphVertex, Integer> gapOrNoGap = Maps.newLinkedHashMap();
     minSeq.put(endVertex, 1); // TODO: CHECK THIS.. !!
@@ -86,17 +86,17 @@ public class EditGraphVisitor {
   public static Map<EditGraphVertex, Integer> determineMinWeightForEachVertex(EditGraph graph) {
     // bepalen minimaal aantal gaps in de decision graph
     Map<EditGraphVertex, Integer> vertexToMinWeight = Maps.newLinkedHashMap();
-    Iterator<EditGraphVertex> iterator = graph.iterator();
+    Iterator<EditGraphVertex> iterator = graph.vertices().iterator();
     // setup map with startvertex
     EditGraphVertex startVertex = iterator.next();
     vertexToMinWeight.put(startVertex, 0);
     while (iterator.hasNext()) {
       EditGraphVertex next = iterator.next();
-      Set<EditGraphEdge> incomingEdgesOf = graph.incomingEdgesOf(next);
+      Set<EditGraphEdge> incomingEdgesOf = Sets.newHashSet(next.incoming());
       // bepaal de nieuwe weight for elk van de incoming edges
       Map<EditGraphEdge, Integer> edgeToTotalWeight = Maps.newLinkedHashMap();
       for (EditGraphEdge incomingEdge : incomingEdgesOf) {
-        edgeToTotalWeight.put(incomingEdge, vertexToMinWeight.get(incomingEdge.getSourceVertex()) + incomingEdge.getScore());
+        edgeToTotalWeight.put(incomingEdge, vertexToMinWeight.get(incomingEdge.from()) + incomingEdge.getScore());
       }
       Integer min = Collections.min(edgeToTotalWeight.values());
       vertexToMinWeight.put(next, min);
@@ -109,7 +109,7 @@ public class EditGraphVisitor {
   public static int determineMinimumNumberOfGaps(EditGraph dGraph) {
     // we moeten de weight van de end vertex hebben om de rest te filteren..
     Map<EditGraphVertex, Integer> vertexToMinWeight = determineMinWeightForEachVertex(dGraph);
-    EditGraphVertex endVertex = dGraph.getEndVertex();
+    EditGraphVertex endVertex = dGraph.getEnd();
     int minGaps = vertexToMinWeight.get(endVertex);
     // System.out.println("Mininum number of gaps in the alignment: "+minGaps);
     return minGaps;
@@ -125,7 +125,7 @@ public class EditGraphVisitor {
 
   private List<EditGraphVertex> getVerticesInTopologicalOrder(EditGraph dGraph2) {
     List<EditGraphVertex> topoVertices = Lists.newArrayList();
-    Iterator<EditGraphVertex> topologicalOrder = dGraph2.iterator();
+    Iterator<EditGraphVertex> topologicalOrder = dGraph2.vertices().iterator();
     while (topologicalOrder.hasNext()) {
       topoVertices.add(topologicalOrder.next());
     }
@@ -140,42 +140,41 @@ public class EditGraphVisitor {
     List<EditGraphVertex> verticesToRemove = Lists.newArrayList();
     List<EditGraphEdge> edgesToRemove = Lists.newArrayList();
     List<EditGraphEdge> edgesToAdd = Lists.newArrayList();
-    Iterator<EditGraphVertex> iterator = newEditGraph.iterator();
+    Iterator<EditGraphVertex> iterator = newEditGraph.vertices().iterator();
     while (iterator.hasNext()) {
       EditGraphVertex editGraphVertex = iterator.next();
-      Token witnessToken = editGraphVertex.getWitnessToken();
+      Token witnessToken = editGraphVertex.getWitness();
       LOG.info("witnessToken={}", witnessToken);
       if (witnessToken != null && witnessToken.getContent().equals("")) {
         LOG.info("skipVertex!");
         // skipvertex, remove
         verticesToRemove.add(editGraphVertex);
-        Set<EditGraphEdge> incomingEdges = newEditGraph.incomingEdgesOf(editGraphVertex);
-        Set<EditGraphEdge> outgoingEdges = newEditGraph.outgoingEdgesOf(editGraphVertex);
+        Set<EditGraphEdge> incomingEdges = Sets.newHashSet(editGraphVertex.incoming());
+        Set<EditGraphEdge> outgoingEdges = Sets.newHashSet(editGraphVertex.outgoing());
         for (EditGraphEdge incomingEdge : incomingEdges) {
           for (EditGraphEdge outgoingEdge : outgoingEdges) {
-            edgesToAdd.add(new EditGraphEdge(incomingEdge.getSourceVertex(), outgoingEdge.getTargetVertex(), EditOperation.GAP, incomingEdge.getScore() + outgoingEdge.getScore()));
+            editGraph.connect(incomingEdge.from(), outgoingEdge.to(), EditOperation.GAP, incomingEdge.getScore() + outgoingEdge.getScore());
           }
         }
-        edgesToRemove.addAll(incomingEdges);
-        edgesToRemove.addAll(outgoingEdges);
+        for (EditGraphEdge e : incomingEdges) {
+          e.delete();
+        }
+        for (EditGraphEdge e : outgoingEdges) {
+          e.delete();
+        }
       }
     }
-    for (EditGraphEdge editGraphEdge : edgesToAdd) {
-      newEditGraph.add(editGraphEdge);
-    }
-    newEditGraph.removeAllEdges(edgesToRemove);
-    newEditGraph.removeAllVertices(verticesToRemove);
     return newEditGraph;
   }
 
   private LinkedHashSet<EditGraphEdge> getMinimumScoreEdges(Matches matches) {
     Set<Token> ambiguous = matches.getAmbiguous();
     LinkedHashSet<EditGraphEdge> edgeSet1 = Sets.newLinkedHashSet();
-    List<EditGraphVertex> verticesToCheck = Lists.newArrayList(editGraph.getStartVertex());
+    List<EditGraphVertex> verticesToCheck = Lists.newArrayList(editGraph.getStart());
     boolean onePath = true;
     while (!verticesToCheck.isEmpty()) {
       EditGraphVertex vertex = verticesToCheck.remove(0);
-      Set<EditGraphEdge> outgoingEdges = editGraph.outgoingEdgesOf(vertex);
+      Set<EditGraphEdge> outgoingEdges = Sets.newHashSet(vertex.outgoing());
       if (!outgoingEdges.isEmpty()) {
         Multimap<Integer, EditGraphEdge> edgesForScore = ArrayListMultimap.create();
         for (EditGraphEdge editGraphEdge : outgoingEdges) {
@@ -186,7 +185,7 @@ public class EditGraphVisitor {
         onePath = onePath && (edges.size() == 1);
         edgeSet1.addAll(edges);
         for (EditGraphEdge editGraphEdge : edges) {
-          verticesToCheck.add(editGraphEdge.getTargetVertex());
+          verticesToCheck.add(editGraphEdge.to());
         }
       }
     }
@@ -194,10 +193,10 @@ public class EditGraphVisitor {
     if (!onePath) {
       LOG.info("try reverse");
       LinkedHashSet<EditGraphEdge> edgeSet2 = Sets.newLinkedHashSet();
-      verticesToCheck = Lists.newArrayList(editGraph.getEndVertex());
+      verticesToCheck = Lists.newArrayList(editGraph.getEnd());
       while (!verticesToCheck.isEmpty()) {
         EditGraphVertex vertex = verticesToCheck.remove(0);
-        Set<EditGraphEdge> incomingEdges = editGraph.incomingEdgesOf(vertex);
+        Set<EditGraphEdge> incomingEdges = Sets.newHashSet(vertex.incoming());
         if (!incomingEdges.isEmpty()) {
           Multimap<Integer, EditGraphEdge> edgesForScore = ArrayListMultimap.create();
           for (EditGraphEdge editGraphEdge : incomingEdges) {
@@ -207,7 +206,7 @@ public class EditGraphVisitor {
           Collection<EditGraphEdge> edges = edgesForScore.get(minScore);
           edgeSet2.addAll(edges);
           for (EditGraphEdge editGraphEdge : edges) {
-            verticesToCheck.add(editGraphEdge.getSourceVertex());
+            verticesToCheck.add(editGraphEdge.from());
           }
         }
       }
@@ -220,8 +219,8 @@ public class EditGraphVisitor {
   private Set<EditGraphVertex> getVertices(Set<EditGraphEdge> minimumScoreEdges) {
     Set<EditGraphVertex> vertices = Sets.newLinkedHashSet();
     for (EditGraphEdge edge : minimumScoreEdges) {
-      vertices.add(edge.getSourceVertex());
-      vertices.add(edge.getTargetVertex());
+      vertices.add(edge.from());
+      vertices.add(edge.to());
     }
     return vertices;
   }
@@ -235,12 +234,11 @@ public class EditGraphVisitor {
   }
 
   private Set<EditGraphEdge> getEdges(Set<EditGraphVertex> verticesToKeep) {
-    Set<EditGraphEdge> edgeSet = editGraph.edgeSet();
+    Set<EditGraphEdge> edgeSet = Sets.newHashSet(editGraph.edges());
     Set<EditGraphEdge> newEdges = Sets.newLinkedHashSet();
     for (EditGraphEdge edge : edgeSet) {
-      if (verticesToKeep.contains(edge.getSourceVertex()) && verticesToKeep.contains(edge.getTargetVertex())) {
-        EditGraphEdge newEdge = new EditGraphEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge.getEditOperation(), edge.getScore());
-        newEdges.add(newEdge);
+      if (verticesToKeep.contains(edge.from()) && verticesToKeep.contains(edge.to())) {
+        newEdges.add(editGraph.connect(edge.from(), edge.to(), edge.getEditOperation(), edge.getScore()));
       }
     }
     return newEdges;
@@ -253,9 +251,9 @@ public class EditGraphVisitor {
 
     List<EditGraphVertex> verticesInReverseTopologicalOrder = Lists.reverse(getVerticesInTopologicalOrder(editGraph));
 
-    int localminimum = minWeightProVertex.get(editGraph.getEndVertex());
+    int localminimum = minWeightProVertex.get(editGraph.getEnd());
     for (EditGraphVertex vertex : verticesInReverseTopologicalOrder) {
-      Token token = vertex.getWitnessToken();
+      Token token = vertex.getWitness();
       Integer minWeight = minWeightProVertex.get(vertex);
       if (ambiguous.contains(token)) {
         if (minWeight <= localminimum) {
@@ -272,6 +270,8 @@ public class EditGraphVisitor {
   }
 
   private EditGraph newEditGraph(Set<EditGraphEdge> edgesToKeep, Set<EditGraphVertex> newVertices) {
+    throw new UnsupportedOperationException();
+    /*
     EditGraph newGraph = new EditGraph();
     newGraph.setStartVertex(editGraph.getStartVertex());
     newGraph.setEndVertex(editGraph.getEndVertex());
@@ -282,6 +282,7 @@ public class EditGraphVisitor {
       newGraph.add(edge);
     }
     return newGraph;
+    */
   }
 
   private EditGraphEdge findTheMinimumEdge(Map<EditGraphEdge, Integer> determineMinSequencesProEdge, Integer min) {
@@ -299,17 +300,17 @@ public class EditGraphVisitor {
   }
 
   private Map<EditGraphEdge, Integer> determineMinSequencesForVertex(EditGraph graph, Map<EditGraphVertex, Integer> minSeq, Map<EditGraphVertex, Integer> gapOrNoGap, EditGraphVertex vertex) {
-    Set<EditGraphEdge> outgoingEdgesOf = graph.outgoingEdgesOf(vertex);
+    Set<EditGraphEdge> outgoingEdgesOf = Sets.newHashSet(vertex.outgoing());
     if (outgoingEdgesOf.isEmpty()) {
       throw new RuntimeException("Error: " + vertex.toString() + " has no outgoing edges!");
     }
     Map<EditGraphEdge, Integer> edges = Maps.newLinkedHashMap();
     for (EditGraphEdge outgoing : outgoingEdgesOf) {
-      EditGraphVertex targetVertex = outgoing.getTargetVertex();
+      EditGraphVertex targetVertex = outgoing.to();
       // Note: Gaps causes extra sequences.
       // Note: A sequence at the start vertex does not count, cause
       // Note: it will be an empty sequence, cause there are no more tokens
-      if (vertex != graph.getStartVertex() && gapOrNoGap.get(targetVertex) == 0 && outgoing.getEditOperation() == EditOperation.GAP) {
+      if (vertex != graph.getStart() && gapOrNoGap.get(targetVertex) == 0 && outgoing.getEditOperation() == EditOperation.GAP) {
         edges.put(outgoing, 1 + minSeq.get(targetVertex));
       } else {
         edges.put(outgoing, minSeq.get(targetVertex));
@@ -317,5 +318,4 @@ public class EditGraphVisitor {
     }
     return edges;
   }
-
 }

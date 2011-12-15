@@ -1,9 +1,8 @@
 package eu.interedition.collatex.implementation.graph;
 
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.Token;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -14,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
-import static eu.interedition.collatex.implementation.graph.GraphRelationshipType.START_END;
-import static eu.interedition.collatex.implementation.graph.GraphRelationshipType.VARIANT_GRAPH;
+import static eu.interedition.collatex.implementation.graph.GraphRelationshipType.*;
+import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 /**
@@ -28,6 +27,7 @@ public class GraphFactory {
   private Resolver<Token> tokenResolver = new DefaultResolver<Token>();
   private EmbeddedGraphDatabase database;
   private Node variantGraphs;
+  private Node editGraphs;
 
   public GraphFactory() throws IOException {
     this(Files.createTempDir(), true);
@@ -59,11 +59,18 @@ public class GraphFactory {
     final Transaction tx = database.beginTx();
     try {
       final Node referenceNode = database.getReferenceNode();
-      final Relationship r = referenceNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING);
-      if (r == null) {
+      final Relationship vgRel = referenceNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING);
+      if (vgRel == null) {
         referenceNode.createRelationshipTo(variantGraphs = database.createNode(), VARIANT_GRAPH);
       } else {
-        variantGraphs = r.getEndNode();
+        variantGraphs = vgRel.getEndNode();
+      }
+
+      final Relationship egRel = referenceNode.getSingleRelationship(EDIT_GRAPH, OUTGOING);
+      if (egRel == null) {
+        referenceNode.createRelationshipTo(editGraphs = database.createNode(), VARIANT_GRAPH);
+      } else {
+        editGraphs = egRel.getEndNode();
       }
       tx.success();
     } finally {
@@ -83,19 +90,34 @@ public class GraphFactory {
     this.tokenResolver = tokenResolver;
   }
 
-  public synchronized VariantGraph newVariantGraph() {
-    final Transaction tx = database.beginTx();
-    try {
-      final VariantGraph graph = new VariantGraph(database, witnessResolver, tokenResolver);
-      graph.init(VariantGraphVertex.createWrapper(graph), VariantGraphEdge.createWrapper(graph), database.createNode(), database.createNode());
+  public VariantGraph newVariantGraph() {
+    final VariantGraph graph = new VariantGraph(database, witnessResolver, tokenResolver);
+    graph.init(VariantGraphVertex.createWrapper(graph), VariantGraphEdge.createWrapper(graph), database.createNode(), database.createNode());
 
-      variantGraphs.createRelationshipTo(graph.getStart().getNode(), START_END);
-      graph.getEnd().getNode().createRelationshipTo(variantGraphs, START_END);
+    variantGraphs.createRelationshipTo(graph.getStart().getNode(), START_END);
+    graph.getEnd().getNode().createRelationshipTo(variantGraphs, START_END);
 
-      tx.success();
-      return graph;
-    } finally {
-      tx.finish();
+    return graph;
+  }
+
+  public EditGraph newEditGraph() {
+    final EditGraph graph = new EditGraph(database, witnessResolver, tokenResolver);
+    graph.init(EditGraphVertex.createWrapper(graph), EditGraphEdge.createWrapper(graph), database.createNode(), database.createNode());
+
+    editGraphs.createRelationshipTo(graph.getStart().getNode(), START_END);
+    graph.getEnd().getNode().createRelationshipTo(editGraphs, START_END);
+
+    return graph;
+  }
+
+  public void delete(EditGraph eg) {
+    eg.getStart().getNode().getSingleRelationship(START_END, INCOMING).delete();
+    eg.getEnd().getNode().getSingleRelationship(START_END, OUTGOING).delete();
+    for (EditGraphVertex v : eg.vertices()) {
+      for (EditGraphEdge e : v.incoming()) {
+        e.delete();
+      }
+      v.delete();
     }
   }
 }

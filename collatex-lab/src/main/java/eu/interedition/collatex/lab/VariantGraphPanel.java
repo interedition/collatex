@@ -3,52 +3,47 @@ package eu.interedition.collatex.lab;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import edu.uci.ics.jung.visualization.decorators.EdgeShape;
-import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.apache.commons.collections15.Transformer;
 
+import javax.swing.*;
 import java.awt.*;
 
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, VariantGraphEdge> {
+public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertexModel, VariantGraphEdgeModel> {
 
-  public static final BasicStroke TRANSPOSITION_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 10.0f }, 0.0f);
-  public static final BasicStroke PATH_STROKE = new BasicStroke();
-
-  public VariantGraphPanel(VariantGraph g) {
-    super(new SugiyamaLayout<VariantGraphVertex, VariantGraphEdge>(g));
+  public VariantGraphPanel(VariantGraphModel g) {
+    super(new SugiyamaLayout<VariantGraphVertexModel, VariantGraphEdgeModel>(g));
 
     setBackground(Color.WHITE);
+    setBorder(BorderFactory.createTitledBorder("Variant Graph"));
     setGraphMouse(new DefaultModalGraphMouse<String, Integer>());
 
-    final RenderContext<VariantGraphVertex, VariantGraphEdge> rc = getRenderContext();
-    rc.setVertexLabelTransformer(new Transformer<VariantGraphVertex, String>() {
+    final RenderContext<VariantGraphVertexModel, VariantGraphEdgeModel> rc = getRenderContext();
+    rc.setVertexLabelTransformer(new Transformer<VariantGraphVertexModel, String>() {
       @Override
-      public String transform(VariantGraphVertex variantGraphVertex) {
-        return Joiner.on(", ").join(Iterables.transform(variantGraphVertex.getTokens(), new Function<Token, String>() {
+      public String transform(VariantGraphVertexModel variantGraphVertexModel) {
+        return Joiner.on(", ").join(Iterables.transform(variantGraphVertexModel.getTokens(), new Function<Token, String>() {
 
           @Override
           public String apply(Token input) {
             return input.getWitness().getSigil() + ":'" + ((SimpleToken) input).getNormalized() + "'";
           }
-        })) + " (" + variantGraphVertex.getRank() + ")";
+        })) + " (" + variantGraphVertexModel.getRank() + ")";
       }
     });
-    rc.setEdgeLabelTransformer(new Transformer<VariantGraphEdge, String>() {
+    rc.setEdgeLabelTransformer(new Transformer<VariantGraphEdgeModel, String>() {
       @Override
-      public String transform(VariantGraphEdge variantGraphEdge) {
-        return Joiner.on(", ").join(Iterables.transform(variantGraphEdge.getWitnesses(), new Function<IWitness, String>() {
+      public String transform(VariantGraphEdgeModel variantGraphEdgeModel) {
+        return Joiner.on(", ").join(Iterables.transform(variantGraphEdgeModel.getWitnesses(), new Function<IWitness, String>() {
 
           @Override
           public String apply(IWitness input) {
@@ -57,16 +52,16 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertex, V
         }));
       }
     });
-    rc.setVertexFillPaintTransformer(new Transformer<VariantGraphVertex, Paint>() {
+    rc.setVertexFillPaintTransformer(new Transformer<VariantGraphVertexModel, Paint>() {
       @Override
-      public Paint transform(VariantGraphVertex v) {
+      public Paint transform(VariantGraphVertexModel v) {
         return v.getTokens().isEmpty() ? Color.BLACK : Color.WHITE;
       }
     });
-    rc.setEdgeStrokeTransformer(new Transformer<VariantGraphEdge, Stroke>() {
+    rc.setEdgeStrokeTransformer(new Transformer<VariantGraphEdgeModel, Stroke>() {
       @Override
-      public Stroke transform(VariantGraphEdge variantGraphEdge) {
-        return variantGraphEdge.getWitnesses().isEmpty() ? TRANSPOSITION_STROKE : PATH_STROKE;
+      public Stroke transform(VariantGraphEdgeModel variantGraphEdgeModel) {
+        return variantGraphEdgeModel.getWitnesses().isEmpty() ? CollateXLaboratory.DASHED_STROKE : CollateXLaboratory.SOLID_STROKE;
       }
     });
   }
