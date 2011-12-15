@@ -51,13 +51,13 @@ public class EditGraphPanel extends VisualizationViewer<EditGraphVertexModel, Ed
     rc.setEdgeDrawPaintTransformer(new Transformer<EditGraphEdgeModel, Paint>() {
       @Override
       public Paint transform(EditGraphEdgeModel model) {
-        return (model.getEditOperation() == EditOperation.GAP ? Color.RED : Color.GREEN);
+        return (model.getPaths().isEmpty() ? Color.LIGHT_GRAY : Color.BLACK);
       }
     });
     rc.setEdgeStrokeTransformer(new Transformer<EditGraphEdgeModel, Stroke>() {
       @Override
       public Stroke transform(EditGraphEdgeModel model) {
-        return model.getPaths().isEmpty() ? CollateXLaboratory.DASHED_STROKE : CollateXLaboratory.SOLID_STROKE;
+        return (model.getEditOperation() == EditOperation.GAP ? CollateXLaboratory.DASHED_STROKE : CollateXLaboratory.SOLID_STROKE);
       }
     });
   }

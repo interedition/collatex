@@ -21,7 +21,7 @@ import java.util.List;
 public class CollateXLaboratory extends JFrame {
   private static final Logger LOG = LoggerFactory.getLogger(CollateXLaboratory.class);
   public static final BasicStroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 5.0f }, 0.0f);
-  public static final BasicStroke SOLID_STROKE = new BasicStroke();
+  public static final BasicStroke SOLID_STROKE = new BasicStroke(1.5f);
 
   private final GraphFactory graphFactory;
   private final WitnessPanel witnessPanel = new WitnessPanel();

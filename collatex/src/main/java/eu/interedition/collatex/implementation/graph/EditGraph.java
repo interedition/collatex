@@ -181,6 +181,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     }
     return linkedTokens;
   }
+
   public EditGraphEdge connect(EditGraphVertex from, EditGraphVertex to, EditOperation operation, int score) {
     Preconditions.checkArgument(!from.equals(to));
 
