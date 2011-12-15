@@ -1,5 +1,6 @@
 package eu.interedition.collatex.implementation.alignment;
 
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -75,7 +76,7 @@ public class BeckettTest extends AbstractTest {
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final StringBuilder graphTokens = new StringBuilder();
     for (Token token : VariantGraphWitnessAdapter.create(graph).getTokens()) {
-      graphTokens.append(" ").append(((SimpleToken) token).getNormalized());
+      graphTokens.append(" ").append(((VariantGraphVertexTokenAdapter) token).getNormalized());
     }
 
     assertEquals("# its soft changeless light neither daylight nor moonlight nor starlight nor unlike any light he could remember from the days & and nights when day followed hard on night & and vice versa #", graphTokens.toString().trim());
@@ -167,8 +168,8 @@ public class BeckettTest extends AbstractTest {
     final VariantGraphBuilder builder = merge(graph, w[4]);
     final List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
     final List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
-    assertEquals("The same as when", SimpleToken.toString(phraseMatches.get(0).right));
-    assertEquals("Darly", SimpleToken.toString(phraseMatches.get(1).right));
+    assertEquals("the same as when", SimpleToken.toString(phraseMatches.get(0).right));
+    assertEquals("darly", SimpleToken.toString(phraseMatches.get(1).right));
     assertEquals("among others", SimpleToken.toString(phraseMatches.get(2).right));
     assertEquals("once died left him .", SimpleToken.toString(phraseMatches.get(3).right));
     assertEquals("darly", SimpleToken.toString(transpositions.get(0).right));

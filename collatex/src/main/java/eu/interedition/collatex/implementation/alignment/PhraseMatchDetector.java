@@ -1,74 +1,72 @@
+/*
+ * Copyright 2011 The Interedition Development Group.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import eu.interedition.collatex.implementation.Tuple;
-import eu.interedition.collatex.interfaces.Token;
+import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter;
 import eu.interedition.collatex.interfaces.IWitness;
-
+import eu.interedition.collatex.interfaces.Token;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+/**
+ *
+ * @author Ronald
+ */
 public class PhraseMatchDetector {
-  
-  public List<Tuple<List<Token>>> detect(Map<Token, Token> linkedTokens, IWitness base, IWitness witness) {
-    final Map<Token, Tuple<Token>> tokenIndex = createTokenIndex(linkedTokens);
-    final Map<Tuple<Token>, Tuple<Token>> prevMatchesInBase = mapPrevTokenMatches(base, tokenIndex);
-    final Map<Tuple<Token>, Tuple<Token>> prevMatchesInWitness = mapPrevTokenMatches(witness, tokenIndex);
 
+  public List<Tuple<List<Token>>> detect(Map<Token, Token> linkedTokens, IWitness base, IWitness witness) {
+    //rank the variant graph
+    VariantGraphWitnessAdapter adapter = (VariantGraphWitnessAdapter) base;
+    adapter.getGraph().rank();
+    
     final List<Tuple<List<Token>>> phraseMatches = Lists.newArrayList();
 
     // chain token matches
     final List<Token> basePhrase = Lists.newArrayList();
     final List<Token> witnessPhrase = Lists.newArrayList();
-    for (Tuple<Token> witnessMatch : prevMatchesInWitness.keySet()) {
-      final Tuple<Token> prevMatchInBase = prevMatchesInBase.get(witnessMatch);
-      final Tuple<Token> prevMatchInWitness = prevMatchesInWitness.get(witnessMatch);
-      if (prevMatchInBase != prevMatchInWitness) {
+    int previousRank = 1;
+
+    //TODO: previous rank should be influenced by ommissions!
+    for (Token token : witness.getTokens()) {
+      if (!linkedTokens.containsKey(token)) {
+        continue;
+      }
+      Token baseToken = linkedTokens.get(token);
+      VariantGraphVertexTokenAdapter a = (VariantGraphVertexTokenAdapter) baseToken;
+      int rank = a.getVertex().getRank();
+      //see todo above: difference will not always be 0 or 1!
+      int difference = rank - previousRank;
+      if (difference != 0 && difference != 1) {
         if (!basePhrase.isEmpty()) {
-        // start a new sequence
+          // start a new sequence
           phraseMatches.add(new Tuple<List<Token>>(Lists.newArrayList(basePhrase), Lists.newArrayList(witnessPhrase)));
         }
         // clear buffer
         basePhrase.clear();
         witnessPhrase.clear();
       }
-      basePhrase.add(witnessMatch.right);
-      witnessPhrase.add(witnessMatch.left);
+      basePhrase.add(baseToken);
+      witnessPhrase.add(token);
+      previousRank = rank;
     }
     if (!basePhrase.isEmpty()) {
       phraseMatches.add(new Tuple<List<Token>>(Lists.newArrayList(basePhrase), Lists.newArrayList(witnessPhrase)));
     }
-
     return phraseMatches;
   }
-
-  private Map<Tuple<Token>, Tuple<Token>> mapPrevTokenMatches(IWitness in, Map<Token, Tuple<Token>> tokenIndex) {
-    final Map<Tuple<Token>, Tuple<Token>> predecessors = Maps.newLinkedHashMap();
-    Tuple<Token> prev = null;
-    for (Token token : in.getTokens()) {
-      if (!tokenIndex.containsKey(token)) {
-        // skip non matches
-        continue;
-      }
-      final Tuple<Token> next = tokenIndex.get(token);
-      predecessors.put(next, prev);
-      prev = next;
-    }
-    return predecessors;
-  }
-
-  private Map<Token, Tuple<Token>> createTokenIndex(Map<Token, Token> linkedTokens) {
-    final Map<Token, Tuple<Token>> index = Maps.newLinkedHashMap();
-    for (Entry<Token, Token> entry : linkedTokens.entrySet()) {
-      final Token left = entry.getKey();
-      final Token right = entry.getValue();
-      final Tuple<Token> alignedToken = new Tuple<Token>(left, right);
-      index.put(left, alignedToken);
-      index.put(right, alignedToken);
-    }
-    return index;
-  }
-
 }

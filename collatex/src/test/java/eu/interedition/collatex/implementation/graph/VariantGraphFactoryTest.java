@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.graph.db;
+package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;

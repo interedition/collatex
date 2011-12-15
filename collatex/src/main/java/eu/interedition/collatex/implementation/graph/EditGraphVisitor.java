@@ -1,16 +1,25 @@
 package eu.interedition.collatex.implementation.graph;
 
-import java.util.*;
-
-import com.google.common.collect.*;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.matching.Matches;
-import eu.interedition.collatex.implementation.output.DotExporter;
 import eu.interedition.collatex.interfaces.Token;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@Deprecated
 public class EditGraphVisitor {
 
   private static final Logger LOG = LoggerFactory.getLogger(EditGraphVisitor.class);
@@ -26,8 +35,6 @@ public class EditGraphVisitor {
   // than the minimum amount of sequences for the whole graph
   // This is probably not the end solution
   public List<EditGraphEdge> getShortestPath(Matches match) {
-    exportGraphBefore();
-
     Map<EditGraphVertex, Integer> determineMinSequences = determineMinSequences(editGraph);
     int minSequences = determineMinSequences.get(editGraph.getStart());
 
@@ -42,22 +49,10 @@ public class EditGraphVisitor {
       currentVertex = edge.to();
     }
 
-    exportGraphAfter(graphWithSinglePath);
-
     if (Iterables.size(currentVertex.outgoing()) > 1) {
       throw new RuntimeException("Vertex " + currentVertex + " has more than one possible outgoing edge!");
     }
     return shortestPath;
-  }
-
-  private void exportGraphBefore() {
-    LOG.info("generating shortestpath_before.svg");
-    DotExporter.generateSVG("site/collation/shortestpath_before.svg", DotExporter.toDot(editGraph), "Shortest Path before");
-  }
-
-  private void exportGraphAfter(EditGraph graphWithSinglePath) {
-    LOG.info("generating shortestpath_after.svg");
-    DotExporter.generateSVG("site/collation/shortestpath_after.svg", DotExporter.toDot(graphWithSinglePath), "Shortest Path after");
   }
 
   public Map<EditGraphVertex, Integer> determineMinSequences(EditGraph graph) {
