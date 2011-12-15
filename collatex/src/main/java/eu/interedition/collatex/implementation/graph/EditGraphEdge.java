@@ -19,10 +19,9 @@ public class EditGraphEdge extends GraphEdge<EditGraph, EditGraphVertex> {
     super(graph, relationship);
   }
 
-  public EditGraphEdge(EditGraph graph, EditGraphVertex from, EditGraphVertex to, EditOperation operation, int score) {
+  public EditGraphEdge(EditGraph graph, EditGraphVertex from, EditGraphVertex to, EditOperation operation) {
     super(graph, from.getNode().createRelationshipTo(to.getNode(), PATH));
     relationship.setProperty(EDIT_OPERATION_KEY, operation.ordinal());
-    relationship.setProperty(SCORE_KEY, score);
   }
 
   public EditOperation getEditOperation() {
@@ -31,7 +30,11 @@ public class EditGraphEdge extends GraphEdge<EditGraph, EditGraphVertex> {
 
 
   public int getScore() {
-    return (Integer) relationship.getProperty(SCORE_KEY);
+    return (Integer) relationship.getProperty(SCORE_KEY, 0);
+  }
+
+  public void setScore(int score) {
+    relationship.setProperty(SCORE_KEY, score);
   }
 
   public SortedSet<Integer> getShortestPathIds() {
@@ -42,33 +45,6 @@ public class EditGraphEdge extends GraphEdge<EditGraph, EditGraphVertex> {
     final SortedSet<Integer> paths = getShortestPathIds();
     paths.add(path);
     relationship.setProperty(SHORTEST_PATH_IDS_KEY, paths.toArray(new Integer[paths.size()]));
-  }
-
-  @Override
-  public String toString() {
-    return "(" + from() + ")->(" + to() + "):" + getEditOperation();
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(from(), to(), getEditOperation());
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (obj != null && obj instanceof EditGraphEdge) {
-      final EditGraphEdge edge = (EditGraphEdge) obj;
-
-      if (!Objects.equal(from(), edge.from())) {
-        return false;
-      }
-      if (!Objects.equal(to(), edge.to())) {
-        return false;
-      }
-
-      return Objects.equal(getEditOperation(), edge.getEditOperation());
-    }
-    return super.equals(obj);
   }
 
   public static Function<Relationship, EditGraphEdge> createWrapper(final EditGraph graph) {

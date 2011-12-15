@@ -16,16 +16,17 @@ public class EditGraphVertex extends GraphVertex<EditGraph> {
 
   private static final String BASE_KEY = "base";
   private static final String WITNESS_KEY = "witness";
-  private static final String WEIGHT_KEY = "weight";
+  private static final String WITNESS_INDEX_KEY = "witnessIndex";
 
   public EditGraphVertex(EditGraph graph, Node node) {
     super(graph, node);
   }
 
-  public EditGraphVertex(EditGraph graph, Token base, Token witness) {
+  public EditGraphVertex(EditGraph graph, Token base, Token witness, int witnessIndex) {
     super(graph, graph.getDatabase().createNode());
     setBase(base);
     setWitness(witness);
+    setWitnessIndex(witnessIndex);
   }
 
   public Token getBase() {
@@ -44,16 +45,12 @@ public class EditGraphVertex extends GraphVertex<EditGraph> {
     setToken(WITNESS_KEY, token);
   }
 
-  public int getWeight() {
-    return (Integer) node.getProperty(WEIGHT_KEY, -1);
+  public int getWitnessIndex() {
+    return (Integer) node.getProperty(WITNESS_INDEX_KEY);
   }
 
-  public void setWeight(int weight) {
-    if (weight == -1) {
-      node.removeProperty(WEIGHT_KEY);
-    } else {
-      node.setProperty(WEIGHT_KEY, weight);
-    }
+  public void setWitnessIndex(int witnessIndex) {
+    node.setProperty(WITNESS_INDEX_KEY, witnessIndex);
   }
 
   public Iterable<EditGraphEdge> outgoing() {
@@ -78,34 +75,6 @@ public class EditGraphVertex extends GraphVertex<EditGraph> {
     }
   }
   
-  @Override
-  public String toString() {
-    if (getWitness() == null || getBase() == null) {
-      return "start/end vertex";
-    }
-    String string = getWitness().toString() + "->" + getBase().toString();
-    final int weight = getWeight();
-    if (weight > 0) {
-      string += " (weight:" + String.valueOf(weight) + ")";
-    }
-    return string;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getBase(), getWitness());
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (obj != null && obj instanceof EditGraphVertex) {
-      final EditGraphVertex vertex = (EditGraphVertex) obj;
-      return Objects.equal(getBase(), vertex.getBase()) && Objects.equal(getWitness(), vertex.getWitness());
-
-    }
-    return super.equals(obj);
-  }
-
   public static Function<Node, EditGraphVertex> createWrapper(final EditGraph graph) {
     return new Function<Node, EditGraphVertex>() {
       @Override

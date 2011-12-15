@@ -45,7 +45,7 @@ public class EditGraphPanel extends VisualizationViewer<EditGraphVertexModel, Ed
     rc.setVertexFillPaintTransformer(new Transformer<EditGraphVertexModel, Paint>() {
       @Override
       public Paint transform(EditGraphVertexModel model) {
-        return model.getBase().equals(model.getWitness()) ? Color.WHITE : Color.LIGHT_GRAY;
+        return model.getBase().equals(model.getWitness()) ? Color.BLACK : Color.WHITE;
       }
     });
     rc.setEdgeDrawPaintTransformer(new Transformer<EditGraphEdgeModel, Paint>() {
@@ -58,6 +58,12 @@ public class EditGraphPanel extends VisualizationViewer<EditGraphVertexModel, Ed
       @Override
       public Stroke transform(EditGraphEdgeModel model) {
         return (model.getEditOperation() == EditOperation.GAP ? CollateXLaboratory.DASHED_STROKE : CollateXLaboratory.SOLID_STROKE);
+      }
+    });
+    rc.setEdgeLabelTransformer(new Transformer<EditGraphEdgeModel, String>() {
+      @Override
+      public String transform(EditGraphEdgeModel model) {
+        return Integer.toString(model.getScore());
       }
     });
   }

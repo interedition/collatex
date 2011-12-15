@@ -10,12 +10,10 @@ import java.util.SortedSet;
 public class EditGraphVertexModel {
   private final Token base;
   private final Token witness;
-  private final int weight;
 
-  public EditGraphVertexModel(Token witness, Token base, int weight) {
+  public EditGraphVertexModel(Token witness, Token base) {
     this.base = base;
     this.witness = witness;
-    this.weight = weight;
   }
 
   public Token getBase() {
@@ -24,9 +22,5 @@ public class EditGraphVertexModel {
 
   public Token getWitness() {
     return witness;
-  }
-
-  public int getWeight() {
-    return weight;
   }
 }

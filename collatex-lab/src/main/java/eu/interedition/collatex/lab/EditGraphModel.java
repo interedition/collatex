@@ -43,7 +43,7 @@ public class EditGraphModel extends DirectedSparseGraph<EditGraphVertexModel, Ed
 
     final Map<EditGraphVertex, EditGraphVertexModel> vertexMap = Maps.newHashMap();
     for (EditGraphVertex ev : eg.vertices()) {
-      final EditGraphVertexModel v = new EditGraphVertexModel(ev.getBase(), ev.getWitness(), ev.getWeight());
+      final EditGraphVertexModel v = new EditGraphVertexModel(ev.getBase(), ev.getWitness());
       addVertex(v);
       vertexMap.put(ev, v);
       if (eg.getStart().equals(ev)) {

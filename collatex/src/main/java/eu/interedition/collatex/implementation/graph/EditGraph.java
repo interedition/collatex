@@ -51,10 +51,14 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
   @Override
   public void init(Function<Node, EditGraphVertex> vertexWrapper, Function<Relationship, EditGraphEdge> edgeWrapper, Node start, Node end) {
     super.init(vertexWrapper, edgeWrapper, start, end);
+    
     this.start.setBase(SimpleToken.START);
     this.start.setWitness(SimpleToken.START);
+    this.start.setWitnessIndex(-1);
+    
     this.end.setBase(SimpleToken.END);
     this.end.setWitness(SimpleToken.END);
+    this.end.setWitnessIndex(Integer.MAX_VALUE);
   }
 
   public Iterable<EditGraphVertex> vertices() {
@@ -78,13 +82,13 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     Multimap<Token, Token> matches = m.getAll();
     // add for vertices for witness tokens that have a matching base token
     int witnessIndex = 0;
-    int lastMatchIndex = -1;
+    int lastMatch = -1;
     for (Token witnessToken : witness.getTokens()) {
       Collection<Token> baseTokens = matches.get(witnessToken);
       if (!baseTokens.isEmpty()) {
         final Set<EditGraphVertex> vertexSet = Sets.newLinkedHashSet();
         for (Token baseToken : baseTokens) {
-          EditGraphVertex editGraphVertex = new EditGraphVertex(this, baseToken, witnessToken);
+          EditGraphVertex editGraphVertex = new EditGraphVertex(this, baseToken, witnessToken, witnessIndex);
           vertexSet.add(editGraphVertex);
 
           // TODO: you don't want to always draw an edge
@@ -92,7 +96,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
           // TODO: less edges are needed
           for (EditGraphVertex lastVertex : prevVertexSet) {
             Token lastBaseToken = lastVertex.getBase();
-            int score = witnessIndex - lastMatchIndex - 1;
+            int score = witnessIndex - lastMatch - 1;
             EditOperation operation;
             if (base.isNear(lastBaseToken, baseToken)) {
               operation = EditOperation.NO_GAP;
@@ -100,19 +104,21 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
               operation = EditOperation.GAP;
               score++;
             }
-            connect(lastVertex, editGraphVertex, operation, score);
+            connect(lastVertex, editGraphVertex, operation).setScore(score);
           }
         }
         prevVertexSet = vertexSet;
-        lastMatchIndex = witnessIndex;
+        lastMatch = witnessIndex;
       }
       witnessIndex++;
     }
 
+    end.setWitnessIndex(witnessIndex);
+
     // add edges to end vertex
     for (EditGraphVertex lastVertex : prevVertexSet) {
       final boolean lastTokenNearEnd = base.isNear(lastVertex.getBase(), end.getBase());
-      connect(lastVertex, end, lastTokenNearEnd ? EditOperation.NO_GAP : EditOperation.GAP, lastTokenNearEnd ? 0 : 1);
+      connect(lastVertex, end, lastTokenNearEnd ? EditOperation.NO_GAP : EditOperation.GAP).setScore(lastTokenNearEnd ? 0 : 1);
     }
 
     //addSkipVertices(ambiguousNormalized);
@@ -182,7 +188,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     return linkedTokens;
   }
 
-  public EditGraphEdge connect(EditGraphVertex from, EditGraphVertex to, EditOperation operation, int score) {
+  public EditGraphEdge connect(EditGraphVertex from, EditGraphVertex to, EditOperation operation) {
     Preconditions.checkArgument(!from.equals(to));
 
     for (EditGraphEdge e : from.outgoing()) {
@@ -190,7 +196,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
         throw new IllegalStateException(String.format("%s and %s already connected", from, to));
       }
     }
-    return new EditGraphEdge(this, from, to, operation, score);
+    return new EditGraphEdge(this, from, to, operation);
   }
 
   private void addSkipVertices(Set<String> ambiguousNormalized) {
@@ -206,12 +212,12 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
 //              connect(incomingEdge.from(), outgoingEdge.to(), EditOperation.GAP, 3);
 //            }
 //          }
-          final EditGraphVertex skipVertex = new EditGraphVertex(null, null, null);
+          final EditGraphVertex skipVertex = new EditGraphVertex(null, null, null, 0);
           for (EditGraphEdge incomingEdge : incomingEdges) {
-            connect(incomingEdge.from(), skipVertex, EditOperation.GAP, 3);
+            connect(incomingEdge.from(), skipVertex, EditOperation.GAP).setScore(3);
           }
           for (EditGraphEdge outgoingEdge : outgoingEdges) {
-            connect(skipVertex, outgoingEdge.to(), EditOperation.NO_GAP, 0);
+            connect(skipVertex, outgoingEdge.to(), EditOperation.NO_GAP);
           }
         }
       }

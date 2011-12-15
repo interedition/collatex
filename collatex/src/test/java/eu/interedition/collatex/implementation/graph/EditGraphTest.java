@@ -1,6 +1,7 @@
 package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.graph.EditGraph;
@@ -18,6 +19,7 @@ import eu.interedition.collatex.interfaces.Token;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -85,16 +87,13 @@ public class EditGraphTest extends AbstractTest {
   @Test
   public void testShortestPathOneOmissionRepetition() {
     final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
-    EqualityTokenComparator comparator = new EqualityTokenComparator();
-    EditGraph dGraph = graphFactory.newEditGraph().build(w[0], w[1], comparator);
-    EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
-    Matches matches = Matches.between(w[0], w[1], comparator);
-    List<EditGraphEdge> edges = visitor.getShortestPath(matches);
-    assertEquals(EditOperation.GAP, edges.get(0).getEditOperation()); // The ideal path should start with a gap
-    assertEquals(EditOperation.NO_GAP, edges.get(1).getEditOperation());
-    assertEquals(EditOperation.NO_GAP, edges.get(2).getEditOperation());
-    assertEquals(EditOperation.NO_GAP, edges.get(3).getEditOperation());
-    assertEquals(4, edges.size());
+    EditGraph eg = graphFactory.newEditGraph().build(w[0], w[1], new EqualityTokenComparator());
+    final List<EditGraphEdge> shortestPath = Lists.newArrayList(shortestPathIn(eg));
+    assertEquals(4, shortestPath.size());
+    assertEquals(EditOperation.GAP, shortestPath.get(0).getEditOperation()); // The ideal path should start with a gap
+    assertEquals(EditOperation.NO_GAP, shortestPath.get(1).getEditOperation());
+    assertEquals(EditOperation.NO_GAP, shortestPath.get(2).getEditOperation());
+    assertEquals(EditOperation.NO_GAP, shortestPath.get(3).getEditOperation());
   }
 
   // TODO

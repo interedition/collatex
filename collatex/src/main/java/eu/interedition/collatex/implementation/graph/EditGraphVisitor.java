@@ -148,7 +148,7 @@ public class EditGraphVisitor {
         Set<EditGraphEdge> outgoingEdges = Sets.newHashSet(editGraphVertex.outgoing());
         for (EditGraphEdge incomingEdge : incomingEdges) {
           for (EditGraphEdge outgoingEdge : outgoingEdges) {
-            editGraph.connect(incomingEdge.from(), outgoingEdge.to(), EditOperation.GAP, incomingEdge.getScore() + outgoingEdge.getScore());
+            editGraph.connect(incomingEdge.from(), outgoingEdge.to(), EditOperation.GAP).setScore(incomingEdge.getScore() + outgoingEdge.getScore());
           }
         }
         for (EditGraphEdge e : incomingEdges) {
@@ -233,7 +233,9 @@ public class EditGraphVisitor {
     Set<EditGraphEdge> newEdges = Sets.newLinkedHashSet();
     for (EditGraphEdge edge : edgeSet) {
       if (verticesToKeep.contains(edge.from()) && verticesToKeep.contains(edge.to())) {
-        newEdges.add(editGraph.connect(edge.from(), edge.to(), edge.getEditOperation(), edge.getScore()));
+        final EditGraphEdge newEdge = editGraph.connect(edge.from(), edge.to(), edge.getEditOperation());
+        newEdge.setScore(edge.getScore());
+        newEdges.add(newEdge);
       }
     }
     return newEdges;
@@ -252,11 +254,11 @@ public class EditGraphVisitor {
       Integer minWeight = minWeightProVertex.get(vertex);
       if (ambiguous.contains(token)) {
         if (minWeight <= localminimum) {
-          vertex.setWeight(minWeight);
+          // FIXME: vertex.setWeight(minWeight);
           verticesToKeep.add(vertex);
         }
       } else {
-        vertex.setWeight(minWeight);
+        // FIXME: vertex.setWeight(minWeight);
         verticesToKeep.add(vertex);
         localminimum = minWeight;
       }
