@@ -74,7 +74,12 @@ public class EditGraphVertex extends GraphVertex<EditGraph> {
       node.setProperty(key, tokenRef);
     }
   }
-  
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getBase().toString()).append(" = ").append(getWitness().toString()).toString();
+  }
+
   public static Function<Node, EditGraphVertex> createWrapper(final EditGraph graph) {
     return new Function<Node, EditGraphVertex>() {
       @Override

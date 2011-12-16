@@ -43,5 +43,8 @@ public abstract class GraphEdge<G extends Graph<V, ?>, V extends GraphVertex> {
     return super.equals(obj);
   }
 
-
+  @Override
+  public String toString() {
+    return new StringBuilder(from().toString()).append(" -> ").append(to().toString()).toString();
+  }
 }

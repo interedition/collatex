@@ -15,11 +15,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipExpander;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.TraversalDescription;
-import org.neo4j.kernel.StandardExpander;
 import org.neo4j.kernel.Traversal;
 
 import java.util.Collection;
@@ -30,6 +28,8 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.transform;
+import static eu.interedition.collatex.implementation.graph.EditOperation.GAP;
+import static eu.interedition.collatex.implementation.graph.EditOperation.NO_GAP;
 import static eu.interedition.collatex.implementation.graph.GraphRelationshipType.PATH;
 import static org.neo4j.graphalgo.GraphAlgoFactory.dijkstra;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -82,7 +82,6 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     Multimap<Token, Token> matches = m.getAll();
     // add for vertices for witness tokens that have a matching base token
     int witnessIndex = 0;
-    int lastMatch = -1;
     for (Token witnessToken : witness.getTokens()) {
       Collection<Token> baseTokens = matches.get(witnessToken);
       if (!baseTokens.isEmpty()) {
@@ -94,21 +93,11 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
           // TODO: you don't want to always draw an edge
           // TODO: in the case of ngrams in witness and superbase
           // TODO: less edges are needed
-          for (EditGraphVertex lastVertex : prevVertexSet) {
-            Token lastBaseToken = lastVertex.getBase();
-            int score = witnessIndex - lastMatch - 1;
-            EditOperation operation;
-            if (base.isNear(lastBaseToken, baseToken)) {
-              operation = EditOperation.NO_GAP;
-            } else {
-              operation = EditOperation.GAP;
-              score++;
-            }
-            connect(lastVertex, editGraphVertex, operation).setScore(score);
+          for (EditGraphVertex prevVertex : prevVertexSet) {
+            connect(prevVertex, editGraphVertex, base.isNear(prevVertex.getBase(), baseToken) ? NO_GAP : GAP);
           }
         }
         prevVertexSet = vertexSet;
-        lastMatch = witnessIndex;
       }
       witnessIndex++;
     }
@@ -117,9 +106,10 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
 
     // add edges to end vertex
     for (EditGraphVertex lastVertex : prevVertexSet) {
-      final boolean lastTokenNearEnd = base.isNear(lastVertex.getBase(), end.getBase());
-      connect(lastVertex, end, lastTokenNearEnd ? EditOperation.NO_GAP : EditOperation.GAP).setScore(lastTokenNearEnd ? 0 : 1);
+      connect(lastVertex, end, base.isNear(lastVertex.getBase(), end.getBase()) ? NO_GAP : GAP);
     }
+
+    score();
 
     //addSkipVertices(ambiguousNormalized);
 
@@ -132,6 +122,28 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     }
 
     return this;
+  }
+
+  protected void score() {
+    for (EditGraphEdge e : edges()) {
+      int score = (e.to().getWitnessIndex() - e.from().getWitnessIndex()) - 1;
+      if (e.getEditOperation() == GAP) {
+        score += 1;
+      }
+
+      boolean sequence = true;
+      for (EditGraphEdge prev : e.from().incoming()) {
+        if (prev.getEditOperation() != e.getEditOperation()) {
+          sequence = false;
+          break;
+        }
+      }
+      if (sequence) {
+        score -= 1;
+      }
+
+      e.setScore(Math.max(score, 0));
+    }
   }
 
   public Iterable<Iterable<EditGraphEdge>> shortestPaths() {
@@ -214,10 +226,10 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
 //          }
           final EditGraphVertex skipVertex = new EditGraphVertex(null, null, null, 0);
           for (EditGraphEdge incomingEdge : incomingEdges) {
-            connect(incomingEdge.from(), skipVertex, EditOperation.GAP).setScore(3);
+            connect(incomingEdge.from(), skipVertex, GAP).setScore(3);
           }
           for (EditGraphEdge outgoingEdge : outgoingEdges) {
-            connect(skipVertex, outgoingEdge.to(), EditOperation.NO_GAP);
+            connect(skipVertex, outgoingEdge.to(), NO_GAP);
           }
         }
       }

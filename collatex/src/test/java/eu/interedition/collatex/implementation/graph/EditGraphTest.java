@@ -61,27 +61,12 @@ public class EditGraphTest extends AbstractTest {
     final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     EditGraph eg = graphFactory.newEditGraph().build(w[0], w[1], new EqualityTokenComparator());
     assertShortestPathVertices(eg, "the", "black", "cat");
-  }
 
-  //When there are multiple paths with the same minimum number of gaps
-  //do a second pass that tries to find the longest common sequence
-  @Test
-  public void testTryToFindMinimumAmountOfSequences() {
-    final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
-    EqualityTokenComparator comparator = new EqualityTokenComparator();
-    EditGraph dGraph = graphFactory.newEditGraph().build(w[0], w[1], comparator);
-    EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
-    Matches matches = Matches.between(w[0], w[1], comparator);
-    EditGraph dGraph2 = visitor.removeChoicesThatIntroduceGaps(matches);
-    Map<EditGraphVertex, Integer> determineMinSequences = visitor.determineMinSequences(dGraph2);
-    // asserts
-    Iterator<EditGraphVertex> dgVerticesIterator = dGraph2.vertices().iterator();
-    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
-    assertEquals(new Integer(2), determineMinSequences.get(dgVerticesIterator.next()));
-    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
-    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
-    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
-    assertEquals(new Integer(1), determineMinSequences.get(dgVerticesIterator.next()));
+    final List<EditGraphEdge> edges = Lists.newArrayList(shortestPathIn(eg));
+    assertEquals(4, edges.size());
+    assertEquals(4, ((SimpleToken) edges.get(1).from().getBase()).getIndex());
+    assertEquals(5, ((SimpleToken) edges.get(2).from().getBase()).getIndex());
+    assertEquals(6, ((SimpleToken) edges.get(3).from().getBase()).getIndex());
   }
 
   @Test

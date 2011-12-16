@@ -38,4 +38,9 @@ public abstract class GraphVertex<G extends Graph> {
     }
     return super.equals(obj);
   }
+
+  @Override
+  public String toString() {
+    return node.toString();
+  }
 }
