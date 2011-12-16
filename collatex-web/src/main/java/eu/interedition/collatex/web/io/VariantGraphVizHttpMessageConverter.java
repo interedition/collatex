@@ -14,6 +14,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -24,13 +25,11 @@ public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConv
    */
   protected static final MediaType IMAGE_SVG_XML = new MediaType("image", "svg+xml");
 
-  protected static final MediaType TEXT_GRAPHVIZ = new MediaType("text", "x-graphviz");
-
   @Autowired
   private GraphVizService graphVizService;
 
   public VariantGraphVizHttpMessageConverter() {
-    super(TEXT_GRAPHVIZ, IMAGE_SVG_XML);
+    super(MediaType.TEXT_PLAIN, IMAGE_SVG_XML);
   }
 
   @Override
@@ -60,7 +59,7 @@ public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConv
       if (contentType != null && contentType.isCompatibleWith(IMAGE_SVG_XML)) {
         graphVizService.toSvg(graph, body, false);
       } else {
-        graphVizService.toDot(graph, new OutputStreamWriter(body), false);
+        graphVizService.toDot(graph, new OutputStreamWriter(body, Charset.forName("UTF-8")), false);
       }
     } finally {
       Closeables.closeQuietly(body);

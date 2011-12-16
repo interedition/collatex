@@ -33,10 +33,27 @@
 
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver"/>
 
-    <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-        <property name="contentType" value="text/html;charset=utf-8"/>
-        <property name="prefix" value=""/>
-        <property name="suffix" value=".ftl"/>
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="defaultContentType" value="text/html;charset=utf-8" />
+        <property name="favorParameter" value="true"/>
+        <property name="parameterName" value="format"/>
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html;charset=utf-8"/>
+                <entry key="tei" value="application/tei+xml"/>
+                <entry key="graphml" value="application/graphml+xml"/>
+                <entry key="text" value="text/plain"/>
+                <entry key="svg" value="image/svg+xml"/>
+                <entry key="json" value="application/json"/>
+            </map>
+        </property>
+        <property name="viewResolvers">
+            <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+                <property name="contentType" value="text/html;charset=utf-8"/>
+                <property name="prefix" value=""/>
+                <property name="suffix" value=".ftl"/>
+            </bean>            
+        </property>
     </bean>
 
     <bean id="freemarkerConfigurer" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">

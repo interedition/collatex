@@ -1,5 +1,10 @@
 YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", function(Y) {
-    var create = Y.Node.create, sub = Y.Lang.sub;
+    var create = Y.Node.create,
+        sub = Y.Lang.sub,
+        svgContainer = null,
+        tableContainer = null,
+        graphVizDotContainer = null,
+        graphmlContainer = null;
 
     function addWitness(e) {
         if (e) e.preventDefault();
@@ -46,15 +51,14 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
 
     function collate(e) {
         if (e) e.preventDefault();
+        clearResults();
         var witnesses = getWitnesses();
         if (witnesses.length > 1) {
-            var results = Y.one("#results");
-            results.setContent('<p class="in-progress">Collating, please wait ...</p>')
-
             var collation = { witnesses: [] };
             Y.each(witnesses, function(w, i) {
                 collation.witnesses.push({ id: "W" + (i + 1).toString(), content: witnesses[i] });
             });
+
             Y.io(cp + "/", {
                 method: "post",
                 headers: {
@@ -64,11 +68,9 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
                 data: Y.JSON.stringify(collation),
                 on: {
                     success: function(transactionId, resp) {
-                        results.setContent("");
-
                         var at = Y.JSON.parse(resp.responseText);
                         var table = create('<table class="alignment"/>');
-                        results.append(table);
+                        tableContainer.append(table);
 
                         var cells = []
                         var variantStatus = [];
@@ -94,18 +96,65 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
                             table.append(column);
                         }
 
-                        results.scrollIntoView();
+                        tableContainer.scrollIntoView();
                     },
                     failure: function(transactionId, resp) {
-                        results.setContent('<p class="error">' + Y.dump(resp) + '</p>');
+                        tableContainer.setContent('<p class="error">' + Y.dump(resp) + '</p>');
                     }
                 }
             });
+            Y.io(cp + "/", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "text/plain"
+                },
+                data: Y.JSON.stringify(collation),
+                on: {
+                    "success": function(transactionId, resp) {
+                        graphVizDotContainer.append(sub('<textarea rows="{rows}" style="width: 30em" readonly="readonly">{content}</textarea>', {
+                            rows: Math.min(resp.responseText.match(/\n/g).length, 20),
+                            content: Y.Escape.html(resp.responseText)
+                        }));
+                    }
+                }
+            });
+            Y.io(cp + "/", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/graphml+xml"
+                },
+                data: Y.JSON.stringify(collation),
+                on: {
+                    "success": function(transactionId, resp) {
+                        graphmlContainer.append(sub('<textarea rows="{rows}" style="width: 30em" readonly="readonly">{content}</textarea>', {
+                            rows: Math.min(resp.responseText.match(/\n/g).length, 20),
+                            content: Y.Escape.html(resp.responseText)
+                        }));
+                    }
+                }
+            });
+            Y.io(cp + "/", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "image/svg+xml"
+                },
+                data: Y.JSON.stringify(collation),
+                on: {
+                    "success": function(transactionId, resp) {
+                        svgContainer.getDOMNode().appendChild(document.importNode(resp.responseXML.documentElement, true));
+                    }
+                }
+            });
+
         }
         setWitnesses(witnesses);
     }
 
     function selectExample(e) {
+        clearResults();
         var selected = this.get("value").replace(/^e/, "");
         if (selected.length == 0) {
             setWitnesses(["", ""]);
@@ -115,7 +164,18 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
         }
     }
 
+    function clearResults() {
+        svgContainer.empty();
+        tableContainer.empty();
+        graphVizDotContainer.empty();
+        graphmlContainer.empty();
+    }
     Y.on("domready", function() {
+        svgContainer = Y.one("#variant-graph-svg");
+        tableContainer = Y.one("#alignment-table");
+        graphVizDotContainer = Y.one("#graphviz-dot");
+        graphmlContainer = Y.one("#graphml");
+
         setWitnesses(["", ""]);
 
         var exampleSelect = Y.one("#examples");

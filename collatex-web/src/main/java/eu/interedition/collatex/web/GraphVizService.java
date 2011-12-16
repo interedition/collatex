@@ -91,7 +91,7 @@ public class GraphVizService implements InitializingBean {
 
     Writer dotWriter = null;
     try {
-      toDot(vg, dotWriter = new OutputStreamWriter(dotBuf, Charset.defaultCharset()), transpositions);
+      toDot(vg, dotWriter = new OutputStreamWriter(dotBuf, Charset.forName("UTF-8")), transpositions);
     } finally {
       Closeables.close(dotWriter, false);
     }
