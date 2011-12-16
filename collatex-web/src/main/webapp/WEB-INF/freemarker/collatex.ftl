@@ -1,6 +1,6 @@
 <#assign cp = springMacroRequestContext.getContextPath()>
 
-<#macro page title>
+<#macro page title header="">
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,6 +14,7 @@
     <link rel="stylesheet" type="text/css" href="${cp}/static/collatex.css"/>
     <script type="text/javascript">var cp = "${cp?js_string}";</script>
     <script type="text/javascript" src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
+    <#if header?has_content>${header}</#if>
 </head>
 <body class="yui3-skin-sam">
 <table id="top-bar">

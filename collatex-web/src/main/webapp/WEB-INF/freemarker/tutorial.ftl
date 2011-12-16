@@ -1,4 +1,11 @@
-<@c.page title="REST service">
+<#assign header>
+  <link href="http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css" rel="stylesheet" type="text/css">
+  <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shCore.js" type="text/javascript"></script>
+  <#-- <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shAutoloader.js" type="text/javascript"></script> -->
+  <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushXml.js" type="text/javascript"></script>
+  <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushJScript.js" type="text/javascript"></script>
+</#assign>
+<@c.page title="REST service" header=header>
 	<h1>REST service</h1>
 	
 	<p>
@@ -19,7 +26,7 @@
 	</p>
 	
 	<p>
-	<pre>Content-Type: application/json;charset=UTF-8
+	<pre class="brush: js">Content-Type: application/json;charset=UTF-8
 	
 {
 	"witnesses" : [
@@ -39,7 +46,7 @@
 	</p>
 	
 	<p>
-	<pre>{
+	<pre class="brush: js">{
         "witnesses" : [
                 {"id" : "A", "tokens" : [
                         { "t" : "A" },
@@ -83,7 +90,7 @@
 	<h3>Example: Alignment table in JSON</h3>
 	
 	<p>The indentation is added for readability and not included in the output. Gaps in the table are represented by <code>null</code>.</p>
-	<pre>{"alignment":[        
+	<pre class="brush: js">{"alignment":[
 	{"witness":"A","tokens":[                
 		{"t":"A","n":"a"},                
 		{"t":"nice","n":"nice"},                
@@ -105,7 +112,7 @@
 	
 	<h3>Example: Critical apparatus in TEI P5</h3>
 	
-	<pre>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<pre class="brush: xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?>
 &lt;collatex:apparatus xmlns:collatex="http://interedition.eu/collatex/ns/1.0" xmlns="http://www.tei-c.org/ns/1.0">A &lt;app>
         &lt;rdg wit="#A">nice black&lt;/rdg>
         &lt;rdg wit="#B">white&lt;/rdg>
@@ -123,7 +130,7 @@
 	<p>For the example witnesses from the Input section above, the output in GraphML format will look as follows.  
 	The 'identical' key, not used here, is set for those nodes that are transposed duplicates of other nodes.
 	</p>
-	<pre>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<pre class="brush: xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?>
 &lt;graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
     &lt;key attr.name="number" attr.type="int" for="node" id="d1"/>
     &lt;key attr.name="token" attr.type="string" for="node" id="d0"/>
@@ -264,4 +271,9 @@
         &lt;/edge>
     &lt;/graph>
 &lt;/graphml></pre>
+
+    <script type="text/javascript">
+      SyntaxHighlighter.defaults['toolbar'] = false;
+      SyntaxHighlighter.all()
+    </script>
 </@c.page>
