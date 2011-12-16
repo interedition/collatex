@@ -3,6 +3,7 @@ package eu.interedition.collatex.implementation.graph;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -131,25 +132,29 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
         score += 1;
       }
 
+      final Iterable<EditGraphEdge> prevEdges = e.from().incoming();
       boolean sequence = true;
-      for (EditGraphEdge prev : e.from().incoming()) {
+      for (EditGraphEdge prev : prevEdges) {
         if (prev.getEditOperation() != e.getEditOperation()) {
           sequence = false;
           break;
         }
       }
-      if (sequence) {
+      if (!Iterables.isEmpty(prevEdges) && sequence) {
         score -= 1;
       }
 
-      e.setScore(Math.max(score, 0));
+      e.setScore(score);
     }
   }
 
   public Iterable<Iterable<EditGraphEdge>> shortestPaths() {
     int maxId = -1;
     for (EditGraphEdge e : start.outgoing()) {
-      maxId = Math.max(maxId, e.getShortestPathIds().last());
+      final SortedSet<Integer> shortestPathIds = e.getShortestPathIds();
+      if (!shortestPathIds.isEmpty()) {
+        maxId = Math.max(maxId, shortestPathIds.last());
+      }
     }
     
     final int lastPathId = maxId;

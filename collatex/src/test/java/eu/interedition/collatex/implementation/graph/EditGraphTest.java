@@ -4,13 +4,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
-import eu.interedition.collatex.implementation.graph.EditGraph;
-import eu.interedition.collatex.implementation.graph.EditGraphEdge;
-import eu.interedition.collatex.implementation.graph.EditGraphLinker;
-import eu.interedition.collatex.implementation.graph.EditGraphVertex;
-import eu.interedition.collatex.implementation.graph.EditGraphVisitor;
-import eu.interedition.collatex.implementation.graph.EditOperation;
-import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.matching.Matches;
@@ -19,7 +12,6 @@ import eu.interedition.collatex.interfaces.Token;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -81,23 +73,13 @@ public class EditGraphTest extends AbstractTest {
     assertEquals(EditOperation.NO_GAP, shortestPath.get(3).getEditOperation());
   }
 
-  // TODO
-  // All the witness are equal
-  // There should only be one valid path through this decision graph
-  @Ignore
   @Test
   public void testShortestPathEverythingEqual() {
+    // All the witness are equal
+    // There should only be one valid path through this decision graph
     final IWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
-    EqualityTokenComparator comparator = new EqualityTokenComparator();
-    EditGraph dGraph = graphFactory.newEditGraph().build(w[0], w[1], comparator);
-    EditGraphVisitor visitor = new EditGraphVisitor(dGraph);
-
-    Matches matches = Matches.between(w[0], w[1], comparator);
-    List<EditGraphEdge> path = visitor.getShortestPath(matches);
-    // we expect 8 edges
-    // they all should have weight 0
-    Iterator<EditGraphEdge> edges = path.iterator();
-    assertEquals(new Integer(0), edges.next().getEditOperation());
+    EditGraph eg = graphFactory.newEditGraph().build(w[0], w[1], new EqualityTokenComparator());
+    assertEquals(1, Iterables.size(eg.shortestPaths()));
   }
 
   protected static void assertShortestPathVertices(EditGraph dGraph, String... vertices) {
