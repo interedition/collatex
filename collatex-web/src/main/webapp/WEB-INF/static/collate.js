@@ -1,4 +1,4 @@
-YUI().use("io", "json", "dump", "event", "node", "escape", function(Y) {
+YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", function(Y) {
     var create = Y.Node.create, sub = Y.Lang.sub;
 
     function addWitness(e) {
@@ -28,8 +28,8 @@ YUI().use("io", "json", "dump", "event", "node", "escape", function(Y) {
         for (var wc = 0; wc < contents.length; wc++) {
             var witnessData = { id: "witness-" + wc.toString(), label: "Witness #" + (wc + 1).toString(), contents: Y.Escape.html(contents[wc]) };
             witnessContainer.append(create('<div class="yui3-g form-element" />')
-                    .append(create('<div class="yui3-u-1-4"/>').append(sub('<label for="{id}">{label}:</label>', witnessData)))
-                    .append(create('<div class="yui3-u"/>').append(sub('<textarea id="{id}" name="{id}" rows="3" cols="80" style="width: 20em">{contents}</textarea>', witnessData))));
+                    .append(create('<div class="yui3-u-1-6 form-label"/>').append(sub('<label for="{id}">{label}:</label>', witnessData)))
+                    .append(create('<div class="yui3-u form-input"/>').append(sub('<textarea id="{id}" name="{id}" rows="3" cols="80" style="width: 50em">{contents}</textarea>', witnessData))));
         }
 
         Y.some(contents, function(c, i) {
@@ -59,36 +59,42 @@ YUI().use("io", "json", "dump", "event", "node", "escape", function(Y) {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json",
-                    "Accept": "application/collatex.table+json"
+                    "Accept": "application/json"
                 },
                 data: Y.JSON.stringify(collation),
                 on: {
                     success: function(transactionId, resp) {
                         results.setContent("");
 
-                        var varianceClasses = [ "invariant", "variant" ];
-
                         var at = Y.JSON.parse(resp.responseText);
                         var table = create('<table class="alignment"/>');
                         results.append(table);
-                        Y.each(at.table, function(c, i) {
-                            if (i == 0) {
-                                var header = create("<tr/>");
-                                table.append(header);
-                                Y.each(at.sigils, function(s) {
-                                    header.append('<th>'+ Y.Escape.html(s) + '</th>');
-                                });
-                            }
 
-                            var row = create("<tr/>");
-                            table.append(row);
-
-                            var varianceClass = varianceClasses[at.variance[i]];
-                            Y.each(c, function(t) {
-                                var cell = { content: (t == null ? "&ndash;" : Y.Escape.html(t.t)), varianceClass: varianceClass };
-                                row.append(sub('<td class="{varianceClass}">{content}</td>', cell));
+                        var cells = []
+                        var variantStatus = [];
+                        Y.each(at.table, function(r) {
+                            var cellContents = [];
+                            Y.each(r, function(c) {
+                                cellContents.push(c == null ? null : Y.Array.reduce(c, "", function(str, next) {
+                                    return str + (str.length == 0 ? "" : " ") + next;
+                                }));
                             });
-                        })
+                            cells.push(cellContents);
+                            variantStatus.push(Y.Array.dedupe(Y.Array.filter(cellContents, function(c) { return (c != null); })).length == 1);
+                        });
+
+                        for (var wc = 0; wc < at.sigils.length; wc++) {
+                            var column = create("<tr/>");
+                            column.append('<th>'+ Y.Escape.html(at.sigils[wc]) + '</th>');
+
+                            Y.each(cells, function(r, cc) {
+                                var c = r[wc];
+                                column.append('<td class="' + (variantStatus[cc] ? "invariant" : "variant") + (c == null ? " gap" : "") +  '">' + (c == null ? "" : Y.Escape.html(c)));
+                            });
+                            table.append(column);
+                        }
+
+                        results.scrollIntoView();
                     },
                     failure: function(transactionId, resp) {
                         results.setContent('<p class="error">' + Y.dump(resp) + '</p>');
@@ -115,7 +121,7 @@ YUI().use("io", "json", "dump", "event", "node", "escape", function(Y) {
         var exampleSelect = Y.one("#examples");
         Y.each(examples, function(e, i) {
             var title = e[0];
-            if (title.length > 20) title = title.substring(0, 20) + "…";
+            if (title.length > 20) title = title.substring(0, 80) + "…";
             var exampleData = { value: "e" + i.toString(), title : title };
             exampleSelect.append(sub('<option value="{value}">{title}</option>', exampleData));
         });

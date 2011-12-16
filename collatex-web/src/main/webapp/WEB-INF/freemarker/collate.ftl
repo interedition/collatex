@@ -1,41 +1,47 @@
 <@c.page title="Collate">
-    <div class="yui3-g">
-        <div class="yui3-u-1-2">
-            <h2>Witnesses</h2>
 
-            <form id="collate-form" method="post">
-                <div class="yui3-g form-element">
-                    <div class="yui3-u-1-4"><label for="examples">Examples:</label></div>
-                    <div class="yui3-u">
-                        <select id="examples" name="examples">
-                            <option value=""></option>
-                        </select>
-                    </div>
-                </div>
-                <div id="witnesses">
-                </div>
-                <div class="yui-3">
-                    <div class="yui3-u-1-4">&nbsp;</div>
-                    <div class="yui3-u">
-                        <button id="add-witness">Add</button>
-                        <input type="submit" value="Collate">
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="yui3-u-1-2">
-            <h2>Results</h2>
+    <div id="input">
+        <h2>Witnesses</h2>
 
-            <div id="results"></div>
-        </div>
+        <form id="collate-form" method="post">
+            <div class="yui3-g form-element">
+                <div class="yui3-u-1-6 form-label"><label for="examples">Examples:</label></div>
+                <div class="yui3-u form-input">
+                    <select id="examples" name="examples" style="width: 40em">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div id="witnesses">
+            </div>
+            <div class="yui-3">
+                <div class="yui3-u-1-4">&nbsp;</div>
+                <div class="yui3-u">
+                    <button id="add-witness">Add</button>
+                    <input type="submit" value="Collate">
+                </div>
+            </div>
+        </form>
     </div>
+
+    <div id="output">
+        <h2>Results</h2>
+
+        <div id="results"></div>
+    </div>
+
 
     <script type="text/javascript" src="${cp}/static/examples.js"></script>
     <script type="text/javascript" src="${cp}/static/collate.js"></script>
     <style type="text/css">
-        .invariant { background: inherit; }
-        .variant { background: #ffa07a}
+        table.alignment th { border-width: 2px; padding: 0 1em  }
+        table.alignment td.gap { border: 0; text-align: center }
+        table.alignment td.invariant { border-color: #80BB00 }
+        table.alignment td.variant { border-color: #ffa07a }
+        table.alignment td { white-space: nowrap; }
         .form-element { margin: 1em 0; }
+        .form-label { text-align: right }
+        .form-label label { padding-right: 1em }
         .in-progress { padding: 2em; background: #90ee90; font-weight: bold }
         #results { overflow-x: auto; }
     </style>

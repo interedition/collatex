@@ -36,7 +36,7 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
   private JsonFactory jsonFactory = new JsonFactory();
 
   public VariantGraphJSONSerializer() {
-    super(APPLICATION_VARIANTGRAPH_JSON, APPLICATION_ALIGNMENTTABLE_JSON);
+    super(MediaType.APPLICATION_JSON);
   }
 
   @Override
