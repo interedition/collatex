@@ -3,6 +3,8 @@ package eu.interedition.collatex.implementation.graph;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -20,6 +22,8 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.Traversal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -44,6 +48,7 @@ import static org.neo4j.kernel.Uniqueness.RELATIONSHIP_GLOBAL;
  */
 @SuppressWarnings("serial")
 public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
+  private static final Logger LOG = LoggerFactory.getLogger(EditGraph.class);
 
   public EditGraph(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
     super(database, witnessResolver, tokenResolver);
@@ -192,13 +197,19 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
   }
 
   public Map<Token, Token> linkedTokens() {
-    final Map<Token, Token> linkedTokens = Maps.newLinkedHashMap();
+    final BiMap<Token, Token> linkedTokens = HashBiMap.create();
     for (Iterable<EditGraphEdge> shortestPath : shortestPaths()) {
       for (EditGraphEdge e : shortestPath) {
         final EditGraphVertex vertex = e.from();
-        if (!vertex.equals(start)) {
-          linkedTokens.put(vertex.getWitness(), vertex.getBase());
+        if (vertex.equals(start)) {
+          continue;
         }
+        final Token baseToken = vertex.getBase();
+        if (linkedTokens.containsValue(baseToken)) {
+          LOG.warn("Duplicate match for base token {}", baseToken);
+          continue;
+        }
+        linkedTokens.put(vertex.getWitness(), baseToken);
       }
       break;
     }
