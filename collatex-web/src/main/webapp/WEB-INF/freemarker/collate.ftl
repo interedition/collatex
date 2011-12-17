@@ -1,8 +1,8 @@
 <@c.page title="Collate">
 
-    <h2>Witnesses</h2>
 
-<div id="input">
+    <div id="input">
+        <h2>Witnesses</h2>
         <form id="collate-form" method="post">
             <div class="yui3-g form-element">
                 <div class="yui3-u-1-6 form-label"><label for="examples">Examples:</label></div>
@@ -24,9 +24,10 @@
         </form>
     </div>
 
-    <h2>Results</h2>
 
     <div id="output">
+      <h2>Results</h2>
+
       <h3>Variant Graph</h3>
       <div id="variant-graph-svg"></div>
 
@@ -63,5 +64,6 @@
         .form-label label { padding-right: 1em }
         .in-progress { padding: 2em; background: #90ee90; font-weight: bold }
         #variant-graph-svg, #alignment-table { overflow-x: auto; border: 1px solid #ccc; padding: 1em }
+        #input, #output { margin-top: 2em; padding: 1em; border: 1px solid #ccc; }
     </style>
 </@c.page>

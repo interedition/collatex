@@ -52,122 +52,81 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
 
     function collate(e) {
         if (e) e.preventDefault();
+
         clearResults();
+
         var witnesses = getWitnesses();
-        if (witnesses.length > 1) {
-            var collation = { witnesses: [] };
-            Y.each(witnesses, function(w, i) {
-                collation.witnesses.push({ id: "W" + (i + 1).toString(), content: witnesses[i] });
-            });
-
-            Y.io(cp + "/", {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                data: Y.JSON.stringify(collation),
-                on: {
-                    success: function(transactionId, resp) {
-                        var at = Y.JSON.parse(resp.responseText);
-                        var table = create('<table class="alignment"/>');
-                        tableContainer.append(table);
-
-                        var cells = []
-                        var variantStatus = [];
-                        Y.each(at.table, function(r) {
-                            var cellContents = [];
-                            Y.each(r, function(c) {
-                                cellContents.push(c == null ? null : Y.Array.reduce(c, "", function(str, next) {
-                                    return str + (str.length == 0 ? "" : " ") + next;
-                                }));
-                            });
-                            cells.push(cellContents);
-                            variantStatus.push(Y.Array.dedupe(Y.Array.filter(cellContents, function(c) { return (c != null); })).length == 1);
-                        });
-
-                        for (var wc = 0; wc < at.sigils.length; wc++) {
-                            var column = create("<tr/>");
-                            column.append('<th>'+ Y.Escape.html(at.sigils[wc]) + '</th>');
-
-                            Y.each(cells, function(r, cc) {
-                                var c = r[wc];
-                                column.append('<td class="' + (variantStatus[cc] ? "invariant" : "variant") + (c == null ? " gap" : "") +  '">' + (c == null ? "" : Y.Escape.html(c)));
-                            });
-                            table.append(column);
-                        }
-
-                        tableContainer.scrollIntoView();
-                    },
-                    failure: function(transactionId, resp) {
-                        tableContainer.setContent('<p class="error">' + Y.dump(resp) + '</p>');
-                    }
-                }
-            });
-            Y.io(cp + "/", {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "text/plain"
-                },
-                data: Y.JSON.stringify(collation),
-                on: {
-                    "success": function(transactionId, resp) {
-                        graphVizDotContainer.append(sub('<textarea rows="{rows}" style="width: 20em" readonly="readonly">{content}</textarea>', {
-                            rows: 10, //Math.min(resp.responseText.match(/\n/g).length, 20),
-                            content: Y.Escape.html(resp.responseText)
-                        }));
-                    }
-                }
-            });
-            Y.io(cp + "/", {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/graphml+xml"
-                },
-                data: Y.JSON.stringify(collation),
-                on: {
-                    "success": function(transactionId, resp) {
-                        graphmlContainer.append(sub('<textarea rows="{rows}" style="width: 20em" readonly="readonly">{content}</textarea>', {
-                            rows: 10, // Math.min(resp.responseText.match(/\n/g).length, 20),
-                            content: Y.Escape.html(resp.responseText)
-                        }));
-                    }
-                }
-            });
-            Y.io(cp + "/", {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/tei+xml"
-                },
-                data: Y.JSON.stringify(collation),
-                on: {
-                    "success": function(transactionId, resp) {
-                        teiPsContainer.append(sub('<textarea rows="{rows}" style="width: 20em" readonly="readonly">{content}</textarea>', {
-                            rows: 10, // Math.min(resp.responseText.match(/\n/g).length, 20),
-                            content: Y.Escape.html(resp.responseText)
-                        }));
-                    }
-                }
-            });
-            Y.io(cp + "/", {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "image/svg+xml"
-                },
-                data: Y.JSON.stringify(collation),
-                on: {
-                    "success": function(transactionId, resp) {
-                        svgContainer.getDOMNode().appendChild(document.importNode(resp.responseXML.documentElement, true));
-                    }
-                }
-            });
-
+        if (witnesses.length <= 1) {
+            return;
         }
-        setWitnesses(witnesses);
+
+        // build the collation input
+        var collation = { witnesses:[] };
+        Y.each(witnesses, function (w, i) {
+            collation.witnesses.push({ id:"W" + (i + 1).toString(), content:witnesses[i] });
+        });
+
+        var collationData = Y.JSON.stringify(collation);
+        var callCollator = function(resultType, callback) {
+            Y.io(cp + "/", {
+                method:"post",
+                headers:{
+                    "Content-Type":"application/json",
+                    "Accept": resultType
+                },
+                data: collationData,
+                on:{
+                    success: callback,
+                    failure: function (transactionId, resp) { alert(Y.dump(resp)); }
+                }
+            });
+        };
+
+        callCollator("image/svg+xml", function (transactionId, resp) {
+            svgContainer.getDOMNode().appendChild(document.importNode(resp.responseXML.documentElement, true));
+            tableContainer.scrollIntoView();
+        });
+        callCollator("application/json", function (transactionId, resp) {
+            var at = Y.JSON.parse(resp.responseText);
+            var table = create('<table class="alignment"/>');
+            tableContainer.append(table);
+            var cells = []
+            var variantStatus = [];
+            Y.each(at.table, function (r) {
+                var cellContents = [];
+                Y.each(r, function (c) {
+                    cellContents.push(c == null ? null : Y.Array.reduce(c, "", function (str, next) {
+                        return str + (str.length == 0 ? "" : " ") + next;
+                    }));
+                });
+                cells.push(cellContents);
+                variantStatus.push(Y.Array.dedupe(Y.Array.filter(cellContents, function (c) {
+                    return (c != null);
+                })).length == 1);
+            });
+            for (var wc = 0; wc < at.sigils.length; wc++) {
+                var column = create("<tr/>");
+                column.append('<th>' + Y.Escape.html(at.sigils[wc]) + '</th>');
+                Y.each(cells, function (r, cc) {
+                    var c = r[wc];
+                    column.append('<td class="' + (variantStatus[cc] ? "invariant" : "variant") + (c == null ? " gap" : "") + '">' + (c == null ? "" : Y.Escape.html(c)));
+                });
+                table.append(column);
+            }
+        });
+        callCollator("text/plain", function (transactionId, resp) {
+            var textArea = create('<textarea rows="10" style="width: 20em" readonly="readonly">' + Y.Escape.html(resp.responseText) + '</textarea>');
+            graphVizDotContainer.append(textArea);
+        });
+        callCollator("application/graphml+xml", function (transactionId, resp) {
+            var textArea = create('<textarea rows="10" style="width: 20em" readonly="readonly">' + Y.Escape.html(resp.responseText) + '</textarea>');
+            graphmlContainer.append(textArea);
+        });
+
+        callCollator("application/tei+xml", function (transactionId, resp) {
+            var textArea = create('<textarea rows="10" style="width: 20em" readonly="readonly">' + Y.Escape.html(resp.responseText) + '</textarea>');
+            teiPsContainer.append(textArea);
+        });
     }
 
     function selectExample(e) {
@@ -201,7 +160,7 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
         var exampleSelect = Y.one("#examples");
         Y.each(examples, function(e, i) {
             var title = e[0];
-            if (title.length > 20) title = title.substring(0, 80) + "…";
+            if (title.length > 80) title = title.substring(0, 80) + "…";
             var exampleData = { value: "e" + i.toString(), title : title };
             exampleSelect.append(sub('<option value="{value}">{title}</option>', exampleData));
         });
