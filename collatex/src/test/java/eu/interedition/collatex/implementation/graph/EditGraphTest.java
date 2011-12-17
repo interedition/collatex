@@ -81,6 +81,33 @@ public class EditGraphTest extends AbstractTest {
     EditGraph eg = graphFactory.newEditGraph().build(w[0], w[1], new EqualityTokenComparator());
     assertEquals(1, Iterables.size(eg.shortestPaths()));
   }
+  
+  //TODO: finish the new scoring method and make this test work!
+  @Ignore
+  @Test
+  public void testScoringOfTheEditGraph() {
+    // a b a b a
+    // a b a
+    IWitness[] w = createWitnesses("a b a b a", "a b a");
+    EditGraph eg = graphFactory.newEditGraph().build(w[0], w[1], new EqualityTokenComparator());
+    eg.score();
+    // we expect two shortests paths, either the prefix or the suffix
+    // for now I just take one shortest path and see
+    Iterable<Iterable<EditGraphEdge>> shortestPaths = eg.shortestPaths();
+    //TODO: Warning: There is no sure way of knowing which of the two shortests paths will be returned first!
+    //TODO: So there is really no other way than testing explicit edges that we belong to one
+    //TODO: of the shortest paths.. for now: will take one of the two!
+    //TODO: it seems the suffix path comes first
+    
+    //NOTE: we want to assert scores on certain edges first..
+    Iterable<EditGraphEdge> first = shortestPaths.iterator().next();
+    Iterator<EditGraphEdge> edges = first.iterator();
+    assertEquals(0, edges.next().getScore()); // it should be no gap, no gap, no gap, gap
+    assertEquals(0, edges.next().getScore());
+    assertEquals(0, edges.next().getScore());
+    assertEquals(1, edges.next().getScore());        
+  }
+
 
   protected static void assertShortestPathVertices(EditGraph dGraph, String... vertices) {
     final Iterator<EditGraphEdge> shortestPath = shortestPathIn(dGraph).iterator();
