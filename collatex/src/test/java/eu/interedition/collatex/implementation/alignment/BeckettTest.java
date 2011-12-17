@@ -183,13 +183,4 @@ public class BeckettTest extends AbstractTest {
     }
     Assert.assertTrue(contents.containsAll(Arrays.asList(expected)));
   }
-
-  private void assertPhraseMatches(VariantGraphBuilder builder, String... expectedPhrases) {
-    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
-    int i=0;
-    for (Tuple<List<Token>> phraseMatch : phraseMatches) {
-      Assert.assertEquals(expectedPhrases[i], SimpleToken.toString(phraseMatch.right));
-      i++;
-    }
-  }
 }

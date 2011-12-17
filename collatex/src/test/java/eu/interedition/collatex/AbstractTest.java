@@ -6,6 +6,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.implementation.graph.GraphFactory;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
@@ -167,5 +168,14 @@ public abstract class AbstractTest {
       Iterables.addAll(tokens, Iterables.filter(v.tokens(witnessSet), SimpleToken.class));
     }
     return tokens;
+  }
+
+  protected void assertPhraseMatches(VariantGraphBuilder builder, String... expectedPhrases) {
+    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
+    int i = 0;
+    for (Tuple<List<Token>> phraseMatch : phraseMatches) {
+      Assert.assertEquals(expectedPhrases[i], SimpleToken.toString(phraseMatch.right));
+      i++;
+    }
   }
 }
