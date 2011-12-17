@@ -57,9 +57,9 @@ public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConv
     final OutputStream body = outputMessage.getBody();
     try {
       if (contentType != null && contentType.isCompatibleWith(IMAGE_SVG_XML)) {
-        graphVizService.toSvg(graph, body, false);
+        graphVizService.toSvg(graph, body);
       } else {
-        graphVizService.toDot(graph, new OutputStreamWriter(body, Charset.forName("UTF-8")), false);
+        graphVizService.toDot(graph, new OutputStreamWriter(body, Charset.forName("UTF-8")));
       }
     } finally {
       Closeables.closeQuietly(body);
