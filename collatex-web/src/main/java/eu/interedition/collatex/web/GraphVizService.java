@@ -36,14 +36,14 @@ public class GraphVizService implements InitializingBean {
     return configuredDotPath;
   }
 
-  public void toDot(VariantGraph graph, Writer writer, boolean transpositions) {
+  public void toDot(VariantGraph graph, Writer writer) {
     final Transaction tx = graph.newTransaction();
     try {
       final PrintWriter out = new PrintWriter(writer);
       final String indent = "  ";
-      final String connector = (transpositions ? " -- " : " -> ");
+      final String connector = " -> ";
 
-      out.println((transpositions ? "graph" : "digraph") + " G {");
+      out.println("digraph G {");
 
       for (VariantGraphVertex v : graph.vertices()) {
         out.print(indent + "v" + v.getNode().getId());
@@ -57,10 +57,10 @@ public class GraphVizService implements InitializingBean {
         out.println(";");
       }
 
-      if (transpositions) {
-        for (VariantGraphTransposition t : graph.transpositions()) {
-          out.println(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId() + ";");
-        }
+      for (VariantGraphTransposition t : graph.transpositions()) {
+        out.print(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId());
+        out.print(" [color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
+        out.println(";");
       }
 
       out.println("}");
@@ -84,14 +84,14 @@ public class GraphVizService implements InitializingBean {
     return (dotPath != null);
   }
 
-  public void toSvg(VariantGraph vg, OutputStream out, boolean transpositions) throws IOException {
+  public void toSvg(VariantGraph vg, OutputStream out) throws IOException {
     Preconditions.checkState(isSvgAvailable());
 
     final FileBackedOutputStream dotBuf = new FileBackedOutputStream(102400);
 
     Writer dotWriter = null;
     try {
-      toDot(vg, dotWriter = new OutputStreamWriter(dotBuf, Charset.forName("UTF-8")), transpositions);
+      toDot(vg, dotWriter = new OutputStreamWriter(dotBuf, Charset.forName("UTF-8")));
     } finally {
       Closeables.close(dotWriter, false);
     }
