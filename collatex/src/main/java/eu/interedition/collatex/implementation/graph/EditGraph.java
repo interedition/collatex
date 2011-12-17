@@ -1,12 +1,10 @@
 package eu.interedition.collatex.implementation.graph;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.input.SimpleToken;
@@ -15,7 +13,6 @@ import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.Token;
 import org.neo4j.graphalgo.WeightedPath;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.Evaluation;
@@ -52,19 +49,6 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
 
   public EditGraph(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
     super(database, witnessResolver, tokenResolver);
-  }
-
-  @Override
-  public void init(Function<Node, EditGraphVertex> vertexWrapper, Function<Relationship, EditGraphEdge> edgeWrapper, Node start, Node end) {
-    super.init(vertexWrapper, edgeWrapper, start, end);
-    
-    this.start.setBase(SimpleToken.START);
-    this.start.setWitness(SimpleToken.START);
-    this.start.setWitnessIndex(-1);
-    
-    this.end.setBase(SimpleToken.END);
-    this.end.setWitness(SimpleToken.END);
-    this.end.setWitnessIndex(Integer.MAX_VALUE);
   }
 
   public Iterable<EditGraphVertex> vertices() {

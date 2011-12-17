@@ -50,10 +50,6 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   public void init(Function<Node, VariantGraphVertex> vertexWrapper, Function<Relationship, VariantGraphEdge> edgeWrapper, Node start, Node end) {
     super.init(vertexWrapper, edgeWrapper, start, end);
     this.transpositionWrapper = VariantGraphTransposition.createWrapper(this);
-
-    this.start.setTokens(Sets.<Token>newTreeSet());
-    this.end.setTokens(Sets.<Token>newTreeSet());
-    connect(this.start, this.end, Sets.<IWitness>newTreeSet());
   }
 
   public Function<Relationship, VariantGraphTransposition> getTranspositionWrapper() {

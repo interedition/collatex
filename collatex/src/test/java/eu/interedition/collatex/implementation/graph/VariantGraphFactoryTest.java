@@ -21,4 +21,19 @@ public class VariantGraphFactoryTest extends AbstractTest {
   public void emptyGraphCanBeTraversed() {
     Assert.assertEquals(2, Iterables.size(graphFactory.newVariantGraph().vertices()));
   }
+  
+  @Test
+  public void purgeGraphs() {
+    graphFactory.newEditGraph();
+    graphFactory.newEditGraph();
+    graphFactory.newEditGraph();
+    graphFactory.newEditGraph();
+
+    graphFactory.newVariantGraph();
+    
+    graphFactory.deleteGraphsOlderThan(Long.MAX_VALUE);
+
+    Assert.assertEquals(0, Iterables.size(graphFactory.variantGraphs()));
+    Assert.assertEquals(0, Iterables.size(graphFactory.editGraphs()));
+  }
 }
