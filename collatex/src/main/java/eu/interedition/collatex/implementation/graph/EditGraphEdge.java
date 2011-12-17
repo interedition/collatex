@@ -28,9 +28,8 @@ public class EditGraphEdge extends GraphEdge<EditGraph, EditGraphVertex> {
     return EditOperation.values()[(Integer) relationship.getProperty(EDIT_OPERATION_KEY)];
   }
 
-
   public int getScore() {
-    return (Integer) relationship.getProperty(SCORE_KEY, 0);
+    return (Integer) relationship.getProperty(SCORE_KEY);
   }
 
   public void setScore(int score) {

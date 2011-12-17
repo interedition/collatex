@@ -71,15 +71,13 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void testDirkVincent7() {
-    final VariantGraph graph = merge(//
-            "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
-            "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final StringBuilder graphTokens = new StringBuilder();
-    for (Token token : VariantGraphWitnessAdapter.create(graph).getTokens()) {
-      graphTokens.append(" ").append(((VariantGraphVertexTokenAdapter) token).getNormalized());
-    }
-
-    assertEquals("# its soft changeless light neither daylight nor moonlight nor starlight nor unlike any light he could remember from the days & and nights when day followed hard on night & and vice versa #", graphTokens.toString().trim());
+    IWitness[] w = createWitnesses(//
+      "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
+      "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+    VariantGraph graph = merge(w[0]);
+    VariantGraphBuilder builder = merge(graph, w[1]);
+    assertPhraseMatches(builder, "its soft light any light he could remember from the days nights when day followed night vice versa");
+    assertTrue(Iterables.isEmpty(builder.getTranspositions()));
   }
 
   @Test
@@ -184,5 +182,14 @@ public class BeckettTest extends AbstractTest {
       extractPhrases(contents, graph, witness);
     }
     Assert.assertTrue(contents.containsAll(Arrays.asList(expected)));
+  }
+
+  private void assertPhraseMatches(VariantGraphBuilder builder, String... expectedPhrases) {
+    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
+    int i=0;
+    for (Tuple<List<Token>> phraseMatch : phraseMatches) {
+      Assert.assertEquals(expectedPhrases[i], SimpleToken.toString(phraseMatch.right));
+      i++;
+    }
   }
 }
