@@ -25,7 +25,11 @@ import eu.interedition.collatex.implementation.graph.GraphFactory;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +40,13 @@ import java.util.SortedSet;
 
 @Controller
 @RequestMapping("/")
-public class CollationController {
+public class CollationController implements InitializingBean {
+  private static final Logger LOG = LoggerFactory.getLogger(CollationController.class);
+
+  private static final int TWO_HOURS = 7200000;
+
+  @Autowired
+  private TaskScheduler taskScheduler;
 
   @Autowired
   private GraphFactory graphFactory;
@@ -69,4 +79,20 @@ public class CollationController {
     return "collate";
   }
 
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    taskScheduler.scheduleWithFixedDelay(new Runnable() {
+      @Override
+      public void run() {
+        final Transaction tx = graphFactory.getDatabase().beginTx();
+        try {
+          LOG.debug("Purging graphs older than 2 hours");
+          graphFactory.deleteGraphsOlderThan(System.currentTimeMillis() - TWO_HOURS);
+          tx.success();
+        } finally {
+          tx.finish();
+        }
+      }
+    }, TWO_HOURS);
+  }
 }
