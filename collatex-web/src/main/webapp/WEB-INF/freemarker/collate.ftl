@@ -34,13 +34,17 @@
       <div id="alignment-table"></div>
 
       <div class="yui3-g">
-        <div class="yui3-u-1-2">
+        <div class="yui3-u-1-3">
           <h3>GraphML</h3>
           <div id="graphml"></div>
         </div>
-        <div class="yui3-u">
+        <div class="yui3-u-1-3">
           <h3>GraphViz</h3>
           <div id="graphviz-dot"></div>
+        </div>
+        <div class="yui3-u">
+          <h3>TEI-P5</h3>
+          <div id="tei-ps"></div>
         </div>
       </div>
     </div>

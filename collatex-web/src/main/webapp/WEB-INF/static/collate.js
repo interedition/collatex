@@ -4,7 +4,8 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
         svgContainer = null,
         tableContainer = null,
         graphVizDotContainer = null,
-        graphmlContainer = null;
+        graphmlContainer = null,
+        teiPsContainer = null;
 
     function addWitness(e) {
         if (e) e.preventDefault();
@@ -34,7 +35,7 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
             var witnessData = { id: "witness-" + wc.toString(), label: "Witness #" + (wc + 1).toString(), contents: Y.Escape.html(contents[wc]) };
             witnessContainer.append(create('<div class="yui3-g form-element" />')
                     .append(create('<div class="yui3-u-1-6 form-label"/>').append(sub('<label for="{id}">{label}:</label>', witnessData)))
-                    .append(create('<div class="yui3-u form-input"/>').append(sub('<textarea id="{id}" name="{id}" rows="3" cols="80" style="width: 50em">{contents}</textarea>', witnessData))));
+                    .append(create('<div class="yui3-u form-input"/>').append(sub('<textarea id="{id}" name="{id}" rows="3" cols="80" style="width: 20em">{contents}</textarea>', witnessData))));
         }
 
         Y.some(contents, function(c, i) {
@@ -112,8 +113,8 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
                 data: Y.JSON.stringify(collation),
                 on: {
                     "success": function(transactionId, resp) {
-                        graphVizDotContainer.append(sub('<textarea rows="{rows}" style="width: 30em" readonly="readonly">{content}</textarea>', {
-                            rows: Math.min(resp.responseText.match(/\n/g).length, 20),
+                        graphVizDotContainer.append(sub('<textarea rows="{rows}" style="width: 20em" readonly="readonly">{content}</textarea>', {
+                            rows: 10, //Math.min(resp.responseText.match(/\n/g).length, 20),
                             content: Y.Escape.html(resp.responseText)
                         }));
                     }
@@ -128,8 +129,24 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
                 data: Y.JSON.stringify(collation),
                 on: {
                     "success": function(transactionId, resp) {
-                        graphmlContainer.append(sub('<textarea rows="{rows}" style="width: 30em" readonly="readonly">{content}</textarea>', {
-                            rows: Math.min(resp.responseText.match(/\n/g).length, 20),
+                        graphmlContainer.append(sub('<textarea rows="{rows}" style="width: 20em" readonly="readonly">{content}</textarea>', {
+                            rows: 10, // Math.min(resp.responseText.match(/\n/g).length, 20),
+                            content: Y.Escape.html(resp.responseText)
+                        }));
+                    }
+                }
+            });
+            Y.io(cp + "/", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/tei+xml"
+                },
+                data: Y.JSON.stringify(collation),
+                on: {
+                    "success": function(transactionId, resp) {
+                        teiPsContainer.append(sub('<textarea rows="{rows}" style="width: 20em" readonly="readonly">{content}</textarea>', {
+                            rows: 10, // Math.min(resp.responseText.match(/\n/g).length, 20),
                             content: Y.Escape.html(resp.responseText)
                         }));
                     }
@@ -169,12 +186,15 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", funct
         tableContainer.empty();
         graphVizDotContainer.empty();
         graphmlContainer.empty();
+        teiPsContainer.empty();
     }
+
     Y.on("domready", function() {
         svgContainer = Y.one("#variant-graph-svg");
         tableContainer = Y.one("#alignment-table");
         graphVizDotContainer = Y.one("#graphviz-dot");
         graphmlContainer = Y.one("#graphml");
+        teiPsContainer = Y.one("#tei-ps");
 
         setWitnesses(["", ""]);
 
