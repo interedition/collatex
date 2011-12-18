@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import static com.google.common.collect.Lists.reverse;
 
@@ -38,7 +39,9 @@ public class TokenLinker implements ITokenLinker {
   public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     base.rank();
 
-    LOG.trace("Matching tokens of {} and {}", base, witness);
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Matching tokens of {} and {}", base, witness);
+    }
     matches = Matches.between(base.vertices(), witness, comparator);
 
     LOG.trace("Finding minimal unique token sequences");
@@ -64,15 +67,17 @@ public class TokenLinker implements ITokenLinker {
     // NOTE: Not all ranks are actually in use (because of ommissions)
     // gather matched ranks into a set ordered by their natural order
     LOG.trace("Find all the ranks of the vertices of the VG that are matched against");
-    final Set<Integer> rankSet = Sets.newTreeSet();
+    final SortedSet<Integer> rankSet = Sets.newTreeSet();
     for (VariantGraphVertex matchedVertex : baseMatches) {
       rankSet.add(matchedVertex.getRank());
     }
     //Turn it into a List so that distance between matched ranks can be called
     //Note that omitted vertices are not in the list, so they don't cause an extra phrasematch
     ranks = Lists.newArrayList(rankSet);
-    LOG.trace("base {}", baseMatches);
-    LOG.trace("Ranks {}", ranks);
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("base {}", baseMatches);
+      LOG.trace("Ranks {}", ranks);
+    }
 
     // try and find matches in the base for each sequence in the witness
     phraseMatches = Lists.newArrayList();
@@ -182,7 +187,9 @@ public class TokenLinker implements ITokenLinker {
 
   private List<VariantGraphVertex> matchPhrase(List<Token> phrase, int expectedDirection) {
     final List<VariantGraphVertex> matchedPhrase = Lists.newArrayList();
-    LOG.trace("Trying to find phrase: {}", phrase);
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Trying to find phrase: {}", phrase);
+    }
        
     VariantGraphVertex lastMatch = null;
     int lastMatchIndex = 0;
@@ -209,7 +216,10 @@ public class TokenLinker implements ITokenLinker {
         return Collections.emptyList();
       }
     }
-    LOG.trace("Found phrase: {}", phrase);
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Found phrase: {}", phrase);
+    }
     return matchedPhrase;
   }
 }
