@@ -1,20 +1,17 @@
 package eu.interedition.collatex.implementation.alignment;
 
-import com.google.common.collect.ListMultimap;
-import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
 import eu.interedition.collatex.implementation.matching.Matches;
-import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.interfaces.Token;
 import org.junit.Assert;
 import org.junit.Test;
 

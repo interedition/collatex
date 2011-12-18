@@ -1,6 +1,5 @@
 package eu.interedition.collatex.implementation.alignment;
 
-import java.util.Set;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
@@ -11,8 +10,8 @@ import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.Matches;
-import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.ITokenLinker;
+import eu.interedition.collatex.interfaces.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,19 +63,15 @@ public class TokenLinker implements ITokenLinker {
     LOG.trace("Find matches in the base");
     List<VariantGraphVertex> baseMatches = Lists.newArrayList(Iterables.filter(base.vertices(), Predicates.in(matches.getAll().values())));
 
+    LOG.trace("Find all the ranks of the vertices of the VG that are matched against");
     // NOTE: Not all ranks are actually in use (because of ommissions)
     // gather matched ranks into a set ordered by their natural order
-    LOG.trace("Find all the ranks of the vertices of the VG that are matched against");
-    final SortedSet<Integer> rankSet = Sets.newTreeSet();
-    for (VariantGraphVertex matchedVertex : baseMatches) {
-      rankSet.add(matchedVertex.getRank());
-    }
-    //Turn it into a List so that distance between matched ranks can be called
-    //Note that omitted vertices are not in the list, so they don't cause an extra phrasematch
-    ranks = Lists.newArrayList(rankSet);
+    // Turn it into a List so that distance between matched ranks can be called
+    // Note that omitted vertices are not in the list, so they don't cause an extra phrasematch
+    ranks = Lists.newArrayList(Sets.newTreeSet(Iterables.transform(baseMatches, VariantGraphVertex.TO_RANK)));
     if (LOG.isTraceEnabled()) {
-      LOG.trace("base {}", baseMatches);
-      LOG.trace("Ranks {}", ranks);
+      LOG.trace("Base: {}", baseMatches);
+      LOG.trace("Ranks: {}", ranks);
     }
 
     // try and find matches in the base for each sequence in the witness

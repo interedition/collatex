@@ -3,13 +3,10 @@ package eu.interedition.collatex.implementation.graph;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex.implementation.matching.Matches;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.Token;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Iterator;

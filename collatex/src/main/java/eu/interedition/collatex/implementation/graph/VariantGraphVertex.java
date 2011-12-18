@@ -131,4 +131,11 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
       return contents.toString().trim();
     }
   };
+
+  public static final Function<VariantGraphVertex,Integer> TO_RANK = new Function<VariantGraphVertex, Integer>() {
+    @Override
+    public Integer apply(VariantGraphVertex input) {
+      return input.getRank();
+    }
+  };
 }

@@ -17,12 +17,11 @@ package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.implementation.Tuple;
-import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
 import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.Token;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

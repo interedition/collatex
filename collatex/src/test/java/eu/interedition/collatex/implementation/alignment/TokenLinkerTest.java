@@ -27,12 +27,14 @@ public class TokenLinkerTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
-    final IWitness graph = VariantGraphWitnessAdapter.create(merge(w[0]));
+    final VariantGraph graph = merge(w[0]);
+    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
     final Map<Token, VariantGraphVertex> links = linkTokens(graph, w[1]);
 
-    assertEquals(graph.getTokens().get(1), links.get(w[1].getTokens().get(0)).tokens().first()); // 'its'
-    assertEquals(graph.getTokens().get(3), links.get(w[1].getTokens().get(3)).tokens().first()); // 'light'
-    assertEquals(graph.getTokens().get(12), links.get(w[1].getTokens().get(6)).tokens().first()); // 2nd 'light'
+
+    assertEquals(vertices.get(1), links.get(w[1].getTokens().get(0))); // 'its'
+    assertEquals(vertices.get(3), links.get(w[1].getTokens().get(3))); // 'light'
+    assertEquals(vertices.get(12), links.get(w[1].getTokens().get(6))); // 2nd 'light'
   }
 
   @Test
