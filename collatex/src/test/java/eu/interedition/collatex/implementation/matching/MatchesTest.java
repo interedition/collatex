@@ -7,6 +7,8 @@ import java.util.Set;
 import com.google.common.collect.ListMultimap;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 
@@ -17,7 +19,8 @@ public class MatchesTest extends AbstractTest {
   @Test
   public void test1() {
     final IWitness[] w = createWitnesses("john and paul and george and ringo", "john and paul and george and ringo");
-    final Matches matches = Matches.between(w[0], w[1], new EqualityTokenComparator());
+    final VariantGraph graph = merge(w[0]);
+    final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 
     int expected_unmatched = 0;
     int expected_unique = 4; // john paul george ringo
@@ -28,7 +31,8 @@ public class MatchesTest extends AbstractTest {
   @Test
   public void test2() {
     final IWitness[] w = createWitnesses("the white cat", "the black cat");
-    final Matches matches = Matches.between(w[0], w[1], new EqualityTokenComparator());
+    final VariantGraph graph = merge(w[0]);
+    final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 
     int expected_unmatched = 1; // black
     int expected_unique = 2; // the & cat
@@ -46,7 +50,7 @@ public class MatchesTest extends AbstractTest {
     Set<Token> ambiguous = matches.getAmbiguous();
     LOG.info("ambiguous: {}", ambiguous);
 
-    ListMultimap<Token, Token> all = matches.getAll();
+    ListMultimap<Token,VariantGraphVertex> all = matches.getAll();
     LOG.info("all: {}", all);
 
     assertEquals(expected_unmatched, unmatched.size());

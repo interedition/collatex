@@ -22,9 +22,9 @@ public class EditGraphLinker implements ITokenLinker {
   }
 
   @Override
-  public Map<Token, Token> link(IWitness superbase, IWitness b, Comparator<Token> comparator) {
-    final EditGraph editGraph = graphFactory.newEditGraph();
-    final Map<Token, Token> linkedTokens = editGraph.build(superbase, b, comparator).linkedTokens();
+  public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+    final EditGraph editGraph = graphFactory.newEditGraph(base);
+    final Map<Token, VariantGraphVertex> linkedTokens = editGraph.build(base, witness, comparator).linkedTokens();
     graphFactory.delete(editGraph);
     return linkedTokens;
   }

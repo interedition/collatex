@@ -139,7 +139,10 @@ public class CollateXLaboratory extends JFrame {
 
       final Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
-        editGraphModel.update(graphFactory.newEditGraph().build(w.get(0), w.get(1), new EqualityTokenComparator()));
+        final VariantGraph pvg = graphFactory.newVariantGraph();
+        new VariantGraphBuilder(pvg).add(w.get(0));
+        
+        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, w.get(1).getTokens(), new EqualityTokenComparator()));
       } finally {
         transaction.finish();
       }

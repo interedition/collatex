@@ -1,10 +1,12 @@
 package eu.interedition.collatex.implementation.graph;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.input.SimpleToken;
@@ -13,6 +15,7 @@ import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.Token;
 import org.neo4j.graphalgo.WeightedPath;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.Evaluation;
@@ -25,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -46,9 +50,15 @@ import static org.neo4j.kernel.Uniqueness.RELATIONSHIP_GLOBAL;
 @SuppressWarnings("serial")
 public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
   private static final Logger LOG = LoggerFactory.getLogger(EditGraph.class);
+  private final Function<Node, VariantGraphVertex> variantGraphVertexWrapper;
 
-  public EditGraph(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
+  public EditGraph(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver, Function<Node, VariantGraphVertex> variantGraphVertexWrapper) {
     super(database, witnessResolver, tokenResolver);
+    this.variantGraphVertexWrapper = variantGraphVertexWrapper;
+  }
+
+  public Function<Node, VariantGraphVertex> getVariantGraphVertexWrapper() {
+    return variantGraphVertexWrapper;
   }
 
   public Iterable<EditGraphVertex> vertices() {
@@ -63,20 +73,20 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     return Traversal.description().breadthFirst().relationships(PATH, OUTGOING);
   }
 
-  public EditGraph build(IWitness base, IWitness witness, Comparator<Token> comparator) {
+  public EditGraph build(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     Set<EditGraphVertex> prevVertexSet = Sets.newLinkedHashSet();
     prevVertexSet.add(start);
     // build the decision graph from the matches and the variant graph
-    Matches m = Matches.between(base, witness, comparator);
+    Matches m = Matches.between(base.vertices(), witness, comparator);
     Set<String> ambiguousNormalized = getAmbiguousNormalizedContent(m);
-    Multimap<Token, Token> matches = m.getAll();
+    ListMultimap<Token, VariantGraphVertex> matches = m.getAll();
     // add for vertices for witness tokens that have a matching base token
     int witnessIndex = 0;
-    for (Token witnessToken : witness.getTokens()) {
-      Collection<Token> baseTokens = matches.get(witnessToken);
+    for (Token witnessToken : witness) {
+      List<VariantGraphVertex> baseTokens = matches.get(witnessToken);
       if (!baseTokens.isEmpty()) {
         final Set<EditGraphVertex> vertexSet = Sets.newLinkedHashSet();
-        for (Token baseToken : baseTokens) {
+        for (VariantGraphVertex baseToken : baseTokens) {
           EditGraphVertex editGraphVertex = new EditGraphVertex(this, baseToken, witnessToken, witnessIndex);
           vertexSet.add(editGraphVertex);
 
@@ -180,15 +190,15 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     }).traverse(start.getNode()).relationships(), edgeWrapper);
   }
 
-  public Map<Token, Token> linkedTokens() {
-    final BiMap<Token, Token> linkedTokens = HashBiMap.create();
+  public Map<Token, VariantGraphVertex> linkedTokens() {
+    final BiMap<Token, VariantGraphVertex> linkedTokens = HashBiMap.create();
     for (Iterable<EditGraphEdge> shortestPath : shortestPaths()) {
       for (EditGraphEdge e : shortestPath) {
         final EditGraphVertex vertex = e.from();
         if (vertex.equals(start)) {
           continue;
         }
-        final Token baseToken = vertex.getBase();
+        final VariantGraphVertex baseToken = vertex.getBase();
         if (linkedTokens.containsValue(baseToken)) {
           LOG.warn("Duplicate match for base token {}", baseToken);
           continue;

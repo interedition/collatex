@@ -24,13 +24,14 @@ public class VariantGraphFactoryTest extends AbstractTest {
   
   @Test
   public void purgeGraphs() {
-    graphFactory.newEditGraph();
-    graphFactory.newEditGraph();
-    graphFactory.newEditGraph();
-    graphFactory.newEditGraph();
+    final VariantGraph vg = graphFactory.newVariantGraph();
 
-    graphFactory.newVariantGraph();
-    
+    graphFactory.newEditGraph(vg);
+    graphFactory.newEditGraph(vg);
+    graphFactory.newEditGraph(vg);
+    graphFactory.newEditGraph(vg);
+
+
     graphFactory.deleteGraphsOlderThan(Long.MAX_VALUE);
 
     Assert.assertEquals(0, Iterables.size(graphFactory.variantGraphs()));

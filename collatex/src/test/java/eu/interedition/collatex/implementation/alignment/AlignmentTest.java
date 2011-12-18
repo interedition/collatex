@@ -32,6 +32,7 @@ import org.junit.Test;
 
 import java.util.SortedSet;
 
+import static eu.interedition.collatex.implementation.alignment.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
 
 public class AlignmentTest extends AbstractTest {
@@ -116,9 +117,9 @@ public class AlignmentTest extends AbstractTest {
     IWitness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
     VariantGraph graph = merge(w[0], w[1]);
     VariantGraphBuilder builder = merge(graph, w[2]);
-    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
-    assertEquals("hello nice cruel world", SimpleToken.toString(phraseMatches.get(0).right));
-    List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
+    List<List<Match>> phraseMatches = builder.getPhraseMatches();
+    assertEquals("hello nice cruel world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
+    List<List<Match>> transpositions = builder.getTranspositions();
     assertEquals(0, transpositions.size());
   } 
   
@@ -127,9 +128,9 @@ public class AlignmentTest extends AbstractTest {
     IWitness[] w = createWitnesses("Hello cruel world", "Hello world");
     VariantGraph graph = merge(w[0]);
     VariantGraphBuilder builder = merge(graph, w[1]);
-    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
-    assertEquals("hello world", SimpleToken.toString(phraseMatches.get(0).right));
-    List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
+    List<List<Match>> phraseMatches = builder.getPhraseMatches();
+    assertEquals("hello world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
+    List<List<Match>> transpositions = builder.getTranspositions();
     assertEquals(0, transpositions.size());
   }
   
@@ -138,9 +139,9 @@ public class AlignmentTest extends AbstractTest {
     IWitness[] w = createWitnesses("Hello world", "Hello cruel world");
     VariantGraph graph = merge(w[0]);
     VariantGraphBuilder builder = merge(graph, w[1]);
-    List<Tuple<List<Token>>> phraseMatches = builder.getPhraseMatches();
-    assertEquals("hello world", SimpleToken.toString(phraseMatches.get(0).right));
-    List<Tuple<List<Token>>> transpositions = builder.getTranspositions();
+    List<List<Match>> phraseMatches = builder.getPhraseMatches();
+    assertEquals("hello world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
+    List<List<Match>> transpositions = builder.getTranspositions();
     assertEquals(0, transpositions.size());
   }   
 }

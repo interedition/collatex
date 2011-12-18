@@ -26,11 +26,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.implementation.Tuple;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.Token;
-import eu.interedition.collatex.interfaces.IWitness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -80,46 +83,36 @@ public class TranspositionDetector {
   //    return transpositions;
   //  }
 
-  public List<Tuple<Tuple<List<Token>>>> detect(List<Tuple<List<Token>>> phraseMatches, IWitness base) {
+  public List<Tuple<List<Match>>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
     // sort phrase matches by base token order
-    final Map<Token, Tuple<List<Token>>> tokenIndex = Maps.uniqueIndex(phraseMatches, new Function<Tuple<List<Token>>, Token>() {
+    final List<List<Match>> sortedPhraseMatches = Lists.newArrayList(phraseMatches);
+    Collections.sort(sortedPhraseMatches, new Comparator<List<Match>>() {
       @Override
-      public Token apply(Tuple<List<Token>> input) {
-        return input.left.get(0);
+      public int compare(List<Match> o1, List<Match> o2) {
+        Preconditions.checkArgument(!o1.isEmpty());
+        Preconditions.checkArgument(!o2.isEmpty());
+        return o1.get(0).vertex.getRank() - o2.get(0).vertex.getRank();
       }
     });
-    final List<Tuple<List<Token>>> sortedPhraseMatches = Lists.newArrayList();
-    for (Token token : base.getTokens()) {
-      if (tokenIndex.containsKey(token)) {
-        sortedPhraseMatches.add(tokenIndex.get(token));
-      }
-    }
 
     // compare sorted to unsorted phrase matches in order to yield transpositions
-    final List<Tuple<Tuple<List<Token>>>> transpositions = Lists.newArrayList();
-
-    Preconditions.checkState(sortedPhraseMatches.size() == phraseMatches.size(), "Something went wrong in the linking process!");
-    final Iterator<Tuple<List<Token>>> unsortedIt = phraseMatches.iterator();
-    final Iterator<Tuple<List<Token>>> sortedIt = sortedPhraseMatches.iterator();
+    final List<Tuple<List<Match>>> transpositions = Lists.newArrayList();
+    final Iterator<List<Match>> unsortedIt = phraseMatches.iterator();
+    final Iterator<List<Match>> sortedIt = sortedPhraseMatches.iterator();
     while (unsortedIt.hasNext() && sortedIt.hasNext()) {
-      final Tuple<List<Token>> phraseMatchInWitness = unsortedIt.next();
-      final Tuple<List<Token>> phraseMatchInBase = sortedIt.next();
+      final List<Match> phraseMatchInWitness = unsortedIt.next();
+      final List<Match> phraseMatchInBase = sortedIt.next();
       if (!phraseMatchInWitness.equals(phraseMatchInBase)) {
         // TODO: I have got no idea why we have to mirror the sequences here!
-        transpositions.add(new Tuple<Tuple<List<Token>>>(phraseMatchInBase, phraseMatchInWitness));
+        transpositions.add(new Tuple<List<Match>>(phraseMatchInBase, phraseMatchInWitness));
       }
     }
 
     if (LOG.isTraceEnabled()) {
-      for (Tuple<Tuple<List<Token>>> transposition : transpositions) {
-        LOG.trace("Detected transposition: {} <==> {}", phraseMatchToString(transposition.left), phraseMatchToString(transposition.right));
+      for (Tuple<List<Match>> transposition : transpositions) {
+        LOG.trace("Detected transposition: {} <==> {}", Iterables.toString(transposition.left), Iterables.toString(transposition.right));
       }
     }
     return transpositions;
   }
-
-  private Object phraseMatchToString(Tuple<List<Token>> phraseMatch) {
-    return new StringBuilder("{").append(Iterables.toString(phraseMatch.left)).append(" = ").append(Iterables.toString(phraseMatch.right)).append("}").toString();
-  }
-
 }

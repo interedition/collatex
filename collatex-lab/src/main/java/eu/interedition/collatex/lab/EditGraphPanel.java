@@ -34,11 +34,12 @@ public class EditGraphPanel extends VisualizationViewer<EditGraphVertexModel, Ed
     rc.setVertexLabelTransformer(new Transformer<EditGraphVertexModel, String>() {
       @Override
       public String transform(EditGraphVertexModel model) {
-        final SimpleToken bt = (SimpleToken) model.getBase();
-        final SimpleToken wt = (SimpleToken) model.getWitness();
-        if (bt.equals(wt)) {
+        if (model.getBase().isEmpty()) {
           return "";
         }
+
+        final SimpleToken bt = (SimpleToken) model.getBase().first();
+        final SimpleToken wt = (SimpleToken) model.getWitness();
         return String.format("'%s'[%d] = '%s'[%d]", bt.getContent(), bt.getIndex(), wt.getContent(), wt.getIndex());
       }
     });

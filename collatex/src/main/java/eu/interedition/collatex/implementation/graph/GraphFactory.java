@@ -96,7 +96,7 @@ public class GraphFactory {
   }
 
   public Iterable<VariantGraph> variantGraphs() {
-    return Iterables.transform(variantGraphs.getRelationships(START_END, OUTGOING), new Function<Relationship, VariantGraph>() {
+    return Iterables.transform(variantGraphs.getRelationships(VARIANT_GRAPH, OUTGOING), new Function<Relationship, VariantGraph>() {
       @Override
       public VariantGraph apply(Relationship input) {
         return wrapVariantGraph(input);
@@ -105,7 +105,7 @@ public class GraphFactory {
   }
   
   public Iterable<EditGraph> editGraphs() {
-    return Iterables.transform(editGraphs.getRelationships(START_END, OUTGOING), new Function<Relationship, EditGraph>() {
+    return Iterables.transform(editGraphs.getRelationships(EDIT_GRAPH, OUTGOING), new Function<Relationship, EditGraph>() {
       @Override
       public EditGraph apply(Relationship input) {
         return wrapEditGraph(input);
@@ -117,9 +117,9 @@ public class GraphFactory {
     final Node startNode = database.createNode();
     final Node endNode = database.createNode();
 
-    final Relationship startRel = variantGraphs.createRelationshipTo(startNode, START_END);
+    final Relationship startRel = variantGraphs.createRelationshipTo(startNode, VARIANT_GRAPH);
     startRel.setProperty(CREATED_KEY, System.currentTimeMillis());
-    startNode.createRelationshipTo(endNode, START_END);
+    startNode.createRelationshipTo(endNode, VARIANT_GRAPH);
 
     final VariantGraph graph = wrapVariantGraph(startNode, endNode);
     final VariantGraphVertex start = graph.getStart();
@@ -132,23 +132,25 @@ public class GraphFactory {
     return graph;
   }
 
-  public EditGraph newEditGraph() {
+  public EditGraph newEditGraph(VariantGraph vg) {
     final Node startNode = database.createNode();
     final Node endNode = database.createNode();
 
-    final Relationship startRel = editGraphs.createRelationshipTo(startNode, START_END);
+    final Relationship startRel = editGraphs.createRelationshipTo(startNode, EDIT_GRAPH);
     startRel.setProperty(CREATED_KEY, System.currentTimeMillis());
-    startNode.createRelationshipTo(endNode, START_END);
+    
+    startNode.createRelationshipTo(endNode, EDIT_GRAPH);
+    startNode.createRelationshipTo(vg.getStart().getNode(), VARIANT_GRAPH);
 
     final EditGraph graph = wrapEditGraph(startNode, endNode);
     final EditGraphVertex start = graph.getStart();
     final EditGraphVertex end = graph.getEnd();
 
-    start.setBase(SimpleToken.START);
+    start.setBase(vg.getStart());
     start.setWitness(SimpleToken.START);
     start.setWitnessIndex(-1);
 
-    end.setBase(SimpleToken.END);
+    end.setBase(vg.getEnd());
     end.setWitness(SimpleToken.END);
     end.setWitnessIndex(Integer.MAX_VALUE);
 
@@ -156,12 +158,12 @@ public class GraphFactory {
   }
 
   public void deleteGraphsOlderThan(long timestamp) {
-    for (Relationship vgRel : variantGraphs.getRelationships(START_END, OUTGOING)) {
+    for (Relationship vgRel : variantGraphs.getRelationships(VARIANT_GRAPH, OUTGOING)) {
       if (((Long) vgRel.getProperty(CREATED_KEY)) < timestamp) {
         delete(wrapVariantGraph(vgRel));
       }
     }
-    for (Relationship egRel : editGraphs.getRelationships(START_END, OUTGOING)) {
+    for (Relationship egRel : editGraphs.getRelationships(EDIT_GRAPH, OUTGOING)) {
       if (((Long) egRel.getProperty(CREATED_KEY)) < timestamp) {
         delete(wrapEditGraph(egRel));
       }
@@ -170,8 +172,15 @@ public class GraphFactory {
 
   public void delete(VariantGraph vg) {
     final Node startNode = vg.getStart().getNode();
-    startNode.getSingleRelationship(START_END, INCOMING).delete();
-    startNode.getSingleRelationship(START_END, OUTGOING).delete();
+    for (Relationship rel : startNode.getRelationships(VARIANT_GRAPH, INCOMING)) {
+      final Node relStart = rel.getStartNode();
+      if (!relStart.equals(variantGraphs)) {
+        delete(wrapEditGraph(relStart, relStart.getSingleRelationship(EDIT_GRAPH, OUTGOING).getEndNode()));
+      }
+    }
+
+    startNode.getSingleRelationship(VARIANT_GRAPH, INCOMING).delete();
+    startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).delete();
     for (VariantGraphVertex v : vg.vertices()) {
       for (VariantGraphEdge e : v.incoming()) {
         e.delete();
@@ -185,8 +194,9 @@ public class GraphFactory {
   
   public void delete(EditGraph eg) {
     final Node startNode = eg.getStart().getNode();
-    startNode.getSingleRelationship(START_END, INCOMING).delete();
-    startNode.getSingleRelationship(START_END, OUTGOING).delete();
+    startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).delete();
+    startNode.getSingleRelationship(EDIT_GRAPH, INCOMING).delete();
+    startNode.getSingleRelationship(EDIT_GRAPH, OUTGOING).delete();
 
     for (EditGraphVertex v : eg.vertices()) {
       for (EditGraphEdge e : v.incoming()) {
@@ -198,7 +208,7 @@ public class GraphFactory {
 
   protected VariantGraph wrapVariantGraph(Relationship startEndRel) {
     final Node startNode = startEndRel.getEndNode();
-    return wrapVariantGraph(startNode, startNode.getSingleRelationship(START_END, OUTGOING).getEndNode());
+    return wrapVariantGraph(startNode, startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).getEndNode());
   }
 
   protected VariantGraph wrapVariantGraph(Node start, Node end) {
@@ -209,11 +219,12 @@ public class GraphFactory {
 
   protected EditGraph wrapEditGraph(Relationship startEndRel) {
     final Node startNode = startEndRel.getEndNode();
-    return wrapEditGraph(startNode, startNode.getSingleRelationship(START_END, OUTGOING).getEndNode());
+    return wrapEditGraph(startNode, startNode.getSingleRelationship(EDIT_GRAPH, OUTGOING).getEndNode());
   }
 
   protected EditGraph wrapEditGraph(Node start, Node end) {
-    final EditGraph graph = new EditGraph(database, witnessResolver, tokenResolver);
+    final VariantGraph vg = wrapVariantGraph(start.getSingleRelationship(VARIANT_GRAPH, OUTGOING));
+    final EditGraph graph = new EditGraph(database, witnessResolver, tokenResolver, vg.getVertexWrapper());
     graph.init(EditGraphVertex.createWrapper(graph), EditGraphEdge.createWrapper(graph), start, end);
     return graph;
   }

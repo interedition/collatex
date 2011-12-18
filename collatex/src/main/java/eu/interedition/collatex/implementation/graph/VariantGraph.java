@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeBasedTable;
+import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
@@ -162,6 +163,10 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     }
     
     return new VariantGraphTransposition(this, from, to);
+  }
+
+  public boolean isNear(VariantGraphVertex a, VariantGraphVertex b) {
+    return verticesAreAdjacent(a, b) && (Iterables.size(a.outgoing()) == 1 || Iterables.size(b.incoming()) == 1);
   }
 
   public boolean verticesAreAdjacent(VariantGraphVertex a, VariantGraphVertex b) {

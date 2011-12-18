@@ -19,6 +19,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.Tuple;
 import eu.interedition.collatex.implementation.alignment.VariantGraphWitnessAdapter.VariantGraphVertexTokenAdapter;
+import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.Token;
 import java.util.List;
@@ -31,19 +33,16 @@ import java.util.Set;
  */
 public class PhraseMatchDetector {
 
-  public List<Tuple<List<Token>>> detect(Map<Token, Token> linkedTokens, IWitness base, IWitness witness) {
+  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, IWitness witness) {
     //rank the variant graph
-    VariantGraphWitnessAdapter adapter = (VariantGraphWitnessAdapter) base;
-    adapter.getGraph().rank();
+    base.rank();
     
-    List<Tuple<List<Token>>> phraseMatches = Lists.newArrayList();
+    List<List<Match>> phraseMatches = Lists.newArrayList();
 
     // gather matched ranks into a set ordered by their natural order
-    Set<Integer> rankSet = Sets.newTreeSet();
-    for (Token baseToken: linkedTokens.values()) {
-      VariantGraphVertexTokenAdapter a = (VariantGraphVertexTokenAdapter) baseToken;
-      int rank = a.getVertex().getRank();
-      rankSet.add(rank);
+    final Set<Integer> rankSet = Sets.newTreeSet();
+    for (VariantGraphVertex vertex : linkedTokens.values()) {
+      rankSet.add(vertex.getRank());
     }
  
     //Turn it into a List so that distance between matched ranks can be called
@@ -51,7 +50,7 @@ public class PhraseMatchDetector {
     List<Integer> ranks = Lists.newArrayList(rankSet);
 
     // chain token matches
-    List<Token> basePhrase = Lists.newArrayList();
+    List<VariantGraphVertex> basePhrase = Lists.newArrayList();
     List<Token> witnessPhrase = Lists.newArrayList();
     int previousRank = 1;
 
@@ -60,16 +59,15 @@ public class PhraseMatchDetector {
       if (!linkedTokens.containsKey(token)) {
         continue;
       }
-      Token baseToken = linkedTokens.get(token);
-      VariantGraphVertexTokenAdapter a = (VariantGraphVertexTokenAdapter) baseToken;
-      int rank = a.getVertex().getRank();
+      VariantGraphVertex baseToken = linkedTokens.get(token);
+      int rank = baseToken.getRank();
       int indexOfRank = ranks.indexOf(rank);
       int indexOfPreviousRank = ranks.indexOf(previousRank);
       int difference = indexOfRank - indexOfPreviousRank;
       if (difference != 0 && difference != 1) {
         if (!basePhrase.isEmpty()) {
           // start a new sequence
-          phraseMatches.add(new Tuple<List<Token>>(Lists.newArrayList(basePhrase), Lists.newArrayList(witnessPhrase)));
+          phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
         }
         // clear buffer
         basePhrase.clear();
@@ -80,7 +78,7 @@ public class PhraseMatchDetector {
       previousRank = rank;
     }
     if (!basePhrase.isEmpty()) {
-      phraseMatches.add(new Tuple<List<Token>>(Lists.newArrayList(basePhrase), Lists.newArrayList(witnessPhrase)));
+      phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
     }
     return phraseMatches;
   }

@@ -22,19 +22,24 @@ public class EditGraphVertex extends GraphVertex<EditGraph> {
     super(graph, node);
   }
 
-  public EditGraphVertex(EditGraph graph, Token base, Token witness, int witnessIndex) {
+  public EditGraphVertex(EditGraph graph, VariantGraphVertex base, Token witness, int witnessIndex) {
     super(graph, graph.getDatabase().createNode());
     setBase(base);
     setWitness(witness);
     setWitnessIndex(witnessIndex);
   }
 
-  public Token getBase() {
-    return getToken(BASE_KEY);    
+  public VariantGraphVertex getBase() {
+    final Long vertexId = (Long) node.getProperty(BASE_KEY, null);
+    return (vertexId == null ? null : graph.getVariantGraphVertexWrapper().apply(graph.getDatabase().getNodeById(vertexId)));
   }
   
-  public void setBase(Token token) {
-    setToken(BASE_KEY, token);
+  public void setBase(VariantGraphVertex vertex) {
+    if (vertex == null) {
+      node.removeProperty(BASE_KEY);
+    } else {
+      node.setProperty(BASE_KEY, vertex.getNode().getId());
+    }
   }
 
   public Token getWitness() {

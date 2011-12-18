@@ -127,6 +127,10 @@ public abstract class AbstractTest {
     assertEquals(expected, ((SimpleToken) vertex.tokens().first()).getNormalized());
   }
 
+  protected static void assertVertexHasContent(VariantGraphVertex vertex, String content, IWitness in) {
+    Assert.assertEquals(String.format("%s does not has expected content for %s", vertex, in), content, toString(vertex, in));
+  }
+
   protected static VariantGraphVertex vertexWith(VariantGraph graph, String content, IWitness in) {
     for (VariantGraphVertex v : graph.vertices(Sets.newTreeSet(Collections.singleton(in)))) {
       if (content.equals(toString(v, in))) {
