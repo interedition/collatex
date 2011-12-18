@@ -11,7 +11,6 @@ import eu.interedition.collatex.interfaces.Token;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Test;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,11 +50,11 @@ public class TokenLinkerTest extends AbstractTest {
         unlinked.add(witnessToken);
       }
     }
-    assertTrue(unlinked.contains(w[2].getTokens().get(1)));
-    assertTrue(unlinked.contains(w[2].getTokens().get(2)));
-    assertTrue(unlinked.contains(w[2].getTokens().get(21)));
-    assertTrue(unlinked.contains(w[2].getTokens().get(22)));
-    assertTrue(unlinked.contains(w[2].getTokens().get(23)));
+    assertTrue(unlinked.contains(w[2].getTokens().get(1))); // faint
+    assertTrue(unlinked.contains(w[2].getTokens().get(2))); // unchanging
+    assertTrue(unlinked.contains(w[2].getTokens().get(21))); // night
+    assertTrue(unlinked.contains(w[2].getTokens().get(22))); // on
+    assertTrue(unlinked.contains(w[2].getTokens().get(23))); // day
     assertEquals(5, unlinked.size());
   }
 
@@ -66,17 +65,15 @@ public class TokenLinkerTest extends AbstractTest {
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
     final TokenLinker linker = new TokenLinker();
-    linkTokens(linker, w[0], w[1]);
-    final Iterator<VariantGraphVertex> tokenIterator = linker.getBaseMatches().iterator();
-    tokenIterator.next(); // skip start vertex match
+    Map<Token, VariantGraphVertex> links = linkTokens(linker, w[0], w[1]);
 
-    assertVertexHasContent(tokenIterator.next(), "its", w[0]);
-    assertVertexHasContent(tokenIterator.next(), "soft", w[0]);
-    assertVertexHasContent(tokenIterator.next(), "light", w[0]);
-    assertVertexHasContent(tokenIterator.next(), "any", w[0]);
-    assertVertexHasContent(tokenIterator.next(), "light", w[0]);
-    assertVertexHasContent(tokenIterator.next(), "he", w[0]);
-    assertVertexHasContent(tokenIterator.next(), "could", w[0]);
+    assertTrue(links.containsKey(w[1].getTokens().get(0))); // its
+    assertTrue(links.containsKey(w[1].getTokens().get(1))); // soft
+    assertTrue(links.containsKey(w[1].getTokens().get(3))); // light
+    assertTrue(links.containsKey(w[1].getTokens().get(5))); // any
+    assertTrue(links.containsKey(w[1].getTokens().get(6))); // light
+    assertTrue(links.containsKey(w[1].getTokens().get(7))); // he
+    assertTrue(links.containsKey(w[1].getTokens().get(8))); // could
   }
 
 
@@ -110,7 +107,6 @@ public class TokenLinkerTest extends AbstractTest {
            );
     VariantGraph graph = merge(w[0], w[1]);
     VariantGraphBuilder builder = merge(graph, w[2]);
-    System.out.println(builder.getPhraseMatches().get(0));
     assertPhraseMatches(builder, "very happy is the cat");
     assertTrue(Iterables.isEmpty(builder.getTranspositions()));
   }
