@@ -6,6 +6,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex.implementation.Tuple;
+import eu.interedition.collatex.implementation.alignment.Match;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.implementation.graph.GraphFactory;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
@@ -32,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
 
+import static eu.interedition.collatex.implementation.alignment.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -172,4 +175,14 @@ public abstract class AbstractTest {
     }
     return tokens;
   }
+
+  protected void assertPhraseMatches(VariantGraphBuilder builder, String... expectedPhrases) {
+    List<List<Match>> phraseMatches = builder.getPhraseMatches();
+    int i = 0;
+    for (List<Match> phraseMatch : phraseMatches) {
+      Assert.assertEquals(expectedPhrases[i], SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatch)));
+      i++;
+    }
+  }
+
 }

@@ -103,15 +103,16 @@ public class TokenLinkerTest extends AbstractTest {
 
   @Test
   public void linkingRepetitionCausedByTransposition() {
-    final IWitness[] w = createWitnesses("the cat is very happy", "very happy is the cat", "very delitied and happy is the cat");
-
-    final IWitness graph = VariantGraphWitnessAdapter.create(merge(w[0], w[1]));
-    final Map<Token, VariantGraphVertex> links = linkTokens(graph, w[2]);
-
-    assertEquals(graph.getTokens().get(3), links.get(w[2].getTokens().get(0))); // very
-    assertEquals(graph.getTokens().get(4), links.get(w[2].getTokens().get(3))); // happy
-    assertEquals(graph.getTokens().get(8), links.get(w[2].getTokens().get(5))); // the
-    assertEquals(graph.getTokens().get(9), links.get(w[2].getTokens().get(6))); // cat
+   IWitness[] w = createWitnesses(//
+      "the cat is very happy", //
+      "very happy is the cat", // 
+      "very delitied and happy is the cat"
+           );
+    VariantGraph graph = merge(w[0], w[1]);
+    VariantGraphBuilder builder = merge(graph, w[2]);
+    System.out.println(builder.getPhraseMatches().get(0));
+    assertPhraseMatches(builder, "very happy is the cat");
+    assertTrue(Iterables.isEmpty(builder.getTranspositions()));
   }
 
   @Test
