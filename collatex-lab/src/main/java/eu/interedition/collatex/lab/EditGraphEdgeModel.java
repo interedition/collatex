@@ -2,6 +2,7 @@ package eu.interedition.collatex.lab;
 
 import eu.interedition.collatex.implementation.graph.EditOperation;
 
+import eu.interedition.collatex.implementation.graph.Score;
 import java.util.SortedSet;
 
 /**
@@ -10,9 +11,9 @@ import java.util.SortedSet;
 public class EditGraphEdgeModel {
   private final EditOperation editOperation;
   private final SortedSet<Integer> paths;
-  private final int score;
+  private final Score score;
 
-  public EditGraphEdgeModel(EditOperation editOperation, SortedSet<Integer> paths, int score) {
+  public EditGraphEdgeModel(EditOperation editOperation, SortedSet<Integer> paths, Score score) {
     this.editOperation = editOperation;
     this.paths = paths;
     this.score = score;
@@ -26,7 +27,7 @@ public class EditGraphEdgeModel {
     return paths;
   }
 
-  public int getScore() {
+  public Score getScore() {
     return score;
   }
 }

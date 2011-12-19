@@ -1,7 +1,6 @@
 package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import org.neo4j.graphdb.Relationship;
@@ -28,12 +27,13 @@ public class EditGraphEdge extends GraphEdge<EditGraph, EditGraphVertex> {
     return EditOperation.values()[(Integer) relationship.getProperty(EDIT_OPERATION_KEY)];
   }
 
-  public int getScore() {
-    return (Integer) relationship.getProperty(SCORE_KEY);
+  public Score getScore() {
+    return new Score((int[]) relationship.getProperty(SCORE_KEY));
   }
 
-  public void setScore(int score) {
-    relationship.setProperty(SCORE_KEY, score);
+  public void setScore(Score score) {
+    int[] unwrapped = score.toArray();
+    relationship.setProperty(SCORE_KEY, unwrapped);
   }
 
   public SortedSet<Integer> getShortestPathIds() {
