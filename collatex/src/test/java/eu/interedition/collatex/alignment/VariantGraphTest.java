@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.alignment;
+package eu.interedition.collatex.alignment;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

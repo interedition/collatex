@@ -1,8 +1,6 @@
-package eu.interedition.collatex.implementation.input;
+package eu.interedition.collatex.input;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.input.SimpleToken;
-import eu.interedition.collatex.input.WhitespaceAndPunctuationTokenizer;
 import org.junit.Test;
 
 import java.util.List;

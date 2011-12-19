@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.alignment;
+package eu.interedition.collatex.alignment;
 
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;

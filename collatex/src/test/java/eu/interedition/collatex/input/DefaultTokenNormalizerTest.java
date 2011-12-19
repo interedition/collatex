@@ -18,11 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.input;
+package eu.interedition.collatex.input;
 
 import static org.junit.Assert.assertEquals;
 
-import eu.interedition.collatex.input.DefaultTokenNormalizer;
 import org.junit.Test;
 
 public class DefaultTokenNormalizerTest {

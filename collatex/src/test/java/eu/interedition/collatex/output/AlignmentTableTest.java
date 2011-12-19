@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.output;
+package eu.interedition.collatex.output;
 
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;

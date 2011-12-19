@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.matching;
+package eu.interedition.collatex.matching;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
@@ -7,8 +7,6 @@ import eu.interedition.collatex.IWitness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.matching.EditDistanceTokenComparator;
-import eu.interedition.collatex.matching.Matches;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

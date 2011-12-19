@@ -18,12 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.alignment;
+package eu.interedition.collatex.alignment;
 
 import eu.interedition.collatex.IWitness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.alignment.Match;
-import eu.interedition.collatex.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.input.SimpleToken;
 import java.util.List;

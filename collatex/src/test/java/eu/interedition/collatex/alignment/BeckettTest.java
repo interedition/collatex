@@ -1,4 +1,4 @@
-package eu.interedition.collatex.implementation.alignment;
+package eu.interedition.collatex.alignment;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
@@ -6,8 +6,6 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.IWitness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.alignment.Match;
-import eu.interedition.collatex.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.input.SimpleToken;

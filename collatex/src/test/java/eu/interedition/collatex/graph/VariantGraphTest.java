@@ -18,17 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.implementation.graph;
+package eu.interedition.collatex.graph;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.IWitness;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphEdge;
-import eu.interedition.collatex.graph.VariantGraphTransposition;
-import eu.interedition.collatex.graph.VariantGraphVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
