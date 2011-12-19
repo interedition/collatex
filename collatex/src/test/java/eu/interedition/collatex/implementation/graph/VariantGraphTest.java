@@ -121,11 +121,14 @@ public class VariantGraphTest extends AbstractTest {
     final IWitness[] w = createWitnesses("The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog");
     final VariantGraph graph = merge(w);
 
-    final VariantGraphEdge edge = edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0]));
-    assertHasWitnesses(edge, w[0], w[1], w[2]);
+    // There should be two vertices for cat in the graph
+    VariantGraphEdge edge = edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0]));
+    assertHasWitnesses(edge, w[0]);
+    edge = edgeBetween(vertexWith(graph, "red", w[1]), vertexWith(graph, "cat", w[1]));
+    assertHasWitnesses(edge, w[1], w[2]);
 
-    assertEquals(14, Iterables.size(graph.vertices()));
-    assertEquals(10, Iterables.size(graph.edges()));
+    assertEquals(16, Iterables.size(graph.vertices())); // start and end vertices included
+    assertEquals(18, Iterables.size(graph.edges()));
   }
 
   @Test
