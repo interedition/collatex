@@ -36,7 +36,7 @@ ${header}
               <div class="yui3-menu-content">
                 <ul>
                   <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/collate/console">Console</a></li>
-                  <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/collate/darwin">Darwin Sample</a></li>
+                  <#--<li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/collate/darwin">Darwin Sample</a></li>-->
                   <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/collate/tutorial">REST API</a></li>
                 </ul>
               </div>
