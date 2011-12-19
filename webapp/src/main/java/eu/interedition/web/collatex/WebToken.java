@@ -20,8 +20,8 @@
 
 package eu.interedition.web.collatex;
 
-import eu.interedition.collatex.implementation.input.SimpleToken;
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.input.SimpleToken;
 import org.codehaus.jackson.JsonNode;
 
 public class WebToken extends SimpleToken {

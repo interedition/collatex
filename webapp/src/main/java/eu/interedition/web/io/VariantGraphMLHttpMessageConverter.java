@@ -2,10 +2,10 @@ package eu.interedition.web.io;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.implementation.graph.VariantGraph;
-import eu.interedition.collatex.implementation.graph.VariantGraphEdge;
-import eu.interedition.collatex.implementation.graph.VariantGraphTransposition;
-import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphEdge;
+import eu.interedition.collatex.graph.VariantGraphTransposition;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;

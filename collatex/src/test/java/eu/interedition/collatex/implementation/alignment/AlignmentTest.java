@@ -20,19 +20,20 @@
 
 package eu.interedition.collatex.implementation.alignment;
 
-import eu.interedition.collatex.implementation.Tuple;
-import eu.interedition.collatex.implementation.graph.VariantGraph;
-import eu.interedition.collatex.implementation.input.SimpleToken;
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.alignment.Match;
+import eu.interedition.collatex.alignment.VariantGraphBuilder;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.input.SimpleToken;
 import java.util.List;
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.interfaces.Token;
-import eu.interedition.collatex.interfaces.IWitness;
 import org.junit.Test;
 
 import java.util.SortedSet;
 
-import static eu.interedition.collatex.implementation.alignment.Match.PHRASE_MATCH_TO_TOKENS;
+import static eu.interedition.collatex.alignment.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
 
 public class AlignmentTest extends AbstractTest {

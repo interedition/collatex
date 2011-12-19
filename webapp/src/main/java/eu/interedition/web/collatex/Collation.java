@@ -20,7 +20,7 @@
 
 package eu.interedition.web.collatex;
 
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
 
 import java.util.SortedSet;
 

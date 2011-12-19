@@ -3,7 +3,7 @@ package eu.interedition.web;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.jolbox.bonecp.BoneCPDataSource;
-import eu.interedition.collatex.implementation.graph.GraphFactory;
+import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.text.json.map.TextSerializerModule;
 import eu.interedition.web.io.RangeConverter;
 import eu.interedition.web.text.TextIndex;

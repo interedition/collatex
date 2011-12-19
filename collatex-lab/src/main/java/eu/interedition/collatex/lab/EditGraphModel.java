@@ -3,9 +3,9 @@ package eu.interedition.collatex.lab;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import eu.interedition.collatex.implementation.graph.EditGraph;
-import eu.interedition.collatex.implementation.graph.EditGraphEdge;
-import eu.interedition.collatex.implementation.graph.EditGraphVertex;
+import eu.interedition.collatex.graph.EditGraph;
+import eu.interedition.collatex.graph.EditGraphEdge;
+import eu.interedition.collatex.graph.EditGraphVertex;
 
 import java.util.Map;
 

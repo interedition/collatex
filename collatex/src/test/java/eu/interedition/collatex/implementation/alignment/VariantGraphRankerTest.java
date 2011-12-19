@@ -22,8 +22,8 @@ package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.VariantGraph;
-import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 import org.junit.Test;
 
 import java.util.List;

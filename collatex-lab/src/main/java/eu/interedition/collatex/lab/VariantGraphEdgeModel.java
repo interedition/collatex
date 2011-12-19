@@ -1,6 +1,6 @@
 package eu.interedition.collatex.lab;
 
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
 
 import java.util.SortedSet;
 

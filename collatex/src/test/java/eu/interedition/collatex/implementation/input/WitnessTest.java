@@ -2,8 +2,10 @@ package eu.interedition.collatex.implementation.input;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.interfaces.Token;
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.input.Witness;
 import org.junit.Test;
 
 import java.util.Iterator;

@@ -6,9 +6,9 @@ import com.google.common.collect.Iterables;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import eu.interedition.collatex.implementation.input.SimpleToken;
-import eu.interedition.collatex.interfaces.Token;
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.input.SimpleToken;
 import org.apache.commons.collections15.Transformer;
 
 import javax.swing.*;

@@ -1,13 +1,19 @@
 package eu.interedition.collatex.implementation.graph;
 
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.EditGraph;
+import eu.interedition.collatex.graph.EditGraphEdge;
+import eu.interedition.collatex.graph.EditGraphLinker;
+import eu.interedition.collatex.graph.EditOperation;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 import org.junit.Ignore;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.input.SimpleToken;
-import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex.interfaces.IWitness;
-import eu.interedition.collatex.interfaces.Token;
+import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.junit.Test;
 
 import java.util.Iterator;

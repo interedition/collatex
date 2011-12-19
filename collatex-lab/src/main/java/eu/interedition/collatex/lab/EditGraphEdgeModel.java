@@ -1,8 +1,8 @@
 package eu.interedition.collatex.lab;
 
-import eu.interedition.collatex.implementation.graph.EditOperation;
+import eu.interedition.collatex.graph.EditOperation;
 
-import eu.interedition.collatex.implementation.graph.Score;
+import eu.interedition.collatex.graph.Score;
 import java.util.SortedSet;
 
 /**

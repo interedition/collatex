@@ -2,12 +2,13 @@ package eu.interedition.collatex.implementation.matching;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.implementation.graph.VariantGraph;
-import eu.interedition.collatex.implementation.graph.VariantGraphVertex;
-import eu.interedition.collatex.interfaces.Token;
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.matching.EditDistanceTokenComparator;
+import eu.interedition.collatex.matching.Matches;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

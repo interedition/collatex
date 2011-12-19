@@ -1,11 +1,11 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
-import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
-import eu.interedition.collatex.implementation.graph.GraphFactory;
-import eu.interedition.collatex.implementation.graph.VariantGraph;
-import eu.interedition.collatex.implementation.matching.EqualityTokenComparator;
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.alignment.VariantGraphBuilder;
+import eu.interedition.collatex.graph.GraphFactory;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

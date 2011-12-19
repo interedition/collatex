@@ -2,8 +2,8 @@ package eu.interedition.collatex.implementation.alignment;
 
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.interfaces.Token;
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Token;
 import org.junit.Test;
 
 import java.util.SortedSet;

@@ -1,7 +1,7 @@
 package eu.interedition.web.io;
 
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.web.collatex.GraphVizService;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;

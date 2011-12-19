@@ -2,10 +2,10 @@ package eu.interedition.collatex.lab;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.implementation.input.DefaultTokenNormalizer;
-import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
-import eu.interedition.collatex.implementation.input.WitnessBuilder;
-import eu.interedition.collatex.interfaces.IWitness;
+import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.input.DefaultTokenNormalizer;
+import eu.interedition.collatex.input.WhitespaceTokenizer;
+import eu.interedition.collatex.input.WitnessBuilder;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;

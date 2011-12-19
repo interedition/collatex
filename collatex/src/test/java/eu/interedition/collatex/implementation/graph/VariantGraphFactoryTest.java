@@ -2,6 +2,7 @@ package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.graph.VariantGraph;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
 package eu.interedition.collatex.lab;
 
-import eu.interedition.collatex.interfaces.Token;
+import eu.interedition.collatex.Token;
 
 import java.util.SortedSet;
 
