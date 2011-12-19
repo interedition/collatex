@@ -28,10 +28,10 @@ import eu.interedition.text.NameRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -43,7 +43,11 @@ import javax.sql.DataSource;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.Collections.singleton;
 
@@ -54,7 +58,7 @@ public class RelationalNameRepository implements NameRepository, InitializingBea
   private RelationalDatabaseKeyFactory keyFactory;
   private int cacheSize = 1000;
 
-  private SimpleJdbcTemplate jt;
+  private JdbcTemplate jt;
   private SimpleJdbcInsert nameInsert;
   private DataFieldMaxValueIncrementer nameIdIncrementer;
 
@@ -181,7 +185,7 @@ public class RelationalNameRepository implements NameRepository, InitializingBea
   }
 
   public void afterPropertiesSet() throws Exception {
-    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.jt = (dataSource == null ? null : new JdbcTemplate(dataSource));
     this.nameInsert = new SimpleJdbcInsert(dataSource).withTableName("text_qname");
     this.nameIdIncrementer = this.keyFactory.create("text_qname");
 

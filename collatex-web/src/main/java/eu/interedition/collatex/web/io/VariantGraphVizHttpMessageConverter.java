@@ -25,11 +25,11 @@ public class VariantGraphVizHttpMessageConverter extends AbstractHttpMessageConv
    */
   protected static final MediaType IMAGE_SVG_XML = new MediaType("image", "svg+xml");
 
-  @Autowired
   private GraphVizService graphVizService;
 
-  public VariantGraphVizHttpMessageConverter() {
+  public VariantGraphVizHttpMessageConverter(GraphVizService graphVizService) {
     super(MediaType.TEXT_PLAIN, IMAGE_SVG_XML);
+    this.graphVizService = graphVizService;
   }
 
   @Override

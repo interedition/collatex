@@ -37,6 +37,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.SortedSet;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping("/")
@@ -46,7 +49,7 @@ public class CollationController implements InitializingBean {
   private static final int TWO_HOURS = 7200000;
 
   @Autowired
-  private TaskScheduler taskScheduler;
+  private ScheduledExecutorService taskScheduler;
 
   @Autowired
   private GraphFactory graphFactory;
@@ -93,6 +96,6 @@ public class CollationController implements InitializingBean {
           tx.finish();
         }
       }
-    }, TWO_HOURS);
+    }, 0, TWO_HOURS, TimeUnit.MILLISECONDS);
   }
 }

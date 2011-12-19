@@ -36,19 +36,28 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import static eu.interedition.text.util.TextDigestingFilterReader.NULL_DIGEST;
 
@@ -57,7 +66,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   private DataSource dataSource;
   private RelationalDatabaseKeyFactory keyFactory;
 
-  private SimpleJdbcTemplate jt;
+  private JdbcTemplate jt;
   private SimpleJdbcInsert textInsert;
   private DataFieldMaxValueIncrementer textIdIncrementer;
 
@@ -72,7 +81,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   public void afterPropertiesSet() throws Exception {
-    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.jt = (dataSource == null ? null : new JdbcTemplate(dataSource));
     this.textInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_content"));
     this.textIdIncrementer = keyFactory.create("text_content");
   }
@@ -167,7 +176,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   public Text write(final Text text, final Reader contents, final long contentLength) throws IOException {
     final long id = ((RelationalText) text).getId();
     final TextDigestingFilterReader digestingFilterReader = new TextDigestingFilterReader(new BufferedReader(contents));
-    jt.getJdbcOperations().execute("update text_content set content = ?, content_length = ? where id = ?", new PreparedStatementCallback<Void>() {
+    jt.execute("update text_content set content = ?, content_length = ? where id = ?", new PreparedStatementCallback<Void>() {
       public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
         ps.setCharacterStream(1, digestingFilterReader, contentLength);
         ps.setLong(2, contentLength);
