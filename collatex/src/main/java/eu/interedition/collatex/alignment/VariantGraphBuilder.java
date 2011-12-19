@@ -31,7 +31,7 @@ public class VariantGraphBuilder {
   private LinkedHashMap<Token, VariantGraphVertex> alignments;
 
   public VariantGraphBuilder(VariantGraph graph) {
-    this(graph, new EqualityTokenComparator(), new TokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
+    this(graph, new EqualityTokenComparator(), new DefaultTokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
   }
 
   public VariantGraphBuilder(VariantGraph graph, Comparator<Token> comparator, ITokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {

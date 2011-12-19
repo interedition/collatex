@@ -23,8 +23,8 @@ import java.util.Map;
 
 import static com.google.common.collect.Lists.reverse;
 
-public class TokenLinker implements ITokenLinker {
-  private static final Logger LOG = LoggerFactory.getLogger(TokenLinker.class);
+public class DefaultTokenLinker implements ITokenLinker {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultTokenLinker.class);
 
   private Matches matches;
   private List<List<Token>> leftExpandingPhrases;

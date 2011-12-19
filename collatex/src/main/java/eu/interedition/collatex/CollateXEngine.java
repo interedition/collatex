@@ -22,7 +22,7 @@
 
 package eu.interedition.collatex;
 
-import eu.interedition.collatex.alignment.TokenLinker;
+import eu.interedition.collatex.alignment.DefaultTokenLinker;
 import eu.interedition.collatex.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -47,7 +47,7 @@ public class CollateXEngine {
   private ITokenizer tokenizer = new WhitespaceTokenizer();
   // private ITokenizer tokenizer = new WhitespaceAndPunctuationTokenizer();
   private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
-  private ITokenLinker tokenLinker = new TokenLinker();
+  private ITokenLinker tokenLinker = new DefaultTokenLinker();
 
   private final GraphFactory graphFactory;
 

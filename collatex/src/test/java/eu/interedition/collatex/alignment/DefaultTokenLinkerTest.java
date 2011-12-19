@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class TokenLinkerTest extends AbstractTest {
+public class DefaultTokenLinkerTest extends AbstractTest {
 
   @Test
   public void testDirkVincent4() {
@@ -66,7 +66,7 @@ public class TokenLinkerTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
-    final TokenLinker linker = new TokenLinker();
+    final DefaultTokenLinker linker = new DefaultTokenLinker();
     Map<Token, VariantGraphVertex> links = linkTokens(linker, w[0], w[1]);
 
     assertTrue(links.containsKey(w[1].getTokens().get(0))); // its
@@ -239,7 +239,7 @@ public class TokenLinkerTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
-    final TokenLinker linker = new TokenLinker();
+    final DefaultTokenLinker linker = new DefaultTokenLinker();
     linkTokens(linker, w[0], w[1]);
 
     final Token soft = w[1].getTokens().get(1);
@@ -261,7 +261,7 @@ public class TokenLinkerTest extends AbstractTest {
             "the cat very happy is very happy the cat",//
             "very delitied and happy is the cat");
 
-    final TokenLinker linker = new TokenLinker();
+    final DefaultTokenLinker linker = new DefaultTokenLinker();
     linkTokens(linker, w[0], w[1]);
 
     final List<List<Token>> rightExpandingPhrases = linker.getRightExpandingPhrases();
@@ -277,21 +277,21 @@ public class TokenLinkerTest extends AbstractTest {
     assertEquals("cat #", SimpleToken.toString(leftExpandingPhrases.get(3)));
   }
 
-  private Map<Token, VariantGraphVertex> linkTokens(TokenLinker linker, IWitness base, IWitness witness) {
+  private Map<Token, VariantGraphVertex> linkTokens(DefaultTokenLinker linker, IWitness base, IWitness witness) {
     final VariantGraph graph = merge(base);
     return linker.link(graph, witness.getTokens(), new EqualityTokenComparator());
   }
 
-  private Map<Token, VariantGraphVertex> linkTokens(TokenLinker linker, VariantGraph base, IWitness witness) {
+  private Map<Token, VariantGraphVertex> linkTokens(DefaultTokenLinker linker, VariantGraph base, IWitness witness) {
     return linker.link(base, witness.getTokens(), new EqualityTokenComparator());
   }
 
   private Map<Token, VariantGraphVertex> linkTokens(IWitness base, IWitness witness) {
-    return linkTokens(new TokenLinker(), base, witness);
+    return linkTokens(new DefaultTokenLinker(), base, witness);
   }
 
   private Map<Token, VariantGraphVertex> linkTokens(VariantGraph base, IWitness witness) {
-    return linkTokens(new TokenLinker(), base, witness);
+    return linkTokens(new DefaultTokenLinker(), base, witness);
   }
 
   private static void assertLink(String left, String right, Map.Entry<Token, VariantGraphVertex> match) {

@@ -2,6 +2,7 @@ package eu.interedition.collatex.graph;
 
 import eu.interedition.collatex.IWitness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.alignment.EditGraphTokenLinker;
 import org.junit.Ignore;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -23,7 +24,7 @@ public class EditGraphTest extends AbstractTest {
   public void testUsecase1() {
     final IWitness[] w = createWitnesses("The black cat", "The black and white cat");
     final VariantGraph graph = merge(w[0]);
-    EditGraphLinker linker = new EditGraphLinker(graphFactory);
+    EditGraphTokenLinker linker = new EditGraphTokenLinker(graphFactory);
     Map<Token, VariantGraphVertex> link = linker.link(graph, w[1].getTokens(), new EqualityTokenComparator());
     assertEquals(3, link.size());
   }
