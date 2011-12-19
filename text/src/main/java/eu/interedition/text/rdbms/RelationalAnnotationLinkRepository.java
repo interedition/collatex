@@ -31,17 +31,25 @@ import eu.interedition.text.util.AbstractAnnotationLinkRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static eu.interedition.text.rdbms.RelationalAnnotationRepository.mapAnnotationFrom;
 import static eu.interedition.text.rdbms.RelationalAnnotationRepository.selectAnnotationFrom;
@@ -60,7 +68,8 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
 
   private int batchSize = 10000;
 
-  private SimpleJdbcTemplate jt;
+  private JdbcTemplate jt;
+  private NamedParameterJdbcTemplate npjt;
   private SimpleJdbcInsert annotationLinkInsert;
   private SimpleJdbcInsert annotationLinkTargetInsert;
   private SimpleJdbcInsert annotationLinkDataInsert;
@@ -152,7 +161,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     });
 
     if (!ids.isEmpty()) {
-      jt.batchUpdate("delete from text_annotation_link where id = :id", ids.toArray(new SqlParameterSource[ids.size()]));
+      npjt.batchUpdate("delete from text_annotation_link where id = :id", ids.toArray(new SqlParameterSource[ids.size()]));
     }
   }
 
@@ -339,7 +348,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
       }
     }
 
-    jt.batchUpdate("delete from text_annotation_link_data where link = :link and name = :name", batchPs.toArray(new SqlParameterSource[batchPs.size()]));
+    npjt.batchUpdate("delete from text_annotation_link_data where link = :link and name = :name", batchPs.toArray(new SqlParameterSource[batchPs.size()]));
   }
 
   @Required
@@ -367,7 +376,8 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
   }
 
   public void afterPropertiesSet() throws Exception {
-    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.jt = (dataSource == null ? null : new JdbcTemplate(dataSource));
+    this.npjt = (jt == null ? null : new NamedParameterJdbcTemplate(jt));
     this.annotationLinkInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link"));
     this.annotationLinkTargetInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link_target"));
     this.annotationLinkDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_link_data");

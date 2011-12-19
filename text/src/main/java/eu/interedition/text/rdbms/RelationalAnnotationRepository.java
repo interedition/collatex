@@ -22,23 +22,32 @@ package eu.interedition.text.rdbms;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.interedition.text.*;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.AnnotationConsumer;
+import eu.interedition.text.Name;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
 import eu.interedition.text.query.Criterion;
 import eu.interedition.text.util.AbstractAnnotationRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 import static eu.interedition.text.rdbms.RelationalNameRepository.mapNameFrom;
 import static eu.interedition.text.rdbms.RelationalNameRepository.selectNameFrom;
@@ -52,7 +61,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   private RelationalNameRepository nameRepository;
   private RelationalQueryCriteriaTranslator queryCriteriaTranslator;
 
-  private SimpleJdbcTemplate jt;
+  private JdbcTemplate jt;
   private SimpleJdbcInsert annotationInsert;
   private SimpleJdbcInsert annotationDataInsert;
 
@@ -273,7 +282,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    this.jt = (dataSource == null ? null : new SimpleJdbcTemplate(dataSource));
+    this.jt = (dataSource == null ? null : new JdbcTemplate(dataSource));
     this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation"));
     this.annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
 

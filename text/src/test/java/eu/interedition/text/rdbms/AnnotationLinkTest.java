@@ -23,14 +23,20 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import eu.interedition.text.*;
+import eu.interedition.text.AbstractTestResourceTest;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.AnnotationLink;
+import eu.interedition.text.AnnotationLinkRepository;
+import eu.interedition.text.Name;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.query.Criteria;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -68,7 +74,7 @@ public class AnnotationLinkTest extends AbstractTestResourceTest {
     final Map<AnnotationLink, Set<Annotation>> afterTextRemoval = annotationLinkRepository.find(Criteria.any());
     Assert.assertEquals(0, afterTextRemoval.size());
 
-    final SimpleJdbcTemplate jt = new SimpleJdbcTemplate(dataSource);
+    final JdbcTemplate jt = new JdbcTemplate(dataSource);
     Assert.assertEquals(1, jt.queryForInt("select count(*) from text_annotation_link"));
     ((RelationalAnnotationLinkRepository)annotationLinkRepository).cleanup();
     Assert.assertEquals(0, jt.queryForInt("select count(*) from text_annotation_link"));
