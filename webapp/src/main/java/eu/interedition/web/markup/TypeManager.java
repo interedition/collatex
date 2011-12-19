@@ -1,8 +1,5 @@
-package eu.interedition.markup.type;
+package eu.interedition.web.markup;
 
-import eu.interedition.markup.MarkupRelationshipType;
-import eu.interedition.markup.schema.Schema;
-import eu.interedition.markup.name.Name;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.springframework.beans.factory.annotation.Autowired;

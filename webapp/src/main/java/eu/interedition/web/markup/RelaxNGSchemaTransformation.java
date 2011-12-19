@@ -1,15 +1,9 @@
-package eu.interedition.markup.schema;
+package eu.interedition.web.markup;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import eu.interedition.markup.name.Name;
-import eu.interedition.markup.name.NameManager;
-import eu.interedition.markup.name.Namespace;
-import eu.interedition.markup.type.AnnotationType;
-import eu.interedition.markup.type.PropertyType;
-import eu.interedition.markup.type.TypeManager;
 import org.kohsuke.rngom.digested.*;
 import org.kohsuke.rngom.parse.IllegalSchemaException;
 import org.kohsuke.rngom.parse.xml.SAXParseable;

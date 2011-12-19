@@ -1,4 +1,4 @@
-package eu.interedition.markup.schema;
+package eu.interedition.web.markup;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

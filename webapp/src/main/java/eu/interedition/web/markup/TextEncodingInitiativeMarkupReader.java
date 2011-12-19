@@ -1,13 +1,6 @@
-package eu.interedition.markup;
+package eu.interedition.web.markup;
 
-import com.google.common.base.Throwables;
-import com.google.common.io.Closeables;
-import eu.interedition.markup.schema.RelaxNGSchemaTransformation;
-import eu.interedition.markup.schema.Schema;
-import org.kohsuke.rngom.digested.DPattern;
-import org.kohsuke.rngom.digested.DSchemaBuilderImpl;
 import org.kohsuke.rngom.parse.IllegalSchemaException;
-import org.kohsuke.rngom.parse.xml.SAXParseable;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.RelationshipType;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -17,13 +10,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.StopWatch;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Locale;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

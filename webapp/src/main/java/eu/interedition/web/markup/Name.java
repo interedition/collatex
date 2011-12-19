@@ -1,9 +1,8 @@
-package eu.interedition.markup.name;
+package eu.interedition.web.markup;
 
-import eu.interedition.markup.NodeWrapper;
 import org.neo4j.graphdb.Node;
 
-import static eu.interedition.markup.MarkupRelationshipType.IS_NAMESPACE_OF;
+import static eu.interedition.web.markup.MarkupRelationshipType.IS_NAMESPACE_OF;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 /**

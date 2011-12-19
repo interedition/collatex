@@ -1,6 +1,5 @@
-package eu.interedition.markup.name;
+package eu.interedition.web.markup;
 
-import eu.interedition.markup.MarkupRelationshipType;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.neo4j.graphdb.GraphDatabaseService;

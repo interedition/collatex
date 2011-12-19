@@ -1,4 +1,4 @@
-package eu.interedition.markup;
+package eu.interedition.web.markup;
 
 import org.neo4j.graphdb.RelationshipType;
 

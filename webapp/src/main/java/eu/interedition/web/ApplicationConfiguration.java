@@ -9,6 +9,7 @@ import eu.interedition.web.io.RangeConverter;
 import eu.interedition.web.text.TextIndex;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.h2.Driver;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +38,10 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Configuration
-@ComponentScan(basePackageClasses = ApplicationConfiguration.class, includeFilters = {@ComponentScan.Filter(Service.class)}, useDefaultFilters = false)
+@ComponentScan(
+        basePackageClasses = ApplicationConfiguration.class,
+        includeFilters = {@ComponentScan.Filter(Service.class)},
+        useDefaultFilters = false)
 @ImportResource("classpath:/eu/interedition/text/rdbms/repository-context.xml")
 public class ApplicationConfiguration {
   private static final String DATA_DIRECTORY = System.getProperty("interedition.data");
@@ -72,6 +76,11 @@ public class ApplicationConfiguration {
   @Bean
   public GraphFactory graphFactory() throws IOException {
     return new GraphFactory(new File(dataDirectory(), "graphs"));
+  }
+
+  @Bean
+  public GraphDatabaseService graphDatabase() throws IOException {
+    return graphFactory().getDatabase();
   }
 
   @Bean(name = { "dataSource", "repositoryDataSource" }, destroyMethod = "close")

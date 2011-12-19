@@ -1,12 +1,8 @@
-package eu.interedition.markup.type;
+package eu.interedition.web.markup;
 
-import com.google.common.collect.Sets;
-import eu.interedition.markup.name.Name;
 import org.neo4j.graphdb.Node;
 
-import java.util.SortedSet;
-
-import static eu.interedition.markup.MarkupRelationshipType.NAMES_ANNOTATION_TYPE;
+import static eu.interedition.web.markup.MarkupRelationshipType.NAMES_ANNOTATION_TYPE;
 import static org.neo4j.graphdb.Direction.INCOMING;
 
 /**

@@ -1,12 +1,11 @@
-package eu.interedition.markup.name;
+package eu.interedition.web.markup;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import eu.interedition.markup.NodeWrapper;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
-import static eu.interedition.markup.MarkupRelationshipType.IS_NAMESPACE_OF;
+import static eu.interedition.web.markup.MarkupRelationshipType.IS_NAMESPACE_OF;
 import static org.neo4j.graphdb.Direction.INCOMING;
 
 /**

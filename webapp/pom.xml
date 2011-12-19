@@ -77,6 +77,10 @@
             <artifactId>bonecp</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.kohsuke.rngom</groupId>
+            <artifactId>rngom</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
         </dependency>

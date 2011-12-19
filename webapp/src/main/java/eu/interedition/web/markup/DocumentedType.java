@@ -1,6 +1,6 @@
-package eu.interedition.markup.type;
+package eu.interedition.web.markup;
 
-import eu.interedition.markup.NodeWrapper;
+import eu.interedition.web.markup.NodeWrapper;
 import org.neo4j.graphdb.Node;
 
 /**
