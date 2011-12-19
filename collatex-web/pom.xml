@@ -48,12 +48,5 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
         </dependency>
-        <dependency>
-        	<groupId>org.jgrapht</groupId>
-        	<artifactId>jgrapht-jdk1.5</artifactId>
-        	<version>0.7.3</version>
-        	<type>jar</type>
-        	<scope>compile</scope>
-        </dependency>
     </dependencies>
 </project>

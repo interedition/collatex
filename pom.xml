@@ -20,9 +20,7 @@
         <module>collatex</module>
         <module>collatex-lab</module>
         <module>collatex-nmerge</module>
-        <module>collatex-nodeps</module>
         <module>collatex-web</module>
-        <module>collatex-client-jee</module>
         <module>collatex-cocoon</module>
         <module>text</module>
         <module>text-repository</module>
