@@ -1,21 +1,14 @@
 package eu.interedition.collatex.lab;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import eu.interedition.collatex.implementation.graph.EditOperation;
 import eu.interedition.collatex.implementation.input.SimpleToken;
-import eu.interedition.collatex.interfaces.IWitness;
-import eu.interedition.collatex.interfaces.Token;
 import org.apache.commons.collections15.Transformer;
-import org.apache.commons.collections15.functors.ConstantTransformer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.SortedSet;
 
 
 /**
@@ -40,7 +33,7 @@ public class EditGraphPanel extends VisualizationViewer<EditGraphVertexModel, Ed
 
         final SimpleToken bt = (SimpleToken) model.getBase().first();
         final SimpleToken wt = (SimpleToken) model.getWitness();
-        return String.format("'%s'[%d] = '%s'[%d]", bt.getContent(), bt.getIndex(), wt.getContent(), wt.getIndex());
+        return String.format("'%s'[%d] = '%s'[%d]", wt.getContent(), wt.getIndex(), bt.getContent(), bt.getIndex());
       }
     });
     rc.setVertexFillPaintTransformer(new Transformer<EditGraphVertexModel, Paint>() {
@@ -64,7 +57,7 @@ public class EditGraphPanel extends VisualizationViewer<EditGraphVertexModel, Ed
     rc.setEdgeLabelTransformer(new Transformer<EditGraphEdgeModel, String>() {
       @Override
       public String transform(EditGraphEdgeModel model) {
-        return Integer.toString(model.getScore());
+        return Integer.toString(model.getScore().getTempScore());
       }
     });
   }
