@@ -56,7 +56,7 @@ public class CollateXEngine {
   private final GraphFactory graphFactory;
 
   public CollateXEngine() throws IOException {
-    this(new GraphFactory());
+    this(GraphFactory.create());
   }
 
   public CollateXEngine(GraphFactory graphFactory) {

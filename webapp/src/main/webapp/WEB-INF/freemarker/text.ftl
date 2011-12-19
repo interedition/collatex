@@ -1,7 +1,5 @@
 <#assign maxLength=102400 truncated=(text.length gt maxLength)/>
 <@ie.page metadata.description?html>
-<h1>${metadata.description?html}</h1>
-
 <div id="text-length" style="text-align: right; font-weight: bold; margin: 1em 0">
     Created: ${metadata.created?string?html}
     | Updated: ${metadata.updated?string?html}

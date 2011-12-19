@@ -20,30 +20,44 @@
 
 package eu.interedition.web.collatex;
 
+import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
 import eu.interedition.collatex.implementation.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.implementation.graph.GraphFactory;
 import eu.interedition.collatex.implementation.graph.VariantGraph;
+import eu.interedition.collatex.implementation.input.WhitespaceTokenizer;
+import eu.interedition.collatex.implementation.input.Witness;
+import eu.interedition.collatex.implementation.output.Apparatus;
 import eu.interedition.collatex.interfaces.IWitness;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.InputStream;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/collate")
 public class CollationController implements InitializingBean {
   private static final Logger LOG = LoggerFactory.getLogger(CollationController.class);
-
   private static final int TWO_HOURS = 7200000;
 
   @Autowired
@@ -75,9 +89,19 @@ public class CollationController implements InitializingBean {
     }
   }
 
-  @RequestMapping
-  public String form() {
-    return "collate";
+  @RequestMapping("/console")
+  public String console() {
+    return "collate/console";
+  }
+
+  @RequestMapping("/darwin")
+  public String darwinExample() {
+    return "collate/darwin-example";
+  }
+
+  @RequestMapping("/tutorial")
+  public String tutorial() {
+    return "collate/tutorial";
   }
 
   @Override

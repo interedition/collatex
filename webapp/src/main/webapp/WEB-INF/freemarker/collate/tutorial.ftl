@@ -1,13 +1,10 @@
 <#assign header>
   <link href="http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css" rel="stylesheet" type="text/css">
   <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shCore.js" type="text/javascript"></script>
-  <#-- <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shAutoloader.js" type="text/javascript"></script> -->
   <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushXml.js" type="text/javascript"></script>
   <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushJScript.js" type="text/javascript"></script>
 </#assign>
-<@c.page title="REST service" header=header>
-	<h1>REST service</h1>
-	
+<@ie.page title="CollateX REST API" header=header>
 	<p>
 	This is the REST service of CollateX.
 	To call it, you can post witness data as specified below and get the collation result back in a number of formats.
@@ -276,4 +273,4 @@
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all()
     </script>
-</@c.page>
+</@ie.page>

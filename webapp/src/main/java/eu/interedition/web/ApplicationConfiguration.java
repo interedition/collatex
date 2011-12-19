@@ -9,9 +9,10 @@ import eu.interedition.web.io.RangeConverter;
 import eu.interedition.web.text.TextIndex;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.h2.Driver;
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.format.support.FormattingConversionServiceFactoryBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Service;
@@ -43,44 +43,33 @@ import java.util.concurrent.ScheduledExecutorService;
         includeFilters = {@ComponentScan.Filter(Service.class)},
         useDefaultFilters = false)
 @ImportResource("classpath:/eu/interedition/text/rdbms/repository-context.xml")
-public class ApplicationConfiguration {
+public class ApplicationConfiguration implements DisposableBean {
   private static final String DATA_DIRECTORY = System.getProperty("interedition.data");
   private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfiguration.class);
+
+  private File dataDirectory;
 
   @Bean
   public File dataDirectory() throws IOException {
     if (DATA_DIRECTORY == null) {
-      final File temporaryDataDirectory = Files.createTempDir().getCanonicalFile();
-
-      LOG.info("Creating temporary data directory '{}'", temporaryDataDirectory);
-      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            Files.deleteRecursively(temporaryDataDirectory);
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-      }));
-
-      return temporaryDataDirectory;
+      dataDirectory = Files.createTempDir().getCanonicalFile();
+      LOG.info("Created temporary data directory '{}'", dataDirectory);
     } else {
-      final File dataDirectory = new File(DATA_DIRECTORY);
+      dataDirectory = new File(DATA_DIRECTORY);
       Assert.isTrue(dataDirectory.isDirectory() || dataDirectory.mkdirs(),//
               "Data directory '" + dataDirectory + "' does not exist and could not be created");
-      return dataDirectory;
     }
+    return dataDirectory;
   }
 
   @Bean
   public GraphFactory graphFactory() throws IOException {
-    return new GraphFactory(new File(dataDirectory(), "graphs"));
+    return new GraphFactory(graphDatabase());
   }
 
-  @Bean
-  public GraphDatabaseService graphDatabase() throws IOException {
-    return graphFactory().getDatabase();
+  @Bean(destroyMethod = "shutdown")
+  public EmbeddedGraphDatabase graphDatabase() throws IOException {
+    return new EmbeddedGraphDatabase(new File(dataDirectory(), "graphs").getCanonicalPath());
   }
 
   @Bean(name = { "dataSource", "repositoryDataSource" }, destroyMethod = "close")
@@ -138,8 +127,16 @@ public class ApplicationConfiguration {
     return om;
   }
 
-  @Bean
+  @Bean(destroyMethod = "shutdown")
   public ScheduledExecutorService taskScheduler() {
     return Executors.newScheduledThreadPool(42);
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    if (DATA_DIRECTORY == null && dataDirectory != null) {
+      Files.deleteRecursively(dataDirectory);
+      LOG.info("Deleted temporary data directory '{}'", dataDirectory);
+    }
   }
 }

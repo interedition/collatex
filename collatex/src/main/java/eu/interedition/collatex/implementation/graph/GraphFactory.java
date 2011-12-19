@@ -7,6 +7,7 @@ import com.google.common.io.Files;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.interfaces.IWitness;
 import eu.interedition.collatex.interfaces.Token;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -30,23 +31,15 @@ public class GraphFactory {
 
   private Resolver<IWitness> witnessResolver = new DefaultResolver<IWitness>();
   private Resolver<Token> tokenResolver = new DefaultResolver<Token>();
-  private EmbeddedGraphDatabase database;
+  private GraphDatabaseService database;
   private Node variantGraphs;
   private Node editGraphs;
 
-  public GraphFactory() throws IOException {
-    this(Files.createTempDir(), true);
-  }
-
-  public GraphFactory(File dbStorageDirectory) throws IOException {
-    this(dbStorageDirectory, false);
-  }
-
-  public GraphFactory(File dbStorageDirectory, final boolean deleteAfterUsage) throws IOException {
+  public static GraphFactory create(File dbStorageDirectory, final boolean deleteAfterUsage) throws IOException {
     final File dbDirectory = dbStorageDirectory.getCanonicalFile();
 
     LOG.debug("Creating variant graph database in {} (deleteAfterUsage = {})", dbDirectory, deleteAfterUsage);
-    database = new EmbeddedGraphDatabase(dbDirectory.getAbsolutePath());
+    final EmbeddedGraphDatabase database = new EmbeddedGraphDatabase(dbDirectory.getAbsolutePath());
     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
       @Override
       public void run() {
@@ -60,7 +53,23 @@ public class GraphFactory {
         }
       }
     }));
+    
+    return new GraphFactory(database);
+  }
 
+  public static GraphFactory create(File dbStorageDirectory) throws IOException {
+    return create(dbStorageDirectory, false);    
+  }
+
+  public static GraphFactory create() throws IOException {
+    return create(Files.createTempDir());
+  }
+
+  
+  public GraphFactory(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
+    this.database = database;
+    this.witnessResolver = witnessResolver;
+    this.tokenResolver = tokenResolver;
     final Transaction tx = database.beginTx();
     try {
       final Node referenceNode = database.getReferenceNode();
@@ -83,16 +92,12 @@ public class GraphFactory {
     }
   }
 
-  public EmbeddedGraphDatabase getDatabase() {
+  public GraphFactory(EmbeddedGraphDatabase database) {
+    this(database, new DefaultResolver<IWitness>(), new DefaultResolver<Token>());
+  }
+  
+  public GraphDatabaseService getDatabase() {
     return database;
-  }
-
-  public void setWitnessResolver(Resolver<IWitness> witnessResolver) {
-    this.witnessResolver = witnessResolver;
-  }
-
-  public void setTokenResolver(Resolver<Token> tokenResolver) {
-    this.tokenResolver = tokenResolver;
   }
 
   public Iterable<VariantGraph> variantGraphs() {

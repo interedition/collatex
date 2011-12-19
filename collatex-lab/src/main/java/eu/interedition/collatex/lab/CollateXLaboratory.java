@@ -66,7 +66,7 @@ public class CollateXLaboratory extends JFrame {
 
   public static void main(String[] args) throws Exception {
     UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-    new CollateXLaboratory(new GraphFactory()).setVisible(true);
+    new CollateXLaboratory(GraphFactory.create()).setVisible(true);
   }
 
   private class AddWitnessAction extends AbstractAction {
@@ -105,10 +105,17 @@ public class CollateXLaboratory extends JFrame {
 
       LOG.debug("Collating {}", Iterables.toString(w));
 
-      final Transaction transaction = graphFactory.getDatabase().beginTx();
+      Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
         final VariantGraph pvg = graphFactory.newVariantGraph();
-        new VariantGraphBuilder(pvg).add(w.toArray(new IWitness[w.size()]));
+
+        final VariantGraphBuilder builder = new VariantGraphBuilder(pvg);
+        for (IWitness witness : w) {
+          builder.add(witness);
+          transaction.success();
+          transaction.finish();
+          transaction = graphFactory.getDatabase().beginTx();
+        }
 
         variantGraphModel.update(pvg.join().rank());
 

@@ -1,6 +1,4 @@
-<@c.page title="Collate">
-
-
+<@ie.page title="CollateX Console">
     <div id="input">
         <h2>Witnesses</h2>
         <form id="collate-form" method="post">
@@ -51,19 +49,12 @@
     </div>
 
 
-    <script type="text/javascript" src="${cp}/static/examples.js"></script>
-    <script type="text/javascript" src="${cp}/static/collate.js"></script>
+    <script type="text/javascript" src="${cp}/static/collate-console.js"></script>
     <style type="text/css">
-        table.alignment th { border-width: 2px; padding: 0 1em  }
-        table.alignment td.gap { border: 0; text-align: center }
-        table.alignment td.invariant { border-color: #80BB00 }
-        table.alignment td.variant { border-color: #ffa07a }
-        table.alignment td { white-space: nowrap; }
         .form-element { margin: 1em 0; }
         .form-label { text-align: right }
         .form-label label { padding-right: 1em }
-        .in-progress { padding: 2em; background: #90ee90; font-weight: bold }
         #variant-graph-svg, #alignment-table { overflow-x: auto; border: 1px solid #ccc; padding: 1em }
         #input, #output { margin-top: 2em; padding: 1em; border: 1px solid #ccc; }
     </style>
-</@c.page>
+</@ie.page>

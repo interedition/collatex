@@ -1,6 +1,4 @@
 <@ie.page "Upload text">
-<h1>Upload text</h1>
-
 <div id="error-message" class="error center" style="margin: 5em 0.5em 0 0"><br></div>
 
 <form id="upload" name="upload" method="post" enctype="multipart/form-data">

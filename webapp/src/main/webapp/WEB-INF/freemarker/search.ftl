@@ -1,8 +1,5 @@
 <#assign searchQuery=query.query>
 <@ie.page "Search">
-
-    <h1>Search Results</h1>
-
     <#if results?has_content>
     <ol class="search-results">
         <#list results as r>

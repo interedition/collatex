@@ -1,7 +1,5 @@
 <#assign title="Transform XML Text #" + metadata.text.id?html maxLength=102400 truncated=(metadata.text.length gt maxLength)/>
 <@ie.page title>
-    <h1>${title}</h1>
-
     <div id="text-length" style="text-align: right; font-weight: bold; margin: 1em 0">
         Length: ${metadata.text.length} characters
         <#if truncated>(${maxLength} displayed)</#if>

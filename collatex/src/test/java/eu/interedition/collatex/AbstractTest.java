@@ -52,7 +52,7 @@ public abstract class AbstractTest {
 
   @BeforeClass
   public static void createVariantGraphFactory() throws IOException {
-    graphFactory = new GraphFactory();
+    graphFactory = GraphFactory.create();
   }
 
   @Before
