@@ -31,5 +31,5 @@ public interface Token extends Comparable<Token> {
    */
   String getContent();
 
-  IWitness getWitness();
+  Witness getWitness();
 }

@@ -1,6 +1,6 @@
 package eu.interedition.collatex.lab;
 
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 
 import java.util.SortedSet;
 
@@ -8,13 +8,13 @@ import java.util.SortedSet;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class VariantGraphEdgeModel {
-  private final SortedSet<IWitness> witnesses;
+  private final SortedSet<Witness> witnesses;
 
-  public VariantGraphEdgeModel(SortedSet<IWitness> witnesses) {
+  public VariantGraphEdgeModel(SortedSet<Witness> witnesses) {
     this.witnesses = witnesses;
   }
 
-  public SortedSet<IWitness> getWitnesses() {
+  public SortedSet<Witness> getWitnesses() {
     return witnesses;
   }
 

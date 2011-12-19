@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex.alignment;
 
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.input.SimpleToken;
@@ -37,35 +37,35 @@ import static org.junit.Assert.assertEquals;
 public class AlignmentTest extends AbstractTest {
   @Test
   public void transposition() {
-    final IWitness[] w = createWitnesses("the cat is black", "black is the cat");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> t = merge(w).toTable();
+    final Witness[] w = createWitnesses("the cat is black", "black is the cat");
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("|the|cat|is|black| |", toString(t, w[0]));
     assertEquals("|black| |is|the|cat|", toString(t, w[1]));
   }
 
   @Test
   public void doubleTransposition2() {
-    final IWitness[] w = createWitnesses("a b", "b a");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> t = merge(w).toTable();
+    final Witness[] w = createWitnesses("a b", "b a");
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("| |a|b|", toString(t, w[0]));
     assertEquals("|b|a| |", toString(t, w[1]));
   }
 
   @Test
   public void doubleTransposition3() {
-    final IWitness[] w = createWitnesses("a b c", "b a c");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> t = merge(w).toTable();
+    final Witness[] w = createWitnesses("a b c", "b a c");
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("| |a|b|c|", toString(t, w[0]));
     assertEquals("|b|a| |c|", toString(t, w[1]));
   }
 
   @Test
   public void additionInCombinationWithTransposition() {
-    final IWitness[] w = createWitnesses(//
+    final Witness[] w = createWitnesses(//
             "the cat is very happy",//
             "very happy is the cat",//
             "very delitied and happy is the cat");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> t = merge(w).toTable();
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("|the|cat| | |is|very|happy|", toString(t, w[0]));
     assertEquals("|very| | |happy|is|the|cat|", toString(t, w[1]));
     assertEquals("|very|delitied|and|happy|is|the|cat|", toString(t, w[2]));
@@ -73,11 +73,11 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void additionInCombinationWithTransposition2() {
-    final IWitness[] w = createWitnesses(//
+    final Witness[] w = createWitnesses(//
             "the cat is black",//
             "black is the cat",//
             "black and white is the cat");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> t = merge(w).toTable();
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
     assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
     assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));
@@ -85,18 +85,18 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void simpleTransposition() {
-    final IWitness[] w = createWitnesses(//
+    final Witness[] w = createWitnesses(//
             "A black cat in a white basket",//
             "A white cat in a black basket");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> t = merge(w).toTable();
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("|A|black|cat|in|a|white|basket|", toString(t, w[0]));
     assertEquals("|A|white|cat|in|a|black|basket|", toString(t, w[1]));
   }
 
   @Test
   public void transposeInOnePair() {
-    final IWitness[] w = createWitnesses("y", "x y z", "z y");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> t = merge(w).toTable();
+    final Witness[] w = createWitnesses("y", "x y z", "z y");
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("| |y| |", toString(t, w[0]));
     assertEquals("|x|y|z|", toString(t, w[1]));
     assertEquals("|z|y| |", toString(t, w[2]));
@@ -104,8 +104,8 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void transposeInTwoPairs() {
-    final IWitness[] w = createWitnesses("y x", "x y z", "z y");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> t = merge(w).toTable();
+    final Witness[] w = createWitnesses("y x", "x y z", "z y");
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("| |y|x|", toString(t, w[0]));
     assertEquals("|x|y|z|", toString(t, w[1]));
     assertEquals("|z|y| |", toString(t, w[2]));
@@ -113,7 +113,7 @@ public class AlignmentTest extends AbstractTest {
   
   @Test
   public void testOrderIndependence() {
-    IWitness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
+    Witness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
     VariantGraph graph = merge(w[0], w[1]);
     VariantGraphBuilder builder = merge(graph, w[2]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
@@ -124,7 +124,7 @@ public class AlignmentTest extends AbstractTest {
   
   @Test
   public void testPhraseMatchingShouldIgnoreDeletions() {
-    IWitness[] w = createWitnesses("Hello cruel world", "Hello world");
+    Witness[] w = createWitnesses("Hello cruel world", "Hello world");
     VariantGraph graph = merge(w[0]);
     VariantGraphBuilder builder = merge(graph, w[1]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
@@ -135,7 +135,7 @@ public class AlignmentTest extends AbstractTest {
   
   @Test
   public void testPhraseMatchingShouldIgnoreAdditions() {
-    IWitness[] w = createWitnesses("Hello world", "Hello cruel world");
+    Witness[] w = createWitnesses("Hello world", "Hello cruel world");
     VariantGraph graph = merge(w[0]);
     VariantGraphBuilder builder = merge(graph, w[1]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();

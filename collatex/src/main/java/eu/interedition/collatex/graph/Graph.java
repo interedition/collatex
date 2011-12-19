@@ -1,7 +1,7 @@
 package eu.interedition.collatex.graph;
 
 import com.google.common.base.Function;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -13,7 +13,7 @@ import org.neo4j.graphdb.Transaction;
  */
 public abstract class Graph<V extends GraphVertex, E extends GraphEdge> {
   protected final GraphDatabaseService database;
-  protected final Resolver<IWitness> witnessResolver;
+  protected final Resolver<Witness> witnessResolver;
   protected final Resolver<Token> tokenResolver;
 
   protected Function<Node, V> vertexWrapper;
@@ -21,7 +21,7 @@ public abstract class Graph<V extends GraphVertex, E extends GraphEdge> {
   protected V start;
   protected V end;
 
-  public Graph(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
+  public Graph(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver) {
     this.database = database;
     this.witnessResolver = witnessResolver;
     this.tokenResolver = tokenResolver;
@@ -50,7 +50,7 @@ public abstract class Graph<V extends GraphVertex, E extends GraphEdge> {
     return end;
   }
 
-  public Resolver<IWitness> getWitnessResolver() {
+  public Resolver<Witness> getWitnessResolver() {
     return witnessResolver;
   }
 

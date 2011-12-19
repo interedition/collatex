@@ -20,7 +20,7 @@
 
 package eu.interedition.web.collatex;
 
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -54,7 +54,7 @@ public class CollationController implements InitializingBean {
   @RequestMapping(method = RequestMethod.POST)
   @ResponseBody
   public VariantGraph graph(@RequestBody Collation collation) throws Exception {
-    final SortedSet<IWitness> witnesses = collation.getWitnesses();
+    final SortedSet<Witness> witnesses = collation.getWitnesses();
 
     final Transaction tx = graphFactory.getDatabase().beginTx();
     try {
@@ -62,7 +62,7 @@ public class CollationController implements InitializingBean {
       final VariantGraph graph = graphFactory.newVariantGraph();
 
       // merge
-      new VariantGraphBuilder(graph).add(witnesses.toArray(new IWitness[witnesses.size()]));
+      new VariantGraphBuilder(graph).add(witnesses.toArray(new Witness[witnesses.size()]));
 
       // post-process
       graph.join().rank();

@@ -3,7 +3,7 @@ package eu.interedition.web.io;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphEdge;
@@ -96,8 +96,8 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
 
         jgen.writeEndArray();
       } else {
-        final SortedSet<IWitness> witnesses = graph.witnesses();
-        final RowSortedTable<Integer,IWitness,SortedSet<Token>> table = graph.toTable();
+        final SortedSet<Witness> witnesses = graph.witnesses();
+        final RowSortedTable<Integer,Witness,SortedSet<Token>> table = graph.toTable();
 
         jgen.writeStartObject();
 
@@ -105,7 +105,7 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
         jgen.writeNumberField("columns", table.columnKeySet().size());
         jgen.writeArrayFieldStart("sigils");
 
-        for (IWitness witness : witnesses) {
+        for (Witness witness : witnesses) {
           jgen.writeString(witness.getSigil());
         }
         jgen.writeEndArray();
@@ -113,9 +113,9 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
 
         jgen.writeArrayFieldStart("table");
         for (Integer row : table.rowKeySet()) {
-          final Map<IWitness,SortedSet<Token>> cells = table.row(row);
+          final Map<Witness,SortedSet<Token>> cells = table.row(row);
           jgen.writeStartArray();
-          for (IWitness witness : witnesses) {
+          for (Witness witness : witnesses) {
             final SortedSet<Token> cell = cells.get(witness);
             if (cell == null) {
               jgen.writeNull();

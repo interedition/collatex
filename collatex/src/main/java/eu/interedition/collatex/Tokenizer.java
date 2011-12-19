@@ -22,18 +22,7 @@ package eu.interedition.collatex;
 
 import java.util.List;
 
-/**
- * IWitness
- * 
- * Representation of a single textual witness
- *
- */
-public interface IWitness extends Comparable<IWitness> {
+public interface Tokenizer {
 
-  String getSigil();
-
-  // Note: This should return a non-modifiable container
-  List<Token> getTokens();
-
-  boolean isNear(Token a, Token b);
+  List<Token> tokenize(Witness witness, String content);
 }

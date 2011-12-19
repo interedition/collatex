@@ -21,7 +21,7 @@
 package eu.interedition.collatex.input;
 
 import com.google.common.collect.Maps;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 
 import java.util.ArrayList;
@@ -29,14 +29,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class Witness implements Iterable<Token>, IWitness {
-  public static final Witness SUPERBASE = new Witness("");
+public class SimpleWitness implements Iterable<Token>, Witness {
+  public static final SimpleWitness SUPERBASE = new SimpleWitness("");
 
   private final String sigil;
   protected List<Token> tokens = new ArrayList<Token>();
   private final Map<Token, Token> relations = Maps.newLinkedHashMap();
 
-  public Witness(final String sigil) {
+  public SimpleWitness(final String sigil) {
     this.sigil = sigil;
   }
 
@@ -87,7 +87,7 @@ public class Witness implements Iterable<Token>, IWitness {
   }
 
   @Override
-  public int compareTo(IWitness o) {
+  public int compareTo(Witness o) {
     return sigil.compareTo(o.getSigil());
   }
 }

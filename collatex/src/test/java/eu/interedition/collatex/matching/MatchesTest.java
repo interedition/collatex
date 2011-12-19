@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.common.collect.ListMultimap;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
@@ -18,7 +18,7 @@ public class MatchesTest extends AbstractTest {
 
   @Test
   public void test1() {
-    final IWitness[] w = createWitnesses("john and paul and george and ringo", "john and paul and george and ringo");
+    final Witness[] w = createWitnesses("john and paul and george and ringo", "john and paul and george and ringo");
     final VariantGraph graph = merge(w[0]);
     final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 
@@ -30,7 +30,7 @@ public class MatchesTest extends AbstractTest {
 
   @Test
   public void test2() {
-    final IWitness[] w = createWitnesses("the white cat", "the black cat");
+    final Witness[] w = createWitnesses("the white cat", "the black cat");
     final VariantGraph graph = merge(w[0]);
     final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 

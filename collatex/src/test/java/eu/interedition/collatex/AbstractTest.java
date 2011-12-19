@@ -42,7 +42,7 @@ public abstract class AbstractTest {
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
   protected WitnessBuilder witnessBuilder = new WitnessBuilder(new DefaultTokenNormalizer());
-  protected ITokenizer tokenizer = new WhitespaceTokenizer();
+  protected Tokenizer tokenizer = new WhitespaceTokenizer();
   protected static GraphFactory graphFactory;
   private Transaction transaction;
 
@@ -63,26 +63,26 @@ public abstract class AbstractTest {
       transaction = null;
     }
   }
-  protected IWitness[] createWitnesses(WitnessBuilder witnessBuilder, ITokenizer tokenizer, String... contents) {
+  protected Witness[] createWitnesses(WitnessBuilder witnessBuilder, Tokenizer tokenizer, String... contents) {
     Assert.assertTrue("Not enough sigla", contents.length <= SIGLA.length);
-    final IWitness[] witnesses = new IWitness[contents.length];
+    final Witness[] witnesses = new Witness[contents.length];
     for (int wc = 0; wc < contents.length; wc++) {
       witnesses[wc] = witnessBuilder.build(Character.toString(SIGLA[wc]), contents[wc], tokenizer);
     }
     return witnesses;
   }
 
-  protected IWitness[] createWitnesses(String... contents) {
+  protected Witness[] createWitnesses(String... contents) {
     return createWitnesses(witnessBuilder, tokenizer, contents);
   }
 
-  protected VariantGraphBuilder merge(VariantGraph graph, IWitness... witnesses) {
+  protected VariantGraphBuilder merge(VariantGraph graph, Witness... witnesses) {
     final VariantGraphBuilder builder = new VariantGraphBuilder(graph);
     builder.add(witnesses);
     return builder;
   }
 
-  protected VariantGraph merge(IWitness... witnesses) {
+  protected VariantGraph merge(Witness... witnesses) {
     final VariantGraph graph = graphFactory.newVariantGraph();
     merge(graph, witnesses);
     return graph;
@@ -92,18 +92,18 @@ public abstract class AbstractTest {
     return merge(createWitnesses(witnesses));
   }
 
-  protected static SortedSet<String> extractPhrases(VariantGraph graph, IWitness witness) {
+  protected static SortedSet<String> extractPhrases(VariantGraph graph, Witness witness) {
     return extractPhrases(Sets.<String>newTreeSet(), graph, witness);
   }
 
-  protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, VariantGraph graph, IWitness witness) {
+  protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, VariantGraph graph, Witness witness) {
     for (VariantGraphVertex v : graph.vertices(Sets.newTreeSet(Collections.singleton(witness)))) {
       phrases.add(toString(v, witness));
     }
     return phrases;
   }
 
-  protected static String toString(VariantGraphVertex vertex, IWitness... witnesses) {
+  protected static String toString(VariantGraphVertex vertex, Witness... witnesses) {
     final SortedSet<Token> tokens = vertex.tokens(Sets.newTreeSet(Arrays.asList(witnesses)));
     List<String> tokenContents = Lists.newArrayListWithExpectedSize(tokens.size());
     for (Token token : tokens) {
@@ -112,7 +112,7 @@ public abstract class AbstractTest {
     return Joiner.on(' ').join(tokenContents);
   }
 
-  protected static void assertHasWitnesses(VariantGraphEdge edge, IWitness... witnesses) {
+  protected static void assertHasWitnesses(VariantGraphEdge edge, Witness... witnesses) {
     assertEquals(Sets.newTreeSet(Arrays.asList(witnesses)), edge.getWitnesses());
   }
 
@@ -126,11 +126,11 @@ public abstract class AbstractTest {
     assertEquals(expected, ((SimpleToken) vertex.tokens().first()).getNormalized());
   }
 
-  protected static void assertVertexHasContent(VariantGraphVertex vertex, String content, IWitness in) {
+  protected static void assertVertexHasContent(VariantGraphVertex vertex, String content, Witness in) {
     Assert.assertEquals(String.format("%s does not has expected content for %s", vertex, in), content, toString(vertex, in));
   }
 
-  protected static VariantGraphVertex vertexWith(VariantGraph graph, String content, IWitness in) {
+  protected static VariantGraphVertex vertexWith(VariantGraph graph, String content, Witness in) {
     for (VariantGraphVertex v : graph.vertices(Sets.newTreeSet(Collections.singleton(in)))) {
       if (content.equals(toString(v, in))) {
         return v;
@@ -140,15 +140,15 @@ public abstract class AbstractTest {
     return null;
   }
 
-  protected static String toString(RowSortedTable<Integer, IWitness, SortedSet<Token>> table) {
+  protected static String toString(RowSortedTable<Integer, Witness, SortedSet<Token>> table) {
     final StringBuilder tableStr = new StringBuilder();
-    for (IWitness witness : table.columnKeySet()) {
+    for (Witness witness : table.columnKeySet()) {
       tableStr.append(witness.getSigil()).append(": ").append(toString(table, witness)).append("\n");
     }
     return tableStr.toString();
   }
 
-  protected static String toString(RowSortedTable<Integer, IWitness, SortedSet<Token>> table, IWitness witness) {
+  protected static String toString(RowSortedTable<Integer, Witness, SortedSet<Token>> table, Witness witness) {
     final StringBuilder tableRowStr = new StringBuilder("|");
     for (Integer row : table.rowKeySet()) {
       final SortedSet<Token> tokens = table.get(row, witness);
@@ -163,8 +163,8 @@ public abstract class AbstractTest {
   }
 
   @Deprecated
-  protected List<SimpleToken> getTokens(VariantGraph graph, IWitness... witnesses) {
-    final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Arrays.asList(witnesses));
+  protected List<SimpleToken> getTokens(VariantGraph graph, Witness... witnesses) {
+    final SortedSet<Witness> witnessSet = Sets.newTreeSet(Arrays.asList(witnesses));
     final List<SimpleToken> tokens = Lists.newArrayList();
     for (VariantGraphVertex v : graph.vertices(witnessSet)) {
       Iterables.addAll(tokens, Iterables.filter(v.tokens(witnessSet), SimpleToken.class));

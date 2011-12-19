@@ -6,7 +6,7 @@ import com.google.common.collect.Iterables;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.input.SimpleToken;
 import org.apache.commons.collections15.Transformer;
@@ -43,10 +43,10 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertexMod
     rc.setEdgeLabelTransformer(new Transformer<VariantGraphEdgeModel, String>() {
       @Override
       public String transform(VariantGraphEdgeModel variantGraphEdgeModel) {
-        return Joiner.on(", ").join(Iterables.transform(variantGraphEdgeModel.getWitnesses(), new Function<IWitness, String>() {
+        return Joiner.on(", ").join(Iterables.transform(variantGraphEdgeModel.getWitnesses(), new Function<Witness, String>() {
 
           @Override
-          public String apply(IWitness input) {
+          public String apply(Witness input) {
             return input.getSigil();
           }
         }));

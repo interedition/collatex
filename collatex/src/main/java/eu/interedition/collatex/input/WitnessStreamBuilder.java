@@ -23,16 +23,16 @@ package eu.interedition.collatex.input;
 import java.io.IOException;
 import java.io.InputStream;
 
-import eu.interedition.collatex.ITokenNormalizer;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.TokenNormalizer;
+import eu.interedition.collatex.Witness;
 import org.xml.sax.SAXException;
 
 public abstract class WitnessStreamBuilder extends WitnessBuilder {
 
-  public WitnessStreamBuilder(ITokenNormalizer tokenNormalizer) {
+  public WitnessStreamBuilder(TokenNormalizer tokenNormalizer) {
     super(tokenNormalizer);
   }
 
-  public abstract IWitness build(InputStream inputStream) throws SAXException, IOException;
+  public abstract Witness build(InputStream inputStream) throws SAXException, IOException;
 
 }

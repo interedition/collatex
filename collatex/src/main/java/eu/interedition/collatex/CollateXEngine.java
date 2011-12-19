@@ -23,6 +23,7 @@
 package eu.interedition.collatex;
 
 import eu.interedition.collatex.alignment.DefaultTokenLinker;
+import eu.interedition.collatex.alignment.TokenLinker;
 import eu.interedition.collatex.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -44,10 +45,10 @@ import java.io.IOException;
  * 
  */
 public class CollateXEngine {
-  private ITokenizer tokenizer = new WhitespaceTokenizer();
+  private Tokenizer tokenizer = new WhitespaceTokenizer();
   // private ITokenizer tokenizer = new WhitespaceAndPunctuationTokenizer();
-  private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
-  private ITokenLinker tokenLinker = new DefaultTokenLinker();
+  private TokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
+  private TokenLinker tokenLinker = new DefaultTokenLinker();
 
   private final GraphFactory graphFactory;
 
@@ -59,15 +60,15 @@ public class CollateXEngine {
     this.graphFactory = graphFactory;
   }
   
-  public void setTokenLinker(ITokenLinker tokenLinker) {
+  public void setTokenLinker(TokenLinker tokenLinker) {
     this.tokenLinker = tokenLinker;
   }
 
-  public void setTokenizer(ITokenizer tokenizer) {
+  public void setTokenizer(Tokenizer tokenizer) {
     this.tokenizer = tokenizer;
   }
 
-  public void setTokenNormalizer(ITokenNormalizer tokenNormalizer) {
+  public void setTokenNormalizer(TokenNormalizer tokenNormalizer) {
     this.tokenNormalizer = tokenNormalizer;
   }
 
@@ -78,7 +79,7 @@ public class CollateXEngine {
    * @param text - the body of the witness
    * @return
    */
-  public IWitness createWitness(final String sigil, final String text) {
+  public Witness createWitness(final String sigil, final String text) {
     WitnessBuilder builder = new WitnessBuilder(tokenNormalizer);
     return builder.build(sigil, text, tokenizer);
   }
@@ -93,7 +94,7 @@ public class CollateXEngine {
    * We're not sure what we want to do with the name of this method: alignment vs. collation
    * Terminology check
    */
-  public VariantGraph graph(IWitness... witnesses) {
+  public VariantGraph graph(Witness... witnesses) {
     final VariantGraph graph = graphFactory.newVariantGraph();
     new VariantGraphBuilder(graph).add(witnesses);
     return graph;

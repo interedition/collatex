@@ -20,19 +20,19 @@
 
 package eu.interedition.web.collatex;
 
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 
 import java.util.SortedSet;
 
 public class Collation {
 
-  private final SortedSet<IWitness> witnesses;
+  private final SortedSet<Witness> witnesses;
 
-  public Collation(SortedSet<IWitness> witnesses) {
+  public Collation(SortedSet<Witness> witnesses) {
     this.witnesses = witnesses;
   }
 
-  public SortedSet<IWitness> getWitnesses() {
+  public SortedSet<Witness> getWitnesses() {
     return witnesses;
   }
 }

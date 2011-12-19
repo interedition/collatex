@@ -20,7 +20,7 @@
 
 package eu.interedition.web.collatex;
 
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.input.SimpleToken;
 import org.codehaus.jackson.JsonNode;
 
@@ -28,7 +28,7 @@ public class WebToken extends SimpleToken {
 
   private final JsonNode jsonNode;
 
-  public WebToken(IWitness witness, int index, String content, String normalized, JsonNode jsonNode) {
+  public WebToken(Witness witness, int index, String content, String normalized, JsonNode jsonNode) {
     super(witness, index, content, normalized);
     this.jsonNode = jsonNode;
   }

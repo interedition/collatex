@@ -32,8 +32,8 @@ import javax.xml.xpath.*;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.ITokenNormalizer;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.TokenNormalizer;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 
 import org.w3c.dom.Document;
@@ -43,9 +43,9 @@ import org.xml.sax.SAXException;
 public class WitnessTeiBuilder extends WitnessStreamBuilder {
   DocumentBuilder builder = null;
   XPathFactory factory;
-  private final ITokenNormalizer tokenNormalizer;
+  private final TokenNormalizer tokenNormalizer;
 
-  public WitnessTeiBuilder(ITokenNormalizer tokenNormalizer1) {
+  public WitnessTeiBuilder(TokenNormalizer tokenNormalizer1) {
     super(tokenNormalizer1);
     this.tokenNormalizer = tokenNormalizer1;
     DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
@@ -58,8 +58,8 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
   }
 
   @Override
-  public IWitness build(InputStream inputStream) throws SAXException, IOException {
-    Witness witness = new Witness(UUID.randomUUID().toString());
+  public Witness build(InputStream inputStream) throws SAXException, IOException {
+    SimpleWitness witness = new SimpleWitness(UUID.randomUUID().toString());
     Document doc = getXmlDocument(inputStream);
 
     XPath xpath = factory.newXPath();
@@ -75,7 +75,7 @@ public class WitnessTeiBuilder extends WitnessStreamBuilder {
         String value = nodes.item(i).getTextContent();
         builder1.append(value);
       }
-      IWitness w = build(builder1.toString());
+      Witness w = build(builder1.toString());
       tokenList = w.getTokens();
     } else { // get text from prepared 'w' elements 
       for (int i = 0; i < nodes.getLength(); i++) {

@@ -2,7 +2,7 @@ package eu.interedition.collatex.alignment;
 
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import org.junit.Test;
 
@@ -32,10 +32,10 @@ public class TranspositionTest extends AbstractTest {
 
   @Test
   public void transposition1() {
-    final IWitness[] w = createWitnesses(//
+    final Witness[] w = createWitnesses(//
             "the white and black cat", "The black cat",//
             "the black and white cat", "the black and green cat");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> table = merge(w).toTable();
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
 
     assertEquals("|the|white|and|black|cat|", toString(table, w[0]));
     assertEquals("|The| | |black|cat|", toString(table, w[1]));
@@ -45,8 +45,8 @@ public class TranspositionTest extends AbstractTest {
 
   @Test
   public void transposition2() {
-    final IWitness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> table = merge(w).toTable();
+    final Witness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
 
     assertEquals("| |He|was|agast,|so|", toString(table, w[0]));
     assertEquals("| |He|was|agast| |", toString(table, w[1]));
@@ -55,8 +55,8 @@ public class TranspositionTest extends AbstractTest {
 
   @Test
   public void transposition2Reordered() {
-    final IWitness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> table = merge(w).toTable();
+    final Witness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
 
     // TODO: it would be nice if He was agast stayed in one place!
     assertEquals("| | | |So|he|was|agast|", toString(table, w[0]));

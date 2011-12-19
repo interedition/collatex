@@ -10,7 +10,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollateXEngine;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.input.SimpleToken;
@@ -42,7 +42,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
 
   private CollateXEngine engine;
   private OutputType outputType = OutputType.ALIGNMENT_TABLE;
-  private SortedSet<IWitness> witnesses = Sets.newTreeSet();
+  private SortedSet<Witness> witnesses = Sets.newTreeSet();
   private String sigil;
 
   public CollateXTransformer() {
@@ -97,13 +97,13 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   private void sendAlignmentTable() throws SAXException {
     sendStartElementEventNS("alignment", EMPTY_ATTRIBUTES);
     if (!witnesses.isEmpty()) {
-      final VariantGraph graph = engine.graph(witnesses.toArray(new IWitness[witnesses.size()]));
-      final SortedSet<IWitness> witnesses = graph.witnesses();
-      final RowSortedTable<Integer, IWitness, SortedSet<Token>> table = graph.toTable();
+      final VariantGraph graph = engine.graph(witnesses.toArray(new Witness[witnesses.size()]));
+      final SortedSet<Witness> witnesses = graph.witnesses();
+      final RowSortedTable<Integer, Witness, SortedSet<Token>> table = graph.toTable();
       for (Integer rowIndex : table.rowKeySet()) {
-        final Map<IWitness, SortedSet<Token>> row = table.row(rowIndex);
+        final Map<Witness, SortedSet<Token>> row = table.row(rowIndex);
         sendStartElementEventNS("row", EMPTY_ATTRIBUTES);
-        for (IWitness witness : witnesses) {
+        for (Witness witness : witnesses) {
           final AttributesImpl cellAttrs = new AttributesImpl();
           cellAttrs.addCDATAAttribute(namespaceURI, "sigil", "sigil", witness.getSigil());
           sendStartElementEventNS("cell", cellAttrs);
@@ -120,7 +120,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   }
 
   private void sendTeiApparatus() throws SAXException {
-    final Apparatus apparatus = engine.createApparatus(engine.graph(witnesses.toArray(new IWitness[witnesses.size()])));
+    final Apparatus apparatus = engine.createApparatus(engine.graph(witnesses.toArray(new Witness[witnesses.size()])));
 
     sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
     startPrefixMapping("tei", TEI_NS);
@@ -130,7 +130,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
       final Apparatus.Entry entry = entryIt.next();
       // group together similar phrases
       final Multimap<String, String> content2WitMap = ArrayListMultimap.create();
-      for (IWitness witness : entry.getWitnesses()) {
+      for (Witness witness : entry.getWitnesses()) {
         content2WitMap.put(SimpleToken.toString(entry.getReadingOf(witness)), witness.getSigil());
       }
 

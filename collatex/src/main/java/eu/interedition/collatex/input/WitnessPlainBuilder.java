@@ -25,20 +25,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import eu.interedition.collatex.ITokenNormalizer;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.TokenNormalizer;
+import eu.interedition.collatex.Witness;
 
 public class WitnessPlainBuilder extends WitnessStreamBuilder {
 
-  private final ITokenNormalizer tokenNormalizer;
+  private final TokenNormalizer tokenNormalizer;
 
-  public WitnessPlainBuilder(ITokenNormalizer tokenNormalizer) {
+  public WitnessPlainBuilder(TokenNormalizer tokenNormalizer) {
     super(tokenNormalizer);
     this.tokenNormalizer = tokenNormalizer;
   }
 
   @Override
-  public IWitness build(InputStream inputStream) throws IOException {
+  public Witness build(InputStream inputStream) throws IOException {
     InputStreamReader reader = new InputStreamReader(inputStream);
 
     BufferedReader bufferedReader = new BufferedReader(reader);

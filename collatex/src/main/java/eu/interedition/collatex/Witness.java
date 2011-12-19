@@ -20,8 +20,20 @@
 
 package eu.interedition.collatex;
 
-import com.google.common.base.Function;
+import java.util.List;
 
-public interface ITokenNormalizer extends Function<String, String> {
+/**
+ * IWitness
+ * 
+ * Representation of a single textual witness
+ *
+ */
+public interface Witness extends Comparable<Witness> {
 
+  String getSigil();
+
+  // Note: This should return a non-modifiable container
+  List<Token> getTokens();
+
+  boolean isNear(Token a, Token b);
 }

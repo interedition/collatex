@@ -24,7 +24,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void getTokens() {
-    final IWitness[] w = createWitnesses("a b c d");
+    final Witness[] w = createWitnesses("a b c d");
     final VariantGraph graph = merge(w);
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newTreeSet(Arrays.asList(w))));
     assertEquals(6, vertices.size());
@@ -63,7 +63,7 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void oneWitness() {
-    final IWitness[] w = createWitnesses("only one witness");
+    final Witness[] w = createWitnesses("only one witness");
     final VariantGraph graph = merge(w);
 
     assertEquals(5, Iterables.size(graph.vertices()));
@@ -81,9 +81,9 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void getPathForWitness() {
-    final IWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
+    final Witness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
     final VariantGraph graph = merge(w);
-    final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(w[0]));
+    final SortedSet<Witness> witnessSet = Sets.newTreeSet(Collections.singleton(w[0]));
     final List<VariantGraphVertex> path = Lists.newArrayList(graph.vertices(witnessSet));
 
     assertEquals(8, path.size());
@@ -99,7 +99,7 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void transpositions() {
-    final IWitness[] w = createWitnesses("the black and white cat", "the white and black cat", "the black and black cat");
+    final Witness[] w = createWitnesses("the black and white cat", "the white and black cat", "the black and black cat");
     final VariantGraph graph = merge(w[0], w[1]);
 
     assertEquals(2, graph.transpositions().size());
@@ -118,7 +118,7 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void transpositions2() {
-    final IWitness[] w = createWitnesses("The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog");
+    final Witness[] w = createWitnesses("The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog");
     final VariantGraph graph = merge(w);
 
     // There should be two vertices for cat in the graph
@@ -133,7 +133,7 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void joinTwoIdenticalWitnesses() {
-    final IWitness[] w = createWitnesses("the black cat", "the black cat");
+    final Witness[] w = createWitnesses("the black cat", "the black cat");
     final VariantGraph graph = merge(w).join();
 
     assertEquals(3, Iterables.size(graph.vertices()));
@@ -147,7 +147,7 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void joinTwoDifferentWitnesses() {
-    final IWitness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
+    final Witness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
     final VariantGraph graph = merge(w).join();
 
     final VariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
@@ -173,7 +173,7 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void joinTwoDifferentWitnesses2() {
-    final IWitness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
+    final Witness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
     final VariantGraph graph = merge(w).join();
 
     final VariantGraphVertex blackieVertex = vertexWith(graph, "blackie", w[0]);

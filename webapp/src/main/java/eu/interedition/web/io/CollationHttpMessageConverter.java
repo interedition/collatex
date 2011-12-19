@@ -2,13 +2,13 @@ package eu.interedition.web.io;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.ITokenNormalizer;
-import eu.interedition.collatex.ITokenizer;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.TokenNormalizer;
+import eu.interedition.collatex.Tokenizer;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.input.WhitespaceTokenizer;
-import eu.interedition.collatex.input.Witness;
+import eu.interedition.collatex.input.SimpleWitness;
 import eu.interedition.web.collatex.Collation;
 import eu.interedition.web.collatex.WebToken;
 import org.codehaus.jackson.JsonNode;
@@ -29,9 +29,9 @@ import java.util.SortedSet;
  */
 public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<Collation> {
 
-  private ITokenizer tokenizer = new WhitespaceTokenizer();
+  private Tokenizer tokenizer = new WhitespaceTokenizer();
 
-  private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
+  private TokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -57,7 +57,7 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
       throw new HttpMessageNotReadableException("Expecting 'witnesses' array");
     }
     
-    SortedSet<IWitness> witnesses = Sets.newTreeSet();
+    SortedSet<Witness> witnesses = Sets.newTreeSet();
     for (JsonNode witnessNode : witnessesNode) {
       if (!witnessNode.isObject()) {
         throw new HttpMessageNotReadableException("Expecting witness object");
@@ -71,7 +71,7 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
         throw new HttpMessageNotReadableException("Empty witness 'id' encountered");
       }
 
-      final Witness witness = new Witness(witnessIdStr);
+      final SimpleWitness witness = new SimpleWitness(witnessIdStr);
       if (witnesses.contains(witness)) {
         throw new HttpMessageNotReadableException(String.format("Duplicate sigil for witness '%s", witness));
       }

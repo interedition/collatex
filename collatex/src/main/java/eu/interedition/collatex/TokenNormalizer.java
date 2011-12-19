@@ -20,9 +20,8 @@
 
 package eu.interedition.collatex;
 
-import java.util.List;
+import com.google.common.base.Function;
 
-public interface ITokenizer {
+public interface TokenNormalizer extends Function<String, String> {
 
-  List<Token> tokenize(IWitness witness, String content);
 }

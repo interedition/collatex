@@ -1,7 +1,7 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.alignment.VariantGraphBuilder;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -101,7 +101,7 @@ public class CollateXLaboratory extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      final List<IWitness> w = witnessPanel.getWitnesses();
+      final List<Witness> w = witnessPanel.getWitnesses();
 
       LOG.debug("Collating {}", Iterables.toString(w));
 
@@ -110,7 +110,7 @@ public class CollateXLaboratory extends JFrame {
         final VariantGraph pvg = graphFactory.newVariantGraph();
 
         final VariantGraphBuilder builder = new VariantGraphBuilder(pvg);
-        for (IWitness witness : w) {
+        for (Witness witness : w) {
           builder.add(witness);
           transaction.success();
           transaction.finish();
@@ -138,7 +138,7 @@ public class CollateXLaboratory extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      final List<IWitness> w = witnessPanel.getWitnesses();
+      final List<Witness> w = witnessPanel.getWitnesses();
 
       if (w.size() < 2) {
         return;

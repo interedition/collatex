@@ -17,7 +17,7 @@ package eu.interedition.collatex.alignment;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
@@ -32,7 +32,7 @@ import java.util.Set;
  */
 public class PhraseMatchDetector {
 
-  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, IWitness witness) {
+  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, Witness witness) {
     //rank the variant graph
     base.rank();
     

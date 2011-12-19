@@ -11,7 +11,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.input.SimpleToken;
 import eu.interedition.collatex.matching.Matches;
@@ -53,7 +53,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
   private static final Logger LOG = LoggerFactory.getLogger(EditGraph.class);
   private final Function<Node, VariantGraphVertex> variantGraphVertexWrapper;
 
-  public EditGraph(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver, Function<Node, VariantGraphVertex> variantGraphVertexWrapper) {
+  public EditGraph(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver, Function<Node, VariantGraphVertex> variantGraphVertexWrapper) {
     super(database, witnessResolver, tokenResolver);
     this.variantGraphVertexWrapper = variantGraphVertexWrapper;
   }

@@ -1,19 +1,19 @@
 package eu.interedition.collatex.input;
 
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.ITokenNormalizer;
-import eu.interedition.collatex.ITokenizer;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.TokenNormalizer;
+import eu.interedition.collatex.Tokenizer;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class WhitespaceAndPunctuationTokenizer implements ITokenizer {
-  private ITokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
+public class WhitespaceAndPunctuationTokenizer implements Tokenizer {
+  private TokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
 
   @Override
-  public List<Token> tokenize(IWitness witness, String content) {
+  public List<Token> tokenize(Witness witness, String content) {
     List<Token> tokens = Lists.newArrayList();
     StringTokenizer tokenizer = new StringTokenizer(content, " ,.-()?;:\n", true);
     SimpleToken previous = null;

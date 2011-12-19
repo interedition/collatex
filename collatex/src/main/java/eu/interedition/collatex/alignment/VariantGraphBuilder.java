@@ -4,8 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.ITokenLinker;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Tuple;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -21,7 +20,7 @@ public class VariantGraphBuilder {
 
   private final VariantGraph graph;
   private final Comparator<Token> comparator;
-  private final ITokenLinker tokenLinker;
+  private final TokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;
   private final TranspositionDetector transpositionDetector;
 
@@ -34,7 +33,7 @@ public class VariantGraphBuilder {
     this(graph, new EqualityTokenComparator(), new DefaultTokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
   }
 
-  public VariantGraphBuilder(VariantGraph graph, Comparator<Token> comparator, ITokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
+  public VariantGraphBuilder(VariantGraph graph, Comparator<Token> comparator, TokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
     this.graph = graph;
     this.comparator = comparator;
     this.tokenLinker = tokenLinker;
@@ -42,8 +41,8 @@ public class VariantGraphBuilder {
     this.transpositionDetector = transpositionDetector;
   }
 
-  public VariantGraphBuilder add(IWitness... witnesses) {
-    for (IWitness witness : witnesses) {
+  public VariantGraphBuilder add(Witness... witnesses) {
+    for (Witness witness : witnesses) {
       merge(witness);
     }
     return this;
@@ -65,7 +64,7 @@ public class VariantGraphBuilder {
     return Collections.unmodifiableMap(alignments);
   }
 
-  protected void merge(IWitness witness) {
+  protected void merge(Witness witness) {
     if (LOG.isTraceEnabled()) {
       LOG.trace("{} + {}: {} vs. {}", new Object[] { graph, witness, graph.vertices(), witness.getTokens() });
     }
@@ -109,7 +108,7 @@ public class VariantGraphBuilder {
 
     LOG.debug("{} + {}: Merge comparand into graph", graph, witness);
     VariantGraphVertex last = graph.getStart();
-    final SortedSet<IWitness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
+    final SortedSet<Witness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
     final Map<Token, VariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
     for (Token token : witness.getTokens()) {
       VariantGraphVertex matchingVertex = alignments.get(token);
@@ -138,7 +137,7 @@ public class VariantGraphBuilder {
   }
 
   // NOTE: this method should not return the original sequence when a mirror exists!
-  private List<List<Match>> filterMirrored(List<Tuple<List<Match>>> transpositions, IWitness witness) {
+  private List<List<Match>> filterMirrored(List<Tuple<List<Match>>> transpositions, Witness witness) {
     final List<List<Match>> transposed = Lists.newArrayList();
     final Deque<Tuple<List<Match>>> toCheck = new ArrayDeque<Tuple<List<Match>>>(transpositions);
     while (!toCheck.isEmpty()) {
@@ -167,7 +166,7 @@ public class VariantGraphBuilder {
 
   // Note: this only calculates the distance between the tokens in the witness.
   // Note: it does not take into account a possible distance in the vertices in the graph!
-  private boolean transpositionsAreNear(Tuple<List<Match>> a, Tuple<List<Match>> b, IWitness witness) {
+  private boolean transpositionsAreNear(Tuple<List<Match>> a, Tuple<List<Match>> b, Witness witness) {
     return witness.isNear(Iterables.getLast(a.right).token, Iterables.get(b.right, 0).token);
   }
 

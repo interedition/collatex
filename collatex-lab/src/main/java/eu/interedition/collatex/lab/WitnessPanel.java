@@ -2,7 +2,7 @@ package eu.interedition.collatex.lab;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.input.WhitespaceTokenizer;
 import eu.interedition.collatex.input.WitnessBuilder;
@@ -58,8 +58,8 @@ public class WitnessPanel extends JPanel {
     }
   }
 
-  public List<IWitness> getWitnesses() {
-    List<IWitness> witnesses = Lists.newArrayListWithCapacity(this.witnesses.size());
+  public List<Witness> getWitnesses() {
+    List<Witness> witnesses = Lists.newArrayListWithCapacity(this.witnesses.size());
     for (WitnessTextArea textArea : this.witnesses) {
       final String textContent = textArea.getTextContent();
       if (!Strings.isNullOrEmpty(textContent)) {

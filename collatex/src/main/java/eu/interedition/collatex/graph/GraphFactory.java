@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.input.SimpleToken;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -29,7 +29,7 @@ public class GraphFactory {
   private static final Logger LOG = LoggerFactory.getLogger(GraphFactory.class);
   public static final String CREATED_KEY = "created";
 
-  private Resolver<IWitness> witnessResolver = new DefaultResolver<IWitness>();
+  private Resolver<Witness> witnessResolver = new DefaultResolver<Witness>();
   private Resolver<Token> tokenResolver = new DefaultResolver<Token>();
   private GraphDatabaseService database;
   private Node variantGraphs;
@@ -66,7 +66,7 @@ public class GraphFactory {
   }
 
   
-  public GraphFactory(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
+  public GraphFactory(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver) {
     this.database = database;
     this.witnessResolver = witnessResolver;
     this.tokenResolver = tokenResolver;
@@ -93,7 +93,7 @@ public class GraphFactory {
   }
 
   public GraphFactory(EmbeddedGraphDatabase database) {
-    this(database, new DefaultResolver<IWitness>(), new DefaultResolver<Token>());
+    this(database, new DefaultResolver<Witness>(), new DefaultResolver<Token>());
   }
   
   public GraphDatabaseService getDatabase() {
@@ -132,7 +132,7 @@ public class GraphFactory {
 
     start.setTokens(Sets.<Token>newTreeSet());
     end.setTokens(Sets.<Token>newTreeSet());
-    graph.connect(start, end, Sets.<IWitness>newTreeSet());
+    graph.connect(start, end, Sets.<Witness>newTreeSet());
 
     return graph;
   }

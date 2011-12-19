@@ -6,7 +6,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.ITokenLinker;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
@@ -23,7 +22,7 @@ import java.util.Map;
 
 import static com.google.common.collect.Lists.reverse;
 
-public class DefaultTokenLinker implements ITokenLinker {
+public class DefaultTokenLinker implements TokenLinker {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTokenLinker.class);
 
   private Matches matches;

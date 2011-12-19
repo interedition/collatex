@@ -1,6 +1,6 @@
 package eu.interedition.collatex.graph;
 
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.alignment.EditGraphTokenLinker;
 import org.junit.Ignore;
@@ -22,7 +22,7 @@ public class EditGraphTest extends AbstractTest {
 
   @Test
   public void testUsecase1() {
-    final IWitness[] w = createWitnesses("The black cat", "The black and white cat");
+    final Witness[] w = createWitnesses("The black cat", "The black and white cat");
     final VariantGraph graph = merge(w[0]);
     EditGraphTokenLinker linker = new EditGraphTokenLinker(graphFactory);
     Map<Token, VariantGraphVertex> link = linker.link(graph, w[1].getTokens(), new EqualityTokenComparator());
@@ -34,7 +34,7 @@ public class EditGraphTest extends AbstractTest {
     // All the witness are equal
     // There are choices to be made however, since there is duplication of tokens
     // Optimal alignment has no gaps
-    final IWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
+    final Witness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
     final VariantGraph graph = merge(w[0]);
     assertNumberOfGaps(0, graphFactory.newEditGraph(graph).build(graph, w[1].getTokens(), new EqualityTokenComparator()));
   }
@@ -44,7 +44,7 @@ public class EditGraphTest extends AbstractTest {
     // There is an omission
     // Optimal alignment has 1 gap
     // Note: there are two paths here that contain 1 gap
-    final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
+    final Witness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     final VariantGraph graph = merge(w[0]);
     assertNumberOfGaps(1, graphFactory.newEditGraph(graph).build(graph, w[1].getTokens(), new EqualityTokenComparator()));
   }
@@ -55,7 +55,7 @@ public class EditGraphTest extends AbstractTest {
   // the shortest path should take the gap first
   @Test
   public void testRemoveChoicesThatIntroduceGaps() {
-    final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
+    final Witness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     final VariantGraph graph = merge(w[0]);
     EditGraph eg = graphFactory.newEditGraph(graph).build(graph, w[1].getTokens(), new EqualityTokenComparator());
     assertShortestPathVertices(eg, "the", "black", "cat");
@@ -70,7 +70,7 @@ public class EditGraphTest extends AbstractTest {
   @Ignore
   @Test
   public void testShortestPathOneOmissionRepetition() {
-    final IWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
+    final Witness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     final VariantGraph graph = merge(w[0]);
     EditGraph eg = graphFactory.newEditGraph(graph).build(graph, w[1].getTokens(), new EqualityTokenComparator());
     final List<EditGraphEdge> shortestPath = Lists.newArrayList(shortestPathIn(eg));
@@ -85,7 +85,7 @@ public class EditGraphTest extends AbstractTest {
   public void testShortestPathEverythingEqual() {
     // All the witness are equal
     // There should only be one valid path through this decision graph
-    final IWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
+    final Witness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
     final VariantGraph graph = merge(w[0]);
     EditGraph eg = graphFactory.newEditGraph(graph).build(graph, w[1].getTokens(), new EqualityTokenComparator());
     assertEquals(1, Iterables.size(eg.shortestPaths()));

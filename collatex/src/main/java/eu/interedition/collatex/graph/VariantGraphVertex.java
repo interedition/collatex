@@ -3,7 +3,7 @@ package eu.interedition.collatex.graph;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import org.neo4j.graphdb.Node;
 
@@ -36,7 +36,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     return incoming(null);
   }
 
-  public Iterable<VariantGraphEdge> incoming(SortedSet<IWitness> witnesses) {
+  public Iterable<VariantGraphEdge> incoming(SortedSet<Witness> witnesses) {
     return Iterables.filter(transform(node.getRelationships(GraphRelationshipType.PATH, INCOMING), graph.getEdgeWrapper()), VariantGraphEdge.createTraversableFilter(witnesses));
   }
 
@@ -44,7 +44,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     return outgoing(null);
   }
 
-  public Iterable<VariantGraphEdge> outgoing(SortedSet<IWitness> witnesses) {
+  public Iterable<VariantGraphEdge> outgoing(SortedSet<Witness> witnesses) {
     return Iterables.filter(transform(node.getRelationships(GraphRelationshipType.PATH, OUTGOING), graph.getEdgeWrapper()), VariantGraphEdge.createTraversableFilter(witnesses));
   }
 
@@ -56,7 +56,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     return tokens(null);
   }
 
-  public SortedSet<Token> tokens(SortedSet<IWitness> witnesses) {
+  public SortedSet<Token> tokens(SortedSet<Witness> witnesses) {
     final SortedSet<Token> tokens = Sets.newTreeSet(graph.getTokenResolver().resolve(getTokenReferences()));
     if (witnesses != null && !witnesses.isEmpty()) {
       for (Iterator<Token> tokenIt = tokens.iterator(); tokenIt.hasNext(); ) {
@@ -69,8 +69,8 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     return tokens;
   }
 
-  public SortedSet<IWitness> witnesses() {
-    final SortedSet<IWitness> witnesses = Sets.newTreeSet();
+  public SortedSet<Witness> witnesses() {
+    final SortedSet<Witness> witnesses = Sets.newTreeSet();
     for (Token token : tokens()) {
       witnesses.add(token.getWitness());
     }
@@ -120,7 +120,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   public static final Function<VariantGraphVertex, String> TO_CONTENTS = new Function<VariantGraphVertex, String>() {
     @Override
     public String apply(VariantGraphVertex input) {
-      final SortedSet<IWitness> witnesses = input.witnesses();
+      final SortedSet<Witness> witnesses = input.witnesses();
       if (witnesses.isEmpty()) {
         return "";
       }

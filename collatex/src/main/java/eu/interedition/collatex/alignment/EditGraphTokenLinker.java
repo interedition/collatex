@@ -1,6 +1,5 @@
 package eu.interedition.collatex.alignment;
 
-import eu.interedition.collatex.ITokenLinker;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.EditGraph;
 import eu.interedition.collatex.graph.GraphFactory;
@@ -10,7 +9,7 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 import java.util.Comparator;
 import java.util.Map;
 
-public class EditGraphTokenLinker implements ITokenLinker {
+public class EditGraphTokenLinker implements TokenLinker {
 
   private final GraphFactory graphFactory;
 

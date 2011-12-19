@@ -20,7 +20,7 @@
 
 package eu.interedition.collatex.input;
 
-import eu.interedition.collatex.ITokenNormalizer;
+import eu.interedition.collatex.TokenNormalizer;
 
 import java.util.regex.Pattern;
 
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * <p>Lowercases the token and strips punctuation</p>
  *
  */
-public class DefaultTokenNormalizer implements ITokenNormalizer {
+public class DefaultTokenNormalizer implements TokenNormalizer {
   private final static Pattern PUNCT = Pattern.compile("\\p{Punct}");
   
   @Override

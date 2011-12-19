@@ -23,7 +23,7 @@ package eu.interedition.collatex.alignment;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
@@ -47,8 +47,8 @@ public class SpencerHoweTest extends AbstractTest {
 
   @Test
   public void alignmentTable() {
-    final IWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
-    final RowSortedTable<Integer, IWitness, SortedSet<Token>> table = merge(w).toTable();
+    final Witness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
+    final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
 
     assertEquals(3, table.columnKeySet().size());
     //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element
@@ -59,7 +59,7 @@ public class SpencerHoweTest extends AbstractTest {
 
   @Test
   public void graph() {
-    final IWitness[] w = createWitnesses("a", "b", "a b");
+    final Witness[] w = createWitnesses("a", "b", "a b");
     final VariantGraph graph = merge(w);
     assertEquals(4, Iterables.size(graph.vertices()));
     assertEquals(5, Iterables.size(graph.edges()));

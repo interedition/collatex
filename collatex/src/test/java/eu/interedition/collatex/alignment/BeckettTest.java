@@ -4,7 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
@@ -28,7 +28,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent() {
-    final IWitness[] w = createWitnesses(//
+    final Witness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = merge(w[0]);
@@ -40,7 +40,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent5() {
-    final IWitness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
+    final Witness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     final VariantGraph graph = merge(w);
 
     vertexWith(graph, "its", w[0]);
@@ -52,7 +52,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent6() {
-    final IWitness[] w = createWitnesses(
+    final Witness[] w = createWitnesses(
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = merge(w);
@@ -71,7 +71,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void testDirkVincent7() {
-    IWitness[] w = createWitnesses(//
+    Witness[] w = createWitnesses(//
       "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
       "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     VariantGraph graph = merge(w[0]);
@@ -82,7 +82,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent8() {
-    final IWitness[] w = createWitnesses(//
+    final Witness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
@@ -103,7 +103,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent10() {
-    final IWitness[] w = createWitnesses(
+    final Witness[] w = createWitnesses(
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
@@ -147,7 +147,7 @@ public class BeckettTest extends AbstractTest {
   @Test
   public void sentence42Transposition() {
     // punctuation should be treated as separate tokens for this test to succeed
-    final IWitness[] w = createWitnesses(witnessBuilder, new WhitespaceAndPunctuationTokenizer(),//
+    final Witness[] w = createWitnesses(witnessBuilder, new WhitespaceAndPunctuationTokenizer(),//
             "The same clock as when for example Magee once died.",//
             "The same as when for example Magee once died.",//
             "The same as when for example McKee once died .",//
@@ -179,7 +179,7 @@ public class BeckettTest extends AbstractTest {
 
   private static void assertGraphContains(VariantGraph graph, String... expected) {
     SortedSet<String> contents = Sets.newTreeSet();
-    for (IWitness witness : graph.witnesses()) {
+    for (Witness witness : graph.witnesses()) {
       extractPhrases(contents, graph, witness);
     }
     Assert.assertTrue(contents.containsAll(Arrays.asList(expected)));

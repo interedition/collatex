@@ -20,9 +20,9 @@
 
 package eu.interedition.collatex.input;
 
-import eu.interedition.collatex.ITokenNormalizer;
-import eu.interedition.collatex.ITokenizer;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.TokenNormalizer;
+import eu.interedition.collatex.Tokenizer;
+import eu.interedition.collatex.Witness;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.util.UUID;
 
 public class WitnessBuilder {
 
-  private final ITokenNormalizer tokenNormalizer;
+  private final TokenNormalizer tokenNormalizer;
 
   public enum ContentType {
     TEXT_XML("text/xml"), TEXT_PLAIN("text/plain");
@@ -52,11 +52,11 @@ public class WitnessBuilder {
     }
   }
 
-  public WitnessBuilder(ITokenNormalizer tokenNormalizer) {
+  public WitnessBuilder(TokenNormalizer tokenNormalizer) {
     this.tokenNormalizer = tokenNormalizer;
   }
 
-  public IWitness build(InputStream inputStream, ContentType contentType) throws SAXException, IOException {
+  public Witness build(InputStream inputStream, ContentType contentType) throws SAXException, IOException {
     if (contentType == null) {
       throw new IllegalArgumentException("Given content type is unsupported!");
     }
@@ -70,20 +70,20 @@ public class WitnessBuilder {
     }
   }
 
-  public IWitness build(String witnessId, String text, ITokenizer tokenizer) {
-    final Witness witness = new Witness(witnessId);
+  public Witness build(String witnessId, String text, Tokenizer tokenizer) {
+    final SimpleWitness witness = new SimpleWitness(witnessId);
     witness.setTokens(tokenizer.tokenize(witness, text));
     return witness;
   }
 
-  public IWitness build(String witness) {
+  public Witness build(String witness) {
     /* no witnessId? generate a random one */
     return build(UUID.randomUUID().toString(), witness, new WhitespaceTokenizer());
   }
 
-  public IWitness[] buildWitnesses(String... _witnesses) {
+  public Witness[] buildWitnesses(String... _witnesses) {
     /* no witnessId? generate a random one */
-    IWitness[] witnesses = new IWitness[_witnesses.length];
+    Witness[] witnesses = new Witness[_witnesses.length];
     for (int i = 0; i < witnesses.length; i++) {
       witnesses[i] = build("" + (i + 1), _witnesses[i], new WhitespaceTokenizer());
     }

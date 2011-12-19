@@ -9,7 +9,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeBasedTable;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.output.Apparatus;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -40,7 +40,7 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   private Function<Relationship, VariantGraphTransposition> transpositionWrapper;
 
-  public VariantGraph(GraphDatabaseService database, Resolver<IWitness> witnessResolver, Resolver<Token> tokenResolver) {
+  public VariantGraph(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver) {
     super(database, witnessResolver, tokenResolver);
   }
 
@@ -66,7 +66,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return vertices(null);
   }
 
-  public Iterable<VariantGraphVertex> vertices(final SortedSet<IWitness> witnesses) {
+  public Iterable<VariantGraphVertex> vertices(final SortedSet<Witness> witnesses) {
     return new Iterable<VariantGraphVertex>() {
       @Override
       public Iterator<VariantGraphVertex> iterator() {
@@ -107,7 +107,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return edges(null);
   }
 
-  public Iterable<VariantGraphEdge> edges(final SortedSet<IWitness> witnesses) {
+  public Iterable<VariantGraphEdge> edges(final SortedSet<Witness> witnesses) {
     return transform(Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
 
       @Override
@@ -130,7 +130,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return new VariantGraphVertex(this, Sets.newTreeSet(singleton(token)));
   }
 
-  public VariantGraphEdge connect(VariantGraphVertex from, VariantGraphVertex to, SortedSet<IWitness> witnesses) {
+  public VariantGraphEdge connect(VariantGraphVertex from, VariantGraphVertex to, SortedSet<Witness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
 
     if (from.equals(start)) {
@@ -181,8 +181,8 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return null;
   }
 
-  public SortedSet<IWitness> witnesses() {
-    final SortedSet<IWitness> witnesses = Sets.newTreeSet();
+  public SortedSet<Witness> witnesses() {
+    final SortedSet<Witness> witnesses = Sets.newTreeSet();
     for (VariantGraphEdge e : start.outgoing()) {
       witnesses.addAll(e.getWitnesses());
     }
@@ -202,8 +202,8 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
         final VariantGraphEdge joinCandidateSingleIncoming = outgoing.get(0);
         final VariantGraphVertex joinCandidate = joinCandidateSingleIncoming.to();
         if (Iterables.size(joinCandidate.incoming()) == 1) {
-          final SortedSet<IWitness> incomingWitnesses = joinCandidateSingleIncoming.getWitnesses();
-          final SortedSet<IWitness> outgoingWitnesses = Sets.newTreeSet();
+          final SortedSet<Witness> incomingWitnesses = joinCandidateSingleIncoming.getWitnesses();
+          final SortedSet<Witness> outgoingWitnesses = Sets.newTreeSet();
           final List<VariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.outgoing());
           for (VariantGraphEdge e : joinCandidateOutgoing) {
             outgoingWitnesses.addAll(e.getWitnesses());
@@ -250,7 +250,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return ranks(null);
   }
 
-  public Iterable<Set<VariantGraphVertex>> ranks(final SortedSet<IWitness> witnesses) {
+  public Iterable<Set<VariantGraphVertex>> ranks(final SortedSet<Witness> witnesses) {
     return new Iterable<Set<VariantGraphVertex>>() {
       @Override
       public Iterator<Set<VariantGraphVertex>> iterator() {
@@ -317,12 +317,12 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return new Apparatus(witnesses(), entries);
   }
 
-  public RowSortedTable<Integer, IWitness, SortedSet<Token>> toTable() {
-    final TreeBasedTable<Integer, IWitness, SortedSet<Token>> table = TreeBasedTable.create();
+  public RowSortedTable<Integer, Witness, SortedSet<Token>> toTable() {
+    final TreeBasedTable<Integer, Witness, SortedSet<Token>> table = TreeBasedTable.create();
     for (VariantGraphVertex v : rank().vertices()) {
       final int row = v.getRank();
       for (Token token : v.tokens()) {
-        final IWitness column = token.getWitness();
+        final Witness column = token.getWitness();
 
         SortedSet<Token> cell = table.get(row, column);
         if (cell == null) {

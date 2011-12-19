@@ -22,20 +22,20 @@ package eu.interedition.collatex.input;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
-import eu.interedition.collatex.IWitness;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 
 public class SimpleToken implements Token {
-  public static final SimpleToken START = new SimpleToken(Witness.SUPERBASE, -1, "", "#");
-  public static final SimpleToken END = new SimpleToken(Witness.SUPERBASE, Integer.MAX_VALUE, "", "#");
+  public static final SimpleToken START = new SimpleToken(SimpleWitness.SUPERBASE, -1, "", "#");
+  public static final SimpleToken END = new SimpleToken(SimpleWitness.SUPERBASE, Integer.MAX_VALUE, "", "#");
 
-  private IWitness witness;
+  private Witness witness;
   private int index;
   private String content;
   private String trailingWhitespace;
   private String normalized;
 
-  public SimpleToken(IWitness witness, int index, String content, String normalized) {
+  public SimpleToken(Witness witness, int index, String content, String normalized) {
     this.witness = witness;
     this.index = index;
     this.content = content;
@@ -53,7 +53,7 @@ public class SimpleToken implements Token {
   }
 
   @Override
-  public IWitness getWitness() {
+  public Witness getWitness() {
     return witness;
   }
 
