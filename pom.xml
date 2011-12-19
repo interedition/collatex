@@ -20,11 +20,10 @@
         <module>collatex</module>
         <module>collatex-lab</module>
         <module>collatex-nmerge</module>
-        <module>collatex-web</module>
         <module>collatex-cocoon</module>
         <module>text</module>
-        <module>text-repository</module>
         <module>semantic-markup</module>
+        <module>webapp</module>
     </modules>
     <dependencies>
         <dependency>
