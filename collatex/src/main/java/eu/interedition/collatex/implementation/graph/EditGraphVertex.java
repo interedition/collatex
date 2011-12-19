@@ -1,7 +1,6 @@
 package eu.interedition.collatex.implementation.graph;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.interfaces.Token;
 import org.neo4j.graphdb.Node;
@@ -82,7 +81,7 @@ public class EditGraphVertex extends GraphVertex<EditGraph> {
 
   @Override
   public String toString() {
-    return new StringBuilder(getBase().toString()).append(" = ").append(getWitness().toString()).toString();
+    return new StringBuilder(getWitness().toString()).append(" = ").append(getBase().toString()).toString();
   }
 
   public static Function<Node, EditGraphVertex> createWrapper(final EditGraph graph) {

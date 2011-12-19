@@ -1,6 +1,5 @@
 package eu.interedition.collatex.implementation.graph;
 
-import java.util.List;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -10,7 +9,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.implementation.input.SimpleToken;
 import eu.interedition.collatex.implementation.matching.Matches;
@@ -28,8 +27,6 @@ import org.neo4j.kernel.Traversal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -78,6 +75,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
   }
 
   public EditGraph build(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+    base.rank();
     Set<EditGraphVertex> prevVertexSet = Sets.newLinkedHashSet();
     prevVertexSet.add(start);
     // build the decision graph from the matches and the variant graph
@@ -118,7 +116,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     //addSkipVertices(ambiguousNormalized);
 
     int pathId = 0;
-    for (WeightedPath path : dijkstra(DEFAULT.add(PATH, OUTGOING), EditGraphEdge.SCORE_KEY).findAllPaths(start.getNode(), end.getNode())) {
+    for (WeightedPath path : dijkstra(DEFAULT.add(PATH, OUTGOING), new EditGraphEdgeCostEvualator()).findAllPaths(start.getNode(), end.getNode())) {
       for (EditGraphEdge edge : transform(path.relationships(), edgeWrapper)) {
         edge.addShortestPathId(pathId);
       }
@@ -128,60 +126,38 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     return this;
   }
 
-  protected void score() {
-    for (EditGraphEdge e : edges()) {
-      int score = (e.to().getWitnessIndex() - e.from().getWitnessIndex()) - 1;
-      if (e.getEditOperation() == GAP) {
-        score += 1;
-      }
-
-      final Iterable<EditGraphEdge> prevEdges = e.from().incoming();
-      boolean sequence = true;
-      for (EditGraphEdge prev : prevEdges) {
-        if (prev.getEditOperation() != e.getEditOperation()) {
-          sequence = false;
-          break;
-        }
-      }
-      if (!Iterables.isEmpty(prevEdges) && sequence) {
-        score -= 1;
-      }
-
-      e.setScore(score);
-    }
-  }
-
-  //  protected void score() {
-//    Iterable<EditGraphEdge> edgesInTopologicalOrder = edgesInTopologicalOrder();
-//    for (EditGraphEdge edge : edgesInTopologicalOrder) {
-//      int score = determineScore(edge);
-//      LOG.debug("Scoring edge {} {}", edge, score);
-//      edge.setScore(score);
+//  protected void score() {
+//    for (EditGraphEdge e : edges()) {
+//      int score = (e.to().getWitnessIndex() - e.from().getWitnessIndex()) - 1;
+//      if (e.getEditOperation() == GAP) {
+//        score += 1;
+//      }
+//
+//      final Iterable<EditGraphEdge> prevEdges = e.from().incoming();
+//      boolean sequence = true;
+//      for (EditGraphEdge prev : prevEdges) {
+//        if (prev.getEditOperation() != e.getEditOperation()) {
+//          sequence = false;
+//          break;
+//        }
+//      }
+//      if (!Iterables.isEmpty(prevEdges) && sequence) {
+//        score -= 1;
+//      }
+//
+//      e.setScore(score);
 //    }
 //  }
-  
-  private int determineScore(EditGraphEdge edge) {
-    EditGraphVertex from = edge.from();
-    //NOTE: not so nice way of determining whether edges originated from start vertex
-    //TODO: better to use equals graph.getStart etc
-    if (Iterables.isEmpty(from.incoming())) {
-      return 99; //TODO: this should not be fixed like this
-    } 
-    EditGraphEdge prevEdge = findMinimalScoringIncomingEdge(from);
-    //check for a jump backwards..
-    //if so, do not deduce the score, cause it would brake the sequence
-    //LOG.debug("distance: {}", edge.to().getWitnessIndex() - edge.from().getWitnessIndex());
-    // if the editoperation of the minimalEdge is the same as the edge to score
-    // we are in sequence and we deduce the score
-    // otherwise we keep the score as it is
-    //TODO: think about transpositions
-    if (prevEdge.getEditOperation() == edge.getEditOperation()) {
-      return prevEdge.getScore() - 1;
+
+  protected void score() {
+    Iterable<EditGraphEdge> edgesInTopologicalOrder = edgesInTopologicalOrder();
+    for (EditGraphEdge edge : edgesInTopologicalOrder) {
+      Score score = determineScore(edge);
+      LOG.debug("Scoring edge {} {}", edge, score);
+      edge.setScore(score);
     }
-    return prevEdge.getScore();
   }
-
-
+  
   public Iterable<Iterable<EditGraphEdge>> shortestPaths() {
     int maxId = -1;
     for (EditGraphEdge e : start.outgoing()) {
@@ -256,6 +232,97 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     return new EditGraphEdge(this, from, to, operation);
   }
 
+  private Iterable<EditGraphEdge> edgesInTopologicalOrder() {
+    List<Iterable<EditGraphEdge>> sortedEdges = Lists.newArrayList(); 
+    Iterable<EditGraphVertex> vertices = vertices();
+    for (EditGraphVertex v : vertices) {
+      sortedEdges.add(v.outgoing());
+    }
+    return Iterables.concat(sortedEdges);
+  }
+
+  private Score determineScore(EditGraphEdge edge) {
+    EditGraphVertex from = edge.from();
+    //NOTE: not so nice way of determining whether edges originated from start vertex
+    //NOTE: it might be better to use equals graph.getStart()?
+    if (Iterables.isEmpty(from.incoming())) {
+      Score score = new Score();
+      if (edge.getEditOperation()==EditOperation.NO_GAP) {
+        score.addMatch();
+      } else {
+        score.àddGap();
+      }
+      return score;
+    }
+    // walk over all the incoming edges and determine the next score
+    Map<EditGraphEdge, Score> scores = Maps.newHashMap();
+    for (EditGraphEdge incomingEdge : from.incoming()) {
+      Score newScore = determineScore(incomingEdge, edge);
+      scores.put(incomingEdge, newScore);
+    }
+    EditGraphEdge minimalScoringIncomingEdge = findMinimalScoringIncomingEdge(scores);
+    return scores.get(minimalScoringIncomingEdge);
+  }
+
+  
+//      EditGraphEdge prevEdge = findMinimalScoringIncomingEdge(from);
+//    //check for a jump backwards..
+//    //if so, do not deduce the score, cause it would brake the sequence
+//    int distance = edge.to().getBase().getRank() - edge.from().getBase().getRank();
+//    LOG.debug("distance: {}", distance);
+//    //TODO: this does not always work.. remember: ommissions cause jump in rank, not only real transpositions!
+//    if (distance<0||distance>1) {
+//      // we have detected a jump backwards.. we are not in sequence..
+//      return prevEdge.getScore();
+//    }
+  
+//      EditGraphEdge prevEdge = findMinimalScoringIncomingEdge(from);
+//    //check for a jump backwards..
+//    //if so, do not deduce the score, cause it would brake the sequence
+//    int distance = edge.to().getBase().getRank() - edge.from().getBase().getRank();
+//    LOG.debug("distance: {}", distance);
+//    //TODO: this does not always work.. remember: ommissions cause jump in rank, not only real transpositions!
+//    if (distance<0||distance>1) {
+//      // we have detected a jump backwards.. we are not in sequence..
+//      return prevEdge.getScore();
+//    }
+    
+    
+    
+    
+ 
+  // there are 4 possibilities here
+  // no_gap/no_gap --> ideal
+  // gap/gap --> less ideal, but ok
+  // gap/no_gap --> close gap scoring, start new etc
+  // no_gap/gap --> close match seq scoring, start new etc
+  private Score determineScore(EditGraphEdge incomingEdge, EditGraphEdge outgoingEdge) {
+    Score newScore = incomingEdge.getScore().copy();
+    // if the editoperation of the incomingEdge is the same as the outgoingEdge to score
+    // we are in sequence and we add match/gap to score
+    // otherwise we first transition state (this should cause a penalty) and then we add match/gap to score
+    if (incomingEdge.getEditOperation() != outgoingEdge.getEditOperation()) {
+      newScore.transitionState();
+    }
+    if (outgoingEdge.getEditOperation()==EditOperation.NO_GAP) {
+      newScore.addMatch();
+    } else {
+      newScore.àddGap();
+    }
+    return newScore;
+  }
+  
+  // NOTE: warning: there can be multiple incoming edges with the same minimum score..
+  private EditGraphEdge findMinimalScoringIncomingEdge(Map<EditGraphEdge, Score> scores) {
+    EditGraphEdge minimumEdge = scores.keySet().iterator().next();
+    for (EditGraphEdge edge: scores.keySet()) {
+      if (edge.getScore().getTempScore() < minimumEdge.getScore().getTempScore()) {
+        minimumEdge = edge;
+      }
+    }
+    return minimumEdge;
+  }
+
   private void addSkipVertices(Set<String> ambiguousNormalized) {
     for (EditGraphVertex vertex : vertices()) {
       Token witnessToken = vertex.getWitness();
@@ -271,7 +338,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
 //          }
           final EditGraphVertex skipVertex = new EditGraphVertex(null, null, null, 0);
           for (EditGraphEdge incomingEdge : incomingEdges) {
-            connect(incomingEdge.from(), skipVertex, GAP).setScore(3);
+            //connect(incomingEdge.from(), skipVertex, GAP).setScore(3);
           }
           for (EditGraphEdge outgoingEdge : outgoingEdges) {
             connect(skipVertex, outgoingEdge.to(), NO_GAP);
@@ -289,23 +356,4 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     }
     return ambiguousNormalized;
   }
-
-  private Iterable<EditGraphEdge> edgesInTopologicalOrder() {
-    List<Iterable<EditGraphEdge>> sortedEdges = Lists.newArrayList(); 
-    Iterable<EditGraphVertex> vertices = vertices();
-    for (EditGraphVertex v : vertices) {
-      sortedEdges.add(v.outgoing());
-    }
-    return Iterables.concat(sortedEdges);
-  }
-
-  private EditGraphEdge findMinimalScoringIncomingEdge(EditGraphVertex from) {
-    EditGraphEdge minimumEdge = from.incoming().iterator().next();
-    for (EditGraphEdge edge: from.incoming()) {
-      if (edge.getScore() < minimumEdge.getScore()) {
-        minimumEdge = edge;
-      }
-    }
-    return minimumEdge;
-  }  
 }
