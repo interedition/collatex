@@ -1,9 +1,10 @@
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.input.SimpleWitness;
 import org.junit.Test;
 
 import java.util.SortedSet;
@@ -32,7 +33,7 @@ public class TranspositionTest extends AbstractTest {
 
   @Test
   public void transposition1() {
-    final Witness[] w = createWitnesses(//
+    final SimpleWitness[] w = createWitnesses(//
             "the white and black cat", "The black cat",//
             "the black and white cat", "the black and green cat");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
@@ -45,7 +46,7 @@ public class TranspositionTest extends AbstractTest {
 
   @Test
   public void transposition2() {
-    final Witness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
+    final SimpleWitness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
 
     assertEquals("| |He|was|agast,|so|", toString(table, w[0]));
@@ -55,7 +56,7 @@ public class TranspositionTest extends AbstractTest {
 
   @Test
   public void transposition2Reordered() {
-    final Witness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
+    final SimpleWitness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
 
     // TODO: it would be nice if He was agast stayed in one place!

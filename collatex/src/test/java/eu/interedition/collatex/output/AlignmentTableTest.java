@@ -24,6 +24,7 @@ import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.input.SimpleWitness;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -41,7 +42,7 @@ public class AlignmentTableTest extends AbstractTest {
 
   @Test
   public void firstWitness() {
-    final Witness[] w = createWitnesses("the black cat");
+    final SimpleWitness[] w = createWitnesses("the black cat");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
     assertEquals(1, table.columnKeySet().size());
     assertEquals("|the|black|cat|", toString(table, w[0]));
@@ -49,7 +50,7 @@ public class AlignmentTableTest extends AbstractTest {
   
   @Test
   public void everythingMatches() {
-    final Witness[] w = createWitnesses("the black cat", "the black cat", "the black cat");
+    final SimpleWitness[] w = createWitnesses("the black cat", "the black cat", "the black cat");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
     assertEquals(3, table.columnKeySet().size());
     assertEquals("|the|black|cat|", toString(table, w[0]));
@@ -59,7 +60,7 @@ public class AlignmentTableTest extends AbstractTest {
   
   @Test
   public void variant() {
-    final Witness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
+    final SimpleWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
     assertEquals(5, table.columnKeySet().size());
     assertEquals("|the|black|cat|", toString(table, w[0]));
@@ -114,7 +115,7 @@ public class AlignmentTableTest extends AbstractTest {
   
   @Test
   public void testSimpleSpencerHowe() {
-    final Witness[] w = createWitnesses("a", "b", "a b");
+    final SimpleWitness[] w = createWitnesses("a", "b", "a b");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
     assertEquals(3, table.columnKeySet().size());
     assertEquals("|a| |", toString(table, w[0]));

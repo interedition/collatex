@@ -1,4 +1,4 @@
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
@@ -9,6 +9,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.input.SimpleWitness;
 import eu.interedition.collatex.input.WhitespaceAndPunctuationTokenizer;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import static eu.interedition.collatex.alignment.Match.PHRASE_MATCH_TO_TOKENS;
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -28,11 +29,11 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent() {
-    final Witness[] w = createWitnesses(//
+    final SimpleWitness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = merge(w[0]);
-    final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator()).getAll();
+    final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
 
     assertVertexHasContent(matches.get(w[1].getTokens().get(0)).get(0), "its", w[0]);
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'
@@ -40,7 +41,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent5() {
-    final Witness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
+    final SimpleWitness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
     final VariantGraph graph = merge(w);
 
     vertexWith(graph, "its", w[0]);
@@ -52,7 +53,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent6() {
-    final Witness[] w = createWitnesses(
+    final SimpleWitness[] w = createWitnesses(
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = merge(w);
@@ -71,18 +72,18 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void testDirkVincent7() {
-    Witness[] w = createWitnesses(//
+    final SimpleWitness[] w = createWitnesses(//
       "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
       "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     VariantGraph graph = merge(w[0]);
-    VariantGraphBuilder builder = merge(graph, w[1]);
+    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[1]);
     assertPhraseMatches(builder, "its soft light any light he could remember from the days nights when day followed night vice versa");
     assertTrue(Iterables.isEmpty(builder.getTranspositions()));
   }
 
   @Test
   public void dirkVincent8() {
-    final Witness[] w = createWitnesses(//
+    final SimpleWitness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
@@ -103,7 +104,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincent10() {
-    final Witness[] w = createWitnesses(
+    final SimpleWitness[] w = createWitnesses(
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
@@ -147,7 +148,7 @@ public class BeckettTest extends AbstractTest {
   @Test
   public void sentence42Transposition() {
     // punctuation should be treated as separate tokens for this test to succeed
-    final Witness[] w = createWitnesses(witnessBuilder, new WhitespaceAndPunctuationTokenizer(),//
+    final SimpleWitness[] w = createWitnesses(new WhitespaceAndPunctuationTokenizer(),//
             "The same clock as when for example Magee once died.",//
             "The same as when for example Magee once died.",//
             "The same as when for example McKee once died .",//
@@ -164,7 +165,7 @@ public class BeckettTest extends AbstractTest {
     assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
 
     // transpositions should be handled correctly for this test to succeed
-    final VariantGraphBuilder builder = merge(graph, w[4]);
+    final VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[4]);
     final List<List<Match>> phraseMatches = builder.getPhraseMatches();
     final List<List<Match>> transpositions = builder.getTranspositions();
     assertEquals("the same as when", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));

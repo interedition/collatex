@@ -12,13 +12,14 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
+import eu.interedition.collatex.input.SimpleWitness;
 import org.junit.Test;
 
 public class MatchesTest extends AbstractTest {
 
   @Test
   public void test1() {
-    final Witness[] w = createWitnesses("john and paul and george and ringo", "john and paul and george and ringo");
+    final SimpleWitness[] w = createWitnesses("john and paul and george and ringo", "john and paul and george and ringo");
     final VariantGraph graph = merge(w[0]);
     final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 
@@ -30,7 +31,7 @@ public class MatchesTest extends AbstractTest {
 
   @Test
   public void test2() {
-    final Witness[] w = createWitnesses("the white cat", "the black cat");
+    final SimpleWitness[] w = createWitnesses("the white cat", "the black cat");
     final VariantGraph graph = merge(w[0]);
     final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 

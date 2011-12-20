@@ -1,10 +1,14 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import eu.interedition.collatex.CollationAlgorithm;
+import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.alignment.VariantGraphBuilder;
+import eu.interedition.collatex.dekker.VariantGraphBuilder;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.input.SimpleWitness;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
@@ -101,7 +105,7 @@ public class CollateXLaboratory extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      final List<Witness> w = witnessPanel.getWitnesses();
+      final List<SimpleWitness> w = witnessPanel.getWitnesses();
 
       LOG.debug("Collating {}", Iterables.toString(w));
 
@@ -109,9 +113,9 @@ public class CollateXLaboratory extends JFrame {
       try {
         final VariantGraph pvg = graphFactory.newVariantGraph();
 
-        final VariantGraphBuilder builder = new VariantGraphBuilder(pvg);
-        for (Witness witness : w) {
-          builder.add(witness);
+        final CollationAlgorithm collator = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
+        for (SimpleWitness witness : w) {
+          collator.collate(pvg, witness);
           transaction.success();
           transaction.finish();
           transaction = graphFactory.getDatabase().beginTx();
@@ -138,7 +142,7 @@ public class CollateXLaboratory extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      final List<Witness> w = witnessPanel.getWitnesses();
+      final List<SimpleWitness> w = witnessPanel.getWitnesses();
 
       if (w.size() < 2) {
         return;
@@ -147,9 +151,10 @@ public class CollateXLaboratory extends JFrame {
       final Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
         final VariantGraph pvg = graphFactory.newVariantGraph();
-        new VariantGraphBuilder(pvg).add(w.get(0));
-        
-        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, w.get(1).getTokens(), new EqualityTokenComparator()));
+
+        CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(pvg, w.get(0));
+
+        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, Sets.newTreeSet(w.get(1)), new EqualityTokenComparator()));
       } finally {
         transaction.finish();
       }

@@ -291,32 +291,6 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     };
   }
 
-  /**
-   * Factory method that builds a ParallelSegmentationApparatus from a VariantGraph
-   */
-  public Apparatus toApparatus() {
-    join();
-    rank();
-
-    List<Apparatus.Entry> entries = Lists.newArrayList();
-    for (VariantGraphVertex v : vertices()) {
-      if (v.equals(getStart()) || v.equals(getEnd())) {
-        continue;
-      }
-      Apparatus.Entry entry;
-      int rank = v.getRank();
-      if (rank > entries.size()) {
-        entry = new Apparatus.Entry(witnesses());
-        entries.add(entry);
-      } else {
-        entry = entries.get(rank - 1);
-      }
-      entry.add(v);
-    }
-
-    return new Apparatus(witnesses(), entries);
-  }
-
   public RowSortedTable<Integer, Witness, SortedSet<Token>> toTable() {
     final TreeBasedTable<Integer, Witness, SortedSet<Token>> table = TreeBasedTable.create();
     for (VariantGraphVertex v : rank().vertices()) {

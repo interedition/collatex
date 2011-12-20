@@ -74,7 +74,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     return Traversal.description().breadthFirst().relationships(PATH, OUTGOING);
   }
 
-  public EditGraph build(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+  public EditGraph build(VariantGraph base, SortedSet<Token> witness, Comparator<Token> comparator) {
     base.rank();
     Set<EditGraphVertex> prevVertexSet = Sets.newLinkedHashSet();
     prevVertexSet.add(start);

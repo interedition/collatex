@@ -2,11 +2,8 @@ package eu.interedition.web.io;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.TokenNormalizer;
-import eu.interedition.collatex.Tokenizer;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.input.WhitespaceTokenizer;
 import eu.interedition.collatex.input.SimpleWitness;
 import eu.interedition.web.collatex.Collation;
@@ -28,10 +25,6 @@ import java.util.SortedSet;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<Collation> {
-
-  private Tokenizer tokenizer = new WhitespaceTokenizer();
-
-  private TokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -57,7 +50,7 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
       throw new HttpMessageNotReadableException("Expecting 'witnesses' array");
     }
     
-    SortedSet<Witness> witnesses = Sets.newTreeSet();
+    List<Iterable<Token>> witnesses = Lists.newArrayList();
     for (JsonNode witnessNode : witnessesNode) {
       if (!witnessNode.isObject()) {
         throw new HttpMessageNotReadableException("Expecting witness object");
@@ -82,12 +75,11 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
         throw new HttpMessageNotReadableException(String.format("Expected either 'tokens' or 'content' field in witness \"%s\"", witness));
       }
       
-      List<Token> tokens = null;
       if (!tokensNode.isMissingNode()) {
         if (!tokensNode.isArray()) {
           throw new HttpMessageNotReadableException(String.format("Expected 'tokens' array in witness \"%s\"", witness));
         }
-        tokens = Lists.newArrayList();
+        List<Token> tokens = Lists.newArrayList();
         for (JsonNode tokenNode : tokensNode) {
           if (!tokenNode.isObject()) {
             throw new HttpMessageNotReadableException(String.format("Expected token object in 'tokens' field in witness \"%s\"", witness));
@@ -100,7 +92,7 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
           String normalizedTokenContent;
           final JsonNode normalizedTokenContentNode = tokenNode.path("n");
           if (normalizedTokenContentNode.isMissingNode()) {
-            normalizedTokenContent = tokenNormalizer.apply(tokenContent);
+            normalizedTokenContent = SimpleWitness.TOKEN_NORMALIZER.apply(tokenContent);
           } else {
             if (!normalizedTokenContentNode.isTextual()) {
               throw new HttpMessageNotReadableException(String.format("Expected textual normalized token content in witness \"%s\"", witness));
@@ -114,17 +106,17 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
           
           tokens.add(new WebToken(witness, tokens.size(), tokenContent, normalizedTokenContent, tokenNode));
         }
+        witness.setTokens(tokens);
       } else {
         if (!contentNode.isTextual()) {
           throw new HttpMessageNotReadableException(String.format("Expected 'content' text field in witness \"%s\"", witness));
         }
-        tokens = tokenizer.tokenize(witness, contentNode.getTextValue());
+        witness.setTokenContents(new WhitespaceTokenizer().apply(contentNode.getTextValue()));
       }
       
-      if (tokens.isEmpty()) {
+      if (witness.getTokens().isEmpty()) {
         throw new HttpMessageNotReadableException(String.format("No tokens in witness \"%s\"", witness));
       }      
-      witness.setTokens(tokens);
       witnesses.add(witness);
     }
 

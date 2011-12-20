@@ -3,9 +3,8 @@ package eu.interedition.collatex.lab;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.input.DefaultTokenNormalizer;
+import eu.interedition.collatex.input.SimpleWitness;
 import eu.interedition.collatex.input.WhitespaceTokenizer;
-import eu.interedition.collatex.input.WitnessBuilder;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -58,12 +57,12 @@ public class WitnessPanel extends JPanel {
     }
   }
 
-  public List<Witness> getWitnesses() {
-    List<Witness> witnesses = Lists.newArrayListWithCapacity(this.witnesses.size());
+  public List<SimpleWitness> getWitnesses() {
+    List<SimpleWitness> witnesses = Lists.newArrayListWithCapacity(this.witnesses.size());
     for (WitnessTextArea textArea : this.witnesses) {
       final String textContent = textArea.getTextContent();
       if (!Strings.isNullOrEmpty(textContent)) {
-        witnesses.add(new WitnessBuilder(new DefaultTokenNormalizer()).build(textArea.getSigil(), textContent, new WhitespaceTokenizer()));
+        witnesses.add(new SimpleWitness(textArea.getSigil(), textContent, new WhitespaceTokenizer()));
       }
     }
     return witnesses;

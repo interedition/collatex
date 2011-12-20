@@ -7,6 +7,7 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.input.SimpleWitness;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +16,7 @@ public class NearMatcherTest extends AbstractTest {
   
   @Test
   public void nearTokenMatching() {
-    final Witness[] w = createWitnesses("near matching yeah", "nar matching");
+    final SimpleWitness[] w = createWitnesses("near matching yeah", "nar matching");
     final VariantGraph graph = merge(w[0]);
     final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1].getTokens(), new EditDistanceTokenComparator()).getAll();
 

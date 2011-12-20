@@ -18,12 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.Tuple;
 import eu.interedition.collatex.graph.VariantGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

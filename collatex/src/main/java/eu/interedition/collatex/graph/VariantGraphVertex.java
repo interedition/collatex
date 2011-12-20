@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.input.SimpleToken;
 import org.neo4j.graphdb.Node;
 
 import java.util.Collections;
@@ -126,7 +127,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
       }
       final StringBuilder contents = new StringBuilder();
       for (Token token : input.tokens(Sets.newTreeSet(Collections.singleton(witnesses.first())))) {
-        contents.append(token.getContent()).append(" ");
+        contents.append(((SimpleToken) token).getContent()).append(" ");
       }
       return contents.toString().trim();
     }

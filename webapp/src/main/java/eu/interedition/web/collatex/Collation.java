@@ -20,19 +20,23 @@
 
 package eu.interedition.web.collatex;
 
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.input.SimpleWitness;
+import sun.java2d.pipe.SpanShapeRenderer;
 
+import java.util.List;
 import java.util.SortedSet;
 
 public class Collation {
 
-  private final SortedSet<Witness> witnesses;
+  private final List<Iterable<Token>> witnesses;
 
-  public Collation(SortedSet<Witness> witnesses) {
+  public Collation(List<Iterable<Token>> witnesses) {
     this.witnesses = witnesses;
   }
 
-  public SortedSet<Witness> getWitnesses() {
+  public List<Iterable<Token>> getWitnesses() {
     return witnesses;
   }
 }

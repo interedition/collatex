@@ -9,6 +9,7 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.input.SimpleToken;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -90,7 +91,7 @@ public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConv
         for (Witness witness : tokenIndex.keySet()) {
           final StringBuilder cellContent = new StringBuilder();
           for (Token token : tokenIndex.get(witness)) {
-            cellContent.append(token.getContent()).append(" ");
+            cellContent.append(((SimpleToken) token).getContent()).append(" ");
           }
           cellContents.put(witness, cellContent.toString().trim());
         }

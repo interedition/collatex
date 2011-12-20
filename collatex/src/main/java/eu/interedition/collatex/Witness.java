@@ -20,8 +20,6 @@
 
 package eu.interedition.collatex;
 
-import java.util.List;
-
 /**
  * IWitness
  * 
@@ -31,9 +29,6 @@ import java.util.List;
 public interface Witness extends Comparable<Witness> {
 
   String getSigil();
-
-  // Note: This should return a non-modifiable container
-  List<Token> getTokens();
 
   boolean isNear(Token a, Token b);
 }

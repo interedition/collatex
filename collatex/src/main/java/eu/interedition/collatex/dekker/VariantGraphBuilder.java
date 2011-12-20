@@ -1,24 +1,23 @@
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex.CollationAlgorithmBase;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Tuple;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class VariantGraphBuilder {
+public class VariantGraphBuilder extends CollationAlgorithmBase {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraphBuilder.class);
 
-  private final VariantGraph graph;
   private final Comparator<Token> comparator;
   private final TokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;
@@ -29,48 +28,28 @@ public class VariantGraphBuilder {
   private List<List<Match>> transpositions;
   private LinkedHashMap<Token, VariantGraphVertex> alignments;
 
-  public VariantGraphBuilder(VariantGraph graph) {
-    this(graph, new EqualityTokenComparator(), new DefaultTokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
+  public VariantGraphBuilder(Comparator<Token> comparator) {
+    this(comparator, new DefaultTokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
   }
 
-  public VariantGraphBuilder(VariantGraph graph, Comparator<Token> comparator, TokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
-    this.graph = graph;
+  public VariantGraphBuilder(Comparator<Token> comparator, TokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
     this.comparator = comparator;
     this.tokenLinker = tokenLinker;
     this.phraseMatchDetector = phraseMatchDetector;
     this.transpositionDetector = transpositionDetector;
   }
 
-  public VariantGraphBuilder add(Witness... witnesses) {
-    for (Witness witness : witnesses) {
-      merge(witness);
-    }
-    return this;
-  }
+  @Override
+  public void collate(VariantGraph graph, SortedSet<Token> tokens) {
+    Preconditions.checkArgument(!tokens.isEmpty(), "Empty witness");
+    final Witness witness = tokens.first().getWitness();
 
-  public Map<Token, VariantGraphVertex> getTokenLinks() {
-    return tokenLinks;
-  }
-
-  public List<List<Match>> getPhraseMatches() {
-    return Collections.unmodifiableList(phraseMatches);
-  }
-
-  public List<List<Match>> getTranspositions() {
-    return Collections.unmodifiableList(transpositions);
-  }
-
-  public Map<Token, VariantGraphVertex> getAlignments() {
-    return Collections.unmodifiableMap(alignments);
-  }
-
-  protected void merge(Witness witness) {
     if (LOG.isTraceEnabled()) {
-      LOG.trace("{} + {}: {} vs. {}", new Object[] { graph, witness, graph.vertices(), witness.getTokens() });
+      LOG.trace("{} + {}: {} vs. {}", new Object[] { graph, witness, graph.vertices(), tokens});
     }
 
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
-    tokenLinks = tokenLinker.link(graph, witness.getTokens(), comparator);
+    tokenLinks = tokenLinker.link(graph, tokens, comparator);
     if (LOG.isTraceEnabled()) {
       for (Map.Entry<Token, VariantGraphVertex> tokenLink : tokenLinks.entrySet()) {
         LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
@@ -78,7 +57,7 @@ public class VariantGraphBuilder {
     }
 
     LOG.debug("{} + {}: Detect phrase matches", graph, witness);
-    phraseMatches = phraseMatchDetector.detect(tokenLinks, graph, witness);
+    phraseMatches = phraseMatchDetector.detect(tokenLinks, graph, tokens);
     if (LOG.isTraceEnabled()) {
       for (List<Match> phraseMatch : phraseMatches) {
         LOG.trace("{} + {}: Phrase match: {}", new Object[] { graph, witness, Iterables.toString(phraseMatch) });
@@ -110,7 +89,7 @@ public class VariantGraphBuilder {
     VariantGraphVertex last = graph.getStart();
     final SortedSet<Witness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
     final Map<Token, VariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
-    for (Token token : witness.getTokens()) {
+    for (Token token : tokens) {
       VariantGraphVertex matchingVertex = alignments.get(token);
       if (matchingVertex == null) {
         matchingVertex = graph.add(token);
@@ -134,6 +113,22 @@ public class VariantGraphBuilder {
     if (LOG.isTraceEnabled()) {
       LOG.trace("{}: {}", graph, Iterables.toString(graph.vertices()));
     }
+  }
+
+  public Map<Token, VariantGraphVertex> getTokenLinks() {
+    return tokenLinks;
+  }
+
+  public List<List<Match>> getPhraseMatches() {
+    return Collections.unmodifiableList(phraseMatches);
+  }
+
+  public List<List<Match>> getTranspositions() {
+    return Collections.unmodifiableList(transpositions);
+  }
+
+  public Map<Token, VariantGraphVertex> getAlignments() {
+    return Collections.unmodifiableMap(alignments);
   }
 
   // NOTE: this method should not return the original sequence when a mirror exists!

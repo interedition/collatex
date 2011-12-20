@@ -32,7 +32,6 @@ public class SimpleToken implements Token {
   private Witness witness;
   private int index;
   private String content;
-  private String trailingWhitespace;
   private String normalized;
 
   public SimpleToken(Witness witness, int index, String content, String normalized) {
@@ -40,14 +39,12 @@ public class SimpleToken implements Token {
     this.index = index;
     this.content = content;
     this.normalized = normalized;
-    this.trailingWhitespace = "";
   }
 
   public int getIndex() {
     return index;
   }
 
-  @Override
   public String getContent() {
     return content;
   }
@@ -56,15 +53,6 @@ public class SimpleToken implements Token {
   public Witness getWitness() {
     return witness;
   }
-
-  public String getTrailingWhitespace() {
-    return trailingWhitespace;
-  }
-
-  public void setTrailingWhitespace(String whitespace) {
-    this.trailingWhitespace = whitespace;
-  }
-
 
   public String getNormalized() {
     return normalized;

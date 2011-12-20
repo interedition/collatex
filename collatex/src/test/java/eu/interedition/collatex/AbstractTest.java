@@ -6,16 +6,16 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.alignment.Match;
-import eu.interedition.collatex.alignment.VariantGraphBuilder;
+import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.dekker.VariantGraphBuilder;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphEdge;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.input.DefaultTokenNormalizer;
 import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.input.SimpleWitness;
 import eu.interedition.collatex.input.WhitespaceTokenizer;
-import eu.interedition.collatex.input.WitnessBuilder;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
 
-import static eu.interedition.collatex.alignment.Match.PHRASE_MATCH_TO_TOKENS;
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -41,8 +41,6 @@ public abstract class AbstractTest {
   protected final Logger LOG = LoggerFactory.getLogger(getClass());
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
-  protected WitnessBuilder witnessBuilder = new WitnessBuilder(new DefaultTokenNormalizer());
-  protected Tokenizer tokenizer = new WhitespaceTokenizer();
   protected static GraphFactory graphFactory;
   private Transaction transaction;
 
@@ -63,26 +61,26 @@ public abstract class AbstractTest {
       transaction = null;
     }
   }
-  protected Witness[] createWitnesses(WitnessBuilder witnessBuilder, Tokenizer tokenizer, String... contents) {
+  protected SimpleWitness[] createWitnesses(Function<String, List<String>> tokenizer, String... contents) {
     Assert.assertTrue("Not enough sigla", contents.length <= SIGLA.length);
-    final Witness[] witnesses = new Witness[contents.length];
+    final SimpleWitness[] witnesses = new SimpleWitness[contents.length];
     for (int wc = 0; wc < contents.length; wc++) {
-      witnesses[wc] = witnessBuilder.build(Character.toString(SIGLA[wc]), contents[wc], tokenizer);
+      witnesses[wc] = new SimpleWitness(Character.toString(SIGLA[wc]), contents[wc], tokenizer);
     }
     return witnesses;
   }
 
-  protected Witness[] createWitnesses(String... contents) {
-    return createWitnesses(witnessBuilder, tokenizer, contents);
+  protected SimpleWitness[] createWitnesses(String... contents) {
+    return createWitnesses(new WhitespaceTokenizer(), contents);
   }
 
-  protected VariantGraphBuilder merge(VariantGraph graph, Witness... witnesses) {
-    final VariantGraphBuilder builder = new VariantGraphBuilder(graph);
-    builder.add(witnesses);
-    return builder;
+  protected CollationAlgorithm merge(VariantGraph graph, SimpleWitness... witnesses) {
+    final CollationAlgorithm algorithm = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
+    algorithm.collate(graph, witnesses);
+    return algorithm;
   }
 
-  protected VariantGraph merge(Witness... witnesses) {
+  protected VariantGraph merge(SimpleWitness... witnesses) {
     final VariantGraph graph = graphFactory.newVariantGraph();
     merge(graph, witnesses);
     return graph;
@@ -155,7 +153,7 @@ public abstract class AbstractTest {
       tableRowStr.append(tokens == null ? ' ' : Joiner.on(" ").join(Iterables.transform(tokens, new Function<Token, String>() {
         @Override
         public String apply(Token input) {
-          return input.getContent();
+          return ((SimpleToken) input).getContent();
         }
       }))).append("|");
     }

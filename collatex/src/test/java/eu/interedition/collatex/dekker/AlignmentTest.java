@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
@@ -27,17 +27,18 @@ import eu.interedition.collatex.input.SimpleToken;
 import java.util.List;
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.input.SimpleWitness;
 import org.junit.Test;
 
 import java.util.SortedSet;
 
-import static eu.interedition.collatex.alignment.Match.PHRASE_MATCH_TO_TOKENS;
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
 
 public class AlignmentTest extends AbstractTest {
   @Test
   public void transposition() {
-    final Witness[] w = createWitnesses("the cat is black", "black is the cat");
+    final SimpleWitness[] w = createWitnesses("the cat is black", "black is the cat");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("|the|cat|is|black| |", toString(t, w[0]));
     assertEquals("|black| |is|the|cat|", toString(t, w[1]));
@@ -45,7 +46,7 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void doubleTransposition2() {
-    final Witness[] w = createWitnesses("a b", "b a");
+    final SimpleWitness[] w = createWitnesses("a b", "b a");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("| |a|b|", toString(t, w[0]));
     assertEquals("|b|a| |", toString(t, w[1]));
@@ -53,7 +54,7 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void doubleTransposition3() {
-    final Witness[] w = createWitnesses("a b c", "b a c");
+    final SimpleWitness[] w = createWitnesses("a b c", "b a c");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("| |a|b|c|", toString(t, w[0]));
     assertEquals("|b|a| |c|", toString(t, w[1]));
@@ -61,7 +62,7 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void additionInCombinationWithTransposition() {
-    final Witness[] w = createWitnesses(//
+    final SimpleWitness[] w = createWitnesses(//
             "the cat is very happy",//
             "very happy is the cat",//
             "very delitied and happy is the cat");
@@ -73,7 +74,7 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void additionInCombinationWithTransposition2() {
-    final Witness[] w = createWitnesses(//
+    final SimpleWitness[] w = createWitnesses(//
             "the cat is black",//
             "black is the cat",//
             "black and white is the cat");
@@ -85,7 +86,7 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void simpleTransposition() {
-    final Witness[] w = createWitnesses(//
+    final SimpleWitness[] w = createWitnesses(//
             "A black cat in a white basket",//
             "A white cat in a black basket");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
@@ -95,7 +96,7 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void transposeInOnePair() {
-    final Witness[] w = createWitnesses("y", "x y z", "z y");
+    final SimpleWitness[] w = createWitnesses("y", "x y z", "z y");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("| |y| |", toString(t, w[0]));
     assertEquals("|x|y|z|", toString(t, w[1]));
@@ -104,7 +105,7 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void transposeInTwoPairs() {
-    final Witness[] w = createWitnesses("y x", "x y z", "z y");
+    final SimpleWitness[] w = createWitnesses("y x", "x y z", "z y");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> t = merge(w).toTable();
     assertEquals("| |y|x|", toString(t, w[0]));
     assertEquals("|x|y|z|", toString(t, w[1]));
@@ -113,9 +114,9 @@ public class AlignmentTest extends AbstractTest {
   
   @Test
   public void testOrderIndependence() {
-    Witness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
+    final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
     VariantGraph graph = merge(w[0], w[1]);
-    VariantGraphBuilder builder = merge(graph, w[2]);
+    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[2]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
     assertEquals("hello nice cruel world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
     List<List<Match>> transpositions = builder.getTranspositions();
@@ -124,9 +125,9 @@ public class AlignmentTest extends AbstractTest {
   
   @Test
   public void testPhraseMatchingShouldIgnoreDeletions() {
-    Witness[] w = createWitnesses("Hello cruel world", "Hello world");
+    final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello world");
     VariantGraph graph = merge(w[0]);
-    VariantGraphBuilder builder = merge(graph, w[1]);
+    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[1]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
     assertEquals("hello world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
     List<List<Match>> transpositions = builder.getTranspositions();
@@ -135,9 +136,9 @@ public class AlignmentTest extends AbstractTest {
   
   @Test
   public void testPhraseMatchingShouldIgnoreAdditions() {
-    Witness[] w = createWitnesses("Hello world", "Hello cruel world");
+    final SimpleWitness[] w = createWitnesses("Hello world", "Hello cruel world");
     VariantGraph graph = merge(w[0]);
-    VariantGraphBuilder builder = merge(graph, w[1]);
+    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[1]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
     assertEquals("hello world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
     List<List<Match>> transpositions = builder.getTranspositions();

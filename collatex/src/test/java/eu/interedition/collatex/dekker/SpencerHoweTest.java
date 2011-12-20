@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.RowSortedTable;
@@ -27,6 +27,7 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.input.SimpleWitness;
 import org.junit.Test;
 
 import java.util.SortedSet;
@@ -47,7 +48,7 @@ public class SpencerHoweTest extends AbstractTest {
 
   @Test
   public void alignmentTable() {
-    final Witness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
+    final SimpleWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
     final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
 
     assertEquals(3, table.columnKeySet().size());
@@ -59,7 +60,7 @@ public class SpencerHoweTest extends AbstractTest {
 
   @Test
   public void graph() {
-    final Witness[] w = createWitnesses("a", "b", "a b");
+    final SimpleWitness[] w = createWitnesses("a", "b", "a b");
     final VariantGraph graph = merge(w);
     assertEquals(4, Iterables.size(graph.vertices()));
     assertEquals(5, Iterables.size(graph.edges()));

@@ -5,16 +5,20 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.CollateXEngine;
+import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.input.SimpleToken;
-import eu.interedition.collatex.input.WhitespaceAndPunctuationTokenizer;
+import eu.interedition.collatex.input.SimpleWitness;
+import eu.interedition.collatex.input.WhitespaceTokenizer;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.output.Apparatus;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.transformation.AbstractSAXTransformer;
@@ -24,6 +28,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -40,17 +45,16 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     ALIGNMENT_TABLE, TEI_APPARATUS
   }
 
-  private CollateXEngine engine;
+  private GraphFactory graphFactory;
   private OutputType outputType = OutputType.ALIGNMENT_TABLE;
-  private SortedSet<Witness> witnesses = Sets.newTreeSet();
+  private List<Iterable<Token>> witnesses = Lists.newArrayList();
   private String sigil;
 
   public CollateXTransformer() {
     super();
     try {
+      this.graphFactory = GraphFactory.create();
       this.defaultNamespaceURI = COLLATEX_NS;
-      engine = new CollateXEngine();
-      engine.setTokenizer(new WhitespaceAndPunctuationTokenizer());
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
@@ -90,14 +94,16 @@ public class CollateXTransformer extends AbstractSAXTransformer {
       }
       ignoreHooksCount--;
     } else if ("witness".equals(name)) {
-      witnesses.add(engine.createWitness(sigil, endTextRecording()));
+      witnesses.add(new SimpleWitness(sigil, endTextRecording(), new WhitespaceTokenizer()));
     }
   }
 
   private void sendAlignmentTable() throws SAXException {
     sendStartElementEventNS("alignment", EMPTY_ATTRIBUTES);
     if (!witnesses.isEmpty()) {
-      final VariantGraph graph = engine.graph(witnesses.toArray(new Witness[witnesses.size()]));
+      
+      final VariantGraph graph = graphFactory.newVariantGraph();
+      CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(graph, witnesses);
       final SortedSet<Witness> witnesses = graph.witnesses();
       final RowSortedTable<Integer, Witness, SortedSet<Token>> table = graph.toTable();
       for (Integer rowIndex : table.rowKeySet()) {
@@ -120,7 +126,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   }
 
   private void sendTeiApparatus() throws SAXException {
-    final Apparatus apparatus = engine.createApparatus(engine.graph(witnesses.toArray(new Witness[witnesses.size()])));
+    final Apparatus apparatus = null; // FIXME: create TEI-P5 output
 
     sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
     startPrefixMapping("tei", TEI_NS);

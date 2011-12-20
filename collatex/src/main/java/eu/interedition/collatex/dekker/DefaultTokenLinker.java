@@ -1,5 +1,6 @@
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
@@ -19,6 +20,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import static com.google.common.collect.Lists.reverse;
 
@@ -33,11 +35,13 @@ public class DefaultTokenLinker implements TokenLinker {
   private Map<Token, VariantGraphVertex> tokenLinks;
 
   @Override
-  public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+  public Map<Token, VariantGraphVertex> link(VariantGraph base, SortedSet<Token> witness, Comparator<Token> comparator) {
+    Preconditions.checkArgument(!witness.isEmpty(), "Empty witness");
+
     base.rank();
 
     if (LOG.isTraceEnabled()) {
-      LOG.trace("Matching tokens of {} and {}", base, witness);
+      LOG.trace("Matching tokens of {} and {}", base, witness.first().getWitness());
     }
     matches = Matches.between(base.vertices(), witness, comparator);
 

@@ -21,12 +21,7 @@
 package eu.interedition.collatex.input;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.TokenNormalizer;
-import eu.interedition.collatex.Tokenizer;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.Token;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,18 +33,17 @@ import java.util.List;
  * It does not support streaming it does not support trailing whitespace!
  * </p>
  */
-public class WhitespaceTokenizer implements Tokenizer {
-  private TokenNormalizer tokenNormalizer = new DefaultTokenNormalizer();
+public class WhitespaceTokenizer implements Function<String, List<String>> {
 
   @Override
-  public List<Token> tokenize(final Witness witness, String content) {
-    return Lists.newArrayList(Iterables.transform(Arrays.asList(content.split("\\s+")), new Function<String, Token>() {
-      private int tokenCount = 0;
-
-      @Override
-      public Token apply(String input) {
-        return new SimpleToken(witness, tokenCount++, input, tokenNormalizer.apply(input.trim()));
-      }
-    }));
+  public List<String> apply(String input) {
+    return Lists.transform(Arrays.asList(input.trim().split("\\s+")), TRIMMER);
   }
+
+  static final Function<String, String> TRIMMER = new Function<String, String>() {
+    @Override
+    public String apply(String input) {
+      return input.trim();
+    }
+  };
 }

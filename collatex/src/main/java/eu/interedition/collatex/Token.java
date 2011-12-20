@@ -24,12 +24,5 @@ package eu.interedition.collatex;
  * The normalized version of the token. 
  */
 public interface Token extends Comparable<Token> {
-  /**
-   * The content stream token text
-   *
-   * @return the text of the token.
-   */
-  String getContent();
-
   Witness getWitness();
 }

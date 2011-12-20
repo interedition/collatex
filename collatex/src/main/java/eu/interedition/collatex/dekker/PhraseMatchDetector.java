@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -25,6 +25,7 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  *
@@ -32,7 +33,7 @@ import java.util.Set;
  */
 public class PhraseMatchDetector {
 
-  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, Witness witness) {
+  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, SortedSet<Token> tokens) {
     //rank the variant graph
     base.rank();
     
@@ -53,7 +54,7 @@ public class PhraseMatchDetector {
     List<Token> witnessPhrase = Lists.newArrayList();
     int previousRank = 1;
 
-    for (Token token : witness.getTokens()) {
+    for (Token token : tokens) {
       //Note: this if skips added tokens so they don't cause an extra phrasematch
       if (!linkedTokens.containsKey(token)) {
         continue;

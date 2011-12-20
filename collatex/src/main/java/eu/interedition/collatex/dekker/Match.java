@@ -1,4 +1,4 @@
-package eu.interedition.collatex.alignment;
+package eu.interedition.collatex.dekker;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;

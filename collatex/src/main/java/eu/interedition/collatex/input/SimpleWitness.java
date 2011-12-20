@@ -20,45 +20,64 @@
 
 package eu.interedition.collatex.input;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class SimpleWitness implements Iterable<Token>, Witness {
   public static final SimpleWitness SUPERBASE = new SimpleWitness("");
+  public final static Pattern PUNCT = Pattern.compile("\\p{Punct}");
+  public static final Function<String, String> TOKEN_NORMALIZER = new Function<String, String>() {
+    @Override
+    public String apply(String input) {
+      final String normalized = PUNCT.matcher(input.trim().toLowerCase()).replaceAll("");
+      return (normalized == null || normalized.length() == 0 ? input : normalized);
+    }
+  };
 
   private final String sigil;
-  protected List<Token> tokens = new ArrayList<Token>();
+  private final List<Token> tokens = new ArrayList<Token>();
   private final Map<Token, Token> relations = Maps.newLinkedHashMap();
 
-  public SimpleWitness(final String sigil) {
+  public SimpleWitness(String sigil) {
     this.sigil = sigil;
   }
 
-  protected void prepareTokens() {
-    relations.clear();
-    Token previous = SimpleToken.START;
-    for (Token token : tokens) {
-      relations.put(previous, token);
-      previous = token;
-    }
-    relations.put(previous, SimpleToken.END);
+  public SimpleWitness(String sigil, String content, Function<String, List<String>> tokenizer) {
+    this(sigil);
+    setTokenContents(tokenizer.apply(content));
   }
 
-  // Note: not pleased with this method! implement Iterable!
-  @Override
   public List<Token> getTokens() {
     return tokens;
   }
 
+  public void setTokenContents(List<String> tokenContents) {
+    final List<Token> tokens = Lists.newArrayListWithExpectedSize(tokenContents.size());
+    for (String content : tokenContents) {
+      tokens.add(new SimpleToken(this, tokens.size(), content, TOKEN_NORMALIZER.apply(content)));
+    }
+    setTokens(tokens);
+  }
+
   public void setTokens(List<Token> tokens) {
-    this.tokens = tokens;
-    prepareTokens();
+    this.tokens.clear();
+    this.relations.clear();
+    Token previous = SimpleToken.START;
+    for (Token token : tokens) {
+      this.tokens.add(token);
+      this.relations.put(previous, token);
+      previous = token;
+    }
+    relations.put(previous, SimpleToken.END);
   }
 
   @Override
