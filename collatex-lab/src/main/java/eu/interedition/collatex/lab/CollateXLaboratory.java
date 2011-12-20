@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.input.SimpleWitness;
@@ -16,6 +17,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
+
+import static eu.interedition.collatex.CollationAlgorithmFactory.dekker;
+import static eu.interedition.collatex.CollationAlgorithmFactory.needlemanWunsch;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -33,10 +37,16 @@ public class CollateXLaboratory extends JFrame {
 
   private final EditGraphModel editGraphModel = new EditGraphModel();
   private final EditGraphPanel editGraphPanel;
+  private final JComboBox algorithm;
 
   public CollateXLaboratory(GraphFactory graphFactory) {
     super("CollateX Laboratory");
     this.graphFactory = graphFactory;
+
+    this.algorithm = new JComboBox(new Object[]{"Dekker", "Needleman-Wunsch"});
+    this.algorithm.setEditable(false);
+    this.algorithm.setFocusable(false);
+    this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
 
     final JSplitPane graphPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     graphPane.setContinuousLayout(true);
@@ -50,9 +60,10 @@ public class CollateXLaboratory extends JFrame {
     splitPane.setRightComponent(graphPane);
     add(splitPane, BorderLayout.CENTER);
 
-
     final JToolBar toolBar = new JToolBar();
     toolBar.setBorderPainted(true);
+    toolBar.add(algorithm);
+    toolBar.addSeparator();
     toolBar.add(new AddWitnessAction());
     toolBar.add(new RemoveWitnessesAction());
     toolBar.add(new CollateAction());
@@ -109,14 +120,12 @@ public class CollateXLaboratory extends JFrame {
 
       Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
+        final EqualityTokenComparator comparator = new EqualityTokenComparator();
         final VariantGraph pvg = graphFactory.newVariantGraph();
 
-        final CollationAlgorithm collator = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
+        final CollationAlgorithm collator = "Dekker".equals(algorithm.getSelectedItem()) ? dekker(comparator) : needlemanWunsch(comparator);
         for (SimpleWitness witness : w) {
           collator.collate(pvg, witness);
-          transaction.success();
-          transaction.finish();
-          transaction = graphFactory.getDatabase().beginTx();
         }
 
         variantGraphModel.update(pvg.join().rank());
@@ -148,11 +157,12 @@ public class CollateXLaboratory extends JFrame {
 
       final Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
+        final EqualityTokenComparator comparator = new EqualityTokenComparator();
         final VariantGraph pvg = graphFactory.newVariantGraph();
 
-        CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(pvg, w.get(0));
+        CollationAlgorithmFactory.dekker(comparator).collate(pvg, w.get(0));
 
-        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, Sets.newTreeSet(w.get(1)), new EqualityTokenComparator()));
+        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, Sets.newTreeSet(w.get(1)), comparator));
       } finally {
         transaction.finish();
       }
