@@ -1,6 +1,7 @@
 package eu.interedition.collatex;
 
-import eu.interedition.collatex.dekker.VariantGraphBuilder;
+import eu.interedition.collatex.dekker.DekkerAlgorithm;
+import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 
 import java.util.Comparator;
 
@@ -10,6 +11,10 @@ import java.util.Comparator;
 public class CollationAlgorithmFactory {
   
   public static CollationAlgorithm dekker(Comparator<Token> comparator) {
-    return new VariantGraphBuilder(comparator);
+    return new DekkerAlgorithm(comparator);
+  }
+  
+  public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {
+    return new NeedlemanWunschAlgorithm(comparator);
   }
 }

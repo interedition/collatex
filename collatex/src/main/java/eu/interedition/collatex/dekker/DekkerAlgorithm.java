@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithmBase;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
@@ -15,8 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class VariantGraphBuilder extends CollationAlgorithmBase {
-  private static final Logger LOG = LoggerFactory.getLogger(VariantGraphBuilder.class);
+public class DekkerAlgorithm extends CollationAlgorithmBase {
+  private static final Logger LOG = LoggerFactory.getLogger(DekkerAlgorithm.class);
 
   private final Comparator<Token> comparator;
   private final TokenLinker tokenLinker;
@@ -28,15 +27,15 @@ public class VariantGraphBuilder extends CollationAlgorithmBase {
   private List<List<Match>> transpositions;
   private LinkedHashMap<Token, VariantGraphVertex> alignments;
 
-  public VariantGraphBuilder(Comparator<Token> comparator) {
-    this(comparator, new DefaultTokenLinker(), new PhraseMatchDetector(), new TranspositionDetector());
+  public DekkerAlgorithm(Comparator<Token> comparator) {
+    this(comparator, new DefaultTokenLinker());
   }
 
-  public VariantGraphBuilder(Comparator<Token> comparator, TokenLinker tokenLinker, PhraseMatchDetector phraseMatchDetector, TranspositionDetector transpositionDetector) {
+  public DekkerAlgorithm(Comparator<Token> comparator, TokenLinker tokenLinker) {
     this.comparator = comparator;
     this.tokenLinker = tokenLinker;
-    this.phraseMatchDetector = phraseMatchDetector;
-    this.transpositionDetector = transpositionDetector;
+    this.phraseMatchDetector = new PhraseMatchDetector();
+    this.transpositionDetector = new TranspositionDetector();
   }
 
   @Override
@@ -85,31 +84,15 @@ public class VariantGraphBuilder extends CollationAlgorithmBase {
       }
     }
 
-    LOG.debug("{} + {}: Merge comparand into graph", graph, witness);
-    VariantGraphVertex last = graph.getStart();
-    final SortedSet<Witness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
-    final Map<Token, VariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
-    for (Token token : tokens) {
-      VariantGraphVertex matchingVertex = alignments.get(token);
-      if (matchingVertex == null) {
-        matchingVertex = graph.add(token);
-      } else {
-        matchingVertex.add(Collections.singleton(token));
-      }
-      witnessTokenVertices.put(token, matchingVertex);
-
-      graph.connect(last, matchingVertex, witnessSet);
-      last = matchingVertex;
-    }
-    graph.connect(last, graph.getEnd(), witnessSet);
-
-    LOG.debug("{}: Registering transpositions", graph);
+    final Map<Token, VariantGraphVertex> transposedTokens = Maps.newHashMap();
     for (List<Match> transposedPhrase : transpositions) {
       for (Match match : transposedPhrase) {
-        graph.transpose(match.vertex, witnessTokenVertices.get(match.token));
+        transposedTokens.put(match.token, match.vertex);
       }
     }
-
+    
+    merge(graph, tokens, alignments, transposedTokens);
+    
     if (LOG.isTraceEnabled()) {
       LOG.trace("{}: {}", graph, Iterables.toString(graph.vertices()));
     }

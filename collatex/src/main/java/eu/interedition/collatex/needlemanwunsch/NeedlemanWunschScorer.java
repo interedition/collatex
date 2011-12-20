@@ -1,4 +1,4 @@
-package eu.interedition.collatex.dekker;
+package eu.interedition.collatex.needlemanwunsch;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraphVertex;

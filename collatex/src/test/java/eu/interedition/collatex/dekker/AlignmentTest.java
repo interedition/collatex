@@ -116,7 +116,7 @@ public class AlignmentTest extends AbstractTest {
   public void testOrderIndependence() {
     final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
     VariantGraph graph = merge(w[0], w[1]);
-    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[2]);
+    DekkerAlgorithm builder = merge(graph, w[2]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
     assertEquals("hello nice cruel world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
     List<List<Match>> transpositions = builder.getTranspositions();
@@ -127,7 +127,7 @@ public class AlignmentTest extends AbstractTest {
   public void testPhraseMatchingShouldIgnoreDeletions() {
     final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello world");
     VariantGraph graph = merge(w[0]);
-    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[1]);
+    DekkerAlgorithm builder = merge(graph, w[1]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
     assertEquals("hello world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
     List<List<Match>> transpositions = builder.getTranspositions();
@@ -138,7 +138,7 @@ public class AlignmentTest extends AbstractTest {
   public void testPhraseMatchingShouldIgnoreAdditions() {
     final SimpleWitness[] w = createWitnesses("Hello world", "Hello cruel world");
     VariantGraph graph = merge(w[0]);
-    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[1]);
+    DekkerAlgorithm builder = merge(graph, w[1]);
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
     assertEquals("hello world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
     List<List<Match>> transpositions = builder.getTranspositions();

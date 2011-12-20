@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.Match;
-import eu.interedition.collatex.dekker.VariantGraphBuilder;
+import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphEdge;
@@ -74,10 +74,10 @@ public abstract class AbstractTest {
     return createWitnesses(new WhitespaceTokenizer(), contents);
   }
 
-  protected CollationAlgorithm merge(VariantGraph graph, SimpleWitness... witnesses) {
+  protected DekkerAlgorithm merge(VariantGraph graph, SimpleWitness... witnesses) {
     final CollationAlgorithm algorithm = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
     algorithm.collate(graph, witnesses);
-    return algorithm;
+    return (DekkerAlgorithm) algorithm;
   }
 
   protected VariantGraph merge(SimpleWitness... witnesses) {
@@ -170,7 +170,7 @@ public abstract class AbstractTest {
     return tokens;
   }
 
-  protected void assertPhraseMatches(VariantGraphBuilder builder, String... expectedPhrases) {
+  protected void assertPhraseMatches(DekkerAlgorithm builder, String... expectedPhrases) {
     List<List<Match>> phraseMatches = builder.getPhraseMatches();
     int i = 0;
     for (List<Match> phraseMatch : phraseMatches) {

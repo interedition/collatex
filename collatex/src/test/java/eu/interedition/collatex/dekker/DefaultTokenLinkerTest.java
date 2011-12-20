@@ -4,7 +4,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
@@ -110,7 +109,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
       "very delitied and happy is the cat"
            );
     VariantGraph graph = merge(w[0], w[1]);
-    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[2]);
+    DekkerAlgorithm builder = merge(graph, w[2]);
     assertPhraseMatches(builder, "very happy is the cat");
     assertTrue(Iterables.isEmpty(builder.getTranspositions()));
   }

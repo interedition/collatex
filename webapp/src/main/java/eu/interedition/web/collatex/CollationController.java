@@ -22,11 +22,8 @@ package eu.interedition.web.collatex;
 
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.dekker.VariantGraphBuilder;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.input.SimpleWitness;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
@@ -40,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.SortedSet;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 

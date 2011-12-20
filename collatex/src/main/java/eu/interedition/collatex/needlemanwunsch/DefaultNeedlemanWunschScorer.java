@@ -1,5 +1,6 @@
-package eu.interedition.collatex.dekker;
+package eu.interedition.collatex.needlemanwunsch;
 
+import com.google.common.base.Preconditions;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
@@ -20,8 +21,8 @@ public class DefaultNeedlemanWunschScorer implements NeedlemanWunschScorer {
   @Override
   public float score(VariantGraphVertex a, Token b) {
     final SortedSet<Token> tokens = a.tokens();
-
-    return (tokens.isEmpty() ? 0 : comparator.compare(tokens.first(), b) == 0 ? 1 : -1);
+    Preconditions.checkArgument(!tokens.isEmpty(), "Vertex without tokens");
+    return (comparator.compare(tokens.first(), b) == 0 ? 1 : -1);
   }
 
   @Override

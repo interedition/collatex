@@ -76,7 +76,7 @@ public class BeckettTest extends AbstractTest {
       "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
       "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     VariantGraph graph = merge(w[0]);
-    VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[1]);
+    DekkerAlgorithm builder = merge(graph, w[1]);
     assertPhraseMatches(builder, "its soft light any light he could remember from the days nights when day followed night vice versa");
     assertTrue(Iterables.isEmpty(builder.getTranspositions()));
   }
@@ -165,7 +165,7 @@ public class BeckettTest extends AbstractTest {
     assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
 
     // transpositions should be handled correctly for this test to succeed
-    final VariantGraphBuilder builder = (VariantGraphBuilder) merge(graph, w[4]);
+    final DekkerAlgorithm builder = merge(graph, w[4]);
     final List<List<Match>> phraseMatches = builder.getPhraseMatches();
     final List<List<Match>> transpositions = builder.getTranspositions();
     assertEquals("the same as when", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
