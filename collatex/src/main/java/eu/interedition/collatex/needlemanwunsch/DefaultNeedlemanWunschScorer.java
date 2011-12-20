@@ -27,6 +27,6 @@ public class DefaultNeedlemanWunschScorer implements NeedlemanWunschScorer {
 
   @Override
   public float gap() {
-    return -1;
+    return -10;
   }
 }

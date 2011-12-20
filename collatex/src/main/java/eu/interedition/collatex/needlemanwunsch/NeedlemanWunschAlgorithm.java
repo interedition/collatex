@@ -67,9 +67,9 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithmBase {
     }
 
     ac = 1;
-    for (VariantGraphVertex vertex : against.vertices()) {
+    for (VariantGraphVertex vertex : vertexList) {
       bc = 1;
-      for (Token token : witness) {
+      for (Token token : tokenList) {
         final float k = matrix[ac - 1][bc - 1] + scorer.score(vertex, token);
         final float l = matrix[ac - 1][bc] + scorer.gap();
         final float m = matrix[ac][bc - 1] + scorer.gap();
