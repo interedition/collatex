@@ -23,7 +23,6 @@ package eu.interedition.collatex.dekker;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.input.SimpleWitness;
@@ -43,7 +42,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void twoWitnesses() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
-    final VariantGraph graph = merge(w);
+    final VariantGraph graph = collate(w);
 
     assertEquals(5, Iterables.size(graph.vertices()));
     assertEquals(4, Iterables.size(graph.edges()));
@@ -62,7 +61,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void addition1() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the white and black cat");
-    final VariantGraph graph = merge(w);
+    final VariantGraph graph = collate(w);
 
     assertEquals(7, Lists.newArrayList(graph.vertices()).size());
     assertEquals(7, Iterables.size(graph.edges()));
@@ -85,7 +84,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void variant() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
-    final VariantGraph graph = merge(w);
+    final VariantGraph graph = collate(w);
 
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
     assertEquals(9, vertices.size());
@@ -116,7 +115,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void doubleTransposition2() {
     final SimpleWitness[] w = createWitnesses("a b", "b a");
-    final VariantGraph graph = merge(w);
+    final VariantGraph graph = collate(w);
 
     assertEquals(5, Iterables.size(graph.vertices()));
 
@@ -127,7 +126,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void mirroredTranspositionsWithMatchInBetween() {
     final SimpleWitness[] w = createWitnesses("the black and white cat", "the white and black cat");
-    final VariantGraph graph = merge(w);
+    final VariantGraph graph = collate(w);
 
     Assert.assertEquals(9, Iterables.size(graph.vertices()));
 

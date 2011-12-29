@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphEdge;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +48,6 @@ public abstract class CollationAlgorithmBase implements CollationAlgorithm {
     for (Token token : witnessTokens) {
       VariantGraphVertex matchingVertex = alignments.get(token);
       if (matchingVertex == null) {
-        if (LOG.isTraceEnabled()) {
-          LOG.trace("Creating new vertex for unmatched {}", token);
-        }
         matchingVertex = into.add(token);
       } else {
         if (LOG.isTraceEnabled()) {
@@ -60,15 +58,9 @@ public abstract class CollationAlgorithmBase implements CollationAlgorithm {
       witnessTokenVertices.put(token, matchingVertex);
 
       into.connect(last, matchingVertex, witnessSet);
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("Connected {} and {}", last, matchingVertex);
-      }
       last = matchingVertex;
     }
     into.connect(last, into.getEnd(), witnessSet);
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Connected {} and {}", last, into.getEnd());
-    }
 
     LOG.debug("{}: Registering transpositions", into);
     for (Token token : transpositions.keySet()) {

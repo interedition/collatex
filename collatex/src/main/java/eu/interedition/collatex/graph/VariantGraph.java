@@ -20,6 +20,8 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.kernel.Traversal;
 import org.neo4j.kernel.Uniqueness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
@@ -37,6 +39,8 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
+  private static final Logger LOG = LoggerFactory.getLogger(VariantGraph.class);
+
   private Function<Relationship, VariantGraphTransposition> transpositionWrapper;
 
   public VariantGraph(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver) {
@@ -126,11 +130,18 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   }
 
   public VariantGraphVertex add(Token token) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Creating new vertex with {}", token);
+    }
     return new VariantGraphVertex(this, singleton(token));
   }
 
   public VariantGraphEdge connect(VariantGraphVertex from, VariantGraphVertex to, Set<Witness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Connected {} and {} with {}", new Object[] { from, to, witnesses });
+    }
 
     if (from.equals(start)) {
       final VariantGraphEdge startEndEdge = edgeBetween(start, end);
@@ -196,37 +207,37 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
 
     while (!queue.isEmpty()) {
       final VariantGraphVertex vertex = queue.remove();
-      final List<VariantGraphEdge> outgoing = Lists.newArrayList(vertex.outgoing());
-      if (outgoing.size() == 1) {
-        final VariantGraphEdge joinCandidateSingleIncoming = outgoing.get(0);
-        final VariantGraphVertex joinCandidate = joinCandidateSingleIncoming.to();
-        if (Iterables.size(joinCandidate.incoming()) == 1) {
-          final Set<Witness> incomingWitnesses = joinCandidateSingleIncoming.witnesses();
+      final List<VariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
+      if (outgoingEdges.size() == 1) {
+        final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
+        final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
+        if (Iterables.size(joinCandidateVertex.incoming()) == 1) {
+          final Set<Witness> incomingWitnesses = joinCandidateEdge.witnesses();
           final Set<Witness> outgoingWitnesses = Sets.newHashSet();
-          final List<VariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.outgoing());
+          final List<VariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidateVertex.outgoing());
           for (VariantGraphEdge e : joinCandidateOutgoing) {
             outgoingWitnesses.addAll(e.witnesses());
           }
           if (incomingWitnesses.equals(outgoingWitnesses)) {
-            vertex.add(joinCandidate.tokens());
-            for (VariantGraphTransposition t : joinCandidate.transpositions()) {
-              transpose(vertex, t.other(joinCandidate));
+            vertex.add(joinCandidateVertex.tokens());
+            for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
+              transpose(vertex, t.other(joinCandidateVertex));
               t.delete();
             }
             for (VariantGraphEdge e : joinCandidateOutgoing) {
               connect(vertex, e.to(), e.witnesses());
               e.delete();
             }
-            joinCandidateSingleIncoming.delete();
-            joinCandidate.delete();
+            joinCandidateEdge.delete();
+            joinCandidateVertex.delete();
 
-            outgoing.remove(joinCandidateSingleIncoming);
+            outgoingEdges.remove(joinCandidateEdge);
             queue.add(vertex);
           }
         }
       }
-      for (VariantGraphEdge e : outgoing) {
-        queue.offer(e.to());
+      for (VariantGraphEdge e : outgoingEdges) {
+        queue.add(e.to());
       }
     }
 

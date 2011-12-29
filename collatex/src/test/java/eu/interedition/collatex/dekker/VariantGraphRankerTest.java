@@ -34,7 +34,7 @@ public class VariantGraphRankerTest extends AbstractTest {
 
   @Test
   public void ranking() {
-    final VariantGraph graph = merge("The black cat", "The black and white cat", "The black and green cat").rank();
+    final VariantGraph graph = collate("The black cat", "The black and white cat", "The black and green cat").rank();
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
 
     assertVertexEquals("the", vertices.get(1));
@@ -53,7 +53,7 @@ public class VariantGraphRankerTest extends AbstractTest {
 
   @Test
   public void agastTranspositionHandling() {
-    final VariantGraph graph = merge("He was agast, so", "He was agast", "So he was agast").rank();
+    final VariantGraph graph = collate("He was agast, so", "He was agast", "So he was agast").rank();
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
 
     assertVertexEquals("so", vertices.get(1));

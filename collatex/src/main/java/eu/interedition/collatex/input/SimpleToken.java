@@ -80,7 +80,7 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
   @Override
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof SimpleToken) {
-      SimpleToken other = (SimpleToken) obj;
+      final SimpleToken other = (SimpleToken) obj;
       return getIndex() == other.getIndex() && getWitness().equals(other.getWitness());
     }
     return super.equals(obj);

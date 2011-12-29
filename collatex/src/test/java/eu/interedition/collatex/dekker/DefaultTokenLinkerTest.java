@@ -2,7 +2,6 @@ package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -29,7 +28,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
-    final VariantGraph graph = merge(w[0]);
+    final VariantGraph graph = collate(w[0]);
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
     final Map<Token, VariantGraphVertex> links = linkTokens(graph, w[1]);
 
@@ -46,7 +45,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
 
-    final Map<Token, VariantGraphVertex> links = linkTokens(merge(w[0], w[1]), w[2]);
+    final Map<Token, VariantGraphVertex> links = linkTokens(collate(w[0], w[1]), w[2]);
 
     final List<Token> unlinked = Lists.newArrayList();
     for (Token witnessToken : w[2].getTokens()) {
@@ -87,7 +86,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
             "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.",//
             "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
 
-    final Map<Token, VariantGraphVertex> links = linkTokens(merge(w[0]), w[1]);
+    final Map<Token, VariantGraphVertex> links = linkTokens(collate(w[0]), w[1]);
     assertTrue(!links.containsKey(w[1].getTokens().get(0)));
     assertTrue(!links.containsKey(w[1].getTokens().get(1)));
     assertTrue(!links.containsKey(w[1].getTokens().get(2)));
@@ -109,17 +108,16 @@ public class DefaultTokenLinkerTest extends AbstractTest {
       "very happy is the cat", // 
       "very delitied and happy is the cat"
            );
-    VariantGraph graph = merge(w[0], w[1]);
-    DekkerAlgorithm builder = merge(graph, w[2]);
-    assertPhraseMatches(builder, "very happy is the cat");
-    assertTrue(Iterables.isEmpty(builder.getTranspositions()));
+    VariantGraph graph = collate(w);
+    assertPhraseMatches("very happy is the cat");
+    assertTrue(Iterables.isEmpty(((DekkerAlgorithm) collationAlgorithm).getTranspositions()));
   }
 
   @Test
   public void twoEqualPossibilities1() {
     final SimpleWitness[] w = createWitnesses("a", "a a");
 
-    final VariantGraph graph = merge(w[0]);
+    final VariantGraph graph = collate(w[0]);
     final Map<Token, VariantGraphVertex> links = linkTokens(graph, w[1]);
 
     assertEquals(1, links.size());
@@ -131,7 +129,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
   public void everythingIsUnique() {
     final SimpleWitness[] w = createWitnesses("everything is unique should be no problem", "everything is unique");
 
-    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("everything", "everything", Iterables.get(matches, 0));
@@ -146,7 +144,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
             "this one very different",//
             "everything is different");
 
-    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0], w[1]), w[2]).entrySet();
+    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(collate(w[0], w[1]), w[2]).entrySet();
 
     assertEquals(3, matches.size());
     assertEquals("everything", ((SimpleToken) getFirst(Iterables.get(matches, 0).getValue().tokens(), null)).getContent());
@@ -161,7 +159,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
             "this one is different",//
             "everything is different");
 
-    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0], w[1]), w[2]).entrySet();
+    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(collate(w[0], w[1]), w[2]).entrySet();
 
     assertEquals(3, matches.size());
     assertEquals("everything", ((SimpleToken) getFirst(Iterables.get(matches, 0).getValue().tokens(), null)).getContent());
@@ -173,7 +171,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
   public void getMatchesUsingWitnessIndex() {
     final SimpleWitness[] w = createWitnesses("The big black cat and the big black rat", "The big black");
 
-    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("the", "the", Iterables.get(matches, 0));
@@ -185,7 +183,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
   public void getMatchesUsingWitnessIndexWithOverlapping() {
     final SimpleWitness[] w = createWitnesses("the big black cat and the big black rat", "the big black cat");
 
-    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(4, matches.size());
     assertLink("cat", "cat", Iterables.get(matches, 0));
@@ -199,7 +197,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
   public void overlappingMatches2() {
     final SimpleWitness[] w = createWitnesses("the black cat and the black mat", "the black dog and the black mat");
 
-    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(6, matches.size());
     assertLink("and", "and", Iterables.get(matches, 0));
@@ -214,7 +212,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
   public void matchesWithIndex() {
     final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
 
-    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("the", "the", Iterables.get(matches, 0));
@@ -226,7 +224,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
   public void twoEqualPossibilities2() {
     final SimpleWitness[] w = createWitnesses("a a", "a");
 
-    final VariantGraph graph = merge(w[0]);
+    final VariantGraph graph = collate(w[0]);
     final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(graph, w[1]).entrySet();
 
     assertEquals(1, matches.size());
@@ -280,7 +278,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
   }
 
   private Map<Token, VariantGraphVertex> linkTokens(DefaultTokenLinker linker, SimpleWitness base, SimpleWitness witness) {
-    final VariantGraph graph = merge(base);
+    final VariantGraph graph = collate(base);
     return linker.link(graph, witness, new EqualityTokenComparator());
   }
 

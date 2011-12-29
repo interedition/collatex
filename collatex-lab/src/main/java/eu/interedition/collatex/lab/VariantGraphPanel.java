@@ -48,7 +48,7 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertexMod
           }
           label.append("'] ");
         }
-        return label.toString().trim();
+        return label.append("(").append(variantGraphVertexModel.getRank()).append(")").toString().trim();
       }
     });
     rc.setEdgeLabelTransformer(new Transformer<VariantGraphEdgeModel, String>() {

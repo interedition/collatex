@@ -46,6 +46,7 @@ public abstract class AbstractTest {
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
   protected static GraphFactory graphFactory;
+  protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
   private Transaction transaction;
 
   @BeforeClass
@@ -78,20 +79,18 @@ public abstract class AbstractTest {
     return createWitnesses(new WhitespaceTokenizer(), contents);
   }
 
-  protected DekkerAlgorithm merge(VariantGraph graph, SimpleWitness... witnesses) {
-    final CollationAlgorithm algorithm = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
-    algorithm.collate(graph, witnesses);
-    return (DekkerAlgorithm) algorithm;
+  protected void collate(VariantGraph graph, SimpleWitness... witnesses) {
+    collationAlgorithm.collate(graph, witnesses);
   }
 
-  protected VariantGraph merge(SimpleWitness... witnesses) {
+  protected VariantGraph collate(SimpleWitness... witnesses) {
     final VariantGraph graph = graphFactory.newVariantGraph();
-    merge(graph, witnesses);
+    collate(graph, witnesses);
     return graph;
   }
 
-  protected VariantGraph merge(String... witnesses) {
-    return merge(createWitnesses(witnesses));
+  protected VariantGraph collate(String... witnesses) {
+    return collate(createWitnesses(witnesses));
   }
 
   protected static SortedSet<String> extractPhrases(VariantGraph graph, Witness witness) {
@@ -171,8 +170,8 @@ public abstract class AbstractTest {
     return tableRowStr.toString();
   }
 
-  protected void assertPhraseMatches(DekkerAlgorithm builder, String... expectedPhrases) {
-    List<List<Match>> phraseMatches = builder.getPhraseMatches();
+  protected void assertPhraseMatches(String... expectedPhrases) {
+    List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
     int i = 0;
     for (List<Match> phraseMatch : phraseMatches) {
       Assert.assertEquals(expectedPhrases[i], SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatch)));

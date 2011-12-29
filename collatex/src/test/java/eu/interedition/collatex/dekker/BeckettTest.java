@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.CollationAlgorithmBase;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -32,7 +33,7 @@ public class BeckettTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final VariantGraph graph = merge(w[0]);
+    final VariantGraph graph = collate(w[0]);
     final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
 
     assertVertexHasContent(matches.get(w[1].getTokens().get(0)).get(0), "its", w[0]);
@@ -42,7 +43,7 @@ public class BeckettTest extends AbstractTest {
   @Test
   public void dirkVincent5() {
     final SimpleWitness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
-    final VariantGraph graph = merge(w);
+    final VariantGraph graph = collate(w);
 
     vertexWith(graph, "its", w[0]);
     vertexWith(graph, "soft", w[0]);
@@ -56,7 +57,7 @@ public class BeckettTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses(
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final VariantGraph graph = merge(w);
+    final VariantGraph graph = collate(w);
 
     final VariantGraphVertex itsVertex = vertexWith(graph, "its", w[0]);
     final VariantGraphVertex softVertex = vertexWith(graph, "soft", w[0]);
@@ -73,12 +74,11 @@ public class BeckettTest extends AbstractTest {
   @Test
   public void testDirkVincent7() {
     final SimpleWitness[] w = createWitnesses(//
-      "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
-      "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    VariantGraph graph = merge(w[0]);
-    DekkerAlgorithm builder = merge(graph, w[1]);
-    assertPhraseMatches(builder, "its soft light any light he could remember from the days nights when day followed night vice versa");
-    assertTrue(Iterables.isEmpty(builder.getTranspositions()));
+            "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",
+            "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
+    VariantGraph graph = collate(w);
+    assertPhraseMatches("its soft light any light he could remember from the days nights when day followed night vice versa");
+    assertTrue(Iterables.isEmpty(((DekkerAlgorithm) collationAlgorithm).getTranspositions()));
   }
 
   @Test
@@ -87,7 +87,7 @@ public class BeckettTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
-    final VariantGraph graph = merge(w[0], w[1]);
+    final VariantGraph graph = collate(w[0], w[1]);
     final Matches matches = Matches.between(graph.vertices(), w[2].getTokens(), new EqualityTokenComparator());
 
     final Set<Token> unmatchedTokens = matches.getUnmatched();
@@ -108,7 +108,7 @@ public class BeckettTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
             "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
-    final VariantGraph graph = merge(w);
+    final VariantGraph graph = collate(w);
 
     vertexWith(graph, "its", w[0]);
     vertexWith(graph, "soft", w[0]);
@@ -155,19 +155,19 @@ public class BeckettTest extends AbstractTest {
             "The same as when among others Darly once died & left him.",//
             "The same as when Darly among others once died and left him.");
 
-    final VariantGraph graph = merge(w[0], w[1]);
+    final VariantGraph graph = collate(w[0], w[1]);
     assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died", ".");
 
-    merge(graph, w[2]);
+    collate(graph, w[2]);
     assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "once", "died", ".");
 
-    merge(graph, w[3]);
+    collate(graph, w[3]);
     assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
 
     // transpositions should be handled correctly for this test to succeed
-    final DekkerAlgorithm builder = merge(graph, w[4]);
-    final List<List<Match>> phraseMatches = builder.getPhraseMatches();
-    final List<List<Match>> transpositions = builder.getTranspositions();
+    collate(graph, w[4]);
+    final List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
+    final List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
     assertEquals("the same as when", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
     assertEquals("darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(1))));
     assertEquals("among others", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(2))));

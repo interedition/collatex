@@ -3,7 +3,6 @@ package eu.interedition.collatex.matching;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
@@ -17,7 +16,7 @@ public class NearMatcherTest extends AbstractTest {
   @Test
   public void nearTokenMatching() {
     final SimpleWitness[] w = createWitnesses("near matching yeah", "nar matching");
-    final VariantGraph graph = merge(w[0]);
+    final VariantGraph graph = collate(w[0]);
     final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1].getTokens(), new EditDistanceTokenComparator()).getAll();
 
     assertEquals(4, matches.size()); // 2 matches plus start/end marker matches
