@@ -12,7 +12,6 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.TreeBasedTable;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.output.Apparatus;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.transform;
 import static eu.interedition.collatex.graph.GraphRelationshipType.PATH;
@@ -185,7 +183,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   public Set<Witness> witnesses() {
     final Set<Witness> witnesses = Sets.newHashSet();
     for (VariantGraphEdge e : start.outgoing()) {
-      witnesses.addAll(e.getWitnesses());
+      witnesses.addAll(e.witnesses());
     }
     return witnesses;
   }
@@ -203,11 +201,11 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
         final VariantGraphEdge joinCandidateSingleIncoming = outgoing.get(0);
         final VariantGraphVertex joinCandidate = joinCandidateSingleIncoming.to();
         if (Iterables.size(joinCandidate.incoming()) == 1) {
-          final Set<Witness> incomingWitnesses = joinCandidateSingleIncoming.getWitnesses();
+          final Set<Witness> incomingWitnesses = joinCandidateSingleIncoming.witnesses();
           final Set<Witness> outgoingWitnesses = Sets.newHashSet();
           final List<VariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.outgoing());
           for (VariantGraphEdge e : joinCandidateOutgoing) {
-            outgoingWitnesses.addAll(e.getWitnesses());
+            outgoingWitnesses.addAll(e.witnesses());
           }
           if (incomingWitnesses.equals(outgoingWitnesses)) {
             vertex.add(joinCandidate.tokens());
@@ -216,7 +214,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
               t.delete();
             }
             for (VariantGraphEdge e : joinCandidateOutgoing) {
-              connect(vertex, e.to(), e.getWitnesses());
+              connect(vertex, e.to(), e.witnesses());
               e.delete();
             }
             joinCandidateSingleIncoming.delete();

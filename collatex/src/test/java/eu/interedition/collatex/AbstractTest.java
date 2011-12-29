@@ -2,10 +2,8 @@ package eu.interedition.collatex;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
@@ -119,7 +117,7 @@ public abstract class AbstractTest {
   }
 
   protected static void assertHasWitnesses(VariantGraphEdge edge, Witness... witnesses) {
-    assertEquals(Sets.newHashSet(Arrays.asList(witnesses)), edge.getWitnesses());
+    assertEquals(Sets.newHashSet(Arrays.asList(witnesses)), edge.witnesses());
   }
 
   protected static VariantGraphEdge edgeBetween(VariantGraphVertex start, VariantGraphVertex end) {

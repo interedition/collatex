@@ -26,13 +26,13 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.input.SimpleWitness;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
@@ -46,6 +46,20 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals(0, graph.witnesses().size());
     assertEquals(2, Iterables.size(graph.vertices()));
     assertEquals(1, Iterables.size(graph.edges()));
+  }
+
+  @Test
+  public void reconnectingVerticesYieldsSameEdge() {
+    final SimpleWitness witness = createWitnesses("hello world")[0];
+    final VariantGraph graph = graphFactory.newVariantGraph();
+    final VariantGraphVertex helloVertex = graph.add(witness.getTokens().get(0));
+    final VariantGraphVertex worldVertex = graph.add(witness.getTokens().get(1));
+    final VariantGraphEdge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness>singleton(witness));
+    
+    Assert.assertEquals(1, edge.witnesses().size());
+
+    Assert.assertEquals(edge, graph.connect(helloVertex, worldVertex, Collections.<Witness>singleton(witness)));
+    Assert.assertEquals(1, edge.witnesses().size());
   }
 
   @Test

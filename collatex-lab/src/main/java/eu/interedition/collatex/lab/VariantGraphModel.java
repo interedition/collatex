@@ -2,7 +2,6 @@ package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -57,7 +56,7 @@ public class VariantGraphModel extends DirectedSparseGraph<VariantGraphVertexMod
       }
     }
     for (VariantGraphEdge pe : pvg.edges()) {
-      addEdge(new VariantGraphEdgeModel(pe.getWitnesses()), vertexMap.get(pe.from()), vertexMap.get(pe.to()));
+      addEdge(new VariantGraphEdgeModel(pe.witnesses()), vertexMap.get(pe.from()), vertexMap.get(pe.to()));
     }
     
     for (VariantGraphTransposition t : pvg.transpositions()) {
