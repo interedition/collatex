@@ -20,15 +20,24 @@
 
 package eu.interedition.collatex;
 
+import java.util.Comparator;
+
 /**
  * IWitness
  * 
  * Representation of a single textual witness
  *
  */
-public interface Witness extends Comparable<Witness> {
+public interface Witness {
 
   String getSigil();
 
   boolean isNear(Token a, Token b);
+  
+  final Comparator<Witness> SIGIL_COMPARATOR = new Comparator<Witness>() {
+    @Override
+    public int compare(Witness o1, Witness o2) {
+      return o1.getSigil().compareTo(o2.getSigil());
+    }
+  };
 }

@@ -35,13 +35,13 @@ public class DefaultTokenLinker implements TokenLinker {
   private Map<Token, VariantGraphVertex> tokenLinks;
 
   @Override
-  public Map<Token, VariantGraphVertex> link(VariantGraph base, SortedSet<Token> witness, Comparator<Token> comparator) {
-    Preconditions.checkArgument(!witness.isEmpty(), "Empty witness");
+  public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+    Preconditions.checkArgument(!Iterables.isEmpty(witness), "Empty witness");
 
     base.rank();
 
     if (LOG.isTraceEnabled()) {
-      LOG.trace("Matching tokens of {} and {}", base, witness.first().getWitness());
+      LOG.trace("Matching tokens of {} and {}", base, Iterables.getFirst(witness, null).getWitness());
     }
     matches = Matches.between(base.vertices(), witness, comparator);
 

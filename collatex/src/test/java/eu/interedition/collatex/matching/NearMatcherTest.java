@@ -21,7 +21,7 @@ public class NearMatcherTest extends AbstractTest {
     final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1].getTokens(), new EditDistanceTokenComparator()).getAll();
 
     assertEquals(4, matches.size()); // 2 matches plus start/end marker matches
-    assertEquals(w[0].getTokens().get(0), Iterables.get(matches.get(w[1].getTokens().get(0)), 0).tokens().first());
-    assertEquals(w[0].getTokens().get(1), Iterables.get(matches.get(w[1].getTokens().get(1)), 0).tokens().first());
+    assertEquals(w[0].getTokens().get(0), Iterables.getFirst(Iterables.get(matches.get(w[1].getTokens().get(0)), 0).tokens(), null));
+    assertEquals(w[0].getTokens().get(1), Iterables.getFirst(Iterables.get(matches.get(w[1].getTokens().get(1)), 0).tokens(), null));
   }
 }

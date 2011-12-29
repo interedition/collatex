@@ -21,11 +21,12 @@
 package eu.interedition.collatex.input;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 
-public class SimpleToken implements Token {
+public class SimpleToken implements Token, Comparable<SimpleToken> {
   public static final SimpleToken START = new SimpleToken(SimpleWitness.SUPERBASE, -1, "", "#");
   public static final SimpleToken END = new SimpleToken(SimpleWitness.SUPERBASE, Integer.MAX_VALUE, "", "#");
 
@@ -73,7 +74,7 @@ public class SimpleToken implements Token {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getWitness(), getIndex());
+    return Objects.hashCode(getIndex(), getWitness());
   }
 
   @Override
@@ -86,11 +87,8 @@ public class SimpleToken implements Token {
   }
 
   @Override
-  public int compareTo(Token o) {
-    final int witnessComparison = witness.compareTo(o.getWitness());
-    if (witnessComparison != 0) {
-      return witnessComparison;
-    }
-    return (index - ((SimpleToken) o).getIndex());
+  public int compareTo(SimpleToken o) {
+    Preconditions.checkArgument(witness.equals(o.getWitness()));
+    return (index - o.index);
   }
 }

@@ -1,5 +1,6 @@
 package eu.interedition.collatex.needlemanwunsch;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.CollationAlgorithmBase;
@@ -8,10 +9,12 @@ import eu.interedition.collatex.dekker.TokenLinker;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -22,7 +25,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithmBase {
 
   private final Comparator<Token> comparator;
   private float[][] matrix;
-  private List<VariantGraphVertex> unlinkedVertices;
+  private List<Set<VariantGraphVertex>> unlinkedVertices;
   private List<Token> unlinkedTokens;
 
   public NeedlemanWunschAlgorithm(Comparator<Token> comparator) {
@@ -34,7 +37,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithmBase {
     return matrix;
   }
 
-  public List<VariantGraphVertex> getUnlinkedVertices() {
+  public List<Set<VariantGraphVertex>> getUnlinkedVertices() {
     return unlinkedVertices;
   }
 
@@ -43,16 +46,13 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithmBase {
   }
 
   @Override
-  protected void collate(VariantGraph against, SortedSet<Token> witness) {
+  public void collate(VariantGraph against, Iterable<Token> witness) {
     final DefaultNeedlemanWunschScorer scorer = new DefaultNeedlemanWunschScorer(comparator);
 
-    final List<VariantGraphVertex> vertexList = Lists.newArrayList(against.vertices());
-    vertexList.remove(0);
-    vertexList.remove(vertexList.size() - 1);
-
+    final List<Set<VariantGraphVertex>> vertexList = Lists.newArrayList(against.rank().ranks());
     final List<Token> tokenList = Lists.newArrayList(witness);
 
-    final SortedMap<Token, VariantGraphVertex> alignments = Maps.newTreeMap();
+    final Map<Token, VariantGraphVertex> alignments = Maps.newHashMap();
     matrix = new float[vertexList.size() + 1][tokenList.size() + 1];
     unlinkedVertices = Lists.newArrayListWithCapacity(vertexList.size());
     unlinkedTokens = Lists.newArrayListWithCapacity(tokenList.size());
@@ -67,10 +67,10 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithmBase {
     }
 
     ac = 1;
-    for (VariantGraphVertex vertex : vertexList) {
+    for (Set<VariantGraphVertex> vertices : vertexList) {
       bc = 1;
       for (Token token : tokenList) {
-        final float k = matrix[ac - 1][bc - 1] + scorer.score(vertex, token);
+        final float k = matrix[ac - 1][bc - 1] + scorer.score(vertices, token);
         final float l = matrix[ac - 1][bc] + scorer.gap();
         final float m = matrix[ac][bc - 1] + scorer.gap();
         matrix[ac][bc++] = Math.max(Math.max(k, l), m);
@@ -88,7 +88,16 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithmBase {
 
       if (score == scoreDiag + scorer.score(vertexList.get(ac - 1), tokenList.get(bc - 1))) {
         // match
-        alignments.put(tokenList.get(bc - 1), vertexList.get(ac - 1));
+        final Token matchedToken = tokenList.get(bc - 1);
+        for (VariantGraphVertex vertex : vertexList.get(ac - 1)) {
+          if (comparator.compare(Iterables.getFirst(vertex.tokens(), null), matchedToken) == 0) {
+            if (LOG.isTraceEnabled()) {
+              LOG.trace("Matched {} and {}", matchedToken, vertex);
+            }
+            alignments.put(matchedToken, vertex);
+            break;
+          }
+        }
         ac--;
         bc--;
       } else if (score == scoreLeft + scorer.gap()) {

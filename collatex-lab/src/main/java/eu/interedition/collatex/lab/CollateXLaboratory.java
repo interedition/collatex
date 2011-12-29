@@ -162,7 +162,7 @@ public class CollateXLaboratory extends JFrame {
 
         CollationAlgorithmFactory.dekker(comparator).collate(pvg, w.get(0));
 
-        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, Sets.newTreeSet(w.get(1)), comparator));
+        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, w.get(1), comparator));
       } finally {
         transaction.finish();
       }

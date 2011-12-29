@@ -27,12 +27,12 @@ public class Matches {
 
     final ListMultimap<Token, VariantGraphVertex> all = ArrayListMultimap.create();
     for (VariantGraphVertex vertex : vertices) {
-      final SortedSet<Token> tokens = vertex.tokens();
+      final Set<Token> tokens = vertex.tokens();
       if (tokens.isEmpty()) {
         continue;
       }
       for (Token witnessToken : witnessTokens) {
-        if (comparator.compare(tokens.first(), witnessToken) == 0) {
+        if (comparator.compare(Iterables.getFirst(tokens, null), witnessToken) == 0) {
           all.put(witnessToken, vertex);
         }
       }

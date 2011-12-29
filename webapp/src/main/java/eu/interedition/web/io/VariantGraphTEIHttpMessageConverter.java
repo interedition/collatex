@@ -1,7 +1,11 @@
 package eu.interedition.web.io;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Closeables;
@@ -26,6 +30,7 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
@@ -69,7 +74,7 @@ public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConv
     final OutputStream body = outputMessage.getBody();
     XMLStreamWriter xml = null;
     try {
-      final SortedSet<Witness> allWitnesses = graph.witnesses();
+      final Set<Witness> allWitnesses = graph.witnesses();
 
       xml = xmlOutputFactory.createXMLStreamWriter(body);
       xml.writeStartDocument();
@@ -80,23 +85,23 @@ public class VariantGraphTEIHttpMessageConverter extends AbstractHttpMessageConv
       for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext(); ) {
         final Set<VariantGraphVertex> row = rowIt.next();
 
-        final SortedSetMultimap<Witness, Token> tokenIndex = TreeMultimap.create();
+        final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();
         for (VariantGraphVertex v : row) {
           for (Token token : v.tokens()) {
             tokenIndex.put(token.getWitness(), token);
           }
         }
 
-        final Map<Witness, String> cellContents = Maps.newHashMap();
+        final SortedMap<Witness, String> cellContents = Maps.newTreeMap(Witness.SIGIL_COMPARATOR);
         for (Witness witness : tokenIndex.keySet()) {
           final StringBuilder cellContent = new StringBuilder();
-          for (Token token : tokenIndex.get(witness)) {
-            cellContent.append(((SimpleToken) token).getContent()).append(" ");
+          for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(tokenIndex.get(witness), SimpleToken.class))) {
+            cellContent.append(token.getContent()).append(" ");
           }
           cellContents.put(witness, cellContent.toString().trim());
         }
 
-        final SortedSetMultimap<String, Witness> segments = TreeMultimap.create();
+        final SetMultimap<String, Witness> segments = LinkedHashMultimap.create();
         for (Map.Entry<Witness, String> cell : cellContents.entrySet()) {
           segments.put(cell.getValue(), cell.getKey());
         }

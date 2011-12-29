@@ -1,5 +1,6 @@
 package eu.interedition.collatex.lab;
 
+import com.google.common.collect.Iterables;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
@@ -31,7 +32,7 @@ public class EditGraphPanel extends VisualizationViewer<EditGraphVertexModel, Ed
           return "";
         }
 
-        final SimpleToken bt = (SimpleToken) model.getBase().first();
+        final SimpleToken bt = (SimpleToken) Iterables.getFirst(model.getBase(), null);
         final SimpleToken wt = (SimpleToken) model.getWitness();
         return String.format("'%s'[%d] = '%s'[%d]", wt.getContent(), wt.getIndex(), bt.getContent(), bt.getIndex());
       }

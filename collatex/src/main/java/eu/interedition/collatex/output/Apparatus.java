@@ -36,9 +36,9 @@ public class Apparatus {
   public static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
   private final List<Entry> entries;
-  private final SortedSet<Witness> witnesses;
+  private final Set<Witness> witnesses;
 
-  public Apparatus(SortedSet<Witness> witnesses, final List<Entry> entries) {
+  public Apparatus(Set<Witness> witnesses, final List<Entry> entries) {
     this.witnesses = witnesses;
     this.entries = entries;
   }
@@ -47,20 +47,20 @@ public class Apparatus {
     return entries;
   }
 
-  public SortedSet<Witness> getWitnesses() {
+  public Set<Witness> getWitnesses() {
     return witnesses;
   }
 
   public static class Entry {
 
     private final Set<VariantGraphVertex> contents = Sets.newLinkedHashSet();
-    private final SortedSet<Witness> witnesses;
+    private final Set<Witness> witnesses;
 
-    public Entry(SortedSet<Witness> witnesses) {
+    public Entry(Set<Witness> witnesses) {
       this.witnesses = witnesses;
     }
 
-    public SortedSet<Witness> getWitnesses() {
+    public Set<Witness> getWitnesses() {
       return witnesses;
     }
 
@@ -69,7 +69,7 @@ public class Apparatus {
     }
 
     public boolean covers(Witness witness) {
-      final TreeSet<Witness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
+      final Set<Witness> witnessSet = Collections.singleton(witness);
       for (VariantGraphVertex vertex : contents) {
         if (!vertex.tokens(witnessSet).isEmpty()) {
           return true;
@@ -81,15 +81,15 @@ public class Apparatus {
     /**
     * An empty entry returns an empty reading!
     */
-    public SortedSet<Token> getReadingOf(final Witness witness) {
-      final TreeSet<Witness> witnessSet = Sets.newTreeSet(Collections.singleton(witness));
+    public Set<Token> getReadingOf(final Witness witness) {
+      final Set<Witness> witnessSet = Collections.singleton(witness);
       for (VariantGraphVertex vertex : contents) {
-        final SortedSet<Token> tokens = vertex.tokens(witnessSet);
+        final Set<Token> tokens = vertex.tokens(witnessSet);
         if (!tokens.isEmpty()) {
           return tokens;
         }
       }
-      return Sets.newTreeSet();
+      return Collections.emptySet();
     }
 
     public boolean hasEmptyCells() {

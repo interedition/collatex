@@ -30,6 +30,7 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.input.SimpleWitness;
 import org.junit.Test;
 
+import java.util.Set;
 import java.util.SortedSet;
 
 import static org.junit.Assert.assertEquals;
@@ -49,7 +50,7 @@ public class SpencerHoweTest extends AbstractTest {
   @Test
   public void alignmentTable() {
     final SimpleWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
-    final RowSortedTable<Integer, Witness, SortedSet<Token>> table = merge(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> table = merge(w).toTable();
 
     assertEquals(3, table.columnKeySet().size());
     //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element

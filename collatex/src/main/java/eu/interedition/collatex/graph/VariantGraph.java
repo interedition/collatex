@@ -6,6 +6,7 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeBasedTable;
@@ -66,7 +67,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return vertices(null);
   }
 
-  public Iterable<VariantGraphVertex> vertices(final SortedSet<Witness> witnesses) {
+  public Iterable<VariantGraphVertex> vertices(final Set<Witness> witnesses) {
     return new Iterable<VariantGraphVertex>() {
       @Override
       public Iterator<VariantGraphVertex> iterator() {
@@ -107,7 +108,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return edges(null);
   }
 
-  public Iterable<VariantGraphEdge> edges(final SortedSet<Witness> witnesses) {
+  public Iterable<VariantGraphEdge> edges(final Set<Witness> witnesses) {
     return transform(Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
 
       @Override
@@ -115,7 +116,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
         if (witnesses != null && !witnesses.isEmpty()) {
           final Relationship lastRel = path.lastRelationship();
           if (lastRel != null) {
-            if (!new VariantGraphEdge(VariantGraph.this, lastRel).traversableWith(witnesses)) {
+            if (edgeWrapper.apply(lastRel).traversableWith(witnesses)) {
               return Evaluation.EXCLUDE_AND_PRUNE;
             }
           }
@@ -127,10 +128,10 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   }
 
   public VariantGraphVertex add(Token token) {
-    return new VariantGraphVertex(this, Sets.newTreeSet(singleton(token)));
+    return new VariantGraphVertex(this, singleton(token));
   }
 
-  public VariantGraphEdge connect(VariantGraphVertex from, VariantGraphVertex to, SortedSet<Witness> witnesses) {
+  public VariantGraphEdge connect(VariantGraphVertex from, VariantGraphVertex to, Set<Witness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
 
     if (from.equals(start)) {
@@ -181,8 +182,8 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return null;
   }
 
-  public SortedSet<Witness> witnesses() {
-    final SortedSet<Witness> witnesses = Sets.newTreeSet();
+  public Set<Witness> witnesses() {
+    final Set<Witness> witnesses = Sets.newHashSet();
     for (VariantGraphEdge e : start.outgoing()) {
       witnesses.addAll(e.getWitnesses());
     }
@@ -202,8 +203,8 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
         final VariantGraphEdge joinCandidateSingleIncoming = outgoing.get(0);
         final VariantGraphVertex joinCandidate = joinCandidateSingleIncoming.to();
         if (Iterables.size(joinCandidate.incoming()) == 1) {
-          final SortedSet<Witness> incomingWitnesses = joinCandidateSingleIncoming.getWitnesses();
-          final SortedSet<Witness> outgoingWitnesses = Sets.newTreeSet();
+          final Set<Witness> incomingWitnesses = joinCandidateSingleIncoming.getWitnesses();
+          final Set<Witness> outgoingWitnesses = Sets.newHashSet();
           final List<VariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidate.outgoing());
           for (VariantGraphEdge e : joinCandidateOutgoing) {
             outgoingWitnesses.addAll(e.getWitnesses());
@@ -250,7 +251,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return ranks(null);
   }
 
-  public Iterable<Set<VariantGraphVertex>> ranks(final SortedSet<Witness> witnesses) {
+  public Iterable<Set<VariantGraphVertex>> ranks(final Set<Witness> witnesses) {
     return new Iterable<Set<VariantGraphVertex>>() {
       @Override
       public Iterator<Set<VariantGraphVertex>> iterator() {
@@ -291,16 +292,16 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     };
   }
 
-  public RowSortedTable<Integer, Witness, SortedSet<Token>> toTable() {
-    final TreeBasedTable<Integer, Witness, SortedSet<Token>> table = TreeBasedTable.create();
+  public RowSortedTable<Integer, Witness, Set<Token>> toTable() {
+    final TreeBasedTable<Integer, Witness, Set<Token>> table = TreeBasedTable.create(Ordering.natural(), Witness.SIGIL_COMPARATOR);
     for (VariantGraphVertex v : rank().vertices()) {
       final int row = v.getRank();
       for (Token token : v.tokens()) {
         final Witness column = token.getWitness();
 
-        SortedSet<Token> cell = table.get(row, column);
+        Set<Token> cell = table.get(row, column);
         if (cell == null) {
-          table.put(row, column, cell = Sets.newTreeSet());
+          table.put(row, column, cell = Sets.newHashSet());
         }
         cell.add(token);
       }

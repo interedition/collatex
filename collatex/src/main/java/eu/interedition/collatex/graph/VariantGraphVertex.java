@@ -2,6 +2,7 @@ package eu.interedition.collatex.graph;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
@@ -10,10 +11,13 @@ import org.neo4j.graphdb.Node;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.SortedSet;
 
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.getFirst;
 import static com.google.common.collect.Iterables.transform;
+import static java.util.Collections.singleton;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -28,7 +32,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     super(graph, node);
   }
 
-  public VariantGraphVertex(VariantGraph graph, SortedSet<Token> tokens) {
+  public VariantGraphVertex(VariantGraph graph, Set<Token> tokens) {
     this(graph, graph.getDatabase().createNode());
     setTokens(tokens);
   }
@@ -37,7 +41,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     return incoming(null);
   }
 
-  public Iterable<VariantGraphEdge> incoming(SortedSet<Witness> witnesses) {
+  public Iterable<VariantGraphEdge> incoming(Set<Witness> witnesses) {
     return Iterables.filter(transform(node.getRelationships(GraphRelationshipType.PATH, INCOMING), graph.getEdgeWrapper()), VariantGraphEdge.createTraversableFilter(witnesses));
   }
 
@@ -45,7 +49,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     return outgoing(null);
   }
 
-  public Iterable<VariantGraphEdge> outgoing(SortedSet<Witness> witnesses) {
+  public Iterable<VariantGraphEdge> outgoing(Set<Witness> witnesses) {
     return Iterables.filter(transform(node.getRelationships(GraphRelationshipType.PATH, OUTGOING), graph.getEdgeWrapper()), VariantGraphEdge.createTraversableFilter(witnesses));
   }
 
@@ -53,12 +57,12 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     return transform(node.getRelationships(GraphRelationshipType.TRANSPOSITION), graph.getTranspositionWrapper());
   }
 
-  public SortedSet<Token> tokens() {
+  public Set<Token> tokens() {
     return tokens(null);
   }
 
-  public SortedSet<Token> tokens(SortedSet<Witness> witnesses) {
-    final SortedSet<Token> tokens = Sets.newTreeSet(graph.getTokenResolver().resolve(getTokenReferences()));
+  public Set<Token> tokens(Set<Witness> witnesses) {
+    final Set<Token> tokens = graph.getTokenResolver().resolve(getTokenReferences());
     if (witnesses != null && !witnesses.isEmpty()) {
       for (Iterator<Token> tokenIt = tokens.iterator(); tokenIt.hasNext(); ) {
         final Token token = tokenIt.next();
@@ -70,8 +74,8 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     return tokens;
   }
 
-  public SortedSet<Witness> witnesses() {
-    final SortedSet<Witness> witnesses = Sets.newTreeSet();
+  public Set<Witness> witnesses() {
+    final Set<Witness> witnesses = Sets.newHashSet();
     for (Token token : tokens()) {
       witnesses.add(token.getWitness());
     }
@@ -79,12 +83,12 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   }
 
   public void add(Iterable<Token> tokens) {
-    final SortedSet<Token> tokenSet = Sets.newTreeSet(tokens());
+    final Set<Token> tokenSet = Sets.newHashSet(tokens());
     Iterables.addAll(tokenSet, tokens);
     setTokens(tokenSet);
   }
 
-  public void setTokens(SortedSet<Token> tokens) {
+  public void setTokens(Set<Token> tokens) {
     setTokenReferences(graph.getTokenResolver().resolve(tokens));
   }
 
@@ -121,13 +125,13 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   public static final Function<VariantGraphVertex, String> TO_CONTENTS = new Function<VariantGraphVertex, String>() {
     @Override
     public String apply(VariantGraphVertex input) {
-      final SortedSet<Witness> witnesses = input.witnesses();
+      final Set<Witness> witnesses = input.witnesses();
       if (witnesses.isEmpty()) {
         return "";
       }
       final StringBuilder contents = new StringBuilder();
-      for (Token token : input.tokens(Sets.newTreeSet(Collections.singleton(witnesses.first())))) {
-        contents.append(((SimpleToken) token).getContent()).append(" ");
+      for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(input.tokens(singleton(getFirst(witnesses, null))), SimpleToken.class))) {
+        contents.append(token.getContent()).append(" ");
       }
       return contents.toString().trim();
     }

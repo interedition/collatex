@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 import static eu.interedition.collatex.graph.GraphRelationshipType.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
@@ -130,9 +131,9 @@ public class GraphFactory {
     final VariantGraphVertex start = graph.getStart();
     final VariantGraphVertex end = graph.getEnd();
 
-    start.setTokens(Sets.<Token>newTreeSet());
-    end.setTokens(Sets.<Token>newTreeSet());
-    graph.connect(start, end, Sets.<Witness>newTreeSet());
+    start.setTokens(Collections.<Token>emptySet());
+    end.setTokens(Collections.<Token>emptySet());
+    graph.connect(start, end, Collections.<Witness>emptySet());
 
     return graph;
   }

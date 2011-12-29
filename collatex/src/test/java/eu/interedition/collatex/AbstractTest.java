@@ -2,8 +2,13 @@ package eu.interedition.collatex;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.Match;
@@ -28,6 +33,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 
 import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
@@ -95,23 +101,25 @@ public abstract class AbstractTest {
   }
 
   protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, VariantGraph graph, Witness witness) {
-    for (VariantGraphVertex v : graph.vertices(Sets.newTreeSet(Collections.singleton(witness)))) {
+    for (VariantGraphVertex v : graph.vertices(Collections.singleton(witness))) {
       phrases.add(toString(v, witness));
     }
     return phrases;
   }
 
   protected static String toString(VariantGraphVertex vertex, Witness... witnesses) {
-    final SortedSet<Token> tokens = vertex.tokens(Sets.newTreeSet(Arrays.asList(witnesses)));
+    final Multimap<Witness, Token> tokens = Multimaps.index(vertex.tokens(Sets.newHashSet(Arrays.asList(witnesses))), Token.TO_WITNESS);
     List<String> tokenContents = Lists.newArrayListWithExpectedSize(tokens.size());
-    for (Token token : tokens) {
-      tokenContents.add(((SimpleToken) token).getNormalized());
+    for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
+      for (Token token : Ordering.natural().sortedCopy(Iterables.filter(tokens.get(witness), SimpleToken.class))) {
+        tokenContents.add(((SimpleToken) token).getNormalized());
+      }      
     }
     return Joiner.on(' ').join(tokenContents);
   }
 
   protected static void assertHasWitnesses(VariantGraphEdge edge, Witness... witnesses) {
-    assertEquals(Sets.newTreeSet(Arrays.asList(witnesses)), edge.getWitnesses());
+    assertEquals(Sets.newHashSet(Arrays.asList(witnesses)), edge.getWitnesses());
   }
 
   protected static VariantGraphEdge edgeBetween(VariantGraphVertex start, VariantGraphVertex end) {
@@ -121,7 +129,7 @@ public abstract class AbstractTest {
   }
 
   protected static void assertVertexEquals(String expected, VariantGraphVertex vertex) {
-    assertEquals(expected, ((SimpleToken) vertex.tokens().first()).getNormalized());
+    assertEquals(expected, ((SimpleToken) Iterables.getFirst(vertex.tokens(), null)).getNormalized());
   }
 
   protected static void assertVertexHasContent(VariantGraphVertex vertex, String content, Witness in) {
@@ -129,7 +137,7 @@ public abstract class AbstractTest {
   }
 
   protected static VariantGraphVertex vertexWith(VariantGraph graph, String content, Witness in) {
-    for (VariantGraphVertex v : graph.vertices(Sets.newTreeSet(Collections.singleton(in)))) {
+    for (VariantGraphVertex v : graph.vertices(Collections.singleton(in))) {
       if (content.equals(toString(v, in))) {
         return v;
       }
@@ -138,7 +146,7 @@ public abstract class AbstractTest {
     return null;
   }
 
-  protected static String toString(RowSortedTable<Integer, Witness, SortedSet<Token>> table) {
+  protected static String toString(RowSortedTable<Integer, Witness, Set<Token>> table) {
     final StringBuilder tableStr = new StringBuilder();
     for (Witness witness : table.columnKeySet()) {
       tableStr.append(witness.getSigil()).append(": ").append(toString(table, witness)).append("\n");
@@ -146,28 +154,23 @@ public abstract class AbstractTest {
     return tableStr.toString();
   }
 
-  protected static String toString(RowSortedTable<Integer, Witness, SortedSet<Token>> table, Witness witness) {
+  protected static String toString(RowSortedTable<Integer, Witness, Set<Token>> table, Witness witness) {
     final StringBuilder tableRowStr = new StringBuilder("|");
     for (Integer row : table.rowKeySet()) {
-      final SortedSet<Token> tokens = table.get(row, witness);
-      tableRowStr.append(tokens == null ? ' ' : Joiner.on(" ").join(Iterables.transform(tokens, new Function<Token, String>() {
-        @Override
-        public String apply(Token input) {
-          return ((SimpleToken) input).getContent();
-        }
-      }))).append("|");
+      final Set<Token> tokens = table.get(row, witness);
+      if (tokens == null) {
+        tableRowStr.append(" |");
+      } else {
+        final List<SimpleToken> simpleTokens = Ordering.natural().sortedCopy(Iterables.filter(tokens, SimpleToken.class));
+        tableRowStr.append(Joiner.on(" ").join(Iterables.transform(simpleTokens, new Function<Token, String>() {
+          @Override
+          public String apply(Token input) {
+            return ((SimpleToken) input).getContent();
+          }
+        }))).append("|");
+      }
     }
     return tableRowStr.toString();
-  }
-
-  @Deprecated
-  protected List<SimpleToken> getTokens(VariantGraph graph, Witness... witnesses) {
-    final SortedSet<Witness> witnessSet = Sets.newTreeSet(Arrays.asList(witnesses));
-    final List<SimpleToken> tokens = Lists.newArrayList();
-    for (VariantGraphVertex v : graph.vertices(witnessSet)) {
-      Iterables.addAll(tokens, Iterables.filter(v.tokens(witnessSet), SimpleToken.class));
-    }
-    return tokens;
   }
 
   protected void assertPhraseMatches(DekkerAlgorithm builder, String... expectedPhrases) {

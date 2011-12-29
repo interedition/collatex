@@ -37,6 +37,11 @@ public class Match {
     return super.equals(obj);
   }
 
+  @Override
+  public String toString() {    
+    return new StringBuilder("{").append(vertex).append("; ").append(token).append("}").toString();
+  }
+
   public static List<Match> createPhraseMatch(List<VariantGraphVertex> vertices, List<Token> tokens) {
     final List<Match> phraseMatch = Lists.newArrayListWithExpectedSize(vertices.size());
     final Iterator<VariantGraphVertex> vertexIt = vertices.iterator();

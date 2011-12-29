@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class DekkerAlgorithm extends CollationAlgorithmBase {
-  private static final Logger LOG = LoggerFactory.getLogger(DekkerAlgorithm.class);
-
   private final Comparator<Token> comparator;
   private final TokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;
@@ -25,7 +23,7 @@ public class DekkerAlgorithm extends CollationAlgorithmBase {
   private Map<Token, VariantGraphVertex> tokenLinks;
   private List<List<Match>> phraseMatches;
   private List<List<Match>> transpositions;
-  private LinkedHashMap<Token, VariantGraphVertex> alignments;
+  private Map<Token, VariantGraphVertex> alignments;
 
   public DekkerAlgorithm(Comparator<Token> comparator) {
     this(comparator, new DefaultTokenLinker());
@@ -39,9 +37,9 @@ public class DekkerAlgorithm extends CollationAlgorithmBase {
   }
 
   @Override
-  public void collate(VariantGraph graph, SortedSet<Token> tokens) {
-    Preconditions.checkArgument(!tokens.isEmpty(), "Empty witness");
-    final Witness witness = tokens.first().getWitness();
+  public void collate(VariantGraph graph, Iterable<Token> tokens) {
+    Preconditions.checkArgument(!Iterables.isEmpty(tokens), "Empty witness");
+    final Witness witness = Iterables.getFirst(tokens, null).getWitness();
 
     if (LOG.isTraceEnabled()) {
       LOG.trace("{} + {}: {} vs. {}", new Object[] { graph, witness, graph.vertices(), tokens});
@@ -72,7 +70,8 @@ public class DekkerAlgorithm extends CollationAlgorithmBase {
     }
 
     LOG.debug("{} + {}: Determine aligned tokens by filtering transpositions", graph, witness);
-    alignments = Maps.newLinkedHashMap(tokenLinks);
+    alignments = Maps.newHashMap(tokenLinks);
+
     for (List<Match> transposedPhrase : transpositions) {
       for (Match match : transposedPhrase) {
         alignments.remove(match.token);

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -104,10 +105,10 @@ public class CollateXTransformer extends AbstractSAXTransformer {
       
       final VariantGraph graph = graphFactory.newVariantGraph();
       CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(graph, witnesses);
-      final SortedSet<Witness> witnesses = graph.witnesses();
-      final RowSortedTable<Integer, Witness, SortedSet<Token>> table = graph.toTable();
+      final Set<Witness> witnesses = graph.witnesses();
+      final RowSortedTable<Integer, Witness, Set<Token>> table = graph.toTable();
       for (Integer rowIndex : table.rowKeySet()) {
-        final Map<Witness, SortedSet<Token>> row = table.row(rowIndex);
+        final Map<Witness, Set<Token>> row = table.row(rowIndex);
         sendStartElementEventNS("row", EMPTY_ATTRIBUTES);
         for (Witness witness : witnesses) {
           final AttributesImpl cellAttrs = new AttributesImpl();

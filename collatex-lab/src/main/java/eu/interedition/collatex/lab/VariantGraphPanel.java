@@ -2,7 +2,11 @@ package eu.interedition.collatex.lab;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
@@ -13,6 +17,7 @@ import org.apache.commons.collections15.Transformer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Iterator;
 
 
 /**
@@ -31,13 +36,19 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertexMod
     rc.setVertexLabelTransformer(new Transformer<VariantGraphVertexModel, String>() {
       @Override
       public String transform(VariantGraphVertexModel variantGraphVertexModel) {
-        return Joiner.on(", ").join(Iterables.transform(variantGraphVertexModel.getTokens(), new Function<Token, String>() {
-
-          @Override
-          public String apply(Token input) {
-            return input.getWitness().getSigil() + ":'" + ((SimpleToken) input).getNormalized() + "'";
+        final Multimap<Witness,Token> tokens = Multimaps.index(variantGraphVertexModel.getTokens(), Token.TO_WITNESS);
+        final StringBuilder label = new StringBuilder();
+        for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
+          label.append("[").append(witness.getSigil()).append(": '");
+          for (Iterator<SimpleToken> tokenIt = Ordering.natural().sortedCopy(Iterables.filter(tokens.get(witness), SimpleToken.class)).iterator(); tokenIt.hasNext(); ) {
+            label.append(tokenIt.next().getContent());
+            if (tokenIt.hasNext()) {
+              label.append(" ");
+            }
           }
-        })) + " (" + variantGraphVertexModel.getRank() + ")";
+          label.append("'] ");
+        }
+        return label.toString().trim();
       }
     });
     rc.setEdgeLabelTransformer(new Transformer<VariantGraphEdgeModel, String>() {

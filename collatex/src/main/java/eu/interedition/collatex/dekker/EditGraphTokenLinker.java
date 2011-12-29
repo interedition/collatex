@@ -19,7 +19,7 @@ public class EditGraphTokenLinker implements TokenLinker {
   }
 
   @Override
-  public Map<Token, VariantGraphVertex> link(VariantGraph base, SortedSet<Token> witness, Comparator<Token> comparator) {
+  public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     final EditGraph editGraph = graphFactory.newEditGraph(base);
     final Map<Token, VariantGraphVertex> linkedTokens = editGraph.build(base, witness, comparator).linkedTokens();
     graphFactory.delete(editGraph);

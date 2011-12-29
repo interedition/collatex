@@ -10,6 +10,7 @@ import eu.interedition.collatex.graph.VariantGraphEdge;
 import eu.interedition.collatex.graph.VariantGraphTransposition;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -60,7 +61,7 @@ public class VariantGraphModel extends DirectedSparseGraph<VariantGraphVertexMod
     }
     
     for (VariantGraphTransposition t : pvg.transpositions()) {
-      addEdge(new VariantGraphEdgeModel(Sets.<Witness>newTreeSet()), vertexMap.get(t.from()), vertexMap.get(t.to()));
+      addEdge(new VariantGraphEdgeModel(Collections.<Witness>emptySet()), vertexMap.get(t.from()), vertexMap.get(t.to()));
     }
   }
 }

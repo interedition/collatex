@@ -104,9 +104,4 @@ public class SimpleWitness implements Iterable<Token>, Witness {
     Token other = relations.get(a);
     return other.equals(b);
   }
-
-  @Override
-  public int compareTo(Witness o) {
-    return sigil.compareTo(o.getSigil());
-  }
 }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.collect.Iterables.getFirst;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -148,9 +149,9 @@ public class DefaultTokenLinkerTest extends AbstractTest {
     final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0], w[1]), w[2]).entrySet();
 
     assertEquals(3, matches.size());
-    assertEquals("everything", ((SimpleToken) Iterables.get(matches, 0).getValue().tokens().first()).getContent());
-    assertEquals("is", ((SimpleToken) Iterables.get(matches, 1).getValue().tokens().first()).getContent());
-    assertEquals("different", ((SimpleToken) Iterables.get(matches, 2).getValue().tokens().first()).getContent());
+    assertEquals("everything", ((SimpleToken) getFirst(Iterables.get(matches, 0).getValue().tokens(), null)).getContent());
+    assertEquals("is", ((SimpleToken) getFirst(Iterables.get(matches, 1).getValue().tokens(), null)).getContent());
+    assertEquals("different", ((SimpleToken) getFirst(Iterables.get(matches, 2).getValue().tokens(), null)).getContent());
   }
 
   @Test
@@ -163,9 +164,9 @@ public class DefaultTokenLinkerTest extends AbstractTest {
     final Set<Map.Entry<Token,VariantGraphVertex>> matches = linkTokens(merge(w[0], w[1]), w[2]).entrySet();
 
     assertEquals(3, matches.size());
-    assertEquals("everything", ((SimpleToken) Iterables.get(matches, 0).getValue().tokens().first()).getContent());
-    assertEquals("is", ((SimpleToken) Iterables.get(matches, 1).getValue().tokens().first()).getContent());
-    assertEquals("different", ((SimpleToken) Iterables.get(matches, 2).getValue().tokens().first()).getContent());
+    assertEquals("everything", ((SimpleToken) getFirst(Iterables.get(matches, 0).getValue().tokens(), null)).getContent());
+    assertEquals("is", ((SimpleToken) getFirst(Iterables.get(matches, 1).getValue().tokens(), null)).getContent());
+    assertEquals("different", ((SimpleToken) getFirst(Iterables.get(matches, 2).getValue().tokens(), null)).getContent());
   }
 
   @Test
@@ -231,7 +232,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
     assertEquals(1, matches.size());
     final Map.Entry<Token, VariantGraphVertex> match = Iterables.get(matches, 0);
     assertEquals(vertexWith(graph, "a", w[0]), match.getValue());
-    assertEquals(((SimpleToken) vertexWith(graph, "a", w[0]).tokens().first()).getNormalized(), ((SimpleToken) match.getKey()).getNormalized());
+    assertEquals(((SimpleToken) getFirst(vertexWith(graph, "a", w[0]).tokens(), null)).getNormalized(), ((SimpleToken) match.getKey()).getNormalized());
   }
 
   @Test
@@ -280,11 +281,11 @@ public class DefaultTokenLinkerTest extends AbstractTest {
 
   private Map<Token, VariantGraphVertex> linkTokens(DefaultTokenLinker linker, SimpleWitness base, SimpleWitness witness) {
     final VariantGraph graph = merge(base);
-    return linker.link(graph, Sets.newTreeSet(witness), new EqualityTokenComparator());
+    return linker.link(graph, witness, new EqualityTokenComparator());
   }
 
   private Map<Token, VariantGraphVertex> linkTokens(DefaultTokenLinker linker, VariantGraph base, SimpleWitness witness) {
-    return linker.link(base, Sets.newTreeSet(witness), new EqualityTokenComparator());
+    return linker.link(base, witness, new EqualityTokenComparator());
   }
 
   private Map<Token, VariantGraphVertex> linkTokens(SimpleWitness base, SimpleWitness witness) {

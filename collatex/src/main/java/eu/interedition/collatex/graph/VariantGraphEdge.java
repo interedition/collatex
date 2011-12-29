@@ -5,10 +5,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Witness;
 import org.neo4j.graphdb.Relationship;
 
+import java.util.Set;
 import java.util.SortedSet;
 
 /**
@@ -21,27 +23,27 @@ public class VariantGraphEdge extends GraphEdge<VariantGraph, VariantGraphVertex
     super(graph, relationship);
   }
 
-  public VariantGraphEdge(VariantGraph graph, VariantGraphVertex from, VariantGraphVertex to, SortedSet<Witness> witnesses) {
+  public VariantGraphEdge(VariantGraph graph, VariantGraphVertex from, VariantGraphVertex to, Set<Witness> witnesses) {
     this(graph, from.getNode().createRelationshipTo(to.getNode(), GraphRelationshipType.PATH));
     setWitnesses(witnesses);
   }
 
-  public boolean traversableWith(SortedSet<Witness> witnesses) {
+  public boolean traversableWith(Set<Witness> witnesses) {
     return (witnesses == null || witnesses.isEmpty() || Iterables.any(getWitnesses(), Predicates.in(witnesses)));
   }
 
-  public VariantGraphEdge add(SortedSet<Witness> witnesses) {
-    final SortedSet<Witness> registered = getWitnesses();
+  public VariantGraphEdge add(Set<Witness> witnesses) {
+    final Set<Witness> registered = getWitnesses();
     registered.addAll(witnesses);
     setWitnesses(registered);
     return this;
   }
 
-  public SortedSet<Witness> getWitnesses() {
-    return Sets.newTreeSet(graph.getWitnessResolver().resolve(getWitnessReferences()));
+  public Set<Witness> getWitnesses() {
+    return graph.getWitnessResolver().resolve(getWitnessReferences());
   }
 
-  public void setWitnesses(SortedSet<Witness> witnesses) {
+  public void setWitnesses(Set<Witness> witnesses) {
     setWitnessReferences(graph.getWitnessResolver().resolve(witnesses));
   }
 
@@ -63,7 +65,7 @@ public class VariantGraphEdge extends GraphEdge<VariantGraph, VariantGraphVertex
     };
   }
 
-  public static Predicate<VariantGraphEdge> createTraversableFilter(final SortedSet<Witness> witnesses) {
+  public static Predicate<VariantGraphEdge> createTraversableFilter(final Set<Witness> witnesses) {
     return new Predicate<VariantGraphEdge>() {
       @Override
       public boolean apply(VariantGraphEdge input) {
@@ -75,7 +77,7 @@ public class VariantGraphEdge extends GraphEdge<VariantGraph, VariantGraphVertex
   public static final Function<VariantGraphEdge, String> TO_CONTENTS = new Function<VariantGraphEdge, String>() {
     @Override
     public String apply(VariantGraphEdge input) {
-      return Joiner.on(", ").join(input.getWitnesses());
+      return Joiner.on(", ").join(Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(input.getWitnesses()));
     }
   };
 }

@@ -52,7 +52,7 @@ public class VariantGraphTest extends AbstractTest {
   public void getTokens() {
     final SimpleWitness[] w = createWitnesses("a b c d");
     final VariantGraph graph = merge(w);
-    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newTreeSet(Arrays.<Witness>asList(w))));
+    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newHashSet(Arrays.<Witness>asList(w))));
     assertEquals(6, vertices.size());
     assertEquals(graph.getStart(), vertices.get(0));
     assertVertexEquals("a", vertices.get(1));
@@ -84,7 +84,7 @@ public class VariantGraphTest extends AbstractTest {
   public void getPathForWitness() {
     final SimpleWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
     final VariantGraph graph = merge(w);
-    final SortedSet<Witness> witnessSet = Sets.newTreeSet(Collections.<Witness>singleton(w[0]));
+    final Set<Witness> witnessSet = Collections.<Witness>singleton(w[0]);
     final List<VariantGraphVertex> path = Lists.newArrayList(graph.vertices(witnessSet));
 
     assertEquals(8, path.size());

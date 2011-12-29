@@ -1,6 +1,7 @@
 package eu.interedition.web.io;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.Witness;
@@ -22,7 +23,9 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
 /**
@@ -97,8 +100,8 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
 
         jgen.writeEndArray();
       } else {
-        final SortedSet<Witness> witnesses = graph.witnesses();
-        final RowSortedTable<Integer,Witness,SortedSet<Token>> table = graph.toTable();
+        final List<Witness> witnesses = Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(graph.witnesses());
+        final RowSortedTable<Integer,Witness,Set<Token>> table = graph.toTable();
 
         jgen.writeStartObject();
 
@@ -114,19 +117,20 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
 
         jgen.writeArrayFieldStart("table");
         for (Integer row : table.rowKeySet()) {
-          final Map<Witness,SortedSet<Token>> cells = table.row(row);
+          final Map<Witness,Set<Token>> cells = table.row(row);
           jgen.writeStartArray();
           for (Witness witness : witnesses) {
-            final SortedSet<Token> cell = cells.get(witness);
-            if (cell == null) {
+            final Set<Token> cellContents = cells.get(witness);
+            if (cellContents == null) {
               jgen.writeNull();
             } else {
+              final List<SimpleToken> cell = Ordering.natural().sortedCopy(Iterables.filter(cellContents, SimpleToken.class));
               jgen.writeStartArray();
-              for (Token token : cell) {
+              for (SimpleToken token : cell) {
                 if (token instanceof WebToken) {
                   jgen.writeTree(((WebToken) token).getJsonNode());
                 } else {
-                  jgen.writeString(((SimpleToken) token).getContent());
+                  jgen.writeString(token.getContent());
                 }
               }
               jgen.writeEndArray();

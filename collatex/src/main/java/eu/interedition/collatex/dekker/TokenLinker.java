@@ -11,6 +11,6 @@ import java.util.SortedSet;
 
 public interface TokenLinker {
 
-  Map<Token, VariantGraphVertex> link(VariantGraph base, SortedSet<Token> witness, Comparator<Token> comparator);
+  Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator);
 
 }

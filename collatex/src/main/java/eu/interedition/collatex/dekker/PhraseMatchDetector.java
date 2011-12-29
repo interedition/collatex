@@ -33,7 +33,7 @@ import java.util.SortedSet;
  */
 public class PhraseMatchDetector {
 
-  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, SortedSet<Token> tokens) {
+  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, Iterable<Token> tokens) {
     //rank the variant graph
     base.rank();
     

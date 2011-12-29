@@ -14,7 +14,7 @@ public class DefaultResolver<T> implements Resolver<T> {
   private final BiMap<T, Integer> entities = HashBiMap.create();
 
   @Override
-  public int add(T entity) {
+  public synchronized int add(T entity) {
     if (entities.containsKey(entity)) {
       return entities.get(entity);
     } else {
@@ -24,7 +24,7 @@ public class DefaultResolver<T> implements Resolver<T> {
   }
 
   @Override
-  public Set<T> resolve(int... refs) {
+  public synchronized Set<T> resolve(int... refs) {
     final Set<T> resolved = Sets.newHashSetWithExpectedSize(refs.length);
     final BiMap<Integer, T> inverseMapping = entities.inverse();
     for (int rc = 0; rc < refs.length; rc++) {
@@ -34,7 +34,7 @@ public class DefaultResolver<T> implements Resolver<T> {
   }
 
   @Override
-  public int[] resolve(Set<T> entities) {
+  public synchronized int[] resolve(Set<T> entities) {
     final int[] refs = new int[entities.size()];
     int ec = 0;
     for (T entity : entities) {
