@@ -105,7 +105,7 @@ public class TextController {
     return "text_index";
   }
 
-  @RequestMapping(value = "/{id}", headers = "accept=text/plain")
+  @RequestMapping(value = "/{id}", produces = "text/plain")
   public void readText(@PathVariable("id") int id, @RequestParam(value = "r", required = false) Range range, HttpServletResponse response) throws IOException {
     final Text text = textService.load(id).getText();
 
@@ -123,13 +123,13 @@ public class TextController {
   }
 
 
-  @RequestMapping(value = "/{id}", headers = "accept=application/xml")
+  @RequestMapping(value = "/{id}", produces = "application/xml")
   @ResponseBody
   public XMLSerialization readXML(@PathVariable("id") int id) {
     return readXML(id, new XMLSerialization());
   }
 
-  @RequestMapping(value = "/{id}", headers = {"content-type=application/json", "accept=application/xml"})
+  @RequestMapping(value = "/{id}", consumes = "application/json", produces = "application/xml")
   @ResponseBody
   public XMLSerialization readXML(@PathVariable("id") int id, @RequestBody XMLSerialization serialization) {
     serialization.setText(textService.load(id).getText());
@@ -137,13 +137,13 @@ public class TextController {
     return serialization;
   }
 
-  @RequestMapping(value = "/{id}", headers = "accept=application/json")
+  @RequestMapping(value = "/{id}", produces = "application/json")
   @ResponseBody
   public JSONSerialization readJSON(@PathVariable("id") int id, @RequestParam(value = "r", required = false) Range rangeParam) {
     return readJSON(id, new JSONSerialization(), rangeParam);
   }
 
-  @RequestMapping(value = "/{id}", headers = {"content-type=application/json", "accept=application/json"})
+  @RequestMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
   @ResponseBody
   public JSONSerialization readJSON(@PathVariable("id") int id, @RequestBody JSONSerialization serialization, @RequestParam(value = "r", required = false) Range rangeParam) {
     serialization.setText(textService.load(id).getText());
@@ -153,7 +153,7 @@ public class TextController {
     return serialization;
   }
 
-  @RequestMapping(value = "/{id}", headers = "accept=text/html")
+  @RequestMapping(value = "/{id}", produces = "text/html")
   public ModelAndView readHTML(@PathVariable("id") int id) throws IOException {
     final TextMetadata metadata = textService.load(id);
     final Text text = metadata.getText();
@@ -165,12 +165,12 @@ public class TextController {
     return mv;
   }
 
-  @RequestMapping(method = RequestMethod.POST, headers = {"content-type=text/plain"})
+  @RequestMapping(method = RequestMethod.POST, consumes = "text/plain")
   public Object writeText(HttpServletRequest request, Reader requestBody) throws IOException, XMLStreamException, SAXException {
     return respondWith(request, textService.create(new TextMetadata(), requestBody));
   }
 
-  @RequestMapping(method = RequestMethod.POST, headers = "content-type=application/xml")
+  @RequestMapping(method = RequestMethod.POST, consumes = "application/xml")
   public Object writeXML(HttpServletRequest request, InputStream requestBody) throws XMLStreamException, IOException, SAXException {
     XMLStreamReader xmlReader = null;
     try {
@@ -180,7 +180,7 @@ public class TextController {
     }
   }
 
-  @RequestMapping(method = RequestMethod.POST, headers = "content-type=multipart/form-data")
+  @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
   public RedirectView writeFormData(@ModelAttribute TextMetadata text, @RequestParam("file") MultipartFile file,//
                                     @RequestParam("fileType") Text.Type textType,//
                                     @RequestParam(value = "fileEncoding", required = false, defaultValue = "UTF-8") String charset)
@@ -247,7 +247,7 @@ public class TextController {
     return respondWith(request, textService.create(parsedMetadata, (RelationalText) parsed));
   }
 
-  @RequestMapping(value = "/{id}/annotate", method = RequestMethod.POST, headers = "content-type=application/json")
+  @RequestMapping(value = "/{id}/annotate", method = RequestMethod.POST, consumes = "application/json")
   public Object writeAnnotations(@PathVariable("id") long id, HttpServletRequest request, @RequestBody Reader annotations) throws IOException {
     final TextMetadata metadata = textService.load(id);
 
@@ -264,7 +264,7 @@ public class TextController {
     }
   }
 
-  @RequestMapping(value = "/{id}/annotate", method = RequestMethod.PUT, headers = "content-type=application/json")
+  @RequestMapping(value = "/{id}/annotate", method = RequestMethod.PUT, consumes = "application/json")
   public Object replaceAnnotations(@PathVariable("id") long id, HttpServletRequest request, @RequestBody Reader annotations) throws IOException {
     final TextMetadata metadata = textService.load(id);
     final RelationalText text = metadata.getText();

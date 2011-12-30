@@ -13,7 +13,6 @@
   <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssgrids/grids-min.css">
   <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssbase/base-min.css">
   <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css">
-  <link rel="stylesheet" type="text/css" href="${cp}/static/text-repository.css">
 
   <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.min.js"></script>
   <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.behavior.min.js"></script>
