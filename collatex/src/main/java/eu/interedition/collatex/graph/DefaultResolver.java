@@ -1,5 +1,6 @@
 package eu.interedition.collatex.graph;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
@@ -28,7 +29,7 @@ public class DefaultResolver<T> implements Resolver<T> {
     final Set<T> resolved = Sets.newHashSetWithExpectedSize(refs.length);
     final BiMap<Integer, T> inverseMapping = entities.inverse();
     for (int rc = 0; rc < refs.length; rc++) {
-      resolved.add(inverseMapping.get(refs[rc]));
+      resolved.add(Preconditions.checkNotNull(inverseMapping.get(refs[rc])));
     }
     return resolved;
   }
