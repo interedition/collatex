@@ -20,7 +20,6 @@
 
 package eu.interedition.collatex.dekker;
 
-import eu.interedition.collatex.CollationAlgorithmBase;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;

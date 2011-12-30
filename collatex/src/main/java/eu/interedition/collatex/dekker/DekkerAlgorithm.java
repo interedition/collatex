@@ -4,17 +4,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import eu.interedition.collatex.CollationAlgorithmBase;
+import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class DekkerAlgorithm extends CollationAlgorithmBase {
+public class DekkerAlgorithm extends CollationAlgorithm.Base {
   private final Comparator<Token> comparator;
   private final TokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;

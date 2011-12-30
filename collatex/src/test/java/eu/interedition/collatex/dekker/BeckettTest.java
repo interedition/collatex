@@ -4,7 +4,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.CollationAlgorithmBase;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;

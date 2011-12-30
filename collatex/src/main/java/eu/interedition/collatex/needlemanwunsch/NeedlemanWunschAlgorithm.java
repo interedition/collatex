@@ -3,25 +3,21 @@ package eu.interedition.collatex.needlemanwunsch;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import eu.interedition.collatex.CollationAlgorithmBase;
+import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.dekker.TokenLinker;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class NeedlemanWunschAlgorithm extends CollationAlgorithmBase {
+public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
 
   private final Comparator<Token> comparator;
   private float[][] matrix;
