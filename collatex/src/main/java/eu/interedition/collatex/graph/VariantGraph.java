@@ -1,6 +1,7 @@
 package eu.interedition.collatex.graph;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
@@ -10,6 +11,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeBasedTable;
+import com.google.common.primitives.Longs;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -24,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +77,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       @Override
       public Iterator<VariantGraphVertex> iterator() {
         return new AbstractIterator<VariantGraphVertex>() {
-          private Map<VariantGraphVertex, Integer> encountered = Maps.newHashMap();
+          private Map<Long, Integer> encountered = Maps.newHashMap();
           private Queue<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>(singleton(getStart()));
 
           @Override
@@ -85,19 +88,18 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
             final VariantGraphVertex next = queue.remove();
             for (VariantGraphEdge edge : next.outgoing(witnesses)) {
               final VariantGraphVertex end = edge.to();
+              final long endId = end.getNode().getId();
+
+              final int endEncountered = Objects.firstNonNull(encountered.get(endId), 0);
               final int endIncoming = Iterables.size(end.incoming(witnesses));
-              if (endIncoming == 1) {
+
+              if (endIncoming == endEncountered) {
+                throw new IllegalStateException(String.format("Encountered cycle traversing %s to %s", edge, end));
+              } else if ((endIncoming - endEncountered) == 1) {
                 queue.add(end);
-              } else if (encountered.containsKey(end)) {
-                final int endEncountered = encountered.remove(end);
-                if ((endIncoming - endEncountered) == 1) {
-                  queue.add(end);
-                } else {
-                  encountered.put(end, endEncountered + 1);
-                }
-              } else {
-                encountered.put(end, 1);
               }
+
+              encountered.put(endId, endEncountered + 1);
             }
             return next;
           }
@@ -200,44 +202,46 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   }
 
   public VariantGraph join() {
-    final Queue<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>();
+    final Set<Long> processed = Sets.newHashSet();
+
+    final Deque<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>();
     for (VariantGraphEdge startingEdges : start.outgoing()) {
-      queue.add(startingEdges.to());
+      queue.push(startingEdges.to());
     }
 
     while (!queue.isEmpty()) {
-      final VariantGraphVertex vertex = queue.remove();
+      final VariantGraphVertex vertex = queue.pop();
       final List<VariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
         final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
         final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
-        if (Iterables.size(joinCandidateVertex.incoming()) == 1) {
-          final Set<Witness> incomingWitnesses = joinCandidateEdge.witnesses();
-          final Set<Witness> outgoingWitnesses = Sets.newHashSet();
-          final List<VariantGraphEdge> joinCandidateOutgoing = Lists.newArrayList(joinCandidateVertex.outgoing());
-          for (VariantGraphEdge e : joinCandidateOutgoing) {
-            outgoingWitnesses.addAll(e.witnesses());
+        if (!end.equals(joinCandidateVertex) && Iterables.size(joinCandidateVertex.incoming()) == 1) {
+          vertex.add(joinCandidateVertex.tokens());
+          for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
+            final VariantGraphVertex other = t.other(joinCandidateVertex);
+            t.delete();
+            transpose(vertex, other);
           }
-          if (incomingWitnesses.equals(outgoingWitnesses)) {
-            vertex.add(joinCandidateVertex.tokens());
-            for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
-              transpose(vertex, t.other(joinCandidateVertex));
-              t.delete();
-            }
-            for (VariantGraphEdge e : joinCandidateOutgoing) {
-              connect(vertex, e.to(), e.witnesses());
-              e.delete();
-            }
-            joinCandidateEdge.delete();
-            joinCandidateVertex.delete();
-
-            outgoingEdges.remove(joinCandidateEdge);
-            queue.add(vertex);
+          for (VariantGraphEdge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
+            final VariantGraphVertex to = e.to();
+            final Set<Witness> witnesses = e.witnesses();
+            e.delete();
+            connect(vertex, to, witnesses);
           }
+          joinCandidateEdge.delete();
+          joinCandidateVertex.delete();
+          queue.push(vertex);
+          continue;
         }
       }
+
+      processed.add(vertex.getNode().getId());
       for (VariantGraphEdge e : outgoingEdges) {
-        queue.add(e.to());
+        final VariantGraphVertex next = e.to();
+        // FIXME: Why do we run out of memory in some cases here, if this is not checked?
+        if (!processed.contains(next.getNode().getId())) {
+          queue.push(next);
+        }
       }
     }
 
