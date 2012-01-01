@@ -23,32 +23,53 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.text.rdbms.RelationalText;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 
 import java.util.Date;
 
 /**
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc5013">RFC5013: The Dublin Core Metadata Element Set</a>
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ *
  */
 public class TextMetadata {
   private RelationalText text;
-  private TextCollection collection;
   private Date created;
   private Date updated;
   private String title;
-  private String summary;
-  private String author;
+  private String creator;
+  private String subject;
+  private String description;
+  private String publisher;
+  private String contributor;
+  private String date;
+  private String type;
+  private String format;
+  private String identifier;
+  private String source;
+  private String language;
 
   public TextMetadata() {
   }
 
   public TextMetadata(TextMetadata other) {
     this.text = other.text;
-    this.collection = other.collection;
     this.created = other.created;
     this.updated = other.updated;
     this.title = other.title;
-    this.summary = other.summary;
-    this.author = other.author;
+    this.creator = other.creator;
+    this.subject = other.subject;
+    this.description = other.description;
+    this.publisher = other.publisher;
+    this.contributor = other.contributor;
+    this.date = other.date;
+    this.type = other.type;
+    this.format = other.format;
+    this.identifier = other.identifier;
+    this.source = other.source;
+    this.language = other.language;
   }
 
   public RelationalText getText() {
@@ -83,44 +104,109 @@ public class TextMetadata {
     this.title = title;
   }
 
-  public String getSummary() {
-    return summary;
+  public String getCreator() {
+    return creator;
   }
 
-  public void setSummary(String summary) {
-    this.summary = summary;
+  public void setCreator(String creator) {
+    this.creator = creator;
   }
 
-  public String getAuthor() {
-    return author;
+  public String getSubject() {
+    return subject;
   }
 
-  public void setAuthor(String author) {
-    this.author = author;
+  public void setSubject(String subject) {
+    this.subject = subject;
   }
 
-  public TextCollection getCollection() {
-    return collection;
+  public String getPublisher() {
+    return publisher;
   }
 
-  public void setCollection(TextCollection collection) {
-    this.collection = collection;
+  public void setPublisher(String publisher) {
+    this.publisher = publisher;
+  }
+
+  public String getContributor() {
+    return contributor;
+  }
+
+  public void setContributor(String contributor) {
+    this.contributor = contributor;
+  }
+
+  public String getDate() {
+    return date;
+  }
+
+  public void setDate(String date) {
+    this.date = date;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getFormat() {
+    return format;
+  }
+
+  public void setFormat(String format) {
+    this.format = format;
+  }
+
+  public String getIdentifier() {
+    return identifier;
+  }
+
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
+  }
+
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  public String getLanguage() {
+    return language;
+  }
+
+  public void setLanguage(String language) {
+    this.language = language;
   }
 
   public String getDescription() {
-    final StringBuilder desc = new StringBuilder();
-    if (title != null) {
-      if (author != null) {
-        desc.append(author).append(": ");
-      }
-      desc.append(title);
-    } else {
-      desc.append("Text #").append(text.getId());
-    }
-    return desc.toString();
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public boolean isEmpty() {
-    return Iterables.all(Lists.newArrayList(title, summary, author), Predicates.isNull());
+    return Iterables.all(Lists.newArrayList(title, creator, subject, description, publisher, contributor, date, type, format, identifier, source, language), Predicates.isNull());
+  }
+
+  public void addTo(Document document) {
+    document.add(new Field("created", Long.toString(created.getTime()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+    document.add(new Field("updated", Long.toString(updated.getTime()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+    if (title != null) {
+      document.add(new Field("title", title, Field.Store.NO, Field.Index.ANALYZED));
+    }
+    if (description != null) {
+      document.add(new Field("description", description, Field.Store.NO, Field.Index.ANALYZED));
+    }
+    if (creator != null) {
+      document.add(new Field("creator", creator, Field.Store.NO, Field.Index.ANALYZED));
+    }
   }
 }

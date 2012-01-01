@@ -99,11 +99,11 @@ public class TextService implements InitializingBean {
   }
 
   public long count() {
-    return jt.queryForLong("select count(*) from repository_text_metadata");
+    return jt.queryForLong("select count(*) from text_metadata");
   }
 
   public List<TextMetadata> list(long page, long pageSize) {
-    return jt.query(sql().append(" order by tm.updated desc limit ? offset ?").toString(), new TextMetadataRowMapper(), pageSize, page * pageSize);
+    return jt.query(sql().append(" order by tm.text_updated desc limit ? offset ?").toString(), new TextMetadataRowMapper(), pageSize, page * pageSize);
   }
 
   public void scroll(final TextScroller scroller) {
@@ -124,8 +124,7 @@ public class TextService implements InitializingBean {
     sql.append(", ").append(selectMetadataFrom("tm"));
     sql.append(", ").append(selectCollectionFrom("tc"));
     sql.append(" from text_content t");
-    sql.append(" join repository_text_metadata tm on t.id = tm.text");
-    sql.append(" left join repository_text_collection tc on tm.collection = tc.id");
+    sql.append(" join text_metadata tm on t.id = tm.text");
     return sql;
   }
 
@@ -147,12 +146,20 @@ public class TextService implements InitializingBean {
     }
     metadataInsert.execute(new MapSqlParameterSource()
             .addValue("text", text.getId())
-            .addValue("created", metadata.getCreated())
-            .addValue("updated", metadata.getUpdated())
-            .addValue("collection", metadata.getCollection() == null ? null : metadata.getCollection().getId())
-            .addValue("title", metadata.getTitle())
-            .addValue("summary", metadata.getSummary())
-            .addValue("author", metadata.getAuthor()));
+            .addValue("text_created", metadata.getCreated())
+            .addValue("text_updated", metadata.getUpdated())
+            .addValue("text_title", metadata.getTitle())
+            .addValue("text_creator", metadata.getCreator())
+            .addValue("text_subject", metadata.getSubject())
+            .addValue("text_description", metadata.getDescription())
+            .addValue("text_publisher", metadata.getPublisher())
+            .addValue("text_contributor", metadata.getContributor())
+            .addValue("text_date", metadata.getDate())
+            .addValue("text_type", metadata.getType())
+            .addValue("text_format", metadata.getFormat())
+            .addValue("text_identifier", metadata.getIdentifier())
+            .addValue("text_source", metadata.getSource())
+            .addValue("text_language", metadata.getLanguage()));
 
     textIndex.update(metadata);
     return metadata;
@@ -186,7 +193,7 @@ public class TextService implements InitializingBean {
               } else if (inTitleStmt && "title".equals(localName)) {
                 text.setTitle(textContent());
               } else if (inTitleStmt && "author".equals(localName)) {
-                text.setAuthor(textContent());
+                text.setCreator(textContent());
               }
             }
 
@@ -232,7 +239,7 @@ public class TextService implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    this.metadataInsert = new SimpleJdbcInsert(dataSource).withTableName("repository_text_metadata");
+    this.metadataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_metadata");
     this.jt = new JdbcTemplate(dataSource);
     this.saxParserFactory = SAXParserFactory.newInstance();
     this.saxParserFactory.setValidating(false);
@@ -241,48 +248,37 @@ public class TextService implements InitializingBean {
   }
 
   public static String selectMetadataFrom(String tableName) {
-    return SQL.select(tableName, "created", "updated", "title", "summary", "author");
+    return SQL.select(tableName, "text_created", "text_updated", "text_title", "text_creator", "text_subject", "text_description", "text_publisher", "text_contributor", "text_date", "text_type", "text_format", "text_identifier", "text_source", "text_language");
   }
 
   public static String selectCollectionFrom(String tableName) {
     return SQL.select(tableName, "id", "name");
   }
 
-  public static TextMetadata mapMetadata(ResultSet rs, String prefix, RelationalText text, TextCollection collection) throws SQLException {
+  public static TextMetadata mapMetadata(ResultSet rs, String prefix, RelationalText text) throws SQLException {
     final TextMetadata metadata = new TextMetadata();
     metadata.setText(text);
-    metadata.setCollection(collection);
-    metadata.setCreated(rs.getTimestamp(prefix + "_created"));
-    metadata.setUpdated(rs.getTimestamp(prefix + "_updated"));
-    metadata.setTitle(rs.getString(prefix + "_title"));
-    metadata.setSummary(rs.getString(prefix + "_summary"));
-    metadata.setAuthor(rs.getString(prefix + "_author"));
+    metadata.setCreated(rs.getTimestamp(prefix + "_text_created"));
+    metadata.setUpdated(rs.getTimestamp(prefix + "_text_updated"));
+    metadata.setTitle(rs.getString(prefix + "_text_title"));
+    metadata.setCreator(rs.getString(prefix + "_text_creator"));
+    metadata.setSubject(rs.getString(prefix + "_text_subject"));
+    metadata.setDescription(rs.getString(prefix + "_text_description"));
+    metadata.setPublisher(rs.getString(prefix + "_text_publisher"));
+    metadata.setContributor(rs.getString(prefix + "_text_contributor"));
+    metadata.setDate(rs.getString(prefix + "_text_date"));
+    metadata.setType(rs.getString(prefix + "_text_type"));
+    metadata.setFormat(rs.getString(prefix + "_text_format"));
+    metadata.setIdentifier(rs.getString(prefix + "_text_identifier"));
+    metadata.setSource(rs.getString(prefix + "_text_source"));
+    metadata.setLanguage(rs.getString(prefix + "_text_language"));
     return metadata;
   }
 
-  public static TextCollection mapCollection(ResultSet rs, String prefix) throws SQLException {
-    final TextCollection collection = new TextCollection();
-    collection.setId(rs.getLong(prefix + "_id"));
-    collection.setName(rs.getString(prefix + "_name"));
-    return collection;
-  }
-
   private static class TextMetadataRowMapper implements RowMapper<TextMetadata> {
-    private Map<Long, TextCollection> collections = Maps.newHashMap();
-
     @Override
     public TextMetadata mapRow(ResultSet rs, int rowNum) throws SQLException {
-      TextCollection collection = mapCollection(rs, "tc");
-      final long collectionId = collection.getId();
-      if (collectionId == 0) {
-        collection = null;
-      } else if (collections.containsKey(collectionId)) {
-        collection = collections.get(collectionId);
-      } else {
-        collections.put(collectionId, collection);
-      }
-
-      return mapMetadata(rs, "tm", mapTextFrom(rs, "t"), collection);
+      return mapMetadata(rs, "tm", mapTextFrom(rs, "t"));
     }
   }
 

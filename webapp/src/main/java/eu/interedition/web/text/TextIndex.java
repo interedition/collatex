@@ -126,17 +126,7 @@ public class TextIndex implements InitializingBean, DisposableBean {
         document.add(new Field("content_length", Long.toString(text.getLength()), Field.Store.YES, Field.Index.NOT_ANALYZED));
         document.add(new Field("content", content));
 
-        document.add(new Field("created", Long.toString(metadata.getCreated().getTime()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        document.add(new Field("updated", Long.toString(metadata.getUpdated().getTime()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        if (metadata.getTitle() != null) {
-          document.add(new Field("title", metadata.getTitle(), Field.Store.NO, Field.Index.ANALYZED));
-        }
-        if (metadata.getSummary() != null) {
-          document.add(new Field("summary", metadata.getSummary(), Field.Store.NO, Field.Index.ANALYZED));
-        }
-        if (metadata.getAuthor() != null) {
-          document.add(new Field("author", metadata.getAuthor(), Field.Store.NO, Field.Index.ANALYZED));
-        }
+        metadata.addTo(document);
 
         indexWriter.updateDocument(idTerm(metadata), document);
         commit();
@@ -165,7 +155,7 @@ public class TextIndex implements InitializingBean, DisposableBean {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
         try {
-          final long numTexts = jt.queryForLong("select count(*) from repository_text_metadata");
+          final long numTexts = jt.queryForLong("select count(*) from text_metadata");
           final long numDocuments = indexWriter.numDocs();
           if (numTexts != numDocuments) {
             taskExecutor.execute(new IndexingTask());
