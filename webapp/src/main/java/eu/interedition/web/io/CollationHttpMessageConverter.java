@@ -2,10 +2,15 @@ package eu.interedition.web.io;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex.CollationAlgorithm;
+import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.input.WhitespaceTokenizer;
 import eu.interedition.collatex.input.SimpleWitness;
+import eu.interedition.collatex.matching.EditDistanceTokenComparator;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.web.collatex.Collation;
 import eu.interedition.web.collatex.WebToken;
 import org.codehaus.jackson.JsonNode;
@@ -18,6 +23,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -26,10 +32,12 @@ import java.util.SortedSet;
  */
 public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<Collation> {
 
-  private ObjectMapper objectMapper = new ObjectMapper();
+  private final GraphFactory graphFactory;
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
-  public CollationHttpMessageConverter() {
+  public CollationHttpMessageConverter(GraphFactory graphFactory) {
     super(MediaType.APPLICATION_JSON);
+    this.graphFactory = graphFactory;
   }
 
   @Override
@@ -45,12 +53,13 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
   @Override
   protected Collation readInternal(Class<? extends Collation> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     final JsonNode collationNode = objectMapper.readTree(inputMessage.getBody());
+
     final JsonNode witnessesNode = collationNode.path("witnesses");
     if (witnessesNode.isMissingNode() || !witnessesNode.isArray()) {
       throw new HttpMessageNotReadableException("Expecting 'witnesses' array");
     }
-    
-    List<Iterable<Token>> witnesses = Lists.newArrayList();
+
+    final List<Iterable<Token>> witnesses = Lists.newArrayList();
     for (JsonNode witnessNode : witnessesNode) {
       if (!witnessNode.isObject()) {
         throw new HttpMessageNotReadableException("Expecting witness object");
@@ -124,7 +133,33 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
       throw new HttpMessageNotReadableException("No witnesses in collation");
     }
 
-    return new Collation(witnesses);
+    Comparator<Token> tokenComparator = null;
+    final JsonNode tokenComparatorNode = collationNode.path("tokenComparator");
+    if (tokenComparatorNode.isObject()) {
+      if ("levenshtein".equals(tokenComparatorNode.path("type").getTextValue())) {
+        final int configuredDistance = tokenComparatorNode.path("distance").getIntValue();
+        tokenComparator = new EditDistanceTokenComparator(configuredDistance == 0 ? 1 : configuredDistance);
+      }
+    }
+    if (tokenComparator == null) {
+      tokenComparator = new EqualityTokenComparator();
+    }
+
+    CollationAlgorithm collationAlgorithm = null;
+    final JsonNode collationAlgorithmNode = collationNode.path("algorithm");
+    if (collationAlgorithmNode.isTextual()) {
+      final String collationAlgorithmValue = collationAlgorithmNode.getTextValue();
+      if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
+        collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
+      } else if ("dekker-experimental".equalsIgnoreCase(collationAlgorithmValue)) {
+        collationAlgorithm = CollationAlgorithmFactory.dekkerExperimental(tokenComparator, graphFactory);
+      }
+    }
+    if (collationAlgorithm == null) {
+      collationAlgorithm = CollationAlgorithmFactory.dekker(tokenComparator);
+    }
+
+    return new Collation(witnesses, collationAlgorithm);
   }
 
   @Override

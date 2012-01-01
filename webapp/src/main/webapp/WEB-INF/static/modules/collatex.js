@@ -6,11 +6,13 @@ YUI.add('interedition-collatex', function(Y) {
     };
     NS.Collator.NAME = "collatex-collator";
     NS.Collator.ATTRS = {
-        "base": {}
+        "base": {},
+        "algorithm": { value: "dekker" },
+        "tokenComparator": { value: { type: "equality" } }
     };
 
     Y.extend(NS.Collator, Y.Base, {
-        collate: function(resultType, data, callback) {
+        collate: function(resultType, witnesses, callback) {
             Y.io.queue.stop();
             Y.io.queue(this.get("base") + "/collate", {
                 method:"post",
@@ -18,7 +20,11 @@ YUI.add('interedition-collatex', function(Y) {
                     "Content-Type":"application/json",
                     "Accept": resultType
                 },
-                data: Y.JSON.stringify(data),
+                data: Y.JSON.stringify({
+                    witnesses: witnesses,
+                    algorithm: this.get("algorithm"),
+                    tokenComparator: this.get("tokenComparator")
+                }),
                 on:{
                     success: function(transactionId, resp) { callback(resp); },
                     failure: function (transactionId, resp) { alert("Error in collator: " + resp.statusText); }

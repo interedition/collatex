@@ -218,32 +218,32 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "inte
 
         clearResults();
 
-        var witnesses = getWitnesses();
-        if (witnesses.length <= 1) {
+        var witnessTexts = getWitnesses();
+        if (witnessTexts.length <= 1) {
             return;
         }
 
         // build the collation input
-        var collation = { witnesses:[] };
-        Y.each(witnesses, function (w, i) {
-            collation.witnesses.push({ id:"W" + (i + 1).toString(), content:witnesses[i] });
+        var witnesses = [];
+        Y.each(witnessTexts, function(w, i) {
+            witnesses.push({ id:"W" + (i + 1).toString(), content: w });
         });
 
-        collator.toSVG(collation, function (svg) {
+        collator.toSVG(witnesses, function(svg) {
             svgContainer.getDOMNode().appendChild(document.importNode(svg, true));
             tableContainer.scrollIntoView();
         });
-        collator.toTable(collation, tableContainer);
-        collator.toGraphViz(collation, function (resp) {
+        collator.toTable(witnesses, tableContainer);
+        collator.toGraphViz(witnesses, function(resp) {
             var textArea = create('<textarea rows="10" style="width: 20em" readonly="readonly">' + Y.Escape.html(resp) + '</textarea>');
             graphVizDotContainer.append(textArea);
         });
-        collator.toGraphML(collation, function (resp) {
+        collator.toGraphML(witnesses, function(resp) {
             var textArea = create('<textarea rows="10" style="width: 20em" readonly="readonly">' + Y.Escape.html(resp) + '</textarea>');
             graphmlContainer.append(textArea);
         });
 
-        collator.toTEI(collation, function (resp) {
+        collator.toTEI(witnesses, function(resp) {
             var textArea = create('<textarea rows="10" style="width: 20em" readonly="readonly">' + Y.Escape.html(resp) + '</textarea>');
             teiPsContainer.append(textArea);
         });
@@ -256,6 +256,15 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "inte
             setWitnesses(["", ""]);
         } else {
             setWitnesses(examples[parseInt(selected)]);
+            collate();
+        }
+    }
+
+    function selectAlgorithm(e) {
+        var newValue = this.get("value");
+        var oldValue = collator.get("algorithm");
+        if (oldValue != newValue) {
+            collator.set("algorithm", newValue);
             collate();
         }
     }
@@ -285,6 +294,7 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "inte
             exampleSelect.append(sub('<option value="{value}">{title}</option>', exampleData));
         });
 
+        Y.on("change", selectAlgorithm, "#algorithm");
         Y.on("change", selectExample, "#examples");
         Y.on("click", addWitness, "#add-witness");
         Y.on("submit", collate, "#collate-form");

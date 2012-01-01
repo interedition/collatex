@@ -1,7 +1,17 @@
 <@ie.page title="CollateX Console">
     <div id="input">
-        <h2>Witnesses</h2>
+        <h2>Collation</h2>
         <form id="collate-form" method="post">
+            <div class="yui3-g form-element">
+              <div class="yui3-u-1-6 form-label"><label for="algorithm">Algorithm:</label></div>
+              <div class="yui3-u form-input">
+                <select id="algorithm" name="algorithm" style="width: 40em">
+                  <option value="dekker">Dekker</option>
+                  <option value="dekker-experimental">Dekker-Experimental</option>
+                  <option value="needleman-wunsch">Needleman-Wunsch</option>
+                </select>
+              </div>
+            </div>
             <div class="yui3-g form-element">
                 <div class="yui3-u-1-6 form-label"><label for="examples">Examples:</label></div>
                 <div class="yui3-u form-input">

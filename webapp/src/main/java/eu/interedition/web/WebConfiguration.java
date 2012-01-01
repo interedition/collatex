@@ -1,6 +1,7 @@
 package eu.interedition.web;
 
 import com.google.common.collect.Maps;
+import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.json.JSONSerializer;
@@ -51,6 +52,9 @@ import java.util.Properties;
 public class WebConfiguration extends WebMvcConfigurerAdapter {
 
   @Autowired
+  private GraphFactory graphFactory;
+
+  @Autowired
   private GraphVizService graphVizService;
 
   @Autowired
@@ -72,7 +76,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.add(new CollationHttpMessageConverter());
+    converters.add(new CollationHttpMessageConverter(graphFactory));
     converters.add(new VariantGraphTEIHttpMessageConverter());
     converters.add(new VariantGraphMLHttpMessageConverter());
     converters.add(new VariantGraphVizHttpMessageConverter(graphVizService));

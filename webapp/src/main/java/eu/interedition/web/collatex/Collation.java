@@ -20,6 +20,7 @@
 
 package eu.interedition.web.collatex;
 
+import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.input.SimpleWitness;
@@ -31,12 +32,18 @@ import java.util.SortedSet;
 public class Collation {
 
   private final List<Iterable<Token>> witnesses;
+  private final CollationAlgorithm algorithm;
 
-  public Collation(List<Iterable<Token>> witnesses) {
+  public Collation(List<Iterable<Token>> witnesses, CollationAlgorithm algorithm) {
     this.witnesses = witnesses;
+    this.algorithm = algorithm;
   }
 
   public List<Iterable<Token>> getWitnesses() {
     return witnesses;
+  }
+
+  public CollationAlgorithm getAlgorithm() {
+    return algorithm;
   }
 }

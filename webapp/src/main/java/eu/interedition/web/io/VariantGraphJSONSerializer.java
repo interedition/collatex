@@ -1,8 +1,11 @@
 package eu.interedition.web.io;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
+import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
@@ -13,6 +16,7 @@ import eu.interedition.collatex.input.SimpleToken;
 import eu.interedition.web.collatex.WebToken;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -37,7 +41,7 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
 
   protected static final MediaType APPLICATION_ALIGNMENTTABLE_JSON = new MediaType("application", "collatex.table+json");
 
-  private JsonFactory jsonFactory = new JsonFactory();
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   public VariantGraphJSONSerializer() {
     super(MediaType.APPLICATION_JSON);
@@ -61,7 +65,7 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
   @Override
   protected void writeInternal(VariantGraph graph, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     final OutputStream body = outputMessage.getBody();
-    final JsonGenerator jgen = jsonFactory.createJsonGenerator(body);
+    final JsonGenerator jgen = objectMapper.getJsonFactory().createJsonGenerator(body);
     final Transaction tx = graph.newTransaction();
     try {
       final MediaType contentType = outputMessage.getHeaders().getContentType();

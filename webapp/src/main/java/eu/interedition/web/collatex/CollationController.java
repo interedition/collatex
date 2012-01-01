@@ -20,11 +20,8 @@
 
 package eu.interedition.web.collatex;
 
-import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -55,15 +51,13 @@ public class CollationController implements InitializingBean {
   @RequestMapping(method = RequestMethod.POST)
   @ResponseBody
   public VariantGraph graph(@RequestBody Collation collation) throws Exception {
-    final List<Iterable<Token>> witnesses = collation.getWitnesses();
-
     final Transaction tx = graphFactory.getDatabase().beginTx();
     try {
       // create
       final VariantGraph graph = graphFactory.newVariantGraph();
 
       // merge
-      CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(graph, witnesses);
+      collation.getAlgorithm().collate(graph, collation.getWitnesses());
 
       // post-process
       graph.join().rank();
