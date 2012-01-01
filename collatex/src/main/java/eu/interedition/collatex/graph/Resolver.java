@@ -7,8 +7,6 @@ import java.util.Set;
  */
 public interface Resolver<T> {
 
-  int add(T entity);
-
   Set<T> resolve(int... refs);
 
   int[] resolve(Set<T> entities);
