@@ -1,20 +1,18 @@
 package eu.interedition.app;
 
-import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import java.util.concurrent.Executors;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Application extends JFrame {
+public class Server extends JFrame {
 
-  public Application() {
+  public Server() {
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setTitle("Interedition Microservices");
 
@@ -26,12 +24,12 @@ public class Application extends JFrame {
   }
 
   public static void main(String... args) {
-    new Application();
+    new Server();
   }
 
   private class ServerControlAction extends AbstractAction {
 
-    private Server server;
+    private org.mortbay.jetty.Server server;
 
     private ServerControlAction() {
       super("Start Server");
@@ -47,7 +45,7 @@ public class Application extends JFrame {
             final SelectChannelConnector connector = new SelectChannelConnector();
             connector.setPort(9090);
 
-            server = new Server();
+            server = new org.mortbay.jetty.Server();
             server.addConnector(connector);
             //server.setHandler(new WebAppContext(webappFile.toURI().toString(), CONTEXT_PATH));
             server.setStopAtShutdown(true);

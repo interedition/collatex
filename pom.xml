@@ -22,7 +22,7 @@
         <module>text</module>
         <module>style</module>
         <module>webapp</module>
-        <module>app</module>
+        <module>server</module>
     </modules>
     <dependencies>
         <dependency>
