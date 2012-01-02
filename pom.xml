@@ -382,7 +382,7 @@
     </licenses>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <license.licenseName>apache_v2</license.licenseName>
+        <license.licenseName>gpl_v3</license.licenseName>
         <spring.version>3.1.0.RELEASE</spring.version>
         <slf4j.version>1.5.11</slf4j.version>
         <restlet.version>2.0-RC2</restlet.version>
