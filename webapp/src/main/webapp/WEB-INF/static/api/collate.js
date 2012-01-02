@@ -1,17 +1,7 @@
-YUI.add('interedition-collatex', function(Y) {
-    var NS = Y.namespace("interedition.collatex");
+YUI.add('interedition-collate', function(Y) {
+    var NS = Y.namespace("interedition.collate");
 
-    NS.Collator = function(config) {
-        NS.Collator.superclass.constructor.apply(this, arguments);
-    };
-    NS.Collator.NAME = "collatex-collator";
-    NS.Collator.ATTRS = {
-        "base": {},
-        "algorithm": { value: "dekker" },
-        "tokenComparator": { value: { type: "equality" } }
-    };
-
-    Y.extend(NS.Collator, Y.Base, {
+    NS.Collator = Y.Base.create("interedition-collate-collator", Y.Base, [], {
         collate: function(resultType, witnesses, callback) {
             Y.io.queue.stop();
             Y.io.queue(this.get("base") + "/collate", {
@@ -27,7 +17,7 @@ YUI.add('interedition-collatex', function(Y) {
                 }),
                 on:{
                     success: function(transactionId, resp) { callback(resp); },
-                    failure: function (transactionId, resp) { alert("Error in collator: " + resp.statusText); }
+                    failure: function(transactionId, resp) { alert("Error in collator: " + resp.statusText); }
                 }
             });
             Y.io.queue.start();
@@ -86,6 +76,12 @@ YUI.add('interedition-collatex', function(Y) {
 
                 container.append(table);
             });
+        }
+    }, {
+        ATTRS: {
+            "base": {},
+            "algorithm": { value: "dekker" },
+            "tokenComparator": { value: { type: "equality" } }
         }
     });
 }, "1", {

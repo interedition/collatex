@@ -160,8 +160,8 @@ var examples = [
     ]
 ];
 
-YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "interedition-collatex", function(Y) {
-    var collator = new Y.interedition.collatex.Collator({ base: cp }),
+YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "interedition-collate", function(Y) {
+    var collator = new Y.interedition.collate.Collator({ base: cp }),
         create = Y.Node.create,
         sub = Y.Lang.sub,
         svgContainer = null,

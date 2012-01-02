@@ -892,8 +892,8 @@ var darwinChapters = [ {
   } ]
 } ];
 
-YUI().use("node", "array-extras", "json", "escape", "interedition-collatex", function(Y) {
-    var collator = new Y.interedition.collatex.Collator({ base: cp }), slots = [];
+YUI().use("node", "array-extras", "json", "escape", "interedition-collate", function(Y) {
+    var collator = new Y.interedition.collate.Collator({ base: cp }), slots = [];
 
     for (var cc = 0; cc < darwinChapters.length; cc++) {
         slots[cc] = Y.Node.create('<div class="chapter"><h2>' + (cc + 1) + '.</h2></div>');
@@ -902,6 +902,6 @@ YUI().use("node", "array-extras", "json", "escape", "interedition-collatex", fun
 
     for (var cc = 0; cc < darwinChapters.length; cc++) {
         var currentSlot = slots[cc];
-        collator.toTable(darwinChapters[cc], currentSlot);
+        collator.toTable(darwinChapters[cc].witnesses, currentSlot);
     }
 })

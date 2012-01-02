@@ -91,6 +91,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("/static/interedition/**").addResourceLocations("classpath:/eu/interedition/style/");
     registry.addResourceHandler("/static/**").addResourceLocations("/WEB-INF/static/");
   }
 

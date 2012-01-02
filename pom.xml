@@ -22,7 +22,9 @@
         <module>collatex-nmerge</module>
         <module>collatex-cocoon</module>
         <module>text</module>
+        <module>style</module>
         <module>webapp</module>
+        <module>app</module>
     </modules>
     <dependencies>
         <dependency>
@@ -76,6 +78,11 @@
                 <groupId>eu.interedition</groupId>
                 <artifactId>text</artifactId>
                 <version>1.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.interedition</groupId>
+                <artifactId>style</artifactId>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -221,6 +228,11 @@
                 <artifactId>jung-visualization</artifactId>
                 <version>${jung.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty</artifactId>
+                <version>6.1.26</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <repositories>
@@ -273,69 +285,9 @@
                 </executions>
                 -->
             </plugin>
-            <!--
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.9.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <aggregate>true</aggregate>
-                    <strictCheck>true</strictCheck>
-                    <header>HEADER</header>
-                    <encoding>UTF-8</encoding>
-                    <excludes>
-                        <exclude>HEADER</exclude>
-                        <exclude>LICENSE</exclude>
-                        <exclude>NOTICE</exclude>
-                        <exclude>README</exclude>
-                        <exclude>**/*.apt</exclude>
-                        <exclude>**/*.py</exclude>
-                        <exclude>**/*.rb</exclude>
-                        <exclude>src/test/resources/**</exclude>
-                        <exclude>src/main/webapp/examples.xml</exclude>
-                        <exclude>src/main/webapp/darwin.xml</exclude>
-                        <exclude>examples/**</exclude>
-                        <exclude>site/**</exclude>
-                        <exclude>target/**</exclude>
-                    </excludes>
-                    <properties>
-                        <year>2010</year>
-                    </properties>
-                </configuration>
-            </plugin>
-            -->
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.1.2</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>bin</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.26</version>
             </plugin>
         </plugins>
         <extensions>
