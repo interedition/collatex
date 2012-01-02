@@ -8,16 +8,16 @@
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <title>${title} :: Interedition Web Services</title>
 
-  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssfonts/fonts-min.css">
-  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssreset/reset-min.css">
-  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssgrids/grids-min.css">
-  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssbase/base-min.css">
+  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.1/build/cssfonts/fonts-min.css">
+  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.1/build/cssreset/reset-min.css">
+  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.1/build/cssgrids/grids-min.css">
+  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.1/build/cssbase/base-min.css">
   <link rel="stylesheet" type="text/css" href="${cp}/static/webapp.css">
   <link rel="stylesheet" type="text/css" href="${cp}/static/interedition/interedition.css">
 
   <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.min.js"></script>
   <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.behavior.min.js"></script>
-  <script type="text/javascript" src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
+  <script type="text/javascript" src="${cp}/static/yui-3.4.1/build/yui/yui-min.js"></script>
   <script type="text/javascript" src="${cp}/static/api/collate.js"></script>
   <script type="text/javascript" src="${cp}/static/api/text.js"></script>
   <script type="text/javascript">var cp = "${cp?js_string}";</script>
