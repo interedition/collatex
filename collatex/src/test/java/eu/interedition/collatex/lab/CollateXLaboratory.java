@@ -1,10 +1,8 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.input.SimpleWitness;
