@@ -277,17 +277,6 @@
                         <root>src/test/java</root>
                     </roots>
                 </configuration>
-                <!--
-                <executions>
-                    <execution>
-                        <id>first</id>
-                        <goals>
-                            <goal>update-file-header</goal>
-                        </goals>
-                        <phase>process-sources</phase>
-                    </execution>
-                </executions>
-                -->
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
@@ -366,7 +355,7 @@
     </distributionManagement>
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/gremid/collatex/issues/</url>
+        <url>https://github.com/interedition/microservices/issues</url>
     </issueManagement>
     <licenses>
         <license>
@@ -385,7 +374,6 @@
         <license.licenseName>gpl_v3</license.licenseName>
         <spring.version>3.1.0.RELEASE</spring.version>
         <slf4j.version>1.5.11</slf4j.version>
-        <restlet.version>2.0-RC2</restlet.version>
         <jung.version>2.0.1</jung.version>
     </properties>
 </project>
