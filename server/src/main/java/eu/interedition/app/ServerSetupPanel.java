@@ -58,6 +58,7 @@ public class ServerSetupPanel extends JPanel {
 
     gbc.gridx++;
     gbc.anchor = GridBagConstraints.LINE_START;
+    dotPathTextField.setEditable(false);
     add(dotPathTextField, gbc);
 
     gbc.gridx++;

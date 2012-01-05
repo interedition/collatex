@@ -169,6 +169,8 @@ public class TextIndex implements InitializingBean, DisposableBean {
 
   @Override
   public void destroy() throws Exception {
+    Closeables.close(this.indexReader, false);
+    Closeables.close(this.indexWriter, false);
     Closeables.close(this.directory, false);
   }
 

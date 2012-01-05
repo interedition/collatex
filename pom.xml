@@ -246,6 +246,10 @@
     </dependencyManagement>
     <repositories>
         <repository>
+            <id>interedition-releases</id>
+            <url>http://gregor.middell.net/maven/content/repositories/interedition-releases</url>
+        </repository>
+        <repository>
             <id>spring-maven-milestone</id>
             <name>Springframework Maven Repository</name>
             <url>http://maven.springframework.org/milestone</url>

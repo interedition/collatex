@@ -1,9 +1,9 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-    <id>dist</id>
+    <id>webstart</id>
     <formats>
-        <format>dir</format>
+        <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
@@ -17,16 +17,14 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/assembly/skel</directory>
+            <directory>${project.build.directory}/jnlp</directory>
             <outputDirectory>/</outputDirectory>
             <directoryMode>0755</directoryMode>
             <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/appassembler</directory>
-            <outputDirectory>/</outputDirectory>
-            <directoryMode>0755</directoryMode>
-            <fileMode>0644</fileMode>
+            <excludes>
+                <exclude>**/*.pack</exclude>
+                <exclude>**/*.keystore</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
     <dependencySets>
@@ -40,12 +38,11 @@
             <fileMode>0644</fileMode>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>web</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <scope>runtime</scope>
             <includes>
                 <include>*:*:war:*</include>
             </includes>
-            <unpack>true</unpack>
             <directoryMode>0755</directoryMode>
             <fileMode>0644</fileMode>
         </dependencySet>

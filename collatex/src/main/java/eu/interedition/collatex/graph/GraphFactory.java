@@ -83,7 +83,7 @@ public class GraphFactory {
 
       final Relationship egRel = referenceNode.getSingleRelationship(EDIT_GRAPH, OUTGOING);
       if (egRel == null) {
-        referenceNode.createRelationshipTo(editGraphs = database.createNode(), VARIANT_GRAPH);
+        referenceNode.createRelationshipTo(editGraphs = database.createNode(), EDIT_GRAPH);
       } else {
         editGraphs = egRel.getEndNode();
       }

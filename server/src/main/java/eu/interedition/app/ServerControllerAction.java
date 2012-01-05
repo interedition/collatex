@@ -18,7 +18,6 @@ import java.net.UnknownHostException;
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
 */
 public class ServerControllerAction extends AbstractAction {
-  private static final String BASE_DIRECTORY_PATH = System.getProperty("basedir");
   private static final String START_LABEL = "Start Server";
   private static final String STOP_LABEL = "Stop Server";
 
@@ -26,12 +25,10 @@ public class ServerControllerAction extends AbstractAction {
 
   private Desktop desktop = Desktop.getDesktop();
   private Server server;
-  private final File webApplicationRoot;
 
   public ServerControllerAction(ServerLaunchFrame frame) {
     super(START_LABEL);
     this.frame = frame;
-    this.webApplicationRoot = (BASE_DIRECTORY_PATH == null ? null : new File(BASE_DIRECTORY_PATH, "web"));
     putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/org/freedesktop/tango/16x16/apps/internet-web-browser.png"), "Browse Web"));
   }
 
@@ -46,6 +43,11 @@ public class ServerControllerAction extends AbstractAction {
 
   public void start() {
     if (server != null) {
+      return;
+    }
+    final File webappArchive = ServerLaunchFrame.getWebappArchive();
+    if (!webappArchive.isDirectory()) {
+      JOptionPane.showMessageDialog(frame, "The server code has not been downloaded yet.\nPlease ensure you have a connection to the Internet and restart the application in order to download it.", "Server code not available", JOptionPane.WARNING_MESSAGE);
       return;
     }
 
@@ -72,9 +74,7 @@ public class ServerControllerAction extends AbstractAction {
         server = new Server();
         server.setStopAtShutdown(true);
         server.addConnector(connector);
-        if (webApplicationRoot != null) {
-          server.setHandler(new WebAppContext(webApplicationRoot.toURI().toString(), "/"));
-        }
+        server.setHandler(new WebAppContext(webappArchive.getAbsolutePath(), "/"));
         try {
           server.start();
           putValue(Action.NAME, STOP_LABEL);
