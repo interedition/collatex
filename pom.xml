@@ -68,6 +68,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>javax.jnlp</groupId>
+                <artifactId>jnlp-api</artifactId>
+                <version>1.5.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>eu.interedition</groupId>
                 <artifactId>collatex</artifactId>
                 <version>1.3-SNAPSHOT</version>

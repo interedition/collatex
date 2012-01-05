@@ -1,11 +1,8 @@
-package eu.interedition.app;
+package eu.interedition.server;
 
-import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.NullOutputStream;
 
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
@@ -20,23 +17,35 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
+ * Downloads the web application archive if it is not available on the local machine yet.
+ * <p/>
+ * The archive is downloaded from where the application was (Java Web Start's codebase) and unpacked into the
+ * application's data directory.
+ *
+ * @see eu.interedition.server.ServerApplicationFrame#getWebappArchive()
+ * @see javax.jnlp.BasicService#getCodeBase()
+ *
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class WebApplicationDownloader implements Runnable {
 
-  private final ServerLaunchFrame frame;
+  private final ServerApplicationFrame frame;
 
-  public WebApplicationDownloader(ServerLaunchFrame frame) {
+  /**
+   * Constructor.
+   *
+   * @param frame the application's frame for lookup of the web application's location
+   */
+  public WebApplicationDownloader(ServerApplicationFrame frame) {
     this.frame = frame;
   }
 
   @Override
   public void run() {
-    final File webappArchive = ServerLaunchFrame.getWebappArchive();
+    final File webappArchive = ServerApplicationFrame.getWebappArchive();
     if (webappArchive.isDirectory()) {
       return;
     }

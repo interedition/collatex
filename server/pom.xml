@@ -23,8 +23,6 @@
         <dependency>
             <groupId>javax.jnlp</groupId>
             <artifactId>jnlp-api</artifactId>
-            <version>1.5.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>eu.interedition</groupId>
@@ -62,7 +60,7 @@
                     <codebase>${webstart.codebase}</codebase>
                     <jnlp>
                         <outputFile>server.jnlp</outputFile>
-                        <mainClass>eu.interedition.app.ServerLaunchFrame</mainClass>
+                        <mainClass>eu.interedition.server.ServerApplicationFrame</mainClass>
                     </jnlp>
                     <sign>
                         <keystore>interedition.keystore</keystore>
