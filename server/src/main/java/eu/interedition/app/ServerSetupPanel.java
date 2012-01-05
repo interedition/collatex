@@ -1,6 +1,6 @@
 package eu.interedition.app;
 
-import com.google.common.io.ByteStreams;
+import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 
@@ -20,7 +20,7 @@ import java.nio.charset.Charset;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class ServerConfigurationPanel extends JPanel {
+public class ServerSetupPanel extends JPanel {
 
   private final ServerLaunchFrame frame;
 
@@ -30,8 +30,9 @@ public class ServerConfigurationPanel extends JPanel {
 
   private File dotPath;
   private int port = 7369;
+  private final ServerControllerAction launchAction;
 
-  public ServerConfigurationPanel(ServerLaunchFrame frame) {
+  public ServerSetupPanel(ServerLaunchFrame frame) {
     super(new GridBagLayout());
     final GridBagConstraints gbc = new GridBagConstraints();
     this.frame = frame;
@@ -87,11 +88,16 @@ public class ServerConfigurationPanel extends JPanel {
     add(serverUrl, gbc);
     
     gbc.gridx++;
-    add(new JButton(new ServerLaunchAction(frame)), gbc);
+    launchAction = new ServerControllerAction(frame);
+    add(new JButton(launchAction), gbc);
 
     setBorder(BorderFactory.createTitledBorder("Server settings"));
 
     frame.getExecutorService().execute(new DotPathAutodetector());
+  }
+
+  public ServerControllerAction getControllerAction() {
+    return launchAction;
   }
 
   public File getDotPath() {
@@ -107,18 +113,18 @@ public class ServerConfigurationPanel extends JPanel {
       @Override
       public void run() {
         if (serverUrl == null) {
-          ServerConfigurationPanel.this.serverUrl.setText("");
-          ServerConfigurationPanel.this.serverUrl.setEnabled(false);
+          ServerSetupPanel.this.serverUrl.setText("");
+          ServerSetupPanel.this.serverUrl.setEnabled(false);
         } else {
-          ServerConfigurationPanel.this.serverUrl.setText(serverUrl.toString());
-          ServerConfigurationPanel.this.serverUrl.setEnabled(true);
+          ServerSetupPanel.this.serverUrl.setText(serverUrl.toString());
+          ServerSetupPanel.this.serverUrl.setEnabled(true);
         }
       }
     });
   }
 
-  public void setDotPath(final File dotPath) {
-    this.dotPath = dotPath;
+  public void setDotPath(final File newDotPath) {
+    this.dotPath = (newDotPath.isFile() && newDotPath.canExecute() ? newDotPath : null);
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
@@ -164,13 +170,16 @@ public class ServerConfigurationPanel extends JPanel {
   }
 
   private class DotPathAutodetector implements Runnable {
+
+    private final Charset charset = Charset.defaultCharset();
+
     @Override
     public void run() {
       String path = null;
       InputStream stream = null;
       try {
         final Process which = new ProcessBuilder("which", "dot").start();
-        path = CharStreams.toString(new InputStreamReader(stream = which.getInputStream(), Charset.defaultCharset()));
+        path = CharStreams.toString(new InputStreamReader(stream = which.getInputStream(), charset)).trim();
         which.waitFor();
       } catch (IOException e) {
       } catch (InterruptedException e) {
@@ -178,10 +187,10 @@ public class ServerConfigurationPanel extends JPanel {
         Closeables.closeQuietly(stream);
       }
 
-      if (path == null || path.trim().length() == 0) {
+      if (Strings.isNullOrEmpty(path)) {
         try {
           final Process where = new ProcessBuilder("where.exe", "dot.exe").start();
-          path = CharStreams.toString(new InputStreamReader(stream = where.getInputStream(), Charset.defaultCharset()));
+          path = CharStreams.toString(new InputStreamReader(stream = where.getInputStream(), charset)).trim();
           where.waitFor();
         } catch (IOException e) {
         } catch (InterruptedException e) {
@@ -191,18 +200,12 @@ public class ServerConfigurationPanel extends JPanel {
 
       }
 
-      if (path == null || path.trim().length() == 0) {
+      if (Strings.isNullOrEmpty(path)) {
         return;
       }
 
-      final String[] paths = path.trim().split("[\r\n]+");
-      path = (path.length() == 0 ? null : paths[0].trim());
-      if (path == null) {
-        return;
-      }
-
-      final File file = new File(path);
-      setDotPath(file.canExecute() ? file : null);
+      final String[] paths = path.split("[\r\n]+");
+      setDotPath(new File(paths[0].trim()));
     }
   }
 }

@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,10 +18,9 @@ public class ServerLaunchFrame extends JFrame {
   private static final Logger LOG = LoggerFactory.getLogger(ServerLaunchFrame.class.getPackage().getName());
 
   private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-  private final ServerConfigurationPanel configurationPanel = new ServerConfigurationPanel(this);
+  private final ServerSetupPanel setupPanel = new ServerSetupPanel(this);
 
   public ServerLaunchFrame() {
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
     setTitle("Interedition Microservices");
 
     final JLabel logo = new JLabel(new ImageIcon(getClass().getResource("/eu/interedition/style/interedition_logo.png"), "Interedition-Logo"));
@@ -31,20 +32,28 @@ public class ServerLaunchFrame extends JFrame {
     logoPanel.add(logo);
     add(logoPanel, BorderLayout.WEST);
 
-    add(configurationPanel, BorderLayout.CENTER);
+    add(setupPanel, BorderLayout.CENTER);
 
     pack();
     setLocation(200, 200);
     setResizable(false);
     setVisible(true);
+
+    setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        exit();
+      }
+    });
   }
 
   public ExecutorService getExecutorService() {
     return executorService;
   }
 
-  public ServerConfigurationPanel getConfigurationPanel() {
-    return configurationPanel;
+  public ServerSetupPanel getSetupPanel() {
+    return setupPanel;
   }
 
   public static void main(String... args) {
@@ -62,4 +71,12 @@ public class ServerLaunchFrame extends JFrame {
     }
     JOptionPane.showMessageDialog(this, t.getMessage(), "Unexpected error", JOptionPane.ERROR_MESSAGE);
   }
+
+  public void exit() {
+    setupPanel.getControllerAction().stop();
+
+    setVisible(false);
+    System.exit(0);
+  }
+
 }

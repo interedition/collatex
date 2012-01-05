@@ -55,6 +55,18 @@ ${header}
         </ul>
     </div>
 </div>
+<script type="text/javascript">
+  YUI().use("node", "node-menunav", function(Y) {
+    Y.on("contentready", function() {
+      this.plug(Y.Plugin.NodeMenuNav, { autoSubmenuDisplay: true, mouseOutHideDelay: 0 });
+    }, "#main-menu");
+  <#--
+  Y.on("domready", function() {
+      Y.one("#query").focus();
+  });
+  -->
+  });
+</script>
 <#--
 <div style="text-align: right; margin: 1em 0">
     <form id="quick-search-form" action="${cp}/search/">
@@ -67,18 +79,6 @@ ${header}
 <div id="footer" class="color12">
   Copyright &copy; 2011, 2012 The Interedition Development Group. See the <a href="http://www.interedition.eu/" title="Interedition Homepage">Interedition Homepage</a> for further information.
 </div>
-<script type="text/javascript">
-    YUI().use("node", "node-menunav", function(Y) {
-        Y.on("contentready", function() {
-            this.plug(Y.Plugin.NodeMenuNav, { autoSubmenuDisplay: true, mouseOutHideDelay: 0 });
-        }, "#main-menu");
-        <#--
-        Y.on("domready", function() {
-            Y.one("#query").focus();
-        });
-        -->
-    });
-</script>
 </body>
 </html>
 </#macro>

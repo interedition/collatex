@@ -17,7 +17,7 @@ YUI.add('interedition-collate', function(Y) {
                 }),
                 on:{
                     success: function(transactionId, resp) { callback(resp); },
-                    failure: function(transactionId, resp) { alert("Error in collator: " + resp.statusText); }
+                    failure: function(transactionId, resp) { Y.log("Error in collator: " + resp.statusText); }
                 }
             });
             Y.io.queue.start();
