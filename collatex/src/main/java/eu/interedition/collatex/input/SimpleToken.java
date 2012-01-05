@@ -27,19 +27,28 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
+  public static int nextId = 0;
   public static final SimpleToken START = new SimpleToken(SimpleWitness.SUPERBASE, -1, "", "#");
   public static final SimpleToken END = new SimpleToken(SimpleWitness.SUPERBASE, Integer.MAX_VALUE, "", "#");
 
+  private final int id;
   private Witness witness;
   private int index;
   private String content;
   private String normalized;
 
   public SimpleToken(Witness witness, int index, String content, String normalized) {
+    synchronized (SimpleToken.class) {
+      this.id = (nextId == Integer.MAX_VALUE ? 0 : nextId++);
+    }
     this.witness = witness;
     this.index = index;
     this.content = content;
     this.normalized = normalized;
+  }
+
+  public int getId() {
+    return id;
   }
 
   public int getIndex() {

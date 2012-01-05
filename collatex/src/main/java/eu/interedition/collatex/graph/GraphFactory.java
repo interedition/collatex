@@ -7,6 +7,8 @@ import com.google.common.io.Files;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.input.SimpleTokenResolver;
+import eu.interedition.collatex.input.SimpleWitnessResolver;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -30,8 +32,8 @@ public class GraphFactory {
   private static final Logger LOG = LoggerFactory.getLogger(GraphFactory.class);
   public static final String CREATED_KEY = "created";
 
-  private Resolver<Witness> witnessResolver = new DefaultResolver<Witness>();
-  private Resolver<Token> tokenResolver = new DefaultResolver<Token>();
+  private Resolver<Witness> witnessResolver = new SimpleWitnessResolver();
+  private Resolver<Token> tokenResolver = new SimpleTokenResolver();
   private GraphDatabaseService database;
   private Node variantGraphs;
   private Node editGraphs;
@@ -94,7 +96,7 @@ public class GraphFactory {
   }
 
   public GraphFactory(EmbeddedGraphDatabase database) {
-    this(database, new DefaultResolver<Witness>(), new DefaultResolver<Token>());
+    this(database, new SimpleWitnessResolver(), new SimpleTokenResolver());
   }
   
   public GraphDatabaseService getDatabase() {

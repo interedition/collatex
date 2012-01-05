@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 public class SimpleWitness implements Iterable<Token>, Witness {
   public static final SimpleWitness SUPERBASE = new SimpleWitness("");
-  public final static Pattern PUNCT = Pattern.compile("\\p{Punct}");
+  public static final Pattern PUNCT = Pattern.compile("\\p{Punct}");
   public static final Function<String, String> TOKEN_NORMALIZER = new Function<String, String>() {
     @Override
     public String apply(String input) {
@@ -43,17 +43,27 @@ public class SimpleWitness implements Iterable<Token>, Witness {
     }
   };
 
+  private static int nextId = 0;
+
+  private final int id;
   private final String sigil;
   private final List<Token> tokens = new ArrayList<Token>();
   private final Map<Token, Token> relations = Maps.newLinkedHashMap();
 
   public SimpleWitness(String sigil) {
+    synchronized (SimpleWitness.class) {
+      this.id = (nextId == Integer.MAX_VALUE ? 0 : nextId++);
+    }
     this.sigil = sigil;
   }
 
   public SimpleWitness(String sigil, String content, Function<String, List<String>> tokenizer) {
     this(sigil);
     setTokenContents(tokenizer.apply(content));
+  }
+
+  public int getId() {
+    return id;
   }
 
   public List<Token> getTokens() {
