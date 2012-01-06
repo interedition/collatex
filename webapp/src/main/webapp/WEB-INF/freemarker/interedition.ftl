@@ -77,7 +77,7 @@ ${header}
 -->
 <#nested />
 <div id="footer" class="color12">
-  Copyright &copy; 2011, 2012 The Interedition Development Group. See the <a href="http://www.interedition.eu/" title="Interedition Homepage">Interedition Homepage</a> for further information.
+  Copyright &copy; 2011, 2012 The Interedition Development Group. All rights reserved. See the <a href="http://www.interedition.eu/" title="Interedition Homepage">Interedition Homepage</a> for further information.
 </div>
 </body>
 </html>
