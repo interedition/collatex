@@ -57,6 +57,7 @@ public class ServletContainerSetupPanel extends JPanel {
     gbc.anchor = GridBagConstraints.LINE_END;
     add(new JLabel("Port:"), gbc);
 
+    portTextField.setToolTipText("The TCP port on which the servlet container shall listen for HTTP requests");
     portTextField.setColumns(6);
     portTextField.setValue(Integer.parseInt(frame.getPreferences().get("port", "7369")));
     portTextField.addPropertyChangeListener("value", new PropertyChangeListener() {
@@ -80,6 +81,7 @@ public class ServletContainerSetupPanel extends JPanel {
 
     gbc.gridx++;
     gbc.anchor = GridBagConstraints.LINE_START;
+    dotPathTextField.setToolTipText("<html>Path to GraphViz' <code>dot</code> executable. GraphViz is optionally used by the hosted web application in order to create SVG-based renderings of collation results</html>");
     dotPathTextField.setEditable(false);
     dotPathTextField.setText(frame.getPreferences().get("dotPath", ""));
     add(dotPathTextField, gbc);
@@ -96,6 +98,7 @@ public class ServletContainerSetupPanel extends JPanel {
     
     gbc.gridx++;
     gbc.anchor = GridBagConstraints.LINE_START;
+    serverUrlTextField.setToolTipText("URL of the current server instance");
     serverUrlTextField.setEditable(false);
     serverUrlTextField.setEnabled(false);
     serverUrlTextField.addFocusListener(new FocusAdapter() {
@@ -132,7 +135,7 @@ public class ServletContainerSetupPanel extends JPanel {
   }
 
   /**
-   * The TCP port on which the servlet container shall listen for HTTP connections.
+   * The TCP port on which the servlet container shall listen for HTTP requests.
    *
    * @return the port number (&gt; 1)
    */
@@ -200,6 +203,7 @@ public class ServletContainerSetupPanel extends JPanel {
     private SelectDotPathAction() {
       super("Select...");
       putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/org/freedesktop/tango/16x16/actions/document-open.png"), "Open File"));
+      putValue(Action.SHORT_DESCRIPTION, "<html>Select path to <code>dot</code> executable</html>");
 
       fileChooser = new JFileChooser(System.getProperty("user.dir"));
       fileChooser.setDialogTitle("Select GraphViz dot path");

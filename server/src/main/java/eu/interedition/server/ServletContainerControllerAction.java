@@ -24,7 +24,9 @@ import java.net.UnknownHostException;
  */
 public class ServletContainerControllerAction extends AbstractAction {
   private static final String START_LABEL = "Start Server";
+  private static final String START_DESCRIPTION = "Starts the Interedition Server and opens its homepage in a browser";
   private static final String STOP_LABEL = "Stop Server";
+  private static final String STOP_DESCRIPTION = "Shuts down the Interedition Server";
 
   private final ServerApplicationFrame frame;
   private final Desktop desktop = Desktop.getDesktop();
@@ -40,6 +42,7 @@ public class ServletContainerControllerAction extends AbstractAction {
     super(START_LABEL);
     this.frame = frame;
     putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/org/freedesktop/tango/16x16/apps/internet-web-browser.png"), "Browse Web"));
+    putValue(Action.SHORT_DESCRIPTION, START_DESCRIPTION);
   }
 
   @Override
@@ -91,6 +94,7 @@ public class ServletContainerControllerAction extends AbstractAction {
         try {
           server.start();
           putValue(Action.NAME, STOP_LABEL);
+          putValue(Action.SHORT_DESCRIPTION, STOP_DESCRIPTION);
         } catch (Exception e) {
           server = null;
           frame.error(e, "Cannot start server");
@@ -144,6 +148,7 @@ public class ServletContainerControllerAction extends AbstractAction {
           server.setStopAtShutdown(false);
           server = null;
           putValue(Action.NAME, START_LABEL);
+          putValue(Action.SHORT_DESCRIPTION, START_DESCRIPTION);
         } catch (Exception e) {
           frame.error(e, "Cannot stop server");
         }
