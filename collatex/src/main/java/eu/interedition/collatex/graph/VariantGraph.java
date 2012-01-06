@@ -11,7 +11,6 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeBasedTable;
-import com.google.common.primitives.Longs;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -46,8 +45,8 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
 
   private Function<Relationship, VariantGraphTransposition> transpositionWrapper;
 
-  public VariantGraph(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver) {
-    super(database, witnessResolver, tokenResolver);
+  public VariantGraph(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
+    super(database, witnessMapper, tokenMapper);
   }
 
   @Override

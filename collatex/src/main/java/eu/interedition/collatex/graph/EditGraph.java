@@ -53,8 +53,8 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
   private static final Logger LOG = LoggerFactory.getLogger(EditGraph.class);
   private final Function<Node, VariantGraphVertex> variantGraphVertexWrapper;
 
-  public EditGraph(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver, Function<Node, VariantGraphVertex> variantGraphVertexWrapper) {
-    super(database, witnessResolver, tokenResolver);
+  public EditGraph(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper, Function<Node, VariantGraphVertex> variantGraphVertexWrapper) {
+    super(database, witnessMapper, tokenMapper);
     this.variantGraphVertexWrapper = variantGraphVertexWrapper;
   }
 

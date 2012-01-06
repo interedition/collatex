@@ -2,13 +2,12 @@ package eu.interedition.collatex.graph;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.input.SimpleToken;
-import eu.interedition.collatex.input.SimpleTokenResolver;
-import eu.interedition.collatex.input.SimpleWitnessResolver;
+import eu.interedition.collatex.input.SimpleTokenMapper;
+import eu.interedition.collatex.input.SimpleWitnessMapper;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -32,8 +31,8 @@ public class GraphFactory {
   private static final Logger LOG = LoggerFactory.getLogger(GraphFactory.class);
   public static final String CREATED_KEY = "created";
 
-  private Resolver<Witness> witnessResolver = new SimpleWitnessResolver();
-  private Resolver<Token> tokenResolver = new SimpleTokenResolver();
+  private EntityMapper<Witness> witnessMapper = new SimpleWitnessMapper();
+  private EntityMapper<Token> tokenMapper = new SimpleTokenMapper();
   private GraphDatabaseService database;
   private Node variantGraphs;
   private Node editGraphs;
@@ -69,10 +68,10 @@ public class GraphFactory {
   }
 
   
-  public GraphFactory(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver) {
+  public GraphFactory(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
     this.database = database;
-    this.witnessResolver = witnessResolver;
-    this.tokenResolver = tokenResolver;
+    this.witnessMapper = witnessMapper;
+    this.tokenMapper = tokenMapper;
     final Transaction tx = database.beginTx();
     try {
       final Node referenceNode = database.getReferenceNode();
@@ -96,7 +95,7 @@ public class GraphFactory {
   }
 
   public GraphFactory(EmbeddedGraphDatabase database) {
-    this(database, new SimpleWitnessResolver(), new SimpleTokenResolver());
+    this(database, new SimpleWitnessMapper(), new SimpleTokenMapper());
   }
   
   public GraphDatabaseService getDatabase() {
@@ -220,7 +219,7 @@ public class GraphFactory {
   }
 
   protected VariantGraph wrapVariantGraph(Node start, Node end) {
-    final VariantGraph graph = new VariantGraph(database, witnessResolver, tokenResolver);
+    final VariantGraph graph = new VariantGraph(database, witnessMapper, tokenMapper);
     graph.init(VariantGraphVertex.createWrapper(graph), VariantGraphEdge.createWrapper(graph), start, end);
     return graph;
   }
@@ -232,7 +231,7 @@ public class GraphFactory {
 
   protected EditGraph wrapEditGraph(Node start, Node end) {
     final VariantGraph vg = wrapVariantGraph(start.getSingleRelationship(VARIANT_GRAPH, OUTGOING));
-    final EditGraph graph = new EditGraph(database, witnessResolver, tokenResolver, vg.getVertexWrapper());
+    final EditGraph graph = new EditGraph(database, witnessMapper, tokenMapper, vg.getVertexWrapper());
     graph.init(EditGraphVertex.createWrapper(graph), EditGraphEdge.createWrapper(graph), start, end);
     return graph;
   }

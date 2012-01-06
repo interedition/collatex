@@ -13,18 +13,18 @@ import org.neo4j.graphdb.Transaction;
  */
 public abstract class Graph<V extends GraphVertex, E extends GraphEdge> {
   protected final GraphDatabaseService database;
-  protected final Resolver<Witness> witnessResolver;
-  protected final Resolver<Token> tokenResolver;
+  protected final EntityMapper<Witness> witnessMapper;
+  protected final EntityMapper<Token> tokenMapper;
 
   protected Function<Node, V> vertexWrapper;
   protected Function<Relationship, E> edgeWrapper;
   protected V start;
   protected V end;
 
-  public Graph(GraphDatabaseService database, Resolver<Witness> witnessResolver, Resolver<Token> tokenResolver) {
+  public Graph(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
     this.database = database;
-    this.witnessResolver = witnessResolver;
-    this.tokenResolver = tokenResolver;
+    this.witnessMapper = witnessMapper;
+    this.tokenMapper = tokenMapper;
   }
 
   public void init(Function<Node, V> vertexWrapper, Function<Relationship, E> edgeWrapper, Node start, Node end) {
@@ -50,12 +50,12 @@ public abstract class Graph<V extends GraphVertex, E extends GraphEdge> {
     return end;
   }
 
-  public Resolver<Witness> getWitnessResolver() {
-    return witnessResolver;
+  public EntityMapper<Witness> getWitnessMapper() {
+    return witnessMapper;
   }
 
-  public Resolver<Token> getTokenResolver() {
-    return tokenResolver;
+  public EntityMapper<Token> getTokenMapper() {
+    return tokenMapper;
   }
 
   public Function<Node, V> getVertexWrapper() {

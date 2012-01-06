@@ -5,9 +5,9 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public interface Resolver<T> {
+public interface EntityMapper<T> {
 
-  Set<T> resolve(int... refs);
+  Set<T> map(int... refs);
 
-  int[] resolve(Set<T> entities);
+  int[] map(Set<T> entities);
 }

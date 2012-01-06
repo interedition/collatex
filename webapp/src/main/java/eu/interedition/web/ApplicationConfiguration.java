@@ -4,8 +4,8 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.jolbox.bonecp.BoneCPDataSource;
 import eu.interedition.collatex.graph.GraphFactory;
-import eu.interedition.collatex.input.SimpleTokenResolver;
-import eu.interedition.collatex.input.SimpleWitnessResolver;
+import eu.interedition.collatex.input.SimpleTokenMapper;
+import eu.interedition.collatex.input.SimpleWitnessMapper;
 import eu.interedition.text.json.map.TextSerializerModule;
 import eu.interedition.web.io.RangeConverter;
 import eu.interedition.web.text.TextIndex;
@@ -66,7 +66,7 @@ public class ApplicationConfiguration implements DisposableBean {
 
   @Bean
   public GraphFactory graphFactory() throws IOException {
-    return new GraphFactory(graphDatabase(), new SimpleWitnessResolver(), new SimpleTokenResolver());
+    return new GraphFactory(graphDatabase(), new SimpleWitnessMapper(), new SimpleTokenMapper());
   }
 
   @Bean(destroyMethod = "shutdown")

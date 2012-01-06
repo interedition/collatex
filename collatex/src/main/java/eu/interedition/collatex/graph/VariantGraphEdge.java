@@ -6,6 +6,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.Witness;
 import org.neo4j.graphdb.Relationship;
 
@@ -23,7 +24,7 @@ public class VariantGraphEdge extends GraphEdge<VariantGraph, VariantGraphVertex
 
   public VariantGraphEdge(VariantGraph graph, VariantGraphVertex from, VariantGraphVertex to, Set<Witness> witnesses) {
     this(graph, from.getNode().createRelationshipTo(to.getNode(), GraphRelationshipType.PATH));
-    setWitnessReferences(this.graph.getWitnessResolver().resolve(witnesses));
+    setWitnessReferences(this.graph.getWitnessMapper().map(witnesses));
   }
 
   public boolean traversableWith(Set<Witness> witnesses) {
@@ -31,14 +32,12 @@ public class VariantGraphEdge extends GraphEdge<VariantGraph, VariantGraphVertex
   }
 
   public VariantGraphEdge add(Set<Witness> witnesses) {
-    final Set<Witness> registered = witnesses();
-    registered.addAll(witnesses);
-    setWitnessReferences(graph.getWitnessResolver().resolve(registered));
+    setWitnessReferences(graph.getWitnessMapper().map(Sets.union(witnesses(), witnesses)));
     return this;
   }
 
   public Set<Witness> witnesses() {
-    return graph.getWitnessResolver().resolve(getWitnessReferences());
+    return graph.getWitnessMapper().map(getWitnessReferences());
   }
 
   public int[] getWitnessReferences() {

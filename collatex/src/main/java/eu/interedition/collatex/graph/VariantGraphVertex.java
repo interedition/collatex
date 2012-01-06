@@ -4,17 +4,14 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.input.SimpleToken;
 import org.neo4j.graphdb.Node;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.SortedSet;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getFirst;
 import static com.google.common.collect.Iterables.transform;
 import static java.util.Collections.singleton;
@@ -62,7 +59,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   }
 
   public Set<Token> tokens(Set<Witness> witnesses) {
-    final Set<Token> tokens = graph.getTokenResolver().resolve(getTokenReferences());
+    final Set<Token> tokens = graph.getTokenMapper().map(getTokenReferences());
     if (witnesses != null && !witnesses.isEmpty()) {
       for (Iterator<Token> tokenIt = tokens.iterator(); tokenIt.hasNext(); ) {
         final Token token = tokenIt.next();
@@ -89,7 +86,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   }
 
   public void setTokens(Set<Token> tokens) {
-    setTokenReferences(graph.getTokenResolver().resolve(tokens));
+    setTokenReferences(graph.getTokenMapper().map(tokens));
   }
 
   public int getRank() {

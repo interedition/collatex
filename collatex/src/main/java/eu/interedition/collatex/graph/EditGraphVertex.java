@@ -67,11 +67,11 @@ public class EditGraphVertex extends GraphVertex<EditGraph> {
 
   protected Token getToken(String key) {
     final Integer tokenRef = (Integer) node.getProperty(key, null);
-    return (tokenRef == null ? null : Iterables.getFirst(graph.getTokenResolver().resolve(tokenRef), null));
+    return (tokenRef == null ? null : Iterables.getFirst(graph.getTokenMapper().map(tokenRef), null));
   }
 
   protected void setToken(String key, Token base) {
-    final Integer tokenRef = base == null ? null : graph.getTokenResolver().resolve(Collections.singleton(base))[0];
+    final Integer tokenRef = (base == null ? null : graph.getTokenMapper().map(Collections.singleton(base))[0]);
     if (tokenRef == null) {
       node.removeProperty(key);
     } else {
