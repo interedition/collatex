@@ -101,21 +101,11 @@ public class GraphVizService implements InitializingBean {
     final Future<Void> inputTask = executorService.submit(new Callable<Void>() {
       @Override
       public Void call() throws Exception {
-        final FileBackedOutputStream dotBuf = new FileBackedOutputStream(102400);
-
         Writer dotWriter = null;
         try {
-          toDot(vg, dotWriter = new OutputStreamWriter(dotBuf, Charset.forName("UTF-8")));
+          toDot(vg, dotWriter = new OutputStreamWriter(dotProc.getOutputStream(), Charset.forName("UTF-8")));
         } finally {
           Closeables.close(dotWriter, false);
-        }
-
-        final OutputStream dotStdin = new BufferedOutputStream(dotProc.getOutputStream());
-        try {
-          ByteStreams.copy(dotBuf.getSupplier(), dotStdin);
-        } finally {
-          Closeables.close(dotStdin, false);
-          dotBuf.reset();
         }
 
         return null;
