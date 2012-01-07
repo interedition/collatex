@@ -68,11 +68,14 @@ img.icon {
     margin-bottom: 2em;
 }
 
-#header h1 {
+.boxed {
     background: #9D9DCB;
     color: #FFFFFF;
-    text-align: right;
     padding: 1em 0.5em;
+}
+
+#header h1 {
+    text-align: right;
     margin-bottom: 0.5em;
 }
 

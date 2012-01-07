@@ -198,7 +198,7 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "inte
             var witnessData = { id: "witness-" + wc.toString(), label: "Witness #" + (wc + 1).toString(), contents: Y.Escape.html(contents[wc]) };
             witnessContainer.append(create('<div class="yui3-g form-element" />')
                 .append(create('<div class="yui3-u-1-6 form-label"/>').append(sub('<label for="{id}">{label}:</label>', witnessData)))
-                .append(create('<div class="yui3-u form-input"/>').append(sub('<textarea id="{id}" name="{id}" rows="3" cols="80" style="width: 20em">{contents}</textarea>', witnessData))));
+                .append(create('<div class="yui3-u form-input"/>').append(sub('<textarea id="{id}" name="{id}" rows="3" cols="80" style="width: 40em">{contents}</textarea>', witnessData))));
         }
 
         Y.some(contents, function(c, i) {

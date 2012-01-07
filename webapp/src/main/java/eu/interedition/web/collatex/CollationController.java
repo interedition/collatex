@@ -79,9 +79,9 @@ public class CollationController implements InitializingBean {
     return "collate/darwin-example";
   }
 
-  @RequestMapping("/tutorial")
-  public String tutorial() {
-    return "collate/tutorial";
+  @RequestMapping("/apidocs")
+  public String apiDocs() {
+    return "collate/apidocs";
   }
 
   @Override

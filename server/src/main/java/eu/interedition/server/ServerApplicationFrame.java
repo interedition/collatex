@@ -153,6 +153,13 @@ public class ServerApplicationFrame extends JFrame {
   public static void main(String... args) {
     System.setSecurityManager(null);
 
+    /*
+    try {
+      UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+    } catch (Exception e) {
+    }
+    */
+
     initDataDirectory();
 
     final ServerApplicationFrame applicationFrame = new ServerApplicationFrame();
