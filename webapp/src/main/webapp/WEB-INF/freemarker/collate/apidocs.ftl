@@ -3,7 +3,7 @@
 <link href="${cp}/static/google-code-prettify/prettify-sunburst-theme.css" type="text/css" rel="stylesheet" />
 <script src="${cp}/static/google-code-prettify/prettify.js" type="text/javascript"></script>
 </#assign>
-<@ie.page title="CollateX REST API" header=header>
+<@ie.page title="CollateX RESTful API" header=header>
 	<p>
 	This is the REST service of CollateX.
 	To call it, you can post witness data as specified below and get the collation result back in a number of formats.
