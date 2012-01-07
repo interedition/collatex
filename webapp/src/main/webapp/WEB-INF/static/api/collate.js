@@ -79,7 +79,22 @@ YUI.add('interedition-collate', function(Y) {
         }
     }, {
         ATTRS: {
-            "base": {},
+            "base": {
+                valueFn: function() {
+                    var collateJsResource = /\/static\/api\/collate\.js$/;
+                    var value = "";
+                    Y.all("script").each(function(s) {
+                        var src = s.get("src");
+                        if (src != null) {
+                            var result = collateJsResource.exec(src);
+                            if (result) {
+                                value = src.substring(0, result.index);
+                            }
+                        }
+                    });
+                    return value;
+                }
+            },
             "algorithm": { value: "dekker" },
             "tokenComparator": { value: { type: "equality" } }
         }

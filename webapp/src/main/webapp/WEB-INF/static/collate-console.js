@@ -161,7 +161,7 @@ var examples = [
 ];
 
 YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "interedition-collate", function(Y) {
-    var collator = new Y.interedition.collate.Collator({ base: cp }),
+    var collator = new Y.interedition.collate.Collator(),
         create = Y.Node.create,
         sub = Y.Lang.sub,
         svgContainer = null,

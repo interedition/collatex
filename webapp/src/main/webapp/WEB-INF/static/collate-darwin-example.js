@@ -893,7 +893,7 @@ var darwinChapters = [ {
 } ];
 
 YUI().use("node", "array-extras", "json", "escape", "interedition-collate", function(Y) {
-    var collator = new Y.interedition.collate.Collator({ base: cp }), results = Y.one("#results"), slots = [];
+    var collator = new Y.interedition.collate.Collator(), results = Y.one("#results"), slots = [];
 
     for (var cc = 0; cc < darwinChapters.length; cc++) {
         slots[cc] = Y.Node.create('<div class="chapter"><h2>' + (cc + 1) + '.</h2></div>');
