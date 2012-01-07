@@ -16,10 +16,6 @@ table.alignment td.invariant { border-color: #80BB00 }
 table.alignment td.variant { border-color: #ffa07a }
 table.alignment td { white-space: nowrap; }
 
-pre {
-    background: #eee;
-}
-
 a, a:visited, a:link, a:hover, a:active {
     color: inherit;
     font-weight: bold;
