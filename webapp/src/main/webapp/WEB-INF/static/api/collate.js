@@ -115,5 +115,5 @@ YUI.add('interedition-collate', function(Y) {
         }
     });
 }, "1", {
-    requires: ["base", "io", "io-queue", "json", "node", "array-extras", "escape", "dump"]
+    requires: ["base", "io", "json", "node", "array-extras", "escape", "dump"]
 });
