@@ -32,6 +32,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +49,11 @@ public class CollationController implements InitializingBean {
 
   @Autowired
   private GraphFactory graphFactory;
+
+  @RequestMapping
+  public String redirectToConsole() {
+    return "redirect:/collate/console";
+  }
 
   @RequestMapping(method = RequestMethod.POST)
   @ResponseBody

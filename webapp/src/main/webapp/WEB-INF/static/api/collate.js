@@ -3,8 +3,7 @@ YUI.add('interedition-collate', function(Y) {
 
     NS.Collator = Y.Base.create("interedition-collate-collator", Y.Base, [], {
         collate: function(resultType, witnesses, callback) {
-            Y.io.queue.stop();
-            Y.io.queue(this.get("base") + "/collate", {
+            Y.io(this.get("base") + "/collate", {
                 method:"post",
                 headers:{
                     "Content-Type":"application/json",
@@ -17,10 +16,25 @@ YUI.add('interedition-collate', function(Y) {
                 }),
                 on:{
                     success: function(transactionId, resp) { callback(resp); },
-                    failure: function(transactionId, resp) { Y.log("Error in collator: " + resp.statusText); }
+                    failure: function(transactionId, resp) { Y.log(resp.status + " " + resp.statusText, "error", resp); }
                 }
             });
-            Y.io.queue.start();
+        },
+        withDekker: function() {
+            this.set("algorithm", "dekker");
+            return this;
+        },
+        withNeedlemanWunsch: function() {
+            this.set("algorithm", "needleman-wunsch");
+            return this;
+        },
+        withExactMatching: function() {
+            this.set("tokenComparator", { type: "equality" })
+            return this;
+        },
+        withFuzzyMatching: function(maxDistance) {
+            this.set("tokenComparator", { type: "levenshtein", distance: maxDistance || 1 })
+            return this;
         },
         toJSON: function(data, callback) {
             this.collate("application/json", data, function(resp) {
@@ -56,6 +70,7 @@ YUI.add('interedition-collate', function(Y) {
                     var cellContents = [];
                     Y.each(r, function (c) {
                         cellContents.push(c == null ? null : Y.Array.reduce(c, "", function (str, next) {
+                            next = Y.Lang.isString(next) ? next : Y.dump(next);
                             return str + (str.length == 0 ? "" : " ") + next;
                         }));
                     });
@@ -100,5 +115,5 @@ YUI.add('interedition-collate', function(Y) {
         }
     });
 }, "1", {
-    requires: ["base", "io", "io-queue", "json", "node", "array-extras", "escape"]
+    requires: ["base", "io", "io-queue", "json", "node", "array-extras", "escape", "dump"]
 });
