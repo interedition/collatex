@@ -1,25 +1,14 @@
 package eu.interedition.collatex.dekker;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.SortedSetMultimap;
-import com.google.common.collect.TreeMultimap;
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.input.SimpleToken;
-import eu.interedition.collatex.input.SimpleWitness;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Set;
-import java.util.SortedMap;
+import com.google.common.collect.Iterables;
+
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.graph.VariantGraph;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -43,6 +32,7 @@ public class DarwinTest extends AbstractTest {
   }
 
   @Test
+  @Ignore
   public void incomplete() {
     final VariantGraph graph = collate(//
             "Habit also has a decided influence, as in the period of flowering with plants when transported from one climate to another. In animals it has a more marked effect; for instance, I find in the domestic duck that the bones of the wing weigh less and the bones of the leg more, in proportion to the whole skeleton, than do the same bones in the wild-duck; and I presume that this change may be safely attributed to the domestic duck flying much less, and walking more, than its wild parent. The great and inherited development of the udders in cows and goats in countries where they are habitually milked, in comparison with the state of these organs in other countries, is another instance of the effect of use. Not a single domestic animal can be named which has not in some country drooping ears; and the view suggested by some authors, that the drooping is due to the disuse of the muscles of the ear, from the animals not being much alarmed by danger, seems probable.",
