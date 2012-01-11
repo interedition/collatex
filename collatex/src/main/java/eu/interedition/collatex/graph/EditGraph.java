@@ -250,7 +250,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
       if (edge.getEditOperation()==EditOperation.NO_GAP) {
         score.addMatch();
       } else {
-        score.àddGap();
+        score.addGap();
       }
       return score;
     }
@@ -307,7 +307,7 @@ public class EditGraph extends Graph<EditGraphVertex, EditGraphEdge> {
     if (outgoingEdge.getEditOperation()==EditOperation.NO_GAP) {
       newScore.addMatch();
     } else {
-      newScore.àddGap();
+      newScore.addGap();
     }
     return newScore;
   }
