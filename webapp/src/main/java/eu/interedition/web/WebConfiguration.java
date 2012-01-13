@@ -77,10 +77,10 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
     converters.add(new CollationHttpMessageConverter(graphFactory));
+    converters.add(new VariantGraphJSONSerializer());
     converters.add(new VariantGraphTEIHttpMessageConverter());
     converters.add(new VariantGraphMLHttpMessageConverter());
     converters.add(new VariantGraphVizHttpMessageConverter(graphVizService));
-    converters.add(new VariantGraphJSONSerializer());
     converters.add(new JSONSerializationHttpMessageConverter(jsonSerializer(), objectMapper));
     converters.add(new XMLSerializationHttpMessageConverter(xmlSerializer));
 
