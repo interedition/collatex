@@ -7,6 +7,10 @@ table {
     margin: 1em;
 }
 
+th, td {
+    border: 1px solid #B0C4DE;
+}
+
 table.alignment { border-collapse: separate; border-spacing: 0.25em; }
 table.alignment tr { border: 0; }
 table.alignment th, table.alignment td { border: 1px solid #d3d3d3; padding: 0.5em; }
@@ -17,12 +21,13 @@ table.alignment td.variant { border-color: #ffa07a }
 table.alignment td { white-space: nowrap; }
 
 a, a:visited, a:link, a:hover, a:active {
-    color: inherit;
+    color: #080A80;
     font-weight: bold;
     text-decoration: none;
 }
 
 .yui3-menu a {
+    color: inherit;
     font-weight: normal;
 }
 
