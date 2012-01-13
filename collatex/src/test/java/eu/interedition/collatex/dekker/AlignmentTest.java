@@ -23,11 +23,11 @@ package eu.interedition.collatex.dekker;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.simple.SimpleToken;
 import java.util.List;
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.input.SimpleWitness;
+import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
 import java.util.Set;

@@ -24,7 +24,7 @@ import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.input.SimpleWitness;
+import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Ignore;
 import org.junit.Test;
 

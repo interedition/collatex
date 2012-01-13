@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.input.SimpleWitness;
+import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Assert;
 import org.junit.Test;
 

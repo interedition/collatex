@@ -1,4 +1,4 @@
-package eu.interedition.collatex.input;
+package eu.interedition.collatex.simple;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;

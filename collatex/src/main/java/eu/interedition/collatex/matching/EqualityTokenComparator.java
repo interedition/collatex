@@ -1,7 +1,7 @@
 package eu.interedition.collatex.matching;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.Comparator;
 

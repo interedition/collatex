@@ -1,8 +1,7 @@
-package eu.interedition.collatex.input;
+package eu.interedition.collatex.simple;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import org.junit.Test;
 

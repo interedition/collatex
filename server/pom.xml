@@ -120,6 +120,6 @@
     </build>
     <properties>
         <webapp.version>1.3-SNAPSHOT</webapp.version>
-        <webstart.codebase>http://interedition.github.com/microservices/jnlp/</webstart.codebase>
+        <webstart.codebase>http://interedition.github.com/microservices/</webstart.codebase>
     </properties>
 </project>

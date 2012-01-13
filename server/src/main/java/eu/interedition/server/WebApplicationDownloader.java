@@ -32,6 +32,7 @@ import java.util.zip.ZipInputStream;
  */
 public class WebApplicationDownloader implements Runnable {
 
+  public static final int TWENTY_MEGABYTES = 20 * 1024 * 1024;
   private final ServerApplicationFrame frame;
 
   /**
@@ -59,11 +60,15 @@ public class WebApplicationDownloader implements Runnable {
         return;
       }
 
-      InputStream netStream = null;
+      ProgressMonitorInputStream netStream = null;
       OutputStream fileStream = null;
       boolean downloadCompleted = false;
       try {
         netStream = new ProgressMonitorInputStream(frame, "Downloading server code...", webapp.toURL().openStream());
+        netStream.getProgressMonitor().setMillisToDecideToPopup(0);
+        netStream.getProgressMonitor().setMillisToPopup(0);
+        netStream.getProgressMonitor().setMaximum(TWENTY_MEGABYTES);
+
         final ZipInputStream zipStream = new ZipInputStream(netStream);
         while (true) {
           ZipEntry currentEntry = zipStream.getNextEntry();

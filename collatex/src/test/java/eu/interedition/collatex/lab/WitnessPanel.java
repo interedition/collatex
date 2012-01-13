@@ -2,9 +2,8 @@ package eu.interedition.collatex.lab;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.input.SimpleWitness;
-import eu.interedition.collatex.input.WhitespaceTokenizer;
+import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.simple.WhitespaceTokenizer;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;

@@ -5,7 +5,7 @@ import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import eu.interedition.collatex.graph.EditOperation;
-import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.simple.SimpleToken;
 import org.apache.commons.collections15.Transformer;
 
 import javax.swing.*;

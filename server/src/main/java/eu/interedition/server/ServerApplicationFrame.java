@@ -1,5 +1,6 @@
 package eu.interedition.server;
 
+import com.google.common.io.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
@@ -90,6 +92,21 @@ public class ServerApplicationFrame extends JFrame {
     return new File(dataDirectory, "webapp-" + VERSIONS.getString("webapp.version"));
   }
 
+  public static File[] getOutdatedWebAppArchives() {
+    final File webappArchive = getWebappArchive();
+    return dataDirectory.listFiles(new FileFilter() {
+
+      @Override
+      public boolean accept(File f) {
+        if (!f.isDirectory()) {
+          return false;
+        }
+
+        final String name = f.getName();
+        return name.startsWith("webapp-") && (name.contains("SNAPSHOT") || !f.equals(webappArchive));
+      }
+    });
+  }
   /**
    * Access to the setup panel and its settings.
    *
@@ -153,14 +170,15 @@ public class ServerApplicationFrame extends JFrame {
   public static void main(String... args) {
     System.setSecurityManager(null);
 
-    /*
-    try {
-      UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-    } catch (Exception e) {
-    }
-    */
-
     initDataDirectory();
+
+    for (File outdated : getOutdatedWebAppArchives()) {
+      try {
+        LOG.info("Deleting outdated webapp {}", outdated);
+        Files.deleteRecursively(outdated);
+      } catch (IOException e) {
+      }
+    }
 
     final ServerApplicationFrame applicationFrame = new ServerApplicationFrame();
 

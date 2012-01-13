@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.input;
+package eu.interedition.collatex.simple;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;

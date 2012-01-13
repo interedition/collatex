@@ -5,7 +5,7 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.input.SimpleWitness;
+import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;

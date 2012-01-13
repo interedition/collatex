@@ -10,7 +10,7 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.input.SimpleToken;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.matching.Matches;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
 import static com.google.common.collect.Lists.reverse;
 

@@ -1,25 +1,11 @@
 package eu.interedition.collatex.dekker;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.SortedSetMultimap;
-import com.google.common.collect.TreeMultimap;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.input.SimpleToken;
-import eu.interedition.collatex.input.SimpleWitness;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Set;
-import java.util.SortedMap;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

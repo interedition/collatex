@@ -1,14 +1,12 @@
 package eu.interedition.web.io;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.GraphFactory;
-import eu.interedition.collatex.input.WhitespaceTokenizer;
-import eu.interedition.collatex.input.SimpleWitness;
+import eu.interedition.collatex.simple.WhitespaceTokenizer;
+import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.web.collatex.Collation;
@@ -25,7 +23,6 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
