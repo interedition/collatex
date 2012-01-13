@@ -32,9 +32,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +54,7 @@ public class CollationController implements InitializingBean {
 
   @RequestMapping
   public String redirectToConsole() {
-    return "redirect:/collate/console";
+    return "redirect:/collate/apidocs";
   }
 
   @RequestMapping(method = RequestMethod.POST)
@@ -87,8 +89,8 @@ public class CollationController implements InitializingBean {
   }
 
   @RequestMapping("/apidocs")
-  public String apiDocs() {
-    return "collate/apidocs";
+  public ModelAndView apiDocs(HttpServletRequest request) {
+    return new ModelAndView("collate/apidocs", "endpoint", UriComponentsBuilder.fromHttpUrl(request.getRequestURL().toString()).replacePath(request.getContextPath()).pathSegment("collate").build().encode().toUriString());
   }
 
   @Override
