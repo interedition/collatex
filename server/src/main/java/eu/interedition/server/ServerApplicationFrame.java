@@ -168,6 +168,11 @@ public class ServerApplicationFrame extends JFrame {
    * @param args command line arguments (ignored)
    */
   public static void main(String... args) {
+    try {
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    } catch (Exception e) {
+    }
+
     System.setSecurityManager(null);
 
     initDataDirectory();

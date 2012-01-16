@@ -33,8 +33,7 @@ public class ServletContainerSetupPanel extends JPanel {
   private final ServerApplicationFrame frame;
 
   private final JFormattedTextField portTextField = new JFormattedTextField(new DecimalFormat("#####"));
-  private final JTextField dotPathTextField = new JTextField(40);
-  private final JTextField serverUrlTextField = new JTextField(40);
+  private final JTextField dotPathTextField = new JTextField(30);
   private final ServletContainerControllerAction launchAction;
 
   /**
@@ -88,32 +87,9 @@ public class ServletContainerSetupPanel extends JPanel {
     gbc.gridx++;
     add(new JButton(new SelectDotPathAction()), gbc);
 
-    gbc.gridx = 0;
+    gbc.gridx = 1;
     gbc.gridy++;
-    gbc.anchor = GridBagConstraints.LINE_END;
-    add(new JLabel("URL:"), gbc);
-    
-    gbc.gridx++;
-    gbc.anchor = GridBagConstraints.LINE_START;
-    serverUrlTextField.setToolTipText("URL of the current server instance");
-    serverUrlTextField.setEditable(false);
-    serverUrlTextField.setEnabled(false);
-    serverUrlTextField.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        serverUrlTextField.selectAll();
-      }
-
-      @Override
-      public void focusLost(FocusEvent e) {
-        serverUrlTextField.select(0, 0);
-      }
-    });
-    add(serverUrlTextField, gbc);
-    
-    gbc.gridx++;
-    launchAction = new ServletContainerControllerAction(frame);
-    add(new JButton(launchAction), gbc);
+    add(new JButton(launchAction = new ServletContainerControllerAction(frame)), gbc);
 
     setBorder(BorderFactory.createTitledBorder("Server settings"));
 
@@ -138,26 +114,6 @@ public class ServletContainerSetupPanel extends JPanel {
    */
   public int getPort() {
     return Math.max(1, ((Number) portTextField.getValue()).intValue());
-  }
-
-  /**
-   * Sets the URL of the server to be displayed in this panel.
-   *
-   * @param serverUrl the URL instance or <code>null</code> in case the server is not running
-   */
-  public void setServerUrl(final URI serverUrl) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        if (serverUrl == null) {
-          ServletContainerSetupPanel.this.serverUrlTextField.setText("");
-          ServletContainerSetupPanel.this.serverUrlTextField.setEnabled(false);
-        } else {
-          ServletContainerSetupPanel.this.serverUrlTextField.setText(serverUrl.toString());
-          ServletContainerSetupPanel.this.serverUrlTextField.setEnabled(true);
-        }
-      }
-    });
   }
 
   /**

@@ -114,12 +114,9 @@ public class ServletContainerControllerAction extends AbstractAction {
           host = "localhost";
         }
 
-        final URI serverUrl = new URI("http", null, host, port, "/", null, null);
-        setupPanel.setServerUrl(serverUrl);
-
         if (desktop.isSupported(Desktop.Action.BROWSE)) {
           try {
-            desktop.browse(serverUrl);
+            desktop.browse(new URI("http", null, host, port, "/", null, null));
           } catch (IOException e) {
             frame.error(e, "Cannot browse URL");
           }
@@ -143,7 +140,6 @@ public class ServletContainerControllerAction extends AbstractAction {
       @Override
       public void run() {
         try {
-          frame.getSetupPanel().setServerUrl(null);
           server.stop();
           server.setStopAtShutdown(false);
           server = null;
