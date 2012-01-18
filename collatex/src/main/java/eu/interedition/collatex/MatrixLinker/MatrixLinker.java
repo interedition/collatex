@@ -10,8 +10,6 @@ import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.Matches;
 
-import com.google.common.collect.ArrayTable;
-
 public class MatrixLinker implements TokenLinker {
 
 	@Override
@@ -23,10 +21,10 @@ public class MatrixLinker implements TokenLinker {
 		return null;
 	}
 
-	protected ArrayTable<VariantGraphVertex,Token,Boolean> buildMatrix(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+	protected SparseMatrix buildMatrix(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
 		base.rank();
 		Matches matches = Matches.between(base.vertices(), witness, comparator);
-		ArrayTable<VariantGraphVertex, Token, Boolean> arrayTable = ArrayTable.create(base.vertices(), witness);
+		SparseMatrix arrayTable = new SparseMatrix(base.vertices(), witness);
     Set<Token> unique = matches.getUnique();
     Set<Token> ambiguous = matches.getAmbiguous();
     int column = 0;
