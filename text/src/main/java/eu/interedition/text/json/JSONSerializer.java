@@ -3,6 +3,7 @@ package eu.interedition.text.json;
 import com.google.common.base.Throwables;
 import com.google.common.collect.*;
 import eu.interedition.text.*;
+import eu.interedition.text.Range;
 import eu.interedition.text.json.map.AnnotationSerializer;
 import eu.interedition.text.json.map.NameSerializer;
 import eu.interedition.text.mem.SimpleAnnotation;
