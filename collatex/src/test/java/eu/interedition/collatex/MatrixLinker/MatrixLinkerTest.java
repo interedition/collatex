@@ -43,9 +43,17 @@ public class MatrixLinkerTest extends AbstractTest {
   	SimpleWitness[] sw = createWitnesses("A B C A B","A B C A B");
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
-  	ArrayTable<VariantGraphVertex, Token, Boolean> buildMatrix = linker.buildMatrix(vg,sw[1]);
+  	ArrayTable<VariantGraphVertex, Token, Boolean> buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	System.out.println("pos: "+ buildMatrix.at(0,0));
   	assertTrue(buildMatrix.at(0, 0));
+  	assertTrue(buildMatrix.at(1, 1));
+  	assertTrue(buildMatrix.at(1, 4));
+  	assertTrue(buildMatrix.at(2, 2));
+  	assertTrue(buildMatrix.at(0, 3));
+  	assertTrue(buildMatrix.at(3, 0));
+  	assertTrue(buildMatrix.at(3, 3));
+  	assertTrue(buildMatrix.at(4, 1));
+  	assertTrue(buildMatrix.at(4, 4));
   }
 
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,
