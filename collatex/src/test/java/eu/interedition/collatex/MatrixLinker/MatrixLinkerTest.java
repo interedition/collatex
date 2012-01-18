@@ -53,6 +53,7 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertTrue(buildMatrix.at(3, 3));
   	assertTrue(buildMatrix.at(4, 1));
   	assertTrue(buildMatrix.at(4, 4));
+  	System.out.println(buildMatrix.toHtml());
   }
   
   @Test
@@ -62,6 +63,17 @@ public class MatrixLinkerTest extends AbstractTest {
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	assertTrue(buildMatrix.at(4, 2));
+  }
+  
+  @Test
+  public void testHermansText() {
+  	String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn.";
+  	String textD2 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>";
+  	SimpleWitness[] sw = createWitnesses(textD1,textD2);
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	System.out.println(buildMatrix.toHtml());
   }
 
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,
