@@ -118,4 +118,41 @@ public class SparseMatrix  {
   public int colNum() {
 		return sparseMatrix.columnKeyList().size();
   }
+
+
+
+	public ArrayList<ArrayList<Coordinate>> getIslands() {
+		ArrayList<ArrayList<Coordinate>> islands = new ArrayList<ArrayList<Coordinate>>();
+		ArrayList<Coordinate> allTrue = allTrues();
+		for(Coordinate c: allTrue) {
+			System.out.println("next coordinate: "+c);
+			boolean found = false;
+			while(!found) {
+				for(ArrayList<Coordinate> alc : islands) {
+					System.out.println("inspect island");
+					for(Coordinate otherC : alc) {
+						System.out.println("next on island: "+otherC);
+						if(c.borders(otherC)) {
+							System.out.println("add to island");
+							alc.add(c);
+							found = true;
+						}
+						if(found)
+							break;
+					}
+					if(found)
+						break;
+				}
+				if(!found) {
+					System.out.println("new island");
+					ArrayList<Coordinate> island = new ArrayList<Coordinate>();
+					island.add(c);
+					islands.add(island);
+				}
+				found = true;
+			}
+		}
+	  // TODO Auto-generated method stub
+	  return islands;
+  }
 }
