@@ -32,19 +32,15 @@ public class SparseMatrix  {
   @Override
   public String toString() {
   	String result = "";
-  	for(Token t : sparseMatrix.columnKeyList()) {
-		  String token = t.toString();
-		  int pos = token.lastIndexOf(":");
-		  if(pos>-1) {
-		    String woord = token.substring(pos+2, token.length()-1);
-	      result += " " + woord;
-		  }
-  	}
+  	ArrayList<String> colLabels = columnLabels();
+  	for(String cLabel : colLabels) {
+	      result += " " + cLabel;
+		}
   	result += "\n";
   	int colNum = sparseMatrix.columnKeyList().size();
-  	ArrayList<String> labels = rowLabels();
+  	ArrayList<String> rLabels = rowLabels();
   	int row = 0;
-  	for(String label : labels) {
+  	for(String label : rLabels) {
       result += label;
       for(int col=0; col<colNum;col++)
       	result += " " + at(row++,col);
@@ -55,19 +51,15 @@ public class SparseMatrix  {
 
   public String toHtml() {
   	String result = "<table>\n<tr><td></td>\n";
-  	for(Token t : sparseMatrix.columnKeyList()) {
-		  String token = t.toString();
-		  int pos = token.lastIndexOf(":");
-		  if(pos>-1) {
-		    String woord = token.substring(pos+2, token.length()-1);
-	      result += "<td>" + woord + "</td>";
-		  }
-  	}
+  	ArrayList<String> colLabels = columnLabels();
+  	for(String cLabel : colLabels) {
+	      result += "<td>" + cLabel + "</td>";
+		}
   	result += "</tr>\n";
   	int colNum = sparseMatrix.columnKeyList().size();
-  	ArrayList<String> labels = rowLabels();
+  	ArrayList<String> rLabels = rowLabels();
   	int row = 0;
-  	for(String label : labels) {
+  	for(String label : rLabels) {
       result += "<tr><td>" + label + "</td>";
       for(int col=0; col<colNum;col++)
       	if(at(row,col))
@@ -88,6 +80,18 @@ public class SparseMatrix  {
 		  int pos = token.lastIndexOf(":");
 		  if(pos>-1) {
 		  	labels.add(token.substring(pos+2, token.length()-2));
+		  }
+  	}
+    return labels;
+  }
+  
+  public ArrayList<String> columnLabels() {
+  	ArrayList<String> labels = new ArrayList<String>();
+  	for(Token t : sparseMatrix.columnKeyList()) {
+		  String token = t.toString();
+		  int pos = token.lastIndexOf(":");
+		  if(pos>-1) {
+		    labels.add(token.substring(pos+2, token.length()-1));
 		  }
   	}
     return labels;

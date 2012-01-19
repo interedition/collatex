@@ -92,7 +92,7 @@ public class MatrixLinkerTest extends AbstractTest {
   @Test
   public void testRowLabels() {
   	String textD1 = "de het een";
-  	String textD9 = "de het een";
+  	String textD9 = "het een de";
   	SimpleWitness[] sw = createWitnesses(textD1,textD9);
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
@@ -101,6 +101,20 @@ public class MatrixLinkerTest extends AbstractTest {
     assertEquals("de",labels.get(0));
     assertEquals("het",labels.get(1));
     assertEquals("een",labels.get(2));
+  }
+  
+  @Test
+  public void testColumnLabels() {
+  	String textD1 = "de het een";
+  	String textD9 = "het een de";
+  	SimpleWitness[] sw = createWitnesses(textD1,textD9);
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+    ArrayList<String> labels = buildMatrix.columnLabels();
+    assertEquals("het",labels.get(0));
+    assertEquals("een",labels.get(1));
+    assertEquals("de",labels.get(2));
   }
 
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,
