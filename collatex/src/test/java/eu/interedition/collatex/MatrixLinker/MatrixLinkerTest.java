@@ -3,6 +3,7 @@ package eu.interedition.collatex.MatrixLinker;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,15 +66,41 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertTrue(buildMatrix.at(4, 2));
   }
   
+  @Ignore
   @Test
-  public void testHermansText() {
+  public void testHermansText1() {
   	String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn.";
-  	String textD2 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>";
-  	SimpleWitness[] sw = createWitnesses(textD1,textD2);
+  	String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>";
+  	SimpleWitness[] sw = createWitnesses(textD1,textD9);
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	System.out.println(buildMatrix.toHtml());
+  }
+  
+  @Test
+  public void testHermansText2() {
+  	String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i>JSg</i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels.<b> De</b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
+  	String textD9 = "Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
+  	SimpleWitness[] sw = createWitnesses(textD1,textD9);
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	System.out.println(buildMatrix.toHtml());
+  }
+  
+  @Test
+  public void testRowLabels() {
+  	String textD1 = "de het een";
+  	String textD9 = "de het een";
+  	SimpleWitness[] sw = createWitnesses(textD1,textD9);
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+    ArrayList<String> labels = buildMatrix.rowLabels();
+    assertEquals("de",labels.get(0));
+    assertEquals("het",labels.get(1));
+    assertEquals("een",labels.get(2));
   }
 
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,
