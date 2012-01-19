@@ -1,6 +1,7 @@
 package eu.interedition.collatex.MatrixLinker;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 
 public class MatrixLinkerTest extends AbstractTest {
 
-	@Ignore
-  @Test
+  @Ignore
+	@Test
   public void test1() {
   	SimpleWitness[] sw = createWitnesses("A B C A B","A B C A B");
     int baseWitness = 0;
@@ -66,7 +67,6 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertTrue(buildMatrix.at(4, 2));
   }
   
-  @Ignore
   @Test
   public void testHermansText1() {
   	String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn.";
@@ -87,6 +87,7 @@ public class MatrixLinkerTest extends AbstractTest {
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	System.out.println(buildMatrix.toHtml());
+  	buildMatrix.allTrues();
   }
   
   @Test
@@ -115,6 +116,38 @@ public class MatrixLinkerTest extends AbstractTest {
     assertEquals("het",labels.get(0));
     assertEquals("een",labels.get(1));
     assertEquals("de",labels.get(2));
+  }
+  
+  @Test
+  public void testAllTrues() {
+  	SimpleWitness[] sw = createWitnesses("A B A B C","A B C A B");
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	ArrayList<Coordinate> allTrue = buildMatrix.allTrues();
+  	assertEquals(9,allTrue.size());
+  	assertTrue(allTrue.contains(new Coordinate(0,0)));
+  	assertFalse(allTrue.contains(new Coordinate(1,0)));
+  }
+  
+  @Test
+  public void testCoordinates() {
+  	Coordinate a = new Coordinate(0,0);
+  	Coordinate b = new Coordinate(0,0);
+  	Coordinate c = new Coordinate(1,1);
+  	assertEquals(new Coordinate(0,0),a);
+  	assertEquals(b, a);
+  	assertFalse(a.equals(c));
+  }
+  
+  @Test
+  public void testBorders() {
+  	Coordinate a = new Coordinate(0,0);
+  	Coordinate b = new Coordinate(1,1);
+  	Coordinate c = new Coordinate(2,1);
+  	assertTrue(a.borders(b));
+  	assertFalse(a.borders(c));
+  	assertFalse(b.borders(c));
   }
 
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,

@@ -97,4 +97,25 @@ public class SparseMatrix  {
     return labels;
   }
 
+  public ArrayList<Coordinate> allTrues() {
+  	ArrayList<Coordinate> pairs = new ArrayList<Coordinate>();
+  	int rows = rowNum();
+  	int cols = colNum();
+  	for(int i=0; i<rows; i++) {
+  		for(int j=0; j<cols; j++) {
+  			if(at(i,j))
+  				pairs.add(new Coordinate(i,j));
+  			System.out.println();
+  		}
+  	}
+  	return pairs;
+  }
+  
+  public int rowNum() {
+		return sparseMatrix.rowKeyList().size();
+  }
+  
+  public int colNum() {
+		return sparseMatrix.columnKeyList().size();
+  }
 }
