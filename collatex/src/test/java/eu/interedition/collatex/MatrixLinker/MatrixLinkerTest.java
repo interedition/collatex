@@ -156,12 +156,31 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertEquals(1,isl.size());
   	isl.add(new Coordinate(0, 0));
   	assertEquals(1,isl.size());
+  	isl.add(new Coordinate(0, 1));
+  	assertEquals(1,isl.size());
   	isl.add(new Coordinate(2, 2));
   	assertEquals(1,isl.size());
   	assertTrue(isl.neighbour(new Coordinate(1,1)));
   	isl.add(new Coordinate(1, 1));
   	assertEquals(2,isl.size());
 }
+  
+  @Test
+  public void testArchipelago() {
+  	Archipelago arch = new Archipelago();
+  	Island isl_1 = new Island();
+  	isl_1.add(new Coordinate(0,0));
+  	isl_1.add(new Coordinate(1,1));
+  	arch.add(isl_1);
+  	Island isl_2 = new Island();
+  	isl_2.add(new Coordinate(2,2));
+  	isl_2.add(new Coordinate(3,3));
+  	arch.add(isl_2);
+  	assertEquals(2, arch.size());
+  	assertTrue(isl_1.overlap(isl_2));
+  	arch.mergeIslands();
+  	assertEquals(1, arch.size());
+  }
   
   @Test
   public void testIslands() {

@@ -127,18 +127,12 @@ public class SparseMatrix  {
 			while(!found) {
 				for(Island alc : islands.iterator()) {
 //					System.out.println("inspect island");
-					for(Coordinate otherC : alc.iterator()) {
-//						System.out.println("next on island: "+otherC);
-						if(c.borders(otherC)) {
-//							System.out.println("add to island");
+					if(alc.neighbour(c)) {
 							alc.add(c);
 							found = true;
-						}
-						if(found)
-							break;
 					}
 					if(found)
-						break;
+							break;
 				}
 				if(!found) {
 //					System.out.println("new island");

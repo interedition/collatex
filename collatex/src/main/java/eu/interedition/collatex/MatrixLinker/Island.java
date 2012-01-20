@@ -46,7 +46,31 @@ public class Island {
 		return false;
 	}
 	
+	public boolean overlap(Island isl) {
+		for(Coordinate c: isl.iterator()) {
+			if(partOf(c) || neighbour(c))
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean isEmpty() {
+		return island.isEmpty();
+	}
+	
+	public void clear() {
+		island.clear();
+	}
+	
 	public int size() {
 	  return island.size();
+  }
+
+	public void merge(Island island2) {
+		for(Coordinate c: island2.iterator()) {
+			System.out.println("("+c.col+","+c.row+")");
+			add(c);
+			System.out.println("size: "+size());
+		}
   }
 }

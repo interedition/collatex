@@ -21,4 +21,24 @@ public class Archipelago {
 	public int size() {
 	  return islands.size();
   }
+
+	public void mergeIslands() {
+		int i=0;
+		int j=1;
+		int[] rr = new int[size()];
+		for(i=0; i<size(); i++) {
+			for(j=i+1; j<size(); j++) {
+				if(islands.get(i).overlap(islands.get(j))) {
+					System.out.println("island "+i+" overlaps island "+j);
+					islands.get(i).merge(islands.get(j));
+					islands.get(j).clear();
+					rr[j] = 1;
+				}
+			}
+		}
+		for(i=(rr.length-1); i>0; i--) {
+			if(rr[i]==1)
+			  islands.remove(i);
+		}
+  }
 }
