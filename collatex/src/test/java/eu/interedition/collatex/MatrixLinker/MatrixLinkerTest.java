@@ -78,16 +78,15 @@ public class MatrixLinkerTest extends AbstractTest {
 //  	System.out.println(buildMatrix.toHtml());
   }
   
-  @Ignore
   @Test
   public void testHermansText2() {
-  	String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i>JSg</i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels.<b> De</b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
+  	String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
   	String textD9 = "Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
   	SimpleWitness[] sw = createWitnesses(textD1,textD9);
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
-//  	System.out.println(buildMatrix.toHtml());
+  	System.out.println(buildMatrix.toHtml());
   }
   
   @Test
@@ -156,7 +155,7 @@ public class MatrixLinkerTest extends AbstractTest {
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
-  	ArrayList<ArrayList<Coordinate>> islands = buildMatrix.getIslands();
+  	Archipelago islands = buildMatrix.getIslands();
   	System.out.println("size: "+islands.size());
   	assertEquals(3, islands.size());
   }

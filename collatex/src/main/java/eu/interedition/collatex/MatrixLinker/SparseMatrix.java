@@ -9,14 +9,11 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 
 public class SparseMatrix  {
 	
-	
 	private ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
 	public SparseMatrix(Iterable<VariantGraphVertex> vertices, Iterable<Token> witness) {
     sparseMatrix = ArrayTable.create(vertices,witness);
 	}
-
-	
 
 	public void set(int row, int column, boolean value) {
 		sparseMatrix.set(row, column, value);
@@ -121,19 +118,19 @@ public class SparseMatrix  {
 
 
 
-	public ArrayList<ArrayList<Coordinate>> getIslands() {
-		ArrayList<ArrayList<Coordinate>> islands = new ArrayList<ArrayList<Coordinate>>();
+	public Archipelago getIslands() {
+		Archipelago islands = new Archipelago();
 		ArrayList<Coordinate> allTrue = allTrues();
 		for(Coordinate c: allTrue) {
-			System.out.println("next coordinate: "+c);
+//			System.out.println("next coordinate: "+c);
 			boolean found = false;
 			while(!found) {
-				for(ArrayList<Coordinate> alc : islands) {
-					System.out.println("inspect island");
-					for(Coordinate otherC : alc) {
-						System.out.println("next on island: "+otherC);
+				for(Island alc : islands.iterator()) {
+//					System.out.println("inspect island");
+					for(Coordinate otherC : alc.iterator()) {
+//						System.out.println("next on island: "+otherC);
 						if(c.borders(otherC)) {
-							System.out.println("add to island");
+//							System.out.println("add to island");
 							alc.add(c);
 							found = true;
 						}
@@ -144,15 +141,14 @@ public class SparseMatrix  {
 						break;
 				}
 				if(!found) {
-					System.out.println("new island");
-					ArrayList<Coordinate> island = new ArrayList<Coordinate>();
+//					System.out.println("new island");
+					Island island = new Island();
 					island.add(c);
 					islands.add(island);
 				}
 				found = true;
 			}
 		}
-	  // TODO Auto-generated method stub
 	  return islands;
   }
 }
