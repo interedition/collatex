@@ -30,7 +30,7 @@ public class Archipelago {
 			for(j=i+1; j<size(); j++) {
 				if(islands.get(i).overlap(islands.get(j))) {
 					System.out.println("island "+i+" overlaps island "+j);
-					islands.get(i).merge(islands.get(j));
+					((UndirectedIsland) islands.get(i)).merge(islands.get(j));
 					islands.get(j).clear();
 					rr[j] = 1;
 				}

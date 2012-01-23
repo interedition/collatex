@@ -2,63 +2,61 @@ package eu.interedition.collatex.MatrixLinker;
 
 import java.util.ArrayList;
 
-/**
- * An Island is a collections of Coordinates. All these 'fields' are connected at the corners.
- * I.e. all the white or all the black fields on a chessboard could be an island.
- * 
- * @author meindert
- *
- */
+public abstract class Island {
 
-public class Island extends DirectedIsland {
+	protected ArrayList<Coordinate> island;
 
-	private ArrayList<DirectedIsland> versions;
-
-	public Island() {
-		island = new ArrayList<Coordinate>();
-		versions = new ArrayList<DirectedIsland>();
-	}
-
-	public void add(Coordinate coordinate) {
-		if(island.isEmpty())
-			island.add(coordinate);
-		else 
-			if(!partOf(coordinate) && neighbour(coordinate))
-				island.add(coordinate);
-			else
-				return;
-		if(versions.isEmpty()) {
-			DirectedIsland version = new DirectedIsland();
-			version.add(coordinate);
-			versions.add(version);
-		} else {
-			
-		}
+	public ArrayList<Coordinate> iterator() {
+    return island;
   }
 
-	public void merge(Island island2) {
-		for(Coordinate c: island2.iterator()) {
-			System.out.println("("+c.col+","+c.row+")");
-			add(c);
-			System.out.println("size: "+size());
-		}
+	public boolean partOf(Coordinate c) {
+  	return island.contains(c);
   }
-	
+
+	public boolean neighbour(Coordinate c) {
+  	if(partOf(c))
+  		return false;
+  	for(Coordinate islC : island) {
+  		if(c.borders(islC)) {
+  			return true;
+  		}
+  	}
+  	return false;
+  }
+
+	public boolean overlap(Island isl) {
+  	for(Coordinate c: isl.iterator()) {
+  		if(partOf(c) || neighbour(c))
+  			return true;
+  	}
+  	return false;
+  }
+
+	public boolean isEmpty() {
+  	return island.isEmpty();
+  }
+
+	public void clear() {
+  	island.clear();
+  }
+
+	public int size() {
+    return island.size();
+  }
+
 	/**
-	 * Two islands are competitors if there is a horizontal or
-	 * vertical line which goes through both islands 
-	 */
-	public boolean isCompetitor (Island isl) {
-		for(Coordinate c: isl.iterator()) {
-			for(Coordinate d: island) {
-				if(c.sameCol(d) || c.sameRow(d))
-					return true;
-			}
-		}
-		return false;
-	}
-
-	public int numOfVersions() {
-		return versions.size();
+   * Two islands are competitors if there is a horizontal or
+   * vertical line which goes through both islands 
+   */
+  public boolean isCompetitor(UndirectedIsland isl) {
+  	for(Coordinate c: isl.iterator()) {
+  		for(Coordinate d: island) {
+  			if(c.sameCol(d) || c.sameRow(d))
+  				return true;
+  		}
+  	}
+  	return false;
   }
+
 }

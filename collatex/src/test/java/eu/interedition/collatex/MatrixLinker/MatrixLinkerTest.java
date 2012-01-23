@@ -151,7 +151,7 @@ public class MatrixLinkerTest extends AbstractTest {
   
   @Test
   public void testIsland() {
-  	Island isl = new Island();
+  	UndirectedIsland isl = new UndirectedIsland();
   	isl.add(new Coordinate(0, 0));
   	assertEquals(1,isl.size());
   	isl.add(new Coordinate(0, 0));
@@ -163,10 +163,10 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertTrue(isl.neighbour(new Coordinate(1,1)));
   	isl.add(new Coordinate(1, 1));
   	assertEquals(2,isl.size());
-  	Island isl_2 = new Island();
+  	UndirectedIsland isl_2 = new UndirectedIsland();
   	isl_2.add(new Coordinate(1,4));
     assertTrue(isl.isCompetitor(isl_2));
-  	Island isl_3 = new Island();
+  	UndirectedIsland isl_3 = new UndirectedIsland();
   	isl_3.add(new Coordinate(2,2));
     assertFalse(isl.isCompetitor(isl_3));
 }
@@ -188,7 +188,7 @@ public class MatrixLinkerTest extends AbstractTest {
   @Ignore
   @Test
   public void testIslandVersions() {
-  	Island isl_1 = new Island();
+  	UndirectedIsland isl_1 = new UndirectedIsland();
   	isl_1.add(new Coordinate(2,0));
   	isl_1.add(new Coordinate(1,1));
   	isl_1.add(new Coordinate(2,2));
@@ -200,11 +200,11 @@ public class MatrixLinkerTest extends AbstractTest {
   @Test
   public void testArchipelago() {
   	Archipelago arch = new Archipelago();
-  	Island isl_1 = new Island();
+  	UndirectedIsland isl_1 = new UndirectedIsland();
   	isl_1.add(new Coordinate(0,0));
   	isl_1.add(new Coordinate(1,1));
   	arch.add(isl_1);
-  	Island isl_2 = new Island();
+  	UndirectedIsland isl_2 = new UndirectedIsland();
   	isl_2.add(new Coordinate(2,2));
   	isl_2.add(new Coordinate(3,3));
   	arch.add(isl_2);

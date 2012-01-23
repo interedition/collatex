@@ -125,7 +125,7 @@ public class SparseMatrix  {
 //			System.out.println("next coordinate: "+c);
 			boolean found = false;
 			while(!found) {
-				for(Island alc : islands.iterator()) {
+				for(UndirectedIsland alc : islands.iterator()) {
 //					System.out.println("inspect island");
 					if(alc.neighbour(c)) {
 							alc.add(c);
@@ -136,7 +136,7 @@ public class SparseMatrix  {
 				}
 				if(!found) {
 //					System.out.println("new island");
-					Island island = new Island();
+					UndirectedIsland island = new UndirectedIsland();
 					island.add(c);
 					islands.add(island);
 				}
