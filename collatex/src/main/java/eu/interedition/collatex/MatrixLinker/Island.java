@@ -10,18 +10,14 @@ import java.util.ArrayList;
  *
  */
 
-public class Island {
+public class Island extends DirectedIsland {
 
-	private ArrayList<Coordinate> island;
+	private ArrayList<DirectedIsland> versions;
 
 	public Island() {
 		island = new ArrayList<Coordinate>();
+		versions = new ArrayList<DirectedIsland>();
 	}
-
-	// this is not a real iterator implementation but it works...
-  public ArrayList<Coordinate> iterator() {
-	  return island;
-  }
 
 	public void add(Coordinate coordinate) {
 		if(island.isEmpty())
@@ -29,41 +25,15 @@ public class Island {
 		else 
 			if(!partOf(coordinate) && neighbour(coordinate))
 				island.add(coordinate);
-  }
-
-	public boolean partOf(Coordinate c) {
-		return island.contains(c);
-	}
-	
-	public boolean neighbour(Coordinate c) {
-		if(partOf(c))
-			return false;
-		for(Coordinate islC : island) {
-			if(c.borders(islC)) {
-				return true;
-			}
+			else
+				return;
+		if(versions.isEmpty()) {
+			DirectedIsland version = new DirectedIsland();
+			version.add(coordinate);
+			versions.add(version);
+		} else {
+			
 		}
-		return false;
-	}
-	
-	public boolean overlap(Island isl) {
-		for(Coordinate c: isl.iterator()) {
-			if(partOf(c) || neighbour(c))
-				return true;
-		}
-		return false;
-	}
-	
-	public boolean isEmpty() {
-		return island.isEmpty();
-	}
-	
-	public void clear() {
-		island.clear();
-	}
-	
-	public int size() {
-	  return island.size();
   }
 
 	public void merge(Island island2) {
@@ -72,5 +42,23 @@ public class Island {
 			add(c);
 			System.out.println("size: "+size());
 		}
+  }
+	
+	/**
+	 * Two islands are competitors if there is a horizontal or
+	 * vertical line which goes through both islands 
+	 */
+	public boolean isCompetitor (Island isl) {
+		for(Coordinate c: isl.iterator()) {
+			for(Coordinate d: island) {
+				if(c.sameCol(d) || c.sameRow(d))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public int numOfVersions() {
+		return versions.size();
   }
 }

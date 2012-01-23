@@ -16,6 +16,14 @@ public class Coordinate {
 	public int getCol() {
 		return col;
 	}
+	
+	public boolean sameCol(Coordinate c) {
+		return c.col==col;
+	}
+
+	public boolean sameRow(Coordinate c) {
+		return c.row==row;
+	}
 
 	public String toString() {
 		return "("+row+","+col+")";

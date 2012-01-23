@@ -163,7 +163,39 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertTrue(isl.neighbour(new Coordinate(1,1)));
   	isl.add(new Coordinate(1, 1));
   	assertEquals(2,isl.size());
+  	Island isl_2 = new Island();
+  	isl_2.add(new Coordinate(1,4));
+    assertTrue(isl.isCompetitor(isl_2));
+  	Island isl_3 = new Island();
+  	isl_3.add(new Coordinate(2,2));
+    assertFalse(isl.isCompetitor(isl_3));
 }
+  
+  @Test
+  public void testDirectedIsland() {
+  	DirectedIsland isl = new DirectedIsland();
+  	isl.add(new Coordinate(0, 0));
+  	assertEquals(1,isl.size());
+  	assertEquals(0,isl.direction());
+  	isl.add(new Coordinate(1, 1));
+  	assertEquals(2,isl.size());
+  	assertEquals(1,isl.direction());
+  	isl.add(new Coordinate(2, 2));
+  	assertEquals(3,isl.size());
+  	assertEquals(1,isl.direction());
+  }
+  
+  @Ignore
+  @Test
+  public void testIslandVersions() {
+  	Island isl_1 = new Island();
+  	isl_1.add(new Coordinate(2,0));
+  	isl_1.add(new Coordinate(1,1));
+  	isl_1.add(new Coordinate(2,2));
+    assertEquals(2,isl_1.numOfVersions());
+    isl_1.add(new Coordinate(1,3));
+    assertEquals(3,isl_1.numOfVersions());
+  }
   
   @Test
   public void testArchipelago() {
