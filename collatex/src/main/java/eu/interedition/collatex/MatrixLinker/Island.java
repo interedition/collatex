@@ -59,4 +59,6 @@ public abstract class Island {
   	return false;
   }
 
+	public abstract void add(Coordinate c) ;
+
 }
