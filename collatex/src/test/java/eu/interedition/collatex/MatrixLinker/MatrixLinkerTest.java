@@ -150,7 +150,7 @@ public class MatrixLinkerTest extends AbstractTest {
   }
   
   @Test
-  public void testIsland() {
+  public void testUndirectedIsland() {
   	UndirectedIsland isl = new UndirectedIsland();
   	isl.add(new Coordinate(0, 0));
   	assertEquals(1,isl.size());
@@ -193,8 +193,20 @@ public class MatrixLinkerTest extends AbstractTest {
   	isl_1.add(new Coordinate(1,1));
   	isl_1.add(new Coordinate(2,2));
     assertEquals(2,isl_1.numOfVersions());
+    isl_1.add(new Coordinate(3,1));
+    assertEquals(4,isl_1.numOfVersions());
+    isl_1.add(new Coordinate(1,3));
+    assertEquals(4,isl_1.numOfVersions());
+//  add in different order
+    isl_1 = new UndirectedIsland();
+  	isl_1.add(new Coordinate(2,0));
+  	isl_1.add(new Coordinate(1,1));
+  	isl_1.add(new Coordinate(2,2));
+    assertEquals(2,isl_1.numOfVersions());
     isl_1.add(new Coordinate(1,3));
     assertEquals(3,isl_1.numOfVersions());
+    isl_1.add(new Coordinate(3,1));
+    assertEquals(4,isl_1.numOfVersions());
   }
   
   @Test

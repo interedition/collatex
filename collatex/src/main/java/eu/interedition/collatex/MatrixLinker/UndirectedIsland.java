@@ -19,21 +19,45 @@ public class UndirectedIsland extends Island {
 		versions = new ArrayList<DirectedIsland>();
 	}
 
-	public void add(Coordinate coordinate) {
+	public boolean add(Coordinate coordinate) {
+		boolean result = false;
 		if(island.isEmpty())
-			island.add(coordinate);
+			result = island.add(coordinate);
 		else 
 			if(!partOf(coordinate) && neighbour(coordinate))
-				island.add(coordinate);
+				result = island.add(coordinate);
 			else
-				return;
+				return false;
 		if(versions.isEmpty()) {
 			DirectedIsland version = new DirectedIsland();
 			version.add(coordinate);
 			versions.add(version);
 		} else {
-			
+			boolean res = false;
+			for(DirectedIsland ver: versions) {
+				res = ver.add(coordinate);
+			}
+			if(!res) {
+  			DirectedIsland version_1 = new DirectedIsland();
+  			version_1.add(coordinate);
+  			DirectedIsland version_2 = new DirectedIsland();
+  			version_2.add(coordinate);
+  			for(DirectedIsland ver: versions) {
+  				if(ver.neighbour(coordinate)) {
+  					for(Coordinate c: ver.iterator()) {
+  						if(!version_1.add(c)) {
+  							version_2.add(c);
+  						}
+  					}
+  				}
+  			}
+  			versions.add(version_1);
+  			if(version_2.direction()!=0)
+  				versions.add(version_2);
+  			// 
+			}
 		}
+		return result;
   }
 
 	public void merge(Island island2) {

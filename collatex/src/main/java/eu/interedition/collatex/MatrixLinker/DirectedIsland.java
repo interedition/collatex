@@ -14,7 +14,6 @@ import org.apache.lucene.index.CorruptIndexException;
  * I.e. if the row-cordinate gets larger and the col-coordinate also, the
  * direction is 1 (positive) else it is -1 (negative)
  * 
- * 
  */
 
 public class DirectedIsland extends Island{
@@ -26,27 +25,36 @@ public class DirectedIsland extends Island{
 		direction = 0;
 	}
 
-	public void add(Coordinate coordinate) {
-		if(island.isEmpty())
-			island.add(coordinate);
-		else 
-			if(!partOf(coordinate) && neighbour(coordinate))
+	public boolean add(Coordinate coordinate) {
+		System.out.println("Add to DirectedIsland: "+coordinate);
+		boolean result = false;
+		if(island.isEmpty()) {
+			System.out.println("island is empty");
+			result = island.add(coordinate);
+		} else  
+			if(!partOf(coordinate) && neighbour(coordinate)) {
+				System.out.println("!partOf(coordinate) && neighbour(coordinate)");
 				if(direction==0) {
-					Coordinate curr_coordinate = island.get(0);
-					System.out.println("curr_coor: "+curr_coordinate);
-					direction = (curr_coordinate.row - coordinate.row) / (curr_coordinate.col - coordinate.col);
-					System.out.println("new coordinate: "+ coordinate);
-					island.add(coordinate);
+					System.out.println("direction==0");
+					Coordinate existing_coordinate = island.get(0);
+					System.out.println("existing_coor: "+existing_coordinate);
+					direction = (existing_coordinate.row - coordinate.row) / (existing_coordinate.col - coordinate.col);
+					result = island.add(coordinate);
 					System.out.println("direction: "+direction);
 				}	else {
-					Coordinate curr_coordinate = island.get(0);
-					System.out.println("curr_coor: "+curr_coordinate);
-					int new_direction = (curr_coordinate.row - coordinate.row) / (curr_coordinate.col - coordinate.col);
-					System.out.println("new coordinate: "+ coordinate);
-					System.out.println("direction: "+new_direction);
-					if(new_direction==direction)
-						island.add(coordinate);
+					System.out.println("direction = "+direction);
+					Coordinate existing_coordinate = island.get(0);
+					System.out.println("existing_coor: "+existing_coordinate);
+					if(existing_coordinate.col!=coordinate.col) {
+  					int new_direction = (existing_coordinate.row - coordinate.row) / (existing_coordinate.col - coordinate.col);
+  					System.out.println("new direction: "+new_direction);
+  					if(new_direction==direction)
+  						result = island.add(coordinate);
+					}
 				}
+			}
+		System.out.println("result: "+result);
+		return result; 
   }
 
 	public int direction() {

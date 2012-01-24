@@ -59,6 +59,6 @@ public abstract class Island {
   	return false;
   }
 
-	public abstract void add(Coordinate c) ;
+	public abstract boolean add(Coordinate c) ;
 
 }
