@@ -163,12 +163,6 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertTrue(isl.neighbour(new Coordinate(1,1)));
   	isl.add(new Coordinate(1, 1));
   	assertEquals(2,isl.size());
-  	UndirectedIsland isl_2 = new UndirectedIsland();
-  	isl_2.add(new Coordinate(1,4));
-    assertTrue(isl.isCompetitor(isl_2));
-  	UndirectedIsland isl_3 = new UndirectedIsland();
-  	isl_3.add(new Coordinate(2,2));
-    assertFalse(isl.isCompetitor(isl_3));
 }
   
   @Test

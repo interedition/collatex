@@ -60,5 +60,19 @@ public abstract class Island {
   }
 
 	public abstract boolean add(Coordinate c) ;
+	
+	/**
+	 * Two islands are competitors if there is a horizontal or
+	 * vertical line which goes through both islands 
+	 */
+	public boolean isCompetitor (Island isl) {
+		for(Coordinate c: isl.iterator()) {
+			for(Coordinate d: island) {
+				if(c.sameCol(d) || c.sameRow(d))
+					return true;
+			}
+		}
+		return false;
+	}
 
 }
