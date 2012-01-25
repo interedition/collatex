@@ -26,34 +26,24 @@ public class DirectedIsland extends Island{
 	}
 
 	public boolean add(Coordinate coordinate) {
-		System.out.println("Add to DirectedIsland: "+coordinate);
 		boolean result = false;
 		if(island.isEmpty()) {
-			System.out.println("island is empty");
 			result = island.add(coordinate);
 		} else  
 			if(!partOf(coordinate) && neighbour(coordinate)) {
-				System.out.println("!partOf(coordinate) && neighbour(coordinate)");
 				if(direction==0) {
-					System.out.println("direction==0");
 					Coordinate existing_coordinate = island.get(0);
-					System.out.println("existing_coor: "+existing_coordinate);
 					direction = (existing_coordinate.row - coordinate.row) / (existing_coordinate.col - coordinate.col);
 					result = island.add(coordinate);
-					System.out.println("direction: "+direction);
 				}	else {
-					System.out.println("direction = "+direction);
 					Coordinate existing_coordinate = island.get(0);
-					System.out.println("existing_coor: "+existing_coordinate);
 					if(existing_coordinate.col!=coordinate.col) {
   					int new_direction = (existing_coordinate.row - coordinate.row) / (existing_coordinate.col - coordinate.col);
-  					System.out.println("new direction: "+new_direction);
   					if(new_direction==direction)
   						result = island.add(coordinate);
 					}
 				}
 			}
-		System.out.println("result: "+result);
 		return result; 
   }
 

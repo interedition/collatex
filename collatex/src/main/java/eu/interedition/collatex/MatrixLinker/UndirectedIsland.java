@@ -21,40 +21,42 @@ public class UndirectedIsland extends Island {
 
 	public boolean add(Coordinate coordinate) {
 		boolean result = false;
-		if(island.isEmpty())
+		if(island.isEmpty()) {
 			result = island.add(coordinate);
-		else 
-			if(!partOf(coordinate) && neighbour(coordinate))
+		} else 
+			if(!partOf(coordinate) && neighbour(coordinate)) {
 				result = island.add(coordinate);
-			else
+			} else {
 				return false;
+			}
 		if(versions.isEmpty()) {
 			DirectedIsland version = new DirectedIsland();
 			version.add(coordinate);
 			versions.add(version);
 		} else {
-			boolean res = false;
+			ArrayList<DirectedIsland> new_versions = new ArrayList<DirectedIsland>();
+			boolean addedToExistingVersion = false;
 			for(DirectedIsland ver: versions) {
-				res = ver.add(coordinate);
+				addedToExistingVersion |= ver.add(coordinate);
 			}
-			if(!res) {
-  			DirectedIsland version_1 = new DirectedIsland();
-  			version_1.add(coordinate);
-  			DirectedIsland version_2 = new DirectedIsland();
-  			version_2.add(coordinate);
-  			for(DirectedIsland ver: versions) {
-  				if(ver.neighbour(coordinate)) {
-  					for(Coordinate c: ver.iterator()) {
-  						if(!version_1.add(c)) {
-  							version_2.add(c);
-  						}
-  					}
-  				}
+			for(Coordinate c: island) {
+				if(c.borders(coordinate)) {
+					boolean formNewVersion = true;
+					for(DirectedIsland di : versions) {
+						formNewVersion &= !(di.partOf(coordinate) && di.partOf(c));
+					}
+					if(formNewVersion) {
+  					DirectedIsland version = new DirectedIsland();
+  					version.add(coordinate);
+  					version.add(c);
+  					new_versions.add(version);
+					}
+				}
+			}
+			if(!new_versions.isEmpty()) {
+  			for(DirectedIsland di : new_versions) {
+  				versions.add(di);
   			}
-  			versions.add(version_1);
-  			if(version_2.direction()!=0)
-  				versions.add(version_2);
-  			// 
 			}
 		}
 		return result;
@@ -62,13 +64,15 @@ public class UndirectedIsland extends Island {
 
 	public void merge(Island island2) {
 		for(Coordinate c: island2.iterator()) {
-			System.out.println("("+c.col+","+c.row+")");
 			add(c);
-			System.out.println("size: "+size());
 		}
   }
 	
 	public int numOfVersions() {
 		return versions.size();
   }
+	
+	public ArrayList<DirectedIsland> getVersions() {
+		return versions;
+	}
 }

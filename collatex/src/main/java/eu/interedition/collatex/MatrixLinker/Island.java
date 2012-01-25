@@ -75,4 +75,16 @@ public abstract class Island {
 		return false;
 	}
 
+	public String toString() {
+		String result = "";
+		for(Coordinate coor : island) {
+		  if(result.isEmpty())
+		  	result = "{ " + coor;
+		  else
+		  	result += ", "+coor;
+		}
+		result += " }";
+		return result;
+	}
+
 }
