@@ -61,6 +61,30 @@ public abstract class Island {
 
 	public abstract boolean add(Coordinate c) ;
 	
+	public boolean remove(Coordinate c) {
+		boolean result = true;
+		if(partOf(c))
+			island.remove(c);
+		else
+			result = false;
+		return result;
+	}
+
+	protected boolean removeSameColOrRow(Coordinate c) {
+    ArrayList<Coordinate> remove = new ArrayList<Coordinate>();
+		for(Coordinate coor: island) {
+			if(coor.sameCol(c) || coor.sameRow(c)) {
+				remove.add(coor);
+			}
+		}
+		if(remove.isEmpty())
+			return false;
+    for(Coordinate coor : remove) {
+    	island.remove(coor);
+    }
+	  return true;
+  }
+
 	/**
 	 * Two islands are competitors if there is a horizontal or
 	 * vertical line which goes through both islands 
@@ -84,6 +108,30 @@ public abstract class Island {
 		  	result += ", "+coor;
 		}
 		result += " }";
+		return result;
+	}
+	
+	public boolean sharedCol(Island isl) {
+		boolean result = false;
+		for(Coordinate col : isl.iterator()) {
+			for(Coordinate c: island) {
+		    result = c.sameCol(col);
+		    if(result)
+		    	break;
+			}
+		}
+		return result;
+	}
+
+	public boolean sharedRow(Island isl) {
+		boolean result = false;
+		for(Coordinate col : isl.iterator()) {
+			for(Coordinate c: island) {
+		    result = c.sameRow(col);
+		    if(result)
+		    	break;
+			}
+		}
 		return result;
 	}
 

@@ -2,8 +2,6 @@ package eu.interedition.collatex.MatrixLinker;
 
 import java.util.ArrayList;
 
-import org.apache.lucene.index.CorruptIndexException;
-
 /**
  * An DirectedIsland is a collections of Coordinates all on the same
  * diagonal. The direction of this diagonal can be -1, 0, or 1.
@@ -50,5 +48,21 @@ public class DirectedIsland extends Island{
 	public int direction() {
 		return direction;
 	}
+	
+	public DirectedIsland removePoints(DirectedIsland di) {
+		DirectedIsland result = (DirectedIsland) this.copy();
+    for(Coordinate c : di.iterator()) {
+    	result.removeSameColOrRow(c);
+    }
+		return result;		
+	}
+
+	private DirectedIsland copy() {
+		DirectedIsland di = new DirectedIsland();
+		for(Coordinate c : island) {
+			di.add(c);
+		}
+	  return di;
+  } 
 
 }

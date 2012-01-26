@@ -267,7 +267,63 @@ public class MatrixLinkerTest extends AbstractTest {
   	Archipelago islands = buildMatrix.getIslands();
   	assertEquals(3, islands.size());
   }
+  
+  @Test
+  public void testRivalVersions() {
+  	UndirectedIsland isl_1 = new UndirectedIsland();
+  	isl_1.add(new Coordinate(2,0));
+  	isl_1.add(new Coordinate(1,1));
+    isl_1.add(new Coordinate(2,2));
+    ArrayList<DirectedIsland> versions = isl_1.getVersions();
+    assertEquals(2, versions.size());
+    DirectedIsland isl_2 = versions.get(0);
+    ArrayList<DirectedIsland> conflictingVersions = isl_1.conflictingVersions(isl_2);
+    assertEquals(1, conflictingVersions.size());
+  }
+  
+  @Test
+  public void testNonRivalVersions() {
+  	UndirectedIsland isl_1 = new UndirectedIsland();
+  	isl_1.add(new Coordinate(2,0));
+  	isl_1.add(new Coordinate(1,1));
+  	ArrayList<DirectedIsland> nonRivalVersions = isl_1.nonRivalVersions();
+  	assertEquals(1,nonRivalVersions.size());
+    isl_1.add(new Coordinate(2,2));
+    nonRivalVersions = isl_1.nonRivalVersions();
+  	assertEquals(1,nonRivalVersions.size());
+  }
 
+  @Test
+  public void testNonRivalVersionGroups() {
+  	UndirectedIsland isl_1 = new UndirectedIsland();
+  	isl_1.add(new Coordinate(2,0));
+  	isl_1.add(new Coordinate(1,1));
+  	ArrayList<DirectedIsland> nonRivalVersions = isl_1.nonRivalVersions();
+  	assertEquals(1,nonRivalVersions.size());
+    isl_1.add(new Coordinate(2,2));
+  	ArrayList<Archipelago> allNonRivalVersionGroups = isl_1.allNonRivalVersionGroups();
+  	assertEquals(2, allNonRivalVersionGroups.size());
+  	for(Archipelago i : allNonRivalVersionGroups) {
+  		assertEquals(1,i.size());
+  	}
+  	isl_1.add(new Coordinate(3,3));
+  	allNonRivalVersionGroups = isl_1.allNonRivalVersionGroups();
+  	assertEquals(2, allNonRivalVersionGroups.size());
+  	assertEquals(2,allNonRivalVersionGroups.get(0).size());
+  }
+  
+  @Test
+  public void testRemovePoints() {
+  	DirectedIsland di_1 = new DirectedIsland();
+  	di_1.add(new Coordinate(1, 1));
+  	di_1.add(new Coordinate(2, 2));
+  	DirectedIsland di_2 = new DirectedIsland();
+  	di_2.add(new Coordinate(2, 2));
+  	DirectedIsland di_3 = di_1.removePoints(di_2);
+  	assertEquals(2, di_1.size());
+  	assertEquals(1, di_3.size());
+  }
+  
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,
       int posBaseWitness, int secondWitness, int posSecondWitness,
       Map<Token, VariantGraphVertex> link) {

@@ -9,6 +9,11 @@ public class Archipelago {
 		islands = new ArrayList<Island>();
 	}
 
+	public Archipelago(Island isl) {
+		islands = new ArrayList<Island>();
+		islands.add(isl);
+  }
+
 	// this is not a real iterator implementation but it works...
   public ArrayList<Island> iterator() {
 	  return islands;
@@ -41,4 +46,8 @@ public class Archipelago {
 			  islands.remove(i);
 		}
   }
+	
+	public Island get(int i) {
+		return islands.get(i);
+	}
 }

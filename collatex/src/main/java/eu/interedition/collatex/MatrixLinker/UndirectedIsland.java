@@ -75,4 +75,51 @@ public class UndirectedIsland extends Island {
 	public ArrayList<DirectedIsland> getVersions() {
 		return versions;
 	}
+	
+	public ArrayList<DirectedIsland> conflictingVersions(DirectedIsland isl) {
+		ArrayList<DirectedIsland> rivals = new ArrayList<DirectedIsland>();
+		for(DirectedIsland di : versions) {
+			if(!isl.equals(di)) {
+				if(isl.sharedCol(di) || isl.sharedRow(di)) {
+					rivals.add(di);
+				}
+			}
+		}
+		return rivals;
+	}
+	
+	public ArrayList<DirectedIsland> nonRivalVersions() {
+		ArrayList<DirectedIsland> conflictFree = new ArrayList<DirectedIsland>();
+		if(versions.size()<2) {
+			conflictFree.addAll(versions);
+			return conflictFree;
+		}
+		int numOfVersions = versions.size();
+		conflictFree.add(versions.get(0));
+		for(int i=0; i<numOfVersions; i++) {
+			for(int j=i+1; j<numOfVersions; j++) {
+				versions.get(i);
+				versions.get(j);
+			}
+		}
+		return conflictFree;
+	}
+	
+	public ArrayList<Archipelago> allNonRivalVersionGroups() {
+		ArrayList<Archipelago> archList = new ArrayList<Archipelago>();
+		int numOfVersions = versions.size();
+		for(int i=0; i<numOfVersions; i++) {
+			DirectedIsland v_i = versions.get(i);
+			Archipelago arch = new Archipelago(v_i);
+			for(int j=i+1; j<numOfVersions; j++) {
+				DirectedIsland v_j = versions.get(j);
+				v_j = v_j.removePoints(v_i);
+				if(!v_j.isEmpty())
+					arch.add(v_j);
+			}
+			archList.add(arch);
+		}
+		return archList;
+	}
+	
 }
