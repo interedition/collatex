@@ -34,7 +34,6 @@ public class Archipelago {
 		for(i=0; i<size(); i++) {
 			for(j=i+1; j<size(); j++) {
 				if(islands.get(i).overlap(islands.get(j))) {
-					System.out.println("island "+i+" overlaps island "+j);
 					((UndirectedIsland) islands.get(i)).merge(islands.get(j));
 					islands.get(j).clear();
 					rr[j] = 1;
@@ -50,4 +49,16 @@ public class Archipelago {
 	public Island get(int i) {
 		return islands.get(i);
 	}
+
+	public Object numOfConflicts() {
+		int result = 0;
+		int num = islands.size();
+		for(int i=0; i<num; i++)
+			for(int j=i+1; j<num; j++) {
+//				System.out.println("compare "+islands.get(j)+" with "+islands.get(i));				
+				if(islands.get(j).isCompetitor(islands.get(i)))
+					result++;
+			}
+	  return result;
+  }
 }

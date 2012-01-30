@@ -102,7 +102,6 @@ public class SparseMatrix  {
   		for(int j=0; j<cols; j++) {
   			if(at(i,j))
   				pairs.add(new Coordinate(i,j));
-  			System.out.println();
   		}
   	}
   	return pairs;
