@@ -89,6 +89,18 @@ public class MatrixLinkerTest extends AbstractTest {
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	System.out.println(buildMatrix.toHtml());
+  	Archipelago archipelago = buildMatrix.getIslands();
+  	assertEquals(42, archipelago.size());
+  	System.out.println("no of islands: " + archipelago.size());
+  	for(Island isl : archipelago.iterator()) {
+  		System.out.println("island: " + isl+" ("+((UndirectedIsland) isl).allNonRivalVersionGroups().size()+" versions)");
+//    	assertEquals(2, allNonRivalVersionGroups.size());
+//    	allNonRivalVersionGroups = ((UndirectedIsland) isl).allNonRivalVersionGroups();
+//    	assertEquals(2, allNonRivalVersionGroups.size());
+//    	assertEquals(2,allNonRivalVersionGroups.get(0).size());
+  	}
+    assertEquals(98,archipelago.numOfConflicts());
+
   }
   
   @Ignore
@@ -257,7 +269,18 @@ public class MatrixLinkerTest extends AbstractTest {
   	arch.mergeIslands();
   	assertEquals(1, arch.size());
   }
-  
+
+  @Test
+  public void testArchipelagoRivalIslands() {
+  	SimpleWitness[] sw = createWitnesses("A B C A B","A B C A B");
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	Archipelago archipelago = buildMatrix.getIslands();
+    assertEquals(3,archipelago.size());
+    assertEquals(2,archipelago.numOfConflicts());
+  }
+
   @Test
   public void testIslands() {
   	SimpleWitness[] sw = createWitnesses("A B C A B","A B C A B");
