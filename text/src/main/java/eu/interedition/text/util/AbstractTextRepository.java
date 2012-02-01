@@ -53,9 +53,6 @@ public abstract class AbstractTextRepository implements TextRepository {
   }
 
   public Text create(XMLStreamReader xml) throws IOException, XMLStreamException {
-    final File xmlSource = File.createTempFile(getClass().getName(), ".xml");
-
-
     final FileBackedOutputStream xmlBuf = createBuffer();
     XMLEventReader xmlEventReader = null;
     XMLEventWriter xmlEventWriter = null;
@@ -75,7 +72,6 @@ public abstract class AbstractTextRepository implements TextRepository {
       return write(create(Text.Type.XML), xmlBufReader);
     } finally {
       Closeables.close(xmlBufReader, false);
-      xmlSource.delete();
     }
   }
 
