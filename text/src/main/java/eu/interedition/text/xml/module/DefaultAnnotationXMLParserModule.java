@@ -20,24 +20,24 @@
 package eu.interedition.text.xml.module;
 
 import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.Name;
 import eu.interedition.text.Range;
-import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserState;
 
-import java.util.Map;
 import java.util.Stack;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
-
   private Stack<Long> startOffsetStack;
 
+  public DefaultAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize, boolean addNodePath) {
+    super(annotationRepository, batchSize, addNodePath);
+  }
+
   public DefaultAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
-    super(annotationRepository, batchSize);
+    this(annotationRepository, batchSize, false);
   }
 
   @Override
@@ -64,7 +64,7 @@ public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParse
   public void end(XMLEntity entity, XMLParserState state) {
     if (state.getInclusionContext().peek()) {
       final Range range = new Range(startOffsetStack.pop(), state.getTextOffset());
-      add(new SimpleAnnotation(state.getTarget(), entity.getName(), range, entity.getAttributes()));
+      add(state, state.getTarget(), entity.getName(), range, entity.getAttributes());
     }
     super.end(entity, state);
   }

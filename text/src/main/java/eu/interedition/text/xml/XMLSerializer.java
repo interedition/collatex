@@ -28,6 +28,7 @@ import eu.interedition.text.*;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.event.ExceptionPropagatingAnnotationEventAdapter;
 import eu.interedition.text.mem.SimpleName;
+import org.codehaus.jackson.JsonNode;
 import org.springframework.beans.factory.annotation.Required;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -294,6 +295,8 @@ public class XMLSerializer {
   }
 
   private static class HierarchyAwareAnnotationComparator implements Comparator<Annotation> {
+    private static final String XML_NODE_ATTR = TextConstants.XML_NODE_ATTR_NAME.toString();
+
     private Ordering<Name> hierarchyOrdering;
     private final List<Name> hierarchy;
 
@@ -312,6 +315,18 @@ public class XMLSerializer {
       final Name o2Name = o2.getName();
       if (hierarchy.contains(o1Name) && hierarchy.contains(o2Name)) {
         result = hierarchyOrdering.compare(o1Name, o2Name);
+      }
+      if (result != 0) {
+        return result;
+      }
+
+      final JsonNode o1NodePath = o1.getData().get(XML_NODE_ATTR);
+      final JsonNode o2NodePath = o2.getData().get(XML_NODE_ATTR);
+      if (o1NodePath != null && o2NodePath != null) {
+        try {
+          result = new XMLNodePath(o1NodePath).compareTo(new XMLNodePath(o2NodePath));
+        } catch (IllegalArgumentException e) {
+        }
       }
       if (result != 0) {
         return result;

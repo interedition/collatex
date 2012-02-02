@@ -31,7 +31,6 @@ import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserState;
 import org.codehaus.jackson.node.ObjectNode;
 
-import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   private Map<Name, SimpleAnnotation> milestones;
 
   public TEIAwareAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
-    super(annotationRepository, batchSize);
+    super(annotationRepository, batchSize, false);
   }
 
   @Override
@@ -73,7 +72,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
     final long textOffset = state.getTextOffset();
     for (Name milestoneUnit : milestones.keySet()) {
       final SimpleAnnotation last = milestones.get(milestoneUnit);
-      add(new SimpleAnnotation(last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData()));
+      add(state, last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData());
     }
 
     this.milestones = null;
@@ -114,7 +113,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
 
     final SimpleAnnotation last = milestones.get(milestoneUnit);
     if (last != null) {
-      add(new SimpleAnnotation(last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData()));
+      add(state, last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData());
     }
 
     milestones.put(milestoneUnit, new SimpleAnnotation(state.getTarget(), milestoneUnit, new Range(textOffset, textOffset), entityAttributes));
@@ -152,7 +151,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
       final Iterator<SimpleAnnotation> aIt = spanning.removeAll(refId).iterator();
       while (aIt.hasNext()) {
         final SimpleAnnotation a = aIt.next();
-        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData()));
+        add(state, a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData());
       }
     }
   }

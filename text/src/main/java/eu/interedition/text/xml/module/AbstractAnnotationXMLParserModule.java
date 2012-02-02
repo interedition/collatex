@@ -20,29 +20,35 @@
 package eu.interedition.text.xml.module;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Name;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.xml.XMLParserState;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ObjectNode;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleAdapter {
+  private static final String XML_NODE_ATTR = TextConstants.XML_NODE_ATTR_NAME.toString();
+
   protected final AnnotationRepository annotationRepository;
   protected final int batchSize;
+  protected final boolean addNodePath;
 
   private List<Annotation> annotationBatch;
 
-  protected AbstractAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
+  protected AbstractAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize, boolean addNodePath) {
     this.annotationRepository = annotationRepository;
     this.batchSize = batchSize;
+    this.addNodePath = addNodePath;
   }
 
   @Override
@@ -61,8 +67,12 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
     super.end(state);
   }
 
-  protected void add(Annotation annotation) {
-    annotationBatch.add(annotation);
+  protected void add(XMLParserState state, Text text, Name name, Range range, JsonNode data) {
+    if (addNodePath && data.isObject()) {
+      ((ObjectNode) data).put(XML_NODE_ATTR, state.getNodePath().toArrayNode());
+    }
+
+    annotationBatch.add(new SimpleAnnotation(text, name, range, data));
 
     if ((annotationBatch.size() % batchSize) == 0) {
       emit();

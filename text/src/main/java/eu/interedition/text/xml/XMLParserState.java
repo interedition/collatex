@@ -50,7 +50,7 @@ public class XMLParserState {
   private final Stack<XMLEntity> elementContext = new Stack<XMLEntity>();
   private final Stack<Boolean> inclusionContext = new Stack<Boolean>();
   private final Stack<Boolean> spacePreservationContext = new Stack<Boolean>();
-  private final Stack<Integer> nodePath = new Stack<Integer>();
+  private final XMLNodePath nodePath = new XMLNodePath();
 
   private final FileBackedOutputStream textBuffer;
 
@@ -119,7 +119,7 @@ public class XMLParserState {
     return !elementContext.isEmpty() && configuration.isNotable(elementContext.peek());
   }
 
-  public Stack<Integer> getNodePath() {
+  public XMLNodePath getNodePath() {
     return nodePath;
   }
 
@@ -227,12 +227,13 @@ public class XMLParserState {
       LOG.trace("End of " + entity);
     }
 
+    nodePath.pop();
+
     for (XMLParserModule m : modules) {
       m.end(entity, this);
     }
 
     elementContext.pop();
-    nodePath.pop();
     spacePreservationContext.pop();
     inclusionContext.pop();
   }

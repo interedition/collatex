@@ -34,6 +34,7 @@ public interface TextConstants {
 
   final Name XML_ID_ATTR_NAME = new SimpleName(XML_NS_URI, "id");
   final Name XML_SPACE_ATTR_NAME = new SimpleName(XML_NS_URI, "space");
+  final Name XML_NODE_ATTR_NAME = new SimpleName(XML_NS_URI, "node");
 
   final URI CLIX_NS = URI.create("http://lmnl.net/clix");
   final String CLIX_NS_PREFIX = "c";

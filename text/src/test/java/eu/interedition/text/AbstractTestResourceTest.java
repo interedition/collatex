@@ -152,7 +152,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     parserModules.add(new LineElementXMLParserModule());
     parserModules.add(new NotableCharacterXMLParserModule());
     parserModules.add(new TextXMLParserModule());
-    parserModules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
+    parserModules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000, true));
     parserModules.add(new CLIXAnnotationXMLParserModule(annotationRepository, 1000));
     parserModules.add(new TEIAwareAnnotationXMLParserModule(annotationRepository, 1000));
     parserModules.addAll(parserModules());

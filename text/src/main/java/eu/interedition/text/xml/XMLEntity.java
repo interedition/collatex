@@ -126,7 +126,8 @@ public class XMLEntity {
     for (Iterator<String> attrNameIt = data.getFieldNames(); attrNameIt.hasNext(); ) {
       try {
         final String attrName = attrNameIt.next();
-        attributes.put(Names.fromString(attrName), data.get(attrName).toString());
+        final JsonNode value = data.get(attrName);
+        attributes.put(Names.fromString(attrName), value.isTextual() ? value.getTextValue() : value.toString());
       } catch (IllegalArgumentException e) {
       }
     }

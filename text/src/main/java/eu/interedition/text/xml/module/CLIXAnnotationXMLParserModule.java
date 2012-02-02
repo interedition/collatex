@@ -19,10 +19,8 @@
  */
 package eu.interedition.text.xml.module;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import eu.interedition.text.AnnotationRepository;
-import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.mem.SimpleAnnotation;
@@ -40,13 +38,13 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
   private Map<String, SimpleAnnotation> annotations;
 
   public CLIXAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
-    super(annotationRepository, batchSize);
+    super(annotationRepository, batchSize, false);
   }
 
   @Override
   public void start(XMLParserState state) {
     super.start(state);
-    annotations = Maps.<String, SimpleAnnotation>newHashMap();
+    annotations = Maps.newHashMap();
   }
 
   @Override
@@ -74,7 +72,7 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
     if (endId != null) {
       final SimpleAnnotation a = annotations.remove(endId.toString());
       if (a != null) {
-        add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData()));
+        add(state, a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData());
       }
     }
   }
