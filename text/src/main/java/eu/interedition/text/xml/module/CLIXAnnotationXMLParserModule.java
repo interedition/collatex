@@ -19,6 +19,7 @@
  */
 package eu.interedition.text.xml.module;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Name;
@@ -27,6 +28,8 @@ import eu.interedition.text.TextConstants;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserState;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ObjectNode;
 
 import java.util.Map;
 
@@ -56,9 +59,9 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
   public void start(XMLEntity entity, XMLParserState state) {
     super.start(entity, state);
 
-    final Map<Name, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
-    final String startId = entityAttributes.remove(TextConstants.CLIX_START_ATTR_NAME);
-    final String endId = entityAttributes.remove(TextConstants.CLIX_END_ATTR_NAME);
+    final ObjectNode entityAttributes = entity.getAttributes();
+    final JsonNode startId = entityAttributes.remove(TextConstants.CLIX_START_ATTR_NAME.toString());
+    final JsonNode endId = entityAttributes.remove(TextConstants.CLIX_END_ATTR_NAME.toString());
     if (startId == null && endId == null) {
       return;
     }
@@ -66,10 +69,10 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
     final long textOffset = state.getTextOffset();
 
     if (startId != null) {
-      annotations.put(startId, new SimpleAnnotation(state.getTarget(), entity.getName(), new Range(textOffset, textOffset), entityAttributes));
+      annotations.put(startId.toString(), new SimpleAnnotation(state.getTarget(), entity.getName(), new Range(textOffset, textOffset), entityAttributes));
     }
     if (endId != null) {
-      final SimpleAnnotation a = annotations.remove(endId);
+      final SimpleAnnotation a = annotations.remove(endId.toString());
       if (a != null) {
         add(new SimpleAnnotation(a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData()));
       }

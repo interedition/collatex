@@ -55,11 +55,6 @@ public class JSONSerialization implements JSONSerializerConfiguration {
     this.namespaceMappings = namespaceMappings;
   }
 
-  @Override
-  public Set<Name> getDataSet() {
-    return dataSet;
-  }
-
   @JsonDeserialize(contentAs = Name.class)
   public void setDataSet(Set<Name> dataSet) {
     this.dataSet = dataSet;

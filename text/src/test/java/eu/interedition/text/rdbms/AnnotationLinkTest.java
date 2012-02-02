@@ -59,7 +59,7 @@ public class AnnotationLinkTest extends AbstractTestResourceTest {
     Annotation textAnnotation = Iterables.getFirst(annotationRepository.find(Criteria.text(text)), null);
 
     final Text source = source();
-    final Annotation sourceAnnotation = Iterables.getOnlyElement(annotationRepository.create(new SimpleAnnotation(source, new SimpleName(TEST_NS, "test"), new Range(0, (int) source.getLength()), null)));
+    final Annotation sourceAnnotation = Iterables.getOnlyElement(annotationRepository.create(new SimpleAnnotation(source, new SimpleName(TEST_NS, "test"), new Range(0, (int) source.getLength()))));
 
     final Multimap<Name, Set<Annotation>> createdLinks = ArrayListMultimap.create();
     createdLinks.put(new SimpleName(TEST_NS, "testLink"), Sets.newHashSet(textAnnotation, sourceAnnotation));

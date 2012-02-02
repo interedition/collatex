@@ -70,14 +70,21 @@ public class Names {
 
   public static String toString(Name name) {
     final URI ns = name.getNamespace();
-    return "{" + (ns == null ? "" : ns) + "}" + name.getLocalName();
+    final String localName = name.getLocalName();
+    return (ns == null ? localName : new StringBuilder("{").append(ns).append("}").append(localName).toString());
   }
+  
+  public static Name fromString(String str) {
+    if (!str.startsWith("{")) {
+      return new SimpleName((URI) null, str);
+    }
 
-  public static Name fromString(String nameStr) {
-    final Matcher matcher = NAME_PATTERN.matcher(nameStr);
-    Preconditions.checkArgument(matcher.matches(), nameStr);
-    return new SimpleName(matcher.group(1), matcher.group(2));
+    final int namespaceEnd = str.indexOf("}");
+    Preconditions.checkArgument(namespaceEnd >= 1 && namespaceEnd < str.length() - 1);
+    if (namespaceEnd == 1) {
+      return new SimpleName((URI) null, str);
+    } else {
+      return new SimpleName(URI.create(str.substring(1, namespaceEnd)), str.substring(namespaceEnd + 1));
+    }
   }
-
-  private static final Pattern NAME_PATTERN = Pattern.compile("^\\{([^\\}]+)\\}(.+)$");
 }

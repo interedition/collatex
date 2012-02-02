@@ -19,6 +19,7 @@
  */
 package eu.interedition.text.rdbms;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -27,8 +28,10 @@ import eu.interedition.text.AnnotationConsumer;
 import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
+import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.query.Criterion;
 import eu.interedition.text.util.AbstractAnnotationRepository;
+import eu.interedition.text.util.Annotations;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -63,16 +66,11 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
 
   private JdbcTemplate jt;
   private SimpleJdbcInsert annotationInsert;
-  private SimpleJdbcInsert annotationDataInsert;
 
   private DataFieldMaxValueIncrementer annotationIdIncrementer;
 
   public Iterable<Annotation> create(Iterable<Annotation> annotations) {
-    final Set<Name> names = Sets.newHashSet();
-    for (Annotation a : annotations) {
-      names.add(a.getName());
-      names.addAll(a.getData().keySet());
-    }
+    final Set<Name> names = Sets.newHashSet(Iterables.transform(annotations, Annotations.NAME));
     final Map<Name, Long> nameIds = Maps.newHashMap();
     for (Name name : nameRepository.get(names)) {
       nameIds.put(name, ((RelationalName)name).getId());
@@ -80,133 +78,62 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
 
     final List<Annotation> created = Lists.newArrayList();
     final List<SqlParameterSource> annotationBatch = Lists.newArrayList();
-    final List<SqlParameterSource> dataBatch = new ArrayList<SqlParameterSource>();
     for (Annotation a : annotations) {
       final long id = annotationIdIncrementer.nextLongValue();
       final Long nameId = nameIds.get(a.getName());
       final Range range = a.getRange();
+      final byte[] rawData = SimpleAnnotation.toRawData(a);
 
       annotationBatch.add(new MapSqlParameterSource()
               .addValue("id", id)
               .addValue("text", ((RelationalText) a.getText()).getId())
               .addValue("name", nameId)
               .addValue("range_start", range.getStart())
-              .addValue("range_end", range.getEnd()));
-      created.add(new RelationalAnnotation(a.getText(), new RelationalName(a.getName(), nameId), range, a.getData(), id));
-
-      for (Map.Entry<Name, String> dataEntry : a.getData().entrySet()) {
-        dataBatch.add(new MapSqlParameterSource()
-                .addValue("annotation", id)
-                .addValue("name", nameIds.get(dataEntry.getKey()))
-                .addValue("value", dataEntry.getValue()));
-      }
+              .addValue("range_end", range.getEnd())
+              .addValue("json_data", rawData));
+      
+      created.add(new RelationalAnnotation(a.getText(), new RelationalName(a.getName(), nameId), range, rawData, id));
     }
 
     if (!annotationBatch.isEmpty()) {
       annotationInsert.executeBatch(annotationBatch.toArray(new SqlParameterSource[annotationBatch.size()]));
     }
-    if (!dataBatch.isEmpty()) {
-      annotationDataInsert.executeBatch(dataBatch.toArray(new SqlParameterSource[dataBatch.size()]));
-    }
-
     return created;
   }
 
   @Override
   public void scroll(Criterion criterion, final AnnotationConsumer consumer) {
-    final List<Object> parameters = Lists.newArrayList();
-
-    final StringBuilder sql = sql(new StringBuilder("select ").
-            append(selectAnnotationFrom("a")).append(", ").
-            append(selectNameFrom("n")).append(", ").
-            append(selectTextFrom("t")).toString(), false, parameters, criterion);
-    sql.append(" order by n.id");
-
-    jt.query(sql.toString(), new RowMapper<Void>() {
-      private Map<Long, RelationalText> textCache = Maps.newHashMap();
-      private RelationalName currentName;
-
-      public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        if (currentName == null || currentName.getId() != rs.getLong("n_id")) {
-          currentName = mapNameFrom(rs, "n");
-        }
-        final long textId = rs.getLong("t_id");
-        RelationalText currentText = textCache.get(textId);
-        if (currentText == null) {
-          textCache.put(textId, currentText = mapTextFrom(rs, "t"));
-        }
-
-        consumer.consume(mapAnnotationFrom(rs, currentText, currentName, "a"));
-        return null;
-      }
-    }, parameters.toArray(new Object[parameters.size()]));
-  }
-
-  @Override
-  public void scroll(Criterion criterion, final Set<Name> names, final AnnotationConsumer consumer) {
-    if (names != null && names.isEmpty()) {
-      scroll(criterion, consumer);
-      return;
-    }
-
     final List<Object> ps = Lists.newArrayList();
     final StringBuilder sql = sql(new StringBuilder("select  ")
             .append(selectAnnotationFrom("a")).append(", ")
             .append(selectNameFrom("n")).append(", ")
-            .append(selectTextFrom("t")).append(", ")
-            .append(selectNameFrom("dn")).append(", ")
-            .append(selectDataFrom("d")).toString(), true, ps, criterion);
+            .append(selectTextFrom("t")).toString(), ps, criterion);
 
-    sql.append(" order by a.id, n.id, dn.id ");
+    sql.append(" order by a.id, n.id ");
 
 
     jt.query(sql.toString(), new RowMapper<Void>() {
       private final Map<Long, Name> nameCache = Maps.newHashMap();
       private final Map<Long, Text> textCache = Maps.newHashMap();
 
-      private Text text;
-      private Name name;
-      private Range range;
-      private long id;
-      private Map<Name, String> data;
-
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        final long annotationId = rs.getLong("a_id");
-        if (id == 0 || id != annotationId) {
-          if (id != 0) {
-            consumer.consume(new RelationalAnnotation(text, name, range, data, id));
-          }
-          final long textId = rs.getLong("t_id");
-          text = textCache.get(textId);
-          if (text == null) {
-            textCache.put(textId, text = mapTextFrom(rs, "t"));
-          }
-          name = name(rs.getLong("n_id"), rs, "n");
-          range = new Range(rs.getLong("a_range_start"), rs.getLong("a_range_end"));
-          data = Maps.newHashMap();
-          id = annotationId;
+        final long textId = rs.getLong("t_id");
+        Text text = textCache.get(textId);
+        if (text == null) {
+          textCache.put(textId, text = mapTextFrom(rs, "t"));
         }
 
-        final long dataNameId = rs.getLong("dn_id");
-        if (dataNameId != 0) {
-          final Name dataName = name(dataNameId, rs, "dn");
-          if (names == null || names.contains(dataName)) {
-            data.put(dataName, mapDataFrom(rs, "d"));
-          }
-        }
-
-        if (rs.isLast()) {
-          consumer.consume(new RelationalAnnotation(text, name, range, data, id));
-        }
-        return null;
-      }
-
-      private Name name(long id, ResultSet rs, String prefix) throws SQLException {
-        Name name = nameCache.get(id);
+        final long nameId = rs.getLong("n_id");
+        Name name = nameCache.get(nameId);
         if (name == null) {
-          nameCache.put(id, name = mapNameFrom(rs, prefix));
+          nameCache.put(nameId, name = mapNameFrom(rs, "n"));
         }
-        return name;
+
+        consumer.consume(new RelationalAnnotation(text, name,
+                new Range(rs.getLong("a_range_start"), rs.getLong("a_range_end")),
+                rs.getBytes("a_json_data"), rs.getLong("a_id")));
+
+        return null;
       }
     }, ps.toArray(new Object[ps.size()]));
   }
@@ -216,7 +143,7 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     final ArrayList<Object> parameters = new ArrayList<Object>();
     final List<Object[]> batchParameters = Lists.newArrayListWithCapacity(batchSize);
 
-    jt.query(sql("select a.id as a_id", false, parameters, criterion).toString(), new RowMapper<Void>() {
+    jt.query(sql("select a.id as a_id", parameters, criterion).toString(), new RowMapper<Void>() {
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
         batchParameters.add(new Object[]{rs.getInt("a_id")});
 
@@ -284,42 +211,28 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
 
     this.jt = (dataSource == null ? null : new JdbcTemplate(dataSource));
     this.annotationInsert = (jt == null ? null : new SimpleJdbcInsert(dataSource).withTableName("text_annotation"));
-    this.annotationDataInsert = new SimpleJdbcInsert(dataSource).withTableName("text_annotation_data");
-
     this.annotationIdIncrementer = keyFactory.create("text_annotation");
   }
 
-  private StringBuilder sql(String select, boolean joinData, List<Object> ps, Criterion criterion) {
-    return queryCriteriaTranslator.where(from(new StringBuilder(select), joinData), criterion, ps);
+  private StringBuilder sql(String select, List<Object> ps, Criterion criterion) {
+    return queryCriteriaTranslator.where(from(new StringBuilder(select)), criterion, ps);
   }
 
-  private StringBuilder from(StringBuilder sql, boolean joinData) {
+  private StringBuilder from(StringBuilder sql) {
     sql.append(" from text_annotation a");
     sql.append(" join text_qname n on a.name = n.id");
     sql.append(" join text_content t on a.text = t.id");
-    if (joinData) {
-      sql.append(" left join text_annotation_data d on d.annotation = a.id");
-      sql.append(" left join text_qname dn on d.name = dn.id");
-    }
     return sql;
   }
 
   public static String selectAnnotationFrom(String tableName) {
-    return SQL.select(tableName, "id", "range_start", "range_end");
+    return SQL.select(tableName, "id", "range_start", "range_end", "json_data");
   }
 
 
   public static RelationalAnnotation mapAnnotationFrom(ResultSet rs, RelationalText text, RelationalName name, String tableName) throws SQLException {
     return new RelationalAnnotation(text, name,//
-            new Range(rs.getLong(tableName + "_range_start"), rs.getLong(tableName + "_range_end")), null,//
-            rs.getLong(tableName + "_id"));
-  }
-
-  public static String selectDataFrom(String tableName) {
-    return SQL.select(tableName, "value");
-  }
-
-  public static String mapDataFrom(ResultSet rs, String prefix) throws SQLException {
-    return rs.getString(prefix + "_value");
+            new Range(rs.getLong(tableName + "_range_start"), rs.getLong(tableName + "_range_end")),//
+            rs.getBytes(tableName + "_json_data"), rs.getLong(tableName + "_id"));
   }
 }

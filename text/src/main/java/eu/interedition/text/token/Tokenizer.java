@@ -71,7 +71,7 @@ public class Tokenizer {
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
     annotationRepository.delete(and(text(text), annotationName(tokenName)));
-    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none(), Collections.<Name>emptySet());
+    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none());
   }
 
   private class TokenGeneratingListener implements AnnotationEventListener {
@@ -143,7 +143,7 @@ public class Tokenizer {
 
     private void token() {
       if (tokenStart < offset) {
-        batch.add(new SimpleAnnotation(text, tokenName, new Range(tokenStart, offset), null));
+        batch.add(new SimpleAnnotation(text, tokenName, new Range(tokenStart, offset)));
         if ((batch.size() % batchSize) == 0) {
           emit();
         }

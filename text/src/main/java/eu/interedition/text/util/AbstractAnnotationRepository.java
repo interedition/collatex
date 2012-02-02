@@ -77,17 +77,6 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
     return result;
   }
 
-  public Iterable<Annotation> find(Criterion criterion, final Set<Name> names) {
-    final List<Annotation> result = Lists.newArrayList();
-    scroll(criterion, names, new AnnotationConsumer() {
-      @Override
-      public void consume(Annotation annotation) {
-        result.add(annotation);
-      }
-    });
-    return result;
-  }
-
   public SortedSet<Name> names(Text text) {
     final SortedSet<Name> names = getNames(text);
 
@@ -123,7 +112,7 @@ public abstract class AbstractAnnotationRepository implements AnnotationReposito
   @Override
   public void transform(Criterion criterion, final Text to, final Function<Annotation, Annotation> transform) {
     final List<Annotation> batch = Lists.newArrayListWithExpectedSize(batchSize);
-    scroll(criterion, null, new AnnotationConsumer() {
+    scroll(criterion, new AnnotationConsumer() {
       @Override
       public void consume(Annotation annotation) {
         batch.add(annotation);

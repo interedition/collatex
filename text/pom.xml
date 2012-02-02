@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>text</artifactId>
     <version>1.1-SNAPSHOT</version>
-	<name>Text</name>
+	<name>Interedition Text</name>
     <description>A text model with range-based markup via standoff annotations.</description>
     <licenses>
         <license>

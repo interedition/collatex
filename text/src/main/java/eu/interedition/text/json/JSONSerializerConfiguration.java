@@ -17,7 +17,5 @@ public interface JSONSerializerConfiguration {
 
   Map<String, URI> getNamespaceMappings();
 
-  Set<Name> getDataSet();
-
   Criterion getQuery();
 }

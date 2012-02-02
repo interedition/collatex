@@ -19,8 +19,7 @@
  */
 package eu.interedition.text;
 
-import javax.xml.namespace.QName;
-import java.util.Map;
+import org.codehaus.jackson.JsonNode;
 
 /**
  * @author <a href="http://gregor.middell.net/"
@@ -33,5 +32,5 @@ public interface Annotation extends Comparable<Annotation> {
 
   Range getRange();
 
-  Map<Name, String> getData();
+  JsonNode getData();
 }

@@ -35,11 +35,7 @@ public interface AnnotationRepository {
 
   void scroll(Criterion criterion, AnnotationConsumer consumer);
 
-  void scroll(Criterion criterion, Set<Name> names, AnnotationConsumer consumer);
-
   Iterable<Annotation> find(Criterion criterion);
-
-  Iterable<Annotation> find(Criterion criterion, Set<Name> names);
 
   void delete(Iterable<Annotation> annotations);
 

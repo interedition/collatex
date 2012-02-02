@@ -73,10 +73,10 @@ public class AnnotationTest extends AbstractTestResourceTest {
 
       sw.start("print");
       if (LOG.isDebugEnabled()) {
-        annotationRepository.scroll(Criteria.text(newText), null, new AnnotationConsumer() {
+        annotationRepository.scroll(Criteria.text(newText), new AnnotationConsumer() {
           @Override
           public void consume(Annotation annotation) {
-            LOG.debug("{}: {}", annotation, Iterables.toString(annotation.getData().entrySet()));
+            LOG.debug("{}: {}", annotation, annotation.getData().toString());
           }
         });
       }

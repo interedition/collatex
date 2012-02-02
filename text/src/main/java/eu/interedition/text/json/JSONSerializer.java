@@ -12,6 +12,8 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.node.NullNode;
+import org.codehaus.jackson.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.io.IOException;
@@ -70,7 +72,7 @@ public class JSONSerializer {
     final SortedSet<RelationalName> names = Sets.newTreeSet();
     jgen.writeArrayFieldStart(ANNOTATIONS_FIELD);
     try {
-      annotationRepository.scroll(criterion, config.getDataSet(), new AnnotationConsumer() {
+      annotationRepository.scroll(criterion, new AnnotationConsumer() {
         @Override
         public void consume(Annotation annotation) {
           try {
@@ -89,21 +91,9 @@ public class JSONSerializer {
             jgen.writeEndArray();
 
 
-            final Map<Name, String> data = annotation.getData();
-            if (!data.isEmpty()) {
-              jgen.writeArrayFieldStart(ANNOTATION_DATA_FIELD);
-              for (Map.Entry<Name, String> dataEntry : data.entrySet()) {
-                final Name dn = dataEntry.getKey();
-                checkState(RelationalName.class.isAssignableFrom(dn.getClass()), dn.getClass().toString());
-                names.add((RelationalName) dn);
+            jgen.writeFieldName(ANNOTATION_DATA_FIELD);
+            jgen.writeTree(annotation.getData());
 
-                jgen.writeStartArray();
-                jgen.writeNumber(((RelationalName) dn).getId());
-                jgen.writeString(dataEntry.getValue());
-                jgen.writeEndArray();
-              }
-              jgen.writeEndArray();
-            }
             jgen.writeEndObject();
           } catch (IOException e) {
             throw Throwables.propagate(e);
@@ -164,24 +154,7 @@ public class JSONSerializer {
       rangeParser.setCodec(jp.getCodec());
       final Range range = rangeParser.readValueAs(Range.class);
 
-      final Map<Name, String> data = Maps.newHashMap();
-      if (annotationNode.has(ANNOTATION_DATA_FIELD)) {
-        for (JsonNode dataNode : annotationNode.get(ANNOTATION_DATA_FIELD)) {
-          checkFormat(dataNode.isArray() && dataNode.size() > 1, "Expected array of 2 as annotation data entry", jp);
-
-          final String dataNameRef = dataNode.get(0).getTextValue();
-          checkFormat(dataNameRef != null, "Expected annotation data's name reference", jp);
-          checkFormat(names.containsKey(dataNameRef), "Invalid annotation data name reference", jp);
-
-          final Name dataName = names.get(dataNameRef);
-
-          final String dataValue = dataNode.get(1).getTextValue();
-          checkFormat(dataValue != null, "Expected annotation data value", jp);
-          data.put(dataName, dataValue);
-        }
-      }
-
-      batch.add(new SimpleAnnotation(text, name, range, data));
+      batch.add(new SimpleAnnotation(text, name, range, SimpleAnnotation.toData(annotationNode.get(ANNOTATION_DATA_FIELD))));
       if (batch.size() % batchSize == 0) {
         annotationRepository.create(batch);
         batch.clear();

@@ -35,8 +35,6 @@ import java.util.Stack;
 public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
 
   private Stack<Long> startOffsetStack;
-  private Stack<Map<Name, String>> attributeStack;
-
 
   public DefaultAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
     super(annotationRepository, batchSize);
@@ -46,12 +44,10 @@ public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParse
   public void start(XMLParserState state) {
     super.start(state);
     startOffsetStack = new Stack<Long>();
-    attributeStack = new Stack<Map<Name, String>>();
   }
 
   @Override
   public void end(XMLParserState state) {
-    attributeStack = null;
     startOffsetStack = null;
     super.end(state);
   }
@@ -61,7 +57,6 @@ public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParse
     super.start(entity, state);
     if (state.getInclusionContext().peek()) {
       startOffsetStack.push(state.getTextOffset());
-      attributeStack.push(entity.getAttributes());
     }
   }
 
@@ -69,7 +64,7 @@ public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParse
   public void end(XMLEntity entity, XMLParserState state) {
     if (state.getInclusionContext().peek()) {
       final Range range = new Range(startOffsetStack.pop(), state.getTextOffset());
-      add(new SimpleAnnotation(state.getTarget(), entity.getName(), range, attributeStack.pop()));
+      add(new SimpleAnnotation(state.getTarget(), entity.getName(), range, entity.getAttributes()));
     }
     super.end(entity, state);
   }

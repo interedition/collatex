@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS text_annotation (
   text BIGINT NOT NULL REFERENCES text_content (id) ON DELETE CASCADE,
   name BIGINT NOT NULL REFERENCES text_qname (id),
   range_start BIGINT NOT NULL,
-  range_end BIGINT NOT NULL
+  range_end BIGINT NOT NULL,
+  json_data BLOB NOT NULL
 );
 
 CREATE SEQUENCE IF NOT EXISTS text_annotation_sequence;
@@ -39,13 +40,6 @@ CREATE TABLE IF NOT EXISTS text_annotation_link_target (
   link BIGINT NOT NULL REFERENCES text_annotation_link (id) ON DELETE CASCADE,
   target BIGINT NOT NULL REFERENCES text_annotation (id) ON DELETE CASCADE,
   UNIQUE (link, target)
-);
-
-CREATE TABLE IF NOT EXISTS text_annotation_data (
-  annotation BIGINT NOT NULL REFERENCES text_annotation (id) ON DELETE CASCADE,
-  name BIGINT NOT NULL REFERENCES text_qname (id),
-  value TEXT NOT NULL,
-  UNIQUE (annotation, name)
 );
 
 CREATE TABLE IF NOT EXISTS text_annotation_link_data (

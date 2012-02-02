@@ -57,11 +57,6 @@ public class JSONSerializerTest extends AbstractTestResourceTest {
       }
 
       @Override
-      public Set<Name> getDataSet() {
-        return null;
-      }
-
-      @Override
       public Criterion getQuery() {
         return Criteria.any();
       }

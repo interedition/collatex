@@ -29,6 +29,7 @@ import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserState;
+import org.codehaus.jackson.node.ObjectNode;
 
 import java.net.URI;
 import java.util.Iterator;
@@ -51,6 +52,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   }
 
   private static final Name MILESTONE_NAME = new SimpleName(TEI_NS, "milestone");
+  private static final Name MILESTONE_UNIT_ATTR_NAME = new SimpleName(TEI_NS, "unit");
 
   private Multimap<String, SimpleAnnotation> spanning;
   private Map<Name, SimpleAnnotation> milestones;
@@ -89,15 +91,14 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
 
   protected void handleMilestoneElements(XMLEntity entity, XMLParserState state) {
     final Name entityName = entity.getName();
-    final Map<Name, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
+    final ObjectNode entityAttributes = entity.getAttributes();
 
     Name milestoneUnit = null;
     if (MILESTONE_NAME.equals(entityName)) {
-      for (Iterator<Name> it = entityAttributes.keySet().iterator(); it.hasNext(); ) {
-        final Name attrName = it.next();
-        final URI attrNameNs = attrName.getNamespace();
-        if ("unit".equals(attrName.getLocalName()) && (attrNameNs == null || TEI_NS.equals(attrNameNs))) {
-          milestoneUnit = new SimpleName(TEI_NS, entityAttributes.get(attrName));
+      for (Iterator<String> it = entityAttributes.getFieldNames(); it.hasNext(); ) {
+        final String attrName = it.next();
+        if (MILESTONE_UNIT_ATTR_NAME.getLocalName().equals(attrName) || MILESTONE_UNIT_ATTR_NAME.toString().equals(attrName)) {
+          milestoneUnit = new SimpleName(TEI_NS, entityAttributes.get(attrName).toString());
           it.remove();
         }
       }
@@ -120,20 +121,16 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   }
 
   protected void handleSpanningElements(XMLEntity entity, XMLParserState state) {
-    final URI entityNs = entity.getName().getNamespace();
-    final Map<Name, String> entityAttributes = Maps.newHashMap(entity.getAttributes());
+    final ObjectNode entityAttributes = entity.getAttributes();
     String spanTo = null;
     String refId = null;
-    for (Iterator<Name> it = entityAttributes.keySet().iterator(); it.hasNext(); ) {
-      final Name attrName = it.next();
-      if ("spanTo".equals(attrName.getLocalName())) {
-        final URI attrNs = attrName.getNamespace();
-        if (attrNs == null || TEI_NS.equals(attrNs)) {
-          spanTo = entityAttributes.get(attrName).replaceAll("^#", "");
-          it.remove();
-        }
-      } else if (XML_ID_ATTR_NAME.equals(attrName)) {
-        refId = entityAttributes.get(attrName);
+    for (Iterator<String> it = entityAttributes.getFieldNames(); it.hasNext(); ) {
+      final String attrName = it.next();
+      if (attrName.endsWith("spanTo")) {
+        spanTo = entityAttributes.get(attrName).toString().replaceAll("^#", "");
+        it.remove();
+      } else if (XML_ID_ATTR_NAME.toString().equals(attrName)) {
+        refId = entityAttributes.get(attrName).toString();
       }
     }
 

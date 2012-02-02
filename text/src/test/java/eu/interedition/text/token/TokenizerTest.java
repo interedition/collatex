@@ -19,21 +19,29 @@
  */
 package eu.interedition.text.token;
 
-import com.google.common.base.Strings;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.interedition.text.*;
+import eu.interedition.text.AbstractTestResourceTest;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.AnnotationRepository;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
+import eu.interedition.text.event.AnnotationEventAdapter;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.rdbms.RelationalTextRepository;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.SortedMap;
 
 import static eu.interedition.text.query.Criteria.and;
@@ -48,22 +56,64 @@ public class TokenizerTest extends AbstractTestResourceTest {
   private RelationalTextRepository textRepository;
 
   @Autowired
-  private AnnotationEventSource annotationEventSource;
-
-  @Autowired
   private AnnotationRepository annotationRepository;
 
-  @Test
-  public void tokenize() throws IOException, TransformerException, XMLStreamException {
-    final Tokenizer tokenizer = new Tokenizer();
+  @Autowired
+  private AnnotationEventSource annotationEventSource;
+
+  private Tokenizer tokenizer;
+
+  @Before
+  public void createTokenizer() {
+    tokenizer = new Tokenizer();
     tokenizer.setAnnotationRepository(annotationRepository);
     tokenizer.setEventSource(annotationEventSource);
-
-    final Text text = text("george-algabal-tei.xml");
-    tokenizer.tokenize(text, new WhitespaceTokenizerSettings(true));
-    printTokenizedWitness(text);
   }
 
+  @Test
+  public void printTokenization() throws IOException {
+    printTokenizedWitness(tokenize());
+
+  }
+
+  @Test
+  public void streamTokenNGrams() throws IOException {
+    final int ngramLength = 2;
+    annotationEventSource.listen(new AnnotationEventAdapter() {
+      private Queue<String> ngram = new ArrayDeque<String>(ngramLength);
+      private Set<Integer> hashes = Sets.newHashSet();
+      private int ngrams;
+      
+      @Override
+      public void text(Range r, String text) {
+        ngram.add(text.trim().toLowerCase());
+        if (ngram.size() == ngramLength) {
+          ngrams++;
+
+          final int hash = Joiner.on("").join(ngram).hashCode();
+          if (hashes.contains(hash)) {
+            LOG.debug("{} = {}", Iterables.toString(ngram), hash);
+          }
+          hashes.add(hash);
+          
+          ngram.remove();
+        }
+      }
+
+      @Override
+      public void end() {
+        LOG.debug("{} vs. {}", ngrams, hashes.size());
+      }
+
+    }, tokenize(), annotationName(Tokenizer.DEFAULT_TOKEN_NAME));
+  }
+
+  protected Text tokenize() throws IOException {
+    final Text text = text("george-algabal-tei.xml");
+    tokenizer.tokenize(text, new WhitespaceTokenizerSettings(true));
+    return text;
+  }
+  
   private void printTokenizedWitness(Text text) throws IOException {
     if (!LOG.isDebugEnabled()) {
       return;

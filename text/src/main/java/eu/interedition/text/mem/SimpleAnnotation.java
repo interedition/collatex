@@ -20,34 +20,56 @@
 package eu.interedition.text.mem;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import eu.interedition.text.*;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.Name;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
 import eu.interedition.text.util.Annotations;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
-import javax.xml.namespace.QName;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class SimpleAnnotation implements Annotation {
+  public static final ObjectMapper JSON = new ObjectMapper();
+
+  protected static final JsonNode EMPTY_DATA_NODE = JSON.createObjectNode();
+  protected static final byte[] EMPTY_DATA = new byte[0];
+
   protected final Text text;
   protected final Name name;
   protected final Range range;
-  protected final Map<Name, String> data;
+  protected final byte[] data;
 
-  public SimpleAnnotation(Text text, Name name, Range range, Map<Name, String> data) {
+  protected JsonNode dataNode;
+
+  public SimpleAnnotation(Text text, Name name, Range range, byte[] data) {
     this.text = text;
     this.name = name;
     this.range = range;
-    this.data = (data == null || data.isEmpty() ? null : Collections.unmodifiableMap(data));
+    this.data = (data == null ? EMPTY_DATA : data);
   }
 
+  public SimpleAnnotation(Text text, Name name, Range range) {
+    this(text, name, range, (byte[]) null);
+  }
+
+  public SimpleAnnotation(Text text, Name name, Range range, JsonNode data) {
+    this(text, name, range, toData(data));
+  }
+  
   public SimpleAnnotation(Annotation other) {
-    this(other.getText(), other.getName(), other.getRange(), other.getData());
+    this.text = other.getText();
+    this.name = other.getName();
+    this.range = other.getRange();
+    this.data = toRawData(other);
   }
 
   public Text getText() {
@@ -63,8 +85,31 @@ public class SimpleAnnotation implements Annotation {
   }
 
   @Override
-  public Map<Name, String> getData() {
-    return (data == null ? Collections.<Name, String>emptyMap() : data);
+  public JsonNode getData() {
+    if (dataNode == null) {
+      dataNode = toDataNode(data);
+    }
+    return dataNode;
+  }
+
+  public static byte[] toRawData(Annotation a) {
+    return (a instanceof SimpleAnnotation ? ((SimpleAnnotation) a).data : toData(a.getData()));
+  }
+
+  public static JsonNode toDataNode(byte[] data) {
+    try {
+      return (data == null ? EMPTY_DATA_NODE : JSON.readTree(new ByteArrayInputStream(data)));
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  public static byte[] toData(JsonNode data) {
+    try {
+      return (data == null ? EMPTY_DATA : JSON.writeValueAsBytes(data));
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   protected Objects.ToStringHelper toStringHelper() {

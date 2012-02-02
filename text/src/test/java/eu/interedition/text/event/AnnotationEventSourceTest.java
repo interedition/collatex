@@ -49,10 +49,10 @@ public class AnnotationEventSourceTest extends AbstractTestResourceTest {
                     annotationName(new SimpleName(TEI_NS, "lg")),
                     annotationName(new SimpleName(TEI_NS, "l")),
                     annotationName(new SimpleName(TEI_NS, "p"))
-            ), Collections.<Name>emptySet());
+            ));
   }
 
-  private final AnnotationEventListener DEBUG_LISTENER = new AnnotationEventListener() {
+  public static final AnnotationEventListener DEBUG_LISTENER = new AnnotationEventListener() {
 
     public void start() {
     }

@@ -52,7 +52,7 @@ public class XMLSerializer {
 
   public void serialize(final ContentHandler xml, Text text, final XMLSerializerConfiguration config) throws XMLStreamException, IOException {
     try {
-      eventSource.listen(new SerializingListener(xml, config), text, config.getQuery(), null);
+      eventSource.listen(new SerializingListener(xml, config), text, config.getQuery());
     } catch (Throwable t) {
       Throwables.propagateIfInstanceOf(t, IOException.class);
       Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
@@ -96,7 +96,7 @@ public class XMLSerializer {
     protected void doStart(long offset, Iterable<Annotation> annotations) throws Exception {
       for (Annotation a : annotationOrdering.immutableSortedCopy(annotations)) {
         final Name name = a.getName();
-        Map<Name, String> attributes = a.getData();
+        Map<Name, String> attributes = XMLEntity.dataToAttributes(a.getData());
         if (!rootWritten || hierarchy.contains(name)) {
           startElement(name, attributes);
         } else {
@@ -119,7 +119,7 @@ public class XMLSerializer {
     @Override
     protected void doEmpty(long offset, Iterable<Annotation> annotations) throws Exception {
       for (Annotation a : annotationOrdering.immutableSortedCopy(annotations)) {
-        emptyElement(a.getName(), a.getData());
+        emptyElement(a.getName(), XMLEntity.dataToAttributes(a.getData()));
       }
     }
 

@@ -32,7 +32,7 @@ import java.util.Map;
 public class RelationalAnnotation extends SimpleAnnotation {
   protected final long id;
 
-  public RelationalAnnotation(Text text, Name name, Range range, Map<Name, String> data, long id) {
+  public RelationalAnnotation(Text text, Name name, Range range, byte[] data, long id) {
     super(text, name, range, data);
     this.id = id;
   }
