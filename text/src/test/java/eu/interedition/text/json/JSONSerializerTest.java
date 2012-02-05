@@ -2,11 +2,12 @@ package eu.interedition.text.json;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.NullOutputStream;
-import eu.interedition.text.*;
+import eu.interedition.text.AbstractTestResourceTest;
+import eu.interedition.text.Range;
+import eu.interedition.text.TextConstants;
 import eu.interedition.text.json.map.TextSerializerModule;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.query.Criterion;
-import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

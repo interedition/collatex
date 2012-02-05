@@ -20,7 +20,6 @@
 package eu.interedition.text;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
@@ -29,7 +28,12 @@ import eu.interedition.text.util.SimpleXMLParserConfiguration;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLParser;
 import eu.interedition.text.xml.XMLParserModule;
-import eu.interedition.text.xml.module.*;
+import eu.interedition.text.xml.module.CLIXAnnotationXMLParserModule;
+import eu.interedition.text.xml.module.DefaultAnnotationXMLParserModule;
+import eu.interedition.text.xml.module.LineElementXMLParserModule;
+import eu.interedition.text.xml.module.NotableCharacterXMLParserModule;
+import eu.interedition.text.xml.module.TEIAwareAnnotationXMLParserModule;
+import eu.interedition.text.xml.module.TextXMLParserModule;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +43,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -52,21 +56,10 @@ import static eu.interedition.text.TextConstants.TEI_NS;
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 public abstract class AbstractTestResourceTest extends AbstractTextTest {
-  /**
-   * Names of available XML test resources.
-   */
-  protected static final List<String> RESOURCES = Lists.newArrayList(//
-          "archimedes-palimpsest-tei.xml",//
-          "george-algabal-tei.xml",//
-          "homer-iliad-tei.xml",//
-          "ignt-0101.xml",//
-          "whitman-leaves-facs-tei.xml",
-          "wp-orpheus1-clix.xml");
-
   protected static XMLInputFactory xmlInputFactory;
 
-  private Map<String, Text> sources = Maps.newHashMap();
-  private Map<String, Text> texts = Maps.newHashMap();
+  private Map<URI, Text> sources = Maps.newHashMap();
+  private Map<URI, Text> texts = Maps.newHashMap();
 
   @Autowired
   private XMLParser xmlParser;
@@ -92,40 +85,51 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected Text text() {
-    return text(Iterables.getFirst(RESOURCES, null));
+    return text("archimedes-palimpsest-tei.xml");
   }
 
   protected Text source() {
-    return source(Iterables.getFirst(RESOURCES, null));
+    return source("archimedes-palimpsest-tei.xml");
   }
 
-  /**
-   * Returns a test document generated from the resource with the given name.
-   * <p/>
-   * <p/>
-   * <p/>
-   * The generated test document is cached for later reuse.
-   *
-   * @param resource the name of the resource
-   * @return the corresponding test document
-   * @see #RESOURCES
-   */
+  protected void unload() {
+    unload("archimedes-palimpsest-tei.xml");
+  }
+
   protected synchronized Text text(String resource) {
+    try {
+      return text(AbstractTestResourceTest.class.getResource("/" + resource).toURI());
+    } catch (URISyntaxException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  protected synchronized Text text(URI resource) {
     load(resource);
     return texts.get(resource);
   }
 
   protected synchronized Text source(String resource) {
+    try {
+      return source(AbstractTestResourceTest.class.getResource("/" + resource).toURI());
+    } catch (URISyntaxException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  protected synchronized Text source(URI resource) {
     load(resource);
     return sources.get(resource);
   }
 
   protected List<XMLParserModule> parserModules() {
-    return Lists.<XMLParserModule>newArrayList();
+    return Lists.newArrayList();
   }
 
   protected SimpleXMLParserConfiguration configure(SimpleXMLParserConfiguration pc) {
+    pc.addLineElement(new SimpleName(TEI_NS, "div"));
     pc.addLineElement(new SimpleName(TEI_NS, "head"));
+    pc.addLineElement(new SimpleName(TEI_NS, "sp"));
     pc.addLineElement(new SimpleName(TEI_NS, "stage"));
     pc.addLineElement(new SimpleName(TEI_NS, "speaker"));
     pc.addLineElement(new SimpleName(TEI_NS, "lg"));
@@ -141,6 +145,9 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     pc.exclude(new SimpleName(TEI_NS, "teiHeader"));
     pc.exclude(new SimpleName(TEI_NS, "front"));
     pc.exclude(new SimpleName(TEI_NS, "fw"));
+    pc.exclude(new SimpleName(TEI_NS, "app"));
+
+    pc.include(new SimpleName(TEI_NS, "lem"));
 
     return pc;
   }
@@ -160,27 +167,16 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     return pc;
   }
 
-  protected synchronized void unload(String resource) {
-    sources.remove(resource);
-    texts.remove(resource);
-  }
-
-  protected void unload() {
-    unload(Iterables.getFirst(RESOURCES, null));
-  }
-
-  private synchronized void load(String resource) {
+  protected synchronized void load(URI resource) {
     try {
-      if (RESOURCES.contains(resource) && !texts.containsKey(resource)) {
-        final URL xmlResource = AbstractTestResourceTest.class.getResource("/" + resource);
-        final URI uri = xmlResource.toURI();
-        final StopWatch stopWatch = new StopWatch(uri.toString());
+      if (!texts.containsKey(resource)) {
+        final StopWatch stopWatch = new StopWatch(resource.toString());
 
         InputStream xmlStream = null;
         XMLStreamReader xmlReader = null;
         try {
           stopWatch.start("create");
-          xmlReader = xmlInputFactory.createXMLStreamReader(xmlStream = xmlResource.openStream());
+          xmlReader = xmlInputFactory.createXMLStreamReader(xmlStream = resource.toURL().openStream());
           final Text xml = textRepository.create(xmlReader);
           stopWatch.stop();
 
@@ -202,5 +198,16 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     }
   }
 
+  protected synchronized void unload(String resource) {
+    try {
+      unload(AbstractTestResourceTest.class.getResource("/" + resource).toURI());
+    } catch (URISyntaxException e) {
+      throw Throwables.propagate(e);
+    }
+  }
 
+  protected synchronized void unload(URI resource) {
+    sources.remove(resource);
+    texts.remove(resource);
+  }
 }

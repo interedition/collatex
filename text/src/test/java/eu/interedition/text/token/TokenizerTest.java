@@ -22,6 +22,7 @@ package eu.interedition.text.token;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
@@ -31,6 +32,7 @@ import eu.interedition.text.Text;
 import eu.interedition.text.event.AnnotationEventAdapter;
 import eu.interedition.text.event.AnnotationEventSource;
 import eu.interedition.text.query.Criteria;
+import eu.interedition.text.query.Criterion;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +74,7 @@ public class TokenizerTest extends AbstractTestResourceTest {
 
   @Test
   public void printTokenization() throws IOException {
-    printTokenizedWitness(tokenize());
+    printTokenizedWitness(tokenize(), annotationName(Tokenizer.DEFAULT_TOKEN_NAME));
 
   }
 
@@ -113,8 +115,8 @@ public class TokenizerTest extends AbstractTestResourceTest {
     tokenizer.tokenize(text, new WhitespaceTokenizerSettings(true));
     return text;
   }
-  
-  private void printTokenizedWitness(Text text) throws IOException {
+
+  protected void printTokenizedWitness(Text text, Criterion tokenCriterion) throws IOException {
     if (!LOG.isDebugEnabled()) {
       return;
     }
@@ -122,7 +124,7 @@ public class TokenizerTest extends AbstractTestResourceTest {
     long read = 0;
 
     final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
-    for (Annotation token : annotationRepository.find(and(Criteria.text(text), annotationName(Tokenizer.DEFAULT_TOKEN_NAME)))) {
+    for (Annotation token : Ordering.natural().immutableSortedCopy(annotationRepository.find(and(Criteria.text(text), tokenCriterion)))) {
       final Range range = token.getRange();
       if (read < range.getStart()) {
         ranges.put(new Range(read, range.getStart()), false);
