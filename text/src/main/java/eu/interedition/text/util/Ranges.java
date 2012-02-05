@@ -68,6 +68,30 @@ public class Ranges {
     return compressed;
   }
 
+  public static SortedSet<Range> compress(SortedSet<Range> ranges) {
+    final SortedSet<Range> compressed = Sets.newTreeSet();
+
+    Range current = null;
+    for (Iterator<Range> rangeIt = ranges.iterator(); rangeIt.hasNext(); ) {
+      final Range range = rangeIt.next();
+      if (current == null) {
+        current = new Range(range);
+      } else {
+        if (current.getEnd() >= range.getStart()) {
+          current = new Range(current.getStart(), Math.max(current.getEnd(), range.getEnd()));
+        } else {
+          compressed.add(current);
+          current = new Range(range);
+        }
+      }
+      if (!rangeIt.hasNext()) {
+        compressed.add(current);
+      }
+    }
+
+    return compressed;
+  }
+
   public static int length(SortedSet<Range> ranges) {
     int length = 0;
     for (Range r : ranges) {
