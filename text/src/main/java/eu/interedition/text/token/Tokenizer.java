@@ -102,13 +102,6 @@ public class Tokenizer {
     }
 
     @Override
-    public void empty(long offset, Iterable<Annotation> annotations) {
-      if (settings.emptyAnnotationsAreBoundary(text, offset, annotations)) {
-        lastIsTokenBoundary = true;
-      }
-    }
-
-    @Override
     public void end(long offset, Iterable<Annotation> annotations) {
       if (settings.endingAnnotationsAreBoundary(text, offset, annotations)) {
         lastIsTokenBoundary = true;

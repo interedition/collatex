@@ -30,8 +30,6 @@ import java.util.Set;
 public interface TokenizerSettings {
   boolean startingAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations);
 
-  boolean emptyAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations);
-
   boolean endingAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations);
 
   boolean isBoundary(Text text, long offset, char c);

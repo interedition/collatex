@@ -19,9 +19,6 @@
  */
 package eu.interedition.text.event;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -105,16 +102,13 @@ public class AnnotationEventSource {
           if (offset == next) {
             final Set<Annotation> startEvents = (!starts.isEmpty() && offset == starts.firstKey() ? starts.remove(starts.firstKey()) : Sets.<Annotation>newHashSet());
             final Set<Annotation> endEvents = (!ends.isEmpty() && offset == ends.firstKey() ? ends.remove(ends.firstKey()) : Sets.<Annotation>newHashSet());
+            
+            final Set<Annotation> emptyEvents = Sets.newHashSet(Sets.filter(endEvents, EMPTY));
+            endEvents.removeAll(emptyEvents);
 
-            final Set<Annotation> terminating = Sets.filter(endEvents, Predicates.not(EMPTY));
-            if (!terminating.isEmpty()) listener.end(offset, filter(annotationData, terminating, true));
-
-            final Set<Annotation> empty = Sets.filter(startEvents, EMPTY);
-            if (!empty.isEmpty()) listener.empty(offset, filter(annotationData, empty, true));
-
-            final Set<Annotation> starting = Sets.filter(startEvents, Predicates.not(EMPTY));
-            if (!starting.isEmpty()) listener.start(offset, filter(annotationData, starting, false));
-
+            if (!endEvents.isEmpty()) listener.end(offset, filter(annotationData, endEvents, true));
+            if (!startEvents.isEmpty()) listener.start(offset, filter(annotationData, startEvents, false));
+            if (!emptyEvents.isEmpty()) listener.end(offset, filter(annotationData, emptyEvents, true));
 
             next = Math.min(starts.isEmpty() ? contentLength : starts.firstKey(), ends.isEmpty() ? contentLength : ends.firstKey());
           }

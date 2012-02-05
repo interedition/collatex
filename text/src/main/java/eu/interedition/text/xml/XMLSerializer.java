@@ -78,7 +78,9 @@ public class XMLSerializer {
       this.xml = xml;
       this.config = config;
       this.hierarchy = (config.getHierarchy() == null ? Collections.<Name>emptyList() : config.getHierarchy());
-      this.annotationOrdering = Ordering.from(new HierarchyAwareAnnotationComparator(this.hierarchy));
+      this.annotationOrdering = Ordering.from(new HierarchyAwareAnnotationComparator(this.hierarchy))
+              .compound(XMLNodePath.ANNOTATION_COMPARATOR)
+              .compound(Ordering.<Annotation>natural());
       this.namespaceMappings.put(URI.create(XMLConstants.XML_NS_URI), XMLConstants.XML_NS_PREFIX);
       this.namespaceMappings.put(URI.create(XMLConstants.XMLNS_ATTRIBUTE_NS_URI), XMLConstants.XMLNS_ATTRIBUTE);
     }
@@ -114,13 +116,6 @@ public class XMLSerializer {
           clixIdIncrements.put(localName, id);
           clixIds.put(a, clixId);
         }
-      }
-    }
-
-    @Override
-    protected void doEmpty(long offset, Iterable<Annotation> annotations) throws Exception {
-      for (Annotation a : annotationOrdering.immutableSortedCopy(annotations)) {
-        emptyElement(a.getName(), XMLEntity.dataToAttributes(a.getData()));
       }
     }
 
@@ -295,8 +290,6 @@ public class XMLSerializer {
   }
 
   private static class HierarchyAwareAnnotationComparator implements Comparator<Annotation> {
-    private static final String XML_NODE_ATTR = TextConstants.XML_NODE_ATTR_NAME.toString();
-
     private Ordering<Name> hierarchyOrdering;
     private final List<Name> hierarchy;
 
@@ -316,23 +309,8 @@ public class XMLSerializer {
       if (hierarchy.contains(o1Name) && hierarchy.contains(o2Name)) {
         result = hierarchyOrdering.compare(o1Name, o2Name);
       }
-      if (result != 0) {
-        return result;
-      }
 
-      final JsonNode o1NodePath = o1.getData().get(XML_NODE_ATTR);
-      final JsonNode o2NodePath = o2.getData().get(XML_NODE_ATTR);
-      if (o1NodePath != null && o2NodePath != null) {
-        try {
-          result = new XMLNodePath(o1NodePath).compareTo(new XMLNodePath(o2NodePath));
-        } catch (IllegalArgumentException e) {
-        }
-      }
-      if (result != 0) {
-        return result;
-      }
-
-      return o1.compareTo(o2);
+      return result;
     }
   }
 }

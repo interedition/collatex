@@ -32,8 +32,6 @@ public interface AnnotationEventListener {
 
   void start(long offset, Iterable<Annotation> annotations);
 
-  void empty(long offset, Iterable<Annotation> annotations);
-
   void end(long offset, Iterable<Annotation> annotations);
 
   void text(Range r, String text);

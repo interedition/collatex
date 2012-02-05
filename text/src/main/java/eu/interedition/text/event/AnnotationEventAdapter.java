@@ -35,9 +35,6 @@ public class AnnotationEventAdapter implements AnnotationEventListener {
   public void start(long offset, Iterable<Annotation> annotations) {
   }
 
-  public void empty(long offset, Iterable<Annotation> annotations) {
-  }
-
   public void end(long offset, Iterable<Annotation> annotations) {
   }
 

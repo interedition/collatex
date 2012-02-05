@@ -46,14 +46,6 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
     }
   }
 
-  public void empty(long offset, Iterable<Annotation> annotations) {
-    try {
-      doEmpty(offset, annotations);
-    } catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
   public void end(long offset, Iterable<Annotation> annotations) {
     try {
       doEnd(offset, annotations);
@@ -82,9 +74,6 @@ public class ExceptionPropagatingAnnotationEventAdapter implements AnnotationEve
   }
 
   protected void doStart(long offset, Iterable<Annotation> annotations) throws Exception {
-  }
-
-  protected void doEmpty(long offset, Iterable<Annotation> annotations) throws Exception {
   }
 
   protected void doEnd(long offset, Iterable<Annotation> annotations) throws Exception {
