@@ -32,17 +32,19 @@ import java.util.Comparator;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Annotations {
-  public static Ordering<Annotation> DEFAULT_ORDERING = Ordering.from(new Comparator<Annotation>() {
+  public static Ordering<Annotation> RANGE_ORDERING = Ordering.from(new Comparator<Annotation>() {
     public int compare(Annotation o1, Annotation o2) {
-      return o1.compareTo(o2);
+      return o1.getRange().compareTo(o2.getRange());
     }
   });
 
-  public static ComparisonChain compare(Annotation a, Annotation b) {
-    return ComparisonChain.start()
-            .compare(a.getRange(), b.getRange())
-            .compare(a.getName(), b.getName());
-  }
+  public static Ordering<Annotation> NAME_ORDERING = Ordering.from(new Comparator<Annotation>() {
+    public int compare(Annotation o1, Annotation o2) {
+      return o1.getRange().compareTo(o2.getRange());
+    }
+  });
+
+  public static Ordering<Annotation> BASIC_ORDERING = RANGE_ORDERING.compound(NAME_ORDERING);
 
   public static final Function<Annotation, Name> NAME = new Function<Annotation, Name>() {
     public Name apply(Annotation input) {

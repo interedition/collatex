@@ -38,6 +38,8 @@ import java.nio.charset.Charset;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class SimpleAnnotation implements Annotation {
+  private static final Ordering<Annotation> ORDERING = Annotations.BASIC_ORDERING.compound(Ordering.arbitrary());
+
   public static final ObjectMapper JSON = new ObjectMapper();
 
   protected static final JsonNode EMPTY_DATA_NODE = JSON.createObjectNode();
@@ -113,7 +115,7 @@ public class SimpleAnnotation implements Annotation {
   }
 
   protected Objects.ToStringHelper toStringHelper() {
-    return Objects.toStringHelper(this).addValue(text).addValue(getName()).addValue(getRange());
+    return Objects.toStringHelper(this).addValue(text).addValue(getName()).addValue(getRange()).addValue(getData());
   }
 
   @Override
@@ -122,6 +124,6 @@ public class SimpleAnnotation implements Annotation {
   }
 
   public int compareTo(Annotation o) {
-    return Annotations.compare(this, o).compare(this, o, Ordering.arbitrary()).result();
+    return ORDERING.compare(this, o);
   }
 }

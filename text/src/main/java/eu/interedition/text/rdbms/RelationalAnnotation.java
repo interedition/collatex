@@ -20,6 +20,7 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.Range;
@@ -27,9 +28,17 @@ import eu.interedition.text.Text;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.util.Annotations;
 
-import java.util.Map;
+import java.util.Comparator;
 
 public class RelationalAnnotation extends SimpleAnnotation {
+  private static final Ordering<Annotation> ORDERING = Annotations.BASIC_ORDERING.compound(new Comparator<Annotation>() {
+    @Override
+    public int compare(Annotation o1, Annotation o2) {
+      final long difference = ((RelationalAnnotation) o1).id - ((RelationalAnnotation) o2).id;
+      return (difference == 0 ? 0 : (difference < 0 ? -1 : 1));
+    }
+  });
+
   protected final long id;
 
   public RelationalAnnotation(Text text, Name name, Range range, byte[] data, long id) {
@@ -65,6 +74,6 @@ public class RelationalAnnotation extends SimpleAnnotation {
   }
 
   public int compareTo(Annotation o) {
-    return Annotations.compare(this, o).compare(id, ((RelationalAnnotation)o).id).result();
+    return ORDERING.compare(this, o);
   }
 }
