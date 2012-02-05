@@ -68,8 +68,8 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
   }
 
   protected void add(XMLParserState state, Text text, Name name, Range range, JsonNode data) {
-    if (addNodePath && data.isObject()) {
-      ((ObjectNode) data).put(XML_NODE_ATTR, state.getNodePath().toArrayNode());
+    if (!addNodePath && data.isObject()) {
+      ((ObjectNode) data).remove(XML_NODE_ATTR);
     }
 
     annotationBatch.add(new SimpleAnnotation(text, name, range, data));

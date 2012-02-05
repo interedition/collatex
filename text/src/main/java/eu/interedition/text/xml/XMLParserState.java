@@ -214,7 +214,9 @@ public class XMLParserState {
       spacePreservationContext.push("preserve".equalsIgnoreCase(xmlSpace.toString()));
     }
 
+    nodePath.set(entity.getAttributes());
     nodePath.push(0);
+
     elementContext.push(entity);
 
     for (XMLParserModule m : modules) {
@@ -227,13 +229,12 @@ public class XMLParserState {
       LOG.trace("End of " + entity);
     }
 
-    nodePath.pop();
-
     for (XMLParserModule m : modules) {
       m.end(entity, this);
     }
 
     elementContext.pop();
+    nodePath.pop();
     spacePreservationContext.pop();
     inclusionContext.pop();
   }
