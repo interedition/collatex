@@ -45,8 +45,9 @@ img.icon {
 }
 
 .hidden {
-    display: none;
+    visibility: hidden;
 }
+
 
 .error {
     color: #FF3366;

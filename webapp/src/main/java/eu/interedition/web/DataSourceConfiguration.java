@@ -16,16 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.format.support.FormattingConversionServiceFactoryBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriUtils;
@@ -40,14 +37,9 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Configuration
-@ComponentScan(
-        basePackageClasses = ApplicationConfiguration.class,
-        includeFilters = {@ComponentScan.Filter(Service.class)},
-        useDefaultFilters = false)
-@ImportResource("classpath:/eu/interedition/text/rdbms/repository-context.xml")
-public class ApplicationConfiguration implements DisposableBean {
+public class DataSourceConfiguration implements DisposableBean {
   private static final String DATA_DIRECTORY = System.getProperty("interedition.data");
-  private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfiguration.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataSourceConfiguration.class);
 
   private File dataDirectory;
 
@@ -115,25 +107,6 @@ public class ApplicationConfiguration implements DisposableBean {
     return new TextIndex(indexHome);
   }
   
-  @Bean
-  public FormattingConversionServiceFactoryBean conversionService() {
-    final FormattingConversionServiceFactoryBean cs = new FormattingConversionServiceFactoryBean();
-    cs.setConverters(Sets.newHashSet(new RangeConverter()));
-    return cs;
-  }
-
-  @Bean
-  public ObjectMapper objectMapper() {
-    final ObjectMapper om = new ObjectMapper();
-    om.registerModule(new TextSerializerModule());
-    return om;
-  }
-
-  @Bean(destroyMethod = "shutdown")
-  public ScheduledExecutorService taskScheduler() {
-    return Executors.newScheduledThreadPool(42);
-  }
-
   @Override
   public void destroy() throws Exception {
     if (DATA_DIRECTORY == null && dataDirectory != null) {

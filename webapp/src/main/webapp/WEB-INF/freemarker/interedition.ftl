@@ -28,7 +28,7 @@ ${header}
 </head>
 <body class="yui3-skin-sam">
 <div id="header"><h1 class="boxed">${title?html}</h1></div>
-<div id="main-menu" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav">
+<div id="main-menu" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav hidden">
     <div class="yui3-menu-content">
         <ul>
           <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/">Introduction</a></li>
@@ -60,6 +60,7 @@ ${header}
   YUI().use("node", "node-menunav", function(Y) {
     Y.on("contentready", function() {
       this.plug(Y.Plugin.NodeMenuNav, { autoSubmenuDisplay: true, mouseOutHideDelay: 0 });
+      this.removeClass("hidden");
     }, "#main-menu");
   <#--
   Y.on("domready", function() {

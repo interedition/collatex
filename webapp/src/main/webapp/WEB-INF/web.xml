@@ -5,13 +5,8 @@
 	<description>CollateX web application</description>
 
     <context-param>
-        <param-name>contextClass</param-name>
-        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-    </context-param>
-
-    <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>eu.interedition.web.ApplicationConfiguration</param-value>
+        <param-value>classpath:/eu/interedition/web/application-context.xml</param-value>
     </context-param>
 
 	<listener>
@@ -21,14 +16,6 @@
 	<servlet>
 		<servlet-name>dispatcher</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <init-param>
-            <param-name>contextClass</param-name>
-            <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-        </init-param>
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>eu.interedition.web.WebConfiguration</param-value>
-        </init-param>
         <init-param>
             <param-name>dispatchOptionsRequest</param-name>
             <param-value>true</param-value>

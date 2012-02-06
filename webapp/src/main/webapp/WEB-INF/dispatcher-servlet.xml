@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:message-converters>
+            <bean class="eu.interedition.web.io.CollationHttpMessageConverter">
+                <constructor-arg ref="graphFactory"/>
+            </bean>
+            <bean class="eu.interedition.web.io.VariantGraphJSONSerializer"/>
+            <bean class="eu.interedition.web.io.VariantGraphTEIHttpMessageConverter"/>
+            <bean class="eu.interedition.web.io.VariantGraphMLHttpMessageConverter"/>
+            <bean class="eu.interedition.web.io.VariantGraphVizHttpMessageConverter">
+                <constructor-arg ref="graphVizService"/>
+            </bean>
+            <bean class="eu.interedition.web.io.VariantGraphJSONSerializer"/>
+            <bean class="eu.interedition.web.io.JSONSerializationHttpMessageConverter">
+                <constructor-arg ref="jsonSerializer"/>
+                <constructor-arg ref="objectMapper"/>
+            </bean>
+            <bean class="eu.interedition.web.io.XMLSerializationHttpMessageConverter">
+                <constructor-arg ref="xmlSerializer"/>
+            </bean>
+            <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+                <property name="objectMapper" ref="objectMapper"/>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <mvc:interceptors>
+        <bean class="eu.interedition.web.CrossOriginResourceSharingInterceptor"/>
+    </mvc:interceptors>
+
+    <mvc:resources mapping="/static/interedition/**" location="classpath:/eu/interedition/style/"/>
+    <mvc:resources mapping="/static/**" location="/WEB-INF/static/"/>
+
+    <mvc:view-controller path="/" view-name="index"/>
+
+    <context:component-scan base-package="eu.interedition.web" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver"/>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="maxInMemorySize" value="102400"/>
+        <property name="maxUploadSize" value="20971520" />
+    </bean>
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="contentType" value="text/html;charset=utf-8"/>
+        <property name="prefix" value=""/>
+        <property name="suffix" value=".ftl"/>
+    </bean>
+
+    <bean id="freeMarkerConfigurer" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPath" value="/WEB-INF/freemarker/"/>
+        <property name="freemarkerSettings">
+            <props>
+                <prop key="auto_include">/header.ftl</prop>
+                <prop key="default_encoding">UTF-8</prop>
+                <prop key="output_encoding">UTF-8</prop>
+                <prop key="url_escaping_charset">UTF-8</prop>
+                <prop key="strict_syntax">true</prop>
+                <prop key="whitespace_stripping">true</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="jsonSerializer" class="eu.interedition.text.json.JSONSerializer">
+        <property name="annotationRepository"  ref="annotationRepository"/>
+        <property name="textRepository" ref="textRepository"/>
+    </bean>
+</beans>

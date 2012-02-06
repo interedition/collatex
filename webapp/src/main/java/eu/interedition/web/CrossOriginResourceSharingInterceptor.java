@@ -1,4 +1,4 @@
-package eu.interedition.web.text;
+package eu.interedition.web;
 
 import com.google.common.base.Objects;
 import org.springframework.web.bind.ServletRequestUtils;

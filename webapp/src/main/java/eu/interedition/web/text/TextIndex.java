@@ -71,15 +71,6 @@ public class TextIndex implements InitializingBean, DisposableBean {
   @Autowired
   private RelationalTextRepository textRepository;
 
-  @Autowired
-  private ScheduledExecutorService taskExecutor;
-
-  @Autowired
-  private PlatformTransactionManager transactionManager;
-
-  @Autowired
-  private JdbcTemplate jt;
-
   private FSDirectory directory;
   private StandardAnalyzer analyzer;
   private IndexWriter indexWriter;
@@ -143,6 +134,22 @@ public class TextIndex implements InitializingBean, DisposableBean {
     return new Term("id", Long.toString(metadata.getText().getId()));
   }
 
+  @Transactional
+  public void index() throws IOException {
+    indexWriter.deleteAll();
+    textService.scroll(new TextService.TextScroller() {
+      @Override
+      public void text(TextMetadata text) {
+        try {
+          update(text);
+        } catch (IOException e) {
+          throw Throwables.propagate(e);
+        }
+      }
+    });
+    commit();
+  }
+
   @Override
   public void afterPropertiesSet() throws Exception {
     this.directory = FSDirectory.open(base);
@@ -150,21 +157,6 @@ public class TextIndex implements InitializingBean, DisposableBean {
 
     this.indexWriter = new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_33, analyzer));
     this.indexReader = IndexReader.open(this.indexWriter, false);
-
-    new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(TransactionStatus status) {
-        try {
-          final long numTexts = jt.queryForLong("select count(*) from text_metadata");
-          final long numDocuments = indexWriter.numDocs();
-          if (numTexts != numDocuments) {
-            taskExecutor.execute(new IndexingTask());
-          }
-        } catch (IOException e) {
-          throw Throwables.propagate(e);
-        }
-      }
-    });
   }
 
   @Override
@@ -186,35 +178,5 @@ public class TextIndex implements InitializingBean, DisposableBean {
 
     Closeables.closeQuietly(this.indexSearcher);
     this.indexSearcher = null;
-  }
-
-  private class IndexingTask implements Runnable {
-
-    @Override
-    public void run() {
-      new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          try {
-            indexWriter.deleteAll();
-
-            textService.scroll(new TextService.TextScroller() {
-              @Override
-              public void text(TextMetadata text) {
-                try {
-                  update(text);
-                } catch (IOException e) {
-                  throw Throwables.propagate(e);
-                }
-              }
-            });
-
-            commit();
-          } catch (IOException e) {
-            throw Throwables.propagate(e);
-          }
-        }
-      });
-    }
   }
 }

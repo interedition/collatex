@@ -10,12 +10,11 @@ import eu.interedition.collatex.graph.VariantGraphEdge;
 import eu.interedition.collatex.graph.VariantGraphTransposition;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import org.neo4j.graphdb.Transaction;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,19 +26,19 @@ import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Service
-public class GraphVizService implements InitializingBean {
+public class GraphVizService implements InitializingBean, DisposableBean {
 
   private final String configuredDotPath = System.getProperty("collatex.graphviz.dot", "/usr/bin/dot");
   private String dotPath;
 
-  @Autowired
-  private ExecutorService executorService;
+  private ExecutorService threadPool = Executors.newCachedThreadPool();
 
   public String getConfiguredDotPath() {
     return configuredDotPath;
@@ -98,7 +97,7 @@ public class GraphVizService implements InitializingBean {
 
     final Process dotProc = Runtime.getRuntime().exec(dotPath + " -Grankdir=LR -Gid=VariantGraph -Tsvg");
 
-    final Future<Void> inputTask = executorService.submit(new Callable<Void>() {
+    final Future<Void> inputTask = threadPool.submit(new Callable<Void>() {
       @Override
       public Void call() throws Exception {
         Writer dotWriter = null;
@@ -147,5 +146,10 @@ public class GraphVizService implements InitializingBean {
   public void afterPropertiesSet() throws Exception {
     final File dotExecutable = new File(configuredDotPath);
     this.dotPath = (dotExecutable.canExecute() ? dotExecutable.getCanonicalPath() : null);
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    threadPool.shutdownNow();
   }
 }

@@ -42,12 +42,7 @@ import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping("/collate")
-public class CollationController implements InitializingBean {
-  private static final Logger LOG = LoggerFactory.getLogger(CollationController.class);
-  private static final int TWO_HOURS = 7200000;
-
-  @Autowired
-  private ScheduledExecutorService taskScheduler;
+public class CollationController {
 
   @Autowired
   private GraphFactory graphFactory;
@@ -91,22 +86,5 @@ public class CollationController implements InitializingBean {
   @RequestMapping("/apidocs")
   public ModelAndView apiDocs(HttpServletRequest request) {
     return new ModelAndView("collate/apidocs", "endpoint", UriComponentsBuilder.fromHttpUrl(request.getRequestURL().toString()).replacePath(request.getContextPath()).pathSegment("collate").build().encode().toUriString());
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    taskScheduler.scheduleWithFixedDelay(new Runnable() {
-      @Override
-      public void run() {
-        final Transaction tx = graphFactory.getDatabase().beginTx();
-        try {
-          LOG.debug("Purging graphs older than 2 hours");
-          graphFactory.deleteGraphsOlderThan(System.currentTimeMillis() - TWO_HOURS);
-          tx.success();
-        } finally {
-          tx.finish();
-        }
-      }
-    }, 0, TWO_HOURS, TimeUnit.MILLISECONDS);
   }
 }
