@@ -26,6 +26,7 @@ import eu.interedition.text.Name;
 import eu.interedition.text.mem.SimpleName;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
 import java.util.Set;
@@ -40,9 +41,12 @@ public class NameTest extends AbstractTest {
           new SimpleName(TEST_NS, "namespacedName")
   ));
 
+  @Autowired
+  private RelationalNameRegistry nameRegistry;
+
   @Test
   public void getNames() {
-    final Set<Name> resolved = nameRepository.get(TEST_NAMES);
+    final Set<Name> resolved = nameRegistry.get(TEST_NAMES);
     Assert.assertEquals(2, resolved.size());
     Assert.assertEquals(2, Iterables.size(Iterables.filter(resolved, RelationalName.class)));
   }

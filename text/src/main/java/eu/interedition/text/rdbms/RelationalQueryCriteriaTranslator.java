@@ -21,7 +21,6 @@ package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import eu.interedition.text.NameRepository;
 import eu.interedition.text.Range;
 import eu.interedition.text.query.*;
 
@@ -34,10 +33,10 @@ import java.util.List;
  */
 public class RelationalQueryCriteriaTranslator {
 
-  private NameRepository nameRepository;
+  private RelationalNameRegistry nameRegistry;
 
-  public void setNameRepository(NameRepository nameRepository) {
-    this.nameRepository = nameRepository;
+  public void setNameRegistry(RelationalNameRegistry nameRegistry) {
+    this.nameRegistry = nameRegistry;
   }
 
   public StringBuilder where(StringBuilder sql, Criterion criterion, Collection<Object> ps) {
@@ -98,7 +97,7 @@ public class RelationalQueryCriteriaTranslator {
 
   protected void sql(StringBuilder sql, AnnotationLinkNameCriterion criterion, Collection<Object> ps) {
     sql.append("(al.name = ?)");
-    ps.add(((RelationalName)nameRepository.get(criterion.getName())).getId());
+    ps.add(((RelationalName) nameRegistry.get(criterion.getName())).getId());
   }
 
   protected void sql(AnnotationIdentityCriterion criterion, Collection<Object> ps, StringBuilder sql) {
@@ -108,7 +107,7 @@ public class RelationalQueryCriteriaTranslator {
 
   protected void sql(StringBuilder sql, AnnotationNameCriterion criterion, Collection<Object> ps) {
     sql.append("(a.name = ?)");
-    ps.add(((RelationalName)nameRepository.get(criterion.getName())).getId());
+    ps.add(((RelationalName) nameRegistry.get(criterion.getName())).getId());
   }
 
   protected void sql(StringBuilder sql, TextCriterion criterion, Collection<Object> ps) {

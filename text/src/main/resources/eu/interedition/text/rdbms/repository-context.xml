@@ -27,46 +27,35 @@
         <property name="dataSource" ref="repositoryDataSource" />
     </bean>
 
-    <bean id="nameRepository" class="eu.interedition.text.rdbms.RelationalNameRepository">
+    <bean id="nameRegistry" class="eu.interedition.text.rdbms.RelationalNameRegistry">
         <property name="dataSource" ref="repositoryDataSource" />
         <property name="transactionManager" ref="repositoryTransactionManager"/>
         <property name="keyFactory" ref="keyFactory"/>
     </bean>
 
     <bean id="queryCriteriaTranslator" class="eu.interedition.text.rdbms.RelationalQueryCriteriaTranslator">
-        <property name="nameRepository" ref="nameRepository" />
+        <property name="nameRegistry" ref="nameRegistry" />
     </bean>
 
     <bean id="textRepository" class="eu.interedition.text.rdbms.RelationalTextRepository">
         <property name="dataSource" ref="repositoryDataSource" />
         <property name="keyFactory" ref="keyFactory"/>
-    </bean>
-
-    <bean id="annotationRepository" class="eu.interedition.text.rdbms.RelationalAnnotationRepository">
-        <property name="dataSource" ref="repositoryDataSource" />
-        <property name="keyFactory" ref="keyFactory"/>
-        <property name="nameRepository" ref="nameRepository" />
-        <property name="textRepository" ref="textRepository" />
+        <property name="nameRegistry" ref="nameRegistry" />
         <property name="queryCriteriaTranslator" ref="queryCriteriaTranslator"/>
     </bean>
 
     <bean id="annotationLinkRepository" class="eu.interedition.text.rdbms.RelationalAnnotationLinkRepository">
         <property name="dataSource" ref="repositoryDataSource" />
         <property name="keyFactory" ref="keyFactory"/>
-        <property name="nameRepository" ref="nameRepository" />
+        <property name="nameRepository" ref="nameRegistry" />
         <property name="queryCriteriaTranslator" ref="queryCriteriaTranslator"/>
     </bean>
 
-    <bean id="eventSource" class="eu.interedition.text.event.AnnotationEventSource">
-        <property name="annotationRepository" ref="annotationRepository" />
-        <property name="textRepository" ref="textRepository" />
-    </bean>
-    
     <bean id="xmlParser" class="eu.interedition.text.xml.XMLParser">
         <property name="textRepository" ref="textRepository" />
     </bean>
 
     <bean id="xmlSerializer" class="eu.interedition.text.xml.XMLSerializer">
-        <property name="eventSource" ref="eventSource"/>
+        <property name="textRepository" ref="textRepository"/>
     </bean>
 </beans>

@@ -66,7 +66,7 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
   public void clixSerialize() throws Exception {
     final Text testText = text("wp-orpheus1-clix.xml");
 
-    annotationRepository.delete(and(Criteria.text(testText), rangeLength(0)));
+    textRepository.delete(and(Criteria.text(testText), rangeLength(0)));
 
     xmlSerializer.serialize(createOutputHandler(), testText, new XMLSerializerConfiguration() {
       public Name getRootName() {
@@ -97,7 +97,7 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
   @Test
   public void teiConversion() throws Exception {
     final Text testText = text("george-algabal-tei.xml");
-    annotationRepository.delete(and(Criteria.text(testText), rangeLength(0)));
+    textRepository.delete(and(Criteria.text(testText), rangeLength(0)));
     xmlSerializer.serialize(createOutputHandler(), testText, new XMLSerializerConfiguration() {
       public Name getRootName() {
         return new SimpleName(TEI_NS, "text");

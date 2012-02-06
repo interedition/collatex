@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Name;
-import eu.interedition.text.NameRepository;
 import eu.interedition.text.util.SQL;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -51,7 +50,7 @@ import java.util.Set;
 
 import static java.util.Collections.singleton;
 
-public class RelationalNameRepository implements NameRepository, InitializingBean {
+public class RelationalNameRegistry implements InitializingBean {
 
   private DataSource dataSource;
   private PlatformTransactionManager transactionManager;

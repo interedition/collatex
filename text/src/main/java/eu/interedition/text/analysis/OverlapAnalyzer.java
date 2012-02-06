@@ -20,20 +20,18 @@
 package eu.interedition.text.analysis;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
-import eu.interedition.text.event.AnnotationEventAdapter;
+import eu.interedition.text.event.TextAdapter;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class OverlapAnalyzer extends AnnotationEventAdapter {
+public class OverlapAnalyzer extends TextAdapter {
   protected Set<Name> selfOverlapping;
 
   protected Set<SortedSet<Name>> overlapping;
@@ -49,7 +47,7 @@ public class OverlapAnalyzer extends AnnotationEventAdapter {
   }
 
   @Override
-  public void start() {
+  public void start(long contentLength) {
     selfOverlapping = Sets.newHashSet();
     overlapping = Sets.newHashSet();
     started = Sets.newHashSet();

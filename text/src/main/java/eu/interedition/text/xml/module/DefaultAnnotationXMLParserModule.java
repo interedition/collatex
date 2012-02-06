@@ -19,8 +19,8 @@
  */
 package eu.interedition.text.xml.module;
 
-import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Range;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserState;
 
@@ -32,12 +32,12 @@ import java.util.Stack;
 public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
   private Stack<Long> startOffsetStack;
 
-  public DefaultAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize, boolean addNodePath) {
-    super(annotationRepository, batchSize, addNodePath);
+  public DefaultAnnotationXMLParserModule(TextRepository textRepository, int batchSize, boolean addNodePath) {
+    super(textRepository, batchSize, addNodePath);
   }
 
-  public DefaultAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
-    this(annotationRepository, batchSize, false);
+  public DefaultAnnotationXMLParserModule(TextRepository textRepository, int batchSize) {
+    this(textRepository, batchSize, false);
   }
 
   @Override

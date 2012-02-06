@@ -23,6 +23,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
+import eu.interedition.text.event.TextAdapter;
+import eu.interedition.text.query.Criteria;
 import eu.interedition.text.xml.module.XMLParserModuleAdapter;
 import org.junit.After;
 import org.junit.Assert;
@@ -70,10 +72,16 @@ public class XMLParserTest extends AbstractTestResourceTest {
     assertTrue(text.toString(), text.getLength() > 0);
 
     if (LOG.isDebugEnabled()) {
-      textRepository.read(text, new TextConsumer() {
+      textRepository.read(text, Criteria.none(), new TextAdapter() {
+        private StringBuilder buf = new StringBuilder();
+        @Override
+        public void text(Range r, String text) {
+          buf.append(text);
+        }
 
-        public void read(Reader content, long contentLength) throws IOException {
-          LOG.debug(CharStreams.toString(content));
+        @Override
+        public void end() {
+          LOG.debug(buf.toString());
         }
       });
     }
@@ -82,8 +90,8 @@ public class XMLParserTest extends AbstractTestResourceTest {
   @Test
   public void offsetMapping() throws IOException {
     if (LOG.isDebugEnabled()) {
-      final SortedMap<Range, String> sources = textRepository.bulkRead(source("george-algabal-tei.xml"), Sets.newTreeSet(sourceRanges));
-      final SortedMap<Range, String> texts = textRepository.bulkRead(text("george-algabal-tei.xml"), Sets.newTreeSet(textRanges));
+      final SortedMap<Range, String> sources = textRepository.read(source("george-algabal-tei.xml"), Sets.newTreeSet(sourceRanges));
+      final SortedMap<Range, String> texts = textRepository.read(text("george-algabal-tei.xml"), Sets.newTreeSet(textRanges));
       final Iterator<Range> sourceRangeIt = sourceRanges.iterator();
       final Iterator<Range> textRangeIt = textRanges.iterator();
       while (sourceRangeIt.hasNext() && textRangeIt.hasNext()) {

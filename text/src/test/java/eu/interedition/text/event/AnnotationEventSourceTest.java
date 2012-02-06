@@ -22,15 +22,12 @@ package eu.interedition.text.event;
 import com.google.common.collect.Iterables;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.Name;
 import eu.interedition.text.Range;
+import eu.interedition.text.TextListener;
 import eu.interedition.text.mem.SimpleName;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
 
 import static eu.interedition.text.TextConstants.TEI_NS;
 import static eu.interedition.text.query.Criteria.annotationName;
@@ -38,23 +35,21 @@ import static eu.interedition.text.query.Criteria.or;
 
 public class AnnotationEventSourceTest extends AbstractTestResourceTest {
 
-  @Autowired
-  private AnnotationEventSource source;
-
   @Test
   public void generateEvents() throws IOException {
-    source.listen(DEBUG_LISTENER, text("george-algabal-tei.xml"),
-            or(
-                    annotationName(new SimpleName(TEI_NS, "div")),
-                    annotationName(new SimpleName(TEI_NS, "lg")),
-                    annotationName(new SimpleName(TEI_NS, "l")),
-                    annotationName(new SimpleName(TEI_NS, "p"))
-            ));
+    textRepository.read(text("george-algabal-tei.xml"), or(
+            annotationName(new SimpleName(TEI_NS, "div")),
+            annotationName(new SimpleName(TEI_NS, "lg")),
+            annotationName(new SimpleName(TEI_NS, "l")),
+            annotationName(new SimpleName(TEI_NS, "p"))
+    ), DEBUG_LISTENER
+    );
   }
 
-  public static final AnnotationEventListener DEBUG_LISTENER = new AnnotationEventListener() {
+  public static final TextListener DEBUG_LISTENER = new TextListener() {
 
-    public void start() {
+    public void start(long contentLength) {
+      LOG.debug("START TEXT: (" + contentLength + " character(s))");
     }
 
     public void start(long offset, Iterable<Annotation> annotations) {

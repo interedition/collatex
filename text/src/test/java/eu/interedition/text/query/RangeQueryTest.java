@@ -31,7 +31,7 @@ public class RangeQueryTest extends AbstractTestResourceTest {
 
   @Test
   public void searchEmptyRanges() {
-    final Iterable<Annotation> empties = annotationRepository.find(Criteria.and(Criteria.text(text()), Criteria.rangeLength(0)));
+    final Iterable<Annotation> empties = textRepository.find(Criteria.and(Criteria.text(text()), Criteria.rangeLength(0)));
     LOG.debug(Joiner.on('\n').join(empties));
   }
 }

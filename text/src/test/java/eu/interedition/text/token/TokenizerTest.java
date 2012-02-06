@@ -26,11 +26,9 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
-import eu.interedition.text.event.AnnotationEventAdapter;
-import eu.interedition.text.event.AnnotationEventSource;
+import eu.interedition.text.event.TextAdapter;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.query.Criterion;
 import eu.interedition.text.rdbms.RelationalTextRepository;
@@ -57,19 +55,12 @@ public class TokenizerTest extends AbstractTestResourceTest {
   @Autowired
   private RelationalTextRepository textRepository;
 
-  @Autowired
-  private AnnotationRepository annotationRepository;
-
-  @Autowired
-  private AnnotationEventSource annotationEventSource;
-
   private Tokenizer tokenizer;
 
   @Before
   public void createTokenizer() {
     tokenizer = new Tokenizer();
-    tokenizer.setAnnotationRepository(annotationRepository);
-    tokenizer.setEventSource(annotationEventSource);
+    tokenizer.setTextRepository(textRepository);
   }
 
   @Test
@@ -81,11 +72,11 @@ public class TokenizerTest extends AbstractTestResourceTest {
   @Test
   public void streamTokenNGrams() throws IOException {
     final int ngramLength = 2;
-    annotationEventSource.listen(new AnnotationEventAdapter() {
+    textRepository.read(tokenize(), annotationName(Tokenizer.DEFAULT_TOKEN_NAME), new TextAdapter() {
       private Queue<String> ngram = new ArrayDeque<String>(ngramLength);
       private Set<Integer> hashes = Sets.newHashSet();
       private int ngrams;
-      
+
       @Override
       public void text(Range r, String text) {
         ngram.add(text.trim().toLowerCase());
@@ -97,7 +88,7 @@ public class TokenizerTest extends AbstractTestResourceTest {
             LOG.debug("{} = {}", Iterables.toString(ngram), hash);
           }
           hashes.add(hash);
-          
+
           ngram.remove();
         }
       }
@@ -107,7 +98,7 @@ public class TokenizerTest extends AbstractTestResourceTest {
         LOG.debug("{} vs. {}", ngrams, hashes.size());
       }
 
-    }, tokenize(), annotationName(Tokenizer.DEFAULT_TOKEN_NAME));
+    });
   }
 
   protected Text tokenize() throws IOException {
@@ -124,7 +115,7 @@ public class TokenizerTest extends AbstractTestResourceTest {
     long read = 0;
 
     final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
-    for (Annotation token : Ordering.natural().immutableSortedCopy(annotationRepository.find(and(Criteria.text(text), tokenCriterion)))) {
+    for (Annotation token : Ordering.natural().immutableSortedCopy(textRepository.find(and(Criteria.text(text), tokenCriterion)))) {
       final Range range = token.getRange();
       if (read < range.getStart()) {
         ranges.put(new Range(read, range.getStart()), false);
@@ -138,7 +129,7 @@ public class TokenizerTest extends AbstractTestResourceTest {
       ranges.put(new Range(read, (int) length), false);
     }
 
-    final SortedMap<Range, String> texts = textRepository.bulkRead(text, Sets.newTreeSet(ranges.keySet()));
+    final SortedMap<Range, String> texts = textRepository.read(text, Sets.newTreeSet(ranges.keySet()));
     StringBuilder tokenized = new StringBuilder();
     for (Map.Entry<Range, Boolean> range : ranges.entrySet()) {
       tokenized.append(range.getValue() ? "[" : "");

@@ -19,8 +19,7 @@ import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.TextConsumer;
-import eu.interedition.text.event.AnnotationEventAdapter;
-import eu.interedition.text.event.AnnotationEventSource;
+import eu.interedition.text.event.TextAdapter;
 import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.util.Annotations;
@@ -28,7 +27,6 @@ import eu.interedition.text.util.Ranges;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLNodePath;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -59,9 +57,6 @@ public class ChangeTesting extends AbstractTestResourceTest {
     }
   });
 
-  @Autowired
-  private AnnotationEventSource annotationEventSource;
-
   @Test
   public void createTexts() throws IOException {
     for (File testFile : TEST_FILES) {
@@ -84,7 +79,12 @@ public class ChangeTesting extends AbstractTestResourceTest {
       final Text testText = text(testFile.toURI());
 
       final Multimap<String, ChangeAdapter> changes = HashMultimap.create();
-      annotationEventSource.listen(new AnnotationEventAdapter() {
+      textRepository.read(testText, Criteria.or(
+              annotationName(new SimpleName(TextConstants.TEI_NS, "add")),
+              annotationName(new SimpleName(TextConstants.TEI_NS, "del")),
+              annotationName(new SimpleName(TextConstants.TEI_NS, "subst")),
+              annotationName(new SimpleName(TextConstants.TEI_NS, "restore"))
+      ), new TextAdapter() {
         private Deque<ChangeAdapter> parents = new ArrayDeque<ChangeAdapter>();
 
         @Override
@@ -102,7 +102,7 @@ public class ChangeTesting extends AbstractTestResourceTest {
             if (isNullOrEmpty(change.getChangeSetRef())) {
               final ChangeAdapter parent = Iterators.find(parents.descendingIterator(), ChangeAdapter.HAS_CHANGE_SET_REF, null);
               if (parent != null) {
-                change.setChangeSetRef(parent.getChangeSetRef());                
+                change.setChangeSetRef(parent.getChangeSetRef());
               }
               changes.put((parent == null ? "" : parent.getChangeSetRef()), change);
             }
@@ -116,12 +116,7 @@ public class ChangeTesting extends AbstractTestResourceTest {
         public void end(long offset, Iterable<Annotation> annotations) {
           parents.removeAll(Lists.newArrayList(Iterables.transform(annotations, ChangeAdapter.ADAPT)));
         }
-      }, testText, Criteria.or(
-              annotationName(new SimpleName(TextConstants.TEI_NS, "add")),
-              annotationName(new SimpleName(TextConstants.TEI_NS, "del")),
-              annotationName(new SimpleName(TextConstants.TEI_NS, "subst")),
-              annotationName(new SimpleName(TextConstants.TEI_NS, "restore"))
-      ));
+      });
 
       final Multimap<String,ChangeAdapter> revTypeIndex = Multimaps.index(changes.values(), ChangeAdapter.TO_REV_TYPE);
 
@@ -175,7 +170,7 @@ public class ChangeTesting extends AbstractTestResourceTest {
       System.out.printf("%s %s\n", Strings.repeat("=", 100), testFile.getName());
       final SortedSet<Range> rangesToRemove = Iterables.getLast(removedRanges);
       System.out.println(Iterables.toString(rangesToRemove));
-      annotationEventSource.listen(new AnnotationEventAdapter() {
+      textRepository.read(testText, Criteria.none(), new TextAdapter() {
         @Override
         public void text(Range r, String text) {
           int removed = 0;
@@ -190,25 +185,35 @@ public class ChangeTesting extends AbstractTestResourceTest {
             }
 
             final Range overlap = rangeToRemove.overlap(r);
-            final Range shifted = overlap.shift(- (r.getStart() + removed));
+            final Range shifted = overlap.shift(-(r.getStart() + removed));
             buf.replace((int) shifted.getStart(), (int) shifted.getEnd(), "");
             removed += overlap.length();
           }
           System.out.print(buf.toString());
         }
-      }, testText, Criteria.none());
+      });
       System.out.println();
     }
   }
 
   private static final Ordering<Annotation> CHANGE_HIERARCHY_ORDERING = Annotations.RANGE_ORDERING.compound(XMLNodePath.ANNOTATION_COMPARATOR);
 
-  private static final TextConsumer PRINTING_TEXT_CONSUMER = new TextConsumer() {
+  private static final TextAdapter PRINTING_TEXT_LISTENER = new TextAdapter() {
+
     @Override
-    public void read(Reader content, long contentLength) throws IOException {
+    public void start(long contentLength) {
       System.out.println(Strings.repeat("=", 100));
-      CharStreams.copy(content, System.out);
+    }
+
+    @Override
+    public void end() {
+      System.out.println();
       System.out.println(Strings.repeat("=", 100));
+    }
+
+    @Override
+    public void text(Range r, String text) {
+      System.out.print(text);
     }
   };
 }

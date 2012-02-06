@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.event;
+package eu.interedition.text;
 
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
@@ -26,9 +26,9 @@ import eu.interedition.text.Range;
 import java.util.Map;
 
 
-public interface AnnotationEventListener {
+public interface TextListener {
 
-  void start();
+  void start(long contentLength);
 
   void start(long offset, Iterable<Annotation> annotations);
 

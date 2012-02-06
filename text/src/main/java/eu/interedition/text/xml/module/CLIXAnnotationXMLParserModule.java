@@ -20,9 +20,9 @@
 package eu.interedition.text.xml.module;
 
 import com.google.common.collect.Maps;
-import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Range;
 import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLParserState;
@@ -37,8 +37,8 @@ import java.util.Map;
 public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
   private Map<String, SimpleAnnotation> annotations;
 
-  public CLIXAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
-    super(annotationRepository, batchSize, false);
+  public CLIXAnnotationXMLParserModule(TextRepository textRepository, int batchSize) {
+    super(textRepository, batchSize, false);
   }
 
   @Override

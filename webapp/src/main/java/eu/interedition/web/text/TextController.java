@@ -81,9 +81,6 @@ public class TextController {
   private RelationalTextRepository textRepository;
 
   @Autowired
-  private AnnotationRepository annotationRepository;
-
-  @Autowired
   private XMLParser xmlParser;
 
   @Autowired
@@ -97,7 +94,7 @@ public class TextController {
   @RequestMapping("/{id}/names")
   @ResponseBody
   public SortedSet<Name> readNames(@PathVariable("id") long id) {
-    return annotationRepository.names(textRepository.load(id));
+    return textRepository.names(textRepository.load(id));
   }
 
   @RequestMapping(method = RequestMethod.GET)
@@ -209,7 +206,7 @@ public class TextController {
     Preconditions.checkArgument(metadata.getText().getType() == Text.Type.XML);
 
     Map<String, List<String>> names = Maps.newHashMap();
-    for (Name name : annotationRepository.names(metadata.getText())) {
+    for (Name name : textRepository.names(metadata.getText())) {
       final URI namespaceURI = name.getNamespace();
       final String ns = (namespaceURI == null ? "" : namespaceURI.toString());
       List<String> localNames = names.get(ns);
@@ -230,15 +227,15 @@ public class TextController {
     modules.add(new LineElementXMLParserModule());
     modules.add(new NotableCharacterXMLParserModule());
     modules.add(new TextXMLParserModule());
-    modules.add(new DefaultAnnotationXMLParserModule(annotationRepository, 1000));
-    modules.add(new CLIXAnnotationXMLParserModule(annotationRepository, 1000));
+    modules.add(new DefaultAnnotationXMLParserModule(textRepository, 1000));
+    modules.add(new CLIXAnnotationXMLParserModule(textRepository, 1000));
     if (pc.isTransformTEI()) {
-      modules.add(new TEIAwareAnnotationXMLParserModule(annotationRepository, 1000));
+      modules.add(new TEIAwareAnnotationXMLParserModule(textRepository, 1000));
     }
 
     final Text parsed = xmlParser.parse(source.getText(), pc);
     if (pc.isRemoveEmpty()) {
-      annotationRepository.delete(and(text(parsed), rangeLength(0)));
+      textRepository.delete(and(text(parsed), rangeLength(0)));
     }
 
     final TextMetadata parsedMetadata = new TextMetadata(source);
@@ -269,7 +266,7 @@ public class TextController {
     final TextMetadata metadata = textService.load(id);
     final RelationalText text = metadata.getText();
 
-    annotationRepository.delete(Criteria.text(text));
+    textRepository.delete(Criteria.text(text));
     writeAnnotations(text, annotations);
     return respondWith(request, metadata);
   }

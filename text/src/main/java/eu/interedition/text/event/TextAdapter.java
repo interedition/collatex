@@ -17,15 +17,28 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text;
+package eu.interedition.text.event;
 
-import java.util.Set;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.Range;
+import eu.interedition.text.TextListener;
 
+/**
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
+public class TextAdapter implements TextListener {
+  public void start(long contentLength) {
+  }
 
-public interface NameRepository {
+  public void start(long offset, Iterable<Annotation> annotations) {
+  }
 
-  Name get(Name name);
+  public void end(long offset, Iterable<Annotation> annotations) {
+  }
 
-  Set<Name> get(Set<Name> name);
+  public void text(Range r, String text) {
+  }
 
+  public void end() {
+  }
 }

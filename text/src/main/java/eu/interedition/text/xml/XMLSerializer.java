@@ -24,11 +24,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
-import eu.interedition.text.*;
-import eu.interedition.text.event.AnnotationEventSource;
-import eu.interedition.text.event.ExceptionPropagatingAnnotationEventAdapter;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.Name;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.event.ExceptionPropagatingTextAdapter;
 import eu.interedition.text.mem.SimpleName;
-import org.codehaus.jackson.JsonNode;
 import org.springframework.beans.factory.annotation.Required;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -38,22 +41,29 @@ import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLSerializer {
-  private AnnotationEventSource eventSource;
+
+  private TextRepository textRepository;
 
   @Required
-  public void setEventSource(AnnotationEventSource eventSource) {
-    this.eventSource = eventSource;
+  public void setTextRepository(TextRepository textRepository) {
+    this.textRepository = textRepository;
   }
 
   public void serialize(final ContentHandler xml, Text text, final XMLSerializerConfiguration config) throws XMLStreamException, IOException {
     try {
-      eventSource.listen(new SerializingListener(xml, config), text, config.getQuery());
+      textRepository.read(text, config.getQuery(), new SerializingListener(xml, config));
     } catch (Throwable t) {
       Throwables.propagateIfInstanceOf(t, IOException.class);
       Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
@@ -61,7 +71,7 @@ public class XMLSerializer {
     }
   }
 
-  private class SerializingListener extends ExceptionPropagatingAnnotationEventAdapter {
+  private class SerializingListener extends ExceptionPropagatingTextAdapter {
     private final ContentHandler xml;
     private final XMLSerializerConfiguration config;
     private final List<Name> hierarchy;
@@ -86,7 +96,7 @@ public class XMLSerializer {
     }
 
     @Override
-    protected void doStart() throws Exception {
+    protected void doStart(long contentLength) throws Exception {
       xml.startDocument();
 
       final Name rootName = config.getRootName();

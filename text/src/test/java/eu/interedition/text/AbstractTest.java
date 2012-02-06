@@ -22,7 +22,6 @@ package eu.interedition.text;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,9 +46,6 @@ public abstract class AbstractTest {
    * A logger for debug output.
    */
   protected static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class.getPackage().getName());
-
-  @Autowired
-  protected NameRepository nameRepository;
 
   protected static String escapeNewlines(String str) {
     return str.replaceAll("[\n\r]+", "\\\\n");

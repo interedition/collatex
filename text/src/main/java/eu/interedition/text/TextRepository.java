@@ -19,10 +19,10 @@
  */
 package eu.interedition.text;
 
+import com.google.common.base.Function;
+import eu.interedition.text.query.Criterion;
+
 import javax.xml.stream.*;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.SortedMap;
@@ -36,7 +36,17 @@ public interface TextRepository {
 
   Text create(Annotation layer, XMLStreamReader xml) throws IOException, XMLStreamException;
 
+  Iterable<Annotation> create(Annotation... annotations);
+
+  Iterable<Annotation> create(Iterable<Annotation> annotations);
+
   void delete(Text text);
+
+  void delete(Iterable<Annotation> annotations);
+
+  void delete(Annotation... annotations);
+
+  void delete(Criterion criterion);
 
   void read(Text text, XMLStreamWriter xml) throws IOException, XMLStreamException;
 
@@ -44,11 +54,25 @@ public interface TextRepository {
 
   void read(Text text, Range range, TextConsumer consumer) throws IOException;
 
+  void read(Text text, Criterion criterion, TextListener listener) throws IOException;
+
+  void read(Text text, Criterion criterion, int pageSize, TextListener listener) throws IOException;
+
   String read(Text text, Range range) throws IOException;
 
-  SortedMap<Range, String> bulkRead(Text text, SortedSet<Range> ranges) throws IOException;
+  SortedMap<Range, String> read(Text text, SortedSet<Range> ranges) throws IOException;
 
   Text write(Text text, Reader contents) throws IOException;
 
   Text write(Text text, Reader contents, long contentLength) throws IOException;
+
+  SortedSet<Name> names(Text text);
+
+  void scroll(Criterion criterion, AnnotationConsumer consumer);
+
+  Iterable<Annotation> find(Criterion criterion);
+
+  void transform(Criterion criterion, Text to, Function<Annotation, Annotation> transform);
+
+  Iterable<Annotation> transform(Iterable<Annotation> annotations, Text to, Function<Annotation, Annotation> transform);
 }

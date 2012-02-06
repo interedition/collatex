@@ -71,7 +71,6 @@
     </bean>
     
     <bean id="jsonSerializer" class="eu.interedition.text.json.JSONSerializer">
-        <property name="annotationRepository"  ref="annotationRepository"/>
         <property name="textRepository" ref="textRepository"/>
     </bean>
 </beans>

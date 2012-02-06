@@ -21,11 +21,11 @@ package eu.interedition.text.xml.module;
 
 import com.google.common.collect.Lists;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.xml.XMLParserState;
 import org.codehaus.jackson.JsonNode;
@@ -39,14 +39,14 @@ import java.util.List;
 public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleAdapter {
   private static final String XML_NODE_ATTR = TextConstants.XML_NODE_ATTR_NAME.toString();
 
-  protected final AnnotationRepository annotationRepository;
+  protected TextRepository textRepository;
   protected final int batchSize;
   protected final boolean addNodePath;
 
   private List<Annotation> annotationBatch;
 
-  protected AbstractAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize, boolean addNodePath) {
-    this.annotationRepository = annotationRepository;
+  protected AbstractAnnotationXMLParserModule(TextRepository textRepository, int batchSize, boolean addNodePath) {
+    this.textRepository = textRepository;
     this.batchSize = batchSize;
     this.addNodePath = addNodePath;
   }
@@ -80,7 +80,7 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
   }
 
   protected void emit() {
-    annotationRepository.create(annotationBatch);
+    textRepository.create(annotationBatch);
     annotationBatch.clear();
   }
 

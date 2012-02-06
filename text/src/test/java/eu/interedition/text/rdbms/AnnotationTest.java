@@ -20,11 +20,14 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.collect.Iterables;
-import eu.interedition.text.*;
+import eu.interedition.text.AbstractTestResourceTest;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
+import eu.interedition.text.event.TextAdapter;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.transform.AnnotationTransformers;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
 
 import java.io.IOException;
@@ -41,15 +44,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class AnnotationTest extends AbstractTestResourceTest {
 
-  @Autowired
-  private AnnotationRepository annotationRepository;
-
   @Test
   public void deleteAll() {
     final Text existing = text();
     try {
-      annotationRepository.delete(and(Criteria.text(existing), rangeFitsWithin(new Range(0, existing.getLength()))));
-      final Iterable<Annotation> remaining = annotationRepository.find(Criteria.text(existing));
+      textRepository.delete(and(Criteria.text(existing), rangeFitsWithin(new Range(0, existing.getLength()))));
+      final Iterable<Annotation> remaining = textRepository.find(Criteria.text(existing));
       assertTrue(Integer.toString(size(remaining)) + " in " + existing, Iterables.isEmpty(remaining));
     } finally {
       unload();
@@ -60,23 +60,25 @@ public class AnnotationTest extends AbstractTestResourceTest {
   public void transform() throws IOException {
     final Text existing = text("george-algabal-tei.xml");
     try {
-      final int numAnnotations = size(annotationRepository.find(Criteria.text(existing)));
+      final int numAnnotations = size(textRepository.find(Criteria.text(existing)));
 
       final Text newText = textRepository.create(null, new StringReader("Hello Hello!"));
 
       final StopWatch sw = new StopWatch("transform");
       sw.start("shift");
-      annotationRepository.transform(Criteria.text(existing), newText, AnnotationTransformers.shift(10));
+      textRepository.transform(Criteria.text(existing), newText, AnnotationTransformers.shift(10));
       sw.stop();
 
-      assertEquals(numAnnotations, size(annotationRepository.find(Criteria.text(newText))));
+      assertEquals(numAnnotations, size(textRepository.find(Criteria.text(newText))));
 
       sw.start("print");
       if (LOG.isDebugEnabled()) {
-        annotationRepository.scroll(Criteria.text(newText), new AnnotationConsumer() {
+        textRepository.read(newText, Criteria.any(), new TextAdapter() {
           @Override
-          public void consume(Annotation annotation) {
-            LOG.debug("{}: {}", annotation, annotation.getData().toString());
+          public void start(long offset, Iterable<Annotation> annotations) {
+            for (Annotation annotation : annotations) {
+              LOG.debug("{}: {}", annotation, annotation.getData().toString());
+            }
           }
         });
       }

@@ -51,10 +51,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static eu.interedition.text.rdbms.RelationalAnnotationRepository.mapAnnotationFrom;
-import static eu.interedition.text.rdbms.RelationalAnnotationRepository.selectAnnotationFrom;
-import static eu.interedition.text.rdbms.RelationalNameRepository.mapNameFrom;
-import static eu.interedition.text.rdbms.RelationalNameRepository.selectNameFrom;
+import static eu.interedition.text.rdbms.RelationalTextRepository.mapAnnotationFrom;
+import static eu.interedition.text.rdbms.RelationalTextRepository.selectAnnotationFrom;
+import static eu.interedition.text.rdbms.RelationalNameRegistry.mapNameFrom;
+import static eu.interedition.text.rdbms.RelationalNameRegistry.selectNameFrom;
 import static eu.interedition.text.rdbms.RelationalTextRepository.mapTextFrom;
 import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom;
 
@@ -64,7 +64,7 @@ import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom
 public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRepository implements InitializingBean {
   private DataSource dataSource;
   private RelationalDatabaseKeyFactory keyFactory;
-  private RelationalNameRepository nameRepository;
+  private RelationalNameRegistry nameRepository;
   private RelationalQueryCriteriaTranslator queryCriteriaTranslator;
 
   private int batchSize = 10000;
@@ -271,7 +271,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     final List<Object> ps = Lists.<Object>newArrayList(linkIds.keySet());
     final StringBuilder sql = new StringBuilder("select  ");
     sql.append(selectDataFrom("d")).append(", ");
-    sql.append(RelationalNameRepository.selectNameFrom("n")).append(", ");
+    sql.append(RelationalNameRegistry.selectNameFrom("n")).append(", ");
     sql.append("d.link as d_link");
     sql.append(" from text_annotation_link_data d join text_qname n on d.name = n.id where d.link in (");
     for (Iterator<Long> linkIdIt = linkIds.keySet().iterator(); linkIdIt.hasNext(); ) {
@@ -308,7 +308,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
           dataMap = data.get(link);
         }
 
-        RelationalName name = RelationalNameRepository.mapNameFrom(rs, "n");
+        RelationalName name = RelationalNameRegistry.mapNameFrom(rs, "n");
         if (nameCache.containsKey(name.getId())) {
           name = nameCache.get(name.getId());
         } else {
@@ -390,8 +390,8 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
   }
 
   @Required
-  public void setNameRepository(RelationalNameRepository nameRepository) {
-    this.nameRepository = nameRepository;
+  public void setNameRepository(RelationalNameRegistry nameRegistry) {
+    this.nameRepository = nameRegistry;
   }
 
   @Required

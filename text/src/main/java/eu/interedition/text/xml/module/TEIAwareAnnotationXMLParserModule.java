@@ -22,9 +22,9 @@ package eu.interedition.text.xml.module;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import eu.interedition.text.AnnotationRepository;
 import eu.interedition.text.Name;
 import eu.interedition.text.Range;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.xml.XMLEntity;
@@ -56,8 +56,8 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   private Multimap<String, SimpleAnnotation> spanning;
   private Map<Name, SimpleAnnotation> milestones;
 
-  public TEIAwareAnnotationXMLParserModule(AnnotationRepository annotationRepository, int batchSize) {
-    super(annotationRepository, batchSize, false);
+  public TEIAwareAnnotationXMLParserModule(TextRepository textRepository, int batchSize) {
+    super(textRepository, batchSize, false);
   }
 
   @Override

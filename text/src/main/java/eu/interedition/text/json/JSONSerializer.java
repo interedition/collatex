@@ -3,6 +3,7 @@ package eu.interedition.text.json;
 import com.google.common.base.Throwables;
 import com.google.common.collect.*;
 import eu.interedition.text.*;
+import eu.interedition.text.event.TextAdapter;
 import eu.interedition.text.json.map.AnnotationSerializer;
 import eu.interedition.text.json.map.NameSerializer;
 import eu.interedition.text.mem.SimpleAnnotation;
@@ -12,8 +13,6 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.node.NullNode;
-import org.codehaus.jackson.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.io.IOException;
@@ -39,17 +38,11 @@ public class JSONSerializer {
 
 
   private TextRepository textRepository;
-  private AnnotationRepository annotationRepository;
   private int batchSize = 1024;
 
   @Required
   public void setTextRepository(TextRepository textRepository) {
     this.textRepository = textRepository;
-  }
-
-  @Required
-  public void setAnnotationRepository(AnnotationRepository annotationRepository) {
-    this.annotationRepository = annotationRepository;
   }
 
   public void setBatchSize(int batchSize) {
@@ -64,7 +57,7 @@ public class JSONSerializer {
     final BiMap<String, URI> nsMap = HashBiMap.create(config.getNamespaceMappings());
     final BiMap<URI, String> prefixMap = (nsMap == null ? null : nsMap.inverse());
 
-    final Operator criterion = and(config.getQuery(), text(text));
+    final Operator criterion = and(config.getQuery());
     if (range != null) {
       criterion.add(rangeOverlap(range));
     }
@@ -72,31 +65,33 @@ public class JSONSerializer {
     final SortedSet<RelationalName> names = Sets.newTreeSet();
     jgen.writeArrayFieldStart(ANNOTATIONS_FIELD);
     try {
-      annotationRepository.scroll(criterion, new AnnotationConsumer() {
+      textRepository.read(text, criterion, new TextAdapter() {
         @Override
-        public void consume(Annotation annotation) {
-          try {
-            jgen.writeStartObject();
+        public void start(long offset, Iterable<Annotation> annotations) {
+          for (Annotation annotation : annotations) {
+            try {
+              jgen.writeStartObject();
 
-            final Name an = annotation.getName();
-            checkState(RelationalName.class.isAssignableFrom(an.getClass()), an.getClass().toString());
-            names.add((RelationalName) an);
+              final Name an = annotation.getName();
+              checkState(RelationalName.class.isAssignableFrom(an.getClass()), an.getClass().toString());
+              names.add((RelationalName) an);
 
-            jgen.writeNumberField(AnnotationSerializer.NAME_FIELD, ((RelationalName) an).getId());
+              jgen.writeNumberField(AnnotationSerializer.NAME_FIELD, ((RelationalName) an).getId());
 
-            final Range ar = annotation.getRange();
-            jgen.writeArrayFieldStart(AnnotationSerializer.RANGE_FIELD);
-            jgen.writeNumber(ar.getStart());
-            jgen.writeNumber(ar.getEnd());
-            jgen.writeEndArray();
+              final Range ar = annotation.getRange();
+              jgen.writeArrayFieldStart(AnnotationSerializer.RANGE_FIELD);
+              jgen.writeNumber(ar.getStart());
+              jgen.writeNumber(ar.getEnd());
+              jgen.writeEndArray();
 
 
-            jgen.writeFieldName(ANNOTATION_DATA_FIELD);
-            jgen.writeTree(annotation.getData());
+              jgen.writeFieldName(ANNOTATION_DATA_FIELD);
+              jgen.writeTree(annotation.getData());
 
-            jgen.writeEndObject();
-          } catch (IOException e) {
-            throw Throwables.propagate(e);
+              jgen.writeEndObject();
+            } catch (IOException e) {
+              throw Throwables.propagate(e);
+            }
           }
         }
       });
@@ -156,12 +151,12 @@ public class JSONSerializer {
 
       batch.add(new SimpleAnnotation(text, name, range, SimpleAnnotation.toData(annotationNode.get(ANNOTATION_DATA_FIELD))));
       if (batch.size() % batchSize == 0) {
-        annotationRepository.create(batch);
+        textRepository.create(batch);
         batch.clear();
       }
     }
     if (!batch.isEmpty()) {
-      annotationRepository.create(batch);
+      textRepository.create(batch);
     }
 
     checkFormat(jp.nextToken().equals(END_ARRAY), "Expected end of array", jp);

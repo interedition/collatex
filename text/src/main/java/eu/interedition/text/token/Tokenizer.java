@@ -20,18 +20,20 @@
 package eu.interedition.text.token;
 
 import com.google.common.collect.Lists;
-import eu.interedition.text.*;
-import eu.interedition.text.event.AnnotationEventListener;
-import eu.interedition.text.event.AnnotationEventSource;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.Name;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextListener;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static eu.interedition.text.query.Criteria.*;
 
@@ -43,26 +45,16 @@ public class Tokenizer {
 
   private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
-  private AnnotationRepository annotationRepository;
-  private AnnotationEventSource eventSource;
+  private TextRepository textRepository;
   private Name tokenName = DEFAULT_TOKEN_NAME;
-  private int pageSize = 102400;
   private int batchSize = 1024;
 
-  public void setAnnotationRepository(AnnotationRepository annotationRepository) {
-    this.annotationRepository = annotationRepository;
-  }
-
-  public void setEventSource(AnnotationEventSource eventSource) {
-    this.eventSource = eventSource;
+  public void setTextRepository(TextRepository textRepository) {
+    this.textRepository = textRepository;
   }
 
   public void setTokenName(Name tokenName) {
     this.tokenName = tokenName;
-  }
-
-  public void setPageSize(int pageSize) {
-    this.pageSize = pageSize;
   }
 
   public void setBatchSize(int batchSize) {
@@ -70,11 +62,11 @@ public class Tokenizer {
   }
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
-    annotationRepository.delete(and(text(text), annotationName(tokenName)));
-    eventSource.listen(new TokenGeneratingListener(text, settings), pageSize, text, none());
+    textRepository.delete(and(text(text), annotationName(tokenName)));
+    textRepository.read(text, none(), new TokenGeneratingListener(text, settings));
   }
 
-  private class TokenGeneratingListener implements AnnotationEventListener {
+  private class TokenGeneratingListener implements TextListener {
     private final TokenizerSettings settings;
     private final Text text;
 
@@ -90,7 +82,7 @@ public class Tokenizer {
     }
 
     @Override
-    public void start() {
+    public void start(long contentLength) {
       LOG.debug("Tokenizing " + text);
     }
 
@@ -146,7 +138,7 @@ public class Tokenizer {
     }
 
     private void emit() {
-      annotationRepository.create(batch);
+      textRepository.create(batch);
       batch.clear();
     }
   }
