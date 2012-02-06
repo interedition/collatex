@@ -28,6 +28,8 @@ public interface Text {
     TXT, XML
   }
 
+  Annotation getLayer();
+
   Type getType();
 
   long getLength();

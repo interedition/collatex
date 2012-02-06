@@ -177,7 +177,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
         try {
           stopWatch.start("create");
           xmlReader = xmlInputFactory.createXMLStreamReader(xmlStream = resource.toURL().openStream());
-          final Text xml = textRepository.create(xmlReader);
+          final Text xml = textRepository.create(null, xmlReader);
           stopWatch.stop();
 
           sources.put(resource, xml);

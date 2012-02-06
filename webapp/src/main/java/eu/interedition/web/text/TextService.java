@@ -129,11 +129,11 @@ public class TextService implements InitializingBean {
   }
 
   public TextMetadata create(TextMetadata text, Reader content) throws IOException, SAXException {
-    return create(text, (RelationalText) textRepository.create(content));
+    return create(text, (RelationalText) textRepository.create(null, content));
   }
 
   public TextMetadata create(TextMetadata text, XMLStreamReader xml) throws IOException, SAXException, XMLStreamException {
-    return create(text, (RelationalText) textRepository.create(xml));
+    return create(text, (RelationalText) textRepository.create(null, xml));
   }
 
   protected TextMetadata create(TextMetadata metadata, RelationalText text) throws IOException, SAXException {
@@ -278,7 +278,7 @@ public class TextService implements InitializingBean {
   private static class TextMetadataRowMapper implements RowMapper<TextMetadata> {
     @Override
     public TextMetadata mapRow(ResultSet rs, int rowNum) throws SQLException {
-      return mapMetadata(rs, "tm", mapTextFrom(rs, "t"));
+      return mapMetadata(rs, "tm", mapTextFrom(rs, "t", null));
     }
   }
 

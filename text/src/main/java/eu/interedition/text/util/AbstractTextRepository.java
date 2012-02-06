@@ -24,6 +24,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
+import eu.interedition.text.Annotation;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConsumer;
@@ -52,7 +53,7 @@ public abstract class AbstractTextRepository implements TextRepository {
     this.memoryBufferThreshold = memoryBufferThreshold;
   }
 
-  public Text create(XMLStreamReader xml) throws IOException, XMLStreamException {
+  public Text create(Annotation layer, XMLStreamReader xml) throws IOException, XMLStreamException {
     final FileBackedOutputStream xmlBuf = createBuffer();
     XMLEventReader xmlEventReader = null;
     XMLEventWriter xmlEventWriter = null;
@@ -69,15 +70,15 @@ public abstract class AbstractTextRepository implements TextRepository {
     Reader xmlBufReader = null;
     try {
       xmlBufReader = new InputStreamReader(xmlBuf.getSupplier().getInput(), Text.CHARSET);
-      return write(create(Text.Type.XML), xmlBufReader);
+      return write(create(layer, Text.Type.XML), xmlBufReader);
     } finally {
       Closeables.close(xmlBufReader, false);
     }
   }
 
   @Override
-  public Text create(Reader content) throws IOException {
-    return write(create(Text.Type.TXT), content);
+  public Text create(Annotation layer, Reader content) throws IOException {
+    return write(create(layer, Text.Type.TXT), content);
   }
 
   @Override
@@ -112,16 +113,6 @@ public abstract class AbstractTextRepository implements TextRepository {
   @Override
   public String read(Text text, Range range) throws IOException {
     return getOnlyElement(bulkRead(text, Sets.newTreeSet(singleton(range))).values());
-  }
-
-  @Override
-  public Text concat(Text... texts) throws IOException {
-    return concat(Arrays.asList(texts));
-  }
-
-  @Override
-  public Text duplicate(Text text) throws IOException {
-    return concat(singleton(text));
   }
 
   protected FileBackedOutputStream createBuffer() {

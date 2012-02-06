@@ -20,24 +20,25 @@
 package eu.interedition.text.rdbms;
 
 import com.google.common.base.Objects;
+import eu.interedition.text.Annotation;
 import eu.interedition.text.Text;
 import eu.interedition.text.mem.SimpleText;
 
 public class RelationalText extends SimpleText {
   protected long id;
 
-  public RelationalText(Type type, long length, byte[] digest, long id) {
-    super(type, length, digest);
+  public RelationalText(Annotation layer, Type type, long length, byte[] digest, long id) {
+    super(layer, type, length, digest);
     this.id = id;
   }
 
-  public RelationalText(Type type, String content, long id) {
-    super(type, content);
+  public RelationalText(Annotation layer, Type type, String content, long id) {
+    super(layer, type, content);
     this.id = id;
   }
 
   public RelationalText(RelationalText other) {
-    this(other.type, other.length, other.digest, other.id);
+    this(other.layer, other.type, other.length, other.digest, other.id);
   }
 
   public long getId() {

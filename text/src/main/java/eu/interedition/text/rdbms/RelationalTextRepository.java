@@ -19,6 +19,7 @@
  */
 package eu.interedition.text.rdbms;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -26,6 +27,8 @@ import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConsumer;
@@ -59,6 +62,10 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
+import static eu.interedition.text.rdbms.RelationalAnnotationRepository.mapAnnotationFrom;
+import static eu.interedition.text.rdbms.RelationalAnnotationRepository.selectAnnotationFrom;
+import static eu.interedition.text.rdbms.RelationalNameRepository.mapNameFrom;
+import static eu.interedition.text.rdbms.RelationalNameRepository.selectNameFrom;
 import static eu.interedition.text.util.TextDigestingFilterReader.NULL_DIGEST;
 
 public class RelationalTextRepository extends AbstractTextRepository implements InitializingBean {
@@ -86,11 +93,14 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     this.textIdIncrementer = keyFactory.create("text_content");
   }
 
-  public Text create(Text.Type type) {
+  public Text create(Annotation layer, Text.Type type) {
+    Preconditions.checkArgument(layer == null || layer instanceof RelationalAnnotation);
+            
     final long id = textIdIncrementer.nextLongValue();
 
     final Map<String, Object> textData = Maps.newHashMap();
     textData.put("id", id);
+    textData.put("layer", (layer == null ? null : ((RelationalAnnotation) layer).getId()));
     textData.put("type", type.ordinal());
     textData.put("content", "");
     textData.put("content_length", 0);
@@ -98,7 +108,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
 
     textInsert.execute(textData);
 
-    return new RelationalText(type, 0, NULL_DIGEST, id);
+    return new RelationalText(layer, type, 0, NULL_DIGEST, id);
   }
 
   public Text write(Text text, Reader content) throws IOException {
@@ -187,39 +197,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     });
     final byte[] digest = digestingFilterReader.digest();
     jt.update("update text_content set content_digest = ? where id = ?", digest, id);
-    return new RelationalText(text.getType(), contentLength, digest, id);
-  }
-
-  @Override
-  public Text concat(Iterable<Text> texts) throws IOException {
-    final FileBackedOutputStream buf = createBuffer();
-    final OutputStreamWriter bufWriter = new OutputStreamWriter(buf, Text.CHARSET);
-    try {
-      for (Text text : texts) {
-        read(new ReaderCallback<Void>(text) {
-          @Override
-          protected Void read(Clob content) throws SQLException, IOException {
-            Reader reader = null;
-            try {
-              CharStreams.copy(reader = content.getCharacterStream(), bufWriter);
-            } finally {
-              Closeables.close(reader, false);
-            }
-            return null;
-          }
-        });
-      }
-    } finally {
-       Closeables.close(bufWriter, false);
-    }
-
-    Reader reader = null;
-    try {
-      return create(reader = new InputStreamReader(buf.getSupplier().getInput(), Text.CHARSET));
-    } finally {
-      Closeables.closeQuietly(reader);
-      buf.reset();
-    }
+    return new RelationalText(text.getLayer(), text.getType(), contentLength, digest, id);
   }
 
   private <T> T read(final ReaderCallback<T> callback) {
@@ -244,7 +222,12 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     final List<Long> idList = Lists.newArrayList(ids);
     final StringBuilder sql = new StringBuilder("select ");
     sql.append(selectTextFrom("t"));
-    sql.append(" from text_content t where t.id in (");
+    sql.append(", ").append(selectAnnotationFrom("l"));
+    sql.append(", ").append(selectNameFrom("ln"));
+    sql.append(" from text_content t");
+    sql.append(" left join text_annotation l on t.layer = l.id");
+    sql.append(" left join text_qname ln on l.name = ln.id");
+    sql.append(" where t.id in (");
     for (Iterator<Long> it = ids.iterator(); it.hasNext(); ) {
       it.next();
       sql.append("?").append(it.hasNext() ? ", " : "");
@@ -252,9 +235,22 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     sql.append(")");
 
     return jt.query(sql.toString(), new RowMapper<Text>() {
+      private final Map<Long, RelationalName> nameCache = Maps.newHashMap();
+
       @Override
       public Text mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return mapTextFrom(rs, "t");
+        final long layerNameId = rs.getLong("l_id");
+
+        RelationalAnnotation layer = null;
+        if (layerNameId != 0) {
+          RelationalName name = nameCache.get(layerNameId);
+          if (name == null) {
+            nameCache.put(layerNameId, name = mapNameFrom(rs, "ln"));
+          }
+          layer = mapAnnotationFrom(rs, null, name, "l");
+        }
+
+        return mapTextFrom(rs, "t", layer);
       }
     }, idList.toArray(new Object[idList.size()]));
   }
@@ -267,8 +263,8 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     return SQL.select(tableName, "id", "type", "content_length", "content_digest");
   }
 
-  public static RelationalText mapTextFrom(ResultSet rs, String prefix) throws SQLException {
-    return new RelationalText(Text.Type.values()[rs.getInt(prefix + "_type")],//
+  public static RelationalText mapTextFrom(ResultSet rs, String prefix, RelationalAnnotation layer) throws SQLException {
+    return new RelationalText(layer, Text.Type.values()[rs.getInt(prefix + "_type")],//
             rs.getLong(prefix + "_content_length"),//
             rs.getBytes(prefix + "_content_digest"),//
             rs.getLong(prefix + "_id"));

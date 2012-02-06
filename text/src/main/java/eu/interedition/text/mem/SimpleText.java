@@ -20,6 +20,7 @@
 package eu.interedition.text.mem;
 
 import com.google.common.base.Objects;
+import eu.interedition.text.Annotation;
 import eu.interedition.text.Text;
 import eu.interedition.text.util.TextDigestingFilterReader;
 
@@ -27,24 +28,31 @@ import eu.interedition.text.util.TextDigestingFilterReader;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class SimpleText implements Text {
+  protected final Annotation layer;
   protected final Type type;
   protected final long length;
   protected final byte[] digest;
   protected final String content;
 
-  public SimpleText(Type type, long length, byte[] digest) {
-    this(type, length, digest, null);
+  public SimpleText(Annotation layer, Type type, long length, byte[] digest) {
+    this(layer, type, length, digest, null);
   }
 
-  public SimpleText(Type type, long length, byte[] digest, String content) {
+  public SimpleText(Annotation layer, Type type, long length, byte[] digest, String content) {
+    this.layer = layer;
     this.type = type;
     this.length = length;
     this.digest = digest;
     this.content = content;
   }
 
-  public SimpleText(Type type, String content) {
-    this(type, content.length(), TextDigestingFilterReader.digest(content), content);
+  public SimpleText(Annotation layer, Type type, String content) {
+    this(layer, type, content.length(), TextDigestingFilterReader.digest(content), content);
+  }
+
+  @Override
+  public Annotation getLayer() {
+    return layer;
   }
 
   @Override
@@ -67,7 +75,7 @@ public class SimpleText implements Text {
   }
 
   protected Objects.ToStringHelper toStringHelper() {
-    return Objects.toStringHelper(this).addValue(type).add("length", length);
+    return Objects.toStringHelper(this).addValue(layer).add("type", type).add("length", length);
   }
 
   @Override

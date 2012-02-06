@@ -37,8 +37,5 @@ public class TextTest extends AbstractTextTest {
   @Test
   public void digesting() throws Exception {
     Assert.assertEquals(encodeHexString(digest(TEST_TEXT)), encodeHexString(text.getDigest()));
-
-    final Text concat = textRepository.concat(text, text, text);
-    Assert.assertEquals(3 * text.getLength(), concat.getLength());
   }
 }

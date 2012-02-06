@@ -49,7 +49,7 @@ public abstract class AbstractTextTest extends AbstractTest {
    */
   @Before
   public void createTestText() throws IOException {
-    this.text = textRepository.create(new StringReader(getTestText()));
+    this.text = textRepository.create(null, new StringReader(getTestText()));
   }
 
   /**

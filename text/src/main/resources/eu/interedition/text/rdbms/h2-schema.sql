@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS text_content (
   type SMALLINT NOT NULL,
   content CLOB NOT NULL,
   content_length BIGINT NOT NULL,
-  content_digest BYTEA(64) NOT NULL
+  content_digest BYTEA(64) NOT NULL,
+  layer BIGINT
 );
 
 CREATE SEQUENCE IF NOT EXISTS text_content_sequence;
@@ -28,6 +29,8 @@ CREATE TABLE IF NOT EXISTS text_annotation (
 
 CREATE SEQUENCE IF NOT EXISTS text_annotation_sequence;
 CREATE INDEX IF NOT EXISTS text_annotation_ranges ON text_annotation (range_start, range_end);
+
+ALTER TABLE text_content ADD CONSTRAINT IF NOT EXISTS layer_ref FOREIGN KEY(layer) REFERENCES text_annotation (id) ON DELETE CASCADE;
 
 CREATE TABLE IF NOT EXISTS text_annotation_link (
   id BIGINT PRIMARY KEY,

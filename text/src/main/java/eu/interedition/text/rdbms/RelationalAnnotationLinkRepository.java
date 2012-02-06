@@ -55,6 +55,7 @@ import static eu.interedition.text.rdbms.RelationalAnnotationRepository.mapAnnot
 import static eu.interedition.text.rdbms.RelationalAnnotationRepository.selectAnnotationFrom;
 import static eu.interedition.text.rdbms.RelationalNameRepository.mapNameFrom;
 import static eu.interedition.text.rdbms.RelationalNameRepository.selectNameFrom;
+import static eu.interedition.text.rdbms.RelationalTextRepository.mapTextFrom;
 import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom;
 
 /**
@@ -184,6 +185,8 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
             .append("al.id as al_id, ")
             .append(selectAnnotationFrom("a")).append(", ")
             .append(selectTextFrom("t")).append(", ")
+            .append(selectAnnotationFrom("l")).append(", ")
+            .append(selectNameFrom("ln")).append(", ")
             .append(selectNameFrom("aln")).append(", ")
             .append(selectNameFrom("an")).toString();
 
@@ -196,6 +199,9 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
 
     final Map<AnnotationLink, Set<Annotation>> annotationLinks = new HashMap<AnnotationLink, Set<Annotation>>();
     jt.query(sql(dataSelect, where.toString()).append(" order by al.id, t.id, an.id, a.id").toString(), new RowMapper<Void>() {
+      private final Map<Long, RelationalName> nameCache = Maps.newHashMap();
+      private final Map<Long, RelationalText> textCache = Maps.newHashMap();
+
       private RelationalAnnotationLink currentLink;
       private RelationalText currentText;
       private RelationalName currentAnnotationName;
@@ -209,10 +215,10 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
           currentLink = new RelationalAnnotationLink(mapNameFrom(rs, "aln"), annotationLinkId);
         }
         if (currentText == null || currentText.getId() != textId) {
-          currentText = RelationalTextRepository.mapTextFrom(rs, "t");
+          currentText = text(textId, rs);
         }
         if (currentAnnotationName == null || currentAnnotationName.getId() != annotationNameId) {
-          currentAnnotationName = mapNameFrom(rs, "an");
+          currentAnnotationName = name(annotationNameId, rs, "an");
         }
 
         Set<Annotation> members = annotationLinks.get(currentLink);
@@ -222,6 +228,28 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
         members.add(mapAnnotationFrom(rs, currentText, currentAnnotationName, "a"));
 
         return null;
+      }
+
+      protected RelationalName name(long id, ResultSet rs, String prefix) throws SQLException {
+        RelationalName name = nameCache.get(id);
+        if (name == null) {
+          nameCache.put(id, name = mapNameFrom(rs, prefix));
+        }
+        return name;
+      }
+
+      protected RelationalText text(long id, ResultSet rs) throws SQLException {
+        RelationalText text = textCache.get(id);
+        if (text == null) {
+          final long layerId = rs.getLong("l_id");
+          RelationalAnnotation layer = null;
+          if (layerId != 0) {
+            layer = mapAnnotationFrom(rs, null, name(rs.getLong("ln_id"), rs, "ln"), "l");
+          }
+          text = mapTextFrom(rs, "t", layer);
+          textCache.put(id, text);
+        }
+        return text;
       }
 
     }, linkIds.toArray(new Object[linkIds.size()]));
@@ -399,6 +427,8 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     sql.append(" join text_annotation a on alt.target = a.id");
     sql.append(" join text_qname an on a.name = an.id");
     sql.append(" join text_content t on a.text = t.id");
+    sql.append(" left join text_annotation l on t.layer = l.id");
+    sql.append(" left join text_qname ln on l.name = ln.id");
     return sql;
   }
 

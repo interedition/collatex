@@ -42,7 +42,7 @@ public class XMLParser {
 
   public Text parse(Text source, final XMLParserConfiguration configuration) throws IOException, XMLStreamException {
     Preconditions.checkArgument(source.getType() == Text.Type.XML);
-    final Text target = textRepository.create(Text.Type.TXT);
+    final Text target = textRepository.create(null, Text.Type.TXT);
     final XMLParserState state = new XMLParserState(source, target, configuration);
     try {
       textRepository.read(source, new XMLParserTextConsumer(state));

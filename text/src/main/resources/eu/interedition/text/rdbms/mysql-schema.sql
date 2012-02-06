@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS text_content (
   type SMALLINT NOT NULL,
   content LONGTEXT NOT NULL,
   content_length BIGINT NOT NULL,
-  content_digest BINARY(64) NOT NULL
+  content_digest BINARY(64) NOT NULL,
+  layer BIGINT
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS text_annotation (
@@ -31,6 +32,8 @@ CREATE TABLE IF NOT EXISTS text_annotation (
   FOREIGN KEY (name) REFERENCES text_qname (id),
   INDEX (range_start, range_end)
 ) ENGINE = INNODB;
+
+ALTER TABLE text_content ADD CONSTRAINT layer_ref FOREIGN KEY (layer) REFERENCES text_annotation (id) ON DELETE CASCADE;
 
 CREATE TABLE IF NOT EXISTS text_annotation_link (
   id BIGINT PRIMARY KEY,

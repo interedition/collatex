@@ -107,34 +107,50 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     final StringBuilder sql = sql(new StringBuilder("select  ")
             .append(selectAnnotationFrom("a")).append(", ")
             .append(selectNameFrom("n")).append(", ")
-            .append(selectTextFrom("t")).toString(), ps, criterion);
+            .append(selectTextFrom("t")).append(", ")
+            .append(selectAnnotationFrom("l")).append(", ")
+            .append(selectNameFrom("ln")).toString(), ps, criterion);
 
-    sql.append(" order by a.id, n.id ");
+    sql.append(" order by a.id, n.id, ln.id");
 
 
     jt.query(sql.toString(), new RowMapper<Void>() {
-      private final Map<Long, Name> nameCache = Maps.newHashMap();
-      private final Map<Long, Text> textCache = Maps.newHashMap();
+      private final Map<Long, RelationalName> nameCache = Maps.newHashMap();
+      private final Map<Long, RelationalText> textCache = Maps.newHashMap();
 
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        final long textId = rs.getLong("t_id");
-        Text text = textCache.get(textId);
-        if (text == null) {
-          textCache.put(textId, text = mapTextFrom(rs, "t"));
-        }
-
-        final long nameId = rs.getLong("n_id");
-        Name name = nameCache.get(nameId);
-        if (name == null) {
-          nameCache.put(nameId, name = mapNameFrom(rs, "n"));
-        }
-
-        consumer.consume(new RelationalAnnotation(text, name,
+        consumer.consume(new RelationalAnnotation(
+                text(rs.getLong("t_id"), rs),
+                name(rs.getLong("n_id"), rs, "n"),
                 new Range(rs.getLong("a_range_start"), rs.getLong("a_range_end")),
-                rs.getBytes("a_json_data"), rs.getLong("a_id")));
+                rs.getBytes("a_json_data"),
+                rs.getLong("a_id")));
 
         return null;
       }
+
+      protected RelationalName name(long id, ResultSet rs, String prefix) throws SQLException {
+        RelationalName name = nameCache.get(id);
+        if (name == null) {
+          nameCache.put(id, name = mapNameFrom(rs, prefix));
+        }
+        return name;
+      }
+
+      protected RelationalText text(long id, ResultSet rs) throws SQLException {
+        RelationalText text = textCache.get(id);
+        if (text == null) {
+          final long layerId = rs.getLong("l_id");
+          RelationalAnnotation layer = null;
+          if (layerId != 0) {
+            layer = mapAnnotationFrom(rs, null, name(rs.getLong("ln_id"), rs, "ln"), "l");
+          }
+          text = mapTextFrom(rs, "t", layer);
+          textCache.put(id, text);
+        }
+        return text;
+      }
+
     }, ps.toArray(new Object[ps.size()]));
   }
 
@@ -222,6 +238,8 @@ public class RelationalAnnotationRepository extends AbstractAnnotationRepository
     sql.append(" from text_annotation a");
     sql.append(" join text_qname n on a.name = n.id");
     sql.append(" join text_content t on a.text = t.id");
+    sql.append(" left join text_annotation l on t.layer = l.id");
+    sql.append(" left join text_qname ln on l.name = ln.id");
     return sql;
   }
 

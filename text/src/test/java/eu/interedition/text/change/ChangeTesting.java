@@ -133,7 +133,10 @@ public class ChangeTesting extends AbstractTestResourceTest {
         (chosenRevisionTypes.contains(revisionType) ? after : before).addAll(revTypeIndex.get(revisionType));
       }
 
-      final List<Set<ChangeAdapter>> versions = Lists.newArrayList(before, after);
+      final List<Set<ChangeAdapter>> versions = Lists.newArrayList();
+      versions.add(before);
+      versions.add(after);
+
       final Iterable<SortedSet<Range>> removedRanges = new Iterable<SortedSet<Range>>() {
 
         @Override

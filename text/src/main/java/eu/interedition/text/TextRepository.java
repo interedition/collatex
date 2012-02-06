@@ -30,11 +30,11 @@ import java.util.SortedSet;
 
 public interface TextRepository {
 
-  Text create(Text.Type type);
+  Text create(Annotation layer, Text.Type type);
 
-  Text create(Reader content) throws IOException;
+  Text create(Annotation layer, Reader content) throws IOException;
 
-  Text create(XMLStreamReader xml) throws IOException, XMLStreamException;
+  Text create(Annotation layer, XMLStreamReader xml) throws IOException, XMLStreamException;
 
   void delete(Text text);
 
@@ -51,11 +51,4 @@ public interface TextRepository {
   Text write(Text text, Reader contents) throws IOException;
 
   Text write(Text text, Reader contents, long contentLength) throws IOException;
-
-  Text concat(Iterable<Text> texts) throws IOException;
-
-  Text concat(Text... texts) throws IOException;
-
-  Text duplicate(Text text) throws IOException;
-
 }

@@ -62,7 +62,7 @@ public class AnnotationTest extends AbstractTestResourceTest {
     try {
       final int numAnnotations = size(annotationRepository.find(Criteria.text(existing)));
 
-      final Text newText = textRepository.create(new StringReader("Hello Hello!"));
+      final Text newText = textRepository.create(null, new StringReader("Hello Hello!"));
 
       final StopWatch sw = new StopWatch("transform");
       sw.start("shift");
