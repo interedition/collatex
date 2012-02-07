@@ -27,7 +27,7 @@ import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.xml.XMLParserState;
+import eu.interedition.text.xml.XMLTransformer;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ObjectNode;
 
@@ -36,38 +36,36 @@ import java.util.List;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleAdapter {
+public abstract class AbstractAnnotationXMLTransformerModule extends XMLTransformerModuleAdapter {
   private static final String XML_NODE_ATTR = TextConstants.XML_NODE_ATTR_NAME.toString();
 
-  protected TextRepository textRepository;
   protected final int batchSize;
   protected final boolean addNodePath;
 
   private List<Annotation> annotationBatch;
 
-  protected AbstractAnnotationXMLParserModule(TextRepository textRepository, int batchSize, boolean addNodePath) {
-    this.textRepository = textRepository;
+  protected AbstractAnnotationXMLTransformerModule(int batchSize, boolean addNodePath) {
     this.batchSize = batchSize;
     this.addNodePath = addNodePath;
   }
 
   @Override
-  public void start(XMLParserState state) {
-    super.start(state);
+  public void start(XMLTransformer transformer) {
+    super.start(transformer);
     annotationBatch = Lists.newArrayList();
   }
 
   @Override
-  public void end(XMLParserState state) {
+  public void end(XMLTransformer transformer) {
     if (!annotationBatch.isEmpty()) {
-      emit();
+      emit(transformer.getRepository());
     }
 
     annotationBatch = null;
-    super.end(state);
+    super.end(transformer);
   }
 
-  protected void add(XMLParserState state, Text text, Name name, Range range, JsonNode data) {
+  protected void add(XMLTransformer transformer, Text text, Name name, Range range, JsonNode data) {
     if (!addNodePath && data.isObject()) {
       ((ObjectNode) data).remove(XML_NODE_ATTR);
     }
@@ -75,12 +73,12 @@ public abstract class AbstractAnnotationXMLParserModule extends XMLParserModuleA
     annotationBatch.add(new SimpleAnnotation(text, name, range, data));
 
     if ((annotationBatch.size() % batchSize) == 0) {
-      emit();
+      emit(transformer.getRepository());
     }
   }
 
-  protected void emit() {
-    textRepository.create(annotationBatch);
+  protected void emit(TextRepository repository) {
+    repository.create(annotationBatch);
     annotationBatch.clear();
   }
 

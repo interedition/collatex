@@ -22,50 +22,50 @@ package eu.interedition.text.xml.module;
 import eu.interedition.text.Range;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.xml.XMLEntity;
-import eu.interedition.text.xml.XMLParserState;
+import eu.interedition.text.xml.XMLTransformer;
 
 import java.util.Stack;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class DefaultAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
+public class DefaultAnnotationXMLTransformerModule extends AbstractAnnotationXMLTransformerModule {
   private Stack<Long> startOffsetStack;
 
-  public DefaultAnnotationXMLParserModule(TextRepository textRepository, int batchSize, boolean addNodePath) {
-    super(textRepository, batchSize, addNodePath);
+  public DefaultAnnotationXMLTransformerModule(int batchSize, boolean addNodePath) {
+    super(batchSize, addNodePath);
   }
 
-  public DefaultAnnotationXMLParserModule(TextRepository textRepository, int batchSize) {
-    this(textRepository, batchSize, false);
+  public DefaultAnnotationXMLTransformerModule(int batchSize) {
+    this(batchSize, false);
   }
 
   @Override
-  public void start(XMLParserState state) {
-    super.start(state);
+  public void start(XMLTransformer transformer) {
+    super.start(transformer);
     startOffsetStack = new Stack<Long>();
   }
 
   @Override
-  public void end(XMLParserState state) {
+  public void end(XMLTransformer transformer) {
     startOffsetStack = null;
-    super.end(state);
+    super.end(transformer);
   }
 
   @Override
-  public void start(XMLEntity entity, XMLParserState state) {
-    super.start(entity, state);
-    if (state.getInclusionContext().peek()) {
-      startOffsetStack.push(state.getTextOffset());
+  public void start(XMLTransformer transformer, XMLEntity entity) {
+    super.start(transformer, entity);
+    if (transformer.getInclusionContext().peek()) {
+      startOffsetStack.push(transformer.getTextOffset());
     }
   }
 
   @Override
-  public void end(XMLEntity entity, XMLParserState state) {
-    if (state.getInclusionContext().peek()) {
-      final Range range = new Range(startOffsetStack.pop(), state.getTextOffset());
-      add(state, state.getTarget(), entity.getName(), range, entity.getAttributes());
+  public void end(XMLTransformer transformer, XMLEntity entity) {
+    if (transformer.getInclusionContext().peek()) {
+      final Range range = new Range(startOffsetStack.pop(), transformer.getTextOffset());
+      add(transformer, transformer.getTarget(), entity.getName(), range, entity.getAttributes());
     }
-    super.end(entity, state);
+    super.end(transformer, entity);
   }
 }

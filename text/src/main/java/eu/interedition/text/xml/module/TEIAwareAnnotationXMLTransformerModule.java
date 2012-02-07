@@ -28,7 +28,7 @@ import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.xml.XMLEntity;
-import eu.interedition.text.xml.XMLParserState;
+import eu.interedition.text.xml.XMLTransformer;
 import org.codehaus.jackson.node.ObjectNode;
 
 import java.util.Iterator;
@@ -40,7 +40,7 @@ import static eu.interedition.text.TextConstants.XML_ID_ATTR_NAME;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
+public class TEIAwareAnnotationXMLTransformerModule extends AbstractAnnotationXMLTransformerModule {
   private static final Map<Name, Name> MILESTONE_ELEMENT_UNITS = Maps.newHashMap();
 
   static {
@@ -56,39 +56,39 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
   private Multimap<String, SimpleAnnotation> spanning;
   private Map<Name, SimpleAnnotation> milestones;
 
-  public TEIAwareAnnotationXMLParserModule(TextRepository textRepository, int batchSize) {
-    super(textRepository, batchSize, false);
+  public TEIAwareAnnotationXMLTransformerModule(int batchSize) {
+    super(batchSize, false);
   }
 
   @Override
-  public void start(XMLParserState state) {
-    super.start(state);
+  public void start(XMLTransformer transformer) {
+    super.start(transformer);
     this.spanning = ArrayListMultimap.create();
     this.milestones = Maps.newHashMap();
   }
 
   @Override
-  public void end(XMLParserState state) {
-    final long textOffset = state.getTextOffset();
+  public void end(XMLTransformer transformer) {
+    final long textOffset = transformer.getTextOffset();
     for (Name milestoneUnit : milestones.keySet()) {
       final SimpleAnnotation last = milestones.get(milestoneUnit);
-      add(state, last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData());
+      add(transformer, last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData());
     }
 
     this.milestones = null;
     this.spanning = null;
 
-    super.end(state);
+    super.end(transformer);
   }
 
   @Override
-  public void start(XMLEntity entity, XMLParserState state) {
-    super.start(entity, state);
-    handleSpanningElements(entity, state);
-    handleMilestoneElements(entity, state);
+  public void start(XMLTransformer transformer, XMLEntity entity) {
+    super.start(transformer, entity);
+    handleSpanningElements(entity, transformer);
+    handleMilestoneElements(entity, transformer);
   }
 
-  protected void handleMilestoneElements(XMLEntity entity, XMLParserState state) {
+  protected void handleMilestoneElements(XMLEntity entity, XMLTransformer state) {
     final Name entityName = entity.getName();
     final ObjectNode entityAttributes = entity.getAttributes();
 
@@ -119,7 +119,7 @@ public class TEIAwareAnnotationXMLParserModule extends AbstractAnnotationXMLPars
     milestones.put(milestoneUnit, new SimpleAnnotation(state.getTarget(), milestoneUnit, new Range(textOffset, textOffset), entityAttributes));
   }
 
-  protected void handleSpanningElements(XMLEntity entity, XMLParserState state) {
+  protected void handleSpanningElements(XMLEntity entity, XMLTransformer state) {
     final ObjectNode entityAttributes = entity.getAttributes();
     String spanTo = null;
     String refId = null;

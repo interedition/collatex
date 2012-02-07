@@ -187,6 +187,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
             .append(selectTextFrom("t")).append(", ")
             .append(selectAnnotationFrom("l")).append(", ")
             .append(selectNameFrom("ln")).append(", ")
+            .append(selectTextFrom("lt")).append(", ")
             .append(selectNameFrom("aln")).append(", ")
             .append(selectNameFrom("an")).toString();
 
@@ -244,7 +245,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
           final long layerId = rs.getLong("l_id");
           RelationalAnnotation layer = null;
           if (layerId != 0) {
-            layer = mapAnnotationFrom(rs, null, name(rs.getLong("ln_id"), rs, "ln"), "l");
+            layer = mapAnnotationFrom(rs, mapTextFrom(rs, "lt", null), name(rs.getLong("ln_id"), rs, "ln"), "l");
           }
           text = mapTextFrom(rs, "t", layer);
           textCache.put(id, text);
@@ -429,6 +430,7 @@ public class RelationalAnnotationLinkRepository extends AbstractAnnotationLinkRe
     sql.append(" join text_content t on a.text = t.id");
     sql.append(" left join text_annotation l on t.layer = l.id");
     sql.append(" left join text_qname ln on l.name = ln.id");
+    sql.append(" left join text_content lt on l.text = lt.id");
     return sql;
   }
 

@@ -23,13 +23,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Name;
 import eu.interedition.text.xml.XMLEntity;
-import eu.interedition.text.xml.XMLParserConfiguration;
-import eu.interedition.text.xml.XMLParserModule;
+import eu.interedition.text.xml.XMLTransformerConfiguration;
+import eu.interedition.text.xml.XMLTransformerModule;
 
 import java.util.List;
 import java.util.Set;
 
-public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
+public class SimpleXMLTransformerConfiguration implements XMLTransformerConfiguration {
 
   protected Set<Name> excluded = Sets.newHashSet();
   protected Set<Name> included = Sets.newHashSet();
@@ -40,7 +40,7 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
   protected boolean compressingWhitespace = true;
   private int textBufferSize = 102400;
   private boolean removeLeadingWhitespace = true;
-  protected List<XMLParserModule> modules = Lists.<XMLParserModule>newArrayList();
+  protected List<XMLTransformerModule> modules = Lists.<XMLTransformerModule>newArrayList();
 
   public void addLineElement(Name lineElementName) {
     lineElements.add(lineElementName);
@@ -110,7 +110,7 @@ public class SimpleXMLParserConfiguration implements XMLParserConfiguration {
     this.compressingWhitespace = compressingWhitespace;
   }
 
-  public List<XMLParserModule> getModules() {
+  public List<XMLTransformerModule> getModules() {
     return modules;
   }
 

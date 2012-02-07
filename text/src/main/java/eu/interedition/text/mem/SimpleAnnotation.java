@@ -100,7 +100,7 @@ public class SimpleAnnotation implements Annotation {
 
   public static JsonNode toDataNode(byte[] data) {
     try {
-      return (data == null ? EMPTY_DATA_NODE : JSON.readTree(new ByteArrayInputStream(data)));
+      return (data == null || data.length == 0 ? EMPTY_DATA_NODE : JSON.readTree(new ByteArrayInputStream(data)));
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }

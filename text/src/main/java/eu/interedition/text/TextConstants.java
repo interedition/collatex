@@ -40,4 +40,6 @@ public interface TextConstants {
   final String CLIX_NS_PREFIX = "c";
   final Name CLIX_START_ATTR_NAME = new SimpleName(CLIX_NS, "sID");
   final Name CLIX_END_ATTR_NAME = new SimpleName(CLIX_NS, "eID");
+
+  final Name XML_TRANSFORM_NAME = new SimpleName(INTEREDITION_NS_URI, "xmlTransformation");
 }

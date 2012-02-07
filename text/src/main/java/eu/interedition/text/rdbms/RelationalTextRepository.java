@@ -215,9 +215,11 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     sql.append(selectTextFrom("t"));
     sql.append(", ").append(selectAnnotationFrom("l"));
     sql.append(", ").append(selectNameFrom("ln"));
+    sql.append(", ").append(selectTextFrom("lt"));
     sql.append(" from text_content t");
     sql.append(" left join text_annotation l on t.layer = l.id");
     sql.append(" left join text_qname ln on l.name = ln.id");
+    sql.append(" left join text_content lt on l.text = lt.id");
     sql.append(" where t.id in (");
     for (Iterator<Long> it = ids.iterator(); it.hasNext(); ) {
       it.next();
@@ -238,7 +240,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
           if (name == null) {
             nameCache.put(layerNameId, name = mapNameFrom(rs, "ln"));
           }
-          layer = mapAnnotationFrom(rs, null, name, "l");
+          layer = mapAnnotationFrom(rs, mapTextFrom(rs, "lt", null), name, "l");
         }
 
         return mapTextFrom(rs, "t", layer);
@@ -445,6 +447,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
             .append(selectNameFrom("n")).append(", ")
             .append(selectTextFrom("t")).append(", ")
             .append(selectAnnotationFrom("l")).append(", ")
+            .append(selectTextFrom("lt")).append(", ")
             .append(selectNameFrom("ln")).toString(), ps, criterion);
 
     sql.append(" order by a.id, n.id, ln.id");
@@ -479,7 +482,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
           final long layerId = rs.getLong("l_id");
           RelationalAnnotation layer = null;
           if (layerId != 0) {
-            layer = mapAnnotationFrom(rs, null, name(rs.getLong("ln_id"), rs, "ln"), "l");
+            layer = mapAnnotationFrom(rs, mapTextFrom(rs, "lt", null), name(rs.getLong("ln_id"), rs, "ln"), "l");
           }
           text = mapTextFrom(rs, "t", layer);
           textCache.put(id, text);
@@ -528,6 +531,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     sql.append(" join text_content t on a.text = t.id");
     sql.append(" left join text_annotation l on t.layer = l.id");
     sql.append(" left join text_qname ln on l.name = ln.id");
+    sql.append(" left join text_content lt on l.text = lt.id");
     return sql;
   }
 

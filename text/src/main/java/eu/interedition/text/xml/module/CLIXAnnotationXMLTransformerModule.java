@@ -25,7 +25,7 @@ import eu.interedition.text.TextConstants;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.xml.XMLEntity;
-import eu.interedition.text.xml.XMLParserState;
+import eu.interedition.text.xml.XMLTransformer;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ObjectNode;
 
@@ -34,28 +34,28 @@ import java.util.Map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserModule {
+public class CLIXAnnotationXMLTransformerModule extends AbstractAnnotationXMLTransformerModule {
   private Map<String, SimpleAnnotation> annotations;
 
-  public CLIXAnnotationXMLParserModule(TextRepository textRepository, int batchSize) {
-    super(textRepository, batchSize, false);
+  public CLIXAnnotationXMLTransformerModule(int batchSize) {
+    super(batchSize, false);
   }
 
   @Override
-  public void start(XMLParserState state) {
-    super.start(state);
+  public void start(XMLTransformer transformer) {
+    super.start(transformer);
     annotations = Maps.newHashMap();
   }
 
   @Override
-  public void end(XMLParserState state) {
+  public void end(XMLTransformer transformer) {
     annotations = null;
-    super.end(state);
+    super.end(transformer);
   }
 
   @Override
-  public void start(XMLEntity entity, XMLParserState state) {
-    super.start(entity, state);
+  public void start(XMLTransformer transformer, XMLEntity entity) {
+    super.start(transformer, entity);
 
     final ObjectNode entityAttributes = entity.getAttributes();
     final JsonNode startId = entityAttributes.remove(TextConstants.CLIX_START_ATTR_NAME.toString());
@@ -64,15 +64,15 @@ public class CLIXAnnotationXMLParserModule extends AbstractAnnotationXMLParserMo
       return;
     }
 
-    final long textOffset = state.getTextOffset();
+    final long textOffset = transformer.getTextOffset();
 
     if (startId != null) {
-      annotations.put(startId.toString(), new SimpleAnnotation(state.getTarget(), entity.getName(), new Range(textOffset, textOffset), entityAttributes));
+      annotations.put(startId.toString(), new SimpleAnnotation(transformer.getTarget(), entity.getName(), new Range(textOffset, textOffset), entityAttributes));
     }
     if (endId != null) {
       final SimpleAnnotation a = annotations.remove(endId.toString());
       if (a != null) {
-        add(state, a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData());
+        add(transformer, a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData());
       }
     }
   }

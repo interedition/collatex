@@ -17,29 +17,20 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.xml;
+package eu.interedition.text.xml.module;
 
-import java.util.List;
+import eu.interedition.text.xml.XMLEntity;
+import eu.interedition.text.xml.XMLTransformer;
 
-public interface XMLParserConfiguration {
+/**
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
+public class LineElementXMLTransformerModule extends XMLTransformerModuleAdapter {
 
-  boolean isLineElement(XMLEntity entity);
-
-  boolean isContainerElement(XMLEntity entity);
-
-  boolean included(XMLEntity entity);
-
-  boolean excluded(XMLEntity entity);
-
-  char getNotableCharacter();
-
-  boolean isNotable(XMLEntity entity);
-
-  boolean isCompressingWhitespace();
-
-  List<XMLParserModule> getModules();
-
-  int getTextBufferSize();
-
-  boolean isRemoveLeadingWhitespace();
+  @Override
+  public void start(XMLTransformer transformer, XMLEntity entity) {
+    if (transformer.getTextOffset() > 0 && transformer.isLineElement() && transformer.isIncluded()) {
+      transformer.write("\n", false);
+    }
+  }
 }

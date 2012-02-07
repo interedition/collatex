@@ -24,19 +24,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import eu.interedition.text.mem.SimpleName;
-import eu.interedition.text.util.SimpleXMLParserConfiguration;
+import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
 import eu.interedition.text.xml.XML;
-import eu.interedition.text.xml.XMLParser;
-import eu.interedition.text.xml.XMLParserModule;
-import eu.interedition.text.xml.module.CLIXAnnotationXMLParserModule;
-import eu.interedition.text.xml.module.DefaultAnnotationXMLParserModule;
-import eu.interedition.text.xml.module.LineElementXMLParserModule;
-import eu.interedition.text.xml.module.NotableCharacterXMLParserModule;
-import eu.interedition.text.xml.module.TEIAwareAnnotationXMLParserModule;
-import eu.interedition.text.xml.module.TextXMLParserModule;
+import eu.interedition.text.xml.XMLTransformerModule;
+import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.module.CLIXAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.DefaultAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.LineElementXMLTransformerModule;
+import eu.interedition.text.xml.module.NotableCharacterXMLTransformerModule;
+import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.TextXMLTransformerModule;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
 
 import javax.xml.stream.XMLInputFactory;
@@ -58,15 +58,19 @@ import static eu.interedition.text.TextConstants.TEI_NS;
 public abstract class AbstractTestResourceTest extends AbstractTextTest {
   protected static XMLInputFactory xmlInputFactory;
 
+  protected XMLTransformer xmlTransformer;
+
   private Map<URI, Text> sources = Maps.newHashMap();
   private Map<URI, Text> texts = Maps.newHashMap();
-
-  @Autowired
-  private XMLParser xmlParser;
 
   @BeforeClass
   public static void initXmlInputFactory() {
     xmlInputFactory = XML.createXMLInputFactory();
+  }
+
+  @Before
+  public void createXMLTransformer() {
+    xmlTransformer = new XMLTransformer(textRepository, configure(createXMLParserConfiguration()));
   }
 
   @After
@@ -119,11 +123,11 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     return sources.get(resource);
   }
 
-  protected List<XMLParserModule> parserModules() {
+  protected List<XMLTransformerModule> parserModules() {
     return Lists.newArrayList();
   }
 
-  protected SimpleXMLParserConfiguration configure(SimpleXMLParserConfiguration pc) {
+  protected SimpleXMLTransformerConfiguration configure(SimpleXMLTransformerConfiguration pc) {
     pc.addLineElement(new SimpleName(TEI_NS, "div"));
     pc.addLineElement(new SimpleName(TEI_NS, "head"));
     pc.addLineElement(new SimpleName(TEI_NS, "sp"));
@@ -149,17 +153,17 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
     return pc;
   }
 
-  protected SimpleXMLParserConfiguration createXMLParserConfiguration() {
-    SimpleXMLParserConfiguration pc = new SimpleXMLParserConfiguration();
+  protected SimpleXMLTransformerConfiguration createXMLParserConfiguration() {
+    SimpleXMLTransformerConfiguration pc = new SimpleXMLTransformerConfiguration();
 
-    final List<XMLParserModule> parserModules = pc.getModules();
-    parserModules.add(new LineElementXMLParserModule());
-    parserModules.add(new NotableCharacterXMLParserModule());
-    parserModules.add(new TextXMLParserModule());
-    parserModules.add(new DefaultAnnotationXMLParserModule(textRepository, 1000, true));
-    parserModules.add(new CLIXAnnotationXMLParserModule(textRepository, 1000));
-    parserModules.add(new TEIAwareAnnotationXMLParserModule(textRepository, 1000));
-    parserModules.addAll(parserModules());
+    final List<XMLTransformerModule> modules = pc.getModules();
+    modules.add(new LineElementXMLTransformerModule());
+    modules.add(new NotableCharacterXMLTransformerModule());
+    modules.add(new TextXMLTransformerModule());
+    modules.add(new DefaultAnnotationXMLTransformerModule(1000, true));
+    modules.add(new CLIXAnnotationXMLTransformerModule(1000));
+    modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
+    modules.addAll(parserModules());
 
     return pc;
   }
@@ -179,7 +183,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
 
           sources.put(resource, xml);
           stopWatch.start("parse");
-          texts.put(resource, xmlParser.parse(xml, configure(createXMLParserConfiguration())));
+          texts.put(resource, xmlTransformer.transform(xml));
           stopWatch.stop();
         } finally {
           XML.closeQuietly(xmlReader);

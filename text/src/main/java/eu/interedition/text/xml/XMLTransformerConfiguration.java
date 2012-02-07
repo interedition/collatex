@@ -17,20 +17,29 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.xml.module;
+package eu.interedition.text.xml;
 
-import eu.interedition.text.xml.XMLEntity;
-import eu.interedition.text.xml.XMLParserState;
+import java.util.List;
 
-/**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
- */
-public class LineElementXMLParserModule extends XMLParserModuleAdapter {
+public interface XMLTransformerConfiguration {
 
-  @Override
-  public void start(XMLEntity entity, XMLParserState state) {
-    if (state.getTextOffset() > 0 && state.isLineElement() && state.isIncluded()) {
-      state.insert("\n", false);
-    }
-  }
+  boolean isLineElement(XMLEntity entity);
+
+  boolean isContainerElement(XMLEntity entity);
+
+  boolean included(XMLEntity entity);
+
+  boolean excluded(XMLEntity entity);
+
+  char getNotableCharacter();
+
+  boolean isNotable(XMLEntity entity);
+
+  boolean isCompressingWhitespace();
+
+  List<XMLTransformerModule> getModules();
+
+  int getTextBufferSize();
+
+  boolean isRemoveLeadingWhitespace();
 }

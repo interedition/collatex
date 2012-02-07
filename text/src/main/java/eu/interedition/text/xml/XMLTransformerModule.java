@@ -17,41 +17,29 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.xml.module;
+package eu.interedition.text.xml;
 
 import eu.interedition.text.Range;
-import eu.interedition.text.xml.XMLEntity;
-import eu.interedition.text.xml.XMLParserModule;
-import eu.interedition.text.xml.XMLParserState;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class XMLParserModuleAdapter implements XMLParserModule {
-  public void start(XMLParserState state) {
-  }
+public interface XMLTransformerModule {
+  void start(XMLTransformer transformer);
 
-  public void start(XMLEntity entity, XMLParserState state) {
-  }
+  void start(XMLTransformer transformer, XMLEntity entity);
 
-  public void startText(XMLParserState state) {
-  }
+  void startText(XMLTransformer transformer);
 
-  public void end(XMLEntity entity, XMLParserState state) {
-  }
+  void text(XMLTransformer transformer, String text);
 
-  public void text(String text, XMLParserState state) {
-  }
+  void textWritten(XMLTransformer transformer, String read, String written);
 
-  public void insertText(String read, String inserted, XMLParserState state) {
-  }
+  void endText(XMLTransformer transformer);
 
-  public void end(XMLParserState state) {
-  }
+  void end(XMLTransformer transformer, XMLEntity entity);
 
-  public void offsetMapping(XMLParserState state, Range textRange, Range sourceRange) {
-  }
+  void end(XMLTransformer transformer);
 
-  public void endText(XMLParserState state) {
-  }
+  void offsetMapping(XMLTransformer transformer, Range textRange, Range sourceRange);
 }

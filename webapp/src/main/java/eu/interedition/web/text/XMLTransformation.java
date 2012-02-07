@@ -20,8 +20,8 @@
 package eu.interedition.web.text;
 
 import eu.interedition.text.Name;
-import eu.interedition.text.util.SimpleXMLParserConfiguration;
-import eu.interedition.text.xml.XMLParserModule;
+import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
+import eu.interedition.text.xml.XMLTransformerModule;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class XMLTransformation extends SimpleXMLParserConfiguration {
+public class XMLTransformation extends SimpleXMLTransformerConfiguration {
   protected boolean transformTEI = true;
   protected boolean removeEmpty = false;
 
@@ -98,7 +98,7 @@ public class XMLTransformation extends SimpleXMLParserConfiguration {
 
   @JsonIgnore
   @Override
-  public List<XMLParserModule> getModules() {
+  public List<XMLTransformerModule> getModules() {
     return super.getModules();
   }
 

@@ -17,29 +17,19 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.xml;
+package eu.interedition.text.xml.module;
 
-import eu.interedition.text.Range;
+import eu.interedition.text.xml.XMLEntity;
+import eu.interedition.text.xml.XMLTransformer;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public interface XMLParserModule {
-  void start(XMLParserState state);
-
-  void start(XMLEntity entity, XMLParserState state);
-
-  void startText(XMLParserState state);
-
-  void text(String text, XMLParserState state);
-
-  void endText(XMLParserState state);
-
-  void end(XMLEntity entity, XMLParserState state);
-
-  void insertText(String read, String inserted, XMLParserState state);
-
-  void end(XMLParserState state);
-
-  void offsetMapping(XMLParserState state, Range textRange, Range sourceRange);
+public class NotableCharacterXMLTransformerModule extends XMLTransformerModuleAdapter {
+  @Override
+  public void start(XMLTransformer transformer, XMLEntity entity) {
+    if (transformer.isNotable() && transformer.isIncluded()) {
+      transformer.write(Character.toString(transformer.getConfiguration().getNotableCharacter()), false);
+    }
+  }
 }

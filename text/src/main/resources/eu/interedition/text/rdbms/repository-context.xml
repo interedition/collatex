@@ -51,10 +51,6 @@
         <property name="queryCriteriaTranslator" ref="queryCriteriaTranslator"/>
     </bean>
 
-    <bean id="xmlParser" class="eu.interedition.text.xml.XMLParser">
-        <property name="textRepository" ref="textRepository" />
-    </bean>
-
     <bean id="xmlSerializer" class="eu.interedition.text.xml.XMLSerializer">
         <property name="textRepository" ref="textRepository"/>
     </bean>

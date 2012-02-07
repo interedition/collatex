@@ -21,11 +21,10 @@ package eu.interedition.text.xml;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
 import eu.interedition.text.event.TextAdapter;
 import eu.interedition.text.query.Criteria;
-import eu.interedition.text.xml.module.XMLParserModuleAdapter;
+import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,7 +32,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
@@ -112,12 +110,12 @@ public class XMLParserTest extends AbstractTestResourceTest {
   }
 
   @Override
-  protected List<XMLParserModule> parserModules() {
-    final List<XMLParserModule> parserModules = super.parserModules();
+  protected List<XMLTransformerModule> parserModules() {
+    final List<XMLTransformerModule> modules = super.parserModules();
 
-    parserModules.add(new XMLParserModuleAdapter() {
+    modules.add(new XMLTransformerModuleAdapter() {
       @Override
-      public void offsetMapping(XMLParserState state, Range textRange, Range sourceRange) {
+      public void offsetMapping(XMLTransformer transformer, Range textRange, Range sourceRange) {
         if (LOG.isDebugEnabled()) {
           sourceRanges.add(sourceRange);
           textRanges.add(textRange);
@@ -125,6 +123,6 @@ public class XMLParserTest extends AbstractTestResourceTest {
       }
     });
 
-    return parserModules;
+    return modules;
   }
 }

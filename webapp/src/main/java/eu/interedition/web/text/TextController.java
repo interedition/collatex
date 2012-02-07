@@ -24,16 +24,23 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
-import eu.interedition.text.*;
+import eu.interedition.text.Name;
+import eu.interedition.text.Range;
+import eu.interedition.text.Text;
 import eu.interedition.text.event.NameCollector;
 import eu.interedition.text.json.JSONSerializer;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.xml.XML;
-import eu.interedition.text.xml.XMLParser;
-import eu.interedition.text.xml.XMLParserModule;
-import eu.interedition.text.xml.module.*;
+import eu.interedition.text.xml.XMLTransformerModule;
+import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.module.CLIXAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.DefaultAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.LineElementXMLTransformerModule;
+import eu.interedition.text.xml.module.NotableCharacterXMLTransformerModule;
+import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.TextXMLTransformerModule;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.stax2.XMLInputFactory2;
@@ -45,7 +52,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
@@ -55,7 +70,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Date;
@@ -80,9 +99,6 @@ public class TextController {
 
   @Autowired
   private RelationalTextRepository textRepository;
-
-  @Autowired
-  private XMLParser xmlParser;
 
   @Autowired
   private JSONSerializer jsonSerializer;
@@ -219,17 +235,17 @@ public class TextController {
     final TextMetadata source = textService.load(id);
     Preconditions.checkArgument(source.getText().getType() == Text.Type.XML);
 
-    final List<XMLParserModule> modules = pc.getModules();
-    modules.add(new LineElementXMLParserModule());
-    modules.add(new NotableCharacterXMLParserModule());
-    modules.add(new TextXMLParserModule());
-    modules.add(new DefaultAnnotationXMLParserModule(textRepository, 1000));
-    modules.add(new CLIXAnnotationXMLParserModule(textRepository, 1000));
+    final List<XMLTransformerModule> modules = pc.getModules();
+    modules.add(new LineElementXMLTransformerModule());
+    modules.add(new NotableCharacterXMLTransformerModule());
+    modules.add(new TextXMLTransformerModule());
+    modules.add(new DefaultAnnotationXMLTransformerModule(1000));
+    modules.add(new CLIXAnnotationXMLTransformerModule(1000));
     if (pc.isTransformTEI()) {
-      modules.add(new TEIAwareAnnotationXMLParserModule(textRepository, 1000));
+      modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
     }
 
-    final Text parsed = xmlParser.parse(source.getText(), pc);
+    final Text parsed = new XMLTransformer(textRepository, pc).transform(source.getText());
     if (pc.isRemoveEmpty()) {
       textRepository.delete(and(text(parsed), rangeLength(0)));
     }

@@ -19,17 +19,23 @@
  */
 package eu.interedition.text.xml.module;
 
-import eu.interedition.text.xml.XMLEntity;
-import eu.interedition.text.xml.XMLParserState;
+import eu.interedition.text.xml.XMLTransformer;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class NotableCharacterXMLParserModule extends XMLParserModuleAdapter {
+public class TextXMLTransformerModule extends XMLTransformerModuleAdapter {
+
   @Override
-  public void start(XMLEntity entity, XMLParserState state) {
-    if (state.isNotable() && state.isIncluded()) {
-      state.insert(Character.toString(state.getConfiguration().getNotableCharacter()), false);
+  public void text(XMLTransformer transformer, String text) {
+    if (!transformer.isIncluded()) {
+      return;
     }
+
+    if (!transformer.isSpacePreserved() && transformer.isContainerElement()) {
+      return;
+    }
+
+    transformer.write(text, true);
   }
 }
