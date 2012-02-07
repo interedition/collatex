@@ -91,14 +91,6 @@ public class MatrixLinkerTest extends AbstractTest {
   	System.out.println(buildMatrix.toHtml());
   	Archipelago archipelago = buildMatrix.getIslands();
   	assertEquals(42, archipelago.size());
-  	System.out.println("no of islands: " + archipelago.size());
-  	for(Island isl : archipelago.iterator()) {
-  		System.out.println("island: " + isl+" ("+((UndirectedIsland) isl).allNonRivalVersionGroups().size()+" versions)");
-//    	assertEquals(2, allNonRivalVersionGroups.size());
-//    	allNonRivalVersionGroups = ((UndirectedIsland) isl).allNonRivalVersionGroups();
-//    	assertEquals(2, allNonRivalVersionGroups.size());
-//    	assertEquals(2,allNonRivalVersionGroups.get(0).size());
-  	}
     assertEquals(98,archipelago.numOfConflicts());
 
   }
@@ -281,6 +273,7 @@ public class MatrixLinkerTest extends AbstractTest {
     assertEquals(2,archipelago.numOfConflicts());
   }
 
+  @Ignore
   @Test
   public void testIslands() {
   	SimpleWitness[] sw = createWitnesses("A B C A B","A B C A B");
@@ -289,6 +282,8 @@ public class MatrixLinkerTest extends AbstractTest {
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	Archipelago islands = buildMatrix.getIslands();
   	assertEquals(3, islands.size());
+  	assertEquals(2,islands.numOfConflicts());
+  	assertEquals(2, islands.numOfNonConflConstell());
   }
   
   @Test
@@ -345,6 +340,46 @@ public class MatrixLinkerTest extends AbstractTest {
   	DirectedIsland di_3 = di_1.removePoints(di_2);
   	assertEquals(2, di_1.size());
   	assertEquals(1, di_3.size());
+  }
+  
+  @Test
+  public void testTwoIslands() {
+  	Island isl_1 = new DirectedIsland();
+  	isl_1.add(new Coordinate(0,0));
+  	isl_1.add(new Coordinate(1,1));
+  	Island isl_2 = new DirectedIsland();
+  	isl_2.add(new Coordinate(2,2));
+  	isl_2.add(new Coordinate(3,3));
+  	assertEquals(1,isl_1.getNonConflConf(isl_2).size());
+  	Island isl_3 = new DirectedIsland();
+  	isl_3.add(new Coordinate(1,1));
+  	isl_3.add(new Coordinate(2,2));
+  	assertEquals(2,isl_1.getNonConflConf(isl_3).size());
+  	isl_1.add(new Coordinate(2,2));
+  	isl_3.add(new Coordinate(3,3));
+  	assertEquals(3,isl_1.getNonConflConf(isl_3).size());
+  	Island isl_4 = new DirectedIsland();
+  	isl_4.add(new Coordinate(0,0));
+  	isl_4.add(new Coordinate(1,1));
+  	Island isl_5 = new DirectedIsland();
+  	isl_5.add(new Coordinate(1,2));
+  	isl_5.add(new Coordinate(2,3));
+  	ArrayList<Archipelago> archList = isl_4.getNonConflConf(isl_5);
+  	assertEquals(2,archList.size());
+  	isl_4.add(new Coordinate(2,2));
+  	isl_5.add(new Coordinate(3,4));
+  	archList = isl_4.getNonConflConf(isl_5);
+  	assertEquals(3, archList.size());
+  }
+  
+  @Test
+  public void testFindCoorOnRolOrCol() {
+  	Island isl_1 = new DirectedIsland();
+  	isl_1.add(new Coordinate(0,0));
+  	isl_1.add(new Coordinate(1,1));
+    assertEquals(new Coordinate(0,0),isl_1.getCoorOnRow(0));  	
+    assertEquals(new Coordinate(1,1),isl_1.getCoorOnCol(1));  	
+    assertEquals(null,isl_1.getCoorOnCol(4));  	
   }
   
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,

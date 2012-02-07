@@ -41,4 +41,8 @@ public class Coordinate {
     res &= Math.abs(this.col - c.getCol())==1;
 		return res;
   }
+
+	public Coordinate copy() {
+	  return new Coordinate(row, col);
+  }
 }

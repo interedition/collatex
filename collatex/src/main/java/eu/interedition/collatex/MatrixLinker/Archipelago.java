@@ -61,4 +61,23 @@ public class Archipelago {
 			}
 	  return result;
   }
+
+	public int numOfNonConflConstell() {
+		int num = size();
+		for(int i=0 ; i<num ; i++)
+			for(int j=i+1; j<num; j++) {
+				
+			}
+	  // TODO Auto-generated method stub
+	  return 0;
+  }
+
+	public Archipelago copy() {
+		Archipelago result = new Archipelago();
+		for(Island isl: islands) {
+			result.add(isl.copy());
+		}
+	  return result;
+  }
+
 }

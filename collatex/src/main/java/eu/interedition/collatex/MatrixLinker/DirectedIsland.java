@@ -57,12 +57,22 @@ public class DirectedIsland extends Island{
 		return result;		
 	}
 
-	private DirectedIsland copy() {
-		DirectedIsland di = new DirectedIsland();
-		for(Coordinate c : island) {
-			di.add(c);
+	@Override
+	public Coordinate getCoorOnRow(int row) {
+		for(Coordinate coor : island) {
+			if(coor.getRow()==row)
+				return coor;
 		}
-	  return di;
-  } 
+		return null;
+	}
+		
+	@Override
+	public Coordinate getCoorOnCol(int col) {
+		for(Coordinate coor : island) {
+			if(coor.getCol()==col)
+				return coor;
+		}
+		return null;
+	}
 
 }
