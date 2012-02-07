@@ -24,7 +24,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-import eu.interedition.text.TextConsumer;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -36,18 +35,17 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +53,6 @@ import java.io.Reader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -108,21 +105,22 @@ public class TextIndex implements InitializingBean, DisposableBean {
 
   public void update(final TextMetadata metadata) throws IOException {
     final RelationalText text = metadata.getText();
-    textRepository.read(text, new TextConsumer() {
-      @Override
-      public void read(Reader content, long contentLength) throws IOException {
-        final Document document = new Document();
-        document.add(new Field("id", Long.toString(text.getId()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        document.add(new Field("type", text.getType().toString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        document.add(new Field("content_length", Long.toString(text.getLength()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        document.add(new Field("content", content));
+    Reader textReader = null;
+    try {
+      final Document document = new Document();
+      document.add(new Field("id", Long.toString(text.getId()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+      document.add(new Field("type", text.getType().toString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+      document.add(new Field("content_length", Long.toString(text.getLength()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+      document.add(new Field("content", textReader = textRepository.read(text).getInput()));
 
-        metadata.addTo(document);
+      metadata.addTo(document);
 
-        indexWriter.updateDocument(idTerm(metadata), document);
-        commit();
-      }
-    });
+      indexWriter.updateDocument(idTerm(metadata), document);
+      commit();
+
+    } finally {
+      Closeables.close(textReader, false);
+    }
   }
 
   public void delete(TextMetadata metadata) throws IOException {

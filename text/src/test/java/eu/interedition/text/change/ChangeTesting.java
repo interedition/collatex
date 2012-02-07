@@ -1,7 +1,6 @@
 package eu.interedition.text.change;
 
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
@@ -11,14 +10,13 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextConsumer;
 import eu.interedition.text.event.TextAdapter;
 import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.query.Criteria;
@@ -58,22 +56,20 @@ public class ChangeTesting extends AbstractTestResourceTest {
   });
 
   @Test
-  public void createTexts() throws IOException {
+  public void createTexts() throws IOException, XMLStreamException {
     for (File testFile : TEST_FILES) {
       final List<ChangeSet> changeSets = Lists.newArrayList();
-      textRepository.read(source(testFile.toURI()), new TextConsumer() {
-        @Override
-        public void read(Reader content, long contentLength) throws IOException {
-          XMLStreamReader xml = null;
-          try {
-            changeSets.addAll(ChangeSet.readDeclarations(xml = xmlInputFactory.createXMLStreamReader(content)));
-          } catch (XMLStreamException e) {
-            Throwables.propagate(e);
-          } finally {
-            XML.closeQuietly(xml);
-          }
-        }
-      });
+
+      Reader xmlStream = null;
+      XMLStreamReader xml = null;
+      try {
+        xmlStream = textRepository.read(source(testFile.toURI())).getInput();
+        changeSets.addAll(ChangeSet.readDeclarations(xml = xmlInputFactory.createXMLStreamReader(xmlStream)));
+      } finally {
+        XML.closeQuietly(xml);
+        Closeables.close(xmlStream, false);
+      }
+
       changeSets.add(0, new ChangeSet(""));
 
       final Text testText = text(testFile.toURI());

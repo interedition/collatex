@@ -23,10 +23,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextConsumer;
 import eu.interedition.text.TextRepository;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Stack;
@@ -45,32 +47,13 @@ public class XMLParser {
     final Text target = textRepository.create(null, Text.Type.TXT);
     final XMLParserState state = new XMLParserState(source, target, configuration);
     try {
-      textRepository.read(source, new XMLParserTextConsumer(state));
-      Reader textReader = null;
-      try {
-        return textRepository.write(state.getTarget(), textReader = state.readText());
-      } finally {
-        Closeables.close(textReader, false);
-      }
-    } catch (Throwable t) {
-      Throwables.propagateIfInstanceOf(t, IOException.class);
-      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
-      throw Throwables.propagate(t);
-    }
-  }
-
-  private class XMLParserTextConsumer implements TextConsumer {
-    private final XMLParserState state;
-
-    public XMLParserTextConsumer(XMLParserState state) {
-      this.state = state;
-    }
-
-    public void read(Reader content, long contentLength) throws IOException {
+      Reader xmlReader = null;
       XMLStreamReader reader = null;
-      final Stack<XMLEntity> entities = new Stack<XMLEntity>();
       try {
-        reader = xmlInputFactory.createXMLStreamReader(content);
+        xmlReader = textRepository.read(source).getInput();
+        reader = xmlInputFactory.createXMLStreamReader(xmlReader);
+
+        final Stack<XMLEntity> entities = new Stack<XMLEntity>();
         state.start();
         while (reader.hasNext()) {
           final int event = reader.next();
@@ -103,18 +86,21 @@ public class XMLParser {
               break;
           }
         }
-
         state.end();
-      } catch (XMLStreamException e) {
-        throw Throwables.propagate(e);
       } finally {
-        if (reader != null) {
-          try {
-            reader.close();
-          } catch (XMLStreamException e) {
-          }
-        }
+        XML.closeQuietly(reader);
+        Closeables.close(xmlReader, false);
       }
+      Reader textReader = null;
+      try {
+        return textRepository.write(state.getTarget(), textReader = state.readText());
+      } finally {
+        Closeables.close(textReader, false);
+      }
+    } catch (Throwable t) {
+      Throwables.propagateIfInstanceOf(t, IOException.class);
+      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
+      throw Throwables.propagate(t);
     }
   }
 }

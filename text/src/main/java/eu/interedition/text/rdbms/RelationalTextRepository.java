@@ -19,8 +19,8 @@
  */
 package eu.interedition.text.rdbms;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -28,12 +28,12 @@ import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
+import com.google.common.io.InputSupplier;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.AnnotationConsumer;
 import eu.interedition.text.Name;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextConsumer;
+import eu.interedition.text.TextListener;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.query.Criterion;
 import eu.interedition.text.util.AbstractTextRepository;
@@ -71,6 +71,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
+import static eu.interedition.text.query.Criteria.*;
 import static eu.interedition.text.rdbms.RelationalNameRegistry.mapNameFrom;
 import static eu.interedition.text.rdbms.RelationalNameRegistry.selectNameFrom;
 import static eu.interedition.text.util.TextDigestingFilterReader.NULL_DIGEST;
@@ -245,48 +246,42 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     }, idList.toArray(new Object[idList.size()]));
   }
 
-  public void read(Text text, final TextConsumer consumer) throws IOException {
-    read(new ReaderCallback<Void>(text) {
-
+  public InputSupplier<Reader> read(final Text text) throws IOException {
+    return new InputSupplier<Reader>() {
       @Override
-      protected Void read(Clob content) throws SQLException, IOException {
-        Reader contentReader = null;
-        try {
-          consumer.read(contentReader = content.getCharacterStream(), content.length());
-        } catch (IOException e) {
-          Throwables.propagate(e);
-        } finally {
-          Closeables.close(contentReader, false);
-        }
-        return null;
+      public Reader getInput() throws IOException {
+        return read(new ClobCallback<Reader>(text) {
+
+          @Override
+          protected Reader clob(Clob content) throws SQLException, IOException {
+            return content.getCharacterStream();
+          }
+        });
       }
-    });
+    };
   }
 
-  public void read(Text text, final Range range, final TextConsumer consumer) throws IOException {
-    read(new ReaderCallback<Void>(text) {
-
+  public InputSupplier<Reader> read(final Text text, final Range range) throws IOException {
+    return new InputSupplier<Reader>() {
       @Override
-      protected Void read(Clob content) throws SQLException, IOException {
-        Reader contentReader = null;
-        try {
-          consumer.read(contentReader = new RangeFilteringReader(content.getCharacterStream(), range), range.length());
-        } catch (IOException e) {
-          Throwables.propagate(e);
-        } finally {
-          Closeables.close(contentReader, false);
-        }
-        return null;
+      public Reader getInput() throws IOException {
+        return read(new ClobCallback<Reader>(text) {
+
+          @Override
+          protected Reader clob(Clob content) throws SQLException, IOException {
+            return new RangeFilteringReader(content.getCharacterStream(), range);
+          }
+        });
       }
-    });
+    };
   }
 
   public SortedMap<Range, String> read(Text text, final SortedSet<Range> ranges) throws IOException {
     final SortedMap<Range, String> results = Maps.newTreeMap();
-    read(new ReaderCallback<Void>(text) {
+    read(new ClobCallback<Void>(text) {
 
       @Override
-      protected Void read(Clob content) throws SQLException, IOException {
+      protected Void clob(Clob content) throws SQLException, IOException {
         for (Range range : ranges) {
           results.put(range, content.getSubString(range.getStart() + 1, (int) range.length()));
         }
@@ -296,13 +291,100 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     return results;
   }
 
-  private <T> T read(final ReaderCallback<T> callback) {
+  public void read(final Text text, final Criterion criterion, final int pageSize, final TextListener listener) throws IOException {
+    read(new ClobCallback<Object>(text) {
+      @Override
+      protected Object clob(Clob content) throws SQLException, IOException {
+        Reader contentStream = null;
+        try {
+          final SortedMap<Long, Set<Annotation>> starts = Maps.newTreeMap();
+          final SortedMap<Long, Set<Annotation>> ends = Maps.newTreeMap();
+
+          final long contentLength = content.length();
+          contentStream = content.getCharacterStream();
+
+          long offset = 0;
+          long next = 0;
+          long pageEnd = 0;
+
+          listener.start(contentLength);
+
+          final Set<Annotation> annotationData = Sets.newHashSet();
+          while (true) {
+            if ((offset % pageSize) == 0) {
+              pageEnd = Math.min(offset + pageSize, contentLength);
+              final Range pageRange = new Range(offset, pageEnd);
+              final Iterable<Annotation> pageAnnotations = find(and(criterion, text(text), rangeOverlap(pageRange)));
+              for (Annotation a : pageAnnotations) {
+                final long start = a.getRange().getStart();
+                final long end = a.getRange().getEnd();
+                if (start >= offset) {
+                  Set<Annotation> starting = starts.get(start);
+                  if (starting == null) {
+                    starts.put(start, starting = Sets.newHashSet());
+                  }
+                  starting.add(a);
+                  annotationData.add(a);
+                }
+                if (end <= pageEnd) {
+                  Set<Annotation> ending = ends.get(end);
+                  if (ending == null) {
+                    ends.put(end, ending = Sets.newHashSet());
+                  }
+                  ending.add(a);
+                  annotationData.add(a);
+                }
+              }
+
+              next = Math.min(starts.isEmpty() ? contentLength : starts.firstKey(), ends.isEmpty() ? contentLength : ends.firstKey());
+            }
+
+            if (offset == next) {
+              final Set<Annotation> startEvents = (!starts.isEmpty() && offset == starts.firstKey() ? starts.remove(starts.firstKey()) : Sets.<Annotation>newHashSet());
+              final Set<Annotation> endEvents = (!ends.isEmpty() && offset == ends.firstKey() ? ends.remove(ends.firstKey()) : Sets.<Annotation>newHashSet());
+
+              final Set<Annotation> emptyEvents = Sets.newHashSet(Sets.filter(endEvents, EMPTY));
+              endEvents.removeAll(emptyEvents);
+
+              if (!endEvents.isEmpty()) listener.end(offset, filter(annotationData, endEvents, true));
+              if (!startEvents.isEmpty()) listener.start(offset, filter(annotationData, startEvents, false));
+              if (!emptyEvents.isEmpty()) listener.end(offset, filter(annotationData, emptyEvents, true));
+
+              next = Math.min(starts.isEmpty() ? contentLength : starts.firstKey(), ends.isEmpty() ? contentLength : ends.firstKey());
+            }
+
+            if (offset == contentLength) {
+              break;
+            }
+
+            final long readTo = Math.min(pageEnd, next);
+            if (offset < readTo) {
+              final char[] currentText = new char[(int) (readTo - offset)];
+              int read = contentStream.read(currentText);
+              if (read > 0) {
+                listener.text(new Range(offset, offset + read), new String(currentText, 0, read));
+                offset += read;
+              }
+            }
+          }
+
+          listener.end();
+        } finally {
+          Closeables.close(contentStream, false);
+        }
+
+        return null;
+      }
+    });
+  }
+
+  private <T> T read(final ClobCallback<T> callback) {
     return DataAccessUtils.requiredUniqueResult(jt.query("select content from text_content where id = ?",
             new RowMapper<T>() {
 
               public T mapRow(ResultSet rs, int rowNum) throws SQLException {
                 try {
-                  return callback.read(rs.getClob(1));
+                  return callback.clob(rs.getClob(1));
                 } catch (IOException e) {
                   throw new SQLException(e);
                 }
@@ -345,7 +427,18 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
   @Override
-  public void scroll(Criterion criterion, final AnnotationConsumer consumer) {
+  public Iterable<Annotation> find(Criterion criterion) {
+    final SortedSet<Annotation> result = Sets.newTreeSet();
+    scroll(criterion, new AnnotationCallback() {
+      @Override
+      public void annotation(Annotation annotation) {
+        result.add(annotation);
+      }
+    });
+    return result;
+  }
+
+  private void scroll(Criterion criterion, final AnnotationCallback callback) {
     final List<Object> ps = Lists.newArrayList();
     final StringBuilder sql = buildAnnotationQuery(new StringBuilder("select  ")
             .append(selectAnnotationFrom("a")).append(", ")
@@ -362,7 +455,7 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
       private final Map<Long, RelationalText> textCache = Maps.newHashMap();
 
       public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-        consumer.consume(new RelationalAnnotation(
+        callback.annotation(new RelationalAnnotation(
                 text(rs.getLong("t_id"), rs),
                 name(rs.getLong("n_id"), rs, "n"),
                 new Range(rs.getLong("a_range_start"), rs.getLong("a_range_end")),
@@ -397,18 +490,22 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     }, ps.toArray(new Object[ps.size()]));
   }
 
-
   @Override
-  protected SortedSet<Name> getNames(Text text) {
-    final StringBuilder namesSql = new StringBuilder("select distinct ");
-    namesSql.append(selectNameFrom("n"));
-    namesSql.append(" from text_qname n join text_annotation a on a.name = n.id where a.text = ?");
-    return Sets.newTreeSet(jt.query(namesSql.toString(), new RowMapper<Name>() {
-
-      public Name mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return mapNameFrom(rs, "n");
+  public void transform(Criterion criterion, final Text to, final Function<Annotation, Annotation> transform) {
+    final List<Annotation> batch = Lists.newArrayListWithExpectedSize(batchSize);
+    scroll(criterion, new AnnotationCallback() {
+      @Override
+      public void annotation(Annotation annotation) {
+        batch.add(annotation);
+        if ((batch.size() % batchSize) == 0) {
+          transform(batch, to, transform);
+          batch.clear();
+        }
       }
-    }, ((RelationalText) text).getId()));
+    });
+    if (!batch.isEmpty()) {
+      transform(batch, to, transform);
+    }
   }
 
   public void afterPropertiesSet() throws Exception {
@@ -455,13 +552,22 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
             rs.getLong(prefix + "_id"));
   }
 
-  private abstract class ReaderCallback<T> {
+  private abstract class ClobCallback<T> {
     private final RelationalText text;
 
-    private ReaderCallback(Text text) {
+    private ClobCallback(Text text) {
       this.text = (RelationalText) text;
     }
 
-    protected abstract T read(Clob content) throws SQLException, IOException;
+    protected abstract T clob(Clob content) throws SQLException, IOException;
+  }
+
+  /**
+  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+  */
+  private static interface AnnotationCallback {
+
+    void annotation(Annotation annotation);
+
   }
 }

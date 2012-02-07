@@ -2,6 +2,7 @@ package eu.interedition.text.json;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.*;
+import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
 import eu.interedition.text.event.TextAdapter;
 import eu.interedition.text.json.map.AnnotationSerializer;
@@ -112,7 +113,7 @@ public class JSONSerializer {
     }
 
     jgen.writeNumberField(TEXT_LENGTH_FIELD, text.getLength());
-    jgen.writeStringField(TEXT_FIELD, textRepository.read(text, range == null ? new Range(0, text.getLength()) : range));
+    jgen.writeStringField(TEXT_FIELD, CharStreams.toString(textRepository.read(text, range == null ? new Range(0, text.getLength()) : range)));
 
     jgen.writeEndObject();
   }

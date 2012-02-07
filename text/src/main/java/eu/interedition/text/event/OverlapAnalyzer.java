@@ -17,14 +17,18 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.analysis;
+package eu.interedition.text.event;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
+import eu.interedition.text.Text;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.event.TextAdapter;
+import eu.interedition.text.query.Criteria;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -33,10 +37,13 @@ import java.util.SortedSet;
  */
 public class OverlapAnalyzer extends TextAdapter {
   protected Set<Name> selfOverlapping;
-
   protected Set<SortedSet<Name>> overlapping;
-
   protected Set<Annotation> started;
+
+  public OverlapAnalyzer analyze(TextRepository repository, Text text) throws IOException {
+    repository.read(text, Criteria.any(), this);
+    return this;
+  }
 
   public Set<Name> getSelfOverlapping() {
     return selfOverlapping;

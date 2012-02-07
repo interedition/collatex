@@ -20,6 +20,7 @@
 package eu.interedition.text;
 
 import com.google.common.base.Function;
+import com.google.common.io.InputSupplier;
 import eu.interedition.text.query.Criterion;
 
 import javax.xml.stream.*;
@@ -50,25 +51,19 @@ public interface TextRepository {
 
   void read(Text text, XMLStreamWriter xml) throws IOException, XMLStreamException;
 
-  void read(Text text, TextConsumer consumer) throws IOException;
+  InputSupplier<Reader> read(Text text) throws IOException;
 
-  void read(Text text, Range range, TextConsumer consumer) throws IOException;
+  InputSupplier<Reader> read(Text text, Range range) throws IOException;
 
   void read(Text text, Criterion criterion, TextListener listener) throws IOException;
 
   void read(Text text, Criterion criterion, int pageSize, TextListener listener) throws IOException;
-
-  String read(Text text, Range range) throws IOException;
 
   SortedMap<Range, String> read(Text text, SortedSet<Range> ranges) throws IOException;
 
   Text write(Text text, Reader contents) throws IOException;
 
   Text write(Text text, Reader contents, long contentLength) throws IOException;
-
-  SortedSet<Name> names(Text text);
-
-  void scroll(Criterion criterion, AnnotationConsumer consumer);
 
   Iterable<Annotation> find(Criterion criterion);
 

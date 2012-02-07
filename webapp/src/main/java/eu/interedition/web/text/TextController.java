@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.text.*;
+import eu.interedition.text.event.NameCollector;
 import eu.interedition.text.json.JSONSerializer;
 import eu.interedition.text.query.Criteria;
 import eu.interedition.text.rdbms.RelationalText;
@@ -93,8 +94,8 @@ public class TextController {
 
   @RequestMapping("/{id}/names")
   @ResponseBody
-  public SortedSet<Name> readNames(@PathVariable("id") long id) {
-    return textRepository.names(textRepository.load(id));
+  public SortedSet<Name> readNames(@PathVariable("id") long id) throws IOException, XMLStreamException {
+    return new NameCollector().collect(textRepository, textRepository.load(id)).getNames();
   }
 
   @RequestMapping(method = RequestMethod.GET)
@@ -111,12 +112,7 @@ public class TextController {
     final PrintWriter responseWriter = response.getWriter();
 
     range = (range == null ? new Range(0, text.getLength()) : range);
-    textRepository.read(text, range, new TextConsumer() {
-      @Override
-      public void read(Reader content, long contentLength) throws IOException {
-        CharStreams.copy(content, responseWriter);
-      }
-    });
+    CharStreams.copy(textRepository.read(text), responseWriter);
   }
 
 
@@ -201,12 +197,12 @@ public class TextController {
   }
 
   @RequestMapping(value = "/{id}/transform", method = RequestMethod.GET)
-  public ModelAndView readTransformationForm(@PathVariable("id") long id) {
+  public ModelAndView readTransformationForm(@PathVariable("id") long id) throws XMLStreamException, IOException {
     final TextMetadata metadata = textService.load(id);
     Preconditions.checkArgument(metadata.getText().getType() == Text.Type.XML);
 
     Map<String, List<String>> names = Maps.newHashMap();
-    for (Name name : textRepository.names(metadata.getText())) {
+    for (Name name : new NameCollector().collect(textRepository, metadata.getText()).getNames()) {
       final URI namespaceURI = name.getNamespace();
       final String ns = (namespaceURI == null ? "" : namespaceURI.toString());
       List<String> localNames = names.get(ns);

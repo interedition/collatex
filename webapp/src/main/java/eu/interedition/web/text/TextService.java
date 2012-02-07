@@ -21,9 +21,8 @@ package eu.interedition.web.text;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.io.Closeables;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextConsumer;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
 import eu.interedition.text.util.SQL;
@@ -53,7 +52,6 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static eu.interedition.text.rdbms.RelationalTextRepository.mapTextFrom;
 import static eu.interedition.text.rdbms.RelationalTextRepository.selectTextFrom;
@@ -166,60 +164,52 @@ public class TextService implements InitializingBean {
   }
 
   protected void extractMetadata(final TextMetadata text) throws IOException, SAXException {
+    Reader textReader = null;
     try {
-    textRepository.read(text.getText(), new TextConsumer() {
-      @Override
-      public void read(Reader content, long contentLength) throws IOException {
-        try {
-          saxParserFactory.newSAXParser().parse(new InputSource(content), new DefaultHandler() {
-            private boolean inTitleStmt = false;
-            private StringBuilder textContent;
+      textReader = textRepository.read(text.getText()).getInput();
+      saxParserFactory.newSAXParser().parse(new InputSource(textReader), new DefaultHandler() {
+        private boolean inTitleStmt = false;
+        private StringBuilder textContent;
 
-            @Override
-            public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-              if ("titleStmt".equals(localName) && text.isEmpty()) {
-                inTitleStmt = true;
-              } else if (inTitleStmt && "title".equals(localName)) {
-                textContent = new StringBuilder();
-              } else if (inTitleStmt && "author".equals(localName)) {
-                textContent = new StringBuilder();
-              }
-            }
-
-            @Override
-            public void endElement(String uri, String localName, String qName) throws SAXException {
-              if ("titleStmt".equals(localName)) {
-                inTitleStmt = false;
-              } else if (inTitleStmt && "title".equals(localName)) {
-                text.setTitle(textContent());
-              } else if (inTitleStmt && "author".equals(localName)) {
-                text.setCreator(textContent());
-              }
-            }
-
-            @Override
-            public void characters(char[] ch, int start, int length) throws SAXException {
-              if (textContent != null) {
-                textContent.append(ch, start, length);
-              }
-            }
-
-            protected String textContent() {
-              final String str = textContent.toString().replaceAll("\\s+", " ");
-              textContent = null;
-              return str;
-            }
-          });
-        } catch (SAXException e) {
-          Throwables.propagate(e);
-        } catch (ParserConfigurationException e) {
-          Throwables.propagate(e);
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+          if ("titleStmt".equals(localName) && text.isEmpty()) {
+            inTitleStmt = true;
+          } else if (inTitleStmt && "title".equals(localName)) {
+            textContent = new StringBuilder();
+          } else if (inTitleStmt && "author".equals(localName)) {
+            textContent = new StringBuilder();
+          }
         }
-      }
-    });
-    } catch (Throwable t) {
-      Throwables.propagateIfInstanceOf(t, SAXException.class);
-      Throwables.propagate(t);
+
+        @Override
+        public void endElement(String uri, String localName, String qName) throws SAXException {
+          if ("titleStmt".equals(localName)) {
+            inTitleStmt = false;
+          } else if (inTitleStmt && "title".equals(localName)) {
+            text.setTitle(textContent());
+          } else if (inTitleStmt && "author".equals(localName)) {
+            text.setCreator(textContent());
+          }
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException {
+          if (textContent != null) {
+            textContent.append(ch, start, length);
+          }
+        }
+
+        protected String textContent() {
+          final String str = textContent.toString().replaceAll("\\s+", " ");
+          textContent = null;
+          return str;
+        }
+      });
+    } catch (ParserConfigurationException e) {
+      throw Throwables.propagate(e);
+    } finally {
+      Closeables.close(textReader, false);
     }
   }
 

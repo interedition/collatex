@@ -17,12 +17,13 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.analysis;
+package eu.interedition.text.event;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Range;
 import eu.interedition.text.Text;
+import eu.interedition.text.event.OverlapAnalyzer;
 import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.query.Criteria;
@@ -57,8 +58,6 @@ public class OverlapAnalyzerTest extends AbstractTestResourceTest {
   }
 
   protected OverlapAnalyzer analyze(Text text) throws IOException {
-    final OverlapAnalyzer analyzer = new OverlapAnalyzer();
-    textRepository.read(text, Criteria.any(), analyzer);
-    return analyzer;
+    return new OverlapAnalyzer().analyze(textRepository, text);
   }
 }
