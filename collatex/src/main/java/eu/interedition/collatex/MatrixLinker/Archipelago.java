@@ -20,7 +20,27 @@ public class Archipelago {
   }
 
 	public void add(Island island) {
+		for(Island i : islands) {
+			if(island.size()>i.size()) {
+				islands.add(islands.indexOf(i), island);
+				return;
+			} else
+				try {
+					DirectedIsland disl = (DirectedIsland) island;
+					DirectedIsland di   = (DirectedIsland) i;
+				if(island.size()>i.size() && disl.direction()>di.direction()) {
+					islands.add(islands.indexOf(i), island);
+					return;
+				}
+				} catch (Exception e) {
+					// No directed island(s) so no way to determine priority
+				}
+		}
 		islands.add(island);
+  }
+
+	private void remove(int i) {
+		islands.remove(i);
   }
 
 	public int size() {
@@ -84,23 +104,8 @@ public class Archipelago {
 	  return result;
   }
 
-	public Archipelago orderedBySize() {
-		Archipelago result = copy();
-		int num = result.size();
-		for(int i=0; i<num; i++)
-			for(int j=i; j<num; j++) {
-				if(result.get(i).size()<result.get(j).size()) {
-					Island temp = result.get(i);
-					result.set(i,result.get(j));
-					result.set(j, temp);
-				}
-			}
-	  // TODO Auto-generated method stub
-	  return result;
-  }
-
 	public Archipelago orderedBySizeNonConfl() {
-		Archipelago result = orderedBySize();
+		Archipelago result = this.copy();
 		int num = result.size();
 		ArrayList<Integer> remove = new ArrayList<Integer>();
 		for(int i=0; i<num; i++)
@@ -121,8 +126,7 @@ public class Archipelago {
 	  return result;
   }
 
-	private void remove(int i) {
-		islands.remove(i);
-  }
-
+//	public Archipelago nextNonConflConf() {
+//		return new Archipelago();
+//	}
 }

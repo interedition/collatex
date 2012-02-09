@@ -401,9 +401,9 @@ public class MatrixLinkerTest extends AbstractTest {
   	isl_3.add(new Coordinate(10,10));
   	isl_3.add(new Coordinate(11,11));
   	arch.add(isl_3);
-  	assertEquals(4,arch.orderedBySize().get(0).size());
-  	assertEquals(3,arch.orderedBySize().get(1).size());
-  	assertEquals(2,arch.orderedBySize().get(2).size());
+  	assertEquals(4,arch.get(0).size());
+  	assertEquals(3,arch.get(1).size());
+  	assertEquals(2,arch.get(2).size());
   }
 
   @Test
@@ -431,8 +431,9 @@ public class MatrixLinkerTest extends AbstractTest {
   	isl_3.add(new Coordinate(9,11));
   	arch.add(isl_3);
   	assertEquals(2,arch.orderedBySizeNonConfl().size());
-  	assertEquals(4,arch.orderedBySize().get(0).size());
-  	assertEquals(3,arch.orderedBySize().get(1).size());
+  	assertEquals(4,arch.get(0).size());
+  	assertEquals(3,arch.get(1).size());
+//  	assertEquals(2,arch.nextNonConflConf().size());
   }
   
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,
