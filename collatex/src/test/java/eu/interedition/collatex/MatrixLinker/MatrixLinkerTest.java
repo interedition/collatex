@@ -283,7 +283,8 @@ public class MatrixLinkerTest extends AbstractTest {
   	Archipelago islands = buildMatrix.getIslands();
   	assertEquals(3, islands.size());
   	assertEquals(2,islands.numOfConflicts());
-  	assertEquals(2, islands.numOfNonConflConstell());
+  	int res = islands.numOfNonConflConstell();
+  	assertEquals(2, res);
   }
   
   @Test
@@ -380,6 +381,58 @@ public class MatrixLinkerTest extends AbstractTest {
     assertEquals(new Coordinate(0,0),isl_1.getCoorOnRow(0));  	
     assertEquals(new Coordinate(1,1),isl_1.getCoorOnCol(1));  	
     assertEquals(null,isl_1.getCoorOnCol(4));  	
+  }
+  
+  @Test
+  public void testOrderedIslands() {
+  	Archipelago arch = new Archipelago();
+  	DirectedIsland isl_1 = new DirectedIsland();
+  	isl_1.add(new Coordinate(1,1));
+  	isl_1.add(new Coordinate(2,2));
+  	isl_1.add(new Coordinate(3,3));
+  	arch.add(isl_1);
+  	DirectedIsland isl_2 = new DirectedIsland();
+  	isl_2.add(new Coordinate(5,5));
+  	isl_2.add(new Coordinate(6,6));
+  	arch.add(isl_2);
+  	DirectedIsland isl_3 = new DirectedIsland();
+  	isl_3.add(new Coordinate(8,8));
+  	isl_3.add(new Coordinate(9,9));
+  	isl_3.add(new Coordinate(10,10));
+  	isl_3.add(new Coordinate(11,11));
+  	arch.add(isl_3);
+  	assertEquals(4,arch.orderedBySize().get(0).size());
+  	assertEquals(3,arch.orderedBySize().get(1).size());
+  	assertEquals(2,arch.orderedBySize().get(2).size());
+  }
+
+  @Test
+  public void testOrderedIslands2() {
+	/*
+	 * bepaal welke islands zo aan deze orderedlist toegevoegd kunnen worden
+	 * en welke vanwege conflicten niet
+	 * bepaal de mate van overlap tussen twee conflicterende eilanden
+	 *  
+	 */
+  	Archipelago arch = new Archipelago();
+  	DirectedIsland isl_1 = new DirectedIsland();
+  	isl_1.add(new Coordinate(1,1));
+  	isl_1.add(new Coordinate(2,2));
+  	isl_1.add(new Coordinate(3,3));
+  	arch.add(isl_1);
+  	DirectedIsland isl_2 = new DirectedIsland();
+  	isl_2.add(new Coordinate(3,5));
+  	isl_2.add(new Coordinate(4,6));
+  	arch.add(isl_2);
+  	DirectedIsland isl_3 = new DirectedIsland();
+  	isl_3.add(new Coordinate(6,8));
+  	isl_3.add(new Coordinate(7,9));
+  	isl_3.add(new Coordinate(8,10));
+  	isl_3.add(new Coordinate(9,11));
+  	arch.add(isl_3);
+  	assertEquals(2,arch.orderedBySizeNonConfl().size());
+  	assertEquals(4,arch.orderedBySize().get(0).size());
+  	assertEquals(3,arch.orderedBySize().get(1).size());
   }
   
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,

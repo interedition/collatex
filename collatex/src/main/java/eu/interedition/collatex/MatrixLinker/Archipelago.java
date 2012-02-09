@@ -50,6 +50,10 @@ public class Archipelago {
 		return islands.get(i);
 	}
 
+	private void set(int i, Island island) {
+		islands.set(i, island);
+  }
+
 	public Object numOfConflicts() {
 		int result = 0;
 		int num = islands.size();
@@ -78,6 +82,47 @@ public class Archipelago {
 			result.add(isl.copy());
 		}
 	  return result;
+  }
+
+	public Archipelago orderedBySize() {
+		Archipelago result = copy();
+		int num = result.size();
+		for(int i=0; i<num; i++)
+			for(int j=i; j<num; j++) {
+				if(result.get(i).size()<result.get(j).size()) {
+					Island temp = result.get(i);
+					result.set(i,result.get(j));
+					result.set(j, temp);
+				}
+			}
+	  // TODO Auto-generated method stub
+	  return result;
+  }
+
+	public Archipelago orderedBySizeNonConfl() {
+		Archipelago result = orderedBySize();
+		int num = result.size();
+		ArrayList<Integer> remove = new ArrayList<Integer>();
+		for(int i=0; i<num; i++)
+			for(int j=i+1; j<num; j++)
+				if(!remove.contains(i)&& !remove.contains(j)) {
+					if(result.get(i).isCompetitor(result.get(j))) {
+						int pos = 0;
+						for(Integer p : remove)
+							if(remove.get(p)<j)
+								break;
+							else
+								pos++;
+						remove.add(pos,j);
+					}
+				}
+	  for(Integer i : remove)
+	  	result.remove(i.intValue());
+	  return result;
+  }
+
+	private void remove(int i) {
+		islands.remove(i);
   }
 
 }
