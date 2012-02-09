@@ -280,7 +280,7 @@ public class MatrixLinkerTest extends AbstractTest {
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
-  	Archipelago islands = buildMatrix.getIslands();
+  	ArchipelagoWithVersions islands = buildMatrix.getIslands();
   	assertEquals(3, islands.size());
   	assertEquals(2,islands.numOfConflicts());
   	int res = islands.numOfNonConflConstell();
@@ -414,7 +414,7 @@ public class MatrixLinkerTest extends AbstractTest {
 	 * bepaal de mate van overlap tussen twee conflicterende eilanden
 	 *  
 	 */
-  	Archipelago arch = new Archipelago();
+  	ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
   	DirectedIsland isl_1 = new DirectedIsland();
   	isl_1.add(new Coordinate(1,1));
   	isl_1.add(new Coordinate(2,2));
@@ -434,6 +434,17 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertEquals(4,arch.get(0).size());
   	assertEquals(3,arch.get(1).size());
 //  	assertEquals(2,arch.nextNonConflConf().size());
+  }
+  
+  @Test public void nonConflictingVersions() {
+//  	Archipelago arch = new Archipelago();
+  	DirectedIsland isl_1 = new DirectedIsland();
+  	isl_1.add(new Coordinate(1,1));
+  	isl_1.add(new Coordinate(2,2));
+  	isl_1.add(new Coordinate(3,3));
+//  	arch.add(isl_1);
+  	ArchipelagoWithVersions arch = new ArchipelagoWithVersions(isl_1);
+  	assertEquals(1,arch.numOfNonConflConstell());
   }
   
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,

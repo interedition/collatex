@@ -3,7 +3,8 @@ package eu.interedition.collatex.MatrixLinker;
 import java.util.ArrayList;
 
 public class Archipelago {
-	private ArrayList<Island> islands;
+
+	protected ArrayList<Island> islands;
 
 	public Archipelago() {
 		islands = new ArrayList<Island>();
@@ -13,12 +14,6 @@ public class Archipelago {
 		islands = new ArrayList<Island>();
 		islands.add(isl);
   }
-
-	// this is not a real iterator implementation but it works...
-  public ArrayList<Island> iterator() {
-	  return islands;
-  }
-
 	public void add(Island island) {
 		for(Island i : islands) {
 			if(island.size()>i.size()) {
@@ -33,13 +28,18 @@ public class Archipelago {
 					return;
 				}
 				} catch (Exception e) {
-					// No directed island(s) so no way to determine priority
 				}
 		}
 		islands.add(island);
   }
 
-	private void remove(int i) {
+	// this is not a real iterator implementation but it works...
+  public ArrayList<Island> iterator() {
+	  return islands;
+  }
+
+
+	protected void remove(int i) {
 		islands.remove(i);
   }
 
@@ -65,14 +65,6 @@ public class Archipelago {
 			  islands.remove(i);
 		}
   }
-	
-	public Island get(int i) {
-		return islands.get(i);
-	}
-
-	private void set(int i, Island island) {
-		islands.set(i, island);
-  }
 
 	public Object numOfConflicts() {
 		int result = 0;
@@ -85,16 +77,10 @@ public class Archipelago {
 			}
 	  return result;
   }
-
-	public int numOfNonConflConstell() {
-		int num = size();
-		for(int i=0 ; i<num ; i++)
-			for(int j=i+1; j<num; j++) {
-				
-			}
-	  // TODO Auto-generated method stub
-	  return 0;
-  }
+	
+	public Island get(int i) {
+		return islands.get(i);
+	}
 
 	public Archipelago copy() {
 		Archipelago result = new Archipelago();
@@ -104,29 +90,4 @@ public class Archipelago {
 	  return result;
   }
 
-	public Archipelago orderedBySizeNonConfl() {
-		Archipelago result = this.copy();
-		int num = result.size();
-		ArrayList<Integer> remove = new ArrayList<Integer>();
-		for(int i=0; i<num; i++)
-			for(int j=i+1; j<num; j++)
-				if(!remove.contains(i)&& !remove.contains(j)) {
-					if(result.get(i).isCompetitor(result.get(j))) {
-						int pos = 0;
-						for(Integer p : remove)
-							if(remove.get(p)<j)
-								break;
-							else
-								pos++;
-						remove.add(pos,j);
-					}
-				}
-	  for(Integer i : remove)
-	  	result.remove(i.intValue());
-	  return result;
-  }
-
-//	public Archipelago nextNonConflConf() {
-//		return new Archipelago();
-//	}
 }

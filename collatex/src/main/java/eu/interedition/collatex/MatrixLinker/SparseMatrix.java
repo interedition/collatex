@@ -117,8 +117,8 @@ public class SparseMatrix  {
 
 
 
-	public Archipelago getIslands() {
-		Archipelago islands = new Archipelago();
+	public ArchipelagoWithVersions getIslands() {
+		ArchipelagoWithVersions islands = new ArchipelagoWithVersions();
 		ArrayList<Coordinate> allTrue = allTrues();
 		for(Coordinate c: allTrue) {
 //			System.out.println("next coordinate: "+c);
