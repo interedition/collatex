@@ -4,25 +4,25 @@ import java.util.ArrayList;
 
 public class Archipelago {
 
-	protected ArrayList<DirectedIsland> islands;
+	protected ArrayList<Island> islands;
 
 	public Archipelago() {
-		islands = new ArrayList<DirectedIsland>();
+		islands = new ArrayList<Island>();
 	}
 
-	public Archipelago(DirectedIsland isl) {
-		islands = new ArrayList<DirectedIsland>();
+	public Archipelago(Island isl) {
+		islands = new ArrayList<Island>();
 		islands.add(isl);
   }
-	public void add(DirectedIsland island) {
-		for(DirectedIsland i : islands) {
+	public void add(Island island) {
+		for(Island i : islands) {
 			if(island.size()>i.size()) {
 				islands.add(islands.indexOf(i), island);
 				return;
 			} else
 				try {
-					DirectedIsland disl = (DirectedIsland) island;
-					DirectedIsland di   = (DirectedIsland) i;
+					Island disl = (Island) island;
+					Island di   = (Island) i;
 				if(island.size()>i.size() && disl.direction()>di.direction()) {
 					islands.add(islands.indexOf(i), island);
 					return;
@@ -34,7 +34,7 @@ public class Archipelago {
   }
 
 	// this is not a real iterator implementation but it works...
-  public ArrayList<DirectedIsland> iterator() {
+  public ArrayList<Island> iterator() {
 	  return islands;
   }
 
@@ -78,20 +78,20 @@ public class Archipelago {
 	  return result;
   }
 	
-	public DirectedIsland get(int i) {
+	public Island get(int i) {
 		return islands.get(i);
 	}
 
 	public Archipelago copy() {
 		Archipelago result = new Archipelago();
-		for(DirectedIsland isl: islands) {
-			result.add((DirectedIsland) isl.copy());
+		for(Island isl: islands) {
+			result.add((Island) isl.copy());
 		}
 	  return result;
   }
 
-	public boolean conflictsWith(DirectedIsland island) {
-		for(DirectedIsland isl : islands) {
+	public boolean conflictsWith(Island island) {
+		for(Island isl : islands) {
 			if(isl.isCompetitor(island))
 				return true;
 		}
@@ -100,7 +100,7 @@ public class Archipelago {
 
 	public String toString() {
 		String result = "";
-		for(DirectedIsland island : islands) {
+		for(Island island : islands) {
 		  if(result.isEmpty())
 		  	result = "[ " + island;
 		  else

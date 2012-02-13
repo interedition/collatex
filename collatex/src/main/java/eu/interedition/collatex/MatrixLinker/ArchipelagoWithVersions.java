@@ -7,17 +7,17 @@ public class ArchipelagoWithVersions extends Archipelago {
 	private ArrayList<Archipelago> nonConflVersions;
 
 	public ArchipelagoWithVersions() {
-		islands = new ArrayList<DirectedIsland>();
+		islands = new ArrayList<Island>();
 		nonConflVersions = new ArrayList<Archipelago>();
 	}
 
-	public ArchipelagoWithVersions(DirectedIsland isl) {
-		islands = new ArrayList<DirectedIsland>();
+	public ArchipelagoWithVersions(Island isl) {
+		islands = new ArrayList<Island>();
 		nonConflVersions = new ArrayList<Archipelago>();
 		add(isl);
   }
 
-	public void add(DirectedIsland island) {
+	public void add(Island island) {
     super.add(island);
 //		addIslandToNonConflictingVersions(island);
   }
@@ -62,7 +62,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 //  }
 
 	public void createNonConflictingVersions() {
-		for(DirectedIsland island : islands) {
+		for(Island island : islands) {
   		System.out.println("createNonConflictingVersions("+island+")");
   		if(nonConflVersions.size()==0) {
   			System.out.println("nonConflVersions.size()==0");
@@ -83,9 +83,9 @@ public class ArchipelagoWithVersions extends Archipelago {
   			if(!found_one) {
   				System.out.println("!found_one");
     			for(Archipelago version : nonConflVersions)	{
-  					for(DirectedIsland isl : version.iterator()) {
-  						DirectedIsland di = (DirectedIsland)isl;
-  						DirectedIsland res = di.removePoints((DirectedIsland) island);
+  					for(Island isl : version.iterator()) {
+  						Island di = (Island)isl;
+  						Island res = di.removePoints((Island) island);
   						System.out.println("di: "+di);
   						System.out.println("res: "+res);
   						if(res.size()>0) {
@@ -119,8 +119,8 @@ public class ArchipelagoWithVersions extends Archipelago {
 
 	public ArchipelagoWithVersions copy() {
 		ArchipelagoWithVersions result = new ArchipelagoWithVersions();
-		for(DirectedIsland isl: islands) {
-			result.add((DirectedIsland) isl.copy());
+		for(Island isl: islands) {
+			result.add((Island) isl.copy());
 		}
 	  return result;
   }
