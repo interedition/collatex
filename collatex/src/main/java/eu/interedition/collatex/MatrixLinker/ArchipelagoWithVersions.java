@@ -7,26 +7,109 @@ public class ArchipelagoWithVersions extends Archipelago {
 	private ArrayList<Archipelago> nonConflVersions;
 
 	public ArchipelagoWithVersions() {
-		islands = new ArrayList<Island>();
+		islands = new ArrayList<DirectedIsland>();
 		nonConflVersions = new ArrayList<Archipelago>();
 	}
 
-	public ArchipelagoWithVersions(Island isl) {
-		islands = new ArrayList<Island>();
+	public ArchipelagoWithVersions(DirectedIsland isl) {
+		islands = new ArrayList<DirectedIsland>();
 		nonConflVersions = new ArrayList<Archipelago>();
 		add(isl);
   }
 
-	public void add(Island island) {
+	public void add(DirectedIsland island) {
     super.add(island);
-		addIslandToNonConflictingVersions(island);
+//		addIslandToNonConflictingVersions(island);
   }
 
-	private void addIslandToNonConflictingVersions(Island island) {
-		if(nonConflVersions.size()==0) {
-			Archipelago version = new Archipelago();
-			version.add(island.copy());
-			nonConflVersions.add(version);
+//	private void addIslandToNonConflictingVersions(DirectedIsland island) {
+//		System.out.println("addIslandToNonConflictingVersions("+island+")");
+//
+//		if(nonConflVersions.size()==0) {
+//			System.out.println("nonConflVersions.size()==0");
+//			Archipelago version = new Archipelago();
+//			version.add(island);
+//			nonConflVersions.add(version);
+//		} else {
+//			boolean found_one = false;
+//			for(Archipelago version : nonConflVersions)	{
+//				System.out.println("version: "+version);
+//				if(!version.conflictsWith(island)) {
+//					System.out.println("!version.conflictsWith(island)");
+//					version.add(island);
+//					found_one = true;
+//				} else {
+//					for(Island isl : version.iterator()) {
+//						DirectedIsland di = (DirectedIsland)isl;
+//						DirectedIsland res = di.removePoints((DirectedIsland) island);
+//						System.out.println("di: "+di);
+//						System.out.println("res: "+res);
+//					}
+//					/* misschien een deel van deze versie bruikbaar om samen met
+//					 * het nieuwe island een nieuwe versie te maken? 
+//					 */
+//				}
+//			}
+//			if(!found_one) {
+//				System.out.println("!found_one");
+//				// new version
+//				// geheel nieuw of deels uit een andere versie opgebouwd.
+//				Archipelago version = new Archipelago();
+//				version.add(island);
+//				nonConflVersions.add(version);
+//			}
+//		}
+//  }
+
+	public void createNonConflictingVersions() {
+		for(DirectedIsland island : islands) {
+  		System.out.println("createNonConflictingVersions("+island+")");
+  		if(nonConflVersions.size()==0) {
+  			System.out.println("nonConflVersions.size()==0");
+  			Archipelago version = new Archipelago();
+  			version.add(island);
+  			nonConflVersions.add(version);
+  		} else {
+  			boolean found_one = false;
+				ArrayList<Archipelago> new_versions = new ArrayList<Archipelago>();
+  			for(Archipelago version : nonConflVersions)	{
+  				System.out.println("version: "+version);
+  				if(!version.conflictsWith(island)) {
+  					System.out.println("!version.conflictsWith(island)");
+  					version.add(island);
+  					found_one = true;
+  				}
+  			}
+  			if(!found_one) {
+  				System.out.println("!found_one");
+    			for(Archipelago version : nonConflVersions)	{
+  					for(Island isl : version.iterator()) {
+  						DirectedIsland di = (DirectedIsland)isl;
+  						DirectedIsland res = di.removePoints((DirectedIsland) island);
+  						System.out.println("di: "+di);
+  						System.out.println("res: "+res);
+  						if(res.size()>0) {
+  							found_one = true;
+  			  			Archipelago new_version = new Archipelago();
+  			  			new_version.add(island);
+  			  			new_version.add(res);
+  			  			new_versions.add(new_version);
+  						}
+  					}
+    			}
+					if(new_versions.size()>0) {
+						for(Archipelago arch : new_versions) {
+							nonConflVersions.add(arch);
+						}
+					}
+  			}
+  			if(!found_one) {
+  				System.out.println("!found_one");
+  				Archipelago version = new Archipelago();
+  				version.add(island);
+  				nonConflVersions.add(version);
+  			}
+  		}
 		}
   }
 
@@ -36,8 +119,8 @@ public class ArchipelagoWithVersions extends Archipelago {
 
 	public ArchipelagoWithVersions copy() {
 		ArchipelagoWithVersions result = new ArchipelagoWithVersions();
-		for(Island isl: islands) {
-			result.add(isl.copy());
+		for(DirectedIsland isl: islands) {
+			result.add((DirectedIsland) isl.copy());
 		}
 	  return result;
   }
@@ -63,6 +146,16 @@ public class ArchipelagoWithVersions extends Archipelago {
 	  for(Integer i : remove)
 	  	result.remove(i.intValue());
 	  return result;
+  }
+
+	public Archipelago getVersion(int i) {
+		try {
+			if(nonConflVersions.isEmpty())
+				createNonConflictingVersions();
+			return nonConflVersions.get(i);
+		} catch(IndexOutOfBoundsException exc) {
+			return null;
+		}
   }
 
 //	public Archipelago nextNonConflConf() {

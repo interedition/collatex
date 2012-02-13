@@ -138,9 +138,9 @@ public abstract class Island {
 	public ArrayList<Archipelago> getNonConflConf(Island isl_2) {
 		ArrayList<Archipelago> archList = new ArrayList<Archipelago>();
 		Archipelago arch = new Archipelago();
-		arch.add(this);
+		arch.add((DirectedIsland) this);
 		if(!isCompetitor(isl_2)) {
-			arch.add(isl_2);
+			arch.add((DirectedIsland) isl_2);
 			archList.add (arch);
 		} else {
 			Island[] sharedCs = sharedCoords(isl_2);
@@ -150,8 +150,8 @@ public abstract class Island {
 				isl_2a.remove(c);
 			}
 		  arch = new Archipelago();
-			arch.add(isl_1a.copy());
-			arch.add(isl_2a.copy());
+			arch.add((DirectedIsland) isl_1a.copy());
+			arch.add((DirectedIsland) isl_2a.copy());
 			archList.add (arch.copy());
 		  int tel = sharedCs[1].size()-1;
 			for(int i=sharedCs[0].size()-1; i>-1; i--) {
@@ -159,8 +159,8 @@ public abstract class Island {
 			  arch = new Archipelago();
 			  isl_1a.remove(c);
 			  isl_2a.add(sharedCs[1].get(tel--));
-				arch.add(isl_1a.copy());
-				arch.add(isl_2a.copy());
+				arch.add((DirectedIsland) isl_1a.copy());
+				arch.add((DirectedIsland) isl_2a.copy());
 				archList.add (arch.copy());
 			}
 		}

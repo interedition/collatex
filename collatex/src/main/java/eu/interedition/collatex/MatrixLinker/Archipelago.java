@@ -4,17 +4,17 @@ import java.util.ArrayList;
 
 public class Archipelago {
 
-	protected ArrayList<Island> islands;
+	protected ArrayList<DirectedIsland> islands;
 
 	public Archipelago() {
-		islands = new ArrayList<Island>();
+		islands = new ArrayList<DirectedIsland>();
 	}
 
-	public Archipelago(Island isl) {
-		islands = new ArrayList<Island>();
+	public Archipelago(DirectedIsland isl) {
+		islands = new ArrayList<DirectedIsland>();
 		islands.add(isl);
   }
-	public void add(Island island) {
+	public void add(DirectedIsland island) {
 		for(Island i : islands) {
 			if(island.size()>i.size()) {
 				islands.add(islands.indexOf(i), island);
@@ -34,7 +34,7 @@ public class Archipelago {
   }
 
 	// this is not a real iterator implementation but it works...
-  public ArrayList<Island> iterator() {
+  public ArrayList<DirectedIsland> iterator() {
 	  return islands;
   }
 
@@ -54,7 +54,7 @@ public class Archipelago {
 		for(i=0; i<size(); i++) {
 			for(j=i+1; j<size(); j++) {
 				if(islands.get(i).overlap(islands.get(j))) {
-					((UndirectedIsland) islands.get(i)).merge(islands.get(j));
+					(islands.get(i)).merge(islands.get(j));
 					islands.get(j).clear();
 					rr[j] = 1;
 				}
@@ -84,10 +84,30 @@ public class Archipelago {
 
 	public Archipelago copy() {
 		Archipelago result = new Archipelago();
-		for(Island isl: islands) {
-			result.add(isl.copy());
+		for(DirectedIsland isl: islands) {
+			result.add((DirectedIsland) isl.copy());
 		}
 	  return result;
   }
+
+	public boolean conflictsWith(Island island) {
+		for(Island isl : islands) {
+			if(isl.isCompetitor(island))
+				return true;
+		}
+	  return false;
+  }
+
+	public String toString() {
+		String result = "";
+		for(Island island : islands) {
+		  if(result.isEmpty())
+		  	result = "[ " + island;
+		  else
+		  	result += ", " + island;
+		}
+		result += " ]";
+		return result;
+	}
 
 }

@@ -75,4 +75,10 @@ public class DirectedIsland extends Island{
 		return null;
 	}
 
+	public void merge(DirectedIsland di) {
+		for(Coordinate c: di.iterator()) {
+			add(c);
+		}
+  }
+
 }

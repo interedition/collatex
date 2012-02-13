@@ -135,7 +135,7 @@ public class SparseMatrix  {
 				}
 				if(!found) {
 //					System.out.println("new island");
-					UndirectedIsland island = new UndirectedIsland();
+					DirectedIsland island = new DirectedIsland();
 					island.add(c);
 					islands.add(island);
 				}

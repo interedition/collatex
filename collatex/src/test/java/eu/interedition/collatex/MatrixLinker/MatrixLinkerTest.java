@@ -248,11 +248,11 @@ public class MatrixLinkerTest extends AbstractTest {
   @Test
   public void testArchipelago() {
   	Archipelago arch = new Archipelago();
-  	UndirectedIsland isl_1 = new UndirectedIsland();
+  	DirectedIsland isl_1 = new DirectedIsland();
   	isl_1.add(new Coordinate(0,0));
   	isl_1.add(new Coordinate(1,1));
   	arch.add(isl_1);
-  	UndirectedIsland isl_2 = new UndirectedIsland();
+  	DirectedIsland isl_2 = new DirectedIsland();
   	isl_2.add(new Coordinate(2,2));
   	isl_2.add(new Coordinate(3,3));
   	arch.add(isl_2);
@@ -273,7 +273,6 @@ public class MatrixLinkerTest extends AbstractTest {
     assertEquals(2,archipelago.numOfConflicts());
   }
 
-  @Ignore
   @Test
   public void testIslands() {
   	SimpleWitness[] sw = createWitnesses("A B C A B","A B C A B");
@@ -281,10 +280,20 @@ public class MatrixLinkerTest extends AbstractTest {
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions islands = buildMatrix.getIslands();
+  	System.out.println("islands: "+islands);
   	assertEquals(3, islands.size());
   	assertEquals(2,islands.numOfConflicts());
+  	islands.createNonConflictingVersions();
+		System.out.println("version(0): "+islands.getVersion(0));
+  	System.out.println("version(1): "+islands.getVersion(1));
+  	System.out.println("version(2): "+islands.getVersion(2));
   	int res = islands.numOfNonConflConstell();
   	assertEquals(2, res);
+  	assertEquals(1, islands.getVersion(0).size());
+		System.out.println("version(0): "+islands.getVersion(0));
+  	System.out.println("version(1): "+islands.getVersion(1));
+  	assertEquals(3, islands.getVersion(1).size());
+  	assertEquals(null, islands.getVersion(2));
   }
   
   @Test
