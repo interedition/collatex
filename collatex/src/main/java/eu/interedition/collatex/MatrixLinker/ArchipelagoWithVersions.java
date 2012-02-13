@@ -83,7 +83,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   			if(!found_one) {
   				System.out.println("!found_one");
     			for(Archipelago version : nonConflVersions)	{
-  					for(Island isl : version.iterator()) {
+  					for(DirectedIsland isl : version.iterator()) {
   						DirectedIsland di = (DirectedIsland)isl;
   						DirectedIsland res = di.removePoints((DirectedIsland) island);
   						System.out.println("di: "+di);

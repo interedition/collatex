@@ -15,7 +15,7 @@ public class Archipelago {
 		islands.add(isl);
   }
 	public void add(DirectedIsland island) {
-		for(Island i : islands) {
+		for(DirectedIsland i : islands) {
 			if(island.size()>i.size()) {
 				islands.add(islands.indexOf(i), island);
 				return;
@@ -78,7 +78,7 @@ public class Archipelago {
 	  return result;
   }
 	
-	public Island get(int i) {
+	public DirectedIsland get(int i) {
 		return islands.get(i);
 	}
 
@@ -90,8 +90,8 @@ public class Archipelago {
 	  return result;
   }
 
-	public boolean conflictsWith(Island island) {
-		for(Island isl : islands) {
+	public boolean conflictsWith(DirectedIsland island) {
+		for(DirectedIsland isl : islands) {
 			if(isl.isCompetitor(island))
 				return true;
 		}
@@ -100,7 +100,7 @@ public class Archipelago {
 
 	public String toString() {
 		String result = "";
-		for(Island island : islands) {
+		for(DirectedIsland island : islands) {
 		  if(result.isEmpty())
 		  	result = "[ " + island;
 		  else

@@ -14,9 +14,10 @@ import java.util.ArrayList;
  * 
  */
 
-public class DirectedIsland extends Island{
+public class DirectedIsland {
 
 	private int direction;
+	private ArrayList<Coordinate> island;
 
 	public DirectedIsland() {
 		island = new ArrayList<Coordinate>();
@@ -57,7 +58,6 @@ public class DirectedIsland extends Island{
 		return result;		
 	}
 
-	@Override
 	public Coordinate getCoorOnRow(int row) {
 		for(Coordinate coor : island) {
 			if(coor.getRow()==row)
@@ -66,7 +66,6 @@ public class DirectedIsland extends Island{
 		return null;
 	}
 		
-	@Override
 	public Coordinate getCoorOnCol(int col) {
 		for(Coordinate coor : island) {
 			if(coor.getCol()==col)
@@ -79,6 +78,77 @@ public class DirectedIsland extends Island{
 		for(Coordinate c: di.iterator()) {
 			add(c);
 		}
+  }
+
+	public DirectedIsland copy() {
+		DirectedIsland result = new DirectedIsland();
+		for(Coordinate c: island)
+			result.add(c.copy());
+		return result;
+	}
+
+	/**
+   * Two islands are competitors if there is a horizontal or
+   * vertical line which goes through both islands 
+   */
+  public boolean isCompetitor(DirectedIsland isl) {
+  	for(Coordinate c: isl.iterator()) {
+  		for(Coordinate d: island) {
+  			if(c.sameCol(d) || c.sameRow(d))
+  				return true;
+  		}
+  	}
+  	return false;
+  }
+
+	public boolean partOf(Coordinate c) {
+  	return island.contains(c);
+  }
+
+	public boolean neighbour(Coordinate c) {
+  	if(partOf(c))
+  		return false;
+  	for(Coordinate islC : island) {
+  		if(c.borders(islC)) {
+  			return true;
+  		}
+  	}
+  	return false;
+  }
+
+	public ArrayList<Coordinate> iterator() {
+    return island;
+  }
+
+	protected boolean removeSameColOrRow(Coordinate c) {
+    ArrayList<Coordinate> remove = new ArrayList<Coordinate>();
+		for(Coordinate coor: island) {
+			if(coor.sameCol(c) || coor.sameRow(c)) {
+				remove.add(coor);
+			}
+		}
+		if(remove.isEmpty())
+			return false;
+    for(Coordinate coor : remove) {
+    	island.remove(coor);
+    }
+	  return true;
+  }
+
+	public boolean overlap(DirectedIsland isl) {
+		for(Coordinate c: isl.iterator()) {
+    	if(partOf(c) || neighbour(c))
+    		return true;
+    }
+    return false;
+	}
+
+  public int size() {
+  	return island.size();
+  }
+
+  public void clear() {
+  	island.clear();
   }
 
 }
