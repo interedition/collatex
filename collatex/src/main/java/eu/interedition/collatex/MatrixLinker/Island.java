@@ -150,5 +150,18 @@ public class Island {
   public void clear() {
   	island.clear();
   }
+  
+  public String toString() {
+  	if(size()==0)
+  		return "{ }";
+  	String result = "";
+  	for(Coordinate c : island) {
+  		if(result.isEmpty())
+  			result = "{ " + c;
+  		else
+  			result += ", " + c;
+  	}
+		return result + " }";
+  }
 
 }
