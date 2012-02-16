@@ -25,10 +25,10 @@ public class ArchipelagoWithVersions extends Archipelago {
 		nonConflVersions = new ArrayList<Archipelago>();
 		int tel = 0;
 		for(Island island : islands) {
-  		System.out.println("createNonConflictingVersions["+tel+"]("+island+")");
+//  		System.out.println("createNonConflictingVersions["+tel+"]("+island+")");
   		tel++;
   		if(nonConflVersions.size()==0) {
-  			System.out.println("nonConflVersions.size()==0");
+//  			System.out.println("nonConflVersions.size()==0");
   			Archipelago version = new Archipelago();
   			version.add(island);
   			nonConflVersions.add(version);
@@ -36,29 +36,42 @@ public class ArchipelagoWithVersions extends Archipelago {
   			boolean found_one = false;
 				ArrayList<Archipelago> new_versions = new ArrayList<Archipelago>();
   			for(Archipelago version : nonConflVersions)	{
-  				System.out.println("version: "+version);
+//  				System.out.println("version: "+version);
   				if(!version.conflictsWith(island)) {
-  					System.out.println("!version.conflictsWith(island)");
+//  					System.out.println("!version.conflictsWith(island)");
   					version.add(island);
   					found_one = true;
   				}
   			}
   			if(!found_one) {
-  				System.out.println("!found_one");
+//  				System.out.println("!found_one");
+  				// try to find a existing version in which the new island fits
+  				// after removing some points
     			for(Archipelago version : nonConflVersions)	{
+						Island island_copy = island.copy();
   					for(Island isl : version.iterator()) {
-  						Island di = (Island)isl;
-  						Island res = di.removePoints((Island) island);
-  						System.out.println("di: "+di);
-  						System.out.println("res: "+res);
+  						island_copy = island_copy.removePoints(isl);
+  					}
+						if(island_copy.size()>0) {
+							version.add(island_copy);
+							found_one = true;
+						}
+    			}
+    			// create a new version with the new island and (parts of) existing islands
+    			for(Archipelago version : nonConflVersions)	{
+		  			Archipelago new_version = new Archipelago();
+		  			new_version.add(island);
+  					for(Island isl : version.iterator()) {
+  						Island di = isl.copy();
+//  						System.out.println("di: "+di);
+  						Island res = di.removePoints(island);
+//  						System.out.println("res: "+res);
   						if(res.size()>0) {
   							found_one = true;
-  			  			Archipelago new_version = new Archipelago();
-  			  			new_version.add(island);
   			  			new_version.add(res);
-  			  			new_versions.add(new_version);
   						}
   					}
+		  			new_versions.add(new_version);
     			}
 					if(new_versions.size()>0) {
 						for(Archipelago arch : new_versions) {
@@ -67,7 +80,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 					}
   			}
   			if(!found_one) {
-  				System.out.println("!found_one");
+//  				System.out.println("!found_one");
   				Archipelago version = new Archipelago();
   				version.add(island);
   				nonConflVersions.add(version);
@@ -90,10 +103,10 @@ public class ArchipelagoWithVersions extends Archipelago {
 
 	// is to be a list of non-conflicting versions
 	public ArchipelagoWithVersions orderedBySizeNonConfl() {
-		System.out.println("orderedBySizeNonConfl()");
-		for(Archipelago arch : nonConflVersions) {
-			System.out.println("version: "+arch);
-		}
+//		System.out.println("orderedBySizeNonConfl()");
+//		for(Archipelago arch : nonConflVersions) {
+//			System.out.println("version: "+arch);
+//		}
 		ArchipelagoWithVersions result = this.copy();
 		int num = result.size();
 		ArrayList<Integer> remove = new ArrayList<Integer>();
@@ -110,7 +123,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 						remove.add(pos,j);
 					}
 				}
-		System.out.println("num to be removed: "+remove.size());
+//		System.out.println("num to be removed: "+remove.size());
 	  for(Integer i : remove)
 	  	result.remove(i.intValue());
 	  return result;

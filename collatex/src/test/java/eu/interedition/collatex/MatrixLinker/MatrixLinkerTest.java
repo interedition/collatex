@@ -247,18 +247,18 @@ public class MatrixLinkerTest extends AbstractTest {
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions islands = buildMatrix.getIslands();
-  	System.out.println("islands: "+islands);
+//  	System.out.println("islands: "+islands);
   	assertEquals(3, islands.size());
   	assertEquals(2,islands.numOfConflicts());
   	islands.createNonConflictingVersions();
-		System.out.println("version(0): "+islands.getVersion(0));
-  	System.out.println("version(1): "+islands.getVersion(1));
-  	System.out.println("version(2): "+islands.getVersion(2));
+//		System.out.println("version(0): "+islands.getVersion(0));
+//  	System.out.println("version(1): "+islands.getVersion(1));
+//  	System.out.println("version(2): "+islands.getVersion(2));
   	int res = islands.numOfNonConflConstell();
   	assertEquals(2, res);
   	assertEquals(1, islands.getVersion(0).size());
-		System.out.println("version(0): "+islands.getVersion(0));
-  	System.out.println("version(1): "+islands.getVersion(1));
+//		System.out.println("version(0): "+islands.getVersion(0));
+//  	System.out.println("version(1): "+islands.getVersion(1));
   	assertEquals(3, islands.getVersion(1).size());
   	assertEquals(null, islands.getVersion(2));
   }
@@ -308,7 +308,6 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertEquals(2,arch.get(2).size());
   }
 
-  @Ignore
   @Test
   public void testOrderedIslands2() {
 	/*
@@ -328,6 +327,10 @@ public class MatrixLinkerTest extends AbstractTest {
   	isl_2.add(new Coordinate(4,6));
   	arch.add(isl_2);
   	arch.createNonConflictingVersions();
+//  	System.out.println("versions: ");
+//  	for(Archipelago arch_v : arch.getNonConflVersions()) {
+//  		System.out.println(arch_v);
+//  	}
   	assertEquals(2,arch.getNonConflVersions().size());
   	Island isl_3 = new Island();
   	isl_3.add(new Coordinate(6,8));
@@ -336,6 +339,10 @@ public class MatrixLinkerTest extends AbstractTest {
   	isl_3.add(new Coordinate(9,11));
   	arch.add(isl_3);
   	arch.createNonConflictingVersions();
+//  	System.out.println("versions: ");
+//  	for(Archipelago arch_v : arch.getNonConflVersions()) {
+//  		System.out.println(arch_v);
+//  	}
   	assertEquals(2,arch.getNonConflVersions().size());
   	assertEquals(2,arch.orderedBySizeNonConfl().size());
   	assertEquals(4,arch.get(0).size());
