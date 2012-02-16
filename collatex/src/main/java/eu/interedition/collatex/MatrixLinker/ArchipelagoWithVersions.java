@@ -19,51 +19,14 @@ public class ArchipelagoWithVersions extends Archipelago {
 
 	public void add(Island island) {
     super.add(island);
-//		addIslandToNonConflictingVersions(island);
   }
 
-//	private void addIslandToNonConflictingVersions(DirectedIsland island) {
-//		System.out.println("addIslandToNonConflictingVersions("+island+")");
-//
-//		if(nonConflVersions.size()==0) {
-//			System.out.println("nonConflVersions.size()==0");
-//			Archipelago version = new Archipelago();
-//			version.add(island);
-//			nonConflVersions.add(version);
-//		} else {
-//			boolean found_one = false;
-//			for(Archipelago version : nonConflVersions)	{
-//				System.out.println("version: "+version);
-//				if(!version.conflictsWith(island)) {
-//					System.out.println("!version.conflictsWith(island)");
-//					version.add(island);
-//					found_one = true;
-//				} else {
-//					for(Island isl : version.iterator()) {
-//						DirectedIsland di = (DirectedIsland)isl;
-//						DirectedIsland res = di.removePoints((DirectedIsland) island);
-//						System.out.println("di: "+di);
-//						System.out.println("res: "+res);
-//					}
-//					/* misschien een deel van deze versie bruikbaar om samen met
-//					 * het nieuwe island een nieuwe versie te maken? 
-//					 */
-//				}
-//			}
-//			if(!found_one) {
-//				System.out.println("!found_one");
-//				// new version
-//				// geheel nieuw of deels uit een andere versie opgebouwd.
-//				Archipelago version = new Archipelago();
-//				version.add(island);
-//				nonConflVersions.add(version);
-//			}
-//		}
-//  }
-
 	public void createNonConflictingVersions() {
+		nonConflVersions = new ArrayList<Archipelago>();
+		int tel = 0;
 		for(Island island : islands) {
-  		System.out.println("createNonConflictingVersions("+island+")");
+  		System.out.println("createNonConflictingVersions["+tel+"]("+island+")");
+  		tel++;
   		if(nonConflVersions.size()==0) {
   			System.out.println("nonConflVersions.size()==0");
   			Archipelago version = new Archipelago();
@@ -127,6 +90,10 @@ public class ArchipelagoWithVersions extends Archipelago {
 
 	// is to be a list of non-conflicting versions
 	public ArchipelagoWithVersions orderedBySizeNonConfl() {
+		System.out.println("orderedBySizeNonConfl()");
+		for(Archipelago arch : nonConflVersions) {
+			System.out.println("version: "+arch);
+		}
 		ArchipelagoWithVersions result = this.copy();
 		int num = result.size();
 		ArrayList<Integer> remove = new ArrayList<Integer>();
@@ -143,6 +110,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 						remove.add(pos,j);
 					}
 				}
+		System.out.println("num to be removed: "+remove.size());
 	  for(Integer i : remove)
 	  	result.remove(i.intValue());
 	  return result;
@@ -158,7 +126,8 @@ public class ArchipelagoWithVersions extends Archipelago {
 		}
   }
 
-//	public Archipelago nextNonConflConf() {
-//		return new Archipelago();
-//	}
+	public ArrayList<Archipelago> getNonConflVersions() {
+	  return nonConflVersions;
+  }
+
 }

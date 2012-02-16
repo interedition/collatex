@@ -14,6 +14,7 @@ public class Archipelago {
 		islands = new ArrayList<Island>();
 		islands.add(isl);
   }
+	
 	public void add(Island island) {
 		for(Island i : islands) {
 			if(island.size()>i.size()) {
@@ -109,5 +110,13 @@ public class Archipelago {
 		result += " ]";
 		return result;
 	}
+
+	public int value() {
+	  int result= 0;
+	  for(Island isl: islands) {
+	  	result += isl.value();
+	  }
+	  return result;
+  }
 
 }

@@ -117,7 +117,6 @@ public class MatrixLinkerTest extends AbstractTest {
 	    FileWriter fw = new FileWriter("C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\Hulp1.html");
 	    fw.write(buildMatrix.toHtml());
     } catch (IOException e) {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
     }
   	System.out.println(buildMatrix.toHtml());
@@ -309,6 +308,7 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertEquals(2,arch.get(2).size());
   }
 
+  @Ignore
   @Test
   public void testOrderedIslands2() {
 	/*
@@ -327,18 +327,23 @@ public class MatrixLinkerTest extends AbstractTest {
   	isl_2.add(new Coordinate(3,5));
   	isl_2.add(new Coordinate(4,6));
   	arch.add(isl_2);
+  	arch.createNonConflictingVersions();
+  	assertEquals(2,arch.getNonConflVersions().size());
   	Island isl_3 = new Island();
   	isl_3.add(new Coordinate(6,8));
   	isl_3.add(new Coordinate(7,9));
   	isl_3.add(new Coordinate(8,10));
   	isl_3.add(new Coordinate(9,11));
   	arch.add(isl_3);
+  	arch.createNonConflictingVersions();
+  	assertEquals(2,arch.getNonConflVersions().size());
   	assertEquals(2,arch.orderedBySizeNonConfl().size());
   	assertEquals(4,arch.get(0).size());
   	assertEquals(3,arch.get(1).size());
   }
   
-  @Test public void nonConflictingVersions() {
+  @Test
+  public void testNonConflictingVersions() {
   	ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
   	Island isl_1 = new Island();
   	isl_1.add(new Coordinate(1,1));
@@ -347,6 +352,25 @@ public class MatrixLinkerTest extends AbstractTest {
   	arch.add(isl_1);
   	arch.createNonConflictingVersions();
   	assertEquals(1,arch.numOfNonConflConstell());
+  }
+  
+  @Test
+  public void testIslandValue() {
+  	Island isl_1 = new Island();
+  	isl_1.add(new Coordinate(1,1));
+  	assertEquals(1,isl_1.value());
+  	isl_1.add(new Coordinate(2,2));
+  	assertEquals(5,isl_1.value());
+  	isl_1.add(new Coordinate(3,3));
+  	assertEquals(10,isl_1.value());
+  	Island isl_2 = new Island();
+  	isl_2.add(new Coordinate(2,2));
+  	isl_2.add(new Coordinate(3,1));
+  	assertEquals(3,isl_2.value());
+  	Archipelago arch = new Archipelago();
+  	arch.add(isl_1);
+  	arch.add(isl_2);
+  	assertEquals(13,arch.value());
   }
   
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,

@@ -164,4 +164,11 @@ public class Island {
 		return result + " }";
   }
 
+	public int value() {
+		if(size()<2) {
+			return size();
+		}
+	  return direction + size()*size();
+  }
+
 }
