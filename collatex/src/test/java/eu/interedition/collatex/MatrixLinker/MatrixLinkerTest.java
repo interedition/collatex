@@ -333,8 +333,8 @@ public class MatrixLinkerTest extends AbstractTest {
   	isl_3.add(new Coordinate(9,11));
   	arch.add(isl_3);
   	arch.createNonConflictingVersions();
-  	assertEquals(28,arch.versionsOrderedByValue().get(0).value());
-  	assertEquals(27,arch.versionsOrderedByValue().get(1).value());
+  	assertEquals(28,arch.getVersion(0).value());
+  	assertEquals(27,arch.getVersion(1).value());
   }
   
   @Test

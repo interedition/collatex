@@ -75,7 +75,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     			}
 					if(new_versions.size()>0) {
 						for(Archipelago arch : new_versions) {
-							nonConflVersions.add(arch);
+							addVersion(arch);
 						}
 					}
   			}
@@ -83,11 +83,22 @@ public class ArchipelagoWithVersions extends Archipelago {
 //  				System.out.println("!found_one");
   				Archipelago version = new Archipelago();
   				version.add(island);
-  				nonConflVersions.add(version);
+  				addVersion(version);
   			}
   		}
 		}
   }
+	
+	void addVersion(Archipelago version) {
+		int pos = 0;
+		for(pos = 0; pos<nonConflVersions.size(); pos++) {
+			if(version.value()>nonConflVersions.get(pos).value()) {
+				nonConflVersions.add(pos,version);
+				break;
+			}
+		}
+		nonConflVersions.add(version);
+	}
 
 	public int numOfNonConflConstell() {
 	  return nonConflVersions.size();
@@ -98,34 +109,6 @@ public class ArchipelagoWithVersions extends Archipelago {
 		for(Island isl: islands) {
 			result.add((Island) isl.copy());
 		}
-	  return result;
-  }
-
-	// is to be a list of non-conflicting versions
-	public ArchipelagoWithVersions orderedBySizeNonConfl() {
-//		System.out.println("orderedBySizeNonConfl()");
-//		for(Archipelago arch : nonConflVersions) {
-//			System.out.println("version: "+arch);
-//		}
-		ArchipelagoWithVersions result = this.copy();
-		int num = result.size();
-		ArrayList<Integer> remove = new ArrayList<Integer>();
-		for(int i=0; i<num; i++)
-			for(int j=i+1; j<num; j++)
-				if(!remove.contains(i)&& !remove.contains(j)) {
-					if(result.get(i).isCompetitor(result.get(j))) {
-						int pos = 0;
-						for(Integer p : remove)
-							if(remove.get(p)<j)
-								break;
-							else
-								pos++;
-						remove.add(pos,j);
-					}
-				}
-//		System.out.println("num to be removed: "+remove.size());
-	  for(Integer i : remove)
-	  	result.remove(i.intValue());
 	  return result;
   }
 
@@ -141,21 +124,6 @@ public class ArchipelagoWithVersions extends Archipelago {
 
 	public ArrayList<Archipelago> getNonConflVersions() {
 	  return nonConflVersions;
-  }
-
-	public ArrayList<Archipelago> versionsOrderedByValue() {
-		ArrayList<Archipelago> result = new ArrayList<Archipelago>();
-		for(Archipelago version : nonConflVersions) {
-			int pos = 0;
-			for(pos = 0; pos<result.size(); pos++) {
-				if(version.value()>result.get(pos).value()) {
-					result.add(pos,version);
-					break;
-				}
-			}
-			result.add(version);
-		}
-	  return result;
   }
 
 }
