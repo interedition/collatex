@@ -310,12 +310,6 @@ public class MatrixLinkerTest extends AbstractTest {
 
   @Test
   public void testOrderedIslands2() {
-	/*
-	 * bepaal welke islands zo aan deze orderedlist toegevoegd kunnen worden
-	 * en welke vanwege conflicten niet
-	 * bepaal de mate van overlap tussen twee conflicterende eilanden
-	 *  
-	 */
   	ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
   	Island isl_1 = new Island();
   	isl_1.add(new Coordinate(1,1));
@@ -339,14 +333,8 @@ public class MatrixLinkerTest extends AbstractTest {
   	isl_3.add(new Coordinate(9,11));
   	arch.add(isl_3);
   	arch.createNonConflictingVersions();
-//  	System.out.println("versions: ");
-//  	for(Archipelago arch_v : arch.getNonConflVersions()) {
-//  		System.out.println(arch_v);
-//  	}
-  	assertEquals(2,arch.getNonConflVersions().size());
-  	assertEquals(2,arch.orderedBySizeNonConfl().size());
-  	assertEquals(4,arch.get(0).size());
-  	assertEquals(3,arch.get(1).size());
+  	assertEquals(28,arch.versionsOrderedByValue().get(0).value());
+  	assertEquals(27,arch.versionsOrderedByValue().get(1).value());
   }
   
   @Test

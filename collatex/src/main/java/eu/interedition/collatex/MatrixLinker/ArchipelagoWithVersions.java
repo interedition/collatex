@@ -143,4 +143,19 @@ public class ArchipelagoWithVersions extends Archipelago {
 	  return nonConflVersions;
   }
 
+	public ArrayList<Archipelago> versionsOrderedByValue() {
+		ArrayList<Archipelago> result = new ArrayList<Archipelago>();
+		for(Archipelago version : nonConflVersions) {
+			int pos = 0;
+			for(pos = 0; pos<result.size(); pos++) {
+				if(version.value()>result.get(pos).value()) {
+					result.add(pos,version);
+					break;
+				}
+			}
+			result.add(version);
+		}
+	  return result;
+  }
+
 }
