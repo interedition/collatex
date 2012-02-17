@@ -171,4 +171,16 @@ public class Island {
 	  return direction + size()*size();
   }
 
+	@Override
+	public boolean equals(Object obj) {
+		if(!obj.getClass().equals(Island.class))
+			return false;
+		Island isl = (Island) obj;
+		boolean result = true;
+		for(Coordinate c : isl.iterator()) {
+			result &= this.partOf(c);
+		}
+		return result;
+	}
+
 }

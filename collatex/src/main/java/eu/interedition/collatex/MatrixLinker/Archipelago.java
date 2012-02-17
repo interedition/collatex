@@ -119,4 +119,17 @@ public class Archipelago {
 	  return result;
   }
 
+	@Override
+	public boolean equals(Object object) {
+		if(object.getClass()!=this.getClass())
+				return false;
+		if(((Archipelago)object).size()!=this.size())
+		  return false;
+		for(int i=0; i<size(); i++) {
+			if(!((Archipelago)object).get(i).equals(get(i)))
+				return false;
+		}
+		return true;		
+	}
+
 }

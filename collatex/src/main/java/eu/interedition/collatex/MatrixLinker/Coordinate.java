@@ -45,4 +45,12 @@ public class Coordinate {
 	public Coordinate copy() {
 	  return new Coordinate(row, col);
   }
+
+	public boolean partOf(Archipelago arch) {
+		boolean result = false;
+		for(Island isl : arch.iterator()) {
+			result |= isl.partOf(this);
+		}
+	  return result;
+  }
 }

@@ -69,7 +69,32 @@ public class SparseMatrix  {
   	result += "</table>";
 		return result;
   }
-  
+
+
+  public String toHtml(Archipelago arch) {
+  	String result = "<table>\n<tr><td></td>\n";
+  	ArrayList<String> colLabels = columnLabels();
+  	for(String cLabel : colLabels) {
+	      result += "<td>" + cLabel + "</td>";
+		}
+  	result += "</tr>\n";
+  	int colNum = sparseMatrix.columnKeyList().size();
+  	ArrayList<String> rLabels = rowLabels();
+  	int row = 0;
+  	for(String label : rLabels) {
+      result += "<tr><td>" + label + "</td>";
+      for(int col=0; col<colNum;col++)
+      	if(new Coordinate(row,col).partOf(arch))
+      		result += "<td BGCOLOR=\"lightgreen\">M</td>";
+      	else
+      		result += "<td></td>";
+      result += "</tr>\n";
+      row++;
+	  }
+  	result += "</table>";
+		return result;
+  }
+
   public ArrayList<String> rowLabels() {
   	ArrayList<String> labels = new ArrayList<String>();
   	for(VariantGraphVertex vgv : sparseMatrix.rowKeyList()) {
@@ -117,14 +142,14 @@ public class SparseMatrix  {
 
 
 
-	public ArchipelagoWithVersions getIslands() {
-		ArchipelagoWithVersions islands = new ArchipelagoWithVersions();
+	public ArrayList<Island> getIslands() {
+		ArrayList<Island> islands = new ArrayList<Island>();
 		ArrayList<Coordinate> allTrue = allTrues();
 		for(Coordinate c: allTrue) {
 //			System.out.println("next coordinate: "+c);
 			boolean found = false;
 			while(!found) {
-				for(Island alc : islands.iterator()) {
+				for(Island alc : islands) {
 //					System.out.println("inspect island");
 					if(alc.neighbour(c)) {
 							alc.add(c);
