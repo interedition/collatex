@@ -84,7 +84,7 @@ public class SparseMatrix  {
   	for(String label : rLabels) {
       result += "<tr><td>" + label + "</td>";
       for(int col=0; col<colNum;col++)
-      	if(new Coordinate(row,col).partOf(arch))
+      	if(new Coordinate(col,row).partOf(arch))
       		result += "<td BGCOLOR=\"lightgreen\">M</td>";
       	else
       		result += "<td></td>";
@@ -126,18 +126,18 @@ public class SparseMatrix  {
   	for(int i=0; i<rows; i++) {
   		for(int j=0; j<cols; j++) {
   			if(at(i,j))
-  				pairs.add(new Coordinate(i,j));
+  				pairs.add(new Coordinate(j,i));
   		}
   	}
   	return pairs;
   }
   
   public int rowNum() {
-		return sparseMatrix.rowKeyList().size();
+		return rowLabels().size();
   }
   
   public int colNum() {
-		return sparseMatrix.columnKeyList().size();
+		return columnLabels().size();
   }
 
 

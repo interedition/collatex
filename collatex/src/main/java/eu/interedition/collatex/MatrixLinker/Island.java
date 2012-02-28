@@ -183,4 +183,22 @@ public class Island {
 		return result;
 	}
 
+	public Coordinate getLeftEnd() {
+		Coordinate coor = island.get(0);
+		for(Coordinate c: island) {
+			if(c.col<coor.col)
+				coor = c;
+		}
+	  return coor;
+  }
+
+	public Coordinate getRightEnd() {
+		Coordinate coor = island.get(0);
+		for(Coordinate c: island) {
+			if(c.col>coor.col)
+				coor = c;
+		}
+	  return coor;
+  }
+
 }

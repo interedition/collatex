@@ -1,21 +1,17 @@
 package eu.interedition.collatex.MatrixLinker;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.input.SimpleWitness;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 
@@ -52,12 +48,40 @@ public class HermansTest extends AbstractTest {
   	assertEquals(42, archipelago.size());
     assertEquals(98,archipelago.numOfConflicts());
 //  	assertTrue(false);
-    archipelago.createNonConflictingVersions();
-    assertEquals(603,archipelago.numOfNonConflConstell());
-    assertEquals(500,archipelago.getVersion(0).value());
-    assertEquals(497,archipelago.getVersion(4).value());
+//    archipelago.createNonConflictingVersions();
+//    assertEquals(603,archipelago.numOfNonConflConstell());
+//    assertEquals(500,archipelago.getVersion(0).value());
+//    assertEquals(497,archipelago.getVersion(4).value());
+    
+    Archipelago firstVersion = archipelago.createFirstVersion();
+  	for(Island isl: firstVersion.iterator()) {
+  		System.out.print(" "+isl.size());
+  	}
+  	try {
+  		int i = 0;
+  		String file_name = "result_3_"+i+".html";
+    	File logFile = new File(File.separator + "C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\output_collatex_exp\\"+file_name);
+    	PrintWriter logging = new PrintWriter(new FileOutputStream(logFile));
+//  	logging.println(buildMatrix.toHtml(archipelago.getVersion(i)));
+    	logging.println(buildMatrix.toHtml(firstVersion));
+    	logging.close();
+  	} catch (FileNotFoundException e) {
+  		e.printStackTrace();
+  	}
+//    for(int i=0; i<10; i++) {
+//  		try {
+//  			String file_name = "result_"+i+".html";
+//    		File logFile = new File(File.separator + "C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\output_collatex_exp\\"+file_name);
+//    		PrintWriter logging = new PrintWriter(new FileOutputStream(logFile));
+//      	logging.println(buildMatrix.toHtml(archipelago.getVersion(i)));
+//      	logging.close();
+//      } catch (FileNotFoundException e) {
+//  	    e.printStackTrace();
+//      }
+//    }
+
   }
-  
+
   @Test
   public void testHermansText3() {
   	String textMZ_DJ233 = "Werumeus Buning maakt artikelen van vijf pagina&APO+s over de geologie van de diepzee, die hij uit Engelse boeken overschrijft, wat hij pas in de laatste regel vermeldt, omdat hij zo goed kan koken.<p/>\n" +
@@ -75,6 +99,13 @@ public class HermansTest extends AbstractTest {
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+//  	try {
+//	    FileWriter fw = new FileWriter("C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\Hulp1.html");
+//	    fw.write(buildMatrix.toHtml());
+//    } catch (IOException e) {
+//	    e.printStackTrace();
+//    }
+//  	System.out.println(buildMatrix.toHtml());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
   	for(Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
@@ -91,6 +122,17 @@ public class HermansTest extends AbstractTest {
   	for(Island isl: firstVersion.iterator()) {
   		System.out.print(" "+isl.size());
   	}
+  	try {
+  		int i = 0;
+  		String file_name = "result_2_"+i+".html";
+    	File logFile = new File(File.separator + "C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\output_collatex_exp\\"+file_name);
+    	PrintWriter logging = new PrintWriter(new FileOutputStream(logFile));
+//  	logging.println(buildMatrix.toHtml(archipelago.getVersion(i)));
+    	logging.println(buildMatrix.toHtml(firstVersion));
+    	logging.close();
+  	} catch (FileNotFoundException e) {
+  		e.printStackTrace();
+  	}
     
     assertEquals(4877, firstVersion.value());
 //  	assertTrue(false);
@@ -99,6 +141,16 @@ public class HermansTest extends AbstractTest {
 //    assertEquals(603,archipelago.numOfNonConflConstell());
 //    assertEquals(500,archipelago.getVersion(0).value());
 //    assertEquals(497,archipelago.getVersion(4).value());
+//    for(int i=0; i<10; i++) {
+//  		try {
+//  			String file_name = "result_2_"+i+".html";
+//    		File logFile = new File(File.separator + "C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\output_collatex_exp\\"+file_name);
+//    		PrintWriter logging = new PrintWriter(new FileOutputStream(logFile));
+//      	logging.println(buildMatrix.toHtml(archipelago.getVersion(i)));
+//      	logging.close();
+//      } catch (FileNotFoundException e) {
+//  	    e.printStackTrace();
+//      }
 //    }
   }
   

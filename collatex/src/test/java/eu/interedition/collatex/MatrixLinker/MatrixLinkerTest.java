@@ -4,8 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,8 @@ public class MatrixLinkerTest extends AbstractTest {
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	assertEquals(5,buildMatrix.colNum());
+  	assertEquals(5,buildMatrix.rowNum());
   	assertTrue(buildMatrix.at(0, 0));
   	assertTrue(buildMatrix.at(1, 1));
   	assertTrue(buildMatrix.at(1, 4));
@@ -227,7 +232,7 @@ public class MatrixLinkerTest extends AbstractTest {
   }
   
   @Test
-  public void testFindCoorOnRolOrCol() {
+  public void testFindCoorOnRowOrCol() {
   	Island isl_1 = new Island();
   	isl_1.add(new Coordinate(0,0));
   	isl_1.add(new Coordinate(1,1));
@@ -319,6 +324,51 @@ public class MatrixLinkerTest extends AbstractTest {
   	assertEquals(13,arch.value());
   }
   
+  @Test
+  public void testFindGaps() {
+  	Island isl_1 = new Island();
+  	isl_1.add(new Coordinate(1,1));
+  	isl_1.add(new Coordinate(2,2));
+  	Island isl_2 = new Island();
+  	isl_2.add(new Coordinate(4,4));
+  	isl_2.add(new Coordinate(5,5));
+  	ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
+  	arch.add(isl_1);
+  	arch.add(isl_2);
+  	ArrayList<Coordinate> list = new ArrayList<Coordinate>();
+  	list.add(new Coordinate(0, 0));
+  	list.add(new Coordinate(7, 7));
+  	ArrayList<Coordinate> gaps = arch.findGaps(list);
+  	assertEquals(4,gaps.size());
+  	assertEquals(new Coordinate(1,1),gaps.get(0));
+  	assertEquals(new Coordinate(5,5),gaps.get(3));
+  }
+
+  @Test
+  public void testArchipelagoGaps() {
+//  	SimpleWitness[] sw = createWitnesses("Op den Atlantischen Oceaan voer een groote stoomer. Onder de","Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder");
+  	SimpleWitness[] sw = createWitnesses("A B E F C D G H","A B C D E F G H");
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+  	for(Island isl: buildMatrix.getIslands())	{
+  		archipelago.add(isl);
+    }
+    assertEquals(4,archipelago.size());
+    try {
+	    PrintWriter pw = new PrintWriter(new File("exampleOutput.txt"));
+	    archipelago.createXML(buildMatrix, pw);
+	    pw.close();
+    } catch (FileNotFoundException e) {
+	    e.printStackTrace();
+    }
+  	ArrayList<Coordinate> list = new ArrayList<Coordinate>();
+  	ArrayList<Coordinate> gaps = archipelago.createFirstVersion().findGaps(list);
+  	System.out.println(buildMatrix.toHtml(archipelago.createFirstVersion()));
+  	assertEquals(6,gaps.size());
+  }
+
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,
       int posBaseWitness, int secondWitness, int posSecondWitness,
       Map<Token, VariantGraphVertex> link) {

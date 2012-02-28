@@ -4,9 +4,9 @@ public class Coordinate {
 	int row;
 	int col;
 	
-	Coordinate(int row, int col) {
-	  this.row = row;
+	Coordinate(int col, int row) {
 	  this.col = col;
+	  this.row = row;
 	}
 	
 	public int getRow() {
@@ -26,7 +26,7 @@ public class Coordinate {
 	}
 
 	public String toString() {
-		return "("+row+","+col+")";
+		return "("+col+","+row+")";
 	}
 	
 	public boolean equals(Object o) {
@@ -43,7 +43,7 @@ public class Coordinate {
   }
 
 	public Coordinate copy() {
-	  return new Coordinate(row, col);
+	  return new Coordinate(col, row);
   }
 
 	public boolean partOf(Archipelago arch) {

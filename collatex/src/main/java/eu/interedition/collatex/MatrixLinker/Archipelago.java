@@ -132,4 +132,40 @@ public class Archipelago {
 		return true;		
 	}
 
+	public ArrayList<Coordinate> findGaps() {
+		ArrayList<Coordinate> list = new ArrayList<Coordinate>();
+		return findGaps(list);
+  }
+
+	public ArrayList<Coordinate> findGaps(Coordinate begin, Coordinate end) {
+		ArrayList<Coordinate> list = new ArrayList<Coordinate>();
+		list.add(begin);
+		list.add(end);
+		return findGaps(list);
+  }
+
+	public ArrayList<Coordinate> findGaps(ArrayList<Coordinate> list) {
+		ArrayList<Coordinate> result = new ArrayList<Coordinate>(list);
+		for(Island isl : islands) {
+			Coordinate left = isl.getLeftEnd();
+			Coordinate right = isl.getRightEnd();
+			boolean found = false;
+			for(int i=0; i<result.size(); i++) {
+				if(left.col<result.get(i).col || (left.col==result.get(i).col && left.row<result.get(i).row)) {
+					result.add(i, right);
+					result.add(i, left);
+					found = true;
+					break;
+				}
+			}
+			if(!found) {
+				result.add(left);
+				result.add(right);
+			}
+		}
+		result.remove(result.size()-1);
+		result.remove(0);
+	  return result;
+  }
+
 }

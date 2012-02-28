@@ -1,5 +1,6 @@
 package eu.interedition.collatex.MatrixLinker;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class ArchipelagoWithVersions extends Archipelago {
@@ -34,7 +35,6 @@ public class ArchipelagoWithVersions extends Archipelago {
     nonConflVersions = new ArrayList<Archipelago>();
 		int tel = 0;
 		for(Island island : islands) {
-  		System.out.println("createNonConflictingVersions["+tel+"]("+island+")");
   		tel++;
 //  		if(tel>22)
   			debug = false;
@@ -204,5 +204,84 @@ public class ArchipelagoWithVersions extends Archipelago {
 	  // TODO Auto-generated method stub
 	  return result;
   }
+
+	public void createXML(SparseMatrix mat, PrintWriter output) {
+		ArrayList<String> columnLabels = mat.columnLabels();
+		ArrayList<String> rowLabels = mat.rowLabels();
+  	ArrayList<Coordinate> list = new ArrayList<Coordinate>();
+  	int rowNum = rowLabels.size();
+  	int colNum = columnLabels.size();
+  	list.add(new Coordinate(0, 0));
+  	list.add(new Coordinate(colNum-1, rowNum-1));
+  	ArrayList<Coordinate> gaps = createFirstVersion().findGaps(list);
+  	int rowPos = 0;
+  	int colPos = 0;
+  	int gapsPos = 0;
+		output.println("<xml>");
+  	while(true) {
+  		int islStart = gaps.get(gapsPos).col; 
+  		int islStartRow = gaps.get(gapsPos).row; 
+  		int islEnd = gaps.get(gapsPos+1).col;
+  		if(colPos<islStart || rowPos<gaps.get(gapsPos).row) {
+  			String lem ="";
+  			String rdg = "";
+  			while(colPos<gaps.get(gapsPos).col)
+  				lem += columnLabels.get(colPos++) + " ";
+  			while(rowPos<gaps.get(gapsPos).row)
+  				rdg += rowLabels.get(rowPos++) + " ";
+  			printApp(output,lem, rdg);
+  		}
+  		if(colPos==islStart && rowPos>islStartRow) {
+  			String lem ="";
+  			String rdg = "";
+  			while(colPos<gaps.get(gapsPos).col)
+  				lem += columnLabels.get(colPos++) + " ";
+  			printApp(output,lem, rdg);
+  			gapsPos += 2;
+  		} else {
+  			String res = "";
+  			while(islStart<=islEnd)
+  				res += columnLabels.get(islStart++)+" ";
+  			output.println(res.trim());
+  			colPos = gaps.get(gapsPos+1).col + 1;
+  			rowPos = gaps.get(gapsPos+1).row + 1;
+  			gapsPos += 2;
+  		}
+  		if(gapsPos>=gaps.size() || colPos==colNum)
+  			break;
+  	}
+		String lem = "";
+		while(colPos<colNum-1){
+			lem += columnLabels.get(colPos) + " ";
+			colPos++;
+		}
+		String rdg = "";
+		while(rowPos<rowNum-1){
+			rdg += rowLabels.get(rowPos) + " ";
+			rowPos++;
+		}
+		if(!(lem.isEmpty() && rdg.isEmpty())) {
+			if(lem.isEmpty())
+				lem = "[WEGGELATEN]";
+			if(rdg.isEmpty())
+				rdg = "[WEGGELATEN]";
+			printApp(output,lem,rdg);
+		}
+		output.println("</xml>");
+	}
+	
+	private void printApp(PrintWriter output, String lem,String rdg) {
+		if(!(lem.isEmpty() && rdg.isEmpty())) {
+			if(lem.isEmpty())
+				lem = "[WEGGELATEN]";
+			if(rdg.isEmpty())
+				rdg = "[WEGGELATEN]";
+  		output.println("  <app>");
+  		output.println("    <lem>"+lem.trim()+"</lem>");
+  		output.println("    <rdg>"+rdg.trim()+"</rdg>");
+  		output.println("  </app>");
+		}
+
+	}
 
 }
