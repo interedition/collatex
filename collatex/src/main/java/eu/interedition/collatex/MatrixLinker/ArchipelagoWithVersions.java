@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class ArchipelagoWithVersions extends Archipelago {
 
+	private static final String newLine = System.getProperty("line.separator");
 	private ArrayList<Archipelago> nonConflVersions;
 
 	public ArchipelagoWithVersions() {
@@ -205,7 +206,8 @@ public class ArchipelagoWithVersions extends Archipelago {
 	  return result;
   }
 
-	public void createXML(SparseMatrix mat, PrintWriter output) {
+	public String createXML(SparseMatrix mat, PrintWriter output) {
+		String result = "";
 		ArrayList<String> columnLabels = mat.columnLabels();
 		ArrayList<String> rowLabels = mat.rowLabels();
   	ArrayList<Coordinate> list = new ArrayList<Coordinate>();
@@ -218,6 +220,8 @@ public class ArchipelagoWithVersions extends Archipelago {
   	int colPos = 0;
   	int gapsPos = 0;
 		output.println("<xml>");
+		result += "<xml>" + newLine;
+		String res = "";
   	while(true) {
   		int islStart = gaps.get(gapsPos).col; 
   		int islStartRow = gaps.get(gapsPos).row; 
@@ -229,20 +233,23 @@ public class ArchipelagoWithVersions extends Archipelago {
   				lem += columnLabels.get(colPos++) + " ";
   			while(rowPos<gaps.get(gapsPos).row)
   				rdg += rowLabels.get(rowPos++) + " ";
-  			printApp(output,lem, rdg);
+  			result += printApp(output,lem, rdg);
+  			res = " ";
   		}
   		if(colPos==islStart && rowPos>islStartRow) {
   			String lem ="";
   			String rdg = "";
   			while(colPos<gaps.get(gapsPos).col)
   				lem += columnLabels.get(colPos++) + " ";
-  			printApp(output,lem, rdg);
+  			result += printApp(output,lem, rdg);
   			gapsPos += 2;
   		} else {
-  			String res = "";
   			while(islStart<=islEnd)
   				res += columnLabels.get(islStart++)+" ";
-  			output.println(res.trim());
+  			output.println(res);
+  			if(!res.trim().isEmpty())
+  			  result += res + newLine;
+  			res = "";
   			colPos = gaps.get(gapsPos+1).col + 1;
   			rowPos = gaps.get(gapsPos+1).row + 1;
   			gapsPos += 2;
@@ -265,22 +272,27 @@ public class ArchipelagoWithVersions extends Archipelago {
 				lem = "[WEGGELATEN]";
 			if(rdg.isEmpty())
 				rdg = "[WEGGELATEN]";
-			printApp(output,lem,rdg);
+			result += printApp(output,lem,rdg);
 		}
 		output.println("</xml>");
+		result += "</xml>";
+		return result;
 	}
 	
-	private void printApp(PrintWriter output, String lem,String rdg) {
+	private String printApp(PrintWriter output, String lem,String rdg) {
+		String result = "";
 		if(!(lem.isEmpty() && rdg.isEmpty())) {
 			if(lem.isEmpty())
 				lem = "[WEGGELATEN]";
 			if(rdg.isEmpty())
 				rdg = "[WEGGELATEN]";
-  		output.println("  <app>");
-  		output.println("    <lem>"+lem.trim()+"</lem>");
-  		output.println("    <rdg>"+rdg.trim()+"</rdg>");
-  		output.println("  </app>");
+			result += "  <app>"+ newLine;
+			result += "    <lem>"+lem.trim()+"</lem>" + newLine;
+			result += "    <rdg>"+rdg.trim()+"</rdg>" + newLine;
+			result += "  </app>" + newLine;
+  		output.println(result);
 		}
+		return result;
 
 	}
 
