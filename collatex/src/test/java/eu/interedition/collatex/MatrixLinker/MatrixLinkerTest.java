@@ -26,6 +26,8 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 
 public class MatrixLinkerTest extends AbstractTest {
 
+	String newLine = System.getProperty("line.separator");
+
   @Ignore
 	@Test
   public void test1() {
@@ -363,7 +365,6 @@ public class MatrixLinkerTest extends AbstractTest {
     } catch (FileNotFoundException e) {
 	    e.printStackTrace();
     }
-    String newLine = System.getProperty("line.separator");
   	String expected = "<xml>"+newLine+"a b "+newLine+"  <app>"+newLine+"    <lem>[WEGGELATEN]</lem>"+newLine+"    <rdg>e f</rdg>"+newLine+"  </app>"+newLine+
   										" c d "+newLine+"  <app>"+newLine+"    <lem>e f</lem>"+newLine+"    <rdg>[WEGGELATEN]</rdg>"+newLine+"  </app>"+newLine+" g h "+newLine+"</xml>";
 		assertEquals(expected.length() ,result.length());
@@ -395,10 +396,9 @@ public class MatrixLinkerTest extends AbstractTest {
 		assertEquals(expected ,result);
   }
 
-  @Ignore
   @Test
   public void testArchipelagoGapsRealText() {
-  	SimpleWitness[] sw = createWitnesses("Op den Atlantischen Oceaan voer een groote stoomer. Onder de","Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder");
+  	SimpleWitness[] sw = createWitnesses("Op den Atlantischen Oceaan voer een groote stoomer. Onder de","Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de");
 		VariantGraph vg = collate(sw[0]);
   	MatrixLinker linker = new MatrixLinker();
   	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
@@ -415,26 +415,55 @@ public class MatrixLinkerTest extends AbstractTest {
     } catch (FileNotFoundException e) {
 	    e.printStackTrace();
     }
-    String expected = "<xml>\nop \n  <app>\n    <lem>de atlantische</lem>\n    <rdg>den atlantischen</rdg>\n  </app>\n"+
-    									" oceaan voer een \n"+
-    									"  <app>\n"+
-    									"    <lem>ontzaggelijk zeekasteel</lem>\n"+
-    									"    <rdg>groote stoomer</rdg>\n"+
-    									"  </app>\n"+
-    									" onder\n"+
-    									"  <app>\n"+
-    									"    <lem>[WEGGELATEN]</lem>\n"+
-    									"    <rdg> de</rdg>\n"+
-    									"  </app>\n"+
-    									"</xml>";
-    System.out.println(expected);
-    System.out.println(result);
+    String expected = "<xml>"+newLine+"op "+newLine+"  <app>"+newLine+"    <lem>de atlantische</lem>"+newLine+"    <rdg>den atlantischen</rdg>"+newLine+"  </app>"+newLine+
+    									" oceaan voer een "+newLine+"  <app>"+newLine+"    <lem>ontzaggelijk zeekasteel</lem>"+newLine+
+    									"    <rdg>groote stoomer</rdg>"+newLine+"  </app>"+newLine+
+    									" onder de "+newLine+"</xml>";
     assertEquals(expected.substring(0, 10),result.substring(0, 10));
     assertEquals(expected,result);
   	ArrayList<Coordinate> list = new ArrayList<Coordinate>();
   	ArrayList<Coordinate> gaps = archipelago.createFirstVersion().findGaps(list);
-  	System.out.println(buildMatrix.toHtml(archipelago.createFirstVersion()));
-  	assertEquals(6,gaps.size());
+  	assertEquals(4,gaps.size());
+  }
+
+  @Test
+  public void testArchipelagoGapsRealText2() {
+  	SimpleWitness[] sw = createWitnesses(
+  			"Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i>JSg</i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels",
+  			"op	de	atlantische	oceaan	voer	een	ontzaggelijk	zeekasteel	onder	de	vele	passagiers	aan	boord	bevond	zich	een	bruine	korte	dikke	man	hij	werd	nooit	zonder	sigaar	gezien	zijn	pantalon	had	lijnrechte	vouwen	in	de	pijpen	maar	zat	toch	altijd	vol	rimpels"
+  			);
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+  	for(Island isl: buildMatrix.getIslands())	{
+  		archipelago.add(isl);
+    }
+    assertEquals(12,archipelago.size());
+    String result = "";
+    try {
+	    PrintWriter pw = new PrintWriter(new File("exampleOutput.txt"));
+	    result = archipelago.createXML(buildMatrix, pw);
+	    pw.close();
+    } catch (FileNotFoundException e) {
+	    e.printStackTrace();
+    }
+    String expected = "<xml>"+newLine+"op "+newLine+"  <app>"+newLine+"    <lem>de atlantische</lem>"+newLine+"    <rdg>den atlantischen</rdg>"+newLine+"  </app>"+newLine+
+    									" oceaan voer een "+newLine+"  <app>"+newLine+"    <lem>ontzaggelijk zeekasteel</lem>"+newLine+
+    									"    <rdg>groote stoomer</rdg>"+newLine+"  </app>"+newLine+
+    									" onder de "+newLine+"  <app>"+newLine+"    <lem>vele passagiers</lem>"+newLine+
+    									"    <rdg>velen</rdg>"+newLine+
+    									"  </app>"+newLine+" aan "+newLine+"  <app>"+newLine+
+    									"    <lem>boord</lem>"+newLine+"    <rdg>boojrd</rdg>"+newLine+
+    									"  </app>"+newLine+
+    									" bevond zich een bruine korte dikke man "+newLine+
+    									"  <app>"+newLine+"    <lem>hij</lem>"+newLine+
+    									"    <rdg>ijsgi</rdg>"+newLine+"  </app>"+newLine+
+    									" werd nooit zonder sigaar gezien zijn pantalon had lijnrechte vouwen in de pijpen maar zat toch altijd vol rimpels "+newLine+ 
+    									"</xml>";
+    assertEquals(expected,result);
+  	ArrayList<Coordinate> gaps = archipelago.createFirstVersion().findGaps();
+  	assertEquals(10,gaps.size());
   }
 
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,
