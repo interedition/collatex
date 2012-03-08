@@ -29,10 +29,12 @@ public class Collation {
 
   private final List<Iterable<Token>> witnesses;
   private final CollationAlgorithm algorithm;
+  private final boolean joined;
 
-  public Collation(List<Iterable<Token>> witnesses, CollationAlgorithm algorithm) {
+  public Collation(List<Iterable<Token>> witnesses, CollationAlgorithm algorithm, boolean joined) {
     this.witnesses = witnesses;
     this.algorithm = algorithm;
+    this.joined = joined;
   }
 
   public List<Iterable<Token>> getWitnesses() {
@@ -41,5 +43,9 @@ public class Collation {
 
   public CollationAlgorithm getAlgorithm() {
     return algorithm;
+  }
+
+  public boolean isJoined() {
+    return joined;
   }
 }

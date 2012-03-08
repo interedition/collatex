@@ -12,7 +12,8 @@ YUI.add('interedition-collate', function(Y) {
                 data: Y.JSON.stringify({
                     witnesses: witnesses,
                     algorithm: this.get("algorithm"),
-                    tokenComparator: this.get("tokenComparator")
+                    tokenComparator: this.get("tokenComparator"),
+                    joined: this.get("joined")
                 }),
                 on:{
                     success: function(transactionId, resp) { callback(resp); },
@@ -111,7 +112,8 @@ YUI.add('interedition-collate', function(Y) {
                 }
             },
             "algorithm": { value: "dekker" },
-            "tokenComparator": { value: { type: "equality" } }
+            "tokenComparator": { value: { type: "equality" } },
+            "joined": { value: true }
         }
     });
 }, "1", {

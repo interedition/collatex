@@ -277,6 +277,15 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "inte
         teiPsContainer.empty();
     }
 
+    function selectJoined(e) {
+        var newValue = this.get("checked");
+        var oldValue = collator.get("joined");
+        if (oldValue != newValue) {
+            collator.set("joined", newValue);
+            collate();
+        }
+    }
+
     Y.on("domready", function() {
         svgContainer = Y.one("#variant-graph-svg");
         tableContainer = Y.one("#alignment-table");
@@ -294,6 +303,7 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "inte
             exampleSelect.append(sub('<option value="{value}">{title}</option>', exampleData));
         });
 
+        Y.on("change", selectJoined, "#joined");
         Y.on("change", selectAlgorithm, "#algorithm");
         Y.on("change", selectExample, "#examples");
         Y.on("click", addWitness, "#add-witness");

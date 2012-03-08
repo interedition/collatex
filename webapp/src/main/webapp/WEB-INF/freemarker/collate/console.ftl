@@ -22,6 +22,10 @@
             </div>
             <div id="witnesses">
             </div>
+          <div class="yui3-g form-element">
+            <div class="yui3-u-1-6 form-label"><label for="examples">Segmentation:</label></div>
+            <div class="yui3-u form-input"><input type="checkbox" id="joined" name="joined" checked="checked"></div>
+          </div>
             <div class="yui-3">
                 <div class="yui3-u-1-4">&nbsp;</div>
                 <div class="yui3-u">

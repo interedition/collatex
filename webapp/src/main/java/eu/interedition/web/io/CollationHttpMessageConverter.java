@@ -156,7 +156,13 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
       collationAlgorithm = CollationAlgorithmFactory.dekker(tokenComparator);
     }
 
-    return new Collation(witnesses, collationAlgorithm);
+    boolean joined = true;
+    final JsonNode joinedNode = collationNode.path("joined");
+    if (joinedNode.isBoolean()) {
+      joined = joinedNode.getBooleanValue();
+    }
+
+    return new Collation(witnesses, collationAlgorithm, joined);
   }
 
   @Override

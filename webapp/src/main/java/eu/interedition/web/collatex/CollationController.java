@@ -64,7 +64,10 @@ public class CollationController {
       collation.getAlgorithm().collate(graph, collation.getWitnesses());
 
       // post-process
-      graph.join().rank();
+      if (collation.isJoined()) {
+        graph.join();
+      }
+      graph.rank();
 
       tx.success();
       return graph;
