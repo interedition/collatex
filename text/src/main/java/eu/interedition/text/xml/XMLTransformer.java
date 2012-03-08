@@ -75,6 +75,12 @@ public class XMLTransformer {
   private Range textOffsetRange;
 
 
+  public XMLTransformer(TextRepository repository, XMLTransformerConfiguration configuration) {
+    this.repository = repository;
+    this.configuration = configuration;
+    this.modules = configuration.getModules();
+  }
+
   public Text transform(Text source) throws IOException, XMLStreamException {
     Preconditions.checkArgument(source.getType() == Text.Type.XML);
     final Annotation layer = Iterables.getFirst(repository.create(new SimpleAnnotation(source, XML_TRANSFORM_NAME, new Range(0, source.getLength()))), null);
@@ -138,12 +144,6 @@ public class XMLTransformer {
       Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
       throw Throwables.propagate(t);
     }
-  }
-
-  public XMLTransformer(TextRepository repository, XMLTransformerConfiguration configuration) {
-    this.repository = repository;
-    this.configuration = configuration;
-    this.modules = configuration.getModules();
   }
 
   public Text getSource() {

@@ -1,15 +1,11 @@
 package eu.interedition.web;
 
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.jolbox.bonecp.BoneCPDataSource;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.simple.SimpleTokenMapper;
 import eu.interedition.collatex.simple.SimpleWitnessMapper;
-import eu.interedition.text.json.map.TextSerializerModule;
-import eu.interedition.web.io.RangeConverter;
-import eu.interedition.web.text.TextIndex;
-import org.codehaus.jackson.map.ObjectMapper;
+import eu.interedition.web.index.IndexController;
 import org.h2.Driver;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.slf4j.Logger;
@@ -18,8 +14,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.format.support.FormattingConversionServiceFactoryBean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -30,8 +26,6 @@ import org.springframework.web.util.UriUtils;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -99,14 +93,10 @@ public class DataSourceConfiguration implements DisposableBean {
   }
 
   @Bean
-  public TextIndex textIndex() throws IOException {
-    final File indexHome = new File(dataDirectory(), "index");
-    Assert.isTrue(indexHome.isDirectory() || indexHome.mkdirs(),//
-            "Fulltext index directory '" + indexHome + "' does not exist and could not be created");
-
-    return new TextIndex(indexHome);
+  public NamedParameterJdbcTemplate namedParameterJdbcTemplate() throws IOException {
+    return new NamedParameterJdbcTemplate(relationalDataSource());
   }
-  
+
   @Override
   public void destroy() throws Exception {
     if (DATA_DIRECTORY == null && dataDirectory != null) {

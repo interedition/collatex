@@ -17,12 +17,12 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.web.text;
+package eu.interedition.web.index;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextIndexQuery {
+public class IndexQuery {
   private String query;
   private int pageSize = 100;
   private int page = 0;

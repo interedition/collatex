@@ -1,70 +1,70 @@
 YUI.add('interedition-text', function(Y) {
-    var NS = Y.namespace("interedition.text");
+    var NS = Y.mix(Y.namespace("interedition"), {
+        baseUrl: /(.+)\/static\/yui/.exec(Y.config.base)[1]
+    })
 
     NS.RANGE_SORT = function(a, b) {
         var ra = a.range, rb = b.range;
         return (ra.start == rb.start ? rb.end - ra.end : ra.start - rb.start);
     };
 
-    NS.QName = function(namespace, localName) {
+    // ================================================================================ Name
+
+    NS.Name = function(namespace, localName) {
         this.namespace = namespace;
         this.localName = localName;
     };
-    NS.QName.prototype.toString = function() {
-        return (this.namespace == null ? "" : "{" + this.namespace + "}") + this.localName;
-    };
-    NS.QName.fromString = function(str) {
-        var firstBrace = str.indexOf("{");
-        if (firstBrace < 0) {
-            return new NS.QName(null, str);
-        }
-        var secondBrace = str.indexOf("}");
-        if (secondBrace < firstBrace || secondBrace >= (str.length - 1)) {
-            Y.error("Invalid QName", str, { throwFail: true });
-        }
+    Y.mix(NS.Name.prototype, {
+       toString: function() {
+           return (this.namespace == null ? "" : "{" + this.namespace + "}") + this.localName;
+       },
+       fromString: function(str) {
+            var firstBrace = str.indexOf("{");
+            if (firstBrace < 0) {
+                return new NS.Name(null, str);
+            }
+            var secondBrace = str.indexOf("}");
+            if (secondBrace < firstBrace || secondBrace >= (str.length - 1)) {
+                Y.error("Invalid Name", str, { throwFail: true });
+            }
 
-        return new NS.QName(str.substring(firstBrace + 1, secondBrace), str.substring(secondBrace + 1))
-    };
+            return new NS.Name(str.substring(firstBrace + 1, secondBrace), str.substring(secondBrace + 1))
+        }
+    });
+
+    // ================================================================================ Range
 
     NS.Range = function(start, end) {
         this.start = start;
         this.end = end;
     };
-    NS.Range.prototype.length = function() {
-        return this.end - this.start;
-    };
-    NS.Range.prototype.of = function(text) {
-        return text.substring(this.start, this.end);
-    };
-    NS.Range.prototype.precedes = function(other) {
-        return this.end <= other.start;
-    };
-    NS.Range.prototype.equalsStartOf = function(other) {
-        return  (this.start == other.start) && (this.end == other.start);
-    };
+    Y.mix(NS.Range.prototype, {
+        length: function() { return this.end - this.start; },
+        precedes: function(other) { return this.end <= other.start; },
+        overlapsWith: function(other) { return this.amountOfOverlapWith(other) > 0; },
 
-    NS.Range.prototype.overlapsWith = function(other) {
-        return this.amountOfOverlapWith(other) > 0;
-    };
-    NS.Range.prototype.amountOfOverlapWith = function(other) {
-        return (Math.min(this.end, other.end) - Math.max(this.start, other.start));
-    };
-    NS.Range.prototype.toId = function() {
-        return "r" + this.start.toString() + "-" + this.end.toString();
-    };
-    NS.Range.fromId = function(str) {
-        var components = str.replace("r", "").split("-");
-        return new NS.Range(parseInt(components[0]), parseInt(components[1]));
-    };
-    NS.Range.prototype.toString = function() {
-        return "[" + this.start + ", " + this.end + "]";
-    };
+        of: function(text) { return text.substring(this.start, this.end); },
+        equalsStartOf: function(other) { return  (this.start == other.start) && (this.end == other.start); },
+        amountOfOverlapWith: function(other) { return (Math.min(this.end, other.end) - Math.max(this.start, other.start)); },
+
+        fromId: function(str) {
+            var components = str.replace("r", "").split("-");
+            return new NS.Range(parseInt(components[0]), parseInt(components[1]));
+        },
+        toId: function() { return "r" + this.start.toString() + "-" + this.end.toString(); },
+
+        toString: function() { return "[" + this.start + ", " + this.end + "]"; }
+    });
+
+    // ================================================================================ Annotation
 
     NS.Annotation = function(name, range, data) {
         this.name = name;
         this.range = range;
         this.data = data || [];
     };
+
+    // ================================================================================ Text
 
     NS.Text = function(data) {
         NS.Text.superclass.constructor.apply(this, arguments);
@@ -122,20 +122,16 @@ YUI.add('interedition-text', function(Y) {
             names = Y.Array.dedupe(names);
             names.sort();
             return Y.Array.map(names, function(n) {
-                return NS.QName.fromString(n);
+                return NS.Name.fromString(n);
             });
         }
     });
 
-    NS.Repository = function(config) {
-        NS.Repository.superclass.constructor.apply(this, arguments);
-    };
-    NS.Repository.NAME = "text-repository";
-    NS.Repository.ATTRS = {
-        "base": {}
-    };
-    Y.extend(NS.Repository, Y.Base, {
-        "read": function(id, cb) {
+    // ================================================================================ Repository
+
+
+    NS.Repository = Y.Base.create("text-repository", Y.Base, [], {
+        read: function(id, cb) {
             Y.io(this.toURI(id), {
                 headers: {
                     "Accept": "application/json"
@@ -146,7 +142,7 @@ YUI.add('interedition-text', function(Y) {
 
                         var names = {};
                         Y.each(data.n || {}, function(n, id) {
-                            names[id] = new NS.QName(n[0], n[1]);
+                            names[id] = new NS.Name(n[0], n[1]);
                         });
 
                         var annotations = Y.Array.map(data.a, function(a) {
@@ -161,7 +157,7 @@ YUI.add('interedition-text', function(Y) {
                 }
             });
         },
-        "write": function(textContents, cb) {
+        write: function(textContents, cb) {
             Y.io(this.get("base") + "/text", {
                 method: "post",
                 headers: {
@@ -177,7 +173,7 @@ YUI.add('interedition-text', function(Y) {
                 }
             });
         },
-        "annotate": function(id, annotations, cb) {
+        annotate: function(id, annotations, cb) {
             var names = {}, nameCount = 0, nameIndex = {}, nameRef = function(n) {
                 var nameStr = n.toString();
                 if (nameStr in nameIndex) {
@@ -210,7 +206,7 @@ YUI.add('interedition-text', function(Y) {
             });
 
         },
-        "transform": function(id, transformConfig, cb) {
+        transform: function(id, transformConfig, cb) {
             Y.io(this.toURI(id) + "/transform", {
                 method: "post",
                 headers: {
@@ -225,156 +221,95 @@ YUI.add('interedition-text', function(Y) {
                 }
             });
         },
-        "redirectTo": function(id) {
+        redirectTo: function(id) {
             Y.config.win.location = this.toURI(id);
         },
-        "toURI": function(id) {
+        toURI: function(id) {
             return (this.get("base") + "/text/" + id.toString());
         }
-    });
-
-    NS.TextPanel = function(cfg) {
-        NS.TextPanel.superclass.constructor.apply(this, arguments);
-    };
-    NS.TextPanel.NAME = "interedition-text-panel";
-    NS.TextPanel.ATTRS = {
-        node: {
-            writeOnce: "initOnly",
-            setter: function(node) {
-                var n = Y.one(node);
-                if (!n) throw ("TextPanel: Invalid node given: " + node);
-                return n;
-            }
-        },
-        text: {
-            writeOnce: "initOnly"
-        },
-        segments: {
-            value: []
-        }
-    };
-    Y.extend(NS.TextPanel, Y.Base, {
-        initializer: function(cfg) {
-            this.get("text").after("textChange", this.update, this);
-            this.get("text").after("annotationsChange", this.update, this);
-            this.update();
-        },
-        update: function() {
-            var node = this.get("node"), text = this.get("text"), segments = this.get("segments");
-            var textContents = text.get("text");
-
-            node.empty();
-            segments.length = 0;
-            Y.each(text.partition(), function(range) {
-                var start = range.start, end = range.end, spanId = range.toId();
-                var segment = Y.Node.create("<span id='" + spanId + "'>" + Y.Escape.html(textContents.substring(start, end)).replace("\n", "<br>") + "</span>");
-
-                node.append(segment);
-                segments.push([range, segment]);
-            });
-            this.fire("update");
+    }, {
+        ATTRS: {
+            "base": { value: NS.baseUrl }
         }
     });
 
-    NS.AnnotationNamesSelectionList = function(cfg) {
-        NS.AnnotationNamesSelectionList.superclass.constructor.apply(this, arguments);
-    };
-    NS.AnnotationNamesSelectionList.NAME = "interedition-text-annotation-names-selection-list";
-    NS.AnnotationNamesSelectionList.ATTRS = {
-        node: {
-            writeOnce: "initOnly",
-            setter: function(node) {
-                var n = Y.one(node);
-                if (!n) throw ("AnnotationGutter: Invalid node given: " + node);
-                return n;
-            }
-        },
-        textPanel: {},
-        names: {
-            value: []
-        },
-        selectedNames: {
-            value: []
-        }
-    };
-    Y.extend(NS.AnnotationNamesSelectionList, Y.Base, {
-        initializer: function(cfg) {
-            this.get("textPanel").on("update", this.update, this);
-            this.update();
-        },
-        entryChanged: function(e) {
-            var names = this.get("names");
-            var selected = names[parseInt(e.target.getAttribute("id").replace("name-", ""))].toString();
-            var selectedNames = this.get("selectedNames");
-            if (e.target.get("checked")) {
-                selectedNames.push(selected);
-                selectedNames.sort();
-            } else {
-                selectedNames = Y.Array.filter(selectedNames, function(n) {
-                    return (n != selected);
-                });
-            }
-            this.set("selectedNames", selectedNames);
-        },
-        update: function() {
-            var names = this.get("textPanel").get("text").names();
-            this.set("names", names);
-
-            var container = this.get("node");
-            container.empty();
-            Y.each(names, function(n, i) {
-                var nameId = "name-" + i;
-                var input = Y.Node.create(Y.Lang.sub("<input type='checkbox' id='{id}' name='{id}' />", { id: nameId }));
-                container.append(Y.Node.create("<p/>")
-                    .append(input)
-                    .append("&nbsp;")
-                    .append(Y.Lang.sub("<label for='{id}'>{label}</label>", { id: nameId, label: n.toString() })));
-                Y.on("change", this.entryChanged, input, this);
-            }, this);
-
-        }
+    Y.extend(NS.Repository, Y.Base, {
     });
 
-    NS.AnnotationGutter = function(cfg) {
-        NS.AnnotationGutter.superclass.constructor.apply(this, arguments);
-    };
-    NS.AnnotationGutter.NAME = "interedition-text-annotation-gutter";
-    NS.AnnotationGutter.ATTRS = {
-        node: {
-            writeOnce: "initOnly",
-            setter: function(node) {
-                var n = Y.one(node);
-                if (!n) throw ("AnnotationGutter: Invalid node given: " + node);
-                return n;
+    NS.XMLTransformationRule = Y.Base.create("text-xml-transformation-rule", Y.Model, [], {
+
+    }, {
+       ATTRS: {
+           name: {},
+           lineElement: { value: false },
+           containerElement: { value: false },
+           included: { value: false },
+           excluded: { value: false },
+           notable: { value: false }
+       }
+    });
+    NS.XMLTransformation = Y.Base.create("text-xml-transformation", Y.Model, [], {
+        baseUrl: NS.baseUrl + "/xml/transform",
+        url: function() { return "/".join([ this.baseUrl, encodeURIComponent(this.get("name")) ]); },
+        parse: function (response) {
+            Y.log(response);
+            if (response.data) {
+                return response.data;
+            }
+            //this.fire('error', { type : 'parse', error: 'No data in the response.' });
+        },
+        sync: function (action, options, callback) {
+            var onIo = {
+                success: Y.bind(this._syncSucceeded, this, callback),
+                failure: Y.bind(this._syncFailed, this, callback)
+            };
+            switch (action) {
+                case 'create':
+                    Y.io(this.url(), {
+                        method: "post",
+                        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                        on: {
+                            success: function() { this.sync("update", null, callback); },
+                            failure: onIo.failure
+                        }
+                    });
+                    return;
+                case 'update':
+                    Y.io(this.url(), {
+                        method: "put",
+                        data: Y.JSON.stringify(this.toJSON()),
+                        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                        on: onIo
+                    });
+                    return;
+                case 'read':
+                    Y.io(this.url(), { method: "get", headers: { "Accept": "application/json" }, on: onIo });
+                    return;
+                case 'delete':
+                    Y.io(this.url(), { method: "delete", headers: { "Accept": "application/json" }, on: onIo });
+                    return;
+                default:
+                    callback('Invalid action');
             }
         },
-        textPanel: {}
-    }
-    Y.extend(NS.AnnotationGutter, Y.Base, {
-        initializer: function(cfg) {
-            this.get("textPanel").on("update", this.update, this);
-            this.update();
+        _syncSucceeded: function (callback, id, response) {
+            callback(null, Y.JSON.parse(response.responseText));
         },
-        update: function() {
-            var textPanel = this.get("textPanel"), gutterNode = this.get("node");
-
-            var textPanelRegion = textPanel.get("node").get("region");
-
-            gutterNode.empty();
-            var gutter = d3.select(gutterNode.getDOMNode())
-                .append("svg:svg")
-                .attr("width", "100%")
-                .attr("height", textPanelRegion.height + "px");
-
-            gutter.append("svg:rect")
-                .attr("x", 10).attr("y", 0).attr("width", 30).attr("height", textPanelRegion.height)
-                .attr("stroke", "#fff").attr("fill", "#ffc")
-                .on("click", function() {
-                    alert("Click!");
-                });
-
+        _syncFailed: function(callback, id, response) {
+            callback(response);
+        }
+    }, {
+        ATTRS: {
+            name: {},
+            description: {},
+            transformTEI: { value: false },
+            removeEmpty: { value: false },
+            notableCharacter: {},
+            compressingWhitespace: { value: false },
+            removeLeadingWhitespace: { value: false},
+            rules: {}
         }
     });
 }, "1", {
-    requires: ["io", "json", "node", "event", "base", "array-extras", "escape"]
+    requires: ["io", "json", "base", "array-extras", "escape"]
 });

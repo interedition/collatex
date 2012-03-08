@@ -16,3 +16,25 @@ CREATE TABLE IF NOT EXISTS text_metadata (
   text_language TEXT,
   UNIQUE (text)
 );
+
+CREATE TABLE IF NOT EXISTS xml_transform (
+  id BIGINT IDENTITY,
+  name VARCHAR(128) NOT NULL,
+  transform_tei BOOLEAN NOT NULL DEFAULT TRUE,
+  compress_space BOOLEAN NOT NULL DEFAULT TRUE,
+  remove_empty BOOLEAN NOT NULL DEFAULT TRUE,
+  notable_char CHAR(2) NOT NULL DEFAULT '§',
+  description TEXT NULL,
+  UNIQUE(name)
+);
+
+CREATE TABLE IF NOT EXISTS xml_transform_rule (
+  config BIGINT NOT NULL REFERENCES xml_transform (id) ON DELETE CASCADE,
+  name BIGINT NOT NULL REFERENCES text_qname (id),
+  is_line BOOLEAN NOT NULL,
+  is_container BOOLEAN NOT NULL,
+  is_included BOOLEAN NOT NULL,
+  is_excluded BOOLEAN NOT NULL,
+  is_notable BOOLEAN NOT NULL,
+  UNIQUE(config, name)
+);

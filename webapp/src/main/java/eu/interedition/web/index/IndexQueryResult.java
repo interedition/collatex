@@ -17,17 +17,17 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.web.text;
+package eu.interedition.web.index;
 
-import eu.interedition.web.text.TextMetadata;
+import eu.interedition.web.metadata.DublinCoreMetadata;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextIndexQueryResult extends TextMetadata {
+public class IndexQueryResult extends DublinCoreMetadata {
   private int score;
 
-  public TextIndexQueryResult(TextMetadata other, int score) {
+  public IndexQueryResult(DublinCoreMetadata other, int score) {
     super(other);
     this.score = score;
   }

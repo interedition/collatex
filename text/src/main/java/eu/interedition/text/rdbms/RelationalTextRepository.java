@@ -201,11 +201,11 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
   }
 
 
-  public Text load(long id) {
-    return DataAccessUtils.requiredUniqueResult(load(Collections.singleton(id)));
+  public RelationalText read(long id) {
+    return DataAccessUtils.requiredUniqueResult(read(Collections.singleton(id)));
   }
 
-  public List<Text> load(Iterable<Long> ids) {
+  public List<RelationalText> read(Iterable<Long> ids) {
     if (Iterables.isEmpty(ids)) {
       return Collections.emptyList();
     }
@@ -220,18 +220,13 @@ public class RelationalTextRepository extends AbstractTextRepository implements 
     sql.append(" left join text_annotation l on t.layer = l.id");
     sql.append(" left join text_qname ln on l.name = ln.id");
     sql.append(" left join text_content lt on l.text = lt.id");
-    sql.append(" where t.id in (");
-    for (Iterator<Long> it = ids.iterator(); it.hasNext(); ) {
-      it.next();
-      sql.append("?").append(it.hasNext() ? ", " : "");
-    }
-    sql.append(")");
+    sql.append(" where t.id").append(SQL.inClause(ids));
 
-    return jt.query(sql.toString(), new RowMapper<Text>() {
+    return jt.query(sql.toString(), new RowMapper<RelationalText>() {
       private final Map<Long, RelationalName> nameCache = Maps.newHashMap();
 
       @Override
-      public Text mapRow(ResultSet rs, int rowNum) throws SQLException {
+      public RelationalText mapRow(ResultSet rs, int rowNum) throws SQLException {
         final long layerNameId = rs.getLong("l_id");
 
         RelationalAnnotation layer = null;

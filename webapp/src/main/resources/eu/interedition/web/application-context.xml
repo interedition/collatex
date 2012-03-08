@@ -15,12 +15,13 @@
         <property name="converters">
             <set>
                 <bean class="eu.interedition.web.io.RangeConverter"/>
+                <bean class="eu.interedition.web.text.TextConverter"/>
+                <bean class="eu.interedition.web.text.XMLTransformationConverter"/>
             </set>
         </property>
     </bean>
 
     <task:scheduled-tasks>
         <task:scheduled ref="variantGraphCleanup" method="run" fixed-rate="7200000" />
-        <task:scheduled ref="textIndex" method="index" cron="0 0 3 * * *" />
     </task:scheduled-tasks>
 </beans>

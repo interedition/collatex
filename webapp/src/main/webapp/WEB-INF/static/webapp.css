@@ -11,6 +11,11 @@ th, td {
     border: 1px solid #B0C4DE;
 }
 
+label {
+    font-weight: bold;
+    margin: 0 1em
+}
+
 table.alignment { border-collapse: separate; border-spacing: 0.25em; }
 table.alignment tr { border: 0; }
 table.alignment th, table.alignment td { border: 1px solid #d3d3d3; padding: 0.5em; }
@@ -37,7 +42,13 @@ form table, form table tr td, form table tr th {
 
 form table tr td, form table tr th {
     margin: 0.5em 0;
-    background: #F2F2F2;
+}
+
+form p {
+    padding: 1em;
+    line-height: 2em;
+    border: 1px solid #ccc;
+    background: #eee;
 }
 
 img.icon {

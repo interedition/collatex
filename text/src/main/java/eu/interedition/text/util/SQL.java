@@ -19,6 +19,8 @@
  */
 package eu.interedition.text.util;
 
+import java.util.Iterator;
+
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
@@ -31,5 +33,15 @@ public class SQL {
       select.append(tableName).append(".").append(column).append(" as ").append(tableName).append("_").append(column);
     }
     return select.toString();
+  }
+  
+  public static String inClause(Iterable<?> params) {
+    final StringBuilder sql = new StringBuilder(" in (");
+    for (Iterator<?> it = params.iterator(); it.hasNext(); ) {
+      it.next();
+      sql.append("?").append(it.hasNext() ? ", " : "");
+    }
+    sql.append(")");
+    return sql.toString();
   }
 }

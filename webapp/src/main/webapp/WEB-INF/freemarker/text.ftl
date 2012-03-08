@@ -1,39 +1,32 @@
 <#assign maxLength=102400 truncated=(text.length gt maxLength)/>
-<@ie.page metadata.description?html>
+<@ie.page ("Text #" + text.id?html)>
 <div id="text-length" style="text-align: right; font-weight: bold; margin: 1em 0">
-    Created: ${metadata.created?string?html}
-    | Updated: ${metadata.updated?string?html}
-    | Length: ${text.length} characters <#if truncated>(${maxLength} displayed)</#if>
-    <#if text.type == "XML">| <a href="${cp}/text/${text.id?c}/transform" title="Transform XML">Transform XML</a></#if>
+    Length: ${text.length} characters <#if truncated>(${maxLength} displayed)</#if>
 </div>
 
-    <#if metadata.summary?has_content>
-    <h2>Summary</h2>
-    <p>${metadata.summary?html?replace("\n", "<br>")}</p>
-    </#if>
-
-<div class="yui3-g">
-    <div class="yui3-u-2-3">
-        <h2><img src="${cp}/static/icon/text_${text.type?lower_case}.png" alt="${text.type?html}"> Content</h2>
-        <#if text.type == "TXT">
-            <div class="yui3-g">
-                <div class="yui3-u-1-5"><div id="annotation-gutter"></div></div>
-                <div class="yui3-u-4-5"><div id="text-contents" style="margin: 1em; padding: 1em; font-size: 125%"></div></div>
-            </div>
-        </#if>
-        <#if text.type == "XML">
-            <textarea style="width: 95%; height: 500px" readonly="readonly">${textContents?html}</textarea>
-        </#if>
-    </div>
-    <div class="yui3-u-1-3" style="color: #999999">
-        <h2>Annotations</h2>
-        <div id="annotations"></div>
-        <div id="histogram"></div>
-    </div>
+<div id="text-contents" style="width: 600px; margin: 1em auto; border: 1px solid #eee; padding: 1em; font-size: 108%; font-family: serif">
+${textContents?html?replace('\n', '<br>')}
 </div>
 
+<div><button id="select">Select</button></div>
+
+<script type="text/javascript">
+  YUI().use("selection", function(Y) {
+    var textContentsNode = Y.one("#text-contents");
+
+    Y.on("domready", function() {
+      Y.on("click", function(e) {
+        var sel = new Y.Selection();
+        if (sel.isCollapsed) return;
+
+        var anchor = sel.anchorTextNode, focus = sel.focusTextNode;
+        if (!textContentsNode.contains(anchor) && !textContentsNode.contains(focus)) return;
+      }, "#select");
+    });
+  });
+</script>
 <#-- <p style="font-size: small; color: #dcdcdc;">SHA-512: ${text.digest?html}</p> -->
-
+<!--
 <script type="text/javascript">
     var textId = ${text.id?c};
 
@@ -124,4 +117,5 @@
         });
     });
 </script>
+-->
 </@ie.page>

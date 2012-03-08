@@ -43,16 +43,7 @@ ${header}
               </div>
             </div>
           </li>
-          <li>
-            <span class="yui3-menu-label"><em><span class="color19">Text Repository</span></em></span>
-            <div class="yui3-menu">
-              <div class="yui3-menu-content">
-                <ul>
-                  <li class="yui3-menuitem"><span class="yui3-menuitem-content"><span class="color19">Upload</span></span></li>
-                </ul>
-              </div>
-            </div>
-          </li>
+          <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/text">Text Repository</a></li>
         </ul>
     </div>
 </div>

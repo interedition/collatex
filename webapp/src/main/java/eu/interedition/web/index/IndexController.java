@@ -17,15 +17,17 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.web.text;
+package eu.interedition.web.index;
 
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.web.metadata.DublinCoreMetadata;
+import eu.interedition.web.metadata.MetadataController;
+import eu.interedition.web.text.TextController;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -45,7 +47,16 @@ import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,13 +68,16 @@ import java.util.Map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Transactional
-public class TextIndex implements InitializingBean, DisposableBean {
-
-  private final File base;
+@Controller
+@RequestMapping("/index")
+public class IndexController implements InitializingBean, DisposableBean {
 
   @Autowired
-  private TextService textService;
+  @Qualifier("dataDirectory")
+  private File dataDirectory;
+
+  @Autowired
+  private MetadataController metadataController;
 
   @Autowired
   private RelationalTextRepository textRepository;
@@ -74,11 +88,17 @@ public class TextIndex implements InitializingBean, DisposableBean {
   private IndexReader indexReader;
   private IndexSearcher indexSearcher;
 
-  public TextIndex(File base) {
-    this.base = base;
+  @RequestMapping(produces = "text/html")
+  public ModelAndView search(@ModelAttribute("query") IndexQuery query) throws IOException, ParseException {
+    final List<IndexQueryResult> searchResults = query(query);
+    return (searchResults.size() == 1) ?
+            new ModelAndView(TextController.redirectTo(searchResults.get(0).getText())) :
+            new ModelAndView("search", "results", searchResults);
   }
 
-  public List<TextIndexQueryResult> search(TextIndexQuery query) throws IOException, ParseException {
+  @RequestMapping(produces = "application/json")
+  @ResponseBody
+  public List<IndexQueryResult> query(@ModelAttribute("query") IndexQuery query) throws IOException, ParseException {
     if (Strings.isNullOrEmpty(query.getQuery())) {
       return Collections.emptyList();
     }
@@ -96,15 +116,15 @@ public class TextIndex implements InitializingBean, DisposableBean {
       scores.put(Long.parseLong(document.get("id")), Math.round(scoreDocument.score * 100));
     }
 
-    final List<TextIndexQueryResult> results = Lists.newArrayListWithExpectedSize(scores.size());
-    for (TextMetadata metadata : textService.load(scores.keySet())) {
-      results.add(new TextIndexQueryResult(metadata, scores.get(metadata.getText().getId())));
+    final List<IndexQueryResult> results = Lists.newArrayListWithExpectedSize(scores.size());
+    for (DublinCoreMetadata metadata : metadataController.read(scores.keySet())) {
+      results.add(new IndexQueryResult(metadata, scores.get(metadata.getText())));
     }
     return results;
   }
 
-  public void update(final TextMetadata metadata) throws IOException {
-    final RelationalText text = metadata.getText();
+  public void update(DublinCoreMetadata metadata) throws IOException {
+    final RelationalText text = textRepository.read(metadata.getText());
     Reader textReader = null;
     try {
       final Document document = new Document();
@@ -123,34 +143,28 @@ public class TextIndex implements InitializingBean, DisposableBean {
     }
   }
 
-  public void delete(TextMetadata metadata) throws IOException {
+  public void delete(DublinCoreMetadata metadata) throws IOException {
     indexWriter.deleteDocuments(new TermQuery(idTerm(metadata)));
     commit();
   }
 
-  protected Term idTerm(TextMetadata metadata) {
-    return new Term("id", Long.toString(metadata.getText().getId()));
+  protected Term idTerm(DublinCoreMetadata metadata) {
+    return new Term("id", Long.toString(metadata.getText()));
   }
 
-  @Transactional
   public void index() throws IOException {
     indexWriter.deleteAll();
-    textService.scroll(new TextService.TextScroller() {
-      @Override
-      public void text(TextMetadata text) {
-        try {
-          update(text);
-        } catch (IOException e) {
-          throw Throwables.propagate(e);
-        }
-      }
-    });
+    metadataController.index();
     commit();
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    this.directory = FSDirectory.open(base);
+    final File indexHome = new File(dataDirectory, "index");
+    Assert.isTrue(indexHome.isDirectory() || indexHome.mkdirs(),//
+            "Fulltext index directory '" + indexHome + "' does not exist and could not be created");
+
+    this.directory = FSDirectory.open(indexHome);
     this.analyzer = new StandardAnalyzer(Version.LUCENE_30);
 
     this.indexWriter = new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_33, analyzer));
