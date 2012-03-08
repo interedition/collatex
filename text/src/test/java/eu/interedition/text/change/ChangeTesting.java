@@ -1,6 +1,7 @@
 package eu.interedition.text.change;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
@@ -11,6 +12,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
+import com.google.common.io.Files;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
@@ -28,6 +30,7 @@ import org.junit.Test;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -48,16 +51,26 @@ import static eu.interedition.text.query.Criteria.annotationName;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class ChangeTesting extends AbstractTestResourceTest {
-  private static final File[] TEST_FILES = new File("/Users/gregor/Desktop/change-collection").listFiles(new FileFilter() {
-    @Override
-    public boolean accept(File pathname) {
-      return pathname.isFile() && pathname.getName().endsWith(".xml");
-    }
-  });
+  private static final File TEST_FILE_BASE = new File("/Users/gregor/Desktop/change-collection");
+  private static final File OUTPUT_FILE = new File(TEST_FILE_BASE, "versions");
 
   @Test
   public void createTexts() throws IOException, XMLStreamException {
-    for (File testFile : TEST_FILES) {
+    if (!TEST_FILE_BASE.isDirectory()) {
+      return;
+    }
+
+    if (OUTPUT_FILE.isDirectory()) {
+      Files.deleteRecursively(OUTPUT_FILE);
+    }
+    OUTPUT_FILE.mkdir();
+
+    for (File testFile : TEST_FILE_BASE.listFiles(new FileFilter() {
+      @Override
+      public boolean accept(File pathname) {
+        return pathname.isFile() && pathname.getName().endsWith(".xml");
+      }
+    })) {
       final List<ChangeSet> changeSets = Lists.newArrayList();
 
       Reader xmlStream = null;
@@ -163,32 +176,40 @@ public class ChangeTesting extends AbstractTestResourceTest {
         }
       };
 
-      System.out.printf("%s %s\n", Strings.repeat("=", 100), testFile.getName());
-      final SortedSet<Range> rangesToRemove = Iterables.getLast(removedRanges);
-      System.out.println(Iterables.toString(rangesToRemove));
-      textRepository.read(testText, Criteria.none(), new TextAdapter() {
-        @Override
-        public void text(Range r, String text) {
-          int removed = 0;
-          StringBuffer buf = new StringBuffer(text);
-          for (Iterator<Range> it = rangesToRemove.iterator(); it.hasNext(); ) {
-            final Range rangeToRemove = it.next();
-            if (rangeToRemove.precedes(r)) {
-              it.remove();
-              continue;
-            } else if (rangeToRemove.follows(r)) {
-              break;
-            }
+      int version = 0;
+      for (final SortedSet<Range> rangesToRemove : removedRanges) {
+        final BufferedWriter out = Files.newWriter(new File(OUTPUT_FILE, testFile.getName().replaceAll("\\.xml$", "-" + (version++) + ".txt")), Text.CHARSET);
+        try {
+        textRepository.read(testText, Criteria.none(), new TextAdapter() {
+          @Override
+          public void text(Range r, String text) {
+            int removed = 0;
+            StringBuffer buf = new StringBuffer(text);
+            for (Iterator<Range> it = rangesToRemove.iterator(); it.hasNext(); ) {
+              final Range rangeToRemove = it.next();
+              if (rangeToRemove.precedes(r)) {
+                it.remove();
+                continue;
+              } else if (rangeToRemove.follows(r)) {
+                break;
+              }
 
-            final Range overlap = rangeToRemove.overlap(r);
-            final Range shifted = overlap.shift(-(r.getStart() + removed));
-            buf.replace((int) shifted.getStart(), (int) shifted.getEnd(), "");
-            removed += overlap.length();
+              final Range overlap = rangeToRemove.overlap(r);
+              final Range shifted = overlap.shift(-(r.getStart() + removed));
+              buf.replace((int) shifted.getStart(), (int) shifted.getEnd(), "");
+              removed += overlap.length();
+            }
+            try {
+              out.write(buf.toString());
+            } catch (IOException e) {
+              throw Throwables.propagate(e);
+            }
           }
-          System.out.print(buf.toString());
+        });
+        } finally {
+          Closeables.close(out, false);
         }
-      });
-      System.out.println();
+      }
     }
   }
 
