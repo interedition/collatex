@@ -22,6 +22,7 @@
 package eu.interedition.collatex.nmerge.mvd;
 
 import com.google.common.collect.Iterables;
+import eu.interedition.collatex.Witness;
 
 import java.util.Arrays;
 

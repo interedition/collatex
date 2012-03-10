@@ -20,8 +20,8 @@
  */
 package eu.interedition.collatex.nmerge.graph;
 
-import eu.interedition.collatex.nmerge.mvd.Witness;
 import com.google.common.collect.Ordering;
+import eu.interedition.collatex.Witness;
 
 import java.util.List;
 import java.util.Set;

@@ -20,9 +20,9 @@
  */
 package eu.interedition.collatex.nmerge.graph;
 
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.exception.MVDException;
 import eu.interedition.collatex.nmerge.mvd.Match;
-import eu.interedition.collatex.nmerge.mvd.Witness;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 

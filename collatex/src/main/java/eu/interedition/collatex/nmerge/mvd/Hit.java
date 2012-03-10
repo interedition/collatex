@@ -23,6 +23,7 @@ package eu.interedition.collatex.nmerge.mvd;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import eu.interedition.collatex.Witness;
 
 import java.util.List;
 import java.util.Set;
@@ -130,7 +131,7 @@ public class Hit<T> {
       }
       // now offset is len plus the real offset
       offset -= len;
-      String shortName = i.siglum;
+      String shortName = i.getSigil();
       Hit<T> m = new Hit<T>(i, offset, len, shortName, state);
       hits.add(m);
       if (!multiple) {
@@ -223,7 +224,7 @@ public class Hit<T> {
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append('[');
-    sb.append(version.siglum + ":");
+    sb.append(version.getSigil()+ ":");
     sb.append("Offset " + Integer.toString(offset) + ":");
     sb.append("Length " + Integer.toString(length) + ":");
     sb.append(state.toString());

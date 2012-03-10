@@ -25,6 +25,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.graph.Converter;
 import eu.interedition.collatex.nmerge.graph.VariantGraph;
 import eu.interedition.collatex.nmerge.mvd.Chunk;
@@ -32,7 +33,7 @@ import eu.interedition.collatex.nmerge.mvd.ChunkState;
 import eu.interedition.collatex.nmerge.mvd.Collation;
 import eu.interedition.collatex.nmerge.mvd.Match;
 import eu.interedition.collatex.nmerge.mvd.Variant;
-import eu.interedition.collatex.nmerge.mvd.Witness;
+import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -67,7 +68,7 @@ public class MVDTest extends AbstractTest {
     final List<Witness> witnesses = Lists.newArrayListWithExpectedSize(witnessContents.length);
     int sigil = 0;
     for (String witness : witnessContents) {
-      witnesses.add(collation.add(new Witness("W" + Integer.toString(++sigil)), tokenize(witness)));
+      witnesses.add(collation.add(new SimpleWitness("W" + Integer.toString(++sigil)), tokenize(witness)));
     }
 
     for (Match<String> m : collation.getMatches()) {

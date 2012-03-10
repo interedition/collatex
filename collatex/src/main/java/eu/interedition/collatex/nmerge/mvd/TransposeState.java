@@ -21,6 +21,7 @@
 package eu.interedition.collatex.nmerge.mvd;
 
 import com.google.common.base.Objects;
+import eu.interedition.collatex.Witness;
 
 /**
  * When building chunks keep track of the state of transpositions

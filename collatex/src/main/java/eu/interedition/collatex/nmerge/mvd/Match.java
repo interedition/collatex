@@ -23,6 +23,7 @@ package eu.interedition.collatex.nmerge.mvd;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import eu.interedition.collatex.Witness;
 
 import java.util.Collections;
 import java.util.List;

@@ -20,6 +20,7 @@
  */
 package eu.interedition.collatex.nmerge.mvd;
 
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.exception.MVDException;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;

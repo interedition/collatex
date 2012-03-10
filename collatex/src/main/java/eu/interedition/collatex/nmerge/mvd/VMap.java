@@ -21,6 +21,8 @@
 
 package eu.interedition.collatex.nmerge.mvd;
 
+import eu.interedition.collatex.Witness;
+
 import java.util.HashMap;
 import java.util.Vector;
 

@@ -20,6 +20,7 @@
  */
 package eu.interedition.collatex.nmerge.mvd;
 
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.Errors;
 import eu.interedition.collatex.nmerge.exception.MVDException;
 import eu.interedition.collatex.nmerge.graph.*;

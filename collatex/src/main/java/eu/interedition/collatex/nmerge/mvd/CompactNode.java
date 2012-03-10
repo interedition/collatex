@@ -23,6 +23,7 @@ package eu.interedition.collatex.nmerge.mvd;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex.Witness;
 
 import java.util.Set;
 

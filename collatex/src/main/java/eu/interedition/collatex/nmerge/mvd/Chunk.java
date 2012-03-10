@@ -20,6 +20,7 @@
  */
 package eu.interedition.collatex.nmerge.mvd;
 
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.Tuple;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;

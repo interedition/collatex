@@ -21,7 +21,7 @@
 
 package eu.interedition.collatex.nmerge.graph;
 
-import eu.interedition.collatex.nmerge.mvd.Witness;
+import eu.interedition.collatex.Witness;
 
 import java.util.Set;
 
