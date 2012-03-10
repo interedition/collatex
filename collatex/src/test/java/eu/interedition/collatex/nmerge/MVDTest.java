@@ -62,7 +62,7 @@ public class MVDTest extends AbstractTest {
   }
 
   protected void nmerge(String... witnessContents) throws Exception {
-    final Collation<String> collation = new Collation<String>("Test", Ordering.<String>natural(), "");
+    final Collation<String> collation = new Collation<String>("Test", Ordering.<String>natural());
 
     final List<Witness> witnesses = Lists.newArrayListWithExpectedSize(witnessContents.length);
     int sigil = 0;

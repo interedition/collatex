@@ -6,6 +6,7 @@ import edu.uci.ics.jung.algorithms.layout.RadialTreeLayout;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -194,10 +195,8 @@ public class CollateXLaboratory extends JFrame {
       }
 
       final SimpleWitness witness = w.get(0);
-      final SimpleToken terminal = new SimpleToken(witness, witness.getTokens().size(), "\u00b6", "\u00b6");
-
       tabbedPane.setSelectedIndex(2);
-      final SuffixTreeModel treeModel = new SuffixTreeModel(SuffixTree.create(witness, new EqualityTokenComparator(), terminal));
+      final SuffixTreeModel treeModel = new SuffixTreeModel(SuffixTree.create(witness, new EqualityTokenComparator()));
       suffixTreePanel.getModel().setGraphLayout(new TreeLayout(treeModel, 100, 50));
     }
   }

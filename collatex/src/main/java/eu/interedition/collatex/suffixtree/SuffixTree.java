@@ -20,6 +20,8 @@
  */
 package eu.interedition.collatex.suffixtree;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,9 +81,10 @@ public class SuffixTree<T> {
    *            version it is appended at the end of the input string and then never used.
    */
   @SuppressWarnings("unchecked")
-  private SuffixTree(Iterable<T> str, Comparator<T> comparator, T terminal) {
+  private SuffixTree(Iterable<T> str, Comparator<T> comparator) {
     this.length = Iterables.size(str) + 1;
-    this.source = (T[]) Array.newInstance(terminal.getClass(), this.length + 1);
+    Preconditions.checkArgument(this.length > 1);
+    this.source = (T[]) Array.newInstance(Iterables.getFirst(str, null).getClass(), this.length + 1);
     this.comparator = comparator;
     this.virtualEnd = 1; // added to make 1-character suffix trees work
 
@@ -90,13 +93,13 @@ public class SuffixTree<T> {
       this.source[++i] = t;
     }
     // the terminal ('$') is never examined but assumed to be there
-    this.source[length] = terminal;
+    this.source[length] = null;
 
     this.root = new SuffixTreeNode(null, 0, 0, 0);
   }
 
-  public static <T> SuffixTree<T> create(Iterable<T> str, Comparator<T> comparator, T terminal) {
-    final SuffixTree<T> st = new SuffixTree<T>(str, comparator, terminal);
+  public static <T> SuffixTree<T> create(Iterable<T> str, Comparator<T> comparator) {
+    final SuffixTree<T> st = new SuffixTree<T>(str, comparator);
 
     // allocating first node, child of the root (phase 0), the longest
     // path node
@@ -223,7 +226,7 @@ public class SuffixTree<T> {
       // 2. last character matched is NOT the last of its edge
       else {
         // Trace only last symbol of str, search in the CURRENT edge (node)
-        if (comparator.compare(source[position.node.edgeLabelStart + position.edgePos + 1], source[str.end]) == 0) {
+        if (equals(source[position.node.edgeLabelStart + position.edgePos + 1], source[str.end])) {
           position.edgePos++;
           charsFound = 1;
         }
@@ -301,14 +304,12 @@ public class SuffixTree<T> {
    * @return the son found, or null if no such son.
    */
   SuffixTreeNode findChild(SuffixTreeNode node, T character) {
-    // point to the first son.
-    node = node.firstChild;
-    // scan all sons (all right siblings of the first son) for their first
-    // character (it must match the char given as input to this function).
-    while (node != null && comparator.compare(source[node.edgeLabelStart], character) != 0) {
-      node = node.nextSibling;
+    for (SuffixTreeNode child = node.firstChild; child != null; child = child.nextSibling) {
+      if (equals(source[child.edgeLabelStart], character)) {
+        return child;
+      }
     }
-    return node;
+    return null;
   }
 
   /**
@@ -500,7 +501,7 @@ public class SuffixTree<T> {
            trv.charsFound++, trv.edgePos++) {
         // compare current characters of the string and the edge.
         // if equal - continue
-        if (comparator.compare(source[node.edgeLabelStart + trv.edgePos], source[str.begin + trv.edgePos]) != 0) {
+        if (!equals(comparator.compare(source[node.edgeLabelStart + trv.edgePos], source[str.begin + trv.edgePos]))) {
           trv.edgePos--;
           return node;
         }
@@ -598,7 +599,7 @@ public class SuffixTree<T> {
           return false;
         }
       } else {
-        boolean success = comparator.compare(source[position.edgePos + 1], b) == 0;
+        boolean success = equals(source[position.edgePos + 1], b);
         if (success) {
           position.edgePos++;
         }
@@ -656,7 +657,7 @@ public class SuffixTree<T> {
       nodeLabelEnd = getNodeLabelEnd(node);
       // Scan a single edge - compare each character with the searched
       // string
-      while (j < W.size() && k <= nodeLabelEnd && comparator.compare(source[k], W.get(j)) == 0) {
+      while (j < W.size() && k <= nodeLabelEnd && equals(source[k], W.get(j))) {
         j++;
         k++;
       }
@@ -750,6 +751,10 @@ public class SuffixTree<T> {
     return source;
   }
 
+  private boolean equals(T t1, T t2) {
+    return (t1 == null && t2 == null) || (t1 != null && t2 != null && comparator.compare(t1, t2) == 0);
+  }
+
   /**
    * This function prints the tree. It simply starts the recursive function
    * printNode with depth 0 (the root).
@@ -785,7 +790,7 @@ public class SuffixTree<T> {
       str.append("+");
       // print the node itself
       while (start <= end) {
-        str.append("[").append(source[start].toString()).append("]");
+        str.append("[").append(Objects.firstNonNull(source[start], "").toString()).append("]");
         start++;
       }
       str.append(" (").append(node.edgeLabelStart).append(",").append(end).append(" | ").append(node.pathPosition).append(")\n");

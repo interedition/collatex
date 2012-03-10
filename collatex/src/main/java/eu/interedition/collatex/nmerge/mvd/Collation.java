@@ -48,14 +48,12 @@ public class Collation<T> {
 
   private final Set<Witness> witnesses = Sets.newHashSet();
   private final Ordering<T> tokenOrdering;
-  private final T nullToken;
 
   private List<Match<T>> matches = Lists.newArrayList();
 
-  public Collation(String description, Ordering<T> tokenOrdering, T nullToken) {
+  public Collation(String description, Ordering<T> tokenOrdering) {
     this.description = description;
     this.tokenOrdering = tokenOrdering;
-    this.nullToken = nullToken;
   }
 
   /**
@@ -448,7 +446,7 @@ public class Collation<T> {
    * @throws MVDException
    */
   private SuffixTree<T> makeSuffixTree(VariantGraphSpecialArc<T> special) throws MVDException {
-    return SuffixTree.create(Lists.newArrayList(special.getData()), tokenOrdering, nullToken);
+    return SuffixTree.create(Lists.newArrayList(special.getData()), tokenOrdering);
   }
 
   /**
