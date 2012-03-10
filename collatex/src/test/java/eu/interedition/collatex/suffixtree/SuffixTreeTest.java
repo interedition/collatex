@@ -19,12 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.nmerge;
+package eu.interedition.collatex.suffixtree;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.nmerge.graph.suffixtree.SuffixTree;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,8 +38,8 @@ public class SuffixTreeTest extends AbstractTest {
 
   @Test
   public void simple() {
-    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, Ordering.<String>natural(), "");
-    LOG.debug(st.printTree());
+    final SuffixTree<String> st = SuffixTree.create(TEST_STRING, Ordering.<String>natural(), "");
+    LOG.debug(st.toString());
     Assert.assertNotNull(st.findSubstring(TEST_STRING.subList(0, 3)));
   }
 
@@ -49,7 +48,7 @@ public class SuffixTreeTest extends AbstractTest {
    */
   @Test
   public void verifyAllSuffixes() {
-    final SuffixTree<String> st = new SuffixTree<String>(TEST_STRING, Ordering.<String>natural(), "");
+    final SuffixTree<String> st = SuffixTree.create(TEST_STRING, Ordering.<String>natural(), "");
     final int end = TEST_STRING.size();
     for (int start = 0; start < end; start++) {
       Assert.assertNotNull("Couldn't find word [" + start + ", " + end + "]", st.findSubstring(TEST_STRING.subList(start, end)));

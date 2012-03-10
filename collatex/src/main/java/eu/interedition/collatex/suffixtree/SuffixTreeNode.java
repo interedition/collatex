@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package eu.interedition.collatex.nmerge.graph.suffixtree;
+package eu.interedition.collatex.suffixtree;
 
 import com.google.common.base.Preconditions;
 
@@ -28,21 +28,21 @@ import com.google.common.base.Preconditions;
  */
 public class SuffixTreeNode {
   /**
-   * A linked list of sons of that node
-   */
-  SuffixTreeNode children;
-  /**
-   * A linked list of right siblings of that node
-   */
-  SuffixTreeNode rightSibling;
-  /**
-   * A linked list of left siblings of that node
-   */
-  SuffixTreeNode leftSibling;
-  /**
    * A pointer to that node's father
    */
   SuffixTreeNode parent;
+  /**
+   * A linked list of sons of that node
+   */
+  SuffixTreeNode firstChild;
+  /**
+   * A linked list of right siblings of that node
+   */
+  SuffixTreeNode nextSibling;
+  /**
+   * A linked list of left siblings of that node
+   */
+  SuffixTreeNode previousSibling;
   /**
    * A pointer to the node that represents the largest
    * suffix of the current node
@@ -61,9 +61,6 @@ public class SuffixTreeNode {
    */
   int edgeLabelEnd;
 
-  public SuffixTreeNode() {
-  }
-
   /**
    * Create a Node
    *
@@ -80,12 +77,44 @@ public class SuffixTreeNode {
     this.edgeLabelEnd = end;
   }
 
+  public SuffixTreeNode getFirstChild() {
+    return firstChild;
+  }
+
+  public SuffixTreeNode getNextSibling() {
+    return nextSibling;
+  }
+
+  public SuffixTreeNode getPreviousSibling() {
+    return previousSibling;
+  }
+
+  public SuffixTreeNode getParent() {
+    return parent;
+  }
+
+  public SuffixTreeNode getLargestSuffix() {
+    return largestSuffix;
+  }
+
+  public int getPathPosition() {
+    return pathPosition;
+  }
+
+  public int getEdgeLabelStart() {
+    return edgeLabelStart;
+  }
+
+  public int getEdgeLabelEnd() {
+    return edgeLabelEnd;
+  }
+
   /**
    * Does this node have no children, i.e. is it a leaf?
    *
    * @return true if this node is a leaf
    */
   public boolean isLeaf() {
-    return children == null;
+    return firstChild == null;
   }
 }

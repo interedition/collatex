@@ -28,7 +28,6 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertexMod
     super(new SugiyamaLayout<VariantGraphVertexModel, VariantGraphEdgeModel>(g));
 
     setBackground(Color.WHITE);
-    setBorder(BorderFactory.createTitledBorder("Variant Graph"));
     setGraphMouse(new DefaultModalGraphMouse<String, Integer>());
 
     final RenderContext<VariantGraphVertexModel, VariantGraphEdgeModel> rc = getRenderContext();

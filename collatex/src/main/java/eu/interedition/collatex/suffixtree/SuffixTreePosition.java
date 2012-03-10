@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package eu.interedition.collatex.nmerge.graph.suffixtree;
+package eu.interedition.collatex.suffixtree;
 
 public class SuffixTreePosition {
   public SuffixTreeNode node;

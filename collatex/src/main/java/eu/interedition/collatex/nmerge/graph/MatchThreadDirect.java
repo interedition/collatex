@@ -21,8 +21,8 @@
 package eu.interedition.collatex.nmerge.graph;
 
 import eu.interedition.collatex.nmerge.Errors;
-import eu.interedition.collatex.nmerge.graph.suffixtree.SuffixTree;
-import eu.interedition.collatex.nmerge.graph.suffixtree.SuffixTreePosition;
+import eu.interedition.collatex.suffixtree.SuffixTree;
+import eu.interedition.collatex.suffixtree.SuffixTreePosition;
 import eu.interedition.collatex.nmerge.mvd.Witness;
 import com.google.common.collect.Sets;
 

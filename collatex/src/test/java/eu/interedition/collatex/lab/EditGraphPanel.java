@@ -21,7 +21,6 @@ public class EditGraphPanel extends VisualizationViewer<EditGraphVertexModel, Ed
     super(new SugiyamaLayout<EditGraphVertexModel, EditGraphEdgeModel>(g));
 
     setBackground(Color.WHITE);
-    setBorder(BorderFactory.createTitledBorder("Edit Graph"));
     setGraphMouse(new DefaultModalGraphMouse<String, Integer>());
 
     final RenderContext<EditGraphVertexModel, EditGraphEdgeModel> rc = getRenderContext();

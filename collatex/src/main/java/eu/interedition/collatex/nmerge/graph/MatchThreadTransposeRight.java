@@ -20,7 +20,7 @@
  */
 package eu.interedition.collatex.nmerge.graph;
 
-import eu.interedition.collatex.nmerge.graph.suffixtree.SuffixTree;
+import eu.interedition.collatex.suffixtree.SuffixTree;
 
 import java.util.List;
 import java.util.ListIterator;

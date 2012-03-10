@@ -23,7 +23,7 @@ package eu.interedition.collatex.nmerge.mvd;
 import eu.interedition.collatex.nmerge.Errors;
 import eu.interedition.collatex.nmerge.exception.MVDException;
 import eu.interedition.collatex.nmerge.graph.*;
-import eu.interedition.collatex.nmerge.graph.suffixtree.SuffixTree;
+import eu.interedition.collatex.suffixtree.SuffixTree;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
@@ -448,7 +448,7 @@ public class Collation<T> {
    * @throws MVDException
    */
   private SuffixTree<T> makeSuffixTree(VariantGraphSpecialArc<T> special) throws MVDException {
-    return new SuffixTree<T>(Lists.newArrayList(special.getData()), tokenOrdering, nullToken);
+    return SuffixTree.create(Lists.newArrayList(special.getData()), tokenOrdering, nullToken);
   }
 
   /**

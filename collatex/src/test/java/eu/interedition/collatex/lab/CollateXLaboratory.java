@@ -1,12 +1,17 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
+import edu.uci.ics.jung.algorithms.layout.BalloonLayout;
+import edu.uci.ics.jung.algorithms.layout.RadialTreeLayout;
+import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.suffixtree.SuffixTree;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +40,11 @@ public class CollateXLaboratory extends JFrame {
 
   private final EditGraphModel editGraphModel = new EditGraphModel();
   private final EditGraphPanel editGraphPanel;
+
+  private final SuffixTreePanel suffixTreePanel;
+
   private final JComboBox algorithm;
+  private final JTabbedPane tabbedPane;
 
   public CollateXLaboratory(GraphFactory graphFactory) {
     super("CollateX Laboratory");
@@ -46,16 +55,15 @@ public class CollateXLaboratory extends JFrame {
     this.algorithm.setFocusable(false);
     this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
 
-    final JSplitPane graphPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    graphPane.setContinuousLayout(true);
-    graphPane.setLeftComponent(variantGraphPanel = new VariantGraphPanel(variantGraphModel));
-    graphPane.setRightComponent(editGraphPanel = new EditGraphPanel(editGraphModel));
-    graphPane.setDividerLocation(0.5f);
+    this.tabbedPane = new JTabbedPane();
+    this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(variantGraphModel));
+    this.tabbedPane.addTab("Edit Graph", editGraphPanel = new EditGraphPanel(editGraphModel));
+    this.tabbedPane.addTab("Suffix Tree", suffixTreePanel = new SuffixTreePanel());
 
     final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     splitPane.setContinuousLayout(true);
     splitPane.setLeftComponent(witnessPanel);
-    splitPane.setRightComponent(graphPane);
+    splitPane.setRightComponent(tabbedPane);
     add(splitPane, BorderLayout.CENTER);
 
     final JToolBar toolBar = new JToolBar();
@@ -66,17 +74,17 @@ public class CollateXLaboratory extends JFrame {
     toolBar.add(new RemoveWitnessesAction());
     toolBar.add(new CollateAction());
     toolBar.add(new TokenLinkAction());
+    toolBar.add(new SuffixTreeAction());
     add(toolBar, BorderLayout.NORTH);
 
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setSize(800, 600);
     pack();
 
-    graphPane.setDividerLocation(0.5f);
+    splitPane.setDividerLocation(0.3f);
   }
 
   public static void main(String[] args) throws Exception {
-    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
     new CollateXLaboratory(GraphFactory.create()).setVisible(true);
   }
 
@@ -136,6 +144,7 @@ public class CollateXLaboratory extends JFrame {
       LOG.debug("Collated {}", Iterables.toString(w));
 
       variantGraphPanel.getModel().setGraphLayout(new SugiyamaLayout<VariantGraphVertexModel, VariantGraphEdgeModel>(variantGraphModel));
+      tabbedPane.setSelectedIndex(0);
     }
   }
 
@@ -165,7 +174,31 @@ public class CollateXLaboratory extends JFrame {
         transaction.finish();
       }
 
-      editGraphPanel.getModel().setGraphLayout(new SugiyamaLayout<EditGraphVertexModel, EditGraphEdgeModel>(editGraphModel));
+      editGraphPanel.getModel().setGraphLayout(new SugiyamaLayout(editGraphModel));
+      tabbedPane.setSelectedIndex(1);
+    }
+  }
+
+  private class SuffixTreeAction extends AbstractAction {
+
+    private SuffixTreeAction() {
+      super("Suffix Tree");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      final List<SimpleWitness> w = witnessPanel.getWitnesses();
+      
+      if (w.size() < 1) {
+        return;
+      }
+
+      final SimpleWitness witness = w.get(0);
+      final SimpleToken terminal = new SimpleToken(witness, witness.getTokens().size(), "\u00b6", "\u00b6");
+
+      tabbedPane.setSelectedIndex(2);
+      final SuffixTreeModel treeModel = new SuffixTreeModel(SuffixTree.create(witness, new EqualityTokenComparator(), terminal));
+      suffixTreePanel.getModel().setGraphLayout(new TreeLayout(treeModel, 100, 50));
     }
   }
 }
