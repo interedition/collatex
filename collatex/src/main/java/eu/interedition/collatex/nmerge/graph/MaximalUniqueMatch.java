@@ -65,11 +65,11 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
   /**
    * special arcs on the left that need reMUMing
    */
-  private SimpleQueue<VariantGraphSpecialArc<T>> leftSpecialArcs;
+  private Queue<VariantGraphSpecialArc<T>> leftSpecialArcs;
   /**
    * special arcs on the left that need reMUMing
    */
-  private SimpleQueue<VariantGraphSpecialArc<T>> rightSpecialArcs;
+  private Queue<VariantGraphSpecialArc<T>> rightSpecialArcs;
   /**
    * The left hand subgraph after alignment
    */
@@ -288,7 +288,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
                                                         VariantGraph<T> subGraph) throws MVDException {
     MaximalUniqueMatch<T> mum = new MaximalUniqueMatch<T>(special, subGraph, false);
     HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);
-    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
     queue.add(subGraph.start);
     VariantGraphArc<T> lastArc = null;
     printedNodes.add(subGraph.start);
@@ -349,7 +349,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    * @param a     the arc to check for cycles
    * @param limit number of times to recurse before giving up
    */
-  static <T> void checkForCycle(SimpleQueue<VariantGraphNode<T>> list, VariantGraphArc<T> a, int limit)
+  static <T> void checkForCycle(Queue<VariantGraphNode<T>> list, VariantGraphArc<T> a, int limit)
           throws MVDException {
     if (list.contains(a.to)) {
       throw new MVDException("Cycle: node" + a.to.nodeId + " already encountered");
@@ -428,7 +428,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
   static <T> void findLeftPositions(MaximalUniqueMatch<T> mum, SuffixTree<T> st,
                                     VariantGraphNode<T> node, int distance) {
     HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);
-    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
     int travelled = 0;
     Witness mumV = mum.version;
     VariantGraphNode<T> origin = node;
@@ -538,7 +538,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    */
   static <T> void findRightPositions(MaximalUniqueMatch<T> mum, SuffixTree<T> st, VariantGraphNode<T> node,
                                      int distance) {
-    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
     HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);
     VariantGraphNode<T> origin = node;
     Set<Witness> range = Sets.newHashSet();
@@ -667,13 +667,13 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
   private void addSubArcsToSpecials() {
     if (leftSubArc != null && leftSubArc.dataLen() >= MaximalUniqueMatch.MIN_LEN) {
       if (leftSpecialArcs == null) {
-        leftSpecialArcs = new SimpleQueue<VariantGraphSpecialArc<T>>();
+        leftSpecialArcs = new ArrayDeque<VariantGraphSpecialArc<T>>();
       }
       leftSpecialArcs.add(leftSubArc);
     }
     if (rightSubArc != null && rightSubArc.dataLen() >= MaximalUniqueMatch.MIN_LEN) {
       if (rightSpecialArcs == null) {
-        rightSpecialArcs = new SimpleQueue<VariantGraphSpecialArc<T>>();
+        rightSpecialArcs = new ArrayDeque<VariantGraphSpecialArc<T>>();
       }
       rightSpecialArcs.add(rightSubArc);
     }
@@ -684,7 +684,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    *
    * @return a list of left special arcs for reMUMing
    */
-  public SimpleQueue<VariantGraphSpecialArc<T>> getLeftSpecialArcs() {
+  public Queue<VariantGraphSpecialArc<T>> getLeftSpecialArcs() {
     return leftSpecialArcs;
   }
 
@@ -693,7 +693,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    *
    * @return a list of right special arcs for reMUMing
    */
-  public SimpleQueue<VariantGraphSpecialArc<T>> getRightSpecialArcs() {
+  public Queue<VariantGraphSpecialArc<T>> getRightSpecialArcs() {
     return rightSpecialArcs;
   }
 
@@ -726,7 +726,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
     VariantGraphNode<T> leftFrom = arc.from;
     while (leftFrom != graph.start) {
       if (leftSpecialArcs == null) {
-        leftSpecialArcs = new SimpleQueue<VariantGraphSpecialArc<T>>();
+        leftSpecialArcs = new ArrayDeque<VariantGraphSpecialArc<T>>();
       }
       VariantGraphArc<T> a = leftFrom.pickIncomingArc(version);
       if (a instanceof VariantGraphSpecialArc<?>) {
@@ -737,7 +737,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
     VariantGraphNode<T> rightTo = arc.to;
     while (rightTo != graph.end) {
       if (rightSpecialArcs == null) {
-        rightSpecialArcs = new SimpleQueue<VariantGraphSpecialArc<T>>();
+        rightSpecialArcs = new ArrayDeque<VariantGraphSpecialArc<T>>();
       }
       VariantGraphArc<T> a = rightTo.pickOutgoingArc(version);
       if (a instanceof VariantGraphSpecialArc<?>) {

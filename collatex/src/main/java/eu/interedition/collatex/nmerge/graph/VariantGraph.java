@@ -135,7 +135,7 @@ public class VariantGraph<T> {
    */
   private int maxLength() {
     HashMap<Witness, Integer> lengths = new HashMap<Witness, Integer>();
-    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
     HashSet<VariantGraphNode<T>> printed = new HashSet<VariantGraphNode<T>>();
     queue.add(start);
     while (!queue.isEmpty()) {
@@ -234,7 +234,7 @@ public class VariantGraph<T> {
    * Verify a graph by breadth-first traversal, using exceptions.
    */
   public void verify() throws MVDException {
-    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
     HashSet<VariantGraphNode<T>> printed = new HashSet<VariantGraphNode<T>>();
     start.verify();
     queue.add(start);
@@ -275,7 +275,7 @@ public class VariantGraph<T> {
     StringBuffer sb = new StringBuffer();
     HashSet<VariantGraphNode<T>> printed = new HashSet<VariantGraphNode<T>>();
     try {
-      SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+      Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
       queue.add(start);
       while (!queue.isEmpty()) {
         VariantGraphNode<T> node = queue.poll();
@@ -323,7 +323,7 @@ public class VariantGraph<T> {
    */
   void clearPrinted() {
     HashMap<Integer, VariantGraphNode<T>> hash = new HashMap<Integer, VariantGraphNode<T>>(1500);
-    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
     queue.add(start);
     while (!queue.isEmpty()) {
       VariantGraphNode<T> node = queue.poll();
@@ -356,7 +356,7 @@ public class VariantGraph<T> {
    * @param version the version to remove
    */
   public void removeVersion(Witness version) {
-    SimpleQueue<VariantGraphNode<T>> queue = new SimpleQueue<VariantGraphNode<T>>();
+    Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
     queue.add(start);
     while (!queue.isEmpty()) {
       VariantGraphNode<T> node = queue.poll();

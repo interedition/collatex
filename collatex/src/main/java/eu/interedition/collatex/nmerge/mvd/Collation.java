@@ -311,8 +311,8 @@ public class Collation<T> {
       while (bestMUM != null) {
         if (bestMUM.verify()) {
           bestMUM.merge();
-          SimpleQueue<VariantGraphSpecialArc<T>> leftSpecials = bestMUM.getLeftSpecialArcs();
-          SimpleQueue<VariantGraphSpecialArc<T>> rightSpecials = bestMUM.getRightSpecialArcs();
+          Queue<VariantGraphSpecialArc<T>> leftSpecials = bestMUM.getLeftSpecialArcs();
+          Queue<VariantGraphSpecialArc<T>> rightSpecials = bestMUM.getRightSpecialArcs();
           while (leftSpecials != null && !leftSpecials.isEmpty()) {
             installSpecial(specials, leftSpecials.poll(), bestMUM.getLeftSubgraph(), true);
           }

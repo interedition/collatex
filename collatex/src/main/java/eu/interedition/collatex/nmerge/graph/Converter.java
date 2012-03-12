@@ -425,4 +425,34 @@ public class Converter<T> {
     other.clearPrinted();
     return true;
   }
+
+  /**
+   * A Queue of Nodes
+   */
+  static class NodeQueue<T> extends Vector<VariantGraphNode<T>> {
+    static final long serialVersionUID = 1;
+
+    /**
+     * Add a Node to the queue. A bit difficult, since the node may
+     * already be there. Check that, and prevent duplicates.
+     *
+     * @param node the node to push
+     */
+    void push(VariantGraphNode<T> node) {
+      for (int i = size() - 1; i >= 0; i--) {
+        if (get(i) == node) {
+          return;
+        }
+      }
+      add(node);
+    }
+
+    VariantGraphNode<T> pop() {
+      VariantGraphNode<T> u = null;
+      if (size() > 0) {
+        u = remove(0);
+      }
+      return u;
+    }
+  }
 }
