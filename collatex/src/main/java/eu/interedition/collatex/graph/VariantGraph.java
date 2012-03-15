@@ -112,14 +112,15 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   }
 
   public Iterable<VariantGraphEdge> edges(final Set<Witness> witnesses) {
+    final int[] witnessReferences = (witnesses == null || witnesses.isEmpty()) ? null : getWitnessMapper().map(witnesses);
     return transform(Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
 
       @Override
       public Evaluation evaluate(Path path) {
-        if (witnesses != null && !witnesses.isEmpty()) {
+        if (witnessReferences != null) {
           final Relationship lastRel = path.lastRelationship();
           if (lastRel != null) {
-            if (edgeWrapper.apply(lastRel).traversableWith(witnesses)) {
+            if (!edgeWrapper.apply(lastRel).traversableWith(witnessReferences)) {
               return Evaluation.EXCLUDE_AND_PRUNE;
             }
           }

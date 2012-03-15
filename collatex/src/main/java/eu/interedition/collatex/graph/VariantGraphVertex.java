@@ -7,7 +7,13 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Path;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.traversal.Evaluation;
+import org.neo4j.graphdb.traversal.Evaluator;
+import org.neo4j.kernel.Traversal;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -53,6 +59,28 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   public Iterable<VariantGraphTransposition> transpositions() {
     return transform(node.getRelationships(GraphRelationshipType.TRANSPOSITION), graph.getTranspositionWrapper());
   }
+
+  public Iterable<VariantGraphVertex> vertices(final VariantGraphVertex to) {
+    final int[] witnesses = graph.getWitnessMapper().map(witnesses());
+    final Function<Relationship, VariantGraphEdge> edgeWrapper = graph.getEdgeWrapper();
+    return Iterables.transform(Traversal.description().breadthFirst().relationships(GraphRelationshipType.PATH, Direction.OUTGOING).evaluator(new Evaluator() {
+      @Override
+      public Evaluation evaluate(Path path) {
+        final Relationship lastRel = path.lastRelationship();
+        if (lastRel != null) {
+          if (!edgeWrapper.apply(lastRel).traversableWith(witnesses)) {
+            return Evaluation.EXCLUDE_AND_PRUNE;
+          }
+        }
+        final Node node = path.endNode();
+        if (node != null && node.equals(to.node)) {
+          return Evaluation.INCLUDE_AND_PRUNE;
+        }
+
+        return Evaluation.INCLUDE_AND_CONTINUE;
+      }
+    }).traverse(node).nodes(), graph.getVertexWrapper());
+  };
 
   public Set<Token> tokens() {
     return tokens(null);

@@ -3,8 +3,6 @@ package eu.interedition.collatex.graph;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Witness;
@@ -28,7 +26,23 @@ public class VariantGraphEdge extends GraphEdge<VariantGraph, VariantGraphVertex
   }
 
   public boolean traversableWith(Set<Witness> witnesses) {
-    return (witnesses == null || witnesses.isEmpty() || Iterables.any(witnesses(), Predicates.in(witnesses)));
+    return (witnesses == null || witnesses.isEmpty() || traversableWith(graph.getWitnessMapper().map(witnesses)));
+  }
+
+  public boolean traversableWith(int[] witnesses) {
+    if (witnesses == null || witnesses.length == 0) {
+      return true;
+    }
+
+    final int[] witnessReferences = getWitnessReferences();
+    for (int wrc = 0; wrc < witnessReferences.length; wrc++) {
+      for (int wc = 0; wc < witnesses.length; wc++) {
+        if (witnessReferences[wrc] == witnesses[wc]) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public VariantGraphEdge add(Set<Witness> witnesses) {
@@ -59,9 +73,14 @@ public class VariantGraphEdge extends GraphEdge<VariantGraph, VariantGraphVertex
 
   public static Predicate<VariantGraphEdge> createTraversableFilter(final Set<Witness> witnesses) {
     return new Predicate<VariantGraphEdge>() {
+      private int[] witnessReferences;
+      
       @Override
       public boolean apply(VariantGraphEdge input) {
-        return input.traversableWith(witnesses);
+        if (witnessReferences == null) {
+          witnessReferences = ((witnesses == null || witnesses.isEmpty()) ? new int[0] : input.getGraph().getWitnessMapper().map(witnesses));
+        }
+        return input.traversableWith(witnessReferences);
       }
     };
   }
