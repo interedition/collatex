@@ -19,7 +19,7 @@
 <h2>Type/Paste a plain text</h2>
 
 <form id="paste" name="paste" method="post">
-  <p><textarea rows="10" style="width: 100%" disabled="disabled"></textarea><br><input type="submit" value="Send" disabled="disabled"></p>
+  <p><textarea id="text" rows="10" style="width: 100%"></textarea><br><input type="submit" value="Send"></p>
 </form>
 
 <script type="text/javascript">
@@ -28,6 +28,7 @@
       var file = Y.one("#file");
       var fileType = Y.one("#fileType");
       var fileEncoding = Y.one("#fileEncoding");
+      var text = Y.one("#text");
 
       Y.on("change", function () {
         fileEncoding.set("disabled", this.get("value") == "XML");
@@ -43,16 +44,22 @@
         }
       }, file);
 
-      Y.on("submit", function (e) {
-        var errorMessage = Y.one("#error-message");
+      Y.on("submit", function(e) {
         var fileValue = file.get("value");
         if (fileValue == null || fileValue.trim().length == 0) {
-          errorMessage.setContent("Please enter a file to upload!");
           e.preventDefault();
-        } else {
-          errorMessage.setContent("<br>");
         }
       }, "#upload");
+
+      Y.on("submit", function(e) {
+        e.preventDefault();
+        var textValue = text.get("value");
+        if (textValue == null || textValue.trim().length == 0) {
+          return;
+        }
+
+
+      }, "#paste");
     });
   });
 </script>
