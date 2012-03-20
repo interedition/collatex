@@ -4,10 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -425,7 +430,7 @@ public class MatrixLinkerTest extends AbstractTest {
   	ArrayList<Coordinate> gaps = archipelago.createFirstVersion().findGaps(list);
   	assertEquals(4,gaps.size());
   }
-
+  
   @Test
   public void testArchipelagoGapsRealText2() {
   	SimpleWitness[] sw = createWitnesses(
@@ -464,6 +469,108 @@ public class MatrixLinkerTest extends AbstractTest {
     assertEquals(expected,result);
   	ArrayList<Coordinate> gaps = archipelago.createFirstVersion().findGaps();
   	assertEquals(10,gaps.size());
+  }
+
+  @Test
+  public void testArchipelagoGapsRealText3() {
+//Tekst D9
+  	String tekstD9 = "Het werd avond en de kleine man ging dineren. Hij zat naast een demi&KOP+mondaine, haar naam was Vera, zij maakte hem het hof. Aan het dessert presenteerde zij hem een haltatgeschilde banaan. Maar de kleine man bedankte zo hof&WEG+ felijk als hij kon. Hij had liever een appel.<p/>"+
+  	"&GED+ Ik kan geen bananen zien, bekende hij, behalve aan trossen, groen, op weg naar de koelwagentrein.<p/>"+
+   	"De wenkbrauwen van de demi&KOP+mondaine gingen rechtopstaan en leken op vraagtekens. Aanleiding tot een interessant gedeelte in hun gesprek.<p/>"+
+   	"&GED+ Ik ben planter, vertelde de korte bruine man, bananenplanter in Nicaragua. &APO+<p/>"+
+   	"Uit zijn zak haalde hij een rolletje te voorschijn dat hij opzettelijk bij zich gestoken had. Het was een toto van een halve meter lang: zijn indiaanse vrouwen en kinderen.<p/>";
+//Tekst D1
+  	String tekstD1 = "<b>Het</b> werd avond en de kleine bruine man ging dineeren. Hij zat naast een demi&KOP+mondaine die Vera heette en hem het hof maakte. Aan het dessert bood zij hem een half afgeschilde banaan. Maar de kleine man bedankte zoo hoffelijk als hij kon. Hij had liever een appel. @Ik kan geen bananen zien,# bekende hij, @behalve aan trossen, groen, op weg naar den koelwagentrein.# Vera&APO+s wenkbrauwen kwamen in vorm nog meer die van vraagteekens nabij. Het werd aanleiding tot een interessant gedeelte van hun gesprek: @Ik ben planter#, vertelde de korte bruine man, @bananenplanter in Nicaragua#. Uit zijn zak haalde hij een rolletje te voorschijn (dat hij opzettelijk bij zich gestoken had). Het was een foto, een halve meter lang:<p/>"+
+    "zijn Indiaansche vrouwen en kinderen.<p/>";
+  	SimpleWitness[] sw = createWitnesses(tekstD1,tekstD9);
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+  	for(Island isl: buildMatrix.getIslands())	{
+  		archipelago.add(isl);
+    }
+    assertEquals(146,archipelago.size());
+    String result = "";
+    try {
+	    PrintWriter pw = new PrintWriter(new File("exampleOutput.txt"));
+	    result = archipelago.createXML(buildMatrix, pw);
+	    pw.println(buildMatrix.toHtml(archipelago.createFirstVersion()));
+	    pw.close();
+    } catch (FileNotFoundException e) {
+	    e.printStackTrace();
+    }
+    System.out.println(result);
+  }
+
+  
+  @Test
+  public void testArchipelagoGapsRealText4() {
+  	String tekstD1 = "";
+  	try{
+  	  FileInputStream fstream = new FileInputStream("C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\conserve\\Conserve_D1_fragment.txt");
+  	  DataInputStream in = new DataInputStream(fstream);
+  	  BufferedReader br = new BufferedReader(new InputStreamReader(in));
+  	  String invoer;
+  	  while ((invoer = br.readLine()) != null)   {
+  	    tekstD1 += invoer;
+  	  }
+  	  in.close();
+    }catch (Exception e){ }
+  	String tekstD9 = "";
+  	try{
+  	  FileInputStream fstream = new FileInputStream("C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\conserve\\Conserve_D9_fragment.txt");
+  	  DataInputStream in = new DataInputStream(fstream);
+  	  BufferedReader br = new BufferedReader(new InputStreamReader(in));
+  	  String invoer;
+  	  while ((invoer = br.readLine()) != null)   {
+  	    tekstD9 += invoer;
+  	  }
+  	  in.close();
+    }catch (Exception e){ }
+  	SimpleWitness[] sw = createWitnesses(tekstD1,tekstD9);
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+  	for(Island isl: buildMatrix.getIslands())	{
+  		archipelago.add(isl);
+    }
+//    assertEquals(146,archipelago.size());
+    String result = "";
+    try {
+	    PrintWriter pw = new PrintWriter(new File("exampleOutput_test4.txt"));
+	    System.out.println("A");
+	    result = archipelago.createXML(buildMatrix, pw);
+	    assertEquals("",result);
+	    pw.println(buildMatrix.toHtml(archipelago.createFirstVersion()));
+	    pw.close();
+    } catch (FileNotFoundException e) {
+	    e.printStackTrace();
+    }
+    System.out.println(result);
+  }
+  @Test
+
+  public void testArchipelagoGapsRealText5() {
+  	String tekstD1 = "Op den Atlantischen Oceaan voer een groote stoomer ... Zij die over de railing hingen en recht naar beneden zagen, konden vaststellen dat het schip vorderde";
+  	String tekstD9 = "Over de Atlantische Oceaan voer een grote stomer ... Wie over de reling hing en recht naar beneden keek, kon vaststellen dat het schip vorderde";
+  	SimpleWitness[] sw = createWitnesses(tekstD1,tekstD9);
+		VariantGraph vg = collate(sw[0]);
+  	MatrixLinker linker = new MatrixLinker();
+  	SparseMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
+  	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+  	for(Island isl: buildMatrix.getIslands())	{
+  		archipelago.add(isl);
+    }
+    String result = "";
+    try {
+	    PrintWriter pw = new PrintWriter(new File("exampleOutput_test5.txt"));
+	    result = archipelago.createXML(buildMatrix, pw);
+      assertEquals("",result);
+    } catch (FileNotFoundException e) {
+	    e.printStackTrace();
+    }
   }
 
 	private void compareWitnesses(SimpleWitness[] sw, int baseWitness,

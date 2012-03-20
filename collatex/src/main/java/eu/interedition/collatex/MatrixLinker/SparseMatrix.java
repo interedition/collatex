@@ -72,6 +72,7 @@ public class SparseMatrix  {
 
 
   public String toHtml(Archipelago arch) {
+  	System.out.println("a1a");
   	String result = "<table>\n<tr><td></td>\n";
   	ArrayList<String> colLabels = columnLabels();
   	for(String cLabel : colLabels) {
@@ -81,13 +82,16 @@ public class SparseMatrix  {
   	int colNum = sparseMatrix.columnKeyList().size();
   	ArrayList<String> rLabels = rowLabels();
   	int row = 0;
+    System.out.println("a2a");
   	for(String label : rLabels) {
       result += "<tr><td>" + label + "</td>";
-      for(int col=0; col<colNum;col++)
+      for(int col=0; col<colNum;col++) {
+  	    System.out.println(" : "+col);
       	if(new Coordinate(col,row).partOf(arch))
       		result += "<td BGCOLOR=\"lightgreen\">M</td>";
       	else
       		result += "<td></td>";
+      }
       result += "</tr>\n";
       row++;
 	  }
