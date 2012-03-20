@@ -72,26 +72,26 @@ public class SparseMatrix  {
 
 
   public String toHtml(Archipelago arch) {
-  	System.out.println("a1a");
+  	int mat[] = new int[rowNum()];
+  	for(Island isl: arch.iterator()) {
+  		for(Coordinate c : isl.iterator()) {
+  			mat[c.row] = c.col;
+  		}
+  	}
   	String result = "<table>\n<tr><td></td>\n";
   	ArrayList<String> colLabels = columnLabels();
   	for(String cLabel : colLabels) {
 	      result += "<td>" + cLabel + "</td>";
 		}
   	result += "</tr>\n";
-  	int colNum = sparseMatrix.columnKeyList().size();
   	ArrayList<String> rLabels = rowLabels();
   	int row = 0;
-    System.out.println("a2a");
   	for(String label : rLabels) {
       result += "<tr><td>" + label + "</td>";
-      for(int col=0; col<colNum;col++) {
-  	    System.out.println(" : "+col);
-      	if(new Coordinate(col,row).partOf(arch))
-      		result += "<td BGCOLOR=\"lightgreen\">M</td>";
-      	else
-      		result += "<td></td>";
-      }
+      if(mat[row]>0) {
+        result += "<td colspan=\""+mat[row]+"\"></td>";
+    		result += "<td BGCOLOR=\"lightgreen\">M</td>";
+  		}
       result += "</tr>\n";
       row++;
 	  }
