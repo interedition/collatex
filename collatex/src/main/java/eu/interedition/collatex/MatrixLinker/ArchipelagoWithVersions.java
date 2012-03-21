@@ -205,19 +205,21 @@ public class ArchipelagoWithVersions extends Archipelago {
 			if(!confl)
 				result.add(isl);
 			else {
-				MatchMatrixIsland island1 = result.get(i);
-				double tot_d_1 = 0.0;
-				double tot_d_2 = 0.0;
-				for(int j=0; j<i; j++) {
-				  MatchMatrixIsland island2 = result.get(j);
-				  tot_d_1 += distance(island2,island1);
-				  tot_d_2 += distance(island2,isl);
-				}
-				System.out.println("tot_d_1: "+tot_d_1);
-				System.out.println("tot_d_2: "+tot_d_2);
-				if(tot_d_2<tot_d_1) {
-					result.remove(i);
-					result.add(isl);
+        MatchMatrixIsland island1 = result.get(i);
+				if(island1.size()<=isl.size()) {
+  				double tot_d_1 = 0.0;
+  				double tot_d_2 = 0.0;
+  				for(int j=0; j<i; j++) {
+            MatchMatrixIsland island2 = result.get(j);
+  				  tot_d_1 += distance(island2,island1);
+  				  tot_d_2 += distance(island2,isl);
+  				}
+  				System.out.println("tot_d_1: "+tot_d_1);
+  				System.out.println("tot_d_2: "+tot_d_2);
+  				if(tot_d_2<tot_d_1) {
+  					result.remove(i);
+  					result.add(isl);
+  				}
 				}
 			}
 		}
