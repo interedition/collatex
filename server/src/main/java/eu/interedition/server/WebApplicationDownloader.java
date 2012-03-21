@@ -96,10 +96,7 @@ public class WebApplicationDownloader implements Runnable {
       }
 
       if (!downloadCompleted && webappArchive.isDirectory()) {
-        try {
-          Files.deleteRecursively(webappArchive);
-        } catch (IOException e) {
-        }
+        ServerApplicationFrame.delete(webappArchive);
       }
     } catch (UnavailableServiceException e) {
       frame.error(e, "Cannot locate the Java Web Start runtime");

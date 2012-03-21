@@ -1,7 +1,4 @@
 .idea
-build
-build_tmp
-builder
 target
 *.iml
 *.ipr

@@ -4,6 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.*;
 import com.google.common.io.CharStreams;
 import eu.interedition.text.*;
+import eu.interedition.text.Range;
 import eu.interedition.text.event.TextAdapter;
 import eu.interedition.text.json.map.AnnotationSerializer;
 import eu.interedition.text.json.map.NameSerializer;

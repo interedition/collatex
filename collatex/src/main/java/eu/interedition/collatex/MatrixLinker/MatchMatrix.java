@@ -1,0 +1,176 @@
+package eu.interedition.collatex.MatrixLinker;
+
+import java.util.ArrayList;
+
+import com.google.common.collect.ArrayTable;
+
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.VariantGraphVertex;
+
+public class MatchMatrix {
+	
+	private ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
+
+	public MatchMatrix(Iterable<VariantGraphVertex> vertices, Iterable<Token> witness) {
+    sparseMatrix = ArrayTable.create(vertices,witness);
+	}
+
+	public void set(int row, int column, boolean value) {
+		sparseMatrix.set(row, column, value);
+  }
+
+	public boolean at(int row, int column) {
+		Boolean result = sparseMatrix.at(row,column);
+	  if(result==null)
+	  	return false;
+	  return result;
+  }
+	
+  @Override
+  public String toString() {
+  	String result = "";
+  	ArrayList<String> colLabels = columnLabels();
+  	for(String cLabel : colLabels) {
+	      result += " " + cLabel;
+		}
+  	result += "\n";
+  	int colNum = sparseMatrix.columnKeyList().size();
+  	ArrayList<String> rLabels = rowLabels();
+  	int row = 0;
+  	for(String label : rLabels) {
+      result += label;
+      for(int col=0; col<colNum;col++)
+      	result += " " + at(row++,col);
+      result += "\n";
+  	}
+		return result;
+  }
+
+  public String toHtml() {
+  	String result = "<table>\n<tr><td></td>\n";
+  	ArrayList<String> colLabels = columnLabels();
+  	for(String cLabel : colLabels) {
+	      result += "<td>" + cLabel + "</td>";
+		}
+  	result += "</tr>\n";
+  	int colNum = sparseMatrix.columnKeyList().size();
+  	ArrayList<String> rLabels = rowLabels();
+  	int row = 0;
+  	for(String label : rLabels) {
+      result += "<tr><td>" + label + "</td>";
+      for(int col=0; col<colNum;col++)
+      	if(at(row,col))
+      		result += "<td BGCOLOR=\"lightgreen\">M</td>";
+      	else
+      		result += "<td></td>";
+      result += "</tr>\n";
+      row++;
+	  }
+  	result += "</table>";
+		return result;
+  }
+
+
+  public String toHtml(Archipelago arch) {
+  	System.out.println("a1a");
+  	String result = "<table>\n<tr><td></td>\n";
+  	ArrayList<String> colLabels = columnLabels();
+  	for(String cLabel : colLabels) {
+	      result += "<td>" + cLabel + "</td>";
+		}
+  	result += "</tr>\n";
+  	int colNum = sparseMatrix.columnKeyList().size();
+  	ArrayList<String> rLabels = rowLabels();
+  	int row = 0;
+    System.out.println("a2a");
+  	for(String label : rLabels) {
+      result += "<tr><td>" + label + "</td>";
+      for(int col=0; col<colNum;col++) {
+  	    System.out.println(" : "+col);
+      	if(new MatchMatrixCell(col,row).partOf(arch))
+      		result += "<td BGCOLOR=\"lightgreen\">M</td>";
+      	else
+      		result += "<td></td>";
+      }
+      result += "</tr>\n";
+      row++;
+	  }
+  	result += "</table>";
+		return result;
+  }
+
+  public ArrayList<String> rowLabels() {
+  	ArrayList<String> labels = new ArrayList<String>();
+  	for(VariantGraphVertex vgv : sparseMatrix.rowKeyList()) {
+		  String token = vgv.toString();
+		  int pos = token.lastIndexOf(":");
+		  if(pos>-1) {
+		  	labels.add(token.substring(pos+2, token.length()-2));
+		  }
+  	}
+    return labels;
+  }
+  
+  public ArrayList<String> columnLabels() {
+  	ArrayList<String> labels = new ArrayList<String>();
+  	for(Token t : sparseMatrix.columnKeyList()) {
+		  String token = t.toString();
+		  int pos = token.lastIndexOf(":");
+		  if(pos>-1) {
+		    labels.add(token.substring(pos+2, token.length()-1));
+		  }
+  	}
+    return labels;
+  }
+
+  public ArrayList<MatchMatrixCell> allTrues() {
+  	ArrayList<MatchMatrixCell> pairs = new ArrayList<MatchMatrixCell>();
+  	int rows = rowNum();
+  	int cols = colNum();
+  	for(int i=0; i<rows; i++) {
+  		for(int j=0; j<cols; j++) {
+  			if(at(i,j))
+  				pairs.add(new MatchMatrixCell(j,i));
+  		}
+  	}
+  	return pairs;
+  }
+  
+  public int rowNum() {
+		return rowLabels().size();
+  }
+  
+  public int colNum() {
+		return columnLabels().size();
+  }
+
+
+
+	public ArrayList<MatchMatrixIsland> getIslands() {
+		ArrayList<MatchMatrixIsland> islands = new ArrayList<MatchMatrixIsland>();
+		ArrayList<MatchMatrixCell> allTrue = allTrues();
+		for(MatchMatrixCell c: allTrue) {
+//			System.out.println("next coordinate: "+c);
+			boolean found = false;
+			while(!found) {
+				for(MatchMatrixIsland alc : islands) {
+//					System.out.println("inspect island");
+					if(alc.neighbour(c)) {
+							alc.add(c);
+							found = true;
+					}
+					if(found)
+							break;
+				}
+				if(!found) {
+//					System.out.println("new island");
+					MatchMatrixIsland island = new MatchMatrixIsland();
+					island.add(c);
+					islands.add(island);
+				}
+				found = true;
+			}
+		}
+	  return islands;
+  }
+}

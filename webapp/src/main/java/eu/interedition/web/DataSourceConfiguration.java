@@ -100,8 +100,20 @@ public class DataSourceConfiguration implements DisposableBean {
   @Override
   public void destroy() throws Exception {
     if (DATA_DIRECTORY == null && dataDirectory != null) {
-      Files.deleteRecursively(dataDirectory);
+      delete(dataDirectory);
       LOG.info("Deleted temporary data directory '{}'", dataDirectory);
     }
+  }
+
+  void delete(File directory) {
+    if (directory.isDirectory()) {
+      for (File file : directory.listFiles()) {
+        if (file.isDirectory()) {
+          delete(file);
+        }
+        file.delete();
+      }
+    }
+    directory.delete();
   }
 }

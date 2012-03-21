@@ -47,12 +47,20 @@ public class GraphFactory {
       public void run() {
         database.shutdown();
         if (deleteAfterUsage && dbDirectory.isDirectory()) {
-          try {
-            Files.deleteRecursively(dbDirectory);
-          } catch (IOException e) {
-            e.printStackTrace();
+            delete(dbDirectory);
+        }
+      }
+
+      void delete(File directory) {
+        if (directory.isDirectory()) {
+          for (File file : directory.listFiles()) {
+            if (file.isDirectory()) {
+              delete(file);
+            }
+            file.delete();
           }
         }
+        directory.delete();
       }
     }));
     

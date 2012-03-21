@@ -178,11 +178,8 @@ public class ServerApplicationFrame extends JFrame {
     initDataDirectory();
 
     for (File outdated : getOutdatedWebAppArchives()) {
-      try {
         LOG.info("Deleting outdated webapp {}", outdated);
-        Files.deleteRecursively(outdated);
-      } catch (IOException e) {
-      }
+        delete(outdated);
     }
 
     final ServerApplicationFrame applicationFrame = new ServerApplicationFrame();
@@ -220,5 +217,16 @@ public class ServerApplicationFrame extends JFrame {
     }
   }
 
+  public static void delete(File directory) {
+    if (directory.isDirectory()) {
+      for (File file : directory.listFiles()) {
+        if (file.isDirectory()) {
+          delete(file);
+        }
+        file.delete();
+      }
+    }
+    directory.delete();
+  }
 
 }

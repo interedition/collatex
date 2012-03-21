@@ -91,7 +91,7 @@ public class Score {
     this.score[5] += 1;
   }
 
-  void àddGap() {
+  void addGap() {
     this.score[2] += 1;
     this.score[4] += 1;
   }

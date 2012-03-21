@@ -19,6 +19,8 @@
  */
 package eu.interedition.text.rdbms;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
@@ -47,6 +49,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import static java.util.Collections.singleton;
 
@@ -61,7 +65,7 @@ public class RelationalNameRegistry implements InitializingBean {
   private SimpleJdbcInsert nameInsert;
   private DataFieldMaxValueIncrementer nameIdIncrementer;
 
-  private Map<Name, Long> nameCache;
+  private Cache<Name, Long> nameCache;
   private TransactionTemplate tt;
 
   public Name get(Name name) {
@@ -92,11 +96,19 @@ public class RelationalNameRegistry implements InitializingBean {
     final Set<Name> found = Sets.newHashSetWithExpectedSize(requested.size());
 
     for (Iterator<Name> it = requested.iterator(); it.hasNext(); ) {
-      final Name name = it.next();
-      final Long id = nameCache.get(name);
-      if (id != null) {
-        found.add(new RelationalName(name, id));
-        it.remove();
+      try {
+        final Name name = it.next();
+        final Long id = nameCache.get(name, new Callable<Long>() {
+          @Override
+          public Long call() throws Exception {
+            return null;
+          }
+        });
+        if (id != null) {
+          found.add(new RelationalName(name, id));
+          it.remove();
+        }
+      } catch (ExecutionException e) {
       }
     }
 
@@ -193,7 +205,7 @@ public class RelationalNameRegistry implements InitializingBean {
   }
 
   private void initCache() {
-    nameCache = new MapMaker().maximumSize(cacheSize).makeMap();
+    nameCache = CacheBuilder.newBuilder().maximumSize(cacheSize).build();
     if (jt.queryForInt("select count(*) from text_qname") <= cacheSize) {
       // warm-up cache
       for (RelationalName name : jt.query("select " + selectNameFrom("n") + " from text_qname n", ROW_MAPPER)) {

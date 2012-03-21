@@ -61,7 +61,7 @@ public class ChangeTesting extends AbstractTestResourceTest {
     }
 
     if (OUTPUT_FILE.isDirectory()) {
-      Files.deleteRecursively(OUTPUT_FILE);
+      delete(OUTPUT_FILE);
     }
     OUTPUT_FILE.mkdir();
 
@@ -211,6 +211,18 @@ public class ChangeTesting extends AbstractTestResourceTest {
         }
       }
     }
+  }
+
+  void delete(File directory) {
+    if (directory.isDirectory()) {
+      for (File file : directory.listFiles()) {
+        if (file.isDirectory()) {
+          delete(file);
+        }
+        file.delete();
+      }
+    }
+    directory.delete();
   }
 
   private static final Ordering<Annotation> CHANGE_HIERARCHY_ORDERING = Annotations.RANGE_ORDERING.compound(XMLNodePath.ANNOTATION_COMPARATOR);
