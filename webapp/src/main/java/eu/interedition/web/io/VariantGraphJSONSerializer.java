@@ -104,8 +104,9 @@ public class VariantGraphJSONSerializer extends AbstractHttpMessageConverter<Var
 
         jgen.writeStartObject();
 
-        jgen.writeNumberField("rows", table.rowKeySet().size());
-        jgen.writeNumberField("columns", table.columnKeySet().size());
+        // switch rows and columns due to horizontal content orientation
+        jgen.writeNumberField("columns", table.rowKeySet().size());
+        jgen.writeNumberField("rows", table.columnKeySet().size());
         jgen.writeArrayFieldStart("sigils");
 
         for (Witness witness : witnesses) {
