@@ -1,176 +1,421 @@
 package eu.interedition.collatex.MatrixLinker;
 
-import java.util.ArrayList;
-
+import com.google.common.base.Objects;
 import com.google.common.collect.ArrayTable;
-
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 public class MatchMatrix {
-	
-	private ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
-	public MatchMatrix(Iterable<VariantGraphVertex> vertices, Iterable<Token> witness) {
-    sparseMatrix = ArrayTable.create(vertices,witness);
-	}
+  private ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
-	public void set(int row, int column, boolean value) {
-		sparseMatrix.set(row, column, value);
+  public MatchMatrix(Iterable<VariantGraphVertex> vertices, Iterable<Token> witness) {
+    sparseMatrix = ArrayTable.create(vertices, witness);
   }
 
-	public boolean at(int row, int column) {
-		Boolean result = sparseMatrix.at(row,column);
-	  if(result==null)
-	  	return false;
-	  return result;
+  public boolean at(int row, int column) {
+    return Objects.firstNonNull(sparseMatrix.at(row, column), false);
   }
-	
+
+  public void set(int row, int column, boolean value) {
+    sparseMatrix.set(row, column, value);
+  }
+
   @Override
   public String toString() {
-  	String result = "";
-  	ArrayList<String> colLabels = columnLabels();
-  	for(String cLabel : colLabels) {
-	      result += " " + cLabel;
-		}
-  	result += "\n";
-  	int colNum = sparseMatrix.columnKeyList().size();
-  	ArrayList<String> rLabels = rowLabels();
-  	int row = 0;
-  	for(String label : rLabels) {
+    String result = "";
+    ArrayList<String> colLabels = columnLabels();
+    for (String cLabel : colLabels) {
+      result += " " + cLabel;
+    }
+    result += "\n";
+    int colNum = sparseMatrix.columnKeyList().size();
+    ArrayList<String> rLabels = rowLabels();
+    int row = 0;
+    for (String label : rLabels) {
       result += label;
-      for(int col=0; col<colNum;col++)
-      	result += " " + at(row++,col);
+      for (int col = 0; col < colNum; col++)
+        result += " " + at(row++, col);
       result += "\n";
-  	}
-		return result;
+    }
+    return result;
   }
 
   public String toHtml() {
-  	String result = "<table>\n<tr><td></td>\n";
-  	ArrayList<String> colLabels = columnLabels();
-  	for(String cLabel : colLabels) {
-	      result += "<td>" + cLabel + "</td>";
-		}
-  	result += "</tr>\n";
-  	int colNum = sparseMatrix.columnKeyList().size();
-  	ArrayList<String> rLabels = rowLabels();
-  	int row = 0;
-  	for(String label : rLabels) {
+    String result = "<table>\n<tr><td></td>\n";
+    ArrayList<String> colLabels = columnLabels();
+    for (String cLabel : colLabels) {
+      result += "<td>" + cLabel + "</td>";
+    }
+    result += "</tr>\n";
+    int colNum = sparseMatrix.columnKeyList().size();
+    ArrayList<String> rLabels = rowLabels();
+    int row = 0;
+    for (String label : rLabels) {
       result += "<tr><td>" + label + "</td>";
-      for(int col=0; col<colNum;col++)
-      	if(at(row,col))
-      		result += "<td BGCOLOR=\"lightgreen\">M</td>";
-      	else
-      		result += "<td></td>";
+      for (int col = 0; col < colNum; col++)
+        if (at(row, col))
+          result += "<td BGCOLOR=\"lightgreen\">M</td>";
+        else
+          result += "<td></td>";
       result += "</tr>\n";
       row++;
-	  }
-  	result += "</table>";
-		return result;
+    }
+    result += "</table>";
+    return result;
   }
 
 
   public String toHtml(Archipelago arch) {
-  	int mat[] = new int[rowNum()];
-  	for(MatchMatrixIsland isl: arch.iterator()) {
-  		for(MatchMatrixCell c : isl.iterator()) {
-  			mat[c.row] = c.col;
-  		}
-  	}
-  	String result = "<table>\n<tr><td></td>\n";
-  	ArrayList<String> colLabels = columnLabels();
-  	for(String cLabel : colLabels) {
-	      result += "<td>" + cLabel + "</td>";
-		}
-  	result += "</tr>\n";
-  	ArrayList<String> rLabels = rowLabels();
-  	int row = 0;
-  	for(String label : rLabels) {
+    int mat[] = new int[rowNum()];
+    for (Island isl : arch.iterator()) {
+      for (Coordinates c : isl) {
+        mat[c.row] = c.column;
+      }
+    }
+    String result = "<table>\n<tr><td></td>\n";
+    ArrayList<String> colLabels = columnLabels();
+    for (String cLabel : colLabels) {
+      result += "<td>" + cLabel + "</td>";
+    }
+    result += "</tr>\n";
+    ArrayList<String> rLabels = rowLabels();
+    int row = 0;
+    for (String label : rLabels) {
       result += "<tr><td>" + label + "</td>";
-      if(mat[row]>0) {
-        result += "<td colspan=\""+mat[row]+"\"></td>";
-    		result += "<td BGCOLOR=\"lightgreen\">M</td>";
-  		}
+      if (mat[row] > 0) {
+        result += "<td colspan=\"" + mat[row] + "\"></td>";
+        result += "<td BGCOLOR=\"lightgreen\">M</td>";
+      }
       result += "</tr>\n";
       row++;
-	  }
-  	result += "</table>";
-		return result;
+    }
+    result += "</table>";
+    return result;
   }
 
   public ArrayList<String> rowLabels() {
-  	ArrayList<String> labels = new ArrayList<String>();
-  	for(VariantGraphVertex vgv : sparseMatrix.rowKeyList()) {
-		  String token = vgv.toString();
-		  int pos = token.lastIndexOf(":");
-		  if(pos>-1) {
-		  	labels.add(token.substring(pos+2, token.length()-2));
-		  }
-  	}
+    ArrayList<String> labels = new ArrayList<String>();
+    for (VariantGraphVertex vgv : sparseMatrix.rowKeyList()) {
+      String token = vgv.toString();
+      int pos = token.lastIndexOf(":");
+      if (pos > -1) {
+        labels.add(token.substring(pos + 2, token.length() - 2));
+      }
+    }
     return labels;
   }
-  
+
   public ArrayList<String> columnLabels() {
-  	ArrayList<String> labels = new ArrayList<String>();
-  	for(Token t : sparseMatrix.columnKeyList()) {
-		  String token = t.toString();
-		  int pos = token.lastIndexOf(":");
-		  if(pos>-1) {
-		    labels.add(token.substring(pos+2, token.length()-1));
-		  }
-  	}
+    ArrayList<String> labels = new ArrayList<String>();
+    for (Token t : sparseMatrix.columnKeyList()) {
+      String token = t.toString();
+      int pos = token.lastIndexOf(":");
+      if (pos > -1) {
+        labels.add(token.substring(pos + 2, token.length() - 1));
+      }
+    }
     return labels;
   }
 
-  public ArrayList<MatchMatrixCell> allTrues() {
-  	ArrayList<MatchMatrixCell> pairs = new ArrayList<MatchMatrixCell>();
-  	int rows = rowNum();
-  	int cols = colNum();
-  	for(int i=0; i<rows; i++) {
-  		for(int j=0; j<cols; j++) {
-  			if(at(i,j))
-  				pairs.add(new MatchMatrixCell(j,i));
-  		}
-  	}
-  	return pairs;
+  public ArrayList<Coordinates> allTrues() {
+    ArrayList<Coordinates> pairs = new ArrayList<Coordinates>();
+    int rows = rowNum();
+    int cols = colNum();
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        if (at(i, j))
+          pairs.add(new Coordinates(j, i));
+      }
+    }
+    return pairs;
   }
-  
+
   public int rowNum() {
-		return rowLabels().size();
+    return rowLabels().size();
   }
-  
+
   public int colNum() {
-		return columnLabels().size();
+    return columnLabels().size();
   }
 
 
-
-	public ArrayList<MatchMatrixIsland> getIslands() {
-		ArrayList<MatchMatrixIsland> islands = new ArrayList<MatchMatrixIsland>();
-		ArrayList<MatchMatrixCell> allTrue = allTrues();
-		for(MatchMatrixCell c: allTrue) {
+  public ArrayList<Island> getIslands() {
+    ArrayList<Island> islands = new ArrayList<Island>();
+    ArrayList<Coordinates> allTrue = allTrues();
+    for (Coordinates c : allTrue) {
 //			System.out.println("next coordinate: "+c);
-			boolean found = false;
-			while(!found) {
-				for(MatchMatrixIsland alc : islands) {
+      boolean found = false;
+      while (!found) {
+        for (Island alc : islands) {
 //					System.out.println("inspect island");
-					if(alc.neighbour(c)) {
-							alc.add(c);
-							found = true;
-					}
-					if(found)
-							break;
-				}
-				if(!found) {
+          if (alc.neighbour(c)) {
+            alc.add(c);
+            found = true;
+          }
+          if (found)
+            break;
+        }
+        if (!found) {
 //					System.out.println("new island");
-					MatchMatrixIsland island = new MatchMatrixIsland();
-					island.add(c);
-					islands.add(island);
-				}
-				found = true;
-			}
-		}
-	  return islands;
+          Island island = new Island();
+          island.add(c);
+          islands.add(island);
+        }
+        found = true;
+      }
+    }
+    return islands;
+  }
+
+  public static class Coordinates implements Comparable<Coordinates> {
+    int row;
+    int column;
+
+    Coordinates(int column, int row) {
+      this.column = column;
+      this.row = row;
+    }
+
+    Coordinates(Coordinates other) {
+      this(other.column, other.row);
+    }
+
+    public int getRow() {
+      return row;
+    }
+
+    public int getColumn() {
+      return column;
+    }
+
+    public boolean sameColumn(Coordinates c) {
+      return c.column == column;
+    }
+
+    public boolean sameRow(Coordinates c) {
+      return c.row == row;
+    }
+
+    public boolean bordersOn(Coordinates c) {
+      return (Math.abs(this.row - c.getRow()) == 1) && (Math.abs(this.column - c.getColumn()) == 1);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o != null & o instanceof Coordinates) {
+        final Coordinates c = (Coordinates) o;
+        return (this.row == c.getRow() && this.column == c.getColumn());
+      }
+      return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(row, column);
+    }
+
+    @Override
+    public int compareTo(Coordinates o) {
+      final int result = column - o.column;
+      return (result == 0 ? row - o.row : result);
+    }
+
+    @Override
+    public String toString() {
+      return "(" + column + "," + row + ")";
+    }
+  }
+
+  /**
+   * An DirectedIsland is a collections of Coordinates all on the same
+   * diagonal. The direction of this diagonal can be -1, 0, or 1.
+   * The zero is for a DirectedIsland of only one Coordinate.
+   * Directions 1 and -1 examples
+   * Coordinates (0,0) (1,1) have Direction 1
+   * Coordinates (1,1) (2,1) have Direction -1
+   * I.e. if the row-cordinate gets larger and the col-coordinate also, the
+   * direction is 1 (positive) else it is -1 (negative)
+   */
+  public static class Island implements Iterable<Coordinates> {
+
+    private int direction = 0;
+    private List<Coordinates> island = Lists.newArrayList();
+
+    public Island() {
+    }
+
+    public Island(Island other) {
+      for (Coordinates c : other.island) {
+        add(new Coordinates(c));
+      }
+    }
+
+    public boolean add(Coordinates coordinates) {
+      boolean result = false;
+      if (island.isEmpty()) {
+        result = island.add(coordinates);
+      } else if (!contains(coordinates) && neighbour(coordinates)) {
+        if (direction == 0) {
+          Coordinates existing = island.get(0);
+          direction = (existing.row - coordinates.row) / (existing.column - coordinates.column);
+          result = island.add(coordinates);
+        } else {
+          Coordinates existing = island.get(0);
+          if (existing.column != coordinates.column) {
+            int new_direction = (existing.row - coordinates.row) / (existing.column - coordinates.column);
+            if (new_direction == direction)
+              result = island.add(coordinates);
+          }
+        }
+      }
+      return result;
+    }
+
+    public int direction() {
+      return direction;
+    }
+
+    public Island removePoints(Island di) {
+      Island result = new Island(this);
+      for (Coordinates c : di) {
+        result.removeSameColOrRow(c);
+      }
+      return result;
+    }
+
+    public Coordinates getCoorOnRow(int row) {
+      for (Coordinates coor : island) {
+        if (coor.getRow() == row)
+          return coor;
+      }
+      return null;
+    }
+
+    public Coordinates getCoorOnCol(int col) {
+      for (Coordinates coor : island) {
+        if (coor.getColumn() == col)
+          return coor;
+      }
+      return null;
+    }
+
+    public void merge(Island di) {
+      for (Coordinates c : di) {
+        add(c);
+      }
+    }
+
+    /**
+     * Two islands are competitors if there is a horizontal or
+     * vertical line which goes through both islands
+     */
+    public boolean isCompetitor(Island isl) {
+      for (Coordinates c : isl) {
+        for (Coordinates d : island) {
+          if (c.sameColumn(d) || c.sameRow(d))
+            return true;
+        }
+      }
+      return false;
+    }
+
+    public boolean contains(Coordinates c) {
+      return island.contains(c);
+    }
+
+    public boolean neighbour(Coordinates c) {
+      if (contains(c))
+        return false;
+      for (Coordinates islC : island) {
+        if (c.bordersOn(islC)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    public Coordinates getLeftEnd() {
+      Coordinates coor = island.get(0);
+      for (Coordinates c : island) {
+        if (c.column < coor.column)
+          coor = c;
+      }
+      return coor;
+    }
+
+    public Coordinates getRightEnd() {
+      Coordinates coor = island.get(0);
+      for (Coordinates c : island) {
+        if (c.column > coor.column)
+          coor = c;
+      }
+      return coor;
+    }
+
+    @Override
+    public Iterator<Coordinates> iterator() {
+      return Collections.unmodifiableList(island).iterator();
+    }
+
+    protected boolean removeSameColOrRow(Coordinates c) {
+      ArrayList<Coordinates> remove = new ArrayList<Coordinates>();
+      for (Coordinates coor : island) {
+        if (coor.sameColumn(c) || coor.sameRow(c)) {
+          remove.add(coor);
+        }
+      }
+      if (remove.isEmpty())
+        return false;
+      for (Coordinates coor : remove) {
+        island.remove(coor);
+      }
+      return true;
+    }
+
+    public boolean overlap(Island isl) {
+      for (Coordinates c : isl) {
+        if (contains(c) || neighbour(c))
+          return true;
+      }
+      return false;
+    }
+
+    public int size() {
+      return island.size();
+    }
+
+    public void clear() {
+      island.clear();
+    }
+
+    public int value() {
+      final int size = size();
+      return (size < 2 ? size : direction + size * size);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!obj.getClass().equals(Island.class))
+        return false;
+      Island isl = (Island) obj;
+      boolean result = true;
+      for (Coordinates c : isl) {
+        result &= this.contains(c);
+      }
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return Iterables.toString(island);
+    }
   }
 }

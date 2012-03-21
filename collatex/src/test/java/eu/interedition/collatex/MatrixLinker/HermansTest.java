@@ -40,7 +40,7 @@ public class HermansTest extends AbstractTest {
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
 //  	System.out.println(buildMatrix.toHtml());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
   	System.out.println("archipelago: "+ archipelago);
@@ -54,7 +54,7 @@ public class HermansTest extends AbstractTest {
 //    assertEquals(497,archipelago.getVersion(4).value());
     
     Archipelago firstVersion = archipelago.createFirstVersion();
-  	for(MatchMatrixIsland isl: firstVersion.iterator()) {
+  	for(MatchMatrix.Island isl: firstVersion.iterator()) {
   		System.out.print(" "+isl.size());
   	}
   	try {
@@ -107,19 +107,19 @@ public class HermansTest extends AbstractTest {
 //    }
 //  	System.out.println(buildMatrix.toHtml());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
   	System.out.println("archipelago: "+ archipelago);
   	System.out.println("archipelago.size(): "+ archipelago.size());
-  	for(MatchMatrixIsland isl: archipelago.iterator()) {
+  	for(MatchMatrix.Island isl: archipelago.iterator()) {
   		System.out.print(" "+isl.size());
   	}
   	System.out.println();
   	assertEquals(233, archipelago.size());
     assertEquals(1429,archipelago.numOfConflicts());
     Archipelago firstVersion = archipelago.createFirstVersion();
-  	for(MatchMatrixIsland isl: firstVersion.iterator()) {
+  	for(MatchMatrix.Island isl: firstVersion.iterator()) {
   		System.out.print(" "+isl.size());
   	}
   	try {

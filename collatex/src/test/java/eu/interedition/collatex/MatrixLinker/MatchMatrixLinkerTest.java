@@ -110,58 +110,58 @@ public class MatchMatrixLinkerTest extends AbstractTest {
 		VariantGraph vg = collate(sw[0]);
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
-  	ArrayList<MatchMatrixCell> allTrue = buildMatrix.allTrues();
+  	ArrayList<MatchMatrix.Coordinates> allTrue = buildMatrix.allTrues();
   	assertEquals(9,allTrue.size());
-  	assertTrue(allTrue.contains(new MatchMatrixCell(0,0)));
-  	assertFalse(allTrue.contains(new MatchMatrixCell(1,0)));
+  	assertTrue(allTrue.contains(new MatchMatrix.Coordinates(0,0)));
+  	assertFalse(allTrue.contains(new MatchMatrix.Coordinates(1,0)));
   }
   
   @Test
   public void testCoordinates() {
-  	MatchMatrixCell a = new MatchMatrixCell(0,0);
-  	MatchMatrixCell b = new MatchMatrixCell(0,0);
-  	MatchMatrixCell c = new MatchMatrixCell(1,1);
-  	assertEquals(new MatchMatrixCell(0,0),a);
+  	MatchMatrix.Coordinates a = new MatchMatrix.Coordinates(0,0);
+  	MatchMatrix.Coordinates b = new MatchMatrix.Coordinates(0,0);
+  	MatchMatrix.Coordinates c = new MatchMatrix.Coordinates(1,1);
+  	assertEquals(new MatchMatrix.Coordinates(0,0),a);
   	assertEquals(b, a);
   	assertFalse(a.equals(c));
   }
   
   @Test
   public void testBorders() {
-  	MatchMatrixCell a = new MatchMatrixCell(0,0);
-  	MatchMatrixCell b = new MatchMatrixCell(1,1);
-  	MatchMatrixCell c = new MatchMatrixCell(2,1);
-  	assertTrue(a.borders(b));
-  	assertFalse(a.borders(c));
-  	assertFalse(b.borders(c));
+  	MatchMatrix.Coordinates a = new MatchMatrix.Coordinates(0,0);
+  	MatchMatrix.Coordinates b = new MatchMatrix.Coordinates(1,1);
+  	MatchMatrix.Coordinates c = new MatchMatrix.Coordinates(2,1);
+  	assertTrue(a.bordersOn(b));
+  	assertFalse(a.bordersOn(c));
+  	assertFalse(b.bordersOn(c));
   }
   
   @Test
   public void testUndirectedIsland() {
-  	MatchMatrixIsland isl = new MatchMatrixIsland();
-  	isl.add(new MatchMatrixCell(0, 0));
+  	MatchMatrix.Island isl = new MatchMatrix.Island();
+  	isl.add(new MatchMatrix.Coordinates(0, 0));
   	assertEquals(1,isl.size());
-  	isl.add(new MatchMatrixCell(0, 0));
+  	isl.add(new MatchMatrix.Coordinates(0, 0));
   	assertEquals(1,isl.size());
-  	isl.add(new MatchMatrixCell(0, 1));
+  	isl.add(new MatchMatrix.Coordinates(0, 1));
   	assertEquals(1,isl.size());
-  	isl.add(new MatchMatrixCell(2, 2));
+  	isl.add(new MatchMatrix.Coordinates(2, 2));
   	assertEquals(1,isl.size());
-  	assertTrue(isl.neighbour(new MatchMatrixCell(1,1)));
-  	isl.add(new MatchMatrixCell(1, 1));
+  	assertTrue(isl.neighbour(new MatchMatrix.Coordinates(1,1)));
+  	isl.add(new MatchMatrix.Coordinates(1, 1));
   	assertEquals(2,isl.size());
 }
   
   @Test
   public void testDirectedIsland() {
-  	MatchMatrixIsland isl = new MatchMatrixIsland();
-  	isl.add(new MatchMatrixCell(0, 0));
+  	MatchMatrix.Island isl = new MatchMatrix.Island();
+  	isl.add(new MatchMatrix.Coordinates(0, 0));
   	assertEquals(1,isl.size());
   	assertEquals(0,isl.direction());
-  	isl.add(new MatchMatrixCell(1, 1));
+  	isl.add(new MatchMatrix.Coordinates(1, 1));
   	assertEquals(2,isl.size());
   	assertEquals(1,isl.direction());
-  	isl.add(new MatchMatrixCell(2, 2));
+  	isl.add(new MatchMatrix.Coordinates(2, 2));
   	assertEquals(3,isl.size());
   	assertEquals(1,isl.direction());
   }
@@ -169,13 +169,13 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   @Test
   public void testArchipelago() {
   	Archipelago arch = new Archipelago();
-  	MatchMatrixIsland isl_1 = new MatchMatrixIsland();
-  	isl_1.add(new MatchMatrixCell(0,0));
-  	isl_1.add(new MatchMatrixCell(1,1));
+  	MatchMatrix.Island isl_1 = new MatchMatrix.Island();
+  	isl_1.add(new MatchMatrix.Coordinates(0,0));
+  	isl_1.add(new MatchMatrix.Coordinates(1,1));
   	arch.add(isl_1);
-  	MatchMatrixIsland isl_2 = new MatchMatrixIsland();
-  	isl_2.add(new MatchMatrixCell(2,2));
-  	isl_2.add(new MatchMatrixCell(3,3));
+  	MatchMatrix.Island isl_2 = new MatchMatrix.Island();
+  	isl_2.add(new MatchMatrix.Coordinates(2,2));
+  	isl_2.add(new MatchMatrix.Coordinates(3,3));
   	arch.add(isl_2);
   	assertEquals(2, arch.size());
   	assertTrue(isl_1.overlap(isl_2));
@@ -190,7 +190,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	Archipelago archipelago = new Archipelago();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
     assertEquals(3,archipelago.size());
@@ -204,7 +204,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions islands = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		islands.add(isl);
     }
 //  	System.out.println("islands: "+islands);
@@ -225,43 +225,43 @@ public class MatchMatrixLinkerTest extends AbstractTest {
 
   @Test
   public void testRemovePoints() {
-  	MatchMatrixIsland di_1 = new MatchMatrixIsland();
-  	di_1.add(new MatchMatrixCell(1, 1));
-  	di_1.add(new MatchMatrixCell(2, 2));
-  	MatchMatrixIsland di_2 = new MatchMatrixIsland();
-  	di_2.add(new MatchMatrixCell(2, 2));
-  	MatchMatrixIsland di_3 = di_1.removePoints(di_2);
+  	MatchMatrix.Island di_1 = new MatchMatrix.Island();
+  	di_1.add(new MatchMatrix.Coordinates(1, 1));
+  	di_1.add(new MatchMatrix.Coordinates(2, 2));
+  	MatchMatrix.Island di_2 = new MatchMatrix.Island();
+  	di_2.add(new MatchMatrix.Coordinates(2, 2));
+  	MatchMatrix.Island di_3 = di_1.removePoints(di_2);
   	assertEquals(2, di_1.size());
   	assertEquals(1, di_3.size());
   }
   
   @Test
   public void testFindCoorOnRowOrCol() {
-  	MatchMatrixIsland isl_1 = new MatchMatrixIsland();
-  	isl_1.add(new MatchMatrixCell(0,0));
-  	isl_1.add(new MatchMatrixCell(1,1));
-    assertEquals(new MatchMatrixCell(0,0),isl_1.getCoorOnRow(0));
-    assertEquals(new MatchMatrixCell(1,1),isl_1.getCoorOnCol(1));
+  	MatchMatrix.Island isl_1 = new MatchMatrix.Island();
+  	isl_1.add(new MatchMatrix.Coordinates(0,0));
+  	isl_1.add(new MatchMatrix.Coordinates(1,1));
+    assertEquals(new MatchMatrix.Coordinates(0,0),isl_1.getCoorOnRow(0));
+    assertEquals(new MatchMatrix.Coordinates(1,1),isl_1.getCoorOnCol(1));
     assertEquals(null,isl_1.getCoorOnCol(4));  	
   }
   
   @Test
   public void testOrderedIslands() {
   	Archipelago arch = new Archipelago();
-  	MatchMatrixIsland isl_1 = new MatchMatrixIsland();
-  	isl_1.add(new MatchMatrixCell(1,1));
-  	isl_1.add(new MatchMatrixCell(2,2));
-  	isl_1.add(new MatchMatrixCell(3,3));
+  	MatchMatrix.Island isl_1 = new MatchMatrix.Island();
+  	isl_1.add(new MatchMatrix.Coordinates(1,1));
+  	isl_1.add(new MatchMatrix.Coordinates(2,2));
+  	isl_1.add(new MatchMatrix.Coordinates(3,3));
   	arch.add(isl_1);
-  	MatchMatrixIsland isl_2 = new MatchMatrixIsland();
-  	isl_2.add(new MatchMatrixCell(5,5));
-  	isl_2.add(new MatchMatrixCell(6,6));
+  	MatchMatrix.Island isl_2 = new MatchMatrix.Island();
+  	isl_2.add(new MatchMatrix.Coordinates(5,5));
+  	isl_2.add(new MatchMatrix.Coordinates(6,6));
   	arch.add(isl_2);
-  	MatchMatrixIsland isl_3 = new MatchMatrixIsland();
-  	isl_3.add(new MatchMatrixCell(8,8));
-  	isl_3.add(new MatchMatrixCell(9,9));
-  	isl_3.add(new MatchMatrixCell(10,10));
-  	isl_3.add(new MatchMatrixCell(11,11));
+  	MatchMatrix.Island isl_3 = new MatchMatrix.Island();
+  	isl_3.add(new MatchMatrix.Coordinates(8,8));
+  	isl_3.add(new MatchMatrix.Coordinates(9,9));
+  	isl_3.add(new MatchMatrix.Coordinates(10,10));
+  	isl_3.add(new MatchMatrix.Coordinates(11,11));
   	arch.add(isl_3);
   	assertEquals(4,arch.get(0).size());
   	assertEquals(3,arch.get(1).size());
@@ -271,14 +271,14 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   @Test
   public void testOrderedIslands2() {
   	ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
-  	MatchMatrixIsland isl_1 = new MatchMatrixIsland();
-  	isl_1.add(new MatchMatrixCell(1,1));
-  	isl_1.add(new MatchMatrixCell(2,2));
-  	isl_1.add(new MatchMatrixCell(3,3));
+  	MatchMatrix.Island isl_1 = new MatchMatrix.Island();
+  	isl_1.add(new MatchMatrix.Coordinates(1,1));
+  	isl_1.add(new MatchMatrix.Coordinates(2,2));
+  	isl_1.add(new MatchMatrix.Coordinates(3,3));
   	arch.add(isl_1);
-  	MatchMatrixIsland isl_2 = new MatchMatrixIsland();
-  	isl_2.add(new MatchMatrixCell(3,5));
-  	isl_2.add(new MatchMatrixCell(4,6));
+  	MatchMatrix.Island isl_2 = new MatchMatrix.Island();
+  	isl_2.add(new MatchMatrix.Coordinates(3,5));
+  	isl_2.add(new MatchMatrix.Coordinates(4,6));
   	arch.add(isl_2);
   	arch.createNonConflictingVersions();
 //  	System.out.println("versions: ");
@@ -286,11 +286,11 @@ public class MatchMatrixLinkerTest extends AbstractTest {
 //  		System.out.println(arch_v);
 //  	}
   	assertEquals(2,arch.getNonConflVersions().size());
-  	MatchMatrixIsland isl_3 = new MatchMatrixIsland();
-  	isl_3.add(new MatchMatrixCell(6,8));
-  	isl_3.add(new MatchMatrixCell(7,9));
-  	isl_3.add(new MatchMatrixCell(8,10));
-  	isl_3.add(new MatchMatrixCell(9,11));
+  	MatchMatrix.Island isl_3 = new MatchMatrix.Island();
+  	isl_3.add(new MatchMatrix.Coordinates(6,8));
+  	isl_3.add(new MatchMatrix.Coordinates(7,9));
+  	isl_3.add(new MatchMatrix.Coordinates(8,10));
+  	isl_3.add(new MatchMatrix.Coordinates(9,11));
   	arch.add(isl_3);
   	arch.createNonConflictingVersions();
   	assertEquals(28,arch.getVersion(0).value());
@@ -300,10 +300,10 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   @Test
   public void testNonConflictingVersions() {
   	ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
-  	MatchMatrixIsland isl_1 = new MatchMatrixIsland();
-  	isl_1.add(new MatchMatrixCell(1,1));
-  	isl_1.add(new MatchMatrixCell(2,2));
-  	isl_1.add(new MatchMatrixCell(3,3));
+  	MatchMatrix.Island isl_1 = new MatchMatrix.Island();
+  	isl_1.add(new MatchMatrix.Coordinates(1,1));
+  	isl_1.add(new MatchMatrix.Coordinates(2,2));
+  	isl_1.add(new MatchMatrix.Coordinates(3,3));
   	arch.add(isl_1);
   	arch.createNonConflictingVersions();
   	assertEquals(1,arch.numOfNonConflConstell());
@@ -311,16 +311,16 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   
   @Test
   public void testIslandValue() {
-  	MatchMatrixIsland isl_1 = new MatchMatrixIsland();
-  	isl_1.add(new MatchMatrixCell(1,1));
+  	MatchMatrix.Island isl_1 = new MatchMatrix.Island();
+  	isl_1.add(new MatchMatrix.Coordinates(1,1));
   	assertEquals(1,isl_1.value());
-  	isl_1.add(new MatchMatrixCell(2,2));
+  	isl_1.add(new MatchMatrix.Coordinates(2,2));
   	assertEquals(5,isl_1.value());
-  	isl_1.add(new MatchMatrixCell(3,3));
+  	isl_1.add(new MatchMatrix.Coordinates(3,3));
   	assertEquals(10,isl_1.value());
-  	MatchMatrixIsland isl_2 = new MatchMatrixIsland();
-  	isl_2.add(new MatchMatrixCell(2,2));
-  	isl_2.add(new MatchMatrixCell(3,1));
+  	MatchMatrix.Island isl_2 = new MatchMatrix.Island();
+  	isl_2.add(new MatchMatrix.Coordinates(2,2));
+  	isl_2.add(new MatchMatrix.Coordinates(3,1));
   	assertEquals(3,isl_2.value());
   	Archipelago arch = new Archipelago();
   	arch.add(isl_1);
@@ -330,22 +330,22 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   
   @Test
   public void testFindGaps() {
-  	MatchMatrixIsland isl_1 = new MatchMatrixIsland();
-  	isl_1.add(new MatchMatrixCell(1,1));
-  	isl_1.add(new MatchMatrixCell(2,2));
-  	MatchMatrixIsland isl_2 = new MatchMatrixIsland();
-  	isl_2.add(new MatchMatrixCell(4,4));
-  	isl_2.add(new MatchMatrixCell(5,5));
+  	MatchMatrix.Island isl_1 = new MatchMatrix.Island();
+  	isl_1.add(new MatchMatrix.Coordinates(1,1));
+  	isl_1.add(new MatchMatrix.Coordinates(2,2));
+  	MatchMatrix.Island isl_2 = new MatchMatrix.Island();
+  	isl_2.add(new MatchMatrix.Coordinates(4,4));
+  	isl_2.add(new MatchMatrix.Coordinates(5,5));
   	ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
   	arch.add(isl_1);
   	arch.add(isl_2);
-  	ArrayList<MatchMatrixCell> list = new ArrayList<MatchMatrixCell>();
-  	list.add(new MatchMatrixCell(0, 0));
-  	list.add(new MatchMatrixCell(7, 7));
-  	ArrayList<MatchMatrixCell> gaps = arch.findGaps(list);
+  	ArrayList<MatchMatrix.Coordinates> list = new ArrayList<MatchMatrix.Coordinates>();
+  	list.add(new MatchMatrix.Coordinates(0, 0));
+  	list.add(new MatchMatrix.Coordinates(7, 7));
+  	ArrayList<MatchMatrix.Coordinates> gaps = arch.findGaps(list);
   	assertEquals(4,gaps.size());
-  	assertEquals(new MatchMatrixCell(1,1),gaps.get(0));
-  	assertEquals(new MatchMatrixCell(5,5),gaps.get(3));
+  	assertEquals(new MatchMatrix.Coordinates(1,1),gaps.get(0));
+  	assertEquals(new MatchMatrix.Coordinates(5,5),gaps.get(3));
   }
 
   @Test
@@ -355,7 +355,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
     assertEquals(4,archipelago.size());
@@ -370,8 +370,8 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	String expected = "<xml>"+newLine+"a b "+newLine+"  <app>"+newLine+"    <lem>[WEGGELATEN]</lem>"+newLine+"    <rdg>e f</rdg>"+newLine+"  </app>"+newLine+
   										" c d "+newLine+"  <app>"+newLine+"    <lem>e f</lem>"+newLine+"    <rdg>[WEGGELATEN]</rdg>"+newLine+"  </app>"+newLine+" g h "+newLine+"</xml>";
 		assertEquals(expected.length() ,result.length());
-  	ArrayList<MatchMatrixCell> list = new ArrayList<MatchMatrixCell>();
-  	ArrayList<MatchMatrixCell> gaps = archipelago.createFirstVersion().findGaps(list);
+  	ArrayList<MatchMatrix.Coordinates> list = new ArrayList<MatchMatrix.Coordinates>();
+  	ArrayList<MatchMatrix.Coordinates> gaps = archipelago.createFirstVersion().findGaps(list);
 //  	System.out.println(buildMatrix.toHtml(archipelago.createFirstVersion()));
   	assertEquals(6,gaps.size());
   	
@@ -380,7 +380,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
 //		linker = new MatrixLinker();
 		buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
 		archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
     assertEquals(3,archipelago.size());
@@ -405,7 +405,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
     assertEquals(4,archipelago.size());
@@ -423,8 +423,8 @@ public class MatchMatrixLinkerTest extends AbstractTest {
     									" onder de "+newLine+"</xml>";
     assertEquals(expected.substring(0, 10),result.substring(0, 10));
     assertEquals(expected,result);
-  	ArrayList<MatchMatrixCell> list = new ArrayList<MatchMatrixCell>();
-  	ArrayList<MatchMatrixCell> gaps = archipelago.createFirstVersion().findGaps(list);
+  	ArrayList<MatchMatrix.Coordinates> list = new ArrayList<MatchMatrix.Coordinates>();
+  	ArrayList<MatchMatrix.Coordinates> gaps = archipelago.createFirstVersion().findGaps(list);
   	assertEquals(4,gaps.size());
   }
   
@@ -438,7 +438,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
     assertEquals(12,archipelago.size());
@@ -464,7 +464,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
     									" werd nooit zonder sigaar gezien zijn pantalon had lijnrechte vouwen in de pijpen maar zat toch altijd vol rimpels "+newLine+ 
     									"</xml>";
     assertEquals(expected,result);
-  	ArrayList<MatchMatrixCell> gaps = archipelago.createFirstVersion().findGaps();
+  	ArrayList<MatchMatrix.Coordinates> gaps = archipelago.createFirstVersion().findGaps();
   	assertEquals(10,gaps.size());
   }
 
@@ -484,7 +484,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
     assertEquals(146,archipelago.size());
@@ -530,7 +530,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
 //    assertEquals(146,archipelago.size());
@@ -557,7 +557,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
   	MatchMatrixLinker linker = new MatchMatrixLinker();
   	MatchMatrix buildMatrix = linker.buildMatrix(vg,sw[1],new EqualityTokenComparator());
   	ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-  	for(MatchMatrixIsland isl: buildMatrix.getIslands())	{
+  	for(MatchMatrix.Island isl: buildMatrix.getIslands())	{
   		archipelago.add(isl);
     }
     String result = "";

@@ -1,23 +1,22 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
-import edu.uci.ics.jung.algorithms.layout.BalloonLayout;
-import edu.uci.ics.jung.algorithms.layout.RadialTreeLayout;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
+import eu.interedition.collatex.MatrixLinker.MatchMatrixLinker;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.simple.SimpleToken;
-import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -30,7 +29,7 @@ import static eu.interedition.collatex.CollationAlgorithmFactory.needlemanWunsch
  */
 public class CollateXLaboratory extends JFrame {
   private static final Logger LOG = LoggerFactory.getLogger(CollateXLaboratory.class);
-  public static final BasicStroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 5.0f }, 0.0f);
+  public static final BasicStroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[]{5.0f}, 0.0f);
   public static final BasicStroke SOLID_STROKE = new BasicStroke(1.5f);
 
   private final GraphFactory graphFactory;
@@ -41,6 +40,8 @@ public class CollateXLaboratory extends JFrame {
 
   private final EditGraphModel editGraphModel = new EditGraphModel();
   private final EditGraphPanel editGraphPanel;
+
+  private final JTable matchMatrixTable = new JTable();
 
   private final SuffixTreePanel suffixTreePanel;
 
@@ -60,6 +61,11 @@ public class CollateXLaboratory extends JFrame {
     this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(variantGraphModel));
     this.tabbedPane.addTab("Edit Graph", editGraphPanel = new EditGraphPanel(editGraphModel));
     this.tabbedPane.addTab("Suffix Tree", suffixTreePanel = new SuffixTreePanel());
+    this.tabbedPane.addTab("Match Matrix", new JScrollPane(matchMatrixTable));
+    matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    matchMatrixTable.setShowGrid(true);
+    matchMatrixTable.setGridColor(new Color(0, 0, 0, 32));
+    matchMatrixTable.setColumnSelectionAllowed(true);
 
     final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     splitPane.setContinuousLayout(true);
@@ -76,6 +82,7 @@ public class CollateXLaboratory extends JFrame {
     toolBar.add(new CollateAction());
     toolBar.add(new TokenLinkAction());
     toolBar.add(new SuffixTreeAction());
+    toolBar.add(new MatchMatrixAction());
     add(toolBar, BorderLayout.NORTH);
 
     setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -189,7 +196,7 @@ public class CollateXLaboratory extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       final List<SimpleWitness> w = witnessPanel.getWitnesses();
-      
+
       if (w.size() < 1) {
         return;
       }
@@ -200,4 +207,67 @@ public class CollateXLaboratory extends JFrame {
       suffixTreePanel.getModel().setGraphLayout(new TreeLayout(treeModel, 100, 50));
     }
   }
+
+  private class MatchMatrixAction extends AbstractAction {
+
+    private MatchMatrixAction() {
+      super("Match Matrix");
+    }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      final List<SimpleWitness> w = witnessPanel.getWitnesses();
+
+      if (w.size() < 2) {
+        return;
+      }
+
+      final Transaction transaction = graphFactory.getDatabase().beginTx();
+      try {
+        final EqualityTokenComparator comparator = new EqualityTokenComparator();
+        final VariantGraph vg = graphFactory.newVariantGraph();
+
+        CollationAlgorithmFactory.dekker(comparator).collate(vg, w.get(0));
+        final SimpleWitness witness = w.get(1);
+
+        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchMatrixLinker.buildMatrix(vg, witness, comparator), vg, witness));
+
+        final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
+        columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());
+        for (int col = 1; col < matchMatrixTable.getColumnCount(); col++) {
+          columnModel.getColumn(col).setCellRenderer(MATCH_MATRIX_CELL_RENDERER);
+        }
+
+        tabbedPane.setSelectedIndex(3);
+      } finally {
+        transaction.finish();
+      }
+    }
+  }
+
+  private static final TableCellRenderer MATCH_MATRIX_CELL_RENDERER = new TableCellRenderer() {
+
+    private JLabel label;
+    
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      if (label == null) {
+        label = new JLabel();
+        label.setOpaque(true);
+        label.getInsets().set(5, 5, 5, 5);
+      }
+
+      if (((Boolean) value)) {
+        label.setBackground(isSelected ? Color.GREEN : Color.GREEN.brighter());
+      } else {
+        label.setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
+      }
+      
+      
+
+      return label;
+    }
+  };
+
 }
