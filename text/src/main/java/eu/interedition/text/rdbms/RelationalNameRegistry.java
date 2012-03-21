@@ -23,7 +23,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Name;
 import eu.interedition.text.util.SQL;
@@ -47,10 +46,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 import static java.util.Collections.singleton;
 
@@ -96,19 +92,11 @@ public class RelationalNameRegistry implements InitializingBean {
     final Set<Name> found = Sets.newHashSetWithExpectedSize(requested.size());
 
     for (Iterator<Name> it = requested.iterator(); it.hasNext(); ) {
-      try {
-        final Name name = it.next();
-        final Long id = nameCache.get(name, new Callable<Long>() {
-          @Override
-          public Long call() throws Exception {
-            return null;
-          }
-        });
-        if (id != null) {
-          found.add(new RelationalName(name, id));
-          it.remove();
-        }
-      } catch (ExecutionException e) {
+      final Name name = it.next();
+      final Long id = nameCache.getIfPresent(name);
+      if (id != null) {
+        found.add(new RelationalName(name, id));
+        it.remove();
       }
     }
 
