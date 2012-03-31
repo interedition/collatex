@@ -1,31 +1,20 @@
 /*
- * Copyright 2011 The Interedition Development Group.
+ * Copyright 2010-2012 The Interedition Development Group.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * TODO: change license to GPL
  */
 package eu.interedition.collatex.dekker;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphEdge;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 
 /**
  *
@@ -34,52 +23,42 @@ import java.util.SortedSet;
 public class PhraseMatchDetector {
 
   public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, Iterable<Token> tokens) {
-    //rank the variant graph
-    base.rank();
-    
     List<List<Match>> phraseMatches = Lists.newArrayList();
-
-    // gather matched ranks into a set ordered by their natural order
-    final Set<Integer> rankSet = Sets.newTreeSet();
-    for (VariantGraphVertex vertex : linkedTokens.values()) {
-      rankSet.add(vertex.getRank());
-    }
- 
-    //Turn it into a List so that distance between matched ranks can be called
-    //Note that omitted vertices are not in the list, so they don't cause an extra phrasematch
-    List<Integer> ranks = Lists.newArrayList(rankSet);
-
-    // chain token matches
     List<VariantGraphVertex> basePhrase = Lists.newArrayList();
     List<Token> witnessPhrase = Lists.newArrayList();
-    int previousRank = 1;
-
+    VariantGraphVertex previous = base.getStart();
+ 
     for (Token token : tokens) {
-      //Note: this if skips added tokens so they don't cause an extra phrasematch
       if (!linkedTokens.containsKey(token)) {
         continue;
       }
-      VariantGraphVertex baseToken = linkedTokens.get(token);
-      int rank = baseToken.getRank();
-      int indexOfRank = ranks.indexOf(rank);
-      int indexOfPreviousRank = ranks.indexOf(previousRank);
-      int difference = indexOfRank - indexOfPreviousRank;
-      if (difference != 0 && difference != 1) {
+      VariantGraphVertex baseVertex = linkedTokens.get(token);
+      // requirements:
+      // - there should a directed edge between previous and base vertex
+      // - there may not be a longer path between previous and base vertex
+      boolean directedEdge = directedEdgeBetween(previous, baseVertex);
+      boolean isNear = directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
+      if (!isNear) {
         if (!basePhrase.isEmpty()) {
-          // start a new sequence
           phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
+          basePhrase.clear();
+          witnessPhrase.clear();
         }
-        // clear buffer
-        basePhrase.clear();
-        witnessPhrase.clear();
       }
-      basePhrase.add(baseToken);
+      basePhrase.add(baseVertex);
       witnessPhrase.add(token);
-      previousRank = rank;
+      previous = baseVertex;
     }
     if (!basePhrase.isEmpty()) {
       phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
     }
     return phraseMatches;
+  }
+
+  private boolean directedEdgeBetween(VariantGraphVertex previous, VariantGraphVertex baseVertex) {
+    Set<VariantGraphEdge> outgoing = Sets.newHashSet(previous.outgoing());
+    Set<VariantGraphEdge> incoming = Sets.newHashSet(baseVertex.incoming());
+    Set<VariantGraphEdge> intersection = Sets.intersection(outgoing, incoming);
+    return !intersection.isEmpty();
   }
 }
