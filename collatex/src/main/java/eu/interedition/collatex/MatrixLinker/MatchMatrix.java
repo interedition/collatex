@@ -1,6 +1,7 @@
 package eu.interedition.collatex.MatrixLinker;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -12,7 +13,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class MatchMatrix {
+public class MatchMatrix implements Iterable<MatchMatrix.Coordinates> {
 
   private ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
@@ -175,6 +176,27 @@ public class MatchMatrix {
     return islands;
   }
 
+  @Override
+  public Iterator<Coordinates> iterator() {
+    return new AbstractIterator<Coordinates>() {
+      private int row = 0;
+      private int col = 0;
+      private int rows = rowNum();
+      private int cols = colNum();
+
+      @Override
+      protected Coordinates computeNext() {
+        while (row < rows) {
+          if (cols++ < cols) {
+            return new Coordinates(row, col);
+          }
+          ++row;
+        }
+        return endOfData();
+      }
+    };
+  }
+
   public static class Coordinates implements Comparable<Coordinates> {
     int row;
     int column;
@@ -197,11 +219,11 @@ public class MatchMatrix {
     }
 
     public boolean sameColumn(Coordinates c) {
-      return c.column == column;
+      return (c.column == column);
     }
 
     public boolean sameRow(Coordinates c) {
-      return c.row == row;
+      return (c.row == row);
     }
 
     public boolean bordersOn(Coordinates c) {
