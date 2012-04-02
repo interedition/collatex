@@ -1,20 +1,35 @@
-/*
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
  * Copyright 2010-2012 The Interedition Development Group.
  *
- * TODO: change license to GPL
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.GraphRelationshipType;
 import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphEdge;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 /**
  *
@@ -34,7 +49,7 @@ public class PhraseMatchDetector {
       }
       VariantGraphVertex baseVertex = linkedTokens.get(token);
       // requirements:
-      // - there should a directed edge between previous and base vertex
+      // - there should be a directed edge between previous and base vertex
       // - there may not be a longer path between previous and base vertex
       boolean directedEdge = directedEdgeBetween(previous, baseVertex);
       boolean isNear = directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
@@ -55,10 +70,14 @@ public class PhraseMatchDetector {
     return phraseMatches;
   }
 
-  private boolean directedEdgeBetween(VariantGraphVertex previous, VariantGraphVertex baseVertex) {
-    Set<VariantGraphEdge> outgoing = Sets.newHashSet(previous.outgoing());
-    Set<VariantGraphEdge> incoming = Sets.newHashSet(baseVertex.incoming());
-    Set<VariantGraphEdge> intersection = Sets.intersection(outgoing, incoming);
-    return !intersection.isEmpty();
+  private boolean directedEdgeBetween(VariantGraphVertex a, VariantGraphVertex b) {
+    final Node aNode = a.getNode();
+    final Node bNode = b.getNode();
+    for (Relationship r : aNode.getRelationships(Direction.OUTGOING, GraphRelationshipType.PATH)) {
+      if (r.getEndNode().equals(bNode)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
