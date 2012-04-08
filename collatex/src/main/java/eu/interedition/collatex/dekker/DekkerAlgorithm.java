@@ -1,8 +1,26 @@
+/**
+ * CollateX - a Java library for collating textual sources,
+ * for example, to produce an apparatus.
+ *
+ * Copyright 2010-2012 The Interedition Development Group.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package eu.interedition.collatex.dekker;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Witness;
@@ -13,11 +31,11 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 import java.util.*;
 
 public class DekkerAlgorithm extends CollationAlgorithm.Base {
+
   private final Comparator<Token> comparator;
   private final TokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;
   private final TranspositionDetector transpositionDetector;
-
   private Map<Token, VariantGraphVertex> tokenLinks;
   private List<List<Match>> phraseMatches;
   private List<List<Match>> transpositions;
@@ -40,14 +58,14 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     final Witness witness = Iterables.getFirst(tokens, null).getWitness();
 
     if (LOG.isTraceEnabled()) {
-      LOG.trace("{} + {}: {} vs. {}", new Object[] { graph, witness, graph.vertices(), tokens});
+      LOG.trace("{} + {}: {} vs. {}", new Object[]{graph, witness, graph.vertices(), tokens});
     }
 
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
     tokenLinks = tokenLinker.link(graph, tokens, comparator);
     if (LOG.isTraceEnabled()) {
       for (Map.Entry<Token, VariantGraphVertex> tokenLink : tokenLinks.entrySet()) {
-        LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
+        LOG.trace("{} + {}: Token match: {} = {}", new Object[]{graph, witness, tokenLink.getValue(), tokenLink.getKey()});
       }
     }
 
@@ -55,15 +73,15 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     phraseMatches = phraseMatchDetector.detect(tokenLinks, graph, tokens);
     if (LOG.isTraceEnabled()) {
       for (List<Match> phraseMatch : phraseMatches) {
-        LOG.trace("{} + {}: Phrase match: {}", new Object[] { graph, witness, Iterables.toString(phraseMatch) });
+        LOG.trace("{} + {}: Phrase match: {}", new Object[]{graph, witness, Iterables.toString(phraseMatch)});
       }
     }
 
     LOG.debug("{} + {}: Detect transpositions", graph, witness);
-    transpositions = filterMirrored(transpositionDetector.detect(phraseMatches, graph), witness);
+    transpositions = transpositionDetector.detect(phraseMatches, graph);
     if (LOG.isTraceEnabled()) {
       for (List<Match> transposition : transpositions) {
-        LOG.trace("{} + {}: Transposition: {}", new Object[] { graph, witness, Iterables.toString(transposition) });
+        LOG.trace("{} + {}: Transposition: {}", new Object[]{graph, witness, Iterables.toString(transposition)});
       }
     }
 
@@ -77,7 +95,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     }
     if (LOG.isTraceEnabled()) {
       for (Map.Entry<Token, VariantGraphVertex> alignment : alignments.entrySet()) {
-        LOG.trace("{} + {}: Alignment: {} = {}", new Object[] { graph, witness, alignment.getValue(), alignment.getKey() });
+        LOG.trace("{} + {}: Alignment: {} = {}", new Object[]{graph, witness, alignment.getValue(), alignment.getKey()});
       }
     }
 
@@ -87,9 +105,9 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
         transposedTokens.put(match.token, match.vertex);
       }
     }
-    
+
     merge(graph, tokens, alignments, transposedTokens);
-    
+
     if (LOG.isTraceEnabled()) {
       LOG.trace("{}: {}", graph, Iterables.toString(graph.vertices()));
     }
@@ -110,39 +128,4 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   public Map<Token, VariantGraphVertex> getAlignments() {
     return Collections.unmodifiableMap(alignments);
   }
-
-  // NOTE: this method should not return the original sequence when a mirror exists!
-  private List<List<Match>> filterMirrored(List<Tuple<List<Match>>> transpositions, Witness witness) {
-    final List<List<Match>> transposed = Lists.newArrayList();
-    final Deque<Tuple<List<Match>>> toCheck = new ArrayDeque<Tuple<List<Match>>>(transpositions);
-    while (!toCheck.isEmpty()) {
-      final Tuple<List<Match>> current = toCheck.pop();
-      final Tuple<List<Match>> mirrored = findMirroredTransposition(toCheck, current);
-      if (mirrored != null && transpositionsAreNear(current, mirrored, witness)) {
-        toCheck.remove(mirrored);
-        transposed.add(mirrored.left);
-      } else {
-        transposed.add(current.left);
-      }
-    }
-    return transposed;
-  }
-
-  private Tuple<List<Match>> findMirroredTransposition(final Deque<Tuple<List<Match>>> transToCheck, final Tuple<List<Match>> original) {
-    for (final Tuple<List<Match>> transposition : transToCheck) {
-      if (transposition.left.equals(original.right)) {
-        if (transposition.right.equals(original.left)) {
-          return transposition;
-        }
-      }
-    }
-    return null;
-  }
-
-  // Note: this only calculates the distance between the tokens in the witness.
-  // Note: it does not take into account a possible distance in the vertices in the graph!
-  private boolean transpositionsAreNear(Tuple<List<Match>> a, Tuple<List<Match>> b, Witness witness) {
-    return witness.isNear(Iterables.getLast(a.right).token, Iterables.get(b.right, 0).token);
-  }
-
 }
