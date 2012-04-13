@@ -20,15 +20,16 @@
 package eu.interedition.web.io;
 
 import com.google.common.base.Preconditions;
-import eu.interedition.text.Range;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.TextTarget;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeConverter implements Converter<String, Range> {
+public class RangeConverter implements Converter<String, TextRange> {
   @Override
-  public Range convert(String source) {
+  public TextRange convert(String source) {
     long start = 0;
     long end = 0;
 
@@ -41,7 +42,7 @@ public class RangeConverter implements Converter<String, Range> {
       end = start + toLong(components[1]);
     }
 
-    return new Range(start, end);
+    return new TextRange(start, end);
   }
 
   private static long toLong(String str) {

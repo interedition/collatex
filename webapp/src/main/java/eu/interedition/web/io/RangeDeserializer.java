@@ -19,7 +19,7 @@
  */
 package eu.interedition.web.io;
 
-import eu.interedition.text.Range;
+import eu.interedition.text.TextTarget;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationContext;
@@ -30,9 +30,9 @@ import java.io.IOException;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeDeserializer extends JsonDeserializer<Range> {
+public class RangeDeserializer extends JsonDeserializer<TextTarget> {
   @Override
-  public Range deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+  public TextTarget deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
     throw new UnsupportedOperationException();
   }
 }

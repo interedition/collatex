@@ -1,4 +1,4 @@
-package eu.interedition.server;
+package eu.interedition.server.ui;
 
 import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
@@ -21,14 +21,14 @@ import java.nio.charset.Charset;
 public class GraphVizDotPathAutodetector implements Runnable {
 
   private final Charset charset = Charset.defaultCharset();
-  private final ServletContainerSetupPanel setupPanel;
+  private final ServerSetupPanel setupPanel;
 
   /**
    * Constructor.
    *
    * @param setupPanel the settings panel which receives the detected path
    */
-  public GraphVizDotPathAutodetector(ServletContainerSetupPanel setupPanel) {
+  public GraphVizDotPathAutodetector(ServerSetupPanel setupPanel) {
     this.setupPanel = setupPanel;
   }
 

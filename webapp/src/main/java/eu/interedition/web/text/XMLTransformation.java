@@ -21,8 +21,6 @@ package eu.interedition.web.text;
 
 import com.google.common.collect.Lists;
 import eu.interedition.text.Name;
-import eu.interedition.text.rdbms.RelationalName;
-import eu.interedition.text.rdbms.RelationalNameRegistry;
 import eu.interedition.text.util.SQL;
 import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
 import eu.interedition.text.xml.XMLTransformerModule;
@@ -166,7 +164,7 @@ public class XMLTransformation extends SimpleXMLTransformerConfiguration {
   }
 
 
-  public XMLTransformation save(JdbcTemplate jdbcTemplate, SimpleJdbcInsert xtInsert, SimpleJdbcInsert xtrInsert, RelationalNameRegistry nameRegistry) {
+  public XMLTransformation save(JdbcTemplate jdbcTemplate, SimpleJdbcInsert xtInsert, SimpleJdbcInsert xtrInsert) {
     if (id == 0) {
       id = xtInsert.executeAndReturnKey(new MapSqlParameterSource()
               .addValue("name", name)
@@ -189,7 +187,7 @@ public class XMLTransformation extends SimpleXMLTransformerConfiguration {
       }
       ruleBatch.add(new MapSqlParameterSource()
               .addValue("config", id)
-              .addValue("name", ((RelationalName) nameRegistry.get(rule.getName())).getId())
+              .addValue("name", "") // FIXME!!
               .addValue("is_line", rule.isLineElement())
               .addValue("is_container", rule.isContainerElement())
               .addValue("is_excluded", rule.isExcluded())

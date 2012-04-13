@@ -1,13 +1,15 @@
-package eu.interedition.server;
+package eu.interedition.server.ui;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.webapp.WebAppContext;
+import eu.interedition.server.ServerApplication;
+import org.restlet.data.Protocol;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
@@ -22,32 +24,51 @@ import java.net.UnknownHostException;
  *
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class ServletContainerControllerAction extends AbstractAction {
+@org.springframework.stereotype.Component
+public class ServerController extends AbstractAction implements InitializingBean, DisposableBean {
   private static final String START_LABEL = "Start Server";
   private static final String START_DESCRIPTION = "Starts the Interedition Server and opens its homepage in a browser";
   private static final String STOP_LABEL = "Stop Server";
   private static final String STOP_DESCRIPTION = "Shuts down the Interedition Server";
 
-  private final ServerApplicationFrame frame;
+  @Autowired
+  private TaskExecutor tasks;
+
+  @Autowired
+  private ServerSetupPanel setupPanel;
+
+  @Autowired
+  private ServerApplication application;
+
+  @Autowired
+  private ServerConsole console;
+
   private final Desktop desktop = Desktop.getDesktop();
 
-  private Server server;
+  private org.restlet.Component component;
 
-  /**
-   * Constructor.
-   *
-   * @param frame the parent frame to which modal progress dialogs of this action bind
-   */
-  public ServletContainerControllerAction(ServerApplicationFrame frame) {
+  public ServerController() {
     super(START_LABEL);
-    this.frame = frame;
     putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/org/freedesktop/tango/16x16/apps/internet-web-browser.png"), "Browse Web"));
     putValue(Action.SHORT_DESCRIPTION, START_DESCRIPTION);
   }
 
   @Override
+  public void afterPropertiesSet() throws Exception {
+    component = new org.restlet.Component();
+    component.getDefaultHost().attach(application);
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    if (component.isStarted()) {
+      component.stop();
+    }
+  }
+
+  @Override
   public void actionPerformed(ActionEvent event) {
-    if (server == null) {
+    if (component.isStopped()) {
       start();
     } else {
       stop();
@@ -58,46 +79,25 @@ public class ServletContainerControllerAction extends AbstractAction {
    * Boot the servlet container.
    */
   public void start() {
-    if (server != null) {
+    if (component.isStarted()) {
       return;
     }
-    final File webappArchive = ServerApplicationFrame.getWebappArchive();
-    if (!webappArchive.isDirectory()) {
-      JOptionPane.showMessageDialog(frame, "The server code has not been downloaded yet.\nPlease ensure you have a connection to the Internet and restart the application in order to download it.", "Server code not available", JOptionPane.WARNING_MESSAGE);
-      return;
-    }
-
-    final ServletContainerSetupPanel setupPanel = frame.getSetupPanel();
     final int port = setupPanel.getPort();
 
-    final File dotPath = setupPanel.getDotPath();
-    if (dotPath != null) {
-      try {
-        System.setProperty("collatex.graphviz.dot", dotPath.getCanonicalPath());
-      } catch (IOException e) {
-      }
-    }
-
-    final ServerOperationDialog dialog = new ServerOperationDialog(frame, START_LABEL);
+    final ServerOperationDialog dialog = new ServerOperationDialog(console, START_LABEL);
     setEnabled(false);
 
-    frame.getExecutorService().execute(new Runnable() {
+    tasks.execute(new Runnable() {
       @Override
       public void run() {
-        final SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(port);
-
-        server = new Server();
-        server.setStopAtShutdown(true);
-        server.addConnector(connector);
-        server.setHandler(new WebAppContext(webappArchive.getAbsolutePath(), "/"));
+        component.getServers().clear();
+        component.getServers().add(Protocol.HTTP, port);
         try {
-          server.start();
+          component.start();
           putValue(Action.NAME, STOP_LABEL);
           putValue(Action.SHORT_DESCRIPTION, STOP_DESCRIPTION);
         } catch (Exception e) {
-          server = null;
-          frame.error(e, "Cannot start server");
+          console.error(e, "Cannot start server");
         }
         setEnabled(true);
         dialog.setVisible(false);
@@ -105,7 +105,7 @@ public class ServletContainerControllerAction extends AbstractAction {
     });
     dialog.setVisible(true);
 
-    if (server != null) {
+    if (component.isStarted()) {
       try {
         String host;
         try {
@@ -118,7 +118,7 @@ public class ServletContainerControllerAction extends AbstractAction {
           try {
             desktop.browse(new URI("http", null, host, port, "/", null, null));
           } catch (IOException e) {
-            frame.error(e, "Cannot browse URL");
+            console.error(e, "Cannot browse URL");
           }
         }
       } catch (URISyntaxException e) {
@@ -130,23 +130,21 @@ public class ServletContainerControllerAction extends AbstractAction {
    * Shuts down the servlet container.
    */
   public void stop() {
-    if (server == null) {
+    if (component.isStopped()) {
       return;
     }
-    final ServerOperationDialog dialog = new ServerOperationDialog(frame, STOP_LABEL);
+    final ServerOperationDialog dialog = new ServerOperationDialog(console, STOP_LABEL);
     setEnabled(false);
 
-    frame.getExecutorService().execute(new Runnable() {
+    tasks.execute(new Runnable() {
       @Override
       public void run() {
         try {
-          server.stop();
-          server.setStopAtShutdown(false);
-          server = null;
+          component.stop();
           putValue(Action.NAME, START_LABEL);
           putValue(Action.SHORT_DESCRIPTION, START_DESCRIPTION);
         } catch (Exception e) {
-          frame.error(e, "Cannot stop server");
+          console.error(e, "Cannot stop server");
         }
         setEnabled(true);
         dialog.setVisible(false);

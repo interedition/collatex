@@ -1,18 +1,20 @@
-package eu.interedition.server;
+package eu.interedition.server.ui;
 
 import com.google.common.base.Strings;
+import eu.interedition.server.collatex.VariantGraphConverter;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.net.URI;
 import java.text.DecimalFormat;
+import java.util.prefs.Preferences;
 
 /**
  * Panel with settings for the servlet container.
@@ -28,27 +30,31 @@ import java.text.DecimalFormat;
  *
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class ServletContainerSetupPanel extends JPanel {
-
-  private final ServerApplicationFrame frame;
+@org.springframework.stereotype.Component
+public class ServerSetupPanel extends JPanel implements InitializingBean {
 
   private final JFormattedTextField portTextField = new JFormattedTextField(new DecimalFormat("#####"));
   private final JTextField dotPathTextField = new JTextField(30);
-  private final ServletContainerControllerAction launchAction;
 
-  /**
-   * Constructor.
-   * <p/>
-   * Starts the autodetection of a GraphViz dot executable in case none is set.
-   *
-   * @param frame reference to the application's frame for access to other components
-   *
-   * @see GraphVizDotPathAutodetector
-   */
-  public ServletContainerSetupPanel(final ServerApplicationFrame frame) {
-    super(new GridBagLayout());
+  @Autowired
+  private ServerController controller;
+
+  @Autowired
+  private ServerConsole console;
+
+  @Autowired
+  private Preferences preferences;
+
+  @Autowired
+  private VariantGraphConverter variantGraphConverter;
+
+  @Autowired
+  private TaskExecutor tasks;
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    setLayout(new GridBagLayout());
     final GridBagConstraints gbc = new GridBagConstraints();
-    this.frame = frame;
 
     gbc.gridx = 0;
     gbc.gridy = 0;
@@ -58,11 +64,11 @@ public class ServletContainerSetupPanel extends JPanel {
 
     portTextField.setToolTipText("The TCP port on which the servlet container shall listen for HTTP requests");
     portTextField.setColumns(6);
-    portTextField.setValue(Integer.parseInt(frame.getPreferences().get("port", "7369")));
+    portTextField.setValue(Integer.parseInt(preferences.get("port", "7369")));
     portTextField.addPropertyChangeListener("value", new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-        frame.getPreferences().put("port", Integer.toString(getPort()));
+        preferences.put("port", Integer.toString(getPort()));
       }
     });
 
@@ -81,7 +87,6 @@ public class ServletContainerSetupPanel extends JPanel {
     gbc.anchor = GridBagConstraints.LINE_START;
     dotPathTextField.setToolTipText("<html>Path to GraphViz' <code>dot</code> executable. GraphViz is optionally used by the hosted web application in order to create SVG-based renderings of collation results</html>");
     dotPathTextField.setEditable(false);
-    dotPathTextField.setText(frame.getPreferences().get("dotPath", ""));
     add(dotPathTextField, gbc);
 
     gbc.gridx++;
@@ -89,22 +94,14 @@ public class ServletContainerSetupPanel extends JPanel {
 
     gbc.gridx = 1;
     gbc.gridy++;
-    add(new JButton(launchAction = new ServletContainerControllerAction(frame)), gbc);
+    add(new JButton(controller), gbc);
 
     setBorder(BorderFactory.createTitledBorder("Server settings"));
 
+    setDotPath(new File(preferences.get("dotPath", "")));
     if (getDotPath() == null) {
-      frame.getExecutorService().execute(new GraphVizDotPathAutodetector(this));
+      tasks.execute(new GraphVizDotPathAutodetector(this));
     }
-  }
-
-  /**
-   * Access to the action instance controlling a servlet container.
-   *
-   * @return the controller
-   */
-  public ServletContainerControllerAction getControllerAction() {
-    return launchAction;
   }
 
   /**
@@ -141,9 +138,11 @@ public class ServletContainerSetupPanel extends JPanel {
       public void run() {
         if (dotPath == null || !dotPath.isFile() || !dotPath.canExecute()) {
           dotPathTextField.setText("");
+          variantGraphConverter.setDotPath(null);
         } else {
           dotPathTextField.setText(dotPath.getAbsolutePath());
-          frame.getPreferences().put("dotPath", dotPath.getAbsolutePath());
+          preferences.put("dotPath", dotPath.getAbsolutePath());
+          variantGraphConverter.setDotPath(dotPath);
         }
       }
     });
@@ -177,7 +176,7 @@ public class ServletContainerSetupPanel extends JPanel {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (fileChooser.showDialog(frame, "Select") == JFileChooser.APPROVE_OPTION) {
+      if (fileChooser.showDialog(console, "Select") == JFileChooser.APPROVE_OPTION) {
         setDotPath(fileChooser.getSelectedFile());
       }
     }

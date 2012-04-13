@@ -1,27 +1,21 @@
 package eu.interedition.web.text;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
+import eu.interedition.text.Name;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.mem.SimpleName;
-import eu.interedition.text.query.Criteria;
-import eu.interedition.text.rdbms.RelationalName;
-import eu.interedition.text.rdbms.RelationalNameRegistry;
-import eu.interedition.text.rdbms.RelationalText;
-import eu.interedition.text.util.SQL;
+import eu.interedition.text.query.QueryCriteria;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.web.metadata.DublinCoreMetadata;
 import eu.interedition.web.metadata.MetadataController;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,8 +32,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -52,10 +44,7 @@ public class XMLTransformationController implements InitializingBean {
   private JdbcTemplate jdbcTemplate;
 
   @Autowired
-  private RelationalNameRegistry nameRegistry;
-
-  @Autowired
-  private TextRepository repository;
+  private SessionFactory sessionFactory;
 
   @Autowired
   private MetadataController metadataController;
@@ -91,13 +80,13 @@ public class XMLTransformationController implements InitializingBean {
   @RequestMapping(method = RequestMethod.POST, produces = "application/json")
   @ResponseBody
   public XMLTransformation create(@RequestBody XMLTransformation xt) {
-    return xt.save(jdbcTemplate, xtInsert, xtrInsert, nameRegistry);
+    return xt.save(jdbcTemplate, xtInsert, xtrInsert);
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
   @ResponseBody
   public XMLTransformation update(@PathVariable("id") XMLTransformation xt, @RequestBody XMLTransformation updated) {
-    return xt.update(updated).save(jdbcTemplate, xtInsert, xtrInsert, nameRegistry);
+    return xt.update(updated).save(jdbcTemplate, xtInsert, xtrInsert);
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.POST, consumes = "application/xml", produces = "application/json")
@@ -105,16 +94,17 @@ public class XMLTransformationController implements InitializingBean {
   public Text transform(@PathVariable("id") XMLTransformation xt, InputStream xmlStream) throws XMLStreamException, IOException {
     XMLStreamReader xmlReader = null;
     try {
-      final Text xmlText = repository.create(null, xmlReader = xmlInputFactory.createXMLStreamReader(xmlStream));
+      final Session session = sessionFactory.getCurrentSession();
+      final Text xmlText = Text.create(session, null, xmlReader = xmlInputFactory.createXMLStreamReader(xmlStream));
 
-      final DublinCoreMetadata metadata = new DublinCoreMetadata(DateTime.now()).update(repository, xmlText);
-      metadataController.create((RelationalText) xmlText, metadata);
+      final DublinCoreMetadata metadata = new DublinCoreMetadata(DateTime.now()).update(xmlText);
+      metadataController.create(xmlText, metadata);
 
-      final Text text = new XMLTransformer(repository, xt).transform(xmlText);
-      metadataController.create((RelationalText) text, metadata);
+      final Text text = new XMLTransformer(sessionFactory, xt).transform(xmlText);
+      metadataController.create(text, metadata);
 
       if (xt.isRemoveEmpty()) {
-        repository.delete(Criteria.and(Criteria.text(text), Criteria.rangeLength(0)));
+        QueryCriteria.and(QueryCriteria.text(text), QueryCriteria.rangeLength(0)).delete(session);
       }
       return text;
     } finally {
@@ -136,11 +126,11 @@ public class XMLTransformationController implements InitializingBean {
 
     if (jdbcTemplate.queryForInt("select count(*) from xml_transform") == 0) {
       final List<XMLTransformationRule> teiDefaultRules = Lists.newArrayList();
-      teiDefaultRules.add(new XMLTransformationRule(new SimpleName(TextConstants.TEI_NS, "teiHeader"), false, false, false, true, false));
-      teiDefaultRules.add(new XMLTransformationRule(new SimpleName(TextConstants.TEI_NS, "div"), true, false, false, false, false));
-      teiDefaultRules.add(new XMLTransformationRule(new SimpleName(TextConstants.TEI_NS, "p"), true, false, false, false, false));
-      teiDefaultRules.add(new XMLTransformationRule(new SimpleName(TextConstants.TEI_NS, "l"), true, false, false, false, false));
-      teiDefaultRules.add(new XMLTransformationRule(new SimpleName(TextConstants.TEI_NS, "head"), true, false, false, false, false));
+      teiDefaultRules.add(new XMLTransformationRule(new Name(TextConstants.TEI_NS, "teiHeader"), false, false, false, true, false));
+      teiDefaultRules.add(new XMLTransformationRule(new Name(TextConstants.TEI_NS, "div"), true, false, false, false, false));
+      teiDefaultRules.add(new XMLTransformationRule(new Name(TextConstants.TEI_NS, "p"), true, false, false, false, false));
+      teiDefaultRules.add(new XMLTransformationRule(new Name(TextConstants.TEI_NS, "l"), true, false, false, false, false));
+      teiDefaultRules.add(new XMLTransformationRule(new Name(TextConstants.TEI_NS, "head"), true, false, false, false, false));
 
       final XMLTransformation teiDefault = new XMLTransformation();
       teiDefault.setName("tei");
@@ -148,7 +138,7 @@ public class XMLTransformationController implements InitializingBean {
       teiDefault.setTransformTEI(true);
       teiDefault.setRules(teiDefaultRules);
 
-      teiDefault.save(jdbcTemplate, xtInsert, xtrInsert, nameRegistry);
+      teiDefault.save(jdbcTemplate, xtInsert, xtrInsert);
     }
   }
 }

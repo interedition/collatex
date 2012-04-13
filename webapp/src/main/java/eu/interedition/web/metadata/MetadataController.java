@@ -2,7 +2,7 @@ package eu.interedition.web.metadata;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
-import eu.interedition.text.rdbms.RelationalText;
+import eu.interedition.text.Text;
 import eu.interedition.text.util.SQL;
 import eu.interedition.web.index.IndexController;
 import org.springframework.beans.factory.InitializingBean;
@@ -44,7 +44,7 @@ public class MetadataController implements InitializingBean {
 
   @RequestMapping(value = "/{id}", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
   @ResponseBody
-  public DublinCoreMetadata create(@PathVariable("id") RelationalText text, @RequestBody DublinCoreMetadata metadata) {
+  public DublinCoreMetadata create(@PathVariable("id") Text text, @RequestBody DublinCoreMetadata metadata) {
     try {
       return read(text);
     } catch (EmptyResultDataAccessException e) {
@@ -55,13 +55,13 @@ public class MetadataController implements InitializingBean {
 
   @RequestMapping(value = "/{id}", produces = "application/json")
   @ResponseBody
-  public DublinCoreMetadata read(@PathVariable("id") RelationalText text) {
+  public DublinCoreMetadata read(@PathVariable("id") Text text) {
     return jdbcTemplate.getJdbcOperations().queryForObject(sql().append(" where md.text = ?").toString(), ROW_MAPPER, text.getId());
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
   @ResponseBody
-  public DublinCoreMetadata update(@PathVariable("id") RelationalText text, @RequestBody DublinCoreMetadata updated) {
+  public DublinCoreMetadata update(@PathVariable("id") Text text, @RequestBody DublinCoreMetadata updated) {
     final DublinCoreMetadata metadata = read(text);
     metadata.update(updated);
     jdbcTemplate.update(new StringBuilder("update text_metadata set ")
@@ -85,7 +85,7 @@ public class MetadataController implements InitializingBean {
 
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, consumes = "application/json", produces = "application/json")
   @ResponseBody
-  public RelationalText delete(@PathVariable("id") RelationalText text) {
+  public Text delete(@PathVariable("id") Text text) {
     jdbcTemplate.getJdbcOperations().update("delete from text_metadata where text = ?", text.getId());
     return text;
   }

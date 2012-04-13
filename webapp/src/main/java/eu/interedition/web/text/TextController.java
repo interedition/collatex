@@ -23,17 +23,17 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
 import eu.interedition.text.Text;
-import eu.interedition.text.event.NameCollector;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.TextTarget;
+import eu.interedition.text.util.NameCollector;
 import eu.interedition.text.json.JSONSerializer;
-import eu.interedition.text.query.Criteria;
-import eu.interedition.text.rdbms.RelationalText;
-import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.text.query.QueryCriteria;
 import eu.interedition.text.xml.XML;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.stax2.XMLInputFactory2;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -79,7 +79,7 @@ public class TextController {
   protected static final int MAX_TEXT_LENGTH = 102400;
 
   @Autowired
-  private RelationalTextRepository repository;
+  private SessionFactory sessionFactory;
 
   @Autowired
   private JSONSerializer jsonSerializer;
@@ -91,8 +91,8 @@ public class TextController {
 
   @RequestMapping("/{id}/names")
   @ResponseBody
-  public SortedSet<Name> readNames(@PathVariable("id") long id) throws IOException, XMLStreamException {
-    return new NameCollector().collect(repository, repository.read(id)).getNames();
+  public SortedSet<Name> readNames(@PathVariable("id") Text text) throws IOException, XMLStreamException {
+    return new NameCollector().collect(sessionFactory.getCurrentSession(), text).getNames();
   }
 
   @RequestMapping(method = RequestMethod.GET)
@@ -101,32 +101,32 @@ public class TextController {
   }
 
   @RequestMapping(value = "/{id}", produces = "text/plain")
-  public void readText(@PathVariable("id") RelationalText text, @RequestParam(value = "r", required = false) Range range, HttpServletResponse response) throws IOException {
+  public void readText(@PathVariable("id") Text text, @RequestParam(value = "r", required = false) TextRange range, HttpServletResponse response) throws IOException {
     response.setCharacterEncoding(Text.CHARSET.name());
     response.setContentType(MediaType.TEXT_PLAIN.toString());
     final PrintWriter responseWriter = response.getWriter();
 
-    range = (range == null ? new Range(0, text.getLength()) : range);
-    CharStreams.copy(repository.read(text, range), responseWriter);
+    range = (range == null ? new TextRange(0, text.getLength()) : range);
+    CharStreams.copy(text.read(range), responseWriter);
   }
 
 
   @RequestMapping(value = "/{id}", produces = "text/html")
-  public ModelAndView readHTML(@PathVariable("id") RelationalText text) throws IOException {
+  public ModelAndView readHTML(@PathVariable("id") Text text) throws IOException {
     final StringWriter textContents = new StringWriter();
-    CharStreams.copy(repository.read(text, new Range(0, Math.min(MAX_TEXT_LENGTH, text.getLength()))), textContents);
+    CharStreams.copy(text.read(new TextRange(0, Math.min(MAX_TEXT_LENGTH, text.getLength()))), textContents);
     return new ModelAndView("text").addObject("text", text).addObject("textContents", textContents);
   }
 
   @RequestMapping(value = "/{id}/xml", produces = "application/xml")
   @ResponseBody
-  public XMLSerialization readXML(@PathVariable("id") RelationalText text) {
+  public XMLSerialization readXML(@PathVariable("id") Text text) {
     return readXML(text, new XMLSerialization());
   }
 
   @RequestMapping(value = "/{id}/xml", consumes = "application/json", produces = "application/xml")
   @ResponseBody
-  public XMLSerialization readXML(@PathVariable("id") RelationalText text, @RequestBody XMLSerialization serialization) {
+  public XMLSerialization readXML(@PathVariable("id") Text text, @RequestBody XMLSerialization serialization) {
     serialization.setText(text);
     serialization.evaluate();
     return serialization;
@@ -134,13 +134,13 @@ public class TextController {
 
   @RequestMapping(value = "/{id}/json", produces = "application/json")
   @ResponseBody
-  public JSONSerialization readJSON(@PathVariable("id") RelationalText text, @RequestParam(value = "r", required = false) Range range) {
+  public JSONSerialization readJSON(@PathVariable("id") Text text, @RequestParam(value = "r", required = false) TextTarget range) {
     return readJSON(text, new JSONSerialization(), range);
   }
 
   @RequestMapping(value = "/{id}/json", consumes = "application/json", produces = "application/json")
   @ResponseBody
-  public JSONSerialization readJSON(@PathVariable("id") RelationalText text, @RequestBody JSONSerialization serialization, @RequestParam(value = "r", required = false) Range range) {
+  public JSONSerialization readJSON(@PathVariable("id") Text text, @RequestBody JSONSerialization serialization, @RequestParam(value = "r", required = false) TextTarget range) {
     serialization.setText(text);
     if (range != null) {
       serialization.setRange(range);
@@ -151,20 +151,20 @@ public class TextController {
   @RequestMapping(method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
   @ResponseBody
   public ResponseEntity<Text> writeText(Reader requestBody) throws IOException, XMLStreamException, SAXException {
-    return new ResponseEntity<Text>(repository.create(null, requestBody), HttpStatus.CREATED);
+    return new ResponseEntity<Text>(Text.create(sessionFactory.getCurrentSession(), null, requestBody), HttpStatus.CREATED);
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = "text/plain", produces = "text/html")
   @ResponseBody
   public RedirectView postText(Reader requestBody) throws IOException, XMLStreamException, SAXException {
-    return redirectTo((RelationalText) writeText(requestBody).getBody());
+    return redirectTo(writeText(requestBody).getBody());
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = "application/xml", produces = "application/json")
   public ResponseEntity<Text> writeXML(InputStream requestBody) throws XMLStreamException, IOException, SAXException {
     XMLStreamReader xmlReader = null;
     try {
-      return new ResponseEntity<Text>(repository.create(null, xmlReader = xmlInputFactory.createXMLStreamReader(requestBody)), HttpStatus.CREATED);
+      return new ResponseEntity<Text>(Text.create(sessionFactory.getCurrentSession(), null, xmlReader = xmlInputFactory.createXMLStreamReader(requestBody)), HttpStatus.CREATED);
     } finally {
       XML.closeQuietly(xmlReader);
     }
@@ -172,7 +172,7 @@ public class TextController {
 
   @RequestMapping(method = RequestMethod.POST, consumes = "application/xml", produces = "text/html")
   public RedirectView postXML(InputStream requestBody) throws XMLStreamException, IOException, SAXException {
-    return redirectTo((RelationalText) writeXML(requestBody).getBody());
+    return redirectTo(writeXML(requestBody).getBody());
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data", produces = "text/html")
@@ -187,9 +187,9 @@ public class TextController {
     try {
       switch (textType) {
         case TXT:
-          return redirectTo((RelationalText) repository.create(null, new InputStreamReader(fileStream = file.getInputStream(), Charset.forName(charset))));
+          return redirectTo(Text.create(sessionFactory.getCurrentSession(), null, new InputStreamReader(fileStream = file.getInputStream(), Charset.forName(charset))));
         case XML:
-          return redirectTo((RelationalText) repository.create(null, xmlReader = xmlInputFactory.createXMLStreamReader(fileStream = file.getInputStream())));
+          return redirectTo(Text.create(sessionFactory.getCurrentSession(), null, xmlReader = xmlInputFactory.createXMLStreamReader(fileStream = file.getInputStream())));
       }
     } finally {
       XML.closeQuietly(xmlReader);
@@ -199,14 +199,14 @@ public class TextController {
   }
 
   @RequestMapping(value = "/{id}/annotations", method = RequestMethod.POST, consumes = "application/json")
-  public Object createAnnotations(@PathVariable("id") RelationalText text, HttpServletRequest request, @RequestBody Reader annotations) throws IOException {
+  public Object createAnnotations(@PathVariable("id") Text text, HttpServletRequest request, @RequestBody Reader annotations) throws IOException {
     annotate(text, annotations);
     return respondWith(request, text);
   }
 
   @RequestMapping(value = "/{id}/annotations", method = RequestMethod.PUT, consumes = "application/json")
-  public Object replaceAnnotations(@PathVariable("id") RelationalText text, HttpServletRequest request, @RequestBody Reader annotations) throws IOException {
-    repository.delete(Criteria.text(text));
+  public Object replaceAnnotations(@PathVariable("id") Text text, HttpServletRequest request, @RequestBody Reader annotations) throws IOException {
+    QueryCriteria.text(text).delete(sessionFactory.getCurrentSession());
     annotate(text, annotations);
     return respondWith(request, text);
   }
@@ -221,7 +221,7 @@ public class TextController {
   }
 
 
-  protected static Object respondWith(HttpServletRequest request, RelationalText text) {
+  protected static Object respondWith(HttpServletRequest request, Text text) {
     final List<MediaType> acceptedMediaTypes = MediaType.parseMediaTypes(request.getHeader("Accept"));
     MediaType.sortByQualityValue(acceptedMediaTypes);
 
@@ -234,7 +234,7 @@ public class TextController {
     }
   }
 
-  public static RedirectView redirectTo(RelationalText text) {
+  public static RedirectView redirectTo(Text text) {
     return redirectTo(text.getId());
   }
 
