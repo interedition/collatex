@@ -19,10 +19,18 @@
  */
 package eu.interedition.text.query;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AnyCriterion implements Criterion {
+public class AnyCriterion extends QueryCriterion {
   AnyCriterion() {
+  }
+
+  @Override
+  Criterion restrict() {
+    return Restrictions.sqlRestriction("1 = 1");
   }
 }

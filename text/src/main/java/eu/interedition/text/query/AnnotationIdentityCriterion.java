@@ -19,27 +19,22 @@
  */
 package eu.interedition.text.query;
 
-import com.google.common.base.Function;
 import eu.interedition.text.Annotation;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AnnotationIdentityCriterion implements Criterion {
+public class AnnotationIdentityCriterion extends QueryCriterion {
   private final Annotation annotation;
 
   AnnotationIdentityCriterion(Annotation annotation) {
     this.annotation = annotation;
   }
 
-  public Annotation getAnnotation() {
-    return annotation;
+  @Override
+  Criterion restrict() {
+    return Restrictions.idEq(annotation);
   }
-
-  public static Function<AnnotationIdentityCriterion, Annotation> TO_ANNOTATION = new Function<AnnotationIdentityCriterion, Annotation>() {
-    public Annotation apply(AnnotationIdentityCriterion input) {
-      return input.getAnnotation();
-    }
-  };
-
 }

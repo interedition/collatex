@@ -22,31 +22,30 @@ package eu.interedition.text.event;
 import com.google.common.collect.Iterables;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.Range;
-import eu.interedition.text.TextListener;
-import eu.interedition.text.mem.SimpleName;
+import eu.interedition.text.Name;
+import eu.interedition.text.query.AnnotationListener;
+import eu.interedition.text.TextRange;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static eu.interedition.text.TextConstants.TEI_NS;
-import static eu.interedition.text.query.Criteria.annotationName;
-import static eu.interedition.text.query.Criteria.or;
+import static eu.interedition.text.query.QueryCriteria.annotationName;
+import static eu.interedition.text.query.QueryCriteria.or;
 
 public class AnnotationEventSourceTest extends AbstractTestResourceTest {
 
   @Test
   public void generateEvents() throws IOException {
-    textRepository.read(text("george-algabal-tei.xml"), or(
-            annotationName(new SimpleName(TEI_NS, "div")),
-            annotationName(new SimpleName(TEI_NS, "lg")),
-            annotationName(new SimpleName(TEI_NS, "l")),
-            annotationName(new SimpleName(TEI_NS, "p"))
-    ), DEBUG_LISTENER
-    );
+    or(
+            annotationName(new Name(TEI_NS, "div")),
+            annotationName(new Name(TEI_NS, "lg")),
+            annotationName(new Name(TEI_NS, "l")),
+            annotationName(new Name(TEI_NS, "p"))
+    ).listen(sessionFactory.getCurrentSession(), text("george-algabal-tei.xml"), DEBUG_LISTENER);
   }
 
-  public static final TextListener DEBUG_LISTENER = new TextListener() {
+  public static final AnnotationListener DEBUG_LISTENER = new AnnotationListener() {
 
     public void start(long contentLength) {
       LOG.debug("START TEXT: (" + contentLength + " character(s))");
@@ -64,7 +63,7 @@ public class AnnotationEventSourceTest extends AbstractTestResourceTest {
       LOG.debug("END: [" + offset + "] " + Iterables.toString(annotations));
     }
 
-    public void text(Range r, String text) {
+    public void text(TextRange r, String text) {
       LOG.debug("TEXT: " + r + " == \"" + escapeNewlines(text) + "\"");
     }
 

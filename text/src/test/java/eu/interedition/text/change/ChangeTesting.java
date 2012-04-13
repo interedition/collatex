@@ -9,23 +9,19 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.event.TextAdapter;
-import eu.interedition.text.mem.SimpleName;
-import eu.interedition.text.query.Criteria;
-import eu.interedition.text.util.Annotations;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.query.AnnotationListenerAdapter;
+import eu.interedition.text.query.QueryCriteria;
 import eu.interedition.text.util.Ranges;
 import eu.interedition.text.xml.XML;
-import eu.interedition.text.xml.XMLNodePath;
 import org.junit.Test;
 
 import javax.xml.stream.XMLStreamException;
@@ -45,7 +41,7 @@ import java.util.SortedSet;
 
 import static com.google.common.base.Objects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static eu.interedition.text.query.Criteria.annotationName;
+import static eu.interedition.text.query.QueryCriteria.annotationName;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -76,7 +72,7 @@ public class ChangeTesting extends AbstractTestResourceTest {
       Reader xmlStream = null;
       XMLStreamReader xml = null;
       try {
-        xmlStream = textRepository.read(source(testFile.toURI())).getInput();
+        xmlStream = source(testFile.toURI()).read().getInput();
         changeSets.addAll(ChangeSet.readDeclarations(xml = xmlInputFactory.createXMLStreamReader(xmlStream)));
       } finally {
         XML.closeQuietly(xml);
@@ -88,17 +84,17 @@ public class ChangeTesting extends AbstractTestResourceTest {
       final Text testText = text(testFile.toURI());
 
       final Multimap<String, ChangeAdapter> changes = HashMultimap.create();
-      textRepository.read(testText, Criteria.or(
-              annotationName(new SimpleName(TextConstants.TEI_NS, "add")),
-              annotationName(new SimpleName(TextConstants.TEI_NS, "del")),
-              annotationName(new SimpleName(TextConstants.TEI_NS, "subst")),
-              annotationName(new SimpleName(TextConstants.TEI_NS, "restore"))
-      ), new TextAdapter() {
+      QueryCriteria.or(
+              annotationName(new Name(TextConstants.TEI_NS, "add")),
+              annotationName(new Name(TextConstants.TEI_NS, "del")),
+              annotationName(new Name(TextConstants.TEI_NS, "subst")),
+              annotationName(new Name(TextConstants.TEI_NS, "restore"))
+      ).listen(sessionFactory.getCurrentSession(), testText, new AnnotationListenerAdapter() {
         private Deque<ChangeAdapter> parents = new ArrayDeque<ChangeAdapter>();
 
         @Override
         public void start(long offset, Iterable<Annotation> annotations) {
-          for (Annotation annotation : CHANGE_HIERARCHY_ORDERING.immutableSortedCopy(annotations)) {
+          for (Annotation annotation : Annotation.orderByText(testText).immutableSortedCopy(annotations)) {
             final ChangeAdapter change = new ChangeAdapter(annotation);
 
             final String revisionType = change.getRevisionType();
@@ -141,20 +137,20 @@ public class ChangeTesting extends AbstractTestResourceTest {
       versions.add(before);
       versions.add(after);
 
-      final Iterable<SortedSet<Range>> removedRanges = new Iterable<SortedSet<Range>>() {
+      final Iterable<SortedSet<TextRange>> removedRanges = new Iterable<SortedSet<TextRange>>() {
 
         @Override
-        public Iterator<SortedSet<Range>> iterator() {
-          return new AbstractIterator<SortedSet<Range>>() {
+        public Iterator<SortedSet<TextRange>> iterator() {
+          return new AbstractIterator<SortedSet<TextRange>>() {
             private int version = 0;
 
             @Override
-            protected SortedSet<Range> computeNext() {
+            protected SortedSet<TextRange> computeNext() {
               if (version > versions.size()) {
                 return endOfData();
               }
 
-              final SortedSet<Range> rangesToRemove = Sets.newTreeSet();
+              final SortedSet<TextRange> rangesToRemove = Sets.newTreeSet();
               String toRemove = "del";
               for (int version = 0; version < versions.size(); version++) {
                 if (this.version <= version) {
@@ -164,7 +160,7 @@ public class ChangeTesting extends AbstractTestResourceTest {
                 for (ChangeAdapter changeAdapter : versions.get(version)) {
                   final Name changeName = changeAdapter.getAnnotation().getName();
                   if (toRemove.equals(changeName.getLocalName())) {
-                    rangesToRemove.add(changeAdapter.getAnnotation().getRange());
+                    rangesToRemove.add(changeAdapter.getAnnotation().getTarget());
                   }
                 }
               }
@@ -177,16 +173,16 @@ public class ChangeTesting extends AbstractTestResourceTest {
       };
 
       int version = 0;
-      for (final SortedSet<Range> rangesToRemove : removedRanges) {
+      for (final SortedSet<TextRange> rangesToRemove : removedRanges) {
         final BufferedWriter out = Files.newWriter(new File(OUTPUT_FILE, testFile.getName().replaceAll("\\.xml$", "-" + (version++) + ".txt")), Text.CHARSET);
         try {
-        textRepository.read(testText, Criteria.none(), new TextAdapter() {
+        QueryCriteria.none().listen(sessionFactory.getCurrentSession(), testText, new AnnotationListenerAdapter() {
           @Override
-          public void text(Range r, String text) {
+          public void text(TextRange r, String text) {
             int removed = 0;
             StringBuffer buf = new StringBuffer(text);
-            for (Iterator<Range> it = rangesToRemove.iterator(); it.hasNext(); ) {
-              final Range rangeToRemove = it.next();
+            for (Iterator<TextRange> it = rangesToRemove.iterator(); it.hasNext(); ) {
+              final TextRange rangeToRemove = it.next();
               if (rangeToRemove.precedes(r)) {
                 it.remove();
                 continue;
@@ -194,8 +190,8 @@ public class ChangeTesting extends AbstractTestResourceTest {
                 break;
               }
 
-              final Range overlap = rangeToRemove.overlap(r);
-              final Range shifted = overlap.shift(-(r.getStart() + removed));
+              final TextRange overlap = rangeToRemove.overlap(r);
+              final TextRange shifted = overlap.shift(-(r.getStart() + removed));
               buf.replace((int) shifted.getStart(), (int) shifted.getEnd(), "");
               removed += overlap.length();
             }
@@ -225,9 +221,7 @@ public class ChangeTesting extends AbstractTestResourceTest {
     directory.delete();
   }
 
-  private static final Ordering<Annotation> CHANGE_HIERARCHY_ORDERING = Annotations.RANGE_ORDERING.compound(XMLNodePath.ANNOTATION_COMPARATOR);
-
-  private static final TextAdapter PRINTING_TEXT_LISTENER = new TextAdapter() {
+  private static final AnnotationListenerAdapter PRINTING_TEXT_LISTENER = new AnnotationListenerAdapter() {
 
     @Override
     public void start(long contentLength) {
@@ -241,7 +235,7 @@ public class ChangeTesting extends AbstractTestResourceTest {
     }
 
     @Override
-    public void text(Range r, String text) {
+    public void text(TextRange r, String text) {
       System.out.print(text);
     }
   };

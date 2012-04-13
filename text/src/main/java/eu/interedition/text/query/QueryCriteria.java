@@ -21,56 +21,58 @@ package eu.interedition.text.query;
 
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
+import eu.interedition.text.TextRange;
 import eu.interedition.text.Text;
-
-import java.util.Arrays;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Criteria {
-  public static Criterion any() {
+public class QueryCriteria {
+  public static QueryCriterion any() {
     return new AnyCriterion();
   }
 
-  public static Criterion none() {
+  public static QueryCriterion none() {
     return new NoneCriterion();
   }
 
-  public static Criterion is(Annotation annotation) {
+  public static QueryCriterion is(Annotation annotation) {
     return new AnnotationIdentityCriterion(annotation);
   }
 
-  public static Criterion annotationName(Name name) {
+  public static QueryCriterion annotationName(Name name) {
     return new AnnotationNameCriterion(name);
   }
 
-  public static Criterion linkName(Name name) {
-    return new AnnotationLinkNameCriterion(name);
+  public static QueryCriterion text(Text text) {
+    return new AnnotationTargetTextCriterion(text);
   }
 
-  public static Criterion text(Text text) {
-    return new TextCriterion(text);
-  }
-
-  public static Criterion rangeOverlap(Range range) {
+  public static QueryCriterion rangeOverlap(TextRange range) {
     return new RangeOverlapCriterion(range);
   }
 
-  public static Criterion rangeFitsWithin(Range range) {
+  public static QueryCriterion rangeFitsWithin(TextRange range) {
     return new RangeFitsWithinCriterion(range);
   }
 
-  public static Criterion rangeLength(int length) {
+  public static QueryCriterion rangeLength(int length) {
     return new RangeLengthCriterion(length);
   }
 
-  public static Operator and(Criterion... criteria) {
-    return new AndOperator(Arrays.asList(criteria));
+  public static QueryOperator and(QueryCriterion... criteria) {
+    final AndQueryOperator andOperator = new AndQueryOperator();
+    for (QueryCriterion criterion : criteria) {
+      andOperator.add(criterion);
+    }
+    return andOperator;
   }
 
-  public static Operator or(Criterion... criteria) {
-    return new OrOperator(Arrays.asList(criteria));
+  public static QueryOperator or(QueryCriterion... criteria) {
+    final OrQueryOperator orOperator = new OrQueryOperator();
+    for (QueryCriterion criterion : criteria) {
+      orOperator.add(criterion);
+    }
+    return orOperator;
   }
 }

@@ -19,17 +19,21 @@
  */
 package eu.interedition.text.query;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeLengthCriterion implements Criterion {
+public class RangeLengthCriterion extends QueryCriterion {
   private final long length;
 
   public RangeLengthCriterion(long length) {
     this.length = length;
   }
 
-  public long getLength() {
-    return length;
+  @Override
+  Criterion restrict() {
+    return Restrictions.eq("target.length", length);
   }
 }

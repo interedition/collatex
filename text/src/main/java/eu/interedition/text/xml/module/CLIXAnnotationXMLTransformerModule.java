@@ -19,11 +19,11 @@
  */
 package eu.interedition.text.xml.module;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import eu.interedition.text.Range;
+import eu.interedition.text.Annotation;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.mem.SimpleAnnotation;
+import eu.interedition.text.TextTarget;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 import org.codehaus.jackson.JsonNode;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class CLIXAnnotationXMLTransformerModule extends AbstractAnnotationXMLTransformerModule {
-  private Map<String, SimpleAnnotation> annotations;
+  private Map<String, Annotation> annotations;
 
   public CLIXAnnotationXMLTransformerModule(int batchSize) {
     super(batchSize, false);
@@ -67,12 +67,13 @@ public class CLIXAnnotationXMLTransformerModule extends AbstractAnnotationXMLTra
     final long textOffset = transformer.getTextOffset();
 
     if (startId != null) {
-      annotations.put(startId.toString(), new SimpleAnnotation(transformer.getTarget(), entity.getName(), new Range(textOffset, textOffset), entityAttributes));
+      annotations.put(startId.toString(), new Annotation(entity.getName(), new TextTarget(transformer.getTarget(), textOffset, textOffset), entityAttributes));
     }
     if (endId != null) {
-      final SimpleAnnotation a = annotations.remove(endId.toString());
+      final Annotation a = annotations.remove(endId.toString());
       if (a != null) {
-        add(transformer, a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData());
+        Iterables.getOnlyElement(a.getTargets()).setEnd(textOffset);
+        add(transformer, a);
       }
     }
   }

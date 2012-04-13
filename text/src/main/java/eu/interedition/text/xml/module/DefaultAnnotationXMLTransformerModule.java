@@ -19,8 +19,8 @@
  */
 package eu.interedition.text.xml.module;
 
-import eu.interedition.text.Range;
-import eu.interedition.text.TextRepository;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.TextTarget;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 
@@ -63,8 +63,8 @@ public class DefaultAnnotationXMLTransformerModule extends AbstractAnnotationXML
   @Override
   public void end(XMLTransformer transformer, XMLEntity entity) {
     if (transformer.getInclusionContext().peek()) {
-      final Range range = new Range(startOffsetStack.pop(), transformer.getTextOffset());
-      add(transformer, transformer.getTarget(), entity.getName(), range, entity.getAttributes());
+      final TextTarget target = new TextTarget(transformer.getTarget(), startOffsetStack.pop(), transformer.getTextOffset());
+      add(transformer, new Annotation(entity.getName(), target, entity.getAttributes()));
     }
     super.end(transformer, entity);
   }

@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author <a href="http://gregor.middell.net/"
  *         title="Homepage of Gregor Middell">Gregor Middell</a>
  */
-public class RangeTest {
+public class TextTargetTest {
 
   /**
    * Tests generation of ranges relative to another.

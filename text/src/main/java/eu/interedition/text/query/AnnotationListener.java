@@ -17,19 +17,21 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.util;
+package eu.interedition.text.query;
 
-import eu.interedition.text.AnnotationLink;
-import eu.interedition.text.AnnotationLinkRepository;
 
-import java.util.Arrays;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.TextRange;
 
-/**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
- */
-public abstract class AbstractAnnotationLinkRepository implements AnnotationLinkRepository {
+public interface AnnotationListener {
 
-  public void delete(AnnotationLink... links) {
-    delete(Arrays.asList(links));
-  }
+  void start(long contentLength);
+
+  void start(long offset, Iterable<Annotation> annotations);
+
+  void end(long offset, Iterable<Annotation> annotations);
+
+  void text(TextRange r, String text);
+
+  void end();
 }

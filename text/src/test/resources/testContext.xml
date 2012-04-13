@@ -4,14 +4,40 @@
 
     <bean id="dataSource" class="eu.interedition.text.DataSourceFactoryBean"/>
 
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource"  ref="dataSource"/>
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <array>
+                <value>eu.interedition.text.Annotation</value>
+                <value>eu.interedition.text.Name</value>
+                <value>eu.interedition.text.Text</value>
+                <value>eu.interedition.text.TextTarget</value>
+            </array>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.default_batch_fetch_size">16</prop>
+                <prop key="hibernate.id.new_generator_mappings">true</prop>
+                <prop key="hibernate.jdbc.batch_size">30</prop>
+                <prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.default_cache_concurrency_strategy">transactional</prop>
+            </props>
+        </property>
     </bean>
 
-    <alias name="dataSource" alias="repositoryDataSource"/>
-    <alias name="transactionManager" alias="repositoryTransactionManager"/>
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="xmlSerializer" class="eu.interedition.text.xml.XMLSerializer">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
 
     <bean id="jsonSerializer" class="eu.interedition.text.json.JSONSerializer">
-        <property name="textRepository" ref="textRepository" />
+        <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 </beans>

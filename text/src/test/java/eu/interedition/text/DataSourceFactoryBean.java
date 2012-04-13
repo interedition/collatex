@@ -1,14 +1,9 @@
 package eu.interedition.text;
 
-import eu.interedition.text.rdbms.RelationalDatabaseType;
-import eu.interedition.text.rdbms.RelationalTextRepository;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.jdbc.datasource.init.DataSourceInitializer;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
 
@@ -32,16 +27,6 @@ public class DataSourceFactoryBean extends AbstractFactoryBean<DataSource> {
     } else {
       ds = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
     }
-
-    final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-    populator.setContinueOnError(true);
-    populator.addScript(RelationalDatabaseType.detect(ds).getSchemaResource());
-
-    final DataSourceInitializer initializer = new DataSourceInitializer();
-    initializer.setDataSource(ds);
-    initializer.setDatabasePopulator(populator);
-    initializer.afterPropertiesSet();
-
     return ds;
   }
 }

@@ -19,19 +19,26 @@
  */
 package eu.interedition.text.query;
 
-import eu.interedition.text.Range;
+import eu.interedition.text.TextRange;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeFitsWithinCriterion implements Criterion {
-  private final Range range;
+public class RangeFitsWithinCriterion extends QueryCriterion {
+  private final TextRange range;
 
-  RangeFitsWithinCriterion(Range range) {
+  RangeFitsWithinCriterion(TextRange range) {
     this.range = range;
   }
 
-  public Range getRange() {
-    return range;
+  @Override
+  Criterion restrict() {
+    return Restrictions.and(
+            Restrictions.ge("target.start", range.getStart()),
+            Restrictions.le("target.end", range.getEnd())
+    );
   }
 }

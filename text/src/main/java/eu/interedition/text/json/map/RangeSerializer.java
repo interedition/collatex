@@ -19,7 +19,7 @@
  */
 package eu.interedition.text.json.map;
 
-import eu.interedition.text.Range;
+import eu.interedition.text.TextTarget;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
@@ -29,18 +29,18 @@ import java.io.IOException;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeSerializer extends JsonSerializer<Range> {
+public class RangeSerializer extends JsonSerializer<TextTarget> {
 
   public static final String RANGE_START_FIELD = "s";
   public static final String RANGE_END_FIELD = "e";
 
   @Override
-  public Class<Range> handledType() {
-    return Range.class;
+  public Class<TextTarget> handledType() {
+    return TextTarget.class;
   }
 
   @Override
-  public void serialize(Range value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+  public void serialize(TextTarget value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
     jgen.writeStartObject();
     jgen.writeNumberField(RANGE_START_FIELD, value.getStart());
     jgen.writeNumberField(RANGE_END_FIELD, value.getEnd());

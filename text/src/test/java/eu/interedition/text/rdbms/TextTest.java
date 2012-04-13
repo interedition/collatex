@@ -20,10 +20,7 @@
 package eu.interedition.text.rdbms;
 
 import eu.interedition.text.AbstractTextTest;
-import eu.interedition.text.Text;
 import eu.interedition.text.util.TextDigestingFilterReader;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,5 +34,10 @@ public class TextTest extends AbstractTextTest {
   @Test
   public void digesting() throws Exception {
     Assert.assertEquals(encodeHexString(digest(TEST_TEXT)), encodeHexString(text.getDigest()));
+  }
+
+  @Test
+  public void nullDigest() {
+    Assert.assertEquals(encodeHexString(TextDigestingFilterReader.NULL_DIGEST), encodeHexString(TextDigestingFilterReader.digest("")));
   }
 }

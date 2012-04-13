@@ -19,7 +19,8 @@
  */
 package eu.interedition.text.xml.module;
 
-import eu.interedition.text.Range;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.TextTarget;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformerModule;
 import eu.interedition.text.xml.XMLTransformer;
@@ -52,6 +53,6 @@ public class XMLTransformerModuleAdapter implements XMLTransformerModule {
   public void end(XMLTransformer transformer) {
   }
 
-  public void offsetMapping(XMLTransformer transformer, Range textRange, Range sourceRange) {
+  public void offsetMapping(XMLTransformer transformer, TextRange textRange, TextRange sourceRange) {
   }
 }

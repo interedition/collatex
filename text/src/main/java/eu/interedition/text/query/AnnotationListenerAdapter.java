@@ -17,43 +17,28 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.rdbms;
+package eu.interedition.text.query;
 
-import com.google.common.base.Objects;
-import eu.interedition.text.AnnotationLink;
-import eu.interedition.text.Name;
-import eu.interedition.text.mem.SimpleAnnotationLink;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.query.AnnotationListener;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RelationalAnnotationLink extends SimpleAnnotationLink {
-  protected long id;
-
-  public RelationalAnnotationLink(Name name, long id) {
-    super(name);
-    this.id = id;
+public class AnnotationListenerAdapter implements AnnotationListener {
+  public void start(long contentLength) {
   }
 
-  public long getId() {
-    return id;
+  public void start(long offset, Iterable<Annotation> annotations) {
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(id);
+  public void end(long offset, Iterable<Annotation> annotations) {
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof RelationalAnnotationLink) {
-      return id == ((RelationalAnnotationLink)obj).id;
-    }
-    return super.equals(obj);
+  public void text(TextRange r, String text) {
   }
 
-  @Override
-  public String toString() {
-    return toStringHelper().addValue(id).toString();
+  public void end() {
   }
 }

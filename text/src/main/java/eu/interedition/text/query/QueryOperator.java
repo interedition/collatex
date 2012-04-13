@@ -17,11 +17,37 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text;
+package eu.interedition.text.query;
+
+import com.google.common.collect.Lists;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Junction;
+
+import java.util.List;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public interface AnnotationLink {
-  Name getName();
+public abstract class QueryOperator extends QueryCriterion {
+  protected final List<QueryCriterion> operands = Lists.newLinkedList();
+
+  QueryOperator() {
+  }
+
+  public QueryOperator add(QueryCriterion criterion) {
+    criterion.parent = this;
+    operands.add(criterion);
+    return this;
+  }
+
+  @Override
+  Criterion restrict() {
+    final Junction junction = junction();
+    for (QueryCriterion operand : operands) {
+      junction.add(operand.restrict());
+    }
+    return junction;
+  }
+
+  abstract Junction junction();
 }

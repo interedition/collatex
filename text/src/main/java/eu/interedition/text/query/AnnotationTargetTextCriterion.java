@@ -17,24 +17,24 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text;
+package eu.interedition.text.query;
 
-import eu.interedition.text.Annotation;
-import eu.interedition.text.Name;
-import eu.interedition.text.Range;
+import eu.interedition.text.Text;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
-import java.util.Map;
+/**
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
+public class AnnotationTargetTextCriterion extends QueryCriterion {
+  private final Text text;
 
+  AnnotationTargetTextCriterion(Text text) {
+    this.text = text;
+  }
 
-public interface TextListener {
-
-  void start(long contentLength);
-
-  void start(long offset, Iterable<Annotation> annotations);
-
-  void end(long offset, Iterable<Annotation> annotations);
-
-  void text(Range r, String text);
-
-  void end();
+  @Override
+  Criterion restrict() {
+    return Restrictions.eq("text.id", text.getId());
+  }
 }

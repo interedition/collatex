@@ -19,6 +19,11 @@
  */
 package eu.interedition.text.util;
 
+import com.google.common.collect.AbstractIterator;
+import org.hibernate.Criteria;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
+
 import java.util.Iterator;
 
 /**
@@ -43,5 +48,23 @@ public class SQL {
     }
     sql.append(")");
     return sql.toString();
+  }
+
+  public static <T> Iterable<T> iterate(final Criteria c, Class<T> type) {
+    return new Iterable<T>() {
+      @Override
+      public Iterator<T> iterator() {
+        return new AbstractIterator<T>() {
+
+          final ScrollableResults results = c.scroll(ScrollMode.FORWARD_ONLY);
+
+          @Override
+          @SuppressWarnings("unchecked")
+          protected T computeNext() {
+            return (results.next() ? (T) results.get()[0]: endOfData());
+          }
+        };
+      }
+    };
   }
 }

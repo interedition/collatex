@@ -17,17 +17,17 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.event;
+package eu.interedition.text.query;
 
 import com.google.common.base.Throwables;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.Range;
-import eu.interedition.text.TextListener;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.query.AnnotationListener;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class ExceptionPropagatingTextAdapter implements TextListener {
+public class ExceptionPropagatingAnnotationListenerAdapter implements AnnotationListener {
   public void start(long contentLength) {
     try {
       doStart(contentLength);
@@ -52,7 +52,7 @@ public class ExceptionPropagatingTextAdapter implements TextListener {
     }
   }
 
-  public void text(Range r, String text) {
+  public void text(TextRange r, String text) {
     try {
       doText(r, text);
     } catch (Exception e) {
@@ -77,7 +77,7 @@ public class ExceptionPropagatingTextAdapter implements TextListener {
   protected void doEnd(long offset, Iterable<Annotation> annotations) throws Exception {
   }
 
-  protected void doText(Range r, String text) throws Exception {
+  protected void doText(TextRange r, String text) throws Exception {
   }
 
   protected void doEnd() throws Exception {

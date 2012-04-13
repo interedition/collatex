@@ -25,12 +25,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.mem.SimpleAnnotation;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.TextTarget;
 import org.codehaus.jackson.JsonNode;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ import static eu.interedition.text.TextConstants.XML_TRANSFORM_NAME;
 public class XMLTransformer {
   private static final Logger LOG = LoggerFactory.getLogger(XMLTransformer.class);
   private final XMLInputFactory xmlInputFactory = XML.createXMLInputFactory();
-  private final TextRepository repository;
+  private final SessionFactory sessionFactory;
   private final XMLTransformerConfiguration configuration;
   private final List<XMLTransformerModule> modules;
 
@@ -71,28 +72,30 @@ public class XMLTransformer {
 
   private long sourceOffset;
   private long textOffset;
-  private Range sourceOffsetRange;
-  private Range textOffsetRange;
+  private TextRange sourceOffsetRange;
+  private TextRange textOffsetRange;
 
 
-  public XMLTransformer(TextRepository repository, XMLTransformerConfiguration configuration) {
-    this.repository = repository;
+  public XMLTransformer(SessionFactory sessionFactory, XMLTransformerConfiguration configuration) {
+    this.sessionFactory = sessionFactory;
     this.configuration = configuration;
     this.modules = configuration.getModules();
   }
 
   public Text transform(Text source) throws IOException, XMLStreamException {
     Preconditions.checkArgument(source.getType() == Text.Type.XML);
-    final Annotation layer = Iterables.getFirst(repository.create(new SimpleAnnotation(source, XML_TRANSFORM_NAME, new Range(0, source.getLength()))), null);
+    final Session session = sessionFactory.getCurrentSession();
+
+    final Annotation layer = Iterables.getOnlyElement(Annotation.create(session, new Annotation(XML_TRANSFORM_NAME, new TextTarget(source, 0, source.getLength()), null)));
 
     this.source = source;
-    this.target = repository.create(layer, Text.Type.TXT);
+    this.target = Text.create(session, layer, Text.Type.TXT);
 
     try {
       Reader xmlReader = null;
       XMLStreamReader reader = null;
       try {
-        xmlReader = repository.read(source).getInput();
+        xmlReader = source.read().getInput();
         reader = xmlInputFactory.createXMLStreamReader(xmlReader);
 
         final Stack<XMLEntity> entities = new Stack<XMLEntity>();
@@ -135,7 +138,7 @@ public class XMLTransformer {
       }
       Reader textReader = null;
       try {
-        return repository.write(target, textReader = read());
+        return target.write(session, textReader = read());
       } finally {
         Closeables.close(textReader, false);
       }
@@ -154,8 +157,8 @@ public class XMLTransformer {
     return target;
   }
 
-  public TextRepository getRepository() {
-    return repository;
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
   }
 
   public XMLTransformerConfiguration getConfiguration() {
@@ -273,8 +276,8 @@ public class XMLTransformer {
     sourceOffset = 0;
     textOffset = 0;
 
-    sourceOffsetRange = Range.NULL;
-    textOffsetRange = Range.NULL;
+    sourceOffsetRange = TextRange.NULL;
+    textOffsetRange = TextRange.NULL;
 
     this.nodePath.push(0);
     for (XMLTransformerModule m : modules) {
@@ -392,16 +395,16 @@ public class XMLTransformer {
     final long sourceOffsetRangeLength = sourceOffsetRange.length();
 
     if (addToText == 0 && textOffsetRangeLength == 0) {
-      sourceOffsetRange = new Range(sourceOffsetRange.getStart(), sourceOffsetRange.getEnd() + addToSource);
+      sourceOffsetRange = new TextRange(sourceOffsetRange.getStart(), sourceOffsetRange.getEnd() + addToSource);
     } else if (addToSource == 0 && sourceOffsetRangeLength == 0) {
-      textOffsetRange = new Range(textOffsetRange.getStart(), textOffsetRange.getEnd() + addToText);
+      textOffsetRange = new TextRange(textOffsetRange.getStart(), textOffsetRange.getEnd() + addToText);
     } else if (textOffsetRangeLength == sourceOffsetRangeLength && addToText == addToSource) {
-      sourceOffsetRange = new Range(sourceOffsetRange.getStart(), sourceOffsetRange.getEnd() + addToSource);
-      textOffsetRange = new Range(textOffsetRange.getStart(), textOffsetRange.getEnd() + addToText);
+      sourceOffsetRange = new TextRange(sourceOffsetRange.getStart(), sourceOffsetRange.getEnd() + addToSource);
+      textOffsetRange = new TextRange(textOffsetRange.getStart(), textOffsetRange.getEnd() + addToText);
     } else {
       emitOffsetMapping();
-      sourceOffsetRange = new Range(sourceOffsetRange.getEnd(), sourceOffsetRange.getEnd() + addToSource);
-      textOffsetRange = new Range(textOffsetRange.getEnd(), textOffsetRange.getEnd() + addToText);
+      sourceOffsetRange = new TextRange(sourceOffsetRange.getEnd(), sourceOffsetRange.getEnd() + addToSource);
+      textOffsetRange = new TextRange(textOffsetRange.getEnd(), textOffsetRange.getEnd() + addToText);
     }
 
     this.textOffset += addToText;

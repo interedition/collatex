@@ -19,8 +19,6 @@
  */
 package eu.interedition.text;
 
-import eu.interedition.text.mem.SimpleName;
-
 import javax.xml.XMLConstants;
 import java.net.URI;
 
@@ -29,17 +27,18 @@ import java.net.URI;
  */
 public interface TextConstants {
   final URI XML_NS_URI = URI.create(XMLConstants.XML_NS_URI);
+  final URI XMLNS_ATTRIBUTE_NS_URI = URI.create(XMLConstants.XMLNS_ATTRIBUTE_NS_URI);
   final URI TEI_NS = URI.create("http://www.tei-c.org/ns/1.0");
   final URI INTEREDITION_NS_URI = URI.create("http://interedition.eu/ns");
 
-  final Name XML_ID_ATTR_NAME = new SimpleName(XML_NS_URI, "id");
-  final Name XML_SPACE_ATTR_NAME = new SimpleName(XML_NS_URI, "space");
-  final Name XML_NODE_ATTR_NAME = new SimpleName(XML_NS_URI, "node");
+  final Name XML_ID_ATTR_NAME = new Name(XML_NS_URI, "id");
+  final Name XML_SPACE_ATTR_NAME = new Name(XML_NS_URI, "space");
+  final Name XML_NODE_ATTR_NAME = new Name(XML_NS_URI, "node");
 
   final URI CLIX_NS = URI.create("http://lmnl.net/clix");
   final String CLIX_NS_PREFIX = "c";
-  final Name CLIX_START_ATTR_NAME = new SimpleName(CLIX_NS, "sID");
-  final Name CLIX_END_ATTR_NAME = new SimpleName(CLIX_NS, "eID");
+  final Name CLIX_START_ATTR_NAME = new Name(CLIX_NS, "sID");
+  final Name CLIX_END_ATTR_NAME = new Name(CLIX_NS, "eID");
 
-  final Name XML_TRANSFORM_NAME = new SimpleName(INTEREDITION_NS_URI, "xmlTransformation");
+  final Name XML_TRANSFORM_NAME = new Name(INTEREDITION_NS_URI, "xmlTransformation");
 }

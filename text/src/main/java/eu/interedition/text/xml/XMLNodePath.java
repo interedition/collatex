@@ -4,7 +4,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.mem.SimpleAnnotation;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -50,7 +49,7 @@ public class XMLNodePath extends ArrayDeque<Integer> implements Comparable<XMLNo
   }
 
   public ArrayNode toArrayNode() {
-    final ArrayNode nodePathArray = SimpleAnnotation.JSON.createArrayNode();
+    final ArrayNode nodePathArray = Annotation.JSON.createArrayNode();
     final Iterator<Integer> it = descendingIterator();
     while (it.hasNext()) {
       nodePathArray.add(it.next());

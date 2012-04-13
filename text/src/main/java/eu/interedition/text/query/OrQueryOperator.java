@@ -17,15 +17,21 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text;
+package eu.interedition.text.query;
 
-import java.util.Set;
+import org.hibernate.criterion.Junction;
+import org.hibernate.criterion.Restrictions;
 
+/**
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
+public class OrQueryOperator extends QueryOperator {
+  OrQueryOperator() {
+  }
 
-public interface NameRepository {
-
-  Name get(Name name);
-
-  Set<Name> get(Set<Name> name);
+  @Override
+  Junction junction() {
+    return Restrictions.disjunction();
+  }
 
 }

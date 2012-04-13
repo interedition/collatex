@@ -20,13 +20,12 @@
 package eu.interedition.text.xml.module;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.mem.SimpleName;
+import eu.interedition.text.TextTarget;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 import org.codehaus.jackson.node.ObjectNode;
@@ -44,17 +43,17 @@ public class TEIAwareAnnotationXMLTransformerModule extends AbstractAnnotationXM
   private static final Map<Name, Name> MILESTONE_ELEMENT_UNITS = Maps.newHashMap();
 
   static {
-    MILESTONE_ELEMENT_UNITS.put(new SimpleName(TEI_NS, "pb"), new SimpleName(TEI_NS, "page"));
-    MILESTONE_ELEMENT_UNITS.put(new SimpleName(TEI_NS, "lb"), new SimpleName(TEI_NS, "line"));
-    MILESTONE_ELEMENT_UNITS.put(new SimpleName(TEI_NS, "cb"), new SimpleName(TEI_NS, "column"));
-    MILESTONE_ELEMENT_UNITS.put(new SimpleName(TEI_NS, "gb"), new SimpleName(TEI_NS, "gathering"));
+    MILESTONE_ELEMENT_UNITS.put(new Name(TEI_NS, "pb"), new Name(TEI_NS, "page"));
+    MILESTONE_ELEMENT_UNITS.put(new Name(TEI_NS, "lb"), new Name(TEI_NS, "line"));
+    MILESTONE_ELEMENT_UNITS.put(new Name(TEI_NS, "cb"), new Name(TEI_NS, "column"));
+    MILESTONE_ELEMENT_UNITS.put(new Name(TEI_NS, "gb"), new Name(TEI_NS, "gathering"));
   }
 
-  private static final Name MILESTONE_NAME = new SimpleName(TEI_NS, "milestone");
-  private static final Name MILESTONE_UNIT_ATTR_NAME = new SimpleName(TEI_NS, "unit");
+  private static final Name MILESTONE_NAME = new Name(TEI_NS, "milestone");
+  private static final Name MILESTONE_UNIT_ATTR_NAME = new Name(TEI_NS, "unit");
 
-  private Multimap<String, SimpleAnnotation> spanning;
-  private Map<Name, SimpleAnnotation> milestones;
+  private Multimap<String, Annotation> spanning;
+  private Map<Name, Annotation> milestones;
 
   public TEIAwareAnnotationXMLTransformerModule(int batchSize) {
     super(batchSize, false);
@@ -71,8 +70,9 @@ public class TEIAwareAnnotationXMLTransformerModule extends AbstractAnnotationXM
   public void end(XMLTransformer transformer) {
     final long textOffset = transformer.getTextOffset();
     for (Name milestoneUnit : milestones.keySet()) {
-      final SimpleAnnotation last = milestones.get(milestoneUnit);
-      add(transformer, last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData());
+      final Annotation last = milestones.get(milestoneUnit);
+      Iterables.getOnlyElement(last.getTargets()).setEnd(textOffset);
+      add(transformer, last);
     }
 
     this.milestones = null;
@@ -97,7 +97,7 @@ public class TEIAwareAnnotationXMLTransformerModule extends AbstractAnnotationXM
       for (Iterator<String> it = entityAttributes.getFieldNames(); it.hasNext(); ) {
         final String attrName = it.next();
         if (MILESTONE_UNIT_ATTR_NAME.getLocalName().equals(attrName) || MILESTONE_UNIT_ATTR_NAME.toString().equals(attrName)) {
-          milestoneUnit = new SimpleName(TEI_NS, entityAttributes.get(attrName).toString());
+          milestoneUnit = new Name(TEI_NS, entityAttributes.get(attrName).toString());
           it.remove();
         }
       }
@@ -111,12 +111,13 @@ public class TEIAwareAnnotationXMLTransformerModule extends AbstractAnnotationXM
 
     final long textOffset = state.getTextOffset();
 
-    final SimpleAnnotation last = milestones.get(milestoneUnit);
+    final Annotation last = milestones.get(milestoneUnit);
     if (last != null) {
-      add(state, last.getText(), last.getName(), new Range(last.getRange().getStart(), textOffset), last.getData());
+      Iterables.getOnlyElement(last.getTargets()).setEnd(textOffset);
+      add(state, last);
     }
 
-    milestones.put(milestoneUnit, new SimpleAnnotation(state.getTarget(), milestoneUnit, new Range(textOffset, textOffset), entityAttributes));
+    milestones.put(milestoneUnit, new Annotation(milestoneUnit, new TextTarget(state.getTarget(), textOffset, textOffset), entityAttributes));
   }
 
   protected void handleSpanningElements(XMLEntity entity, XMLTransformer state) {
@@ -141,17 +142,17 @@ public class TEIAwareAnnotationXMLTransformerModule extends AbstractAnnotationXM
 
     if (spanTo != null) {
       final Name name = entity.getName();
-      spanning.put(spanTo, new SimpleAnnotation(
-              state.getTarget(),
-              new SimpleName(name.getNamespace(), name.getLocalName().replaceAll("Span$", "")),
-              new Range(textOffset, textOffset),
+      spanning.put(spanTo, new Annotation(
+              new Name(name.getNamespace(), name.getLocalName().replaceAll("Span$", "")),
+              new TextTarget(state.getTarget(),textOffset, textOffset),
               entityAttributes));
     }
     if (refId != null) {
-      final Iterator<SimpleAnnotation> aIt = spanning.removeAll(refId).iterator();
+      final Iterator<Annotation> aIt = spanning.removeAll(refId).iterator();
       while (aIt.hasNext()) {
-        final SimpleAnnotation a = aIt.next();
-        add(state, a.getText(), a.getName(), new Range(a.getRange().getStart(), textOffset), a.getData());
+        final Annotation a = aIt.next();
+        Iterables.getOnlyElement(a.getTargets()).setEnd(textOffset);
+        add(state, a);
       }
     }
   }

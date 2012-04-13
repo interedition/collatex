@@ -25,9 +25,8 @@ import com.google.common.io.NullOutputStream;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
-import eu.interedition.text.mem.SimpleName;
-import eu.interedition.text.query.Criteria;
-import eu.interedition.text.query.Criterion;
+import eu.interedition.text.query.QueryCriterion;
+import eu.interedition.text.query.QueryCriteria;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import static eu.interedition.text.TextConstants.TEI_NS;
-import static eu.interedition.text.query.Criteria.*;
+import static eu.interedition.text.query.QueryCriteria.*;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -66,7 +65,7 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
   public void clixSerialize() throws Exception {
     final Text testText = text("wp-orpheus1-clix.xml");
 
-    textRepository.delete(and(Criteria.text(testText), rangeLength(0)));
+    and(QueryCriteria.text(testText), rangeLength(0)).delete(sessionFactory.getCurrentSession());
 
     xmlSerializer.serialize(createOutputHandler(), testText, new XMLSerializerConfiguration() {
       public Name getRootName() {
@@ -78,13 +77,13 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
       }
 
       public List<Name> getHierarchy() {
-        return Lists.<Name>newArrayList(
-                new SimpleName((URI) null, "phr"),
-                new SimpleName((URI) null, "s")
+        return Lists.newArrayList(
+                new Name(null, "phr"),
+                new Name(null, "s")
         );
       }
 
-      public Criterion getQuery() {
+      public QueryCriterion getQuery() {
         return any();
       }
     });
@@ -97,10 +96,10 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
   @Test
   public void teiConversion() throws Exception {
     final Text testText = text("george-algabal-tei.xml");
-    textRepository.delete(and(Criteria.text(testText), rangeLength(0)));
+    and(QueryCriteria.text(testText), rangeLength(0)).delete(sessionFactory.getCurrentSession());
     xmlSerializer.serialize(createOutputHandler(), testText, new XMLSerializerConfiguration() {
       public Name getRootName() {
-        return new SimpleName(TEI_NS, "text");
+        return new Name(TEI_NS, "text");
       }
 
       public Map<String, URI> getNamespaceMappings() {
@@ -111,15 +110,15 @@ public class XMLSerializerTest extends AbstractTestResourceTest {
 
       public List<Name> getHierarchy() {
         return Lists.<Name>newArrayList(
-                new SimpleName(TEI_NS, "page"),
-                new SimpleName(TEI_NS, "line")
+                new Name(TEI_NS, "page"),
+                new Name(TEI_NS, "line")
         );
       }
 
-      public Criterion getQuery() {
+      public QueryCriterion getQuery() {
         return or(
-                annotationName(new SimpleName(TEI_NS, "page")),
-                annotationName(new SimpleName(TEI_NS, "line"))
+                annotationName(new Name(TEI_NS, "page")),
+                annotationName(new Name(TEI_NS, "line"))
         );
       }
     });

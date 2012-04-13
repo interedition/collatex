@@ -19,7 +19,8 @@
  */
 package eu.interedition.text.xml;
 
-import eu.interedition.text.Range;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.TextTarget;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -41,5 +42,5 @@ public interface XMLTransformerModule {
 
   void end(XMLTransformer transformer);
 
-  void offsetMapping(XMLTransformer transformer, Range textRange, Range sourceRange);
+  void offsetMapping(XMLTransformer transformer, TextRange textRange, TextRange sourceRange);
 }

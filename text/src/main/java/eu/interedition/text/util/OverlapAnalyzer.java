@@ -17,16 +17,17 @@
  * limitations under the License.
  * #L%
  */
-package eu.interedition.text.event;
+package eu.interedition.text.util;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.event.TextAdapter;
-import eu.interedition.text.query.Criteria;
+import eu.interedition.text.TextTarget;
+import eu.interedition.text.query.AnnotationListenerAdapter;
+import eu.interedition.text.query.QueryCriteria;
+import org.hibernate.Session;
 
 import java.io.IOException;
 import java.util.Set;
@@ -35,13 +36,13 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class OverlapAnalyzer extends TextAdapter {
+public class OverlapAnalyzer extends AnnotationListenerAdapter {
   protected Set<Name> selfOverlapping;
   protected Set<SortedSet<Name>> overlapping;
   protected Set<Annotation> started;
 
-  public OverlapAnalyzer analyze(TextRepository repository, Text text) throws IOException {
-    repository.read(text, Criteria.any(), this);
+  public OverlapAnalyzer analyze(Session session, Text text) throws IOException {
+    QueryCriteria.any().listen(session, text, this);
     return this;
   }
 
@@ -73,13 +74,17 @@ public class OverlapAnalyzer extends TextAdapter {
 
     for (Annotation ending : annotations) {
       final Name endingName = ending.getName();
-      for (Annotation started : this.started) {
-        final Name startedName = started.getName();
-        if (!started.getRange().encloses(ending.getRange())) {
-          if (startedName.equals(endingName)) {
-            selfOverlapping.add(endingName);
-          } else {
-            overlapping.add(Sets.newTreeSet(Sets.newHashSet(startedName, endingName)));
+      for (TextTarget endingTarget : ending.getTargets()) {
+        for (Annotation started : this.started) {
+          final Name startedName = started.getName();
+          for (TextTarget startedTarget : started.getTargets()) {
+            if (!startedTarget.encloses(endingTarget)) {
+              if (startedName.equals(endingName)) {
+                selfOverlapping.add(endingName);
+              } else {
+                overlapping.add(Sets.newTreeSet(Sets.newHashSet(startedName, endingName)));
+              }
+            }
           }
         }
       }

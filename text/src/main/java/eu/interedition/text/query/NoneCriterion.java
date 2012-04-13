@@ -19,10 +19,18 @@
  */
 package eu.interedition.text.query;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class NoneCriterion implements Criterion {
+public class NoneCriterion extends QueryCriterion {
   NoneCriterion() {
+  }
+
+  @Override
+  Criterion restrict() {
+    return Restrictions.sqlRestriction("1 <> 1");
   }
 }

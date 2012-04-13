@@ -5,15 +5,17 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.mem.SimpleName;
+import eu.interedition.text.Name;
 import org.codehaus.jackson.JsonNode;
+
+import java.net.URI;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class ChangeAdapter {
-  private static final String REVISION_TYPE = new SimpleName("http://www.faustedition.net/ns", "revType").toString();
-  private static final String CHANGE_SET_REF = new SimpleName("http://www.tei-c.org/ns/geneticEditions", "stage").toString();
+  private static final String REVISION_TYPE = new Name(URI.create("http://www.faustedition.net/ns"), "revType").toString();
+  private static final String CHANGE_SET_REF = new Name(URI.create("http://www.tei-c.org/ns/geneticEditions"), "stage").toString();
 
   private final Annotation annotation;
   private String revisionType;

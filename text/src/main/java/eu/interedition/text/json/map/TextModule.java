@@ -1,24 +1,24 @@
 package eu.interedition.text.json.map;
 
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
+import eu.interedition.text.TextTarget;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.module.SimpleModule;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextSerializerModule extends SimpleModule {
+public class TextModule extends SimpleModule {
 
-  public TextSerializerModule() {
-    super(TextSerializerModule.class.getPackage().getName(), new Version(1, 0, 0, ""));
+  public TextModule() {
+    super(TextModule.class.getPackage().getName(), Version.unknownVersion());
     addSerializer(new TextSerializer());
     addSerializer(new NameSerializer());
     addSerializer(new RangeSerializer());
     addSerializer(new AnnotationSerializer());
 
     addDeserializer(Name.class, new NameDeserializer());
-    addDeserializer(Range.class, new RangeDeserializer());
+    addDeserializer(TextTarget.class, new RangeDeserializer());
   }
 
 }

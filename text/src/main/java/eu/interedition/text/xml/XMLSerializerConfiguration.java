@@ -20,7 +20,7 @@
 package eu.interedition.text.xml;
 
 import eu.interedition.text.Name;
-import eu.interedition.text.query.Criterion;
+import eu.interedition.text.query.QueryCriterion;
 
 import java.net.URI;
 import java.util.List;
@@ -37,5 +37,5 @@ public interface XMLSerializerConfiguration {
 
   List<Name> getHierarchy();
 
-  Criterion getQuery();
+  QueryCriterion getQuery();
 }

@@ -1,5 +1,6 @@
 package eu.interedition.text.json.map;
 
+import com.google.common.collect.Iterables;
 import eu.interedition.text.Annotation;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
@@ -25,7 +26,7 @@ public class AnnotationSerializer extends JsonSerializer<Annotation> {
   public void serialize(Annotation value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
     jgen.writeStartObject();
     jgen.writeObjectField(NAME_FIELD, value.getName());
-    jgen.writeObjectField(RANGE_FIELD, value.getRange());
+    jgen.writeObjectField(RANGE_FIELD, Iterables.getFirst(value.getTargets(), null));
     jgen.writeEndObject();
   }
 }

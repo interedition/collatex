@@ -4,6 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import eu.interedition.text.Text;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.FilterReader;
@@ -63,6 +64,7 @@ public class TextDigestingFilterReader extends FilterReader {
   public byte[] digest() {
     if (result == null) {
       result = digest.digest();
+      digest.reset();
     }
     return result;
   }

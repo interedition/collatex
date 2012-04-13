@@ -23,32 +23,29 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
 import eu.interedition.text.Text;
-import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.mem.SimpleName;
-import eu.interedition.text.util.Names;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextTarget;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ObjectNode;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamReader;
-
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 
-import static eu.interedition.text.mem.SimpleAnnotation.JSON;
+import static eu.interedition.text.Annotation.JSON;
+import static eu.interedition.text.TextConstants.XML_NS_URI;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
-import static javax.xml.XMLConstants.XML_NS_URI;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLEntity {
-  public static final Name COMMENT_QNAME = new SimpleName(XML_NS_URI, "comment");
+  public static final Name COMMENT_QNAME = new Name(XML_NS_URI, "comment");
 
-  public static final Name PI_QNAME = new SimpleName(XML_NS_URI, "pi");
+  public static final Name PI_QNAME = new Name(XML_NS_URI, "pi");
 
   public static final String PI_TARGET_ATTR = "xml:piTarget";
   public static final String PI_DATA_ATTR = "xml:piData";
@@ -97,14 +94,14 @@ public class XMLEntity {
   }
 
   public static XMLEntity newElement(XMLStreamReader reader) {
-    return new XMLEntity(new SimpleName(reader.getName()), XMLConstants.DEFAULT_NS_PREFIX, attributesToData(reader));
+    return new XMLEntity(new Name(reader.getName()), XMLConstants.DEFAULT_NS_PREFIX, attributesToData(reader));
   }
 
   public static ObjectNode attributesToData(XMLStreamReader reader) {
     final int attributeCount = reader.getAttributeCount();
     final Map<Name, String> attributes = Maps.newHashMapWithExpectedSize(attributeCount);
     for (int ac = 0; ac < attributeCount; ac++) {
-      attributes.put(new SimpleName(reader.getAttributeName(ac)), reader.getAttributeValue(ac));
+      attributes.put(new Name(reader.getAttributeName(ac)), reader.getAttributeValue(ac));
     }
     return attributesToData(attributes);
   }
@@ -127,7 +124,7 @@ public class XMLEntity {
       try {
         final String attrName = attrNameIt.next();
         final JsonNode value = data.get(attrName);
-        attributes.put(Names.fromString(attrName), value.isTextual() ? value.getTextValue() : value.toString());
+        attributes.put(Name.fromString(attrName), value.isTextual() ? value.getTextValue() : value.toString());
       } catch (IllegalArgumentException e) {
       }
     }
@@ -135,7 +132,7 @@ public class XMLEntity {
   }
 
   public Annotation toAnnotation(Text text, long offset) {
-    return new SimpleAnnotation(text, name, new Range(offset, offset), attributes);
+    return new Annotation(name, new TextTarget(text, offset, offset), attributes);
   }
 
   @Override

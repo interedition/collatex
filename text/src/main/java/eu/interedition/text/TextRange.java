@@ -1,29 +1,9 @@
-/*
- * #%L
- * Text: A text model with range-based markup via standoff annotations.
- * %%
- * Copyright (C) 2010 - 2011 The Interedition Development Group
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
 package eu.interedition.text;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-import java.io.Serializable;
 import java.util.SortedSet;
 
 /**
@@ -52,24 +32,27 @@ import java.util.SortedSet;
  * <p/>
  * Apart from encapsulating the offset values denoting the segment, objects of this class also have methods to apply <a href=
  * "http://www.mind-to-mind.com/library/papers/ara/core-range-algebra-03-2002.pdf" title="Nicol: Core Range Algebra (PDF)">Gavin
- * Nicols' Core Range Algebra</a>. These methods like {@link #encloses(Range)} or {@link #hasOverlapWith(Range)} define
+ * Nicols' Core Range Algebra</a>. These methods like {@link #encloses(TextRange)} or {@link #hasOverlapWith(TextRange)} define
  * relationships between text segments, which can be used for example to filter sets of range annotations.
  *
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  * @see CharSequence#subSequence(int, int)
  */
-public class Range implements Comparable<Range> {
-  public static final Range NULL = new Range(0, 0);
+public class TextRange implements Comparable<TextRange> {
+  public static final TextRange NULL = new TextRange(0, 0);
 
   /**
    * The start offset of the segment (counted from zero, inclusive).
    */
-  private final long start;
+  protected long start;
 
   /**
    * The end offset of the segment (counted from zero, exclusive).
    */
-  private final long end;
+  protected long end;
+
+  public TextRange() {
+  }
 
   /**
    * Creates a text segment address.
@@ -79,7 +62,7 @@ public class Range implements Comparable<Range> {
    * @throws IllegalArgumentException if <code>start</code> or <code>end</code> or lower than zero, or if <code>start</code> is greather than
    *                                  <code>end</code>
    */
-  public Range(long start, long end) {
+  public TextRange(long start, long end) {
     if (start < 0 || end < 0 || start > end) {
       throw new IllegalArgumentException(toString(start, end));
     }
@@ -92,7 +75,7 @@ public class Range implements Comparable<Range> {
    *
    * @param b the segment address to be copied
    */
-  public Range(Range b) {
+  public TextRange(TextRange b) {
     this(b.start, b.end);
   }
 
@@ -100,8 +83,16 @@ public class Range implements Comparable<Range> {
     return start;
   }
 
+  public void setStart(long start) {
+    this.start = start;
+  }
+
   public long getEnd() {
     return end;
+  }
+
+  public void setEnd(long end) {
+    this.end = end;
   }
 
   /**
@@ -119,7 +110,7 @@ public class Range implements Comparable<Range> {
    * @param b b range
    * @return <code>true</code>/<code>false</code>
    */
-  public boolean encloses(Range b) {
+  public boolean encloses(TextRange b) {
     return (start <= b.start) && (end >= b.end);
   }
 
@@ -129,7 +120,7 @@ public class Range implements Comparable<Range> {
    * @param b b range
    * @return <code>true</code>/<code>false</code>
    */
-  public boolean enclosesWithSuffix(Range b) {
+  public boolean enclosesWithSuffix(TextRange b) {
     return (start == b.start) && (end > b.end);
   }
 
@@ -139,7 +130,7 @@ public class Range implements Comparable<Range> {
    * @param b b range
    * @return <code>true</code>/<code>false</code>
    */
-  public boolean enclosesWithPrefix(Range b) {
+  public boolean enclosesWithPrefix(TextRange b) {
     return (start < b.start) && (end == b.end);
   }
 
@@ -149,7 +140,7 @@ public class Range implements Comparable<Range> {
    * @param b b range
    * @return <code>true</code>/<code>false</code>
    */
-  public boolean fitsWithin(Range b) {
+  public boolean fitsWithin(TextRange b) {
     return !equals(b) && (start >= b.start) && (end <= b.end);
   }
 
@@ -159,8 +150,8 @@ public class Range implements Comparable<Range> {
    * @param b b range
    * @return <code>true</code>/<code>false</code>
    */
-  public boolean hasOverlapWith(Range b) {
-    final Range overlap = overlap(b);
+  public boolean hasOverlapWith(TextRange b) {
+    final TextRange overlap = overlap(b);
     return (overlap != null) && (overlap.length() > 0);
   }
 
@@ -170,8 +161,8 @@ public class Range implements Comparable<Range> {
    * @param b another segment
    * @return <i>[max(a.start, b.start), min(a.end, b.end)]</i>
    */
-  public Range intersectionWith(Range b) {
-    return new Range(Math.max(start, b.start), Math.min(end, b.end));
+  public TextRange intersectionWith(TextRange b) {
+    return new TextRange(Math.max(start, b.start), Math.min(end, b.end));
   }
 
   /**
@@ -180,10 +171,10 @@ public class Range implements Comparable<Range> {
    * @param b b range
    * @return length of overlap
    */
-  public Range overlap(Range b) {
+  public TextRange overlap(TextRange b) {
     final long start = Math.max(this.start, b.start);
     final long end = Math.min(this.end, b.end);
-    return ((end - start) >= 0 ? new Range(start, end) : null);
+    return ((end - start) >= 0 ? new TextRange(start, end) : null);
   }
 
   /**
@@ -192,7 +183,7 @@ public class Range implements Comparable<Range> {
    * @param b b range
    * @return <code>true</code>/<code>false</code>
    */
-  public boolean precedes(Range b) {
+  public boolean precedes(TextRange b) {
     return b.start >= end;
   }
 
@@ -202,12 +193,12 @@ public class Range implements Comparable<Range> {
    * @param b b range
    * @return <code>true</code>/<code>false</code>
    */
-  public boolean follows(Range b) {
+  public boolean follows(TextRange b) {
     return (start >= (b.end - 1));
   }
 
-  public Range shift(long delta) {
-    return new Range(start + delta, end + delta);
+  public TextRange shift(long delta) {
+    return new TextRange(start + delta, end + delta);
   }
 
   /**
@@ -215,7 +206,7 @@ public class Range implements Comparable<Range> {
    *
    * @see Comparable#compareTo(Object)
    */
-  public int compareTo(Range o) {
+  public int compareTo(TextRange o) {
     final long result = (start == o.start ? o.end - end : start - o.start);
     return (result < 0 ? -1 : (result > 0 ? 1 : 0));
   }
@@ -227,11 +218,11 @@ public class Range implements Comparable<Range> {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null || !(obj instanceof Range)) {
+    if (obj == null || !(obj instanceof TextRange)) {
       return super.equals(obj);
     }
 
-    Range b = (Range) obj;
+    TextRange b = (TextRange) obj;
     return (this.start == b.start) && (this.end == b.end);
   }
 
@@ -251,22 +242,23 @@ public class Range implements Comparable<Range> {
     return toString(start, end);
   }
 
-  public SortedSet<Range> substract(Range subtrahend) {
+  public SortedSet<TextRange> substract(TextRange subtrahend) {
     Preconditions.checkArgument(hasOverlapWith(subtrahend));
 
-    final SortedSet<Range> remainders = Sets.newTreeSet();
+    final SortedSet<TextRange> remainders = Sets.newTreeSet();
     if (fitsWithin(subtrahend)) {
       return remainders;
     }
     if (enclosesWithPrefix(subtrahend)) {
-      remainders.add(new Range(subtrahend.start, end));
+      remainders.add(new TextRange(subtrahend.start, end));
     } else if (enclosesWithSuffix(subtrahend)) {
-      remainders.add(new Range(start, subtrahend.end));
+      remainders.add(new TextRange(start, subtrahend.end));
     } else {
-      remainders.add(new Range(start, subtrahend.start));
-      remainders.add(new Range(subtrahend.end, end));
+      remainders.add(new TextRange(start, subtrahend.start));
+      remainders.add(new TextRange(subtrahend.end, end));
     }
 
     return remainders;
   }
+
 }
