@@ -1,24 +1,44 @@
 package eu.interedition.collatex.MatrixLinker;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.Maps;
+
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.MatrixLinker.MatchMatrix.Island;
 import eu.interedition.collatex.dekker.TokenLinker;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.Matches;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-
 public class MatchMatrixLinker implements TokenLinker {
 
   @Override
-  public Map<Token, VariantGraphVertex> link(VariantGraph base,
-                                             Iterable<Token> witness, Comparator<Token> comparator) {
+  public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     // TODO Auto-generated method stub
 
-    buildMatrix(base, witness, comparator);
-    return null;
+    MatchMatrix buildMatrix = buildMatrix(base, witness, comparator);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+    for (MatchMatrix.Island isl : buildMatrix.getIslands()) {
+      archipelago.add(isl);
+    }
+    Archipelago createFirstVersion = archipelago.createFirstVersion();
+    ArrayList<Island> iterator = createFirstVersion.iterator();
+    // bepaal kleur cel ahv firstversion
+    //    int mat[] = new int[rowNum()];
+    //
+    //    for (Island island : iterator) {
+    //      island.ge
+    //    }
+    //    ArrayList<Coordinates> gaps = createFirstVersion.findGaps();
+    //    for (Coordinates coordinates : gaps) {
+    //      coordinates.
+    //    }
+    Map<Token, VariantGraphVertex> map = Maps.newHashMap();
+    return map;
   }
 
   public static MatchMatrix buildMatrix(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {

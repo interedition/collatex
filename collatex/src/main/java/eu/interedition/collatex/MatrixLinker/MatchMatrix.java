@@ -1,27 +1,30 @@
 package eu.interedition.collatex.MatrixLinker;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ArrayTable;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraphVertex;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ArrayTable;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.lab.Status;
+
 public class MatchMatrix {
 
-  private ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
+  private final ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
   public MatchMatrix(Iterable<VariantGraphVertex> vertices, Iterable<Token> witness) {
     sparseMatrix = ArrayTable.create(vertices, witness);
   }
 
-  public boolean at(int row, int column) {
-    return Objects.firstNonNull(sparseMatrix.at(row, column), false);
+  public Status at(int row, int column) {
+    Boolean firstNonNull = Objects.firstNonNull(sparseMatrix.at(row, column), false);
+    return firstNonNull ? Status.OPTIONAL_MATCH : Status.EMPTY;
   }
 
   public void set(int row, int column, boolean value) {
@@ -61,7 +64,7 @@ public class MatchMatrix {
     for (String label : rLabels) {
       result += "<tr><td>" + label + "</td>";
       for (int col = 0; col < colNum; col++)
-        if (at(row, col))
+        if (!at(row, col).equals(Status.EMPTY))
           result += "<td BGCOLOR=\"lightgreen\">M</td>";
         else
           result += "<td></td>";
@@ -71,7 +74,6 @@ public class MatchMatrix {
     result += "</table>";
     return result;
   }
-
 
   public String toHtml(Archipelago arch) {
     int mat[] = new int[rowNum()];
@@ -131,8 +133,7 @@ public class MatchMatrix {
     int cols = colNum();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (at(i, j))
-          pairs.add(new Coordinates(j, i));
+        if (!at(i, j).equals(Status.EMPTY)) pairs.add(new Coordinates(j, i));
       }
     }
     return pairs;
@@ -146,25 +147,23 @@ public class MatchMatrix {
     return columnLabels().size();
   }
 
-
   public ArrayList<Island> getIslands() {
     ArrayList<Island> islands = new ArrayList<Island>();
     ArrayList<Coordinates> allTrue = allTrues();
     for (Coordinates c : allTrue) {
-//			System.out.println("next coordinate: "+c);
+      //			System.out.println("next coordinate: "+c);
       boolean found = false;
       while (!found) {
         for (Island alc : islands) {
-//					System.out.println("inspect island");
+          //					System.out.println("inspect island");
           if (alc.neighbour(c)) {
             alc.add(c);
             found = true;
           }
-          if (found)
-            break;
+          if (found) break;
         }
         if (!found) {
-//					System.out.println("new island");
+          //					System.out.println("new island");
           Island island = new Island();
           island.add(c);
           islands.add(island);
@@ -246,11 +245,10 @@ public class MatchMatrix {
    */
   public static class Island implements Iterable<Coordinates> {
 
-    private int direction = 0;
-    private List<Coordinates> island = Lists.newArrayList();
+    private int                     direction = 0;
+    private final List<Coordinates> island    = Lists.newArrayList();
 
-    public Island() {
-    }
+    public Island() {}
 
     public Island(Island other) {
       for (Coordinates c : other.island) {
@@ -271,8 +269,7 @@ public class MatchMatrix {
           Coordinates existing = island.get(0);
           if (existing.column != coordinates.column) {
             int new_direction = (existing.row - coordinates.row) / (existing.column - coordinates.column);
-            if (new_direction == direction)
-              result = island.add(coordinates);
+            if (new_direction == direction) result = island.add(coordinates);
           }
         }
       }
@@ -293,16 +290,14 @@ public class MatchMatrix {
 
     public Coordinates getCoorOnRow(int row) {
       for (Coordinates coor : island) {
-        if (coor.getRow() == row)
-          return coor;
+        if (coor.getRow() == row) return coor;
       }
       return null;
     }
 
     public Coordinates getCoorOnCol(int col) {
       for (Coordinates coor : island) {
-        if (coor.getColumn() == col)
-          return coor;
+        if (coor.getColumn() == col) return coor;
       }
       return null;
     }
@@ -320,8 +315,7 @@ public class MatchMatrix {
     public boolean isCompetitor(Island isl) {
       for (Coordinates c : isl) {
         for (Coordinates d : island) {
-          if (c.sameColumn(d) || c.sameRow(d))
-            return true;
+          if (c.sameColumn(d) || c.sameRow(d)) return true;
         }
       }
       return false;
@@ -332,8 +326,7 @@ public class MatchMatrix {
     }
 
     public boolean neighbour(Coordinates c) {
-      if (contains(c))
-        return false;
+      if (contains(c)) return false;
       for (Coordinates islC : island) {
         if (c.bordersOn(islC)) {
           return true;
@@ -345,8 +338,7 @@ public class MatchMatrix {
     public Coordinates getLeftEnd() {
       Coordinates coor = island.get(0);
       for (Coordinates c : island) {
-        if (c.column < coor.column)
-          coor = c;
+        if (c.column < coor.column) coor = c;
       }
       return coor;
     }
@@ -354,8 +346,7 @@ public class MatchMatrix {
     public Coordinates getRightEnd() {
       Coordinates coor = island.get(0);
       for (Coordinates c : island) {
-        if (c.column > coor.column)
-          coor = c;
+        if (c.column > coor.column) coor = c;
       }
       return coor;
     }
@@ -372,8 +363,7 @@ public class MatchMatrix {
           remove.add(coor);
         }
       }
-      if (remove.isEmpty())
-        return false;
+      if (remove.isEmpty()) return false;
       for (Coordinates coor : remove) {
         island.remove(coor);
       }
@@ -382,8 +372,7 @@ public class MatchMatrix {
 
     public boolean overlap(Island isl) {
       for (Coordinates c : isl) {
-        if (contains(c) || neighbour(c))
-          return true;
+        if (contains(c) || neighbour(c)) return true;
       }
       return false;
     }
@@ -403,8 +392,7 @@ public class MatchMatrix {
 
     @Override
     public boolean equals(Object obj) {
-      if (!obj.getClass().equals(Island.class))
-        return false;
+      if (!obj.getClass().equals(Island.class)) return false;
       Island isl = (Island) obj;
       boolean result = true;
       for (Coordinates c : isl) {

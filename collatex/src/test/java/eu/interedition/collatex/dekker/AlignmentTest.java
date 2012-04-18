@@ -19,28 +19,32 @@
  */
 package eu.interedition.collatex.dekker;
 
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.simple.SimpleToken;
-import java.util.List;
-import com.google.common.collect.RowSortedTable;
-import eu.interedition.collatex.*;
-import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Test;
-
-import java.util.Set;
-
 import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
-import eu.interedition.collatex.simple.WhitespaceAndPunctuationTokenizer;
+import static org.junit.Assert.assertEquals;
+
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import com.google.common.collect.RowSortedTable;
+
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
+import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.simple.WhitespaceAndPunctuationTokenizer;
 
 public class AlignmentTest extends AbstractTest {
 
@@ -71,9 +75,9 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void additionInCombinationWithTransposition() {
     final SimpleWitness[] w = createWitnesses(//
-            "the cat is very happy",//
-            "very happy is the cat",//
-            "very delitied and happy is the cat");
+        "the cat is very happy",//
+        "very happy is the cat",//
+        "very delitied and happy is the cat");
     final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
     assertEquals("|the|cat| | |is|very|happy|", toString(t, w[0]));
     assertEquals("|very| | |happy|is|the|cat|", toString(t, w[1]));
@@ -83,9 +87,9 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void additionInCombinationWithTransposition2() {
     final SimpleWitness[] w = createWitnesses(//
-            "the cat is black",//
-            "black is the cat",//
-            "black and white is the cat");
+        "the cat is black",//
+        "black is the cat",//
+        "black and white is the cat");
     final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
     assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
     assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
@@ -95,8 +99,8 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void simpleTransposition() {
     final SimpleWitness[] w = createWitnesses(//
-            "A black cat in a white basket",//
-            "A white cat in a black basket");
+        "A black cat in a white basket",//
+        "A white cat in a black basket");
     final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
     assertEquals("|A|black|cat|in|a|white|basket|", toString(t, w[0]));
     assertEquals("|A|white|cat|in|a|black|basket|", toString(t, w[1]));
@@ -122,9 +126,7 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void testOrderIndependence() {
-    final SimpleWitness[] w = createWitnesses("Hello cruel world",
-            "Hello nice world",
-            "Hello nice cruel world");
+    final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
     VariantGraph graph = collate(w[0], w[1]);
     collate(graph, w[2]);
     List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
@@ -170,7 +172,7 @@ public class AlignmentTest extends AbstractTest {
     collationAlgorithm.collate(graph, witnesses.toArray(new SimpleWitness[0]));
 
     StringWriter writer = new StringWriter();
-    XMLStreamWriter swriter = XMLOutputFactory.newFactory().createXMLStreamWriter(writer);
+    XMLStreamWriter swriter = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
     SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(graph);
     serializer.toGraphML(swriter);
   }
