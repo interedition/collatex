@@ -12,7 +12,6 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.lab.Status;
 
 public class MatchMatrix {
 
@@ -22,9 +21,9 @@ public class MatchMatrix {
     sparseMatrix = ArrayTable.create(vertices, witness);
   }
 
-  public Status at(int row, int column) {
+  public MatchMatrixCellStatus at(int row, int column) {
     Boolean firstNonNull = Objects.firstNonNull(sparseMatrix.at(row, column), false);
-    return firstNonNull ? Status.OPTIONAL_MATCH : Status.EMPTY;
+    return firstNonNull ? MatchMatrixCellStatus.OPTIONAL_MATCH : MatchMatrixCellStatus.EMPTY;
   }
 
   public void set(int row, int column, boolean value) {
@@ -64,7 +63,7 @@ public class MatchMatrix {
     for (String label : rLabels) {
       result += "<tr><td>" + label + "</td>";
       for (int col = 0; col < colNum; col++)
-        if (!at(row, col).equals(Status.EMPTY))
+        if (!at(row, col).equals(MatchMatrixCellStatus.EMPTY))
           result += "<td BGCOLOR=\"lightgreen\">M</td>";
         else
           result += "<td></td>";
@@ -133,7 +132,7 @@ public class MatchMatrix {
     int cols = colNum();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (!at(i, j).equals(Status.EMPTY)) pairs.add(new Coordinates(j, i));
+        if (!at(i, j).equals(MatchMatrixCellStatus.EMPTY)) pairs.add(new Coordinates(j, i));
       }
     }
     return pairs;

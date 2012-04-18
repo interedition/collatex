@@ -35,6 +35,7 @@ import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matrixlinker.MatchMatrixLinker;
+import eu.interedition.collatex.matrixlinker.MatchMatrixCellStatus;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
 
@@ -269,7 +270,7 @@ public class CollateXLaboratory extends JFrame {
                                                                           label.setOpaque(true);
                                                                           label.getInsets().set(5, 5, 5, 5);
                                                                         }
-                                                                        switch ((Status) value) {
+                                                                        switch ((MatchMatrixCellStatus) value) {
                                                                           case PREFERRED_MATCH:
                                                                             label.setBackground(isSelected ? Color.GREEN : Color.GREEN.darker());
                                                                             break;
