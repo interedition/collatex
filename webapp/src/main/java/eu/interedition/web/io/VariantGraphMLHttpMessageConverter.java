@@ -1,12 +1,12 @@
 package eu.interedition.web.io;
 
-import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphEdge;
-import eu.interedition.collatex.graph.VariantGraphTransposition;
-import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -14,12 +14,10 @@ import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Map;
+import com.google.common.io.Closeables;
+
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -30,7 +28,7 @@ public class VariantGraphMLHttpMessageConverter extends AbstractHttpMessageConve
    */
   protected static final MediaType APPLICATION_XML_GRAPHML = new MediaType("application", "graphml+xml");
 
-  private final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
+  private final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
   public VariantGraphMLHttpMessageConverter() {
     super(APPLICATION_XML_GRAPHML);
@@ -63,8 +61,7 @@ public class VariantGraphMLHttpMessageConverter extends AbstractHttpMessageConve
       if (xml != null) {
         try {
           xml.close();
-        } catch (XMLStreamException e) {
-        }
+        } catch (XMLStreamException e) {}
       }
       Closeables.closeQuietly(body);
     }

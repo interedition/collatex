@@ -245,8 +245,8 @@ public class MatchMatrix {
    */
   public static class Island implements Iterable<Coordinates> {
 
-    private int                     direction = 0;
-    private final List<Coordinates> island    = Lists.newArrayList();
+    private int direction = 0;
+    private final List<Coordinates> island = Lists.newArrayList();
 
     public Island() {}
 

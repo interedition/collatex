@@ -17,8 +17,8 @@ import eu.interedition.collatex.simple.SimpleToken;
  */
 @SuppressWarnings("serial")
 public class MatchMatrixTableModel extends AbstractTableModel {
-  private final String[]   rowNames;
-  private final String[]   columnNames;
+  private final String[] rowNames;
+  private final String[] columnNames;
   private final Status[][] data;
 
   public MatchMatrixTableModel(MatchMatrix matchMatrix, VariantGraph vg, Iterable<Token> witness) {
