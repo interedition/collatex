@@ -1,4 +1,4 @@
-package eu.interedition.collatex.MatrixLinker;
+package eu.interedition.collatex.matrixlinker;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,11 +8,11 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.MatrixLinker.MatchMatrix.Island;
 import eu.interedition.collatex.dekker.TokenLinker;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.Matches;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 
 public class MatchMatrixLinker implements TokenLinker {
 

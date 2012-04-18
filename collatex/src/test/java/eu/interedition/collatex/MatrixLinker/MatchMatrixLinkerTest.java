@@ -1,4 +1,4 @@
-package eu.interedition.collatex.MatrixLinker;
+package eu.interedition.collatex.matrixlinker;
 
 import static org.junit.Assert.*;
 
@@ -23,6 +23,10 @@ import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.lab.Status;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.matrixlinker.Archipelago;
+import eu.interedition.collatex.matrixlinker.ArchipelagoWithVersions;
+import eu.interedition.collatex.matrixlinker.MatchMatrix;
+import eu.interedition.collatex.matrixlinker.MatchMatrixLinker;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchMatrixLinkerTest extends AbstractTest {

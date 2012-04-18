@@ -1,4 +1,4 @@
-package eu.interedition.collatex.MatrixLinker;
+package eu.interedition.collatex.matrixlinker;
 
 import java.util.ArrayList;
 import java.util.Collections;

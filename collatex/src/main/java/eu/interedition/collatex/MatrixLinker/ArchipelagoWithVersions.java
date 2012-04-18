@@ -1,4 +1,4 @@
-package eu.interedition.collatex.MatrixLinker;
+package eu.interedition.collatex.matrixlinker;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

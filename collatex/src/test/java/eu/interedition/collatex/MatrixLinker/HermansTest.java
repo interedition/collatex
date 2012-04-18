@@ -1,4 +1,4 @@
-package eu.interedition.collatex.MatrixLinker;
+package eu.interedition.collatex.matrixlinker;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,6 +14,10 @@ import org.junit.Test;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.matrixlinker.Archipelago;
+import eu.interedition.collatex.matrixlinker.ArchipelagoWithVersions;
+import eu.interedition.collatex.matrixlinker.MatchMatrix;
+import eu.interedition.collatex.matrixlinker.MatchMatrixLinker;
 
 public class HermansTest extends AbstractTest {
 
