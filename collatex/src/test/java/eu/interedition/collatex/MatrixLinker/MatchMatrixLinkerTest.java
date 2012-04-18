@@ -22,10 +22,6 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.matrixlinker.Archipelago;
-import eu.interedition.collatex.matrixlinker.ArchipelagoWithVersions;
-import eu.interedition.collatex.matrixlinker.MatchMatrix;
-import eu.interedition.collatex.matrixlinker.MatchMatrixLinker;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchMatrixLinkerTest extends AbstractTest {
@@ -56,15 +52,15 @@ public class MatchMatrixLinkerTest extends AbstractTest {
     MatchMatrix buildMatrix = linker.buildMatrix(vg, sw[1], new EqualityTokenComparator());
     assertEquals(5, buildMatrix.colNum());
     assertEquals(5, buildMatrix.rowNum());
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(0, 0));
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(1, 1));
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(1, 4));
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(2, 2));
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(0, 3));
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(3, 0));
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(3, 3));
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(4, 1));
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(4, 4));
+    assertTrue(buildMatrix.at(0, 0));
+    assertTrue(buildMatrix.at(1, 1));
+    assertTrue(buildMatrix.at(1, 4));
+    assertTrue(buildMatrix.at(2, 2));
+    assertTrue(buildMatrix.at(0, 3));
+    assertTrue(buildMatrix.at(3, 0));
+    assertTrue(buildMatrix.at(3, 3));
+    assertTrue(buildMatrix.at(4, 1));
+    assertTrue(buildMatrix.at(4, 4));
     //  	System.out.println(buildMatrix.toHtml());
   }
 
@@ -74,7 +70,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
     VariantGraph vg = collate(sw[0]);
     MatchMatrixLinker linker = new MatchMatrixLinker();
     MatchMatrix buildMatrix = linker.buildMatrix(vg, sw[1], new EqualityTokenComparator());
-    assertEquals(MatchMatrixCellStatus.OPTIONAL_MATCH, buildMatrix.at(4, 2));
+    assertTrue(buildMatrix.at(4, 2));
   }
 
   @Test
@@ -111,7 +107,7 @@ public class MatchMatrixLinkerTest extends AbstractTest {
     VariantGraph vg = collate(sw[0]);
     MatchMatrixLinker linker = new MatchMatrixLinker();
     MatchMatrix buildMatrix = linker.buildMatrix(vg, sw[1], new EqualityTokenComparator());
-    ArrayList<MatchMatrix.Coordinates> allTrue = buildMatrix.allTrues();
+    ArrayList<MatchMatrix.Coordinates> allTrue = buildMatrix.allMatches();
     assertEquals(9, allTrue.size());
     assertTrue(allTrue.contains(new MatchMatrix.Coordinates(0, 0)));
     assertFalse(allTrue.contains(new MatchMatrix.Coordinates(1, 0)));

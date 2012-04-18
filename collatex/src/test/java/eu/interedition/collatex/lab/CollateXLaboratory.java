@@ -35,33 +35,33 @@ import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matrixlinker.MatchMatrixLinker;
-import eu.interedition.collatex.matrixlinker.MatchMatrixCellStatus;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
+@SuppressWarnings("serial")
 public class CollateXLaboratory extends JFrame {
-  private static final Logger     LOG               = LoggerFactory.getLogger(CollateXLaboratory.class);
-  public static final BasicStroke DASHED_STROKE     = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 5.0f }, 0.0f);
-  public static final BasicStroke SOLID_STROKE      = new BasicStroke(1.5f);
+  private static final Logger LOG = LoggerFactory.getLogger(CollateXLaboratory.class);
+  public static final BasicStroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 5.0f }, 0.0f);
+  public static final BasicStroke SOLID_STROKE = new BasicStroke(1.5f);
 
-  private final GraphFactory      graphFactory;
-  private final WitnessPanel      witnessPanel      = new WitnessPanel();
+  private final GraphFactory graphFactory;
+  private final WitnessPanel witnessPanel = new WitnessPanel();
 
   private final VariantGraphModel variantGraphModel = new VariantGraphModel();
   private final VariantGraphPanel variantGraphPanel;
 
-  private final EditGraphModel    editGraphModel    = new EditGraphModel();
-  private final EditGraphPanel    editGraphPanel;
+  private final EditGraphModel editGraphModel = new EditGraphModel();
+  private final EditGraphPanel editGraphPanel;
 
-  private final JTable            matchMatrixTable  = new JTable();
+  private final JTable matchMatrixTable = new JTable();
 
-  private final SuffixTreePanel   suffixTreePanel;
+  private final SuffixTreePanel suffixTreePanel;
 
-  private final JComboBox         algorithm;
-  private final JTabbedPane       tabbedPane;
+  private final JComboBox algorithm;
+  private final JTabbedPane tabbedPane;
 
   public CollateXLaboratory(GraphFactory graphFactory) {
     super("CollateX Laboratory");
@@ -177,6 +177,7 @@ public class CollateXLaboratory extends JFrame {
       super("Link");
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void actionPerformed(ActionEvent e) {
       final List<SimpleWitness> w = witnessPanel.getWitnesses();
@@ -208,6 +209,7 @@ public class CollateXLaboratory extends JFrame {
       super("Suffix Tree");
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void actionPerformed(ActionEvent e) {
       final List<SimpleWitness> w = witnessPanel.getWitnesses();
@@ -261,35 +263,35 @@ public class CollateXLaboratory extends JFrame {
   }
 
   private static final TableCellRenderer MATCH_MATRIX_CELL_RENDERER = new TableCellRenderer() {
-                                                                      private JLabel label;
+    private JLabel label;
 
-                                                                      @Override
-                                                                      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                                                                        if (label == null) {
-                                                                          label = new JLabel();
-                                                                          label.setOpaque(true);
-                                                                          label.getInsets().set(5, 5, 5, 5);
-                                                                        }
-                                                                        switch ((MatchMatrixCellStatus) value) {
-                                                                          case PREFERRED_MATCH:
-                                                                            label.setBackground(isSelected ? Color.GREEN : Color.GREEN.darker());
-                                                                            break;
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      if (label == null) {
+        label = new JLabel();
+        label.setOpaque(true);
+        label.getInsets().set(5, 5, 5, 5);
+      }
+      switch ((MatchMatrixCellStatus) value) {
+        case PREFERRED_MATCH:
+          label.setBackground(isSelected ? Color.GREEN : Color.GREEN.darker());
+          break;
 
-                                                                          case OPTIONAL_MATCH:
-                                                                            label.setBackground(isSelected ? Color.YELLOW : Color.YELLOW.darker());
-                                                                            break;
+        case OPTIONAL_MATCH:
+          label.setBackground(isSelected ? Color.YELLOW : Color.YELLOW.darker());
+          break;
 
-                                                                          case EMPTY:
-                                                                            label.setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
-                                                                            break;
+        case EMPTY:
+          label.setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
+          break;
 
-                                                                          default:
-                                                                            label.setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
-                                                                            break;
-                                                                        }
+        default:
+          label.setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
+          break;
+      }
 
-                                                                        return label;
-                                                                      }
-                                                                    };
+      return label;
+    }
+  };
 
 }

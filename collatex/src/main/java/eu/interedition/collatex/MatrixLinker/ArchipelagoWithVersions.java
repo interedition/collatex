@@ -20,42 +20,42 @@ public class ArchipelagoWithVersions extends Archipelago {
     add(isl);
   }
 
+  @Override
   public void add(MatchMatrix.Island island) {
     super.add(island);
   }
 
   public void createNonConflictingVersions() {
     boolean debug = false;
-//		PrintWriter logging = null;
-//		File logFile = new File(File.separator + "c:\\logfile.txt");
-//		try {
-//	    logging = new PrintWriter(new FileOutputStream(logFile));
-//    } catch (FileNotFoundException e) {
-//	    e.printStackTrace();
-//    }
+    //		PrintWriter logging = null;
+    //		File logFile = new File(File.separator + "c:\\logfile.txt");
+    //		try {
+    //	    logging = new PrintWriter(new FileOutputStream(logFile));
+    //    } catch (FileNotFoundException e) {
+    //	    e.printStackTrace();
+    //    }
 
     nonConflVersions = new ArrayList<Archipelago>();
     int tel = 0;
     for (MatchMatrix.Island island : islands) {
       tel++;
-//  		if(tel>22)
+      //  		if(tel>22)
       debug = false;
-//  			System.out.println("nonConflVersions.size(): "+nonConflVersions.size());
-//  			int tel_version = 0;
-//  			for(Archipelago arch : nonConflVersions) {
-//  				System.out.println("arch version ("+(tel_version++)+"): " + arch);
-//  			}
-// TODO
-//  		if(tel>22) {
-//  			int tel_version = 0;
-//  			for(Archipelago arch : nonConflVersions) {
-//  				System.out.println("arch version ("+(tel_version++)+"): " + arch);
-//  			}
-//  			System.exit(1);
-//  		}
+      //  			System.out.println("nonConflVersions.size(): "+nonConflVersions.size());
+      //  			int tel_version = 0;
+      //  			for(Archipelago arch : nonConflVersions) {
+      //  				System.out.println("arch version ("+(tel_version++)+"): " + arch);
+      //  			}
+      // TODO
+      //  		if(tel>22) {
+      //  			int tel_version = 0;
+      //  			for(Archipelago arch : nonConflVersions) {
+      //  				System.out.println("arch version ("+(tel_version++)+"): " + arch);
+      //  			}
+      //  			System.exit(1);
+      //  		}
       if (nonConflVersions.size() == 0) {
-        if (debug)
-          System.out.println("nonConflVersions.size()==0");
+        if (debug) System.out.println("nonConflVersions.size()==0");
         Archipelago version = new Archipelago();
         version.add(island);
         nonConflVersions.add(version);
@@ -64,24 +64,20 @@ public class ArchipelagoWithVersions extends Archipelago {
         ArrayList<Archipelago> new_versions = new ArrayList<Archipelago>();
         int tel_loop = 0;
         for (Archipelago version : nonConflVersions) {
-          if (debug)
-            System.out.println("loop 1: " + tel_loop++);
+          if (debug) System.out.println("loop 1: " + tel_loop++);
           if (!version.conflictsWith(island)) {
-            if (debug)
-              System.out.println("!version.conflictsWith(island)");
+            if (debug) System.out.println("!version.conflictsWith(island)");
             version.add(island);
             found_one = true;
           }
         }
         if (!found_one) {
-          if (debug)
-            System.out.println("!found_one");
+          if (debug) System.out.println("!found_one");
           // try to find a existing version in which the new island fits
           // after removing some points
           tel_loop = 0;
           for (Archipelago version : nonConflVersions) {
-            if (debug)
-              System.out.println("loop 2: " + tel_loop++);
+            if (debug) System.out.println("loop 2: " + tel_loop++);
             MatchMatrix.Island island_copy = new MatchMatrix.Island(island);
             for (MatchMatrix.Island isl : version.iterator()) {
               island_copy = island_copy.removePoints(isl);
@@ -94,17 +90,14 @@ public class ArchipelagoWithVersions extends Archipelago {
           // create a new version with the new island and (parts of) existing islands
           tel_loop = 0;
           for (Archipelago version : nonConflVersions) {
-            if (debug)
-              System.out.println("loop 3: " + tel_loop++);
+            if (debug) System.out.println("loop 3: " + tel_loop++);
             Archipelago new_version = new Archipelago();
             new_version.add(island);
             for (MatchMatrix.Island isl : version.iterator()) {
               MatchMatrix.Island di = new MatchMatrix.Island(isl);
-              if (debug)
-                System.out.println("di: " + di);
+              if (debug) System.out.println("di: " + di);
               MatchMatrix.Island res = di.removePoints(island);
-              if (debug)
-                System.out.println("res: " + res);
+              if (debug) System.out.println("res: " + res);
               if (res.size() > 0) {
                 found_one = true;
                 new_version.add(res);
@@ -115,40 +108,37 @@ public class ArchipelagoWithVersions extends Archipelago {
           if (new_versions.size() > 0) {
             tel_loop = 0;
             for (Archipelago arch : new_versions) {
-              if (debug)
-                System.out.println("loop 4: " + tel_loop++);
+              if (debug) System.out.println("loop 4: " + tel_loop++);
               addVersion(arch);
             }
           }
         }
         if (!found_one) {
-          if (debug)
-            System.out.println("!found_one");
+          if (debug) System.out.println("!found_one");
           Archipelago version = new Archipelago();
           version.add(island);
           addVersion(version);
         }
       }
     }
-//		int tel_version = 0;
-//		for(Archipelago arch : nonConflVersions) {
-//			logging.println("arch version ("+(tel_version++)+"): " + arch);
-//		}
-//		tel_version = 0;
-//		for(Archipelago arch : nonConflVersions) {
-//			logging.println("version "+(tel_version++)+": " + arch.value());
-//		}
-//		logging.close();
+    //		int tel_version = 0;
+    //		for(Archipelago arch : nonConflVersions) {
+    //			logging.println("arch version ("+(tel_version++)+"): " + arch);
+    //		}
+    //		tel_version = 0;
+    //		for(Archipelago arch : nonConflVersions) {
+    //			logging.println("version "+(tel_version++)+": " + arch.value());
+    //		}
+    //		logging.close();
   }
 
   private void addVersion(Archipelago version) {
     int pos = 0;
-//		int tel_loop = 0;
-//		System.out.println("addVersion - num of versions: "+nonConflVersions.size());
+    //		int tel_loop = 0;
+    //		System.out.println("addVersion - num of versions: "+nonConflVersions.size());
     for (pos = 0; pos < nonConflVersions.size(); pos++) {
-      if (version.equals(nonConflVersions.get(pos)))
-        return;
-//			System.out.println("loop 5: "+tel_loop++);
+      if (version.equals(nonConflVersions.get(pos))) return;
+      //			System.out.println("loop 5: "+tel_loop++);
       if (version.value() > nonConflVersions.get(pos).value()) {
         nonConflVersions.add(pos, version);
         return;
@@ -161,6 +151,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     return nonConflVersions.size();
   }
 
+  @Override
   public ArchipelagoWithVersions copy() {
     ArchipelagoWithVersions result = new ArchipelagoWithVersions();
     for (MatchMatrix.Island isl : islands) {
@@ -171,8 +162,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   public Archipelago getVersion(int i) {
     try {
-      if (nonConflVersions.isEmpty())
-        createNonConflictingVersions();
+      if (nonConflVersions.isEmpty()) createNonConflictingVersions();
       return nonConflVersions.get(i);
     } catch (IndexOutOfBoundsException exc) {
       return null;
@@ -185,7 +175,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   /*
     * Create a non-conflicting version by simply taken all the islands
-    * that to not conflict with each other, largest first. This presuming
+    * that do not conflict with each other, largest first. This presuming
     * that Archipelago will have a high value if it contains the largest
     * possible islands
     */
@@ -198,7 +188,7 @@ public class ArchipelagoWithVersions extends Archipelago {
       for (i = 0; i < res_size; i++) {
         if (result.get(i).isCompetitor(isl)) {
           confl = true;
-//					System.out.println("confl: "+isl+" with: "+i+" : "+result.get(i));
+          //					System.out.println("confl: "+isl+" with: "+i+" : "+result.get(i));
           break;
         }
       }
@@ -238,14 +228,11 @@ public class ArchipelagoWithVersions extends Archipelago {
     int isl2_R_y = isl2.getRightEnd().row;
     result = distance(isl1_L_x, isl1_L_y, isl2_L_x, isl2_L_y);
     double d = distance(isl1_L_x, isl1_L_y, isl2_R_x, isl2_R_y);
-    if (d < result)
-      result = d;
+    if (d < result) result = d;
     d = distance(isl1_R_x, isl1_R_y, isl2_L_x, isl2_L_y);
-    if (d < result)
-      result = d;
+    if (d < result) result = d;
     d = distance(isl1_R_x, isl1_R_y, isl2_R_x, isl2_R_y);
-    if (d < result)
-      result = d;
+    if (d < result) result = d;
     return result;
   }
 
@@ -264,17 +251,17 @@ public class ArchipelagoWithVersions extends Archipelago {
     int colNum = columnLabels.size();
     list.add(new MatchMatrix.Coordinates(0, 0));
     list.add(new MatchMatrix.Coordinates(colNum - 1, rowNum - 1));
-//  	System.out.println("1");
+    //  	System.out.println("1");
     Archipelago createFirstVersion = createFirstVersion();
     System.out.println("2");
-//  	output.println(mat.toHtml(this));
+    //  	output.println(mat.toHtml(this));
     output.println(mat.toHtml(createFirstVersion));
-//  	System.out.println("3");
+    //  	System.out.println("3");
     ArrayList<MatchMatrix.Coordinates> gaps = createFirstVersion.findGaps(list);
     System.out.println("4");
     ArrayList<Integer[]> listOrderedByCol = new ArrayList<Integer[]>();
     int teller = 0;
-    Integer[] isl = {0, 0, 0, 0, 0};
+    Integer[] isl = { 0, 0, 0, 0, 0 };
     for (MatchMatrix.Coordinates c : gaps) {
       teller++;
       if (teller % 2 == 0) {
@@ -326,77 +313,74 @@ public class ArchipelagoWithVersions extends Archipelago {
         vorige = c;
       } else {
         // vergelijk c met vorige
-        if (c.column < vorige.column || c.row < vorige.row)
-          System.out.println("sprong");
+        if (c.column < vorige.column || c.row < vorige.row) System.out.println("sprong");
         System.out.print(c);
         vorige = c;
       }
     }
-//  	while(true) {
-//  		/**
-//  		 * Hier anders aanpakken?
-//  		 * Bijv eerst de stukken tussen de eilanden simpel als varianten opvatten?
-//  		 * Probleem (bijvoorbeeld text 4): de eerste woorden in 'lem' matchen met
-//  		 * 	woorden veel verderop in de 'rdg' (en zijn geen echte match).
-//  		 * Dus proberen kijken of eerst de eilanden nogmaals gewaardeerd worden
-//  		 * om zo eilanden die niet in de 'archipel' passen er buiten te laten.
-//  		 */
-//  		/** */
-//  		int islStart = gaps.get(gapsPos).col; 
-//  		int islStartRow = gaps.get(gapsPos).row; 
-//  		int islEnd = gaps.get(gapsPos+1).col;
-//  		if(colPos<islStart || rowPos<gaps.get(gapsPos).row) {
-//  			String lem ="";
-//  			String rdg = "";
-//  			while(colPos<gaps.get(gapsPos).col)
-//  				lem += columnLabels.get(colPos++) + " ";
-//  			while(rowPos<gaps.get(gapsPos).row)
-//  				rdg += rowLabels.get(rowPos++) + " ";
-//  			result += printApp(output,lem, rdg);
-//  			res = " ";
-//  		}
-//  		if(colPos==islStart && rowPos>islStartRow) {
-//  			String lem ="";
-//  			String rdg = "";
-//  			while(colPos<gaps.get(gapsPos).col)
-//  				lem += columnLabels.get(colPos++) + " ";
-//  			result += printApp(output,lem, rdg);
-//  			gapsPos += 2;
-//  		} else {
-//  			while(islStart<=islEnd)
-//  				res += columnLabels.get(islStart++)+" ";
-//  			output.println(res);
-//  			if(!res.trim().isEmpty())
-//  			  result += res + newLine;
-//  			res = "";
-//  			colPos = gaps.get(gapsPos+1).col + 1;
-//  			rowPos = gaps.get(gapsPos+1).row + 1;
-//  			gapsPos += 2;
-//  		}
-//  		if(gapsPos>=gaps.size() || colPos==colNum)
-//  			break;
-//  	}
-//		String lem = "";
-//		while(colPos<colNum-1){
-//			lem += columnLabels.get(colPos) + " ";
-//			colPos++;
-//		}
-//		String rdg = "";
-//		while(rowPos<rowNum-1){
-//			rdg += rowLabels.get(rowPos) + " ";
-//			rowPos++;
-//		}
-//		if(!(lem.isEmpty() && rdg.isEmpty())) {
-//			result += printApp(output,lem,rdg);
-//		}
-//		output.println("</xml>");
-//		result += "</xml>";
+    //  	while(true) {
+    //  		/**
+    //  		 * Hier anders aanpakken?
+    //  		 * Bijv eerst de stukken tussen de eilanden simpel als varianten opvatten?
+    //  		 * Probleem (bijvoorbeeld text 4): de eerste woorden in 'lem' matchen met
+    //  		 * 	woorden veel verderop in de 'rdg' (en zijn geen echte match).
+    //  		 * Dus proberen kijken of eerst de eilanden nogmaals gewaardeerd worden
+    //  		 * om zo eilanden die niet in de 'archipel' passen er buiten te laten.
+    //  		 */
+    //  		/** */
+    //  		int islStart = gaps.get(gapsPos).col; 
+    //  		int islStartRow = gaps.get(gapsPos).row; 
+    //  		int islEnd = gaps.get(gapsPos+1).col;
+    //  		if(colPos<islStart || rowPos<gaps.get(gapsPos).row) {
+    //  			String lem ="";
+    //  			String rdg = "";
+    //  			while(colPos<gaps.get(gapsPos).col)
+    //  				lem += columnLabels.get(colPos++) + " ";
+    //  			while(rowPos<gaps.get(gapsPos).row)
+    //  				rdg += rowLabels.get(rowPos++) + " ";
+    //  			result += printApp(output,lem, rdg);
+    //  			res = " ";
+    //  		}
+    //  		if(colPos==islStart && rowPos>islStartRow) {
+    //  			String lem ="";
+    //  			String rdg = "";
+    //  			while(colPos<gaps.get(gapsPos).col)
+    //  				lem += columnLabels.get(colPos++) + " ";
+    //  			result += printApp(output,lem, rdg);
+    //  			gapsPos += 2;
+    //  		} else {
+    //  			while(islStart<=islEnd)
+    //  				res += columnLabels.get(islStart++)+" ";
+    //  			output.println(res);
+    //  			if(!res.trim().isEmpty())
+    //  			  result += res + newLine;
+    //  			res = "";
+    //  			colPos = gaps.get(gapsPos+1).col + 1;
+    //  			rowPos = gaps.get(gapsPos+1).row + 1;
+    //  			gapsPos += 2;
+    //  		}
+    //  		if(gapsPos>=gaps.size() || colPos==colNum)
+    //  			break;
+    //  	}
+    //		String lem = "";
+    //		while(colPos<colNum-1){
+    //			lem += columnLabels.get(colPos) + " ";
+    //			colPos++;
+    //		}
+    //		String rdg = "";
+    //		while(rowPos<rowNum-1){
+    //			rdg += rowLabels.get(rowPos) + " ";
+    //			rowPos++;
+    //		}
+    //		if(!(lem.isEmpty() && rdg.isEmpty())) {
+    //			result += printApp(output,lem,rdg);
+    //		}
+    //		output.println("</xml>");
+    //		result += "</xml>";
     return doeiets(output, listOrderedByCol, listOrderedByRow, columnLabels, rowLabels);
   }
 
-  private String doeiets(PrintWriter output, ArrayList<Integer[]> listOrderedByCol,
-                         ArrayList<Integer[]> listOrderedByRow, ArrayList<String> columnLabels,
-                         ArrayList<String> rowLabels) {
+  private String doeiets(PrintWriter output, ArrayList<Integer[]> listOrderedByCol, ArrayList<Integer[]> listOrderedByRow, ArrayList<String> columnLabels, ArrayList<String> rowLabels) {
     String result = new String("<xml>\n");
     int rowCount = 0;
     int colCount = 0;
@@ -413,22 +397,18 @@ public class ArchipelagoWithVersions extends Archipelago {
         int a = -1;
         try {
           a = listOrderedByCol.get(lastCol)[3];
-        } catch (ArrayIndexOutOfBoundsException excep) {
-        }
+        } catch (ArrayIndexOutOfBoundsException excep) {}
         int b = listOrderedByCol.get(colCount)[1];
-        if ((b - a) > 1)
-          lem = getTekst(columnLabels, (a + 1), (b - 1));
+        if ((b - a) > 1) lem = getTekst(columnLabels, (a + 1), (b - 1));
         lastCol = colCount;
       }
       if (rowCount > lastRow) {
         int a = -1;
         try {
           a = listOrderedByRow.get(lastRow)[4];
-        } catch (ArrayIndexOutOfBoundsException excep) {
-        }
+        } catch (ArrayIndexOutOfBoundsException excep) {}
         int b = listOrderedByRow.get(rowCount)[2];
-        if ((b - a) > 1)
-          rdg = getTekst(rowLabels, (a + 1), (b - 1));
+        if ((b - a) > 1) rdg = getTekst(rowLabels, (a + 1), (b - 1));
         lastRow = rowCount;
       }
 
@@ -465,7 +445,7 @@ public class ArchipelagoWithVersions extends Archipelago {
         result += app;
         System.out.println(app);
       } else if (colIslNo < rowIslNo) {
-//				System.out.println("colIslNo (" +colIslNo + ") < rowIslNo ("+ rowIslNo + ")");
+        //				System.out.println("colIslNo (" +colIslNo + ") < rowIslNo ("+ rowIslNo + ")");
         lem = "";
         rdg = "";
         if (listOrderedByRow.get(rowCount + 1)[0] < rowIslNo) {
@@ -481,23 +461,22 @@ public class ArchipelagoWithVersions extends Archipelago {
         result += app;
         System.out.println(app);
       }
-//  		for(Integer[] a : listOrderedByCol) {
-//  			if((a[0]-lastCol)>1)
-//  				sprong  = true;
-//  			if(!sprong)
-//  				while(listOrderedByRow.get(rowCount)[0]<a[0]) {
-//  					rowCount++;
-//  				}
-//  			else {
-//  				String lem = "";
-//  				for(int i=a[1];i<=a[3];i++)
-//  					lem += " " + columnLabels.get(i);
-//  				result += printApp(output,lem,"[VERPLAATST?"+a[0]+"]");
-//  				sprong = false;
-//  			}
-//  		}
-      if (rowCount >= listOrderedByRow.size() || colCount >= listOrderedByCol.size())
-        finished = true;
+      //  		for(Integer[] a : listOrderedByCol) {
+      //  			if((a[0]-lastCol)>1)
+      //  				sprong  = true;
+      //  			if(!sprong)
+      //  				while(listOrderedByRow.get(rowCount)[0]<a[0]) {
+      //  					rowCount++;
+      //  				}
+      //  			else {
+      //  				String lem = "";
+      //  				for(int i=a[1];i<=a[3];i++)
+      //  					lem += " " + columnLabels.get(i);
+      //  				result += printApp(output,lem,"[VERPLAATST?"+a[0]+"]");
+      //  				sprong = false;
+      //  			}
+      //  		}
+      if (rowCount >= listOrderedByRow.size() || colCount >= listOrderedByCol.size()) finished = true;
     }
     output.println("</xml>");
     output.flush();
@@ -512,8 +491,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     return result.replace("[,", "[") + "]";
   }
 
-  private String getTekst(ArrayList<String> rowLabels, Integer start,
-                          Integer einde) {
+  private String getTekst(ArrayList<String> rowLabels, Integer start, Integer einde) {
     String result = "";
     for (int i = start; i <= einde; i++) {
       result += " " + rowLabels.get(i);
@@ -524,10 +502,8 @@ public class ArchipelagoWithVersions extends Archipelago {
   private String printApp(PrintWriter output, String lem, String rdg) {
     String result = "";
     if (!(lem.isEmpty() && rdg.isEmpty())) {
-      if (lem.isEmpty())
-        lem = "[WEGGELATEN]";
-      if (rdg.isEmpty())
-        rdg = "[WEGGELATEN]";
+      if (lem.isEmpty()) lem = "[WEGGELATEN]";
+      if (rdg.isEmpty()) rdg = "[WEGGELATEN]";
       result += "  <app>" + newLine;
       result += "    <lem>" + lem.trim() + "</lem>" + newLine;
       result += "    <rdg>" + rdg.trim() + "</rdg>" + newLine;

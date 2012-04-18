@@ -63,4 +63,19 @@ public class MatchMatrixLinker implements TokenLinker {
     return arrayTable;
   }
 
+  public static MatchMatrix enhance(MatchMatrix matrix) {
+    MatchMatrix enhancedMatrix = matrix;
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+    for (MatchMatrix.Island isl : matrix.getIslands()) {
+      archipelago.add(isl);
+    }
+    Archipelago preferred = archipelago.createFirstVersion();
+    ArrayList<Island> iterator = preferred.iterator();
+    //    for (Island island : iterator) {
+    //      island.contains(c)
+    //    }
+
+    return enhancedMatrix;
+  }
+
 }

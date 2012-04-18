@@ -62,8 +62,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     }
   }
 
-  public void startTransformingElement(String uri, String name, String raw, Attributes attr) throws ProcessingException,
-          IOException, SAXException {
+  public void startTransformingElement(String uri, String name, String raw, Attributes attr) throws ProcessingException, IOException, SAXException {
     if ("collation".equals(name)) {
       final String outputType = attr.getValue(defaultNamespaceURI, "outputType");
       if (outputType != null && "tei".equalsIgnoreCase(outputType.trim())) {
@@ -136,7 +135,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
     startPrefixMapping("tei", TEI_NS);
 
-    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext(); ) {
+    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext();) {
       final Set<VariantGraphVertex> row = rowIt.next();
 
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();

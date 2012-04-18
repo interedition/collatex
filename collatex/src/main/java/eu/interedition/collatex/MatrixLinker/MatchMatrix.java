@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.lab.MatchMatrixCellStatus;
 
 public class MatchMatrix {
 
@@ -21,9 +22,8 @@ public class MatchMatrix {
     sparseMatrix = ArrayTable.create(vertices, witness);
   }
 
-  public MatchMatrixCellStatus at(int row, int column) {
-    Boolean firstNonNull = Objects.firstNonNull(sparseMatrix.at(row, column), false);
-    return firstNonNull ? MatchMatrixCellStatus.OPTIONAL_MATCH : MatchMatrixCellStatus.EMPTY;
+  public Boolean at(int row, int column) {
+    return Objects.firstNonNull(sparseMatrix.at(row, column), false);
   }
 
   public void set(int row, int column, boolean value) {
@@ -126,13 +126,13 @@ public class MatchMatrix {
     return labels;
   }
 
-  public ArrayList<Coordinates> allTrues() {
+  public ArrayList<Coordinates> allMatches() {
     ArrayList<Coordinates> pairs = new ArrayList<Coordinates>();
     int rows = rowNum();
     int cols = colNum();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (!at(i, j).equals(MatchMatrixCellStatus.EMPTY)) pairs.add(new Coordinates(j, i));
+        if (at(i, j)) pairs.add(new Coordinates(j, i));
       }
     }
     return pairs;
@@ -148,7 +148,7 @@ public class MatchMatrix {
 
   public ArrayList<Island> getIslands() {
     ArrayList<Island> islands = new ArrayList<Island>();
-    ArrayList<Coordinates> allTrue = allTrues();
+    ArrayList<Coordinates> allTrue = allMatches();
     for (Coordinates c : allTrue) {
       //			System.out.println("next coordinate: "+c);
       boolean found = false;
@@ -177,7 +177,7 @@ public class MatchMatrix {
     int row;
     int column;
 
-    Coordinates(int column, int row) {
+    public Coordinates(int column, int row) {
       this.column = column;
       this.row = row;
     }
