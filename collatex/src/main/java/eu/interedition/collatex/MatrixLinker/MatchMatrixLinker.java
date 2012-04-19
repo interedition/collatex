@@ -18,8 +18,6 @@ public class MatchMatrixLinker implements TokenLinker {
 
   @Override
   public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
-    // TODO Auto-generated method stub
-
     MatchMatrix buildMatrix = buildMatrix(base, witness, comparator);
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
     for (MatchMatrix.Island isl : buildMatrix.getIslands()) {
@@ -27,7 +25,6 @@ public class MatchMatrixLinker implements TokenLinker {
     }
     Archipelago createFirstVersion = archipelago.createFirstVersion();
     ArrayList<Island> iterator = createFirstVersion.iterator();
-    // bepaal kleur cel ahv firstversion
     //    int mat[] = new int[rowNum()];
     //
     //    for (Island island : iterator) {
@@ -61,21 +58,6 @@ public class MatchMatrixLinker implements TokenLinker {
       column++;
     }
     return arrayTable;
-  }
-
-  public static MatchMatrix enhance(MatchMatrix matrix) {
-    MatchMatrix enhancedMatrix = matrix;
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : matrix.getIslands()) {
-      archipelago.add(isl);
-    }
-    Archipelago preferred = archipelago.createFirstVersion();
-    ArrayList<Island> iterator = preferred.iterator();
-    //    for (Island island : iterator) {
-    //      island.contains(c)
-    //    }
-
-    return enhancedMatrix;
   }
 
 }

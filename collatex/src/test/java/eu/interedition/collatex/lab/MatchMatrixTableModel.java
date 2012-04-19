@@ -26,11 +26,6 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   private final MatchMatrixCellStatus[][] data;
 
   public MatchMatrixTableModel(MatchMatrix matchMatrix, VariantGraph vg, Iterable<Token> witness) {
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : matchMatrix.getIslands()) {
-      archipelago.add(isl);
-    }
-    Archipelago preferred = archipelago.createFirstVersion();
 
     final int rowNum = matchMatrix.rowNum();
     final int colNum = matchMatrix.colNum();
@@ -48,14 +43,14 @@ public class MatchMatrixTableModel extends AbstractTableModel {
       columnNames[col] = ((SimpleToken) witnessIt.next()).getContent();
     }
 
+    Archipelago preferred = preferred(matchMatrix);
     data = new MatchMatrixCellStatus[rowNum][colNum];
     for (int row = 0; row < rowNum; row++) {
       for (int col = 0; col < colNum; col++) {
         Boolean at = matchMatrix.at(row, col);
         MatchMatrixCellStatus cell;
         if (at) {
-          Island i = new Island();
-          i.add(new Coordinates(row, col));
+          Island i = makeIslet(row, col);
           cell = preferred.conflictsWith(i) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
         } else {
           cell = MatchMatrixCellStatus.EMPTY;
@@ -63,6 +58,21 @@ public class MatchMatrixTableModel extends AbstractTableModel {
         data[row][col] = cell;
       }
     }
+  }
+
+  private Island makeIslet(int row, int col) {
+    Island i = new Island();
+    i.add(new Coordinates(row, col));
+    return i;
+  }
+
+  private Archipelago preferred(MatchMatrix matchMatrix) {
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+    for (MatchMatrix.Island isl : matchMatrix.getIslands()) {
+      archipelago.add(isl);
+    }
+    Archipelago preferred = archipelago.createFirstVersion();
+    return preferred;
   }
 
   @Override

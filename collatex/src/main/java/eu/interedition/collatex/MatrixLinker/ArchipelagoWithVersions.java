@@ -7,7 +7,8 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   private static final String newLine = System.getProperty("line.separator");
   private ArrayList<Archipelago> nonConflVersions;
-  private Integer[] isl2;
+
+  //  private Integer[] isl2;
 
   public ArchipelagoWithVersions() {
     islands = new ArrayList<MatchMatrix.Island>();
@@ -381,7 +382,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   }
 
   private String doeiets(PrintWriter output, ArrayList<Integer[]> listOrderedByCol, ArrayList<Integer[]> listOrderedByRow, ArrayList<String> columnLabels, ArrayList<String> rowLabels) {
-    String result = new String("<xml>\n");
+    String result = "<xml>\n";
     int rowCount = 0;
     int colCount = 0;
     int lastCol = -1;

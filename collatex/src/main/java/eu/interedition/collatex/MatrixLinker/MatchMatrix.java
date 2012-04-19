@@ -12,7 +12,6 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.lab.MatchMatrixCellStatus;
 
 public class MatchMatrix {
 
@@ -32,46 +31,46 @@ public class MatchMatrix {
 
   @Override
   public String toString() {
-    String result = "";
+    StringBuilder result = new StringBuilder();
     ArrayList<String> colLabels = columnLabels();
     for (String cLabel : colLabels) {
-      result += " " + cLabel;
+      result.append(" ").append(cLabel);
     }
-    result += "\n";
+    result.append("\n");
     int colNum = sparseMatrix.columnKeyList().size();
     ArrayList<String> rLabels = rowLabels();
     int row = 0;
     for (String label : rLabels) {
-      result += label;
+      result.append(label);
       for (int col = 0; col < colNum; col++)
-        result += " " + at(row++, col);
-      result += "\n";
+        result.append(" ").append(at(row++, col));
+      result.append("\n");
     }
-    return result;
+    return result.toString();
   }
 
   public String toHtml() {
-    String result = "<table>\n<tr><td></td>\n";
+    StringBuilder result = new StringBuilder("<table>\n<tr><td></td>\n");
     ArrayList<String> colLabels = columnLabels();
     for (String cLabel : colLabels) {
-      result += "<td>" + cLabel + "</td>";
+      result.append("<td>").append(cLabel).append("</td>");
     }
-    result += "</tr>\n";
+    result.append("</tr>\n");
     int colNum = sparseMatrix.columnKeyList().size();
     ArrayList<String> rLabels = rowLabels();
     int row = 0;
     for (String label : rLabels) {
-      result += "<tr><td>" + label + "</td>";
+      result.append("<tr><td>").append(label).append("</td>");
       for (int col = 0; col < colNum; col++)
-        if (!at(row, col).equals(MatchMatrixCellStatus.EMPTY))
-          result += "<td BGCOLOR=\"lightgreen\">M</td>";
+        if (at(row, col))
+          result.append("<td BGCOLOR=\"lightgreen\">M</td>");
         else
-          result += "<td></td>";
-      result += "</tr>\n";
+          result.append("<td></td>");
+      result.append("</tr>\n");
       row++;
     }
-    result += "</table>";
-    return result;
+    result.append("</table>");
+    return result.toString();
   }
 
   public String toHtml(Archipelago arch) {
@@ -81,25 +80,24 @@ public class MatchMatrix {
         mat[c.row] = c.column;
       }
     }
-    String result = "<table>\n<tr><td></td>\n";
+    StringBuilder result = new StringBuilder("<table>\n<tr><td></td>\n");
     ArrayList<String> colLabels = columnLabels();
     for (String cLabel : colLabels) {
-      result += "<td>" + cLabel + "</td>";
+      result.append("<td>").append(cLabel).append("</td>");
     }
-    result += "</tr>\n";
+    result.append("</tr>\n");
     ArrayList<String> rLabels = rowLabels();
     int row = 0;
     for (String label : rLabels) {
-      result += "<tr><td>" + label + "</td>";
+      result.append("<tr><td>").append(label).append("</td>");
       if (mat[row] > 0) {
-        result += "<td colspan=\"" + mat[row] + "\"></td>";
-        result += "<td BGCOLOR=\"lightgreen\">M</td>";
+        result.append("<td colspan=\"").append(mat[row]).append("\"></td>").append("<td BGCOLOR=\"lightgreen\">M</td>");
       }
-      result += "</tr>\n";
+      result.append("</tr>\n");
       row++;
     }
-    result += "</table>";
-    return result;
+    result.append("</table>");
+    return result.toString();
   }
 
   public ArrayList<String> rowLabels() {
@@ -114,6 +112,16 @@ public class MatchMatrix {
     return labels;
   }
 
+  public List<VariantGraphVertex> rowVertices() {
+    List<VariantGraphVertex> vertices = Lists.newArrayList();
+    for (VariantGraphVertex vgv : sparseMatrix.rowKeyList()) {
+      if (vgv.toString().contains(":")) {
+        vertices.add(vgv);
+      }
+    }
+    return vertices;
+  }
+
   public ArrayList<String> columnLabels() {
     ArrayList<String> labels = new ArrayList<String>();
     for (Token t : sparseMatrix.columnKeyList()) {
@@ -124,6 +132,16 @@ public class MatchMatrix {
       }
     }
     return labels;
+  }
+
+  public List<Token> columnTokens() {
+    List<Token> tokens = Lists.newArrayList();
+    for (Token t : sparseMatrix.columnKeyList()) {
+      if (t.toString().contains(":")) {
+        tokens.add(t);
+      }
+    }
+    return tokens;
   }
 
   public ArrayList<Coordinates> allMatches() {
@@ -391,6 +409,7 @@ public class MatchMatrix {
 
     @Override
     public boolean equals(Object obj) {
+      if (obj == null) return false;
       if (!obj.getClass().equals(Island.class)) return false;
       Island isl = (Island) obj;
       boolean result = true;

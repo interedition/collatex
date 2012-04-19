@@ -28,8 +28,7 @@ public class Archipelago {
             islands.add(islands.indexOf(i), island);
             return;
           }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
     islands.add(island);
   }
@@ -38,7 +37,6 @@ public class Archipelago {
   public ArrayList<MatchMatrix.Island> iterator() {
     return islands;
   }
-
 
   protected void remove(int i) {
     islands.remove(i);
@@ -62,8 +60,7 @@ public class Archipelago {
       }
     }
     for (i = (rr.length - 1); i > 0; i--) {
-      if (rr[i] == 1)
-        islands.remove(i);
+      if (rr[i] == 1) islands.remove(i);
     }
   }
 
@@ -72,9 +69,8 @@ public class Archipelago {
     int num = islands.size();
     for (int i = 0; i < num; i++)
       for (int j = i + 1; j < num; j++) {
-//				System.out.println("compare "+islands.get(j)+" with "+islands.get(i));				
-        if (islands.get(j).isCompetitor(islands.get(i)))
-          result++;
+        //				System.out.println("compare "+islands.get(j)+" with "+islands.get(i));				
+        if (islands.get(j).isCompetitor(islands.get(i))) result++;
       }
     return result;
   }
@@ -93,12 +89,12 @@ public class Archipelago {
 
   public boolean conflictsWith(MatchMatrix.Island island) {
     for (MatchMatrix.Island isl : islands) {
-      if (isl.isCompetitor(island))
-        return true;
+      if (isl.isCompetitor(island)) return true;
     }
     return false;
   }
 
+  @Override
   public String toString() {
     String result = "";
     for (MatchMatrix.Island island : islands) {
@@ -121,13 +117,11 @@ public class Archipelago {
 
   @Override
   public boolean equals(Object object) {
-    if (object.getClass() != this.getClass())
-      return false;
-    if (((Archipelago) object).size() != this.size())
-      return false;
+    if (object == null) return false;
+    if (object.getClass() != this.getClass()) return false;
+    if (((Archipelago) object).size() != this.size()) return false;
     for (int i = 0; i < size(); i++) {
-      if (!((Archipelago) object).get(i).equals(get(i)))
-        return false;
+      if (!((Archipelago) object).get(i).equals(get(i))) return false;
     }
     return true;
   }
