@@ -2,6 +2,7 @@ package eu.interedition.collatex.matrixlinker;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import eu.interedition.collatex.dekker.TokenLinker;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.Matches;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
 import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 
 public class MatchMatrixLinker implements TokenLinker {
@@ -25,16 +27,14 @@ public class MatchMatrixLinker implements TokenLinker {
     }
     Archipelago createFirstVersion = archipelago.createFirstVersion();
     ArrayList<Island> iterator = createFirstVersion.iterator();
-    //    int mat[] = new int[rowNum()];
-    //
-    //    for (Island island : iterator) {
-    //      island.ge
-    //    }
-    //    ArrayList<Coordinates> gaps = createFirstVersion.findGaps();
-    //    for (Coordinates coordinates : gaps) {
-    //      coordinates.
-    //    }
+    List<Token> columnTokens = buildMatrix.columnTokens();
+    List<VariantGraphVertex> rowVertices = buildMatrix.rowVertices();
     Map<Token, VariantGraphVertex> map = Maps.newHashMap();
+    for (Island island : iterator) {
+      for (Coordinates c : island) {
+        map.put(columnTokens.get(c.column), rowVertices.get(c.row));
+      }
+    }
     return map;
   }
 
