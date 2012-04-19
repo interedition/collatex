@@ -1,23 +1,34 @@
 package eu.interedition.collatex.matrixlinker;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
-import org.junit.Ignore;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class HermansTest extends AbstractTest {
+  @Before
+  public void setUp() {
+    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator()));
+  }
 
-  @Ignore
   @Test
   public void testHermansText1() {
     String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn.";
@@ -28,7 +39,6 @@ public class HermansTest extends AbstractTest {
     System.out.println(buildMatrix.toHtml());
   }
 
-  @Ignore
   @Test
   public void testHermansText2() {
     String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
@@ -145,4 +155,40 @@ public class HermansTest extends AbstractTest {
     // }
   }
 
+  @Test
+  public void testHermansText2a() throws XMLStreamException {
+    String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
+    String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
+    SimpleWitness[] sw = createWitnesses(textD1, textD9);
+    testWitnessCollation(sw);
+  }
+
+  private void testWitnessCollation(SimpleWitness[] sw) throws XMLStreamException, FactoryConfigurationError {
+    VariantGraph vg = collate(sw);
+    String teiMM = generateTEI(vg);
+    assertNotNull(teiMM);
+    LOG.info(teiMM);
+    setCollationAlgorithm(CollationAlgorithmFactory.dekker(new EqualityTokenComparator()));
+    vg = collate(sw);
+    String teiD = generateTEI(vg);
+    LOG.info(teiD);
+    assertNotNull(teiD);
+    assertFalse(teiD.equals(teiMM));
+  }
+
+  //  @Test
+  public void testHermansText3a() throws XMLStreamException {
+    String textMZ_DJ233 = "Werumeus Buning maakt artikelen van vijf pagina&APO+s over de geologie van de diepzee, die hij uit Engelse boeken overschrijft, wat hij pas in de laatste regel vermeldt, omdat hij zo goed kan koken.<p/>\n" + "J. W. Hofstra kan niet lezen en nauwelijks stotteren, laat staan schrijven. Hij oefent het ambt van litterair criticus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\n" + "Zo nu en dan koopt Elsevier een artikel van een echte professor wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\n" + "Edouard Bouquin is het olijke culturele geweten. Bouquin betekent: 1) oud boek van geringe waarde, 2) oude bok, 3) mannetjeskonijn. Ik kan het ook niet helpen, het staat in Larousse.<p/>\n" + "De politiek van dit blad wordt geschreven door een der leeuwen uit het Nederlandse wapen (ik geloof de rechtse) op een krakerige gerechtszaaltoon in zeer korte zinnetjes, omdat hij tot zijn spijt de syntaxis onvoldoende beheerst.<p/>\nAldus de artikelen van Werumeus Buning";
+    String textD4F = "Werumeus  Buning maakt machtigmooie artikelen van vijf pagina&APO+s  over de  geologie van de  diepzee, die  hij uit Engelse  boeken overschrijft,   wat hij  pas in de laatste  regel  vermeldt,   omdat hij   zo  goed kan koken.<p/>\n" + "J. W.Hofstra kan niet lezen en nauwelijks stotteren,   laat staan schrijven.   Hij  oefent het ambt van literair kritikus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\n" + "Edouard  Bouquin is  het olijke  culturele  geweten.   Bouquin betekent:   1)  oud boek  van geringe  waarde,   2)  oude bok,   3)  mannetjeskonijn.   Ik kan het ook niet helpen,   het staat in Larousse.<p/>\n" + "Nu en dan koopt Elsevier een artikel van een echte professor, wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\n" + "\n" + "De politiek van dit blad  wordt geschreven door een der leeuwen uit het nederlandse wapen (ik geloof de   rechtse)  op een krakerige  gerechtszaaltoon in zeer korte  zinnetjes, omdat hij  tot zijn  spijt  de  syntaxis  onvoldoende  beheerst. <p/>Volgens de stukjes van Werumeus Buning";
+    SimpleWitness[] sw = createWitnesses(textMZ_DJ233, textD4F);
+    testWitnessCollation(sw);
+  }
+
+  private String generateTEI(VariantGraph vg) throws XMLStreamException, FactoryConfigurationError {
+    SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
+    StringWriter writer = new StringWriter();
+    XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
+    s.toTEI(xml);
+    return writer.toString();
+  }
 }
