@@ -2,8 +2,10 @@ package eu.interedition.collatex.matrixlinker;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ArrayTable;
@@ -11,9 +13,33 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.matching.Matches;
 
 public class MatchMatrix {
+
+  public static MatchMatrix create(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+    base.rank();
+    Matches matches = Matches.between(base.vertices(), witness, comparator);
+    MatchMatrix arrayTable = new MatchMatrix(base.vertices(), witness);
+    Set<Token> unique = matches.getUnique();
+    Set<Token> ambiguous = matches.getAmbiguous();
+    int column = 0;
+    for (Token t : witness) {
+      if (unique.contains(t)) {
+        arrayTable.set(matches.getAll().get(t).get(0).getRank() - 1, column, true);
+      } else {
+        if (ambiguous.contains(t)) {
+          for (VariantGraphVertex vgv : matches.getAll().get(t)) {
+            arrayTable.set(vgv.getRank() - 1, column, true);
+          }
+        }
+      }
+      column++;
+    }
+    return arrayTable;
+  }
 
   private final ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 

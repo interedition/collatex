@@ -34,7 +34,7 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.matrixlinker.MatchMatrixLinker;
+import eu.interedition.collatex.matrixlinker.MatchMatrix;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
 
@@ -247,7 +247,7 @@ public class CollateXLaboratory extends JFrame {
         CollationAlgorithmFactory.dekker(comparator).collate(vg, w.get(0));
         final SimpleWitness witness = w.get(1);
 
-        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchMatrixLinker.buildMatrix(vg, witness, comparator), vg, witness));
+        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchMatrix.create(vg, witness, comparator), vg, witness));
 
         final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
         columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());
