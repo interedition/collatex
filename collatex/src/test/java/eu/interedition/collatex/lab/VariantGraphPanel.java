@@ -6,6 +6,8 @@ import java.awt.Stroke;
 import java.util.Iterator;
 
 import org.apache.commons.collections15.Transformer;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.WordUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -37,7 +39,7 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertexMod
       @Override
       public String transform(VariantGraphVertexModel variantGraphVertexModel) {
         final Multimap<Witness, Token> tokens = Multimaps.index(variantGraphVertexModel.getTokens(), Token.TO_WITNESS);
-        final StringBuilder label = new StringBuilder("<html>");
+        final StringBuilder label = new StringBuilder();
         for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
           label.append("[").append(witness.getSigil()).append(": '");
           for (Iterator<SimpleToken> tokenIt = Ordering.natural().sortedCopy(Iterables.filter(tokens.get(witness), SimpleToken.class)).iterator(); tokenIt.hasNext();) {
@@ -46,9 +48,12 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraphVertexMod
               label.append(" ");
             }
           }
-          label.append("']<br/>");
+          label.append("']\n");
         }
-        return label.append("(").append(variantGraphVertexModel.getRank()).append(")").append("</html>").toString().trim();
+        String trim = label.append("(").append(variantGraphVertexModel.getRank()).append(")").toString().trim();
+        String wrappedLabel = WordUtils.wrap(trim, 30, "\n", false);
+        String htmllabel = StringEscapeUtils.escapeHtml(wrappedLabel).replaceAll("\n", "<br/>");
+        return "<html>" + htmllabel + "</html>";
       }
     });
     rc.setEdgeLabelTransformer(new Transformer<VariantGraphEdgeModel, String>() {
