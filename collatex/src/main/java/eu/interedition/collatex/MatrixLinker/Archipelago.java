@@ -1,6 +1,13 @@
 package eu.interedition.collatex.matrixlinker;
 
 import java.util.ArrayList;
+import java.util.Map;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
+
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 
 public class Archipelago {
 
@@ -162,4 +169,17 @@ public class Archipelago {
     return result;
   }
 
+  public boolean containsCoordinate(int row, int column) {
+    return Objects.equal(getCoordinatesMap().get(row), column);
+  }
+
+  private Map<Integer, Integer> getCoordinatesMap() {
+    final Map<Integer, Integer> map = Maps.newHashMap();
+    for (final Island isl : iterator()) {
+      for (final Coordinates c : isl) {
+        map.put(c.getRow(), c.getColumn());
+      }
+    }
+    return map;
+  }
 }

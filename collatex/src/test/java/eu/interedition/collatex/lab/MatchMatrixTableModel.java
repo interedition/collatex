@@ -1,15 +1,12 @@
 package eu.interedition.collatex.lab;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
 import org.slf4j.Logger;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -17,8 +14,6 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matrixlinker.Archipelago;
 import eu.interedition.collatex.matrixlinker.ArchipelagoWithVersions;
 import eu.interedition.collatex.matrixlinker.MatchMatrix;
-import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
-import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 import eu.interedition.collatex.simple.SimpleToken;
 
 /**
@@ -57,7 +52,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
         Boolean at = matchMatrix.at(row, col);
         MatchMatrixCellStatus cell;
         if (at) {
-          cell = contains(preferred, row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
+          cell = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
         } else {
           cell = MatchMatrixCellStatus.EMPTY;
         }
@@ -66,24 +61,12 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     }
   }
 
-  private boolean contains(Archipelago preferred, int row, int col) {
-    Map<Integer, Integer> map = Maps.newHashMap();
-    for (Island isl : preferred.iterator()) {
-      for (Coordinates c : isl) {
-        map.put(c.getRow(), c.getColumn());
-      }
-    }
-    return Objects.equal(map.get(row), col);
-  }
-
   private Archipelago preferred(MatchMatrix matchMatrix) {
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
     for (MatchMatrix.Island isl : matchMatrix.getIslands()) {
       archipelago.add(isl);
     }
     Archipelago preferred = archipelago.createFirstVersion();
-    String html = matchMatrix.toHtml(preferred);
-    LOG.info(html);
     return preferred;
   }
 

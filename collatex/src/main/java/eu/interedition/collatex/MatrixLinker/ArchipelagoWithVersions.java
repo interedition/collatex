@@ -295,12 +295,12 @@ public class ArchipelagoWithVersions extends Archipelago {
     for (Integer[] a : listOrderedByRow) {
       System.out.println(a[0] + ": " + a[1] + "-" + a[2]);
     }
-    int rowPos = 0;
-    int colPos = 0;
-    int gapsPos = 0;
+    //    int rowPos = 0;
+    //    int colPos = 0;
+    //    int gapsPos = 0;
     output.println("<xml>");
     result += "<xml>" + newLine;
-    String res = "";
+    //    String res = "";
     /* inspecteer inhoud gaps */
     teller = 0;
     MatchMatrix.Coordinates vorige = new MatchMatrix.Coordinates(0, 0);
@@ -387,7 +387,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     int colCount = 0;
     int lastCol = -1;
     int lastRow = -1;
-    boolean sprong = false;
+    //    boolean sprong = false;
     boolean finished = false;
 
     while (!finished) {
