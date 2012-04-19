@@ -22,11 +22,11 @@ public class MatchMatrixLinker implements TokenLinker {
     for (MatchMatrix.Island isl : buildMatrix.getIslands()) {
       archipelago.add(isl);
     }
-    Archipelago createFirstVersion = archipelago.createFirstVersion();
+    Archipelago preferredIslands = archipelago.createFirstVersion();
     List<Token> columnTokens = buildMatrix.columnTokens();
     List<VariantGraphVertex> rowVertices = buildMatrix.rowVertices();
     Map<Token, VariantGraphVertex> map = Maps.newHashMap();
-    for (Island island : createFirstVersion.iterator()) {
+    for (Island island : preferredIslands.iterator()) {
       for (Coordinates c : island) {
         map.put(columnTokens.get(c.column), rowVertices.get(c.row));
       }

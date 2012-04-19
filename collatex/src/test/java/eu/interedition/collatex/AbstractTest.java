@@ -1,5 +1,23 @@
 package eu.interedition.collatex;
 
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
@@ -9,34 +27,17 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.dekker.Match;
+
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
+import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphEdge;
 import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.simple.WhitespaceTokenizer;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.neo4j.graphdb.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-
-import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -66,6 +67,7 @@ public abstract class AbstractTest {
       transaction = null;
     }
   }
+
   protected SimpleWitness[] createWitnesses(Function<String, List<String>> tokenizer, String... contents) {
     Assert.assertTrue("Not enough sigla", contents.length <= SIGLA.length);
     final SimpleWitness[] witnesses = new SimpleWitness[contents.length];
@@ -94,7 +96,7 @@ public abstract class AbstractTest {
   }
 
   protected static SortedSet<String> extractPhrases(VariantGraph graph, Witness witness) {
-    return extractPhrases(Sets.<String>newTreeSet(), graph, witness);
+    return extractPhrases(Sets.<String> newTreeSet(), graph, witness);
   }
 
   protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, VariantGraph graph, Witness witness) {
@@ -110,7 +112,7 @@ public abstract class AbstractTest {
     for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
       for (Token token : Ordering.natural().sortedCopy(Iterables.filter(tokens.get(witness), SimpleToken.class))) {
         tokenContents.add(((SimpleToken) token).getNormalized());
-      }      
+      }
     }
     return Joiner.on(' ').join(tokenContents);
   }
@@ -177,6 +179,10 @@ public abstract class AbstractTest {
       Assert.assertEquals(expectedPhrases[i], SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatch)));
       i++;
     }
+  }
+
+  protected void setCollationAlgorithm(CollationAlgorithm collationAlgorithm) {
+    this.collationAlgorithm = collationAlgorithm;
   }
 
 }

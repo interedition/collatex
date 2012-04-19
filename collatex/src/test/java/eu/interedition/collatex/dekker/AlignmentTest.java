@@ -167,7 +167,7 @@ public class AlignmentTest extends AbstractTest {
     witnesses.add(new SimpleWitness("w2", "Y B Z ", tokenizer));
     witnesses.add(new SimpleWitness("w3", "Y A X ", tokenizer));
 
-    collationAlgorithm = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
+    setCollationAlgorithm(CollationAlgorithmFactory.dekker(new EqualityTokenComparator()));
     VariantGraph graph = graphFactory.newVariantGraph();
     collationAlgorithm.collate(graph, witnesses.toArray(new SimpleWitness[0]));
 
