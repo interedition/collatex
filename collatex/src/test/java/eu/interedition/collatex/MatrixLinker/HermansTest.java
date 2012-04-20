@@ -172,6 +172,32 @@ public class HermansTest extends AbstractTest {
 
     //Mock Archipelago
     Archipelago result = mock(Archipelago.class);
+    Island i1 = new Island(new Coordinates(3, 3), new Coordinates(5, 5));
+    Island i2 = new Island(new Coordinates(3, 20), new Coordinates(5, 22));
+    Island i3 = new Island(new Coordinates(20, 3), new Coordinates(22, 5));
+    Island i4 = new Island(new Coordinates(20, 20), new Coordinates(22, 22));
+    Island i5 = new Island(new Coordinates(69, 66), new Coordinates(71, 68));
+    Island i6 = new Island(new Coordinates(25, 25), new Coordinates(26, 26));
+    Island i7 = new Island(new Coordinates(73, 70), new Coordinates(74, 71));
+    Island i8 = new Island(new Coordinates(0, 17), new Coordinates(0, 17));
+    Island i9 = new Island(new Coordinates(17, 17), new Coordinates(17, 17));
+    when(result.islandsCompete(i1, i2)).thenReturn(true);
+    when(result.islandsCompete(i1, i3)).thenReturn(true);
+    when(result.islandsCompete(i1, i4)).thenReturn(false);
+    when(result.islandsCompete(i1, i5)).thenReturn(false);
+    when(result.islandsCompete(i2, i3)).thenReturn(false);
+    when(result.islandsCompete(i2, i4)).thenReturn(true);
+    when(result.islandsCompete(i2, i5)).thenReturn(false);
+    when(result.islandsCompete(i3, i4)).thenReturn(true);
+    when(result.islandsCompete(i3, i5)).thenReturn(false);
+    when(result.islandsCompete(i4, i5)).thenReturn(false);
+    when(result.islandsCompete(i6, i7)).thenReturn(false);
+    when(result.islandsCompete(i8, i9)).thenReturn(true);
+    when(result.findClosestIsland(i2, i4)).thenReturn(i4);
+    when(result.findClosestIsland(i3, i4)).thenReturn(i4);
+    when(result.findClosestIsland(i1, i2)).thenReturn(i1);
+    when(result.findClosestIsland(i1, i3)).thenReturn(i1);
+    when(result.findClosestIsland(i5, i6)).thenReturn(i1);
 
     creator.createFirstVersion(result);
     verify(result).add(new Island(new Coordinates(40, 39), new Coordinates(58, 57)));
@@ -179,7 +205,32 @@ public class HermansTest extends AbstractTest {
     verify(result).add(new Island(new Coordinates(30, 31), new Coordinates(36, 37)));
     verify(result).add(new Island(new Coordinates(62, 59), new Coordinates(67, 64)));
     verify(result).add(new Island(new Coordinates(77, 74), new Coordinates(80, 77)));
+    verify(result).islandsCompete(i1, i2);
+    verify(result).islandsCompete(i1, i3);
+    verify(result).islandsCompete(i1, i4);
+    verify(result).islandsCompete(i1, i5);
+    verify(result).islandsCompete(i2, i3);
+    verify(result).islandsCompete(i2, i4);
+    verify(result).islandsCompete(i2, i5);
+    verify(result).islandsCompete(i3, i4);
+    verify(result).islandsCompete(i3, i5);
+    verify(result).islandsCompete(i4, i5);
+    verify(result).add(i5);
+    verify(result).findClosestIsland(i1, i2);
+    verify(result).findClosestIsland(i1, i3);
+    verify(result).findClosestIsland(i2, i4);
+    verify(result).findClosestIsland(i3, i4);
+    verify(result).add(i1);
+    verify(result).add(i4);
+    verify(result).islandsCompete(i6, i7);
+    verify(result).add(i6);
+    verify(result).add(i7);
+    verify(result).islandsCompete(i8, i9);
+    verify(result).findClosestIsland(null, null);
+    //    verify(result).islandsCompete(null, null);
+    //    verify(result).findClosestIsland(null, null);
     verifyNoMoreInteractions(result);
+
     //    SimpleWitness[] sw = createWitnesses(textD1, textD9);
     //    testWitnessCollation(sw);
   }

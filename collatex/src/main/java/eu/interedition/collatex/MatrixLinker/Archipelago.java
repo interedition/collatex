@@ -3,6 +3,9 @@ package eu.interedition.collatex.matrixlinker;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 
@@ -10,47 +13,48 @@ import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
 import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 
 public class Archipelago {
+  Logger LOG = LoggerFactory.getLogger(Archipelago.class);
 
-  protected ArrayList<MatchMatrix.Island> islands;
+  private ArrayList<MatchMatrix.Island> islands;
 
   public Archipelago() {
-    islands = new ArrayList<MatchMatrix.Island>();
+    setIslands(new ArrayList<MatchMatrix.Island>());
   }
 
   public Archipelago(MatchMatrix.Island isl) {
-    islands = new ArrayList<MatchMatrix.Island>();
-    islands.add(isl);
+    setIslands(new ArrayList<MatchMatrix.Island>());
+    getIslands().add(isl);
   }
 
   public void add(MatchMatrix.Island island) {
-    for (MatchMatrix.Island i : islands) {
+    for (MatchMatrix.Island i : getIslands()) {
       if (island.size() > i.size()) {
-        islands.add(islands.indexOf(i), island);
+        getIslands().add(getIslands().indexOf(i), island);
         return;
       } else
         try {
           MatchMatrix.Island disl = island;
           MatchMatrix.Island di = i;
           if (island.size() > i.size() && disl.direction() > di.direction()) {
-            islands.add(islands.indexOf(i), island);
+            getIslands().add(getIslands().indexOf(i), island);
             return;
           }
         } catch (Exception e) {}
     }
-    islands.add(island);
+    getIslands().add(island);
   }
 
   // this is not a real iterator implementation but it works...
   public ArrayList<MatchMatrix.Island> iterator() {
-    return islands;
+    return getIslands();
   }
 
   protected void remove(int i) {
-    islands.remove(i);
+    getIslands().remove(i);
   }
 
   public int size() {
-    return islands.size();
+    return getIslands().size();
   }
 
   public void mergeIslands() {
@@ -59,43 +63,43 @@ public class Archipelago {
     int[] rr = new int[size()];
     for (i = 0; i < size(); i++) {
       for (j = i + 1; j < size(); j++) {
-        if (islands.get(i).overlap(islands.get(j))) {
-          (islands.get(i)).merge(islands.get(j));
-          islands.get(j).clear();
+        if (getIslands().get(i).overlap(getIslands().get(j))) {
+          (getIslands().get(i)).merge(getIslands().get(j));
+          getIslands().get(j).clear();
           rr[j] = 1;
         }
       }
     }
     for (i = (rr.length - 1); i > 0; i--) {
-      if (rr[i] == 1) islands.remove(i);
+      if (rr[i] == 1) getIslands().remove(i);
     }
   }
 
   public Object numOfConflicts() {
     int result = 0;
-    int num = islands.size();
+    int num = getIslands().size();
     for (int i = 0; i < num; i++)
       for (int j = i + 1; j < num; j++) {
         //				System.out.println("compare "+islands.get(j)+" with "+islands.get(i));				
-        if (islands.get(j).isCompetitor(islands.get(i))) result++;
+        if (getIslands().get(j).isCompetitor(getIslands().get(i))) result++;
       }
     return result;
   }
 
   public MatchMatrix.Island get(int i) {
-    return islands.get(i);
+    return getIslands().get(i);
   }
 
   public Archipelago copy() {
     Archipelago result = new Archipelago();
-    for (MatchMatrix.Island isl : islands) {
+    for (MatchMatrix.Island isl : getIslands()) {
       result.add(new MatchMatrix.Island(isl));
     }
     return result;
   }
 
   public boolean conflictsWith(MatchMatrix.Island island) {
-    for (MatchMatrix.Island isl : islands) {
+    for (MatchMatrix.Island isl : getIslands()) {
       if (isl.isCompetitor(island)) return true;
     }
     return false;
@@ -104,7 +108,7 @@ public class Archipelago {
   @Override
   public String toString() {
     String result = "";
-    for (MatchMatrix.Island island : islands) {
+    for (MatchMatrix.Island island : getIslands()) {
       if (result.isEmpty())
         result = "[ " + island;
       else
@@ -116,7 +120,7 @@ public class Archipelago {
 
   public int value() {
     int result = 0;
-    for (MatchMatrix.Island isl : islands) {
+    for (MatchMatrix.Island isl : getIslands()) {
       result += isl.value();
     }
     return result;
@@ -147,7 +151,7 @@ public class Archipelago {
 
   public ArrayList<MatchMatrix.Coordinates> findGaps(ArrayList<MatchMatrix.Coordinates> list) {
     ArrayList<MatchMatrix.Coordinates> result = new ArrayList<MatchMatrix.Coordinates>(list);
-    for (MatchMatrix.Island isl : islands) {
+    for (MatchMatrix.Island isl : getIslands()) {
       MatchMatrix.Coordinates left = isl.getLeftEnd();
       MatchMatrix.Coordinates right = isl.getRightEnd();
       boolean found = false;
@@ -182,4 +186,62 @@ public class Archipelago {
     }
     return map;
   }
+
+  public boolean islandsCompete(Island i1, Island i2) {
+    return i1.isCompetitor(i2);
+  }
+
+  public void setIslands(ArrayList<MatchMatrix.Island> islands) {
+    this.islands = islands;
+  }
+
+  public ArrayList<MatchMatrix.Island> getIslands() {
+    return islands;
+  }
+
+  public Island findClosestIsland(Island island1, Island island2) {
+    Island closest = null;
+    double minimum1 = 10000;
+    double minimum2 = 10000;
+    for (Island fixedIsland : getIslands()) {
+      minimum1 = Math.min(minimum1, distance(island1, fixedIsland));
+      minimum2 = Math.min(minimum2, distance(island2, fixedIsland));
+    }
+    if (minimum1 < minimum2) {
+      closest = island1;
+    } else if (minimum2 < minimum1) {
+      closest = island2;
+    } else {
+      LOG.info("{} -> {}", island1, island2);
+      throw new RuntimeException("no minimum found, help!");
+    }
+    return closest;
+  }
+
+  private double distance(MatchMatrix.Island isl1, MatchMatrix.Island isl2) {
+    double result = 0.0;
+    int isl1_L_x = isl1.getLeftEnd().column;
+    int isl1_L_y = isl1.getLeftEnd().row;
+    int isl1_R_x = isl1.getRightEnd().column;
+    int isl1_R_y = isl1.getRightEnd().row;
+    int isl2_L_x = isl2.getLeftEnd().column;
+    int isl2_L_y = isl2.getLeftEnd().row;
+    int isl2_R_x = isl2.getRightEnd().column;
+    int isl2_R_y = isl2.getRightEnd().row;
+    result = distance(isl1_L_x, isl1_L_y, isl2_L_x, isl2_L_y);
+    double d = distance(isl1_L_x, isl1_L_y, isl2_R_x, isl2_R_y);
+    if (d < result) result = d;
+    d = distance(isl1_R_x, isl1_R_y, isl2_L_x, isl2_L_y);
+    if (d < result) result = d;
+    d = distance(isl1_R_x, isl1_R_y, isl2_R_x, isl2_R_y);
+    if (d < result) result = d;
+    return result;
+  }
+
+  private double distance(int a_x, int a_y, int b_x, int b_y) {
+    double result = 0.0;
+    result = Math.sqrt((a_x - b_x) * (a_x - b_x) + (a_y - b_y) * (a_y - b_y));
+    return result;
+  }
+
 }
