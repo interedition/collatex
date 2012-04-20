@@ -46,6 +46,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     }
 
     Archipelago preferred = preferred(matchMatrix);
+    LOG.info(matchMatrix.toHtml(preferred));
     data = new MatchMatrixCellStatus[rowNum][colNum];
     for (int row = 0; row < rowNum; row++) {
       for (int col = 0; col < colNum; col++) {

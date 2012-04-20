@@ -1,5 +1,6 @@
 package eu.interedition.collatex.matrixlinker;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,9 +8,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.ArrayTable;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Token;
@@ -18,6 +21,7 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.Matches;
 
 public class MatchMatrix {
+  static Logger LOG = LoggerFactory.getLogger(MatchMatrix.class);
 
   public static MatchMatrix create(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     base.rank();
@@ -176,7 +180,7 @@ public class MatchMatrix {
     int cols = colNum();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (at(i, j)) pairs.add(new Coordinates(j, i));
+        if (at(i, j)) pairs.add(new Coordinates(i, j));
       }
     }
     return pairs;
@@ -221,13 +225,13 @@ public class MatchMatrix {
     int row;
     int column;
 
-    public Coordinates(int column, int row) {
+    public Coordinates(int row, int column) {
       this.column = column;
       this.row = row;
     }
 
     Coordinates(Coordinates other) {
-      this(other.column, other.row);
+      this(other.row, other.column);
     }
 
     public int getRow() {
@@ -272,7 +276,7 @@ public class MatchMatrix {
 
     @Override
     public String toString() {
-      return "(" + column + "," + row + ")";
+      return "(" + row + "," + column + ")";
     }
   }
 
@@ -289,30 +293,40 @@ public class MatchMatrix {
   public static class Island implements Iterable<Coordinates> {
 
     private int direction = 0;
-    private final List<Coordinates> island = Lists.newArrayList();
+    private final List<Coordinates> islandCoordinates = Lists.newArrayList();
 
     public Island() {}
 
     public Island(Island other) {
-      for (Coordinates c : other.island) {
+      for (Coordinates c : other.islandCoordinates) {
         add(new Coordinates(c));
+      }
+    }
+
+    public Island(Coordinates first, Coordinates last) {
+      add(first);
+      Coordinates newCoordinate = first;
+      while (!newCoordinate.equals(last)) {
+        newCoordinate = new Coordinates(newCoordinate.getRow() + 1, newCoordinate.getColumn() + 1);
+        //        LOG.info("{}", newCoordinate);
+        add(newCoordinate);
       }
     }
 
     public boolean add(Coordinates coordinates) {
       boolean result = false;
-      if (island.isEmpty()) {
-        result = island.add(coordinates);
+      if (islandCoordinates.isEmpty()) {
+        result = islandCoordinates.add(coordinates);
       } else if (!contains(coordinates) && neighbour(coordinates)) {
         if (direction == 0) {
-          Coordinates existing = island.get(0);
+          Coordinates existing = islandCoordinates.get(0);
           direction = (existing.row - coordinates.row) / (existing.column - coordinates.column);
-          result = island.add(coordinates);
+          result = islandCoordinates.add(coordinates);
         } else {
-          Coordinates existing = island.get(0);
+          Coordinates existing = islandCoordinates.get(0);
           if (existing.column != coordinates.column) {
             int new_direction = (existing.row - coordinates.row) / (existing.column - coordinates.column);
-            if (new_direction == direction) result = island.add(coordinates);
+            if (new_direction == direction) result = islandCoordinates.add(coordinates);
           }
         }
       }
@@ -332,14 +346,14 @@ public class MatchMatrix {
     }
 
     public Coordinates getCoorOnRow(int row) {
-      for (Coordinates coor : island) {
+      for (Coordinates coor : islandCoordinates) {
         if (coor.getRow() == row) return coor;
       }
       return null;
     }
 
     public Coordinates getCoorOnCol(int col) {
-      for (Coordinates coor : island) {
+      for (Coordinates coor : islandCoordinates) {
         if (coor.getColumn() == col) return coor;
       }
       return null;
@@ -357,7 +371,7 @@ public class MatchMatrix {
      */
     public boolean isCompetitor(Island isl) {
       for (Coordinates c : isl) {
-        for (Coordinates d : island) {
+        for (Coordinates d : islandCoordinates) {
           if (c.sameColumn(d) || c.sameRow(d)) return true;
         }
       }
@@ -365,12 +379,12 @@ public class MatchMatrix {
     }
 
     public boolean contains(Coordinates c) {
-      return island.contains(c);
+      return islandCoordinates.contains(c);
     }
 
     public boolean neighbour(Coordinates c) {
       if (contains(c)) return false;
-      for (Coordinates islC : island) {
+      for (Coordinates islC : islandCoordinates) {
         if (c.bordersOn(islC)) {
           return true;
         }
@@ -379,16 +393,16 @@ public class MatchMatrix {
     }
 
     public Coordinates getLeftEnd() {
-      Coordinates coor = island.get(0);
-      for (Coordinates c : island) {
+      Coordinates coor = islandCoordinates.get(0);
+      for (Coordinates c : islandCoordinates) {
         if (c.column < coor.column) coor = c;
       }
       return coor;
     }
 
     public Coordinates getRightEnd() {
-      Coordinates coor = island.get(0);
-      for (Coordinates c : island) {
+      Coordinates coor = islandCoordinates.get(0);
+      for (Coordinates c : islandCoordinates) {
         if (c.column > coor.column) coor = c;
       }
       return coor;
@@ -396,19 +410,19 @@ public class MatchMatrix {
 
     @Override
     public Iterator<Coordinates> iterator() {
-      return Collections.unmodifiableList(island).iterator();
+      return Collections.unmodifiableList(islandCoordinates).iterator();
     }
 
     protected boolean removeSameColOrRow(Coordinates c) {
       ArrayList<Coordinates> remove = new ArrayList<Coordinates>();
-      for (Coordinates coor : island) {
+      for (Coordinates coor : islandCoordinates) {
         if (coor.sameColumn(c) || coor.sameRow(c)) {
           remove.add(coor);
         }
       }
       if (remove.isEmpty()) return false;
       for (Coordinates coor : remove) {
-        island.remove(coor);
+        islandCoordinates.remove(coor);
       }
       return true;
     }
@@ -421,11 +435,11 @@ public class MatchMatrix {
     }
 
     public int size() {
-      return island.size();
+      return islandCoordinates.size();
     }
 
     public void clear() {
-      island.clear();
+      islandCoordinates.clear();
     }
 
     public int value() {
@@ -434,10 +448,19 @@ public class MatchMatrix {
     }
 
     @Override
+    public int hashCode() {
+      return Objects.hashCode(islandCoordinates);
+    }
+
+    @Override
     public boolean equals(Object obj) {
       if (obj == null) return false;
+
       if (!obj.getClass().equals(Island.class)) return false;
+
       Island isl = (Island) obj;
+      if (isl.size() != size()) return false;
+
       boolean result = true;
       for (Coordinates c : isl) {
         result &= this.contains(c);
@@ -447,7 +470,8 @@ public class MatchMatrix {
 
     @Override
     public String toString() {
-      return Iterables.toString(island);
+      return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
+      //      return Iterables.toString(islandCoordinates);
     }
   }
 }

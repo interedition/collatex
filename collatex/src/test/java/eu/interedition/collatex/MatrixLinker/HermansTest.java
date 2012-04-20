@@ -1,6 +1,7 @@
 package eu.interedition.collatex.matrixlinker;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +21,8 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -134,7 +137,7 @@ public class HermansTest extends AbstractTest {
       e.printStackTrace();
     }
 
-    assertEquals(4877, firstVersion.value());
+    //    assertEquals(4877, firstVersion.value());
     // assertTrue(false);
 
     // archipelago.createNonConflictingVersions();
@@ -159,8 +162,26 @@ public class HermansTest extends AbstractTest {
   public void testHermansText2a() throws XMLStreamException {
     String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
     String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
-    SimpleWitness[] sw = createWitnesses(textD1, textD9);
-    testWitnessCollation(sw);
+    SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
+    VariantGraph base = collate(witnesses[0]);
+    MatchMatrix matrix = MatchMatrix.create(base, witnesses[1], new EqualityTokenComparator());
+    ArchipelagoWithVersions creator = new ArchipelagoWithVersions();
+    for (MatchMatrix.Island island : matrix.getIslands()) {
+      creator.add(island);
+    }
+
+    //Mock Archipelago
+    Archipelago result = mock(Archipelago.class);
+
+    creator.createFirstVersion(result);
+    verify(result).add(new Island(new Coordinates(40, 39), new Coordinates(58, 57)));
+    verify(result).add(new Island(new Coordinates(8, 8), new Coordinates(15, 15)));
+    verify(result).add(new Island(new Coordinates(30, 31), new Coordinates(36, 37)));
+    verify(result).add(new Island(new Coordinates(62, 59), new Coordinates(67, 64)));
+    verify(result).add(new Island(new Coordinates(77, 74), new Coordinates(80, 77)));
+    verifyNoMoreInteractions(result);
+    //    SimpleWitness[] sw = createWitnesses(textD1, textD9);
+    //    testWitnessCollation(sw);
   }
 
   private void testWitnessCollation(SimpleWitness[] sw) throws XMLStreamException, FactoryConfigurationError {

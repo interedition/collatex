@@ -2,8 +2,24 @@ package eu.interedition.collatex.matrixlinker;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 
 public class ArchipelagoWithVersions extends Archipelago {
+  Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
 
   private static final String newLine = System.getProperty("line.separator");
   private ArrayList<Archipelago> nonConflVersions;
@@ -180,7 +196,102 @@ public class ArchipelagoWithVersions extends Archipelago {
     * that Archipelago will have a high value if it contains the largest
     * possible islands
     */
-  public Archipelago createFirstVersion() {
+  public Archipelago createFirstVersion(Archipelago result) {
+    Map<Integer, Integer> fixedIslandCoordinates = Maps.newHashMap();
+
+    Multimap<Integer, MatchMatrix.Island> islandMultimap = ArrayListMultimap.create();
+    for (MatchMatrix.Island isl : islands) {
+      islandMultimap.put(isl.size(), isl);
+    }
+    List<Integer> keySet = Lists.newArrayList(islandMultimap.keySet());
+    Collections.sort(keySet);
+    List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
+    for (Integer size : decreasingIslandSizes) {
+      Collection<Island> islands = islandMultimap.get(size);
+      if (islands.size() == 1) {
+        Island isl = islands.iterator().next();
+        if (islandIsPossible(isl, fixedIslandCoordinates)) {
+          fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, isl);
+        }
+
+      } else {
+        List<Island> possibleIslands = Lists.newArrayList();
+        for (Island i : islands) {
+          if (islandIsPossible(i, fixedIslandCoordinates)) {
+            possibleIslands.add(i);
+          }
+        }
+        if (possibleIslands.size() == 1) {
+          fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, possibleIslands.get(0));
+        } else if (possibleIslands.size() > 1) {
+          //           Map<>
+          for (Island island : possibleIslands) {
+
+          }
+        }
+
+      }
+    }
+    //    for (MatchMatrix.Island isl : islands) {
+    //      int i = 0;
+    //      int res_size = result.size();
+    //      boolean confl = false;
+    //
+    //      for (i = 0; i < res_size; i++) {
+    //        if (result.get(i).isCompetitor(isl)) {
+    //          confl = true;
+    //          //					System.out.println("confl: "+isl+" with: "+i+" : "+result.get(i));
+    //          break;
+    //        }
+    //      }
+    //      if (!confl)
+    //        result.add(isl);
+    //      else {
+    //        MatchMatrix.Island island1 = result.get(i);
+    //        if (island1.size() <= isl.size()) {
+    //          double tot_d_1 = 0.0;
+    //          double tot_d_2 = 0.0;
+    //          for (int j = 0; j < i; j++) {
+    //            MatchMatrix.Island island2 = result.get(j);
+    //            tot_d_1 += distance(island2, island1);
+    //            tot_d_2 += distance(island2, isl);
+    //          }
+    //          System.out.println("tot_d_1: " + tot_d_1);
+    //          System.out.println("tot_d_2: " + tot_d_2);
+    //          if (tot_d_2 < tot_d_1) {
+    //            result.remove(i);
+    //            result.add(isl);
+    //          }
+    //        }
+    //      }
+    //    }
+    return result;
+  }
+
+  private Map<Integer, Integer> addIslandToResult(Map<Integer, Integer> fixedIslandCoordinates, Archipelago result, Island isl) {
+    LOG.info("adding island: '{}'", isl);
+    result.add(isl);
+    fixedIslandCoordinates = fixIslandCoordinates(isl, fixedIslandCoordinates);
+    return fixedIslandCoordinates;
+  }
+
+  private Map<Integer, Integer> fixIslandCoordinates(Island isl, Map<Integer, Integer> fixedIslandCoordinates) {
+    for (Coordinates coordinates : isl) {
+      fixedIslandCoordinates.put(coordinates.row, coordinates.column);
+    }
+    return fixedIslandCoordinates;
+  }
+
+  private boolean islandIsPossible(Island island, Map<Integer, Integer> fixedIslandCoordinates) {
+    boolean possible = true;
+    for (Coordinates coordinates : island) {
+      if (fixedIslandCoordinates.containsKey(coordinates.row) || //
+          fixedIslandCoordinates.containsValue(coordinates.column)) return false;
+    }
+    return possible;
+  }
+
+  public Archipelago createFirstVersion1() {
     Archipelago result = new Archipelago();
     for (MatchMatrix.Island isl : islands) {
       int i = 0;
@@ -189,7 +300,7 @@ public class ArchipelagoWithVersions extends Archipelago {
       for (i = 0; i < res_size; i++) {
         if (result.get(i).isCompetitor(isl)) {
           confl = true;
-          //					System.out.println("confl: "+isl+" with: "+i+" : "+result.get(i));
+          //          System.out.println("confl: "+isl+" with: "+i+" : "+result.get(i));
           break;
         }
       }
@@ -251,7 +362,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     int rowNum = rowLabels.size();
     int colNum = columnLabels.size();
     list.add(new MatchMatrix.Coordinates(0, 0));
-    list.add(new MatchMatrix.Coordinates(colNum - 1, rowNum - 1));
+    list.add(new MatchMatrix.Coordinates(rowNum - 1, colNum - 1));
     //  	System.out.println("1");
     Archipelago createFirstVersion = createFirstVersion();
     System.out.println("2");
@@ -379,6 +490,10 @@ public class ArchipelagoWithVersions extends Archipelago {
     //		output.println("</xml>");
     //		result += "</xml>";
     return doeiets(output, listOrderedByCol, listOrderedByRow, columnLabels, rowLabels);
+  }
+
+  public Archipelago createFirstVersion() {
+    return createFirstVersion(new Archipelago());
   }
 
   private String doeiets(PrintWriter output, ArrayList<Integer[]> listOrderedByCol, ArrayList<Integer[]> listOrderedByRow, ArrayList<String> columnLabels, ArrayList<String> rowLabels) {
