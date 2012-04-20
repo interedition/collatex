@@ -163,6 +163,9 @@ public class HermansTest extends AbstractTest {
     String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
     String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
     SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
+
+    testWitnessCollation(witnesses);
+
     VariantGraph base = collate(witnesses[0]);
     MatchMatrix matrix = MatchMatrix.create(base, witnesses[1], new EqualityTokenComparator());
     ArchipelagoWithVersions creator = new ArchipelagoWithVersions();
@@ -231,8 +234,6 @@ public class HermansTest extends AbstractTest {
     //    verify(result).findClosestIsland(null, null);
     verifyNoMoreInteractions(result);
 
-    //    SimpleWitness[] sw = createWitnesses(textD1, textD9);
-    //    testWitnessCollation(sw);
   }
 
   private void testWitnessCollation(SimpleWitness[] sw) throws XMLStreamException, FactoryConfigurationError {
