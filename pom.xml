@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.interedition</groupId>
     <artifactId>parent</artifactId>
-    <version>6</version>
+    <version>7</version>
     <packaging>pom</packaging>
     <name>Interedition Microservices</name>
     <description>Modules developed by a European-funded development collective whose aim it is to promote the
