@@ -41,6 +41,7 @@ import org.annolab.tt4j.TreeTaggerException;
 import org.annolab.tt4j.TreeTaggerWrapper;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -69,6 +70,7 @@ public class TokenizerTest extends AbstractTestResourceTest {
   private SessionFactory sessionFactory;
 
   @Test
+  @Ignore
   public void printTokenization() throws IOException, TreeTaggerException {
     final Text text = tokenize();
     printTokenizedWitness(text, annotationName(SENTENCE_NAME));
@@ -84,6 +86,7 @@ public class TokenizerTest extends AbstractTestResourceTest {
       treeTagger.setPerformanceMode(true);
       treeTagger.setHandler(new TokenHandler<String>() {
         public void token(String token, String pos, String lemma) {
+          System.out.printf("%s; %s; %s\n", token, pos, lemma);
           posStatistics.put(pos, Objects.firstNonNull(posStatistics.get(pos), 0) + 1);
         }
       });
