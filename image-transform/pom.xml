@@ -9,6 +9,7 @@
         <version>6</version>
     </parent>
     <artifactId>image-transform</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <name>Image Transformation</name>
     <description>Utilities for transforming digital images.</description>
     <licenses>
