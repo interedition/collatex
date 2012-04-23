@@ -14,6 +14,8 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -22,14 +24,11 @@ import java.util.List;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
+@Component
 public class CollationDeserializer extends JsonDeserializer<Collation> {
 
-
-  private final GraphFactory graphFactory;
-
-  public CollationDeserializer(GraphFactory graphFactory) {
-    this.graphFactory = graphFactory;
-  }
+  @Autowired
+  private GraphFactory graphFactory;
 
   @Override
   public Collation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {

@@ -10,10 +10,13 @@ import org.restlet.representation.WriterRepresentation;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.channels.WritableByteChannel;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -33,6 +36,19 @@ public class VariantGraphvizDotRepresentation extends WriterRepresentation imple
     return this;
   }
 
+  @Transactional
+  @Override
+  public void write(WritableByteChannel writableChannel) throws IOException {
+    super.write(writableChannel);
+  }
+
+  @Transactional
+  @Override
+  public void write(OutputStream outputStream) throws IOException {
+    super.write(outputStream);
+  }
+
+  @Transactional
   @Override
   public void write(Writer writer) throws IOException {
     final PrintWriter out = new PrintWriter(writer);

@@ -21,7 +21,7 @@
         <p>
           The CollateX service is callable via
           <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html" title="RFC">HTTP POST requests</a> to
-          <a href="${endpoint}" title="REST-API Endpoint">${endpoint?html}</a>.</p>
+          <a href="${endpoint!'/'}" title="REST-API Endpoint">${endpoint!'/'?html}</a>.</p>
 
         <h3>Input</h3>
 

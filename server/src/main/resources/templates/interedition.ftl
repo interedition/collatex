@@ -1,5 +1,4 @@
 <#ftl>
-<#assign cp = springMacroRequestContext.getContextPath()>
 
 <#macro page title header="">
 <!DOCTYPE html>
@@ -17,9 +16,11 @@
   <link rel="stylesheet" type="text/css" href="${cp}/static/webapp.css">
   <link rel="stylesheet" type="text/css" href="${cp}/static/interedition/interedition.css">
 
+  <script type="text/javascript" src="${cp}/static/yui-3.4.1/build/yui/yui-min.js"></script>
+  <script type="text/javascript">YUI.GlobalConfig = { debug: true, combine: true, comboBase: '${cp?js_string}/resources?', root: 'yui-3.4.1/build/' };</script>
+
   <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.min.js"></script>
   <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.behavior.min.js"></script>
-  <script type="text/javascript" src="${cp}/static/yui-3.4.1/build/yui/yui-min.js"></script>
   <script type="text/javascript" src="${cp}/static/api/collate.js"></script>
   <script type="text/javascript" src="${cp}/static/api/text.js"></script>
   <script type="text/javascript">var cp = "${cp?js_string}";</script>

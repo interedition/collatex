@@ -3,7 +3,6 @@ package eu.interedition.server.ui;
 import eu.interedition.server.ServerApplication;
 import org.restlet.data.Protocol;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 
@@ -17,7 +16,7 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 /**
- * Boots/Shuts down the servlet container.
+ * Boots/Shuts down the server.
  * <p/>
  * The action performs a start/ shutdown depending on its current state. The bootstrapping and shutdown
  * run asynchronously with a progress dialog signalling the ongoing action to the user.
@@ -25,7 +24,7 @@ import java.net.UnknownHostException;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @org.springframework.stereotype.Component
-public class ServerController extends AbstractAction implements InitializingBean, DisposableBean {
+public class ServerController extends AbstractAction implements DisposableBean {
   private static final String START_LABEL = "Start Server";
   private static final String START_DESCRIPTION = "Starts the Interedition Server and opens its homepage in a browser";
   private static final String STOP_LABEL = "Stop Server";
@@ -45,8 +44,6 @@ public class ServerController extends AbstractAction implements InitializingBean
 
   private final Desktop desktop = Desktop.getDesktop();
 
-  private org.restlet.Component component;
-
   public ServerController() {
     super(START_LABEL);
     putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource("/org/freedesktop/tango/16x16/apps/internet-web-browser.png"), "Browse Web"));
@@ -54,21 +51,15 @@ public class ServerController extends AbstractAction implements InitializingBean
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
-    component = new org.restlet.Component();
-    component.getDefaultHost().attach(application);
-  }
-
-  @Override
   public void destroy() throws Exception {
-    if (component.isStarted()) {
-      component.stop();
+    if (application.isStarted()) {
+      application.stop();
     }
   }
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    if (component.isStopped()) {
+    if (application.isStopped()) {
       start();
     } else {
       stop();
@@ -79,7 +70,7 @@ public class ServerController extends AbstractAction implements InitializingBean
    * Boot the servlet container.
    */
   public void start() {
-    if (component.isStarted()) {
+    if (application.isStarted()) {
       return;
     }
     final int port = setupPanel.getPort();
@@ -90,10 +81,11 @@ public class ServerController extends AbstractAction implements InitializingBean
     tasks.execute(new Runnable() {
       @Override
       public void run() {
-        component.getServers().clear();
-        component.getServers().add(Protocol.HTTP, port);
+        application.getServers().clear();
+        application.getServers().add(Protocol.HTTP, port).getContext().getParameters().set("maxThreads", "512");
+
         try {
-          component.start();
+          application.start();
           putValue(Action.NAME, STOP_LABEL);
           putValue(Action.SHORT_DESCRIPTION, STOP_DESCRIPTION);
         } catch (Exception e) {
@@ -105,7 +97,7 @@ public class ServerController extends AbstractAction implements InitializingBean
     });
     dialog.setVisible(true);
 
-    if (component.isStarted()) {
+    if (application.isStarted()) {
       try {
         String host;
         try {
@@ -130,7 +122,7 @@ public class ServerController extends AbstractAction implements InitializingBean
    * Shuts down the servlet container.
    */
   public void stop() {
-    if (component.isStopped()) {
+    if (application.isStopped()) {
       return;
     }
     final ServerOperationDialog dialog = new ServerOperationDialog(console, STOP_LABEL);
@@ -140,7 +132,7 @@ public class ServerController extends AbstractAction implements InitializingBean
       @Override
       public void run() {
         try {
-          component.stop();
+          application.stop();
           putValue(Action.NAME, START_LABEL);
           putValue(Action.SHORT_DESCRIPTION, START_DESCRIPTION);
         } catch (Exception e) {

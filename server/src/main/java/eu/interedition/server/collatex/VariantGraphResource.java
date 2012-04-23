@@ -5,6 +5,7 @@ import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import org.restlet.data.Reference;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
@@ -34,9 +35,9 @@ public class VariantGraphResource extends ServerResource {
     Preconditions.checkState(getRequest() != null);
   }
 
-  @Get("html")
-  public Template docs() throws IOException {
-    return freemarkerConfiguration.getTemplate("test.ftl");
+  @Get
+  public void docs() {
+    getResponse().redirectPermanent(new Reference(getReference(), "collate/apidocs"));
   }
 
   @Post

@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.ExecutorServiceAdapter;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -54,6 +56,19 @@ public class VariantGraphSVGRepresentation extends OutputRepresentation implemen
     return this;
   }
 
+  @Transactional
+  @Override
+  public void write(WritableByteChannel writableChannel) throws IOException {
+    super.write(writableChannel);
+  }
+
+  @Transactional
+  @Override
+  public void write(Writer writer) throws IOException {
+    super.write(writer);
+  }
+
+  @Transactional
   @Override
   public void write(OutputStream out) throws IOException {
     Preconditions.checkState(converter.isSvgAvailable());

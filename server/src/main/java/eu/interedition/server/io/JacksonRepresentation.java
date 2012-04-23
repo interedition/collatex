@@ -1,7 +1,5 @@
 package eu.interedition.server.io;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -18,77 +16,37 @@ import java.util.logging.Level;
  *
  * @see <a href="http://jackson.codehaus.org/">Jackson project</a>
  * @author Jerome Louvel
- * @param <T>
- *            The type to wrap.
  */
-public class JacksonRepresentation<T> extends WriterRepresentation {
+public class JacksonRepresentation extends WriterRepresentation {
 
   /** The Jackson object mapper. */
   private final ObjectMapper objectMapper;
 
   /** The (parsed) object to format. */
-  private T object;
+  private final Object object;
 
   /** The object class to instantiate. */
-  private Class<T> objectClass;
+  private final Class<?> objectClass;
 
   /** The JSON representation to parse. */
-  private Representation jsonRepresentation;
+  private final Representation representation;
 
-  /**
-   * Constructor.
-   *
-   * @param mediaType
-   *            The target media type.
-   * @param object
-   *            The object to format.
-   */
-  @SuppressWarnings("unchecked")
-  public JacksonRepresentation(MediaType mediaType, T object, ObjectMapper objectMapper) {
-    super(mediaType);
-    this.object = object;
-    this.objectClass = (Class<T>) ((object == null) ? null : object
-            .getClass());
-    this.jsonRepresentation = null;
+  public JacksonRepresentation(ObjectMapper objectMapper, Representation source, Class<?> target) {
+    super(source.getMediaType());
     this.objectMapper = objectMapper;
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param representation
-   *            The representation to parse.
-   */
-  public JacksonRepresentation(Representation representation,
-                               Class<T> objectClass, ObjectMapper objectMapper) {
-    super(representation.getMediaType());
+    this.objectClass = target;
     this.object = null;
-    this.objectClass = objectClass;
-    this.jsonRepresentation = representation;
+    this.representation = source;
+  }
+
+  public JacksonRepresentation(ObjectMapper objectMapper, MediaType mediaType, Object source, Class<?> target) {
+    super(mediaType);
     this.objectMapper = objectMapper;
+    this.objectClass = target;
+    this.object = source;
+    this.representation = null;
   }
 
-  /**
-   * Constructor.
-   *
-   * @param object
-   *            The object to format.
-   */
-  public JacksonRepresentation(T object, ObjectMapper objectMapper) {
-    this(MediaType.APPLICATION_JSON, object, objectMapper);
-  }
-
-  /**
-   * Creates a Jackson object mapper based on a media type. By default, it
-   * calls {@link ObjectMapper#ObjectMapper()}.
-   *
-   * @return The Jackson object mapper.
-   */
-  protected ObjectMapper createObjectMapper() {
-    JsonFactory jsonFactory = new JsonFactory();
-    jsonFactory.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
-    return new ObjectMapper(jsonFactory);
-  }
 
   /**
    * Returns the wrapped object, deserializing the representation with Jackson
@@ -96,59 +54,28 @@ public class JacksonRepresentation<T> extends WriterRepresentation {
    *
    * @return The wrapped object.
    */
-  public T getObject() {
-    T result = null;
+  public Object getObject() {
+    if (object != null) {
+      return object;
+    }
 
-    if (this.object != null) {
-      result = this.object;
-    } else if (this.jsonRepresentation != null) {
+    if (representation != null) {
       try {
-        result = getObjectMapper().readValue(
-                this.jsonRepresentation.getStream(), this.objectClass);
+        return objectMapper.readValue(representation.getStream(), this.objectClass);
       } catch (IOException e) {
-        Context.getCurrentLogger().log(Level.WARNING,
-                "Unable to parse the object with Jackson.", e);
+        Context.getCurrentLogger().log(Level.WARNING, "Unable to parse the object with Jackson.", e);
       }
     }
 
-    return result;
-  }
-
-  /**
-   * Returns the object class to instantiate.
-   *
-   * @return The object class to instantiate.
-   */
-  public Class<T> getObjectClass() {
-    return objectClass;
-  }
-
-  /**
-   * Returns the modifiable Jackson object mapper. Useful to customize
-   * mappings.
-   *
-   * @return The modifiable Jackson object mapper.
-   */
-  public ObjectMapper getObjectMapper() {
-    return this.objectMapper;
-  }
-
-  /**
-   * Sets the object to format.
-   *
-   * @param object
-   *            The object to format.
-   */
-  public void setObject(T object) {
-    this.object = object;
+    return null;
   }
 
   @Override
   public void write(Writer writer) throws IOException {
-    if (jsonRepresentation != null) {
-      jsonRepresentation.write(writer);
+    if (representation != null) {
+      representation.write(writer);
     } else if (object != null) {
-      getObjectMapper().writeValue(writer, object);
+      objectMapper.writeValue(writer, object);
     }
   }
 }

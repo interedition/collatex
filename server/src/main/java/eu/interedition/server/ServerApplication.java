@@ -1,64 +1,87 @@
 package eu.interedition.server;
 
 import eu.interedition.server.collatex.VariantGraphResource;
+import eu.interedition.server.io.ComboResourceFinder;
 import eu.interedition.server.ui.ServerConsole;
-import org.restlet.Application;
+import freemarker.template.Configuration;
 import org.restlet.Context;
-import org.restlet.Request;
-import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.resource.Finder;
+import org.restlet.data.Protocol;
+import org.restlet.resource.Directory;
 import org.restlet.resource.ServerResource;
-import org.restlet.routing.Filter;
-import org.restlet.routing.Router;
+import org.restlet.routing.VirtualHost;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+
+import static org.restlet.routing.Template.MODE_EQUALS;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Component
-public class ServerApplication extends Application implements InitializingBean {
-  private static final String TX_ATTRIBUTE = "tx";
-
+public class ServerApplication extends org.restlet.Component implements InitializingBean {
   @Autowired
   private AbstractApplicationContext applicationContext;
 
   @Autowired
+  private Environment environment;
+
+  @Autowired
   private PlatformTransactionManager transactionManager;
 
+  @Autowired
+  private Configuration freemarkerConfiguration;
+
+  @Autowired
+  private ComboResourceFinder comboResourceFinder;
+
   public ServerApplication() {
-    super(new Context());
+    super();
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    final Router router = new Router(getContext());
-    router.attachDefault(transactional(newFinder(VariantGraphResource.class)));
-    setInboundRoot(router);
+    getClients().add(Protocol.CLAP);
+    getClients().add(Protocol.FILE);
+
+    getLogService().setEnabled(false);
+
+    final Context context = getContext();
+
+    final VirtualHost host = getDefaultHost();
+    host.attach("/", new TemplateResourceFinder(freemarkerConfiguration, "index.ftl"), MODE_EQUALS);
+    host.attach("/collate", transactional(newFinder(VariantGraphResource.class)), MODE_EQUALS);
+    host.attach("/collate/apidocs", new TemplateResourceFinder(freemarkerConfiguration, "collate/apidocs.ftl"), MODE_EQUALS);
+    host.attach("/collate/console", new TemplateResourceFinder(freemarkerConfiguration, "collate/console.ftl"), MODE_EQUALS);
+    host.attach("/collate/darwin", new TemplateResourceFinder(freemarkerConfiguration, "collate/darwin-example.ftl"), MODE_EQUALS);
+    host.attach("/resources", comboResourceFinder);
+    host.attach("/static/interedition", new Directory(context.createChildContext(), "clap://thread/eu/interedition/style"));
+    host.attach("/static", new Directory(context.createChildContext(), environment.getRequiredProperty("interedition.static")));
   }
 
   private Restlet transactional(Restlet restlet) {
-    return new TransactionFilter(getContext(), restlet);
+    return new TransactionFilter(getContext().createChildContext(), restlet, transactionManager);
   }
 
   private <T extends ServerResource> ApplicationContextFinder<T> newFinder(Class<T> resourceType) {
-    return new ApplicationContextFinder<T>(getContext(), resourceType);
+    return new ApplicationContextFinder<T>(getContext().createChildContext(), applicationContext, resourceType);
   }
 
   /**
@@ -71,6 +94,14 @@ public class ServerApplication extends Application implements InitializingBean {
    */
   public static void main(String... args) {
     System.setSecurityManager(null);
+
+    final Logger logger = Logger.getLogger("");
+    for (Handler handler : logger.getHandlers()) {
+      if (ConsoleHandler.class.isAssignableFrom(handler.getClass())) {
+        logger.removeHandler(handler);
+      }
+    }
+    SLF4JBridgeHandler.install();
 
     try {
       final ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(new String[]{"/application-context.xml"}, false);
@@ -124,45 +155,4 @@ public class ServerApplication extends Application implements InitializingBean {
     return dataDirectory;
   }
 
-  private class ApplicationContextFinder<T extends ServerResource> extends Finder {
-    private final Class<T> beanType;
-
-    private ApplicationContextFinder(Context context, Class<T> beanType) {
-      super(context);
-      this.beanType = beanType;
-    }
-
-    @Override
-    public ServerResource find(Request request, Response response) {
-      return applicationContext.getBean(beanType);
-    }
-  }
-
-  private class TransactionFilter extends Filter {
-
-    public TransactionFilter(Context context, Restlet next) {
-      super(context, next);
-    }
-
-    @Override
-    protected int beforeHandle(Request request, Response response) {
-      final Map<String, Object> responseAttributes = response.getAttributes();
-      if (!responseAttributes.containsKey(TX_ATTRIBUTE)) {
-        responseAttributes.put(TX_ATTRIBUTE, transactionManager.getTransaction(new DefaultTransactionDefinition()));
-      }
-      return super.beforeHandle(request, response);
-    }
-
-    @Override
-    protected void afterHandle(Request request, Response response) {
-      TransactionStatus tx = (TransactionStatus) response.getAttributes().remove(TX_ATTRIBUTE);
-      if (tx != null) {
-        if (response.getStatus().isError()) {
-          tx.setRollbackOnly();
-        }
-        transactionManager.commit(tx);
-      }
-      super.afterHandle(request, response);
-    }
-  }
 }

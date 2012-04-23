@@ -15,6 +15,7 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.UniformResource;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -31,36 +32,64 @@ public class JacksonConverter extends ConverterHelper implements InitializingBea
   private static final VariantInfo VARIANT_JSON = new VariantInfo(MediaType.APPLICATION_JSON);
 
   @Autowired
-  private GraphFactory graphFactory;
+  private AbstractApplicationContext applicationContext;
+
+  @Autowired
+  private CollateXModule collateXModule;
 
   private ObjectMapper objectMapper;
 
-  /**
-   * Creates the marshaling {@link JacksonRepresentation}.
-   *
-   * @param <T>
-   * @param mediaType
-   *            The target media type.
-   * @param source
-   *            The source object to marshal.
-   * @return The marshaling {@link JacksonRepresentation}.
-   */
-  protected <T> JacksonRepresentation<T> create(MediaType mediaType, T source) {
-    return new JacksonRepresentation<T>(mediaType, source, objectMapper);
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    this.objectMapper = new ObjectMapper();
+    this.objectMapper.getJsonFactory().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
+    this.objectMapper.registerModule(new TextModule());
+    this.objectMapper.registerModule(collateXModule);
+
+    Engine.getInstance().getRegisteredConverters().add(this);
   }
 
-  /**
-   * Creates the unmarshaling {@link JacksonRepresentation}.
-   *
-   * @param <T>
-   * @param source
-   *            The source representation to unmarshal.
-   * @param objectClass
-   *            The object class to instantiate.
-   * @return The unmarshaling {@link JacksonRepresentation}.
-   */
-  protected <T> JacksonRepresentation<T> create(Representation source, Class<T> objectClass) {
-    return new JacksonRepresentation<T>(source, objectClass, objectMapper);
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T toObject(Representation source, Class<T> target, UniformResource resource) throws IOException {
+    Object result = null;
+
+    // The source for the Jackson conversion
+    JacksonRepresentation repr = null;
+
+    if (source instanceof JacksonRepresentation) {
+      repr = (JacksonRepresentation) source;
+    } else if (VARIANT_JSON.isCompatible(source)) {
+      repr = new JacksonRepresentation(objectMapper, source, target);
+    }
+
+    if (repr != null) {
+      // Handle the conversion
+      if ((target != null) && JacksonRepresentation.class.isAssignableFrom(target)) {
+        result = repr;
+      } else {
+        result = repr.getObject();
+      }
+    }
+
+    return (T) result;
+  }
+
+  @Override
+  public Representation toRepresentation(Object source, Variant target, UniformResource resource) {
+    if (source instanceof JacksonRepresentation) {
+      return (JacksonRepresentation) source;
+    }
+
+    if (target.getMediaType() == null) {
+      target.setMediaType(MediaType.APPLICATION_JSON);
+    }
+
+    if (VARIANT_JSON.isCompatible(target)) {
+      return new JacksonRepresentation(objectMapper, target.getMediaType(), source, (source == null) ? null : source.getClass());
+    }
+
+    return null;
   }
 
   @Override
@@ -90,7 +119,7 @@ public class JacksonConverter extends ConverterHelper implements InitializingBea
   public float score(Object source, Variant target, UniformResource resource) {
     float result = -1.0F;
 
-    if (source instanceof JacksonRepresentation<?>) {
+    if (source instanceof JacksonRepresentation) {
       result = 1.0F;
     } else {
       if (target == null) {
@@ -106,14 +135,12 @@ public class JacksonConverter extends ConverterHelper implements InitializingBea
   }
 
   @Override
-  public <T> float score(Representation source, Class<T> target,
-                         UniformResource resource) {
+  public <T> float score(Representation source, Class<T> target, UniformResource resource) {
     float result = -1.0F;
 
-    if (source instanceof JacksonRepresentation<?>) {
+    if (source instanceof JacksonRepresentation) {
       result = 1.0F;
-    } else if ((target != null)
-            && JacksonRepresentation.class.isAssignableFrom(target)) {
+    } else if ((target != null) && JacksonRepresentation.class.isAssignableFrom(target)) {
       result = 1.0F;
     } else if (VARIANT_JSON.isCompatible(source)) {
       result = 0.8F;
@@ -122,69 +149,8 @@ public class JacksonConverter extends ConverterHelper implements InitializingBea
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> T toObject(Representation source, Class<T> target,
-                        UniformResource resource) throws IOException {
-    Object result = null;
-
-    // The source for the Jackson conversion
-    JacksonRepresentation<?> jacksonSource = null;
-
-    if (source instanceof JacksonRepresentation) {
-      jacksonSource = (JacksonRepresentation<?>) source;
-    } else if (VARIANT_JSON.isCompatible(source)) {
-      jacksonSource = create(source, target);
-    }
-
-    if (jacksonSource != null) {
-      // Handle the conversion
-      if ((target != null)
-              && JacksonRepresentation.class.isAssignableFrom(target)) {
-        result = jacksonSource;
-      } else {
-        result = jacksonSource.getObject();
-      }
-    }
-
-    return (T) result;
-  }
-
-  @Override
-  public Representation toRepresentation(Object source, Variant target,
-                                         UniformResource resource) {
-    Representation result = null;
-
-    if (source instanceof JacksonRepresentation) {
-      result = (JacksonRepresentation<?>) source;
-    } else {
-      if (target.getMediaType() == null) {
-        target.setMediaType(MediaType.APPLICATION_JSON);
-      }
-
-      if (VARIANT_JSON.isCompatible(target)) {
-        JacksonRepresentation<Object> jacksonRepresentation = create(
-                target.getMediaType(), source);
-        result = jacksonRepresentation;
-      }
-    }
-
-    return result;
-  }
-
-  @Override
-  public <T> void updatePreferences(List<Preference<MediaType>> preferences,
-                                    Class<T> entity) {
+  public <T> void updatePreferences(List<Preference<MediaType>> preferences, Class<T> entity) {
     updatePreferences(preferences, MediaType.APPLICATION_JSON, 1.0F);
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    this.objectMapper = new ObjectMapper();
-    this.objectMapper.getJsonFactory().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
-    this.objectMapper.registerModule(new TextModule());
-    this.objectMapper.registerModule(new CollateXModule(graphFactory));
-
-    Engine.getInstance().getRegisteredConverters().add(this);
   }
 }

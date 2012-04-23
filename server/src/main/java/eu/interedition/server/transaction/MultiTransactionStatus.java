@@ -73,7 +73,6 @@ public class MultiTransactionStatus implements TransactionStatus {
     return getMainTransactionStatus().isCompleted();
   }
 
-
   private static class SavePoints {
     Map<TransactionStatus,Object> savepoints=new HashMap<TransactionStatus, Object>();
 
