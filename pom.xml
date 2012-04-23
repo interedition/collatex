@@ -22,6 +22,7 @@
         <module>text</module>
         <module>style</module>
         <module>webapp</module>
+        <module>image-transform</module>
         <module>server</module>
     </modules>
     <dependencies>
@@ -42,15 +43,13 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>jul-to-slf4j</artifactId>
             <version>${slf4j.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-            <scope>runtime</scope>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -325,6 +324,10 @@
             <id>tomp2p.net</id>
             <url>http://tomp2p.net/dev/mvn/</url>
         </repository>
+        <repository>
+            <id>gregor-middell-releases</id>
+            <url>http://gregor.middell.net/maven/content/repositories/releases</url>
+        </repository>
     </repositories>
     <build>
         <plugins>
@@ -453,7 +456,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <license.licenseName>gpl_v3</license.licenseName>
         <spring.version>3.1.0.RELEASE</spring.version>
-        <slf4j.version>1.5.11</slf4j.version>
+        <slf4j.version>1.6.4</slf4j.version>
         <jung.version>2.0.1</jung.version>
     </properties>
 </project>
