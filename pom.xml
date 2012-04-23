@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.interedition</groupId>
     <artifactId>parent</artifactId>
-    <version>7</version>
+    <version>8</version>
     <packaging>pom</packaging>
     <name>Interedition Microservices</name>
     <description>Modules developed by a European-funded development collective whose aim it is to promote the
@@ -349,6 +349,36 @@
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <detectLinks>true</detectLinks>
+                    <links>
+                        <link>http://docs.guava-libraries.googlecode.com/git-history/v11.0.2/javadoc/</link>
+                    </links>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>1.0-beta-3</version>
@@ -360,10 +390,6 @@
                         <root>src/test/java</root>
                     </roots>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
             </plugin>
         </plugins>
         <extensions>
