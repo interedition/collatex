@@ -3,11 +3,11 @@ package eu.interedition.text.json;
 import com.google.common.collect.Maps;
 import com.google.common.io.NullOutputStream;
 import eu.interedition.text.AbstractTestResourceTest;
-import eu.interedition.text.Range;
+import eu.interedition.text.TextTarget;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.json.map.TextSerializerModule;
-import eu.interedition.text.query.Criteria;
-import eu.interedition.text.query.Criterion;
+import eu.interedition.text.json.map.TextModule;
+import eu.interedition.text.query.QueryCriterion;
+import eu.interedition.text.query.QueryCriteria;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -30,7 +30,7 @@ public class JSONSerializerTest extends AbstractTestResourceTest {
   @Test
   public void simpleSerialization() throws IOException {
     final ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new TextSerializerModule());
+    objectMapper.registerModule(new TextModule());
 
     final StringWriter json = new StringWriter();
     final JsonFactory jf = objectMapper.getJsonFactory();
@@ -44,7 +44,7 @@ public class JSONSerializerTest extends AbstractTestResourceTest {
 
     js.serialize(jg, text(), new JSONSerializerConfiguration() {
       @Override
-      public Range getRange() {
+      public TextTarget getRange() {
         return null;
       }
 
@@ -57,8 +57,8 @@ public class JSONSerializerTest extends AbstractTestResourceTest {
       }
 
       @Override
-      public Criterion getQuery() {
-        return Criteria.any();
+      public QueryCriterion getQuery() {
+        return QueryCriteria.any();
       }
     });
     if (LOG.isDebugEnabled()) {

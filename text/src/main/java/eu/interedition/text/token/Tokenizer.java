@@ -22,55 +22,54 @@ package eu.interedition.text.token;
 import com.google.common.collect.Lists;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextListener;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.mem.SimpleName;
+import eu.interedition.text.query.AnnotationListener;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.TextTarget;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Required;
 
 import java.io.IOException;
 import java.util.List;
 
-import static eu.interedition.text.query.Criteria.*;
+import static eu.interedition.text.query.QueryCriteria.*;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Tokenizer {
-  public static final Name DEFAULT_TOKEN_NAME = new SimpleName(TextConstants.INTEREDITION_NS_URI, "token");
-
+  public static final Name DEFAULT_TOKEN_NAME = new Name(TextConstants.INTEREDITION_NS_URI, "token");
+  private static final int BATCH_SIZE = 1024;
   private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
-  private TextRepository textRepository;
-  private Name tokenName = DEFAULT_TOKEN_NAME;
-  private int batchSize = 1024;
+  private final SessionFactory sessionFactory;
+  private final Name tokenName;
 
-  public void setTextRepository(TextRepository textRepository) {
-    this.textRepository = textRepository;
-  }
-
-  public void setTokenName(Name tokenName) {
+  public Tokenizer(SessionFactory sessionFactory, Name tokenName) {
+    this.sessionFactory = sessionFactory;
     this.tokenName = tokenName;
   }
 
-  public void setBatchSize(int batchSize) {
-    this.batchSize = batchSize;
+  public Tokenizer(SessionFactory sessionFactory) {
+    this(sessionFactory, DEFAULT_TOKEN_NAME);
   }
 
   public void tokenize(Text text, TokenizerSettings settings) throws IOException {
-    textRepository.delete(and(text(text), annotationName(tokenName)));
-    textRepository.read(text, none(), new TokenGeneratingListener(text, settings));
+    final Session session = sessionFactory.getCurrentSession();
+    and(text(text), annotationName(tokenName)).delete(session);
+    none().listen(session, text, new TokenGeneratingListener(text, settings));
   }
 
-  private class TokenGeneratingListener implements TextListener {
+  private class TokenGeneratingListener implements AnnotationListener {
     private final TokenizerSettings settings;
     private final Text text;
+    private final Session session = sessionFactory.getCurrentSession();
 
-    private List<Annotation> batch = Lists.newArrayListWithExpectedSize(batchSize);
+    private List<Annotation> batch = Lists.newArrayListWithExpectedSize(BATCH_SIZE);
     private boolean lastIsTokenBoundary = true;
     private int offset = 0;
     private int tokenStart = Integer.MAX_VALUE;
@@ -101,7 +100,7 @@ public class Tokenizer {
     }
 
     @Override
-    public void text(Range r, String content) {
+    public void text(TextRange r, String content) {
       for (char c : content.toCharArray()) {
         if (settings.isBoundary(text, offset, c)) {
           lastIsTokenBoundary = true;
@@ -128,8 +127,8 @@ public class Tokenizer {
 
     private void token() {
       if (tokenStart < offset) {
-        batch.add(new SimpleAnnotation(text, tokenName, new Range(tokenStart, offset)));
-        if ((batch.size() % batchSize) == 0) {
+        batch.add(new Annotation(tokenName, new TextTarget(text, tokenStart, offset), null));
+        if ((batch.size() % BATCH_SIZE) == 0) {
           emit();
         }
         tokenCount++;
@@ -138,7 +137,7 @@ public class Tokenizer {
     }
 
     private void emit() {
-      textRepository.create(batch);
+      Annotation.create(session, batch);
       batch.clear();
     }
   }

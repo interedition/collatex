@@ -26,12 +26,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.event.ExceptionPropagatingTextAdapter;
-import eu.interedition.text.mem.SimpleName;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.query.ExceptionPropagatingAnnotationListenerAdapter;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -54,16 +53,16 @@ import java.util.Stack;
  */
 public class XMLSerializer {
 
-  private TextRepository textRepository;
+  private SessionFactory sessionFactory;
 
   @Required
-  public void setTextRepository(TextRepository textRepository) {
-    this.textRepository = textRepository;
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
   }
 
   public void serialize(final ContentHandler xml, Text text, final XMLSerializerConfiguration config) throws XMLStreamException, IOException {
     try {
-      textRepository.read(text, config.getQuery(), new SerializingListener(xml, config));
+      config.getQuery().listen(sessionFactory.getCurrentSession(), text, new SerializingListener(xml, text, config));
     } catch (Throwable t) {
       Throwables.propagateIfInstanceOf(t, IOException.class);
       Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
@@ -71,7 +70,7 @@ public class XMLSerializer {
     }
   }
 
-  private class SerializingListener extends ExceptionPropagatingTextAdapter {
+  private class SerializingListener extends ExceptionPropagatingAnnotationListenerAdapter {
     private final ContentHandler xml;
     private final XMLSerializerConfiguration config;
     private final List<Name> hierarchy;
@@ -84,13 +83,13 @@ public class XMLSerializer {
     private boolean rootWritten = false;
     private Ordering<Annotation> annotationOrdering;
 
-    private SerializingListener(ContentHandler xml, XMLSerializerConfiguration config) {
+    private SerializingListener(ContentHandler xml, Text text, XMLSerializerConfiguration config) {
       this.xml = xml;
       this.config = config;
       this.hierarchy = (config.getHierarchy() == null ? Collections.<Name>emptyList() : config.getHierarchy());
-      this.annotationOrdering = Ordering.from(new HierarchyAwareAnnotationComparator(this.hierarchy))
-              .compound(XMLNodePath.ANNOTATION_COMPARATOR)
-              .compound(Ordering.<Annotation>natural());
+      this.annotationOrdering = Annotation.orderByText(text)
+              .compound(new HierarchyAwareAnnotationComparator(this.hierarchy))
+              .compound(XMLNodePath.ANNOTATION_COMPARATOR);
       this.namespaceMappings.put(URI.create(XMLConstants.XML_NS_URI), XMLConstants.XML_NS_PREFIX);
       this.namespaceMappings.put(URI.create(XMLConstants.XMLNS_ATTRIBUTE_NS_URI), XMLConstants.XMLNS_ATTRIBUTE);
     }
@@ -147,7 +146,7 @@ public class XMLSerializer {
     }
 
     @Override
-    protected void doText(Range r, String text) throws Exception {
+    protected void doText(TextRange r, String text) throws Exception {
       final char[] chars = text.toCharArray();
       xml.characters(chars, 0, chars.length);
     }
@@ -204,9 +203,9 @@ public class XMLSerializer {
       namespaceMappings.put(namespace, prefix);
       namespaceMappingStack.peek().add(namespace);
       if (prefix.length() == 0) {
-        nsAttributes.put(new SimpleName((URI) null, XMLConstants.XMLNS_ATTRIBUTE), uri);
+        nsAttributes.put(new Name(null, XMLConstants.XMLNS_ATTRIBUTE), uri);
       } else {
-        nsAttributes.put(new SimpleName(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix), uri);
+        nsAttributes.put(new Name(TextConstants.XMLNS_ATTRIBUTE_NS_URI, prefix), uri);
         xml.startPrefixMapping(prefix, uri);
       }
     }
@@ -241,7 +240,7 @@ public class XMLSerializer {
     }
 
     private Name toQName(String uri, String localName) {
-      return new SimpleName(URI.create(uri), localName);
+      return new Name(URI.create(uri), localName);
     }
 
     private Attributes toAttributes(final Map<Name, String> attributes) {
@@ -309,18 +308,13 @@ public class XMLSerializer {
     }
 
     public int compare(Annotation o1, Annotation o2) {
-      int result = o1.getRange().compareTo(o2.getRange());
-      if (result != 0) {
-        return result;
-      }
-
       final Name o1Name = o1.getName();
       final Name o2Name = o2.getName();
       if (hierarchy.contains(o1Name) && hierarchy.contains(o2Name)) {
-        result = hierarchyOrdering.compare(o1Name, o2Name);
+        return hierarchyOrdering.compare(o1Name, o2Name);
       }
 
-      return result;
+      return 0;
     }
   }
 }

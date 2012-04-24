@@ -34,7 +34,7 @@ import java.net.URI;
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/testContext.xml", "classpath:/eu/interedition/text/rdbms/repository-context.xml"})
+@ContextConfiguration(locations = {"classpath:/testContext.xml"})
 @Transactional
 public abstract class AbstractTest {
   /**

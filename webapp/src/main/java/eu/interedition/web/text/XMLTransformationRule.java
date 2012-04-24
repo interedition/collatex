@@ -1,7 +1,6 @@
 package eu.interedition.web.text;
 
 import eu.interedition.text.Name;
-import eu.interedition.text.rdbms.RelationalNameRegistry;
 import eu.interedition.text.util.SQL;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -92,7 +91,7 @@ public class XMLTransformationRule {
     @Override
     public XMLTransformationRule mapRow(ResultSet rs, int rowNum) throws SQLException {
       final XMLTransformationRule xtr = new XMLTransformationRule();
-      xtr.setName(RelationalNameRegistry.mapNameFrom(rs, "n"));
+      xtr.setName(null); // FIXME!!
       xtr.setLineElement(rs.getBoolean("xtr_is_line"));
       xtr.setContainerElement(rs.getBoolean("xtr_is_container"));
       xtr.setExcluded(rs.getBoolean("xtr_is_excluded"));

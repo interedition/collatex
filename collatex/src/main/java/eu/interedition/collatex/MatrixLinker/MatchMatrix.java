@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.Lists;
 
@@ -20,7 +21,7 @@ import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.Matches;
 
-public class MatchMatrix {
+public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
   static Logger LOG = LoggerFactory.getLogger(MatchMatrix.class);
 
   public static MatchMatrix create(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
@@ -219,6 +220,27 @@ public class MatchMatrix {
       }
     }
     return islands;
+  }
+
+  @Override
+  public Iterator<Coordinate> iterator() {
+    return new AbstractIterator<Coordinate>() {
+      private int row = 0;
+      private final int col = 0;
+      private final int rows = rowNum();
+      private int cols = colNum();
+
+      @Override
+      protected Coordinate computeNext() {
+        while (row < rows) {
+          if (cols++ < cols) {
+            return new Coordinate(row, col);
+          }
+          ++row;
+        }
+        return endOfData();
+      }
+    };
   }
 
   public static class Coordinate implements Comparable<Coordinate> {

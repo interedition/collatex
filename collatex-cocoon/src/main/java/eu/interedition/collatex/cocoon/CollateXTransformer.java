@@ -1,23 +1,12 @@
 package eu.interedition.collatex.cocoon;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.RowSortedTable;
-import com.google.common.collect.SetMultimap;
-import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.graph.GraphFactory;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.simple.SimpleToken;
-import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.simple.WhitespaceTokenizer;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.cocoon.ProcessingException;
@@ -27,12 +16,25 @@ import org.neo4j.graphdb.Transaction;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.RowSortedTable;
+import com.google.common.collect.SetMultimap;
+
+import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.graph.GraphFactory;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.simple.WhitespaceTokenizer;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -48,7 +50,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
 
   private GraphFactory graphFactory;
   private OutputType outputType = OutputType.ALIGNMENT_TABLE;
-  private List<Iterable<Token>> witnesses = Lists.newArrayList();
+  private final List<Iterable<Token>> witnesses = Lists.newArrayList();
   private String sigil;
 
   @Override
@@ -62,6 +64,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     }
   }
 
+  @Override
   public void startTransformingElement(String uri, String name, String raw, Attributes attr) throws ProcessingException, IOException, SAXException {
     if ("collation".equals(name)) {
       final String outputType = attr.getValue(defaultNamespaceURI, "outputType");

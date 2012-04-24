@@ -1,6 +1,6 @@
 package eu.interedition.web;
 
-import eu.interedition.text.json.map.TextSerializerModule;
+import eu.interedition.text.json.map.TextModule;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class ObjectMapperFactoryBean extends AbstractFactoryBean<ObjectMapper> {
   @Override
   protected ObjectMapper createInstance() throws Exception {
     final ObjectMapper om = new ObjectMapper();
-    om.registerModule(new TextSerializerModule());
+    om.registerModule(new TextModule());
     return om;
   }
 }

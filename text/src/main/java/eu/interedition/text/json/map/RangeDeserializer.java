@@ -1,6 +1,6 @@
 package eu.interedition.text.json.map;
 
-import eu.interedition.text.Range;
+import eu.interedition.text.TextTarget;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
@@ -14,9 +14,9 @@ import static org.codehaus.jackson.JsonToken.*;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeDeserializer extends JsonDeserializer<Range> {
+public class RangeDeserializer extends JsonDeserializer<TextTarget> {
   @Override
-  public Range deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+  public TextTarget deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
     if (!START_ARRAY.equals(jp.getCurrentToken())) {
       throw new JsonParseException("QName: Expected start of array", jp.getCurrentLocation());
     }
@@ -32,7 +32,7 @@ public class RangeDeserializer extends JsonDeserializer<Range> {
     if (!VALUE_NUMBER_INT.equals(token)) {
       throw new JsonParseException("QName: Expected number as end of range", jp.getCurrentLocation());
     }
-    final Range range = new Range(start, jp.getValueAsLong());
+    final TextTarget range = new TextTarget(null, start, jp.getValueAsLong());
 
     if (!END_ARRAY.equals(jp.nextToken())) {
       throw new JsonParseException("QName: Expected end of array", jp.getCurrentLocation());

@@ -24,10 +24,9 @@ import com.google.common.collect.Maps;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.mem.SimpleName;
-import eu.interedition.text.query.Criteria;
-import eu.interedition.text.query.Criterion;
-import eu.interedition.text.query.Operator;
+import eu.interedition.text.query.QueryCriterion;
+import eu.interedition.text.query.QueryCriteria;
+import eu.interedition.text.query.QueryOperator;
 import eu.interedition.text.xml.XMLSerializerConfiguration;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -37,19 +36,19 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import static eu.interedition.text.query.Criteria.annotationName;
-import static eu.interedition.text.query.Criteria.or;
+import static eu.interedition.text.query.QueryCriteria.annotationName;
+import static eu.interedition.text.query.QueryCriteria.or;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class XMLSerialization implements XMLSerializerConfiguration {
-  private Name rootName = new SimpleName(TextConstants.INTEREDITION_NS_URI, "root");
+  private Name rootName = new Name(TextConstants.INTEREDITION_NS_URI, "root");
   private Map<String, URI> namespaceMappings = Maps.newHashMap();
   private List<Name> hierarchy = Lists.newArrayList();
   private boolean hierarchyOnly = true;
   private Text text;
-  private Criterion query = Criteria.any();
+  private QueryCriterion query = QueryCriteria.any();
 
   public XMLSerialization() {
     namespaceMappings.put("tei", TextConstants.TEI_NS);
@@ -110,18 +109,18 @@ public class XMLSerialization implements XMLSerializerConfiguration {
 
   @JsonIgnore
   @Override
-  public Criterion getQuery() {
+  public QueryCriterion getQuery() {
     return query;
   }
 
   @JsonIgnore
-  public void setQuery(Criterion query) {
+  public void setQuery(QueryCriterion query) {
     this.query = query;
   }
 
   public void evaluate() {
     if (hierarchyOnly && !hierarchy.isEmpty()) {
-      final Operator hierarchyDisjunction = or();
+      final QueryOperator hierarchyDisjunction = or();
       for (Name name : hierarchy) {
         hierarchyDisjunction.add(annotationName(name));
       }

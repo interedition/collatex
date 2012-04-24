@@ -20,26 +20,17 @@
 package eu.interedition.web.metadata;
 
 import com.google.common.base.Predicates;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.rdbms.RelationalText;
 import eu.interedition.text.util.SQL;
 import eu.interedition.text.xml.XML;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.joda.time.DateTime;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
@@ -231,7 +222,7 @@ public class DublinCoreMetadata {
     }
   }
 
-  public DublinCoreMetadata update(TextRepository repository, Text source) throws IOException, XMLStreamException {
+  public DublinCoreMetadata update(Text source) throws IOException, XMLStreamException {
     if (source.getType() != Text.Type.XML) {
       return this;
     }
@@ -239,7 +230,7 @@ public class DublinCoreMetadata {
     Reader textReader = null;
     XMLStreamReader xmlReader = null;
     try {
-      textReader = repository.read(source).getInput();
+      textReader = source.read().getInput();
       xmlReader = XML.createXMLInputFactory().createXMLStreamReader(textReader);
 
       boolean inTitleStmt = false;

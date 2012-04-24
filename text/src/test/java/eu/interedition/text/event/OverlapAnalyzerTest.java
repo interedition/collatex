@@ -21,12 +21,11 @@ package eu.interedition.text.event;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.text.AbstractTestResourceTest;
-import eu.interedition.text.Range;
+import eu.interedition.text.Annotation;
+import eu.interedition.text.Name;
 import eu.interedition.text.Text;
-import eu.interedition.text.event.OverlapAnalyzer;
-import eu.interedition.text.mem.SimpleAnnotation;
-import eu.interedition.text.mem.SimpleName;
-import eu.interedition.text.query.Criteria;
+import eu.interedition.text.TextTarget;
+import eu.interedition.text.util.OverlapAnalyzer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,10 +45,10 @@ public class OverlapAnalyzerTest extends AbstractTestResourceTest {
 
   @Test
   public void analyzeSelfOverlap() throws IOException {
-    final SimpleName overlap = new SimpleName(TEST_NS, "overlap");
-    textRepository.create(
-            new SimpleAnnotation(text, overlap, new Range(0, TEST_TEXT.length() - 1)),
-            new SimpleAnnotation(text, overlap, new Range(1, TEST_TEXT.length()))
+    final Name overlap = new Name(TEST_NS, "overlap");
+    Annotation.create(sessionFactory.getCurrentSession(),
+            new Annotation(overlap, new TextTarget(text, 0, TEST_TEXT.length() - 1), null),
+            new Annotation(overlap, new TextTarget(text, 1, TEST_TEXT.length()), null)
     );
     final OverlapAnalyzer analyzer = analyze(text);
     Assert.assertEquals(0, analyzer.getOverlapping().size());
@@ -58,6 +57,6 @@ public class OverlapAnalyzerTest extends AbstractTestResourceTest {
   }
 
   protected OverlapAnalyzer analyze(Text text) throws IOException {
-    return new OverlapAnalyzer().analyze(textRepository, text);
+    return new OverlapAnalyzer().analyze(sessionFactory.getCurrentSession(), text);
   }
 }

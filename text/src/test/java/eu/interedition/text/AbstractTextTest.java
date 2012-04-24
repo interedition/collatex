@@ -19,6 +19,7 @@
  */
 package eu.interedition.text;
 
+import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public abstract class AbstractTextTest extends AbstractTest {
   public static final String TEST_TEXT = "Hello World";
 
   @Autowired
-  protected TextRepository textRepository;
+  protected SessionFactory sessionFactory;
 
   /**
    * The in-memory document model to run tests against.
@@ -49,7 +50,7 @@ public abstract class AbstractTextTest extends AbstractTest {
    */
   @Before
   public void createTestText() throws IOException {
-    this.text = textRepository.create(null, new StringReader(getTestText()));
+    this.text = Text.create(sessionFactory.getCurrentSession(), null, new StringReader(getTestText()));
   }
 
   /**
@@ -58,7 +59,7 @@ public abstract class AbstractTextTest extends AbstractTest {
   @After
   public void cleanTestText() {
     if (text != null) {
-      textRepository.delete(text);
+      sessionFactory.getCurrentSession().delete(text);
       text = null;
     }
   }

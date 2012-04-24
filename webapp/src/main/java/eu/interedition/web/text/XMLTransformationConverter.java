@@ -1,6 +1,5 @@
 package eu.interedition.web.text;
 
-import eu.interedition.text.rdbms.RelationalNameRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,7 +23,7 @@ public class XMLTransformationConverter implements Converter<String, XMLTransfor
 
     xt.setRules(jdbcTemplate.query(new StringBuilder("select ")
             .append(XMLTransformationRule.select("xtr"))
-            .append(", ").append(RelationalNameRegistry.selectNameFrom("n"))
+            .append(", ").append("") // FIXME!!
             .append(" from xml_transform_rule xtr join text_qname n on xtr.name = n.id where xtr.config = ?").toString(),
             XMLTransformationRule.ROW_MAPPER, id));
 

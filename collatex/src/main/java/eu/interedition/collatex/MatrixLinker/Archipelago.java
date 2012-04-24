@@ -244,7 +244,7 @@ public class Archipelago {
     return result;
   }
 
-  public Double smallestDistance(Island isl) {
+  public double smallestDistance(Island isl) {
     double minimum = 10000;
     for (Island fixedIsland : getIslands()) {
       minimum = Math.min(minimum, distance(isl, fixedIsland));

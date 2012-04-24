@@ -23,8 +23,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-import eu.interedition.text.rdbms.RelationalText;
-import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.text.Text;
 import eu.interedition.web.metadata.DublinCoreMetadata;
 import eu.interedition.web.metadata.MetadataController;
 import eu.interedition.web.text.TextController;
@@ -44,17 +43,15 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -80,7 +77,7 @@ public class IndexController implements InitializingBean, DisposableBean {
   private MetadataController metadataController;
 
   @Autowired
-  private RelationalTextRepository textRepository;
+  private SessionFactory sessionFactory;
 
   private FSDirectory directory;
   private StandardAnalyzer analyzer;
@@ -124,14 +121,14 @@ public class IndexController implements InitializingBean, DisposableBean {
   }
 
   public void update(DublinCoreMetadata metadata) throws IOException {
-    final RelationalText text = textRepository.read(metadata.getText());
+    final Text text = (Text) sessionFactory.getCurrentSession().load(Text.class, metadata.getText());
     Reader textReader = null;
     try {
       final Document document = new Document();
       document.add(new Field("id", Long.toString(text.getId()), Field.Store.YES, Field.Index.NOT_ANALYZED));
       document.add(new Field("type", text.getType().toString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
       document.add(new Field("content_length", Long.toString(text.getLength()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-      document.add(new Field("content", textReader = textRepository.read(text).getInput()));
+      document.add(new Field("content", textReader = text.read().getInput()));
 
       metadata.addTo(document);
 

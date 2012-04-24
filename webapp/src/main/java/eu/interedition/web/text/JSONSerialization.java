@@ -2,11 +2,11 @@ package eu.interedition.web.text;
 
 import com.google.common.collect.Maps;
 import eu.interedition.text.Name;
-import eu.interedition.text.Range;
+import eu.interedition.text.TextTarget;
 import eu.interedition.text.Text;
 import eu.interedition.text.json.JSONSerializerConfiguration;
-import eu.interedition.text.query.Criteria;
-import eu.interedition.text.query.Criterion;
+import eu.interedition.text.query.QueryCriterion;
+import eu.interedition.text.query.QueryCriteria;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
@@ -20,10 +20,10 @@ import java.util.Set;
  */
 public class JSONSerialization implements JSONSerializerConfiguration {
   private Text text;
-  private Range range;
+  private TextTarget range;
   private Map<String, URI> namespaceMappings = Maps.newHashMap();
   private Set<Name> dataSet;
-  private Criterion query = Criteria.any();
+  private QueryCriterion query = QueryCriteria.any();
 
   @JsonIgnore
   public Text getText() {
@@ -36,11 +36,11 @@ public class JSONSerialization implements JSONSerializerConfiguration {
   }
 
   @Override
-  public Range getRange() {
+  public TextTarget getRange() {
     return range;
   }
 
-  public void setRange(Range range) {
+  public void setRange(TextTarget range) {
     this.range = range;
   }
 
@@ -62,7 +62,7 @@ public class JSONSerialization implements JSONSerializerConfiguration {
 
   @JsonIgnore
   @Override
-  public Criterion getQuery() {
+  public QueryCriterion getQuery() {
     return query;
   }
 }

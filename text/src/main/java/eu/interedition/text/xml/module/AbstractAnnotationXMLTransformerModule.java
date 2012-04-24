@@ -21,15 +21,11 @@ package eu.interedition.text.xml.module;
 
 import com.google.common.collect.Lists;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.Name;
-import eu.interedition.text.Range;
-import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.mem.SimpleAnnotation;
 import eu.interedition.text.xml.XMLTransformer;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ObjectNode;
+import org.hibernate.Session;
 
 import java.util.List;
 
@@ -58,27 +54,28 @@ public abstract class AbstractAnnotationXMLTransformerModule extends XMLTransfor
   @Override
   public void end(XMLTransformer transformer) {
     if (!annotationBatch.isEmpty()) {
-      emit(transformer.getRepository());
+      emit(transformer.getSessionFactory().getCurrentSession());
     }
 
     annotationBatch = null;
     super.end(transformer);
   }
 
-  protected void add(XMLTransformer transformer, Text text, Name name, Range range, JsonNode data) {
+  protected void add(XMLTransformer transformer, Annotation annotation) {
+    final JsonNode data = annotation.getData();
     if (!addNodePath && data.isObject()) {
       ((ObjectNode) data).remove(XML_NODE_ATTR);
     }
 
-    annotationBatch.add(new SimpleAnnotation(text, name, range, data));
+    annotationBatch.add(annotation);
 
     if ((annotationBatch.size() % batchSize) == 0) {
-      emit(transformer.getRepository());
+      emit(transformer.getSessionFactory().getCurrentSession());
     }
   }
 
-  protected void emit(TextRepository repository) {
-    repository.create(annotationBatch);
+  protected void emit(Session session) {
+    Annotation.create(session, annotationBatch);
     annotationBatch.clear();
   }
 

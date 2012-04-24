@@ -1,7 +1,6 @@
 package eu.interedition.text.json.map;
 
 import eu.interedition.text.Text;
-import eu.interedition.text.rdbms.RelationalText;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
@@ -27,9 +26,7 @@ public class TextSerializer extends JsonSerializer<Text> {
     jgen.writeStartObject();
     jgen.writeStringField(TYPE_FIELD, value.getType().name().toLowerCase());
     jgen.writeNumberField(LENGTH_FIELD, value.getLength());
-    if (value instanceof RelationalText) {
-      jgen.writeNumberField(ID_FIELD, ((RelationalText) value).getId());
-    }
+    jgen.writeNumberField(ID_FIELD, value.getId());
     jgen.writeEndObject();
   }
 }

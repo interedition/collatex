@@ -19,119 +19,165 @@
  */
 package eu.interedition.text.token;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.text.AbstractTestResourceTest;
 import eu.interedition.text.Annotation;
-import eu.interedition.text.Range;
+import eu.interedition.text.Name;
 import eu.interedition.text.Text;
-import eu.interedition.text.event.TextAdapter;
-import eu.interedition.text.query.Criteria;
-import eu.interedition.text.query.Criterion;
-import eu.interedition.text.rdbms.RelationalTextRepository;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRange;
+import eu.interedition.text.TextTarget;
+import eu.interedition.text.query.AnnotationListenerAdapter;
+import eu.interedition.text.query.QueryCriterion;
+import eu.interedition.text.query.QueryCriteria;
+import org.annolab.tt4j.TokenHandler;
+import org.annolab.tt4j.TreeTaggerException;
+import org.annolab.tt4j.TreeTaggerWrapper;
+import org.hibernate.SessionFactory;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.regex.Pattern;
 
-import static eu.interedition.text.query.Criteria.and;
-import static eu.interedition.text.query.Criteria.annotationName;
+import static eu.interedition.text.query.QueryCriteria.and;
+import static eu.interedition.text.query.QueryCriteria.annotationName;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Transactional
 public class TokenizerTest extends AbstractTestResourceTest {
+
+  private static final Name SENTENCE_NAME = new Name(TextConstants.TEI_NS, "s");
+
   @Autowired
-  private RelationalTextRepository textRepository;
-
-  private Tokenizer tokenizer;
-
-  @Before
-  public void createTokenizer() {
-    tokenizer = new Tokenizer();
-    tokenizer.setTextRepository(textRepository);
-  }
+  private SessionFactory sessionFactory;
 
   @Test
-  public void printTokenization() throws IOException {
-    printTokenizedWitness(tokenize(), annotationName(Tokenizer.DEFAULT_TOKEN_NAME));
+  @Ignore
+  public void printTokenization() throws IOException, TreeTaggerException {
+    final Text text = tokenize();
+    printTokenizedWitness(text, annotationName(SENTENCE_NAME));
 
-  }
-
-  @Test
-  public void streamTokenNGrams() throws IOException {
-    final int ngramLength = 2;
-    textRepository.read(tokenize(), annotationName(Tokenizer.DEFAULT_TOKEN_NAME), new TextAdapter() {
-      private Queue<String> ngram = new ArrayDeque<String>(ngramLength);
-      private Set<Integer> hashes = Sets.newHashSet();
-      private int ngrams;
-
-      @Override
-      public void text(Range r, String text) {
-        ngram.add(text.trim().toLowerCase());
-        if (ngram.size() == ngramLength) {
-          ngrams++;
-
-          final int hash = Joiner.on("").join(ngram).hashCode();
-          if (hashes.contains(hash)) {
-            LOG.debug("{} = {}", Iterables.toString(ngram), hash);
-          }
-          hashes.add(hash);
-
-          ngram.remove();
+    final SortedSet<TextRange> sentences = Sets.newTreeSet();
+    for (Annotation a : QueryCriteria.and(QueryCriteria.text(text), QueryCriteria.annotationName(SENTENCE_NAME)).iterate(sessionFactory.getCurrentSession())) {
+      sentences.add(a.getTarget());
+    }
+    final TreeTaggerWrapper<String> treeTagger = new TreeTaggerWrapper<String>();
+    final SortedMap<String, Integer> posStatistics = Maps.newTreeMap();
+    try {
+      treeTagger.setModel("/Users/gregor/tree-tagger/lib/german.par:utf-8");
+      treeTagger.setPerformanceMode(true);
+      treeTagger.setHandler(new TokenHandler<String>() {
+        public void token(String token, String pos, String lemma) {
+          System.out.printf("%s; %s; %s\n", token, pos, lemma);
+          posStatistics.put(pos, Objects.firstNonNull(posStatistics.get(pos), 0) + 1);
         }
+      });
+      for (String sentenceStr : text.read(sentences).values()) {
+        treeTagger.process(Lists.newArrayList(Iterables.transform(Arrays.asList(sentenceStr.replaceAll("\\s+", " ").trim().split("\\s")), new Function<String, String>() {
+          @Override
+          public String apply(@Nullable String input) {
+            return input.replaceAll("[\\p{Punct}]", "");
+          }
+        })));
+      }
+      for (Map.Entry<String, Integer> pos : posStatistics.entrySet()) {
+        System.out.printf("%s: %d\n", pos.getKey(), pos.getValue());
       }
 
-      @Override
-      public void end() {
-        LOG.debug("{} vs. {}", ngrams, hashes.size());
-      }
-
-    });
+    }
+    finally {
+      treeTagger.destroy();
+    }
   }
 
   protected Text tokenize() throws IOException {
-    final Text text = text("george-algabal-tei.xml");
-    tokenizer.tokenize(text, new WhitespaceTokenizerSettings(true));
+    final Text text = text("gottsched-cato-tei.xml");
+    new Tokenizer(sessionFactory, SENTENCE_NAME).tokenize(text, new TokenizerSettings() {
+      private StringBuffer buf = new StringBuffer();
+      @Override
+      public boolean startingAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations) {
+        return false;
+      }
+
+      @Override
+      public boolean endingAnnotationsAreBoundary(Text text, long offset, Iterable<Annotation> annotations) {
+        return false;
+      }
+
+      @Override
+      public boolean isBoundary(Text text, long offset, char c) {
+        buf.append(c);
+        if (isSentenceBoundary(c, buf.length() - 1)) {
+          return true;
+        } else if (isFilling(c)) {
+          for (int i = buf.length() - 2; i >= 0; i--) {
+            if (isSentenceBoundary(buf.charAt(i), i)) {
+              return true;
+            }
+            if (isFilling(buf.charAt(i))) {
+              continue;
+            }
+            break;
+          }
+          return false;
+        }
+        return false;
+      }
+
+      private boolean isSentenceBoundary(char c, int i) {
+        return (c == '!' || c == '?' || c == ':' || c == ';' || (c == '.' && (i == 0 || !Character.isDigit(buf.charAt(i - 1)))));
+      }
+
+      private boolean isFilling(char c) {
+        return Character.isWhitespace(c) || !Character.isLetterOrDigit(c);
+      }
+    });
     return text;
   }
 
-  protected void printTokenizedWitness(Text text, Criterion tokenCriterion) throws IOException {
+  protected void printTokenizedWitness(Text text, QueryCriterion tokenCriterion) throws IOException {
     if (!LOG.isDebugEnabled()) {
       return;
     }
 
     long read = 0;
 
-    final SortedMap<Range, Boolean> ranges = Maps.newTreeMap();
-    for (Annotation token : Ordering.natural().immutableSortedCopy(textRepository.find(and(Criteria.text(text), tokenCriterion)))) {
-      final Range range = token.getRange();
+    final SortedMap<TextRange, Boolean> ranges = Maps.newTreeMap();
+    for (Annotation token : Annotation.orderByText(text).immutableSortedCopy(and(QueryCriteria.text(text), tokenCriterion).iterate(sessionFactory.getCurrentSession()))) {
+      final TextTarget range = token.getTarget();
       if (read < range.getStart()) {
-        ranges.put(new Range(read, range.getStart()), false);
+        ranges.put(new TextRange(read, range.getStart()), false);
       }
-      ranges.put(token.getRange(), true);
-      read = token.getRange().getEnd();
+      ranges.put(range, true);
+      read = range.getEnd();
     }
 
     final long length = text.getLength();
     if (read < length) {
-      ranges.put(new Range(read, (int) length), false);
+      ranges.put(new TextRange(read, (int) length), false);
     }
 
-    final SortedMap<Range, String> texts = textRepository.read(text, Sets.newTreeSet(ranges.keySet()));
+    final SortedMap<TextRange, String> texts = text.read(Sets.newTreeSet(ranges.keySet()));
     StringBuilder tokenized = new StringBuilder();
-    for (Map.Entry<Range, Boolean> range : ranges.entrySet()) {
+    for (Map.Entry<TextRange, Boolean> range : ranges.entrySet()) {
       tokenized.append(range.getValue() ? "[" : "");
       tokenized.append(texts.get(range.getKey()));
       tokenized.append(range.getValue() ? "]" : "");

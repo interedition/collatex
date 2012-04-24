@@ -1,7 +1,6 @@
 package eu.interedition.text.json.map;
 
 import eu.interedition.text.Name;
-import eu.interedition.text.mem.SimpleName;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
@@ -34,7 +33,7 @@ public class NameDeserializer extends JsonDeserializer<Name> {
     if (!VALUE_STRING.equals(token)) {
       throw new JsonParseException("QName: Expected string as local name", jp.getCurrentLocation());
     }
-    final SimpleName name = new SimpleName(namespace, jp.getText());
+    final Name name = new Name(namespace, jp.getText());
 
     if (!END_ARRAY.equals(jp.nextToken())) {
       throw new JsonParseException("QName: Expected end of array", jp.getCurrentLocation());

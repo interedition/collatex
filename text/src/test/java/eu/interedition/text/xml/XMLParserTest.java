@@ -22,14 +22,13 @@ package eu.interedition.text.xml;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.interedition.text.*;
-import eu.interedition.text.event.TextAdapter;
-import eu.interedition.text.query.Criteria;
+import eu.interedition.text.query.AnnotationListenerAdapter;
+import eu.interedition.text.query.QueryCriteria;
 import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -44,11 +43,8 @@ import static junit.framework.Assert.assertTrue;
  * @author <a href="http://gregor.middell.net/" title="Homepage of Gregor Middell">Gregor Middell</a>
  */
 public class XMLParserTest extends AbstractTestResourceTest {
-  @Autowired
-  private TextRepository textRepository;
-
-  private List<Range> sourceRanges;
-  private List<Range> textRanges;
+  private List<TextRange> sourceRanges;
+  private List<TextRange> textRanges;
 
   @Before
   public void initRanges() {
@@ -70,10 +66,10 @@ public class XMLParserTest extends AbstractTestResourceTest {
     assertTrue(text.toString(), text.getLength() > 0);
 
     if (LOG.isDebugEnabled()) {
-      textRepository.read(text, Criteria.none(), new TextAdapter() {
+      QueryCriteria.none().listen(sessionFactory.getCurrentSession(), text, new AnnotationListenerAdapter() {
         private StringBuilder buf = new StringBuilder();
         @Override
-        public void text(Range r, String text) {
+        public void text(TextRange r, String text) {
           buf.append(text);
         }
 
@@ -88,10 +84,10 @@ public class XMLParserTest extends AbstractTestResourceTest {
   @Test
   public void offsetMapping() throws IOException {
     if (LOG.isDebugEnabled()) {
-      final SortedMap<Range, String> sources = textRepository.read(source("george-algabal-tei.xml"), Sets.newTreeSet(sourceRanges));
-      final SortedMap<Range, String> texts = textRepository.read(text("george-algabal-tei.xml"), Sets.newTreeSet(textRanges));
-      final Iterator<Range> sourceRangeIt = sourceRanges.iterator();
-      final Iterator<Range> textRangeIt = textRanges.iterator();
+      final SortedMap<TextRange, String> sources = source("george-algabal-tei.xml").read(Sets.newTreeSet(sourceRanges));
+      final SortedMap<TextRange, String> texts = text("george-algabal-tei.xml").read(Sets.newTreeSet(textRanges));
+      final Iterator<TextRange> sourceRangeIt = sourceRanges.iterator();
+      final Iterator<TextRange> textRangeIt = textRanges.iterator();
       while (sourceRangeIt.hasNext() && textRangeIt.hasNext()) {
         LOG.debug("[" + escapeNewlines(sources.get(sourceRangeIt.next())) +//
                 "] <====> [" + escapeNewlines(texts.get(textRangeIt.next())) + "]");
@@ -115,7 +111,7 @@ public class XMLParserTest extends AbstractTestResourceTest {
 
     modules.add(new XMLTransformerModuleAdapter() {
       @Override
-      public void offsetMapping(XMLTransformer transformer, Range textRange, Range sourceRange) {
+      public void offsetMapping(XMLTransformer transformer, TextRange textRange, TextRange sourceRange) {
         if (LOG.isDebugEnabled()) {
           sourceRanges.add(sourceRange);
           textRanges.add(textRange);

@@ -19,27 +19,29 @@
  */
 package eu.interedition.text.query;
 
-import com.google.common.base.Function;
 import eu.interedition.text.Name;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+
+import java.net.URI;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AnnotationNameCriterion implements Criterion {
+public class AnnotationNameCriterion extends QueryCriterion {
   private final Name name;
 
   AnnotationNameCriterion(Name name) {
     this.name = name;
   }
 
-  public Name getName() {
-    return name;
+  @Override
+  Criterion restrict() {
+    final URI namespace = name.getNamespace();
+    return Restrictions.and(
+            Restrictions.eq("name.localName", name.getLocalName()),
+            (namespace == null ? Restrictions.isNull("name.namespaceURI") : Restrictions.eq("name.namespaceURI", namespace.toString()))
+    );
   }
-
-  public static Function<AnnotationNameCriterion, Name> TO_NAME = new Function<AnnotationNameCriterion, Name>() {
-    public Name apply(AnnotationNameCriterion input) {
-      return input.getName();
-    }
-  };
-
 }

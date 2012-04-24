@@ -23,17 +23,17 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-import eu.interedition.text.mem.SimpleName;
 import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
 import eu.interedition.text.xml.XML;
-import eu.interedition.text.xml.XMLTransformerModule;
 import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.XMLTransformerModule;
 import eu.interedition.text.xml.module.CLIXAnnotationXMLTransformerModule;
 import eu.interedition.text.xml.module.DefaultAnnotationXMLTransformerModule;
 import eu.interedition.text.xml.module.LineElementXMLTransformerModule;
 import eu.interedition.text.xml.module.NotableCharacterXMLTransformerModule;
 import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
 import eu.interedition.text.xml.module.TextXMLTransformerModule;
+import org.hibernate.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -70,17 +70,18 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
 
   @Before
   public void createXMLTransformer() {
-    xmlTransformer = new XMLTransformer(textRepository, configure(createXMLParserConfiguration()));
+    xmlTransformer = new XMLTransformer(sessionFactory, configure(createXMLParserConfiguration()));
   }
 
   @After
   public void removeDocuments() {
+    final Session session = sessionFactory.getCurrentSession();
     for (Iterator<Text> textIt = texts.values().iterator(); textIt.hasNext(); ) {
-      textRepository.delete(textIt.next());
+      session.delete(textIt.next());
       textIt.remove();
     }
     for (Iterator<Text> sourceIt = sources.values().iterator(); sourceIt.hasNext(); ) {
-      textRepository.delete(sourceIt.next());
+      session.delete(sourceIt.next());
       sourceIt.remove();
     }
   }
@@ -128,27 +129,28 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
   }
 
   protected SimpleXMLTransformerConfiguration configure(SimpleXMLTransformerConfiguration pc) {
-    pc.addLineElement(new SimpleName(TEI_NS, "div"));
-    pc.addLineElement(new SimpleName(TEI_NS, "head"));
-    pc.addLineElement(new SimpleName(TEI_NS, "sp"));
-    pc.addLineElement(new SimpleName(TEI_NS, "stage"));
-    pc.addLineElement(new SimpleName(TEI_NS, "speaker"));
-    pc.addLineElement(new SimpleName(TEI_NS, "lg"));
-    pc.addLineElement(new SimpleName(TEI_NS, "l"));
-    pc.addLineElement(new SimpleName((URI) null, "line"));
+    pc.addLineElement(new Name(TEI_NS, "div"));
+    pc.addLineElement(new Name(TEI_NS, "head"));
+    pc.addLineElement(new Name(TEI_NS, "sp"));
+    pc.addLineElement(new Name(TEI_NS, "stage"));
+    pc.addLineElement(new Name(TEI_NS, "speaker"));
+    pc.addLineElement(new Name(TEI_NS, "lg"));
+    pc.addLineElement(new Name(TEI_NS, "l"));
+    pc.addLineElement(new Name(TEI_NS, "p"));
+    pc.addLineElement(new Name(null, "line"));
 
-    pc.addContainerElement(new SimpleName(TEI_NS, "text"));
-    pc.addContainerElement(new SimpleName(TEI_NS, "div"));
-    pc.addContainerElement(new SimpleName(TEI_NS, "lg"));
-    pc.addContainerElement(new SimpleName(TEI_NS, "subst"));
-    pc.addContainerElement(new SimpleName(TEI_NS, "choice"));
+    pc.addContainerElement(new Name(TEI_NS, "text"));
+    pc.addContainerElement(new Name(TEI_NS, "div"));
+    pc.addContainerElement(new Name(TEI_NS, "lg"));
+    pc.addContainerElement(new Name(TEI_NS, "subst"));
+    pc.addContainerElement(new Name(TEI_NS, "choice"));
 
-    pc.exclude(new SimpleName(TEI_NS, "teiHeader"));
-    pc.exclude(new SimpleName(TEI_NS, "front"));
-    pc.exclude(new SimpleName(TEI_NS, "fw"));
-    pc.exclude(new SimpleName(TEI_NS, "app"));
+    pc.exclude(new Name(TEI_NS, "teiHeader"));
+    pc.exclude(new Name(TEI_NS, "front"));
+    pc.exclude(new Name(TEI_NS, "fw"));
+    pc.exclude(new Name(TEI_NS, "app"));
 
-    pc.include(new SimpleName(TEI_NS, "lem"));
+    pc.include(new Name(TEI_NS, "lem"));
 
     return pc;
   }
@@ -178,7 +180,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
         try {
           stopWatch.start("create");
           xmlReader = xmlInputFactory.createXMLStreamReader(xmlStream = resource.toURL().openStream());
-          final Text xml = textRepository.create(null, xmlReader);
+          final Text xml = Text.create(sessionFactory.getCurrentSession(), null, xmlReader);
           stopWatch.stop();
 
           sources.put(resource, xml);

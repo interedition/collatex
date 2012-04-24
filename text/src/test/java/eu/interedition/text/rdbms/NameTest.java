@@ -19,35 +19,30 @@
  */
 package eu.interedition.text.rdbms;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import eu.interedition.text.AbstractTest;
+import eu.interedition.text.AbstractTextTest;
 import eu.interedition.text.Name;
-import eu.interedition.text.mem.SimpleName;
+import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.net.URI;
-import java.util.Set;
 import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class NameTest extends AbstractTest {
-  final SortedSet<Name> TEST_NAMES = Sets.<Name>newTreeSet(Sets.newHashSet(
-          new SimpleName((URI) null, "noNamespaceName"),
-          new SimpleName(TEST_NS, "namespacedName")
+public class NameTest extends AbstractTextTest {
+  final SortedSet<Name> TEST_NAMES = Sets.newTreeSet(Sets.newHashSet(
+          new Name(null, "noNamespaceName"),
+          new Name(TEST_NS, "namespacedName")
   ));
 
   @Autowired
-  private RelationalNameRegistry nameRegistry;
+  private SessionFactory sessionFactory;
 
   @Test
   public void getNames() {
-    final Set<Name> resolved = nameRegistry.get(TEST_NAMES);
-    Assert.assertEquals(2, resolved.size());
-    Assert.assertEquals(2, Iterables.size(Iterables.filter(resolved, RelationalName.class)));
+    Assert.assertEquals(2, Name.get(sessionFactory.getCurrentSession(), TEST_NAMES).size());
   }
 }

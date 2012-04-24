@@ -4,10 +4,11 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import eu.interedition.text.mem.SimpleName;
+import eu.interedition.text.Name;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 
@@ -15,8 +16,8 @@ import java.util.List;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class ChangeSet extends HashSet<ChangeAdapter> {
-  private static final SimpleName CHANGE_DECL_SET = new SimpleName("http://www.tei-c.org/ns/geneticEditions", "stageNotes");
-  private static final SimpleName CHANGE_DECL = new SimpleName("http://www.tei-c.org/ns/geneticEditions", "stageNote");
+  private static final Name CHANGE_DECL_SET = new Name(URI.create("http://www.tei-c.org/ns/geneticEditions"), "stageNotes");
+  private static final Name CHANGE_DECL = new Name(URI.create("http://www.tei-c.org/ns/geneticEditions"), "stageNote");
 
   public static final Function<ChangeSet,String> TO_ID = new Function<ChangeSet, String>() {
     @Override
@@ -63,7 +64,7 @@ public class ChangeSet extends HashSet<ChangeAdapter> {
     while (xml.hasNext()) {
       switch (xml.next()) {
         case XMLStreamReader.START_ELEMENT:
-          if (CHANGE_DECL.equals(new SimpleName(xml.getName()))) {
+          if (CHANGE_DECL.equals(new Name(xml.getName()))) {
             final ChangeSet changeSet = new ChangeSet();
             for (int ac = 0; ac < xml.getAttributeCount(); ac++) {
               if ("id".equals(xml.getAttributeLocalName(ac))) {
@@ -78,7 +79,7 @@ public class ChangeSet extends HashSet<ChangeAdapter> {
           }
           break;
         case XMLStreamReader.END_ELEMENT:
-          if (CHANGE_DECL_SET.equals(new SimpleName(xml.getName()))) {
+          if (CHANGE_DECL_SET.equals(new Name(xml.getName()))) {
             return declarations;
           }
           break;
