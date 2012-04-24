@@ -66,7 +66,7 @@ public class Crop extends BaseTransform {
         parameters.add(y);
         parameters.add(width);
         parameters.add(height);
-        return JAI.create("crop", parameters);
+        return JAI.create("crop", parameters).getAsBufferedImage();
     }
 
     @Override
