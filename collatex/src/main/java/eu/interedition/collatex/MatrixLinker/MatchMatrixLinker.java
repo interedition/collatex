@@ -10,7 +10,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.TokenLinker;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinate;
 import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 
 public class MatchMatrixLinker implements TokenLinker {
@@ -27,7 +27,7 @@ public class MatchMatrixLinker implements TokenLinker {
     List<VariantGraphVertex> rowVertices = buildMatrix.rowVertices();
     Map<Token, VariantGraphVertex> map = Maps.newHashMap();
     for (Island island : preferredIslands.iterator()) {
-      for (Coordinates c : island) {
+      for (Coordinate c : island) {
         map.put(columnTokens.get(c.column), rowVertices.get(c.row));
       }
     }

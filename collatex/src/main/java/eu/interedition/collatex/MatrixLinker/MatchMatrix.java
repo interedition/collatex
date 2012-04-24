@@ -106,7 +106,7 @@ public class MatchMatrix {
   public String toHtml(Archipelago arch) {
     int mat[] = new int[rowNum()];
     for (Island isl : arch.iterator()) {
-      for (Coordinates c : isl) {
+      for (Coordinate c : isl) {
         mat[c.row] = c.column;
       }
     }
@@ -174,13 +174,13 @@ public class MatchMatrix {
     return tokens;
   }
 
-  public ArrayList<Coordinates> allMatches() {
-    ArrayList<Coordinates> pairs = new ArrayList<Coordinates>();
+  public ArrayList<Coordinate> allMatches() {
+    ArrayList<Coordinate> pairs = new ArrayList<Coordinate>();
     int rows = rowNum();
     int cols = colNum();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (at(i, j)) pairs.add(new Coordinates(i, j));
+        if (at(i, j)) pairs.add(new Coordinate(i, j));
       }
     }
     return pairs;
@@ -196,8 +196,8 @@ public class MatchMatrix {
 
   public ArrayList<Island> getIslands() {
     ArrayList<Island> islands = new ArrayList<Island>();
-    ArrayList<Coordinates> allTrue = allMatches();
-    for (Coordinates c : allTrue) {
+    ArrayList<Coordinate> allTrue = allMatches();
+    for (Coordinate c : allTrue) {
       //			System.out.println("next coordinate: "+c);
       boolean found = false;
       while (!found) {
@@ -221,16 +221,16 @@ public class MatchMatrix {
     return islands;
   }
 
-  public static class Coordinates implements Comparable<Coordinates> {
+  public static class Coordinate implements Comparable<Coordinate> {
     int row;
     int column;
 
-    public Coordinates(int row, int column) {
+    public Coordinate(int row, int column) {
       this.column = column;
       this.row = row;
     }
 
-    Coordinates(Coordinates other) {
+    Coordinate(Coordinate other) {
       this(other.row, other.column);
     }
 
@@ -242,22 +242,22 @@ public class MatchMatrix {
       return column;
     }
 
-    public boolean sameColumn(Coordinates c) {
+    public boolean sameColumn(Coordinate c) {
       return c.column == column;
     }
 
-    public boolean sameRow(Coordinates c) {
+    public boolean sameRow(Coordinate c) {
       return c.row == row;
     }
 
-    public boolean bordersOn(Coordinates c) {
+    public boolean bordersOn(Coordinate c) {
       return (Math.abs(this.row - c.getRow()) == 1) && (Math.abs(this.column - c.getColumn()) == 1);
     }
 
     @Override
     public boolean equals(Object o) {
-      if (o != null & o instanceof Coordinates) {
-        final Coordinates c = (Coordinates) o;
+      if (o != null & o instanceof Coordinate) {
+        final Coordinate c = (Coordinate) o;
         return (this.row == c.getRow() && this.column == c.getColumn());
       }
       return super.equals(o);
@@ -269,7 +269,7 @@ public class MatchMatrix {
     }
 
     @Override
-    public int compareTo(Coordinates o) {
+    public int compareTo(Coordinate o) {
       final int result = column - o.column;
       return (result == 0 ? row - o.row : result);
     }
@@ -281,52 +281,52 @@ public class MatchMatrix {
   }
 
   /**
-   * An DirectedIsland is a collections of Coordinates all on the same
+   * A DirectedIsland is a collections of Coordinates all on the same
    * diagonal. The direction of this diagonal can be -1, 0, or 1.
    * The zero is for a DirectedIsland of only one Coordinate.
    * Directions 1 and -1 examples
    * Coordinates (0,0) (1,1) have Direction 1
    * Coordinates (1,1) (2,1) have Direction -1
-   * I.e. if the row-cordinate gets larger and the col-coordinate also, the
+   * I.e. if the row-coordinate gets larger and the col-coordinate also, the
    * direction is 1 (positive) else it is -1 (negative)
    */
-  public static class Island implements Iterable<Coordinates> {
+  public static class Island implements Iterable<Coordinate> {
 
     private int direction = 0;
-    private final List<Coordinates> islandCoordinates = Lists.newArrayList();
+    private final List<Coordinate> islandCoordinates = Lists.newArrayList();
 
     public Island() {}
 
     public Island(Island other) {
-      for (Coordinates c : other.islandCoordinates) {
-        add(new Coordinates(c));
+      for (Coordinate c : other.islandCoordinates) {
+        add(new Coordinate(c));
       }
     }
 
-    public Island(Coordinates first, Coordinates last) {
+    public Island(Coordinate first, Coordinate last) {
       add(first);
-      Coordinates newCoordinate = first;
+      Coordinate newCoordinate = first;
       while (!newCoordinate.equals(last)) {
-        newCoordinate = new Coordinates(newCoordinate.getRow() + 1, newCoordinate.getColumn() + 1);
+        newCoordinate = new Coordinate(newCoordinate.getRow() + 1, newCoordinate.getColumn() + 1);
         //        LOG.info("{}", newCoordinate);
         add(newCoordinate);
       }
     }
 
-    public boolean add(Coordinates coordinates) {
+    public boolean add(Coordinate coordinate) {
       boolean result = false;
       if (islandCoordinates.isEmpty()) {
-        result = islandCoordinates.add(coordinates);
-      } else if (!contains(coordinates) && neighbour(coordinates)) {
+        result = islandCoordinates.add(coordinate);
+      } else if (!contains(coordinate) && neighbour(coordinate)) {
         if (direction == 0) {
-          Coordinates existing = islandCoordinates.get(0);
-          direction = (existing.row - coordinates.row) / (existing.column - coordinates.column);
-          result = islandCoordinates.add(coordinates);
+          Coordinate existing = islandCoordinates.get(0);
+          direction = (existing.row - coordinate.row) / (existing.column - coordinate.column);
+          result = islandCoordinates.add(coordinate);
         } else {
-          Coordinates existing = islandCoordinates.get(0);
-          if (existing.column != coordinates.column) {
-            int new_direction = (existing.row - coordinates.row) / (existing.column - coordinates.column);
-            if (new_direction == direction) result = islandCoordinates.add(coordinates);
+          Coordinate existing = islandCoordinates.get(0);
+          if (existing.column != coordinate.column) {
+            int new_direction = (existing.row - coordinate.row) / (existing.column - coordinate.column);
+            if (new_direction == direction) result = islandCoordinates.add(coordinate);
           }
         }
       }
@@ -339,28 +339,28 @@ public class MatchMatrix {
 
     public Island removePoints(Island di) {
       Island result = new Island(this);
-      for (Coordinates c : di) {
+      for (Coordinate c : di) {
         result.removeSameColOrRow(c);
       }
       return result;
     }
 
-    public Coordinates getCoorOnRow(int row) {
-      for (Coordinates coor : islandCoordinates) {
+    public Coordinate getCoorOnRow(int row) {
+      for (Coordinate coor : islandCoordinates) {
         if (coor.getRow() == row) return coor;
       }
       return null;
     }
 
-    public Coordinates getCoorOnCol(int col) {
-      for (Coordinates coor : islandCoordinates) {
+    public Coordinate getCoorOnCol(int col) {
+      for (Coordinate coor : islandCoordinates) {
         if (coor.getColumn() == col) return coor;
       }
       return null;
     }
 
     public void merge(Island di) {
-      for (Coordinates c : di) {
+      for (Coordinate c : di) {
         add(c);
       }
     }
@@ -370,21 +370,21 @@ public class MatchMatrix {
      * vertical line which goes through both islands
      */
     public boolean isCompetitor(Island isl) {
-      for (Coordinates c : isl) {
-        for (Coordinates d : islandCoordinates) {
+      for (Coordinate c : isl) {
+        for (Coordinate d : islandCoordinates) {
           if (c.sameColumn(d) || c.sameRow(d)) return true;
         }
       }
       return false;
     }
 
-    public boolean contains(Coordinates c) {
+    public boolean contains(Coordinate c) {
       return islandCoordinates.contains(c);
     }
 
-    public boolean neighbour(Coordinates c) {
+    public boolean neighbour(Coordinate c) {
       if (contains(c)) return false;
-      for (Coordinates islC : islandCoordinates) {
+      for (Coordinate islC : islandCoordinates) {
         if (c.bordersOn(islC)) {
           return true;
         }
@@ -392,43 +392,43 @@ public class MatchMatrix {
       return false;
     }
 
-    public Coordinates getLeftEnd() {
-      Coordinates coor = islandCoordinates.get(0);
-      for (Coordinates c : islandCoordinates) {
+    public Coordinate getLeftEnd() {
+      Coordinate coor = islandCoordinates.get(0);
+      for (Coordinate c : islandCoordinates) {
         if (c.column < coor.column) coor = c;
       }
       return coor;
     }
 
-    public Coordinates getRightEnd() {
-      Coordinates coor = islandCoordinates.get(0);
-      for (Coordinates c : islandCoordinates) {
+    public Coordinate getRightEnd() {
+      Coordinate coor = islandCoordinates.get(0);
+      for (Coordinate c : islandCoordinates) {
         if (c.column > coor.column) coor = c;
       }
       return coor;
     }
 
     @Override
-    public Iterator<Coordinates> iterator() {
+    public Iterator<Coordinate> iterator() {
       return Collections.unmodifiableList(islandCoordinates).iterator();
     }
 
-    protected boolean removeSameColOrRow(Coordinates c) {
-      ArrayList<Coordinates> remove = new ArrayList<Coordinates>();
-      for (Coordinates coor : islandCoordinates) {
+    protected boolean removeSameColOrRow(Coordinate c) {
+      ArrayList<Coordinate> remove = new ArrayList<Coordinate>();
+      for (Coordinate coor : islandCoordinates) {
         if (coor.sameColumn(c) || coor.sameRow(c)) {
           remove.add(coor);
         }
       }
       if (remove.isEmpty()) return false;
-      for (Coordinates coor : remove) {
+      for (Coordinate coor : remove) {
         islandCoordinates.remove(coor);
       }
       return true;
     }
 
     public boolean overlap(Island isl) {
-      for (Coordinates c : isl) {
+      for (Coordinate c : isl) {
         if (contains(c) || neighbour(c)) return true;
       }
       return false;
@@ -462,7 +462,7 @@ public class MatchMatrix {
       if (isl.size() != size()) return false;
 
       boolean result = true;
-      for (Coordinates c : isl) {
+      for (Coordinate c : isl) {
         result &= this.contains(c);
       }
       return result;

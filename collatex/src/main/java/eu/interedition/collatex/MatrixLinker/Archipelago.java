@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 
-import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinate;
 import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 
 public class Archipelago {
@@ -137,23 +137,23 @@ public class Archipelago {
     return true;
   }
 
-  public ArrayList<MatchMatrix.Coordinates> findGaps() {
-    ArrayList<MatchMatrix.Coordinates> list = new ArrayList<MatchMatrix.Coordinates>();
+  public ArrayList<MatchMatrix.Coordinate> findGaps() {
+    ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
     return findGaps(list);
   }
 
-  public ArrayList<MatchMatrix.Coordinates> findGaps(MatchMatrix.Coordinates begin, MatchMatrix.Coordinates end) {
-    ArrayList<MatchMatrix.Coordinates> list = new ArrayList<MatchMatrix.Coordinates>();
+  public ArrayList<MatchMatrix.Coordinate> findGaps(MatchMatrix.Coordinate begin, MatchMatrix.Coordinate end) {
+    ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
     list.add(begin);
     list.add(end);
     return findGaps(list);
   }
 
-  public ArrayList<MatchMatrix.Coordinates> findGaps(ArrayList<MatchMatrix.Coordinates> list) {
-    ArrayList<MatchMatrix.Coordinates> result = new ArrayList<MatchMatrix.Coordinates>(list);
+  public ArrayList<MatchMatrix.Coordinate> findGaps(ArrayList<MatchMatrix.Coordinate> list) {
+    ArrayList<MatchMatrix.Coordinate> result = new ArrayList<MatchMatrix.Coordinate>(list);
     for (MatchMatrix.Island isl : getIslands()) {
-      MatchMatrix.Coordinates left = isl.getLeftEnd();
-      MatchMatrix.Coordinates right = isl.getRightEnd();
+      MatchMatrix.Coordinate left = isl.getLeftEnd();
+      MatchMatrix.Coordinate right = isl.getRightEnd();
       boolean found = false;
       for (int i = 0; i < result.size(); i++) {
         if (left.column < result.get(i).column || (left.column == result.get(i).column && left.row < result.get(i).row)) {
@@ -180,7 +180,7 @@ public class Archipelago {
   private Map<Integer, Integer> getCoordinatesMap() {
     final Map<Integer, Integer> map = Maps.newHashMap();
     for (final Island isl : iterator()) {
-      for (final Coordinates c : isl) {
+      for (final Coordinate c : isl) {
         map.put(c.getRow(), c.getColumn());
       }
     }
@@ -242,6 +242,14 @@ public class Archipelago {
     double result = 0.0;
     result = Math.sqrt((a_x - b_x) * (a_x - b_x) + (a_y - b_y) * (a_y - b_y));
     return result;
+  }
+
+  public Double smallestDistance(Island isl) {
+    double minimum = 10000;
+    for (Island fixedIsland : getIslands()) {
+      minimum = Math.min(minimum, distance(isl, fixedIsland));
+    }
+    return minimum;
   }
 
 }

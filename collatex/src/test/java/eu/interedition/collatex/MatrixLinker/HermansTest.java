@@ -1,12 +1,7 @@
 package eu.interedition.collatex.matrixlinker;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +22,8 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinates;
+import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
+import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinate;
 import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -35,7 +31,7 @@ import eu.interedition.collatex.simple.SimpleWitness;
 public class HermansTest extends AbstractTest {
   @Before
   public void setUp() {
-    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator()));
+    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new StrictEqualityTokenComparator()));
   }
 
   @Test
@@ -164,15 +160,21 @@ public class HermansTest extends AbstractTest {
     // }
   }
 
-  //TODO: fix test!
-  @Ignore
   @Test
   public void testHermansText2a() throws XMLStreamException {
     String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
-    String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
+    String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzagglijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
     SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
 
     testWitnessCollation(witnesses);
+  }
+
+  @Ignore
+  @Test
+  public void testHermansText2aWithMocking() throws XMLStreamException {
+    String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
+    String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
+    SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
 
     VariantGraph base = collate(witnesses[0]);
     MatchMatrix matrix = MatchMatrix.create(base, witnesses[1], new EqualityTokenComparator());
@@ -183,15 +185,15 @@ public class HermansTest extends AbstractTest {
 
     //Mock Archipelago
     Archipelago result = mock(Archipelago.class);
-    Island i1 = new Island(new Coordinates(3, 3), new Coordinates(5, 5));
-    Island i2 = new Island(new Coordinates(3, 20), new Coordinates(5, 22));
-    Island i3 = new Island(new Coordinates(20, 3), new Coordinates(22, 5));
-    Island i4 = new Island(new Coordinates(20, 20), new Coordinates(22, 22));
-    Island i5 = new Island(new Coordinates(69, 66), new Coordinates(71, 68));
-    Island i6 = new Island(new Coordinates(25, 25), new Coordinates(26, 26));
-    Island i7 = new Island(new Coordinates(73, 70), new Coordinates(74, 71));
-    Island i8 = new Island(new Coordinates(0, 17), new Coordinates(0, 17));
-    Island i9 = new Island(new Coordinates(17, 17), new Coordinates(17, 17));
+    Island i1 = new Island(new Coordinate(3, 3), new Coordinate(5, 5));
+    Island i2 = new Island(new Coordinate(3, 20), new Coordinate(5, 22));
+    Island i3 = new Island(new Coordinate(20, 3), new Coordinate(22, 5));
+    Island i4 = new Island(new Coordinate(20, 20), new Coordinate(22, 22));
+    Island i5 = new Island(new Coordinate(69, 66), new Coordinate(71, 68));
+    Island i6 = new Island(new Coordinate(25, 25), new Coordinate(26, 26));
+    Island i7 = new Island(new Coordinate(73, 70), new Coordinate(74, 71));
+    Island i8 = new Island(new Coordinate(0, 17), new Coordinate(0, 17));
+    Island i9 = new Island(new Coordinate(17, 17), new Coordinate(17, 17));
     when(result.islandsCompete(i1, i2)).thenReturn(true);
     when(result.islandsCompete(i1, i3)).thenReturn(true);
     when(result.islandsCompete(i1, i4)).thenReturn(false);
@@ -211,11 +213,11 @@ public class HermansTest extends AbstractTest {
     when(result.findClosestIsland(i5, i6)).thenReturn(i1);
 
     creator.createFirstVersion(result);
-    verify(result).add(new Island(new Coordinates(40, 39), new Coordinates(58, 57)));
-    verify(result).add(new Island(new Coordinates(8, 8), new Coordinates(15, 15)));
-    verify(result).add(new Island(new Coordinates(30, 31), new Coordinates(36, 37)));
-    verify(result).add(new Island(new Coordinates(62, 59), new Coordinates(67, 64)));
-    verify(result).add(new Island(new Coordinates(77, 74), new Coordinates(80, 77)));
+    verify(result).add(new Island(new Coordinate(40, 39), new Coordinate(58, 57)));
+    verify(result).add(new Island(new Coordinate(8, 8), new Coordinate(15, 15)));
+    verify(result).add(new Island(new Coordinate(30, 31), new Coordinate(36, 37)));
+    verify(result).add(new Island(new Coordinate(62, 59), new Coordinate(67, 64)));
+    verify(result).add(new Island(new Coordinate(77, 74), new Coordinate(80, 77)));
     verify(result).islandsCompete(i1, i2);
     verify(result).islandsCompete(i1, i3);
     verify(result).islandsCompete(i1, i4);
@@ -227,21 +229,13 @@ public class HermansTest extends AbstractTest {
     verify(result).islandsCompete(i3, i5);
     verify(result).islandsCompete(i4, i5);
     verify(result).add(i5);
-    verify(result).findClosestIsland(i1, i2);
-    verify(result).findClosestIsland(i1, i3);
-    verify(result).findClosestIsland(i2, i4);
-    verify(result).findClosestIsland(i3, i4);
     verify(result).add(i1);
     verify(result).add(i4);
     verify(result).islandsCompete(i6, i7);
     verify(result).add(i6);
     verify(result).add(i7);
     verify(result).islandsCompete(i8, i9);
-    verify(result).findClosestIsland(null, null);
-    //    verify(result).islandsCompete(null, null);
-    //    verify(result).findClosestIsland(null, null);
     verifyNoMoreInteractions(result);
-
   }
 
   private void testWitnessCollation(SimpleWitness[] sw) throws XMLStreamException, FactoryConfigurationError {
@@ -249,6 +243,7 @@ public class HermansTest extends AbstractTest {
     String teiMM = generateTEI(vg);
     assertNotNull(teiMM);
     LOG.info(teiMM);
+
     setCollationAlgorithm(CollationAlgorithmFactory.dekker(new EqualityTokenComparator()));
     vg = collate(sw);
     String teiD = generateTEI(vg);
@@ -257,7 +252,7 @@ public class HermansTest extends AbstractTest {
     assertFalse(teiD.equals(teiMM));
   }
 
-  //  @Test
+    @Test
   public void testHermansText3a() throws XMLStreamException {
     String textMZ_DJ233 = "Werumeus Buning maakt artikelen van vijf pagina&APO+s over de geologie van de diepzee, die hij uit Engelse boeken overschrijft, wat hij pas in de laatste regel vermeldt, omdat hij zo goed kan koken.<p/>\n" + "J. W. Hofstra kan niet lezen en nauwelijks stotteren, laat staan schrijven. Hij oefent het ambt van litterair criticus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\n" + "Zo nu en dan koopt Elsevier een artikel van een echte professor wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\n" + "Edouard Bouquin is het olijke culturele geweten. Bouquin betekent: 1) oud boek van geringe waarde, 2) oude bok, 3) mannetjeskonijn. Ik kan het ook niet helpen, het staat in Larousse.<p/>\n" + "De politiek van dit blad wordt geschreven door een der leeuwen uit het Nederlandse wapen (ik geloof de rechtse) op een krakerige gerechtszaaltoon in zeer korte zinnetjes, omdat hij tot zijn spijt de syntaxis onvoldoende beheerst.<p/>\nAldus de artikelen van Werumeus Buning";
     String textD4F = "Werumeus  Buning maakt machtigmooie artikelen van vijf pagina&APO+s  over de  geologie van de  diepzee, die  hij uit Engelse  boeken overschrijft,   wat hij  pas in de laatste  regel  vermeldt,   omdat hij   zo  goed kan koken.<p/>\n" + "J. W.Hofstra kan niet lezen en nauwelijks stotteren,   laat staan schrijven.   Hij  oefent het ambt van literair kritikus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\n" + "Edouard  Bouquin is  het olijke  culturele  geweten.   Bouquin betekent:   1)  oud boek  van geringe  waarde,   2)  oude bok,   3)  mannetjeskonijn.   Ik kan het ook niet helpen,   het staat in Larousse.<p/>\n" + "Nu en dan koopt Elsevier een artikel van een echte professor, wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\n" + "\n" + "De politiek van dit blad  wordt geschreven door een der leeuwen uit het nederlandse wapen (ik geloof de   rechtse)  op een krakerige  gerechtszaaltoon in zeer korte  zinnetjes, omdat hij  tot zijn  spijt  de  syntaxis  onvoldoende  beheerst. <p/>Volgens de stukjes van Werumeus Buning";
