@@ -135,7 +135,7 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
     ArrayList<String> labels = new ArrayList<String>();
     for (VariantGraphVertex vgv : sparseMatrix.rowKeyList()) {
       String token = vgv.toString();
-      int pos = token.lastIndexOf(":'");
+      int pos = token.indexOf(":'");
       if (pos > -1) {
         labels.add(token.substring(pos + 2, token.length() - 2));
       }
@@ -157,7 +157,7 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
     ArrayList<String> labels = new ArrayList<String>();
     for (Token t : sparseMatrix.columnKeyList()) {
       String token = t.toString();
-      int pos = token.lastIndexOf(":'");
+      int pos = token.indexOf(":'");
       if (pos > -1) {
         //        LOG.info("token={{}}, pos={}", token, pos);
         labels.add(token.substring(pos + 2, token.length() - 1));
