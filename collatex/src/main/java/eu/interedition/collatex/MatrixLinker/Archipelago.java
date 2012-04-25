@@ -127,6 +127,11 @@ public class Archipelago {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hashCode(islands);
+  }
+
+  @Override
   public boolean equals(Object object) {
     if (object == null) return false;
     if (object.getClass() != this.getClass()) return false;

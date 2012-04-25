@@ -215,7 +215,7 @@ public class ArchipelagoWithVersions extends Archipelago {
       } else if (islands.size() > 1) {
         Set<Island> competingIslands = getCompetingIslands(result, islands);
         for (Island i : getNonCompetingIslands(islands, competingIslands)) {
-          addIslandToResult(fixedIslandCoordinates, result, i);
+          fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
         }
 
         Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
@@ -228,7 +228,7 @@ public class ArchipelagoWithVersions extends Archipelago {
           // TODO: find a better way to determine the best choice of island
           for (Island ci : distanceMap.get(d)) {
             if (islandIsPossible(ci, fixedIslandCoordinates)) {
-              addIslandToResult(fixedIslandCoordinates, result, ci);
+              fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, ci);
             }
           }
         }
