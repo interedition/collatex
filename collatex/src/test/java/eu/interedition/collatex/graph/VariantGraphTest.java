@@ -20,23 +20,23 @@
 
 package eu.interedition.collatex.graph;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static junit.framework.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleWitness;
 
 public class VariantGraphTest extends AbstractTest {
 
@@ -54,11 +54,11 @@ public class VariantGraphTest extends AbstractTest {
     final VariantGraph graph = graphFactory.newVariantGraph();
     final VariantGraphVertex helloVertex = graph.add(witness.getTokens().get(0));
     final VariantGraphVertex worldVertex = graph.add(witness.getTokens().get(1));
-    final VariantGraphEdge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness>singleton(witness));
-    
+    final VariantGraphEdge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
+
     Assert.assertEquals(1, edge.witnesses().size());
 
-    Assert.assertEquals(edge, graph.connect(helloVertex, worldVertex, Collections.<Witness>singleton(witness)));
+    Assert.assertEquals(edge, graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness)));
     Assert.assertEquals(1, edge.witnesses().size());
   }
 
@@ -66,7 +66,7 @@ public class VariantGraphTest extends AbstractTest {
   public void getTokens() {
     final SimpleWitness[] w = createWitnesses("a b c d");
     final VariantGraph graph = collate(w);
-    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newHashSet(Arrays.<Witness>asList(w))));
+    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newHashSet(Arrays.<Witness> asList(w))));
     assertEquals(6, vertices.size());
     assertEquals(graph.getStart(), vertices.get(0));
     assertVertexEquals("a", vertices.get(1));
@@ -98,7 +98,7 @@ public class VariantGraphTest extends AbstractTest {
   public void getPathForWitness() {
     final SimpleWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
     final VariantGraph graph = collate(w);
-    final Set<Witness> witnessSet = Collections.<Witness>singleton(w[0]);
+    final Set<Witness> witnessSet = Collections.<Witness> singleton(w[0]);
     final List<VariantGraphVertex> path = Lists.newArrayList(graph.vertices(witnessSet));
 
     assertEquals(8, path.size());
@@ -207,4 +207,27 @@ public class VariantGraphTest extends AbstractTest {
     assertHasWitnesses(edgeBetween(theVertex, whiteVertex), w[1]);
     assertHasWitnesses(edgeBetween(whiteVertex, catVertex), w[1]);
   }
+
+  //  @Test
+  public void joinTwoDifferentWitnessesWithTranspositions() {
+    final SimpleWitness[] w = createWitnesses("voor Zo nu en dan zin2 na voor", "voor zin2 Nu en dan voor");
+    final VariantGraph graph = collate(w).join();
+
+    final VariantGraphVertex blackieVertex = vertexWith(graph, "voor", w[0]);
+    final VariantGraphVertex whitneyVertex = vertexWith(graph, "zo", w[1]);
+    final VariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
+    final VariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final VariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+
+    assertHasWitnesses(edgeBetween(graph.getStart(), blackieVertex), w[0]);
+    assertHasWitnesses(edgeBetween(blackieVertex, theVertex), w[0]);
+    assertHasWitnesses(edgeBetween(graph.getStart(), whitneyVertex), w[1]);
+    assertHasWitnesses(edgeBetween(whitneyVertex, theVertex), w[1]);
+    assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
+    assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0]);
+    assertHasWitnesses(edgeBetween(theVertex, whiteVertex), w[1]);
+    assertHasWitnesses(edgeBetween(whiteVertex, catVertex), w[1]);
+  }
+
 }

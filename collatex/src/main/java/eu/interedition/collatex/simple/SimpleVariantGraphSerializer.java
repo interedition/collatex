@@ -1,24 +1,30 @@
 package eu.interedition.collatex.simple;
 
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.neo4j.graphdb.Transaction;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.SetMultimap;
+
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphEdge;
 import eu.interedition.collatex.graph.VariantGraphTransposition;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -48,7 +54,7 @@ public class SimpleVariantGraphSerializer {
     xml.writeNamespace("cx", COLLATEX_NS);
     xml.writeNamespace("", TEI_NS);
 
-    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext(); ) {
+    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext();) {
       final Set<VariantGraphVertex> row = rowIt.next();
 
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();
@@ -188,10 +194,10 @@ public class SimpleVariantGraphSerializer {
   private static final String DATA_TAG = "data";
 
   private enum GraphMLProperty {
-    NODE_NUMBER(NODE_TAG, "number", "int"),//
-    NODE_TOKEN(NODE_TAG, "tokens", "string"),//
-    EDGE_NUMBER(EDGE_TAG, "number", "int"),//
-    EDGE_TYPE(EDGE_TAG, "type", "string"),//
+    NODE_NUMBER(NODE_TAG, "number", "int"), //
+    NODE_TOKEN(NODE_TAG, "tokens", "string"), //
+    EDGE_NUMBER(EDGE_TAG, "number", "int"), //
+    EDGE_TYPE(EDGE_TAG, "type", "string"), //
     EDGE_WITNESSES(EDGE_TAG, "witnesses", "string");
 
     private String name;
@@ -218,5 +224,49 @@ public class SimpleVariantGraphSerializer {
       xml.writeAttribute(ATTR_NAME_ATT, name);
       xml.writeAttribute(ATTR_TYPE_ATT, type);
     }
+  }
+
+  public void toDot(VariantGraph graph, Writer writer) {
+    final Transaction tx = graph.newTransaction();
+    try {
+      final PrintWriter out = new PrintWriter(writer);
+      final String indent = "  ";
+      final String connector = " -> ";
+
+      out.println("digraph G {");
+
+      for (VariantGraphVertex v : graph.vertices()) {
+        out.print(indent + "v" + v.getNode().getId());
+        out.print(" [label = \"" + toLabel(v) + "\"]");
+        out.println(";");
+      }
+
+      for (VariantGraphEdge e : graph.edges()) {
+        out.print(indent + "v" + e.from().getNode().getId() + connector + "v" + e.to().getNode().getId());
+        out.print(" [label = \"" + toLabel(e) + "\"]");
+        out.println(";");
+      }
+
+      for (VariantGraphTransposition t : graph.transpositions()) {
+        out.print(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId());
+        out.print(" [color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
+        out.println(";");
+      }
+
+      out.println("}");
+
+      out.flush();
+      tx.success();
+    } finally {
+      tx.finish();
+    }
+  }
+
+  private String toLabel(VariantGraphEdge e) {
+    return VariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
+  }
+
+  private String toLabel(VariantGraphVertex v) {
+    return VariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
   }
 }
