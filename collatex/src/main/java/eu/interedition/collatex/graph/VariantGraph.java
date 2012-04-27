@@ -1,18 +1,18 @@
 package eu.interedition.collatex.graph;
 
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.RowSortedTable;
-import com.google.common.collect.Sets;
-import com.google.common.collect.TreeBasedTable;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.Token;
+import static com.google.common.collect.Iterables.transform;
+import static eu.interedition.collatex.graph.GraphRelationshipType.PATH;
+import static java.util.Collections.singleton;
+import static org.neo4j.graphdb.Direction.OUTGOING;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -24,18 +24,20 @@ import org.neo4j.kernel.Uniqueness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.RowSortedTable;
+import com.google.common.collect.Sets;
+import com.google.common.collect.TreeBasedTable;
 
-import static com.google.common.collect.Iterables.transform;
-import static eu.interedition.collatex.graph.GraphRelationshipType.PATH;
-import static java.util.Collections.singleton;
-import static org.neo4j.graphdb.Direction.OUTGOING;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -76,8 +78,8 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       @Override
       public Iterator<VariantGraphVertex> iterator() {
         return new AbstractIterator<VariantGraphVertex>() {
-          private Map<Long, Integer> encountered = Maps.newHashMap();
-          private Queue<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>(singleton(getStart()));
+          private final Map<Long, Integer> encountered = Maps.newHashMap();
+          private final Queue<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>(singleton(getStart()));
 
           @Override
           protected VariantGraphVertex computeNext() {
@@ -170,7 +172,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
         return t;
       }
     }
-    
+
     return new VariantGraphTransposition(this, from, to);
   }
 
@@ -211,27 +213,30 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
 
     while (!queue.isEmpty()) {
       final VariantGraphVertex vertex = queue.pop();
+      boolean joinHasTranspositions = vertexHasTranspositions(vertex);
       final List<VariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
         final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
         final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
         if (!end.equals(joinCandidateVertex) && Iterables.size(joinCandidateVertex.incoming()) == 1) {
-          vertex.add(joinCandidateVertex.tokens());
-          for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
-            final VariantGraphVertex other = t.other(joinCandidateVertex);
-            t.delete();
-            transpose(vertex, other);
+          if (joinHasTranspositions == vertexHasTranspositions(joinCandidateVertex)) {
+            vertex.add(joinCandidateVertex.tokens());
+            for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
+              final VariantGraphVertex other = t.other(joinCandidateVertex);
+              t.delete();
+              transpose(vertex, other);
+            }
+            for (VariantGraphEdge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
+              final VariantGraphVertex to = e.to();
+              final Set<Witness> witnesses = e.witnesses();
+              e.delete();
+              connect(vertex, to, witnesses);
+            }
+            joinCandidateEdge.delete();
+            joinCandidateVertex.delete();
+            queue.push(vertex);
+            continue;
           }
-          for (VariantGraphEdge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
-            final VariantGraphVertex to = e.to();
-            final Set<Witness> witnesses = e.witnesses();
-            e.delete();
-            connect(vertex, to, witnesses);
-          }
-          joinCandidateEdge.delete();
-          joinCandidateVertex.delete();
-          queue.push(vertex);
-          continue;
         }
       }
 
@@ -246,6 +251,10 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     }
 
     return this;
+  }
+
+  private boolean vertexHasTranspositions(final VariantGraphVertex joinCandidateVertex) {
+    return !Iterables.isEmpty(joinCandidateVertex.transpositions());
   }
 
   public VariantGraph rank() {
@@ -269,9 +278,9 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       @Override
       public Iterator<Set<VariantGraphVertex>> iterator() {
         return new AbstractIterator<Set<VariantGraphVertex>>() {
-          private Iterator<VariantGraphVertex> vertices = vertices(witnesses).iterator();
+          private final Iterator<VariantGraphVertex> vertices = vertices(witnesses).iterator();
           private VariantGraphVertex last;
-          
+
           @Override
           protected Set<VariantGraphVertex> computeNext() {
             if (last == null) {

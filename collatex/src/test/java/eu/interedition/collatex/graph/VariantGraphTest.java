@@ -22,6 +22,7 @@ package eu.interedition.collatex.graph;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class VariantGraphTest extends AbstractTest {
@@ -208,26 +210,33 @@ public class VariantGraphTest extends AbstractTest {
     assertHasWitnesses(edgeBetween(whiteVertex, catVertex), w[1]);
   }
 
-  //  @Test
+  @Test
   public void joinTwoDifferentWitnessesWithTranspositions() {
     final SimpleWitness[] w = createWitnesses("voor Zo nu en dan zin2 na voor", "voor zin2 Nu en dan voor");
     final VariantGraph graph = collate(w).join();
+    SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(graph);
+    StringWriter writer = new StringWriter();
+    s.toDot(graph, writer);
+    LOG.info("dot={}", writer.toString());
 
-    final VariantGraphVertex blackieVertex = vertexWith(graph, "voor", w[0]);
-    final VariantGraphVertex whitneyVertex = vertexWith(graph, "zo", w[1]);
-    final VariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final VariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
-    final VariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
-    final VariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraphVertex voorVertex1 = vertexWith(graph, "voor", w[0]);
+    final VariantGraphVertex zoVertex = vertexWith(graph, "zo", w[0]);
+    final VariantGraphVertex nuendanVertex = vertexWith(graph, "nu en dan", w[0]);
+    final VariantGraphVertex zin2AVertex = vertexWith(graph, "zin2", w[0]);
+    final VariantGraphVertex zin2BVertex = vertexWith(graph, "zin2", w[1]);
+    final VariantGraphVertex naVertex = vertexWith(graph, "na", w[0]);
+    //    final VariantGraphVertex voorVertex2 = vertexWith(graph, "voor", w[0]);
 
-    assertHasWitnesses(edgeBetween(graph.getStart(), blackieVertex), w[0]);
-    assertHasWitnesses(edgeBetween(blackieVertex, theVertex), w[0]);
-    assertHasWitnesses(edgeBetween(graph.getStart(), whitneyVertex), w[1]);
-    assertHasWitnesses(edgeBetween(whitneyVertex, theVertex), w[1]);
-    assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
-    assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0]);
-    assertHasWitnesses(edgeBetween(theVertex, whiteVertex), w[1]);
-    assertHasWitnesses(edgeBetween(whiteVertex, catVertex), w[1]);
+    assertHasWitnesses(edgeBetween(graph.getStart(), voorVertex1), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(voorVertex1, zoVertex), w[0]);
+    assertHasWitnesses(edgeBetween(zoVertex, nuendanVertex), w[0]);
+    assertHasWitnesses(edgeBetween(nuendanVertex, zin2AVertex), w[0]);
+    assertHasWitnesses(edgeBetween(zin2AVertex, naVertex), w[0]);
+    //    assertHasWitnesses(edgeBetween(naVertex, voorVertex2), w[0]);
+    //    assertHasWitnesses(edgeBetween(voorVertex2, graph.getEnd()), w[0], w[1]);
+
+    assertHasWitnesses(edgeBetween(voorVertex1, zin2BVertex), w[1]);
+    assertHasWitnesses(edgeBetween(zin2BVertex, nuendanVertex), w[1]);
+    //    assertHasWitnesses(edgeBetween(nuendanVertex, voorVertex2), w[1]);
   }
-
 }
