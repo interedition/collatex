@@ -206,11 +206,12 @@ public class ArchipelagoWithVersions extends Archipelago {
     List<Integer> keySet = Lists.newArrayList(islandMultimap.keySet());
     Collections.sort(keySet);
     List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
-    for (Integer size : decreasingIslandSizes) {
-      List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, size);
+    for (Integer islandSize : decreasingIslandSizes) {
+      List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, islandSize);
 
       if (islands.size() == 1) {
-        fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, islands.get(0));
+        Island isl = islands.get(0);
+        if (islandIsNoOutlier(result, isl)) fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, isl);
 
       } else if (islands.size() > 1) {
         Set<Island> competingIslands = getCompetingIslands(result, islands);
@@ -225,17 +226,31 @@ public class ArchipelagoWithVersions extends Archipelago {
           // TODO: find a better way to determine the best choice of island
           for (Island ci : distanceMap.get(d)) {
             if (islandIsPossible(ci, fixedIslandCoordinates)) {
-              fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, ci);
+              if (islandIsNoOutlier(result, ci)) fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, ci);
             }
           }
         }
 
         for (Island i : getNonCompetingIslands(islands, competingIslands)) {
-          fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
+          if (islandIsNoOutlier(result, i)) fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
         }
       }
     }
     return result;
+  }
+
+  private boolean islandIsNoOutlier(Archipelago result, Island isl) {
+    return deviation(result, isl) < 10;
+  }
+
+  private double deviation(Archipelago archipelago, Island isl) {
+    if (archipelago.size() == 0) return 0;
+
+    double smallestDistance = archipelago.smallestDistance(isl);
+    int islandSize = isl.size();
+    double deviation = smallestDistance / islandSize;
+    LOG.info("size={}, smallestDistance={}, deviation={}", new Object[] { islandSize, smallestDistance, deviation });
+    return deviation;
   }
 
   private List<Double> shortestToLongestDistances(Multimap<Double, Island> distanceMap) {

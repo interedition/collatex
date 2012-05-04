@@ -264,8 +264,8 @@ public class HermansTest extends AbstractTest {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
     StringWriter writer = new StringWriter();
     //    vg.join();
-    s.toDot(vg, writer);
-    LOG.info("dot={}", writer.toString());
+    //    s.toDot(vg, writer);
+    //    LOG.info("dot={}", writer.toString());
     XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
     s.toTEI(xml);
     return writer.toString();
