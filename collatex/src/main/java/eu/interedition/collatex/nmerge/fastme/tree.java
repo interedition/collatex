@@ -37,7 +37,7 @@ import java.text.NumberFormat;
  * Holds an entire tree of nodes
  */
 public class tree {
-  String name;
+//  String name;
   node root;
   int size;
   double weight;

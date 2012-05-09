@@ -64,35 +64,35 @@ public class ArchipelagoWithVersions extends Archipelago {
     Collections.sort(keySet);
     List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
     for (Integer islandSize : decreasingIslandSizes) {
-      //      if (size > 2) {
-      List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, islandSize);
+      if (islandSize > 2) {
+        List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, islandSize);
 
-      if (islands.size() == 1) {
-        fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, islands.get(0));
+        if (islands.size() == 1) {
+          fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, islands.get(0));
 
-      } else if (islands.size() > 1) {
-        Set<Island> competingIslands = getCompetingIslands(result, islands);
+        } else if (islands.size() > 1) {
+          Set<Island> competingIslands = getCompetingIslands(result, islands);
 
-        Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
-        for (Island isl : competingIslands) {
-          distanceMap.put(result.smallestDistance(isl), isl);
-        }
-        LOG.info("distanceMap = {}", distanceMap);
+          Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
+          for (Island isl : competingIslands) {
+            distanceMap.put(result.smallestDistance(isl), isl);
+          }
+          LOG.info("distanceMap = {}", distanceMap);
 
-        for (Double d : shortestToLongestDistances(distanceMap)) {
-          // TODO: find a better way to determine the best choice of island
-          for (Island ci : distanceMap.get(d)) {
-            if (islandIsPossible(ci, fixedIslandCoordinates)) {
-              fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, ci);
+          for (Double d : shortestToLongestDistances(distanceMap)) {
+            // TODO: find a better way to determine the best choice of island
+            for (Island ci : distanceMap.get(d)) {
+              if (islandIsPossible(ci, fixedIslandCoordinates)) {
+                fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, ci);
+              }
             }
           }
-        }
 
-        for (Island i : getNonCompetingIslands(islands, competingIslands)) {
-          fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
+          for (Island i : getNonCompetingIslands(islands, competingIslands)) {
+            fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
+          }
         }
       }
-      //      }
     }
     return result;
   }

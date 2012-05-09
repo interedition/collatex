@@ -38,6 +38,7 @@ import com.google.common.collect.TreeBasedTable;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleToken;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -265,8 +266,36 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       }
       v.setRank(rank + 1);
     }
-
+    //    adjustForTranspositions();
     return this;
+  }
+
+  private void adjustForTranspositions() {
+    for (VariantGraphVertex v : vertices()) {
+      Iterable<VariantGraphTransposition> transpositions = v.transpositions();
+      for (VariantGraphTransposition vgt : transpositions) {
+        VariantGraphVertex from = vgt.from();
+        VariantGraphVertex to = vgt.to();
+        LOG.info("v {}, from {}, to {}", new Object[] { v, from, to });
+        if (from.equals(v))
+          addNullVertex(v, from, to);
+        else if (to.equals(v)) addNullVertex(v, to, from);
+      }
+    }
+  }
+
+  private void addNullVertex(VariantGraphVertex v, VariantGraphVertex from, VariantGraphVertex to) {
+    Set<Token> nullTokens = Sets.newHashSet();
+    for (Witness w : to.witnesses()) {
+      nullTokens.add(new SimpleToken(w, -1, "", ""));
+    }
+    VariantGraphVertex nullVertex = new VariantGraphVertex(this, nullTokens);
+    int rank = v.getRank();
+    nullVertex.setRank(rank);
+    v.setRank(rank + 1);
+    for (VariantGraphVertex ov : vertices()) {
+      if (!ov.equals(v) && ov.getRank() > rank) ov.setRank(ov.getRank() + 1);
+    }
   }
 
   public Iterable<Set<VariantGraphVertex>> ranks() {

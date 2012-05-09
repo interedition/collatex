@@ -13,12 +13,11 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.matrixlinker.MatchMatrixLinker;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchMatrixLinkerTest extends AbstractTest {
 
-  String newLine = System.getProperty("line.separator");
+  //  String newLine = System.getProperty("line.separator");
 
   @Test
   public void test1() {

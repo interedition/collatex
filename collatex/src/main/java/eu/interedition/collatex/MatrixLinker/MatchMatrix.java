@@ -206,13 +206,14 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
   public Iterator<Coordinate> iterator() {
     return new AbstractIterator<Coordinate>() {
       private int row = 0;
-      private final int col = 0;
+      private final static int col = 0;
       private final int rows = rowNum();
       private int cols = colNum();
 
       @Override
       protected Coordinate computeNext() {
         while (row < rows) {
+          // huh?
           if (cols++ < cols) {
             return new Coordinate(row, col);
           }

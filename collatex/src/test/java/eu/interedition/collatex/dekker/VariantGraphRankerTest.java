@@ -20,15 +20,17 @@
 
 package eu.interedition.collatex.dekker;
 
-import com.google.common.collect.Lists;
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import com.google.common.collect.Lists;
+
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 
 public class VariantGraphRankerTest extends AbstractTest {
 
@@ -57,14 +59,14 @@ public class VariantGraphRankerTest extends AbstractTest {
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
 
     assertVertexEquals("so", vertices.get(1));
-    assertEquals(1, vertices.get(1).getRank());
+    assertEquals(2, vertices.get(1).getRank());
     assertVertexEquals("he", vertices.get(2));
-    assertEquals(2, vertices.get(2).getRank());
+    assertEquals(3, vertices.get(2).getRank());
     assertVertexEquals("was", vertices.get(3));
-    assertEquals(3, vertices.get(3).getRank());
+    assertEquals(4, vertices.get(3).getRank());
     assertVertexEquals("agast", vertices.get(4));
-    assertEquals(4, vertices.get(4).getRank());
+    assertEquals(5, vertices.get(4).getRank());
     assertVertexEquals("so", vertices.get(5));
-    assertEquals(5, vertices.get(5).getRank());
+    assertEquals(7, vertices.get(5).getRank());
   }
 }

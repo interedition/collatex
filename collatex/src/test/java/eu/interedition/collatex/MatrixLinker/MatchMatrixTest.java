@@ -17,9 +17,6 @@ import org.junit.Test;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.matrixlinker.Archipelago;
-import eu.interedition.collatex.matrixlinker.ArchipelagoWithVersions;
-import eu.interedition.collatex.matrixlinker.MatchMatrix;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchMatrixTest extends AbstractTest {
