@@ -49,10 +49,6 @@ public class Archipelago {
     return getIslands();
   }
 
-  protected void remove(int i) {
-    getIslands().remove(i);
-  }
-
   public int size() {
     return getIslands().size();
   }
@@ -105,41 +101,12 @@ public class Archipelago {
     return false;
   }
 
-  @Override
-  public String toString() {
-    String result = "";
-    for (MatchMatrix.Island island : getIslands()) {
-      if (result.isEmpty())
-        result = "[ " + island;
-      else
-        result += ", " + island;
-    }
-    result += " ]";
-    return result;
-  }
-
   public int value() {
     int result = 0;
     for (MatchMatrix.Island isl : getIslands()) {
       result += isl.value();
     }
     return result;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(islands);
-  }
-
-  @Override
-  public boolean equals(Object object) {
-    if (object == null) return false;
-    if (object.getClass() != this.getClass()) return false;
-    if (((Archipelago) object).size() != this.size()) return false;
-    for (int i = 0; i < size(); i++) {
-      if (!((Archipelago) object).get(i).equals(get(i))) return false;
-    }
-    return true;
   }
 
   public ArrayList<MatchMatrix.Coordinate> findGaps() {
@@ -182,16 +149,6 @@ public class Archipelago {
     return Objects.equal(getCoordinatesMap().get(row), column);
   }
 
-  private Map<Integer, Integer> getCoordinatesMap() {
-    final Map<Integer, Integer> map = Maps.newHashMap();
-    for (final Island isl : iterator()) {
-      for (final Coordinate c : isl) {
-        map.put(c.getRow(), c.getColumn());
-      }
-    }
-    return map;
-  }
-
   public boolean islandsCompete(Island i1, Island i2) {
     return i1.isCompetitor(i2);
   }
@@ -223,6 +180,57 @@ public class Archipelago {
     return closest;
   }
 
+  public double smallestDistance(Island isl) {
+    double minimum = 10000;
+    for (Island fixedIsland : getIslands()) {
+      minimum = Math.min(minimum, distance(isl, fixedIsland));
+    }
+    return minimum;
+  }
+
+  protected void remove(int i) {
+    getIslands().remove(i);
+  }
+
+  @Override
+  public String toString() {
+    String result = "";
+    for (MatchMatrix.Island island : getIslands()) {
+      if (result.isEmpty())
+        result = "[ " + island;
+      else
+        result += ", " + island;
+    }
+    result += " ]";
+    return result;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(islands);
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    if (object == null) return false;
+    if (object.getClass() != this.getClass()) return false;
+    if (((Archipelago) object).size() != this.size()) return false;
+    for (int i = 0; i < size(); i++) {
+      if (!((Archipelago) object).get(i).equals(get(i))) return false;
+    }
+    return true;
+  }
+
+  private Map<Integer, Integer> getCoordinatesMap() {
+    final Map<Integer, Integer> map = Maps.newHashMap();
+    for (final Island isl : iterator()) {
+      for (final Coordinate c : isl) {
+        map.put(c.getRow(), c.getColumn());
+      }
+    }
+    return map;
+  }
+
   private double distance(MatchMatrix.Island isl1, MatchMatrix.Island isl2) {
     double result = 0.0;
     int isl1_L_x = isl1.getLeftEnd().column;
@@ -248,13 +256,4 @@ public class Archipelago {
     result = Math.sqrt((a_x - b_x) * (a_x - b_x) + (a_y - b_y) * (a_y - b_y));
     return result;
   }
-
-  public double smallestDistance(Island isl) {
-    double minimum = 10000;
-    for (Island fixedIsland : getIslands()) {
-      minimum = Math.min(minimum, distance(isl, fixedIsland));
-    }
-    return minimum;
-  }
-
 }

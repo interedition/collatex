@@ -66,7 +66,7 @@ public class HermansTest extends AbstractTest {
     // assertEquals(500,archipelago.getVersion(0).value());
     // assertEquals(497,archipelago.getVersion(4).value());
 
-    Archipelago firstVersion = archipelago.createFirstVersion();
+    Archipelago firstVersion = archipelago.createNonConflictingVersion();
     for (MatchMatrix.Island isl : firstVersion.iterator()) {
       System.out.print(" " + isl.size());
     }
@@ -123,7 +123,7 @@ public class HermansTest extends AbstractTest {
     System.out.println();
     assertEquals(233, archipelago.size());
     assertEquals(1429, archipelago.numOfConflicts());
-    Archipelago firstVersion = archipelago.createFirstVersion();
+    Archipelago firstVersion = archipelago.createNonConflictingVersion();
     for (MatchMatrix.Island isl : firstVersion.iterator()) {
       System.out.print(" " + isl.size());
     }
@@ -212,7 +212,7 @@ public class HermansTest extends AbstractTest {
     when(result.findClosestIsland(i1, i3)).thenReturn(i1);
     when(result.findClosestIsland(i5, i6)).thenReturn(i1);
 
-    creator.createFirstVersion(result);
+    creator.createNonConflictingVersion(result);
     verify(result).add(new Island(new Coordinate(40, 39), new Coordinate(58, 57)));
     verify(result).add(new Island(new Coordinate(8, 8), new Coordinate(15, 15)));
     verify(result).add(new Island(new Coordinate(30, 31), new Coordinate(36, 37)));
@@ -263,8 +263,8 @@ public class HermansTest extends AbstractTest {
   private String generateTEI(VariantGraph vg) throws XMLStreamException, FactoryConfigurationError {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
     StringWriter writer = new StringWriter();
-    //    vg.join();
-    //    s.toDot(vg, writer);
+    vg.join();
+    s.toDot(vg, writer);
     //    LOG.info("dot={}", writer.toString());
     XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
     s.toTEI(xml);

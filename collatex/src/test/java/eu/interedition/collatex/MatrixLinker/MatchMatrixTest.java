@@ -342,7 +342,7 @@ public class MatchMatrixTest extends AbstractTest {
     String expected = "<xml>" + newLine + "a b " + newLine + "  <app>" + newLine + "    <lem>[WEGGELATEN]</lem>" + newLine + "    <rdg>e f</rdg>" + newLine + "  </app>" + newLine + " c d " + newLine + "  <app>" + newLine + "    <lem>e f</lem>" + newLine + "    <rdg>[WEGGELATEN]</rdg>" + newLine + "  </app>" + newLine + " g h " + newLine + "</xml>";
     assertEquals(expected.length(), result.length());
     ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
-    ArrayList<MatchMatrix.Coordinate> gaps = archipelago.createFirstVersion().findGaps(list);
+    ArrayList<MatchMatrix.Coordinate> gaps = archipelago.createNonConflictingVersion().findGaps(list);
     //  	System.out.println(buildMatrix.toHtml(archipelago.createFirstVersion()));
     assertEquals(6, gaps.size());
 
@@ -390,7 +390,7 @@ public class MatchMatrixTest extends AbstractTest {
     assertEquals(expected.substring(0, 10), result.substring(0, 10));
     assertEquals(expected, result);
     ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
-    ArrayList<MatchMatrix.Coordinate> gaps = archipelago.createFirstVersion().findGaps(list);
+    ArrayList<MatchMatrix.Coordinate> gaps = archipelago.createNonConflictingVersion().findGaps(list);
     assertEquals(4, gaps.size());
   }
 
@@ -415,7 +415,7 @@ public class MatchMatrixTest extends AbstractTest {
     }
     String expected = "<xml>" + newLine + "op " + newLine + "  <app>" + newLine + "    <lem>de atlantische</lem>" + newLine + "    <rdg>den atlantischen</rdg>" + newLine + "  </app>" + newLine + " oceaan voer een " + newLine + "  <app>" + newLine + "    <lem>ontzaggelijk zeekasteel</lem>" + newLine + "    <rdg>groote stoomer</rdg>" + newLine + "  </app>" + newLine + " onder de " + newLine + "  <app>" + newLine + "    <lem>vele passagiers</lem>" + newLine + "    <rdg>velen</rdg>" + newLine + "  </app>" + newLine + " aan " + newLine + "  <app>" + newLine + "    <lem>boord</lem>" + newLine + "    <rdg>boojrd</rdg>" + newLine + "  </app>" + newLine + " bevond zich een bruine korte dikke man " + newLine + "  <app>" + newLine + "    <lem>hij</lem>" + newLine + "    <rdg>ijsgi</rdg>" + newLine + "  </app>" + newLine + " werd nooit zonder sigaar gezien zijn pantalon had lijnrechte vouwen in de pijpen maar zat toch altijd vol rimpels " + newLine + "</xml>";
     assertEquals(expected, result);
-    ArrayList<MatchMatrix.Coordinate> gaps = archipelago.createFirstVersion().findGaps();
+    ArrayList<MatchMatrix.Coordinate> gaps = archipelago.createNonConflictingVersion().findGaps();
     assertEquals(10, gaps.size());
   }
 
@@ -437,7 +437,7 @@ public class MatchMatrixTest extends AbstractTest {
     try {
       PrintWriter pw = new PrintWriter(new File("exampleOutput.txt"));
       result = archipelago.createXML(buildMatrix, pw);
-      pw.println(buildMatrix.toHtml(archipelago.createFirstVersion()));
+      pw.println(buildMatrix.toHtml(archipelago.createNonConflictingVersion()));
       pw.close();
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -484,7 +484,7 @@ public class MatchMatrixTest extends AbstractTest {
       System.out.println("A");
       result = archipelago.createXML(buildMatrix, pw);
       assertEquals("", result);
-      pw.println(buildMatrix.toHtml(archipelago.createFirstVersion()));
+      pw.println(buildMatrix.toHtml(archipelago.createNonConflictingVersion()));
       pw.close();
     } catch (FileNotFoundException e) {
       e.printStackTrace();

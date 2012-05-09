@@ -23,6 +23,7 @@ import eu.interedition.collatex.matching.Matches;
 
 public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
   static Logger LOG = LoggerFactory.getLogger(MatchMatrix.class);
+  private final ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
   public static MatchMatrix create(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     base.rank();
@@ -46,8 +47,6 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
     return arrayTable;
   }
 
-  private final ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
-
   public MatchMatrix(Iterable<VariantGraphVertex> vertices, Iterable<Token> witness) {
     sparseMatrix = ArrayTable.create(vertices, witness);
   }
@@ -58,26 +57,6 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
 
   public void set(int row, int column, boolean value) {
     sparseMatrix.set(row, column, value);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder result = new StringBuilder();
-    ArrayList<String> colLabels = columnLabels();
-    for (String cLabel : colLabels) {
-      result.append(" ").append(cLabel);
-    }
-    result.append("\n");
-    int colNum = sparseMatrix.columnKeyList().size();
-    ArrayList<String> rLabels = rowLabels();
-    int row = 0;
-    for (String label : rLabels) {
-      result.append(label);
-      for (int col = 0; col < colNum; col++)
-        result.append(" ").append(at(row++, col));
-      result.append("\n");
-    }
-    return result.toString();
   }
 
   public String toHtml() {
@@ -242,6 +221,26 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
         return endOfData();
       }
     };
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    ArrayList<String> colLabels = columnLabels();
+    for (String cLabel : colLabels) {
+      result.append(" ").append(cLabel);
+    }
+    result.append("\n");
+    int colNum = sparseMatrix.columnKeyList().size();
+    ArrayList<String> rLabels = rowLabels();
+    int row = 0;
+    for (String label : rLabels) {
+      result.append(label);
+      for (int col = 0; col < colNum; col++)
+        result.append(" ").append(at(row++, col));
+      result.append("\n");
+    }
+    return result.toString();
   }
 
   public static class Coordinate implements Comparable<Coordinate> {
@@ -431,25 +430,6 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
       return coor;
     }
 
-    @Override
-    public Iterator<Coordinate> iterator() {
-      return Collections.unmodifiableList(islandCoordinates).iterator();
-    }
-
-    protected boolean removeSameColOrRow(Coordinate c) {
-      ArrayList<Coordinate> remove = new ArrayList<Coordinate>();
-      for (Coordinate coor : islandCoordinates) {
-        if (coor.sameColumn(c) || coor.sameRow(c)) {
-          remove.add(coor);
-        }
-      }
-      if (remove.isEmpty()) return false;
-      for (Coordinate coor : remove) {
-        islandCoordinates.remove(coor);
-      }
-      return true;
-    }
-
     public boolean overlap(Island isl) {
       for (Coordinate c : isl) {
         if (contains(c) || neighbour(c)) return true;
@@ -468,6 +448,25 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
     public int value() {
       final int size = size();
       return (size < 2 ? size : direction + size * size);
+    }
+
+    protected boolean removeSameColOrRow(Coordinate c) {
+      ArrayList<Coordinate> remove = new ArrayList<Coordinate>();
+      for (Coordinate coor : islandCoordinates) {
+        if (coor.sameColumn(c) || coor.sameRow(c)) {
+          remove.add(coor);
+        }
+      }
+      if (remove.isEmpty()) return false;
+      for (Coordinate coor : remove) {
+        islandCoordinates.remove(coor);
+      }
+      return true;
+    }
+
+    @Override
+    public Iterator<Coordinate> iterator() {
+      return Collections.unmodifiableList(islandCoordinates).iterator();
     }
 
     @Override

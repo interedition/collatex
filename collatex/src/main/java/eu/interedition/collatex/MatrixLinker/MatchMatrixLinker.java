@@ -22,7 +22,7 @@ public class MatchMatrixLinker implements TokenLinker {
     for (MatchMatrix.Island isl : buildMatrix.getIslands()) {
       archipelago.add(isl);
     }
-    Archipelago preferredIslands = archipelago.createFirstVersion();
+    Archipelago preferredIslands = archipelago.createNonConflictingVersion();
     List<Token> columnTokens = buildMatrix.columnTokens();
     List<VariantGraphVertex> rowVertices = buildMatrix.rowVertices();
     Map<Token, VariantGraphVertex> map = Maps.newHashMap();

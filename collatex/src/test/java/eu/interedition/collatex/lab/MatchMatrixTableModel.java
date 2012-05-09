@@ -67,7 +67,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     for (MatchMatrix.Island isl : matchMatrix.getIslands()) {
       archipelago.add(isl);
     }
-    Archipelago preferred = archipelago.createFirstVersion();
+    Archipelago preferred = archipelago.createNonConflictingVersion();
     return preferred;
   }
 

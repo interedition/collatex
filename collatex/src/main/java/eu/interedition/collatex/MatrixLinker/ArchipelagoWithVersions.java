@@ -21,11 +21,7 @@ import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
 
 public class ArchipelagoWithVersions extends Archipelago {
   Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
-
-  private static final String newLine = System.getProperty("line.separator");
   private ArrayList<Archipelago> nonConflVersions;
-
-  //  private Integer[] isl2;
 
   public ArchipelagoWithVersions() {
     setIslands(new ArrayList<MatchMatrix.Island>());
@@ -43,35 +39,182 @@ public class ArchipelagoWithVersions extends Archipelago {
     super.add(island);
   }
 
+  @Override
+  public ArchipelagoWithVersions copy() {
+    ArchipelagoWithVersions result = new ArchipelagoWithVersions();
+    for (MatchMatrix.Island isl : getIslands()) {
+      result.add(new MatchMatrix.Island(isl));
+    }
+    return result;
+  }
+
+  /*
+    * Create a non-conflicting version by simply taken all the islands
+    * that do not conflict with each other, largest first. This presuming
+    * that Archipelago will have a high value if it contains the largest
+    * possible islands
+    */
+  public Archipelago createNonConflictingVersion(Archipelago result) {
+    Map<Integer, Integer> fixedIslandCoordinates = Maps.newHashMap();
+    Multimap<Integer, MatchMatrix.Island> islandMultimap = ArrayListMultimap.create();
+    for (MatchMatrix.Island isl : getIslands()) {
+      islandMultimap.put(isl.size(), isl);
+    }
+    List<Integer> keySet = Lists.newArrayList(islandMultimap.keySet());
+    Collections.sort(keySet);
+    List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
+    for (Integer islandSize : decreasingIslandSizes) {
+      //      if (size > 2) {
+      List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, islandSize);
+
+      if (islands.size() == 1) {
+        fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, islands.get(0));
+
+      } else if (islands.size() > 1) {
+        Set<Island> competingIslands = getCompetingIslands(result, islands);
+
+        Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
+        for (Island isl : competingIslands) {
+          distanceMap.put(result.smallestDistance(isl), isl);
+        }
+        LOG.info("distanceMap = {}", distanceMap);
+
+        for (Double d : shortestToLongestDistances(distanceMap)) {
+          // TODO: find a better way to determine the best choice of island
+          for (Island ci : distanceMap.get(d)) {
+            if (islandIsPossible(ci, fixedIslandCoordinates)) {
+              fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, ci);
+            }
+          }
+        }
+
+        for (Island i : getNonCompetingIslands(islands, competingIslands)) {
+          fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
+        }
+      }
+      //      }
+    }
+    return result;
+  }
+
+  public Archipelago createNonConflictingVersion() {
+    return createNonConflictingVersion(new Archipelago());
+  }
+
+  public int numOfNonConflConstell() {
+    return nonConflVersions.size();
+  }
+
+  public ArrayList<Archipelago> getNonConflVersions() {
+    return nonConflVersions;
+  }
+
+  private List<Double> shortestToLongestDistances(Multimap<Double, Island> distanceMap) {
+    List<Double> distances = Lists.newArrayList(distanceMap.keySet());
+    Collections.sort(distances);
+    return distances;
+  }
+
+  private Set<Island> getNonCompetingIslands(List<Island> islands, Set<Island> competingIslands) {
+    Set<Island> nonCompetingIslands = Sets.newHashSet(islands);
+    nonCompetingIslands.removeAll(competingIslands);
+    return nonCompetingIslands;
+  }
+
+  private Set<Island> getCompetingIslands(Archipelago result, List<Island> islands) {
+    Set<Island> competingIslands = Sets.newHashSet();
+    for (int i = 0; i < islands.size(); i++) {
+      Island i1 = islands.get(i);
+      for (int j = 1; j < islands.size() - i; j++) {
+        Island i2 = islands.get(i + j);
+        if (result.islandsCompete(i1, i2)) {
+          competingIslands.add(i1);
+          competingIslands.add(i2);
+        }
+      }
+    }
+    return competingIslands;
+  }
+
+  private List<Island> possibleIslands(Map<Integer, Integer> fixedIslandCoordinates, Multimap<Integer, MatchMatrix.Island> islandMultimap, Integer size) {
+    List<Island> islands = Lists.newArrayList();
+    for (Island island : islandMultimap.get(size)) {
+      if (islandIsPossible(island, fixedIslandCoordinates)) {
+        islands.add(island);
+      }
+    }
+    return islands;
+  }
+
+  private Map<Integer, Integer> addIslandToResult(Map<Integer, Integer> fixedIslandCoordinates, Archipelago result, Island isl) {
+    LOG.info("adding island: '{}'", isl);
+    result.add(isl);
+    return fixIslandCoordinates(isl, fixedIslandCoordinates);
+  }
+
+  private Map<Integer, Integer> fixIslandCoordinates(Island isl, Map<Integer, Integer> fixedIslandCoordinates) {
+    for (Coordinate coordinates : isl) {
+      fixedIslandCoordinates.put(coordinates.row, coordinates.column);
+    }
+    return fixedIslandCoordinates;
+  }
+
+  private boolean islandIsPossible(Island island, Map<Integer, Integer> fixedIslandCoordinates) {
+    boolean possible = true;
+    for (Coordinate coordinates : island) {
+      if (fixedIslandCoordinates.containsKey(coordinates.row) || //
+          fixedIslandCoordinates.containsValue(coordinates.column)) return false;
+    }
+    return possible;
+  }
+
+  private boolean islandIsNoOutlier(Archipelago result, Island isl) {
+    return deviation(result, isl) < 10;
+  }
+
+  private double deviation(Archipelago archipelago, Island isl) {
+    if (archipelago.size() == 0) return 0;
+
+    double smallestDistance = archipelago.smallestDistance(isl);
+    int islandSize = isl.size();
+    double deviation = smallestDistance / islandSize;
+    LOG.info("size={}, smallestDistance={}, deviation={}", new Object[] { islandSize, smallestDistance, deviation });
+    return deviation;
+  }
+
+  // these methods are only used in tests. remove?
+  //  private Integer[] isl2;
+  private static final String newLine = System.getProperty("line.separator");
+
   public void createNonConflictingVersions() {
     boolean debug = false;
-    //		PrintWriter logging = null;
-    //		File logFile = new File(File.separator + "c:\\logfile.txt");
-    //		try {
-    //	    logging = new PrintWriter(new FileOutputStream(logFile));
+    //    PrintWriter logging = null;
+    //    File logFile = new File(File.separator + "c:\\logfile.txt");
+    //    try {
+    //      logging = new PrintWriter(new FileOutputStream(logFile));
     //    } catch (FileNotFoundException e) {
-    //	    e.printStackTrace();
+    //      e.printStackTrace();
     //    }
 
     nonConflVersions = new ArrayList<Archipelago>();
     int tel = 0;
     for (MatchMatrix.Island island : getIslands()) {
       tel++;
-      //  		if(tel>22)
+      //      if(tel>22)
       debug = false;
-      //  			System.out.println("nonConflVersions.size(): "+nonConflVersions.size());
-      //  			int tel_version = 0;
-      //  			for(Archipelago arch : nonConflVersions) {
-      //  				System.out.println("arch version ("+(tel_version++)+"): " + arch);
-      //  			}
+      //        System.out.println("nonConflVersions.size(): "+nonConflVersions.size());
+      //        int tel_version = 0;
+      //        for(Archipelago arch : nonConflVersions) {
+      //          System.out.println("arch version ("+(tel_version++)+"): " + arch);
+      //        }
       // TODO
-      //  		if(tel>22) {
-      //  			int tel_version = 0;
-      //  			for(Archipelago arch : nonConflVersions) {
-      //  				System.out.println("arch version ("+(tel_version++)+"): " + arch);
-      //  			}
-      //  			System.exit(1);
-      //  		}
+      //      if(tel>22) {
+      //        int tel_version = 0;
+      //        for(Archipelago arch : nonConflVersions) {
+      //          System.out.println("arch version ("+(tel_version++)+"): " + arch);
+      //        }
+      //        System.exit(1);
+      //      }
       if (nonConflVersions.size() == 0) {
         if (debug) System.out.println("nonConflVersions.size()==0");
         Archipelago version = new Archipelago();
@@ -139,43 +282,15 @@ public class ArchipelagoWithVersions extends Archipelago {
         }
       }
     }
-    //		int tel_version = 0;
-    //		for(Archipelago arch : nonConflVersions) {
-    //			logging.println("arch version ("+(tel_version++)+"): " + arch);
-    //		}
-    //		tel_version = 0;
-    //		for(Archipelago arch : nonConflVersions) {
-    //			logging.println("version "+(tel_version++)+": " + arch.value());
-    //		}
-    //		logging.close();
-  }
-
-  private void addVersion(Archipelago version) {
-    int pos = 0;
-    //		int tel_loop = 0;
-    //		System.out.println("addVersion - num of versions: "+nonConflVersions.size());
-    for (pos = 0; pos < nonConflVersions.size(); pos++) {
-      if (version.equals(nonConflVersions.get(pos))) return;
-      //			System.out.println("loop 5: "+tel_loop++);
-      if (version.value() > nonConflVersions.get(pos).value()) {
-        nonConflVersions.add(pos, version);
-        return;
-      }
-    }
-    nonConflVersions.add(version);
-  }
-
-  public int numOfNonConflConstell() {
-    return nonConflVersions.size();
-  }
-
-  @Override
-  public ArchipelagoWithVersions copy() {
-    ArchipelagoWithVersions result = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : getIslands()) {
-      result.add(new MatchMatrix.Island(isl));
-    }
-    return result;
+    //    int tel_version = 0;
+    //    for(Archipelago arch : nonConflVersions) {
+    //      logging.println("arch version ("+(tel_version++)+"): " + arch);
+    //    }
+    //    tel_version = 0;
+    //    for(Archipelago arch : nonConflVersions) {
+    //      logging.println("version "+(tel_version++)+": " + arch.value());
+    //    }
+    //    logging.close();
   }
 
   public Archipelago getVersion(int i) {
@@ -187,168 +302,6 @@ public class ArchipelagoWithVersions extends Archipelago {
     }
   }
 
-  public ArrayList<Archipelago> getNonConflVersions() {
-    return nonConflVersions;
-  }
-
-  /*
-    * Create a non-conflicting version by simply taken all the islands
-    * that do not conflict with each other, largest first. This presuming
-    * that Archipelago will have a high value if it contains the largest
-    * possible islands
-    */
-  public Archipelago createFirstVersion(Archipelago result) {
-    Map<Integer, Integer> fixedIslandCoordinates = Maps.newHashMap();
-    Multimap<Integer, MatchMatrix.Island> islandMultimap = ArrayListMultimap.create();
-    for (MatchMatrix.Island isl : getIslands()) {
-      islandMultimap.put(isl.size(), isl);
-    }
-    List<Integer> keySet = Lists.newArrayList(islandMultimap.keySet());
-    Collections.sort(keySet);
-    List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
-    for (Integer islandSize : decreasingIslandSizes) {
-      List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, islandSize);
-
-      if (islands.size() == 1) {
-        Island isl = islands.get(0);
-        if (islandIsNoOutlier(result, isl)) fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, isl);
-
-      } else if (islands.size() > 1) {
-        Set<Island> competingIslands = getCompetingIslands(result, islands);
-
-        Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
-        for (Island isl : competingIslands) {
-          distanceMap.put(result.smallestDistance(isl), isl);
-        }
-        LOG.info("distanceMap = {}", distanceMap);
-
-        for (Double d : shortestToLongestDistances(distanceMap)) {
-          // TODO: find a better way to determine the best choice of island
-          for (Island ci : distanceMap.get(d)) {
-            if (islandIsPossible(ci, fixedIslandCoordinates)) {
-              if (islandIsNoOutlier(result, ci)) fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, ci);
-            }
-          }
-        }
-
-        for (Island i : getNonCompetingIslands(islands, competingIslands)) {
-          if (islandIsNoOutlier(result, i)) fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
-        }
-      }
-    }
-    return result;
-  }
-
-  private boolean islandIsNoOutlier(Archipelago result, Island isl) {
-    return deviation(result, isl) < 10;
-  }
-
-  private double deviation(Archipelago archipelago, Island isl) {
-    if (archipelago.size() == 0) return 0;
-
-    double smallestDistance = archipelago.smallestDistance(isl);
-    int islandSize = isl.size();
-    double deviation = smallestDistance / islandSize;
-    LOG.info("size={}, smallestDistance={}, deviation={}", new Object[] { islandSize, smallestDistance, deviation });
-    return deviation;
-  }
-
-  private List<Double> shortestToLongestDistances(Multimap<Double, Island> distanceMap) {
-    List<Double> distances = Lists.newArrayList(distanceMap.keySet());
-    Collections.sort(distances);
-    return distances;
-  }
-
-  private Set<Island> getNonCompetingIslands(List<Island> islands, Set<Island> competingIslands) {
-    Set<Island> nonCompetingIslands = Sets.newHashSet(islands);
-    nonCompetingIslands.removeAll(competingIslands);
-    return nonCompetingIslands;
-  }
-
-  private Set<Island> getCompetingIslands(Archipelago result, List<Island> islands) {
-    Set<Island> competingIslands = Sets.newHashSet();
-    for (int i = 0; i < islands.size(); i++) {
-      Island i1 = islands.get(i);
-      for (int j = 1; j < islands.size() - i; j++) {
-        Island i2 = islands.get(i + j);
-        if (result.islandsCompete(i1, i2)) {
-          competingIslands.add(i1);
-          competingIslands.add(i2);
-        }
-      }
-    }
-    return competingIslands;
-  }
-
-  private List<Island> possibleIslands(Map<Integer, Integer> fixedIslandCoordinates, Multimap<Integer, MatchMatrix.Island> islandMultimap, Integer size) {
-    List<Island> islands = Lists.newArrayList();
-    for (Island island : islandMultimap.get(size)) {
-      if (islandIsPossible(island, fixedIslandCoordinates)) {
-        islands.add(island);
-      }
-    }
-    return islands;
-  }
-
-  private Map<Integer, Integer> addIslandToResult(Map<Integer, Integer> fixedIslandCoordinates, Archipelago result, Island isl) {
-    LOG.info("adding island: '{}'", isl);
-    result.add(isl);
-    return fixIslandCoordinates(isl, fixedIslandCoordinates);
-  }
-
-  private Map<Integer, Integer> fixIslandCoordinates(Island isl, Map<Integer, Integer> fixedIslandCoordinates) {
-    for (Coordinate coordinates : isl) {
-      fixedIslandCoordinates.put(coordinates.row, coordinates.column);
-    }
-    return fixedIslandCoordinates;
-  }
-
-  private boolean islandIsPossible(Island island, Map<Integer, Integer> fixedIslandCoordinates) {
-    boolean possible = true;
-    for (Coordinate coordinates : island) {
-      if (fixedIslandCoordinates.containsKey(coordinates.row) || //
-          fixedIslandCoordinates.containsValue(coordinates.column)) return false;
-    }
-    return possible;
-  }
-
-  //  public Archipelago createFirstVersion1() {
-  //    Archipelago result = new Archipelago();
-  //    for (MatchMatrix.Island isl : getIslands()) {
-  //      int i = 0;
-  //      int res_size = result.size();
-  //      boolean confl = false;
-  //      for (i = 0; i < res_size; i++) {
-  //        if (result.get(i).isCompetitor(isl)) {
-  //          confl = true;
-  //          //          System.out.println("confl: "+isl+" with: "+i+" : "+result.get(i));
-  //          break;
-  //        }
-  //      }
-  //      if (!confl)
-  //        result.add(isl);
-  //      else {
-  //        MatchMatrix.Island island1 = result.get(i);
-  //        if (island1.size() <= isl.size()) {
-  //          double tot_d_1 = 0.0;
-  //          double tot_d_2 = 0.0;
-  //          for (int j = 0; j < i; j++) {
-  //            MatchMatrix.Island island2 = result.get(j);
-  //            tot_d_1 += distance(island2, island1);
-  //            tot_d_2 += distance(island2, isl);
-  //          }
-  //          System.out.println("tot_d_1: " + tot_d_1);
-  //          System.out.println("tot_d_2: " + tot_d_2);
-  //          if (tot_d_2 < tot_d_1) {
-  //            result.remove(i);
-  //            result.add(isl);
-  //          }
-  //        }
-  //      }
-  //    }
-  //    return result;
-  //  }
-
   public String createXML(MatchMatrix mat, PrintWriter output) {
     String result = "";
     ArrayList<String> columnLabels = mat.columnLabels();
@@ -358,12 +311,12 @@ public class ArchipelagoWithVersions extends Archipelago {
     int colNum = columnLabels.size();
     list.add(new MatchMatrix.Coordinate(0, 0));
     list.add(new MatchMatrix.Coordinate(rowNum - 1, colNum - 1));
-    //  	System.out.println("1");
-    Archipelago createFirstVersion = createFirstVersion();
+    //    System.out.println("1");
+    Archipelago createFirstVersion = createNonConflictingVersion();
     System.out.println("2");
-    //  	output.println(mat.toHtml(this));
+    //    output.println(mat.toHtml(this));
     output.println(mat.toHtml(createFirstVersion));
-    //  	System.out.println("3");
+    //    System.out.println("3");
     ArrayList<MatchMatrix.Coordinate> gaps = createFirstVersion.findGaps(list);
     System.out.println("4");
     ArrayList<Integer[]> listOrderedByCol = new ArrayList<Integer[]>();
@@ -425,71 +378,119 @@ public class ArchipelagoWithVersions extends Archipelago {
         vorige = c;
       }
     }
-    //  	while(true) {
-    //  		/**
-    //  		 * Hier anders aanpakken?
-    //  		 * Bijv eerst de stukken tussen de eilanden simpel als varianten opvatten?
-    //  		 * Probleem (bijvoorbeeld text 4): de eerste woorden in 'lem' matchen met
-    //  		 * 	woorden veel verderop in de 'rdg' (en zijn geen echte match).
-    //  		 * Dus proberen kijken of eerst de eilanden nogmaals gewaardeerd worden
-    //  		 * om zo eilanden die niet in de 'archipel' passen er buiten te laten.
-    //  		 */
-    //  		/** */
-    //  		int islStart = gaps.get(gapsPos).col; 
-    //  		int islStartRow = gaps.get(gapsPos).row; 
-    //  		int islEnd = gaps.get(gapsPos+1).col;
-    //  		if(colPos<islStart || rowPos<gaps.get(gapsPos).row) {
-    //  			String lem ="";
-    //  			String rdg = "";
-    //  			while(colPos<gaps.get(gapsPos).col)
-    //  				lem += columnLabels.get(colPos++) + " ";
-    //  			while(rowPos<gaps.get(gapsPos).row)
-    //  				rdg += rowLabels.get(rowPos++) + " ";
-    //  			result += printApp(output,lem, rdg);
-    //  			res = " ";
-    //  		}
-    //  		if(colPos==islStart && rowPos>islStartRow) {
-    //  			String lem ="";
-    //  			String rdg = "";
-    //  			while(colPos<gaps.get(gapsPos).col)
-    //  				lem += columnLabels.get(colPos++) + " ";
-    //  			result += printApp(output,lem, rdg);
-    //  			gapsPos += 2;
-    //  		} else {
-    //  			while(islStart<=islEnd)
-    //  				res += columnLabels.get(islStart++)+" ";
-    //  			output.println(res);
-    //  			if(!res.trim().isEmpty())
-    //  			  result += res + newLine;
-    //  			res = "";
-    //  			colPos = gaps.get(gapsPos+1).col + 1;
-    //  			rowPos = gaps.get(gapsPos+1).row + 1;
-    //  			gapsPos += 2;
-    //  		}
-    //  		if(gapsPos>=gaps.size() || colPos==colNum)
-    //  			break;
-    //  	}
-    //		String lem = "";
-    //		while(colPos<colNum-1){
-    //			lem += columnLabels.get(colPos) + " ";
-    //			colPos++;
-    //		}
-    //		String rdg = "";
-    //		while(rowPos<rowNum-1){
-    //			rdg += rowLabels.get(rowPos) + " ";
-    //			rowPos++;
-    //		}
-    //		if(!(lem.isEmpty() && rdg.isEmpty())) {
-    //			result += printApp(output,lem,rdg);
-    //		}
-    //		output.println("</xml>");
-    //		result += "</xml>";
+    //    while(true) {
+    //      /**
+    //       * Hier anders aanpakken?
+    //       * Bijv eerst de stukken tussen de eilanden simpel als varianten opvatten?
+    //       * Probleem (bijvoorbeeld text 4): de eerste woorden in 'lem' matchen met
+    //       *  woorden veel verderop in de 'rdg' (en zijn geen echte match).
+    //       * Dus proberen kijken of eerst de eilanden nogmaals gewaardeerd worden
+    //       * om zo eilanden die niet in de 'archipel' passen er buiten te laten.
+    //       */
+    //      /** */
+    //      int islStart = gaps.get(gapsPos).col; 
+    //      int islStartRow = gaps.get(gapsPos).row; 
+    //      int islEnd = gaps.get(gapsPos+1).col;
+    //      if(colPos<islStart || rowPos<gaps.get(gapsPos).row) {
+    //        String lem ="";
+    //        String rdg = "";
+    //        while(colPos<gaps.get(gapsPos).col)
+    //          lem += columnLabels.get(colPos++) + " ";
+    //        while(rowPos<gaps.get(gapsPos).row)
+    //          rdg += rowLabels.get(rowPos++) + " ";
+    //        result += printApp(output,lem, rdg);
+    //        res = " ";
+    //      }
+    //      if(colPos==islStart && rowPos>islStartRow) {
+    //        String lem ="";
+    //        String rdg = "";
+    //        while(colPos<gaps.get(gapsPos).col)
+    //          lem += columnLabels.get(colPos++) + " ";
+    //        result += printApp(output,lem, rdg);
+    //        gapsPos += 2;
+    //      } else {
+    //        while(islStart<=islEnd)
+    //          res += columnLabels.get(islStart++)+" ";
+    //        output.println(res);
+    //        if(!res.trim().isEmpty())
+    //          result += res + newLine;
+    //        res = "";
+    //        colPos = gaps.get(gapsPos+1).col + 1;
+    //        rowPos = gaps.get(gapsPos+1).row + 1;
+    //        gapsPos += 2;
+    //      }
+    //      if(gapsPos>=gaps.size() || colPos==colNum)
+    //        break;
+    //    }
+    //    String lem = "";
+    //    while(colPos<colNum-1){
+    //      lem += columnLabels.get(colPos) + " ";
+    //      colPos++;
+    //    }
+    //    String rdg = "";
+    //    while(rowPos<rowNum-1){
+    //      rdg += rowLabels.get(rowPos) + " ";
+    //      rowPos++;
+    //    }
+    //    if(!(lem.isEmpty() && rdg.isEmpty())) {
+    //      result += printApp(output,lem,rdg);
+    //    }
+    //    output.println("</xml>");
+    //    result += "</xml>";
     return doeiets(output, listOrderedByCol, listOrderedByRow, columnLabels, rowLabels);
   }
 
-  public Archipelago createFirstVersion() {
-    return createFirstVersion(new Archipelago());
+  private void addVersion(Archipelago version) {
+    int pos = 0;
+    //    int tel_loop = 0;
+    //    System.out.println("addVersion - num of versions: "+nonConflVersions.size());
+    for (pos = 0; pos < nonConflVersions.size(); pos++) {
+      if (version.equals(nonConflVersions.get(pos))) return;
+      //      System.out.println("loop 5: "+tel_loop++);
+      if (version.value() > nonConflVersions.get(pos).value()) {
+        nonConflVersions.add(pos, version);
+        return;
+      }
+    }
+    nonConflVersions.add(version);
   }
+
+  //  public Archipelago createFirstVersion1() {
+  //    Archipelago result = new Archipelago();
+  //    for (MatchMatrix.Island isl : getIslands()) {
+  //      int i = 0;
+  //      int res_size = result.size();
+  //      boolean confl = false;
+  //      for (i = 0; i < res_size; i++) {
+  //        if (result.get(i).isCompetitor(isl)) {
+  //          confl = true;
+  //          //          System.out.println("confl: "+isl+" with: "+i+" : "+result.get(i));
+  //          break;
+  //        }
+  //      }
+  //      if (!confl)
+  //        result.add(isl);
+  //      else {
+  //        MatchMatrix.Island island1 = result.get(i);
+  //        if (island1.size() <= isl.size()) {
+  //          double tot_d_1 = 0.0;
+  //          double tot_d_2 = 0.0;
+  //          for (int j = 0; j < i; j++) {
+  //            MatchMatrix.Island island2 = result.get(j);
+  //            tot_d_1 += distance(island2, island1);
+  //            tot_d_2 += distance(island2, isl);
+  //          }
+  //          System.out.println("tot_d_1: " + tot_d_1);
+  //          System.out.println("tot_d_2: " + tot_d_2);
+  //          if (tot_d_2 < tot_d_1) {
+  //            result.remove(i);
+  //            result.add(isl);
+  //          }
+  //        }
+  //      }
+  //    }
+  //    return result;
+  //  }
 
   private String doeiets(PrintWriter output, ArrayList<Integer[]> listOrderedByCol, ArrayList<Integer[]> listOrderedByRow, ArrayList<String> columnLabels, ArrayList<String> rowLabels) {
     String result = "<xml>\n";
@@ -556,7 +557,7 @@ public class ArchipelagoWithVersions extends Archipelago {
         result += app;
         System.out.println(app);
       } else if (colIslNo < rowIslNo) {
-        //				System.out.println("colIslNo (" +colIslNo + ") < rowIslNo ("+ rowIslNo + ")");
+        //        System.out.println("colIslNo (" +colIslNo + ") < rowIslNo ("+ rowIslNo + ")");
         lem = "";
         rdg = "";
         if (listOrderedByRow.get(rowCount + 1)[0] < rowIslNo) {
@@ -572,21 +573,21 @@ public class ArchipelagoWithVersions extends Archipelago {
         result += app;
         System.out.println(app);
       }
-      //  		for(Integer[] a : listOrderedByCol) {
-      //  			if((a[0]-lastCol)>1)
-      //  				sprong  = true;
-      //  			if(!sprong)
-      //  				while(listOrderedByRow.get(rowCount)[0]<a[0]) {
-      //  					rowCount++;
-      //  				}
-      //  			else {
-      //  				String lem = "";
-      //  				for(int i=a[1];i<=a[3];i++)
-      //  					lem += " " + columnLabels.get(i);
-      //  				result += printApp(output,lem,"[VERPLAATST?"+a[0]+"]");
-      //  				sprong = false;
-      //  			}
-      //  		}
+      //      for(Integer[] a : listOrderedByCol) {
+      //        if((a[0]-lastCol)>1)
+      //          sprong  = true;
+      //        if(!sprong)
+      //          while(listOrderedByRow.get(rowCount)[0]<a[0]) {
+      //            rowCount++;
+      //          }
+      //        else {
+      //          String lem = "";
+      //          for(int i=a[1];i<=a[3];i++)
+      //            lem += " " + columnLabels.get(i);
+      //          result += printApp(output,lem,"[VERPLAATST?"+a[0]+"]");
+      //          sprong = false;
+      //        }
+      //      }
       if (rowCount >= listOrderedByRow.size() || colCount >= listOrderedByCol.size()) finished = true;
     }
     output.println("</xml>");
@@ -622,7 +623,6 @@ public class ArchipelagoWithVersions extends Archipelago {
       output.print(result);
     }
     return result;
-
   }
 
 }
