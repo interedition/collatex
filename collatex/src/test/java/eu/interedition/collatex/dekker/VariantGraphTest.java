@@ -20,19 +20,20 @@
 
 package eu.interedition.collatex.dekker;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @todo Add test with an addition or omission in between!
@@ -56,7 +57,6 @@ public class VariantGraphTest extends AbstractTest {
     assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(catVertex, graph.getEnd()), w[0], w[1]);
   }
-
 
   @Test
   public void addition1() {
@@ -144,4 +144,23 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals("cat", iterator.next().getNormalized());
     */
   }
+
+  //  @Test
+  //  public void transpositionJoin() {
+  //    final SimpleWitness[] w = createWitnesses("pre a b c d post", "pre c d a b post");
+  //    final VariantGraph graph = collate(w).join();
+  //    Iterable<VariantGraphVertex> vertices = graph.vertices();
+  //    //    assertEquals(2, Iterables.size(vertices));
+  //    Iterator<VariantGraphVertex> iterator = vertices.iterator();
+  //    for (VariantGraphVertex variantGraphVertex : vertices) {
+  //      LOG.info("{}", variantGraphVertex);
+  //    }
+  //    assertEquals("[]", iterator.next().toString());
+  //    assertEquals("[A:0:'pre', B:0:'pre']", iterator.next().toString());
+  //    assertEquals("[B:1:'b']", iterator.next().toString());
+  //    assertEquals("[A:1:'a', B:2:'a']", iterator.next().toString());
+  //    assertEquals("[A:1:'b']", iterator.next().toString());
+  //    assertEquals("[A:0:'post', B:0:'post']", iterator.next().toString());
+  //    assertEquals("[]", iterator.next().toString());
+  //  }
 }

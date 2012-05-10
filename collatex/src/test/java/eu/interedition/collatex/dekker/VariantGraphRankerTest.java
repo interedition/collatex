@@ -59,14 +59,14 @@ public class VariantGraphRankerTest extends AbstractTest {
     final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
 
     assertVertexEquals("so", vertices.get(1));
-    assertEquals(2, vertices.get(1).getRank());
+    assertEquals(1, vertices.get(1).getRank());
     assertVertexEquals("he", vertices.get(2));
-    assertEquals(3, vertices.get(2).getRank());
+    assertEquals(2, vertices.get(2).getRank());
     assertVertexEquals("was", vertices.get(3));
-    assertEquals(4, vertices.get(3).getRank());
+    assertEquals(3, vertices.get(3).getRank());
     assertVertexEquals("agast", vertices.get(4));
-    assertEquals(5, vertices.get(4).getRank());
+    assertEquals(4, vertices.get(4).getRank());
     assertVertexEquals("so", vertices.get(5));
-    assertEquals(7, vertices.get(5).getRank());
+    assertEquals(5, vertices.get(5).getRank());
   }
 }

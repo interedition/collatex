@@ -54,7 +54,7 @@ public class SimpleVariantGraphSerializer {
     xml.writeNamespace("cx", COLLATEX_NS);
     xml.writeNamespace("", TEI_NS);
 
-    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext();) {
+    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().adjustRanksForTranspositions().ranks().iterator(); rowIt.hasNext();) {
       final Set<VariantGraphVertex> row = rowIt.next();
 
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();

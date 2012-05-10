@@ -214,30 +214,36 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
 
     while (!queue.isEmpty()) {
       final VariantGraphVertex vertex = queue.pop();
-      boolean joinHasTranspositions = vertexHasTranspositions(vertex);
+      TranspositionFingerprint tfp = vertex.getTranspositionFingerprint();
+      //      LOG.info("tfp={}", tfp);
+
       final List<VariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
         final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
         final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
-        if (!end.equals(joinCandidateVertex) && Iterables.size(joinCandidateVertex.incoming()) == 1) {
-          if (joinHasTranspositions == vertexHasTranspositions(joinCandidateVertex)) {
-            vertex.add(joinCandidateVertex.tokens());
-            for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
-              final VariantGraphVertex other = t.other(joinCandidateVertex);
-              t.delete();
-              transpose(vertex, other);
-            }
-            for (VariantGraphEdge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
-              final VariantGraphVertex to = e.to();
-              final Set<Witness> witnesses = e.witnesses();
-              e.delete();
-              connect(vertex, to, witnesses);
-            }
-            joinCandidateEdge.delete();
-            joinCandidateVertex.delete();
-            queue.push(vertex);
-            continue;
+        //        LOG.info("vertex={}, candidatevertex={}", vertex, joinCandidateVertex);
+        //        LOG.info("tfp={}, candidate tfp={}, equals={}", new Object[] { tfp, joinCandidateVertex.getTranspositionFingerprint(), tfp.equals(joinCandidateVertex.getTranspositionFingerprint()) });
+        boolean canJoin = !end.equals(joinCandidateVertex) && //
+            Iterables.size(joinCandidateVertex.incoming()) == 1 && //
+            tfp.equals(joinCandidateVertex.getTranspositionFingerprint());
+        if (canJoin) {
+          vertex.add(joinCandidateVertex.tokens());
+          for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
+            final VariantGraphVertex other = t.other(joinCandidateVertex);
+            t.delete();
+            transpose(vertex, other);
           }
+          for (VariantGraphEdge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
+            final VariantGraphVertex to = e.to();
+            final Set<Witness> witnesses = e.witnesses();
+            e.delete();
+            connect(vertex, to, witnesses);
+          }
+          joinCandidateEdge.delete();
+          joinCandidateVertex.delete();
+          queue.push(vertex);
+          tfp = vertex.getTranspositionFingerprint();
+          continue;
         }
       }
 
@@ -254,10 +260,6 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return this;
   }
 
-  private boolean vertexHasTranspositions(final VariantGraphVertex joinCandidateVertex) {
-    return !Iterables.isEmpty(joinCandidateVertex.transpositions());
-  }
-
   public VariantGraph rank() {
     for (VariantGraphVertex v : vertices()) {
       int rank = -1;
@@ -266,22 +268,24 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       }
       v.setRank(rank + 1);
     }
-    //    adjustForTranspositions();
     return this;
   }
 
-  private void adjustForTranspositions() {
+  public VariantGraph adjustRanksForTranspositions() {
     for (VariantGraphVertex v : vertices()) {
       Iterable<VariantGraphTransposition> transpositions = v.transpositions();
       for (VariantGraphTransposition vgt : transpositions) {
         VariantGraphVertex from = vgt.from();
         VariantGraphVertex to = vgt.to();
-        LOG.info("v {}, from {}, to {}", new Object[] { v, from, to });
-        if (from.equals(v))
+        //        LOG.info("v {}, from {}, to {}", new Object[] { v, from, to });
+        if (from.equals(v)) {
           addNullVertex(v, from, to);
-        else if (to.equals(v)) addNullVertex(v, to, from);
+        } else if (to.equals(v)) {
+          addNullVertex(v, to, from);
+        }
       }
     }
+    return this;
   }
 
   private void addNullVertex(VariantGraphVertex v, VariantGraphVertex from, VariantGraphVertex to) {

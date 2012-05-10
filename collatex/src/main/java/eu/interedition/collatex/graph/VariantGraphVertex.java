@@ -1,12 +1,12 @@
 package eu.interedition.collatex.graph;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleToken;
+import static com.google.common.collect.Iterables.*;
+import static java.util.Collections.singleton;
+import static org.neo4j.graphdb.Direction.*;
+
+import java.util.Iterator;
+import java.util.Set;
+
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -15,14 +15,14 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.kernel.Traversal;
 
-import java.util.Iterator;
-import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 
-import static com.google.common.collect.Iterables.getFirst;
-import static com.google.common.collect.Iterables.transform;
-import static java.util.Collections.singleton;
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleToken;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -89,7 +89,7 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   public Set<Token> tokens(Set<Witness> witnesses) {
     final Set<Token> tokens = graph.getTokenMapper().map(getTokenReferences());
     if (witnesses != null && !witnesses.isEmpty()) {
-      for (Iterator<Token> tokenIt = tokens.iterator(); tokenIt.hasNext(); ) {
+      for (Iterator<Token> tokenIt = tokens.iterator(); tokenIt.hasNext();) {
         final Token token = tokenIt.next();
         if (!witnesses.contains(token.getWitness())) {
           tokenIt.remove();
@@ -162,10 +162,15 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     }
   };
 
-  public static final Function<VariantGraphVertex,Integer> TO_RANK = new Function<VariantGraphVertex, Integer>() {
+  public static final Function<VariantGraphVertex, Integer> TO_RANK = new Function<VariantGraphVertex, Integer>() {
     @Override
     public Integer apply(VariantGraphVertex input) {
       return input.getRank();
     }
   };
+
+  public TranspositionFingerprint getTranspositionFingerprint() {
+    return new TranspositionFingerprint(this);
+  }
+
 }

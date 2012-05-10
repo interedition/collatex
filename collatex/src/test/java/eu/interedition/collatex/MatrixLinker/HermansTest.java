@@ -263,8 +263,7 @@ public class HermansTest extends AbstractTest {
   private String generateTEI(VariantGraph vg) throws XMLStreamException, FactoryConfigurationError {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
     StringWriter writer = new StringWriter();
-    vg.join();
-    s.toDot(vg, writer);
+    s.toDot(vg.join(), writer);
     //    LOG.info("dot={}", writer.toString());
     XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
     s.toTEI(xml);
