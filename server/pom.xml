@@ -131,7 +131,7 @@
           <resourcesDirectory>${project.build.directory}/jnlp-resources</resourcesDirectory>
           <jnlp>
             <outputFile>server.jnlp</outputFile>
-            <mainClass>eu.interedition.server.ServerApplicationFrame</mainClass>
+            <mainClass>eu.interedition.server.ServerApplication</mainClass>
           </jnlp>
           <sign>
             <keystore>interedition.keystore</keystore>
@@ -151,7 +151,7 @@
               <gen>true</gen>
             </keystoreConfig>
           </sign>
-          <pack200>true</pack200>
+          <pack200>false</pack200>
         </configuration>
       </plugin>
       <plugin>

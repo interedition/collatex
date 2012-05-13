@@ -4,11 +4,14 @@ import eu.interedition.server.collatex.VariantGraphResource;
 import eu.interedition.server.io.ComboResourceFinder;
 import eu.interedition.server.ui.ServerConsole;
 import freemarker.template.Configuration;
+import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Restlet;
+import org.restlet.data.CharacterSet;
 import org.restlet.data.Protocol;
 import org.restlet.resource.Directory;
 import org.restlet.resource.ServerResource;
+import org.restlet.routing.Router;
 import org.restlet.routing.VirtualHost;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,7 +39,7 @@ import static org.restlet.routing.Template.MODE_EQUALS;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Component
-public class ServerApplication extends org.restlet.Component implements InitializingBean {
+public class ServerApplication extends Application implements InitializingBean {
   @Autowired
   private AbstractApplicationContext applicationContext;
 
@@ -57,23 +60,24 @@ public class ServerApplication extends org.restlet.Component implements Initiali
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
-    getClients().add(Protocol.CLAP);
-    getClients().add(Protocol.FILE);
-
-    getLogService().setEnabled(false);
-
+  public Restlet createInboundRoot() {
     final Context context = getContext();
 
-    final VirtualHost host = getDefaultHost();
-    host.attach("/", new TemplateResourceFinder(freemarkerConfiguration, "index.ftl"), MODE_EQUALS);
-    host.attach("/collate", transactional(newFinder(VariantGraphResource.class)), MODE_EQUALS);
-    host.attach("/collate/apidocs", new TemplateResourceFinder(freemarkerConfiguration, "collate/apidocs.ftl"), MODE_EQUALS);
-    host.attach("/collate/console", new TemplateResourceFinder(freemarkerConfiguration, "collate/console.ftl"), MODE_EQUALS);
-    host.attach("/collate/darwin", new TemplateResourceFinder(freemarkerConfiguration, "collate/darwin-example.ftl"), MODE_EQUALS);
-    host.attach("/resources", comboResourceFinder);
-    host.attach("/static/interedition", new Directory(context.createChildContext(), "clap://thread/eu/interedition/style"));
-    host.attach("/static", new Directory(context.createChildContext(), environment.getRequiredProperty("interedition.static")));
+    final Router router = new Router(context);
+    router.attach("/", new TemplateResourceFinder(freemarkerConfiguration, "index.ftl"), MODE_EQUALS);
+    router.attach("/collate", transactional(newFinder(VariantGraphResource.class)), MODE_EQUALS);
+    router.attach("/collate/apidocs", new TemplateResourceFinder(freemarkerConfiguration, "collate/apidocs.ftl"), MODE_EQUALS);
+    router.attach("/collate/console", new TemplateResourceFinder(freemarkerConfiguration, "collate/console.ftl"), MODE_EQUALS);
+    router.attach("/collate/darwin", new TemplateResourceFinder(freemarkerConfiguration, "collate/darwin-example.ftl"), MODE_EQUALS);
+    router.attach("/resources", comboResourceFinder);
+    router.attach("/static/interedition", new Directory(context.createChildContext(), "clap://class/eu/interedition/style"));
+    router.attach("/static", new Directory(context.createChildContext(), environment.getRequiredProperty("interedition.static")));
+    return router;
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    getMetadataService().setDefaultCharacterSet(CharacterSet.UTF_8);
   }
 
   private Restlet transactional(Restlet restlet) {
@@ -88,7 +92,7 @@ public class ServerApplication extends org.restlet.Component implements Initiali
    * Entry point to the application.
    * <p/>
    * Upon start, the security manager is set to <code>null</code>, so Java Web Start's sandbox does not interfere with
-   * the servlet container's classloading.
+   * classloading.
    *
    * @param args command line arguments (ignored)
    */
