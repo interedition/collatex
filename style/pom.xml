@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>eu.interedition</groupId>
-        <artifactId>parent</artifactId>
-        <version>8</version>
-    </parent>
-    <artifactId>style</artifactId>
-    <version>1.0</version>
-    <name>Interedition Style Resources</name>
-    <description>Interedition Style Resources (Images, Stylesheets, ...)</description>
-    <licenses>
-        <license>
-            <name>GNU General Public License</name>
-            <url>http://www.gnu.org/licenses/gpl.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>eu.interedition</groupId>
+    <artifactId>parent</artifactId>
+    <version>9</version>
+  </parent>
+  <artifactId>style</artifactId>
+  <version>1.0</version>
+  <name>Interedition Style Resources</name>
+  <description>Interedition Style Resources (Images, Stylesheets, ...)</description>
+  <licenses>
+    <license>
+      <name>GNU General Public License</name>
+      <url>http://www.gnu.org/licenses/gpl.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 </project>
