@@ -5,7 +5,7 @@ import java.util.Comparator;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.EditGraphTokenLinker;
 import eu.interedition.collatex.graph.GraphFactory;
-import eu.interedition.collatex.matrixlinker.MatchMatrixLinker;
+import eu.interedition.collatex.matrix.MatchMatrixLinker;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 
 /**

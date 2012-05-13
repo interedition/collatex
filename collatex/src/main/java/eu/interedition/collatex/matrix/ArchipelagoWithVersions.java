@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matrixlinker;
+package eu.interedition.collatex.matrix;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.matrixlinker.MatchMatrix.Coordinate;
-import eu.interedition.collatex.matrixlinker.MatchMatrix.Island;
+import eu.interedition.collatex.matrix.MatchMatrix.Coordinate;
+import eu.interedition.collatex.matrix.MatchMatrix.Island;
 
 public class ArchipelagoWithVersions extends Archipelago {
   Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);

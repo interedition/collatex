@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matrixlinker;
+package eu.interedition.collatex.matrix;
 
 import static org.junit.Assert.assertEquals;
 
