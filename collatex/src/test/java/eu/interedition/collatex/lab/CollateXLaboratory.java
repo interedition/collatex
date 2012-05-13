@@ -34,7 +34,7 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.matrix.MatchMatrix;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
 

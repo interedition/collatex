@@ -11,9 +11,9 @@ import com.google.common.collect.Iterables;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.matrix.Archipelago;
-import eu.interedition.collatex.matrix.ArchipelagoWithVersions;
-import eu.interedition.collatex.matrix.MatchMatrix;
+import eu.interedition.collatex.dekker.matrix.Archipelago;
+import eu.interedition.collatex.dekker.matrix.ArchipelagoWithVersions;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix;
 import eu.interedition.collatex.simple.SimpleToken;
 
 /**

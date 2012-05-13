@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matrix;
+package eu.interedition.collatex.dekker.matrix;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;

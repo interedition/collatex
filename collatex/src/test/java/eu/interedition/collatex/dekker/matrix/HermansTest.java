@@ -1,4 +1,4 @@
-package eu.interedition.collatex.matrix;
+package eu.interedition.collatex.dekker.matrix;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -23,8 +23,8 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
-import eu.interedition.collatex.matrix.MatchMatrix.Coordinate;
-import eu.interedition.collatex.matrix.MatchMatrix.Island;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 
