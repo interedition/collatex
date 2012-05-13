@@ -69,12 +69,13 @@ public class ComboResourceFinder extends Finder implements InitializingBean {
     @Override
     public TextResource resolve(String relativePath) throws IOException, IllegalArgumentException {
       final ClientResource resource = new ClientResource(getContext(), new Reference(base, relativePath).getTargetRef());
+      final Date modificationDate = resource.head().getModificationDate();
       return new TextResource(new InputSupplier<InputStream>() {
         @Override
         public InputStream getInput() throws IOException {
           return resource.get().getStream();
         }
-      }, source.resolve(relativePath), charset, resource.head().getModificationDate().getTime(), maxAge);
+      }, source.resolve(relativePath), charset, modificationDate == null ? System.currentTimeMillis() : modificationDate.getTime(), maxAge);
     }
   }
 
