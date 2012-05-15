@@ -17,11 +17,11 @@ import java.text.DecimalFormat;
 import java.util.prefs.Preferences;
 
 /**
- * Panel with settings for the servlet container.
+ * Panel with settings for the HTTP server.
  * <p/>
  * The settings gathered from the user are:
  * <ol>
- * <li>the number of the {@link #getPort() TCP port} on which the servlet container will listen for HTTP requests</li>
+ * <li>the number of the {@link #getPort() TCP port} on which the server will listen for HTTP requests</li>
  * <li>the {@link #getDotPath() path to GraphViz' <code>dot</code> executable}, which is used by the hosted web
  * application in order to create SVG-based renderings of variant graphs</li>
  * </ol>
@@ -62,7 +62,7 @@ public class ServerSetupPanel extends JPanel implements InitializingBean {
     gbc.anchor = GridBagConstraints.LINE_END;
     add(new JLabel("Port:"), gbc);
 
-    portTextField.setToolTipText("The TCP port on which the servlet container shall listen for HTTP requests");
+    portTextField.setToolTipText("The TCP port on which the server shall listen for HTTP requests");
     portTextField.setColumns(6);
     portTextField.setValue(Integer.parseInt(preferences.get("port", "7369")));
     portTextField.addPropertyChangeListener("value", new PropertyChangeListener() {
@@ -105,7 +105,7 @@ public class ServerSetupPanel extends JPanel implements InitializingBean {
   }
 
   /**
-   * The TCP port on which the servlet container shall listen for HTTP requests.
+   * The TCP port on which the server shall listen for HTTP requests.
    *
    * @return the port number (&gt; 1)
    */

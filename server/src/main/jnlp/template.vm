@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp spec="$jnlpspec" codebase="$jnlpCodebase" href="$outputFile">
   <information>
-    <title>Interedition Microservices</title>
-    <vendor>Interedition</vendor>
+    <title>Interedition Node</title>
+    <vendor>The Interedition Development Group</vendor>
     <homepage href="http://www.interedition.eu/"/>
     <description>Microservices developed by a European-funded development collective whose aim it is to promote the interoperability of the tools and methodology we use in the field of digital scholarly editing and research.</description>
     <offline-allowed/>

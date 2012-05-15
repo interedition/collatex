@@ -46,13 +46,13 @@ public class TranspositionDetector {
     // detect transpositions
     final List<List<Match>> transpositions = Lists.newArrayList();
     int previousRank = 0;
-    Tuple previous = new Tuple(0, 0);
+    Tuple<Integer> previous = new Tuple<Integer>(0, 0);
     
     for (List<Match> phraseMatch : phraseMatches) {
       VariantGraphVertex baseToken = phraseMatch.get(0).vertex;
       int rank = baseToken.getRank();
       int expectedRank = ranks.get(previousRank);
-      Tuple current = new Tuple(expectedRank, rank);
+      Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);
       if (expectedRank != rank && !isMirrored(previous, current)) {
         transpositions.add(phraseMatch);
       }

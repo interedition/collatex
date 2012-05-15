@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>eu.interedition</groupId>
     <artifactId>parent</artifactId>
-    <version>8</version>
+    <version>9</version>
   </parent>
   <artifactId>collatex</artifactId>
   <version>1.3-SNAPSHOT</version>
@@ -43,80 +43,4 @@
       <version>2.6</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.0-beta-3</version>
-        <configuration>
-          <outputEncoding>UTF-8</outputEncoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  <reporting>
-    <plugins>
-      <plugin>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.3.1</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>index</report>
-              <report>dependencies</report>
-              <report>project-team</report>
-              <report>issue-tracking</report>
-              <report>license</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.7.2</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.8</version>
-        <configuration>
-          <encoding>UTF-8</encoding>
-          <doctitle>CollateX</doctitle>
-          <docencoding>UTF-8</docencoding>
-          <links>
-            <link>http://java.sun.com/j2se/1.6.0/docs/api</link>
-            <link>http://google-collections.googlecode.com/svn/trunk/javadoc/</link>
-            <link>http://jackson.codehaus.org/1.4.2/javadoc/</link>
-            <link>http://junit.sourceforge.net/javadoc/</link>
-          </links>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <linkJavadoc>true</linkJavadoc>
-          <docTitle>CollateX</docTitle>
-          <outputEncoding>UTF-8</outputEncoding>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
-  <distributionManagement>
-    <site>
-      <id>collatex-sf-site</id>
-      <name>CollateX Maven Site</name>
-      <url>sftp://web.sourceforge.net/home/groups/c/co/collatex/htdocs/</url>
-    </site>
-  </distributionManagement>
 </project>

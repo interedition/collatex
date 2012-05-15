@@ -1,8 +1,11 @@
 package eu.interedition.server.ui;
 
 import eu.interedition.server.ServerApplication;
+import org.restlet.*;
+import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 
@@ -24,7 +27,7 @@ import java.net.UnknownHostException;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @org.springframework.stereotype.Component
-public class ServerController extends AbstractAction implements DisposableBean {
+public class ServerController extends AbstractAction implements InitializingBean, DisposableBean {
   private static final String START_LABEL = "Start Server";
   private static final String START_DESCRIPTION = "Starts the Interedition Server and opens its homepage in a browser";
   private static final String STOP_LABEL = "Stop Server";
@@ -42,6 +45,8 @@ public class ServerController extends AbstractAction implements DisposableBean {
   @Autowired
   private ServerConsole console;
 
+  private org.restlet.Component component;
+
   private final Desktop desktop = Desktop.getDesktop();
 
   public ServerController() {
@@ -51,15 +56,24 @@ public class ServerController extends AbstractAction implements DisposableBean {
   }
 
   @Override
+  public void afterPropertiesSet() throws Exception {
+    component = new Component();
+    component.getClients().add(Protocol.CLAP);
+    component.getClients().add(Protocol.FILE);
+    component.getLogService().setEnabled(false);
+    component.getDefaultHost().attach(application);
+  }
+
+  @Override
   public void destroy() throws Exception {
-    if (application.isStarted()) {
-      application.stop();
+    if (component.isStarted()) {
+      component.stop();
     }
   }
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    if (application.isStopped()) {
+    if (component.isStopped()) {
       start();
     } else {
       stop();
@@ -67,10 +81,10 @@ public class ServerController extends AbstractAction implements DisposableBean {
   }
 
   /**
-   * Boot the servlet container.
+   * Boot the HTTP server.
    */
   public void start() {
-    if (application.isStarted()) {
+    if (component.isStarted()) {
       return;
     }
     final int port = setupPanel.getPort();
@@ -81,11 +95,11 @@ public class ServerController extends AbstractAction implements DisposableBean {
     tasks.execute(new Runnable() {
       @Override
       public void run() {
-        application.getServers().clear();
-        application.getServers().add(Protocol.HTTP, port).getContext().getParameters().set("maxThreads", "512");
+        component.getServers().clear();
+        component.getServers().add(Protocol.HTTP, port).getContext().getParameters().set("maxThreads", "512");
 
         try {
-          application.start();
+          component.start();
           putValue(Action.NAME, STOP_LABEL);
           putValue(Action.SHORT_DESCRIPTION, STOP_DESCRIPTION);
         } catch (Exception e) {
@@ -97,7 +111,7 @@ public class ServerController extends AbstractAction implements DisposableBean {
     });
     dialog.setVisible(true);
 
-    if (application.isStarted()) {
+    if (component.isStarted()) {
       try {
         String host;
         try {
@@ -119,10 +133,10 @@ public class ServerController extends AbstractAction implements DisposableBean {
   }
 
   /**
-   * Shuts down the servlet container.
+   * Shuts down the HTTP server.
    */
   public void stop() {
-    if (application.isStopped()) {
+    if (component.isStopped()) {
       return;
     }
     final ServerOperationDialog dialog = new ServerOperationDialog(console, STOP_LABEL);
@@ -132,7 +146,7 @@ public class ServerController extends AbstractAction implements DisposableBean {
       @Override
       public void run() {
         try {
-          application.stop();
+          component.stop();
           putValue(Action.NAME, START_LABEL);
           putValue(Action.SHORT_DESCRIPTION, START_DESCRIPTION);
         } catch (Exception e) {
