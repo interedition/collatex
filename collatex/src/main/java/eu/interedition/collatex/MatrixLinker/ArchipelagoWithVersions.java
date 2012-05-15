@@ -77,7 +77,7 @@ public class ArchipelagoWithVersions extends Archipelago {
           for (Island isl : competingIslands) {
             distanceMap.put(result.smallestDistance(isl), isl);
           }
-          LOG.info("distanceMap = {}", distanceMap);
+          //          LOG.info("distanceMap = {}", distanceMap);
 
           for (Double d : shortestToLongestDistances(distanceMap)) {
             // TODO: find a better way to determine the best choice of island
@@ -147,7 +147,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   }
 
   private Map<Integer, Integer> addIslandToResult(Map<Integer, Integer> fixedIslandCoordinates, Archipelago result, Island isl) {
-    LOG.info("adding island: '{}'", isl);
+    //    LOG.info("adding island: '{}'", isl);
     result.add(isl);
     return fixIslandCoordinates(isl, fixedIslandCoordinates);
   }
