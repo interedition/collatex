@@ -23,7 +23,6 @@ package eu.interedition.collatex.nmerge.graph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.Errors;
 import eu.interedition.collatex.suffixtree.SuffixTree;
-import eu.interedition.collatex.suffixtree.SuffixTreePosition;
 import com.google.common.collect.Sets;
 
 import java.util.List;
@@ -77,7 +76,7 @@ public class MatchThreadDirect<T> implements Runnable {
   /**
    * the current position in the SuffixTree
    */
-  protected SuffixTreePosition position;
+  protected SuffixTree.Position<T> position;
   /**
    * Versions shared by all arcs in the path
    */
@@ -129,7 +128,7 @@ public class MatchThreadDirect<T> implements Runnable {
     this.arc = arc;
     this.start = start;
     this.graph = graph;
-    this.position = new SuffixTreePosition(null, 0);
+    this.position = new SuffixTree.Position<T>(null, 0);
     this.offset = offset;
     this.prevChars = prevChars;
     this.forbidden = forbidden;
@@ -152,7 +151,7 @@ public class MatchThreadDirect<T> implements Runnable {
     this.offset = mtd.offset;
     // don't forget to duplicate this!
     // or splits will update each other
-    this.position = new SuffixTreePosition(mtd.position.node, mtd.position.edgePos);
+    this.position = new SuffixTree.Position<T>(mtd.position.node, mtd.position.edgePos);
     this.versions = Sets.newHashSet(mtd.versions);
     this.pathLen = mtd.pathLen;
     this.prevChars = mtd.prevChars;

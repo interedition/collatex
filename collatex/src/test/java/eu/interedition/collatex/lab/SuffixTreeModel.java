@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import edu.uci.ics.jung.graph.DelegateTree;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.suffixtree.SuffixTree;
-import eu.interedition.collatex.suffixtree.SuffixTreeNode;
 
 import java.util.List;
 
@@ -17,9 +16,9 @@ public class SuffixTreeModel extends DelegateTree<SuffixTreeVertexModel, SuffixT
     add(suffixTree, null, suffixTree.getRoot());
   }
 
-  void add(SuffixTree<Token> st, SuffixTreeVertexModel parent, SuffixTreeNode node) {
-    final int start = node.getEdgeLabelStart();
-    final int end = st.getNodeLabelEnd(node);
+  void add(SuffixTree<Token> st, SuffixTreeVertexModel parent, SuffixTree.Node node) {
+    final int start = node.getEdgeStart();
+    final int end = node.getEdgeEnd();
 
     final List<Token> tokens = Lists.newArrayListWithExpectedSize(end - start);
     for (int offset = start; offset <= end; offset++) {
@@ -33,7 +32,7 @@ public class SuffixTreeModel extends DelegateTree<SuffixTreeVertexModel, SuffixT
       addChild(new SuffixTreeEdgeModel(), parent, vertexModel);
     }
 
-    for (SuffixTreeNode child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
+    for (SuffixTree.Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
       add(st, vertexModel, child);
     }
   }
