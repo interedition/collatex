@@ -70,7 +70,7 @@ public abstract class AbstractTestResourceTest extends AbstractTextTest {
 
   @Before
   public void createXMLTransformer() {
-    xmlTransformer = new XMLTransformer(sessionFactory, configure(createXMLParserConfiguration()));
+    xmlTransformer = new XMLTransformer(sessionFactory.getCurrentSession(), configure(createXMLParserConfiguration()));
   }
 
   @After

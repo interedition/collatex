@@ -100,7 +100,7 @@ public class XMLTransformationController implements InitializingBean {
       final DublinCoreMetadata metadata = new DublinCoreMetadata(DateTime.now()).update(xmlText);
       metadataController.create(xmlText, metadata);
 
-      final Text text = new XMLTransformer(sessionFactory, xt).transform(xmlText);
+      final Text text = new XMLTransformer(session, xt).transform(xmlText);
       metadataController.create(text, metadata);
 
       if (xt.isRemoveEmpty()) {
