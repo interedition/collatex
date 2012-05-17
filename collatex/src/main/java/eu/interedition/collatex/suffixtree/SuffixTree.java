@@ -958,8 +958,8 @@ public class SuffixTree<T> {
 
   private static class Path {
     int begin;
-
     int end;
+
     Path(int begin, int end) {
       this.begin = begin;
       this.end = end;
