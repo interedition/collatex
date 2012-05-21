@@ -54,7 +54,7 @@ import static eu.interedition.text.TextConstants.XML_TRANSFORM_NAME;
 public class XMLTransformer {
   private static final Logger LOG = LoggerFactory.getLogger(XMLTransformer.class);
   private final XMLInputFactory xmlInputFactory = XML.createXMLInputFactory();
-  private final SessionFactory sessionFactory;
+  private final Session session;
   private final XMLTransformerConfiguration configuration;
   private final List<XMLTransformerModule> modules;
 
@@ -76,15 +76,14 @@ public class XMLTransformer {
   private TextRange textOffsetRange;
 
 
-  public XMLTransformer(SessionFactory sessionFactory, XMLTransformerConfiguration configuration) {
-    this.sessionFactory = sessionFactory;
+  public XMLTransformer(Session session, XMLTransformerConfiguration configuration) {
+    this.session = session;
     this.configuration = configuration;
     this.modules = configuration.getModules();
   }
 
   public Text transform(Text source) throws IOException, XMLStreamException {
     Preconditions.checkArgument(source.getType() == Text.Type.XML);
-    final Session session = sessionFactory.getCurrentSession();
 
     final Annotation layer = Iterables.getOnlyElement(Annotation.create(session, new Annotation(XML_TRANSFORM_NAME, new TextTarget(source, 0, source.getLength()), null)));
 
@@ -157,8 +156,8 @@ public class XMLTransformer {
     return target;
   }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  public Session getSession() {
+    return session;
   }
 
   public XMLTransformerConfiguration getConfiguration() {

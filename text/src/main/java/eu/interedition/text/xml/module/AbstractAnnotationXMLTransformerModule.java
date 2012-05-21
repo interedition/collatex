@@ -54,7 +54,7 @@ public abstract class AbstractAnnotationXMLTransformerModule extends XMLTransfor
   @Override
   public void end(XMLTransformer transformer) {
     if (!annotationBatch.isEmpty()) {
-      emit(transformer.getSessionFactory().getCurrentSession());
+      emit(transformer.getSession());
     }
 
     annotationBatch = null;
@@ -70,7 +70,7 @@ public abstract class AbstractAnnotationXMLTransformerModule extends XMLTransfor
     annotationBatch.add(annotation);
 
     if ((annotationBatch.size() % batchSize) == 0) {
-      emit(transformer.getSessionFactory().getCurrentSession());
+      emit(transformer.getSession());
     }
   }
 
