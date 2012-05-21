@@ -20,11 +20,11 @@ import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -165,6 +165,26 @@ public class HermansTest extends AbstractTest {
     String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
     String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
     SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
+
+    testWitnessCollation(witnesses);
+  }
+
+  @Test
+  public void testHermansText2b() throws XMLStreamException {
+    String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
+    String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
+    String textDMD1 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>\nOp sommige dekken van de stomer lagen mensen in de zon, op andere dekken werd getennist, op nog andere liepen de passagiers heen en weer en praatten. Wie over de reling hing en recht naar beneden keek, kon vaststellen dat het schip vorderde; of draaide alleen de aarde er onderdoor?<p/>\nOp de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.<p/>";
+    SimpleWitness[] witnesses = createWitnesses(textD1, textD9, textDMD1);
+
+    testWitnessCollation(witnesses);
+  }
+
+  @Test
+  public void testHermansText2c() throws XMLStreamException {
+    String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer.";
+    String textD9 = "Over de Atlantische Oceaan voer een grote stomer.";
+    String textDMD1 = "Over de Atlantische Oceaan voer een vreselijk grote stomer.";
+    SimpleWitness[] witnesses = createWitnesses(textD1, textD9, textDMD1);
 
     testWitnessCollation(witnesses);
   }
