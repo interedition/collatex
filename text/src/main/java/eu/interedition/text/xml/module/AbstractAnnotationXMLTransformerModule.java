@@ -65,6 +65,7 @@ public abstract class AbstractAnnotationXMLTransformerModule extends XMLTransfor
     final JsonNode data = annotation.getData();
     if (!addNodePath && data.isObject()) {
       ((ObjectNode) data).remove(XML_NODE_ATTR);
+      annotation.setData(data);
     }
 
     annotationBatch.add(annotation);
