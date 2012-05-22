@@ -1,7 +1,5 @@
 package eu.interedition.text.json.map;
 
-import eu.interedition.text.Name;
-import eu.interedition.text.TextTarget;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.module.SimpleModule;
 
@@ -14,11 +12,11 @@ public class TextModule extends SimpleModule {
     super(TextModule.class.getPackage().getName(), Version.unknownVersion());
     addSerializer(new TextSerializer());
     addSerializer(new NameSerializer());
-    addSerializer(new RangeSerializer());
+    addSerializer(new TextTargetSerializer());
     addSerializer(new AnnotationSerializer());
 
-    addDeserializer(Name.class, new NameDeserializer());
-    addDeserializer(TextTarget.class, new RangeDeserializer());
+    //addDeserializer(Name.class, new NameDeserializer());
+    //addDeserializer(TextTarget.class, new RangeDeserializer());
   }
 
 }

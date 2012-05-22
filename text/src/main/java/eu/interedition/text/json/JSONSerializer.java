@@ -67,47 +67,15 @@ public class JSONSerializer {
     final BiMap<String, URI> nsMap = HashBiMap.create(config.getNamespaceMappings());
     final BiMap<URI, String> prefixMap = (nsMap == null ? null : nsMap.inverse());
 
+    final SortedSet<Name> names = Sets.newTreeSet();
     final QueryOperator criterion = and(config.getQuery());
     if (range != null) {
       criterion.add(rangeOverlap(range));
     }
-
-    final SortedSet<Name> names = Sets.newTreeSet();
     jgen.writeArrayFieldStart(ANNOTATIONS_FIELD);
-    try {
-      criterion.listen(sessionFactory.getCurrentSession(), text, new AnnotationListenerAdapter() {
-        @Override
-        public void start(long offset, Iterable<Annotation> annotations) {
-          for (Annotation annotation : annotations) {
-            try {
-              jgen.writeStartObject();
-
-              final Name an = annotation.getName();
-              names.add(an);
-
-              jgen.writeNumberField(AnnotationSerializer.NAME_FIELD, an.getId());
-
-              final TextTarget ar = Iterables.getFirst(annotation.getTargets(), null);
-              jgen.writeArrayFieldStart(AnnotationSerializer.RANGE_FIELD);
-              jgen.writeNumber(ar.getStart());
-              jgen.writeNumber(ar.getEnd());
-              jgen.writeEndArray();
-
-
-              jgen.writeFieldName(ANNOTATION_DATA_FIELD);
-              jgen.writeTree(annotation.getData());
-
-              jgen.writeEndObject();
-            } catch (IOException e) {
-              throw Throwables.propagate(e);
-            }
-          }
-        }
-      });
-    } catch (Throwable t) {
-      Throwables.propagateIfInstanceOf(t, IOException.class);
-      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), IOException.class);
-      throw Throwables.propagate(t);
+    for (Annotation annotation : criterion.iterate(sessionFactory.getCurrentSession())) {
+      jgen.writeObject(annotation);
+      names.add(annotation.getName());
     }
     jgen.writeEndArray();
 
@@ -154,9 +122,9 @@ public class JSONSerializer {
 
       final Name name = names.get(nameRef);
 
-      checkFormat(annotationNode.has(AnnotationSerializer.RANGE_FIELD), "No range for annotation", jp);
+      checkFormat(annotationNode.has(AnnotationSerializer.TARGET_FIELD), "No range for annotation", jp);
 
-      final JsonParser rangeParser = annotationNode.get(AnnotationSerializer.RANGE_FIELD).traverse();
+      final JsonParser rangeParser = annotationNode.get(AnnotationSerializer.TARGET_FIELD).traverse();
       rangeParser.setCodec(jp.getCodec());
       final TextTarget range = rangeParser.readValueAs(TextTarget.class);
 
