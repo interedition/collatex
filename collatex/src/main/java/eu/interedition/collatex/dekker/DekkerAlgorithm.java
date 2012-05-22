@@ -19,16 +19,20 @@
  */
 package eu.interedition.collatex.dekker;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+
 import eu.interedition.collatex.CollationAlgorithm;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-
-import java.util.*;
 
 public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
@@ -58,14 +62,14 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     final Witness witness = Iterables.getFirst(tokens, null).getWitness();
 
     if (LOG.isTraceEnabled()) {
-      LOG.trace("{} + {}: {} vs. {}", new Object[]{graph, witness, graph.vertices(), tokens});
+      LOG.trace("{} + {}: {} vs. {}", new Object[] { graph, witness, graph.vertices(), tokens });
     }
 
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
     tokenLinks = tokenLinker.link(graph, tokens, comparator);
     if (LOG.isTraceEnabled()) {
       for (Map.Entry<Token, VariantGraphVertex> tokenLink : tokenLinks.entrySet()) {
-        LOG.trace("{} + {}: Token match: {} = {}", new Object[]{graph, witness, tokenLink.getValue(), tokenLink.getKey()});
+        LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
       }
     }
 
@@ -73,7 +77,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     phraseMatches = phraseMatchDetector.detect(tokenLinks, graph, tokens);
     if (LOG.isTraceEnabled()) {
       for (List<Match> phraseMatch : phraseMatches) {
-        LOG.trace("{} + {}: Phrase match: {}", new Object[]{graph, witness, Iterables.toString(phraseMatch)});
+        LOG.trace("{} + {}: Phrase match: {}", new Object[] { graph, witness, Iterables.toString(phraseMatch) });
       }
     }
 
@@ -81,7 +85,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     transpositions = transpositionDetector.detect(phraseMatches, graph);
     if (LOG.isTraceEnabled()) {
       for (List<Match> transposition : transpositions) {
-        LOG.trace("{} + {}: Transposition: {}", new Object[]{graph, witness, Iterables.toString(transposition)});
+        LOG.trace("{} + {}: Transposition: {}", new Object[] { graph, witness, Iterables.toString(transposition) });
       }
     }
 
@@ -95,7 +99,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     }
     if (LOG.isTraceEnabled()) {
       for (Map.Entry<Token, VariantGraphVertex> alignment : alignments.entrySet()) {
-        LOG.trace("{} + {}: Alignment: {} = {}", new Object[]{graph, witness, alignment.getValue(), alignment.getKey()});
+        LOG.trace("{} + {}: Alignment: {} = {}", new Object[] { graph, witness, alignment.getValue(), alignment.getKey() });
       }
     }
 
@@ -109,7 +113,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     merge(graph, tokens, alignments, transposedTokens);
 
     if (LOG.isTraceEnabled()) {
-      LOG.trace("{}: {}", graph, Iterables.toString(graph.vertices()));
+      LOG.trace("!{}: {}", graph, Iterables.toString(graph.vertices()));
     }
   }
 

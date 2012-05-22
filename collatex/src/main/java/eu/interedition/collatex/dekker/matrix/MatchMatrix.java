@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
@@ -26,19 +28,29 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
   private final ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
   public static MatchMatrix create(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
-    base.rank();
-    Matches matches = Matches.between(base.vertices(), witness, comparator);
-    MatchMatrix arrayTable = new MatchMatrix(base.vertices(), witness);
+    //    base.rank()/*.adjustRanksForTranspositions()*/;
+    Map<VariantGraphVertex, Integer> vertexIndex = Maps.newLinkedHashMap();
+    Iterable<VariantGraphVertex> baseVertices = base.vertices();
+    int index = 0;
+    for (VariantGraphVertex baseVertex : baseVertices) {
+      vertexIndex.put(baseVertex, index++);
+    }
+    Matches matches = Matches.between(baseVertices, witness, comparator);
+    MatchMatrix arrayTable = new MatchMatrix(baseVertices, witness);
     Set<Token> unique = matches.getUnique();
     Set<Token> ambiguous = matches.getAmbiguous();
     int column = 0;
     for (Token t : witness) {
+      List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
       if (unique.contains(t)) {
-        arrayTable.set(matches.getAll().get(t).get(0).getRank() - 1, column, true);
+        int row = vertexIndex.get(matchingVertices.get(0)) - 1;
+        arrayTable.set(row, column, true);
       } else {
         if (ambiguous.contains(t)) {
-          for (VariantGraphVertex vgv : matches.getAll().get(t)) {
-            arrayTable.set(vgv.getRank() - 1, column, true);
+          for (VariantGraphVertex vgv : matchingVertices) {
+            //            int row = vgv.getRank() - 1;
+            int row = vertexIndex.get(vgv) - 1;
+            arrayTable.set(row, column, true);
           }
         }
       }

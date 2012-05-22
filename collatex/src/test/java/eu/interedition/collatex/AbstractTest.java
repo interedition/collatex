@@ -81,14 +81,14 @@ public abstract class AbstractTest {
     return createWitnesses(new WhitespaceTokenizer(), contents);
   }
 
-  protected void collate(VariantGraph graph, SimpleWitness... witnesses) {
-    collationAlgorithm.collate(graph, witnesses);
-  }
-
   protected VariantGraph collate(SimpleWitness... witnesses) {
     final VariantGraph graph = graphFactory.newVariantGraph();
     collate(graph, witnesses);
     return graph;
+  }
+
+  protected void collate(VariantGraph graph, SimpleWitness... witnesses) {
+    collationAlgorithm.collate(graph, witnesses);
   }
 
   protected VariantGraph collate(String... witnesses) {
