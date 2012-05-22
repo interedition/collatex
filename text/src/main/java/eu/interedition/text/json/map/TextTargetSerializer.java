@@ -29,10 +29,7 @@ import java.io.IOException;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class RangeSerializer extends JsonSerializer<TextTarget> {
-
-  public static final String RANGE_START_FIELD = "s";
-  public static final String RANGE_END_FIELD = "e";
+public class TextTargetSerializer extends JsonSerializer<TextTarget> {
 
   @Override
   public Class<TextTarget> handledType() {
@@ -41,9 +38,10 @@ public class RangeSerializer extends JsonSerializer<TextTarget> {
 
   @Override
   public void serialize(TextTarget value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-    jgen.writeStartObject();
-    jgen.writeNumberField(RANGE_START_FIELD, value.getStart());
-    jgen.writeNumberField(RANGE_END_FIELD, value.getEnd());
-    jgen.writeEndObject();
+    jgen.writeStartArray();
+    jgen.writeNumber(value.getStart());
+    jgen.writeNumber(value.getEnd());
+    jgen.writeNumber(value.getText().getId());
+    jgen.writeEndArray();
   }
 }

@@ -1,9 +1,8 @@
 package eu.interedition.text.json.map;
 
-import com.google.common.collect.Iterables;
 import eu.interedition.text.Annotation;
+import eu.interedition.text.Name;
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
@@ -14,8 +13,10 @@ import java.io.IOException;
  */
 public class AnnotationSerializer extends JsonSerializer<Annotation> {
 
+  public static final String ID_FIELD = "id";
   public static final String NAME_FIELD = "n";
-  public static final String RANGE_FIELD = "r";
+  public static final String TARGET_FIELD = "t";
+  private static final String DATA_FIELD = "d";
 
   @Override
   public Class<Annotation> handledType() {
@@ -23,10 +24,24 @@ public class AnnotationSerializer extends JsonSerializer<Annotation> {
   }
 
   @Override
-  public void serialize(Annotation value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+  public void serialize(Annotation value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
     jgen.writeStartObject();
-    jgen.writeObjectField(NAME_FIELD, value.getName());
-    jgen.writeObjectField(RANGE_FIELD, Iterables.getFirst(value.getTargets(), null));
+    jgen.writeNumberField(ID_FIELD, value.getId());
+
+    final Name name = value.getName();
+    final long nameId = name.getId();
+    jgen.writeFieldName(NAME_FIELD);
+    if (nameId == 0) {
+      jgen.writeObject(name);
+    } else {
+      jgen.writeNumber(nameId);
+    }
+
+    jgen.writeObjectField(TARGET_FIELD, value.getTargets());
+    jgen.writeFieldName(DATA_FIELD);
+
+    jgen.writeTree(value.getData());
+
     jgen.writeEndObject();
   }
 }

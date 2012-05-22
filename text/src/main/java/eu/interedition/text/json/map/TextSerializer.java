@@ -12,8 +12,8 @@ import java.io.IOException;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class TextSerializer extends JsonSerializer<Text> {
-  private static final String TYPE_FIELD = "type";
-  private static final String LENGTH_FIELD = "len";
+  private static final String TYPE_FIELD = "t";
+  private static final String LENGTH_FIELD = "l";
   private static final String ID_FIELD = "id";
 
   @Override
@@ -24,9 +24,9 @@ public class TextSerializer extends JsonSerializer<Text> {
   @Override
   public void serialize(Text value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
     jgen.writeStartObject();
-    jgen.writeStringField(TYPE_FIELD, value.getType().name().toLowerCase());
-    jgen.writeNumberField(LENGTH_FIELD, value.getLength());
     jgen.writeNumberField(ID_FIELD, value.getId());
+    jgen.writeNumberField(LENGTH_FIELD, value.getLength());
+    jgen.writeStringField(TYPE_FIELD, value.getType().name().toLowerCase());
     jgen.writeEndObject();
   }
 }

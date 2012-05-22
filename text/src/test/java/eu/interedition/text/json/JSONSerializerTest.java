@@ -61,6 +61,8 @@ public class JSONSerializerTest extends AbstractTestResourceTest {
         return QueryCriteria.any();
       }
     });
+    jg.flush();
+
     if (LOG.isDebugEnabled()) {
       LOG.debug(json.toString());
     }
