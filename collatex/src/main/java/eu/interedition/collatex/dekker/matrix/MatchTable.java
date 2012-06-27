@@ -41,6 +41,10 @@ public class MatchTable {
     return table;
   }
 
+  public VariantGraphVertex at(int rowIndex, int columnIndex) {
+    return table.at(rowIndex, columnIndex);
+  }
+
   private static MatchTable createEmptyTable(VariantGraph graph, SimpleWitness simpleWitness) {
     // ik heb een Integer range nodig..
     // dit is best een stupid way om het te doen
@@ -78,11 +82,6 @@ public class MatchTable {
   private void set(Token token, int rank, VariantGraphVertex variantGraphVertex) {
     LOG.info("putting: {}<->{}<->{}", new Object[] {token, rank, variantGraphVertex});
     table.put(token, rank, variantGraphVertex);
-  }
-
-
-  public ArrayTable<Token, Integer, VariantGraphVertex> getTable() {
-    return table;
   }
 
   // code taken from MatchMatrix class
