@@ -9,9 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayTable;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -82,4 +85,47 @@ public class MatchTable {
     return table;
   }
 
+  // code taken from MatchMatrix class
+  public List<Island> getIslands() {
+    List<Island> islands = Lists.newArrayList();
+    List<Coordinate> allTrue = allMatches();
+    for (Coordinate c : allTrue) {
+      //			System.out.println("next coordinate: "+c);
+      boolean found = false;
+      while (!found) {
+        for (Island alc : islands) {
+          //					System.out.println("inspect island");
+          if (alc.neighbour(c)) {
+            alc.add(c);
+            found = true;
+          }
+          if (found) break;
+        }
+        if (!found) {
+          //					System.out.println("new island");
+          Island island = new Island();
+          island.add(c);
+          islands.add(island);
+        }
+        found = true;
+      }
+    }
+    return islands;
+  }
+
+  // Note; code taken from MatchMatrix class
+  // might be simpler to work from the cellSet
+  // problem there is that a token does not have to have a position
+  // but a Cell Object might have one?
+  private List<Coordinate> allMatches() {
+    List<Coordinate> pairs = Lists.newArrayList();
+    int rows = table.rowKeySet().size();
+    int cols = table.columnKeySet().size();
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        if (table.at(i, j)!=null) pairs.add(new Coordinate(i, j));
+      }
+    }
+    return pairs;
+  }
 }
