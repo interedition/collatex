@@ -19,7 +19,6 @@ import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
-import eu.interedition.collatex.simple.SimpleWitness;
 
 //Note: this class is intended to replace the current MatchMatrix class
 //The current class is limited to pairwise collation
@@ -33,11 +32,16 @@ public class MatchTable {
   }
   
   // assumes default comparator
-  public static MatchTable create(VariantGraph graph, SimpleWitness witness) {
+  public static MatchTable create(VariantGraph graph, Iterable<Token> witness) {
+    Comparator<Token> comparator = new EqualityTokenComparator();
+    return MatchTable.create(graph, witness, comparator);
+  }
+
+  public static MatchTable create(VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
     // step 1: build the MatchMatrix2
     MatchTable table = createEmptyTable(graph, witness);
     // step 2: do the matching and fill the table
-    fillTableWithMatches(graph, witness, table);
+    fillTableWithMatches(graph, witness, table, comparator);
     return table;
   }
 
@@ -45,7 +49,7 @@ public class MatchTable {
     return table.at(rowIndex, columnIndex);
   }
 
-  private static MatchTable createEmptyTable(VariantGraph graph, SimpleWitness simpleWitness) {
+  private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {
     // ik heb een Integer range nodig..
     // dit is best een stupid way om het te doen
     // ik moet een georderde set hebben
@@ -55,12 +59,11 @@ public class MatchTable {
     while(vertices.hasNext()) {
       ranks.add(vertices.next().getRank());
     }
-    return new MatchTable(simpleWitness.getTokens(), ranks);
+    return new MatchTable(witness, ranks);
   }
 
   // remove static; move parameters into fields
-  private static void fillTableWithMatches(VariantGraph graph, SimpleWitness witness, MatchTable table) {
-    Comparator<Token> comparator = new EqualityTokenComparator();
+  private static void fillTableWithMatches(VariantGraph graph, Iterable<Token> witness, MatchTable table, Comparator<Token> comparator) {
     Matches matches = Matches.between(graph.vertices(), witness, comparator);
     Set<Token> unique = matches.getUnique();
     Set<Token> ambiguous = matches.getAmbiguous();
@@ -127,4 +130,5 @@ public class MatchTable {
     }
     return pairs;
   }
+
 }
