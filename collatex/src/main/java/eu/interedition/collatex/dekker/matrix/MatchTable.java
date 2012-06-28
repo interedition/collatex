@@ -31,14 +31,14 @@ public class MatchTable {
     this.table = ArrayTable.create(tokens, ranks);
   }
   
-  // assumes default comparator
+  // assumes default token comparator
   public static MatchTable create(VariantGraph graph, Iterable<Token> witness) {
     Comparator<Token> comparator = new EqualityTokenComparator();
     return MatchTable.create(graph, witness, comparator);
   }
 
   public static MatchTable create(VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
-    // step 1: build the MatchMatrix2
+    // step 1: build the MatchTable
     MatchTable table = createEmptyTable(graph, witness);
     // step 2: do the matching and fill the table
     fillTableWithMatches(graph, witness, table, comparator);
@@ -47,6 +47,10 @@ public class MatchTable {
 
   public VariantGraphVertex at(int rowIndex, int columnIndex) {
     return table.at(rowIndex, columnIndex);
+  }
+  
+  public List<Token> rowList() {
+    return table.rowKeyList();
   }
 
   private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {
