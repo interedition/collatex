@@ -64,7 +64,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     Collections.sort(keySet);
     List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
     for (Integer islandSize : decreasingIslandSizes) {
-      if (islandSize > 2) {
+//      if (islandSize > 2) { // limitation to prevent false transpositions
         List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, islandSize);
 
         if (islands.size() == 1) {
@@ -92,7 +92,7 @@ public class ArchipelagoWithVersions extends Archipelago {
             fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
           }
         }
-      }
+//      }
     }
     return result;
   }
