@@ -91,7 +91,7 @@ public class MatchTable {
   }
 
   private void set(Token token, int rank, VariantGraphVertex variantGraphVertex) {
-    LOG.info("putting: {}<->{}<->{}", new Object[] { token, rank, variantGraphVertex });
+    //    LOG.info("putting: {}<->{}<->{}", new Object[] { token, rank, variantGraphVertex });
     table.put(token, rank, variantGraphVertex);
   }
 
@@ -102,6 +102,7 @@ public class MatchTable {
     for (Coordinate c : allMatches) {
       //      LOG.info("coordinate {}", c);
       addToIslands(coordinateMapper, c, -1);
+      // Since the coordinates in allMatches are ordered from upper left to lower right, we don't need to check the lower right neighbor.
       //      addToIslands(coordinateMapper, c, 1);
     }
     Set<Coordinate> smallestIslandsCoordinates = Sets.newHashSet(allMatches);

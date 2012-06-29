@@ -214,7 +214,8 @@ public class MatchMatrixTest extends AbstractTest {
     assertEquals(null, isl_1.getCoorOnCol(4));
   }
 
-  @Test
+  //  @Test
+  // This test can be deleted, it's no longer a requirement that the islands are ordered.
   public void testOrderedIslands() {
     Archipelago arch = new Archipelago();
     Island isl_1 = new Island();

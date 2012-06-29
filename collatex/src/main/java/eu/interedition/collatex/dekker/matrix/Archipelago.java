@@ -25,21 +25,21 @@ public class Archipelago {
 
   public void add(Island island) {
     // islands on the archipelago are sorted on size (large -> small) and direction
-    for (Island i : getIslands()) {
-      if (island.size() > i.size()) {
-        getIslands().add(getIslands().indexOf(i), island);
-        return;
-
-      } else
-        try {
-          Island disl = island;
-          Island di = i;
-          if (island.size() > i.size() && disl.direction() > di.direction()) {
-            getIslands().add(getIslands().indexOf(i), island);
-            return;
-          }
-        } catch (Exception e) {}
-    }
+    //    for (Island i : getIslands()) {
+    //      if (island.size() > i.size()) {
+    //        getIslands().add(getIslands().indexOf(i), island);
+    //        return;
+    //
+    //      } else
+    //        try {
+    //          Island disl = island;
+    //          Island di = i;
+    //          if (island.size() > i.size() && disl.direction() > di.direction()) {
+    //            getIslands().add(getIslands().indexOf(i), island);
+    //            return;
+    //          }
+    //        } catch (Exception e) {}
+    //    }
     getIslands().add(island);
   }
 

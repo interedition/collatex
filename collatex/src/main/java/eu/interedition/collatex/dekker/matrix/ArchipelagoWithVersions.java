@@ -16,9 +16,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.dekker.matrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.Island;
-
 public class ArchipelagoWithVersions extends Archipelago {
   Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
   private ArrayList<Archipelago> nonConflVersions;
@@ -64,7 +61,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     Collections.sort(keySet);
     List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
     for (Integer islandSize : decreasingIslandSizes) {
-//      if (islandSize > 2) { // limitation to prevent false transpositions
+      if (islandSize > 0) { // limitation to prevent false transpositions
         List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, islandSize);
 
         if (islands.size() == 1) {
@@ -92,7 +89,7 @@ public class ArchipelagoWithVersions extends Archipelago {
             fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
           }
         }
-//      }
+      }
     }
     return result;
   }
