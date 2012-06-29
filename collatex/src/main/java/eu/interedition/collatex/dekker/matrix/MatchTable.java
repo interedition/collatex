@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayTable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -51,6 +52,10 @@ public class MatchTable {
   
   public List<Token> rowList() {
     return table.rowKeyList();
+  }
+
+  public List<Integer> columnList() {
+    return table.columnKeyList();
   }
 
   private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {

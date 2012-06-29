@@ -1,23 +1,25 @@
 package eu.interedition.collatex.lab;
 
-import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
 import org.slf4j.Logger;
 
-import com.google.common.collect.Iterables;
-
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.ArchipelagoWithVersions;
 import eu.interedition.collatex.dekker.matrix.MatchMatrix;
+import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
+import eu.interedition.collatex.dekker.matrix.MatchTable;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleToken;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author Bram Buitendijk
+ * @author Ronald Haentjens Dekker
  */
 @SuppressWarnings("serial")
 public class MatchMatrixTableModel extends AbstractTableModel {
@@ -27,32 +29,34 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   private final String[] columnNames;
   private final MatchMatrixCellStatus[][] data;
 
-  public MatchMatrixTableModel(MatchMatrix matchMatrix, VariantGraph vg, Iterable<Token> witness) {
+  public MatchMatrixTableModel(MatchTable matchTable, VariantGraph vg, Iterable<Token> witness) {
+    List<Token> rowList = matchTable.rowList();
+    List<Integer> columnList = matchTable.columnList();
+    
+    final int rowNum = rowList.size();
+    final int colNum = columnList.size();
 
-    final int rowNum = matchMatrix.rowNum();
-    final int colNum = matchMatrix.colNum();
-
-    final Iterator<VariantGraphVertex> vertexIt = vg.vertices().iterator();
-    vertexIt.next(); // skip start vertex
+    // set the row labels
     rowNames = new String[rowNum];
     for (int row = 0; row < rowNum; row++) {
-      rowNames[row] = ((SimpleToken) Iterables.getFirst(vertexIt.next().tokens(), null)).getContent();
+      rowNames[row] = ((SimpleToken) rowList.get(row)).getContent();
     }
 
+    // set the column labels
     columnNames = new String[colNum];
-    final Iterator<Token> witnessIt = witness.iterator();
     for (int col = 0; col < colNum; col++) {
-      columnNames[col] = ((SimpleToken) witnessIt.next()).getContent();
+      columnNames[col] = Integer.toString(columnList.get(col)+1);
     }
 
-    Archipelago preferred = preferred(matchMatrix);
-    LOG.info(matchMatrix.toHtml(preferred));
+    // fill the cells with colors
+    Archipelago preferred = preferred(matchTable);
+    //LOG.info(matchMatrix.toHtml(preferred));
     data = new MatchMatrixCellStatus[rowNum][colNum];
     for (int row = 0; row < rowNum; row++) {
       for (int col = 0; col < colNum; col++) {
-        Boolean at = matchMatrix.at(row, col);
+        VariantGraphVertex at = matchTable.at(row, col);
         MatchMatrixCellStatus cell;
-        if (at) {
+        if (at!=null) {
           cell = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
         } else {
           cell = MatchMatrixCellStatus.EMPTY;
@@ -62,11 +66,15 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     }
   }
 
-  private Archipelago preferred(MatchMatrix matchMatrix) {
+  private Archipelago preferred(MatchTable matchTable) {
+    // detect islands
+    List<Island> islands = matchTable.getIslands();
+    // prepare
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : matchMatrix.getIslands()) {
+    for (MatchMatrix.Island isl : islands) {
       archipelago.add(isl);
     }
+    // find preferred islands
     Archipelago preferred = archipelago.createNonConflictingVersion();
     return preferred;
   }
