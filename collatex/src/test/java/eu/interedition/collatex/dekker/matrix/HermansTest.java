@@ -20,8 +20,8 @@ import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
+import eu.interedition.collatex.dekker.matrix.Coordinate;
+import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
@@ -53,7 +53,7 @@ public class HermansTest extends AbstractTest {
     MatchMatrix buildMatrix = MatchMatrix.create(vg, sw[1], new EqualityTokenComparator());
     // System.out.println(buildMatrix.toHtml());
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : buildMatrix.getIslands()) {
+    for (Island isl : buildMatrix.getIslands()) {
       archipelago.add(isl);
     }
     System.out.println("archipelago: " + archipelago);
@@ -67,7 +67,7 @@ public class HermansTest extends AbstractTest {
     // assertEquals(497,archipelago.getVersion(4).value());
 
     Archipelago firstVersion = archipelago.createNonConflictingVersion();
-    for (MatchMatrix.Island isl : firstVersion.iterator()) {
+    for (Island isl : firstVersion.iterator()) {
       System.out.print(" " + isl.size());
     }
     try {
@@ -112,19 +112,19 @@ public class HermansTest extends AbstractTest {
     // }
     // System.out.println(buildMatrix.toHtml());
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : buildMatrix.getIslands()) {
+    for (Island isl : buildMatrix.getIslands()) {
       archipelago.add(isl);
     }
     System.out.println("archipelago: " + archipelago);
     System.out.println("archipelago.size(): " + archipelago.size());
-    for (MatchMatrix.Island isl : archipelago.iterator()) {
+    for (Island isl : archipelago.iterator()) {
       System.out.print(" " + isl.size());
     }
     System.out.println();
     assertEquals(233, archipelago.size());
     assertEquals(1429, archipelago.numOfConflicts());
     Archipelago firstVersion = archipelago.createNonConflictingVersion();
-    for (MatchMatrix.Island isl : firstVersion.iterator()) {
+    for (Island isl : firstVersion.iterator()) {
       System.out.print(" " + isl.size());
     }
     try {
@@ -199,7 +199,7 @@ public class HermansTest extends AbstractTest {
     VariantGraph base = collate(witnesses[0]);
     MatchMatrix matrix = MatchMatrix.create(base, witnesses[1], new EqualityTokenComparator());
     ArchipelagoWithVersions creator = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island island : matrix.getIslands()) {
+    for (Island island : matrix.getIslands()) {
       creator.add(island);
     }
 

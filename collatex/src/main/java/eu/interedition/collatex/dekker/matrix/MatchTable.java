@@ -3,6 +3,7 @@ package eu.interedition.collatex.dekker.matrix;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -10,11 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -96,31 +96,67 @@ public class MatchTable {
   }
 
   // code taken from MatchMatrix class
-  public List<Island> getIslands() {
-    List<Island> islands = Lists.newArrayList();
-    List<Coordinate> allTrue = allMatches();
-    for (Coordinate c : allTrue) {
-      //			System.out.println("next coordinate: "+c);
-      boolean found = false;
-      while (!found) {
-        for (Island alc : islands) {
-          //					System.out.println("inspect island");
-          if (alc.neighbour(c)) {
-            alc.add(c);
-            found = true;
-          }
-          if (found) break;
-        }
-        if (!found) {
-          //					System.out.println("new island");
-          Island island = new Island();
-          island.add(c);
-          islands.add(island);
-        }
-        found = true;
+  public Set<Island> getIslands() {
+    Map<Coordinate, Island> coordinateMapper = Maps.newHashMap();
+    List<Coordinate> allMatches = allMatches();
+    for (Coordinate c : allMatches) {
+      //      LOG.info("coordinate {}", c);
+      addToIslands(coordinateMapper, c, -1);
+      //      addToIslands(coordinateMapper, c, 1);
+    }
+    Set<Coordinate> smallestIslandsCoordinates = Sets.newHashSet(allMatches);
+    smallestIslandsCoordinates.removeAll(coordinateMapper.keySet());
+    for (Coordinate coordinate : smallestIslandsCoordinates) {
+      Island island = new Island();
+      island.add(coordinate);
+      coordinateMapper.put(coordinate, island);
+    }
+    return Sets.newHashSet(coordinateMapper.values());
+
+    //      //			System.out.println("next coordinate: "+c);
+    //      boolean found = false;
+    //      while (!found) {
+    //        for (Island alc : islands) {
+    //          //					System.out.println("inspect island");
+    //          if (alc.neighbour(c)) {
+    //            alc.add(c);
+    //            found = true;
+    //            break;
+    //          }
+    //        }
+    //        if (!found) {
+    //          //					System.out.println("new island");
+    //          Island island = new Island();
+    //          island.add(c);
+    //          islands.add(island);
+    //        }
+    //        found = true;
+    //      }
+    //    }
+    //    return islands;
+  }
+
+  private void addToIslands(Map<Coordinate, Island> coordinateMapper, Coordinate c, int diff) {
+    Coordinate neighborCoordinate = new Coordinate(c.row + diff, c.column + diff);
+    VariantGraphVertex neighbor = null;
+    try {
+      neighbor = table.at(c.row + diff, c.column + diff);
+    } catch (IndexOutOfBoundsException e) {}
+    if (neighbor != null) {
+      Island island = coordinateMapper.get(neighborCoordinate);
+      if (island == null) {
+        //        LOG.info("new island");
+        Island island0 = new Island();
+        island0.add(neighborCoordinate);
+        island0.add(c);
+        coordinateMapper.put(neighborCoordinate, island0);
+        coordinateMapper.put(c, island0);
+      } else {
+        //        LOG.info("add to existing island");
+        island.add(c);
+        coordinateMapper.put(c, island);
       }
     }
-    return islands;
   }
 
   // Note; code taken from MatchMatrix class

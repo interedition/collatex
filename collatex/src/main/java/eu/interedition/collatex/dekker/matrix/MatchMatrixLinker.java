@@ -8,11 +8,12 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.TokenLinker;
+import eu.interedition.collatex.dekker.matrix.Coordinate;
+import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
 
+@Deprecated
 public class MatchMatrixLinker implements TokenLinker {
 
   @Override
@@ -22,7 +23,7 @@ public class MatchMatrixLinker implements TokenLinker {
     // here we fill the archipelago datastructure with all the islands
     // so the pattern finding is done in the MatchMatrix getIslands() method
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : buildMatrix.getIslands()) {
+    for (Island isl : buildMatrix.getIslands()) {
       archipelago.add(isl);
     }
     // The archipelago with version createNonConflictingVersion() method

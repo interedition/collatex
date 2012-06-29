@@ -16,34 +16,34 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
+import eu.interedition.collatex.dekker.matrix.Coordinate;
+import eu.interedition.collatex.dekker.matrix.Island;
 
 public class ArchipelagoWithVersions extends Archipelago {
   Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
   private ArrayList<Archipelago> nonConflVersions;
 
   public ArchipelagoWithVersions() {
-    setIslands(new ArrayList<MatchMatrix.Island>());
+    setIslands(new ArrayList<Island>());
     nonConflVersions = new ArrayList<Archipelago>();
   }
 
-  public ArchipelagoWithVersions(MatchMatrix.Island isl) {
-    setIslands(new ArrayList<MatchMatrix.Island>());
+  public ArchipelagoWithVersions(Island isl) {
+    setIslands(new ArrayList<Island>());
     nonConflVersions = new ArrayList<Archipelago>();
     add(isl);
   }
 
   @Override
-  public void add(MatchMatrix.Island island) {
+  public void add(Island island) {
     super.add(island);
   }
 
   @Override
   public ArchipelagoWithVersions copy() {
     ArchipelagoWithVersions result = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : getIslands()) {
-      result.add(new MatchMatrix.Island(isl));
+    for (Island isl : getIslands()) {
+      result.add(new Island(isl));
     }
     return result;
   }
@@ -56,8 +56,8 @@ public class ArchipelagoWithVersions extends Archipelago {
     */
   public Archipelago createNonConflictingVersion(Archipelago result) {
     Map<Integer, Integer> fixedIslandCoordinates = Maps.newHashMap();
-    Multimap<Integer, MatchMatrix.Island> islandMultimap = ArrayListMultimap.create();
-    for (MatchMatrix.Island isl : getIslands()) {
+    Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
+    for (Island isl : getIslands()) {
       islandMultimap.put(isl.size(), isl);
     }
     List<Integer> keySet = Lists.newArrayList(islandMultimap.keySet());
@@ -136,7 +136,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     return competingIslands;
   }
 
-  private List<Island> possibleIslands(Map<Integer, Integer> fixedIslandCoordinates, Multimap<Integer, MatchMatrix.Island> islandMultimap, Integer size) {
+  private List<Island> possibleIslands(Map<Integer, Integer> fixedIslandCoordinates, Multimap<Integer, Island> islandMultimap, Integer size) {
     List<Island> islands = Lists.newArrayList();
     for (Island island : islandMultimap.get(size)) {
       if (islandIsPossible(island, fixedIslandCoordinates)) {
@@ -198,7 +198,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 
     nonConflVersions = new ArrayList<Archipelago>();
     int tel = 0;
-    for (MatchMatrix.Island island : getIslands()) {
+    for (Island island : getIslands()) {
       tel++;
       //      if(tel>22)
       debug = false;
@@ -239,8 +239,8 @@ public class ArchipelagoWithVersions extends Archipelago {
           tel_loop = 0;
           for (Archipelago version : nonConflVersions) {
             if (debug) System.out.println("loop 2: " + tel_loop++);
-            MatchMatrix.Island island_copy = new MatchMatrix.Island(island);
-            for (MatchMatrix.Island isl : version.iterator()) {
+            Island island_copy = new Island(island);
+            for (Island isl : version.iterator()) {
               island_copy = island_copy.removePoints(isl);
             }
             if (island_copy.size() > 0) {
@@ -254,10 +254,10 @@ public class ArchipelagoWithVersions extends Archipelago {
             if (debug) System.out.println("loop 3: " + tel_loop++);
             Archipelago new_version = new Archipelago();
             new_version.add(island);
-            for (MatchMatrix.Island isl : version.iterator()) {
-              MatchMatrix.Island di = new MatchMatrix.Island(isl);
+            for (Island isl : version.iterator()) {
+              Island di = new Island(isl);
               if (debug) System.out.println("di: " + di);
-              MatchMatrix.Island res = di.removePoints(island);
+              Island res = di.removePoints(island);
               if (debug) System.out.println("res: " + res);
               if (res.size() > 0) {
                 found_one = true;
@@ -306,23 +306,23 @@ public class ArchipelagoWithVersions extends Archipelago {
     String result = "";
     ArrayList<String> columnLabels = mat.columnLabels();
     ArrayList<String> rowLabels = mat.rowLabels();
-    ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
+    ArrayList<Coordinate> list = new ArrayList<Coordinate>();
     int rowNum = rowLabels.size();
     int colNum = columnLabels.size();
-    list.add(new MatchMatrix.Coordinate(0, 0));
-    list.add(new MatchMatrix.Coordinate(rowNum - 1, colNum - 1));
+    list.add(new Coordinate(0, 0));
+    list.add(new Coordinate(rowNum - 1, colNum - 1));
     //    System.out.println("1");
     Archipelago createFirstVersion = createNonConflictingVersion();
     System.out.println("2");
     //    output.println(mat.toHtml(this));
     output.println(mat.toHtml(createFirstVersion));
     //    System.out.println("3");
-    ArrayList<MatchMatrix.Coordinate> gaps = createFirstVersion.findGaps(list);
+    ArrayList<Coordinate> gaps = createFirstVersion.findGaps(list);
     System.out.println("4");
     ArrayList<Integer[]> listOrderedByCol = new ArrayList<Integer[]>();
     int teller = 0;
     Integer[] isl = { 0, 0, 0, 0, 0 };
-    for (MatchMatrix.Coordinate c : gaps) {
+    for (Coordinate c : gaps) {
       teller++;
       if (teller % 2 == 0) {
         isl[0] = teller / 2;
@@ -362,8 +362,8 @@ public class ArchipelagoWithVersions extends Archipelago {
     //    String res = "";
     /* inspecteer inhoud gaps */
     teller = 0;
-    MatchMatrix.Coordinate vorige = new MatchMatrix.Coordinate(0, 0);
-    for (MatchMatrix.Coordinate c : gaps) {
+    Coordinate vorige = new Coordinate(0, 0);
+    for (Coordinate c : gaps) {
       teller++;
       if (teller % 2 == 0) {
         System.out.print(" " + c + " ");
@@ -457,7 +457,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   //  public Archipelago createFirstVersion1() {
   //    Archipelago result = new Archipelago();
-  //    for (MatchMatrix.Island isl : getIslands()) {
+  //    for (Island isl : getIslands()) {
   //      int i = 0;
   //      int res_size = result.size();
   //      boolean confl = false;
@@ -471,12 +471,12 @@ public class ArchipelagoWithVersions extends Archipelago {
   //      if (!confl)
   //        result.add(isl);
   //      else {
-  //        MatchMatrix.Island island1 = result.get(i);
+  //        Island island1 = result.get(i);
   //        if (island1.size() <= isl.size()) {
   //          double tot_d_1 = 0.0;
   //          double tot_d_2 = 0.0;
   //          for (int j = 0; j < i; j++) {
-  //            MatchMatrix.Island island2 = result.get(j);
+  //            Island island2 = result.get(j);
   //            tot_d_1 += distance(island2, island1);
   //            tot_d_2 += distance(island2, isl);
   //          }

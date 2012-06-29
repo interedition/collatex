@@ -1,6 +1,7 @@
 package eu.interedition.collatex.lab;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -9,8 +10,7 @@ import org.slf4j.Logger;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.ArchipelagoWithVersions;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
+import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
@@ -32,7 +32,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   public MatchMatrixTableModel(MatchTable matchTable, VariantGraph vg, Iterable<Token> witness) {
     List<Token> rowList = matchTable.rowList();
     List<Integer> columnList = matchTable.columnList();
-    
+
     final int rowNum = rowList.size();
     final int colNum = columnList.size();
 
@@ -45,7 +45,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     // set the column labels
     columnNames = new String[colNum];
     for (int col = 0; col < colNum; col++) {
-      columnNames[col] = Integer.toString(columnList.get(col)+1);
+      columnNames[col] = Integer.toString(columnList.get(col) + 1);
     }
 
     // fill the cells with colors
@@ -56,13 +56,13 @@ public class MatchMatrixTableModel extends AbstractTableModel {
       for (int col = 0; col < colNum; col++) {
         VariantGraphVertex at = matchTable.at(row, col);
         MatchMatrixCellStatus status;
-        if (at!=null) {
+        if (at != null) {
           status = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
         } else {
           status = MatchMatrixCellStatus.EMPTY;
         }
         String text;
-        if (at!=null) {
+        if (at != null) {
           text = ((SimpleToken) at.tokens().iterator().next()).getContent();
         } else {
           text = null;
@@ -74,10 +74,10 @@ public class MatchMatrixTableModel extends AbstractTableModel {
 
   private Archipelago preferred(MatchTable matchTable) {
     // detect islands
-    List<Island> islands = matchTable.getIslands();
+    Set<Island> islands = matchTable.getIslands();
     // prepare
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : islands) {
+    for (Island isl : islands) {
       archipelago.add(isl);
     }
     // find preferred islands
