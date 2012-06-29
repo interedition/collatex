@@ -1,6 +1,7 @@
 package eu.interedition.collatex.lab;
 
-import static eu.interedition.collatex.CollationAlgorithmFactory.*;
+import static eu.interedition.collatex.CollationAlgorithmFactory.dekker;
+import static eu.interedition.collatex.CollationAlgorithmFactory.needlemanWunsch;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -31,15 +32,17 @@ import com.google.common.collect.Iterables;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author Bram Buitendijk
+ * @author Ronald Haentjens Dekker
  */
 @SuppressWarnings("serial")
 public class CollateXLaboratory extends JFrame {
@@ -76,7 +79,7 @@ public class CollateXLaboratory extends JFrame {
     this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(variantGraphModel));
     this.tabbedPane.addTab("Edit Graph", editGraphPanel = new EditGraphPanel(editGraphModel));
     this.tabbedPane.addTab("Suffix Tree", suffixTreePanel = new SuffixTreePanel());
-    this.tabbedPane.addTab("Match Matrix", new JScrollPane(matchMatrixTable));
+    this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
     matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     matchMatrixTable.setShowGrid(true);
     matchMatrixTable.setGridColor(new Color(0, 0, 0, 32));
@@ -228,7 +231,7 @@ public class CollateXLaboratory extends JFrame {
   private class MatchMatrixAction extends AbstractAction {
 
     private MatchMatrixAction() {
-      super("Match Matrix");
+      super("Match Table");
     }
 
     @Override
@@ -247,7 +250,7 @@ public class CollateXLaboratory extends JFrame {
         CollationAlgorithmFactory.dekker(comparator).collate(vg, w.get(0));
         final SimpleWitness witness = w.get(1);
 
-        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchMatrix.create(vg, witness, comparator), vg, witness));
+        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, witness, comparator), vg, witness));
 
         final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
         columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());
