@@ -275,17 +275,23 @@ public class CollateXLaboratory extends JFrame {
         label.setOpaque(true);
         label.getInsets().set(5, 5, 5, 5);
       }
-      switch ((MatchMatrixCellStatus) value) {
+      MatchTableCell cell = (MatchTableCell) value;
+      MatchMatrixCellStatus status = cell.getStatus();
+      
+      switch (status) {
         case PREFERRED_MATCH:
           label.setBackground(isSelected ? Color.GREEN : Color.GREEN.darker());
+          label.setText(cell.getText());
           break;
 
         case OPTIONAL_MATCH:
           label.setBackground(isSelected ? Color.YELLOW : Color.YELLOW.darker());
+          label.setText(cell.getText());
           break;
 
         case EMPTY:
           label.setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
+          label.setText("");
           break;
 
         default:

@@ -27,7 +27,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   Logger LOG = org.slf4j.LoggerFactory.getLogger(MatchMatrixTableModel.class);
   private final String[] rowNames;
   private final String[] columnNames;
-  private final MatchMatrixCellStatus[][] data;
+  private final MatchTableCell[][] data;
 
   public MatchMatrixTableModel(MatchTable matchTable, VariantGraph vg, Iterable<Token> witness) {
     List<Token> rowList = matchTable.rowList();
@@ -51,17 +51,23 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     // fill the cells with colors
     Archipelago preferred = preferred(matchTable);
     //LOG.info(matchMatrix.toHtml(preferred));
-    data = new MatchMatrixCellStatus[rowNum][colNum];
+    data = new MatchTableCell[rowNum][colNum];
     for (int row = 0; row < rowNum; row++) {
       for (int col = 0; col < colNum; col++) {
         VariantGraphVertex at = matchTable.at(row, col);
-        MatchMatrixCellStatus cell;
+        MatchMatrixCellStatus status;
         if (at!=null) {
-          cell = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
+          status = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
         } else {
-          cell = MatchMatrixCellStatus.EMPTY;
+          status = MatchMatrixCellStatus.EMPTY;
         }
-        data[row][col] = cell;
+        String text;
+        if (at!=null) {
+          text = ((SimpleToken) at.tokens().iterator().next()).getContent();
+        } else {
+          text = null;
+        }
+        data[row][col] = new MatchTableCell(status, text);
       }
     }
   }
