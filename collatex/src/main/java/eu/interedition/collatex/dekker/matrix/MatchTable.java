@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayTable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -27,11 +26,11 @@ import eu.interedition.collatex.matching.Matches;
 public class MatchTable {
   static Logger LOG = LoggerFactory.getLogger(MatchTable.class);
   private final ArrayTable<Token, Integer, VariantGraphVertex> table;
-  
+
   public MatchTable(Iterable<Token> tokens, Iterable<Integer> ranks) {
     this.table = ArrayTable.create(tokens, ranks);
   }
-  
+
   // assumes default token comparator
   public static MatchTable create(VariantGraph graph, Iterable<Token> witness) {
     Comparator<Token> comparator = new EqualityTokenComparator();
@@ -49,7 +48,7 @@ public class MatchTable {
   public VariantGraphVertex at(int rowIndex, int columnIndex) {
     return table.at(rowIndex, columnIndex);
   }
-  
+
   public List<Token> rowList() {
     return table.rowKeyList();
   }
@@ -65,7 +64,7 @@ public class MatchTable {
     graph.rank();
     Set<Integer> ranks = Sets.newLinkedHashSet();
     Iterator<VariantGraphVertex> vertices = graph.vertices().iterator();
-    while(vertices.hasNext()) {
+    while (vertices.hasNext()) {
       ranks.add(vertices.next().getRank());
     }
     return new MatchTable(witness, ranks);
@@ -80,11 +79,11 @@ public class MatchTable {
       List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
       //TODO: dit kan simpeler! zie de duplicatie
       if (unique.contains(t)) {
-        table.set(t, matchingVertices.get(0).getRank()-1, matchingVertices.get(0));
+        table.set(t, matchingVertices.get(0).getRank() - 1, matchingVertices.get(0));
       } else {
         if (ambiguous.contains(t)) {
           for (VariantGraphVertex vgv : matchingVertices) {
-            table.set(t, vgv.getRank()-1, vgv);
+            table.set(t, vgv.getRank() - 1, vgv);
           }
         }
       }
@@ -92,7 +91,7 @@ public class MatchTable {
   }
 
   private void set(Token token, int rank, VariantGraphVertex variantGraphVertex) {
-    LOG.info("putting: {}<->{}<->{}", new Object[] {token, rank, variantGraphVertex});
+    LOG.info("putting: {}<->{}<->{}", new Object[] { token, rank, variantGraphVertex });
     table.put(token, rank, variantGraphVertex);
   }
 
@@ -134,7 +133,7 @@ public class MatchTable {
     int cols = table.columnKeySet().size();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (table.at(i, j)!=null) pairs.add(new Coordinate(i, j));
+        if (table.at(i, j) != null) pairs.add(new Coordinate(i, j));
       }
     }
     return pairs;

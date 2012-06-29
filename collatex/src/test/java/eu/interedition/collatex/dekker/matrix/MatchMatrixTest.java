@@ -83,25 +83,25 @@ public class MatchMatrixTest extends AbstractTest {
     MatchMatrix buildMatrix = MatchMatrix.create(vg, sw[1], new EqualityTokenComparator());
     ArrayList<MatchMatrix.Coordinate> allTrue = buildMatrix.allMatches();
     assertEquals(9, allTrue.size());
-    assertTrue(allTrue.contains(new MatchMatrix.Coordinate(0, 0, 100)));
-    assertFalse(allTrue.contains(new MatchMatrix.Coordinate(0, 1, 100)));
+    assertTrue(allTrue.contains(new MatchMatrix.Coordinate(0, 0)));
+    assertFalse(allTrue.contains(new MatchMatrix.Coordinate(0, 1)));
   }
 
   @Test
   public void testCoordinates() {
-    MatchMatrix.Coordinate a = new MatchMatrix.Coordinate(0, 0, 100);
-    MatchMatrix.Coordinate b = new MatchMatrix.Coordinate(0, 0, 100);
-    MatchMatrix.Coordinate c = new MatchMatrix.Coordinate(1, 1, 100);
-    assertEquals(new MatchMatrix.Coordinate(0, 0, 100), a);
+    MatchMatrix.Coordinate a = new MatchMatrix.Coordinate(0, 0);
+    MatchMatrix.Coordinate b = new MatchMatrix.Coordinate(0, 0);
+    MatchMatrix.Coordinate c = new MatchMatrix.Coordinate(1, 1);
+    assertEquals(new MatchMatrix.Coordinate(0, 0), a);
     assertEquals(b, a);
     assertFalse(a.equals(c));
   }
 
   @Test
   public void testBorders() {
-    MatchMatrix.Coordinate a = new MatchMatrix.Coordinate(0, 0, 100);
-    MatchMatrix.Coordinate b = new MatchMatrix.Coordinate(1, 1, 100);
-    MatchMatrix.Coordinate c = new MatchMatrix.Coordinate(1, 2, 100);
+    MatchMatrix.Coordinate a = new MatchMatrix.Coordinate(0, 0);
+    MatchMatrix.Coordinate b = new MatchMatrix.Coordinate(1, 1);
+    MatchMatrix.Coordinate c = new MatchMatrix.Coordinate(1, 2);
     assertTrue(a.bordersOn(b));
     assertFalse(a.bordersOn(c));
     assertFalse(b.bordersOn(c));
@@ -110,29 +110,29 @@ public class MatchMatrixTest extends AbstractTest {
   @Test
   public void testUndirectedIsland() {
     MatchMatrix.Island isl = new MatchMatrix.Island();
-    isl.add(new MatchMatrix.Coordinate(0, 0, 0));
+    isl.add(new MatchMatrix.Coordinate(0, 0));
     assertEquals(1, isl.size());
-    isl.add(new MatchMatrix.Coordinate(0, 0, 0));
+    isl.add(new MatchMatrix.Coordinate(0, 0));
     assertEquals(1, isl.size());
-    isl.add(new MatchMatrix.Coordinate(1, 0, 1));
+    isl.add(new MatchMatrix.Coordinate(1, 0));
     assertEquals(1, isl.size());
-    isl.add(new MatchMatrix.Coordinate(2, 2, 2));
+    isl.add(new MatchMatrix.Coordinate(2, 2));
     assertEquals(1, isl.size());
-    assertTrue(isl.neighbour(new MatchMatrix.Coordinate(1, 1, 3)));
-    isl.add(new MatchMatrix.Coordinate(1, 1, 3));
+    assertTrue(isl.neighbour(new MatchMatrix.Coordinate(1, 1)));
+    isl.add(new MatchMatrix.Coordinate(1, 1));
     assertEquals(2, isl.size());
   }
 
   @Test
   public void testDirectedIsland() {
     MatchMatrix.Island isl = new MatchMatrix.Island();
-    isl.add(new MatchMatrix.Coordinate(0, 0, 100));
+    isl.add(new MatchMatrix.Coordinate(0, 0));
     assertEquals(1, isl.size());
     assertEquals(0, isl.direction());
-    isl.add(new MatchMatrix.Coordinate(1, 1, 100));
+    isl.add(new MatchMatrix.Coordinate(1, 1));
     assertEquals(2, isl.size());
     assertEquals(1, isl.direction());
-    isl.add(new MatchMatrix.Coordinate(2, 2, 100));
+    isl.add(new MatchMatrix.Coordinate(2, 2));
     assertEquals(3, isl.size());
     assertEquals(1, isl.direction());
   }
@@ -141,12 +141,12 @@ public class MatchMatrixTest extends AbstractTest {
   public void testArchipelago() {
     Archipelago arch = new Archipelago();
     MatchMatrix.Island isl_1 = new MatchMatrix.Island();
-    isl_1.add(new MatchMatrix.Coordinate(0, 0, 100));
-    isl_1.add(new MatchMatrix.Coordinate(1, 1, 100));
+    isl_1.add(new MatchMatrix.Coordinate(0, 0));
+    isl_1.add(new MatchMatrix.Coordinate(1, 1));
     arch.add(isl_1);
     MatchMatrix.Island isl_2 = new MatchMatrix.Island();
-    isl_2.add(new MatchMatrix.Coordinate(2, 2, 100));
-    isl_2.add(new MatchMatrix.Coordinate(3, 3, 100));
+    isl_2.add(new MatchMatrix.Coordinate(2, 2));
+    isl_2.add(new MatchMatrix.Coordinate(3, 3));
     arch.add(isl_2);
     assertEquals(2, arch.size());
     assertTrue(isl_1.overlap(isl_2));
@@ -195,10 +195,10 @@ public class MatchMatrixTest extends AbstractTest {
   @Test
   public void testRemovePoints() {
     MatchMatrix.Island di_1 = new MatchMatrix.Island();
-    di_1.add(new MatchMatrix.Coordinate(1, 1, 100));
-    di_1.add(new MatchMatrix.Coordinate(2, 2, 100));
+    di_1.add(new MatchMatrix.Coordinate(1, 1));
+    di_1.add(new MatchMatrix.Coordinate(2, 2));
     MatchMatrix.Island di_2 = new MatchMatrix.Island();
-    di_2.add(new MatchMatrix.Coordinate(2, 2, 100));
+    di_2.add(new MatchMatrix.Coordinate(2, 2));
     MatchMatrix.Island di_3 = di_1.removePoints(di_2);
     assertEquals(2, di_1.size());
     assertEquals(1, di_3.size());
@@ -207,10 +207,10 @@ public class MatchMatrixTest extends AbstractTest {
   @Test
   public void testFindCoorOnRowOrCol() {
     MatchMatrix.Island isl_1 = new MatchMatrix.Island();
-    isl_1.add(new MatchMatrix.Coordinate(0, 0, 100));
-    isl_1.add(new MatchMatrix.Coordinate(1, 1, 100));
-    assertEquals(new MatchMatrix.Coordinate(0, 0, 100), isl_1.getCoorOnRow(0));
-    assertEquals(new MatchMatrix.Coordinate(1, 1, 100), isl_1.getCoorOnCol(1));
+    isl_1.add(new MatchMatrix.Coordinate(0, 0));
+    isl_1.add(new MatchMatrix.Coordinate(1, 1));
+    assertEquals(new MatchMatrix.Coordinate(0, 0), isl_1.getCoorOnRow(0));
+    assertEquals(new MatchMatrix.Coordinate(1, 1), isl_1.getCoorOnCol(1));
     assertEquals(null, isl_1.getCoorOnCol(4));
   }
 
@@ -218,19 +218,19 @@ public class MatchMatrixTest extends AbstractTest {
   public void testOrderedIslands() {
     Archipelago arch = new Archipelago();
     MatchMatrix.Island isl_1 = new MatchMatrix.Island();
-    isl_1.add(new MatchMatrix.Coordinate(1, 1, 100));
-    isl_1.add(new MatchMatrix.Coordinate(2, 2, 100));
-    isl_1.add(new MatchMatrix.Coordinate(3, 3, 100));
+    isl_1.add(new MatchMatrix.Coordinate(1, 1));
+    isl_1.add(new MatchMatrix.Coordinate(2, 2));
+    isl_1.add(new MatchMatrix.Coordinate(3, 3));
     arch.add(isl_1);
     MatchMatrix.Island isl_2 = new MatchMatrix.Island();
-    isl_2.add(new MatchMatrix.Coordinate(5, 5, 100));
-    isl_2.add(new MatchMatrix.Coordinate(6, 6, 100));
+    isl_2.add(new MatchMatrix.Coordinate(5, 5));
+    isl_2.add(new MatchMatrix.Coordinate(6, 6));
     arch.add(isl_2);
     MatchMatrix.Island isl_3 = new MatchMatrix.Island();
-    isl_3.add(new MatchMatrix.Coordinate(8, 8, 100));
-    isl_3.add(new MatchMatrix.Coordinate(9, 9, 100));
-    isl_3.add(new MatchMatrix.Coordinate(10, 10, 100));
-    isl_3.add(new MatchMatrix.Coordinate(11, 11, 100));
+    isl_3.add(new MatchMatrix.Coordinate(8, 8));
+    isl_3.add(new MatchMatrix.Coordinate(9, 9));
+    isl_3.add(new MatchMatrix.Coordinate(10, 10));
+    isl_3.add(new MatchMatrix.Coordinate(11, 11));
     arch.add(isl_3);
     assertEquals(4, arch.get(0).size());
     assertEquals(3, arch.get(1).size());
@@ -241,13 +241,13 @@ public class MatchMatrixTest extends AbstractTest {
   public void testOrderedIslands2() {
     ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
     MatchMatrix.Island isl_1 = new MatchMatrix.Island();
-    isl_1.add(new MatchMatrix.Coordinate(1, 1, 100));
-    isl_1.add(new MatchMatrix.Coordinate(2, 2, 100));
-    isl_1.add(new MatchMatrix.Coordinate(3, 3, 100));
+    isl_1.add(new MatchMatrix.Coordinate(1, 1));
+    isl_1.add(new MatchMatrix.Coordinate(2, 2));
+    isl_1.add(new MatchMatrix.Coordinate(3, 3));
     arch.add(isl_1);
     MatchMatrix.Island isl_2 = new MatchMatrix.Island();
-    isl_2.add(new MatchMatrix.Coordinate(5, 3, 100));
-    isl_2.add(new MatchMatrix.Coordinate(6, 4, 100));
+    isl_2.add(new MatchMatrix.Coordinate(5, 3));
+    isl_2.add(new MatchMatrix.Coordinate(6, 4));
     arch.add(isl_2);
     arch.createNonConflictingVersions();
     //  	System.out.println("versions: ");
@@ -256,10 +256,10 @@ public class MatchMatrixTest extends AbstractTest {
     //  	}
     assertEquals(2, arch.getNonConflVersions().size());
     MatchMatrix.Island isl_3 = new MatchMatrix.Island();
-    isl_3.add(new MatchMatrix.Coordinate(8, 6, 100));
-    isl_3.add(new MatchMatrix.Coordinate(9, 7, 100));
-    isl_3.add(new MatchMatrix.Coordinate(10, 8, 100));
-    isl_3.add(new MatchMatrix.Coordinate(11, 9, 100));
+    isl_3.add(new MatchMatrix.Coordinate(8, 6));
+    isl_3.add(new MatchMatrix.Coordinate(9, 7));
+    isl_3.add(new MatchMatrix.Coordinate(10, 8));
+    isl_3.add(new MatchMatrix.Coordinate(11, 9));
     arch.add(isl_3);
     arch.createNonConflictingVersions();
     assertEquals(28, arch.getVersion(0).value());
@@ -270,9 +270,9 @@ public class MatchMatrixTest extends AbstractTest {
   public void testNonConflictingVersions() {
     ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
     MatchMatrix.Island isl_1 = new MatchMatrix.Island();
-    isl_1.add(new MatchMatrix.Coordinate(1, 1, 100));
-    isl_1.add(new MatchMatrix.Coordinate(2, 2, 100));
-    isl_1.add(new MatchMatrix.Coordinate(3, 3, 100));
+    isl_1.add(new MatchMatrix.Coordinate(1, 1));
+    isl_1.add(new MatchMatrix.Coordinate(2, 2));
+    isl_1.add(new MatchMatrix.Coordinate(3, 3));
     arch.add(isl_1);
     arch.createNonConflictingVersions();
     assertEquals(1, arch.numOfNonConflConstell());
@@ -281,15 +281,15 @@ public class MatchMatrixTest extends AbstractTest {
   @Test
   public void testIslandValue() {
     MatchMatrix.Island isl_1 = new MatchMatrix.Island();
-    isl_1.add(new MatchMatrix.Coordinate(1, 1, 100));
+    isl_1.add(new MatchMatrix.Coordinate(1, 1));
     assertEquals(1, isl_1.value());
-    isl_1.add(new MatchMatrix.Coordinate(2, 2, 100));
+    isl_1.add(new MatchMatrix.Coordinate(2, 2));
     assertEquals(5, isl_1.value());
-    isl_1.add(new MatchMatrix.Coordinate(3, 3, 100));
+    isl_1.add(new MatchMatrix.Coordinate(3, 3));
     assertEquals(10, isl_1.value());
     MatchMatrix.Island isl_2 = new MatchMatrix.Island();
-    isl_2.add(new MatchMatrix.Coordinate(2, 2, 100));
-    isl_2.add(new MatchMatrix.Coordinate(1, 3, 100));
+    isl_2.add(new MatchMatrix.Coordinate(2, 2));
+    isl_2.add(new MatchMatrix.Coordinate(1, 3));
     assertEquals(3, isl_2.value());
     Archipelago arch = new Archipelago();
     arch.add(isl_1);
@@ -300,21 +300,21 @@ public class MatchMatrixTest extends AbstractTest {
   @Test
   public void testFindGaps() {
     MatchMatrix.Island isl_1 = new MatchMatrix.Island();
-    isl_1.add(new MatchMatrix.Coordinate(1, 1, 100));
-    isl_1.add(new MatchMatrix.Coordinate(2, 2, 100));
+    isl_1.add(new MatchMatrix.Coordinate(1, 1));
+    isl_1.add(new MatchMatrix.Coordinate(2, 2));
     MatchMatrix.Island isl_2 = new MatchMatrix.Island();
-    isl_2.add(new MatchMatrix.Coordinate(4, 4, 100));
-    isl_2.add(new MatchMatrix.Coordinate(5, 5, 100));
+    isl_2.add(new MatchMatrix.Coordinate(4, 4));
+    isl_2.add(new MatchMatrix.Coordinate(5, 5));
     ArchipelagoWithVersions arch = new ArchipelagoWithVersions();
     arch.add(isl_1);
     arch.add(isl_2);
     ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
-    list.add(new MatchMatrix.Coordinate(0, 0, 100));
-    list.add(new MatchMatrix.Coordinate(7, 7, 100));
+    list.add(new MatchMatrix.Coordinate(0, 0));
+    list.add(new MatchMatrix.Coordinate(7, 7));
     ArrayList<MatchMatrix.Coordinate> gaps = arch.findGaps(list);
     assertEquals(4, gaps.size());
-    assertEquals(new MatchMatrix.Coordinate(1, 1, 100), gaps.get(0));
-    assertEquals(new MatchMatrix.Coordinate(5, 5, 100), gaps.get(3));
+    assertEquals(new MatchMatrix.Coordinate(1, 1), gaps.get(0));
+    assertEquals(new MatchMatrix.Coordinate(5, 5), gaps.get(3));
   }
 
   @Test

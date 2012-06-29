@@ -25,36 +25,10 @@ import eu.interedition.collatex.matching.Matches;
 
 public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
   static Logger LOG = LoggerFactory.getLogger(MatchMatrix.class);
-  private final ArrayTable<VariantGraphVertex, Token, MatchMatrixCell> sparseMatrix;
-
-  //  public static MatchMatrix create0(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
-  //    base.rank()/*.adjustRanksForTranspositions()*/;
-  //    Iterable<VariantGraphVertex> baseVertices = base.vertices();
-  //    Matches matches = Matches.between(baseVertices, witness, comparator);
-  //    MatchMatrix arrayTable = new MatchMatrix(baseVertices, witness);
-  //    Set<Token> unique = matches.getUnique();
-  //    Set<Token> ambiguous = matches.getAmbiguous();
-  //    int column = 0;
-  //    for (Token t : witness) {
-  //      List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
-  //      if (unique.contains(t)) {
-  //        int row = matchingVertices.get(0).getRank() - 1;
-  //        arrayTable.set(row, column, new MatchMatixCell(true);
-  //      } else {
-  //        if (ambiguous.contains(t)) {
-  //          for (VariantGraphVertex vgv : matchingVertices) {
-  //            int row = vgv.getRank() - 1;
-  //            arrayTable.set(row, column, true);
-  //          }
-  //        }
-  //      }
-  //      column++;
-  //    }
-  //    return arrayTable;
-  //  }
+  private final ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
   public static MatchMatrix create(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
-    base.rank()/*.adjustRanksForTranspositions()*/;
+    //    base.rank()/*.adjustRanksForTranspositions()*/;
     Map<VariantGraphVertex, Integer> vertexIndex = Maps.newLinkedHashMap();
     Iterable<VariantGraphVertex> baseVertices = base.vertices();
     int index = 0;
@@ -69,15 +43,14 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
     for (Token t : witness) {
       List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
       if (unique.contains(t)) {
-        VariantGraphVertex v = matchingVertices.get(0);
-        int row = vertexIndex.get(v) - 1;
-        int rank = v.getRank();
-        arrayTable.set(row, column, new MatchMatrixCell(rank, true));
+        int row = vertexIndex.get(matchingVertices.get(0)) - 1;
+        arrayTable.set(row, column, true);
       } else {
         if (ambiguous.contains(t)) {
           for (VariantGraphVertex vgv : matchingVertices) {
+            //            int row = vgv.getRank() - 1;
             int row = vertexIndex.get(vgv) - 1;
-            arrayTable.set(row, column, new MatchMatrixCell(vgv.getRank(), true));
+            arrayTable.set(row, column, true);
           }
         }
       }
@@ -91,11 +64,11 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
   }
 
   public Boolean at(int row, int column) {
-    return Objects.firstNonNull(sparseMatrix.at(row, column).isOn(), false);
+    return Objects.firstNonNull(sparseMatrix.at(row, column), false);
   }
 
-  public void set(int row, int column, MatchMatrixCell cell) {
-    sparseMatrix.set(row, column, cell);
+  public void set(int row, int column, boolean value) {
+    sparseMatrix.set(row, column, value);
   }
 
   public String toHtml() {
@@ -195,13 +168,12 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
   }
 
   public ArrayList<Coordinate> allMatches() {
-    LOG.info("MatchMatrix.allMatches() called");
     ArrayList<Coordinate> pairs = new ArrayList<Coordinate>();
     int rows = rowNum();
     int cols = colNum();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (at(i, j)) pairs.add(new Coordinate(i, j, 0));
+        if (at(i, j)) pairs.add(new Coordinate(i, j));
       }
     }
     return pairs;
@@ -244,20 +216,20 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
 
   @Override
   public Iterator<Coordinate> iterator() {
-    LOG.info("MatchMatrix.iterator() called");
     return new AbstractIterator<Coordinate>() {
       private int row = 0;
-      private int col = 0;
+      private final static int col = 0;
       private final int rows = rowNum();
-      private final int cols = colNum();
+      private int cols = colNum();
 
       @Override
       protected Coordinate computeNext() {
         while (row < rows) {
-          if (col < cols) {
-            return new Coordinate(row, col++, 0);
+          // huh?
+          if (cols++ < cols) {
+            return new Coordinate(row, col);
           }
-          row++;
+          ++row;
         }
         return endOfData();
       }
@@ -287,16 +259,14 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
   public static class Coordinate implements Comparable<Coordinate> {
     int row;
     int column;
-    int rank;
 
-    public Coordinate(int row, int column, int rank) {
+    public Coordinate(int row, int column) {
       this.column = column;
       this.row = row;
-      this.rank = rank;
     }
 
     Coordinate(Coordinate other) {
-      this(other.row, other.column, other.rank);
+      this(other.row, other.column);
     }
 
     public int getRow() {
@@ -307,10 +277,6 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
       return column;
     }
 
-    public int getRank() {
-      return rank;
-    }
-
     public boolean sameColumn(Coordinate c) {
       return c.column == column;
     }
@@ -319,41 +285,33 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
       return c.row == row;
     }
 
-    public boolean sameRank(Coordinate c) {
-      return c.rank == rank;
-    }
-
     public boolean bordersOn(Coordinate c) {
-      return (Math.abs(this.rank - c.getRank()) == 1) && (Math.abs(this.row - c.getRow()) == 1);
+      return (Math.abs(this.row - c.getRow()) == 1) && (Math.abs(this.column - c.getColumn()) == 1);
     }
 
     @Override
     public boolean equals(Object o) {
       if (o != null & o instanceof Coordinate) {
         final Coordinate c = (Coordinate) o;
-        return (this.row == c.getRow() && this.column == c.getColumn() && this.rank == c.getRank());
+        return (this.row == c.getRow() && this.column == c.getColumn());
       }
       return super.equals(o);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(row, column, rank);
+      return Objects.hashCode(row, column);
     }
 
     @Override
     public int compareTo(Coordinate o) {
-      int result = column - o.column;
-      if (result == 0) {
-        result = row - o.row;
-      } else
-        return result;
-      return result == 0 ? rank - o.rank : result;
+      final int result = column - o.column;
+      return (result == 0 ? row - o.row : result);
     }
 
     @Override
     public String toString() {
-      return "(" + row + "," + column + "," + rank + ")";
+      return "(" + row + "," + column + ")";
     }
   }
 
@@ -384,7 +342,7 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
       add(first);
       Coordinate newCoordinate = first;
       while (!newCoordinate.equals(last)) {
-        newCoordinate = new Coordinate(newCoordinate.getRow() + 1, newCoordinate.getColumn() + 1, newCoordinate.getRank() + 1);
+        newCoordinate = new Coordinate(newCoordinate.getRow() + 1, newCoordinate.getColumn() + 1);
         //        LOG.info("{}", newCoordinate);
         add(newCoordinate);
       }
@@ -549,24 +507,6 @@ public class MatchMatrix implements Iterable<MatchMatrix.Coordinate> {
     public String toString() {
       return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
       //      return Iterables.toString(islandCoordinates);
-    }
-  }
-
-  public static class MatchMatrixCell {
-    boolean on = false;
-    int rank = 0;
-
-    public MatchMatrixCell(int rank, boolean on) {
-      this.rank = rank;
-      this.on = on;
-    }
-
-    public boolean isOn() {
-      return on;
-    }
-
-    public int getRank() {
-      return rank;
     }
   }
 }
