@@ -309,8 +309,8 @@ public class ArchipelagoWithVersions extends Archipelago {
     ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
     int rowNum = rowLabels.size();
     int colNum = columnLabels.size();
-    list.add(new MatchMatrix.Coordinate(0, 0));
-    list.add(new MatchMatrix.Coordinate(rowNum - 1, colNum - 1));
+    list.add(new MatchMatrix.Coordinate(0, 0, 0));
+    list.add(new MatchMatrix.Coordinate(rowNum - 1, colNum - 1, 0));
     //    System.out.println("1");
     Archipelago createFirstVersion = createNonConflictingVersion();
     System.out.println("2");
@@ -362,7 +362,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     //    String res = "";
     /* inspecteer inhoud gaps */
     teller = 0;
-    MatchMatrix.Coordinate vorige = new MatchMatrix.Coordinate(0, 0);
+    MatchMatrix.Coordinate vorige = new MatchMatrix.Coordinate(0, 0, 0);
     for (MatchMatrix.Coordinate c : gaps) {
       teller++;
       if (teller % 2 == 0) {

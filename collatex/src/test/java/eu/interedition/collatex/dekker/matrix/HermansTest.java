@@ -1,7 +1,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,13 +14,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
@@ -189,75 +185,75 @@ public class HermansTest extends AbstractTest {
     testWitnessCollation(witnesses);
   }
 
-  @Ignore
-  @Test
-  public void testHermansText2aWithMocking() throws XMLStreamException {
-    String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
-    String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
-    SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
-
-    VariantGraph base = collate(witnesses[0]);
-    MatchMatrix matrix = MatchMatrix.create(base, witnesses[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions creator = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island island : matrix.getIslands()) {
-      creator.add(island);
-    }
-
-    //Mock Archipelago
-    Archipelago result = mock(Archipelago.class);
-    Island i1 = new Island(new Coordinate(3, 3), new Coordinate(5, 5));
-    Island i2 = new Island(new Coordinate(3, 20), new Coordinate(5, 22));
-    Island i3 = new Island(new Coordinate(20, 3), new Coordinate(22, 5));
-    Island i4 = new Island(new Coordinate(20, 20), new Coordinate(22, 22));
-    Island i5 = new Island(new Coordinate(69, 66), new Coordinate(71, 68));
-    Island i6 = new Island(new Coordinate(25, 25), new Coordinate(26, 26));
-    Island i7 = new Island(new Coordinate(73, 70), new Coordinate(74, 71));
-    Island i8 = new Island(new Coordinate(0, 17), new Coordinate(0, 17));
-    Island i9 = new Island(new Coordinate(17, 17), new Coordinate(17, 17));
-    when(result.islandsCompete(i1, i2)).thenReturn(true);
-    when(result.islandsCompete(i1, i3)).thenReturn(true);
-    when(result.islandsCompete(i1, i4)).thenReturn(false);
-    when(result.islandsCompete(i1, i5)).thenReturn(false);
-    when(result.islandsCompete(i2, i3)).thenReturn(false);
-    when(result.islandsCompete(i2, i4)).thenReturn(true);
-    when(result.islandsCompete(i2, i5)).thenReturn(false);
-    when(result.islandsCompete(i3, i4)).thenReturn(true);
-    when(result.islandsCompete(i3, i5)).thenReturn(false);
-    when(result.islandsCompete(i4, i5)).thenReturn(false);
-    when(result.islandsCompete(i6, i7)).thenReturn(false);
-    when(result.islandsCompete(i8, i9)).thenReturn(true);
-    when(result.findClosestIsland(i2, i4)).thenReturn(i4);
-    when(result.findClosestIsland(i3, i4)).thenReturn(i4);
-    when(result.findClosestIsland(i1, i2)).thenReturn(i1);
-    when(result.findClosestIsland(i1, i3)).thenReturn(i1);
-    when(result.findClosestIsland(i5, i6)).thenReturn(i1);
-
-    creator.createNonConflictingVersion(result);
-    verify(result).add(new Island(new Coordinate(40, 39), new Coordinate(58, 57)));
-    verify(result).add(new Island(new Coordinate(8, 8), new Coordinate(15, 15)));
-    verify(result).add(new Island(new Coordinate(30, 31), new Coordinate(36, 37)));
-    verify(result).add(new Island(new Coordinate(62, 59), new Coordinate(67, 64)));
-    verify(result).add(new Island(new Coordinate(77, 74), new Coordinate(80, 77)));
-    verify(result).islandsCompete(i1, i2);
-    verify(result).islandsCompete(i1, i3);
-    verify(result).islandsCompete(i1, i4);
-    verify(result).islandsCompete(i1, i5);
-    verify(result).islandsCompete(i2, i3);
-    verify(result).islandsCompete(i2, i4);
-    verify(result).islandsCompete(i2, i5);
-    verify(result).islandsCompete(i3, i4);
-    verify(result).islandsCompete(i3, i5);
-    verify(result).islandsCompete(i4, i5);
-    verify(result).add(i5);
-    verify(result).add(i1);
-    verify(result).add(i4);
-    verify(result).islandsCompete(i6, i7);
-    verify(result).add(i6);
-    verify(result).add(i7);
-    verify(result).islandsCompete(i8, i9);
-    verifyNoMoreInteractions(result);
-  }
-
+  //  @Ignore
+  //  @Test
+  //  public void testHermansText2aWithMocking() throws XMLStreamException {
+  //    String textD1 = "Op den Atlantischen Oceaan voer een groote stoomer, de lucht was helder blauw, het water rimpelend satijn. Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i> JSg </i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. <b> De </b> pantalon werd naar boven toe breed, ontzaggelijk breed; hij omsloot den buik van den kleinen man als een soort balcon.";
+  //    String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
+  //    SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
+  //
+  //    VariantGraph base = collate(witnesses[0]);
+  //    MatchMatrix matrix = MatchMatrix.create(base, witnesses[1], new EqualityTokenComparator());
+  //    ArchipelagoWithVersions creator = new ArchipelagoWithVersions();
+  //    for (MatchMatrix.Island island : matrix.getIslands()) {
+  //      creator.add(island);
+  //    }
+  //
+  //    //Mock Archipelago
+  //    Archipelago result = mock(Archipelago.class);
+  //    Island i1 = new Island(new Coordinate(3, 3), new Coordinate(5, 5));
+  //    Island i2 = new Island(new Coordinate(3, 20), new Coordinate(5, 22));
+  //    Island i3 = new Island(new Coordinate(20, 3), new Coordinate(22, 5));
+  //    Island i4 = new Island(new Coordinate(20, 20), new Coordinate(22, 22));
+  //    Island i5 = new Island(new Coordinate(69, 66), new Coordinate(71, 68));
+  //    Island i6 = new Island(new Coordinate(25, 25), new Coordinate(26, 26));
+  //    Island i7 = new Island(new Coordinate(73, 70), new Coordinate(74, 71));
+  //    Island i8 = new Island(new Coordinate(0, 17), new Coordinate(0, 17));
+  //    Island i9 = new Island(new Coordinate(17, 17), new Coordinate(17, 17));
+  //    when(result.islandsCompete(i1, i2)).thenReturn(true);
+  //    when(result.islandsCompete(i1, i3)).thenReturn(true);
+  //    when(result.islandsCompete(i1, i4)).thenReturn(false);
+  //    when(result.islandsCompete(i1, i5)).thenReturn(false);
+  //    when(result.islandsCompete(i2, i3)).thenReturn(false);
+  //    when(result.islandsCompete(i2, i4)).thenReturn(true);
+  //    when(result.islandsCompete(i2, i5)).thenReturn(false);
+  //    when(result.islandsCompete(i3, i4)).thenReturn(true);
+  //    when(result.islandsCompete(i3, i5)).thenReturn(false);
+  //    when(result.islandsCompete(i4, i5)).thenReturn(false);
+  //    when(result.islandsCompete(i6, i7)).thenReturn(false);
+  //    when(result.islandsCompete(i8, i9)).thenReturn(true);
+  //    when(result.findClosestIsland(i2, i4)).thenReturn(i4);
+  //    when(result.findClosestIsland(i3, i4)).thenReturn(i4);
+  //    when(result.findClosestIsland(i1, i2)).thenReturn(i1);
+  //    when(result.findClosestIsland(i1, i3)).thenReturn(i1);
+  //    when(result.findClosestIsland(i5, i6)).thenReturn(i1);
+  //
+  //    creator.createNonConflictingVersion(result);
+  //    verify(result).add(new Island(new Coordinate(40, 39), new Coordinate(58, 57)));
+  //    verify(result).add(new Island(new Coordinate(8, 8), new Coordinate(15, 15)));
+  //    verify(result).add(new Island(new Coordinate(30, 31), new Coordinate(36, 37)));
+  //    verify(result).add(new Island(new Coordinate(62, 59), new Coordinate(67, 64)));
+  //    verify(result).add(new Island(new Coordinate(77, 74), new Coordinate(80, 77)));
+  //    verify(result).islandsCompete(i1, i2);
+  //    verify(result).islandsCompete(i1, i3);
+  //    verify(result).islandsCompete(i1, i4);
+  //    verify(result).islandsCompete(i1, i5);
+  //    verify(result).islandsCompete(i2, i3);
+  //    verify(result).islandsCompete(i2, i4);
+  //    verify(result).islandsCompete(i2, i5);
+  //    verify(result).islandsCompete(i3, i4);
+  //    verify(result).islandsCompete(i3, i5);
+  //    verify(result).islandsCompete(i4, i5);
+  //    verify(result).add(i5);
+  //    verify(result).add(i1);
+  //    verify(result).add(i4);
+  //    verify(result).islandsCompete(i6, i7);
+  //    verify(result).add(i6);
+  //    verify(result).add(i7);
+  //    verify(result).islandsCompete(i8, i9);
+  //    verifyNoMoreInteractions(result);
+  //  }
+  //
   private void testWitnessCollation(SimpleWitness[] sw) throws XMLStreamException, FactoryConfigurationError {
     VariantGraph vg = collate(sw);
     String teiMM = generateTEI(vg);
