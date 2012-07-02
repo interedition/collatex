@@ -247,10 +247,15 @@ public class CollateXLaboratory extends JFrame {
         final EqualityTokenComparator comparator = new EqualityTokenComparator();
         final VariantGraph vg = graphFactory.newVariantGraph();
 
-        CollationAlgorithmFactory.dekker(comparator).collate(vg, w.get(0));
-        final SimpleWitness witness = w.get(1);
+        for (int i =0; i <= w.size()-2; i++) {
+          SimpleWitness witness = w.get(i);
+	  LOG.debug("Collating: {}", witness.getSigil());
+          CollationAlgorithmFactory.dekkerMatchMatrix(comparator).collate(vg, witness);
+        }
 
-        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, witness, comparator), vg, witness));
+        SimpleWitness lastWitness = w.get(w.size()-1);
+	LOG.debug("Creating MatchTable for: {}", lastWitness.getSigil());
+        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator), vg, lastWitness));
 
         final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
         columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());
