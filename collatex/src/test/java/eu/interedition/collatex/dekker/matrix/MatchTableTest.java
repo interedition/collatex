@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchTableTest extends AbstractTest {
@@ -45,6 +46,24 @@ public class MatchTableTest extends AbstractTest {
     assertVertexEquals("c", table.at(0, 2));
     assertVertexEquals("a", table.at(1, 3));
     assertVertexEquals("b", table.at(2, 4));
+  }
+  
+  @Test
+  public void testTableCreationAbcabAbcab() {
+    SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
+    VariantGraph vg = collate(sw[0]);
+    MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    assertEquals(5, table.columnList().size());
+    assertEquals(5, table.rowList().size());
+    assertVertexEquals("a", table.at(0, 0));
+    assertVertexEquals("a", table.at(0, 3));
+    assertVertexEquals("b", table.at(1, 1));
+    assertVertexEquals("b", table.at(1, 4));
+    assertVertexEquals("c", table.at(2, 2));
+    assertVertexEquals("a", table.at(3, 0));
+    assertVertexEquals("a", table.at(3, 3));
+    assertVertexEquals("b", table.at(4, 1));
+    assertVertexEquals("b", table.at(4, 4));
   }
 
   @Test

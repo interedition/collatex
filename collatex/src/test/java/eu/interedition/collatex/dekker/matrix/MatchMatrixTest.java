@@ -24,25 +24,6 @@ public class MatchMatrixTest extends AbstractTest {
   String newLine = System.getProperty("line.separator");
 
   @Test
-  public void testBuildMatrix() {
-    SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
-    VariantGraph vg = collate(sw[0]);
-    MatchMatrix buildMatrix = MatchMatrix.create(vg, sw[1], new EqualityTokenComparator());
-    assertEquals(5, buildMatrix.colNum());
-    assertEquals(5, buildMatrix.rowNum());
-    assertTrue(buildMatrix.at(0, 0));
-    assertTrue(buildMatrix.at(1, 1));
-    assertTrue(buildMatrix.at(1, 4));
-    assertTrue(buildMatrix.at(2, 2));
-    assertTrue(buildMatrix.at(0, 3));
-    assertTrue(buildMatrix.at(3, 0));
-    assertTrue(buildMatrix.at(3, 3));
-    assertTrue(buildMatrix.at(4, 1));
-    assertTrue(buildMatrix.at(4, 4));
-    //  	System.out.println(buildMatrix.toHtml());
-  }
-
-  @Test
   public void testAsymmatricMatrix() {
     SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
     VariantGraph vg = collate(sw[0]);
