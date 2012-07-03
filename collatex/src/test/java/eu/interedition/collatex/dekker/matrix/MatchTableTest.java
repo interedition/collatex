@@ -1,6 +1,8 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -107,6 +109,17 @@ public class MatchTableTest extends AbstractTest {
     assertEquals((Integer)0, labels.get(0));
     assertEquals((Integer)1, labels.get(1));
     assertEquals((Integer)2, labels.get(2));
+  }
+
+  @Test
+  public void testGetAllMatches() {
+    SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
+    VariantGraph vg = collate(sw[0]);
+    MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    List<Coordinate> allTrue = table.allMatches();
+    assertEquals(9, allTrue.size());
+    assertTrue(allTrue.contains(new Coordinate(0, 0)));
+    assertFalse(allTrue.contains(new Coordinate(0, 1)));
   }
 
 

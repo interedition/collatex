@@ -23,18 +23,6 @@ public class MatchMatrixTest extends AbstractTest {
 
   String newLine = System.getProperty("line.separator");
 
-
-  @Test
-  public void testAllTrues() {
-    SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
-    VariantGraph vg = collate(sw[0]);
-    MatchMatrix buildMatrix = MatchMatrix.create(vg, sw[1], new EqualityTokenComparator());
-    ArrayList<Coordinate> allTrue = buildMatrix.allMatches();
-    assertEquals(9, allTrue.size());
-    assertTrue(allTrue.contains(new Coordinate(0, 0)));
-    assertFalse(allTrue.contains(new Coordinate(0, 1)));
-  }
-
   @Test
   public void testCoordinates() {
     Coordinate a = new Coordinate(0, 0);

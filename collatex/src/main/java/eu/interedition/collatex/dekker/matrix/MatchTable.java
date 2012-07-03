@@ -140,7 +140,7 @@ public class MatchTable {
   // might be simpler to work from the cellSet
   // problem there is that a token does not have to have a position
   // but a Cell Object might have one?
-  private List<Coordinate> allMatches() {
+  List<Coordinate> allMatches() {
     List<Coordinate> pairs = Lists.newArrayList();
     int rows = table.rowKeySet().size();
     int cols = table.columnKeySet().size();
