@@ -64,7 +64,7 @@ public class MatchTable {
   private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {
     graph.rank();
     // -3 === ignore the start and the end vertex
-    Range<Integer> range = Ranges.closed(0, Iterables.size(graph.vertices())-3);
+    Range<Integer> range = Ranges.closed(0, Math.max(0, Iterables.size(graph.vertices())-3));
     ImmutableList<Integer> set = range.asSet(DiscreteDomains.integers()).asList();
     return new MatchTable(witness, set);
   }

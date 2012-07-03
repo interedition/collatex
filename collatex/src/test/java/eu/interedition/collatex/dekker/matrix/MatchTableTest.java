@@ -29,6 +29,15 @@ public class MatchTableTest extends AbstractTest {
     assertEquals(rightColumn, rightEnd.getColumn());
   }
 
+  
+  @Test
+  public void testTableCreationEmptyGraph() {
+    final VariantGraph graph = graphFactory.newVariantGraph();
+    SimpleWitness[] witnesses = createWitnesses("a b");
+    MatchTable table = MatchTable.create(graph, witnesses[0]);
+    assertEquals(1, table.columnList().size());
+  }
+  
   @Test
   public void testTableCreationAbAcAbc() {
     SimpleWitness[] witnesses = createWitnesses("a b", "a c", "a b c");
