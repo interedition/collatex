@@ -24,14 +24,6 @@ public class MatchMatrixTest extends AbstractTest {
   String newLine = System.getProperty("line.separator");
 
   @Test
-  public void testAsymmatricMatrix() {
-    SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
-    VariantGraph vg = collate(sw[0]);
-    MatchMatrix buildMatrix = MatchMatrix.create(vg, sw[1], new EqualityTokenComparator());
-    assertTrue(buildMatrix.at(4, 2));
-  }
-
-  @Test
   public void testRowLabels() {
     String textD1 = "de het een";
     String textD9 = "het een de";

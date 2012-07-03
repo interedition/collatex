@@ -1,6 +1,7 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -64,6 +65,22 @@ public class MatchTableTest extends AbstractTest {
     assertVertexEquals("a", table.at(3, 3));
     assertVertexEquals("b", table.at(4, 1));
     assertVertexEquals("b", table.at(4, 4));
+  }
+
+  @Test
+  public void testTableCreationAsymmatricMatrix() {
+    SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
+    VariantGraph vg = collate(sw[0]);
+    MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    assertVertexEquals("a", table.at(0, 0));
+    assertVertexEquals("a", table.at(0, 2));
+    assertVertexEquals("b", table.at(1, 1));
+    assertVertexEquals("b", table.at(1, 3));
+    assertVertexEquals("c", table.at(2, 4));
+    assertVertexEquals("a", table.at(3, 0));
+    assertVertexEquals("a", table.at(3, 2));
+    assertVertexEquals("b", table.at(4, 1));
+    assertVertexEquals("b", table.at(4, 3));
   }
 
   @Test
