@@ -1,7 +1,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +10,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -82,6 +82,33 @@ public class MatchTableTest extends AbstractTest {
     assertVertexEquals("b", table.at(4, 1));
     assertVertexEquals("b", table.at(4, 3));
   }
+  
+  @Test
+  public void testRowLabels() {
+    String textD1 = "de het een";
+    String textD9 = "het een de";
+    SimpleWitness[] sw = createWitnesses(textD1, textD9);
+    VariantGraph vg = collate(sw[0]);
+    MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    List<Token> labels = table.rowList();
+    assertTokenEquals("het", labels.get(0));
+    assertTokenEquals("een", labels.get(1));
+    assertTokenEquals("de", labels.get(2));
+  }
+
+  @Test
+  public void testColumnLabels() {
+    String textD1 = "de het een";
+    String textD9 = "het een de";
+    SimpleWitness[] sw = createWitnesses(textD1, textD9);
+    VariantGraph vg = collate(sw[0]);
+    MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    List<Integer> labels = table.columnList();
+    assertEquals((Integer)0, labels.get(0));
+    assertEquals((Integer)1, labels.get(1));
+    assertEquals((Integer)2, labels.get(2));
+  }
+
 
   @Test
   public void testIslandDetectionAbcabCab() {

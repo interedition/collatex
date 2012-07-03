@@ -131,6 +131,10 @@ public abstract class AbstractTest {
     assertEquals(expected, ((SimpleToken) Iterables.getFirst(vertex.tokens(), null)).getNormalized());
   }
 
+  protected static void assertTokenEquals(String expected, Token token) {
+    assertEquals(expected, ((SimpleToken) token).getContent());
+  }
+
   protected static void assertVertexHasContent(VariantGraphVertex vertex, String content, Witness in) {
     Assert.assertEquals(String.format("%s does not has expected content for %s", vertex, in), content, toString(vertex, in));
   }
